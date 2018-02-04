@@ -77,7 +77,7 @@ called ``asgi.py`` and put this in it::
     import django
     from channels.routing import get_default_application
 
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_test.settings")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "myproject.settings")
     django.setup()
     application = get_default_application()
 
