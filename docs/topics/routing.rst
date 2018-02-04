@@ -101,6 +101,10 @@ a single argument, a list of Django URL objects (either ``path()`` or ``url()``)
         url("^$", AsgiHandler),
     ])
 
+Any captured groups will be provided in ``scope`` as the key ``url_route``, a
+dict with an ``args`` key containing a list of positional regex groups and a
+``kwargs`` key with a dict of the named regex groups.
+
 
 ChannelNameRouter
 -----------------
