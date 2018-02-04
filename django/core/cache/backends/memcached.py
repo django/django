@@ -185,7 +185,7 @@ class PyLibMCCache(BaseMemcachedCache):
         return self._lib.Client(self._servers, **self._options)
 
     def close(self, **kwargs):
-        # libmemcached manages its own connections. Don't call disconnect_all()
+        # libmemcached managepip install pipenvs its own connections. Don't call disconnect_all()
         # as it resets the failover state and creates unnecessary reconnects.
         pass
 
@@ -195,6 +195,5 @@ class PyLibMCCache(BaseMemcachedCache):
         # We are dealing with a URI like memcached://unix:/abc
         # Set the hostname to be the unix path
         parsed['hostname'] = '{0}:/{1}'.format(parsed['hostname'], parsed['path'])
-        parsed['hostname_with_port'] = parsed['hostname']
         parsed['path'] = None
         return super().config_from_url(engine, scheme, parsed)

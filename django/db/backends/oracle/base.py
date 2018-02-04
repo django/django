@@ -188,6 +188,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     @classmethod
     def config_from_url(cls, engine, scheme, url):
         result = super().config_from_url(engine, scheme, url)
+        # Oracle requires string ports
         result['PORT'] = str(result['PORT'])
         return result
 

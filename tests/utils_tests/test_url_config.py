@@ -265,9 +265,9 @@ class TestParseURL(unittest.TestCase):
         parsed = parse_url('http://CaseSensitive')
         self.assertEqual(parsed['hostname'], 'CaseSensitive')
 
-    def test_netloc_sensitivity(self):
+    def test_port_is_an_integer(self):
         parsed = parse_url('http://CaseSensitive:123')
-        self.assertEqual(parsed['hostname_with_port'], 'CaseSensitive:123')
+        self.assertIsInstance(parsed['port'], int)
 
     def test_path_strips_leading_slash(self):
         parsed = parse_url('http://test/abc')

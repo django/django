@@ -1,6 +1,7 @@
 import inspect
-from collections import defaultdict, namedtuple
+from collections import defaultdict
 from urllib import parse
+
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import module_loading
 
@@ -36,9 +37,7 @@ def parse_url(url):
         options[key] = value
 
     path = parsed.path[1:]
-    hostname_with_port = hostname
     if port:
-        hostname_with_port = '{0}:{1}'.format(hostname, port)
         port = int(port)
 
     return {
@@ -46,7 +45,6 @@ def parse_url(url):
         'username': parsed.username,
         'password': parsed.password,
         'hostname': hostname,
-        'hostname_with_port': hostname_with_port,
         'port': port,
         'path': path,
         'options': options

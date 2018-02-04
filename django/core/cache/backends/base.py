@@ -283,7 +283,9 @@ class BaseCache:
             'BACKEND': engine
         }
         if result['hostname']:
-            returner['LOCATION'] = result['hostname_with_port']
+            returner['LOCATION'] = result['hostname']
+            if result['port']:
+                returner['LOCATION'] += ':%s' % result['port']
 
         for key in ('timeout', 'key_prefix', 'version'):
             if key in result['options']:

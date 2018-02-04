@@ -128,6 +128,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @classmethod
     def config_from_url(cls, engine, scheme, url):
+        # These special URLs cannot be parsed correctly.
         if url in ('sqlite://:memory:', 'sqlite://'):
             return {
                 'ENGINE': engine,

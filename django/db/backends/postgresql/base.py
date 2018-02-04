@@ -147,12 +147,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     @classmethod
     def config_from_url(cls, engine, scheme, url):
         parsed = parse_url(url)
-        host = parsed.hostname
+        host = parsed['hostname']
 
         # Handle postgres percent-encoded paths.
         if '%2f' in host.lower():
-            host = parse.unquote(host)
-            parsed = parsed._replace(hostname=host)
+            parsed['hostname'] = parse.unquote(host)
 
         result = super().config_from_url(engine, scheme, parsed)
 
