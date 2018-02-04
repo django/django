@@ -4,9 +4,9 @@ import pickle
 import re
 import time
 
+from django.conf.service_url import parse_url
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 from django.utils.functional import cached_property
-from django.utils.url_config import parse_url
 
 
 class BaseMemcachedCache(BaseCache):

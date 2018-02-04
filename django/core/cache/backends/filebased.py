@@ -8,9 +8,9 @@ import tempfile
 import time
 import zlib
 
+from django.conf.service_url import parse_url
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 from django.core.files.move import file_move_safe
-from django.utils.url_config import parse_url
 
 
 class FileBasedCache(BaseCache):

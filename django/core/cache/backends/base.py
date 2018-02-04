@@ -2,9 +2,9 @@
 import time
 import warnings
 
+from django.conf.service_url import parse_url
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_string
-from django.utils.url_config import parse_url
 
 
 class InvalidCacheBackendError(ImproperlyConfigured):

@@ -9,13 +9,13 @@ import warnings
 from urllib import parse
 
 from django.conf import settings
+from django.conf.service_url import parse_url
 from django.core.exceptions import ImproperlyConfigured
 from django.db import DEFAULT_DB_ALIAS
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.utils import DatabaseError as WrappedDatabaseError
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeText
-from django.utils.url_config import parse_url
 from django.utils.version import get_version_tuple
 
 try:

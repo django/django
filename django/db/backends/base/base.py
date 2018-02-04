@@ -9,6 +9,7 @@ import _thread
 import pytz
 
 from django.conf import settings
+from django.conf.service_url import parse_url
 from django.core.exceptions import ImproperlyConfigured
 from django.db import DEFAULT_DB_ALIAS
 from django.db.backends import utils
@@ -18,7 +19,6 @@ from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError, DatabaseErrorWrapper
 from django.utils import timezone
 from django.utils.functional import cached_property
-from django.utils.url_config import parse_url
 
 NO_DB_ALIAS = '__no_db__'
 
