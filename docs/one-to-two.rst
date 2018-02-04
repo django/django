@@ -211,6 +211,22 @@ The method names are largely the same, but they're all now awaitables rather
 than synchronous functions, and ``send_group`` is now ``group_send``.
 
 
+Group objects
+~~~~~~~~~~~~~
+
+Group objects no longer exist; instead you should use the ``group_add``,
+``group_discard``, and ``group_send`` methods on the ``self.channel_layer``
+object inside of a consumer directly. As an example::
+
+    class ChatConsumer(AsyncWebsocketConsumer):
+
+        async def connect(self):
+            AsyncToSync(self.channel_layer.group_add)("chat", self.channel_name)
+
+        def disconnect(self):
+            AsyncToSync(self.channel_layer.group_discard)("chat", self.channel_name)
+
+
 Delay server
 ~~~~~~~~~~~~
 

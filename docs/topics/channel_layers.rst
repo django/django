@@ -166,3 +166,30 @@ the code above::
 
         def chat_message(self, event):
             self.send(text_data=event["text"])
+
+
+Using Outside Of Consumers
+--------------------------
+
+You'll often want to send to the channel layer from outside of the scope of
+a consumer, and so you won't have ``self.channel_layer``. In this case, you
+should use the ``get_channel_layer`` function to retrieve it::
+
+    from channels.layers import get_channel_layer
+    channel_layer = get_channel_layer()
+
+Then, once you have it, you can just call methods on it. Remember that
+**channel layers only support async methods**, so you can either call it
+from your own asynchronous context::
+
+    for chat_name in chats:
+        await channel_layer.group_send(
+            chat_name,
+            {"type": "chat.system_message", "text": announcement_text},
+        )
+
+Or you'll need to use AsyncToSync::
+
+    from asgiref.sync import AsyncToSync
+
+    AsyncToSync(channel_layer.group_send)("chat", {"type": "chat.force_disconnect")
