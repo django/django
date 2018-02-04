@@ -16,17 +16,14 @@ def parse_url(url):
     # This method may be called with an already parsed URL
     if isinstance(url, dict):
         return url
-
     parsed = parse.urlparse(url)
-
     # parsed.hostname always returns a lower-cased hostname
     # this isn't correct if hostname is a file path, so use '_hostinfo'
     # to get the actual host
     hostname, port = parsed._hostinfo
-
     query = parse.parse_qs(parsed.query)
-
     options = {}
+
     for key, values in query.items():
         value = values[-1]
         if value.isdigit():
@@ -39,10 +36,10 @@ def parse_url(url):
         options[key] = value
 
     path = parsed.path[1:]
-
     hostname_with_port = hostname
     if port:
         hostname_with_port = '{0}:{1}'.format(hostname, port)
+        port = int(port)
 
     return {
         'scheme': parsed.scheme,
