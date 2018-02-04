@@ -3,8 +3,8 @@
 
 import unittest
 
-from django.db import connection
 from django.conf.service_url import configure_cache, configure_db, parse_url
+from django.db import connection
 
 GENERIC_TESTS = [
     (
