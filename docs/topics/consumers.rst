@@ -139,13 +139,43 @@ just deals with text and binary frames::
             # Or add a custom WebSocket error code!
             self.close(code=4123)
 
-        def disconnect(self):
+        def disconnect(self, close_code):
             # Called when the socket closes
 
 You can also raise ``channels.exceptions.AcceptConnection`` or
 ``channels.exceptions.DenyConnection`` from anywhere inside the ``connect``
 method in order to accept or reject a connection, if you want reuseable
 authentication or rate-limiting code that doesn't need to use mixins.
+
+
+AsyncWebsocketConsumer
+~~~~~~~~~~~~~~~~~~~~~~
+
+Available as ``channels.generic.websocket.AsyncWebsocketConsumer``, this has
+the exact same methods and signature as ``WebsocketConsumer`` but everything
+is async, and the functions you need to write have to be as well::
+
+    class MyConsumer(AsyncWebsocketConsumer):
+
+        async def connect(self):
+            # Called on connection. Either call
+            await self.accept()
+            # Or to reject the connection, call
+            await self.close()
+
+        async def receive(self, text_data=None, bytes_data=None):
+            # Called with either text_data or bytes_data for each frame
+            # You can call:
+            await self.send(text_data="Hello world!")
+            # Or, to send a binary frame:
+            await self.send(bytes_data="Hello world!")
+            # Want to force-close the connection? Call:
+            await self.close()
+            # Or add a custom WebSocket error code!
+            await self.close(code=4123)
+
+        async def disconnect(self, close_code):
+            # Called when the socket closes
 
 
 JsonWebsocketConsumer
@@ -165,3 +195,11 @@ The only API differences are:
 
 If you want to customise the JSON encoding and decoding, you can override
 the ``encode_json`` and ``decode_json`` classmethods.
+
+
+AsyncJsonWebsocketConsumer
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An async version of ``JsonWebsocketConsumer``, available as
+``channels.generic.websocket.AsyncJsonWebsocketConsumer``. Note that even
+``encode_json`` and ``decode_json`` are async functions.

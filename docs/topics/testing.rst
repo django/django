@@ -73,6 +73,18 @@ To receive an event, call ``receive_output``::
     event = communicator.receive_output(timeout=1)
     assert event["type"] == "http.response.start"
 
+To wait for an application to exit (you'll need to either do this or wait for
+it to send you output before you can see what it did using mocks or inspection),
+use ``wait``::
+
+    communicator.wait(timeout=1)
+
+If you're expecting your application to raise an exception, use ``pytest.raises``
+around ``wait``:
+
+    with pytest.raises(ValueError):
+        communicator.wait()
+
 You should only need this generic class for non-HTTP/WebSocket tests, though
 you might need to fall back to it if you are testing things like HTTP chunked
 responses or long-polling, which aren't supported in ``HttpCommunicator`` yet.

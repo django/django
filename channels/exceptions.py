@@ -48,3 +48,10 @@ class MessageTooLarge(Exception):
     Raised when a message cannot be sent as it's too big.
     """
     pass
+
+
+class StopConsumer(Exception):
+    """
+    Raised when a consumer wants to stop and close down its application instance.
+    """
+    pass

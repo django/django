@@ -97,3 +97,4 @@ class WebsocketCommunicator(ApplicationCommunicator):
             "type": "websocket.disconnect",
             "code": code,
         })
+        await self.future

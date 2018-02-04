@@ -1,7 +1,7 @@
 import json
 
-from ..consumer import SyncConsumer
-from ..exceptions import AcceptConnection, DenyConnection
+from ..consumer import AsyncConsumer, SyncConsumer
+from ..exceptions import AcceptConnection, DenyConnection, StopConsumer
 
 
 class WebsocketConsumer(SyncConsumer):
@@ -29,7 +29,7 @@ class WebsocketConsumer(SyncConsumer):
         """
         Accepts an incoming socket
         """
-        super(WebsocketConsumer, self).send({"type": "websocket.accept"})
+        super().send({"type": "websocket.accept"})
 
     def websocket_receive(self, message):
         """
@@ -52,11 +52,11 @@ class WebsocketConsumer(SyncConsumer):
         Sends a reply back down the WebSocket
         """
         if text_data is not None:
-            super(WebsocketConsumer, self).send(
+            super().send(
                 {"type": "websocket.send", "text": text_data},
             )
         elif bytes_data is not None:
-            super(WebsocketConsumer, self).send(
+            super().send(
                 {"type": "websocket.send", "bytes": bytes_data},
             )
         else:
@@ -69,11 +69,11 @@ class WebsocketConsumer(SyncConsumer):
         Closes the WebSocket from the server end
         """
         if code is not None and code is not True:
-            super(WebsocketConsumer, self).send(
+            super().send(
                 {"type": "websocket.close", "code": code}
             )
         else:
-            super(WebsocketConsumer, self).send(
+            super().send(
                 {"type": "websocket.close"}
             )
 
@@ -83,9 +83,10 @@ class WebsocketConsumer(SyncConsumer):
         need to call super() all the time.
         """
         # TODO: group leaving
-        self.disconnect(message)
+        self.disconnect(message["code"])
+        raise StopConsumer()
 
-    def disconnect(self, message):
+    def disconnect(self, code):
         """
         Called when a WebSocket connection is closed.
         """
@@ -115,7 +116,7 @@ class JsonWebsocketConsumer(WebsocketConsumer):
         """
         Encode the given content as JSON and send it to the client.
         """
-        super(JsonWebsocketConsumer, self).send(
+        super().send(
             text_data=self.encode_json(content),
             close=close,
         )
@@ -126,4 +127,130 @@ class JsonWebsocketConsumer(WebsocketConsumer):
 
     @classmethod
     def encode_json(cls, content):
+        return json.dumps(content)
+
+
+class AsyncWebsocketConsumer(AsyncConsumer):
+    """
+    Base WebSocket consumer, async version. Provides a general encapsulation
+    for the WebSocket handling model that other applications can build on.
+    """
+
+    async def websocket_connect(self, message):
+        """
+        Called when a WebSocket connection is opened.
+        """
+        # TODO: group joining
+        try:
+            await self.connect()
+        except AcceptConnection:
+            await self.accept()
+        except DenyConnection:
+            await self.close()
+
+    async def connect(self):
+        await self.accept()
+
+    async def accept(self):
+        """
+        Accepts an incoming socket
+        """
+        await super().send({"type": "websocket.accept"})
+
+    async def websocket_receive(self, message):
+        """
+        Called when a WebSocket frame is received. Decodes it and passes it
+        to receive().
+        """
+        if "text" in message:
+            await self.receive(text_data=message["text"])
+        else:
+            await self.receive(bytes_data=message["bytes"])
+
+    async def receive(self, text_data=None, bytes_data=None):
+        """
+        Called with a decoded WebSocket frame.
+        """
+        pass
+
+    async def send(self, text_data=None, bytes_data=None, close=False):
+        """
+        Sends a reply back down the WebSocket
+        """
+        if text_data is not None:
+            await super().send(
+                {"type": "websocket.send", "text": text_data},
+            )
+        elif bytes_data is not None:
+            await super().send(
+                {"type": "websocket.send", "bytes": bytes_data},
+            )
+        else:
+            raise ValueError("You must pass one of bytes_data or text_data")
+        if close:
+            await self.close(close)
+
+    async def close(self, code=None):
+        """
+        Closes the WebSocket from the server end
+        """
+        if code is not None and code is not True:
+            await super().send(
+                {"type": "websocket.close", "code": code}
+            )
+        else:
+            await super().send(
+                {"type": "websocket.close"}
+            )
+
+    async def websocket_disconnect(self, message):
+        """
+        Called when a WebSocket connection is closed. Base level so you don't
+        need to call super() all the time.
+        """
+        # TODO: group leaving
+        await self.disconnect(message["code"])
+        raise StopConsumer()
+
+    async def disconnect(self, code):
+        """
+        Called when a WebSocket connection is closed.
+        """
+        pass
+
+
+class AsyncJsonWebsocketConsumer(AsyncWebsocketConsumer):
+    """
+    Variant of AsyncWebsocketConsumer that automatically JSON-encodes and decodes
+    messages as they come in and go out. Expects everything to be text; will
+    error on binary data.
+    """
+
+    async def receive(self, text_data=None, bytes_data=None, **kwargs):
+        if text_data:
+            await self.receive_json(await self.decode_json(text_data), **kwargs)
+        else:
+            raise ValueError("No text section for incoming WebSocket frame!")
+
+    async def receive_json(self, content, **kwargs):
+        """
+        Called with decoded JSON content.
+        """
+        pass
+
+    async def send_json(self, content, close=False):
+        """
+        Encode the given content as JSON and send it to the client.
+        """
+        await super().send(
+            text_data=await self.encode_json(content),
+            close=close,
+        )
+
+    @classmethod
+    async def decode_json(cls, text_data):
+        return json.loads(text_data)
+
+    @classmethod
+    async def encode_json(cls, content):
         return json.dumps(content)

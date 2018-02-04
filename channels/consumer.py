@@ -2,6 +2,7 @@ import functools
 
 from asgiref.sync import async_to_sync, sync_to_async
 
+from .exceptions import StopConsumer
 from .layers import get_channel_layer
 from .utils import await_many_dispatch
 
@@ -47,10 +48,14 @@ class AsyncConsumer:
         else:
             self.base_send = send
         # Pass messages in from channel layer or client to dispatch method
-        if self.channel_layer is not None:
-            await await_many_dispatch([receive, self.channel_receive], self.dispatch)
-        else:
-            await await_many_dispatch([receive], self.dispatch)
+        try:
+            if self.channel_layer is not None:
+                await await_many_dispatch([receive, self.channel_receive], self.dispatch)
+            else:
+                await await_many_dispatch([receive], self.dispatch)
+        except StopConsumer:
+            # Exit cleanly
+            pass
 
     async def dispatch(self, message):
         """
