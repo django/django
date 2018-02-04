@@ -263,27 +263,27 @@ class TestCaches(unittest.TestCase):
 class TestParseURL(unittest.TestCase):
     def test_hostname_sensitivity(self):
         parsed = parse_url('http://CaseSensitive')
-        self.assertEqual(parsed.hostname, 'CaseSensitive')
+        self.assertEqual(parsed['hostname'], 'CaseSensitive')
 
     def test_netloc_sensitivity(self):
         parsed = parse_url('http://CaseSensitive:123')
-        self.assertEqual(parsed.netloc, 'CaseSensitive:123')
+        self.assertEqual(parsed['hostname_with_port'], 'CaseSensitive:123')
 
     def test_path_strips_leading_slash(self):
         parsed = parse_url('http://test/abc')
-        self.assertEqual(parsed.path, 'abc')
+        self.assertEqual(parsed['path'], 'abc')
 
     def test_query_parameters_integer(self):
         parsed = parse_url('http://test/?a=1')
-        self.assertDictEqual(parsed.options, {'a': 1})
+        self.assertDictEqual(parsed['options'], {'a': 1})
 
     def test_query_parameters_boolean(self):
         parsed = parse_url('http://test/?a=true&b=false')
-        self.assertDictEqual(parsed.options, {'a': True, 'b': False})
+        self.assertDictEqual(parsed['options'], {'a': True, 'b': False})
 
     def test_query_last_parameter(self):
         parsed = parse_url('http://test/?a=one&a=two')
-        self.assertDictEqual(parsed.options, {'a': 'two'})
+        self.assertDictEqual(parsed['options'], {'a': 'two'})
 
     def test_does_not_reparse(self):
         parsed = parse_url('http://test/abc')

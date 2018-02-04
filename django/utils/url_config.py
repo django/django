@@ -1,22 +1,10 @@
 import inspect
 from collections import defaultdict, namedtuple
 from urllib import parse
-
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import module_loading
 
 BACKENDS = defaultdict(dict)
-
-BaseParsedURL = namedtuple('ParsedURL', 'scheme username password hostname port path options')
-
-
-class ParsedURL(BaseParsedURL):
-    @property
-    def netloc(self):
-        result = self.hostname
-        if self.port:
-            result += ':{0}'.format(self.port)
-        return result
 
 
 def parse_url(url):
@@ -25,12 +13,11 @@ def parse_url(url):
     with the stdlib urlparse, such as lower-cased hostnames.
     Also parses querystrings into typed components.
     """
-    if isinstance(url, ParsedURL):
+    # This method may be called with an already parsed URL
+    if isinstance(url, dict):
         return url
-    elif isinstance(url, parse.ParseResult):
-        parsed = url
-    else:
-        parsed = parse.urlparse(url)
+
+    parsed = parse.urlparse(url)
 
     # parsed.hostname always returns a lower-cased hostname
     # this isn't correct if hostname is a file path, so use '_hostinfo'
@@ -53,15 +40,20 @@ def parse_url(url):
 
     path = parsed.path[1:]
 
-    return ParsedURL(
-        parsed.scheme,
-        parsed.username,
-        parsed.password,
-        hostname,
-        str(port),
-        path,
-        options
-    )
+    hostname_with_port = hostname
+    if port:
+        hostname_with_port = '{0}:{1}'.format(hostname, port)
+
+    return {
+        'scheme': parsed.scheme,
+        'username': parsed.username,
+        'password': parsed.password,
+        'hostname': hostname,
+        'hostname_with_port': hostname_with_port,
+        'port': port,
+        'path': path,
+        'options': options
+    }
 
 
 def _register_backend(backend_type, scheme, path):

@@ -165,11 +165,13 @@ class MemcachedCache(BaseMemcachedCache):
 
     @classmethod
     def config_from_url(cls, engine, scheme, url):
-        result = parse_url(url)
-        if result.path:
+        parsed = parse_url(url)
+        result = super().config_from_url(engine, scheme, parsed)
+
+        if parsed['path']:
             # We are dealing with a URI like memcached:///socket/path
-            result = result._replace(hostname='/{0}'.format(result.path))
-        return super().config_from_url(engine, scheme, result)
+            result['LOCATION'] = '/{0}'.format(parsed['path'])
+        return result
 
 
 class PyLibMCCache(BaseMemcachedCache):
@@ -189,7 +191,10 @@ class PyLibMCCache(BaseMemcachedCache):
 
     @classmethod
     def config_from_url(cls, engine, scheme, url):
-        result = parse_url(url)
+        parsed = parse_url(url)
         # We are dealing with a URI like memcached://unix:/abc
-        result = result._replace(path=None, hostname='{0}:/{1}'.format(result.hostname, result.path))
-        return super().config_from_url(engine, scheme, result)
+        # Set the hostname to be the unix path
+        parsed['hostname'] = '{0}:/{1}'.format(parsed['hostname'], parsed['path'])
+        parsed['hostname_with_port'] = parsed['hostname']
+        parsed['path'] = None
+        return super().config_from_url(engine, scheme, parsed)

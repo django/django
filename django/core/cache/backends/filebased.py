@@ -144,10 +144,15 @@ class FileBasedCache(BaseCache):
 
     @classmethod
     def config_from_url(cls, engine, scheme, url):
-        result = parse_url(url)
-        path = '/' + result.path
-        if result.hostname:
-            path = '{0}:{1}'.format(result.hostname, path)
+        parsed = parse_url(url)
+        result = super().config_from_url(engine, scheme, parsed)
 
-        result = result._replace(hostname=path)
-        return super().config_from_url(engine, scheme, result)
+        path = '/' + parsed['path']
+
+        # On windows a path like C:/a/b is parsed with C as the hostname
+        # and a/b/ as the path. Reconstruct the windows path here.
+        if parsed['hostname']:
+            path = '{0}:{1}'.format(parsed['hostname'], path)
+
+        result['LOCATION'] = path
+        return result

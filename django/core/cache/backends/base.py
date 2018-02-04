@@ -282,13 +282,13 @@ class BaseCache:
         returner = {
             'BACKEND': engine
         }
-        if result.hostname:
-            returner['LOCATION'] = result.netloc
+        if result['hostname']:
+            returner['LOCATION'] = result['hostname_with_port']
 
         for key in ('timeout', 'key_prefix', 'version'):
-            if key in result.options:
-                timeout = result.options.pop(key)
+            if key in result['options']:
+                timeout = result['options'].pop(key)
                 returner[key.upper()] = timeout
 
-        returner['OPTIONS'] = result.options
+        returner['OPTIONS'] = result['options']
         return returner

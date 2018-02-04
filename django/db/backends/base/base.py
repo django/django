@@ -112,12 +112,12 @@ class BaseDatabaseWrapper:
         parsed = parse_url(url)
         result = {
             'ENGINE': engine,
-            'NAME': parse.unquote(parsed.path or ''),
-            'USER': parse.unquote(parsed.username or ''),
-            'PASSWORD': parse.unquote(parsed.password or ''),
-            'HOST': parsed.hostname,
-            'PORT': parsed.port or '',
-            'OPTIONS': parsed.options
+            'NAME': parse.unquote(parsed['path'] or ''),
+            'USER': parse.unquote(parsed['username'] or ''),
+            'PASSWORD': parse.unquote(parsed['password'] or ''),
+            'HOST': parsed['hostname'],
+            'PORT': parsed['port'] or '',
+            'OPTIONS': parsed['options']
         }
 
         return result
