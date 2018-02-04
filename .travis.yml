@@ -20,6 +20,20 @@ install:
 script:
   - pytest
   - flake8
-  - isort --check-only --recursive channels tests
+  - isort --check-only --diff --recursive channels tests
   - unify --check-only --recursive --quote \" channels tests
-#  - cd js_client && npm install --progress=false && npm test && cd ..
+
+jobs:
+  include:
+    - stage: test_js
+      script: cd js_client && npm install --progress=false && npm test && cd ..
+    - stage: release
+      script: skip
+      deploy:
+        provider: pypi
+        user: andrewgodwin_bot
+        on:
+          tags: true
+        distributions: sdist bdist_wheel
+        password:
+          secure: ITuDPvJplU+MnppDaWcl9sqRdKxO4i/d1/QALfjgfnw+nHU3acu/l78LpE7uWQcvNbbIN7hxIM9BF/Sr0ZXMOJ9W2wOwNng7o0WK2Gf+YXzgkhdXeNVVHSRmO00noxKQQxIZoVKU2pQSIusWVW3gnknOOBG3tmWeVF129d8l4YT+pr72L1I7jQIdOmMv6rThpyqLaehosfQ5U011c+yqS02WooM4o0ox3z3oN7yraOLi5FBXiyyhwTTAzStriMWyX/Hv3zoyfh/FpdYkJNDjSaXaKJECY2abMxNyNIDLvZlFTsiCU1O5UFzWizF/r6iaQ95C1SQy6JNYpGNZvW7o/gAIGzZW8zdICE+zAwt/6btZBo7ipZ3TIW1W8WcvRWG2tezzfTMF0ZI97QYD6/yJCaTUP5bZBsCN9LdeZLqNVe5iLLCBtToHszisVIymYaEZFdMYE9qxtXyqcWIgGWUqLFVf5bgdmaz60eBeVSWLTLP/irHWebQ1y2gdtFGrDIef4JGQiaW/LVJyDDuFtZNGI5d09EIG80eZJCZm01h7/Rc2H+oztgWKaFmPtq8f8Gbf7WaEDhM5IX/qZ5dP61mITlQ9kAKIkdIiJZhw2+m/oqmIQY/bHqk9MCFYFKq34zve6v4SVXOb3IhzSkSF5eBySvftEtpTGCtrz3S7ojthsFs=
