@@ -547,7 +547,9 @@ class SQLCompiler:
                 # to exclude extraneous selects.
                 sub_selects = []
                 sub_params = []
-                for select, _, alias in self.select:
+                for index, (select, _, alias) in enumerate(self.select, start=1):
+                    if not alias and with_col_aliases:
+                        alias = 'col%d' % index
                     if alias:
                         sub_selects.append("%s.%s" % (
                             self.connection.ops.quote_name('subquery'),
@@ -561,7 +563,7 @@ class SQLCompiler:
                 return 'SELECT %s FROM (%s) subquery' % (
                     ', '.join(sub_selects),
                     ' '.join(result),
-                ), sub_params + params
+                ), tuple(sub_params + params)
 
             return ' '.join(result), tuple(params)
         finally:
