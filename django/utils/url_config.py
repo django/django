@@ -64,7 +64,7 @@ def _get_backend(backend_type, scheme):
     return BACKENDS[backend_type][scheme]
 
 
-def configure(backend_type, value):
+def _get_config(backend_type, value):
     scheme = value.split(':', 1)[0]
 
     backend_path = _get_backend(backend_type, scheme)
@@ -86,11 +86,11 @@ def configure(backend_type, value):
 
 
 def configure_db(value):
-    return configure('db', value)
+    return _get_config('db', value)
 
 
 def configure_cache(value):
-    return configure('cache', value)
+    return _get_config('cache', value)
 
 
 def register_db_backend(scheme, path):
