@@ -6,11 +6,15 @@ from wsgiref import simple_server
 
 # If data is too large, socket will choke, so write chunks no larger than 32MB
 # at a time. The rationale behind the 32MB can be found in #5596#comment:4.
+from django.core.signals import request_finished
+from django.http import FileResponse
+
 MAX_SOCKET_CHUNK_SIZE = 32 * 1024 * 1024  # 32 MB
 
 
 class ServerHandler(simple_server.ServerHandler):
     error_status = "500 INTERNAL SERVER ERROR"
+    wsgi_file_wrapper = FileResponse
 
     def write(self, data):
         """'write()' callable as specified by PEP 3333"""
@@ -41,6 +45,10 @@ class ServerHandler(simple_server.ServerHandler):
 class DummyHandler:
     def log_request(self, *args, **kwargs):
         pass
+
+
+class DummyServerHandler(ServerHandler):
+    request_handler = DummyHandler()
 
 
 class FileWrapperHandler(ServerHandler):
@@ -88,6 +96,16 @@ class WSGIFileWrapperTests(TestCase):
         self.assertFalse(handler._used_sendfile)
         self.assertEqual(handler.stdout.getvalue().splitlines()[-1], b'Hello World!')
         self.assertEqual(handler.stderr.getvalue(), b'')
+
+    def test_static_files_request_finished_signal_sent(self):
+        env = {'SERVER_PROTOCOL': 'HTTP/1.0'}
+        handler = DummyServerHandler(None, BytesIO(), BytesIO(), env)
+
+        from unittest import mock
+        with mock.MagicMock() as signal_handler:
+            request_finished.connect(signal_handler)
+            handler.run(wsgi_app_file_wrapper)
+            self.assertEqual(signal_handler.call_count, 1)
 
 
 class WriteChunkCounterHandler(ServerHandler):

@@ -15,6 +15,7 @@ from wsgiref import simple_server
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.wsgi import get_wsgi_application
+from django.http import FileResponse
 from django.utils.module_loading import import_string
 
 __all__ = ('WSGIServer', 'WSGIRequestHandler')
@@ -79,6 +80,7 @@ class ThreadedWSGIServer(socketserver.ThreadingMixIn, WSGIServer):
 
 class ServerHandler(simple_server.ServerHandler):
     http_version = '1.1'
+    wsgi_file_wrapper = FileResponse
 
     def handle_error(self):
         # Ignore broken pipe errors, otherwise pass on
