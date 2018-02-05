@@ -16,7 +16,7 @@ It also bundles this event-driven architecture with *channel layers*,
 a system that allows you to easily communicate between processes, and separate
 your project into different processes.
 
-If you haven't get installed Channels, you may want to read :doc:`installation`
+If you haven't yet installed Channels, you may want to read :doc:`installation`
 first to get it installed. This introduction isn't a direct tutorial, but
 you should be able to use it to follow along and make changes to an existing
 Django project if you like.
