@@ -49,7 +49,7 @@ To access the user, just use ``self.scope["user"]`` in your consumer code::
     class ChatConsumer(WebsocketConsumer):
 
         def connect(self, event):
-            self.username = self.scope["user"]
+            self.user = self.scope["user"]
 
 
 Custom Authentication
