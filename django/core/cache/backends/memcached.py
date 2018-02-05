@@ -185,7 +185,7 @@ class PyLibMCCache(BaseMemcachedCache):
         return self._lib.Client(self._servers, **self._options)
 
     def close(self, **kwargs):
-        # libmemcached managepip install pipenvs its own connections. Don't call disconnect_all()
+        # libmemcached manages its own connections. Don't call disconnect_all()
         # as it resets the failover state and creates unnecessary reconnects.
         pass
 
