@@ -208,6 +208,10 @@ Tests
 
 * Added test :class:`~django.test.Client` support for 307 and 308 redirects.
 
+* The test :class:`~django.test.Client` now serializes a request data
+  dictionary as JSON if ``content_type='application/json'``. You can customize
+  the JSON encoder with test client's ``json_encoder`` parameter.
+
 URLs
 ~~~~
 

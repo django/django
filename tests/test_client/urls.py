@@ -25,6 +25,7 @@ urlpatterns = [
     url(r'^form_view/$', views.form_view),
     url(r'^form_view_with_template/$', views.form_view_with_template),
     url(r'^formset_view/$', views.formset_view),
+    url(r'^json_view/$', views.json_view),
     url(r'^login_protected_view/$', views.login_protected_view),
     url(r'^login_protected_method_view/$', views.login_protected_method_view),
     url(r'^login_protected_view_custom_redirect/$', views.login_protected_view_changed_redirect),

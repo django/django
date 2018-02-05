@@ -1,3 +1,4 @@
+import json
 from urllib.parse import urlencode
 from xml.dom.minidom import parseString
 
@@ -73,7 +74,20 @@ def post_view(request):
     else:
         t = Template('Viewing GET page.', name='Empty GET Template')
         c = Context()
+    return HttpResponse(t.render(c))
 
+
+def json_view(request):
+    """
+    A view that expects a request with the header 'application/json' and JSON
+    data with a key named 'value'.
+    """
+    if request.META.get('CONTENT_TYPE') != 'application/json':
+        return HttpResponse()
+
+    t = Template('Viewing {} page. With data {{ data }}.'.format(request.method))
+    data = json.loads(request.body.decode('utf-8'))
+    c = Context({'data': data['value']})
     return HttpResponse(t.render(c))
 
 

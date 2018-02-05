@@ -13,6 +13,7 @@ from urllib.parse import unquote_to_bytes, urljoin, urlparse, urlsplit
 from django.conf import settings
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
+from django.core.serializers.json import DjangoJSONEncoder
 from django.core.signals import (
     got_request_exception, request_finished, request_started,
 )
@@ -261,7 +262,8 @@ class RequestFactory:
     Once you have a request object you can pass it to any view function,
     just as if that view had been hooked up using a URLconf.
     """
-    def __init__(self, **defaults):
+    def __init__(self, *, json_encoder=DjangoJSONEncoder, **defaults):
+        self.json_encoder = json_encoder
         self.defaults = defaults
         self.cookies = SimpleCookie()
         self.errors = BytesIO()
@@ -310,6 +312,14 @@ class RequestFactory:
                 charset = settings.DEFAULT_CHARSET
             return force_bytes(data, encoding=charset)
 
+    def _encode_json(self, data, content_type):
+        """
+        Return encoded JSON if data is a dict and content_type is
+        application/json.
+        """
+        should_encode = JSON_CONTENT_TYPE_RE.match(content_type) and isinstance(data, dict)
+        return json.dumps(data, cls=self.json_encoder) if should_encode else data
+
     def _get_path(self, parsed):
         path = parsed.path
         # If there are parameters, add them
@@ -332,7 +342,7 @@ class RequestFactory:
     def post(self, path, data=None, content_type=MULTIPART_CONTENT,
              secure=False, **extra):
         """Construct a POST request."""
-        data = {} if data is None else data
+        data = self._encode_json({} if data is None else data, content_type)
         post_data = self._encode_data(data, content_type)
 
         return self.generic('POST', path, post_data, content_type,
@@ -359,18 +369,21 @@ class RequestFactory:
     def put(self, path, data='', content_type='application/octet-stream',
             secure=False, **extra):
         """Construct a PUT request."""
+        data = self._encode_json(data, content_type)
         return self.generic('PUT', path, data, content_type,
                             secure=secure, **extra)
 
     def patch(self, path, data='', content_type='application/octet-stream',
               secure=False, **extra):
         """Construct a PATCH request."""
+        data = self._encode_json(data, content_type)
         return self.generic('PATCH', path, data, content_type,
                             secure=secure, **extra)
 
     def delete(self, path, data='', content_type='application/octet-stream',
                secure=False, **extra):
         """Construct a DELETE request."""
+        data = self._encode_json(data, content_type)
         return self.generic('DELETE', path, data, content_type,
                             secure=secure, **extra)
 
