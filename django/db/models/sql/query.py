@@ -6,7 +6,8 @@ themselves do not have to (and could be backed by things other than SQL
 databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
-from collections import Counter, Iterator, Mapping, OrderedDict, namedtuple
+from collections import Counter, OrderedDict, namedtuple
+from collections.abc import Iterator, Mapping
 from itertools import chain, count, product
 from string import ascii_uppercase
 

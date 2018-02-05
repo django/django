@@ -1,4 +1,4 @@
-import collections
+import collections.abc
 from datetime import datetime
 from math import ceil
 from operator import attrgetter
@@ -99,7 +99,7 @@ class LookupTests(TestCase):
     def test_iterator(self):
         # Each QuerySet gets iterator(), which is a generator that "lazily"
         # returns results using database-level iteration.
-        self.assertIsInstance(Article.objects.iterator(), collections.Iterator)
+        self.assertIsInstance(Article.objects.iterator(), collections.abc.Iterator)
 
         self.assertQuerysetEqual(
             Article.objects.iterator(),
