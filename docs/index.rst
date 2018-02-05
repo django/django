@@ -47,6 +47,7 @@ Topics
    topics/channel_layers
    topics/sessions
    topics/authentication
+   topics/security
    topics/testing
    topics/worker
    deploying
