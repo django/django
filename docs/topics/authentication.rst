@@ -21,6 +21,8 @@ as a combined callable called ``AuthMiddlewareStack`` that includes all three.
 To use the middleware, wrap it around the appropriate level of consumer
 in your ``routing.py``::
 
+    from django.conf.urls import url
+    
     from channels.routing import ProtocolTypeRouter, URLRouter
     from channels.auth import AuthMiddlewareStack
 
