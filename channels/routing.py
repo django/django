@@ -4,6 +4,7 @@ import importlib
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.urls.exceptions import Resolver404
 
 from channels.http import AsgiHandler
 
@@ -73,14 +74,17 @@ class URLRouter:
         path = path.lstrip("/")
         # Run through the routes we have until one matches
         for route in self.routes:
-            match = route.resolve(path)
-            if match is not None:
-                # Add args or kwargs into the scope
-                scope["url_route"] = {
-                    "args": match.args,
-                    "kwargs": match.kwargs,
-                }
-                return match.func(scope)
+            try:
+                match = route.resolve(path)
+                if match is not None:
+                    # Add args or kwargs into the scope
+                    scope["url_route"] = {
+                        "args": match.args,
+                        "kwargs": match.kwargs,
+                    }
+                    return match.func(scope)
+            except Resolver404 as e:
+                pass
         else:
             raise ValueError("No route found for path %r." % path)
 
