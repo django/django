@@ -89,8 +89,9 @@ class MigrationLoader(object):
                     continue
                 raise
             else:
-                # PY3 will happily import empty dirs as namespaces.
-                if not hasattr(module, '__file__'):
+                # Empty directories are namespaces.
+                # getattr() needed on PY36 and older (replace w/attribute access).
+                if getattr(module, '__file__', None) is None:
                     self.unmigrated_apps.add(app_config.label)
                     continue
                 # Module is not a package (e.g. migrations.py).
