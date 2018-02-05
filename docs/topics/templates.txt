@@ -395,15 +395,18 @@ look for templates in the ``jinja2`` subdirectory of installed applications.
 
 The most important entry in :setting:`OPTIONS <TEMPLATES-OPTIONS>` is
 ``'environment'``. It's a dotted Python path to a callable returning a Jinja2
-environment. It defaults to ``'jinja2.Environment'``. Django invokes that
-callable and passes other options as keyword arguments. Furthermore, Django
-adds defaults that differ from Jinja2's for a few options:
+environment. It defaults to
+``'django.template.backends.jinja2.default_environment'``. Django invokes that
+callable and passes other options as keyword arguments.
+
+Furthermore, Django adds defaults that differ from Jinja2's for a few options:
 
 * ``'autoescape'``: ``True``
 * ``'loader'``: a loader configured for :setting:`DIRS <TEMPLATES-DIRS>` and
   :setting:`APP_DIRS <TEMPLATES-APP_DIRS>`
 * ``'auto_reload'``: ``settings.DEBUG``
 * ``'undefined'``: ``DebugUndefined if settings.DEBUG else Undefined``
+* ``'extensions'``: ``['jinja2.ext.i18n']``
 
 ``Jinja2`` engines also accept the following :setting:`OPTIONS
 <TEMPLATES-OPTIONS>`:
@@ -441,13 +444,19 @@ adds defaults that differ from Jinja2's for a few options:
     Unless all of these conditions are met, passing a function to the template is
     simpler and more in line with the design of Jinja2.
 
-The default configuration is purposefully kept to a minimum. If a template is
-rendered with a request (e.g. when using :py:func:`~django.shortcuts.render`),
-the ``Jinja2`` backend adds the globals ``request``, ``csrf_input``, and
-``csrf_token`` to the context. Apart from that, this backend doesn't create a
-Django-flavored environment. It doesn't know about Django filters and tags.
-In order to use Django-specific APIs, you must configure them into the
-environment.
+The default configuration is purposefully kept to a minimum. Out of the box,
+it will provide access to a ``url`` function, which is an alias to
+:py:func:`django.urls.reverse`, and i18n functionality via the Jinja2
+`i18n extension`_. If :py:mod:`django.contrib.staticfiles` is
+installed, a ``static`` function will also be provided from the ``url()``
+method of the :setting:`STATICFILES_STORAGE`.
+
+If a template is rendered with a request (e.g. when using
+:py:func:`~django.shortcuts.render`), the ``Jinja2`` backend adds the globals
+``request``, ``csrf_input``, and ``csrf_token`` to the context. Apart from
+that, this backend doesn't create a Django-flavored environment. It doesn't
+know about Django filters and tags. In order to use Django-specific APIs, you
+must configure them into the environment.
 
 For example, you can create ``myproject/jinja2.py`` with this content::
 
@@ -482,6 +491,35 @@ or filter in Django templates can be achieved simply by calling a function in
 Jinja2 templates, as shown in the example above. Jinja2's global namespace
 removes the need for template context processors. The Django template language
 doesn't have an equivalent of Jinja2 tests.
+
+Additionally, Jinja2 does not have i18n enabled by default, unlike the Django
+Template Language. If you wish to use this functionality in your Jinja2 templates,
+you just enable and activate the `i18n extension`_ in your environment. This can
+be done utilizing Django's built-in translation methods. Building on the example
+environment above, your environment file would then look like::
+
+    from django.contrib.staticfiles.storage import staticfiles_storage
+    from django.urls import reverse
+    from django.utils.translation import gettext, ngettext
+
+    from jinja2 import Environment
+
+
+    def environment(**options):
+        env = Environment(extensions=['jinja2.ext.i18n'], **options)
+        env.install_gettext_callables(gettext, ngettext)
+        env.globals.update({
+            'static': staticfiles_storage.url,
+            'url': reverse,
+        })
+        return env
+
+Then you could have translated text in your template, in addition to the aforementioned
+global functions:
+
+.. code-block:: html+jinja
+
+    <a href="{{ url('admin:index') }}">{% trans %}Administration{% endtrans %}</a>
 
 Custom backends
 ---------------
@@ -828,3 +866,4 @@ Implementing a custom context processor is as simple as defining a function.
 .. _Jinja2: http://jinja.pocoo.org/
 .. _DEP 182: https://github.com/django/deps/blob/master/final/0182-multiple-template-engines.rst
 .. _Django Debug Toolbar: https://github.com/jazzband/django-debug-toolbar
+.. _i18n extension: http://jinja.pocoo.org/docs/latest/extensions/#i18n-extension

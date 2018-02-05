@@ -7,7 +7,7 @@ except ImportError:
     jinja2 = None
 
 
-class WidgetTest(SimpleTestCase):
+class Jinja2TestMixin:
     beatles = (('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))
 
     @classmethod
@@ -26,3 +26,7 @@ class WidgetTest(SimpleTestCase):
 
         output = widget.render(name, value, attrs=attrs, renderer=self.django_renderer, **kwargs)
         assertEqual(output, html)
+
+
+class WidgetTest(Jinja2TestMixin, SimpleTestCase):
+    pass

@@ -149,7 +149,8 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* The admin site will now render properly when the :setting:`FORM_RENDERER` is
+  configured to use Jinja2.
 
 Generic Views
 ~~~~~~~~~~~~~
@@ -212,6 +213,8 @@ Templates
 
 * The new :tfilter:`json_script` filter safely outputs a Python object as JSON,
   wrapped in a ``<script>`` tag, ready for use with JavaScript.
+* Added a default environment to the Jinja2 backend, which provides static,
+  url, and i18n-related functionality.
 
 Tests
 ~~~~~

@@ -1,11 +1,34 @@
 import jinja2
 
+from django.apps import apps
 from django.conf import settings
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
 from .base import BaseEngine
+
+
+def default_environment(**options):
+    from django.urls import reverse
+    from django.utils.translation import gettext, ngettext
+
+    env = jinja2.Environment(**options)
+    env.globals.update({
+        'url': reverse,
+    })
+
+    extensions = options.get('extensions', [])
+    if 'jinja2.ext.i18n' in extensions:
+        env.install_gettext_callables(gettext, ngettext)
+
+    if apps.is_installed('django.contrib.staticfiles'):
+        from django.contrib.staticfiles.storage import staticfiles_storage
+
+        env.globals.update({
+            'static': staticfiles_storage.url,
+        })
+    return env
 
 
 class Jinja2(BaseEngine):
@@ -19,7 +42,7 @@ class Jinja2(BaseEngine):
 
         self.context_processors = options.pop('context_processors', [])
 
-        environment = options.pop('environment', 'jinja2.Environment')
+        environment = options.pop('environment', 'django.template.backends.jinja2.default_environment')
         environment_cls = import_string(environment)
 
         if 'loader' not in options:
@@ -28,6 +51,7 @@ class Jinja2(BaseEngine):
         options.setdefault('auto_reload', settings.DEBUG)
         options.setdefault('undefined',
                            jinja2.DebugUndefined if settings.DEBUG else jinja2.Undefined)
+        options.setdefault('extensions', ['jinja2.ext.i18n'])
 
         self.env = environment_cls(**options)
 
