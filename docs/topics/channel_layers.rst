@@ -192,4 +192,4 @@ Or you'll need to use AsyncToSync::
 
     from asgiref.sync import AsyncToSync
 
-    AsyncToSync(channel_layer.group_send)("chat", {"type": "chat.force_disconnect")
+    AsyncToSync(channel_layer.group_send)("chat", {"type": "chat.force_disconnect"})
