@@ -503,9 +503,11 @@ class F(Combinable):
     def __repr__(self):
         return "{}({})".format(self.__class__.__name__, self.name)
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None,
-                           summarize=False, for_save=False, simple_col=False):
-        return query.resolve_ref(self.name, allow_joins, reuse, summarize, simple_col)
+    def __getitem__(self, k):
+        return SlicableF(self, k)
+
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
+        return query.resolve_ref(self.name, allow_joins, reuse, summarize)
 
     def asc(self, **kwargs):
         return OrderBy(self, **kwargs)
@@ -545,6 +547,60 @@ class OuterRef(F):
         if isinstance(self.name, self.__class__):
             return self.name
         return ResolvedOuterRef(self.name)
+
+
+class SlicableF(F):
+    """
+    An object that can add slicing notation to F expression.
+
+    Object resolves the column on which the slicing is applied, and then
+    applies the slicing if possible.
+    """
+    def __init__(self, f, k):
+        if not isinstance(k, (int, slice)):
+            raise TypeError
+        assert ((not isinstance(k, slice) and (k >= 0)) or
+                (isinstance(k, slice) and (k.start is None or k.start >= 0) and
+                 (k.stop is None or k.stop >= 0))), \
+            "Negative indexing is not supported."
+
+        assert ((not isinstance(k, slice)) or
+                (isinstance(k, slice) and k.step is None)), \
+            "Step argument is not supported."
+
+        self.expression = f
+        if isinstance(k, slice):
+            if k.start is not None:
+                self.low = int(k.start) + 1
+            else:
+                self.low = 1
+            if k.stop is not None:
+                self.length = int(k.stop) - self.low + 1
+            else:
+                self.length = None
+        else:
+            self.low = int(k)
+            self.length = 1
+
+    def __repr__(self):
+        return "{}({})".format(self.__class__.__name__, self.expression.name)
+
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
+        text_fields = ['BinaryField', 'CharField', 'EmailField', 'FilePathField',
+                       'GenericIPAddressField', 'SlugField', 'TextField', 'URLField'
+                       ]
+        resolved = query.resolve_ref(self.expression.name, allow_joins, reuse, summarize)
+        if resolved.target.__class__.__name__ in text_fields:
+            from django.db.models.functions import Substr
+            return Substr(resolved, self.low, self.length)
+        elif resolved.target.__class__.__name__ == "ArrayField":
+            from django.contrib.postgres.fields.array import SliceTransform
+            if self.length is None:
+                return SliceTransform(self.low, 2147483647, resolved)
+            else:
+                return SliceTransform(self.low, min(2147483647, self.length + self.low - 1), resolved)
+        else:
+            raise TypeError("Slicing cannot be applied to this field-type.")
 
 
 class Func(SQLiteNumericMixin, Expression):
