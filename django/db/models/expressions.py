@@ -592,6 +592,9 @@ class F(Combinable):
     def __repr__(self):
         return "{}({})".format(self.__class__.__name__, self.name)
 
+    def __getitem__(self, k):
+        return SliceableF(self, k)
+
     def resolve_expression(self, query=None, allow_joins=True, reuse=None,
                            summarize=False, for_save=False):
         return query.resolve_ref(self.name, allow_joins, reuse, summarize)
@@ -649,6 +652,47 @@ class OuterRef(F):
 
     def relabeled_clone(self, relabels):
         return self
+
+
+class SliceableF(F):
+    """
+    An object that contains a slice of an F expression.
+
+    Object resolves the column on which the slicing is applied, and then
+    applies the slicing if possible.
+    """
+    def __init__(self, obj, subscript):
+        self.name = obj.name
+        if isinstance(subscript, int):
+            if subscript < 0:
+                raise ValueError('Negative indexing is not supported.')
+            self.start = subscript + 1
+            self.length = 1
+        elif isinstance(subscript, slice):
+            if (
+                (subscript.start is not None and subscript.start < 0) or
+                (subscript.stop is not None and subscript.stop < 0)
+            ):
+                raise ValueError('Negative indexing is not supported.')
+            if subscript.step is not None:
+                raise ValueError('Step argument is not supported.')
+            if subscript.stop and subscript.start and subscript.stop < subscript.start:
+                raise ValueError('Slice stop must be greater than slice start.')
+            self.start = 1 if subscript.start is None else subscript.start + 1
+            self.length = None if subscript.stop is None else subscript.stop - (subscript.start or 0)
+        else:
+            raise TypeError('Argument to slice must be either int or slice instance.')
+
+    def resolve_expression(
+        self,
+        query=None,
+        allow_joins=True,
+        reuse=None,
+        summarize=False,
+        for_save=False,
+    ):
+        resolved = query.resolve_ref(self.name, allow_joins, reuse, summarize)
+        return resolved.target.slice_expression(resolved, self.start, self.length)
 
 
 class Func(SQLiteNumericMixin, Expression):

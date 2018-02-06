@@ -185,7 +185,10 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* :class:`F expressions <django.db.models.F>` now support
+  :ref:`slicing notation <string-expressions-using-f>` for ``CharField``,
+  ``EmailField``, ``SlugField``, ``URLField``, ``TextField``, and
+  ``django.contrib.postgres.fields.ArrayField``.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~

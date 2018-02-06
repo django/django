@@ -9,7 +9,7 @@ from django.core import checks, exceptions, serializers, validators
 from django.core.exceptions import FieldError
 from django.core.management import call_command
 from django.db import IntegrityError, connection, models
-from django.db.models.expressions import Exists, OuterRef, RawSQL, Value
+from django.db.models.expressions import Exists, F, OuterRef, RawSQL, Value
 from django.db.models.functions import Cast, JSONObject, Upper
 from django.test import TransactionTestCase, modify_settings, override_settings
 from django.test.utils import isolate_apps
@@ -511,6 +511,30 @@ class TestQuerying(PostgreSQLTestCase):
             qs.values_list('first_two', flat=True),
             [None, [1], [2], [2, 3], [20, 30]],
         )
+
+    def test_slicing_notation_in_f_expressions(self):
+        tests = [
+            (F('field')[:2], [1, 2]),
+            (F('field')[2:], [3, 4]),
+            (F('field')[1:3], [2, 3]),
+        ]
+        for expression, expected in tests:
+            with self.subTest(expression=expression, expected=expected):
+                instance = IntegerArrayModel.objects.create(field=[1, 2, 3, 4])
+                instance.field = expression
+                instance.save()
+                instance.refresh_from_db()
+                self.assertSequenceEqual(instance.field, expected)
+
+    def test_slicing_notation_in_f_expressions_with_annotate(self):
+        instance = IntegerArrayModel(field=[1, 2, 3])
+        instance.save()
+        annotated_model = IntegerArrayModel.objects.annotate(first_two=F('field')[:2])
+        self.assertSequenceEqual(annotated_model[0].first_two, [1, 2])
+        annotated_model = IntegerArrayModel.objects.annotate(after_two=F('field')[2:])
+        self.assertSequenceEqual(annotated_model[0].after_two, [3])
+        annotated_model = IntegerArrayModel.objects.annotate(random_two=F('field')[1:3])
+        self.assertEqual(annotated_model[0].random_two, [2, 3])
 
     def test_usage_in_subquery(self):
         self.assertSequenceEqual(

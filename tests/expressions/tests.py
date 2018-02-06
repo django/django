@@ -32,7 +32,7 @@ from django.utils.functional import SimpleLazyObject
 
 from .models import (
     UUID, UUIDPK, Company, Employee, Experiment, Manager, Number,
-    RemoteEmployee, Result, SimulationRun, Time,
+    RemoteEmployee, Result, SimulationRun, Text, Time,
 )
 
 
@@ -148,6 +148,89 @@ class BasicExpressionsTests(TestCase):
                 }
             ],
         )
+
+    def _test_slicing_of_f_expressions(self, model):
+        tests = [
+            (F('name')[:], 'Example Inc.', 'Example Inc.'),
+            (F('name')[:7], 'Example Inc.', 'Example'),
+            (F('name')[0], 'Example', 'E'),
+            (F('name')[5], 'E', ''),
+            (F('name')[7:], 'Foobar Ltd.', 'Ltd.'),
+            (F('name')[0:10], 'Ltd.', 'Ltd.'),
+            (F('name')[2:7], 'Test GmbH', 'st Gm'),
+            (F('name')[2:2], 'st Gm', ''),
+        ]
+        for expression, name, expected in tests:
+            with self.subTest(expression=expression, name=name, expected=expected):
+                obj = model.objects.get(name=name)
+                obj.name = expression
+                obj.save()
+                obj.refresh_from_db()
+                self.assertEqual(obj.name, expected)
+
+    def test_slicing_of_f_expressions_charfield(self):
+        self._test_slicing_of_f_expressions(Company)
+
+    def test_slicing_of_f_expressions_textfield(self):
+        Text.objects.bulk_create([
+            Text(name=company.name)
+            for company in Company.objects.all()
+        ])
+        self._test_slicing_of_f_expressions(Text)
+
+    def test_slicing_of_f_expressions_with_annotate(self):
+        companies = Company.objects.annotate(first_three=F('name')[:3])
+        self.assertCountEqual(
+            companies.values_list('first_three', flat=True),
+            ['Exa', 'Foo', 'Tes'],
+        )
+        companies = Company.objects.annotate(after_three=F('name')[3:])
+        self.assertCountEqual(
+            companies.values_list('after_three', flat=True),
+            ['mple Inc.', 'bar Ltd.', 't GmbH'],
+        )
+        companies = Company.objects.annotate(random_four=F('name')[2:5])
+        self.assertCountEqual(
+            companies.values_list('random_four', flat=True),
+            ['amp', 'oba', 'st '],
+        )
+        companies = Company.objects.annotate(first_letter=F('name')[:1])
+        self.assertCountEqual(
+            companies.values_list('first_letter', flat=True),
+            ['E', 'F', 'T'],
+        )
+        companies = Company.objects.annotate(first_letter=F('name')[0])
+        self.assertCountEqual(
+            companies.values_list('first_letter', flat=True),
+            ['E', 'F', 'T'],
+        )
+
+    def test_slicing_of_f_expressions_with_negative_index(self):
+        msg = 'Negative indexing is not supported.'
+        indexes = [slice(0, -4), slice(-4, 0), slice(-4), -5]
+        for i in indexes:
+            with self.subTest(i=i), self.assertRaisesMessage(ValueError, msg):
+                F('name')[i]
+
+    def test_slicing_of_f_expressions_with_slice_stop_less_than_slice_start(self):
+        msg = 'Slice stop must be greater than slice start'
+        with self.assertRaisesMessage(ValueError, msg):
+            F('name')[4:2]
+
+    def test_slicing_of_f_expressions_with_invalid_type(self):
+        msg = "Argument to slice must be either int or slice instance."
+        with self.assertRaisesMessage(TypeError, msg):
+            F('name')['error']
+
+    def test_slicing_of_f_expressions_with_step(self):
+        msg = "Step argument is not supported."
+        with self.assertRaisesMessage(ValueError, msg):
+            F('name')[::4]
+
+    def test_slicing_of_f_unsupported_field(self):
+        msg = 'This field does not support slicing.'
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            Company.objects.update(num_chairs=F('num_chairs')[:4])
 
     def test_arithmetic(self):
         # We can perform arithmetic operations in expressions
@@ -1908,6 +1991,7 @@ class ReprTests(SimpleTestCase):
         )
         self.assertEqual(repr(Col('alias', 'field')), "Col(alias, field)")
         self.assertEqual(repr(F('published')), "F(published)")
+        self.assertEqual(repr(F('published')[0:2]), "SliceableF(published)")
         self.assertEqual(repr(F('cost') + F('tax')), "<CombinedExpression: F(cost) + F(tax)>")
         self.assertEqual(
             repr(ExpressionWrapper(F('cost') + F('tax'), IntegerField())),
