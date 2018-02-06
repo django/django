@@ -39,7 +39,7 @@ from django.utils import timezone, translation
 from django.utils.cache import (
     get_cache_key, learn_cache_key, patch_cache_control, patch_vary_headers,
 )
-from django.views.decorators.cache import cache_page
+from django.views.decorators.cache import cache_control, cache_page
 
 from .models import Poll, expensive_calculation
 
@@ -2162,6 +2162,15 @@ class CacheMiddlewareTest(SimpleTestCase):
         # .. even if it has a prefix
         response = other_with_prefix_view(request, '16')
         self.assertEqual(response.content, b'Hello World 16')
+
+    def test_cached_control_private_not_cached(self):
+        """Responses with 'Cache-Control: private' are not cached."""
+        view_with_private_cache = cache_page(3)(cache_control(private=True)(hello_world_view))
+        request = self.factory.get('/view/')
+        response = view_with_private_cache(request, '1')
+        self.assertEqual(response.content, b'Hello World 1')
+        response = view_with_private_cache(request, '2')
+        self.assertEqual(response.content, b'Hello World 2')
 
     def test_sensitive_cookie_not_cached(self):
         """
