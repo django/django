@@ -1,6 +1,16 @@
 Full release notes, with more details and upgrade information, are available at:
 https://channels.readthedocs.io/en/latest/releases
 
+2.0.1 (2018-02-05)
+------------------
+
+* AsyncWebsocketConsumer and AsyncJsonWebsocketConsumer classes added
+
+* OriginValidator and AllowedHostsOriginValidator ASGI middleware is now available
+
+* URLRouter now correctly resolves long lists of URLs
+
+
 2.0.0 (2018-02-01)
 ------------------
 

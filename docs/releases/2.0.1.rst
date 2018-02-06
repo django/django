@@ -1,0 +1,36 @@
+2.0.1 Release Notes
+===================
+
+Channels 2.0.1 is a patch release of channels, adding a couple of small
+new features and fixing one bug in URL resolution.
+
+As always, when updating Channels make sure to also update its dependencies
+(``asgiref`` and ``daphne``) as these also get their own bugfix updates, and
+some bugs that may appear to be part of Channels are actually in those packages.
+
+
+New Features
+------------
+
+* There are new async versions of the Websocket generic consumers,
+  ``AsyncWebsocketConsumer`` and ``AsyncJsonWebsocketConsumer``. Read more
+  about them in :doc:`/topics/consumers`.
+
+* The old ``allowed_hosts_only`` decorator has been removed (it was
+  accidentally included in the 2.0 release but didn't work) and replaced with
+  a new ``OriginValidator`` and ``AllowedHostsOriginValidator`` set of
+  ASGI middleware. Read more in :docs:`/topics/security`.
+
+
+Bugfixes
+--------
+
+* A bug in ``URLRouter`` which didn't allow you to match beyond the first
+  URL in some situations has been resolved, and a test suite was added for
+  URL resolution to prevent it happening again.
+
+
+Backwards Incompatible Changes
+------------------------------
+
+None.
