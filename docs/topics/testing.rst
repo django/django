@@ -77,13 +77,13 @@ To wait for an application to exit (you'll need to either do this or wait for
 it to send you output before you can see what it did using mocks or inspection),
 use ``wait``::
 
-    communicator.wait(timeout=1)
+    await communicator.wait(timeout=1)
 
 If you're expecting your application to raise an exception, use ``pytest.raises``
-around ``wait``:
+around ``wait``::
 
     with pytest.raises(ValueError):
-        communicator.wait()
+        await communicator.wait()
 
 You should only need this generic class for non-HTTP/WebSocket tests, though
 you might need to fall back to it if you are testing things like HTTP chunked
@@ -135,7 +135,7 @@ application, as shown in this example::
     response = await communicator.receive_from()
     assert response == "hello"
     # Close
-    communicator.disconnect()
+    await communicator.disconnect()
 
 .. note::
 
