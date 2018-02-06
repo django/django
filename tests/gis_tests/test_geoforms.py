@@ -1,7 +1,7 @@
 import re
 
 from django.contrib.gis import forms
-from django.contrib.gis.forms import BaseGeometryWidget
+from django.contrib.gis.forms import BaseGeometryWidget, OpenLayersWidget
 from django.contrib.gis.geos import GEOSGeometry
 from django.forms import ValidationError
 from django.test import SimpleTestCase, override_settings
@@ -31,8 +31,9 @@ class GeometryFieldTest(SimpleTestCase):
         fld = forms.GeometryField(srid=32140)
         tol = 0.0000001
         xform_geom = GEOSGeometry('POINT (951640.547328465 4219369.26171664)', srid=32140)
-        # The cleaned geometry should be transformed to 32140.
-        cleaned_geom = fld.clean('SRID=4326;POINT (-95.363151 29.763374)')
+        # The cleaned geometry is transformed to 32140 (the widget map_srid is 3857).
+        cleaned_geom = fld.clean('SRID=3857;POINT (-10615777.40976205 3473169.895707852)')
+        self.assertEqual(cleaned_geom.srid, 32140)
         self.assertTrue(xform_geom.equals_exact(cleaned_geom, tol))
 
     def test_null(self):
@@ -83,6 +84,11 @@ class GeometryFieldTest(SimpleTestCase):
                 with self.assertRaises(forms.ValidationError):
                     fld.to_python(wkt)
 
+    def test_to_python_different_map_srid(self):
+        f = forms.GeometryField(widget=OpenLayersWidget)
+        json = '{ "type": "Point", "coordinates": [ 5.0, 23.0 ] }'
+        self.assertEqual(GEOSGeometry('POINT(5 23)', srid=f.widget.map_srid), f.to_python(json))
+
     def test_field_with_text_widget(self):
         class PointForm(forms.Form):
             pt = forms.PointField(srid=4326, widget=forms.TextInput)
@@ -91,6 +97,8 @@ class GeometryFieldTest(SimpleTestCase):
         cleaned_pt = form.fields['pt'].clean('POINT(5 23)')
         self.assertEqual(cleaned_pt, GEOSGeometry('POINT(5 23)', srid=4326))
         self.assertEqual(4326, cleaned_pt.srid)
+        with self.assertRaisesMessage(ValidationError, 'Invalid geometry value.'):
+            form.fields['pt'].clean('POINT(5)')
 
         point = GEOSGeometry('SRID=4326;POINT(5 23)')
         form = PointForm(data={'pt': 'POINT(5 23)'}, initial={'pt': point})
@@ -132,8 +140,9 @@ class GeometryFieldTest(SimpleTestCase):
             ' rows="10" name="pt3"></textarea>',
             output
         )
-        # Only the invalid PNT(0) should trigger an error log entry
-        self.assertEqual(len(logger_calls), 1)
+        # Only the invalid PNT(0) triggers an error log entry.
+        # Deserialization is called in form clean and in widget rendering.
+        self.assertEqual(len(logger_calls), 2)
         self.assertEqual(
             logger_calls[0],
             "Error creating geometry from value 'PNT(0)' (String input "
