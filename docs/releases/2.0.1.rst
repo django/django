@@ -19,7 +19,7 @@ New Features
 * The old ``allowed_hosts_only`` decorator has been removed (it was
   accidentally included in the 2.0 release but didn't work) and replaced with
   a new ``OriginValidator`` and ``AllowedHostsOriginValidator`` set of
-  ASGI middleware. Read more in :docs:`/topics/security`.
+  ASGI middleware. Read more in :doc:`/topics/security`.
 
 
 Bugfixes
