@@ -7,7 +7,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     update_can_self_select = False
     allows_group_by_pk = True
     related_fields_match_type = True
-    allow_sliced_subqueries = False
+    # MySQL doesn't support sliced subqueries with IN/ALL/ANY/SOME.
+    allow_sliced_subqueries_with_in = False
     has_select_for_update = True
     has_select_for_update_nowait = False
     supports_forward_references = False
