@@ -160,6 +160,10 @@ However, if you want more control and you're willing to work only in
 asynchronous functions, you can write fully asynchronous consumers::
 
     class PingConsumer(AsyncConsumer):
+        async def websocket_connect(self, message):
+            await self.send({
+                "type": "websocket.accept",
+            })
 
         async def websocket_receive(self, message):
             await asyncio.sleep(1)
