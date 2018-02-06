@@ -125,6 +125,59 @@ class BasicExpressionsTests(TestCase):
             ],
         )
 
+    def test_slicing_in_f_expressions(self):
+        # F expressions using string-fields can be sliced.
+        company = Company.objects.get(name="Example Inc.")
+        company.name = F('name')[:7]
+        company.save()
+        company.refresh_from_db()
+        self.assertEqual(company.name, "Example")
+        company = Company.objects.get(name="Foobar Ltd.")
+        company.name = F('name')[7:]
+        company.save()
+        company.refresh_from_db()
+        self.assertEqual(company.name, "Ltd.")
+        company = Company.objects.get(name="Test GmbH")
+        company.name = F('name')[2:7]
+        company.save()
+        company.refresh_from_db()
+        self.assertEqual(company.name, "st Gm")
+
+    def test_slicing_in_f_expressions_with_annotate(self):
+        companies = Company.objects.annotate(first_three=F('name')[:3])
+        self.assertEqual(companies[0].first_three, "Exa")
+        self.assertEqual(companies[1].first_three, "Foo")
+        self.assertEqual(companies[2].first_three, "Tes")
+        companies = Company.objects.annotate(after_three=F('name')[3:])
+        self.assertEqual(companies[0].after_three, "mple Inc.")
+        self.assertEqual(companies[1].after_three, "bar Ltd.")
+        self.assertEqual(companies[2].after_three, "t GmbH")
+        companies = Company.objects.annotate(random_four=F('name')[2:5])
+        self.assertEqual(companies[0].random_four, "amp")
+        self.assertEqual(companies[1].random_four, "oba")
+        self.assertEqual(companies[2].random_four, "st ")
+
+    def test_negative_index_in_slicing_f_expressions(self):
+        # Check that negative indexing is not supported
+        msg = "Negative indexing is not supported."
+        with self.assertRaisesMessage(AssertionError, msg):
+            company = Company.objects.filter(name="Foobar Ltd.")
+            company.update(name=F('name')[:-4])
+
+    def test_step_in_slicing_f_expressions(self):
+        # Check that step argument is not supported
+        msg = "Step argument is not supported."
+        with self.assertRaisesMessage(AssertionError, msg):
+            company = Company.objects.filter(name="Foobar Ltd.")
+            company.update(name=F('name')[::4])
+
+    def test_invalid_fields_in_slicing_f_expressions(self):
+        # Check that invalid fields are not sliced.
+        msg = "Slicing cannot be applied to this field-type."
+        with self.assertRaisesMessage(TypeError, msg):
+            company = Company.objects.filter(name="Foobar Ltd.")
+            company.update(num_chairs=F('num_chairs')[:4])
+
     def test_arithmetic(self):
         # We can perform arithmetic operations in expressions
         # Make sure we have 2 spare chairs

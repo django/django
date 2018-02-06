@@ -183,6 +183,11 @@ Models
 
 * Query expressions can now be negated using a minus sign.
 
+* Slicing notation added to F expressions over the following field-types:
+  ``BinaryField``, ``CharField``, ``EmailField``, ``FilePathField``,
+  ``GenericIPAddressField``, ``SlugField``, ``TextField``, ``URLField`` and
+  ``django.contrib.postgres.fields.ArrayField``.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

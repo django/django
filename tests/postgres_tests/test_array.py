@@ -8,6 +8,7 @@ from django.core import checks, exceptions, serializers, validators
 from django.core.exceptions import FieldError
 from django.core.management import call_command
 from django.db import IntegrityError, connection, models
+from django.db.models.expressions import F
 from django.test import TransactionTestCase, modify_settings, override_settings
 from django.test.utils import isolate_apps
 from django.utils import timezone
@@ -316,6 +317,40 @@ class TestQuerying(PostgreSQLTestCase):
             NestedIntegerArrayModel.objects.filter(field__0__0_1=[1]),
             [instance]
         )
+
+    def test_slicing_notation_in_f_expressions(self):
+        # F expressions using Array can be sliced.
+        first_instance = IntegerArrayModel.objects.create(field=[1, 2, 3, 4])
+        first_instance.field = F('field')[:2]
+        first_instance.save()
+        first_instance.refresh_from_db()
+        self.assertSequenceEqual(
+            first_instance.field, [1, 2]
+        )
+        second_instance = IntegerArrayModel.objects.create(field=[1, 2, 3, 4])
+        second_instance.field = F('field')[2:]
+        second_instance.save()
+        second_instance.refresh_from_db()
+        self.assertSequenceEqual(
+            second_instance.field, [3, 4]
+        )
+        third_instance = IntegerArrayModel.objects.create(field=[1, 2, 3, 4])
+        third_instance.field = F('field')[1:3]
+        third_instance.save()
+        third_instance.refresh_from_db()
+        self.assertSequenceEqual(
+            third_instance.field, [2, 3]
+        )
+
+    def test_slicing_notation_in_f_expressions_with_annotate(self):
+        instance = IntegerArrayModel(field=[1, 2, 3])
+        instance.save()
+        annotated_model = IntegerArrayModel.objects.annotate(first_two=F('field')[:2])
+        self.assertSequenceEqual(annotated_model[0].first_two, [1, 2])
+        annotated_model = IntegerArrayModel.objects.annotate(after_two=F('field')[2:])
+        self.assertSequenceEqual(annotated_model[0].after_two, [3])
+        annotated_model = IntegerArrayModel.objects.annotate(random_two=F('field')[1:3])
+        self.assertEqual(annotated_model[0].random_two, [2, 3])
 
     def test_usage_in_subquery(self):
         self.assertSequenceEqual(
