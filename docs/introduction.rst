@@ -129,7 +129,7 @@ A basic consumer looks like this::
             self.accept()
             self.send(text_data="[Welcome %s!]" % self.username)
 
-        def receive(self, text, bytes=None):
+        def receive(self, *, text_data):
             if text.startswith("/name"):
                 self.username = text[5:].strip()
                 self.send(text_data="[set your username to %s]" % self.username)
