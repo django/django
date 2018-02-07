@@ -2028,7 +2028,7 @@ class QuerysetOrderedTests(unittest.TestCase):
         self.assertIs(qs.order_by('num_notes').ordered, True)
 
 
-@skipUnlessDBFeature('allow_sliced_subqueries')
+@skipUnlessDBFeature('allow_sliced_subqueries_with_in')
 class SubqueryTests(TestCase):
     @classmethod
     def setUpTestData(cls):

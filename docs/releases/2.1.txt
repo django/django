@@ -234,6 +234,9 @@ Database backend API
   feature are changed from :exc:`NotImplementedError` to
   :exc:`django.db.NotSupportedError`.
 
+* Renamed the ``allow_sliced_subqueries`` database feature flag to
+  ``allow_sliced_subqueries_with_in``.
+
 :mod:`django.contrib.gis`
 -------------------------
 
