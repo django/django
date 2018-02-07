@@ -13,7 +13,7 @@ from django.core.exceptions import DisallowedRedirect
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http.cookie import SimpleCookie
 from django.utils import timezone
-from django.utils.encoding import force_bytes, iri_to_uri
+from django.utils.encoding import iri_to_uri
 from django.utils.http import http_date
 
 _charset_from_content_type_re = re.compile(r';\s*charset=(?P<charset>[^\s;]+)', re.I)
@@ -228,9 +228,8 @@ class HttpResponseBase:
             return bytes(value)
         if isinstance(value, str):
             return bytes(value.encode(self.charset))
-
-        # Handle non-string types (#16494)
-        return force_bytes(value, self.charset)
+        # Handle non-string types.
+        return str(value).encode(self.charset)
 
     # These methods partially implement the file-like object interface.
     # See https://docs.python.org/3/library/io.html#io.IOBase

@@ -14,7 +14,7 @@ from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser, MultiPartParserError
 from django.utils.datastructures import ImmutableList, MultiValueDict
 from django.utils.deprecation import RemovedInDjango30Warning
-from django.utils.encoding import escape_uri_path, force_bytes, iri_to_uri
+from django.utils.encoding import escape_uri_path, iri_to_uri
 from django.utils.functional import cached_property
 from django.utils.http import is_same_domain, limited_parse_qsl
 
@@ -511,7 +511,7 @@ class QueryDict(MultiValueDict):
         """
         output = []
         if safe:
-            safe = force_bytes(safe, self.encoding)
+            safe = safe.encode(self.encoding)
 
             def encode(k, v):
                 return '%s=%s' % ((quote(k, safe), quote(v, safe)))
@@ -519,9 +519,10 @@ class QueryDict(MultiValueDict):
             def encode(k, v):
                 return urlencode({k: v})
         for k, list_ in self.lists():
-            k = force_bytes(k, self.encoding)
-            output.extend(encode(k, force_bytes(v, self.encoding))
-                          for v in list_)
+            output.extend(
+                encode(k.encode(self.encoding), v.encode(self.encoding))
+                for v in list_
+            )
         return '&'.join(output)
 
 
