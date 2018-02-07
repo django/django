@@ -9,7 +9,6 @@ from django.contrib.auth.hashers import (
 )
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
-from django.utils.encoding import force_bytes
 
 try:
     import crypt
@@ -238,7 +237,7 @@ class TestUtilsHashPass(SimpleTestCase):
 
             # Get the original salt (includes the original workload factor)
             algorithm, data = encoded.split('$', 1)
-            expected_call = (('wrong_password', force_bytes(data[:29])),)
+            expected_call = (('wrong_password', data[:29].encode()),)
             self.assertEqual(hasher.encode.call_args_list, [expected_call] * 3)
 
     def test_unusable(self):
