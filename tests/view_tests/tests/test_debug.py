@@ -16,7 +16,6 @@ from django.template import TemplateDoesNotExist
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import LoggingCaptureMixin, patch_logger
 from django.urls import reverse
-from django.utils.encoding import force_bytes
 from django.utils.functional import SimpleLazyObject
 from django.utils.safestring import mark_safe
 from django.utils.version import PY36
@@ -325,7 +324,7 @@ class ExceptionReporterTests(SimpleTestCase):
 
         for newline in ['\n', '\r\n', '\r']:
             fd, filename = tempfile.mkstemp(text=False)
-            os.write(fd, force_bytes(newline.join(LINES) + newline))
+            os.write(fd, (newline.join(LINES) + newline).encode())
             os.close(fd)
 
             try:

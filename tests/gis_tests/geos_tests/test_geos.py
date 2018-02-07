@@ -17,7 +17,6 @@ from django.contrib.gis.shortcuts import numpy
 from django.template import Context
 from django.template.engine import Engine
 from django.test import SimpleTestCase
-from django.utils.encoding import force_bytes
 
 from ..test_data import TestDataMixin
 
@@ -160,7 +159,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         ref_pnt = GEOSGeometry('POINT(5 23)')
 
         wkt_f = BytesIO()
-        wkt_f.write(force_bytes(ref_pnt.wkt))
+        wkt_f.write(ref_pnt.wkt.encode())
         wkb_f = BytesIO()
         wkb_f.write(bytes(ref_pnt.wkb))
 
