@@ -38,10 +38,8 @@ class BasicExpressionsTests(TestCase):
             name="Foobar Ltd.", num_employees=3, num_chairs=4,
             ceo=Employee.objects.create(firstname="Frank", lastname="Meyer", salary=20)
         )
-        cls.gmbh = Company.objects.create(
-            name="Test GmbH", num_employees=32, num_chairs=1,
-            ceo=Employee.objects.create(firstname="Max", lastname="Mustermann", salary=30)
-        )
+        cls.max = Employee.objects.create(firstname='Max', lastname='Mustermann', salary=30)
+        cls.gmbh = Company.objects.create(name='Test GmbH', num_employees=32, num_chairs=1, ceo=cls.max)
 
     def setUp(self):
         self.company_query = Company.objects.values(
@@ -398,6 +396,14 @@ class BasicExpressionsTests(TestCase):
             company_ceo_set__num_employees=F('company_ceo_set__num_employees')
         )
         self.assertEqual(str(qs.query).count('JOIN'), 2)
+
+    def test_order_by_exists(self):
+        mary = Employee.objects.create(firstname='Mary', lastname='Mustermann', salary=20)
+        mustermanns_by_seniority = Employee.objects.filter(lastname='Mustermann').order_by(
+            # Order by whether the employee is the CEO of a company
+            Exists(Company.objects.filter(ceo=OuterRef('pk'))).desc()
+        )
+        self.assertSequenceEqual(mustermanns_by_seniority, [self.max, mary])
 
     def test_outerref(self):
         inner = Company.objects.filter(point_of_contact=OuterRef('pk'))
