@@ -1041,11 +1041,11 @@ class Exists(Subquery):
     def __invert__(self):
         return type(self)(self.queryset, negated=(not self.negated), **self.extra)
 
-    def resolve_expression(self, query=None, **kwargs):
+    def resolve_expression(self, query=None, *args, **kwargs):
         # As a performance optimization, remove ordering since EXISTS doesn't
         # care about it, just whether or not a row matches.
         self.queryset = self.queryset.order_by()
-        return super().resolve_expression(query, **kwargs)
+        return super().resolve_expression(query, *args, **kwargs)
 
     def as_sql(self, compiler, connection, template=None, **extra_context):
         sql, params = super().as_sql(compiler, connection, template, **extra_context)

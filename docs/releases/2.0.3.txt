@@ -15,3 +15,5 @@ Bugfixes
 * Prioritized the datetime and time input formats without ``%f`` for the Thai
   locale to fix the admin time picker widget displaying "undefined"
   (:ticket:`29109`).
+
+* Fixed crash with ``QuerySet.order_by(Exists(...))`` (:ticket:`29118`).
