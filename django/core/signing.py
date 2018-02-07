@@ -74,7 +74,7 @@ def base64_hmac(salt, value, key):
 
 def get_cookie_signer(salt='django.core.signing.get_cookie_signer'):
     Signer = import_string(settings.SIGNING_BACKEND)
-    key = force_bytes(settings.SECRET_KEY)
+    key = force_bytes(settings.SECRET_KEY)  # SECRET_KEY may be str or bytes.
     return Signer(b'django.http.cookies' + key, salt=salt)
 
 
@@ -131,7 +131,7 @@ def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, ma
     """
     # TimestampSigner.unsign() returns str but base64 and zlib compression
     # operate on bytes.
-    base64d = force_bytes(TimestampSigner(key, salt=salt).unsign(s, max_age=max_age))
+    base64d = TimestampSigner(key, salt=salt).unsign(s, max_age=max_age).encode()
     decompress = base64d[:1] == b'.'
     if decompress:
         # It's compressed; uncompress it first
