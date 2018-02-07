@@ -580,10 +580,11 @@ class SlicableF(F):
                        'GenericIPAddressField', 'SlugField', 'TextField', 'URLField'
                        ]
         resolved = query.resolve_ref(self.expression.name, allow_joins, reuse, summarize)
-        if resolved.target.__class__.__name__ in text_fields:
+        field_type = resolved.target.get_internal_type()
+        if field_type in text_fields:
             from django.db.models.functions import Substr
             return Substr(resolved, self.low, self.length)
-        elif resolved.target.__class__.__name__ == "ArrayField":
+        elif field_type == "ArrayField":
             from django.contrib.postgres.fields.array import SliceTransform
             if self.length is None:
                 return SliceTransform(self.low, 2147483647, resolved)
