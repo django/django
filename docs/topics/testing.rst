@@ -70,7 +70,7 @@ To send an event, call ``send_input``::
 
 To receive an event, call ``receive_output``::
 
-    event = communicator.receive_output(timeout=1)
+    event = await communicator.receive_output(timeout=1)
     assert event["type"] == "http.response.start"
 
 To wait for an application to exit (you'll need to either do this or wait for

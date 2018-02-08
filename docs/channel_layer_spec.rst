@@ -122,7 +122,7 @@ Asynchronous Support
 
 All channel layers must provide asynchronous (coroutine) methods for their
 primary endpoints. End-users will be able to achieve synchronous versions
-using the ``asyncio.sync.async_to_sync`` wrapper.
+using the ``asgiref.sync.async_to_sync`` wrapper.
 
 
 Groups
