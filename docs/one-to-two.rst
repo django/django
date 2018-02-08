@@ -223,10 +223,10 @@ object inside of a consumer directly. As an example::
     class ChatConsumer(AsyncWebsocketConsumer):
 
         async def connect(self):
-            async_to_sync(self.channel_layer.group_add)("chat", self.channel_name)
+            await self.channel_layer.group_add("chat", self.channel_name)
 
-        def disconnect(self):
-            async_to_sync(self.channel_layer.group_discard)("chat", self.channel_name)
+        async def disconnect(self):
+            await self.channel_layer.group_discard("chat", self.channel_name)
 
 
 Delay server
