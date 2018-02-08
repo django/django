@@ -14,6 +14,10 @@ which will walk through how things work. If you're upgrading from Channels 1,
 take a look at :doc:`one-to-two` to get an overview of the changes; things
 are substantially different.
 
+If you would like complete code examples to read alongside the documentation
+or experiment on, the `channels-examples <https://github.com/andrewgodwin/channels-examples/>`_
+repository contains well-commented example Channels projects.
+
 .. warning::
    This is documentation for the **2.x series** of Channels. If you are looking
    for documentation for the legacy Channels 1, you can select ``1.x`` from the
