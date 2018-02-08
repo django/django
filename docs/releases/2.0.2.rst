@@ -1,0 +1,30 @@
+2.0.2 Release Notes
+===================
+
+Channels 2.0.2 is a patch release of Channels, fixing a bug in the database
+connection handling.
+
+As always, when updating Channels make sure to also update its dependencies
+(``asgiref`` and ``daphne``) as these also get their own bugfix updates, and
+some bugs that may appear to be part of Channels are actually in those packages.
+
+
+New Features
+------------
+
+* There is a new ``channels.db.database_sync_to_async`` wrapper that is like
+  ``sync_to_async`` but also closes database connections for you. You can
+  read more about usage in :doc:`/topics/databases`.
+
+
+Bugfixes
+--------
+
+* SyncConsumer and all its descendant classes now close database connections
+  when they exit.
+
+
+Backwards Incompatible Changes
+------------------------------
+
+None.

@@ -1,6 +1,13 @@
 Full release notes, with more details and upgrade information, are available at:
 https://channels.readthedocs.io/en/latest/releases
 
+2.0.2 (2018-02-08)
+------------------
+
+* SyncConsumer now terminates old database connections, and there is a new
+  database_sync_to_async wrapper to allow async connections to do the same.
+
+
 2.0.1 (2018-02-05)
 ------------------
 
