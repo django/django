@@ -77,7 +77,7 @@ What this means is that you should send high-level events over the channel
 layer, and then have consumers handle those events and do appropriate low-level
 networking to their attached client.
 
-For example, the ``multichat example <https://github.com/andrewgodwin/channels-examples/tree/master/multichat>`_
+For example, the `multichat example <https://github.com/andrewgodwin/channels-examples/tree/master/multichat>`_
 in Andrew Godwin's ``channels-examples`` repository sends events like this
 over the channel layer::
 
