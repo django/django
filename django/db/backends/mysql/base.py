@@ -244,8 +244,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             with self.cursor() as cursor:
                 cursor.execute('; '.join(assignments))
 
-    def create_cursor(self, name=None):
-        cursor = self.connection.cursor()
+    def create_cursor(self, name=None, *args, **kwargs):
+        cursor = self.connection.cursor(*args, **kwargs)
         return CursorWrapper(cursor)
 
     def _rollback(self):
