@@ -370,9 +370,11 @@ ready to learn a bit more about the underlying machinery.
 More about Django :class:`Form` classes
 =======================================
 
-All form classes are created as subclasses of :class:`django.forms.Form`,
-including the :doc:`ModelForm </topics/forms/modelforms>`, which you encounter
-in Django's admin.
+All form classes are created as subclasses of either :class:`django.forms.Form`
+or :class:`django.forms.ModelForm`. You can think of ``ModelForm`` as a
+subclass of ``Form``. ``Form`` and ``ModelForm`` actually inherit common
+functionality from a (private) ``BaseForm`` class, but this implementation
+detail is rarely important.
 
 .. admonition:: Models and Forms
 
