@@ -1,7 +1,8 @@
 import functools
 
-from asgiref.sync import async_to_sync, sync_to_async
+from asgiref.sync import async_to_sync
 
+from .db import database_sync_to_async
 from .exceptions import StopConsumer
 from .layers import get_channel_layer
 from .utils import await_many_dispatch
@@ -87,7 +88,7 @@ class SyncConsumer(AsyncConsumer):
 
     _sync = True
 
-    @sync_to_async
+    @database_sync_to_async
     def dispatch(self, message):
         """
         Dispatches incoming messages to type-based handlers asynchronously.

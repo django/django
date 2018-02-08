@@ -44,6 +44,7 @@ Topics
    installation
    topics/consumers
    topics/routing
+   topics/databases
    topics/channel_layers
    topics/sessions
    topics/authentication

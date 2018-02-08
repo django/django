@@ -99,9 +99,35 @@ be improved by async handling (long-running tasks that could be done in
 parallel) *and* you are only using async-native libraries.
 
 If you really want to call a synchronous function from an ``AsyncConsumer``,
-take a look at ``asgiref.SyncToAsync``, which is the utility that Channels
+take a look at ``asgiref.sync.sync_to_async``, which is the utility that Channels
 uses to run ``SyncConsumers`` in threadpools, and can turn any synchronous
 callable into an asynchronous coroutine.
+
+.. important::
+
+    If you want to call the Django ORM from an ``AsyncConsumer`` (or any other
+    synchronous code), you should use the ``database_sync_to_async`` adapter
+    instead. See :doc:`/topic/databases` for more.
+
+
+Closing Consumers
+~~~~~~~~~~~~~~~~~
+
+When the socket or connection attached to your consumer is closed - either by
+you or the client - you will likely get an event sent to you (for example,
+``http.disconnect`` or ``websocket.disconnect``), and your application instance
+will be given a short amount of time to act on it.
+
+Once you have finished doing your post-disconnect cleanup, you need to raise
+``channels.exceptions.StopConsumer`` to halt the ASGI application cleanly and
+let the server clean it up. If you leave it running - by not raising this
+exception - the server will reach its application close timeout (which is
+10 seconds by default in Daphne) and then kill your application and raise
+a warning.
+
+The generic consumers below do this for you, so this is only needed if you
+are writing your own consumer class based on ``AsyncConsumer`` or
+``SyncConsumer``.
 
 
 Generic Consumers

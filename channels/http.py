@@ -172,7 +172,7 @@ class AsgiHandler(base.BaseHandler):
 
     async def __call__(self, receive, send):
         """
-        Async entrypoint - uses the SyncToAsync wrapper to run things in a
+        Async entrypoint - uses the sync_to_async wrapper to run things in a
         threadpool.
         """
         self.send = async_to_sync(send)

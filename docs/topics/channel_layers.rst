@@ -53,11 +53,11 @@ Synchronous Functions
 By default the ``send()``, ``group_send()``, ``group_add()`` and other functions
 are async functions, meaning you have to ``await`` them. If you need to call
 them from synchronous code, you'll need to use the handy
-``asgiref.sync.AsyncToSync`` wrapper::
+``asgiref.sync.async_to_sync`` wrapper::
 
-    from asgiref.sync import AsyncToSync
+    from asgiref.sync import async_to_sync
 
-    AsyncToSync(channel_layer.send)("channel_name", {...})
+    async_to_sync(channel_layer.send)("channel_name", {...})
 
 
 Single Channels
@@ -137,15 +137,15 @@ during disconnection, illustrated here on the WebSocket generic consumer::
 
     # This example uses WebSocket consumer, which is synchronous, and so
     # needs the async channel layer functions to be converted.
-    from asgiref.sync import AsyncToSync
+    from asgiref.sync import async_to_sync
 
     class ChatConsumer(WebsocketConsumer):
 
         def connect(self):
-            AsyncToSync(self.channel_layer.group_add)("chat", self.channel_name)
+            async_to_sync(self.channel_layer.group_add)("chat", self.channel_name)
 
         def disconnect(self):
-            AsyncToSync(self.channel_layer.group_discard)("chat", self.channel_name)
+            async_to_sync(self.channel_layer.group_discard)("chat", self.channel_name)
 
 Then, to send to a group, use ``group_send``, like in this small example
 which broadcasts chat messages to every connected socket when combined with
@@ -156,7 +156,7 @@ the code above::
         ...
 
         def receive(self, text_data):
-            AsyncToSync(self.channel_layer.group_send)(
+            async_to_sync(self.channel_layer.group_send)(
                 "chat",
                 {
                     "type": "chat.message",
@@ -188,8 +188,8 @@ from your own asynchronous context::
             {"type": "chat.system_message", "text": announcement_text},
         )
 
-Or you'll need to use AsyncToSync::
+Or you'll need to use async_to_sync::
 
-    from asgiref.sync import AsyncToSync
+    from asgiref.sync import async_to_sync
 
-    AsyncToSync(channel_layer.group_send)("chat", {"type": "chat.force_disconnect"})
+    async_to_sync(channel_layer.group_send)("chat", {"type": "chat.force_disconnect"})
