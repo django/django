@@ -130,6 +130,14 @@ are writing your own consumer class based on ``AsyncConsumer`` or
 ``SyncConsumer``.
 
 
+Channel Layers
+~~~~~~~~~~~~~~
+
+Consumers also let you deal with Channel's *channel layers*, to let them
+send messages between each other either one-to-one or via a broadcast system
+called groups. You can read more in :doc:`/topics/channel_layers`.
+
+
 Generic Consumers
 -----------------
 
