@@ -275,7 +275,7 @@ We can change the behavior on a specific backend by creating a subclass of
 ``NotEqual`` with an ``as_mysql`` method::
 
   class MySQLNotEqual(NotEqual):
-      def as_mysql(self, compiler, connection):
+      def as_mysql(self, compiler, connection, **extra_context):
           lhs, lhs_params = self.process_lhs(compiler, connection)
           rhs, rhs_params = self.process_rhs(compiler, connection)
           params = lhs_params + rhs_params

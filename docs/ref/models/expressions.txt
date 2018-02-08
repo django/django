@@ -322,11 +322,12 @@ The ``Func`` API is as follows:
                 function = 'CONCAT'
                 ...
 
-                def as_mysql(self, compiler, connection):
+                def as_mysql(self, compiler, connection, **extra_context):
                     return super().as_sql(
                         compiler, connection,
                         function='CONCAT_WS',
                         template="%(function)s('', %(expressions)s)",
+                        **extra_context
                     )
 
         To avoid a SQL injection vulnerability, ``extra_context`` :ref:`must

@@ -14,16 +14,16 @@ class Cast(Func):
         extra_context['db_type'] = self.output_field.cast_db_type(connection)
         return super().as_sql(compiler, connection, **extra_context)
 
-    def as_mysql(self, compiler, connection):
+    def as_mysql(self, compiler, connection, **extra_context):
         # MySQL doesn't support explicit cast to float.
         template = '(%(expressions)s + 0.0)' if self.output_field.get_internal_type() == 'FloatField' else None
-        return self.as_sql(compiler, connection, template=template)
+        return self.as_sql(compiler, connection, template=template, **extra_context)
 
-    def as_postgresql(self, compiler, connection):
+    def as_postgresql(self, compiler, connection, **extra_context):
         # CAST would be valid too, but the :: shortcut syntax is more readable.
         # 'expressions' is wrapped in parentheses in case it's a complex
         # expression.
-        return self.as_sql(compiler, connection, template='(%(expressions)s)::%(db_type)s')
+        return self.as_sql(compiler, connection, template='(%(expressions)s)::%(db_type)s', **extra_context)
 
 
 class Coalesce(Func):
@@ -35,7 +35,7 @@ class Coalesce(Func):
             raise ValueError('Coalesce must take at least two expressions')
         super().__init__(*expressions, **extra)
 
-    def as_oracle(self, compiler, connection):
+    def as_oracle(self, compiler, connection, **extra_context):
         # Oracle prohibits mixing TextField (NCLOB) and CharField (NVARCHAR2),
         # so convert all fields to NCLOB when that type is expected.
         if self.output_field.get_internal_type() == 'TextField':
@@ -47,8 +47,8 @@ class Coalesce(Func):
             ]
             clone = self.copy()
             clone.set_source_expressions(expressions)
-            return super(Coalesce, clone).as_sql(compiler, connection)
-        return self.as_sql(compiler, connection)
+            return super(Coalesce, clone).as_sql(compiler, connection, **extra_context)
+        return self.as_sql(compiler, connection, **extra_context)
 
 
 class Greatest(Func):
@@ -66,9 +66,9 @@ class Greatest(Func):
             raise ValueError('Greatest must take at least two expressions')
         super().__init__(*expressions, **extra)
 
-    def as_sqlite(self, compiler, connection):
+    def as_sqlite(self, compiler, connection, **extra_context):
         """Use the MAX function on SQLite."""
-        return super().as_sqlite(compiler, connection, function='MAX')
+        return super().as_sqlite(compiler, connection, function='MAX', **extra_context)
 
 
 class Least(Func):
@@ -86,6 +86,6 @@ class Least(Func):
             raise ValueError('Least must take at least two expressions')
         super().__init__(*expressions, **extra)
 
-    def as_sqlite(self, compiler, connection):
+    def as_sqlite(self, compiler, connection, **extra_context):
         """Use the MIN function on SQLite."""
-        return super().as_sqlite(compiler, connection, function='MIN')
+        return super().as_sqlite(compiler, connection, function='MIN', **extra_context)

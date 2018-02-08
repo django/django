@@ -1083,8 +1083,8 @@ class AggregateTestCase(TestCase):
         class Greatest(Func):
             function = 'GREATEST'
 
-            def as_sqlite(self, compiler, connection):
-                return super().as_sql(compiler, connection, function='MAX')
+            def as_sqlite(self, compiler, connection, **extra_context):
+                return super().as_sql(compiler, connection, function='MAX', **extra_context)
 
         qs = Publisher.objects.annotate(
             price_or_median=Greatest(Avg('book__rating'), Avg('book__price'))

@@ -64,7 +64,10 @@ class Aggregate(Func):
             if connection.features.supports_aggregate_filter_clause:
                 filter_sql, filter_params = self.filter.as_sql(compiler, connection)
                 template = self.filter_template % extra_context.get('template', self.template)
-                sql, params = super().as_sql(compiler, connection, template=template, filter=filter_sql)
+                sql, params = super().as_sql(
+                    compiler, connection, template=template, filter=filter_sql,
+                    **extra_context
+                )
                 return sql, params + filter_params
             else:
                 copy = self.copy()
@@ -92,20 +95,20 @@ class Avg(Aggregate):
             return FloatField()
         return super()._resolve_output_field()
 
-    def as_mysql(self, compiler, connection):
-        sql, params = super().as_sql(compiler, connection)
+    def as_mysql(self, compiler, connection, **extra_context):
+        sql, params = super().as_sql(compiler, connection, **extra_context)
         if self.output_field.get_internal_type() == 'DurationField':
             sql = 'CAST(%s as SIGNED)' % sql
         return sql, params
 
-    def as_oracle(self, compiler, connection):
+    def as_oracle(self, compiler, connection, **extra_context):
         if self.output_field.get_internal_type() == 'DurationField':
             expression = self.get_source_expressions()[0]
             from django.db.backends.oracle.functions import IntervalToSeconds, SecondsToInterval
             return compiler.compile(
                 SecondsToInterval(Avg(IntervalToSeconds(expression), filter=self.filter))
             )
-        return super().as_sql(compiler, connection)
+        return super().as_sql(compiler, connection, **extra_context)
 
 
 class Count(Aggregate):
@@ -157,20 +160,20 @@ class Sum(Aggregate):
     function = 'SUM'
     name = 'Sum'
 
-    def as_mysql(self, compiler, connection):
-        sql, params = super().as_sql(compiler, connection)
+    def as_mysql(self, compiler, connection, **extra_context):
+        sql, params = super().as_sql(compiler, connection, **extra_context)
         if self.output_field.get_internal_type() == 'DurationField':
             sql = 'CAST(%s as SIGNED)' % sql
         return sql, params
 
-    def as_oracle(self, compiler, connection):
+    def as_oracle(self, compiler, connection, **extra_context):
         if self.output_field.get_internal_type() == 'DurationField':
             expression = self.get_source_expressions()[0]
             from django.db.backends.oracle.functions import IntervalToSeconds, SecondsToInterval
             return compiler.compile(
                 SecondsToInterval(Sum(IntervalToSeconds(expression)))
             )
-        return super().as_sql(compiler, connection)
+        return super().as_sql(compiler, connection, **extra_context)
 
 
 class Variance(Aggregate):
