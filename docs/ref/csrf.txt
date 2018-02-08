@@ -170,6 +170,14 @@ If you're using AngularJS 1.1.3 and newer, it's sufficient to configure the
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
 
+Similary if you are using axios.js
+
+.. code-block:: javascript
+
+    axios.defaults.xsrfCookieName = 'csrftoken'
+    axios.defaults.xsrfHeaderName = 'X-CSRFToken'
+
+
 Using CSRF in Jinja2 templates
 ------------------------------
 
