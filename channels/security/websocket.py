@@ -24,16 +24,11 @@ class OriginValidator:
         origin_host = None
         for header_name, header_value in scope.get("headers", []):
             if header_name == b"origin":
-                print("got origin header, val %r" % header_value)
                 try:
                     origin_host = urlparse(header_value.decode("ascii")).hostname
-                    print("nuhost: %r" % origin_host)
                 except UnicodeDecodeError:
                     pass
-            else:
-                print("non origin header: %r" % header_name)
         # Check to see if the origin header is valid
-        print("origin header: %s" % origin_host)
         if self.valid_origin(origin_host):
             # Pass control to the application
             return self.application(scope)
