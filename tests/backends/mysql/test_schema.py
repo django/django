@@ -9,6 +9,7 @@ class SchemaEditorTests(TestCase):
     def test_quote_value(self):
         editor = connection.schema_editor()
         tested_values = [
+            ('string', "'string'"),
             (42, '42'),
             (1.754, '1.754'),
             (False, '0'),

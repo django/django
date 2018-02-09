@@ -1,9 +1,9 @@
 from django.db import connection
-from django.test import SimpleTestCase
+from django.test import TestCase
 from django.test.utils import patch_logger
 
 
-class SchemaLoggerTests(SimpleTestCase):
+class SchemaLoggerTests(TestCase):
 
     def test_extra_args(self):
         editor = connection.schema_editor(collect_sql=True)
