@@ -5,6 +5,7 @@ from unittest import TestSuite, TextTestRunner, defaultTestLoader
 
 from django.test import TestCase
 from django.test.runner import DiscoverRunner
+from django.test.utils import captured_stdout
 
 
 @contextmanager
@@ -210,3 +211,15 @@ class DiscoverRunnerTest(TestCase):
         self.assertEqual(count_tests(tags=['foo'], exclude_tags=['bar']), 2)
         self.assertEqual(count_tests(tags=['foo'], exclude_tags=['bar', 'baz']), 1)
         self.assertEqual(count_tests(exclude_tags=['foo']), 0)
+
+    def test_included_tags_displayed(self):
+        runner = DiscoverRunner(tags=['foo', 'bar'], verbosity=2)
+        with captured_stdout() as stdout:
+            runner.build_suite(['test_runner_apps.tagged.tests'])
+            self.assertIn('Including test tag(s): bar, foo.\n', stdout.getvalue())
+
+    def test_excluded_tags_displayed(self):
+        runner = DiscoverRunner(exclude_tags=['foo', 'bar'], verbosity=3)
+        with captured_stdout() as stdout:
+            runner.build_suite(['test_runner_apps.tagged.tests'])
+            self.assertIn('Excluding test tag(s): bar, foo.\n', stdout.getvalue())

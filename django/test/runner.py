@@ -522,6 +522,11 @@ class DiscoverRunner:
             suite.addTest(test)
 
         if self.tags or self.exclude_tags:
+            if self.verbosity >= 2:
+                if self.tags:
+                    print('Including test tag(s): %s.' % ', '.join(sorted(self.tags)))
+                if self.exclude_tags:
+                    print('Excluding test tag(s): %s.' % ', '.join(sorted(self.exclude_tags)))
             suite = filter_tests_by_tags(suite, self.tags, self.exclude_tags)
         suite = reorder_suite(suite, self.reorder_by, self.reverse)
 
