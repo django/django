@@ -6,12 +6,17 @@ from daphne.endpoints import build_endpoint_description_strings
 from daphne.server import Server
 
 from ..routing import get_default_application
+from ..staticfiles import StaticFilesWrapper
 
 
 class DaphneServerThread(LiveServerThread):
     """
     LiveServerThread subclass that runs Daphne
     """
+
+    def __init__(self, host, application, *args, **kwargs):
+        self.application = application
+        super().__init__(host, None, *args, **kwargs)
 
     def run(self):
         """
@@ -46,7 +51,7 @@ class DaphneServerThread(LiveServerThread):
     def _create_server(self):
         endpoints = build_endpoint_description_strings(host=self.host, port=self._port)
         return Server(
-            application=get_default_application(),
+            application=self.application,
             endpoints=endpoints,
             signal_handlers=False,
             ws_protocols=getattr(settings, "CHANNELS_WS_PROTOCOLS", None),
@@ -62,5 +67,26 @@ class DaphneServerThread(LiveServerThread):
 
 
 class ChannelsLiveServerTestCase(LiveServerTestCase):
+    """
+    Drop-in replacement for Django's LiveServerTestCase.
+
+    In order to serve static files create a subclass with serve_static = True.
+    """
 
     server_thread_class = DaphneServerThread
+    static_wrapper = StaticFilesWrapper
+    serve_static = False
+
+    @classmethod
+    def _create_server_thread(cls, connections_override):
+        if cls.serve_static:
+            application = cls.static_wrapper(get_default_application())
+        else:
+            application = get_default_application()
+
+        return cls.server_thread_class(
+            cls.host,
+            application,
+            connections_override=connections_override,
+            port=cls.port,
+        )

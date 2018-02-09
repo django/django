@@ -226,3 +226,10 @@ standard Django ``LiveServerTestCase``::
 
         def test_live_stuff(self):
             call_external_testing_thing(self.live_server_url)
+
+serve_static
+~~~~~~~~~~~~
+
+Subclass ``ChannelsLiveServerTestCase`` with ``serve_static = True`` in order
+to serve static files (comparable to Django's ``StaticLiveServerTestCase``, you
+don't need to run collectstatic before or as a part of your tests setup).
