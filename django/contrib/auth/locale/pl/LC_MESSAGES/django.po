@@ -214,7 +214,7 @@ msgid "staff status"
 msgstr "w zespole"
 
 msgid "Designates whether the user can log into this admin site."
-msgstr "Określa czy użytkownik może zalogować się do panelu admina."
+msgstr "Określa czy użytkownik może zalogować się do panelu administracyjnego."
 
 msgid "active"
 msgstr "aktywny"
