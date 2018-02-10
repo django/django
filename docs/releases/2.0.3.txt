@@ -11,3 +11,7 @@ Bugfixes
 
 * Fixed a regression that caused sliced ``QuerySet.distinct().order_by()``
   followed by ``count()`` to crash (:ticket:`29108`).
+
+* Prioritized the datetime and time input formats without ``%f`` for the Thai
+  locale to fix the admin time picker widget displaying "undefined"
+  (:ticket:`29109`).
