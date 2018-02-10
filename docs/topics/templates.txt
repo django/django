@@ -392,8 +392,10 @@ Set :setting:`BACKEND <TEMPLATES-BACKEND>` to
 
 .. warning::
 
-    Django's admin does not support Jinja2. If you're using Jinja2, you must also have a 
-    DjangoTemplates backend defined in your :setting:`TEMPLATES` to use the admin, i.e.::
+    Django's admin does not support Jinja2
+    (see :ref:`admin's requirements <admin_requirements>`). If you're using Jinja2,
+    you must also have a DjangoTemplates backend defined in your :setting:`TEMPLATES`
+    to use the admin, i.e.::
     
         TEMPLATES = [
             {
