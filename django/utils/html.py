@@ -7,7 +7,6 @@ from urllib.parse import (
     parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit,
 )
 
-from django.utils.encoding import force_text
 from django.utils.functional import Promise, keep_lazy, keep_lazy_text
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
 from django.utils.safestring import SafeData, SafeText, mark_safe
@@ -190,7 +189,7 @@ def strip_tags(value):
     """Return the given HTML with all tags stripped."""
     # Note: in typical case this loop executes _strip_once once. Loop condition
     # is redundant, but helps to reduce number of executions of _strip_once.
-    value = force_text(value)
+    value = str(value)
     while '<' in value and '>' in value:
         new_value = _strip_once(value)
         if len(new_value) >= len(value):
@@ -203,7 +202,7 @@ def strip_tags(value):
 @keep_lazy_text
 def strip_spaces_between_tags(value):
     """Return the given HTML with spaces between tags removed."""
-    return re.sub(r'>\s+<', '><', force_text(value))
+    return re.sub(r'>\s+<', '><', str(value))
 
 
 def smart_urlquote(url):
@@ -213,8 +212,7 @@ def smart_urlquote(url):
         # Tilde is part of RFC3986 Unreserved Characters
         # http://tools.ietf.org/html/rfc3986#section-2.3
         # See also http://bugs.python.org/issue16285
-        segment = quote(segment, safe=RFC3986_SUBDELIMS + RFC3986_GENDELIMS + '~')
-        return force_text(segment)
+        return quote(segment, safe=RFC3986_SUBDELIMS + RFC3986_GENDELIMS + '~')
 
     # Handle IDN before quoting.
     try:
@@ -315,7 +313,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
                     trimmed_something = True
         return lead, middle, trail
 
-    words = word_split_re.split(force_text(text))
+    words = word_split_re.split(str(text))
     for i, word in enumerate(words):
         if '.' in word or '@' in word or ':' in word:
             # lead: Current punctuation trimmed from the beginning of the word.
