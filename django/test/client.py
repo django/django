@@ -310,7 +310,7 @@ class RequestFactory:
                 charset = match.group(1)
             else:
                 charset = settings.DEFAULT_CHARSET
-            return force_bytes(data, encoding=charset)
+            return data.encode(charset)
 
     def _encode_json(self, data, content_type):
         """
@@ -409,7 +409,7 @@ class RequestFactory:
         # If QUERY_STRING is absent or empty, we want to extract it from the URL.
         if not r.get('QUERY_STRING'):
             # WSGI requires latin-1 encoded strings. See get_path_info().
-            query_string = force_bytes(parsed[4]).decode('iso-8859-1')
+            query_string = parsed[4].encode().decode('iso-8859-1')
             r['QUERY_STRING'] = query_string
         return self.request(**r)
 
