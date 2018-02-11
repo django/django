@@ -150,7 +150,7 @@ and then specifying a handler method for events on it::
             # Make a database row with our channel name
             Clients.objects.create(channel_name=self.channel_name)
 
-        def disconnect(self):
+        def disconnect(self, close_code):
             # Note that in some rare cases (power loss, etc) disconnect may fail
             # to run; this naive example would leave zombie channel names around.
             Clients.objects.filter(channel_name=self.channel_name).delete()
@@ -212,7 +212,7 @@ during disconnection, illustrated here on the WebSocket generic consumer::
         def connect(self):
             async_to_sync(self.channel_layer.group_add)("chat", self.channel_name)
 
-        def disconnect(self):
+        def disconnect(self, close_code):
             async_to_sync(self.channel_layer.group_discard)("chat", self.channel_name)
 
 Then, to send to a group, use ``group_send``, like in this small example
