@@ -1069,3 +1069,43 @@ site2.register(Person, save_as_continue=False)
 site7 = admin.AdminSite(name="admin7")
 site7.register(Article, ArticleAdmin2)
 site7.register(Section)
+
+
+# Used to test ModelAdmin.sortable_by and get_sortable_by().
+class ArticleAdmin6(admin.ModelAdmin):
+    list_display = (
+        'content', 'date', callable_year, 'model_year', 'modeladmin_year',
+        'model_year_reversed', 'section',
+    )
+    sortable_by = ('date', callable_year)
+
+    def modeladmin_year(self, obj):
+        return obj.date.year
+    modeladmin_year.admin_order_field = 'date'
+
+
+class ActorAdmin6(admin.ModelAdmin):
+    list_display = ('name', 'age')
+    sortable_by = ('name',)
+
+    def get_sortable_by(self, request):
+        return ('age',)
+
+
+class ChapterAdmin6(admin.ModelAdmin):
+    list_display = ('title', 'book')
+    sortable_by = ()
+
+
+class ColorAdmin6(admin.ModelAdmin):
+    list_display = ('value',)
+
+    def get_sortable_by(self, request):
+        return ()
+
+
+site6 = admin.AdminSite(name='admin6')
+site6.register(Article, ArticleAdmin6)
+site6.register(Actor, ActorAdmin6)
+site6.register(Chapter, ChapterAdmin6)
+site6.register(Color, ColorAdmin6)

@@ -1296,6 +1296,22 @@ subclass::
     a full count on the table which can be expensive if the table contains a
     large number of rows.
 
+.. attribute:: ModelAdmin.sortable_by
+
+    .. versionadded:: 2.1
+
+    By default, the change list page allows sorting by all model fields (and
+    callables that have the ``admin_order_field`` property) specified in
+    :attr:`list_display`.
+
+    If you want to disable sorting for some columns, set ``sortable_by`` to
+    a collection (e.g. ``list``, ``tuple``, or ``set``) of the subset of
+    :attr:`list_display` that you want to be sortable. An empty collection
+    disables sorting for all columns.
+
+    If you need to specify this list dynamically, implement a
+    :meth:`~ModelAdmin.get_sortable_by` method instead.
+
 .. attribute:: ModelAdmin.view_on_site
 
     Set ``view_on_site`` to control whether or not to display the "View on site" link.
@@ -1563,6 +1579,24 @@ templates used by the :class:`ModelAdmin` views:
     The ``get_search_fields`` method is given the ``HttpRequest`` and is expected
     to return the same kind of sequence type as for the
     :attr:`~ModelAdmin.search_fields` attribute.
+
+.. method:: ModelAdmin.get_sortable_by(request)
+
+    .. versionadded:: 2.1
+
+    The ``get_sortable_by()`` method is passed the ``HttpRequest`` and is
+    expected to return a collection (e.g. ``list``, ``tuple``, or ``set``) of
+    field names that will be sortable in the change list page.
+
+    Its default implementation returns :attr:`sortable_by` if it's set,
+    otherwise it defers to :meth:`get_list_display`.
+
+    For example, to prevent one or more columns from being sortable::
+
+        class PersonAdmin(admin.ModelAdmin):
+
+            def get_sortable_by(self, request):
+                return {*self.get_list_display(request)} - {'rank'}
 
 .. method:: ModelAdmin.get_inline_instances(request, obj=None)
 

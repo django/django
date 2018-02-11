@@ -38,10 +38,8 @@ class BasicExpressionsTests(TestCase):
             name="Foobar Ltd.", num_employees=3, num_chairs=4,
             ceo=Employee.objects.create(firstname="Frank", lastname="Meyer", salary=20)
         )
-        cls.gmbh = Company.objects.create(
-            name="Test GmbH", num_employees=32, num_chairs=1,
-            ceo=Employee.objects.create(firstname="Max", lastname="Mustermann", salary=30)
-        )
+        cls.max = Employee.objects.create(firstname='Max', lastname='Mustermann', salary=30)
+        cls.gmbh = Company.objects.create(name='Test GmbH', num_employees=32, num_chairs=1, ceo=cls.max)
 
     def setUp(self):
         self.company_query = Company.objects.values(
@@ -451,6 +449,14 @@ class BasicExpressionsTests(TestCase):
             company_ceo_set__num_employees=F('company_ceo_set__num_employees')
         )
         self.assertEqual(str(qs.query).count('JOIN'), 2)
+
+    def test_order_by_exists(self):
+        mary = Employee.objects.create(firstname='Mary', lastname='Mustermann', salary=20)
+        mustermanns_by_seniority = Employee.objects.filter(lastname='Mustermann').order_by(
+            # Order by whether the employee is the CEO of a company
+            Exists(Company.objects.filter(ceo=OuterRef('pk'))).desc()
+        )
+        self.assertSequenceEqual(mustermanns_by_seniority, [self.max, mary])
 
     def test_outerref(self):
         inner = Company.objects.filter(point_of_contact=OuterRef('pk'))
@@ -1408,6 +1414,40 @@ class ValueTests(TestCase):
         msg = 'ExpressionList requires at least one expression'
         with self.assertRaisesMessage(ValueError, msg):
             ExpressionList()
+
+
+class FieldTransformTests(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.sday = sday = datetime.date(2010, 6, 25)
+        cls.stime = stime = datetime.datetime(2010, 6, 25, 12, 15, 30, 747000)
+        cls.ex1 = Experiment.objects.create(
+            name='Experiment 1',
+            assigned=sday,
+            completed=sday + datetime.timedelta(2),
+            estimated_time=datetime.timedelta(2),
+            start=stime,
+            end=stime + datetime.timedelta(2),
+        )
+
+    def test_month_aggregation(self):
+        self.assertEqual(
+            Experiment.objects.aggregate(month_count=Count('assigned__month')),
+            {'month_count': 1}
+        )
+
+    def test_transform_in_values(self):
+        self.assertQuerysetEqual(
+            Experiment.objects.values('assigned__month'),
+            ["{'assigned__month': 6}"]
+        )
+
+    def test_multiple_transforms_in_values(self):
+        self.assertQuerysetEqual(
+            Experiment.objects.values('end__date__month'),
+            ["{'end__date__month': 6}"]
+        )
 
 
 class ReprTests(TestCase):

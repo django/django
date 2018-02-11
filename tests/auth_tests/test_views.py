@@ -28,7 +28,6 @@ from django.middleware.csrf import CsrfViewMiddleware, get_token
 from django.test import Client, TestCase, override_settings
 from django.test.utils import patch_logger
 from django.urls import NoReverseMatch, reverse, reverse_lazy
-from django.utils.encoding import force_text
 from django.utils.translation import LANGUAGE_SESSION_KEY
 
 from .client import PasswordResetConfirmClient
@@ -1150,7 +1149,7 @@ class ChangelistTests(AuthViewsTestCase):
         # Test the link inside password field help_text.
         rel_link = re.search(
             r'you can change the password using <a href="([^"]*)">this form</a>',
-            force_text(response.content)
+            response.content.decode()
         ).groups()[0]
         self.assertEqual(
             os.path.normpath(user_change_url + rel_link),

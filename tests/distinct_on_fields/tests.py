@@ -1,4 +1,5 @@
-from django.db.models import Max
+from django.db.models import CharField, Max
+from django.db.models.functions import Lower
 from django.test import TestCase, skipUnlessDBFeature
 
 from .models import Celebrity, Fan, Staff, StaffTag, Tag
@@ -8,19 +9,19 @@ from .models import Celebrity, Fan, Staff, StaffTag, Tag
 @skipUnlessDBFeature('supports_nullable_unique_constraints')
 class DistinctOnTests(TestCase):
     def setUp(self):
-        t1 = Tag.objects.create(name='t1')
-        Tag.objects.create(name='t2', parent=t1)
-        t3 = Tag.objects.create(name='t3', parent=t1)
-        Tag.objects.create(name='t4', parent=t3)
-        Tag.objects.create(name='t5', parent=t3)
+        self.t1 = Tag.objects.create(name='t1')
+        self.t2 = Tag.objects.create(name='t2', parent=self.t1)
+        self.t3 = Tag.objects.create(name='t3', parent=self.t1)
+        self.t4 = Tag.objects.create(name='t4', parent=self.t3)
+        self.t5 = Tag.objects.create(name='t5', parent=self.t3)
 
         self.p1_o1 = Staff.objects.create(id=1, name="p1", organisation="o1")
         self.p2_o1 = Staff.objects.create(id=2, name="p2", organisation="o1")
         self.p3_o1 = Staff.objects.create(id=3, name="p3", organisation="o1")
         self.p1_o2 = Staff.objects.create(id=4, name="p1", organisation="o2")
         self.p1_o1.coworkers.add(self.p2_o1, self.p3_o1)
-        StaffTag.objects.create(staff=self.p1_o1, tag=t1)
-        StaffTag.objects.create(staff=self.p1_o1, tag=t1)
+        StaffTag.objects.create(staff=self.p1_o1, tag=self.t1)
+        StaffTag.objects.create(staff=self.p1_o1, tag=self.t1)
 
         celeb1 = Celebrity.objects.create(name="c1")
         celeb2 = Celebrity.objects.create(name="c2")
@@ -94,6 +95,19 @@ class DistinctOnTests(TestCase):
         self.assertIn('OUTER JOIN', str(c1.query))
         c2 = c1.distinct('pk')
         self.assertNotIn('OUTER JOIN', str(c2.query))
+
+    def test_transform(self):
+        new_name = self.t1.name.upper()
+        self.assertNotEqual(self.t1.name, new_name)
+        Tag.objects.create(name=new_name)
+        CharField.register_lookup(Lower)
+        try:
+            self.assertCountEqual(
+                Tag.objects.order_by().distinct('name__lower'),
+                [self.t1, self.t2, self.t3, self.t4, self.t5],
+            )
+        finally:
+            CharField._unregister_lookup(Lower)
 
     def test_distinct_not_implemented_checks(self):
         # distinct + annotate not allowed

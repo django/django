@@ -64,10 +64,14 @@ Some examples
     # Aggregates can contain complex computations also
     Company.objects.annotate(num_offerings=Count(F('products') + F('services')))
 
-    # Expressions can also be used in order_by()
+    # Expressions can also be used in order_by(), either directly
     Company.objects.order_by(Length('name').asc())
     Company.objects.order_by(Length('name').desc())
-
+    # or using the double underscore lookup syntax.
+    from django.db.models import CharField
+    from django.db.models.functions import Length
+    CharField.register_lookup(Length)
+    Company.objects.order_by('name__length')
 
 Built-in Expressions
 ====================

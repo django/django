@@ -19,7 +19,9 @@ testing against the contexts and templates produced by a view,
 rather than the HTML rendered to the end-user.
 
 """
+import itertools
 import tempfile
+from unittest import mock
 
 from django.contrib.auth.models import User
 from django.core import mail
@@ -84,6 +86,31 @@ class ClientTest(TestCase):
         self.assertEqual(response.context['data'], '37')
         self.assertEqual(response.templates[0].name, 'POST Template')
         self.assertContains(response, 'Data received')
+
+    def test_json_serialization(self):
+        """The test client serializes JSON data."""
+        methods = ('post', 'put', 'patch', 'delete')
+        for method in methods:
+            with self.subTest(method=method):
+                client_method = getattr(self.client, method)
+                method_name = method.upper()
+                response = client_method('/json_view/', {'value': 37}, content_type='application/json')
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.context['data'], 37)
+                self.assertContains(response, 'Viewing %s page.' % method_name)
+
+    def test_json_encoder_argument(self):
+        """The test Client accepts a json_encoder."""
+        mock_encoder = mock.MagicMock()
+        mock_encoding = mock.MagicMock()
+        mock_encoder.return_value = mock_encoding
+        mock_encoding.encode.return_value = '{"value": 37}'
+
+        client = self.client_class(json_encoder=mock_encoder)
+        # Vendored tree JSON content types are accepted.
+        client.post('/json_view/', {'value': 37}, content_type='application/vnd.api+json')
+        self.assertTrue(mock_encoder.called)
+        self.assertTrue(mock_encoding.encode.called)
 
     def test_trace(self):
         """TRACE a view"""
@@ -201,6 +228,39 @@ class ClientTest(TestCase):
         response = self.client.get('/accounts/no_trailing_slash', follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.request['PATH_INFO'], '/accounts/login/')
+
+    def test_follow_307_and_308_redirect(self):
+        """
+        A 307 or 308 redirect preserves the request method after the redirect.
+        """
+        methods = ('get', 'post', 'head', 'options', 'put', 'patch', 'delete', 'trace')
+        codes = (307, 308)
+        for method, code in itertools.product(methods, codes):
+            with self.subTest(method=method, code=code):
+                req_method = getattr(self.client, method)
+                response = req_method('/redirect_view_%s/' % code, data={'value': 'test'}, follow=True)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.request['PATH_INFO'], '/post_view/')
+                self.assertEqual(response.request['REQUEST_METHOD'], method.upper())
+
+    def test_follow_307_and_308_preserves_post_data(self):
+        for code in (307, 308):
+            with self.subTest(code=code):
+                response = self.client.post('/redirect_view_%s/' % code, data={'value': 'test'}, follow=True)
+                self.assertContains(response, 'test is the value')
+
+    def test_follow_307_and_308_preserves_put_body(self):
+        for code in (307, 308):
+            with self.subTest(code=code):
+                response = self.client.put('/redirect_view_%s/?to=/put_view/' % code, data='a=b', follow=True)
+                self.assertContains(response, 'a=b is the body')
+
+    def test_follow_307_and_308_preserves_get_params(self):
+        data = {'var': 30, 'to': '/get_view/'}
+        for code in (307, 308):
+            with self.subTest(code=code):
+                response = self.client.get('/redirect_view_%s/' % code, data=data, follow=True)
+                self.assertContains(response, '30 is the value')
 
     def test_redirect_http(self):
         "GET a URL that redirects to an http URI"

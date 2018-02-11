@@ -1782,6 +1782,46 @@ For example::
 If ``value`` is the list ``['a', 'b', 'c']``, the output will be the string
 ``"a // b // c"``.
 
+.. templatefilter:: json_script
+
+``json_script``
+---------------
+
+.. versionadded:: 2.1
+
+Safely outputs a Python object as JSON, wrapped in a ``<script>`` tag, ready
+for use with JavaScript.
+
+**Argument:** HTML "id" of the ``<script>`` tag.
+
+For example::
+
+    {{ value|json_script:"hello-data" }}
+
+If ``value`` is a the dictionary ``{'hello': 'world'}``, the output will be:
+
+.. code-block:: html
+
+    <script id="hello-data" type="application/json">{"hello": "world"}</script>
+
+The resulting data can be accessed in JavaScript like this:
+
+.. code-block:: javascript
+
+    var el = document.getElementById('hello-data');
+    var value = JSON.parse(el.textContent || el.innerText);
+
+XSS attacks are mitigated by escaping the characters "<", ">" and "&". For
+example if ``value`` is ``{'hello': 'world</script>&amp;'}``, the output is:
+
+.. code-block:: html
+
+    <script id="hello-data" type="application/json">{"hello": "world\\u003C/script\\u003E\\u0026amp;"}</script>
+
+This is compatible with a strict Content Security Policy that prohibits in-page
+script execution. It also maintains a clean separation between passive data and
+executable code.
+
 .. templatefilter:: last
 
 ``last``

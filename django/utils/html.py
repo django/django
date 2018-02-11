@@ -1,12 +1,12 @@
 """HTML utilities suitable for global use."""
 
+import json
 import re
 from html.parser import HTMLParser
 from urllib.parse import (
     parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit,
 )
 
-from django.utils.encoding import force_text
 from django.utils.functional import Promise, keep_lazy, keep_lazy_text
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
 from django.utils.safestring import SafeData, SafeText, mark_safe
@@ -75,6 +75,27 @@ _js_escapes.update((ord('%c' % z), '\\u%04X' % z) for z in range(32))
 def escapejs(value):
     """Hex encode characters for use in JavaScript strings."""
     return mark_safe(str(value).translate(_js_escapes))
+
+
+_json_script_escapes = {
+    ord('>'): '\\u003E',
+    ord('<'): '\\u003C',
+    ord('&'): '\\u0026',
+}
+
+
+def json_script(value, element_id):
+    """
+    Escape all the HTML/XML special characters with their unicode escapes, so
+    value is safe to be output anywhere except for inside a tag attribute. Wrap
+    the escaped JSON in a script tag.
+    """
+    from django.core.serializers.json import DjangoJSONEncoder
+    json_str = json.dumps(value, cls=DjangoJSONEncoder).translate(_json_script_escapes)
+    return format_html(
+        '<script id="{}" type="application/json">{}</script>',
+        element_id, mark_safe(json_str)
+    )
 
 
 def conditional_escape(text):
@@ -168,7 +189,7 @@ def strip_tags(value):
     """Return the given HTML with all tags stripped."""
     # Note: in typical case this loop executes _strip_once once. Loop condition
     # is redundant, but helps to reduce number of executions of _strip_once.
-    value = force_text(value)
+    value = str(value)
     while '<' in value and '>' in value:
         new_value = _strip_once(value)
         if len(new_value) >= len(value):
@@ -181,7 +202,7 @@ def strip_tags(value):
 @keep_lazy_text
 def strip_spaces_between_tags(value):
     """Return the given HTML with spaces between tags removed."""
-    return re.sub(r'>\s+<', '><', force_text(value))
+    return re.sub(r'>\s+<', '><', str(value))
 
 
 def smart_urlquote(url):
@@ -191,8 +212,7 @@ def smart_urlquote(url):
         # Tilde is part of RFC3986 Unreserved Characters
         # http://tools.ietf.org/html/rfc3986#section-2.3
         # See also http://bugs.python.org/issue16285
-        segment = quote(segment, safe=RFC3986_SUBDELIMS + RFC3986_GENDELIMS + '~')
-        return force_text(segment)
+        return quote(segment, safe=RFC3986_SUBDELIMS + RFC3986_GENDELIMS + '~')
 
     # Handle IDN before quoting.
     try:
@@ -293,7 +313,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
                     trimmed_something = True
         return lead, middle, trail
 
-    words = word_split_re.split(force_text(text))
+    words = word_split_re.split(str(text))
     for i, word in enumerate(words):
         if '.' in word or '@' in word or ':' in word:
             # lead: Current punctuation trimmed from the beginning of the word.

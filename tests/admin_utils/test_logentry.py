@@ -8,7 +8,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import translation
-from django.utils.encoding import force_bytes
 from django.utils.html import escape
 
 from .models import Article, ArticleProxy, Site
@@ -211,9 +210,10 @@ class LogEntryTests(TestCase):
         logentry.content_type = None
         logentry.save()
 
-        counted_presence_before = response.content.count(force_bytes(should_contain))
+        should_contain = should_contain.encode()
+        counted_presence_before = response.content.count(should_contain)
         response = self.client.get(reverse('admin:index'))
-        counted_presence_after = response.content.count(force_bytes(should_contain))
+        counted_presence_after = response.content.count(should_contain)
         self.assertEqual(counted_presence_before - 1, counted_presence_after)
 
     def test_proxy_model_content_type_is_used_for_log_entries(self):

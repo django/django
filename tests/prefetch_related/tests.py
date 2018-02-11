@@ -1415,6 +1415,21 @@ class DirectPrefechedObjectCacheReuseTests(TestCase):
         with self.assertNumQueries(0):
             prefetch_related_objects([bookwithyear1], 'bookreview_set')
 
+    def test_add_clears_prefetched_objects(self):
+        bookwithyear = BookWithYear.objects.get(pk=self.bookwithyear1.pk)
+        prefetch_related_objects([bookwithyear], 'bookreview_set')
+        self.assertCountEqual(bookwithyear.bookreview_set.all(), [self.bookreview1])
+        new_review = BookReview.objects.create()
+        bookwithyear.bookreview_set.add(new_review)
+        self.assertCountEqual(bookwithyear.bookreview_set.all(), [self.bookreview1, new_review])
+
+    def test_remove_clears_prefetched_objects(self):
+        bookwithyear = BookWithYear.objects.get(pk=self.bookwithyear1.pk)
+        prefetch_related_objects([bookwithyear], 'bookreview_set')
+        self.assertCountEqual(bookwithyear.bookreview_set.all(), [self.bookreview1])
+        bookwithyear.bookreview_set.remove(self.bookreview1)
+        self.assertCountEqual(bookwithyear.bookreview_set.all(), [])
+
 
 class ReadPrefetchedObjectsCacheTests(TestCase):
     @classmethod

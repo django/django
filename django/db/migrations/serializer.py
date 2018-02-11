@@ -1,5 +1,5 @@
 import builtins
-import collections
+import collections.abc
 import datetime
 import decimal
 import enum
@@ -341,7 +341,7 @@ def serializer_factory(value):
         return FunctoolsPartialSerializer(value)
     if isinstance(value, (types.FunctionType, types.BuiltinFunctionType, types.MethodType)):
         return FunctionTypeSerializer(value)
-    if isinstance(value, collections.Iterable):
+    if isinstance(value, collections.abc.Iterable):
         return IterableSerializer(value)
     if isinstance(value, (COMPILED_REGEX_TYPE, RegexObject)):
         return RegexSerializer(value)

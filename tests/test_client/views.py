@@ -1,3 +1,4 @@
+import json
 from urllib.parse import urlencode
 from xml.dom.minidom import parseString
 
@@ -49,6 +50,16 @@ def trace_view(request):
         return HttpResponse(t.render(c))
 
 
+def put_view(request):
+    if request.method == 'PUT':
+        t = Template('Data received: {{ data }} is the body.', name='PUT Template')
+        c = Context({'data': request.body.decode()})
+    else:
+        t = Template('Viewing GET page.', name='Empty GET Template')
+        c = Context()
+    return HttpResponse(t.render(c))
+
+
 def post_view(request):
     """A view that expects a POST, and returns a different template depending
     on whether any POST data is available
@@ -63,7 +74,20 @@ def post_view(request):
     else:
         t = Template('Viewing GET page.', name='Empty GET Template')
         c = Context()
+    return HttpResponse(t.render(c))
 
+
+def json_view(request):
+    """
+    A view that expects a request with the header 'application/json' and JSON
+    data with a key named 'value'.
+    """
+    if request.META.get('CONTENT_TYPE') != 'application/json':
+        return HttpResponse()
+
+    t = Template('Viewing {} page. With data {{ data }}.'.format(request.method))
+    data = json.loads(request.body.decode('utf-8'))
+    c = Context({'data': data['value']})
     return HttpResponse(t.render(c))
 
 
@@ -97,6 +121,20 @@ def redirect_view(request):
     else:
         query = ''
     return HttpResponseRedirect('/get_view/' + query)
+
+
+def _post_view_redirect(request, status_code):
+    """Redirect to /post_view/ using the status code."""
+    redirect_to = request.GET.get('to', '/post_view/')
+    return HttpResponseRedirect(redirect_to, status=status_code)
+
+
+def method_saving_307_redirect_view(request):
+    return _post_view_redirect(request, 307)
+
+
+def method_saving_308_redirect_view(request):
+    return _post_view_redirect(request, 308)
 
 
 def view_with_secure(request):

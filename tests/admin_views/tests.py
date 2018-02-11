@@ -29,7 +29,7 @@ from django.test.utils import override_script_prefix, patch_logger
 from django.urls import NoReverseMatch, resolve, reverse
 from django.utils import formats, translation
 from django.utils.cache import get_max_age
-from django.utils.encoding import force_bytes, force_text, iri_to_uri
+from django.utils.encoding import iri_to_uri
 from django.utils.html import escape
 from django.utils.http import urlencode
 
@@ -131,6 +131,7 @@ class AdminViewBasicTestCase(TestCase):
         cls.chap4 = Chapter.objects.create(title='Chapter 2', content='[ insert contents here ]', book=cls.b2)
         cls.cx1 = ChapterXtra1.objects.create(chap=cls.chap1, xtra='ChapterXtra1 1')
         cls.cx2 = ChapterXtra1.objects.create(chap=cls.chap3, xtra='ChapterXtra1 2')
+        Actor.objects.create(name='Palin', age=27)
 
         # Post data for edit inline
         cls.inline_post_data = {
@@ -183,8 +184,8 @@ class AdminViewBasicTestCase(TestCase):
         """
         self.assertEqual(response.status_code, 200)
         self.assertLess(
-            response.content.index(force_bytes(text1)),
-            response.content.index(force_bytes(text2)),
+            response.content.index(text1.encode()),
+            response.content.index(text2.encode()),
             (failing_msg or '') + '\nResponse:\n' + response.content.decode(response.charset)
         )
 
@@ -929,6 +930,35 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertContains(response, 'question__expires__day=16')
         self.assertContains(response, 'question__expires__month=10')
         self.assertContains(response, 'question__expires__year=2016')
+
+    def test_sortable_by_columns_subset(self):
+        expected_sortable_fields = ('date', 'callable_year')
+        expected_not_sortable_fields = (
+            'content', 'model_year', 'modeladmin_year', 'model_year_reversed',
+            'section',
+        )
+        response = self.client.get(reverse('admin6:admin_views_article_changelist'))
+        for field_name in expected_sortable_fields:
+            self.assertContains(response, '<th scope="col"  class="sortable column-%s">' % field_name)
+        for field_name in expected_not_sortable_fields:
+            self.assertContains(response, '<th scope="col"  class="column-%s">' % field_name)
+
+    def test_get_sortable_by_columns_subset(self):
+        response = self.client.get(reverse('admin6:admin_views_actor_changelist'))
+        self.assertContains(response, '<th scope="col"  class="sortable column-age">')
+        self.assertContains(response, '<th scope="col"  class="column-name">')
+
+    def test_sortable_by_no_column(self):
+        expected_not_sortable_fields = ('title', 'book')
+        response = self.client.get(reverse('admin6:admin_views_chapter_changelist'))
+        for field_name in expected_not_sortable_fields:
+            self.assertContains(response, '<th scope="col"  class="column-%s">' % field_name)
+        self.assertNotContains(response, '<th scope="col"  class="sortable column')
+
+    def test_get_sortable_by_no_column(self):
+        response = self.client.get(reverse('admin6:admin_views_color_changelist'))
+        self.assertContains(response, '<th scope="col"  class="column-value">')
+        self.assertNotContains(response, '<th scope="col"  class="sortable column')
 
 
 @override_settings(TEMPLATES=[{
@@ -2161,16 +2191,14 @@ class AdminViewDeletedObjectsTest(TestCase):
         cause them to be scheduled for deletion.
         """
         pattern = re.compile(
-            force_bytes(
-                r'<li>Plot: <a href="%s">World Domination</a>\s*<ul>\s*'
-                r'<li>Plot details: <a href="%s">almost finished</a>' % (
-                    reverse('admin:admin_views_plot_change', args=(self.pl1.pk,)),
-                    reverse('admin:admin_views_plotdetails_change', args=(self.pd1.pk,)),
-                )
+            r'<li>Plot: <a href="%s">World Domination</a>\s*<ul>\s*'
+            r'<li>Plot details: <a href="%s">almost finished</a>' % (
+                reverse('admin:admin_views_plot_change', args=(self.pl1.pk,)),
+                reverse('admin:admin_views_plotdetails_change', args=(self.pd1.pk,)),
             )
         )
         response = self.client.get(reverse('admin:admin_views_villain_delete', args=(self.v1.pk,)))
-        self.assertRegex(response.content, pattern)
+        self.assertRegex(response.content.decode(), pattern)
 
     def test_cyclic(self):
         """
@@ -5455,7 +5483,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
         # Check the `change_view` link has the correct querystring.
         detail_link = re.search(
             '<a href="(.*?)">{}</a>'.format(self.joepublicuser.username),
-            force_text(response.content)
+            response.content.decode()
         )
         self.assertURLEqual(detail_link.group(1), self.get_change_url())
 
@@ -5467,21 +5495,21 @@ class AdminKeepChangeListFiltersTests(TestCase):
         # Check the form action.
         form_action = re.search(
             '<form action="(.*?)" method="post" id="user_form".*?>',
-            force_text(response.content)
+            response.content.decode()
         )
         self.assertURLEqual(form_action.group(1), '?%s' % self.get_preserved_filters_querystring())
 
         # Check the history link.
         history_link = re.search(
             '<a href="(.*?)" class="historylink">History</a>',
-            force_text(response.content)
+            response.content.decode()
         )
         self.assertURLEqual(history_link.group(1), self.get_history_url())
 
         # Check the delete link.
         delete_link = re.search(
             '<a href="(.*?)" class="deletelink">Delete</a>',
-            force_text(response.content)
+            response.content.decode()
         )
         self.assertURLEqual(delete_link.group(1), self.get_delete_url())
 
@@ -5531,7 +5559,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
         # Check the form action.
         form_action = re.search(
             '<form action="(.*?)" method="post" id="user_form".*?>',
-            force_text(response.content)
+            response.content.decode()
         )
         self.assertURLEqual(form_action.group(1), '?%s' % self.get_preserved_filters_querystring())
 

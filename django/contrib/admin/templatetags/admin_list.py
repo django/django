@@ -100,6 +100,7 @@ def result_headers(cl):
             model_admin=cl.model_admin,
             return_attr=True
         )
+        is_field_sortable = cl.sortable_by is None or field_name in cl.sortable_by
         if attr:
             field_name = _coerce_field_name(field_name, i)
             # Potentially not sortable
@@ -115,13 +116,16 @@ def result_headers(cl):
 
             admin_order_field = getattr(attr, "admin_order_field", None)
             if not admin_order_field:
-                # Not sortable
-                yield {
-                    "text": text,
-                    "class_attrib": format_html(' class="column-{}"', field_name),
-                    "sortable": False,
-                }
-                continue
+                is_field_sortable = False
+
+        if not is_field_sortable:
+            # Not sortable
+            yield {
+                'text': text,
+                'class_attrib': format_html(' class="column-{}"', field_name),
+                'sortable': False,
+            }
+            continue
 
         # OK, it is sortable if we got this far
         th_classes = ['sortable', 'column-{}'.format(field_name)]

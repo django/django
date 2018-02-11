@@ -207,11 +207,12 @@ class DatabaseOperations(BaseDatabaseOperations):
         """
         return 63
 
-    def distinct_sql(self, fields):
+    def distinct_sql(self, fields, params):
         if fields:
-            return 'DISTINCT ON (%s)' % ', '.join(fields)
+            params = [param for param_list in params for param in param_list]
+            return (['DISTINCT ON (%s)' % ', '.join(fields)], params)
         else:
-            return 'DISTINCT'
+            return ['DISTINCT'], []
 
     def last_executed_query(self, cursor, sql, params):
         # http://initd.org/psycopg/docs/cursor.html#cursor.query

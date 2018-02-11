@@ -32,7 +32,7 @@ class BaseDatabaseFeatures:
     # If True, don't use integer foreign keys referring to, e.g., positive
     # integer primary keys.
     related_fields_match_type = False
-    allow_sliced_subqueries = True
+    allow_sliced_subqueries_with_in = True
     has_select_for_update = False
     has_select_for_update_nowait = False
     has_select_for_update_skip_locked = False

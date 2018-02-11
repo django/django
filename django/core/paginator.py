@@ -1,4 +1,4 @@
-import collections
+import collections.abc
 import warnings
 from math import ceil
 
@@ -127,7 +127,7 @@ class Paginator:
 QuerySetPaginator = Paginator   # For backwards-compatibility.
 
 
-class Page(collections.Sequence):
+class Page(collections.abc.Sequence):
 
     def __init__(self, object_list, number, paginator):
         self.object_list = object_list

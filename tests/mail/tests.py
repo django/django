@@ -25,7 +25,6 @@ from django.core.mail.backends import console, dummy, filebased, locmem, smtp
 from django.core.mail.message import BadHeaderError, sanitize_address
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import requires_tz_support
-from django.utils.encoding import force_bytes, force_text
 from django.utils.translation import gettext_lazy
 
 
@@ -800,7 +799,7 @@ class BaseEmailBackendTests(HeadersCheckMixin):
         self.assertEqual(num_sent, 1)
         message = self.get_the_message()
         self.assertEqual(message["subject"], '=?utf-8?q?Ch=C3=A8re_maman?=')
-        self.assertEqual(force_text(message.get_payload(decode=True)), 'Je t\'aime très fort')
+        self.assertEqual(message.get_payload(decode=True).decode(), 'Je t\'aime très fort')
 
     def test_send_long_lines(self):
         """
@@ -1083,7 +1082,7 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
         messages = []
         for filename in os.listdir(self.tmp_dir):
             with open(os.path.join(self.tmp_dir, filename), 'rb') as fp:
-                session = fp.read().split(force_bytes('\n' + ('-' * 79) + '\n', encoding='ascii'))
+                session = fp.read().split(b'\n' + (b'-' * 79) + b'\n')
             messages.extend(message_from_bytes(m) for m in session if m)
         return messages
 
@@ -1140,7 +1139,7 @@ class ConsoleBackendTests(BaseEmailBackendTests, SimpleTestCase):
 
     def get_mailbox_content(self):
         messages = self.stream.getvalue().split('\n' + ('-' * 79) + '\n')
-        return [message_from_bytes(force_bytes(m)) for m in messages if m]
+        return [message_from_bytes(str(m).encode()) for m in messages if m]
 
     def test_console_stream_kwarg(self):
         """
@@ -1149,7 +1148,7 @@ class ConsoleBackendTests(BaseEmailBackendTests, SimpleTestCase):
         s = StringIO()
         connection = mail.get_connection('django.core.mail.backends.console.EmailBackend', stream=s)
         send_mail('Subject', 'Content', 'from@example.com', ['to@example.com'], connection=connection)
-        message = force_bytes(s.getvalue().split('\n' + ('-' * 79) + '\n')[0])
+        message = str(s.getvalue().split('\n' + ('-' * 79) + '\n')[0]).encode()
         self.assertMessageHasHeaders(message, {
             ('MIME-Version', '1.0'),
             ('Content-Type', 'text/plain; charset="utf-8"'),

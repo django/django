@@ -1918,6 +1918,9 @@ class Queries6Tests(TestCase):
         qs = Tag.objects.exclude(category=None).exclude(category__name='foo')
         self.assertEqual(str(qs.query).count(' INNER JOIN '), 1)
 
+    def test_distinct_ordered_sliced_subquery_aggregation(self):
+        self.assertEqual(Tag.objects.distinct().order_by('category__name')[:3].count(), 3)
+
 
 class RawQueriesTests(TestCase):
     def setUp(self):
@@ -2028,7 +2031,7 @@ class QuerysetOrderedTests(unittest.TestCase):
         self.assertIs(qs.order_by('num_notes').ordered, True)
 
 
-@skipUnlessDBFeature('allow_sliced_subqueries')
+@skipUnlessDBFeature('allow_sliced_subqueries_with_in')
 class SubqueryTests(TestCase):
     @classmethod
     def setUpTestData(cls):
