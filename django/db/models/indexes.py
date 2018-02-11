@@ -69,8 +69,8 @@ class Index:
 
     def clone(self):
         """Create a copy of this Index."""
-        path, args, kwargs = self.deconstruct()
-        return self.__class__(*args, **kwargs)
+        _, _, kwargs = self.deconstruct()
+        return self.__class__(**kwargs)
 
     @staticmethod
     def _hash_generator(*args):
