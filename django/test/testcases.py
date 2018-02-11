@@ -1,10 +1,11 @@
 import difflib
 import json
+import logging
 import posixpath
 import sys
 import threading
 import unittest
-from collections import Counter
+from collections import Counter, namedtuple
 from contextlib import contextmanager
 from copy import copy
 from functools import wraps
@@ -378,6 +379,9 @@ class SimpleTestCase(unittest.TestCase):
             response, text, status_code, msg_prefix, html)
 
         self.assertEqual(real_count, 0, msg_prefix + "Response should not contain %s" % text_repr)
+
+    def assertLoggerOutput(self, logger=None, level=None):
+        return _LoggingContextManager(logger, level)
 
     def assertFormError(self, response, form, field, errors, msg_prefix=''):
         """
@@ -769,6 +773,46 @@ class SimpleTestCase(unittest.TestCase):
             if result:
                 standardMsg = '%s == %s' % (safe_repr(xml1, True), safe_repr(xml2, True))
                 self.fail(self._formatMessage(msg, standardMsg))
+
+
+_LoggingWatcher = namedtuple("_LoggingWatcher", ["records", "output"])
+
+
+class _LoggingHandler(logging.Handler):
+
+    def __init__(self):
+        super(_LoggingHandler, self).__init__()
+        self.watcher = _LoggingWatcher([], [])
+
+    def flush(self):
+        pass
+
+    def emit(self, record):
+        self.watcher.records.append(record)
+        msg = self.format(record)
+        self.watcher.output.append(msg)
+
+
+class _LoggingContextManager:
+
+    def __init__(self, logger_name, level=None):
+        self.logger_name = logger_name
+        if level:
+            self.level = level
+        else:
+            self.level = logging.INFO
+
+    def __enter__(self):
+        logger = self.logger = logging.getLogger(self.logger_name)
+        handler = _LoggingHandler()
+        self.watcher = handler.watcher
+        logger.handlers = [handler]
+        logger.setLevel(self.level)
+        logger.propagate = False
+        return handler.watcher
+
+    def __exit__(self, exc_type, exc_value, tb):
+        pass
 
 
 class TransactionTestCase(SimpleTestCase):

@@ -69,7 +69,7 @@ class Command(BaseCommand):
         # For each app, print its migrations in order from oldest (roots) to
         # newest (leaves).
         for app_name in app_names:
-            self.stdout.write(app_name, self.style.MIGRATE_LABEL)
+            self.output.info(app_name, self.style.MIGRATE_LABEL)
             shown = set()
             for node in graph.leaf_nodes(app_name):
                 for plan_node in graph.forwards_plan(node):
@@ -80,13 +80,13 @@ class Command(BaseCommand):
                             title += " (%s squashed migrations)" % len(graph.nodes[plan_node].replaces)
                         # Mark it as applied/unapplied
                         if plan_node in loader.applied_migrations:
-                            self.stdout.write(" [X] %s" % title)
+                            self.output.info(" [X] %s" % title)
                         else:
-                            self.stdout.write(" [ ] %s" % title)
+                            self.output.info(" [ ] %s" % title)
                         shown.add(plan_node)
             # If we didn't print anything, then a small message
             if not shown:
-                self.stdout.write(" (no migrations)", self.style.ERROR)
+                self.output.info(" (no migrations)", self.style.ERROR)
 
     def show_plan(self, connection, app_names=None):
         """
@@ -126,6 +126,6 @@ class Command(BaseCommand):
             if self.verbosity >= 2:
                 deps = print_deps(node)
             if node.key in loader.applied_migrations:
-                self.stdout.write("[X]  %s.%s%s" % (node.key[0], node.key[1], deps))
+                self.output.info("[X]  %s.%s%s" % (node.key[0], node.key[1], deps))
             else:
-                self.stdout.write("[ ]  %s.%s%s" % (node.key[0], node.key[1], deps))
+                self.output.info("[ ]  %s.%s%s" % (node.key[0], node.key[1], deps))
