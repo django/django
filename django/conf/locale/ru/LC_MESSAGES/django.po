@@ -193,7 +193,7 @@ msgid "Lithuanian"
 msgstr "Литовский"
 
 msgid "Latvian"
-msgstr "Латвийский"
+msgstr "Латышский"
 
 msgid "Macedonian"
 msgstr "Македонский"
