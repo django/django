@@ -54,6 +54,11 @@ class ClientTest(TestCase):
         self.assertEqual(response.context['var'], '\xf2')
         self.assertEqual(response.templates[0].name, 'GET Template')
 
+    def test_query_string_encoding(self):
+        # WSGI requires latin-1 encoded strings.
+        response = self.client.get('/get_view/?var=1\ufffd')
+        self.assertEqual(response.context['var'], '1\ufffd')
+
     def test_get_post_view(self):
         "GET a view that normally expects POSTs"
         response = self.client.get('/post_view/', {})
