@@ -905,7 +905,7 @@ Geometry Factories
 .. function:: fromstr(string, srid=None)
 
     :param string: string that contains spatial data
-    :type string: string
+    :type string: str
     :param srid: spatial reference identifier
     :type srid: int
     :rtype: a :class:`GEOSGeometry` corresponding to the spatial data in the string
