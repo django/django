@@ -162,7 +162,7 @@ class OneToOneTests(TestCase):
 
     def test_create_models_m2m(self):
         """
-        Modles are created via the m2m relation if the remote model has a
+        Models are created via the m2m relation if the remote model has a
         OneToOneField (#1064, #1506).
         """
         f = Favorites(name='Fred')
