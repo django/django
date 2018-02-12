@@ -99,6 +99,12 @@ class BaseForm:
         if use_required_attribute is not None:
             self.use_required_attribute = use_required_attribute
 
+        if self.empty_permitted and self.use_required_attribute:
+            raise ValueError(
+                'The empty_permitted and use_required_attribute arguments may '
+                'not both be True.'
+            )
+
         # Initialize form renderer. Use a global default if not specified
         # either as an argument or as self.default_renderer.
         if renderer is None:

@@ -2682,7 +2682,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         self.assertEqual(form.cleaned_data, {})
 
         # Now let's show what happens when empty_permitted=True and the form is empty.
-        form = SongForm(data, empty_permitted=True)
+        form = SongForm(data, empty_permitted=True, use_required_attribute=False)
         self.assertTrue(form.is_valid())
         self.assertEqual(form.errors, {})
         self.assertEqual(form.cleaned_data, {})
@@ -2699,7 +2699,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         # make sure that when checking for empty_permitted that None is treated
         # accordingly.
         data = {'artist': None, 'song': ''}
-        form = SongForm(data, empty_permitted=True)
+        form = SongForm(data, empty_permitted=True, use_required_attribute=False)
         self.assertTrue(form.is_valid())
 
         # However, we *really* need to be sure we are checking for None as any data in
@@ -2709,8 +2709,16 @@ Good luck picking a username that doesn&#39;t already exist.</p>
             qty = IntegerField()
 
         data = {'amount': '0.0', 'qty': ''}
-        form = PriceForm(data, initial={'amount': 0.0}, empty_permitted=True)
+        form = PriceForm(data, initial={'amount': 0.0}, empty_permitted=True, use_required_attribute=False)
         self.assertTrue(form.is_valid())
+
+    def test_empty_permitted_and_use_required_attribute(self):
+        msg = (
+            'The empty_permitted and use_required_attribute arguments may not '
+            'both be True.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Person(empty_permitted=True, use_required_attribute=True)
 
     def test_extracting_hidden_and_visible(self):
         class SongForm(Form):
