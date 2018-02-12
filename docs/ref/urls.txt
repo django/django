@@ -74,14 +74,14 @@ parameter is useful.
 
     :arg module: URLconf module (or module name)
     :arg namespace: Instance namespace for the URL entries being included
-    :type namespace: string
+    :type namespace: str
     :arg app_name: Application namespace for the URL entries being included
-    :type app_name: string
+    :type app_name: str
     :arg pattern_list: Iterable of :func:`django.conf.urls.url` instances
     :arg app_namespace: Application namespace for the URL entries being included
-    :type app_namespace: string
+    :type app_namespace: str
     :arg instance_namespace: Instance namespace for the URL entries being included
-    :type instance_namespace: string
+    :type instance_namespace: str
 
 See :ref:`including-other-urlconfs` and :ref:`namespaces-and-include`.
 
