@@ -7,11 +7,13 @@ from unittest import mock
 
 from django.conf import ENVIRONMENT_VARIABLE, LazySettings, Settings, settings
 from django.core.exceptions import ImproperlyConfigured
+from django.db import connections
 from django.http import HttpRequest
 from django.test import (
     SimpleTestCase, TestCase, TransactionTestCase, modify_settings,
     override_settings, signals,
 )
+from django.test.runner import DiscoverRunner
 from django.test.utils import requires_tz_support
 
 from .models import Simple
@@ -449,23 +451,34 @@ class TestListSettings(unittest.TestCase):
                 delattr(settings_module, setting)
 
 
-class TestDatabaseMirror(unittest.TestCase):
-    def setUp(self):
-        pass
+class TestDatabaseMirror(TestCase):
 
     def test_without_mirror(self):
         Simple.objects.using('default').create()
         Simple.objects.using('other').create()
 
-        self.assertEqual(Simple.objects.count(), 2)
+        self.assertEqual(Simple.objects.count(), 1)
 
     def test_with_mirror(self):
+        """
+        Overriding the DATABASES settings does not take effect as the database setup has already happened. For that
+        reason we call manually call setup_databases to reconfigure the test mirrors.
+        However this will overwrite the original connection to the `other` database which breaks other tests, so we
+        store the original connection in a temporary variable and manually replace it after the test no matter what
+        the result of it is.
+        """
         databases = settings.DATABASES
         databases['other']['TEST']['MIRROR'] = 'default'
 
-        with override_settings(DATABAES=databases):
+        old_connection = connections['other']
 
-            Simple.objects.using('default').create()
-            Simple.objects.using('other').create()
+        try:
+            with override_settings(DATABASES=databases):
+                DiscoverRunner(verbosity=3).setup_databases()
 
-            self.assertEqual(Simple.objects.count(), 1)
+                Simple.objects.using('default').create()
+                Simple.objects.using('other').create()
+
+                self.assertEqual(Simple.objects.count(), 2)
+        finally:
+            connections['other'] = old_connection
