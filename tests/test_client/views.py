@@ -53,7 +53,10 @@ def trace_view(request):
 def put_view(request):
     if request.method == 'PUT':
         t = Template('Data received: {{ data }} is the body.', name='PUT Template')
-        c = Context({'data': request.body.decode()})
+        c = Context({
+            'Content-Length': request.META['CONTENT_LENGTH'],
+            'data': request.body.decode(),
+        })
     else:
         t = Template('Viewing GET page.', name='Empty GET Template')
         c = Context()

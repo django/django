@@ -117,6 +117,13 @@ class ClientTest(TestCase):
         self.assertTrue(mock_encoder.called)
         self.assertTrue(mock_encoding.encode.called)
 
+    def test_put(self):
+        response = self.client.put('/put_view/', {'foo': 'bar'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.templates[0].name, 'PUT Template')
+        self.assertEqual(response.context['data'], "{'foo': 'bar'}")
+        self.assertEqual(response.context['Content-Length'], 14)
+
     def test_trace(self):
         """TRACE a view"""
         response = self.client.trace('/trace_view/')
