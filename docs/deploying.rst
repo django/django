@@ -130,7 +130,7 @@ gets restarted if needed and to allow you to scale the number of processes.
 
 You can also specify the port and IP that Daphne binds to::
 
-    daphne -b 0.0.0.0 -o 8001 myproject.asgi:application
+    daphne -b 0.0.0.0 -p 8001 myproject.asgi:application
 
 You can see more about Daphne and its options
 `on GitHub <https://github.com/django/daphne>`_.
