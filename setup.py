@@ -21,6 +21,8 @@ setup(
             'pytest~=3.3',
             "pytest-django~=3.1",
             "pytest-asyncio~=0.8",
+            "async_generator~=1.8",
+            "async-timeout~=2.0",
             'coverage~=4.4',
         ],
     },
