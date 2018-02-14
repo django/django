@@ -10,6 +10,7 @@ from channels.worker import Worker
 class Command(BaseCommand):
 
     leave_locale_alone = True
+    worker_class = Worker
 
     def add_arguments(self, parser):
         super(Command, self).add_arguments(parser)
@@ -36,7 +37,7 @@ class Command(BaseCommand):
         # Run the worker
         self.logger = setup_logger("django.channels", self.verbosity)
         self.logger.info("Running worker for channels %s", options["channels"])
-        worker = Worker(
+        worker = self.worker_class(
             application=get_default_application(),
             channels=options["channels"],
             channel_layer=self.channel_layer,
