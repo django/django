@@ -1988,6 +1988,10 @@ As described above in :meth:`get_or_create`, this method is prone to a
 race-condition which can result in multiple rows being inserted simultaneously
 if uniqueness is not enforced at the database level.
 
+Like :meth:`get_or_create` and :meth:`create`, if you're using manually
+specified primary keys and an object needs to be created but the key already
+exists in the database, an :exc:`~django.db.IntegrityError` is raised.
+
 ``bulk_create()``
 ~~~~~~~~~~~~~~~~~
 
