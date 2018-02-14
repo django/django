@@ -27,8 +27,9 @@ class ListFilter:
         self.used_parameters = {}
         if self.title is None:
             raise ImproperlyConfigured(
-                "The list filter '%s' does not specify "
-                "a 'title'." % self.__class__.__name__)
+                "The list filter '%s' does not specify a 'title'."
+                % self.__class__.__name__
+            )
 
     def has_output(self):
         """
@@ -66,8 +67,9 @@ class SimpleListFilter(ListFilter):
         super().__init__(request, params, model, model_admin)
         if self.parameter_name is None:
             raise ImproperlyConfigured(
-                "The list filter '%s' does not specify "
-                "a 'parameter_name'." % self.__class__.__name__)
+                "The list filter '%s' does not specify a 'parameter_name'."
+                % self.__class__.__name__
+            )
         if self.parameter_name in params:
             value = params.pop(self.parameter_name)
             self.used_parameters[self.parameter_name] = value
@@ -93,7 +95,8 @@ class SimpleListFilter(ListFilter):
         """
         raise NotImplementedError(
             'The SimpleListFilter.lookups() method must be overridden to '
-            'return a list of tuples (value, verbose value)')
+            'return a list of tuples (value, verbose value).'
+        )
 
     def expected_parameters(self):
         return [self.parameter_name]
@@ -101,13 +104,13 @@ class SimpleListFilter(ListFilter):
     def choices(self, changelist):
         yield {
             'selected': self.value() is None,
-            'query_string': changelist.get_query_string({}, [self.parameter_name]),
+            'query_string': changelist.get_query_string(remove=[self.parameter_name]),
             'display': _('All'),
         }
         for lookup, title in self.lookup_choices:
             yield {
                 'selected': self.value() == str(lookup),
-                'query_string': changelist.get_query_string({self.parameter_name: lookup}, []),
+                'query_string': changelist.get_query_string({self.parameter_name: lookup}),
                 'display': title,
             }
 
@@ -196,26 +199,19 @@ class RelatedFieldListFilter(FieldListFilter):
     def choices(self, changelist):
         yield {
             'selected': self.lookup_val is None and not self.lookup_val_isnull,
-            'query_string': changelist.get_query_string(
-                {},
-                [self.lookup_kwarg, self.lookup_kwarg_isnull]
-            ),
+            'query_string': changelist.get_query_string(remove=[self.lookup_kwarg, self.lookup_kwarg_isnull]),
             'display': _('All'),
         }
         for pk_val, val in self.lookup_choices:
             yield {
                 'selected': self.lookup_val == str(pk_val),
-                'query_string': changelist.get_query_string({
-                    self.lookup_kwarg: pk_val,
-                }, [self.lookup_kwarg_isnull]),
+                'query_string': changelist.get_query_string({self.lookup_kwarg: pk_val}, [self.lookup_kwarg_isnull]),
                 'display': val,
             }
         if self.include_empty_choice:
             yield {
                 'selected': bool(self.lookup_val_isnull),
-                'query_string': changelist.get_query_string({
-                    self.lookup_kwarg_isnull: 'True',
-                }, [self.lookup_kwarg]),
+                'query_string': changelist.get_query_string({self.lookup_kwarg_isnull: 'True'}, [self.lookup_kwarg]),
                 'display': self.empty_value_display,
             }
 
@@ -244,17 +240,13 @@ class BooleanFieldListFilter(FieldListFilter):
                 ('0', _('No'))):
             yield {
                 'selected': self.lookup_val == lookup and not self.lookup_val2,
-                'query_string': changelist.get_query_string({
-                    self.lookup_kwarg: lookup,
-                }, [self.lookup_kwarg2]),
+                'query_string': changelist.get_query_string({self.lookup_kwarg: lookup}, [self.lookup_kwarg2]),
                 'display': title,
             }
         if isinstance(self.field, models.NullBooleanField):
             yield {
                 'selected': self.lookup_val2 == 'True',
-                'query_string': changelist.get_query_string({
-                    self.lookup_kwarg2: 'True',
-                }, [self.lookup_kwarg]),
+                'query_string': changelist.get_query_string({self.lookup_kwarg2: 'True'}, [self.lookup_kwarg]),
                 'display': _('Unknown'),
             }
 
@@ -279,9 +271,7 @@ class ChoicesFieldListFilter(FieldListFilter):
     def choices(self, changelist):
         yield {
             'selected': self.lookup_val is None,
-            'query_string': changelist.get_query_string(
-                {}, [self.lookup_kwarg, self.lookup_kwarg_isnull]
-            ),
+            'query_string': changelist.get_query_string(remove=[self.lookup_kwarg, self.lookup_kwarg_isnull]),
             'display': _('All')
         }
         none_title = ''
@@ -291,17 +281,13 @@ class ChoicesFieldListFilter(FieldListFilter):
                 continue
             yield {
                 'selected': str(lookup) == self.lookup_val,
-                'query_string': changelist.get_query_string(
-                    {self.lookup_kwarg: lookup}, [self.lookup_kwarg_isnull]
-                ),
+                'query_string': changelist.get_query_string({self.lookup_kwarg: lookup}, [self.lookup_kwarg_isnull]),
                 'display': title,
             }
         if none_title:
             yield {
                 'selected': bool(self.lookup_val_isnull),
-                'query_string': changelist.get_query_string({
-                    self.lookup_kwarg_isnull: 'True',
-                }, [self.lookup_kwarg]),
+                'query_string': changelist.get_query_string({self.lookup_kwarg_isnull: 'True'}, [self.lookup_kwarg]),
                 'display': none_title,
             }
 
@@ -395,10 +381,7 @@ class AllValuesFieldListFilter(FieldListFilter):
             queryset = model_admin.get_queryset(request)
         else:
             queryset = parent_model._default_manager.all()
-        self.lookup_choices = (queryset
-                               .distinct()
-                               .order_by(field.name)
-                               .values_list(field.name, flat=True))
+        self.lookup_choices = queryset.distinct().order_by(field.name).values_list(field.name, flat=True)
         super().__init__(field, request, params, model, model_admin, field_path)
 
     def expected_parameters(self):
@@ -407,7 +390,7 @@ class AllValuesFieldListFilter(FieldListFilter):
     def choices(self, changelist):
         yield {
             'selected': self.lookup_val is None and self.lookup_val_isnull is None,
-            'query_string': changelist.get_query_string({}, [self.lookup_kwarg, self.lookup_kwarg_isnull]),
+            'query_string': changelist.get_query_string(remove=[self.lookup_kwarg, self.lookup_kwarg_isnull]),
             'display': _('All'),
         }
         include_none = False
@@ -418,17 +401,13 @@ class AllValuesFieldListFilter(FieldListFilter):
             val = str(val)
             yield {
                 'selected': self.lookup_val == val,
-                'query_string': changelist.get_query_string({
-                    self.lookup_kwarg: val,
-                }, [self.lookup_kwarg_isnull]),
+                'query_string': changelist.get_query_string({self.lookup_kwarg: val}, [self.lookup_kwarg_isnull]),
                 'display': val,
             }
         if include_none:
             yield {
                 'selected': bool(self.lookup_val_isnull),
-                'query_string': changelist.get_query_string({
-                    self.lookup_kwarg_isnull: 'True',
-                }, [self.lookup_kwarg]),
+                'query_string': changelist.get_query_string({self.lookup_kwarg_isnull: 'True'}, [self.lookup_kwarg]),
                 'display': self.empty_value_display,
             }
 
