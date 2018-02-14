@@ -214,11 +214,6 @@ class AuthenticationForm(forms.Form):
                 code='inactive',
             )
 
-    def get_user_id(self):
-        if self.user_cache:
-            return self.user_cache.id
-        return None
-
     def get_user(self):
         return self.user_cache
 
