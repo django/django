@@ -444,39 +444,21 @@ Furthermore, Django adds defaults that differ from Jinja2's for a few options:
     Unless all of these conditions are met, passing a function to the template is
     simpler and more in line with the design of Jinja2.
 
-The default configuration is purposefully kept to a minimum. Out of the box,
-it will provide access to a ``url`` function, which is an alias to
-:py:func:`django.urls.reverse`, and i18n functionality via the Jinja2
-`i18n extension`_. If :py:mod:`django.contrib.staticfiles` is
-installed, a ``static`` function will also be provided from the ``url()``
-method of the :setting:`STATICFILES_STORAGE`.
-
 If a template is rendered with a request (e.g. when using
 :py:func:`~django.shortcuts.render`), the ``Jinja2`` backend adds the globals
 ``request``, ``csrf_input``, and ``csrf_token`` to the context. Apart from
-that, this backend doesn't create a Django-flavored environment. It doesn't
+that, this backend does not create a Django-flavored environment. It doesn't
 know about Django filters and tags. In order to use Django-specific APIs, you
 must configure them into the environment.
 
-For example, you can create ``myproject/jinja2.py`` with this content::
+The default ``'django.template.backends.jinja2.default_environment'``
+environment adds some minimal helpers: it gives access to a ``url`` function,
+which is an alias to :py:func:`django.urls.reverse`, i18n functionality via the
+Jinja2 `i18n extension`_, and, if :py:mod:`django.contrib.staticfiles` is
+installed, a ``static`` function will also be provided from the ``url()``
+method of the :setting:`STATICFILES_STORAGE`.
 
-    from django.contrib.staticfiles.storage import staticfiles_storage
-    from django.urls import reverse
-
-    from jinja2 import Environment
-
-
-    def environment(**options):
-        env = Environment(**options)
-        env.globals.update({
-            'static': staticfiles_storage.url,
-            'url': reverse,
-        })
-        return env
-
-and set the ``'environment'`` option to ``'myproject.jinja2.environment'``.
-
-Then you could use the following constructs in Jinja2 templates:
+This allows you to use the following constructs in Jinja2 templates:
 
 .. code-block:: html+jinja
 
@@ -484,19 +466,10 @@ Then you could use the following constructs in Jinja2 templates:
 
     <a href="{{ url('admin:index') }}">Administration</a>
 
-The concepts of tags and filters exist both in the Django template language
-and in Jinja2 but they're used differently. Since Jinja2 supports passing
-arguments to callables in templates, many features that require a template tag
-or filter in Django templates can be achieved simply by calling a function in
-Jinja2 templates, as shown in the example above. Jinja2's global namespace
-removes the need for template context processors. The Django template language
-doesn't have an equivalent of Jinja2 tests.
+    <a href="{{ url('admin:index') }}">{% trans %}Administration{% endtrans %}</a>
 
-Additionally, Jinja2 does not have i18n enabled by default, unlike the Django
-Template Language. If you wish to use this functionality in your Jinja2 templates,
-you just enable and activate the `i18n extension`_ in your environment. This can
-be done utilizing Django's built-in translation methods. Building on the example
-environment above, your environment file would then look like::
+
+For example, you can create ``myproject/jinja2.py`` with this content::
 
     from django.contrib.staticfiles.storage import staticfiles_storage
     from django.urls import reverse
@@ -514,12 +487,15 @@ environment above, your environment file would then look like::
         })
         return env
 
-Then you could have translated text in your template, in addition to the aforementioned
-global functions:
+and set the ``'environment'`` option to ``'myproject.jinja2.environment'``.
 
-.. code-block:: html+jinja
-
-    <a href="{{ url('admin:index') }}">{% trans %}Administration{% endtrans %}</a>
+The concepts of tags and filters exist both in the Django template language
+and in Jinja2 but they're used differently. Since Jinja2 supports passing
+arguments to callables in templates, many features that require a template tag
+or filter in Django templates can be achieved simply by calling a function in
+Jinja2 templates, as shown in the example above. Jinja2's global namespace
+removes the need for template context processors. The Django template language
+doesn't have an equivalent of Jinja2 tests.
 
 Custom backends
 ---------------
