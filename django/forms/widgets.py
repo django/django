@@ -578,6 +578,7 @@ class ChoiceWidget(Widget):
         """Return a list of optgroups for this widget."""
         groups = []
         has_selected = False
+        subgroup_None = None
 
         for index, (option_value, option_label) in enumerate(self.choices):
             if option_value is None:
@@ -588,11 +589,15 @@ class ChoiceWidget(Widget):
                 group_name = option_value
                 subindex = 0
                 choices = option_label
+                groups.append((group_name, subgroup, index))
             else:
-                group_name = None
+                if subgroup_None is None:
+                    subgroup_None = []
+                    groups.append((None, subgroup_None, index))
+
                 subindex = None
+                subgroup = subgroup_None
                 choices = [(option_value, option_label)]
-            groups.append((group_name, subgroup, index))
 
             for subvalue, sublabel in choices:
                 selected = (
