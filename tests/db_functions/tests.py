@@ -580,7 +580,7 @@ class FunctionTests(TestCase):
 
     def test_length_transform(self):
         try:
-            CharField.register_lookup(Length, 'length')
+            CharField.register_lookup(Length)
             Author.objects.create(name='John Smith', alias='smithj')
             Author.objects.create(name='Rhonda')
             authors = Author.objects.filter(name__length__gt=7)
@@ -591,11 +591,11 @@ class FunctionTests(TestCase):
                 lambda a: a.name
             )
         finally:
-            CharField._unregister_lookup(Length, 'length')
+            CharField._unregister_lookup(Length)
 
     def test_lower_transform(self):
         try:
-            CharField.register_lookup(Lower, 'lower')
+            CharField.register_lookup(Lower)
             Author.objects.create(name='John Smith', alias='smithj')
             Author.objects.create(name='Rhonda')
             authors = Author.objects.filter(name__lower__exact='john smith')
@@ -606,11 +606,11 @@ class FunctionTests(TestCase):
                 lambda a: a.name
             )
         finally:
-            CharField._unregister_lookup(Lower, 'lower')
+            CharField._unregister_lookup(Lower)
 
     def test_upper_transform(self):
         try:
-            CharField.register_lookup(Upper, 'upper')
+            CharField.register_lookup(Upper)
             Author.objects.create(name='John Smith', alias='smithj')
             Author.objects.create(name='Rhonda')
             authors = Author.objects.filter(name__upper__exact='JOHN SMITH')
@@ -621,14 +621,14 @@ class FunctionTests(TestCase):
                 lambda a: a.name
             )
         finally:
-            CharField._unregister_lookup(Upper, 'upper')
+            CharField._unregister_lookup(Upper)
 
     def test_func_transform_bilateral(self):
         class UpperBilateral(Upper):
             bilateral = True
 
         try:
-            CharField.register_lookup(UpperBilateral, 'upper')
+            CharField.register_lookup(UpperBilateral)
             Author.objects.create(name='John Smith', alias='smithj')
             Author.objects.create(name='Rhonda')
             authors = Author.objects.filter(name__upper__exact='john smith')
@@ -639,14 +639,14 @@ class FunctionTests(TestCase):
                 lambda a: a.name
             )
         finally:
-            CharField._unregister_lookup(UpperBilateral, 'upper')
+            CharField._unregister_lookup(UpperBilateral)
 
     def test_func_transform_bilateral_multivalue(self):
         class UpperBilateral(Upper):
             bilateral = True
 
         try:
-            CharField.register_lookup(UpperBilateral, 'upper')
+            CharField.register_lookup(UpperBilateral)
             Author.objects.create(name='John Smith', alias='smithj')
             Author.objects.create(name='Rhonda')
             authors = Author.objects.filter(name__upper__in=['john smith', 'rhonda'])
@@ -658,7 +658,7 @@ class FunctionTests(TestCase):
                 lambda a: a.name
             )
         finally:
-            CharField._unregister_lookup(UpperBilateral, 'upper')
+            CharField._unregister_lookup(UpperBilateral)
 
     def test_function_as_filter(self):
         Author.objects.create(name='John Smith', alias='SMITHJ')
