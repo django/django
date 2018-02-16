@@ -3,6 +3,7 @@ import os
 import pkgutil
 import sys
 from collections import OrderedDict, defaultdict
+from difflib import get_close_matches
 from importlib import import_module
 
 import django
@@ -203,10 +204,11 @@ class ManagementUtility:
                 settings.INSTALLED_APPS
             else:
                 sys.stderr.write("No Django settings specified.\n")
-            sys.stderr.write(
-                "Unknown command: %r\nType '%s help' for usage.\n"
-                % (subcommand, self.prog_name)
-            )
+            possible_matches = get_close_matches(subcommand, commands)
+            sys.stderr.write('Unknown command: %r' % subcommand)
+            if possible_matches:
+                sys.stderr.write('. Did you mean %s?' % possible_matches[0])
+            sys.stderr.write("\nType '%s help' for usage.\n" % self.prog_name)
             sys.exit(1)
         if isinstance(app_name, BaseCommand):
             # If the command is already loaded, use it directly.

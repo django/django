@@ -2256,3 +2256,23 @@ class MainModule(AdminScriptTestCase):
     def test_program_name_in_help(self):
         out, err = self.run_test('-m', ['django', 'help'])
         self.assertOutput(out, "Type 'python -m django help <subcommand>' for help on a specific subcommand.")
+
+
+class DjangoAdminSuggestions(AdminScriptTestCase):
+    def setUp(self):
+        self.write_settings('settings.py')
+
+    def tearDown(self):
+        self.remove_settings('settings.py')
+
+    def test_suggestions(self):
+        args = ['rnserver', '--settings=test_project.settings']
+        out, err = self.run_django_admin(args)
+        self.assertNoOutput(out)
+        self.assertOutput(err, "Unknown command: 'rnserver'. Did you mean runserver?")
+
+    def test_no_suggestions(self):
+        args = ['abcdef', '--settings=test_project.settings']
+        out, err = self.run_django_admin(args)
+        self.assertNoOutput(out)
+        self.assertNotInOutput(err, 'Did you mean')
