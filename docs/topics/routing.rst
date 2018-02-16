@@ -98,12 +98,18 @@ a single argument, a list of Django URL objects (either ``path()`` or ``url()``)
 
     URLRouter([
         url("^longpoll/$", LongPollConsumer),
+        url("^notifications/(?P<stream>\w+)/$", LongPollConsumer),
         url("^$", AsgiHandler),
     ])
 
 Any captured groups will be provided in ``scope`` as the key ``url_route``, a
 dict with an ``args`` key containing a list of positional regex groups and a
 ``kwargs`` key with a dict of the named regex groups.
+
+For example, to pull out the named group ``stream`` in the example above, you
+would do this::
+
+    stream = self.scope["url_route"]["kwargs"]["stream"]
 
 
 ChannelNameRouter
