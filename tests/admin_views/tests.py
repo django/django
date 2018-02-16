@@ -349,6 +349,32 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             "Results of sorting on callable are out of order."
         )
 
+    def test_change_list_sorting_callable_query_expression(self):
+        """
+        Query expressions may be used for admin_order_field. (column 9 is
+        order_by_expression in ArticleAdmin).
+        """
+        response = self.client.get(reverse('admin:admin_views_article_changelist'), {'o': '9'})
+        self.assertContentBefore(
+            response, 'Oldest content', 'Middle content',
+            'Results of sorting on callable are out of order.'
+        )
+        self.assertContentBefore(
+            response, 'Middle content', 'Newest content',
+            'Results of sorting on callable are out of order.'
+        )
+
+    def test_change_list_sorting_callable_query_expression_reverse(self):
+        response = self.client.get(reverse('admin:admin_views_article_changelist'), {'o': '-9'})
+        self.assertContentBefore(
+            response, 'Middle content', 'Oldest content',
+            'Results of sorting on callable are out of order.'
+        )
+        self.assertContentBefore(
+            response, 'Newest content', 'Middle content',
+            'Results of sorting on callable are out of order.'
+        )
+
     def test_change_list_sorting_model(self):
         """
         Ensure we can sort on a list_display field that is a Model method

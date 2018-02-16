@@ -745,6 +745,24 @@ subclass::
 
               author_first_name.admin_order_field = 'author__first_name'
 
+      :doc:`Query expressions </ref/models/expressions>` may be used in
+      ``admin_order_field``. For example::
+
+          from django.db.models import Value
+          from django.db.models.functions import Concat
+
+          class Person(models.Model):
+              first_name = models.CharField(max_length=50)
+              last_name = models.CharField(max_length=50)
+
+              def full_name(self):
+                  return self.first_name + ' ' + self.last_name
+              full_name.admin_order_field = Concat('first_name', Value(' '), 'last_name')
+
+      .. versionadded:: 2.1
+
+          Support for expressions in ``admin_order_field`` was added.
+
     * Elements of ``list_display`` can also be properties. Please note however,
       that due to the way properties work in Python, setting
       ``short_description`` on a property is only possible when using the
