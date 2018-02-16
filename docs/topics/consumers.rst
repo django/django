@@ -138,6 +138,34 @@ send messages between each other either one-to-one or via a broadcast system
 called groups. You can read more in :doc:`/topics/channel_layers`.
 
 
+Scope
+-----
+
+Consumers receive the connection's ``scope`` when they are initialised, which
+contains a lot of the information you'd find on the ``request`` object in a
+Django view. It's available as ``self.scope`` inside the consumer's methods.
+
+Scopes are part of the :doc:`ASGI specification </asgi>`, but here are
+some common things you might want to use:
+
+* ``scope["path"]``, the path on the request. *(HTTP and WebSocket)*
+* ``scope["headers"]``, raw name/value header pairs from the request *(HTTP and WebSocket)*
+* ``scope["method"]``, the method name used for the request. *(HTTP)*
+
+If you enable things like :doc:`authentication`, you'll also be able to access
+the user object as ``scope["user"]``, and the URLRouter, for example, will
+put captured groups from the URL into ``scope["url_route"]``.
+
+In general, the scope is the place to get connection information and where
+middleware will put attributes it wants to let you access (in the same way
+that Django's middleware adds things to ``request``).
+
+For a full list of what can occur in a connection scope, look at the basic
+ASGI spec for the protocol you are terminating, plus any middleware or routing
+code you are using. The web (HTTP and WebSocket) scopes are available in
+`the Web ASGI spec <https://github.com/django/asgiref/blob/master/specs/www.rst>`_.
+
+
 Generic Consumers
 -----------------
 
