@@ -176,6 +176,8 @@ we could crawl the database), and use ``channel_layer.send``::
     })
 
 
+.. _groups:
+
 Groups
 ------
 

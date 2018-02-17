@@ -1,8 +1,10 @@
 import pytest
+from django.test import override_settings
 
 from channels.generic.websocket import (
     AsyncJsonWebsocketConsumer, AsyncWebsocketConsumer, JsonWebsocketConsumer, WebsocketConsumer,
 )
+from channels.layers import get_channel_layer
 from channels.testing import WebsocketCommunicator
 
 
@@ -46,6 +48,41 @@ async def test_websocket_consumer():
 
 
 @pytest.mark.asyncio
+async def test_websocket_consumer_groups():
+    """
+    Tests that WebsocketConsumer adds and removes channels from groups.
+    """
+    results = {}
+
+    class TestConsumer(WebsocketConsumer):
+        groups = ["chat"]
+
+        def receive(self, text_data=None, bytes_data=None):
+            results["received"] = (text_data, bytes_data)
+            self.send(text_data=text_data, bytes_data=bytes_data)
+
+    channel_layers_setting = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        },
+    }
+    with override_settings(CHANNEL_LAYERS=channel_layers_setting):
+        communicator = WebsocketCommunicator(TestConsumer, "/testws/")
+        await communicator.connect()
+
+        channel_layer = get_channel_layer()
+        # Test that the websocket channel was added to the group on connect
+        message = {"type": "websocket.receive", "text": "hello"}
+        await channel_layer.group_send("chat", message)
+        response = await communicator.receive_from()
+        assert response == "hello"
+        assert results["received"] == ("hello", None)
+        # Test that the websocket channel was discarded from the group on disconnect
+        await communicator.disconnect()
+        assert channel_layer.groups == {}
+
+
+@pytest.mark.asyncio
 async def test_async_websocket_consumer():
     """
     Tests that AsyncWebsocketConsumer is implemented correctly.
@@ -82,6 +119,42 @@ async def test_async_websocket_consumer():
     # Close out
     await communicator.disconnect()
     assert "disconnected" in results
+
+
+@pytest.mark.asyncio
+async def test_async_websocket_consumer_groups():
+    """
+    Tests that AsyncWebsocketConsumer adds and removes channels from groups.
+    """
+    results = {}
+
+    class TestConsumer(AsyncWebsocketConsumer):
+        groups = ["chat"]
+
+        async def receive(self, text_data=None, bytes_data=None):
+            results["received"] = (text_data, bytes_data)
+            await self.send(text_data=text_data, bytes_data=bytes_data)
+
+    channel_layers_setting = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        },
+    }
+    with override_settings(CHANNEL_LAYERS=channel_layers_setting):
+        communicator = WebsocketCommunicator(TestConsumer, "/testws/")
+        await communicator.connect()
+
+        channel_layer = get_channel_layer()
+        # Test that the websocket channel was added to the group on connect
+        message = {"type": "websocket.receive", "text": "hello"}
+        await channel_layer.group_send("chat", message)
+        response = await communicator.receive_from()
+        assert response == "hello"
+        assert results["received"] == ("hello", None)
+
+        # Test that the websocket channel was discarded from the group on disconnect
+        await communicator.disconnect()
+        assert channel_layer.groups == {}
 
 
 @pytest.mark.asyncio

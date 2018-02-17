@@ -183,6 +183,7 @@ wraps the verbose plain-ASGI message sending and receiving into handling that
 just deals with text and binary frames::
 
     class MyConsumer(WebsocketConsumer):
+        groups = ["broadcast"]
 
         def connect(self):
             # Called on connection. Either call
@@ -209,6 +210,16 @@ You can also raise ``channels.exceptions.AcceptConnection`` or
 method in order to accept or reject a connection, if you want reuseable
 authentication or rate-limiting code that doesn't need to use mixins.
 
+A ``WebsocketConsumer``'s channel will automatically be added to (on connect)
+and removed from (on disconnect) any groups whose names appear in the
+consumer's ``groups`` class attribute. ``groups`` must be an iterable, and a
+channel layer with support for groups must be set as the channel backend
+(``channels.layers.InMemoryChannelLayer`` and
+``channels_redis.core.RedisChannelLayer`` both support groups). If no channel
+layer is configured or the channel layer doesn't support groups, connecting
+to a ``WebsocketConsumer`` with a non-empty ``groups`` attribute will raise
+``channels.exceptions.InvalidChannelLayerError``. See :ref:`groups` for more.
+
 
 AsyncWebsocketConsumer
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -218,6 +229,7 @@ the exact same methods and signature as ``WebsocketConsumer`` but everything
 is async, and the functions you need to write have to be as well::
 
     class MyConsumer(AsyncWebsocketConsumer):
+        groups = ["broadcast"]
 
         async def connect(self):
             # Called on connection. Either call
