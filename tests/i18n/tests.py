@@ -4,11 +4,14 @@ import gettext as gettext_module
 import os
 import pickle
 import re
+import tempfile
 from contextlib import contextmanager
 from importlib import import_module
 from threading import local
+from unittest import mock
 
 from django import forms
+from django.apps import AppConfig
 from django.conf import settings
 from django.conf.locale import LANG_INFO
 from django.conf.urls.i18n import i18n_patterns
@@ -38,6 +41,11 @@ here = os.path.dirname(os.path.abspath(__file__))
 extended_locale_paths = settings.LOCALE_PATHS + [
     os.path.join(here, 'other', 'locale'),
 ]
+
+
+class AppModuleStub:
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)
 
 
 @contextmanager
@@ -1644,6 +1652,15 @@ class NonDjangoLanguageTests(SimpleTestCase):
     def test_non_django_language(self):
         self.assertEqual(get_language(), 'xxx')
         self.assertEqual(gettext("year"), "reay")
+
+    @override_settings(USE_I18N=True)
+    def test_check_for_langauge(self):
+        with tempfile.TemporaryDirectory() as app_dir:
+            os.makedirs(os.path.join(app_dir, 'locale', 'dummy_Lang', 'LC_MESSAGES'))
+            open(os.path.join(app_dir, 'locale', 'dummy_Lang', 'LC_MESSAGES', 'django.mo'), 'w').close()
+            app_config = AppConfig('dummy_app', AppModuleStub(__path__=[app_dir]))
+            with mock.patch('django.apps.apps.get_app_configs', return_value=[app_config]):
+                self.assertIs(check_for_language('dummy-lang'), True)
 
     @override_settings(
         USE_I18N=True,
