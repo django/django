@@ -40,8 +40,8 @@ To demultiplex specific streams
 
 .. code-block:: javascript
 
-    webSocketBridge.connect();
-    webSocketBridge.listen('/ws/');
+    webSocketBridge.connect('/ws/');
+    webSocketBridge.listen();
     webSocketBridge.demultiplex('mystream', function(action, stream) {
       console.log(action, stream);
     });
