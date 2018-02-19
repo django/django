@@ -540,7 +540,7 @@ ordering. For example::
 
     >>> from django.db.models import CharField
     >>> from django.db.models.functions import Lower
-    >>> CharField.register_lookup(Lower, 'lower')
+    >>> CharField.register_lookup(Lower)
     >>> Blog.objects.values('name__lower')
     <QuerySet [{'name__lower': 'beatles blog'}]>
 
@@ -600,7 +600,7 @@ A few subtleties that are worth mentioning:
 
     >>> from django.db.models import CharField, Count
     >>> from django.db.models.functions import Lower
-    >>> CharField.register_lookup(Lower, 'lower')
+    >>> CharField.register_lookup(Lower)
     >>> Blog.objects.values('entry__authors__name__lower').annotate(entries=Count('entry'))
     <QuerySet [{'entry__authors__name__lower': 'test author', 'entries': 33}]>
     >>> Blog.objects.values(

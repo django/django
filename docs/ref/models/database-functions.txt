@@ -739,7 +739,7 @@ It can also be registered as a transform. For example::
 
     >>> from django.db.models import CharField
     >>> from django.db.models.functions import Length
-    >>> CharField.register_lookup(Length, 'length')
+    >>> CharField.register_lookup(Length)
     >>> # Get authors whose name is longer than 7 characters
     >>> authors = Author.objects.filter(name__length__gt=7)
 
