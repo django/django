@@ -231,7 +231,7 @@ class EmailMessage:
             self.reply_to = []
         self.from_email = from_email or settings.DEFAULT_FROM_EMAIL
         self.subject = subject
-        self.body = body
+        self.body = body or ''
         self.attachments = []
         if attachments:
             for attachment in attachments:

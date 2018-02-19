@@ -357,6 +357,11 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         msg.attach('example.txt', 'Text file content', 'text/plain')
         self.assertIn(html_content, msg.message().as_string())
 
+    def test_none_body(self):
+        msg = EmailMessage('subject', None, 'from@example.com', ['to@example.com'])
+        self.assertEqual(msg.body, '')
+        self.assertEqual(msg.message().get_payload(), '')
+
     def test_encoding(self):
         """
         Regression for #12791 - Encode body correctly with other encodings
