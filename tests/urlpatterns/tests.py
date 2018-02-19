@@ -77,7 +77,7 @@ class ConverterTests(SimpleTestCase):
             return x
 
         test_data = (
-            ('int', {'0', '1', '01', 1234567890}, int),
+            ('int', {'0', '1', '01', 1234567890, '-1', '-01', -1}, int),
             ('str', {'abcxyz'}, no_converter),
             ('path', {'allows.ANY*characters'}, no_converter),
             ('slug', {'abcxyz-ABCXYZ_01234567890'}, no_converter),
@@ -103,7 +103,7 @@ class ConverterTests(SimpleTestCase):
 
     def test_nonmatching_urls(self):
         test_data = (
-            ('int', {'-1', 'letters'}),
+            ('int', {'letters', '123mixed'}),
             ('str', {'', '/'}),
             ('path', {''}),
             ('slug', {'', 'stars*notallowed'}),
