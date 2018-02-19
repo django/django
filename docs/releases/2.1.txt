@@ -179,6 +179,10 @@ Internationalization
 * Added the :meth:`~django.utils.translation.get_supported_language_variant`
   function.
 
+* Untranslated strings for territorial language variants now use the
+  translations of the generic language. For example, untranslated ``pt_BR``
+  strings use ``pt`` translations.
+
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 

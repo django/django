@@ -202,6 +202,8 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             self._catalog = other._catalog.copy()
         else:
             self._catalog.update(other._catalog)
+        if other._fallback:
+            self.add_fallback(other._fallback)
 
     def language(self):
         """Return the translation language."""

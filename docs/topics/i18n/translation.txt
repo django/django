@@ -2082,7 +2082,13 @@ translations for the same literal:
 
 In all cases the name of the directory containing the translation is expected to
 be named using :term:`locale name` notation. E.g. ``de``, ``pt_BR``, ``es_AR``,
-etc.
+etc. Untranslated strings for territorial language variants use the translations
+of the generic language. For example, untranslated ``pt_BR`` strings use ``pt``
+translations.
+
+.. versionchanged:: 2.1
+
+    Fallback to the generic language as described above was added.
 
 This way, you can write applications that include their own translations, and
 you can override base translations in your project. Or, you can just build

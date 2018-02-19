@@ -1455,6 +1455,20 @@ class DjangoFallbackResolutionOrderI18NTests(ResolutionOrderI18NTests):
         self.assertEqual(gettext('Date/time'), 'Datum/Zeit')
 
 
+@override_settings(INSTALLED_APPS=['i18n.territorial_fallback'])
+class TranslationFallbackI18NTests(ResolutionOrderI18NTests):
+
+    def test_sparse_territory_catalog(self):
+        """
+        Untranslated strings for territorial language variants use the
+        translations of the generic language. In this case, the de-de
+        translation falls back to de.
+        """
+        with translation.override('de-de'):
+            self.assertGettext('Test 1 (en)', '(de-de)')
+            self.assertGettext('Test 2 (en)', '(de)')
+
+
 class TestModels(TestCase):
     def test_lazy(self):
         tm = TestModel()
