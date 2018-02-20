@@ -577,10 +577,10 @@ def _rowfactory(row, cursor):
                     # FLOAT column: binary-precision floating point.
                     # This comes from FloatField columns.
                     value = float(value)
-            elif precision > 0:
+            elif precision is not None and precision > 0:
                 # NUMBER(p,s) column: decimal-precision fixed point.
                 # This comes from IntField and DecimalField columns.
-                if scale == 0:
+                if not scale:
                     value = int(value)
                 else:
                     value = decimal.Decimal(value)
