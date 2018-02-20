@@ -108,6 +108,11 @@ class IfTagTests(SimpleTestCase):
     def test_if_tag_eq05(self):
         output = self.engine.render_to_string('if-tag-eq05')
         self.assertEqual(output, 'no')
+    #
+    # @setup({'if-tag-eq06': '{% if foo == 1 %}yes{% else %}no{% endif %}'})
+    # def test_if_tag_eq06(self):
+    #     output = self.engine.render_to_string('if-tag-eq06', {'foo': })
+    #     self.assertEqual(output, 'yes')
 
     # Inequality
     @setup({'if-tag-noteq01': '{% if foo != bar %}yes{% else %}no{% endif %}'})
@@ -600,6 +605,68 @@ class IfTagTests(SimpleTestCase):
     def test_if_is_not_both_variables_missing(self):
         output = self.engine.render_to_string('template', {})
         self.assertEqual(output, 'no')
+
+
+class IfTagSilenceTests(SimpleTestCase):
+
+    # Are accesses correctly silenced?
+    @setup({'template': '{% if foo.bar %}yes{% else %}no{% endif %}'})
+    def test_if_dict_missing_dict_key_silenced(self):
+        output = self.engine.render_to_string('template', {'foo': {}})
+        self.assertEqual(output, 'no')
+
+    @setup({'template': '{% if foo.0 %}yes{% else %}no{% endif %}'})
+    def test_if_list_index_missing_at_position_silenced(self):
+        output = self.engine.render_to_string('template', {'foo': []})
+        self.assertEqual(output, 'no')
+
+    # Are accesses in combination with other things correctly silenced?
+    @setup({'template': '{% if not foo.bar %}yes{% else %}no{% endif %}'})
+    def test_if_dict_missing_dict_key_silenced_negation(self):
+        output = self.engine.render_to_string('template', {'foo': {}})
+        self.assertEqual(output, 'yes')
+
+    @setup({'template': '{% if foo.bar == 1 %}{% else %}no{% endif %}'})
+    def test_if_dict_missing_dict_key_silenced_eq(self):
+        output = self.engine.render_to_string('template', {'foo': {}})
+        self.assertEqual(output, 'no')
+
+    @setup({'template': '{% if foo.bar|length %}yes{% else %}no{% endif %}'})
+    def test_if_dict_missing_dict_key_silenced_filter_len(self):
+        output = self.engine.render_to_string('template', {'foo': {}})
+        self.assertEqual(output, 'no')
+
+    @setup({'template': '{% if foo %}yes{% else %}no{% endif %}'})
+    def test_if_raises_exception(self):
+        def _raise_runtime_error():
+            raise Exception
+
+        with self.assertRaises(Exception):
+            self.engine.render_to_string('template', {'foo': _raise_runtime_error})
+
+    @setup({'template': '{% if not foo %}yes{% else %}no{% endif %}'})
+    def test_if_silenced_exception(self):
+        def _raise_runtime_error():
+            raise Exception
+
+        output = self.engine.render_to_string('template', {'foo': _raise_runtime_error})
+        self.assertEqual(output, 'no')
+
+    @setup({'template': '{% if foo == 1 %}yes{% else %}no{% endif %}'})
+    def test_if_silenced_exception_eq(self):
+        def _raise_exception():
+            raise Exception
+
+        output = self.engine.render_to_string('template', {'foo': _raise_exception})
+        self.assertEqual(output, 'no')
+
+    @setup({'template': '{% if foo|length %}yes{% else %}no{% endif %}'})
+    def test_if_silenced_exception_length(self):
+        def _raise_exception():
+            raise Exception
+
+        with self.assertRaises(Exception):
+            self.engine.render_to_string('template', {'foo': _raise_exception})
 
 
 class IfNodeTests(SimpleTestCase):
