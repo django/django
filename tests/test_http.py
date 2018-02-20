@@ -1,3 +1,4 @@
+import re
 import unittest
 from unittest.mock import MagicMock
 
@@ -5,7 +6,10 @@ import pytest
 from django.http import HttpResponse
 
 from asgiref.testing import ApplicationCommunicator
+from channels.consumer import AsyncConsumer
 from channels.http import AsgiHandler, AsgiRequest
+from channels.sessions import SessionMiddlewareStack
+from channels.testing import HttpCommunicator
 
 
 class RequestTests(unittest.TestCase):
@@ -267,3 +271,47 @@ async def test_handler_body_ignore_extra():
     await handler.receive_output(1)  # response start
     await handler.receive_output(1)  # response body
     MockHandler.request_class.assert_called_with(scope, b"chunk one")
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.asyncio
+async def test_sessions():
+
+    class SimpleHttpApp(AsyncConsumer):
+        """
+        Barebones HTTP ASGI app for testing.
+        """
+
+        async def http_request(self, event):
+            self.scope["session"].save()
+            assert self.scope["path"] == "/test/"
+            assert self.scope["method"] == "GET"
+            await self.send({
+                "type": "http.response.start",
+                "status": 200,
+                "headers": [],
+            })
+            await self.send({
+                "type": "http.response.body",
+                "body": b"test response",
+            })
+
+    communicator = HttpCommunicator(SessionMiddlewareStack(SimpleHttpApp), "GET", "/test/")
+    response = await communicator.get_response()
+    headers = response.get("headers", [])
+
+    assert len(headers) == 1
+    name, value = headers[0]
+
+    assert name == b"Set-Cookie"
+    value = value.decode("utf-8")
+
+    assert re.compile(r'sessionid=').search(value) is not None
+
+    assert re.compile(r'expires=').search(value) is not None
+
+    assert re.compile(r'HttpOnly').search(value) is not None
+
+    assert re.compile(r'Max-Age').search(value) is not None
+
+    assert re.compile(r'Path').search(value) is not None

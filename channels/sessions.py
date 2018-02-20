@@ -96,7 +96,7 @@ class CookieMiddleware:
         # Write out the cookies to the response
         for c in cookies.values():
             message.setdefault("headers", []).append(
-                (b"Set-Cookie", bytes(c.output(header=""))),
+                (b"Set-Cookie", bytes(c.output(header=""), encoding="utf-8")),
             )
 
     @classmethod
