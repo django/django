@@ -15,7 +15,6 @@ from django.core.servers.basehttp import (
 from django.utils import autoreload, six
 from django.utils.encoding import force_text, get_system_encoding
 
-
 naiveip_re = re.compile(r"""^(?:
 (?P<addr>
     (?P<ipv4>\d{1,3}(?:\.\d{1,3}){3}) |         # IPv4 address

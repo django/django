@@ -66,7 +66,6 @@ from .models import (
     Worker, WorkHour,
 )
 
-
 ERROR_MESSAGE = "Please enter the correct username and password \
 for a staff account. Note that both fields may be case-sensitive."
 

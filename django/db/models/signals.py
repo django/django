@@ -6,7 +6,6 @@ from django.dispatch import Signal
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 
-
 class_prepared = Signal(providing_args=["class"])
 
 
