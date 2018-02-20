@@ -199,9 +199,9 @@ Here's the example URLconf from earlier, rewritten using regular expressions::
 
     urlpatterns = [
         path('articles/2003/', views.special_case_2003),
-        re_path('articles/(?P<year>[0-9]{4})/', views.year_archive),
-        re_path('articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/', views.month_archive),
-        re_path('articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/(?P<slug>[\w-_]+)/', views.article_detail),
+        re_path(r'^articles/(?P<year>[0-9]{4})/$', views.year_archive),
+        re_path(r'^articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/$', views.month_archive),
+        re_path(r'^articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/(?P<slug>[\w-_]+)/$', views.article_detail),
     ]
 
 This accomplishes roughly the same thing as the previous example, except:
@@ -243,8 +243,8 @@ following URL patterns which optionally take a page argument::
     from django.urls import re_path
 
     urlpatterns = [
-        re_path(r'blog/(page-(\d+)/)?$', blog_articles),                  # bad
-        re_path(r'comments/(?:page-(?P<page_number>\d+)/)?$', comments),  # good
+        re_path(r'^blog/(page-(\d+)/)?$', blog_articles),                  # bad
+        re_path(r'^comments/(?:page-(?P<page_number>\d+)/)?$', comments),  # good
     ]
 
 Both patterns use nested arguments and will resolve: for example,
