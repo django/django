@@ -117,7 +117,7 @@ def flatten_fieldsets(fieldsets):
     return field_names
 
 
-def get_deleted_objects(objs, opts, user, admin_site, using):
+def get_deleted_objects(objs, user, admin_site, using):
     """
     Find all objects related to ``objs`` that should also be deleted. ``objs``
     must be a homogeneous iterable of objects (e.g. a QuerySet).
