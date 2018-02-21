@@ -30,8 +30,8 @@ from django.utils.translation import (
     LANGUAGE_SESSION_KEY, activate, check_for_language, deactivate,
     get_language, get_language_bidi, get_language_from_request,
     get_language_info, gettext, gettext_lazy, ngettext, ngettext_lazy,
-    npgettext, npgettext_lazy, pgettext, to_locale, trans_real, ugettext,
-    ugettext_lazy, ungettext, ungettext_lazy,
+    npgettext, npgettext_lazy, pgettext, to_locale, trans_null, trans_real,
+    ugettext, ugettext_lazy, ungettext, ungettext_lazy,
 )
 
 from .forms import CompanyForm, I18nForm, SelectDateForm
@@ -1327,7 +1327,7 @@ class MiscTests(SimpleTestCase):
         self.assertIsNone(g('/de-simple-page/'))
 
     def test_get_language_from_path_null(self):
-        from django.utils.translation.trans_null import get_language_from_path as g
+        g = trans_null.get_language_from_path
         self.assertIsNone(g('/pl/'))
         self.assertIsNone(g('/pl'))
         self.assertIsNone(g('/xyz/'))
