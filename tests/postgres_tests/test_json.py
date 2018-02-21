@@ -259,6 +259,20 @@ class TestQuerying(PostgreSQLTestCase):
     def test_iregex(self):
         self.assertTrue(JSONModel.objects.filter(field__foo__iregex=r'^bAr$').exists())
 
+    def test_update(self):
+        JSONModel.objects.filter(field__k__l='m').update(field__k__l='priyansh')
+        self.assertSequenceEqual(
+            JSONModel.objects.filter(field__k__l='priyansh'),
+            [self.objs[8]]
+        )
+
+    def test_update_index(self):
+        JSONModel.objects.filter(field__d__1__f='g').update(field__d__1__f='naimish')
+        self.assertSequenceEqual(
+            JSONModel.objects.filter(field__d__1__f='naimish'),
+            [self.objs[8]]
+        )
+
 
 @isolate_apps('postgres_tests')
 class TestChecks(PostgreSQLTestCase):

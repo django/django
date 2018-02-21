@@ -114,6 +114,16 @@ class UpdateQuery(Query):
         """
         values_seq = []
         for name, val in values.items():
+            if "__" in name:
+                attributes = name.split('__')
+                name = attributes.pop(0)
+                hierarchy = (',').join(attributes)
+                field = self.get_meta().get_field(name)
+                from django.contrib.postgres.functions import Jsonify
+                from django.db.models import Value as V
+                val = Jsonify(
+                    field.name, V("{" + hierarchy + "}"), V('"' + val + '"'), V(False)
+                )
             field = self.get_meta().get_field(name)
             direct = not (field.auto_created and not field.concrete) or not field.concrete
             model = field.model._meta.concrete_model

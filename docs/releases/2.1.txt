@@ -80,7 +80,8 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Fields of type ``JSONField`` can now be updated by specifying the path
+  of the key and the new value in ``update()`` function.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
