@@ -959,9 +959,10 @@ class AutoField(Field):
         return value
 
     def get_prep_value(self, value):
+        from django.db.models.expressions import OuterRef
         value = super().get_prep_value(value)
-        if value is None:
-            return None
+        if value is None or isinstance(value, OuterRef):
+            return value
         return int(value)
 
     def contribute_to_class(self, cls, name, **kwargs):
