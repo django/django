@@ -564,6 +564,7 @@ def _rowfactory(row, cursor):
     for value, desc in zip(row, cursor.description):
         if value is not None and desc[1] is Database.NUMBER:
             precision, scale = desc[4:6]
+            precision = precision or 0
             if scale == -127:
                 if precision == 0:
                     # NUMBER column: decimal-precision floating point
@@ -577,10 +578,10 @@ def _rowfactory(row, cursor):
                     # FLOAT column: binary-precision floating point.
                     # This comes from FloatField columns.
                     value = float(value)
-            elif precision is not None and precision > 0:
+            elif precision > 0:
                 # NUMBER(p,s) column: decimal-precision fixed point.
                 # This comes from IntField and DecimalField columns.
-                if not scale:
+                if scale == 0:
                     value = int(value)
                 else:
                     value = decimal.Decimal(value)
