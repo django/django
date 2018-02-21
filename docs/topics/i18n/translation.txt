@@ -1410,8 +1410,8 @@ function will return the URL in the active language. Example::
 
 .. warning::
 
-    In most cases, it's best to use translated URLs only within a
-    language-code-prefixed block of patterns (using
+    In most cases, it's best to use translated URLs only within a language code
+    prefixed block of patterns (using
     :func:`~django.conf.urls.i18n.i18n_patterns`), to avoid the possibility
     that a carelessly translated URL causes a collision with a non-translated
     URL pattern.
