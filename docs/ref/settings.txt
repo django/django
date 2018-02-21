@@ -1977,6 +1977,25 @@ testing (tables will still be created for the apps' models). If this is used in
 your general project settings, remember to use the :option:`migrate
 --run-syncdb` option if you want to create tables for the app.
 
+.. setting:: MIGRATIONS_INCLUDE_PYC
+
+``MIGRATIONS_INCLUDE_PYC``
+--------------------------
+
+.. versionadded:: 2.1
+
+Default: ``False``
+
+If ``True``, the migrations loader will consider compiled modules when loading
+migrations from disk. This can be useful in frozen environments, but should
+typically remain off.
+
+.. warning::
+
+    This setting defaults to ``False`` for very good reasons. Loading compiled
+    migrations leads to unexpected behavior and errors when (for instance)
+    switching between git branches which may leave compiled modules behind.
+
 .. setting:: MONTH_DAY_FORMAT
 
 ``MONTH_DAY_FORMAT``

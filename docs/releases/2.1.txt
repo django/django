@@ -195,6 +195,9 @@ Models
 * :meth:`.QuerySet.order_by` and :meth:`distinct(*fields) <.QuerySet.distinct>`
   now support using field transforms.
 
+* A new :setting:`MIGRATIONS_INCLUDE_PYC` setting was added to allow loading migration
+  modules from compiled `.pyc` files.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
