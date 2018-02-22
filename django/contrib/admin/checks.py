@@ -1,3 +1,4 @@
+import warnings
 from itertools import chain
 
 from django.apps import apps
@@ -13,6 +14,8 @@ from django.forms.models import (
     BaseModelForm, BaseModelFormSet, _get_foreign_key,
 )
 from django.template.engine import Engine
+from django.utils.deprecation import RemovedInDjango30Warning
+from django.utils.inspect import get_func_args
 
 
 def check_admin_app(app_configs, **kwargs):
@@ -884,6 +887,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
 class InlineModelAdminChecks(BaseModelAdminChecks):
 
     def check(self, inline_obj, **kwargs):
+        self._check_has_add_permission(inline_obj)
         parent_model = inline_obj.parent_model
         return [
             *super().check(inline_obj),
@@ -967,6 +971,20 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
             return must_inherit_from(parent='BaseModelFormSet', option='formset', obj=obj, id='admin.E206')
         else:
             return []
+
+    def _check_has_add_permission(self, obj):
+        cls = obj.__class__
+        try:
+            func = cls.has_add_permission
+        except AttributeError:
+            pass
+        else:
+            args = get_func_args(func)
+            if 'obj' not in args:
+                warnings.warn(
+                    "Update %s.has_add_permission() to accept a positional "
+                    "`obj` argument." % cls.__name__, RemovedInDjango30Warning
+                )
 
 
 def must_be(type, option, obj, id):

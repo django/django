@@ -41,6 +41,9 @@ details on these changes.
 
 * ``django.contrib.staticfiles.templatetags.static()`` will be removed.
 
+* The shim to allow ``InlineModelAdmin.has_add_permission()`` to be defined
+  without an ``obj`` argument will be removed.
+
 .. _deprecation-removed-in-2.1:
 
 2.1

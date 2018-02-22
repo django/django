@@ -64,6 +64,9 @@ Minor features
   with ``change_list_object_tools.html`` and
   ``change_form_object_tools.html`` templates.
 
+* :meth:`.InlineModelAdmin.has_add_permission` is now passed the parent object
+  as the second positional argument, ``obj``.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -397,6 +400,10 @@ Miscellaneous
 
 * ``django.contrib.staticfiles.templatetags.static()`` is deprecated in favor
   of ``django.templatetags.static.static()``.
+
+* Support for :meth:`.InlineModelAdmin.has_add_permission` methods that don't
+  accept ``obj`` as the second positional argument will be removed in Django
+  3.0.
 
 .. _removed-features-2.1:
 

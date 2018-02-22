@@ -44,6 +44,7 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.html import format_html
 from django.utils.http import urlencode
+from django.utils.inspect import get_func_args
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst, format_lazy, get_text_list
 from django.utils.translation import gettext as _, ngettext
@@ -559,12 +560,18 @@ class ModelAdmin(BaseModelAdmin):
         inline_instances = []
         for inline_class in self.inlines:
             inline = inline_class(self.model, self.admin_site)
+            # RemovedInDjango30Warning: obj will be a required argument.
+            args = get_func_args(inline.has_add_permission)
+            if 'obj' in args:
+                inline_has_add_permission = inline.has_add_permission(request, obj)
+            else:
+                inline_has_add_permission = inline.has_add_permission(request)
             if request:
-                if not (inline.has_add_permission(request) or
+                if not (inline_has_add_permission or
                         inline.has_change_permission(request, obj) or
                         inline.has_delete_permission(request, obj)):
                     continue
-                if not inline.has_add_permission(request):
+                if not inline_has_add_permission:
                     inline.max_num = 0
             inline_instances.append(inline)
 
@@ -2007,13 +2014,13 @@ class InlineModelAdmin(BaseModelAdmin):
             queryset = queryset.none()
         return queryset
 
-    def has_add_permission(self, request):
+    def has_add_permission(self, request, obj):
         if self.opts.auto_created:
             # We're checking the rights to an auto-created intermediate model,
             # which doesn't have its own individual permissions. The user needs
             # to have the change permission for the related model in order to
             # be able to do anything with the intermediate model.
-            return self.has_change_permission(request)
+            return self.has_change_permission(request, obj)
         return super().has_add_permission(request)
 
     def has_change_permission(self, request, obj=None):

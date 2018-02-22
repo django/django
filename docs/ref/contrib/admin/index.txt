@@ -2395,10 +2395,15 @@ The ``InlineModelAdmin`` class adds or customizes:
     inline forms. For example, this may be based on the model instance
     (passed as the keyword argument ``obj``).
 
-.. method:: InlineModelAdmin.has_add_permission(request)
+.. method:: InlineModelAdmin.has_add_permission(request, obj)
 
     Should return ``True`` if adding an inline object is permitted, ``False``
-    otherwise.
+    otherwise. ``obj`` is the parent object being edited or ``None`` when
+    adding a new parent.
+
+    .. versionchanged:: 2.1
+
+        The ``obj`` argument was added.
 
 .. method:: InlineModelAdmin.has_change_permission(request, obj=None)
 
