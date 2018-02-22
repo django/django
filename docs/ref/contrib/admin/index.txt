@@ -1894,19 +1894,19 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.has_change_permission(request, obj=None)
 
-    Should return ``True`` if editing obj is permitted, ``False`` otherwise.
-    If obj is ``None``, should return ``True`` or ``False`` to indicate whether
-    editing of objects of this type is permitted in general (e.g., ``False``
-    will be interpreted as meaning that the current user is not permitted to
-    edit any object of this type).
+    Should return ``True`` if editing ``obj`` is permitted, ``False``
+    otherwise. If ``obj`` is ``None``, should return ``True`` or ``False`` to
+    indicate whether editing of objects of this type is permitted in general
+    (e.g., ``False`` will be interpreted as meaning that the current user is
+    not permitted to edit any object of this type).
 
 .. method:: ModelAdmin.has_delete_permission(request, obj=None)
 
-    Should return ``True`` if deleting obj is permitted, ``False`` otherwise.
-    If obj is ``None``, should return ``True`` or ``False`` to indicate whether
-    deleting objects of this type is permitted in general (e.g., ``False`` will
-    be interpreted as meaning that the current user is not permitted to delete
-    any object of this type).
+    Should return ``True`` if deleting ``obj`` is permitted, ``False``
+    otherwise. If ``obj`` is ``None``, should return ``True`` or ``False`` to
+    indicate whether deleting objects of this type is permitted in general
+    (e.g., ``False`` will be interpreted as meaning that the current user is
+    not permitted to delete any object of this type).
 
 .. method:: ModelAdmin.has_module_permission(request)
 
