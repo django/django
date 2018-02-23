@@ -3,6 +3,29 @@ from decimal import Decimal
 from django.template.defaultfilters import pluralize
 from django.test import SimpleTestCase
 
+from ..utils import setup
+
+
+class PluralizeTests(SimpleTestCase):
+
+    def check_values(self, *tests):
+        for value, expected in tests:
+            with self.subTest(value=value):
+                output = self.engine.render_to_string('t', {'value': value})
+                self.assertEqual(output, expected)
+
+    @setup({'t': 'vote{{ value|pluralize }}'})
+    def test_no_arguments(self):
+        self.check_values(('0', 'votes'), ('1', 'vote'), ('2', 'votes'))
+
+    @setup({'t': 'class{{ value|pluralize:"es" }}'})
+    def test_suffix(self):
+        self.check_values(('0', 'classes'), ('1', 'class'), ('2', 'classes'))
+
+    @setup({'t': 'cand{{ value|pluralize:"y,ies" }}'})
+    def test_singular_and_plural_suffix(self):
+        self.check_values(('0', 'candies'), ('1', 'candy'), ('2', 'candies'))
+
 
 class FunctionTests(SimpleTestCase):
 

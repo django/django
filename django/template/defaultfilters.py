@@ -854,22 +854,22 @@ def pluralize(value, arg='s'):
     Return a plural suffix if the value is not 1. By default, use 's' as the
     suffix:
 
-    * If value is 0, vote{{ value|pluralize }} display "0 votes".
-    * If value is 1, vote{{ value|pluralize }} display "1 vote".
-    * If value is 2, vote{{ value|pluralize }} display "2 votes".
+    * If value is 0, vote{{ value|pluralize }} display "votes".
+    * If value is 1, vote{{ value|pluralize }} display "vote".
+    * If value is 2, vote{{ value|pluralize }} display "votes".
 
     If an argument is provided, use that string instead:
 
-    * If value is 0, class{{ value|pluralize:"es" }} display "0 classes".
-    * If value is 1, class{{ value|pluralize:"es" }} display "1 class".
-    * If value is 2, class{{ value|pluralize:"es" }} display "2 classes".
+    * If value is 0, class{{ value|pluralize:"es" }} display "classes".
+    * If value is 1, class{{ value|pluralize:"es" }} display "class".
+    * If value is 2, class{{ value|pluralize:"es" }} display "classes".
 
     If the provided argument contains a comma, use the text before the comma
     for the singular case and the text after the comma for the plural case:
 
-    * If value is 0, cand{{ value|pluralize:"y,ies" }} display "0 candies".
-    * If value is 1, cand{{ value|pluralize:"y,ies" }} display "1 candy".
-    * If value is 2, cand{{ value|pluralize:"y,ies" }} display "2 candies".
+    * If value is 0, cand{{ value|pluralize:"y,ies" }} display "candies".
+    * If value is 1, cand{{ value|pluralize:"y,ies" }} display "candy".
+    * If value is 2, cand{{ value|pluralize:"y,ies" }} display "candies".
     """
     if ',' not in arg:
         arg = ',' + arg
