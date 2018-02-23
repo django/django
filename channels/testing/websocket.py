@@ -89,7 +89,7 @@ class WebsocketCommunicator(ApplicationCommunicator):
         assert isinstance(payload, str), "JSON data is not a text frame"
         return json.loads(payload)
 
-    async def disconnect(self, code=1000):
+    async def disconnect(self, code=1000, timeout=1):
         """
         Closes the socket
         """
@@ -97,4 +97,4 @@ class WebsocketCommunicator(ApplicationCommunicator):
             "type": "websocket.disconnect",
             "code": code,
         })
-        await self.future
+        await self.wait(timeout)

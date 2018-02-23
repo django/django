@@ -1,5 +1,6 @@
 import asyncio
 import types
+from concurrent.futures import CancelledError
 
 
 def name_that_thing(thing):
@@ -33,8 +34,9 @@ async def await_many_dispatch(consumer_callables, dispatch):
     from them to the dispatch awaitable as they come in.
     """
     # Start them all off as tasks
+    loop = asyncio.get_event_loop()
     tasks = [
-        asyncio.ensure_future(consumer_callable())
+        loop.create_task(consumer_callable())
         for consumer_callable in consumer_callables
     ]
     try:
@@ -51,3 +53,7 @@ async def await_many_dispatch(consumer_callables, dispatch):
         # Make sure we clean up tasks on exit
         for task in tasks:
             task.cancel()
+            try:
+                await task
+            except CancelledError:
+                pass
