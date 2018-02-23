@@ -185,6 +185,10 @@ internationalization, type::
 How do you find out the names of individual tests? Look in ``tests/`` — each
 directory name there is the name of a test.
 
+Similarly this can be done with tox::
+
+   $ tox -e py3 generic_relations i18n
+
 If you just want to run a particular class of tests, you can specify a list of
 paths to individual test classes. For example, to run the ``TranslationTests``
 of the ``i18n`` module, type::

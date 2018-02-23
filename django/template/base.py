@@ -51,11 +51,15 @@ times with multiple contexts)
 
 import logging
 import re
-from inspect import getcallargs, getfullargspec
+import warnings
+from collections.abc import Mapping
+from inspect import Signature
 
 from django.template.context import (  # NOQA: imported for backwards compatibility
     BaseContext, Context, ContextPopException, RequestContext,
 )
+from django.template.exceptions import TemplateSyntaxError
+from django.utils.deprecation import RemovedInNextVersionWarning
 from django.utils.formats import localize
 from django.utils.html import conditional_escape, escape
 from django.utils.safestring import SafeData, mark_safe
@@ -64,8 +68,7 @@ from django.utils.text import (
 )
 from django.utils.timezone import template_localtime
 from django.utils.translation import gettext_lazy, pgettext_lazy
-
-from .exceptions import TemplateSyntaxError
+from django.utils.typing import Sequence
 
 TOKEN_TEXT = 0
 TOKEN_VAR = 1
@@ -705,23 +708,20 @@ class FilterExpression:
                 obj = new_obj
         return obj
 
-    def args_check(name, func, provided):
-        provided = list(provided)
+    @staticmethod
+    def args_check(name, func, provided_args):
         # First argument, filter input, is implied.
-        plen = len(provided) + 1
+        provided_args_count = len(provided_args) + 1
         # Check to see if a decorator is providing the real function.
+        # TODO this could be removed if the decorated function was properly wrapped with functools.wraps
         func = getattr(func, '_decorated_function', func)
-
-        args, _, _, defaults, _, _, _ = getfullargspec(func)
-        alen = len(args)
-        dlen = len(defaults or [])
-        # Not enough OR Too many
-        if plen < (alen - dlen) or plen > alen:
-            raise TemplateSyntaxError("%s requires %d arguments, %d provided" %
-                                      (name, alen - dlen, plen))
-
-        return True
-    args_check = staticmethod(args_check)
+        args_count = len(Signature.from_callable(func).parameters)
+        defaults_count = 0 if func.__defaults__ is None else len(func.__defaults__)
+        required_args = args_count - defaults_count
+        if required_args <= provided_args_count <= args_count:
+            return
+        raise TemplateSyntaxError("%s requires %d arguments, %d provided" %
+                                  (name, required_args, provided_args_count))
 
     def __str__(self):
         return self.token
@@ -796,7 +796,7 @@ class Variable:
         """Resolve this variable against a given context."""
         if self.lookups is not None:
             # We're dealing with a variable that needs to be resolved
-            value = self._resolve_lookup(context)
+            value = self._resolve_lookups(context)
         else:
             # We're dealing with a literal, so it's already been "resolved"
             value = self.literal
@@ -816,7 +816,7 @@ class Variable:
     def __str__(self):
         return self.var
 
-    def _resolve_lookup(self, context):
+    def _resolve_lookups(self, context):
         """
         Perform resolution of a real variable (i.e. not a literal) against the
         given context.
@@ -827,60 +827,83 @@ class Variable:
         """
         current = context
         try:  # catch-all for silent variable failures
-            for bit in self.lookups:
-                try:  # dictionary lookup
-                    current = current[bit]
-                    # ValueError/IndexError are for numpy.array lookup on
-                    # numpy < 1.9 and 1.9+ respectively
-                except (TypeError, AttributeError, KeyError, ValueError, IndexError):
-                    try:  # attribute lookup
-                        # Don't return class attributes if the class is the context:
-                        if isinstance(current, BaseContext) and getattr(type(current), bit):
-                            raise AttributeError
-                        current = getattr(current, bit)
-                    except (TypeError, AttributeError):
-                        # Reraise if the exception was raised by a @property
-                        if not isinstance(current, BaseContext) and bit in dir(current):
-                            raise
-                        try:  # list-index lookup
-                            current = current[int(bit)]
-                        except (IndexError,  # list index out of range
-                                ValueError,  # invalid literal for int()
-                                KeyError,    # current is a dict without `int(bit)` key
-                                TypeError):  # unsubscriptable object
-                            raise VariableDoesNotExist("Failed lookup for key "
-                                                       "[%s] in %r",
-                                                       (bit, current))  # missing attribute
+            for token in self.lookups:
+                current = self._perform_lookup(current, token)
                 if callable(current):
-                    if getattr(current, 'do_not_call_in_templates', False):
-                        pass
-                    elif getattr(current, 'alters_data', False):
-                        current = context.template.engine.string_if_invalid
-                    else:
-                        try:  # method call (assuming no args required)
-                            current = current()
-                        except TypeError:
-                            try:
-                                getcallargs(current)
-                            except TypeError:  # arguments *were* required
-                                current = context.template.engine.string_if_invalid  # invalid method call
-                            else:
-                                raise
+                    current = self._resolve_callable(current, context.template.engine.string_if_invalid)
         except Exception as e:
             template_name = getattr(context, 'template_name', None) or 'unknown'
             logger.debug(
                 "Exception while resolving variable '%s' in template '%s'.",
-                bit,
-                template_name,
-                exc_info=True,
+                token, template_name, exc_info=True,
             )
-
             if getattr(e, 'silent_variable_failure', False):
                 current = context.template.engine.string_if_invalid
             else:
                 raise
 
         return current
+
+    @staticmethod
+    def _perform_lookup(lookup_context, token):
+        def doesnt_exist():
+            raise VariableDoesNotExist(
+                "Failed lookup for key [{token}] in {current!r}".format(token=token, current=lookup_context)
+            )
+
+        # Mapping lookup
+        if isinstance(lookup_context, (Mapping, BaseContext)):
+            # a string key is preferred
+            if token in lookup_context:
+                return lookup_context[token]
+            # yet, there could be a corresponding integer key
+            if token.isdigit() and int(token) in lookup_context:
+                return lookup_context[int(token)]
+            doesnt_exist()
+
+        # Attribute lookup, but not for attributes of a context object's class
+        if token in dir(lookup_context) and \
+                not (isinstance(lookup_context, BaseContext) and token in dir(lookup_context.__class__)):
+            return getattr(lookup_context, token)
+
+        # Index lookup
+        if isinstance(lookup_context, Sequence) and token.isdigit():
+            try:
+                return lookup_context[int(token)]
+            except IndexError:
+                doesnt_exist()
+
+        if not isinstance(lookup_context, Mapping) and hasattr(lookup_context, '__getitem__'):
+            warnings.warn(
+                "Template variable lookup on types that to not derive from `collections.abc.Mapping` via the "
+                "`__getitem__`-method is deprecated. If the type `{_type}` from `{module}` is supposed to act as a "
+                "mapping, refactor it to base it on the mentioned abstract meta class. See PEP 3119 for details."
+                .format(_type=lookup_context.__class__.__name__, module=lookup_context.__class__.__module__),
+                RemovedInNextVersionWarning
+            )
+            try:
+                return lookup_context.__getitem__(token)
+            except TypeError:
+                try:
+                    return lookup_context.__getitem__(int(token))
+                except ValueError:
+                    doesnt_exist()
+            except KeyError:
+                doesnt_exist()
+
+        # Invalid lookup
+        doesnt_exist()
+
+    @staticmethod
+    def _resolve_callable(obj, string_if_invalid):
+        if getattr(obj, 'do_not_call_in_templates', False):
+            return obj
+        if getattr(obj, 'alters_data', False):
+            return string_if_invalid
+        if not Signature.from_callable(obj).parameters:
+            return obj()
+        # the callable requires arguments (and defaults aren't considered here)
+        return string_if_invalid
 
 
 class Node:
