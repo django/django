@@ -178,16 +178,19 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
     def _add_fallback(self, localedirs=None):
         """Set the GNUTranslations() fallback with the default language."""
+        fallback = get_fallback()
         # Don't set a fallback for the default language or any English variant
-        # (as it's empty, so it'll ALWAYS fall back to the default language)
-        if self.__language == settings.LANGUAGE_CODE or self.__language.startswith('en'):
+        # (as it's empty, so it'll ALWAYS fall back to the fallback language).
+        # If the language is the same, there's no need for adding the fallback.
+        if self.__language == fallback or self.__language.startswith('en') or (
+                self.__language and settings.LANGUAGE_CODE.startswith(self.__language)):
             return
         if self.domain == 'django':
             # Get from cache
-            default_translation = translation(settings.LANGUAGE_CODE)
+            default_translation = translation(fallback)
         else:
             default_translation = DjangoTranslation(
-                settings.LANGUAGE_CODE, domain=self.domain, localedirs=localedirs
+                fallback, domain=self.domain, localedirs=localedirs
             )
         self.add_fallback(default_translation)
 
@@ -276,6 +279,14 @@ def get_language_bidi():
     else:
         base_lang = get_language().split('-')[0]
         return base_lang in settings.LANGUAGES_BIDI
+
+
+def get_fallback():
+    """
+    Return the fallback language for unsupported languages and missing translations.
+    """
+    fallback = settings.LANGUAGE_FALLBACK
+    return fallback if fallback and isinstance(fallback, str) else settings.LANGUAGE_CODE
 
 
 def catalog():
@@ -508,9 +519,9 @@ def get_language_from_request(request, check_path=False):
             continue
 
     try:
-        return get_supported_language_variant(settings.LANGUAGE_CODE)
+        return get_supported_language_variant(get_fallback())
     except LookupError:
-        return settings.LANGUAGE_CODE
+        return get_fallback()
 
 
 @functools.lru_cache(maxsize=1000)

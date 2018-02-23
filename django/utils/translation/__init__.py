@@ -189,6 +189,10 @@ def get_language_bidi():
     return _trans.get_language_bidi()
 
 
+def get_fallback():
+    return _trans.get_fallback()
+
+
 def check_for_language(lang_code):
     return _trans.check_for_language(lang_code)
 

@@ -48,6 +48,10 @@ def get_language_bidi():
     return settings.LANGUAGE_CODE in settings.LANGUAGES_BIDI
 
 
+def get_fallback():
+    return settings.LANGUAGE_CODE
+
+
 def check_for_language(x):
     return True
 
