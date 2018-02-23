@@ -4,7 +4,7 @@ from collections import defaultdict
 
 from django.contrib.auth import get_permission_codename
 from django.core.exceptions import FieldDoesNotExist
-from django.db import models
+from django.db import models, router
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
 from django.forms.utils import pretty_name
@@ -117,7 +117,7 @@ def flatten_fieldsets(fieldsets):
     return field_names
 
 
-def get_deleted_objects(objs, user, admin_site, using):
+def get_deleted_objects(objs, user, admin_site):
     """
     Find all objects related to ``objs`` that should also be deleted. ``objs``
     must be a homogeneous iterable of objects (e.g. a QuerySet).
@@ -125,6 +125,12 @@ def get_deleted_objects(objs, user, admin_site, using):
     Return a nested list of strings suitable for display in the
     template with the ``unordered_list`` filter.
     """
+    try:
+        obj = objs[0]
+    except IndexError:
+        return [], {}, set(), []
+    else:
+        using = router.db_for_write(obj._meta.model)
     collector = NestedObjects(using=using)
     collector.collect(objs)
     perms_needed = set()

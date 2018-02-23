@@ -1750,12 +1750,10 @@ class ModelAdmin(BaseModelAdmin):
         if obj is None:
             return self._get_obj_does_not_exist_redirect(request, opts, object_id)
 
-        using = router.db_for_write(self.model)
-
         # Populate deleted_objects, a data structure of all related objects that
         # will also be deleted.
         deleted_objects, model_count, perms_needed, protected = get_deleted_objects(
-            [obj], request.user, self.admin_site, using,
+            [obj], request.user, self.admin_site,
         )
 
         if request.POST and not protected:  # The user has confirmed the deletion.
