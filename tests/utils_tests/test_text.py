@@ -136,6 +136,10 @@ class TestUtilsText(SimpleTestCase):
         truncator = text.Truncator('<p>I &lt;3 python, what about you?</p>')
         self.assertEqual('<p>I &lt;3 python...</p>', truncator.words(3, '...', html=True))
 
+        re_tag_catastrophic_test = ('</a' + '\t' * 50000) + '//>'
+        truncator = text.Truncator(re_tag_catastrophic_test)
+        self.assertEqual(re_tag_catastrophic_test, truncator.words(500, html=True))
+
     def test_wrap(self):
         digits = '1234 67 9'
         self.assertEqual(text.wrap(digits, 100), '1234 67 9')
