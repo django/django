@@ -7,6 +7,17 @@ Django 2.0.3 release notes
 Django 2.0.3 fixes two security issues and several bugs in 2.0.2. Also, the
 latest string translations from Transifex are incorporated.
 
+CVE-2018-7536: Denial-of-service possibility in ``urlize`` and ``urlizetrunc`` template filters
+===============================================================================================
+
+The ``django.utils.html.urlize()`` function was extremely slow to evaluate
+certain inputs due to catastrophic backtracking vulnerabilities in two regular
+expressions. The ``urlize()`` function is used to implement the ``urlize`` and
+``urlizetrunc`` template filters, which were thus vulnerable.
+
+The problematic regular expressions are replaced with parsing logic that
+behaves similarly.
+
 Bugfixes
 ========
 

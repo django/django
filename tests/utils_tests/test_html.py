@@ -5,7 +5,7 @@ from django.test import SimpleTestCase
 from django.utils.functional import lazystr
 from django.utils.html import (
     conditional_escape, escape, escapejs, format_html, html_safe, linebreaks,
-    smart_urlquote, strip_spaces_between_tags, strip_tags,
+    smart_urlquote, strip_spaces_between_tags, strip_tags, urlize,
 )
 from django.utils.safestring import mark_safe
 
@@ -216,3 +216,12 @@ class TestUtilsHtml(SimpleTestCase):
             @html_safe
             class HtmlClass:
                 pass
+
+    def test_urlize_unchanged_inputs(self):
+        tests = (
+            ('a' + '@a' * 50000) + 'a',  # simple_email_re catastrophic test
+            ('a' + '.' * 1000000) + 'a',  # trailing_punctuation catastrophic test
+        )
+        for value in tests:
+            with self.subTest(value=value):
+                self.assertEqual(urlize(value), value)

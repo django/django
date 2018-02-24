@@ -14,12 +14,7 @@ from django.utils.text import normalize_newlines
 from .html_parser import HTMLParseError, HTMLParser
 
 # Configuration for urlize() function.
-TRAILING_PUNCTUATION_RE = re.compile(
-    '^'           # Beginning of word
-    '(.*?)'       # The URL in word
-    '([.,:;!]+)'  # Allowed non-wrapping, trailing punctuation
-    '$'           # End of word
-)
+TRAILING_PUNCTUATION_CHARS = '.,:;!'
 WRAPPING_PUNCTUATION = [('(', ')'), ('<', '>'), ('[', ']'), ('&lt;', '&gt;'), ('"', '"'), ('\'', '\'')]
 
 # List of possible strings used for bullets in bulleted lists.
@@ -29,7 +24,6 @@ unencoded_ampersands_re = re.compile(r'&(?!(\w+|#\d+);)')
 word_split_re = re.compile(r'''([\s<>"']+)''')
 simple_url_re = re.compile(r'^https?://\[?\w', re.IGNORECASE)
 simple_url_2_re = re.compile(r'^www\.|^(?!http)\w[^@]+\.(com|edu|gov|int|mil|net|org)($|/.*)$', re.IGNORECASE)
-simple_email_re = re.compile(r'^\S+@\S+\.\S+$')
 
 
 @keep_lazy(str, SafeText)
@@ -276,10 +270,10 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
             trimmed_something = False
 
             # Trim trailing punctuation.
-            match = TRAILING_PUNCTUATION_RE.match(middle)
-            if match:
-                middle = match.group(1)
-                trail = match.group(2) + trail
+            stripped = middle.rstrip(TRAILING_PUNCTUATION_CHARS)
+            if middle != stripped:
+                trail = middle[len(stripped):] + trail
+                middle = stripped
                 trimmed_something = True
 
             # Trim wrapping punctuation.
@@ -295,6 +289,21 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
                     trail = closing + trail
                     trimmed_something = True
         return lead, middle, trail
+
+    def is_email_simple(value):
+        """Return True if value looks like an email address."""
+        # An @ must be in the middle of the value.
+        if '@' not in value or value.startswith('@') or value.endswith('@'):
+            return False
+        try:
+            p1, p2 = value.split('@')
+        except ValueError:
+            # value contains more than one @.
+            return False
+        # Dot must be in p2 (e.g. example.com)
+        if '.' not in p2 or p2.startswith('.'):
+            return False
+        return True
 
     words = word_split_re.split(force_text(text))
     for i, word in enumerate(words):
@@ -315,7 +324,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
             elif simple_url_2_re.match(middle):
                 middle, middle_unescaped, trail = unescape(middle, trail)
                 url = smart_urlquote('http://%s' % middle_unescaped)
-            elif ':' not in middle and simple_email_re.match(middle):
+            elif ':' not in middle and is_email_simple(middle):
                 local, domain = middle.rsplit('@', 1)
                 try:
                     domain = domain.encode('idna').decode('ascii')
