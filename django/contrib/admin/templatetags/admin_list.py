@@ -19,6 +19,8 @@ from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 
+from .base import InclusionAdminNode
+
 register = Library()
 
 DOT = '.'
@@ -40,7 +42,6 @@ def paginator_number(cl, i):
                            i + 1)
 
 
-@register.inclusion_tag('admin/pagination.html')
 def pagination(cl):
     """
     Generate the series of links to the pages in a paginated list.
@@ -87,6 +88,16 @@ def pagination(cl):
         'ALL_VAR': ALL_VAR,
         '1': 1,
     }
+
+
+@register.tag(name='pagination')
+def pagination_tag(parser, token):
+    return InclusionAdminNode(
+        parser, token,
+        func=pagination,
+        template_name='pagination.html',
+        takes_context=False,
+    )
 
 
 def result_headers(cl):
@@ -314,7 +325,6 @@ def result_hidden_fields(cl):
                 yield mark_safe(form[cl.model._meta.pk.name])
 
 
-@register.inclusion_tag("admin/change_list_results.html")
 def result_list(cl):
     """
     Display the headers and data list together.
@@ -331,7 +341,16 @@ def result_list(cl):
             'results': list(results(cl))}
 
 
-@register.inclusion_tag('admin/date_hierarchy.html')
+@register.tag(name='result_list')
+def result_list_tag(parser, token):
+    return InclusionAdminNode(
+        parser, token,
+        func=result_list,
+        template_name='change_list_results.html',
+        takes_context=False,
+    )
+
+
 def date_hierarchy(cl):
     """
     Display the date hierarchy for date drill-down functionality.
@@ -406,7 +425,16 @@ def date_hierarchy(cl):
             }
 
 
-@register.inclusion_tag('admin/search_form.html')
+@register.tag(name='date_hierarchy')
+def date_hierarchy_tag(parser, token):
+    return InclusionAdminNode(
+        parser, token,
+        func=date_hierarchy,
+        template_name='date_hierarchy.html',
+        takes_context=False,
+    )
+
+
 def search_form(cl):
     """
     Display a search form for searching the list.
@@ -416,6 +444,11 @@ def search_form(cl):
         'show_result_count': cl.result_count != cl.full_result_count,
         'search_var': SEARCH_VAR
     }
+
+
+@register.tag(name='search_form')
+def search_form_tag(parser, token):
+    return InclusionAdminNode(parser, token, func=search_form, template_name='search_form.html', takes_context=False)
 
 
 @register.simple_tag
@@ -428,7 +461,6 @@ def admin_list_filter(cl, spec):
     })
 
 
-@register.inclusion_tag('admin/actions.html', takes_context=True)
 def admin_actions(context):
     """
     Track the number of times the action field has been rendered on the page,
@@ -436,3 +468,24 @@ def admin_actions(context):
     """
     context['action_index'] = context.get('action_index', -1) + 1
     return context
+
+
+@register.tag(name='admin_actions')
+def admin_actions_tag(parser, token):
+    return InclusionAdminNode(parser, token, func=admin_actions, template_name='actions.html')
+
+
+def change_list_object_tools(context):
+    """
+    Displays the row of change list object tools.
+    """
+    return context
+
+
+@register.tag(name='change_list_object_tools')
+def change_list_object_tools_tag(parser, token):
+    return InclusionAdminNode(
+        parser, token,
+        func=change_list_object_tools,
+        template_name='change_list_object_tools.html',
+    )
