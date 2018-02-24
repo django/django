@@ -34,13 +34,6 @@ This step is only necessary if you'd like to work with a "large" database engine
 like PostgreSQL, MySQL, or Oracle. To install such a database, consult the
 :ref:`database installation information <database-installation>`.
 
-Remove any old versions of Django
-=================================
-
-If you are upgrading your installation of Django from a previous version, you
-will need to :ref:`uninstall the old Django version before installing the new
-version <removing-old-versions-of-django>`.
-
 Install Django
 ==============
 

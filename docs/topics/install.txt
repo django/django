@@ -122,28 +122,6 @@ database queries, Django will need permission to create a test database.
 .. _cx_Oracle: https://oracle.github.io/python-cx_Oracle/
 .. _Oracle: https://www.oracle.com/
 
-.. _removing-old-versions-of-django:
-
-Remove any old versions of Django
-=================================
-
-If you are upgrading your installation of Django from a previous version,
-you will need to uninstall the old Django version before installing the
-new version.
-
-If you installed Django using pip_ or ``easy_install`` previously, installing
-with pip_ or ``easy_install`` again will automatically take care of the old
-version, so you don't need to do it yourself.
-
-If you previously installed Django using ``python setup.py install``,
-uninstalling is as simple as deleting the ``django`` directory from your Python
-``site-packages``. To find the directory you need to remove, you can run the
-following at your shell prompt (not the interactive Python prompt):
-
-.. console::
-
-    $ python -c "import django; print(django.__path__)"
-
 .. _install-django-code:
 
 Install the Django code
