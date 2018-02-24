@@ -232,3 +232,11 @@ class TestUtilsHtml(SimpleTestCase):
             @html.html_safe
             class HtmlClass(object):
                 pass
+
+    def test_urlize_unchanged_inputs(self):
+        tests = (
+            ('a' + '@a' * 50000) + 'a',  # simple_email_re catastrophic test
+            ('a' + '.' * 1000000) + 'a',  # trailing_punctuation catastrophic test
+        )
+        for value in tests:
+            self.assertEqual(html.urlize(value), value)
