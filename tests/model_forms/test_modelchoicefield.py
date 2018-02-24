@@ -257,6 +257,17 @@ class ModelChoiceFieldTests(TestCase):
             (self.c3.pk, 'Third'),
         ])
 
+    def test_queryset_result_cache_is_reused(self):
+        f = forms.ModelChoiceField(Category.objects.all())
+        with self.assertNumQueries(1):
+            # list() calls __len__() and __iter__(); no duplicate queries.
+            self.assertEqual(list(f.choices), [
+                ('', '---------'),
+                (self.c1.pk, 'Entertainment'),
+                (self.c2.pk, 'A test'),
+                (self.c3.pk, 'Third'),
+            ])
+
     def test_num_queries(self):
         """
         Widgets that render multiple subwidgets shouldn't make more than one
