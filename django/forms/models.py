@@ -1130,7 +1130,7 @@ class ModelChoiceIterator:
     def __iter__(self):
         if self.field.empty_label is not None:
             yield ("", self.field.empty_label)
-        queryset = self.queryset.all()
+        queryset = self.queryset
         # Can't use iterator() when queryset uses prefetch_related()
         if not queryset._prefetch_related_lookups:
             queryset = queryset.iterator()
@@ -1194,7 +1194,7 @@ class ModelChoiceField(ChoiceField):
         return self._queryset
 
     def _set_queryset(self, queryset):
-        self._queryset = queryset
+        self._queryset = None if queryset is None else queryset.all()
         self.widget.choices = self.choices
 
     queryset = property(_get_queryset, _set_queryset)

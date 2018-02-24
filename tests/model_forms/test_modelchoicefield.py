@@ -249,6 +249,7 @@ class ModelChoiceFieldTests(TestCase):
 
     def test_queryset_manager(self):
         f = forms.ModelChoiceField(Category.objects)
+        self.assertEqual(len(f.choices), 4)
         self.assertEqual(list(f.choices), [
             ('', '---------'),
             (self.c1.pk, 'Entertainment'),
