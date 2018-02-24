@@ -5,3 +5,14 @@ Django 1.8.19 release notes
 *March 6, 2018*
 
 Django 1.8.19 fixes two security issues in 1.18.18.
+
+CVE-2018-7536: Denial-of-service possibility in ``urlize`` and ``urlizetrunc`` template filters
+===============================================================================================
+
+The ``django.utils.html.urlize()`` function was extremely slow to evaluate
+certain inputs due to a catastrophic backtracking vulnerability in a regular
+expression. The ``urlize()`` function is used to implement the ``urlize`` and
+``urlizetrunc`` template filters, which were thus vulnerable.
+
+The problematic regular expression is replaced with parsing logic that behaves
+similarly.

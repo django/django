@@ -253,3 +253,12 @@ class TestUtilsHtml(SimpleTestCase):
         for value, output in tests:
             with self.subTest(value=value):
                 self.assertEqual(urlize(value), output)
+
+    def test_urlize_unchanged_inputs(self):
+        tests = (
+            ('a' + '@a' * 50000) + 'a',  # simple_email_re catastrophic test
+            ('a' + '.' * 1000000) + 'a',  # trailing_punctuation catastrophic test
+        )
+        for value in tests:
+            with self.subTest(value=value):
+                self.assertEqual(urlize(value), value)
