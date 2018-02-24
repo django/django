@@ -86,7 +86,6 @@ class Command(RunserverCommand):
                 signal_handlers=not options["use_reloader"],
                 action_logger=self.log_action,
                 http_timeout=self.http_timeout,
-                ws_protocols=getattr(settings, "CHANNELS_WS_PROTOCOLS", None),
                 root_path=getattr(settings, "FORCE_SCRIPT_NAME", "") or "",
                 websocket_handshake_timeout=self.websocket_handshake_timeout,
             ).run()

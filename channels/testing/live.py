@@ -54,7 +54,6 @@ class DaphneServerThread(LiveServerThread):
             application=self.application,
             endpoints=endpoints,
             signal_handlers=False,
-            ws_protocols=getattr(settings, "CHANNELS_WS_PROTOCOLS", None),
             root_path=getattr(settings, "FORCE_SCRIPT_NAME", "") or "",
             ready_callable=lambda: self.is_ready.set(),
         )
