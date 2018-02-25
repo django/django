@@ -30,7 +30,6 @@ class EngineHandler:
         templates = OrderedDict()
         backend_names = []
         for tpl in self._templates:
-            tpl = tpl.copy()
             try:
                 # This will raise an exception if 'BACKEND' doesn't exist or
                 # isn't a string containing at least one dot.
@@ -41,10 +40,13 @@ class EngineHandler:
                     "Invalid BACKEND for a template engine: {}. Check "
                     "your TEMPLATES setting.".format(invalid_backend))
 
-            tpl.setdefault('NAME', default_name)
-            tpl.setdefault('DIRS', [])
-            tpl.setdefault('APP_DIRS', False)
-            tpl.setdefault('OPTIONS', {})
+            tpl = {
+                'NAME': default_name,
+                'DIRS': [],
+                'APP_DIRS': False,
+                'OPTIONS': {},
+                **tpl,
+            }
 
             templates[tpl['NAME']] = tpl
             backend_names.append(tpl['NAME'])

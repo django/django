@@ -589,13 +589,11 @@ class BaseDatabaseWrapper:
         potential child threads while (or after) the test database is destroyed.
         Refs #10868, #17786, #16969.
         """
-        settings_dict = self.settings_dict.copy()
-        settings_dict['NAME'] = None
-        nodb_connection = self.__class__(
-            settings_dict,
+        return self.__class__(
+            {**self.settings_dict, 'NAME': None},
             alias=NO_DB_ALIAS,
-            allow_thread_sharing=False)
-        return nodb_connection
+            allow_thread_sharing=False,
+        )
 
     def _start_transaction_under_autocommit(self):
         """
