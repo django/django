@@ -130,12 +130,5 @@ class FileModel(models.Model):
     file = models.FileField(storage=temp_storage, upload_to='tests')
 
 
-class Group(models.Model):
-    name = models.CharField(max_length=10)
-
-    def __str__(self):
-        return '%s' % self.name
-
-
 class Article(models.Model):
     content = models.TextField()
