@@ -1,0 +1,7 @@
+===========================
+Django 1.8.19 release notes
+===========================
+
+*March 6, 2018*
+
+Django 1.8.19 fixes two security issues in 1.18.18.
