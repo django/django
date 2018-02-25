@@ -212,7 +212,7 @@ WebSockets and chat requests::
             url("^chat/$", PublicChatConsumer),
         ]),
 
-        "telegram": TelegramConsumer,
+        "telegram": ChattyBotConsumer,
     })
 
 The goal of Channels is to let you build out your Django projects to work
