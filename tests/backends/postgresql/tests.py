@@ -2,7 +2,7 @@ import unittest
 import warnings
 from unittest import mock
 
-from django.db import DatabaseError, connection
+from django.db import DatabaseError, connection, connections
 from django.test import TestCase
 
 
@@ -26,10 +26,15 @@ class Tests(TestCase):
         with warnings.catch_warnings(record=True) as w:
             with mock.patch('django.db.backends.base.base.BaseDatabaseWrapper.connect',
                             side_effect=mocked_connect, autospec=True):
-                warnings.simplefilter('always', RuntimeWarning)
-                nodb_conn = connection._nodb_connection
+                with mock.patch.object(
+                    connection,
+                    'settings_dict',
+                    {**connection.settings_dict, 'NAME': 'postgres'},
+                ):
+                    warnings.simplefilter('always', RuntimeWarning)
+                    nodb_conn = connection._nodb_connection
         self.assertIsNotNone(nodb_conn.settings_dict['NAME'])
-        self.assertEqual(nodb_conn.settings_dict['NAME'], connection.settings_dict['NAME'])
+        self.assertEqual(nodb_conn.settings_dict['NAME'], connections['other'].settings_dict['NAME'])
         # Check a RuntimeWarning has been emitted
         self.assertEqual(len(w), 1)
         self.assertEqual(w[0].message.__class__, RuntimeWarning)
