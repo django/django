@@ -172,6 +172,7 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertFalse(check_password(' ', blank_encoded))
 
     @skipUnless(bcrypt, "bcrypt not installed")
+    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.BCryptPasswordHasher'])
     def test_bcrypt(self):
         encoded = make_password('lètmein', hasher='bcrypt')
         self.assertTrue(is_password_usable(encoded))
@@ -187,6 +188,7 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertFalse(check_password(' ', blank_encoded))
 
     @skipUnless(bcrypt, "bcrypt not installed")
+    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.BCryptPasswordHasher'])
     def test_bcrypt_upgrade(self):
         hasher = get_hasher('bcrypt')
         self.assertEqual('bcrypt', hasher.algorithm)
@@ -219,6 +221,7 @@ class TestUtilsHashPass(SimpleTestCase):
             hasher.rounds = old_rounds
 
     @skipUnless(bcrypt, "bcrypt not installed")
+    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.BCryptPasswordHasher'])
     def test_bcrypt_harden_runtime(self):
         hasher = get_hasher('bcrypt')
         self.assertEqual('bcrypt', hasher.algorithm)
