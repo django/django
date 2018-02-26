@@ -51,10 +51,8 @@ class DatabaseCreation(BaseDatabaseCreation):
         if self.is_in_memory_db(source_database_name):
             return orig_settings_dict
         else:
-            new_settings_dict = orig_settings_dict.copy()
             root, ext = os.path.splitext(orig_settings_dict['NAME'])
-            new_settings_dict['NAME'] = '{}_{}.{}'.format(root, suffix, ext)
-            return new_settings_dict
+            return {**orig_settings_dict, 'NAME': '{}_{}.{}'.format(root, suffix, ext)}
 
     def _clone_test_db(self, suffix, verbosity, keepdb=False):
         source_database_name = self.connection.settings_dict['NAME']

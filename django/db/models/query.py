@@ -219,9 +219,7 @@ class QuerySet:
     def __getstate__(self):
         # Force the cache to be fully populated.
         self._fetch_all()
-        obj_dict = self.__dict__.copy()
-        obj_dict[DJANGO_VERSION_PICKLE_KEY] = get_version()
-        return obj_dict
+        return {**self.__dict__, DJANGO_VERSION_PICKLE_KEY: get_version()}
 
     def __setstate__(self, state):
         msg = None

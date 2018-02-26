@@ -100,9 +100,7 @@ class MultiValueDict(dict):
         return result
 
     def __getstate__(self):
-        obj_dict = self.__dict__.copy()
-        obj_dict['_data'] = {k: self._getlist(k) for k in self}
-        return obj_dict
+        return {**self.__dict__, '_data': {k: self._getlist(k) for k in self}}
 
     def __setstate__(self, obj_dict):
         data = obj_dict.pop('_data', {})
