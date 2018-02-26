@@ -2,12 +2,12 @@
 #
 # Translators:
 # Ankhbayar <ankhaa1002@gmail.com>, 2013
-# Bayarkhuu Bataa, 2014,2017
+# Bayarkhuu Bataa, 2014,2017-2018
 # Jacara <baskhuujacara@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jargalan <jargalanch@gmail.com>, 2011
 # Tsolmon <mnts26@gmail.com>, 2011
-# Zorig <zorig_ezd@yahoo.com>, 2013-2014,2016
+# Zorig <zorig_ezd@yahoo.com>, 2013-2014,2016,2018
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2013-2016
 # Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011,2015,2017
 # Ганзориг БП <ganzo.bp@gmail.com>, 2011
@@ -15,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:13+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-12-01 21:10+0100\n"
+"PO-Revision-Date: 2018-02-21 00:40+0000\n"
+"Last-Translator: Zorig <zorig_ezd@yahoo.com>\n"
 "Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
 "mn/)\n"
 "MIME-Version: 1.0\n"
@@ -166,6 +166,9 @@ msgstr "Япон"
 
 msgid "Georgian"
 msgstr "Гүрж"
+
+msgid "Kabyle"
+msgstr ""
 
 msgid "Kazakh"
 msgstr "Казак"
@@ -756,7 +759,7 @@ msgstr "Зөв сонголт хийнэ үү. Энэ утга сонголто�
 
 #, python-format
 msgid "\"%(pk)s\" is not a valid value."
-msgstr ""
+msgstr "\"%(pk)s\" зөв утга биш байна."
 
 #, python-format
 msgid ""
@@ -1241,4 +1244,4 @@ msgid "Django Community"
 msgstr ""
 
 msgid "Connect, get help, or contribute"
-msgstr ""
+msgstr "Холбогдох, тусламж авах эсвэл хувь нэмрээ оруулах"

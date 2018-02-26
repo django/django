@@ -2,18 +2,20 @@
 #
 # Translators:
 # edgars <edgars.jekabsons@gmail.com>, 2011
-# Edgars Voroboks <nullisnot0@inbox.lv>, 2017
+# NullIsNot0 <nullisnot0@inbox.lv>, 2017
+# NullIsNot0 <nullisnot0@inbox.lv>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # krikulis <kristaps.kulis@gmail.com>, 2014
 # Māris Nartišs <maris.gis@gmail.com>, 2016
+# NullIsNot0 <nullisnot0@inbox.lv>, 2018
 # peterisb <pb@sungis.lv>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-18 11:33+0000\n"
-"Last-Translator: Edgars Voroboks <nullisnot0@inbox.lv>\n"
+"POT-Creation-Date: 2017-12-01 21:10+0100\n"
+"PO-Revision-Date: 2018-01-17 17:32+0000\n"
+"Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -66,7 +68,7 @@ msgid "German"
 msgstr "vācu"
 
 msgid "Lower Sorbian"
-msgstr "apakšsorbiešu"
+msgstr "apakšsorbu"
 
 msgid "Greek"
 msgstr "grieķu"
@@ -132,13 +134,13 @@ msgid "Hebrew"
 msgstr "ebreju"
 
 msgid "Hindi"
-msgstr "Hindi"
+msgstr "hindu"
 
 msgid "Croatian"
 msgstr "horvātu"
 
 msgid "Upper Sorbian"
-msgstr "augšsorbiešu"
+msgstr "augšsorbu"
 
 msgid "Hungarian"
 msgstr "ungāru"
@@ -163,6 +165,9 @@ msgstr "Japāņu"
 
 msgid "Georgian"
 msgstr "vācu"
+
+msgid "Kabyle"
+msgstr "kabiliešu"
 
 msgid "Kazakh"
 msgstr "kazahu"
@@ -389,17 +394,17 @@ msgstr[2] ""
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "Pārliecinieties, ka kopā nav vairāk par %(max)s cipariem."
-msgstr[1] "Pārliecinieties, ka kopā nav vairāk par %(max)s ciparu."
+msgstr[0] "Pārliecinieties, ka kopā nav vairāk par %(max)s ciparu."
+msgstr[1] "Pārliecinieties, ka kopā nav vairāk par %(max)s cipariem."
 msgstr[2] "Pārliecinieties, ka kopā nav vairāk par %(max)s cipariem."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
 msgstr[0] ""
-"Pārliecinieties, ka aiz decimālās zīmes nav vairāk par %(max)s cipariem."
-msgstr[1] ""
 "Pārliecinieties, ka aiz decimālās zīmes nav vairāk par %(max)s ciparu."
+msgstr[1] ""
+"Pārliecinieties, ka aiz decimālās zīmes nav vairāk par %(max)s cipariem."
 msgstr[2] ""
 "Pārliecinieties, ka aiz decimālās zīmes nav vairāk par %(max)s cipariem."
 
@@ -409,9 +414,9 @@ msgid ""
 msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] ""
-"Pārliecinieties, ka pirms decimālās zīmes nav vairāk par %(max)s cipariem."
-msgstr[1] ""
 "Pārliecinieties, ka pirms decimālās zīmes nav vairāk par %(max)s ciparu."
+msgstr[1] ""
+"Pārliecinieties, ka pirms decimālās zīmes nav vairāk par %(max)s cipariem."
 msgstr[2] ""
 "Pārliecinieties, ka pirms decimālās zīmes nav vairāk par %(max)s cipariem."
 
@@ -761,7 +766,7 @@ msgid "The inline value did not match the parent instance."
 msgstr "Iekļautā vērtība nesakrita ar vecāka instanci."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr "Izvēlaties pareizu izvēli. Jūsu izvēlele neietilpst pieejamo sarakstā."
+msgstr "Izvēlieties pareizu izvēli. Jūsu izvēle neietilpst pieejamo sarakstā."
 
 #, python-format
 msgid "\"%(pk)s\" is not a valid value."

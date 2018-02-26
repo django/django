@@ -13,6 +13,7 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # lilo.panic, 2016
 # Mikhail Zholobov <legal90@gmail.com>, 2013
+# Nikolay Korotkiy <sikmir@gmail.com>, 2018
 # Vasiliy Anikin <anikin.vasya@gmail.com>, 2017
 # Алексей Борискин <sun.void@gmail.com>, 2013-2017
 # Дмитрий Шатера <mr.bobsans@gmail.com>, 2016
@@ -20,9 +21,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-25 10:45+0000\n"
-"Last-Translator: Алексей Борискин <sun.void@gmail.com>\n"
+"POT-Creation-Date: 2017-12-01 21:10+0100\n"
+"PO-Revision-Date: 2018-01-13 10:40+0000\n"
+"Last-Translator: Nikolay Korotkiy <sikmir@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -173,6 +174,9 @@ msgstr "Японский"
 
 msgid "Georgian"
 msgstr "Грузинский"
+
+msgid "Kabyle"
+msgstr "Кабильский"
 
 msgid "Kazakh"
 msgstr "Казахский"

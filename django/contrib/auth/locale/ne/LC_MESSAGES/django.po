@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-10-07 02:46+0000\n"
+"PO-Revision-Date: 2018-02-10 13:00+0000\n"
 "Last-Translator: Sagar Chalise <chalisesagar@gmail.com>\n"
 "Language-Team: Nepali (http://www.transifex.com/django/django/language/ne/)\n"
 "MIME-Version: 1.0\n"
@@ -67,6 +67,8 @@ msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
+"पासवर्ड जस्ताको त्यस्तै राखिँदैन, त्यसैले यो प्रयोगकर्ताको पासवर्ड हेर्न असम्भव छ । पासवर्ड "
+"फेर्न को लागि भने <a href=\"{}\">यो फारम</a> भर्न सकिन्छ ।"
 
 #, python-format
 msgid ""
@@ -222,21 +224,21 @@ msgstr[1] "पासवर्ड छोटो भयो । कम्तीम�
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "पासवर्डमा कम्तीमा पनि %(min_length)d अक्षर हुनु पर्छ । "
+msgstr[1] "पासवर्डमा कम्तीमा पनि %(min_length)d अक्षरहरू हुनु पर्छ । "
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "%(verbose_name)s संग मिल्दो पासवर्ड भयो ।"
 
 msgid "Your password can't be too similar to your other personal information."
-msgstr ""
+msgstr "व्यक्तिगत विवरणसँग मेल खाने पासवर्ड नराख्नु होस ।"
 
 msgid "This password is too common."
 msgstr "यो पासवर्ड साधारण भयो ।"
 
 msgid "Your password can't be a commonly used password."
-msgstr ""
+msgstr "पासवर्डमा सजिलै अनुमान गर्न सकिने शब्दहरू नराख्नु होस ।"
 
 msgid "This password is entirely numeric."
 msgstr "यो पासवर्डमा अंक मात्र छ ।"
@@ -252,17 +254,18 @@ msgid ""
 "Enter a valid username. This value may contain only English letters, "
 "numbers, and @/./+/-/_ characters."
 msgstr ""
+"उपयुक्त प्रयोगकर्ता नाम राख्नु होस । अङ्ग्रेजी अक्षर, अङ्क र @/./+/-/_ मात्र मान्य छन् ।"
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
-msgstr ""
+msgstr "उपयुक्त प्रयोगकर्ता नाम राख्नु होस । अक्षर, अङ्क र @/./+/-/_ मात्र मान्य छन् ।"
 
 msgid "Logged out"
 msgstr "लग आउट "
 
 msgid "Password reset"
-msgstr ""
+msgstr "पासवर्ड पून: दर्ता"
 
 msgid "Password reset sent"
 msgstr ""
