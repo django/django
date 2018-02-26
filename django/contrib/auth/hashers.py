@@ -456,10 +456,8 @@ class BCryptPasswordHasher(BCryptSHA256PasswordHasher):
     issues.
 
     This hasher does not first hash the password which means it is subject to
-    the 72 character bcrypt password truncation, most use cases should prefer
-    the BCryptSHA256PasswordHasher.
-
-    See: https://code.djangoproject.com/ticket/20138
+    bcrypt's 72 bytes password truncation. Most use cases should prefer the
+    BCryptSHA256PasswordHasher.
     """
     algorithm = "bcrypt"
     digest = None
