@@ -6,8 +6,8 @@
 # Eneko Illarramendi <eneko@illarra.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jazpillaga <jazpillaga@codesyntax.com>, 2011
-# julen <julenx@gmail.com>, 2011-2012
-# julen <julenx@gmail.com>, 2013,2015
+# julen, 2011-2012
+# julen, 2013,2015
 # totorika93 <totorika93@gmail.com>, 2012
 # Unai Zalakain <inactive+unaizalakain@transifex.com>, 2013
 # Urtzi Odriozola <urtzi.odriozola@gmail.com>, 2017
@@ -15,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 10:52+0000\n"
-"Last-Translator: Urtzi Odriozola <urtzi.odriozola@gmail.com>\n"
+"POT-Creation-Date: 2017-12-01 21:10+0100\n"
+"PO-Revision-Date: 2018-01-26 20:48+0000\n"
+"Last-Translator: Eneko Illarramendi <eneko@illarra.com>\n"
 "Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -165,6 +165,9 @@ msgstr "Japoniera"
 
 msgid "Georgian"
 msgstr "Georgiera"
+
+msgid "Kabyle"
+msgstr "Kabylera"
 
 msgid "Kazakh"
 msgstr "Kazakhera"

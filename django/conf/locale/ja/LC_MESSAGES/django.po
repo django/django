@@ -3,7 +3,7 @@
 # Translators:
 # xiu1 <d84ea@hotmail.co.jp>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Kentaro Hori <kentaro0919@gmail.com>, 2015
+# Kentaro Matsuzaki <kentaro0919@gmail.com>, 2015
 # Masashi SHIBATA <contact@c-bata.link>, 2017
 # Shinya Okano <tokibito@gmail.com>, 2012-2017
 # Tetsuya Morimoto <tetsuya.morimoto@gmail.com>, 2011
@@ -11,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:13+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-12-01 21:10+0100\n"
+"PO-Revision-Date: 2017-12-04 02:33+0000\n"
+"Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -162,6 +162,9 @@ msgstr "日本語"
 
 msgid "Georgian"
 msgstr "グルジア語"
+
+msgid "Kabyle"
+msgstr "カビル語"
 
 msgid "Kazakh"
 msgstr "カザフ語"
@@ -1208,12 +1211,15 @@ msgid ""
 "\">DEBUG=True</a> is in your settings file and you have not configured any "
 "URLs."
 msgstr ""
+"このページは、設定ファイルで<a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a>が指定され、何もURLが設定されていない時に表示されます。"
 
 msgid "Django Documentation"
 msgstr "Django ドキュメント"
 
 msgid "Topics, references, &amp; how-to's"
-msgstr "トピック、リファレンス、 &amp; ハウツー"
+msgstr "トピック、リファレンス、ハウツー"
 
 msgid "Tutorial: A Polling App"
 msgstr "チュートリアル: 投票アプリケーション"
