@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.views.decorators.cache import never_cache
 from django.views.generic.edit import FormView
 
+
 TEMPLATE = """{% if messages %}
 <ul class="messages">
     {% for message in messages %}
