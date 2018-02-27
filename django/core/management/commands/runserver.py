@@ -12,7 +12,6 @@ from django.core.servers.basehttp import (
 )
 from django.utils import autoreload
 
-
 naiveip_re = re.compile(r"""^(?:
 (?P<addr>
     (?P<ipv4>\d{1,3}(?:\.\d{1,3}){3}) |         # IPv4 address
