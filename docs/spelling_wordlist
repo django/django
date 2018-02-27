@@ -27,6 +27,7 @@ attr
 auth
 autoclobber
 autocommit
+autocomplete
 autocompletion
 autodetect
 autodetectable
@@ -243,7 +244,6 @@ formset
 formsets
 formtools
 freenode
-Friedl
 Frysian
 functionalities
 gdal
@@ -393,7 +393,6 @@ MBR
 memcache
 memcached
 mentorship
-mercator
 metaclass
 metaclasses
 metadata
@@ -408,6 +407,7 @@ minified
 minify
 mis
 misconfiguration
+mitre
 mixin
 mixins
 modelforms
@@ -460,7 +460,6 @@ ons
 onwards
 optimizations
 orderable
-O'Reilly
 org
 Orléans
 orm
@@ -571,7 +570,6 @@ referer
 referers
 reflow
 regex
-regexes
 registrable
 reimplement
 reindent
@@ -698,6 +696,7 @@ subviews
 subwidget
 subwidgets
 superclass
+superclasses
 superset
 swappable
 symlink
@@ -712,7 +711,6 @@ tagline
 tarball
 tarballs
 teardown
-templatetag
 templating
 testcase
 testserver
@@ -804,7 +802,6 @@ unsquashed
 untar
 untrusted
 unvalidated
-uptime
 url
 urlencode
 urlize

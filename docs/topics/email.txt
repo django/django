@@ -367,11 +367,6 @@ The class has the following methods:
   For MIME types starting with ``text/``, binary data is handled as in
   ``attach()``.
 
-.. versionchanged:: 1.11
-
-    Added the fallback to MIME type ``application/octet-stream`` when binary
-    data for a ``text/*`` attachment cannot be decoded.
-
 Sending alternative content types
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

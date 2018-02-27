@@ -5,7 +5,6 @@ import posixpath
 import re
 import shutil
 import stat
-import sys
 import tempfile
 from importlib import import_module
 from os import path
@@ -60,7 +59,7 @@ class TemplateCommand(BaseCommand):
         parser.add_argument(
             '--name', '-n', dest='files',
             action='append', default=[],
-            help='The file name(s) to render. Separate multiple extensions '
+            help='The file name(s) to render. Separate multiple file names '
                  'with commas, or use -n multiple times.'
         )
 
@@ -104,13 +103,14 @@ class TemplateCommand(BaseCommand):
         camel_case_name = 'camel_case_%s_name' % app_or_project
         camel_case_value = ''.join(x for x in name.title() if x != '_')
 
-        context = Context(dict(options, **{
+        context = Context({
+            **options,
             base_name: name,
             base_directory: top_dir,
             camel_case_name: camel_case_value,
             'docs_version': get_docs_version(),
             'django_version': django.__version__,
-        }), autoescape=False)
+        }, autoescape=False)
 
         # Setup a stub settings environment for template rendering
         if not settings.configured:
@@ -335,9 +335,6 @@ class TemplateCommand(BaseCommand):
         Make sure that the file is writeable.
         Useful if our source is read-only.
         """
-        if sys.platform.startswith('java'):
-            # On Jython there is no os.access()
-            return
         if not os.access(filename, os.W_OK):
             st = os.stat(filename)
             new_permissions = stat.S_IMODE(st.st_mode) | stat.S_IWUSR

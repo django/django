@@ -1,8 +1,8 @@
 from urllib.parse import urljoin
 
 from django.contrib.staticfiles import storage
-from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.forms import Media
+from django.templatetags.static import static
 from django.test import SimpleTestCase, override_settings
 
 
@@ -13,7 +13,7 @@ class StaticTestStorage(storage.StaticFilesStorage):
 
 @override_settings(
     STATIC_URL='http://media.example.com/static/',
-    INSTALLED_APPS=('django.contrib.staticfiles', ),
+    INSTALLED_APPS=('django.contrib.staticfiles',),
     STATICFILES_STORAGE='staticfiles_tests.test_forms.StaticTestStorage',
 )
 class StaticFilesFormsMediaTestCase(SimpleTestCase):
@@ -29,8 +29,8 @@ class StaticFilesFormsMediaTestCase(SimpleTestCase):
         )
         self.assertEqual(
             str(m),
-            """<link href="https://example.com/assets/path/to/css1" type="text/css" media="all" rel="stylesheet" />
-<link href="/path/to/css2" type="text/css" media="all" rel="stylesheet" />
+            """<link href="https://example.com/assets/path/to/css1" type="text/css" media="all" rel="stylesheet">
+<link href="/path/to/css2" type="text/css" media="all" rel="stylesheet">
 <script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>

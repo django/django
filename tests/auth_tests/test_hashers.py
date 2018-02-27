@@ -9,7 +9,6 @@ from django.contrib.auth.hashers import (
 )
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
-from django.utils.encoding import force_bytes
 
 try:
     import crypt
@@ -173,6 +172,7 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertFalse(check_password(' ', blank_encoded))
 
     @skipUnless(bcrypt, "bcrypt not installed")
+    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.BCryptPasswordHasher'])
     def test_bcrypt(self):
         encoded = make_password('lètmein', hasher='bcrypt')
         self.assertTrue(is_password_usable(encoded))
@@ -188,6 +188,7 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertFalse(check_password(' ', blank_encoded))
 
     @skipUnless(bcrypt, "bcrypt not installed")
+    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.BCryptPasswordHasher'])
     def test_bcrypt_upgrade(self):
         hasher = get_hasher('bcrypt')
         self.assertEqual('bcrypt', hasher.algorithm)
@@ -220,6 +221,7 @@ class TestUtilsHashPass(SimpleTestCase):
             hasher.rounds = old_rounds
 
     @skipUnless(bcrypt, "bcrypt not installed")
+    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.BCryptPasswordHasher'])
     def test_bcrypt_harden_runtime(self):
         hasher = get_hasher('bcrypt')
         self.assertEqual('bcrypt', hasher.algorithm)
@@ -238,7 +240,7 @@ class TestUtilsHashPass(SimpleTestCase):
 
             # Get the original salt (includes the original workload factor)
             algorithm, data = encoded.split('$', 1)
-            expected_call = (('wrong_password', force_bytes(data[:29])),)
+            expected_call = (('wrong_password', data[:29].encode()),)
             self.assertEqual(hasher.encode.call_args_list, [expected_call] * 3)
 
     def test_unusable(self):
@@ -429,16 +431,50 @@ class TestUtilsHashPass(SimpleTestCase):
             check_password('wrong_password', encoded)
             self.assertEqual(hasher.harden_runtime.call_count, 1)
 
+
+class BasePasswordHasherTests(SimpleTestCase):
+    not_implemented_msg = 'subclasses of BasePasswordHasher must provide %s() method'
+
+    def setUp(self):
+        self.hasher = BasePasswordHasher()
+
     def test_load_library_no_algorithm(self):
         msg = "Hasher 'BasePasswordHasher' doesn't specify a library attribute"
         with self.assertRaisesMessage(ValueError, msg):
-            BasePasswordHasher()._load_library()
+            self.hasher._load_library()
 
     def test_load_library_importerror(self):
         PlainHasher = type('PlainHasher', (BasePasswordHasher,), {'algorithm': 'plain', 'library': 'plain'})
         msg = "Couldn't load 'PlainHasher' algorithm library: No module named 'plain'"
         with self.assertRaisesMessage(ValueError, msg):
             PlainHasher()._load_library()
+
+    def test_attributes(self):
+        self.assertIsNone(self.hasher.algorithm)
+        self.assertIsNone(self.hasher.library)
+
+    def test_encode(self):
+        msg = self.not_implemented_msg % 'an encode'
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            self.hasher.encode('password', 'salt')
+
+    def test_harden_runtime(self):
+        msg = 'subclasses of BasePasswordHasher should provide a harden_runtime() method'
+        with self.assertWarns(Warning, msg=msg):
+            self.hasher.harden_runtime('password', 'encoded')
+
+    def test_must_update(self):
+        self.assertIs(self.hasher.must_update('encoded'), False)
+
+    def test_safe_summary(self):
+        msg = self.not_implemented_msg % 'a safe_summary'
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            self.hasher.safe_summary('encoded')
+
+    def test_verify(self):
+        msg = self.not_implemented_msg % 'a verify'
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            self.hasher.verify('password', 'encoded')
 
 
 @skipUnless(argon2, "argon2-cffi not installed")

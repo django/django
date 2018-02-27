@@ -28,7 +28,7 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         self.client.logout()
         response = self.client.get(reverse('django-admindocs-docroot'), follow=True)
         # Should display the login screen
-        self.assertContains(response, '<input type="hidden" name="next" value="/admindocs/" />', html=True)
+        self.assertContains(response, '<input type="hidden" name="next" value="/admindocs/">', html=True)
 
     def test_bookmarklets(self):
         response = self.client.get(reverse('django-admindocs-bookmarklets'))
@@ -292,6 +292,16 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
 
     def test_model_detail_title(self):
         self.assertContains(self.response, '<h1>admin_docs.Person</h1>', html=True)
+
+    def test_app_not_found(self):
+        response = self.client.get(reverse('django-admindocs-models-detail', args=['doesnotexist', 'Person']))
+        self.assertEqual(response.context['exception'], "App 'doesnotexist' not found")
+        self.assertEqual(response.status_code, 404)
+
+    def test_model_not_found(self):
+        response = self.client.get(reverse('django-admindocs-models-detail', args=['admin_docs', 'doesnotexist']))
+        self.assertEqual(response.context['exception'], "Model 'doesnotexist' not found in app 'admin_docs'")
+        self.assertEqual(response.status_code, 404)
 
 
 class CustomField(models.Field):

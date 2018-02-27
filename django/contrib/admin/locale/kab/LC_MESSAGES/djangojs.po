@@ -1,0 +1,204 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2017-10-06 08:10+0000\n"
+"Last-Translator: Muḥend Belqasem <belkacem77@gmail.com>\n"
+"Language-Team: Kabyle (http://www.transifex.com/django/django/language/"
+"kab/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: kab\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, javascript-format
+msgid "Available %s"
+msgstr "Yella %s"
+
+#, javascript-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+
+#, javascript-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr ""
+
+msgid "Filter"
+msgstr "Tastayt"
+
+msgid "Choose all"
+msgstr "Fren akk"
+
+#, javascript-format
+msgid "Click to choose all %s at once."
+msgstr ""
+
+msgid "Choose"
+msgstr "Fren"
+
+msgid "Remove"
+msgstr "kkes"
+
+#, javascript-format
+msgid "Chosen %s"
+msgstr "Ifren %s"
+
+#, javascript-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
+
+msgid "Remove all"
+msgstr "Kkes akk"
+
+#, javascript-format
+msgid "Click to remove all chosen %s at once."
+msgstr ""
+
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(sel)s si  %(cnt)s yettwafren"
+msgstr[1] "%(sel)s si  %(cnt)s ttwafernen"
+
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] ""
+msgstr[1] ""
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Now"
+msgstr "Tura"
+
+msgid "Choose a Time"
+msgstr "Fren akud:"
+
+msgid "Choose a time"
+msgstr "Fren akud"
+
+msgid "Midnight"
+msgstr "Ttnaṣfa n yiḍ"
+
+msgid "6 a.m."
+msgstr "6 f.t."
+
+msgid "Noon"
+msgstr "Ttnaṣfa n uzal"
+
+msgid "6 p.m."
+msgstr "6 m.d."
+
+msgid "Cancel"
+msgstr "Sefsex"
+
+msgid "Today"
+msgstr "Ass-a"
+
+msgid "Choose a Date"
+msgstr "Fren azemz"
+
+msgid "Yesterday"
+msgstr "Iḍelli"
+
+msgid "Tomorrow"
+msgstr "Azekka"
+
+msgid "January"
+msgstr "Yennayer"
+
+msgid "February"
+msgstr "Fuṛaṛ"
+
+msgid "March"
+msgstr "Meɣres"
+
+msgid "April"
+msgstr "Yebrir"
+
+msgid "May"
+msgstr "Mayyu"
+
+msgid "June"
+msgstr "Yunyu"
+
+msgid "July"
+msgstr "Yulyu"
+
+msgid "August"
+msgstr "Ɣuct"
+
+msgid "September"
+msgstr "Ctamber"
+
+msgid "October"
+msgstr "Tuber"
+
+msgid "November"
+msgstr "Wamber"
+
+msgid "December"
+msgstr "Dujamber"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr ""
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr ""
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr ""
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr ""
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr ""
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr ""
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr ""
+
+msgid "Show"
+msgstr "Sken"
+
+msgid "Hide"
+msgstr "Ffer"

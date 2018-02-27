@@ -243,7 +243,7 @@ class Migration(migrations.Migration):
                 ('field_custom', JSONField(null=True, blank=True, encoder=DjangoJSONEncoder)),
             ],
             options={
-                'required_db_features': {'has_jsonb_datatype'},
+                'required_db_vendor': 'postgresql',
             },
             bases=(models.Model,),
         ),

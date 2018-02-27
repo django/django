@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Besnik <besnik@programeshqip.org>, 2011
+# Besnik <besnik@programeshqip.org>, 2011,2015
 # Besnik <besnik@programeshqip.org>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:09+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-11-29 22:00+0000\n"
+"Last-Translator: Besnik <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
@@ -24,14 +24,14 @@ msgstr "U fshinë me sukses %(count)d %(items)s."
 
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr "S'mund të fshijë %(name)s"
+msgstr "S’mund të fshijë %(name)s"
 
 msgid "Are you sure?"
 msgstr "Jeni i sigurt?"
 
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Fshiji %(verbose_name_plural)s e përzgjdhur"
+msgstr "Fshiji %(verbose_name_plural)s e përzgjedhur"
 
 msgid "Administration"
 msgstr "Administrim"
@@ -64,10 +64,10 @@ msgid "This year"
 msgstr "Këtë vit"
 
 msgid "No date"
-msgstr ""
+msgstr "Pa datë"
 
 msgid "Has date"
-msgstr ""
+msgstr "Ka datë"
 
 #, python-format
 msgid ""
@@ -75,7 +75,7 @@ msgid ""
 "that both fields may be case-sensitive."
 msgstr ""
 "Ju lutemi, jepni %(username)s dhe fjalëkalimin e saktë për një llogari "
-"ekipi. Kini parasysh se që të dyja fushat mund të jenë të ndjeshme ndaj "
+"ekipi. Kini parasysh se që të dy fushat mund të jenë të ndjeshme ndaj "
 "shkrimit me shkronja të mëdha ose të vogla."
 
 msgid "Action:"
@@ -134,28 +134,28 @@ msgstr "Objekt LogEntry"
 
 #, python-brace-format
 msgid "Added {name} \"{object}\"."
-msgstr ""
+msgstr "U shtua {name} \"{object}\"."
 
 msgid "Added."
 msgstr "U shtua."
 
 msgid "and"
-msgstr " dhe "
+msgstr "dhe "
 
 #, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
-msgstr ""
+msgstr "U ndryshua {fields} për {name} \"{object}\"."
 
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr ""
+msgstr "U ndryshuan {fields}."
 
 #, python-brace-format
 msgid "Deleted {name} \"{object}\"."
-msgstr ""
+msgstr "U fshi {name} \"{object}\"."
 
 msgid "No fields changed."
-msgstr "Nuk u ndryshuan fusha."
+msgstr "S’u ndryshua ndonjë fushë."
 
 msgid "None"
 msgstr "Asnjë"
@@ -163,56 +163,60 @@ msgstr "Asnjë"
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
-"Për të përzgjedhur më shumë se një, mbani të shtypur \"Control\", ose "
-"\"Command\" në Mac, ."
+"Për të përzgjedhur më shumë se një, në Mac mbani të shtypur \"Control\", ose "
+"\"Command\"."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
+msgstr "{name} \"{obj}\" u ndryshua me sukses. Mund ta ripërpunoni më poshtë."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
+"{name} \"{obj}\" u ndryshua me sukses. Mund të shtoni një tjetër {name} më "
+"poshtë."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was added successfully."
-msgstr ""
+msgstr "{name} \"{obj}\" u shtua me sukses."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr ""
+msgstr "{name} \"{obj}\" u ndryshua me sukses. Mund të ripërpunoni më poshtë."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may add another {name} "
 "below."
 msgstr ""
+"{name} \"{obj}\" u ndryshua me sukses. Mund të shtoni një tjetër {name} më "
+"poshtë."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was changed successfully."
-msgstr ""
+msgstr "{name} \"{obj}\" u ndryshua me sukses."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
-"Duhen përzgjedhur objekte që të kryhen veprime mbi ta. Nuk u ndryshua ndonjë "
+"Duhen përzgjedhur objekte që të kryhen veprime mbi ta. S’u ndryshua ndonjë "
 "objekt."
 
 msgid "No action selected."
-msgstr "Pa përzgjedhje veprimi."
+msgstr "S’u përzgjodh ndonjë veprim."
 
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" u fshi me sukses."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "Objekti %(name)s me kyç parësor %(key)r nuk ekziston."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "%(name)s me ID \"%(key)s\" s’ekziston. Mos qe fshirë?"
 
 #, python-format
 msgid "Add %s"
@@ -223,7 +227,7 @@ msgid "Change %s"
 msgstr "Ndrysho %s"
 
 msgid "Database error"
-msgstr "Gabimi baze të dhënash"
+msgstr "Gabim baze të dhënash"
 
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
@@ -234,7 +238,7 @@ msgstr[1] "%(count)s %(name)s u ndryshuan me sukses."
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
-msgstr[0] "%(total_count)s të përzgjedhur"
+msgstr[0] "%(total_count)s i përzgjedhur"
 msgstr[1] "Krejt %(total_count)s të përzgjedhurat"
 
 #, python-format
@@ -260,13 +264,13 @@ msgstr ""
 "vijuese të mbrojtura që kanë lidhje me ta: %(related_objects)s"
 
 msgid "Django site admin"
-msgstr "Përgjegjësi i site-it Django"
+msgstr "Përgjegjës sajti Django"
 
 msgid "Django administration"
 msgstr "Administrim i Django-s"
 
 msgid "Site administration"
-msgstr "Administrim site-i"
+msgstr "Administrim sajti"
 
 msgid "Log in"
 msgstr "Hyni"
@@ -276,10 +280,10 @@ msgid "%(app)s administration"
 msgstr "Administrim %(app)s"
 
 msgid "Page not found"
-msgstr "Nuk u gjet faqe"
+msgstr "S’u gjet faqe"
 
 msgid "We're sorry, but the requested page could not be found."
-msgstr "Na ndjeni, por faqja e kërkuar nuk gjendet dot."
+msgstr "Na ndjeni, por faqja e kërkuar s’gjendet dot."
 
 msgid "Home"
 msgstr "Hyrje"
@@ -297,11 +301,11 @@ msgid ""
 "There's been an error. It's been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Pati një gabim. Iu është njoftuar përgjegjësve të site-it përmes email-it "
-"dhe do të duhej të ndreqej shpejt. Faleminderit për durimin."
+"Pati një gabim. Iu është njoftuar përgjegjësve të sajtit përmes email-i dhe "
+"do të duhej të ndreqej shpejt. Faleminderit për durimin."
 
 msgid "Run the selected action"
-msgstr "Xhironi veprimin e përzgjedhur"
+msgstr "Xhiro veprimin e përzgjedhur"
 
 msgid "Go"
 msgstr "Shko tek"
@@ -330,7 +334,7 @@ msgid "Change password"
 msgstr "Ndryshoni fjalëkalimin"
 
 msgid "Please correct the error below."
-msgstr "Ju lutemi, ndreqini gabimet e mëposhtme."
+msgstr "Ju lutemi, ndreqni gabimin më poshtë."
 
 msgid "Please correct the errors below."
 msgstr "Ju lutemi, ndreqni gabimet më poshtë."
@@ -360,7 +364,7 @@ msgid "History"
 msgstr "Historik"
 
 msgid "View on site"
-msgstr "Shiheni në site"
+msgstr "Shiheni në sajt"
 
 msgid "Filter"
 msgstr "Filtër"
@@ -373,7 +377,7 @@ msgid "Sorting priority: %(priority_number)s"
 msgstr "Përparësi renditjesh: %(priority_number)s"
 
 msgid "Toggle sorting"
-msgstr "Këmbe renditjen"
+msgstr "Shfaq/fshih renditjen"
 
 msgid "Delete"
 msgstr "Fshije"
@@ -394,7 +398,7 @@ msgid ""
 "following protected related objects:"
 msgstr ""
 "Fshirja e %(object_name)s '%(escaped_object)s' do të kërkonte fshirjen e "
-"objekteve vijues, të mbrojtur, të lidhur me të:"
+"objekteve të mbrojtur vijues, të lidhur me të:"
 
 #, python-format
 msgid ""
@@ -432,14 +436,14 @@ msgid ""
 "protected related objects:"
 msgstr ""
 "Fshirja e %(objects_name)s të përzgjedhur do të kërkonte fshirjen e "
-"objekteve vijues, të mbrojtur, të lidhur me të:"
+"objekteve të mbrojtur vijues, të lidhur me të:"
 
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
-"Jeni i sigurt se doni të fshihen e %(objects_name)s përzgjedhur? Krejt "
+"Jeni i sigurt se doni të fshihen %(objects_name)s e përzgjedhur? Krejt "
 "objektet vijues dhe gjëra të lidhura me ta do të fshihen:"
 
 msgid "Change"
@@ -450,26 +454,26 @@ msgstr "Të fshihet?"
 
 #, python-format
 msgid " By %(filter_title)s "
-msgstr "Nga %(filter_title)s "
+msgstr " Nga %(filter_title)s "
 
 msgid "Summary"
 msgstr "Përmbledhje"
 
 #, python-format
 msgid "Models in the %(name)s application"
-msgstr "Modele te zbatimi %(name)s"
+msgstr "Modele te aplikacioni %(name)s"
 
 msgid "Add"
 msgstr "Shtoni"
 
 msgid "You don't have permission to edit anything."
-msgstr "Nuk keni leje për të përpunuar ndonjë gjë."
+msgstr "S’keni leje për të përpunuar ndonjë gjë."
 
 msgid "Recent actions"
-msgstr ""
+msgstr "Veprime së fundi"
 
 msgid "My actions"
-msgstr ""
+msgstr "Veprimet e mia"
 
 msgid "None available"
 msgstr "Asnjë i passhëm"
@@ -482,8 +486,8 @@ msgid ""
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"Ka diçka që nuk shkon me instalimin e bazës suaj të të dhënave. Sigurohuni "
-"që janë krijuar tabelat e duhura të bazës së të dhënave, dhe që baza e të "
+"Ka diçka që s’shkon me instalimin e bazës suaj të të dhënave. Sigurohuni që "
+"janë krijuar tabelat e duhura të bazës së të dhënave, dhe që baza e të "
 "dhënave është e lexueshme nga përdoruesi i duhur."
 
 #, python-format
@@ -510,8 +514,8 @@ msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
 msgstr ""
-"Ky objekt nuk ka historik ndryshimesh. Ndoshta nuk qe shtuar përmes këtij "
-"site-i administrimi."
+"Ky objekt s’ka historik ndryshimesh. Ndoshta s’qe shtuar përmes këtij sajti "
+"administrimi."
 
 msgid "Show all"
 msgstr "Shfaqi krejt"
@@ -520,11 +524,11 @@ msgid "Save"
 msgstr "Ruaje"
 
 msgid "Popup closing..."
-msgstr "Flluska po mbyllet..."
+msgstr "Flluska po mbyllet…"
 
 #, python-format
 msgid "Change selected %(model)s"
-msgstr "Nryshoni %(model)s e përzgjedhur"
+msgstr "Ndryshoni %(model)s e përzgjedhur"
 
 #, python-format
 msgid "Add another %(model)s"
@@ -557,7 +561,7 @@ msgid "Save and continue editing"
 msgstr "Ruajeni dhe vazhdoni përpunimin"
 
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Faleminderit që shpenzoni pak kohë të çmuar me site-in Web sot."
+msgstr "Faleminderit që shpenzoni sot pak kohë të çmuar me sajtin Web."
 
 msgid "Log in again"
 msgstr "Hyni sërish"
@@ -572,9 +576,9 @@ msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"Ju lutem, jepni fjalëkalimin tuaj të vjetër, për hir të sigurisë, dhe mandej "
-"jepni dy herë fjalëkalimin tuaj të ri, që kështu të mund të verifikojmë se e "
-"shtypët saktë."
+"Ju lutemi, jepni fjalëkalimin tuaj të vjetër, për hir të sigurisë, dhe "
+"mandej jepni dy herë fjalëkalimin tuaj të ri, që kështu të mund të "
+"verifikojmë se e shtypët saktë."
 
 msgid "Change my password"
 msgstr "Ndrysho fjalëkalimin tim"
@@ -584,7 +588,7 @@ msgstr "Ricaktim fjalëkalimi"
 
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr ""
-"Fjakalimi juaj u caktua. Mund të vazhdoni më tej dhe të bëni hyrjen tani."
+"Fjalëkalimi juaj u caktua. Mund të vazhdoni më tej dhe të bëni hyrjen tani."
 
 msgid "Password reset confirmation"
 msgstr "Ripohim ricaktimi fjalëkalimi"
@@ -593,8 +597,8 @@ msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr ""
-"Ju lutem, jepeni fjalëkalimin tuaj dy herë, që kështu të mund të verifikojmë "
-"që e shtypët saktë."
+"Ju lutemi, jepeni fjalëkalimin tuaj dy herë, që kështu të mund të "
+"verifikojmë që e shtypët saktë."
 
 msgid "New password:"
 msgstr "Fjalëkalim i ri:"
@@ -607,22 +611,22 @@ msgid ""
 "used.  Please request a new password reset."
 msgstr ""
 "Lidhja për ricaktimin e fjalëkalimit qe e pavlefshme, ndoshta ngaqë është "
-"përdorur tashmë një herë. Ju lutem, kërkoni një ricaktim të ri fjalëkalimi."
+"përdorur tashmë një herë. Ju lutemi, kërkoni një ricaktim të ri fjalëkalimi."
 
 msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
 "Ju kemi dërguar me email udhëzime për caktimin e fjalëkalimit tuaj, nëse ka "
-"një llogari me email-in që dhatë. Do të duhej t'ju vinin pas pak."
+"një llogari me email-in që dhatë. Do të duhej t’ju vinin pas pak."
 
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
 "Nëse nuk merrni një email, ju lutemi, sigurohuni që keni dhënë adresën e "
-"saktë me të cilën u regjistruat, dhe kontrolloni dosjen tuaj të mesazheve "
-"hedhurinë."
+"saktë me të cilën u regjistruat, dhe kontrolloni dosjen tuaj të mesazheve të "
+"padëshiruara."
 
 #, python-format
 msgid ""
@@ -633,13 +637,13 @@ msgstr ""
 "si përdorues te %(site_name)s."
 
 msgid "Please go to the following page and choose a new password:"
-msgstr "Ju lutem, shkoni te faqja vijuese dhe zgjidhni një fjalëkalim të ri:"
+msgstr "Ju lutemi, shkoni te faqja vijuese dhe zgjidhni një fjalëkalim të ri:"
 
 msgid "Your username, in case you've forgotten:"
 msgstr "Emri juaj i përdoruesit, në rast se e keni harruar:"
 
 msgid "Thanks for using our site!"
-msgstr "Faleminderit që përdorni site-in tonë!"
+msgstr "Faleminderit që përdorni sajtin tonë!"
 
 #, python-format
 msgid "The %(site_name)s team"
@@ -649,7 +653,7 @@ msgid ""
 "Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
 msgstr ""
-"Harruat fjalëkalimin tuaj? Jepni më poshtë adresën tuaj email, dhe do t'ju "
+"Harruat fjalëkalimin tuaj? Jepni më poshtë adresën tuaj email, dhe do t’ju "
 "dërgojmë udhëzimet për të caktuar një të ri."
 
 msgid "Email address:"

@@ -410,15 +410,15 @@ performance gains for your application to outweigh the potential risks.
 
 With these caveats in mind, you should be aware of:
 
-`PyPy <http://pypy.org/>`_
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+`PyPy <https://pypy.org/>`_
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`PyPy <http://pypy.org/>`_ is an implementation of Python in Python itself (the
-'standard' Python implementation is in C). PyPy can offer substantial
+`PyPy <https://pypy.org/>`_ is an implementation of Python in Python itself
+(the 'standard' Python implementation is in C). PyPy can offer substantial
 performance gains, typically for heavyweight applications.
 
 A key aim of the PyPy project is `compatibility
-<http://pypy.org/compat.html>`_ with existing Python APIs and libraries.
+<https://pypy.org/compat.html>`_ with existing Python APIs and libraries.
 Django is compatible, but you will need to check the compatibility of other
 libraries you rely on.
 

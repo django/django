@@ -159,10 +159,6 @@ Fields
         valid for a given field. This can be done using the
         :class:`~django.contrib.postgres.validators.KeysValidator`.
 
-    .. versionchanged:: 1.11
-
-        Added the ability to store nulls.
-
 ``JSONField``
 -------------
 

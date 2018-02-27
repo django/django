@@ -280,10 +280,10 @@ Minor features
   :attr:`~django.http.HttpResponse.reason_phrase`.
 
 * When giving the URL of the next page for
-  :func:`~django.contrib.auth.views.logout`,
-  :func:`~django.contrib.auth.views.password_reset`,
-  :func:`~django.contrib.auth.views.password_reset_confirm`,
-  and :func:`~django.contrib.auth.views.password_change`, you can now pass
+  ``django.contrib.auth.views.logout()``,
+  ``django.contrib.auth.views.password_reset()``,
+  ``django.contrib.auth.views.password_reset_confirm()``,
+  and ``django.contrib.auth.views.password_change()``, you can now pass
   URL names and they will be resolved.
 
 * The new :option:`dumpdata --pks` option specifies the primary keys of objects
@@ -742,17 +742,17 @@ can set the
 
 Past versions of Django used base 36 encoding of the ``User`` primary key in
 the password reset views and URLs
-(:func:`django.contrib.auth.views.password_reset_confirm`). Base 36 encoding is
+(``django.contrib.auth.views.password_reset_confirm()``). Base 36 encoding is
 sufficient if the user primary key is an integer, however, with the
 introduction of custom user models in Django 1.5, that assumption may no longer
 be true.
 
-:func:`django.contrib.auth.views.password_reset_confirm` has been modified to
+``django.contrib.auth.views.password_reset_confirm()`` has been modified to
 take a ``uidb64`` parameter instead of ``uidb36``. If you are reversing this
 view, for example in a custom ``password_reset_email.html`` template, be sure
 to update your code.
 
-A temporary shim for :func:`django.contrib.auth.views.password_reset_confirm`
+A temporary shim for ``django.contrib.auth.views.password_reset_confirm()``
 that will allow password reset links generated prior to Django 1.6 to continue
 to work has been added to provide backwards compatibility; this will be removed
 in Django 1.7. Thus, as long as your site has been running Django 1.6 for more

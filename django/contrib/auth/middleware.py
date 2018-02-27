@@ -1,5 +1,3 @@
-from contextlib import suppress
-
 from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth import load_backend
@@ -91,8 +89,10 @@ class RemoteUserMiddleware(MiddlewareMixin):
         """
         backend_str = request.session[auth.BACKEND_SESSION_KEY]
         backend = auth.load_backend(backend_str)
-        with suppress(AttributeError):  # Backend has no clean_username method.
+        try:
             username = backend.clean_username(username)
+        except AttributeError:  # Backend has no clean_username method.
+            pass
         return username
 
     def _remove_invalid_user(self, request):

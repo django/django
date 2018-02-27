@@ -21,13 +21,13 @@ In any case, you should always be able to :ref:`install from source
 __ https://www.gaia-gis.it/fossil/libspatialite
 __ https://www.gaia-gis.it/gaia-sins/
 
-.. _spatialite_source:
-
 .. admonition:: ``SPATIALITE_LIBRARY_PATH`` setting required for SpatiaLite 4.2+
 
-    If you're using SpatiaLite 4.2+, you must put this in your settings::
+    If you're using SpatiaLite 4.2+, you must put this in your ``settings.py``::
 
         SPATIALITE_LIBRARY_PATH = 'mod_spatialite'
+
+.. _spatialite_source:
 
 Installing from source
 ======================

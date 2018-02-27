@@ -111,7 +111,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     }
     data_type_check_constraints = {
         'BooleanField': '%(qn_column)s IN (0,1)',
-        'NullBooleanField': '(%(qn_column)s IN (0,1)) OR (%(qn_column)s IS NULL)',
+        'NullBooleanField': '%(qn_column)s IN (0,1)',
         'PositiveIntegerField': '%(qn_column)s >= 0',
         'PositiveSmallIntegerField': '%(qn_column)s >= 0',
     }
@@ -136,15 +136,15 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'iendswith': "LIKE UPPER(TRANSLATE(%s USING NCHAR_CS)) ESCAPE TRANSLATE('\\' USING NCHAR_CS)",
     }
 
-    _likec_operators = _standard_operators.copy()
-    _likec_operators.update({
+    _likec_operators = {
+        **_standard_operators,
         'contains': "LIKEC %s ESCAPE '\\'",
         'icontains': "LIKEC UPPER(%s) ESCAPE '\\'",
         'startswith': "LIKEC %s ESCAPE '\\'",
         'endswith': "LIKEC %s ESCAPE '\\'",
         'istartswith': "LIKEC UPPER(%s) ESCAPE '\\'",
         'iendswith': "LIKEC UPPER(%s) ESCAPE '\\'",
-    })
+    }
 
     # The patterns below are used to generate SQL pattern lookup clauses when
     # the right-hand side of the lookup isn't a raw string (it might be an expression
@@ -350,6 +350,8 @@ class OracleParam:
         elif string_size > 4000:
             # Mark any string param greater than 4000 characters as a CLOB.
             self.input_size = Database.CLOB
+        elif isinstance(param, datetime.datetime):
+            self.input_size = Database.TIMESTAMP
         else:
             self.input_size = None
 
@@ -400,6 +402,14 @@ class FormatStylePlaceholderCursor:
         return decimal.Decimal(value) if '.' in value else int(value)
 
     @staticmethod
+    def _get_decimal_converter(precision, scale):
+        if scale == 0:
+            return int
+        context = decimal.Context(prec=precision)
+        quantize_value = decimal.Decimal(1).scaleb(-scale)
+        return lambda v: decimal.Decimal(v).quantize(quantize_value, context=context)
+
+    @staticmethod
     def _output_type_handler(cursor, name, defaultType, length, precision, scale):
         """
         Called for each db column fetched from cursors. Return numbers as the
@@ -419,7 +429,7 @@ class FormatStylePlaceholderCursor:
             elif precision > 0:
                 # NUMBER(p,s) column: decimal-precision fixed point.
                 # This comes from IntegerField and DecimalField columns.
-                outconverter = int if scale == 0 else decimal.Decimal
+                outconverter = FormatStylePlaceholderCursor._get_decimal_converter(precision, scale)
             else:
                 # No type information. This normally comes from a
                 # mathematical expression in the SELECT list. Guess int
@@ -476,7 +486,7 @@ class FormatStylePlaceholderCursor:
             # Handle params as dict
             args = {k: ":%s" % k for k in params}
             query = query % args
-        elif unify_by_values and len(params) > 0:
+        elif unify_by_values and params:
             # Handle params as a dict with unified query parameters by their
             # values. It can be used only in single query execute() because
             # executemany() shares the formatted query with each of the params

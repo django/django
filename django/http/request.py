@@ -14,7 +14,8 @@ from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser, MultiPartParserError
 from django.utils.datastructures import ImmutableList, MultiValueDict
 from django.utils.deprecation import RemovedInDjango30Warning
-from django.utils.encoding import escape_uri_path, force_bytes, iri_to_uri
+from django.utils.encoding import escape_uri_path, iri_to_uri
+from django.utils.functional import cached_property
 from django.utils.http import is_same_domain, limited_parse_qsl
 
 RAISE_ERROR = object()
@@ -113,11 +114,17 @@ class HttpRequest:
         return str(port)
 
     def get_full_path(self, force_append_slash=False):
+        return self._get_full_path(self.path, force_append_slash)
+
+    def get_full_path_info(self, force_append_slash=False):
+        return self._get_full_path(self.path_info, force_append_slash)
+
+    def _get_full_path(self, path, force_append_slash):
         # RFC 3986 requires query string arguments to be in the ASCII range.
         # Rather than crash if this doesn't happen, we encode defensively.
         return '%s%s%s' % (
-            escape_uri_path(self.path),
-            '/' if force_append_slash and not self.path.endswith('/') else '',
+            escape_uri_path(path),
+            '/' if force_append_slash and not path.endswith('/') else '',
             ('?' + iri_to_uri(self.META.get('QUERY_STRING', ''))) if self.META.get('QUERY_STRING', '') else ''
         )
 
@@ -170,14 +177,27 @@ class HttpRequest:
             location = '//%s' % self.get_full_path()
         bits = urlsplit(location)
         if not (bits.scheme and bits.netloc):
-            current_uri = '{scheme}://{host}{path}'.format(scheme=self.scheme,
-                                                           host=self.get_host(),
-                                                           path=self.path)
-            # Join the constructed URL with the provided location, which will
-            # allow the provided ``location`` to apply query strings to the
-            # base path as well as override the host, if it begins with //
-            location = urljoin(current_uri, location)
+            # Handle the simple, most common case. If the location is absolute
+            # and a scheme or host (netloc) isn't provided, skip an expensive
+            # urljoin() as long as no path segments are '.' or '..'.
+            if (bits.path.startswith('/') and not bits.scheme and not bits.netloc and
+                    '/./' not in bits.path and '/../' not in bits.path):
+                # If location starts with '//' but has no netloc, reuse the
+                # schema and netloc from the current request. Strip the double
+                # slashes and continue as if it wasn't specified.
+                if location.startswith('//'):
+                    location = location[2:]
+                location = self._current_scheme_host + location
+            else:
+                # Join the constructed URL with the provided location, which
+                # allows the provided location to apply query strings to the
+                # base path.
+                location = urljoin(self._current_scheme_host + self.path, location)
         return iri_to_uri(location)
+
+    @cached_property
+    def _current_scheme_host(self):
+        return '{}://{}'.format(self.scheme, self.get_host())
 
     def _get_scheme(self):
         """
@@ -370,19 +390,17 @@ class QueryDict(MultiValueDict):
 
     def __init__(self, query_string=None, mutable=False, encoding=None):
         super().__init__()
-        if not encoding:
-            encoding = settings.DEFAULT_CHARSET
-        self.encoding = encoding
+        self.encoding = encoding or settings.DEFAULT_CHARSET
         query_string = query_string or ''
         parse_qsl_kwargs = {
             'keep_blank_values': True,
             'fields_limit': settings.DATA_UPLOAD_MAX_NUMBER_FIELDS,
-            'encoding': encoding,
+            'encoding': self.encoding,
         }
         if isinstance(query_string, bytes):
             # query_string normally contains URL-encoded data, a subset of ASCII.
             try:
-                query_string = query_string.decode(encoding)
+                query_string = query_string.decode(self.encoding)
             except UnicodeDecodeError:
                 # ... but some user agents are misbehaving :-(
                 query_string = query_string.decode('iso-8859-1')
@@ -493,7 +511,7 @@ class QueryDict(MultiValueDict):
         """
         output = []
         if safe:
-            safe = force_bytes(safe, self.encoding)
+            safe = safe.encode(self.encoding)
 
             def encode(k, v):
                 return '%s=%s' % ((quote(k, safe), quote(v, safe)))
@@ -501,9 +519,10 @@ class QueryDict(MultiValueDict):
             def encode(k, v):
                 return urlencode({k: v})
         for k, list_ in self.lists():
-            k = force_bytes(k, self.encoding)
-            output.extend(encode(k, force_bytes(v, self.encoding))
-                          for v in list_)
+            output.extend(
+                encode(k.encode(self.encoding), v.encode(self.encoding))
+                for v in list_
+            )
         return '&'.join(output)
 
 
@@ -561,8 +580,4 @@ def validate_host(host, allowed_hosts):
 
     Return ``True`` for a valid host, ``False`` otherwise.
     """
-    for pattern in allowed_hosts:
-        if pattern == '*' or is_same_domain(host, pattern):
-            return True
-
-    return False
+    return any(pattern == '*' or is_same_domain(host, pattern) for pattern in allowed_hosts)

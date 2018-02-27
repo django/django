@@ -84,8 +84,9 @@ class MigrationLoader:
                     continue
                 raise
             else:
-                # PY3 will happily import empty dirs as namespaces.
-                if not hasattr(module, '__file__'):
+                # Empty directories are namespaces.
+                # getattr() needed on PY36 and older (replace w/attribute access).
+                if getattr(module, '__file__', None) is None:
                     self.unmigrated_apps.add(app_config.label)
                     continue
                 # Module is not a package (e.g. migrations.py).
@@ -133,7 +134,7 @@ class MigrationLoader:
             raise AmbiguityError(
                 "There is more than one migration for '%s' with the prefix '%s'" % (app_label, name_prefix)
             )
-        elif len(results) == 0:
+        elif not results:
             raise KeyError("There no migrations for '%s' with the prefix '%s'" % (app_label, name_prefix))
         else:
             return self.disk_migrations[results[0]]
@@ -172,10 +173,9 @@ class MigrationLoader:
         dependencies find the correct root node.
         """
         for parent in migration.dependencies:
-            if parent[0] != key[0] or parent[1] == '__first__':
-                # Ignore __first__ references to the same app (#22325).
-                continue
-            self.graph.add_dependency(migration, key, parent, skip_validation=True)
+            # Ignore __first__ references to the same app.
+            if parent[0] == key[0] and parent[1] != '__first__':
+                self.graph.add_dependency(migration, key, parent, skip_validation=True)
 
     def add_external_dependencies(self, key, migration):
         for parent in migration.dependencies:

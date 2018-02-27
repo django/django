@@ -2,10 +2,9 @@ import decimal
 import json
 import unittest
 import uuid
-from contextlib import suppress
 
 from django import forms
-from django.core import exceptions, serializers, validators
+from django.core import checks, exceptions, serializers, validators
 from django.core.exceptions import FieldError
 from django.core.management import call_command
 from django.db import IntegrityError, connection, models
@@ -20,11 +19,13 @@ from .models import (
     PostgreSQLModel, Tag,
 )
 
-with suppress(ImportError):
+try:
     from django.contrib.postgres.fields import ArrayField
     from django.contrib.postgres.forms import (
         SimpleArrayField, SplitArrayField, SplitArrayWidget,
     )
+except ImportError:
+    pass
 
 
 class TestSaveLoad(PostgreSQLTestCase):
@@ -175,6 +176,15 @@ class TestQuerying(PostgreSQLTestCase):
             self.objs[:2]
         )
 
+    def test_in_subquery(self):
+        IntegerArrayModel.objects.create(field=[2, 3])
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(
+                field__in=IntegerArrayModel.objects.all().values_list('field', flat=True)
+            ),
+            self.objs[2:3]
+        )
+
     @unittest.expectedFailure
     def test_in_including_F_object(self):
         # This test asserts that Array objects passed to filters can be
@@ -297,6 +307,22 @@ class TestQuerying(PostgreSQLTestCase):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__0_2=[2, 3]),
             self.objs[2:3]
+        )
+
+    def test_order_by_slice(self):
+        more_objs = (
+            NullableIntegerArrayModel.objects.create(field=[1, 637]),
+            NullableIntegerArrayModel.objects.create(field=[2, 1]),
+            NullableIntegerArrayModel.objects.create(field=[3, -98123]),
+            NullableIntegerArrayModel.objects.create(field=[4, 2]),
+        )
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.order_by('field__1'),
+            [
+                more_objs[2], more_objs[1], more_objs[3], self.objs[2],
+                self.objs[3], more_objs[0], self.objs[4], self.objs[1],
+                self.objs[0],
+            ]
         )
 
     @unittest.expectedFailure
@@ -422,6 +448,38 @@ class TestChecks(PostgreSQLTestCase):
         errors = model.check()
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0].id, 'postgres.E002')
+
+    def test_invalid_default(self):
+        class MyModel(PostgreSQLModel):
+            field = ArrayField(models.IntegerField(), default=[])
+
+        model = MyModel()
+        self.assertEqual(model.check(), [
+            checks.Warning(
+                msg=(
+                    "ArrayField default should be a callable instead of an "
+                    "instance so that it's not shared between all field "
+                    "instances."
+                ),
+                hint='Use a callable instead, e.g., use `list` instead of `[]`.',
+                obj=MyModel._meta.get_field('field'),
+                id='postgres.E003',
+            )
+        ])
+
+    def test_valid_default(self):
+        class MyModel(PostgreSQLModel):
+            field = ArrayField(models.IntegerField(), default=list)
+
+        model = MyModel()
+        self.assertEqual(model.check(), [])
+
+    def test_valid_default_none(self):
+        class MyModel(PostgreSQLModel):
+            field = ArrayField(models.IntegerField(), default=None)
+
+        model = MyModel()
+        self.assertEqual(model.check(), [])
 
     def test_nested_field_checks(self):
         """
@@ -763,9 +821,9 @@ class TestSplitFormField(PostgreSQLTestCase):
             <tr>
                 <th><label for="id_array_0">Array:</label></th>
                 <td>
-                    <input id="id_array_0" name="array_0" type="text" required />
-                    <input id="id_array_1" name="array_1" type="text" required />
-                    <input id="id_array_2" name="array_2" type="text" required />
+                    <input id="id_array_0" name="array_0" type="text" required>
+                    <input id="id_array_1" name="array_1" type="text" required>
+                    <input id="id_array_2" name="array_2" type="text" required>
                 </td>
             </tr>
         ''')
@@ -834,8 +892,8 @@ class TestSplitFormWidget(PostgreSQLWidgetTestCase):
         self.check_html(
             SplitArrayWidget(forms.TextInput(), size=2), 'array', None,
             """
-            <input name="array_0" type="text" />
-            <input name="array_1" type="text" />
+            <input name="array_0" type="text">
+            <input name="array_1" type="text">
             """
         )
 
@@ -845,8 +903,8 @@ class TestSplitFormWidget(PostgreSQLWidgetTestCase):
             'array', ['val1', 'val2'], attrs={'id': 'foo'},
             html=(
                 """
-                <input id="foo_0" name="array_0" type="text" value="val1" />
-                <input id="foo_1" name="array_1" type="text" value="val2" />
+                <input id="foo_0" name="array_0" type="text" value="val1">
+                <input id="foo_1" name="array_1" type="text" value="val2">
                 """
             )
         )

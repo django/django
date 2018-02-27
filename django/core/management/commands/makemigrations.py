@@ -162,10 +162,11 @@ class Command(BaseCommand):
         if not changes:
             # No changes? Tell them.
             if self.verbosity >= 1:
-                if len(app_labels) == 1:
-                    self.stdout.write("No changes detected in app '%s'" % app_labels.pop())
-                elif len(app_labels) > 1:
-                    self.stdout.write("No changes detected in apps '%s'" % ("', '".join(app_labels)))
+                if app_labels:
+                    if len(app_labels) == 1:
+                        self.stdout.write("No changes detected in app '%s'" % app_labels.pop())
+                    else:
+                        self.stdout.write("No changes detected in apps '%s'" % ("', '".join(app_labels)))
                 else:
                     self.stdout.write("No changes detected")
         else:
@@ -275,7 +276,7 @@ class Command(BaseCommand):
                     biggest_number = max(x for x in numbers if x is not None)
                 except ValueError:
                     biggest_number = 1
-                subclass = type("Migration", (Migration, ), {
+                subclass = type("Migration", (Migration,), {
                     "dependencies": [(app_label, migration.name) for migration in merge_migrations],
                 })
                 migration_name = "%04i_%s" % (

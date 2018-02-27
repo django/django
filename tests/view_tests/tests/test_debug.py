@@ -16,9 +16,9 @@ from django.template import TemplateDoesNotExist
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import LoggingCaptureMixin, patch_logger
 from django.urls import reverse
-from django.utils.encoding import force_bytes
 from django.utils.functional import SimpleLazyObject
 from django.utils.safestring import mark_safe
+from django.utils.version import PY36
 from django.views.debug import (
     CLEANSED_SUBSTITUTE, CallableSettingWrapper, ExceptionReporter,
     cleanse_setting, technical_500_response,
@@ -30,8 +30,6 @@ from ..views import (
     sensitive_args_function_caller, sensitive_kwargs_function_caller,
     sensitive_method_view, sensitive_view,
 )
-
-PY36 = sys.version_info >= (3, 6)
 
 
 class User:
@@ -112,7 +110,14 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
     def test_404_not_in_urls(self):
         response = self.client.get('/not-in-urls')
         self.assertNotContains(response, "Raised by:", status_code=404)
+        self.assertContains(response, "Django tried these URL patterns", status_code=404)
         self.assertContains(response, "<code>not-in-urls</code>, didn't match", status_code=404)
+        # Pattern and view name of a RegexURLPattern appear.
+        self.assertContains(response, r"^regex-post/(?P&lt;pk&gt;[0-9]+)/$", status_code=404)
+        self.assertContains(response, "[name='regex-post']", status_code=404)
+        # Pattern and view name of a RoutePattern appear.
+        self.assertContains(response, r"path-post/&lt;int:pk&gt;/", status_code=404)
+        self.assertContains(response, "[name='path-post']", status_code=404)
 
     @override_settings(ROOT_URLCONF=WithoutEmptyPathUrls)
     def test_404_empty_path_not_in_urls(self):
@@ -319,7 +324,7 @@ class ExceptionReporterTests(SimpleTestCase):
 
         for newline in ['\n', '\r\n', '\r']:
             fd, filename = tempfile.mkstemp(text=False)
-            os.write(fd, force_bytes(newline.join(LINES) + newline))
+            os.write(fd, (newline.join(LINES) + newline).encode())
             os.close(fd)
 
             try:
@@ -349,10 +354,10 @@ class ExceptionReporterTests(SimpleTestCase):
         request = self.rf.get('/test_view/')
         try:
             try:
-                raise AttributeError('Top level')
+                raise AttributeError(mark_safe('<p>Top level</p>'))
             except AttributeError as explicit:
                 try:
-                    raise ValueError('Second exception') from explicit
+                    raise ValueError(mark_safe('<p>Second exception</p>')) from explicit
                 except ValueError:
                     raise IndexError(mark_safe('<p>Final exception</p>'))
         except Exception:
@@ -366,13 +371,13 @@ class ExceptionReporterTests(SimpleTestCase):
         html = reporter.get_traceback_html()
         # Both messages are twice on page -- one rendered as html,
         # one as plain text (for pastebin)
-        self.assertEqual(2, html.count(explicit_exc.format("Top level")))
-        self.assertEqual(2, html.count(implicit_exc.format("Second exception")))
+        self.assertEqual(2, html.count(explicit_exc.format('&lt;p&gt;Top level&lt;/p&gt;')))
+        self.assertEqual(2, html.count(implicit_exc.format('&lt;p&gt;Second exception&lt;/p&gt;')))
         self.assertEqual(10, html.count('&lt;p&gt;Final exception&lt;/p&gt;'))
 
         text = reporter.get_traceback_text()
-        self.assertIn(explicit_exc.format("Top level"), text)
-        self.assertIn(implicit_exc.format("Second exception"), text)
+        self.assertIn(explicit_exc.format('<p>Top level</p>'), text)
+        self.assertIn(implicit_exc.format('<p>Second exception</p>'), text)
         self.assertEqual(3, text.count('<p>Final exception</p>'))
 
     def test_reporting_frames_without_source(self):
@@ -763,7 +768,7 @@ class ExceptionReportTestMixin:
             self.assertContains(response, 'sauce', status_code=500)
             self.assertNotContains(response, 'worcestershire', status_code=500)
         if check_for_POST_params:
-            for k, v in self.breakfast_data.items():
+            for k in self.breakfast_data:
                 # All POST parameters' names are shown.
                 self.assertContains(response, k, status_code=500)
             # Non-sensitive POST parameters' values are shown.
@@ -852,7 +857,7 @@ class ExceptionReportTestMixin:
             self.assertNotIn('worcestershire', body_html)
 
             if check_for_POST_params:
-                for k, v in self.breakfast_data.items():
+                for k in self.breakfast_data:
                     # All POST parameters' names are shown.
                     self.assertIn(k, body_plain)
                 # Non-sensitive POST parameters' values are shown.

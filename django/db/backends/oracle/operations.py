@@ -5,6 +5,7 @@ import uuid
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import strip_quotes, truncate_name
+from django.db.utils import DatabaseError
 from django.utils import timezone
 from django.utils.encoding import force_bytes
 
@@ -13,8 +14,6 @@ from .utils import BulkInsertMapper, InsertIdVar, Oracle_datetime
 
 
 class DatabaseOperations(BaseDatabaseOperations):
-    compiler_module = "django.db.backends.oracle.compiler"
-
     # Oracle uses NUMBER(11) and NUMBER(19) for integer fields.
     integer_field_ranges = {
         'SmallIntegerField': (-99999999999, 99999999999),
@@ -23,6 +22,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         'PositiveSmallIntegerField': (0, 99999999999),
         'PositiveIntegerField': (0, 99999999999),
     }
+    set_operators = {**BaseDatabaseOperations.set_operators, 'difference': 'MINUS'}
 
     # TODO: colorize this SQL code with style.SQL_KEYWORD(), etc.
     _sequence_reset_sql = """
@@ -52,10 +52,6 @@ END;
     # Oracle doesn't support string without precision; use the max string size.
     cast_char_field_without_max_length = 'NVARCHAR2(2000)'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.set_operators['difference'] = 'MINUS'
-
     def cache_key_culling_sql(self):
         return """
             SELECT cache_key
@@ -76,18 +72,14 @@ END;
             # https://docs.oracle.com/database/121/SQLRF/functions067.htm#SQLRF00639
             return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
 
-    def date_interval_sql(self, timedelta):
-        """
-        NUMTODSINTERVAL converts number to INTERVAL DAY TO SECOND literal.
-        """
-        return "NUMTODSINTERVAL(%06f, 'SECOND')" % timedelta.total_seconds()
-
     def date_trunc_sql(self, lookup_type, field_name):
         # https://docs.oracle.com/database/121/SQLRF/functions271.htm#SQLRF52058
         if lookup_type in ('year', 'month'):
             return "TRUNC(%s, '%s')" % (field_name, lookup_type.upper())
         elif lookup_type == 'quarter':
             return "TRUNC(%s, 'Q')" % field_name
+        elif lookup_type == 'week':
+            return "TRUNC(%s, 'IW')" % field_name
         else:
             return "TRUNC(%s)" % field_name
 
@@ -126,6 +118,8 @@ END;
             sql = "TRUNC(%s, '%s')" % (field_name, lookup_type.upper())
         elif lookup_type == 'quarter':
             sql = "TRUNC(%s, 'Q')" % field_name
+        elif lookup_type == 'week':
+            sql = "TRUNC(%s, 'IW')" % field_name
         elif lookup_type == 'day':
             sql = "TRUNC(%s)" % field_name
         elif lookup_type == 'hour':
@@ -158,7 +152,8 @@ END;
         elif internal_type in ['BooleanField', 'NullBooleanField']:
             converters.append(self.convert_booleanfield_value)
         elif internal_type == 'DateTimeField':
-            converters.append(self.convert_datetimefield_value)
+            if settings.USE_TZ:
+                converters.append(self.convert_datetimefield_value)
         elif internal_type == 'DateField':
             converters.append(self.convert_datefield_value)
         elif internal_type == 'TimeField':
@@ -197,8 +192,7 @@ END;
 
     def convert_datetimefield_value(self, value, expression, connection):
         if value is not None:
-            if settings.USE_TZ:
-                value = timezone.make_aware(value, self.connection.timezone)
+            value = timezone.make_aware(value, self.connection.timezone)
         return value
 
     def convert_datefield_value(self, value, expression, connection):
@@ -228,13 +222,30 @@ END;
         return " DEFERRABLE INITIALLY DEFERRED"
 
     def fetch_returned_insert_id(self, cursor):
-        return int(cursor._insert_id_var.getvalue())
+        try:
+            return int(cursor._insert_id_var.getvalue())
+        except TypeError:
+            raise DatabaseError(
+                'The database did not return a new row id. Probably "ORA-1403: '
+                'no data found" was raised internally but was hidden by the '
+                'Oracle OCI library (see https://code.djangoproject.com/ticket/28859).'
+            )
 
     def field_cast_sql(self, db_type, internal_type):
         if db_type and db_type.endswith('LOB'):
             return "DBMS_LOB.SUBSTR(%s)"
         else:
             return "%s"
+
+    def no_limit_value(self):
+        return None
+
+    def limit_offset_sql(self, low_mark, high_mark):
+        fetch, offset = self._get_limit_offset_params(low_mark, high_mark)
+        return '%s%s' % (
+            (' OFFSET %d ROWS' % offset) if offset else '',
+            (' FETCH FIRST %d ROWS ONLY' % fetch) if fetch else '',
+        )
 
     def last_executed_query(self, cursor, sql, params):
         # https://cx-oracle.readthedocs.io/en/latest/cursor.html#Cursor.statement
@@ -556,3 +567,9 @@ END;
             rhs_sql, rhs_params = rhs
             return "NUMTODSINTERVAL(%s - %s, 'DAY')" % (lhs_sql, rhs_sql), lhs_params + rhs_params
         return super().subtract_temporals(internal_type, lhs, rhs)
+
+    def bulk_batch_size(self, fields, objs):
+        """Oracle restricts the number of parameters in a query."""
+        if fields:
+            return self.connection.features.max_query_params // len(fields)
+        return len(objs)

@@ -138,7 +138,7 @@ class BaseModelBackendTest:
         group.permissions.add(group_perm)
 
         self.assertEqual(backend.get_all_permissions(user), {'auth.test_user', 'auth.test_group'})
-        self.assertEqual(backend.get_user_permissions(user), {'auth.test_user', 'auth.test_group'})
+        self.assertEqual(backend.get_user_permissions(user), {'auth.test_user'})
         self.assertEqual(backend.get_group_permissions(user), {'auth.test_group'})
 
         with mock.patch.object(self.UserModel, 'is_anonymous', True):
@@ -164,7 +164,7 @@ class BaseModelBackendTest:
         group.permissions.add(group_perm)
 
         self.assertEqual(backend.get_all_permissions(user), {'auth.test_user', 'auth.test_group'})
-        self.assertEqual(backend.get_user_permissions(user), {'auth.test_user', 'auth.test_group'})
+        self.assertEqual(backend.get_user_permissions(user), {'auth.test_user'})
         self.assertEqual(backend.get_group_permissions(user), {'auth.test_group'})
 
         user.is_active = False
@@ -339,9 +339,7 @@ class SimpleRowlevelBackend:
         return False
 
     def has_module_perms(self, user, app_label):
-        if not user.is_anonymous and not user.is_active:
-            return False
-        return app_label == "app1"
+        return (user.is_anonymous or user.is_active) and app_label == 'app1'
 
     def get_all_permissions(self, user, obj=None):
         if not obj:

@@ -4,7 +4,8 @@ from unittest import mock, skipUnless
 
 from django.core.management import call_command
 from django.db import connection
-from django.test import TestCase, skipUnlessDBFeature
+from django.db.backends.base.introspection import TableInfo
+from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from .models import ColumnTypes
 
@@ -189,7 +190,7 @@ class InspectDBTestCase(TestCase):
                      table_name_filter=lambda tn: tn.startswith('inspectdb_special'),
                      stdout=out)
         output = out.getvalue()
-        base_name = 'Field' if not connection.features.uppercases_column_names else 'field'
+        base_name = 'field' if connection.features.uppercases_column_names else 'Field'
         self.assertIn("field = models.IntegerField()", output)
         self.assertIn("field_field = models.IntegerField(db_column='%s_')" % base_name, output)
         self.assertIn("field_field_0 = models.IntegerField(db_column='%s__')" % base_name, output)
@@ -260,10 +261,37 @@ class InspectDBTestCase(TestCase):
         be visible in the output.
         """
         out = StringIO()
-        with mock.patch('django.db.backends.base.introspection.BaseDatabaseIntrospection.table_names',
-                        return_value=['nonexistent']):
+        with mock.patch('django.db.connection.introspection.get_table_list',
+                        return_value=[TableInfo(name='nonexistent', type='t')]):
             call_command('inspectdb', stdout=out)
         output = out.getvalue()
         self.assertIn("# Unable to inspect table 'nonexistent'", output)
         # The error message depends on the backend
         self.assertIn("# The error was:", output)
+
+
+class InspectDBTransactionalTests(TransactionTestCase):
+    available_apps = None
+
+    def test_include_views(self):
+        """inspectdb --include-views creates models for database views."""
+        with connection.cursor() as cursor:
+            cursor.execute(
+                'CREATE VIEW inspectdb_people_view AS '
+                'SELECT id, name FROM inspectdb_people'
+            )
+        out = StringIO()
+        view_model = 'class InspectdbPeopleView(models.Model):'
+        view_managed = 'managed = False  # Created from a view.'
+        try:
+            call_command('inspectdb', stdout=out)
+            no_views_output = out.getvalue()
+            self.assertNotIn(view_model, no_views_output)
+            self.assertNotIn(view_managed, no_views_output)
+            call_command('inspectdb', include_views=True, stdout=out)
+            with_views_output = out.getvalue()
+            self.assertIn(view_model, with_views_output)
+            self.assertIn(view_managed, with_views_output)
+        finally:
+            with connection.cursor() as cursor:
+                cursor.execute('DROP VIEW inspectdb_people_view')

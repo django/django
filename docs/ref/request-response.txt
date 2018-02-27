@@ -124,7 +124,7 @@ All attributes should be considered read-only, unless stated otherwise.
 .. attribute:: HttpRequest.FILES
 
     A dictionary-like object containing all uploaded files. Each key in
-    ``FILES`` is the ``name`` from the ``<input type="file" name="" />``. Each
+    ``FILES`` is the ``name`` from the ``<input type="file" name="">``. Each
     value in ``FILES`` is an :class:`~django.core.files.uploadedfile.UploadedFile`.
 
     See :doc:`/topics/files` for more information.
@@ -284,6 +284,15 @@ Methods
 
     Example: ``"/music/bands/the_beatles/?print=true"``
 
+.. method:: HttpRequest.get_full_path_info()
+
+    .. versionadded:: 2.1
+
+    Like :meth:`get_full_path`, but uses :attr:`path_info` instead of
+    :attr:`path`.
+
+    Example: ``"/minfo/music/bands/the_beatles/?print=true"``
+
 .. method:: HttpRequest.build_absolute_uri(location)
 
     Returns the absolute URI form of ``location``. If no location is provided,
@@ -419,8 +428,6 @@ a subclass of dictionary. Exceptions are outlined here:
     :setting:`DEFAULT_CHARSET`.
 
 .. classmethod:: QueryDict.fromkeys(iterable, value='', mutable=False, encoding=None)
-
-    .. versionadded:: 1.11
 
     Creates a new ``QueryDict`` with keys from ``iterable`` and each value
     equal to ``value``. For example::
@@ -754,10 +761,9 @@ Methods
       in UTC. If ``expires`` is a ``datetime`` object, the ``max_age``
       will be calculated.
     * Use ``domain`` if you want to set a cross-domain cookie. For example,
-      ``domain=".lawrence.com"`` will set a cookie that is readable by
-      the domains www.lawrence.com, blogs.lawrence.com and
-      calendars.lawrence.com. Otherwise, a cookie will only be readable by
-      the domain that set it.
+      ``domain="example.com"`` will set a cookie that is readable by the
+      domains www.example.com, blog.example.com, etc. Otherwise, a cookie will
+      only be readable by the domain that set it.
     * Use ``httponly=True`` if you want to prevent client-side
       JavaScript from having access to the cookie.
 
@@ -952,7 +958,7 @@ Without passing ``safe=False``, a :exc:`TypeError` will be raised.
 .. warning::
 
     Before the `5th edition of ECMAScript
-    <http://www.ecma-international.org/ecma-262/5.1/index.html#sec-11.1.4>`_
+    <https://www.ecma-international.org/ecma-262/5.1/index.html#sec-11.1.4>`_
     it was possible to poison the JavaScript ``Array`` constructor. For this
     reason, Django does not allow passing non-dict objects to the
     :class:`~django.http.JsonResponse` constructor by default.  However, most

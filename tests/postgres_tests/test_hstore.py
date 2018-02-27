@@ -1,5 +1,4 @@
 import json
-from contextlib import suppress
 
 from django.core import exceptions, serializers
 from django.forms import Form
@@ -8,10 +7,12 @@ from django.test.utils import modify_settings
 from . import PostgreSQLTestCase
 from .models import HStoreModel
 
-with suppress(ImportError):
+try:
     from django.contrib.postgres import forms
     from django.contrib.postgres.fields import HStoreField
     from django.contrib.postgres.validators import KeysValidator
+except ImportError:
+    pass
 
 
 @modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'})
@@ -145,6 +146,18 @@ class TestQuerying(HStoreTestCase):
         self.assertSequenceEqual(
             HStoreModel.objects.filter(field__a__contains='b'),
             self.objs[:2]
+        )
+
+    def test_order_by_field(self):
+        more_objs = (
+            HStoreModel.objects.create(field={'g': '637'}),
+            HStoreModel.objects.create(field={'g': '002'}),
+            HStoreModel.objects.create(field={'g': '042'}),
+            HStoreModel.objects.create(field={'g': '981'}),
+        )
+        self.assertSequenceEqual(
+            HStoreModel.objects.filter(field__has_key='g').order_by('field__g'),
+            [more_objs[1], more_objs[2], more_objs[0], more_objs[3]]
         )
 
     def test_keys_contains(self):

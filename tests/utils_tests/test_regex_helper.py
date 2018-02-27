@@ -1,5 +1,4 @@
 import unittest
-import warnings
 
 from django.utils import regex_helper
 
@@ -22,16 +21,6 @@ class NormalizeTests(unittest.TestCase):
         expected = [('%(_0)s-%(_1)s', ['_0', '_1'])]
         result = regex_helper.normalize(pattern)
         self.assertEqual(result, expected)
-
-    def test_group_ignored(self):
-        pattern = r"(?i)(?L)(?m)(?s)(?u)(?#)"
-        expected = [('', [])]
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')
-            result = regex_helper.normalize(pattern)
-        self.assertEqual(result, expected)
-        for i, char in enumerate('iLmsu#'):
-            self.assertEqual(str(warns[i].message), 'Using (?%s) in url() patterns is deprecated.' % char)
 
     def test_group_noncapturing(self):
         pattern = r"(?:non-capturing)"

@@ -449,6 +449,14 @@ class CategoryItem(models.Model):
         return "category item: " + str(self.category)
 
 
+class MixedCaseFieldCategoryItem(models.Model):
+    CaTeGoRy = models.ForeignKey(SimpleCategory, models.CASCADE)
+
+
+class MixedCaseDbColumnCategoryItem(models.Model):
+    category = models.ForeignKey(SimpleCategory, models.CASCADE, db_column='CaTeGoRy_Id')
+
+
 class OneToOneCategory(models.Model):
     new_name = models.CharField(max_length=15)
     category = models.OneToOneField(SimpleCategory, models.CASCADE)
@@ -460,6 +468,12 @@ class OneToOneCategory(models.Model):
 class CategoryRelationship(models.Model):
     first = models.ForeignKey(SimpleCategory, models.CASCADE, related_name='first_rel')
     second = models.ForeignKey(SimpleCategory, models.CASCADE, related_name='second_rel')
+
+
+class CommonMixedCaseForeignKeys(models.Model):
+    category = models.ForeignKey(CategoryItem, models.CASCADE)
+    mixed_case_field_category = models.ForeignKey(MixedCaseFieldCategoryItem, models.CASCADE)
+    mixed_case_db_column_category = models.ForeignKey(MixedCaseDbColumnCategoryItem, models.CASCADE)
 
 
 class NullableName(models.Model):
@@ -579,7 +593,7 @@ class Order(models.Model):
     id = models.IntegerField(primary_key=True)
 
     class Meta:
-        ordering = ('pk', )
+        ordering = ('pk',)
 
     def __str__(self):
         return '%s' % self.pk
@@ -590,7 +604,7 @@ class OrderItem(models.Model):
     status = models.IntegerField()
 
     class Meta:
-        ordering = ('pk', )
+        ordering = ('pk',)
 
     def __str__(self):
         return '%s' % self.pk

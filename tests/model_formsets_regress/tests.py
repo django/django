@@ -291,7 +291,7 @@ class FormsetTests(TestCase):
         data = {'test-TOTAL_FORMS': '1',
                 'test-INITIAL_FORMS': '0',
                 'test-MAX_NUM_FORMS': '',
-                'test-0-name': 'Random Place', }
+                'test-0-name': 'Random Place'}
         with self.assertNumQueries(1):
             formset = Formset(data, prefix="test")
             formset.save()

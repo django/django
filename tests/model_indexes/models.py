@@ -9,7 +9,10 @@ class Book(models.Model):
     isbn = models.CharField(max_length=50, db_tablespace='idx_tbls')
 
     class Meta:
-        indexes = [models.indexes.Index(fields=['title'])]
+        indexes = [
+            models.indexes.Index(fields=['title']),
+            models.indexes.Index(fields=['isbn', 'id']),
+        ]
 
 
 class AbstractModel(models.Model):

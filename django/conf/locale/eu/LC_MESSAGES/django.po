@@ -10,13 +10,14 @@
 # julen <julenx@gmail.com>, 2013,2015
 # totorika93 <totorika93@gmail.com>, 2012
 # Unai Zalakain <inactive+unaizalakain@transifex.com>, 2013
+# Urtzi Odriozola <urtzi.odriozola@gmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-03-22 15:06+0000\n"
-"Last-Translator: Eneko Illarramendi <eneko@illarra.com>\n"
+"POT-Creation-Date: 2017-11-15 16:15+0100\n"
+"PO-Revision-Date: 2017-11-16 10:52+0000\n"
+"Last-Translator: Urtzi Odriozola <urtzi.odriozola@gmail.com>\n"
 "Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -321,6 +322,7 @@ msgstr "Idatzi baleko zenbaki bat."
 msgid "Enter a valid email address."
 msgstr "Idatzi baleko helbide elektroniko bat."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -413,6 +415,9 @@ msgid ""
 msgstr ""
 "'%(extension)s' fitxategi-luzapena ez da balekoa. Hauek dira onartutako "
 "fitxategi-luzapenak: '%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
+msgstr "Null karaktereak ez daude baimenduta."
 
 msgid "and"
 msgstr "eta"
@@ -747,15 +752,15 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Zuzendu hurrengo balio bikoiztuak."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "Barneko gakoa eta gurasoaren gakoa ez datoz bat."
+msgid "The inline value did not match the parent instance."
+msgstr "Barneko balioa eta gurasoaren instantzia ez datoz bat."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Hautatu aukera zuzen bat. Hautatutakoa ez da zuzena."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" ez da balio egokia lehen mailako gakoentzat."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "\"%(pk)s\" ez da balio egokia."
 
 #, python-format
 msgid ""
@@ -1121,6 +1126,19 @@ msgstr ""
 "eskaeretarako  gaitu berriro."
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+"<meta name=\"referrer\" content=\"no-referrer\"> etiketa erabiltzen ari "
+"bazara edo 'Referrer-Policy: no-referrer' goiburukoa, mesedez ezabatu "
+"itzazu. CSRF babesak 'Referer' goiburukoa behar du egiaztapen zorrotza "
+"egiteko. Pribatutasunaz kezkatuta bazaude, erabili <a rel=\"noreferrer\" ..."
+"> bezalako alternatibak hirugarrenen webgune loturentzat."
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1139,31 +1157,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "Informazio gehiago erabilgarri dago DEBUG=True ezarrita."
 
-msgid "Welcome to Django"
-msgstr "Ongi etorri Djangora"
-
-msgid "It worked!"
-msgstr "Badabil!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Zorionak Djangorekin egindako zure lehen orrian."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-"Jarraian sortu zure lehen aplikazioa <code>python manage.py startapp "
-"[aplikazioaren_etiketa]</code> exekutatuz."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Mezu hay Djangoren settings fitxategian code>DEBUG = True</code> jarrita "
-"daukazulako eta oraindik URLrik gehitu ez duzulako agertzen da. Lanera!"
-
 msgid "No year specified"
 msgstr "Ez da urterik zehaztu"
+
+msgid "Date out of range"
+msgstr "Data baliozko tartetik kanpo"
 
 msgid "No month specified"
 msgstr "Ez da hilabeterik zehaztu"
@@ -1215,3 +1213,48 @@ msgstr "\"%(path)s\" ez da existitzen"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "%(directory)s zerrenda"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django: epeekin perfekzionistak direnentzat Web frameworka."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Ikusi Django %(version)s-ren <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/releases/\" target=\"_blank\" rel=\"noopener\">argitaratze "
+"oharrak</a>"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Instalazioak arrakastaz funtzionatu du! Zorionak!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"Zure settings fitxategian <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> jarrita eta URLrik konfiguratu gabe duzulako ari zara "
+"ikusten orrialde hau."
+
+msgid "Django Documentation"
+msgstr "Django dokumentazioa"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr "Gaiak, erreferentziak, &amp; laguntzak"
+
+msgid "Tutorial: A Polling App"
+msgstr "Tutoriala: Galdetegi aplikazioa"
+
+msgid "Get started with Django"
+msgstr "Hasi Djangorekin"
+
+msgid "Django Community"
+msgstr "Django Komunitatea"
+
+msgid "Connect, get help, or contribute"
+msgstr "Konektatu, lortu laguntza edo lagundu"

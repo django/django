@@ -7,7 +7,7 @@ from ctypes import byref, c_int, c_uint
 from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.geos.geometry import GEOSGeometry, LinearGeometryMixin
-from django.contrib.gis.geos.libgeos import geos_version_tuple, get_pointer_arr
+from django.contrib.gis.geos.libgeos import GEOM_PTR, geos_version_tuple
 from django.contrib.gis.geos.linestring import LinearRing, LineString
 from django.contrib.gis.geos.point import Point
 from django.contrib.gis.geos.polygon import Polygon
@@ -49,12 +49,11 @@ class GeometryCollection(GEOSGeometry):
     # ### Methods for compatibility with ListMixin ###
     def _create_collection(self, length, items):
         # Creating the geometry pointer array.
-        geoms = get_pointer_arr(length)
-        for i, g in enumerate(items):
+        geoms = (GEOM_PTR * length)(*[
             # this is a little sloppy, but makes life easier
             # allow GEOSGeometry types (python wrappers) or pointer types
-            geoms[i] = capi.geom_clone(getattr(g, 'ptr', g))
-
+            capi.geom_clone(getattr(g, 'ptr', g)) for g in items
+        ])
         return capi.create_collection(c_int(self._typeid), byref(geoms), c_uint(length))
 
     def _get_single_internal(self, index):

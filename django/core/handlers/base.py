@@ -13,14 +13,12 @@ logger = logging.getLogger('django.request')
 
 
 class BaseHandler:
-
-    def __init__(self):
-        self._request_middleware = None
-        self._view_middleware = None
-        self._template_response_middleware = None
-        self._response_middleware = None
-        self._exception_middleware = None
-        self._middleware_chain = None
+    _request_middleware = None
+    _view_middleware = None
+    _template_response_middleware = None
+    _response_middleware = None
+    _exception_middleware = None
+    _middleware_chain = None
 
     def load_middleware(self):
         """

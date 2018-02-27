@@ -1,4 +1,3 @@
-import codecs
 import contextlib
 import copy
 from decimal import Decimal
@@ -6,6 +5,8 @@ from decimal import Decimal
 from django.apps.registry import Apps
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.ddl_references import Statement
+from django.db.transaction import atomic
+from django.db.utils import NotSupportedError
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -38,7 +39,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         except sqlite3.ProgrammingError:
             pass
         # Manual emulation of SQLite parameter quoting
-        if isinstance(value, type(True)):
+        if isinstance(value, bool):
             return str(int(value))
         elif isinstance(value, (Decimal, float, int)):
             return str(value)
@@ -49,15 +50,81 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         elif isinstance(value, (bytes, bytearray, memoryview)):
             # Bytes are only allowed for BLOB fields, encoded as string
             # literals containing hexadecimal data and preceded by a single "X"
-            # character:
-            # value = b'\x01\x02' => value_hex = b'0102' => return X'0102'
-            value = bytes(value)
-            hex_encoder = codecs.getencoder('hex_codec')
-            value_hex, _length = hex_encoder(value)
-            # Use 'ascii' encoding for b'01' => '01', no need to use force_text here.
-            return "X'%s'" % value_hex.decode('ascii')
+            # character.
+            return "X'%s'" % value.hex()
         else:
             raise ValueError("Cannot quote parameter value %r of type %s" % (value, type(value)))
+
+    def _is_referenced_by_fk_constraint(self, table_name, column_name=None, ignore_self=False):
+        """
+        Return whether or not the provided table name is referenced by another
+        one. If `column_name` is specified, only references pointing to that
+        column are considered. If `ignore_self` is True, self-referential
+        constraints are ignored.
+        """
+        with self.connection.cursor() as cursor:
+            for other_table in self.connection.introspection.get_table_list(cursor):
+                if ignore_self and other_table.name == table_name:
+                    continue
+                constraints = self.connection.introspection._get_foreign_key_constraints(cursor, other_table.name)
+                for constraint in constraints.values():
+                    constraint_table, constraint_column = constraint['foreign_key']
+                    if (constraint_table == table_name and
+                            (column_name is None or constraint_column == column_name)):
+                        return True
+        return False
+
+    def alter_db_table(self, model, old_db_table, new_db_table, disable_constraints=True):
+        if disable_constraints and self._is_referenced_by_fk_constraint(old_db_table):
+            if self.connection.in_atomic_block:
+                raise NotSupportedError((
+                    'Renaming the %r table while in a transaction is not '
+                    'supported on SQLite because it would break referential '
+                    'integrity. Try adding `atomic = False` to the Migration class.'
+                ) % old_db_table)
+            self.connection.enable_constraint_checking()
+            super().alter_db_table(model, old_db_table, new_db_table)
+            self.connection.disable_constraint_checking()
+        else:
+            super().alter_db_table(model, old_db_table, new_db_table)
+
+    def alter_field(self, model, old_field, new_field, strict=False):
+        old_field_name = old_field.name
+        table_name = model._meta.db_table
+        _, old_column_name = old_field.get_attname_column()
+        if (new_field.name != old_field_name and
+                self._is_referenced_by_fk_constraint(table_name, old_column_name, ignore_self=True)):
+            if self.connection.in_atomic_block:
+                raise NotSupportedError((
+                    'Renaming the %r.%r column while in a transaction is not '
+                    'supported on SQLite because it would break referential '
+                    'integrity. Try adding `atomic = False` to the Migration class.'
+                ) % (model._meta.db_table, old_field_name))
+            with atomic(self.connection.alias):
+                super().alter_field(model, old_field, new_field, strict=strict)
+                # Follow SQLite's documented procedure for performing changes
+                # that don't affect the on-disk content.
+                # https://sqlite.org/lang_altertable.html#otheralter
+                with self.connection.cursor() as cursor:
+                    schema_version = cursor.execute('PRAGMA schema_version').fetchone()[0]
+                    cursor.execute('PRAGMA writable_schema = 1')
+                    references_template = ' REFERENCES "%s" ("%%s") ' % table_name
+                    new_column_name = new_field.get_attname_column()[1]
+                    search = references_template % old_column_name
+                    replacement = references_template % new_column_name
+                    cursor.execute('UPDATE sqlite_master SET sql = replace(sql, %s, %s)', (search, replacement))
+                    cursor.execute('PRAGMA schema_version = %d' % (schema_version + 1))
+                    cursor.execute('PRAGMA writable_schema = 0')
+                    # The integrity check will raise an exception and rollback
+                    # the transaction if the sqlite_master updates corrupt the
+                    # database.
+                    cursor.execute('PRAGMA integrity_check')
+            # Perform a VACUUM to refresh the database representation from
+            # the sqlite_master table.
+            with self.connection.cursor() as cursor:
+                cursor.execute('VACUUM')
+        else:
+            super().alter_field(model, old_field, new_field, strict=strict)
 
     def _remake_table(self, model, create_field=None, delete_field=None, alter_field=None):
         """
@@ -182,8 +249,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
         with altered_table_name(model, model._meta.db_table + "__old"):
             # Rename the old table to make way for the new
-            self.alter_db_table(model, temp_model._meta.db_table, model._meta.db_table)
-
+            self.alter_db_table(
+                model, temp_model._meta.db_table, model._meta.db_table,
+                disable_constraints=False,
+            )
             # Create a new table with the updated schema.
             self.create_model(temp_model)
 

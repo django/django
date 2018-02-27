@@ -39,7 +39,7 @@ class FieldFile(File):
 
     def _get_file(self):
         self._require_file()
-        if not hasattr(self, '_file') or self._file is None:
+        if getattr(self, '_file', None) is None:
             self._file = self.storage.open(self.name, 'rb')
         return self._file
 
@@ -70,10 +70,10 @@ class FieldFile(File):
 
     def open(self, mode='rb'):
         self._require_file()
-        if hasattr(self, '_file') and self._file is not None:
-            self.file.open(mode)
-        else:
+        if getattr(self, '_file', None) is None:
             self.file = self.storage.open(self.name, mode)
+        else:
+            self.file.open(mode)
         return self
     # open() doesn't alter the file's contents, but it does reset the pointer
     open.alters_data = True
@@ -226,14 +226,15 @@ class FileField(Field):
         self.storage = storage or default_storage
         self.upload_to = upload_to
 
-        kwargs['max_length'] = kwargs.get('max_length', 100)
+        kwargs.setdefault('max_length', 100)
         super().__init__(verbose_name, name, **kwargs)
 
     def check(self, **kwargs):
-        errors = super().check(**kwargs)
-        errors.extend(self._check_primary_key())
-        errors.extend(self._check_upload_to())
-        return errors
+        return [
+            *super().check(**kwargs),
+            *self._check_primary_key(),
+            *self._check_upload_to(),
+        ]
 
     def _check_primary_key(self):
         if self._primary_key_set_explicitly:
@@ -313,14 +314,14 @@ class FileField(Field):
         if data is not None:
             # This value will be converted to str and stored in the
             # database, so leaving False as-is is not acceptable.
-            if not data:
-                data = ''
-            setattr(instance, self.name, data)
+            setattr(instance, self.name, data or '')
 
     def formfield(self, **kwargs):
-        defaults = {'form_class': forms.FileField, 'max_length': self.max_length}
-        defaults.update(kwargs)
-        return super().formfield(**defaults)
+        return super().formfield(**{
+            'form_class': forms.FileField,
+            'max_length': self.max_length,
+            **kwargs,
+        })
 
 
 class ImageFileDescriptor(FileDescriptor):
@@ -363,9 +364,10 @@ class ImageField(FileField):
         super().__init__(verbose_name, name, **kwargs)
 
     def check(self, **kwargs):
-        errors = super().check(**kwargs)
-        errors.extend(self._check_image_library_installed())
-        return errors
+        return [
+            *super().check(**kwargs),
+            *self._check_image_library_installed(),
+        ]
 
     def _check_image_library_installed(self):
         try:
@@ -458,6 +460,7 @@ class ImageField(FileField):
             setattr(instance, self.height_field, height)
 
     def formfield(self, **kwargs):
-        defaults = {'form_class': forms.ImageField}
-        defaults.update(kwargs)
-        return super().formfield(**defaults)
+        return super().formfield(**{
+            'form_class': forms.ImageField,
+            **kwargs,
+        })

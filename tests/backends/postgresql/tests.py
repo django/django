@@ -44,10 +44,10 @@ class Tests(TestCase):
             # Ensure the database default time zone is different than
             # the time zone in new_connection.settings_dict. We can
             # get the default time zone by reset & show.
-            cursor = new_connection.cursor()
-            cursor.execute("RESET TIMEZONE")
-            cursor.execute("SHOW TIMEZONE")
-            db_default_tz = cursor.fetchone()[0]
+            with new_connection.cursor() as cursor:
+                cursor.execute("RESET TIMEZONE")
+                cursor.execute("SHOW TIMEZONE")
+                db_default_tz = cursor.fetchone()[0]
             new_tz = 'Europe/Paris' if db_default_tz == 'UTC' else 'UTC'
             new_connection.close()
 
@@ -59,12 +59,12 @@ class Tests(TestCase):
             # time zone, run a query and rollback.
             with self.settings(TIME_ZONE=new_tz):
                 new_connection.set_autocommit(False)
-                cursor = new_connection.cursor()
                 new_connection.rollback()
 
                 # Now let's see if the rollback rolled back the SET TIME ZONE.
-                cursor.execute("SHOW TIMEZONE")
-                tz = cursor.fetchone()[0]
+                with new_connection.cursor() as cursor:
+                    cursor.execute("SHOW TIMEZONE")
+                    tz = cursor.fetchone()[0]
                 self.assertEqual(new_tz, tz)
 
         finally:
@@ -138,6 +138,10 @@ class Tests(TestCase):
         for lookup in lookups:
             with self.subTest(lookup=lookup):
                 self.assertIn('::text', do.lookup_cast(lookup))
+        for lookup in lookups:
+            for field_type in ('CICharField', 'CIEmailField', 'CITextField'):
+                with self.subTest(lookup=lookup, field_type=field_type):
+                    self.assertIn('::citext', do.lookup_cast(lookup, internal_type=field_type))
 
     def test_correct_extraction_psycopg2_version(self):
         from django.db.backends.postgresql.base import psycopg2_version

@@ -5,7 +5,6 @@ import functools
 import math
 import os
 import re
-import sys
 import uuid
 from unittest import mock
 
@@ -25,10 +24,9 @@ from django.utils.deconstruct import deconstructible
 from django.utils.functional import SimpleLazyObject
 from django.utils.timezone import FixedOffset, get_default_timezone, utc
 from django.utils.translation import gettext_lazy as _
+from django.utils.version import PY36
 
 from .models import FoodManager, FoodQuerySet
-
-PY36 = sys.version_info >= (3, 6)
 
 
 class Money(decimal.Decimal):
@@ -518,6 +516,14 @@ class WriterTests(SimpleTestCase):
     def test_serialize_functools_partial(self):
         value = functools.partial(datetime.timedelta, 1, seconds=2)
         result = self.serialize_round_trip(value)
+        self.assertEqual(result.func, value.func)
+        self.assertEqual(result.args, value.args)
+        self.assertEqual(result.keywords, value.keywords)
+
+    def test_serialize_functools_partialmethod(self):
+        value = functools.partialmethod(datetime.timedelta, 1, seconds=2)
+        result = self.serialize_round_trip(value)
+        self.assertIsInstance(result, functools.partialmethod)
         self.assertEqual(result.func, value.func)
         self.assertEqual(result.args, value.args)
         self.assertEqual(result.keywords, value.keywords)

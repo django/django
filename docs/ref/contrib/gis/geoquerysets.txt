@@ -322,10 +322,6 @@ MySQL, PostGIS, SpatiaLite  ``ST_IsValid(poly)``
 Oracle                      ``SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT(poly, 0.05) = 'TRUE'``
 ==========================  ================================================================
 
-.. versionchanged:: 1.11
-
-    Oracle and SpatiaLite support was added.
-
 .. versionchanged:: 2.0
 
     MySQL support was added.
@@ -635,10 +631,6 @@ simpler `ST_Distance <https://postgis.net/docs/ST_Distance.html>`__ function is
 used with projected coordinate systems. Rasters are converted to geometries for
 spheroid based lookups.
 
-.. versionadded:: 1.11
-
-    Support for the ``'spheroid'`` option on SQLite was added.
-
 .. versionadded:: 2.0
 
     MySQL support was added.
@@ -745,10 +737,6 @@ PostGIS     ``ST_DWithin(poly, geom, 5)``
 Oracle      ``SDO_WITHIN_DISTANCE(poly, geom, 5)``
 SpatiaLite  ``PtDistWithin(poly, geom, 5)``
 ==========  ======================================
-
-.. versionchanged:: 1.11
-
-    SpatiaLite support was added.
 
 Aggregate Functions
 -------------------
@@ -864,4 +852,4 @@ Example::
 .. rubric:: Footnotes
 .. [#fnde9im] *See* `OpenGIS Simple Feature Specification For SQL <http://www.opengis.org/docs/99-049.pdf>`_, at Ch. 2.1.13.2, p. 2-13 (The Dimensionally Extended Nine-Intersection Model).
 .. [#fnsdorelate] *See* `SDO_RELATE documentation <https://docs.oracle.com/database/121/SPATL/sdo_relate.htm#SPATL1039>`_, from the Oracle Spatial and Graph Developer's Guide.
-.. [#fncovers] For an explanation of this routine, read `Quirks of the "Contains" Spatial Predicate <http://lin-ear-th-inking.blogspot.com/2007/06/subtleties-of-ogc-covers-spatial.html>`_ by Martin Davis (a PostGIS developer).
+.. [#fncovers] For an explanation of this routine, read `Quirks of the "Contains" Spatial Predicate <https://lin-ear-th-inking.blogspot.com/2007/06/subtleties-of-ogc-covers-spatial.html>`_ by Martin Davis (a PostGIS developer).

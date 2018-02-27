@@ -14,16 +14,6 @@ class SRSException(Exception):
     pass
 
 
-class OGRIndexError(GDALException, KeyError):
-    """
-    This exception is raised when an invalid index is encountered, and has
-    the 'silent_variable_feature' attribute set to true.  This ensures that
-    django's templates proceed to use the next lookup type gracefully when
-    an Exception is raised.  Fixes ticket #4740.
-    """
-    silent_variable_failure = True
-
-
 # #### GDAL/OGR error checking codes and routine ####
 
 # OGR Error Codes

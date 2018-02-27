@@ -2,7 +2,9 @@
 from decimal import Decimal, Rounded
 
 from django.db import connection
-from django.db.backends.utils import format_number, truncate_name
+from django.db.backends.utils import (
+    format_number, split_identifier, truncate_name,
+)
 from django.db.utils import NotSupportedError
 from django.test import (
     SimpleTestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
@@ -20,6 +22,12 @@ class TestUtils(SimpleTestCase):
         self.assertEqual(truncate_name('username"."some_table', 10), 'username"."some_table')
         self.assertEqual(truncate_name('username"."some_long_table', 10), 'username"."some_la38a')
         self.assertEqual(truncate_name('username"."some_long_table', 10, 3), 'username"."some_loa38')
+
+    def test_split_identifier(self):
+        self.assertEqual(split_identifier('some_table'), ('', 'some_table'))
+        self.assertEqual(split_identifier('"some_table"'), ('', 'some_table'))
+        self.assertEqual(split_identifier('namespace"."some_table'), ('namespace', 'some_table'))
+        self.assertEqual(split_identifier('"namespace"."some_table"'), ('namespace', 'some_table'))
 
     def test_format_number(self):
         def equal(value, max_d, places, result):

@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-20 09:03+0000\n"
+"POT-Creation-Date: 2017-11-15 16:15+0100\n"
+"PO-Revision-Date: 2017-11-16 01:13+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
@@ -322,6 +322,7 @@ msgstr "یک عدد معتبر وارد کنید."
 msgid "Enter a valid email address."
 msgstr "یک ایمیل آدرس معتبر وارد کنید."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "یک 'slug' معتبر شامل حروف، ارقام، خط زیر و یا خط تیره وارد کنید."
@@ -398,6 +399,9 @@ msgstr[0] "نباید بیش از %(max)s رقم قبل ممیز داشته با
 msgid ""
 "File extension '%(extension)s' is not allowed. Allowed extensions are: "
 "'%(allowed_extensions)s'."
+msgstr ""
+
+msgid "Null characters are not allowed."
 msgstr ""
 
 msgid "and"
@@ -723,15 +727,15 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "لطفا مقدار تکراری را اصلاح کنید."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "کلید های درون خطی خارجی با هم مطابقت ندارند ."
+msgid "The inline value did not match the parent instance."
+msgstr ""
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "یک گزینهٔ معتبر انتخاب کنید. آن گزینه از گزینه‌های موجود نیست."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "‏«‎%(pk)s» مقدار معتبری برای کلید اصلی نیست."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -1089,6 +1093,14 @@ msgstr ""
 "یا برای درخواستهایی با «مبدا یکسان»."
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1107,29 +1119,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "اطلاعات بیشتر با DEBUG=True ارائه خواهد شد."
 
-msgid "Welcome to Django"
-msgstr "به Django خوش آمدید"
-
-msgid "It worked!"
-msgstr "کار کرد!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "تبریک فراوان بابت اولین صفحهٔ Djangoای‌تان."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"شما این پیغام را میبینید چون <code>DEBUG = True</code> در فایل تنظیمات جنگو "
-"تنیظم شده و هیچ URLـی تنظیم نکرده اید. به کار خود ادامه دهید."
-
 msgid "No year specified"
 msgstr "هیچ سالی مشخص نشده است"
+
+msgid "Date out of range"
+msgstr ""
 
 msgid "No month specified"
 msgstr "هیچ ماهی مشخص نشده است"
@@ -1181,3 +1175,41 @@ msgstr "\"%(path)s\" وجود ندارد"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "فهرست %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr ""
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+
+msgid "The install worked successfully! Congratulations!"
+msgstr ""
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+
+msgid "Django Documentation"
+msgstr ""
+
+msgid "Topics, references, &amp; how-to's"
+msgstr ""
+
+msgid "Tutorial: A Polling App"
+msgstr ""
+
+msgid "Get started with Django"
+msgstr ""
+
+msgid "Django Community"
+msgstr ""
+
+msgid "Connect, get help, or contribute"
+msgstr ""

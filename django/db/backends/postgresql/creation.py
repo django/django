@@ -16,9 +16,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             suffix += " ENCODING '{}'".format(encoding)
         if template:
             suffix += " TEMPLATE {}".format(self._quote_name(template))
-        if suffix:
-            suffix = "WITH" + suffix
-        return suffix
+        return suffix and "WITH" + suffix
 
     def sql_table_creation_suffix(self):
         test_settings = self.connection.settings_dict['TEST']
@@ -43,13 +41,13 @@ class DatabaseCreation(BaseDatabaseCreation):
                 # exists".
                 raise e
 
-    def _clone_test_db(self, number, verbosity, keepdb=False):
+    def _clone_test_db(self, suffix, verbosity, keepdb=False):
         # CREATE DATABASE ... WITH TEMPLATE ... requires closing connections
         # to the template database.
         self.connection.close()
 
         source_database_name = self.connection.settings_dict['NAME']
-        target_database_name = self.get_test_db_clone_settings(number)['NAME']
+        target_database_name = self.get_test_db_clone_settings(suffix)['NAME']
         test_db_params = {
             'dbname': self._quote_name(target_database_name),
             'suffix': self._get_database_create_suffix(template=source_database_name),

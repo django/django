@@ -7,11 +7,11 @@ from unittest import skipIf, skipUnless
 from django.contrib.gis.db import models
 from django.contrib.gis.db.models.functions import Area, Distance
 from django.contrib.gis.measure import D
-from django.db import connection
+from django.db import NotSupportedError, connection
 from django.db.models.functions import Cast
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
-from ..utils import oracle, postgis, spatialite
+from ..utils import FuncTestMixin, oracle, postgis, spatialite
 from .models import City, County, Zipcode
 
 
@@ -86,7 +86,7 @@ class GeographyTest(TestCase):
             self.assertEqual(state, c.state)
 
 
-class GeographyFunctionTests(TestCase):
+class GeographyFunctionTests(FuncTestMixin, TestCase):
     fixtures = ['initial']
 
     @skipUnlessDBFeature("supports_extent_aggr")
@@ -152,5 +152,5 @@ class GeographyFunctionTests(TestCase):
     @skipUnlessDBFeature("has_Area_function")
     @skipIfDBFeature("supports_area_geodetic")
     def test_geodetic_area_raises_if_not_supported(self):
-        with self.assertRaisesMessage(NotImplementedError, 'Area on geodetic coordinate systems not supported.'):
+        with self.assertRaisesMessage(NotSupportedError, 'Area on geodetic coordinate systems not supported.'):
             Zipcode.objects.annotate(area=Area('poly')).get(code='77002')

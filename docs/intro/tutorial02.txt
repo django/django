@@ -85,7 +85,7 @@ Some of these applications make use of at least one database table, though,
 so we need to create the tables in the database before we can use them. To do
 that, run the following command:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py migrate
 
@@ -226,7 +226,7 @@ this:
 
 Now Django knows to include the ``polls`` app. Let's run another command:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py makemigrations polls
 
@@ -256,7 +256,7 @@ schema automatically - that's called :djadmin:`migrate`, and we'll come to it in
 moment - but first, let's see what SQL that migration would run. The
 :djadmin:`sqlmigrate` command takes migration names and returns their SQL:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py sqlmigrate polls 0001
 
@@ -332,7 +332,7 @@ your project without making migrations or touching the database.
 
 Now, run :djadmin:`migrate` again to create those model tables in your database:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py migrate
     Operations to perform:
@@ -373,35 +373,13 @@ Playing with the API
 Now, let's hop into the interactive Python shell and play around with the free
 API Django gives you. To invoke the Python shell, use this command:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py shell
 
 We're using this instead of simply typing "python", because :file:`manage.py`
 sets the ``DJANGO_SETTINGS_MODULE`` environment variable, which gives Django
 the Python import path to your :file:`mysite/settings.py` file.
-
-.. admonition:: Bypassing manage.py
-
-    If you'd rather not use :file:`manage.py`, no problem. Just set the
-    :envvar:`DJANGO_SETTINGS_MODULE` environment variable to
-    ``mysite.settings``, start a plain Python shell, and set up Django:
-
-    .. code-block:: pycon
-
-        >>> import django
-        >>> django.setup()
-
-    If this raises an :exc:`AttributeError`, you're probably using
-    a version of Django that doesn't match this tutorial version. You'll want
-    to either switch to the older tutorial or the newer Django version.
-
-    You must run ``python`` from the same directory :file:`manage.py` is in,
-    or ensure that directory is on the Python path, so that ``import mysite``
-    works.
-
-    For more information on all of this, see the :doc:`django-admin
-    documentation </ref/django-admin>`.
 
 Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
 
@@ -597,7 +575,7 @@ Creating an admin user
 First we'll need to create a user who can login to the admin site. Run the
 following command:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py createsuperuser
 
@@ -630,7 +608,7 @@ server and explore it.
 
 If the server is not running start it like so:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py runserver
 

@@ -139,10 +139,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     features_class = DatabaseFeatures
     introspection_class = DatabaseIntrospection
     ops_class = DatabaseOperations
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._named_cursor_idx = 0
+    # PostgreSQL backend-specific attributes.
+    _named_cursor_idx = 0
 
     def get_connection_params(self):
         settings_dict = self.settings_dict
@@ -153,8 +151,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 "Please supply the NAME value.")
         conn_params = {
             'database': settings_dict['NAME'] or 'postgres',
+            **settings_dict['OPTIONS'],
         }
-        conn_params.update(settings_dict['OPTIONS'])
         conn_params.pop('isolation_level', None)
         if settings_dict['USER']:
             conn_params['user'] = settings_dict['USER']
@@ -267,10 +265,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 alias=self.alias,
                 allow_thread_sharing=False)
         return nodb_connection
-
-    @cached_property
-    def psycopg2_version(self):
-        return PSYCOPG2_VERSION
 
     @cached_property
     def pg_version(self):

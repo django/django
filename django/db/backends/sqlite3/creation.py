@@ -2,7 +2,6 @@ import os
 import shutil
 import sys
 
-from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.base.creation import BaseDatabaseCreation
 
 
@@ -13,19 +12,9 @@ class DatabaseCreation(BaseDatabaseCreation):
         return database_name == ':memory:' or 'mode=memory' in database_name
 
     def _get_test_db_name(self):
-        test_database_name = self.connection.settings_dict['TEST']['NAME']
-        can_share_in_memory_db = self.connection.features.can_share_in_memory_db
-        if not test_database_name:
-            test_database_name = ':memory:'
-        if can_share_in_memory_db:
-            if test_database_name == ':memory:':
-                return 'file:memorydb_%s?mode=memory&cache=shared' % self.connection.alias
-        elif 'mode=memory' in test_database_name:
-            raise ImproperlyConfigured(
-                "Using a shared memory database with `mode=memory` in the "
-                "database name is not supported in your environment, "
-                "use `:memory:` instead."
-            )
+        test_database_name = self.connection.settings_dict['TEST']['NAME'] or ':memory:'
+        if test_database_name == ':memory:':
+            return 'file:memorydb_%s?mode=memory&cache=shared' % self.connection.alias
         return test_database_name
 
     def _create_test_db(self, verbosity, autoclobber, keepdb=False):
@@ -56,20 +45,18 @@ class DatabaseCreation(BaseDatabaseCreation):
                     sys.exit(1)
         return test_database_name
 
-    def get_test_db_clone_settings(self, number):
+    def get_test_db_clone_settings(self, suffix):
         orig_settings_dict = self.connection.settings_dict
         source_database_name = orig_settings_dict['NAME']
         if self.is_in_memory_db(source_database_name):
             return orig_settings_dict
         else:
-            new_settings_dict = orig_settings_dict.copy()
             root, ext = os.path.splitext(orig_settings_dict['NAME'])
-            new_settings_dict['NAME'] = '{}_{}.{}'.format(root, number, ext)
-            return new_settings_dict
+            return {**orig_settings_dict, 'NAME': '{}_{}.{}'.format(root, suffix, ext)}
 
-    def _clone_test_db(self, number, verbosity, keepdb=False):
+    def _clone_test_db(self, suffix, verbosity, keepdb=False):
         source_database_name = self.connection.settings_dict['NAME']
-        target_database_name = self.get_test_db_clone_settings(number)['NAME']
+        target_database_name = self.get_test_db_clone_settings(suffix)['NAME']
         # Forking automatically makes a copy of an in-memory database.
         if not self.is_in_memory_db(source_database_name):
             # Erase the old test database

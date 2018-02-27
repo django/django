@@ -92,6 +92,12 @@ class BaseDatabaseWrapper:
         # is called?
         self.run_commit_hooks_on_set_autocommit_on = False
 
+        # A stack of wrappers to be invoked around execute()/executemany()
+        # calls. Each entry is a function taking five arguments: execute, sql,
+        # params, many, and context. It's the function's responsibility to
+        # call execute(sql, params, many, context).
+        self.execute_wrappers = []
+
         self.client = self.client_class(self)
         self.creation = self.creation_class(self)
         self.features = self.features_class(self)
@@ -567,11 +573,10 @@ class BaseDatabaseWrapper:
         Provide a cursor: with self.temporary_connection() as cursor: ...
         """
         must_close = self.connection is None
-        cursor = self.cursor()
         try:
-            yield cursor
+            with self.cursor() as cursor:
+                yield cursor
         finally:
-            cursor.close()
             if must_close:
                 self.close()
 
@@ -584,13 +589,11 @@ class BaseDatabaseWrapper:
         potential child threads while (or after) the test database is destroyed.
         Refs #10868, #17786, #16969.
         """
-        settings_dict = self.settings_dict.copy()
-        settings_dict['NAME'] = None
-        nodb_connection = self.__class__(
-            settings_dict,
+        return self.__class__(
+            {**self.settings_dict, 'NAME': None},
             alias=NO_DB_ALIAS,
-            allow_thread_sharing=False)
-        return nodb_connection
+            allow_thread_sharing=False,
+        )
 
     def _start_transaction_under_autocommit(self):
         """
@@ -628,6 +631,18 @@ class BaseDatabaseWrapper:
         while current_run_on_commit:
             sids, func = current_run_on_commit.pop(0)
             func()
+
+    @contextmanager
+    def execute_wrapper(self, wrapper):
+        """
+        Return a context manager under which the wrapper is applied to suitable
+        database query executions.
+        """
+        self.execute_wrappers.append(wrapper)
+        try:
+            yield
+        finally:
+            self.execute_wrappers.pop()
 
     def copy(self, alias=None, allow_thread_sharing=None):
         """

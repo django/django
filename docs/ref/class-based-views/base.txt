@@ -40,12 +40,12 @@ MRO is an acronym for Method Resolution Order.
 
     **Example urls.py**::
 
-        from django.conf.urls import url
+        from django.urls import path
 
         from myapp.views import MyView
 
         urlpatterns = [
-            url(r'^mine/$', MyView.as_view(), name='my-view'),
+            path('mine/', MyView.as_view(), name='my-view'),
         ]
 
     **Attributes**
@@ -144,12 +144,12 @@ MRO is an acronym for Method Resolution Order.
 
     **Example urls.py**::
 
-        from django.conf.urls import url
+        from django.urls import path
 
         from myapp.views import HomePageView
 
         urlpatterns = [
-            url(r'^$', HomePageView.as_view(), name='home'),
+            path('', HomePageView.as_view(), name='home'),
         ]
 
     **Context**
@@ -208,15 +208,15 @@ MRO is an acronym for Method Resolution Order.
 
     **Example urls.py**::
 
-        from django.conf.urls import url
+        from django.urls import path
         from django.views.generic.base import RedirectView
 
         from article.views import ArticleCounterRedirectView, ArticleDetail
 
         urlpatterns = [
-            url(r'^counter/(?P<pk>[0-9]+)/$', ArticleCounterRedirectView.as_view(), name='article-counter'),
-            url(r'^details/(?P<pk>[0-9]+)/$', ArticleDetail.as_view(), name='article-detail'),
-            url(r'^go-to-django/$', RedirectView.as_view(url='https://djangoproject.com'), name='go-to-django'),
+            path('counter/<int:pk>/', ArticleCounterRedirectView.as_view(), name='article-counter'),
+            path('details/<int:pk>/', ArticleDetail.as_view(), name='article-detail'),
+            path('go-to-django/', RedirectView.as_view(url='https://djangoproject.com'), name='go-to-django'),
         ]
 
     **Attributes**

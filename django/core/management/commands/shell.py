@@ -2,7 +2,6 @@ import os
 import select
 import sys
 import traceback
-from contextlib import suppress
 
 from django.core.management import BaseCommand, CommandError
 from django.utils.datastructures import OrderedSet
@@ -96,6 +95,8 @@ class Command(BaseCommand):
         available_shells = [options['interface']] if options['interface'] else self.shells
 
         for shell in available_shells:
-            with suppress(ImportError):
+            try:
                 return getattr(self, shell)(options)
+            except ImportError:
+                pass
         raise CommandError("Couldn't import {} interface.".format(shell))

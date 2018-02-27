@@ -290,6 +290,12 @@ LANG_INFO = {
         'name': 'Georgian',
         'name_local': 'ქართული',
     },
+    'kab': {
+        'bidi': False,
+        'code': 'kab',
+        'name': 'Kabyle',
+        'name_local': 'taqbaylit',
+    },
     'kk': {
         'bidi': False,
         'code': 'kk',

@@ -129,7 +129,7 @@ class StateTests(SimpleTestCase):
             author_state.options,
             {"unique_together": {("name", "bio")}, "index_together": {("bio", "age")}, "indexes": []}
         )
-        self.assertEqual(author_state.bases, (models.Model, ))
+        self.assertEqual(author_state.bases, (models.Model,))
 
         self.assertEqual(book_state.app_label, "migrations")
         self.assertEqual(book_state.name, "Book")
@@ -141,18 +141,18 @@ class StateTests(SimpleTestCase):
             book_state.options,
             {"verbose_name": "tome", "db_table": "test_tome", "indexes": [book_index]},
         )
-        self.assertEqual(book_state.bases, (models.Model, ))
+        self.assertEqual(book_state.bases, (models.Model,))
 
         self.assertEqual(author_proxy_state.app_label, "migrations")
         self.assertEqual(author_proxy_state.name, "AuthorProxy")
         self.assertEqual(author_proxy_state.fields, [])
         self.assertEqual(author_proxy_state.options, {"proxy": True, "ordering": ["name"], "indexes": []})
-        self.assertEqual(author_proxy_state.bases, ("migrations.author", ))
+        self.assertEqual(author_proxy_state.bases, ("migrations.author",))
 
         self.assertEqual(sub_author_state.app_label, "migrations")
         self.assertEqual(sub_author_state.name, "SubAuthor")
         self.assertEqual(len(sub_author_state.fields), 2)
-        self.assertEqual(sub_author_state.bases, ("migrations.author", ))
+        self.assertEqual(sub_author_state.bases, ("migrations.author",))
 
         # The default manager is used in migrations
         self.assertEqual([name for name, mgr in food_state.managers], ['food_mgr'])
@@ -1003,7 +1003,7 @@ class ModelStateTests(SimpleTestCase):
         self.assertIs(author_state.fields[2][1].null, False)
         self.assertIs(author_state.fields[3][1].null, True)
         self.assertEqual(author_state.options, {'swappable': 'TEST_SWAPPABLE_MODEL', 'indexes': []})
-        self.assertEqual(author_state.bases, (models.Model, ))
+        self.assertEqual(author_state.bases, (models.Model,))
         self.assertEqual(author_state.managers, [])
 
     @override_settings(TEST_SWAPPABLE_MODEL='migrations.SomeFakeModel')
@@ -1049,7 +1049,7 @@ class ModelStateTests(SimpleTestCase):
             station_state.options,
             {'abstract': False, 'swappable': 'TEST_SWAPPABLE_MODEL', 'indexes': []}
         )
-        self.assertEqual(station_state.bases, ('migrations.searchablelocation', ))
+        self.assertEqual(station_state.bases, ('migrations.searchablelocation',))
         self.assertEqual(station_state.managers, [])
 
     @override_settings(TEST_SWAPPABLE_MODEL='migrations.SomeFakeModel')

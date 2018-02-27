@@ -1,7 +1,6 @@
 from django.db import models
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.state import ModelState
-from django.db.models.fields.related import RECURSIVE_RELATIONSHIP_CONSTANT
 from django.db.models.options import normalize_together
 from django.utils.functional import cached_property
 
@@ -147,13 +146,11 @@ class CreateModel(ModelOperation):
                 ),
             ]
         elif isinstance(operation, AlterModelOptions) and self.name_lower == operation.name_lower:
-            new_options = self.options.copy()
-            new_options.update(operation.options)
             return [
                 CreateModel(
                     self.name,
                     fields=self.fields,
-                    options=new_options,
+                    options={**self.options, **operation.options},
                     bases=self.bases,
                     managers=self.managers,
                 ),
@@ -251,7 +248,7 @@ class DeleteModel(ModelOperation):
             schema_editor.create_model(model)
 
     def describe(self):
-        return "Delete model %s" % (self.name, )
+        return "Delete model %s" % self.name
 
 
 class RenameModel(ModelOperation):
@@ -280,14 +277,6 @@ class RenameModel(ModelOperation):
             [],
             kwargs
         )
-
-    def _get_model_tuple(self, remote_model, app_label, model_name):
-        if remote_model == RECURSIVE_RELATIONSHIP_CONSTANT:
-            return app_label, model_name.lower()
-        elif '.' in remote_model:
-            return tuple(remote_model.lower().split('.'))
-        else:
-            return app_label, remote_model.lower()
 
     def state_forwards(self, app_label, state):
         # Add a new model.
@@ -690,11 +679,10 @@ class AlterModelOptions(ModelOptionOperation):
 
     def state_forwards(self, app_label, state):
         model_state = state.models[app_label, self.name_lower]
-        model_state.options = dict(model_state.options)
-        model_state.options.update(self.options)
+        model_state.options = {**model_state.options, **self.options}
         for key in self.ALTER_OPTION_KEYS:
-            if key not in self.options and key in model_state.options:
-                del model_state.options[key]
+            if key not in self.options:
+                model_state.options.pop(key, False)
         state.reload_model(app_label, self.name_lower, delay=True)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
@@ -704,7 +692,7 @@ class AlterModelOptions(ModelOptionOperation):
         pass
 
     def describe(self):
-        return "Change Meta options on %s" % (self.name, )
+        return "Change Meta options on %s" % self.name
 
 
 class AlterModelManagers(ModelOptionOperation):
@@ -735,7 +723,7 @@ class AlterModelManagers(ModelOptionOperation):
         pass
 
     def describe(self):
-        return "Change managers on %s" % (self.name, )
+        return "Change managers on %s" % self.name
 
 
 class IndexOperation(Operation):

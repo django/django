@@ -610,7 +610,7 @@ filters::
     </h1>
     <p>
     {% for stage in tour_stages %}
-        {% cycle start end %}: {{ stage }}{% if forloop.counter|divisibleby:2 %}<br />{% else %}, {% endif %}
+        {% cycle start end %}: {{ stage }}{% if forloop.counter|divisibleby:2 %}<br>{% else %}, {% endif %}
     {% endfor %}
     </p>
 
@@ -891,9 +891,9 @@ use the ``{% get_language_info %}`` tag::
 
 You can then access the information::
 
-    Language code: {{ lang.code }}<br />
-    Name of language: {{ lang.name_local }}<br />
-    Name in English: {{ lang.name }}<br />
+    Language code: {{ lang.code }}<br>
+    Name of language: {{ lang.name_local }}<br>
+    Name in English: {{ lang.name }}<br>
     Bi-directional: {{ lang.bidi }}
     Name in the active language: {{ lang.name_translated }}
 
@@ -960,8 +960,6 @@ The main solution to these problems is the following ``JavaScriptCatalog`` view,
 which generates a JavaScript code library with functions that mimic the
 ``gettext`` interface, plus an array of translation strings.
 
-.. _javascript_catalog-view:
-
 The ``JavaScriptCatalog`` view
 ------------------------------
 
@@ -994,15 +992,15 @@ The ``JavaScriptCatalog`` view
         from django.views.i18n import JavaScriptCatalog
 
         urlpatterns = [
-            url(r'^jsi18n/$', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+            path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
         ]
 
     **Example with custom packages**::
 
         urlpatterns = [
-            url(r'^jsi18n/myapp/$',
-                JavaScriptCatalog.as_view(packages=['your.app.label']),
-                name='javascript-catalog'),
+            path('jsi18n/myapp/',
+                 JavaScriptCatalog.as_view(packages=['your.app.label']),
+                 name='javascript-catalog'),
         ]
 
     If your root URLconf uses :func:`~django.conf.urls.i18n.i18n_patterns`,
@@ -1014,7 +1012,7 @@ The ``JavaScriptCatalog`` view
         from django.conf.urls.i18n import i18n_patterns
 
         urlpatterns = i18n_patterns(
-            url(r'^jsi18n/$', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+            path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
         )
 
 The precedence of translations is such that the packages appearing later in the
@@ -1237,9 +1235,9 @@ URL::
 
     # The value returned by get_version() must change when translations change.
     urlpatterns = [
-        url(r'^jsi18n/$',
-            cache_page(86400, key_prefix='js18n-%s' % get_version())(JavaScriptCatalog.as_view()),
-            name='javascript-catalog'),
+        path('jsi18n/',
+             cache_page(86400, key_prefix='js18n-%s' % get_version())(JavaScriptCatalog.as_view()),
+             name='javascript-catalog'),
     ]
 
 Client-side caching will save bandwidth and make your site load faster. If
@@ -1255,9 +1253,9 @@ whenever you restart your application server::
     last_modified_date = timezone.now()
 
     urlpatterns = [
-        url(r'^jsi18n/$',
-            last_modified(lambda req, **kw: last_modified_date)(JavaScriptCatalog.as_view()),
-            name='javascript-catalog'),
+        path('jsi18n/',
+             last_modified(lambda req, **kw: last_modified_date)(JavaScriptCatalog.as_view()),
+             name='javascript-catalog'),
     ]
 
 You can even pre-generate the JavaScript catalog as part of your deployment
@@ -1304,26 +1302,26 @@ translations to existing site so that the current URLs won't change.
 
 Example URL patterns::
 
-    from django.conf.urls import include, url
     from django.conf.urls.i18n import i18n_patterns
+    from django.urls import include, url
 
     from about import views as about_views
     from news import views as news_views
     from sitemap.views import sitemap
 
     urlpatterns = [
-        url(r'^sitemap\.xml$', sitemap, name='sitemap-xml'),
+        path('sitemap.xml', sitemap, name='sitemap-xml'),
     ]
 
     news_patterns = ([
-        url(r'^$', news_views.index, name='index'),
-        url(r'^category/(?P<slug>[\w-]+)/$', news_views.category, name='category'),
-        url(r'^(?P<slug>[\w-]+)/$', news_views.details, name='detail'),
+        path('', news_views.index, name='index'),
+        path('category/<slug:slug>/', news_views.category, name='category'),
+        path('<slug:slug>/', news_views.details, name='detail'),
     ], 'news')
 
     urlpatterns += i18n_patterns(
-        url(r'^about/$', about_views.main, name='about'),
-        url(r'^news/', include(news_patterns, namespace='news')),
+        path('about/', about_views.main, name='about'),
+        path('news/', include(news_patterns, namespace='news')),
     )
 
 After defining these URL patterns, Django will automatically add the
@@ -1373,8 +1371,8 @@ Translating URL patterns
 URL patterns can also be marked translatable using the
 :func:`~django.utils.translation.gettext_lazy` function. Example::
 
-    from django.conf.urls import include, url
     from django.conf.urls.i18n import i18n_patterns
+    from django.urls import include, path
     from django.utils.translation import gettext_lazy as _
 
     from about import views as about_views
@@ -1382,18 +1380,18 @@ URL patterns can also be marked translatable using the
     from sitemaps.views import sitemap
 
     urlpatterns = [
-        url(r'^sitemap\.xml$', sitemap, name='sitemap-xml'),
+        path('sitemap.xml', sitemap, name='sitemap-xml'),
     ]
 
     news_patterns = ([
-        url(r'^$', news_views.index, name='index'),
-        url(_(r'^category/(?P<slug>[\w-]+)/$'), news_views.category, name='category'),
-        url(r'^(?P<slug>[\w-]+)/$', news_views.details, name='detail'),
+        path('', news_views.index, name='index'),
+        path(_('category/<slug:slug>/'), news_views.category, name='category'),
+        path('<slug:slug>/', news_views.details, name='detail'),
     ], 'news')
 
     urlpatterns += i18n_patterns(
-        url(_(r'^about/$'), about_views.main, name='about'),
-        url(_(r'^news/'), include(news_patterns, namespace='news')),
+        path(_('about/'), about_views.main, name='about'),
+        path(_('news/'), include(news_patterns, namespace='news')),
     )
 
 After you've created the translations, the :func:`~django.urls.reverse`
@@ -1412,8 +1410,8 @@ function will return the URL in the active language. Example::
 
 .. warning::
 
-    In most cases, it's best to use translated URLs only within a
-    language-code-prefixed block of patterns (using
+    In most cases, it's best to use translated URLs only within a language code
+    prefixed block of patterns (using
     :func:`~django.conf.urls.i18n.i18n_patterns`), to avoid the possibility
     that a carelessly translated URL causes a collision with a non-translated
     URL pattern.
@@ -1654,13 +1652,13 @@ To workaround this, you can escape percent signs by adding a second percent
 sign::
 
     from django.utils.translation import gettext as _
-    output = _("10%% interest)
+    output = _("10%% interest")
 
 Or you can use ``no-python-format`` so that all percent signs are treated as
 literals::
 
     # xgettext:no-python-format
-    output = _("10% interest)
+    output = _("10% interest")
 
 .. _creating-message-files-from-js-code:
 
@@ -1688,7 +1686,7 @@ This is only needed for people who either want to extract message IDs or compile
 message files (``.po``). Translation work itself just involves editing existing
 files of this type, but if you want to create your own message files, or want to
 test or compile a changed message file, download `a precompiled binary
-installer <http://mlocati.github.io/gettext-iconv-windows/>`_.
+installer <https://mlocati.github.io/articles/gettext-iconv-windows.html>`_.
 
 You may also use ``gettext`` binaries you have obtained elsewhere, so long as
 the ``xgettext --version`` command works properly. Do not attempt to use Django
@@ -1752,7 +1750,7 @@ back to the previous page.
 
 Activate this view by adding the following line to your URLconf::
 
-    url(r'^i18n/', include('django.conf.urls.i18n')),
+    path('i18n/', include('django.conf.urls.i18n')),
 
 (Note that this example makes the view available at ``/i18n/setlang/``.)
 
@@ -1763,10 +1761,14 @@ Activate this view by adding the following line to your URLconf::
     language-independent itself to work correctly.
 
 The view expects to be called via the ``POST`` method, with a ``language``
-parameter set in request. If session support is enabled, the view
-saves the language choice in the user's session. Otherwise, it saves the
-language choice in a cookie that is by default named ``django_language``.
-(The name can be changed through the :setting:`LANGUAGE_COOKIE_NAME` setting.)
+parameter set in request. If session support is enabled, the view saves the
+language choice in the user's session. It also saves the language choice in a
+cookie that is named ``django_language`` by default. (The name can be changed
+through the :setting:`LANGUAGE_COOKIE_NAME` setting.)
+
+.. versionchanged:: 2.1
+
+    In older versions, the cookie is only set if session support isn't enabled.
 
 After setting the language choice, Django looks for a ``next`` parameter in the
 ``POST`` or ``GET`` data. If that is found and Django considers it to be a safe
@@ -1786,7 +1788,7 @@ Here's example HTML template code:
     {% load i18n %}
 
     <form action="{% url 'set_language' %}" method="post">{% csrf_token %}
-        <input name="next" type="hidden" value="{{ redirect_to }}" />
+        <input name="next" type="hidden" value="{{ redirect_to }}">
         <select name="language">
             {% get_current_language as LANGUAGE_CODE %}
             {% get_available_languages as LANGUAGES %}
@@ -1797,7 +1799,7 @@ Here's example HTML template code:
                 </option>
             {% endfor %}
         </select>
-        <input type="submit" value="Go" />
+        <input type="submit" value="Go">
     </form>
 
 In this example, Django looks up the URL of the page to which the user will be
@@ -2071,9 +2073,12 @@ translations for the same literal:
 .. seealso::
 
     The translations for literals included in JavaScript assets are looked up
-    following a similar but not identical algorithm. See the
-    :ref:`javascript_catalog view documentation <javascript_catalog-view>` for
-    more details.
+    following a similar but not identical algorithm. See
+    :class:`.JavaScriptCatalog` for more details.
+
+    You can also put :ref:`custom format files <custom-format-files>` in the
+    :setting:`LOCALE_PATHS` directories if you also set
+    :setting:`FORMAT_MODULE_PATH`.
 
 In all cases the name of the directory containing the translation is expected to
 be named using :term:`locale name` notation. E.g. ``de``, ``pt_BR``, ``es_AR``,

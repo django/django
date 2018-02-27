@@ -1,21 +1,32 @@
-from .base import (
-    Cast, Coalesce, Concat, ConcatPair, Greatest, Least, Length, Lower, Now,
-    StrIndex, Substr, Upper,
-)
+from .comparison import Cast, Coalesce, Greatest, Least
 from .datetime import (
     Extract, ExtractDay, ExtractHour, ExtractMinute, ExtractMonth,
     ExtractQuarter, ExtractSecond, ExtractWeek, ExtractWeekDay, ExtractYear,
-    Trunc, TruncDate, TruncDay, TruncHour, TruncMinute, TruncMonth,
-    TruncQuarter, TruncSecond, TruncTime, TruncYear,
+    Now, Trunc, TruncDate, TruncDay, TruncHour, TruncMinute, TruncMonth,
+    TruncQuarter, TruncSecond, TruncTime, TruncWeek, TruncYear,
+)
+from .text import (
+    Chr, Concat, ConcatPair, Left, Length, Lower, Ord, Replace, Right,
+    StrIndex, Substr, Upper,
+)
+from .window import (
+    CumeDist, DenseRank, FirstValue, Lag, LastValue, Lead, NthValue, Ntile,
+    PercentRank, Rank, RowNumber,
 )
 
 __all__ = [
-    # base
-    'Cast', 'Coalesce', 'Concat', 'ConcatPair', 'Greatest', 'Least', 'Length',
-    'Lower', 'Now', 'StrIndex', 'Substr', 'Upper',
+    # comparison and conversion
+    'Cast', 'Coalesce', 'Greatest', 'Least',
     # datetime
     'Extract', 'ExtractDay', 'ExtractHour', 'ExtractMinute', 'ExtractMonth',
     'ExtractQuarter', 'ExtractSecond', 'ExtractWeek', 'ExtractWeekDay',
-    'ExtractYear', 'Trunc', 'TruncDate', 'TruncDay', 'TruncHour', 'TruncMinute',
-    'TruncMonth', 'TruncQuarter', 'TruncSecond', 'TruncTime', 'TruncYear',
+    'ExtractYear', 'Now', 'Trunc', 'TruncDate', 'TruncDay', 'TruncHour',
+    'TruncMinute', 'TruncMonth', 'TruncQuarter', 'TruncSecond', 'TruncTime',
+    'TruncWeek', 'TruncYear',
+    # text
+    'Chr', 'Concat', 'ConcatPair', 'Left', 'Length', 'Lower', 'Ord', 'Replace',
+    'Right', 'StrIndex', 'Substr', 'Upper',
+    # window
+    'CumeDist', 'DenseRank', 'FirstValue', 'Lag', 'LastValue', 'Lead',
+    'NthValue', 'Ntile', 'PercentRank', 'Rank', 'RowNumber',
 ]

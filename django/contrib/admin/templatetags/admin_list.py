@@ -64,15 +64,17 @@ def pagination(cl):
             # ON_EACH_SIDE links at either end of the "current page" link.
             page_range = []
             if page_num > (ON_EACH_SIDE + ON_ENDS):
-                page_range.extend(range(0, ON_ENDS))
-                page_range.append(DOT)
-                page_range.extend(range(page_num - ON_EACH_SIDE, page_num + 1))
+                page_range += [
+                    *range(0, ON_ENDS), DOT,
+                    *range(page_num - ON_EACH_SIDE, page_num + 1),
+                ]
             else:
                 page_range.extend(range(0, page_num + 1))
             if page_num < (paginator.num_pages - ON_EACH_SIDE - ON_ENDS - 1):
-                page_range.extend(range(page_num + 1, page_num + ON_EACH_SIDE + 1))
-                page_range.append(DOT)
-                page_range.extend(range(paginator.num_pages - ON_ENDS, paginator.num_pages))
+                page_range += [
+                    *range(page_num + 1, page_num + ON_EACH_SIDE + 1), DOT,
+                    *range(paginator.num_pages - ON_ENDS, paginator.num_pages)
+                ]
             else:
                 page_range.extend(range(page_num + 1, paginator.num_pages))
 
@@ -98,6 +100,7 @@ def result_headers(cl):
             model_admin=cl.model_admin,
             return_attr=True
         )
+        is_field_sortable = cl.sortable_by is None or field_name in cl.sortable_by
         if attr:
             field_name = _coerce_field_name(field_name, i)
             # Potentially not sortable
@@ -113,23 +116,25 @@ def result_headers(cl):
 
             admin_order_field = getattr(attr, "admin_order_field", None)
             if not admin_order_field:
-                # Not sortable
-                yield {
-                    "text": text,
-                    "class_attrib": format_html(' class="column-{}"', field_name),
-                    "sortable": False,
-                }
-                continue
+                is_field_sortable = False
+
+        if not is_field_sortable:
+            # Not sortable
+            yield {
+                'text': text,
+                'class_attrib': format_html(' class="column-{}"', field_name),
+                'sortable': False,
+            }
+            continue
 
         # OK, it is sortable if we got this far
         th_classes = ['sortable', 'column-{}'.format(field_name)]
         order_type = ''
         new_order_type = 'asc'
         sort_priority = 0
-        sorted = False
         # Is it currently being sorted on?
-        if i in ordering_field_columns:
-            sorted = True
+        is_sorted = i in ordering_field_columns
+        if is_sorted:
             order_type = ordering_field_columns.get(i).lower()
             sort_priority = list(ordering_field_columns).index(i) + 1
             th_classes.append('sorted %sending' % order_type)
@@ -163,7 +168,7 @@ def result_headers(cl):
         yield {
             "text": text,
             "sortable": True,
-            "sorted": sorted,
+            "sorted": is_sorted,
             "ascending": order_type == "asc",
             "sort_priority": sort_priority,
             "url_primary": cl.get_query_string({ORDER_VAR: '.'.join(o_list_primary)}),
@@ -176,7 +181,7 @@ def result_headers(cl):
 def _boolean_icon(field_val):
     icon_url = static('admin/img/icon-%s.svg' %
                       {True: 'yes', False: 'no', None: 'unknown'}[field_val])
-    return format_html('<img src="{}" alt="{}" />', icon_url, field_val)
+    return format_html('<img src="{}" alt="{}">', icon_url, field_val)
 
 
 def _coerce_field_name(field_name, field_index):
@@ -365,8 +370,7 @@ def date_hierarchy(cl):
                 'choices': [{'title': capfirst(formats.date_format(day, 'MONTH_DAY_FORMAT'))}]
             }
         elif year_lookup and month_lookup:
-            days = cl.queryset.filter(**{year_field: year_lookup, month_field: month_lookup})
-            days = getattr(days, 'dates')(field_name, 'day')
+            days = getattr(cl.queryset, 'dates')(field_name, 'day')
             return {
                 'show': True,
                 'back': {
@@ -379,8 +383,7 @@ def date_hierarchy(cl):
                 } for day in days]
             }
         elif year_lookup:
-            months = cl.queryset.filter(**{year_field: year_lookup})
-            months = getattr(months, 'dates')(field_name, 'month')
+            months = getattr(cl.queryset, 'dates')(field_name, 'month')
             return {
                 'show': True,
                 'back': {

@@ -27,7 +27,8 @@ DEFAULT_LOGGING = {
     'formatters': {
         'django.server': {
             '()': 'django.utils.log.ServerFormatter',
-            'format': '[%(server_time)s] %(message)s',
+            'format': '[{server_time}] {message}',
+            'style': '{',
         }
     },
     'handlers': {
@@ -81,7 +82,7 @@ class AdminEmailHandler(logging.Handler):
     """
 
     def __init__(self, include_html=False, email_backend=None):
-        logging.Handler.__init__(self)
+        super().__init__()
         self.include_html = include_html
         self.email_backend = email_backend
 
@@ -190,4 +191,4 @@ class ServerFormatter(logging.Formatter):
         return super().format(record)
 
     def uses_server_time(self):
-        return self._fmt.find('%(server_time)') >= 0
+        return self._fmt.find('{server_time}') >= 0

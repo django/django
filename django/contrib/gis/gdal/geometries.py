@@ -39,19 +39,17 @@
   True True
 """
 import sys
-from binascii import a2b_hex, b2a_hex
+from binascii import b2a_hex
 from ctypes import byref, c_char_p, c_double, c_ubyte, c_void_p, string_at
 
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
-from django.contrib.gis.gdal.error import (
-    GDALException, OGRIndexError, SRSException,
-)
+from django.contrib.gis.gdal.error import GDALException, SRSException
 from django.contrib.gis.gdal.geomtype import OGRGeomType
 from django.contrib.gis.gdal.libgdal import GDAL_VERSION
 from django.contrib.gis.gdal.prototypes import geom as capi, srs as srs_api
 from django.contrib.gis.gdal.srs import CoordTransform, SpatialReference
-from django.contrib.gis.geometry.regex import hex_regex, json_regex, wkt_regex
+from django.contrib.gis.geometry import hex_regex, json_regex, wkt_regex
 from django.utils.encoding import force_bytes
 
 
@@ -69,7 +67,7 @@ class OGRGeometry(GDALBase):
 
         # If HEX, unpack input to a binary buffer.
         if str_instance and hex_regex.match(geom_input):
-            geom_input = memoryview(a2b_hex(geom_input.upper().encode()))
+            geom_input = memoryview(bytes.fromhex(geom_input))
             str_instance = False
 
         # Constructing the geometry,
@@ -144,12 +142,9 @@ class OGRGeometry(GDALBase):
     def _from_json(geom_input):
         ptr = capi.from_json(geom_input)
         if GDAL_VERSION < (2, 0):
-            has_srs = True
             try:
                 capi.get_geom_srs(ptr)
             except SRSException:
-                has_srs = False
-            if not has_srs:
                 srs = SpatialReference(4326)
                 capi.assign_srs(ptr, srs.ptr)
         return ptr
@@ -192,10 +187,7 @@ class OGRGeometry(GDALBase):
 
     def __eq__(self, other):
         "Is this Geometry equal to the other?"
-        if isinstance(other, OGRGeometry):
-            return self.equals(other)
-        else:
-            return False
+        return isinstance(other, OGRGeometry) and self.equals(other)
 
     def __str__(self):
         "WKT is used for the string representation."
@@ -566,12 +558,7 @@ class LineString(OGRGeometry):
             elif dim == 3:
                 return (x.value, y.value, z.value)
         else:
-            raise OGRIndexError('index out of range: %s' % index)
-
-    def __iter__(self):
-        "Iterate over each point in the LineString."
-        for i in range(self.point_count):
-            yield self[i]
+            raise IndexError('Index out of range when accessing points of a line string: %s.' % index)
 
     def __len__(self):
         "Return the number of points in the LineString."
@@ -618,17 +605,12 @@ class Polygon(OGRGeometry):
         "Return the number of interior rings in this Polygon."
         return self.geom_count
 
-    def __iter__(self):
-        "Iterate through each ring in the Polygon."
-        for i in range(self.geom_count):
-            yield self[i]
-
     def __getitem__(self, index):
         "Get the ring at the specified index."
         if 0 <= index < self.geom_count:
             return OGRGeometry(capi.clone_geom(capi.get_geom_ref(self.ptr, index)), self.srs)
         else:
-            raise OGRIndexError('index out of range: %s' % index)
+            raise IndexError('Index out of range when accessing rings of a polygon: %s.' % index)
 
     # Polygon Properties
     @property
@@ -667,12 +649,7 @@ class GeometryCollection(OGRGeometry):
         if 0 <= index < self.geom_count:
             return OGRGeometry(capi.clone_geom(capi.get_geom_ref(self.ptr, index)), self.srs)
         else:
-            raise OGRIndexError('index out of range: %s' % index)
-
-    def __iter__(self):
-        "Iterate over each Geometry."
-        for i in range(self.geom_count):
-            yield self[i]
+            raise IndexError('Index out of range when accessing geometry in a collection: %s.' % index)
 
     def __len__(self):
         "Return the number of geometries in this Geometry Collection."

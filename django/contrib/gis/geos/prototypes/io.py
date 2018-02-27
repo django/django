@@ -118,9 +118,7 @@ class IOBase(GEOSBase):
         self.ptr = self._constructor()
         # Loading the real destructor function at this point as doing it in
         # __del__ is too late (import error).
-        self.destructor.func = self.destructor.get_func(
-            *self.destructor.args, **self.destructor.kwargs
-        )
+        self.destructor.func
 
 # ### Base WKB/WKT Reading and Writing objects ###
 
@@ -302,8 +300,7 @@ thread_context = ThreadLocalIO()
 # These module-level routines return the I/O object that is local to the
 # thread. If the I/O object does not exist yet it will be initialized.
 def wkt_r():
-    if not thread_context.wkt_r:
-        thread_context.wkt_r = _WKTReader()
+    thread_context.wkt_r = thread_context.wkt_r or _WKTReader()
     return thread_context.wkt_r
 
 
@@ -318,8 +315,7 @@ def wkt_w(dim=2, trim=False, precision=None):
 
 
 def wkb_r():
-    if not thread_context.wkb_r:
-        thread_context.wkb_r = _WKBReader()
+    thread_context.wkb_r = thread_context.wkb_r or _WKBReader()
     return thread_context.wkb_r
 
 

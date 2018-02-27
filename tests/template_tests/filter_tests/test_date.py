@@ -80,5 +80,9 @@ class FunctionTests(SimpleTestCase):
     def test_date(self):
         self.assertEqual(date(datetime(2005, 12, 29), "d F Y"), '29 December 2005')
 
+    def test_no_args(self):
+        self.assertEqual(date(''), '')
+        self.assertEqual(date(None), '')
+
     def test_escape_characters(self):
         self.assertEqual(date(datetime(2005, 12, 29), r'jS \o\f F'), '29th of December')

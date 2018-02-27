@@ -3,18 +3,19 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jensadne <jensadne@pvv.ntnu.no>, 2013-2014
-# Jon <jon@funkbit.no>, 2015-2016
-# Jon <jon@funkbit.no>, 2013
-# Jon <jon@funkbit.no>, 2011,2013
+# Jon <jon@kolonial.no>, 2015-2016
+# Jon <jon@kolonial.no>, 2017
+# Jon <jon@kolonial.no>, 2013
+# Jon <jon@kolonial.no>, 2011,2013
 # Sigurd Gartmann <sigurdga-transifex@sigurdga.no>, 2012
 # Tommy Strand <transifex@ireality.no>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-07-27 09:07+0000\n"
-"Last-Translator: Jon <jon@funkbit.no>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-11-27 12:33+0000\n"
+"Last-Translator: Jon <jon@kolonial.no>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/django/django/"
 "language/nb/)\n"
 "MIME-Version: 1.0\n"
@@ -215,8 +216,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s «%(obj)s» ble slettet."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "%(name)s-objekt med primærnøkkelen %(key)r finnes ikke."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "%(name)s med ID \"%(key)s\" eksisterer ikke. Kanskje det ble slettet?"
 
 #, python-format
 msgid "Add %s"

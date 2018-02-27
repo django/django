@@ -30,10 +30,10 @@ class SystemCheckFrameworkTests(SimpleTestCase):
             return [1, 2, 3]
 
         def f2(**kwargs):
-            return [4, ]
+            return [4]
 
         def f3(**kwargs):
-            return [5, ]
+            return [5]
 
         calls = [0]
 

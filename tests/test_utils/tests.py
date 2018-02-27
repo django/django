@@ -1,5 +1,4 @@
 import os
-import sys
 import unittest
 from io import StringIO
 from unittest import mock
@@ -684,9 +683,6 @@ class HTMLEqualTests(SimpleTestCase):
         error_msg = (
             "First argument is not valid HTML:\n"
             "('Unexpected end tag `div` (Line 1, Column 6)', (1, 6))"
-        ) if sys.version_info >= (3, 5) else (
-            "First argument is not valid HTML:\n"
-            "Unexpected end tag `div` (Line 1, Column 6), at line 1, column 7"
         )
         with self.assertRaisesMessage(AssertionError, error_msg):
             self.assertHTMLEqual('< div></ div>', '<div></div>')

@@ -12,7 +12,7 @@ from ctypes import CDLL, CFUNCTYPE, POINTER, Structure, c_char_p
 from ctypes.util import find_library
 
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.functional import SimpleLazyObject
+from django.utils.functional import SimpleLazyObject, cached_property
 from django.utils.version import get_version_tuple
 
 logger = logging.getLogger('django.contrib.gis')
@@ -66,6 +66,8 @@ def load_geos():
     # geos/prototypes/threadsafe.py.
     _lgeos.initGEOS_r.restype = CONTEXT_PTR
     _lgeos.finishGEOS_r.argtypes = [CONTEXT_PTR]
+    # Set restype for compatibility across 32 and 64-bit platforms.
+    _lgeos.GEOSversion.restype = c_char_p
     return _lgeos
 
 
@@ -127,14 +129,6 @@ CS_PTR = POINTER(GEOSCoordSeq_t)
 CONTEXT_PTR = POINTER(GEOSContextHandle_t)
 
 
-# Used specifically by the GEOSGeom_createPolygon and GEOSGeom_createCollection
-#  GEOS routines
-def get_pointer_arr(n):
-    "Get a ctypes pointer array (of length `n`) for GEOSGeom_t opaque pointer."
-    GeomArr = GEOM_PTR * n
-    return GeomArr()
-
-
 lgeos = SimpleLazyObject(load_geos)
 
 
@@ -156,14 +150,12 @@ class GEOSFuncFactory:
             self.argtypes = argtypes
         self.args = args
         self.kwargs = kwargs
-        self.func = None
 
     def __call__(self, *args, **kwargs):
-        if self.func is None:
-            self.func = self.get_func(*self.args, **self.kwargs)
         return self.func(*args, **kwargs)
 
-    def get_func(self, *args, **kwargs):
+    @cached_property
+    def func(self):
         from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
         func = GEOSFunc(self.func_name)
         func.argtypes = self.argtypes or []
@@ -173,9 +165,9 @@ class GEOSFuncFactory:
         return func
 
 
-# Return the string version of the GEOS library. Have to set the restype
-# explicitly to c_char_p to ensure compatibility across 32 and 64-bit platforms.
-geos_version = GEOSFuncFactory('GEOSversion', restype=c_char_p)
+def geos_version():
+    """Return the string version of the GEOS library."""
+    return lgeos.GEOSversion()
 
 
 def geos_version_tuple():

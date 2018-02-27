@@ -48,14 +48,13 @@ of the case of the actual model class name.
 Default: ``[]`` (Empty list)
 
 A list of all the people who get code error notifications. When
-``DEBUG=False`` and a view raises an exception, Django will email these people
-with the full exception information. Each item in the list should be a tuple
-of (Full name, email address). Example::
+:setting:`DEBUG=False <DEBUG>` and :class:`~django.utils.log.AdminEmailHandler`
+is configured in :setting:`LOGGING` (done by default), Django emails these
+people the details of exceptions raised in the request/response cycle.
+
+Each item in the list should be a tuple of (Full name, email address). Example::
 
     [('John', 'john@example.com'), ('Mary', 'mary@example.com')]
-
-Note that Django will email *all* of these people whenever an error happens.
-See :doc:`/howto/error-reporting` for more information.
 
 .. setting:: ALLOWED_HOSTS
 
@@ -99,14 +98,6 @@ is validated against ``['localhost', '127.0.0.1', '[::1]']``.
 This validation only applies via :meth:`~django.http.HttpRequest.get_host()`;
 if your code accesses the ``Host`` header directly from ``request.META`` you
 are bypassing this security protection.
-
-.. versionchanged:: 1.11
-
-    In older versions, ``ALLOWED_HOSTS`` wasn't checked when running tests.
-
-    In older versions, ``ALLOWED_HOSTS`` wasn't checked if ``DEBUG=True``.
-    This was also changed in Django 1.10.3, 1.9.11, and 1.8.16 to prevent a
-    DNS rebinding attack.
 
 .. setting:: APPEND_SLASH
 
@@ -317,7 +308,7 @@ Default: ``None``
 The domain to be used when setting the CSRF cookie.  This can be useful for
 easily allowing cross-subdomain requests to be excluded from the normal cross
 site request forgery protection.  It should be set to a string such as
-``".example.com"`` to allow a POST request from a form on one subdomain to be
+``"example.com"`` to allow a POST request from a form on one subdomain to be
 accepted by a view served from another subdomain.
 
 Please note that the presence of this setting does not imply that Django's CSRF
@@ -389,8 +380,6 @@ cookie is only sent with an HTTPS connection.
 
 ``CSRF_USE_SESSIONS``
 ---------------------
-
-.. versionadded:: 1.11
 
 Default: ``False``
 
@@ -625,8 +614,9 @@ default port. Not used with SQLite.
 Default: ``None``
 
 A string representing the time zone for datetimes stored in this database
-(assuming that it doesn't support time zones) or ``None``. The same values are
-accepted as in the general :setting:`TIME_ZONE` setting.
+(assuming that it doesn't support time zones) or ``None``. This inner option of
+the :setting:`DATABASES` setting accepts the same values as the general
+:setting:`TIME_ZONE` setting.
 
 This allows interacting with third-party databases that store datetimes in
 local time rather than UTC. To avoid issues around DST changes, you shouldn't
@@ -645,8 +635,6 @@ When :setting:`USE_TZ` is ``False``, it is an error to set this option.
 
 ``DISABLE_SERVER_SIDE_CURSORS``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.11.1
 
 Default: ``False``
 
@@ -779,8 +767,6 @@ with :ref:`serialized_rollback=True <test-case-serialized-rollback>`.
 ``TEMPLATE``
 ^^^^^^^^^^^^
 
-.. versionadded:: 1.11
-
 This is a PostgreSQL-specific setting.
 
 The name of a `template`_ (e.g. ``'template0'``) from which to create the test
@@ -835,11 +821,6 @@ This is an Oracle-specific setting.
 
 The password to use when connecting to the Oracle database that will be used
 when running tests. If not provided, Django will generate a random password.
-
-.. versionchanged:: 1.11
-
-    Older versions used a hardcoded default password. This was also changed
-    in 1.10.3, 1.9.11, and 1.8.16 to fix possible security implications.
 
 .. setting:: TEST_TBLSPACE
 
@@ -1362,8 +1343,6 @@ trailing space.
 ``EMAIL_USE_LOCALTIME``
 -----------------------
 
-.. versionadded:: 1.11
-
 Default: ``False``
 
 Whether to send the SMTP ``Date`` header of email messages in the local time
@@ -1586,8 +1565,6 @@ generate correct URLs when ``SCRIPT_NAME`` is not ``/``.
 ``FORM_RENDERER``
 -----------------
 
-.. versionadded:: 1.11
-
 Default: ``'``:class:`django.forms.renderers.DjangoTemplates`\ ``'``
 
 The class that renders form widgets. It must implement :ref:`the low-level
@@ -1600,8 +1577,8 @@ render API <low-level-widget-render-api>`.
 
 Default: ``None``
 
-A full Python path to a Python package that contains format definitions for
-project locales. If not ``None``, Django will check for a ``formats.py``
+A full Python path to a Python package that contains custom format definitions
+for project locales. If not ``None``, Django will check for a ``formats.py``
 file, under the directory named as the current locale, and will use the
 formats defined in this file.
 
@@ -1628,12 +1605,22 @@ paths until it finds a module that actually defines the given format. This
 means that formats defined in packages farther up in the list will take
 precedence over the same formats in packages farther down.
 
-Available formats are :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT`,
-:setting:`DATETIME_FORMAT`, :setting:`YEAR_MONTH_FORMAT`,
-:setting:`MONTH_DAY_FORMAT`, :setting:`SHORT_DATE_FORMAT`,
-:setting:`SHORT_DATETIME_FORMAT`, :setting:`FIRST_DAY_OF_WEEK`,
-:setting:`DECIMAL_SEPARATOR`, :setting:`THOUSAND_SEPARATOR` and
-:setting:`NUMBER_GROUPING`.
+Available formats are:
+
+* :setting:`DATE_FORMAT`
+* :setting:`DATE_INPUT_FORMATS`
+* :setting:`DATETIME_FORMAT`,
+* :setting:`DATETIME_INPUT_FORMATS`
+* :setting:`DECIMAL_SEPARATOR`
+* :setting:`FIRST_DAY_OF_WEEK`
+* :setting:`MONTH_DAY_FORMAT`
+* :setting:`NUMBER_GROUPING`
+* :setting:`SHORT_DATE_FORMAT`
+* :setting:`SHORT_DATETIME_FORMAT`
+* :setting:`THOUSAND_SEPARATOR`
+* :setting:`TIME_FORMAT`
+* :setting:`TIME_INPUT_FORMATS`
+* :setting:`YEAR_MONTH_FORMAT`
 
 .. setting:: IGNORABLE_404_URLS
 
@@ -1755,8 +1742,8 @@ The age of the language cookie, in seconds.
 Default: ``None``
 
 The domain to use for the language cookie. Set this to a string such as
-``".example.com"`` (note the leading dot!) for cross-domain cookies, or use
-``None`` for a standard domain cookie.
+``"example.com"`` for cross-domain cookies, or use ``None`` for a standard
+domain cookie.
 
 Be cautious when updating this setting on a production site. If you update
 this setting to enable cross-domain cookies on a site that previously used
@@ -1884,7 +1871,7 @@ __ https://github.com/django/django/blob/master/django/utils/log.py
 Default: ``'logging.config.dictConfig'``
 
 A path to a callable that will be used to configure logging in the
-Django project. Points at a instance of Python's :ref:`dictConfig
+Django project. Points at an instance of Python's :ref:`dictConfig
 <logging-config-dictschema>` configuration method by default.
 
 If you set :setting:`LOGGING_CONFIG` to ``None``, the logging
@@ -2045,10 +2032,6 @@ format has higher precedence and will be applied instead.
 See also :setting:`DECIMAL_SEPARATOR`, :setting:`THOUSAND_SEPARATOR` and
 :setting:`USE_THOUSAND_SEPARATOR`.
 
-.. versionchanged:: 1.11
-
-    Support for non-uniform digit grouping was added.
-
 .. setting:: PREPEND_WWW
 
 ``PREPEND_WWW``
@@ -2165,8 +2148,6 @@ non-zero value.
 
 ``SECURE_HSTS_PRELOAD``
 -----------------------
-
-.. versionadded:: 1.11
 
 Default: ``False``
 
@@ -2593,23 +2574,6 @@ the correct environment.
 
 .. _list of time zones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
-.. setting:: USE_ETAGS
-
-``USE_ETAGS``
--------------
-
-Default: ``False``
-
-A boolean that specifies whether to output the ``ETag`` header. This saves
-bandwidth but slows down performance. This is used by the
-:class:`~django.middleware.common.CommonMiddleware` and in the :doc:`cache
-framework </topics/cache>`.
-
-.. deprecated:: 1.11
-
-    This setting is deprecated in favor of using ``ConditionalGetMiddleware``,
-    which sets an ETag regardless of this setting.
-
 .. setting:: USE_I18N
 
 ``USE_I18N``
@@ -2852,8 +2816,10 @@ the URL in two places (``settings`` and URLconf).
 
 Default: ``3``
 
-The number of days a password reset link is valid for. Used by the
-:mod:`django.contrib.auth` password reset mechanism.
+The minimum number of days a password reset link is valid for. Depending on
+when the link is generated, it will be valid for up to a day longer.
+
+Used by the :class:`~django.contrib.auth.views.PasswordResetConfirmView`.
 
 .. setting:: PASSWORD_HASHERS
 
@@ -2869,7 +2835,6 @@ Default::
         'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
         'django.contrib.auth.hashers.Argon2PasswordHasher',
         'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
-        'django.contrib.auth.hashers.BCryptPasswordHasher',
     ]
 
 .. setting:: AUTH_PASSWORD_VALIDATORS
@@ -3001,8 +2966,8 @@ The age of session cookies, in seconds.
 Default: ``None``
 
 The domain to use for session cookies. Set this to a string such as
-``".example.com"`` (note the leading dot!) for cross-domain cookies, or use
-``None`` for a standard domain cookie.
+``"example.com"`` for cross-domain cookies, or use ``None`` for a standard
+domain cookie.
 
 Be cautious when updating this setting on a production site. If you update
 this setting to enable cross-domain cookies on a site that previously used
@@ -3438,7 +3403,6 @@ HTTP
   * :setting:`SECURE_SSL_HOST`
   * :setting:`SECURE_SSL_REDIRECT`
 * :setting:`SIGNING_BACKEND`
-* :setting:`USE_ETAGS`
 * :setting:`USE_X_FORWARDED_HOST`
 * :setting:`USE_X_FORWARDED_PORT`
 * :setting:`WSGI_APPLICATION`

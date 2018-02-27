@@ -42,9 +42,10 @@ class SingleObjectMixin(ContextMixin):
 
         # If none of those are defined, it's an error.
         if pk is None and slug is None:
-            raise AttributeError("Generic detail view %s must be called with "
-                                 "either an object pk or a slug."
-                                 % self.__class__.__name__)
+            raise AttributeError(
+                "Generic detail view %s must be called with either an object "
+                "pk or a slug in the URLconf." % self.__class__.__name__
+            )
 
         try:
             # Get the single item from the filtered queryset
@@ -145,7 +146,7 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
                     object_meta.model_name,
                     self.template_name_suffix
                 ))
-            elif hasattr(self, 'model') and self.model is not None and issubclass(self.model, models.Model):
+            elif getattr(self, 'model', None) is not None and issubclass(self.model, models.Model):
                 names.append("%s/%s%s.html" % (
                     self.model._meta.app_label,
                     self.model._meta.model_name,

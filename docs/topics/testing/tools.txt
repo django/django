@@ -109,7 +109,7 @@ Making requests
 
 Use the ``django.test.Client`` class to make requests.
 
-.. class:: Client(enforce_csrf_checks=False, **defaults)
+.. class:: Client(enforce_csrf_checks=False, json_encoder=DjangoJSONEncoder, **defaults)
 
     It requires no arguments at time of construction. However, you can use
     keywords arguments to specify some default headers. For example, this will
@@ -124,6 +124,13 @@ Use the ``django.test.Client`` class to make requests.
 
     The ``enforce_csrf_checks`` argument can be used to test CSRF
     protection (see above).
+
+    The ``json_encoder`` argument allows setting a custom JSON encoder for
+    the JSON serialization that's described in :meth:`post`.
+
+    .. versionchanged:: 2.1
+
+        The ``json_encoder`` argument was added.
 
     Once you have a ``Client`` instance, you can call any of the following
     methods:
@@ -161,7 +168,7 @@ Use the ``django.test.Client`` class to make requests.
             HTTP request from the browser to the server should be passed
             as ``HTTP_HOST``.
 
-            .. _CGI: http://www.w3.org/CGI/
+            .. _CGI: https://www.w3.org/CGI/
 
         If you already have the GET arguments in URL-encoded form, you can
         use that encoding instead of using the data argument. For example,
@@ -206,9 +213,23 @@ Use the ``django.test.Client`` class to make requests.
 
             name=fred&passwd=secret
 
-        If you provide ``content_type`` (e.g. :mimetype:`text/xml` for an XML
-        payload), the contents of ``data`` will be sent as-is in the POST
-        request, using ``content_type`` in the HTTP ``Content-Type`` header.
+        If you provide ``content_type`` as :mimetype:`application/json`, a
+        ``data`` dictionary is serialized using :func:`json.dumps` with
+        :class:`~django.core.serializers.json.DjangoJSONEncoder`. You can
+        change the encoder by providing a ``json_encoder`` argument to
+        :class:`Client`. This serialization also happens for :meth:`put`,
+        :meth:`patch`, and :meth:`delete` requests.
+
+        .. versionchanged:: 2.1
+
+            The JSON serialization described above was added. In older versions,
+            you can call :func:`json.dumps` on ``data`` before passing it to
+            ``post()`` to achieve the same thing.
+
+        If you provide any other ``content_type`` (e.g. :mimetype:`text/xml`
+        for an XML payload), the contents of ``data`` are sent as-is in the
+        POST request, using ``content_type`` in the HTTP ``Content-Type``
+        header.
 
         If you don't provide a value for ``content_type``, the values in
         ``data`` will be transmitted with a content type of
@@ -853,18 +874,11 @@ The live server listens on ``localhost`` and binds to port 0 which uses a free
 port assigned by the operating system. The server's URL can be accessed with
 ``self.live_server_url`` during the tests.
 
-.. versionchanged:: 1.11
-
-    In older versions, Django tried a predefined port range which could be
-    customized in various ways including the ``DJANGO_LIVE_TEST_SERVER_ADDRESS``
-    environment variable. This is removed in favor of the simpler "bind to port
-    0" technique.
-
 To demonstrate how to use ``LiveServerTestCase``, let's write a simple Selenium
 test. First of all, you need to install the `selenium package`_ into your
 Python path:
 
-.. code-block:: console
+.. console::
 
     $ pip install selenium
 
@@ -907,7 +921,7 @@ The code for this test may look as follows::
 
 Finally, you may run the test as follows:
 
-.. code-block:: console
+.. console::
 
     $ ./manage.py test myapp.tests.MySeleniumTests.test_login
 
@@ -1492,7 +1506,7 @@ your test suite.
         self.assertHTMLEqual(
             '<p>Hello <b>world!</p>',
             '''<p>
-                Hello   <b>world! <b/>
+                Hello   <b>world! </b>
             </p>'''
         )
         self.assertHTMLEqual(
@@ -1626,21 +1640,40 @@ You can also tag a test case::
     class SampleTestCase(TestCase):
         ...
 
+Subclasses inherit tags from superclasses, and methods inherit tags from their
+class. Given::
+
+    @tag('foo')
+    class SampleTestCaseChild(SampleTestCase):
+
+        @tag('bar')
+        def test(self):
+            ...
+
+``SampleTestCaseChild.test`` will be labeled with ``'slow'``, ``'core'``,
+``'bar'``, and ``'foo'``.
+
+.. versionchanged:: 2.1
+
+   In older versions, tagged tests don't inherit tags from classes, and
+   tagged subclasses don't inherit tags from superclasses. For example,
+   ``SampleTestCaseChild.test`` is labeled only with ``'bar'``.
+
 Then you can choose which tests to run. For example, to run only fast tests:
 
-.. code-block:: console
+.. console::
 
     $ ./manage.py test --tag=fast
 
 Or to run fast tests and the core one (even though it's slow):
 
-.. code-block:: console
+.. console::
 
     $ ./manage.py test --tag=fast --tag=core
 
 You can also exclude tests by tag. To run core tests if they are not slow:
 
-.. code-block:: console
+.. console::
 
     $ ./manage.py test --tag=core --exclude-tag=slow
 

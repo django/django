@@ -71,8 +71,7 @@ def parse_rst(text, default_reference_context, thing_being_parsed=None):
         'raw_enabled': False,
         'file_insertion_enabled': False,
     }
-    if thing_being_parsed:
-        thing_being_parsed = force_bytes("<%s>" % thing_being_parsed)
+    thing_being_parsed = thing_being_parsed and force_bytes('<%s>' % thing_being_parsed)
     # Wrap ``text`` in some reST that sets the default role to ``cmsreference``,
     # then restores it.
     source = """

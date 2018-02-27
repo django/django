@@ -1,6 +1,5 @@
 import os
 from collections import OrderedDict
-from contextlib import suppress
 
 from django.apps import apps
 from django.contrib.staticfiles.finders import get_finders
@@ -122,8 +121,7 @@ class Command(BaseCommand):
                         level=1,
                     )
 
-        # Here we check if the storage backend has a post_process
-        # method and pass it the list of modified files.
+        # Storage backends may define a post_process() method.
         if self.post_process and hasattr(self.storage, 'post_process'):
             processor = self.storage.post_process(found_files,
                                                   dry_run=self.dry_run)
@@ -313,8 +311,10 @@ class Command(BaseCommand):
         else:
             self.log("Linking '%s'" % source_path, level=1)
             full_path = self.storage.path(prefixed_path)
-            with suppress(OSError):
+            try:
                 os.makedirs(os.path.dirname(full_path))
+            except OSError:
+                pass
             try:
                 if os.path.lexists(full_path):
                     os.unlink(full_path)

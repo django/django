@@ -259,7 +259,7 @@ The whole form, when rendered for the first time, will look like:
 .. code-block:: html+django
 
     <label for="your_name">Your name: </label>
-    <input id="your_name" type="text" name="your_name" maxlength="100" required />
+    <input id="your_name" type="text" name="your_name" maxlength="100" required>
 
 Note that it **does not** include the ``<form>`` tags, or a submit button.
 We'll have to provide those ourselves in the template.
@@ -334,7 +334,7 @@ is:
     <form action="/your-name/" method="post">
         {% csrf_token %}
         {{ form }}
-        <input type="submit" value="Submit" />
+        <input type="submit" value="Submit">
     </form>
 
 All the form's fields and their attributes will be unpacked into HTML markup
@@ -370,9 +370,11 @@ ready to learn a bit more about the underlying machinery.
 More about Django :class:`Form` classes
 =======================================
 
-All form classes are created as subclasses of :class:`django.forms.Form`,
-including the :doc:`ModelForm </topics/forms/modelforms>`, which you encounter
-in Django's admin.
+All form classes are created as subclasses of either :class:`django.forms.Form`
+or :class:`django.forms.ModelForm`. You can think of ``ModelForm`` as a
+subclass of ``Form``. ``Form`` and ``ModelForm`` actually inherit common
+functionality from a (private) ``BaseForm`` class, but this implementation
+detail is rarely important.
 
 .. admonition:: Models and Forms
 
@@ -512,13 +514,13 @@ Here's the output of ``{{ form.as_p }}`` for our ``ContactForm`` instance:
 .. code-block:: html+django
 
     <p><label for="id_subject">Subject:</label>
-        <input id="id_subject" type="text" name="subject" maxlength="100" required /></p>
+        <input id="id_subject" type="text" name="subject" maxlength="100" required></p>
     <p><label for="id_message">Message:</label>
         <textarea name="message" id="id_message" required></textarea></p>
     <p><label for="id_sender">Sender:</label>
-        <input type="email" name="sender" id="id_sender" required /></p>
+        <input type="email" name="sender" id="id_sender" required></p>
     <p><label for="id_cc_myself">Cc myself:</label>
-        <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>
+        <input type="checkbox" name="cc_myself" id="id_cc_myself"></p>
 
 Note that each form field has an ID attribute set to ``id_<field-name>``, which
 is referenced by the accompanying label tag. This is important in ensuring that

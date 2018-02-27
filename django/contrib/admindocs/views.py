@@ -40,9 +40,11 @@ class BaseAdminDocsView(TemplateView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        kwargs.update({'root_path': reverse('admin:index')})
-        kwargs.update(admin.site.each_context(self.request))
-        return super().get_context_data(**kwargs)
+        return super().get_context_data(**{
+            **kwargs,
+            'root_path': reverse('admin:index'),
+            **admin.site.each_context(self.request),
+        })
 
 
 class BookmarkletsView(BaseAdminDocsView):
@@ -73,10 +75,8 @@ class TemplateTagIndexView(BaseAdminDocsView):
             for module_name, library in builtin_libs + app_libs:
                 for tag_name, tag_func in library.tags.items():
                     title, body, metadata = utils.parse_docstring(tag_func.__doc__)
-                    if title:
-                        title = utils.parse_rst(title, 'tag', _('tag:') + tag_name)
-                    if body:
-                        body = utils.parse_rst(body, 'tag', _('tag:') + tag_name)
+                    title = title and utils.parse_rst(title, 'tag', _('tag:') + tag_name)
+                    body = body and utils.parse_rst(body, 'tag', _('tag:') + tag_name)
                     for key in metadata:
                         metadata[key] = utils.parse_rst(metadata[key], 'tag', _('tag:') + tag_name)
                     tag_library = module_name.split('.')[-1]
@@ -87,8 +87,7 @@ class TemplateTagIndexView(BaseAdminDocsView):
                         'meta': metadata,
                         'library': tag_library,
                     })
-        kwargs.update({'tags': tags})
-        return super().get_context_data(**kwargs)
+        return super().get_context_data(**{**kwargs, 'tags': tags})
 
 
 class TemplateFilterIndexView(BaseAdminDocsView):
@@ -107,10 +106,8 @@ class TemplateFilterIndexView(BaseAdminDocsView):
             for module_name, library in builtin_libs + app_libs:
                 for filter_name, filter_func in library.filters.items():
                     title, body, metadata = utils.parse_docstring(filter_func.__doc__)
-                    if title:
-                        title = utils.parse_rst(title, 'filter', _('filter:') + filter_name)
-                    if body:
-                        body = utils.parse_rst(body, 'filter', _('filter:') + filter_name)
+                    title = title and utils.parse_rst(title, 'filter', _('filter:') + filter_name)
+                    body = body and utils.parse_rst(body, 'filter', _('filter:') + filter_name)
                     for key in metadata:
                         metadata[key] = utils.parse_rst(metadata[key], 'filter', _('filter:') + filter_name)
                     tag_library = module_name.split('.')[-1]
@@ -121,8 +118,7 @@ class TemplateFilterIndexView(BaseAdminDocsView):
                         'meta': metadata,
                         'library': tag_library,
                     })
-        kwargs.update({'filters': filters})
-        return super().get_context_data(**kwargs)
+        return super().get_context_data(**{**kwargs, 'filters': filters})
 
 
 class ViewIndexView(BaseAdminDocsView):
@@ -145,8 +141,7 @@ class ViewIndexView(BaseAdminDocsView):
                 'namespace': ':'.join((namespace or [])),
                 'name': name,
             })
-        kwargs.update({'views': views})
-        return super().get_context_data(**kwargs)
+        return super().get_context_data(**{**kwargs, 'views': views})
 
 
 class ViewDetailView(BaseAdminDocsView):
@@ -175,19 +170,17 @@ class ViewDetailView(BaseAdminDocsView):
         if view_func is None:
             raise Http404
         title, body, metadata = utils.parse_docstring(view_func.__doc__)
-        if title:
-            title = utils.parse_rst(title, 'view', _('view:') + view)
-        if body:
-            body = utils.parse_rst(body, 'view', _('view:') + view)
+        title = title and utils.parse_rst(title, 'view', _('view:') + view)
+        body = body and utils.parse_rst(body, 'view', _('view:') + view)
         for key in metadata:
             metadata[key] = utils.parse_rst(metadata[key], 'model', _('view:') + view)
-        kwargs.update({
+        return super().get_context_data(**{
+            **kwargs,
             'name': view,
             'summary': title,
             'body': body,
             'meta': metadata,
         })
-        return super().get_context_data(**kwargs)
 
 
 class ModelIndexView(BaseAdminDocsView):
@@ -195,8 +188,7 @@ class ModelIndexView(BaseAdminDocsView):
 
     def get_context_data(self, **kwargs):
         m_list = [m._meta for m in apps.get_models()]
-        kwargs.update({'models': m_list})
-        return super().get_context_data(**kwargs)
+        return super().get_context_data(**{**kwargs, 'models': m_list})
 
 
 class ModelDetailView(BaseAdminDocsView):
@@ -217,10 +209,8 @@ class ModelDetailView(BaseAdminDocsView):
         opts = model._meta
 
         title, body, metadata = utils.parse_docstring(model.__doc__)
-        if title:
-            title = utils.parse_rst(title, 'model', _('model:') + model_name)
-        if body:
-            body = utils.parse_rst(body, 'model', _('model:') + model_name)
+        title = title and utils.parse_rst(title, 'model', _('model:') + model_name)
+        body = body and utils.parse_rst(body, 'model', _('model:') + model_name)
 
         # Gather fields/field descriptions.
         fields = []
@@ -277,8 +267,9 @@ class ModelDetailView(BaseAdminDocsView):
                 except StopIteration:
                     continue
                 verbose = func.__doc__
-                if verbose:
-                    verbose = utils.parse_rst(utils.trim_docstring(verbose), 'model', _('model:') + opts.model_name)
+                verbose = verbose and (
+                    utils.parse_rst(utils.trim_docstring(verbose), 'model', _('model:') + opts.model_name)
+                )
                 # If a method has no arguments, show it as a 'field', otherwise
                 # as a 'method with arguments'.
                 if func_has_no_args(func) and not func_accepts_kwargs(func) and not func_accepts_var_args(func):
@@ -319,14 +310,14 @@ class ModelDetailView(BaseAdminDocsView):
                 'data_type': 'Integer',
                 'verbose': utils.parse_rst(_("number of %s") % verbose, 'model', _('model:') + opts.model_name),
             })
-        kwargs.update({
+        return super().get_context_data(**{
+            **kwargs,
             'name': '%s.%s' % (opts.app_label, opts.object_name),
             'summary': title,
             'description': body,
             'fields': fields,
             'methods': methods,
         })
-        return super().get_context_data(**kwargs)
 
 
 class TemplateDetailView(BaseAdminDocsView):
@@ -355,11 +346,11 @@ class TemplateDetailView(BaseAdminDocsView):
                     'contents': template_contents,
                     'order': index,
                 })
-        kwargs.update({
+        return super().get_context_data(**{
+            **kwargs,
             'name': template,
             'templates': templates,
         })
-        return super().get_context_data(**kwargs)
 
 
 ####################
@@ -401,13 +392,12 @@ def extract_views_from_urlpatterns(urlpatterns, base='', namespace=None):
                 continue
             views.extend(extract_views_from_urlpatterns(
                 patterns,
-                base + p.regex.pattern,
+                base + str(p.pattern),
                 (namespace or []) + (p.namespace and [p.namespace] or [])
             ))
         elif hasattr(p, 'callback'):
             try:
-                views.append((p.callback, base + p.regex.pattern,
-                              namespace, p.name))
+                views.append((p.callback, base + str(p.pattern), namespace, p.name))
             except ViewDoesNotExist:
                 continue
         else:

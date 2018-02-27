@@ -21,4 +21,5 @@ model maps to a single database table.
    multi-db
    tablespaces
    optimization
+   instrumentation
    examples/index

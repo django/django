@@ -243,7 +243,7 @@ class OptimizerTests(SimpleTestCase):
         self.assertDoesNotOptimize(
             [
                 migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
-                migrations.CreateModel("Bar", [("size", models.IntegerField())], bases=("testapp.Foo", )),
+                migrations.CreateModel("Bar", [("size", models.IntegerField())], bases=("testapp.Foo",)),
                 migrations.DeleteModel("Foo"),
             ],
         )
@@ -252,11 +252,11 @@ class OptimizerTests(SimpleTestCase):
         self.assertOptimizesTo(
             [
                 migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
-                migrations.CreateModel("Bar", [("size", models.IntegerField())], bases=("testapp.Foo", )),
+                migrations.CreateModel("Bar", [("size", models.IntegerField())], bases=("testapp.Foo",)),
                 migrations.DeleteModel("Foo"),
             ],
             [
-                migrations.CreateModel("Bar", [("size", models.IntegerField())], bases=("testapp.Foo", )),
+                migrations.CreateModel("Bar", [("size", models.IntegerField())], bases=("testapp.Foo",)),
             ],
             app_label="otherapp",
         )
@@ -264,7 +264,7 @@ class OptimizerTests(SimpleTestCase):
         self.assertDoesNotOptimize(
             [
                 migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
-                migrations.CreateModel("Bar", [("size", models.IntegerField())], bases=("testapp.Foo", )),
+                migrations.CreateModel("Bar", [("size", models.IntegerField())], bases=("testapp.Foo",)),
                 migrations.DeleteModel("Foo"),
             ],
             app_label="testapp",

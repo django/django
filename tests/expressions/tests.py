@@ -10,8 +10,8 @@ from django.db.models.aggregates import (
     Avg, Count, Max, Min, StdDev, Sum, Variance,
 )
 from django.db.models.expressions import (
-    Case, Col, Exists, ExpressionWrapper, F, Func, OrderBy, OuterRef, Random,
-    RawSQL, Ref, Subquery, Value, When,
+    Case, Col, Combinable, Exists, ExpressionList, ExpressionWrapper, F, Func,
+    OrderBy, OuterRef, Random, RawSQL, Ref, Subquery, Value, When,
 )
 from django.db.models.functions import (
     Coalesce, Concat, Length, Lower, Substr, Upper,
@@ -38,10 +38,8 @@ class BasicExpressionsTests(TestCase):
             name="Foobar Ltd.", num_employees=3, num_chairs=4,
             ceo=Employee.objects.create(firstname="Frank", lastname="Meyer", salary=20)
         )
-        cls.gmbh = Company.objects.create(
-            name="Test GmbH", num_employees=32, num_chairs=1,
-            ceo=Employee.objects.create(firstname="Max", lastname="Mustermann", salary=30)
-        )
+        cls.max = Employee.objects.create(firstname='Max', lastname='Mustermann', salary=30)
+        cls.gmbh = Company.objects.create(name='Test GmbH', num_employees=32, num_chairs=1, ceo=cls.max)
 
     def setUp(self):
         self.company_query = Company.objects.values(
@@ -71,6 +69,15 @@ class BasicExpressionsTests(TestCase):
                 '<Company: Foobar Ltd.>',
                 '<Company: Test GmbH>',
             ],
+        )
+
+    @unittest.skipIf(connection.vendor == 'oracle', "Oracle doesn't support using boolean type in SELECT")
+    def test_filtering_on_annotate_that_uses_q(self):
+        self.assertEqual(
+            Company.objects.annotate(
+                num_employees_check=ExpressionWrapper(Q(num_employees__gt=3), output_field=models.BooleanField())
+            ).filter(num_employees_check=True).count(),
+            2,
         )
 
     def test_filter_inter_attribute(self):
@@ -390,6 +397,14 @@ class BasicExpressionsTests(TestCase):
         )
         self.assertEqual(str(qs.query).count('JOIN'), 2)
 
+    def test_order_by_exists(self):
+        mary = Employee.objects.create(firstname='Mary', lastname='Mustermann', salary=20)
+        mustermanns_by_seniority = Employee.objects.filter(lastname='Mustermann').order_by(
+            # Order by whether the employee is the CEO of a company
+            Exists(Company.objects.filter(ceo=OuterRef('pk'))).desc()
+        )
+        self.assertSequenceEqual(mustermanns_by_seniority, [self.max, mary])
+
     def test_outerref(self):
         inner = Company.objects.filter(point_of_contact=OuterRef('pk'))
         msg = (
@@ -515,6 +530,16 @@ class BasicExpressionsTests(TestCase):
         # This is a contrived example. It exercises the double OuterRef form.
         self.assertCountEqual(outer, [first, second, third])
 
+    def test_nested_subquery_outer_ref_with_autofield(self):
+        first = Time.objects.create(time='09:00')
+        second = Time.objects.create(time='17:00')
+        SimulationRun.objects.create(start=first, end=second, midpoint='12:00')
+        inner = SimulationRun.objects.filter(start=OuterRef(OuterRef('pk'))).values('start')
+        middle = Time.objects.annotate(other=Subquery(inner)).values('other')[:1]
+        outer = Time.objects.annotate(other=Subquery(middle, output_field=models.IntegerField()))
+        # This exercises the double OuterRef form with AutoField as pk.
+        self.assertCountEqual(outer, [first, second])
+
     def test_annotations_within_subquery(self):
         Company.objects.filter(num_employees__lt=50).update(ceo=Employee.objects.get(firstname='Frank'))
         inner = Company.objects.filter(
@@ -544,6 +569,16 @@ class BasicExpressionsTests(TestCase):
 
         expr = FuncB(FuncA())
         self.assertEqual(expr.output_field, FuncA.output_field)
+
+    def test_outerref_mixed_case_table_name(self):
+        inner = Result.objects.filter(result_time__gte=OuterRef('experiment__assigned'))
+        outer = Result.objects.filter(pk__in=Subquery(inner.values('pk')))
+        self.assertFalse(outer.exists())
+
+    def test_outerref_with_operator(self):
+        inner = Company.objects.filter(num_employees=OuterRef('ceo__salary') + 2)
+        outer = Company.objects.filter(pk__in=Subquery(inner.values('pk')))
+        self.assertEqual(outer.get().name, 'Test GmbH')
 
 
 class IterableLookupInnerExpressionsTests(TestCase):
@@ -1028,19 +1063,16 @@ class FTimeDeltaTests(TestCase):
 
         # e1: started one day after assigned, tiny duration, data
         # set so that end time has no fractional seconds, which
-        # tests an edge case on sqlite. This Experiment is only
-        # included in the test data when the DB supports microsecond
-        # precision.
-        if connection.features.supports_microsecond_precision:
-            delay = datetime.timedelta(1)
-            end = stime + delay + delta1
-            e1 = Experiment.objects.create(
-                name='e1', assigned=sday, start=stime + delay, end=end,
-                completed=end.date(), estimated_time=delta1,
-            )
-            cls.deltas.append(delta1)
-            cls.delays.append(e1.start - datetime.datetime.combine(e1.assigned, midnight))
-            cls.days_long.append(e1.completed - e1.assigned)
+        # tests an edge case on sqlite.
+        delay = datetime.timedelta(1)
+        end = stime + delay + delta1
+        e1 = Experiment.objects.create(
+            name='e1', assigned=sday, start=stime + delay, end=end,
+            completed=end.date(), estimated_time=delta1,
+        )
+        cls.deltas.append(delta1)
+        cls.delays.append(e1.start - datetime.datetime.combine(e1.assigned, midnight))
+        cls.days_long.append(e1.completed - e1.assigned)
 
         # e2: started three days after assigned, small duration
         end = stime + delta2
@@ -1144,8 +1176,6 @@ class FTimeDeltaTests(TestCase):
     def test_mixed_comparisons1(self):
         for i in range(len(self.delays)):
             delay = self.delays[i]
-            if not connection.features.supports_microsecond_precision:
-                delay = datetime.timedelta(delay.days, delay.seconds)
             test_set = [e.name for e in Experiment.objects.filter(assigned__gt=F('start') - delay)]
             self.assertEqual(test_set, self.expnames[:i])
 
@@ -1213,27 +1243,21 @@ class FTimeDeltaTests(TestCase):
         self.assertEqual(at_least_120_days, {'e5'})
 
         less_than_5_days = {e.name for e in queryset.filter(completion_duration__lt=datetime.timedelta(days=5))}
-        expected = {'e0', 'e2'}
-        if connection.features.supports_microsecond_precision:
-            expected.add('e1')
-        self.assertEqual(less_than_5_days, expected)
+        self.assertEqual(less_than_5_days, {'e0', 'e1', 'e2'})
 
     @skipUnlessDBFeature('supports_temporal_subtraction')
     def test_time_subtraction(self):
-        if connection.features.supports_microsecond_precision:
-            time = datetime.time(12, 30, 15, 2345)
-            timedelta = datetime.timedelta(hours=1, minutes=15, seconds=15, microseconds=2345)
-        else:
-            time = datetime.time(12, 30, 15)
-            timedelta = datetime.timedelta(hours=1, minutes=15, seconds=15)
-        Time.objects.create(time=time)
+        Time.objects.create(time=datetime.time(12, 30, 15, 2345))
         queryset = Time.objects.annotate(
             difference=ExpressionWrapper(
                 F('time') - Value(datetime.time(11, 15, 0), output_field=models.TimeField()),
                 output_field=models.DurationField(),
             )
         )
-        self.assertEqual(queryset.get().difference, timedelta)
+        self.assertEqual(
+            queryset.get().difference,
+            datetime.timedelta(hours=1, minutes=15, seconds=15, microseconds=2345)
+        )
 
     @skipUnlessDBFeature('supports_temporal_subtraction')
     def test_datetime_subtraction(self):
@@ -1247,6 +1271,16 @@ class FTimeDeltaTests(TestCase):
         ]
         self.assertEqual(over_estimate, ['e4'])
 
+    @skipUnlessDBFeature('supports_temporal_subtraction')
+    def test_datetime_subtraction_microseconds(self):
+        delta = datetime.timedelta(microseconds=8999999999999999)
+        Experiment.objects.update(end=F('start') + delta)
+        qs = Experiment.objects.annotate(
+            delta=ExpressionWrapper(F('end') - F('start'), output_field=models.DurationField())
+        )
+        for e in qs:
+            self.assertEqual(e.delta, delta)
+
     def test_duration_with_datetime(self):
         # Exclude e1 which has very high precision so we can test this on all
         # backends regardless of whether or not it supports
@@ -1255,6 +1289,15 @@ class FTimeDeltaTests(TestCase):
             completed__gt=self.stime + F('estimated_time'),
         ).order_by('name')
         self.assertQuerysetEqual(over_estimate, ['e3', 'e4', 'e5'], lambda e: e.name)
+
+    def test_duration_with_datetime_microseconds(self):
+        delta = datetime.timedelta(microseconds=8999999999999999)
+        qs = Experiment.objects.annotate(dt=ExpressionWrapper(
+            F('start') + delta,
+            output_field=models.DateTimeField(),
+        ))
+        for e in qs:
+            self.assertEqual(e.dt, e.start + delta)
 
     def test_date_minus_duration(self):
         more_than_4_days = Experiment.objects.filter(
@@ -1274,10 +1317,9 @@ class FTimeDeltaTests(TestCase):
             new_start=F('start_sub_hours') + datetime.timedelta(days=-2),
         )
         expected_start = datetime.datetime(2010, 6, 23, 9, 45, 0)
-        if connection.features.supports_microsecond_precision:
-            # subtract 30 microseconds
-            experiments = experiments.annotate(new_start=F('new_start') + datetime.timedelta(microseconds=-30))
-            expected_start += datetime.timedelta(microseconds=+746970)
+        # subtract 30 microseconds
+        experiments = experiments.annotate(new_start=F('new_start') + datetime.timedelta(microseconds=-30))
+        expected_start += datetime.timedelta(microseconds=+746970)
         experiments.update(start=F('new_start'))
         e0 = Experiment.objects.get(name='e0')
         self.assertEqual(e0.start, expected_start)
@@ -1330,6 +1372,45 @@ class ValueTests(TestCase):
         self.assertNotEqual(value, other_value)
         self.assertNotEqual(value, no_output_field)
 
+    def test_raise_empty_expressionlist(self):
+        msg = 'ExpressionList requires at least one expression'
+        with self.assertRaisesMessage(ValueError, msg):
+            ExpressionList()
+
+
+class FieldTransformTests(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.sday = sday = datetime.date(2010, 6, 25)
+        cls.stime = stime = datetime.datetime(2010, 6, 25, 12, 15, 30, 747000)
+        cls.ex1 = Experiment.objects.create(
+            name='Experiment 1',
+            assigned=sday,
+            completed=sday + datetime.timedelta(2),
+            estimated_time=datetime.timedelta(2),
+            start=stime,
+            end=stime + datetime.timedelta(2),
+        )
+
+    def test_month_aggregation(self):
+        self.assertEqual(
+            Experiment.objects.aggregate(month_count=Count('assigned__month')),
+            {'month_count': 1}
+        )
+
+    def test_transform_in_values(self):
+        self.assertQuerysetEqual(
+            Experiment.objects.values('assigned__month'),
+            ["{'assigned__month': 6}"]
+        )
+
+    def test_multiple_transforms_in_values(self):
+        self.assertQuerysetEqual(
+            Experiment.objects.values('end__date__month'),
+            ["{'end__date__month': 6}"]
+        )
+
 
 class ReprTests(TestCase):
 
@@ -1337,6 +1418,10 @@ class ReprTests(TestCase):
         self.assertEqual(
             repr(Case(When(a=1))),
             "<Case: CASE WHEN <Q: (AND: ('a', 1))> THEN Value(None), ELSE Value(None)>"
+        )
+        self.assertEqual(
+            repr(When(Q(age__gte=18), then=Value('legal'))),
+            "<When: WHEN <Q: (AND: ('age__gte', 18))> THEN Value(legal)>"
         )
         self.assertEqual(repr(Col('alias', 'field')), "Col(alias, field)")
         self.assertEqual(repr(F('published')), "F(published)")
@@ -1351,6 +1436,14 @@ class ReprTests(TestCase):
         self.assertEqual(repr(RawSQL('table.col', [])), "RawSQL(table.col, [])")
         self.assertEqual(repr(Ref('sum_cost', Sum('cost'))), "Ref(sum_cost, Sum(F(cost)))")
         self.assertEqual(repr(Value(1)), "Value(1)")
+        self.assertEqual(
+            repr(ExpressionList(F('col'), F('anothercol'))),
+            'ExpressionList(F(col), F(anothercol))'
+        )
+        self.assertEqual(
+            repr(ExpressionList(OrderBy(F('col'), descending=False))),
+            'ExpressionList(OrderBy(F(col), descending=False))'
+        )
 
     def test_functions(self):
         self.assertEqual(repr(Coalesce('a', 'b')), "Coalesce(F(a), F(b))")
@@ -1382,3 +1475,27 @@ class ReprTests(TestCase):
             repr(Variance('a', sample=True, filter=filter)),
             "Variance(F(a), filter=(AND: ('a', 1)), sample=True)"
         )
+
+
+class CombinableTests(SimpleTestCase):
+    bitwise_msg = 'Use .bitand() and .bitor() for bitwise logical operations.'
+
+    def test_negation(self):
+        c = Combinable()
+        self.assertEqual(-c, c * -1)
+
+    def test_and(self):
+        with self.assertRaisesMessage(NotImplementedError, self.bitwise_msg):
+            Combinable() & Combinable()
+
+    def test_or(self):
+        with self.assertRaisesMessage(NotImplementedError, self.bitwise_msg):
+            Combinable() | Combinable()
+
+    def test_reversed_and(self):
+        with self.assertRaisesMessage(NotImplementedError, self.bitwise_msg):
+            object() & Combinable()
+
+    def test_reversed_or(self):
+        with self.assertRaisesMessage(NotImplementedError, self.bitwise_msg):
+            object() | Combinable()

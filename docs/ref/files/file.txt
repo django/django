@@ -90,10 +90,6 @@ The ``File`` class
     ``truncate``, ``write``, ``writelines``, ``readable()``, ``writable()``,
     and ``seekable()``.
 
-    .. versionchanged:: 1.11
-
-        The ``readable()`` and ``writable()`` methods were added.
-
 .. currentmodule:: django.core.files.base
 
 The ``ContentFile`` class

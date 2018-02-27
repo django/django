@@ -82,8 +82,16 @@ class Serializer:
             # Use the concrete parent class' _meta instead of the object's _meta
             # This is to avoid local_fields problems for proxy models. Refs #17717.
             concrete_model = obj._meta.concrete_model
+            # When using natural primary keys, retrieve the pk field of the
+            # parent for multi-table inheritance child models. That field must
+            # be serialized, otherwise deserialization isn't possible.
+            if self.use_natural_primary_keys:
+                pk = concrete_model._meta.pk
+                pk_parent = pk if pk.remote_field and pk.remote_field.parent_link else None
+            else:
+                pk_parent = None
             for field in concrete_model._meta.local_fields:
-                if field.serialize:
+                if field.serialize or field is pk_parent:
                     if field.remote_field is None:
                         if self.selected_fields is None or field.attname in self.selected_fields:
                             self.handle_field(obj, field)
@@ -96,8 +104,7 @@ class Serializer:
                         self.handle_m2m_field(obj, field)
             self.end_object(obj)
             progress_bar.update(count)
-            if self.first:
-                self.first = False
+            self.first = self.first and False
         self.end_serialization()
         return self.getvalue()
 

@@ -1,3 +1,4 @@
+import warnings
 from datetime import datetime
 
 from django.test import TestCase
@@ -8,10 +9,13 @@ from .models import Article, IndexErrorArticle, Person
 class EarliestOrLatestTests(TestCase):
     """Tests for the earliest() and latest() objects methods"""
 
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls._article_get_latest_by = Article._meta.get_latest_by
+
     def tearDown(self):
-        """Makes sure Article has a get_latest_by"""
-        if not Article._meta.get_latest_by:
-            Article._meta.get_latest_by = 'pub_date'
+        Article._meta.get_latest_by = self._article_get_latest_by
 
     def test_earliest(self):
         # Because no Articles exist yet, earliest() raises ArticleDoesNotExist.
@@ -26,11 +30,11 @@ class EarliestOrLatestTests(TestCase):
             headline="Article 2", pub_date=datetime(2005, 7, 27),
             expire_date=datetime(2005, 7, 28)
         )
-        Article.objects.create(
+        a3 = Article.objects.create(
             headline="Article 3", pub_date=datetime(2005, 7, 28),
             expire_date=datetime(2005, 8, 27)
         )
-        Article.objects.create(
+        a4 = Article.objects.create(
             headline="Article 4", pub_date=datetime(2005, 7, 28),
             expire_date=datetime(2005, 7, 30)
         )
@@ -57,11 +61,31 @@ class EarliestOrLatestTests(TestCase):
         # in the Model.Meta
         Article.objects.model._meta.get_latest_by = None
         with self.assertRaisesMessage(
-            AssertionError,
-            "earliest() and latest() require either a field_name parameter or "
-            "'get_latest_by' in the model"
+            ValueError,
+            "earliest() and latest() require either fields as positional "
+            "arguments or 'get_latest_by' in the model's Meta."
         ):
             Article.objects.earliest()
+
+        # Earliest publication date, earliest expire date.
+        self.assertEqual(
+            Article.objects.filter(pub_date=datetime(2005, 7, 28)).earliest('pub_date', 'expire_date'),
+            a4,
+        )
+        # Earliest publication date, latest expire date.
+        self.assertEqual(
+            Article.objects.filter(pub_date=datetime(2005, 7, 28)).earliest('pub_date', '-expire_date'),
+            a3,
+        )
+
+        # Meta.get_latest_by may be a tuple.
+        Article.objects.model._meta.get_latest_by = ('pub_date', 'expire_date')
+        self.assertEqual(Article.objects.filter(pub_date=datetime(2005, 7, 28)).earliest(), a4)
+
+    def test_earliest_fields_and_field_name(self):
+        msg = 'Cannot use both positional arguments and the field_name keyword argument.'
+        with self.assertRaisesMessage(ValueError, msg):
+            Article.objects.earliest('pub_date', field_name='expire_date')
 
     def test_latest(self):
         # Because no Articles exist yet, latest() raises ArticleDoesNotExist.
@@ -72,7 +96,7 @@ class EarliestOrLatestTests(TestCase):
             headline="Article 1", pub_date=datetime(2005, 7, 26),
             expire_date=datetime(2005, 9, 1)
         )
-        Article.objects.create(
+        a2 = Article.objects.create(
             headline="Article 2", pub_date=datetime(2005, 7, 27),
             expire_date=datetime(2005, 7, 28)
         )
@@ -107,11 +131,28 @@ class EarliestOrLatestTests(TestCase):
         # Error is raised if get_latest_by isn't in Model.Meta.
         Article.objects.model._meta.get_latest_by = None
         with self.assertRaisesMessage(
-            AssertionError,
-            "earliest() and latest() require either a field_name parameter or "
-            "'get_latest_by' in the model"
+            ValueError,
+            "earliest() and latest() require either fields as positional "
+            "arguments or 'get_latest_by' in the model's Meta."
         ):
             Article.objects.latest()
+
+        # Latest publication date, latest expire date.
+        self.assertEqual(Article.objects.filter(pub_date=datetime(2005, 7, 27)).latest('pub_date', 'expire_date'), a3)
+        # Latest publication date, earliest expire date.
+        self.assertEqual(
+            Article.objects.filter(pub_date=datetime(2005, 7, 27)).latest('pub_date', '-expire_date'),
+            a2,
+        )
+
+        # Meta.get_latest_by may be a tuple.
+        Article.objects.model._meta.get_latest_by = ('pub_date', 'expire_date')
+        self.assertEqual(Article.objects.filter(pub_date=datetime(2005, 7, 27)).latest(), a3)
+
+    def test_latest_fields_and_field_name(self):
+        msg = 'Cannot use both positional arguments and the field_name keyword argument.'
+        with self.assertRaisesMessage(ValueError, msg):
+            Article.objects.latest('pub_date', field_name='expire_date')
 
     def test_latest_manual(self):
         # You can still use latest() with a model that doesn't have
@@ -119,12 +160,25 @@ class EarliestOrLatestTests(TestCase):
         Person.objects.create(name="Ralph", birthday=datetime(1950, 1, 1))
         p2 = Person.objects.create(name="Stephanie", birthday=datetime(1960, 2, 3))
         msg = (
-            "earliest() and latest() require either a field_name parameter or "
-            "'get_latest_by' in the model"
+            "earliest() and latest() require either fields as positional arguments "
+            "or 'get_latest_by' in the model's Meta."
         )
-        with self.assertRaisesMessage(AssertionError, msg):
+        with self.assertRaisesMessage(ValueError, msg):
             Person.objects.latest()
         self.assertEqual(Person.objects.latest("birthday"), p2)
+
+    def test_field_name_kwarg_deprecation(self):
+        Person.objects.create(name='Deprecator', birthday=datetime(1950, 1, 1))
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')
+            Person.objects.latest(field_name='birthday')
+
+        self.assertEqual(len(warns), 1)
+        self.assertEqual(
+            str(warns[0].message),
+            'The field_name keyword argument to earliest() and latest() '
+            'is deprecated in favor of passing positional arguments.',
+        )
 
 
 class TestFirstLast(TestCase):

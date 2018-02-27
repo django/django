@@ -162,7 +162,7 @@ class OneToOneTests(TestCase):
 
     def test_create_models_m2m(self):
         """
-        Modles are created via the m2m relation if the remote model has a
+        Models are created via the m2m relation if the remote model has a
         OneToOneField (#1064, #1506).
         """
         f = Favorites(name='Fred')
@@ -194,6 +194,15 @@ class OneToOneTests(TestCase):
         p = Place.objects.get(name="Demon Dogs")
         # Assigning None doesn't throw AttributeError if there isn't a related
         # UndergroundBar.
+        p.undergroundbar = None
+
+    def test_assign_none_to_null_cached_reverse_relation(self):
+        p = Place.objects.get(name='Demon Dogs')
+        # Prime the relation's cache with a value of None.
+        with self.assertRaises(Place.undergroundbar.RelatedObjectDoesNotExist):
+            getattr(p, 'undergroundbar')
+        # Assigning None works if there isn't a related UndergroundBar and the
+        # reverse cache has a value of None.
         p.undergroundbar = None
 
     def test_related_object_cache(self):
@@ -498,3 +507,13 @@ class OneToOneTests(TestCase):
         pointer = ToFieldPointer.objects.create(target=target)
         self.assertSequenceEqual(ToFieldPointer.objects.filter(target=target), [pointer])
         self.assertSequenceEqual(ToFieldPointer.objects.filter(pk__exact=pointer), [pointer])
+
+    def test_cached_relation_invalidated_on_save(self):
+        """
+        Model.save() invalidates stale OneToOneField relations after a primary
+        key assignment.
+        """
+        self.assertEqual(self.b1.place, self.p1)  # caches b1.place
+        self.b1.place_id = self.p2.pk
+        self.b1.save()
+        self.assertEqual(self.b1.place, self.p2)

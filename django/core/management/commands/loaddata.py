@@ -72,7 +72,7 @@ class Command(BaseCommand):
             self.loaddata(fixture_labels)
 
         # Close the DB connection -- unless we're still in a transaction. This
-        # is required as a workaround for an  edge case in MySQL: if the same
+        # is required as a workaround for an edge case in MySQL: if the same
         # connection is used to create tables, load data, and query, the query
         # can return incorrect results. See Django #7572, MySQL #37735.
         if transaction.get_autocommit(self.using):
@@ -180,7 +180,8 @@ class Command(BaseCommand):
                                     '\rProcessed %i object(s).' % loaded_objects_in_fixture,
                                     ending=''
                                 )
-                        except (DatabaseError, IntegrityError) as e:
+                        # psycopg2 raises ValueError if data contains NUL chars.
+                        except (DatabaseError, IntegrityError, ValueError) as e:
                             e.args = ("Could not load %(app_label)s.%(object_name)s(pk=%(pk)s): %(error_msg)s" % {
                                 'app_label': obj.object._meta.app_label,
                                 'object_name': obj.object._meta.object_name,
@@ -332,7 +333,7 @@ class Command(BaseCommand):
 class SingleZipReader(zipfile.ZipFile):
 
     def __init__(self, *args, **kwargs):
-        zipfile.ZipFile.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
         if len(self.namelist()) != 1:
             raise ValueError("Zip-compressed fixtures must contain one file.")
 

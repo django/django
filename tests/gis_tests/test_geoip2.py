@@ -115,6 +115,8 @@ class GeoIPTest(unittest.TestCase):
 
             # City information dictionary.
             d = g.city(query)
+            self.assertEqual('NA', d['continent_code'])
+            self.assertEqual('North America', d['continent_name'])
             self.assertEqual('US', d['country_code'])
             self.assertEqual('Houston', d['city'])
             self.assertEqual('TX', d['region'])
@@ -132,10 +134,10 @@ class GeoIPTest(unittest.TestCase):
     @mock.patch('socket.gethostbyname')
     def test05_unicode_response(self, gethostbyname):
         "GeoIP strings should be properly encoded (#16553)."
-        gethostbyname.return_value = '194.27.42.76'
+        gethostbyname.return_value = '191.252.51.69'
         g = GeoIP2()
-        d = g.city("nigde.edu.tr")
-        self.assertEqual('Niğde', d['city'])
+        d = g.city('www.fasano.com.br')
+        self.assertEqual(d['city'], 'São José dos Campos')
         d = g.country('200.26.205.1')
         # Some databases have only unaccented countries
         self.assertIn(d['country_name'], ('Curaçao', 'Curacao'))

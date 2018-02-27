@@ -1,4 +1,5 @@
 from django.core.exceptions import FieldError
+from django.db.models import FilteredRelation
 from django.test import SimpleTestCase, TestCase
 
 from .models import (
@@ -81,7 +82,7 @@ class ReverseSelectRelatedTestCase(TestCase):
             stat = UserStat.objects.select_related('user', 'advanceduserstat').get(posts=200)
             self.assertEqual(stat.advanceduserstat.posts, 200)
             self.assertEqual(stat.user.username, 'bob')
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(0):
             self.assertEqual(stat.advanceduserstat.user.username, 'bob')
 
     def test_nullable_relation(self):
@@ -230,3 +231,8 @@ class ReverseSelectRelatedValidationTests(SimpleTestCase):
 
         with self.assertRaisesMessage(FieldError, self.non_relational_error % ('username', fields)):
             list(User.objects.select_related('username'))
+
+    def test_reverse_related_validation_with_filtered_relation(self):
+        fields = 'userprofile, userstat, relation'
+        with self.assertRaisesMessage(FieldError, self.invalid_error % ('foobar', fields)):
+            list(User.objects.annotate(relation=FilteredRelation('userprofile')).select_related('foobar'))

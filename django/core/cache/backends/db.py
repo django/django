@@ -7,7 +7,6 @@ from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 from django.db import DatabaseError, connections, models, router, transaction
 from django.utils import timezone
-from django.utils.encoding import force_bytes
 from django.utils.inspect import func_supports_parameter
 
 
@@ -31,7 +30,7 @@ class Options:
 
 class BaseDatabaseCache(BaseCache):
     def __init__(self, table, params):
-        BaseCache.__init__(self, params)
+        super().__init__(params)
         self._table = table
 
         class CacheEntry:
@@ -79,7 +78,7 @@ class DatabaseCache(BaseDatabaseCache):
             return default
 
         value = connection.ops.process_clob(row[1])
-        return pickle.loads(base64.b64decode(force_bytes(value)))
+        return pickle.loads(base64.b64decode(value.encode()))
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)

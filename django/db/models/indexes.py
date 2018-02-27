@@ -1,5 +1,6 @@
 import hashlib
 
+from django.db.backends.utils import split_identifier
 from django.utils.encoding import force_bytes
 
 __all__ = ['Index']
@@ -90,7 +91,7 @@ class Index:
         (8 chars) and unique hash + suffix (10 chars). Each part is made to
         fit its size by truncating the excess length.
         """
-        table_name = model._meta.db_table
+        _, table_name = split_identifier(model._meta.db_table)
         column_names = [model._meta.get_field(field_name).column for field_name, order in self.fields_orders]
         column_names_with_order = [
             (('-%s' if order else '%s') % column_name)

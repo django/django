@@ -1,5 +1,3 @@
-from contextlib import suppress
-
 from django.core.exceptions import ValidationError
 from django.forms import Form
 from django.forms.fields import BooleanField, IntegerField
@@ -162,8 +160,10 @@ class BaseFormSet:
             defaults['data'] = self.data
             defaults['files'] = self.files
         if self.initial and 'initial' not in kwargs:
-            with suppress(IndexError):
+            try:
                 defaults['initial'] = self.initial[i]
+            except IndexError:
+                pass
         # Allow extra forms to be empty, unless they're part of
         # the minimum forms.
         if i >= self.initial_form_count() and i >= self.min_num:
@@ -436,9 +436,8 @@ def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
 
 
 def all_valid(formsets):
-    """Return True if every formset in formsets is valid."""
+    """Validate every formset and return True if all are valid."""
     valid = True
     for formset in formsets:
-        if not formset.is_valid():
-            valid = False
+        valid &= formset.is_valid()
     return valid

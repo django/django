@@ -61,9 +61,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 field.get_internal_type() == 'ForeignKey' and
                 field.db_constraint):
             return False
-        if self._is_limited_data_type(field):
-            return False
-        return create_index
+        return not self._is_limited_data_type(field) and create_index
 
     def _delete_composed_index(self, model, fields, *args):
         """

@@ -7,7 +7,6 @@ Move a file in the safest way possible::
 
 import errno
 import os
-from contextlib import suppress
 from shutil import copystat
 
 from django.core.files import locks
@@ -42,14 +41,16 @@ def file_move_safe(old_file_name, new_file_name, chunk_size=1024 * 64, allow_ove
     if _samefile(old_file_name, new_file_name):
         return
 
-    # OSError happens with os.rename() if moving to another filesystem or when
-    # moving opened files on certain operating systems.
-    with suppress(OSError):
+    try:
         if not allow_overwrite and os.access(new_file_name, os.F_OK):
             raise IOError("Destination file %s exists and allow_overwrite is False" % new_file_name)
 
         os.rename(old_file_name, new_file_name)
         return
+    except OSError:
+        # OSError happens with os.rename() if moving to another filesystem or
+        # when moving opened files on certain operating systems.
+        pass
 
     # first open the old file, so that it won't go away
     with open(old_file_name, 'rb') as old_file:

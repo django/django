@@ -5,15 +5,15 @@
 # Janno Liivak <jannolii@gmail.com>, 2013,2015
 # madisvain <madisvain@gmail.com>, 2011
 # Martin Pajuste <martinpajuste@gmail.com>, 2015
-# Martin Pajuste <martinpajuste@gmail.com>, 2016
+# Martin Pajuste <martinpajuste@gmail.com>, 2016-2017
 # Marti Raudsepp <marti@juffo.org>, 2014,2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-07-18 21:34+0000\n"
-"Last-Translator: Marti Raudsepp <marti@juffo.org>\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-11-16 10:22+0000\n"
+"Last-Translator: Martin Pajuste <martinpajuste@gmail.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -72,12 +72,11 @@ msgstr ""
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Paroole ei salvestata töötlemata kujul, seega puudub võimalus selle kasutaja "
-"parooli nägemiseks, kuid saate seda muuta kasutades <a href=\"../password/"
-"\">seda vormi</a>."
+"Salasõna ei salvestata töötlemata kujul, seega puudub võimalus selle "
+"kasutaja salasõna nägemiseks, kuid saate seda muuta kasutades <a href="
+"\"{}\">seda vormi</a>."
 
 #, python-format
 msgid ""

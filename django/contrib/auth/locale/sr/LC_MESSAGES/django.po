@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 08:38+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-10-19 14:35+0000\n"
+"Last-Translator: mPyth <oostoya2@yahoo.com>\n"
 "Language-Team: Serbian (http://www.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
@@ -30,7 +30,7 @@ msgstr "Важни датуми"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "%(name)s објекат са примарним кључем %(key)r не постоји."
 
 msgid "Password changed successfully."
 msgstr "Лозинка успешно измењена."
@@ -40,7 +40,7 @@ msgid "Change password: %s"
 msgstr "Измени лозинку: %s"
 
 msgid "Authentication and Authorization"
-msgstr ""
+msgstr "Аутентикација и Ауторизација"
 
 msgid "password"
 msgstr "лозинка"
@@ -49,10 +49,10 @@ msgid "last login"
 msgstr "последња пријава"
 
 msgid "No password set."
-msgstr ""
+msgstr "Лозинка није унета."
 
 msgid "Invalid password format or unknown hashing algorithm."
-msgstr ""
+msgstr "Инвалидан формат лозинке или непознат hashing алгоритам."
 
 msgid "The two password fields didn't match."
 msgstr "Два поља за лозинке се нису поклопила."
@@ -64,25 +64,29 @@ msgid "Password confirmation"
 msgstr "Потврда лозинке"
 
 msgid "Enter the same password as before, for verification."
-msgstr ""
+msgstr "Унесите исту лозинку као малопре ради верификације."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
+"Лозинке се не чувају у изворном облику па не постоји могућност приказа "
+"лозинке овог корисника, али можете променити лозинку коришћењем <a href=\"../"
+"password/\">ове форме</a>."
 
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
+"Молим вас унесите исправно %(username)s и лозинку. Обратите пажњу да мала и "
+"велика слова представљају различите карактере."
 
 msgid "This account is inactive."
 msgstr "Овај налог је неактиван."
 
 msgid "Email"
-msgstr ""
+msgstr "И-мејл"
 
 msgid "New password"
 msgstr "Нова лозинка"
@@ -112,22 +116,22 @@ msgid "hash"
 msgstr "хеш"
 
 msgid "variety"
-msgstr ""
+msgstr "варијанта"
 
 msgid "version"
-msgstr ""
+msgstr "верзија"
 
 msgid "memory cost"
-msgstr ""
+msgstr "меморијска захтевност"
 
 msgid "time cost"
-msgstr ""
+msgstr "временска захтевност"
 
 msgid "parallelism"
-msgstr ""
+msgstr "паралелизам"
 
 msgid "work factor"
-msgstr "фактор рада"
+msgstr "фактор сложености"
 
 msgid "checksum"
 msgstr "сума за проверу"
@@ -136,7 +140,7 @@ msgid "name"
 msgstr "име"
 
 msgid "content type"
-msgstr ""
+msgstr "тип садржаја"
 
 msgid "codename"
 msgstr "шифра дозволе"
@@ -160,24 +164,28 @@ msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr ""
-"Означава да ли корисник има све дозволе без додељивања појединачних дозвола."
+"Указује да корисник има све дозволе без додељивања појединачних дозвола."
 
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of their groups."
 msgstr ""
+"Групе којима припада овај корисник. Корисник ће добити све дозволе које су "
+"дате групама којима припада."
 
 msgid "user permissions"
-msgstr "корисничке дозволе"
+msgstr "корисникове дозволе"
 
 msgid "Specific permissions for this user."
-msgstr ""
+msgstr "Дозволе које се односе на овог корисника."
 
 msgid "username"
 msgstr "корисничко име"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
+"Обавезан податак. 150 карактера или мање. Дозвољена су само слова, цифре и "
+"карактери @/./+/-/_ ."
 
 msgid "A user with that username already exists."
 msgstr "Корисник са тим корисничким именом већ постоји."
@@ -189,14 +197,13 @@ msgid "last name"
 msgstr "презиме"
 
 msgid "email address"
-msgstr ""
+msgstr "и-мејл адреса"
 
 msgid "staff status"
 msgstr "статус члана посаде"
 
 msgid "Designates whether the user can log into this admin site."
-msgstr ""
-"Означава да ли корисник може да се пријави на овај сајт за администрацију."
+msgstr "Указује да корисник може да се пријави на овај сајт за администрацију."
 
 msgid "active"
 msgstr "активан"
@@ -225,34 +232,39 @@ msgid_plural ""
 "This password is too short. It must contain at least %(min_length)d "
 "characters."
 msgstr[0] ""
+"Ова лозинка је превише кратка, мора садржати најмање %(min_length)d карактер."
 msgstr[1] ""
+"Ова лозинка је превише кратка, мора садржати најмање %(min_length)d "
+"карактера."
 msgstr[2] ""
+"Ова лозинка је превише кратка, мора садржати најмање %(min_length)d "
+"карактера."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Ваша лозинка мора садржати најмање %(min_length)d карактер."
+msgstr[1] "Ваша лозинка мора садржати најмање %(min_length)d карактера."
+msgstr[2] "Ваша лозинка мора садржати најмање %(min_length)d карактера."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
-msgstr ""
+msgstr "Лозинка је превише слична пољу '%(verbose_name)s'."
 
 msgid "Your password can't be too similar to your other personal information."
-msgstr ""
+msgstr "Ваша лозинка не може бити слична вашим личним подацима."
 
 msgid "This password is too common."
-msgstr ""
+msgstr "Ова лозинка је међу најчешће коришћеним лозинкама."
 
 msgid "Your password can't be a commonly used password."
-msgstr ""
+msgstr "Ваша лозинка не може бити међу најчешће коришћеним лозинкама."
 
 msgid "This password is entirely numeric."
-msgstr ""
+msgstr "Ова лозинка садржи само цифре."
 
 msgid "Your password can't be entirely numeric."
-msgstr ""
+msgstr "Ваша лозинка не може садржати само цифре."
 
 #, python-format
 msgid "Password reset on %(site_name)s"
@@ -262,32 +274,36 @@ msgid ""
 "Enter a valid username. This value may contain only English letters, "
 "numbers, and @/./+/-/_ characters."
 msgstr ""
+"Унесите исправно корисничко име. Оно може садржати само слова енглеске "
+"абецеде, цифре и карактере @/./+/-/_  ."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
 msgstr ""
+"Унесите исправно корисничко име. Оно може садржати само слова, цифре и "
+"карактере @/./+/-/_  ."
 
 msgid "Logged out"
 msgstr "Одјављен"
 
 msgid "Password reset"
-msgstr ""
+msgstr "Ресет лозинке"
 
 msgid "Password reset sent"
-msgstr ""
+msgstr "Захтев за ресет лозинке је послат"
 
 msgid "Enter new password"
-msgstr ""
+msgstr "Унесите нову лозинку"
 
 msgid "Password reset unsuccessful"
-msgstr ""
+msgstr "Неуспешан ресет лозинке"
 
 msgid "Password reset complete"
-msgstr ""
+msgstr "Ресет лозинке је завршен"
 
 msgid "Password change"
-msgstr ""
+msgstr "Промена лозинке"
 
 msgid "Password change successful"
-msgstr ""
+msgstr "Лозинка је успешно промењена"

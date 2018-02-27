@@ -216,7 +216,7 @@ Minor features
   makes it possible to use ``REMOTE_USER`` for setups where the header is only
   populated on login pages instead of every request in the session.
 
-* The :func:`~django.contrib.auth.views.password_reset` view accepts an
+* The ``django.contrib.auth.views.password_reset()`` view accepts an
   ``extra_email_context`` parameter.
 
 :mod:`django.contrib.contenttypes`
@@ -657,7 +657,7 @@ URLs
 * The application namespace can now be set using an ``app_name`` attribute
   on the included module or object. It can also be set by passing a 2-tuple
   of (<list of patterns>, <application namespace>) as the first argument to
-  :func:`~django.conf.urls.include`.
+  ``include()``.
 
 * System checks have been added for common URL pattern mistakes.
 
@@ -1233,8 +1233,8 @@ extending. This change necessitated a new template loader API. The old
 Details about the new API can be found :ref:`in the template loader
 documentation <custom-template-loaders>`.
 
-Passing a 3-tuple or an ``app_name`` to :func:`~django.conf.urls.include()`
----------------------------------------------------------------------------
+Passing a 3-tuple or an ``app_name`` to ``include()``
+-----------------------------------------------------
 
 The instance namespace part of passing a tuple as an argument to ``include()``
 has been replaced by passing the ``namespace`` argument to ``include()``. For

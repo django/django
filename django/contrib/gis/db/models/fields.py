@@ -1,10 +1,12 @@
 from collections import defaultdict, namedtuple
-from contextlib import suppress
 
 from django.contrib.gis import forms, gdal
 from django.contrib.gis.db.models.proxy import SpatialProxy
 from django.contrib.gis.gdal.error import GDALException
-from django.contrib.gis.geometry.backend import Geometry, GeometryException
+from django.contrib.gis.geos import (
+    GeometryCollection, GEOSException, GEOSGeometry, LineString,
+    MultiLineString, MultiPoint, MultiPolygon, Point, Polygon,
+)
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.fields import Field
 from django.utils.translation import gettext_lazy as _
@@ -153,8 +155,10 @@ class BaseSpatialField(Field):
         if isinstance(value, gdal.GDALRaster):
             return value
         elif is_candidate:
-            with suppress(GDALException):
+            try:
                 return gdal.GDALRaster(value)
+            except GDALException:
+                pass
         elif isinstance(value, dict):
             try:
                 return gdal.GDALRaster(value)
@@ -163,9 +167,11 @@ class BaseSpatialField(Field):
 
     def get_prep_value(self, value):
         obj = super().get_prep_value(value)
+        if obj is None:
+            return None
         # When the input is not a geometry or raster, attempt to construct one
         # from the given string input.
-        if isinstance(obj, Geometry):
+        if isinstance(obj, GEOSGeometry):
             pass
         else:
             # Check if input is a candidate for conversion to raster or geometry.
@@ -177,8 +183,8 @@ class BaseSpatialField(Field):
                 obj = raster
             elif is_candidate:
                 try:
-                    obj = Geometry(obj)
-                except (GeometryException, GDALException):
+                    obj = GEOSGeometry(obj)
+                except (GEOSException, GDALException):
                     raise ValueError("Couldn't create spatial object from lookup value '%s'." % obj)
             else:
                 raise ValueError('Cannot use object with type %s for a spatial lookup parameter.' % type(obj).__name__)
@@ -196,6 +202,7 @@ class GeometryField(BaseSpatialField):
     form_class = forms.GeometryField
     # The OpenGIS Geometry name.
     geom_type = 'GEOMETRY'
+    geom_class = None
 
     def __init__(self, verbose_name=None, dim=2, geography=False, *, extent=(-180.0, -90.0, 180.0, 90.0),
                  tolerance=0.05, **kwargs):
@@ -242,17 +249,17 @@ class GeometryField(BaseSpatialField):
         super().contribute_to_class(cls, name, **kwargs)
 
         # Setup for lazy-instantiated Geometry object.
-        setattr(cls, self.attname, SpatialProxy(Geometry, self))
+        setattr(cls, self.attname, SpatialProxy(self.geom_class or GEOSGeometry, self, load_func=GEOSGeometry))
 
     def formfield(self, **kwargs):
-        defaults = {'form_class': self.form_class,
-                    'geom_type': self.geom_type,
-                    'srid': self.srid,
-                    }
-        defaults.update(kwargs)
-        if (self.dim > 2 and 'widget' not in kwargs and
-                not getattr(defaults['form_class'].widget, 'supports_3d', False)):
-            defaults['widget'] = forms.Textarea
+        defaults = {
+            'form_class': self.form_class,
+            'geom_type': self.geom_type,
+            'srid': self.srid,
+            **kwargs,
+        }
+        if self.dim > 2 and not getattr(defaults['form_class'].widget, 'supports_3d', False):
+            defaults.setdefault('widget', forms.Textarea)
         return super().formfield(**defaults)
 
     def select_format(self, compiler, sql, params):
@@ -261,49 +268,55 @@ class GeometryField(BaseSpatialField):
         of the spatial backend. For example, Oracle and MySQL require custom
         selection formats in order to retrieve geometries in OGC WKB.
         """
-        select = compiler.connection.ops.select
-        return select % sql if select else sql, params
+        return compiler.connection.ops.select % sql, params
 
 
 # The OpenGIS Geometry Type Fields
 class PointField(GeometryField):
     geom_type = 'POINT'
+    geom_class = Point
     form_class = forms.PointField
     description = _("Point")
 
 
 class LineStringField(GeometryField):
     geom_type = 'LINESTRING'
+    geom_class = LineString
     form_class = forms.LineStringField
     description = _("Line string")
 
 
 class PolygonField(GeometryField):
     geom_type = 'POLYGON'
+    geom_class = Polygon
     form_class = forms.PolygonField
     description = _("Polygon")
 
 
 class MultiPointField(GeometryField):
     geom_type = 'MULTIPOINT'
+    geom_class = MultiPoint
     form_class = forms.MultiPointField
     description = _("Multi-point")
 
 
 class MultiLineStringField(GeometryField):
     geom_type = 'MULTILINESTRING'
+    geom_class = MultiLineString
     form_class = forms.MultiLineStringField
     description = _("Multi-line string")
 
 
 class MultiPolygonField(GeometryField):
     geom_type = 'MULTIPOLYGON'
+    geom_class = MultiPolygon
     form_class = forms.MultiPolygonField
     description = _("Multi polygon")
 
 
 class GeometryCollectionField(GeometryField):
     geom_type = 'GEOMETRYCOLLECTION'
+    geom_class = GeometryCollection
     form_class = forms.GeometryCollectionField
     description = _("Geometry collection")
 
@@ -356,7 +369,7 @@ class RasterField(BaseSpatialField):
             band_index = int(name)
             return type(
                 'SpecificRasterBandTransform',
-                (RasterBandTransform, ),
+                (RasterBandTransform,),
                 {'band_index': band_index}
             )
         except ValueError:

@@ -59,15 +59,11 @@ class PostGISIntrospection(DatabaseIntrospection):
         # to query the PostgreSQL pg_type table corresponding to the
         # PostGIS custom data types.
         oid_sql = 'SELECT "oid" FROM "pg_type" WHERE "typname" = %s'
-        cursor = self.connection.cursor()
-        try:
+        with self.connection.cursor() as cursor:
             for field_type in field_types:
                 cursor.execute(oid_sql, (field_type[0],))
                 for result in cursor.fetchall():
                     postgis_types[result[0]] = field_type[1]
-        finally:
-            cursor.close()
-
         return postgis_types
 
     def get_field_type(self, data_type, description):
@@ -88,8 +84,7 @@ class PostGISIntrospection(DatabaseIntrospection):
         PointField or a PolygonField).  Thus, this routine queries the PostGIS
         metadata tables to determine the geometry type.
         """
-        cursor = self.connection.cursor()
-        try:
+        with self.connection.cursor() as cursor:
             try:
                 # First seeing if this geometry column is in the `geometry_columns`
                 cursor.execute('SELECT "coord_dimension", "srid", "type" '
@@ -122,7 +117,4 @@ class PostGISIntrospection(DatabaseIntrospection):
                 field_params['srid'] = srid
             if dim != 2:
                 field_params['dim'] = dim
-        finally:
-            cursor.close()
-
         return field_type, field_params

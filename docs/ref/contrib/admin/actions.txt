@@ -27,8 +27,9 @@ models. For example, here's the user module from Django's built-in
     has an important caveat: your model's ``delete()`` method will not be
     called.
 
-    If you wish to override this behavior, simply write a custom action which
-    accomplishes deletion in your preferred manner -- for example, by calling
+    If you wish to override this behavior, you can override
+    :meth:`.ModelAdmin.delete_queryset` or write a custom action which does
+    deletion in your preferred manner -- for example, by calling
     ``Model.delete()`` for each of the selected items.
 
     For more background on bulk deletion, see the documentation on :ref:`object

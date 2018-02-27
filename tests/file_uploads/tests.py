@@ -12,7 +12,6 @@ from django.core.files import temp as tempfile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http.multipartparser import MultiPartParser, parse_header
 from django.test import SimpleTestCase, TestCase, client, override_settings
-from django.utils.encoding import force_bytes
 
 from . import uploadhandler
 from .models import FileModel
@@ -65,7 +64,7 @@ class FileUploadTests(TestCase):
                     post_data[key + '_hash'] = hashlib.sha1(post_data[key].read()).hexdigest()
                     post_data[key].seek(0)
                 except AttributeError:
-                    post_data[key + '_hash'] = hashlib.sha1(force_bytes(post_data[key])).hexdigest()
+                    post_data[key + '_hash'] = hashlib.sha1(post_data[key].encode()).hexdigest()
 
             response = self.client.post('/verify/', post_data)
 
@@ -78,7 +77,7 @@ class FileUploadTests(TestCase):
             'Content-Type: application/octet-stream',
             'Content-Transfer-Encoding: base64',
             '']))
-        payload.write(b"\r\n" + encode(force_bytes(content)) + b"\r\n")
+        payload.write(b'\r\n' + encode(content.encode()) + b'\r\n')
         payload.write('--' + client.BOUNDARY + '--\r\n')
         r = {
             'CONTENT_LENGTH': len(payload),

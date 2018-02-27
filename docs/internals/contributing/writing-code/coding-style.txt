@@ -90,7 +90,7 @@ Imports
 
   Quick start:
 
-  .. code-block:: console
+  .. console::
 
       $ pip install isort
       $ isort -rc .

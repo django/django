@@ -37,3 +37,7 @@ class FunctionTests(SimpleTestCase):
 
     def test_range_step(self):
         self.assertEqual(slice_filter('abcdefg', '0::2'), 'aceg')
+
+    def test_fail_silently(self):
+        obj = object()
+        self.assertEqual(slice_filter(obj, '0::2'), obj)

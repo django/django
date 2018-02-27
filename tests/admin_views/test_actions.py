@@ -9,9 +9,10 @@ from django.template.response import TemplateResponse
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
+from .admin import SubscriberAdmin
 from .forms import MediaActionForm
 from .models import (
-    Actor, Answer, ExternalSubscriber, Question, Subscriber,
+    Actor, Answer, Book, ExternalSubscriber, Question, Subscriber,
     UnchangeableObject,
 )
 
@@ -59,6 +60,17 @@ class AdminActionsTest(TestCase):
         self.assertContains(confirmation, ACTION_CHECKBOX_NAME, count=2)
         self.client.post(reverse('admin:admin_views_subscriber_changelist'), delete_confirmation_data)
         self.assertEqual(Subscriber.objects.count(), 0)
+
+    def test_default_delete_action_nonexistent_pk(self):
+        self.assertFalse(Subscriber.objects.filter(id=9998).exists())
+        action_data = {
+            ACTION_CHECKBOX_NAME: ['9998'],
+            'action': 'delete_selected',
+            'index': 0,
+        }
+        response = self.client.post(reverse('admin:admin_views_subscriber_changelist'), action_data)
+        self.assertContains(response, 'Are you sure you want to delete the selected subscribers?')
+        self.assertContains(response, '<ul></ul>', html=True)
 
     @override_settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=True)
     def test_non_localized_pk(self):
@@ -127,6 +139,31 @@ class AdminActionsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         # The page doesn't display a link to the nonexistent change page.
         self.assertContains(response, '<li>Unchangeable object: %s</li>' % obj, 1, html=True)
+
+    def test_delete_queryset_hook(self):
+        delete_confirmation_data = {
+            ACTION_CHECKBOX_NAME: [self.s1.pk, self.s2.pk],
+            'action': 'delete_selected',
+            'post': 'yes',
+            'index': 0,
+        }
+        SubscriberAdmin.overridden = False
+        self.client.post(reverse('admin:admin_views_subscriber_changelist'), delete_confirmation_data)
+        # SubscriberAdmin.delete_queryset() sets overridden to True.
+        self.assertIs(SubscriberAdmin.overridden, True)
+        self.assertEqual(Subscriber.objects.all().count(), 0)
+
+    def test_delete_selected_uses_get_deleted_objects(self):
+        """The delete_selected action uses ModelAdmin.get_deleted_objects()."""
+        book = Book.objects.create(name='Test Book')
+        data = {
+            ACTION_CHECKBOX_NAME: [book.pk],
+            'action': 'delete_selected',
+            'index': 0,
+        }
+        response = self.client.post(reverse('admin2:admin_views_book_changelist'), data)
+        # BookAdmin.get_deleted_objects() returns custom text.
+        self.assertContains(response, 'a deletable object')
 
     def test_custom_function_mail_action(self):
         """A custom action may be defined in a function."""

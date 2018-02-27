@@ -258,12 +258,12 @@ We can hook this into our URLs easily enough:
 .. snippet::
     :filename: urls.py
 
-    from django.conf.urls import url
+    from django.urls import path
     from books.views import RecordInterest
 
     urlpatterns = [
         #...
-        url(r'^author/(?P<pk>[0-9]+)/interest/$', RecordInterest.as_view(), name='author-interest'),
+        path('author/<int:pk>/interest/', RecordInterest.as_view(), name='author-interest'),
     ]
 
 Note the ``pk`` named group, which

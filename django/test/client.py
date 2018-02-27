@@ -4,6 +4,8 @@ import os
 import re
 import sys
 from copy import copy
+from functools import partial
+from http import HTTPStatus
 from importlib import import_module
 from io import BytesIO
 from urllib.parse import unquote_to_bytes, urljoin, urlparse, urlsplit
@@ -11,6 +13,7 @@ from urllib.parse import unquote_to_bytes, urljoin, urlparse, urlsplit
 from django.conf import settings
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
+from django.core.serializers.json import DjangoJSONEncoder
 from django.core.signals import (
     got_request_exception, request_finished, request_started,
 )
@@ -21,7 +24,7 @@ from django.test import signals
 from django.test.utils import ContextList
 from django.urls import resolve
 from django.utils.encoding import force_bytes
-from django.utils.functional import SimpleLazyObject, curry
+from django.utils.functional import SimpleLazyObject
 from django.utils.http import urlencode
 from django.utils.itercompat import is_iterable
 
@@ -235,8 +238,7 @@ def encode_file(boundary, key, file):
 
     if content_type is None:
         content_type = 'application/octet-stream'
-    if not filename:
-        filename = key
+    filename = filename or key
     return [
         to_bytes('--%s' % boundary),
         to_bytes('Content-Disposition: form-data; name="%s"; filename="%s"'
@@ -260,7 +262,8 @@ class RequestFactory:
     Once you have a request object you can pass it to any view function,
     just as if that view had been hooked up using a URLconf.
     """
-    def __init__(self, **defaults):
+    def __init__(self, *, json_encoder=DjangoJSONEncoder, **defaults):
+        self.json_encoder = json_encoder
         self.defaults = defaults
         self.cookies = SimpleCookie()
         self.errors = BytesIO()
@@ -273,7 +276,7 @@ class RequestFactory:
         # - HTTP_COOKIE: for cookie support,
         # - REMOTE_ADDR: often useful, see #8551.
         # See http://www.python.org/dev/peps/pep-3333/#environ-variables
-        environ = {
+        return {
             'HTTP_COOKIE': self.cookies.output(header='', sep='; '),
             'PATH_INFO': '/',
             'REMOTE_ADDR': '127.0.0.1',
@@ -289,10 +292,9 @@ class RequestFactory:
             'wsgi.multiprocess': True,
             'wsgi.multithread': False,
             'wsgi.run_once': False,
+            **self.defaults,
+            **request,
         }
-        environ.update(self.defaults)
-        environ.update(request)
-        return environ
 
     def request(self, **request):
         "Construct a generic request object."
@@ -308,7 +310,15 @@ class RequestFactory:
                 charset = match.group(1)
             else:
                 charset = settings.DEFAULT_CHARSET
-            return force_bytes(data, encoding=charset)
+            return data.encode(charset)
+
+    def _encode_json(self, data, content_type):
+        """
+        Return encoded JSON if data is a dict and content_type is
+        application/json.
+        """
+        should_encode = JSON_CONTENT_TYPE_RE.match(content_type) and isinstance(data, dict)
+        return json.dumps(data, cls=self.json_encoder) if should_encode else data
 
     def _get_path(self, parsed):
         path = parsed.path
@@ -324,16 +334,15 @@ class RequestFactory:
     def get(self, path, data=None, secure=False, **extra):
         """Construct a GET request."""
         data = {} if data is None else data
-        r = {
+        return self.generic('GET', path, secure=secure, **{
             'QUERY_STRING': urlencode(data, doseq=True),
-        }
-        r.update(extra)
-        return self.generic('GET', path, secure=secure, **r)
+            **extra,
+        })
 
     def post(self, path, data=None, content_type=MULTIPART_CONTENT,
              secure=False, **extra):
         """Construct a POST request."""
-        data = {} if data is None else data
+        data = self._encode_json({} if data is None else data, content_type)
         post_data = self._encode_data(data, content_type)
 
         return self.generic('POST', path, post_data, content_type,
@@ -342,11 +351,10 @@ class RequestFactory:
     def head(self, path, data=None, secure=False, **extra):
         """Construct a HEAD request."""
         data = {} if data is None else data
-        r = {
+        return self.generic('HEAD', path, secure=secure, **{
             'QUERY_STRING': urlencode(data, doseq=True),
-        }
-        r.update(extra)
-        return self.generic('HEAD', path, secure=secure, **r)
+            **extra,
+        })
 
     def trace(self, path, secure=False, **extra):
         """Construct a TRACE request."""
@@ -361,18 +369,21 @@ class RequestFactory:
     def put(self, path, data='', content_type='application/octet-stream',
             secure=False, **extra):
         """Construct a PUT request."""
+        data = self._encode_json(data, content_type)
         return self.generic('PUT', path, data, content_type,
                             secure=secure, **extra)
 
     def patch(self, path, data='', content_type='application/octet-stream',
               secure=False, **extra):
         """Construct a PATCH request."""
+        data = self._encode_json(data, content_type)
         return self.generic('PATCH', path, data, content_type,
                             secure=secure, **extra)
 
     def delete(self, path, data='', content_type='application/octet-stream',
                secure=False, **extra):
         """Construct a DELETE request."""
+        data = self._encode_json(data, content_type)
         return self.generic('DELETE', path, data, content_type,
                             secure=secure, **extra)
 
@@ -398,7 +409,7 @@ class RequestFactory:
         # If QUERY_STRING is absent or empty, we want to extract it from the URL.
         if not r.get('QUERY_STRING'):
             # WSGI requires latin-1 encoded strings. See get_path_info().
-            query_string = force_bytes(parsed[4]).decode('iso-8859-1')
+            query_string = parsed[4].encode().decode('iso-8859-1')
             r['QUERY_STRING'] = query_string
         return self.request(**r)
 
@@ -455,7 +466,7 @@ class Client(RequestFactory):
         # Curry a data dictionary into an instance of the template renderer
         # callback function.
         data = {}
-        on_template_render = curry(store_rendered_templates, data)
+        on_template_render = partial(store_rendered_templates, data)
         signal_uid = "template-render-%s" % id(request)
         signals.template_rendered.connect(on_template_render, dispatch_uid=signal_uid)
         # Capture exceptions created by the handler.
@@ -479,9 +490,9 @@ class Client(RequestFactory):
             # Also make sure that the signalled exception is cleared from
             # the local cache!
             if self.exc_info:
-                exc_info = self.exc_info
+                _, exc_value, _ = self.exc_info
                 self.exc_info = None
-                raise exc_info[0](exc_info[1]).with_traceback(exc_info[2])
+                raise exc_value
 
             # Save the client and request that stimulated the response.
             response.client = self
@@ -491,7 +502,7 @@ class Client(RequestFactory):
             response.templates = data.get("templates", [])
             response.context = data.get("context")
 
-            response.json = curry(self._parse_json, response)
+            response.json = partial(self._parse_json, response)
 
             # Attach the ResolverMatch instance to the response
             response.resolver_match = SimpleLazyObject(lambda: resolve(request['PATH_INFO']))
@@ -515,7 +526,7 @@ class Client(RequestFactory):
         """Request a response from the server using GET."""
         response = super().get(path, data=data, secure=secure, **extra)
         if follow:
-            response = self._handle_redirects(response, **extra)
+            response = self._handle_redirects(response, data=data, **extra)
         return response
 
     def post(self, path, data=None, content_type=MULTIPART_CONTENT,
@@ -523,14 +534,14 @@ class Client(RequestFactory):
         """Request a response from the server using POST."""
         response = super().post(path, data=data, content_type=content_type, secure=secure, **extra)
         if follow:
-            response = self._handle_redirects(response, **extra)
+            response = self._handle_redirects(response, data=data, content_type=content_type, **extra)
         return response
 
     def head(self, path, data=None, follow=False, secure=False, **extra):
         """Request a response from the server using HEAD."""
         response = super().head(path, data=data, secure=secure, **extra)
         if follow:
-            response = self._handle_redirects(response, **extra)
+            response = self._handle_redirects(response, data=data, **extra)
         return response
 
     def options(self, path, data='', content_type='application/octet-stream',
@@ -538,7 +549,7 @@ class Client(RequestFactory):
         """Request a response from the server using OPTIONS."""
         response = super().options(path, data=data, content_type=content_type, secure=secure, **extra)
         if follow:
-            response = self._handle_redirects(response, **extra)
+            response = self._handle_redirects(response, data=data, content_type=content_type, **extra)
         return response
 
     def put(self, path, data='', content_type='application/octet-stream',
@@ -546,7 +557,7 @@ class Client(RequestFactory):
         """Send a resource to the server using PUT."""
         response = super().put(path, data=data, content_type=content_type, secure=secure, **extra)
         if follow:
-            response = self._handle_redirects(response, **extra)
+            response = self._handle_redirects(response, data=data, content_type=content_type, **extra)
         return response
 
     def patch(self, path, data='', content_type='application/octet-stream',
@@ -554,7 +565,7 @@ class Client(RequestFactory):
         """Send a resource to the server using PATCH."""
         response = super().patch(path, data=data, content_type=content_type, secure=secure, **extra)
         if follow:
-            response = self._handle_redirects(response, **extra)
+            response = self._handle_redirects(response, data=data, content_type=content_type, **extra)
         return response
 
     def delete(self, path, data='', content_type='application/octet-stream',
@@ -562,14 +573,14 @@ class Client(RequestFactory):
         """Send a DELETE request to the server."""
         response = super().delete(path, data=data, content_type=content_type, secure=secure, **extra)
         if follow:
-            response = self._handle_redirects(response, **extra)
+            response = self._handle_redirects(response, data=data, content_type=content_type, **extra)
         return response
 
     def trace(self, path, data='', follow=False, secure=False, **extra):
         """Send a TRACE request to the server."""
         response = super().trace(path, data=data, secure=secure, **extra)
         if follow:
-            response = self._handle_redirects(response, **extra)
+            response = self._handle_redirects(response, data=data, **extra)
         return response
 
     def login(self, **credentials):
@@ -651,12 +662,19 @@ class Client(RequestFactory):
             response._json = json.loads(response.content.decode(), **extra)
         return response._json
 
-    def _handle_redirects(self, response, **extra):
+    def _handle_redirects(self, response, data='', content_type='', **extra):
         """
         Follow any redirects by requesting responses from the server using GET.
         """
         response.redirect_chain = []
-        while response.status_code in (301, 302, 303, 307):
+        redirect_status_codes = (
+            HTTPStatus.MOVED_PERMANENTLY,
+            HTTPStatus.FOUND,
+            HTTPStatus.SEE_OTHER,
+            HTTPStatus.TEMPORARY_REDIRECT,
+            HTTPStatus.PERMANENT_REDIRECT,
+        )
+        while response.status_code in redirect_status_codes:
             response_url = response.url
             redirect_chain = response.redirect_chain
             redirect_chain.append((response_url, response.status_code))
@@ -674,7 +692,15 @@ class Client(RequestFactory):
             if not path.startswith('/'):
                 path = urljoin(response.request['PATH_INFO'], path)
 
-            response = self.get(path, QueryDict(url.query), follow=False, **extra)
+            if response.status_code in (HTTPStatus.TEMPORARY_REDIRECT, HTTPStatus.PERMANENT_REDIRECT):
+                # Preserve request method post-redirect for 307/308 responses.
+                request_method = getattr(self, response.request['REQUEST_METHOD'].lower())
+            else:
+                request_method = self.get
+                data = QueryDict(url.query)
+                content_type = None
+
+            response = request_method(path, data=data, content_type=content_type, follow=False, **extra)
             response.redirect_chain = redirect_chain
 
             if redirect_chain[-1] in redirect_chain[:-1]:

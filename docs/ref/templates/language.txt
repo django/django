@@ -28,7 +28,7 @@ or Jinja2_, you should feel right at home with Django's templates.
     </howto/custom-template-tags>` to the template language as needed).
 
 .. _`The Django template language: For Python programmers`: ../templates_python/
-.. _Smarty: http://www.smarty.net/
+.. _Smarty: https://www.smarty.net/
 .. _Jinja2: http://jinja.pocoo.org/
 
 Templates
@@ -291,7 +291,7 @@ It's easiest to understand template inheritance by starting with an example::
     <!DOCTYPE html>
     <html lang="en">
     <head>
-        <link rel="stylesheet" href="style.css" />
+        <link rel="stylesheet" href="style.css">
         <title>{% block title %}My amazing site{% endblock %}</title>
     </head>
 
@@ -344,7 +344,7 @@ like::
     <!DOCTYPE html>
     <html lang="en">
     <head>
-        <link rel="stylesheet" href="style.css" />
+        <link rel="stylesheet" href="style.css">
         <title>My amazing blog</title>
     </head>
 

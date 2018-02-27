@@ -14,7 +14,7 @@ For example, Django was used at kusports.com_ to generate customized,
 printer-friendly NCAA tournament brackets, as PDF files, for people
 participating in a March Madness contest.
 
-.. _ReportLab: http://www.reportlab.com/opensource/
+.. _ReportLab: https://www.reportlab.com/opensource/
 .. _kusports.com: http://www.kusports.com/
 
 Install ReportLab
@@ -24,7 +24,7 @@ The ReportLab library is `available on PyPI`_. A `user guide`_ (not
 coincidentally, a PDF file) is also available for download.
 You can install ReportLab with ``pip``:
 
-.. code-block:: console
+.. console::
 
     $ pip install reportlab
 
@@ -35,7 +35,7 @@ Test your installation by importing it in the Python interactive interpreter::
 If that command doesn't raise any errors, the installation worked.
 
 .. _available on PyPI: https://pypi.python.org/pypi/reportlab
-.. _user guide: http://www.reportlab.com/docs/reportlab-userguide.pdf
+.. _user guide: https://www.reportlab.com/docs/reportlab-userguide.pdf
 
 Write your view
 ===============

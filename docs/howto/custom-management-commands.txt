@@ -18,9 +18,7 @@ directory whose name doesn't begin with an underscore. For example::
         __init__.py
         models.py
         management/
-            __init__.py
             commands/
-                __init__.py
                 _private.py
                 closepoll.py
         tests.py
@@ -252,7 +250,8 @@ All attributes can be set in your derived class and can be used in
 .. attribute:: BaseCommand.leave_locale_alone
 
     A boolean indicating whether the locale set in settings should be preserved
-    during the execution of the command instead of being forcibly set to 'en-us'.
+    during the execution of the command instead of translations being
+    deactivated.
 
     Default value is ``False``.
 
@@ -260,9 +259,8 @@ All attributes can be set in your derived class and can be used in
     this option in your custom command if it creates database content that
     is locale-sensitive and such content shouldn't contain any translations
     (like it happens e.g. with :mod:`django.contrib.auth` permissions) as
-    making the locale differ from the de facto default 'en-us' might cause
-    unintended effects. See the `Management commands and locales`_ section
-    above for further details.
+    activating any locale might cause unintended effects. See the `Management
+    commands and locales`_ section above for further details.
 
 .. attribute:: BaseCommand.style
 

@@ -30,6 +30,16 @@ class QuerySetSetOperationTests(TestCase):
         qs3 = Number.objects.filter(num__gte=4, num__lte=6)
         self.assertNumbersEqual(qs1.intersection(qs2, qs3), [5], ordered=False)
 
+    @skipUnlessDBFeature('supports_select_intersection')
+    def test_intersection_with_values(self):
+        ReservedName.objects.create(name='a', order=2)
+        qs1 = ReservedName.objects.all()
+        reserved_name = qs1.intersection(qs1).values('name', 'order', 'id').get()
+        self.assertEqual(reserved_name['name'], 'a')
+        self.assertEqual(reserved_name['order'], 2)
+        reserved_name = qs1.intersection(qs1).values_list('name', 'order', 'id').get()
+        self.assertEqual(reserved_name[:2], ('a', 2))
+
     @skipUnlessDBFeature('supports_select_difference')
     def test_simple_difference(self):
         qs1 = Number.objects.filter(num__lte=5)
@@ -66,6 +76,17 @@ class QuerySetSetOperationTests(TestCase):
         self.assertEqual(len(qs2.difference(qs2)), 0)
         self.assertEqual(len(qs3.difference(qs3)), 0)
 
+    @skipUnlessDBFeature('supports_select_difference')
+    def test_difference_with_values(self):
+        ReservedName.objects.create(name='a', order=2)
+        qs1 = ReservedName.objects.all()
+        qs2 = ReservedName.objects.none()
+        reserved_name = qs1.difference(qs2).values('name', 'order', 'id').get()
+        self.assertEqual(reserved_name['name'], 'a')
+        self.assertEqual(reserved_name['order'], 2)
+        reserved_name = qs1.difference(qs2).values_list('name', 'order', 'id').get()
+        self.assertEqual(reserved_name[:2], ('a', 2))
+
     def test_union_with_empty_qs(self):
         qs1 = Number.objects.all()
         qs2 = Number.objects.none()
@@ -88,6 +109,15 @@ class QuerySetSetOperationTests(TestCase):
         qs1 = Number.objects.filter(num__lte=1)
         qs2 = Number.objects.filter(num__gte=2, num__lte=3)
         self.assertNumbersEqual(qs1.union(qs2).order_by('-num'), [3, 2, 1, 0])
+
+    def test_union_with_values(self):
+        ReservedName.objects.create(name='a', order=2)
+        qs1 = ReservedName.objects.all()
+        reserved_name = qs1.union(qs1).values('name', 'order', 'id').get()
+        self.assertEqual(reserved_name['name'], 'a')
+        self.assertEqual(reserved_name['order'], 2)
+        reserved_name = qs1.union(qs1).values_list('name', 'order', 'id').get()
+        self.assertEqual(reserved_name[:2], ('a', 2))
 
     def test_count_union(self):
         qs1 = Number.objects.filter(num__lte=1).values('num')

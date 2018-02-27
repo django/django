@@ -4,7 +4,6 @@ and database field objects.
 """
 
 from collections import OrderedDict
-from contextlib import suppress
 from itertools import chain
 
 from django.core.exceptions import (
@@ -565,9 +564,7 @@ class BaseModelFormSet(BaseFormSet):
                  queryset=None, *, initial=None, **kwargs):
         self.queryset = queryset
         self.initial_extra = initial
-        defaults = {'data': data, 'files': files, 'auto_id': auto_id, 'prefix': prefix}
-        defaults.update(kwargs)
-        super().__init__(**defaults)
+        super().__init__(**{'data': data, 'files': files, 'auto_id': auto_id, 'prefix': prefix, **kwargs})
 
     def initial_form_count(self):
         """Return the number of forms that are required in this FormSet."""
@@ -590,9 +587,8 @@ class BaseModelFormSet(BaseFormSet):
         return field.to_python
 
     def _construct_form(self, i, **kwargs):
-        pk_required = False
-        if i < self.initial_form_count():
-            pk_required = True
+        pk_required = i < self.initial_form_count()
+        if pk_required:
             if self.is_bound:
                 pk_key = '%s-%s' % (self.add_prefix(i), self.model._meta.pk.name)
                 try:
@@ -615,8 +611,10 @@ class BaseModelFormSet(BaseFormSet):
                 kwargs['instance'] = self.get_queryset()[i]
         elif self.initial_extra:
             # Set initial values for extra forms
-            with suppress(IndexError):
+            try:
                 kwargs['initial'] = self.initial_extra[i - self.initial_form_count()]
+            except IndexError:
+                pass
         form = super()._construct_form(i, **kwargs)
         if pk_required:
             form.fields[self.model._meta.pk.name].required = True
@@ -836,7 +834,7 @@ class BaseModelFormSet(BaseFormSet):
                         pk_value = None
                 except IndexError:
                     pk_value = None
-            if isinstance(pk, OneToOneField) or isinstance(pk, ForeignKey):
+            if isinstance(pk, (ForeignKey, OneToOneField)):
                 qs = pk.remote_field.model._default_manager.get_queryset()
             else:
                 qs = self.model._default_manager.get_queryset()
@@ -1005,7 +1003,7 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
                 raise ValueError(
                     "fk_name '%s' is not a ForeignKey to '%s'." % (fk_name, parent_model._meta.label)
                 )
-        elif len(fks_to_parent) == 0:
+        elif not fks_to_parent:
             raise ValueError(
                 "'%s' has no field named '%s'." % (model._meta.label, fk_name)
             )
@@ -1020,7 +1018,7 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
         ]
         if len(fks_to_parent) == 1:
             fk = fks_to_parent[0]
-        elif len(fks_to_parent) == 0:
+        elif not fks_to_parent:
             if can_fail:
                 return
             raise ValueError(
@@ -1140,7 +1138,7 @@ class ModelChoiceIterator:
             yield self.choice(obj)
 
     def __len__(self):
-        return (len(self.queryset) + (1 if self.field.empty_label is not None else 0))
+        return len(self.queryset) + (1 if self.field.empty_label is not None else 0)
 
     def choice(self, obj):
         return (self.field.prepare_value(obj), self.field.label_from_instance(obj))
@@ -1350,8 +1348,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
 
 
 def modelform_defines_fields(form_class):
-    return (form_class is not None and (
-            hasattr(form_class, '_meta') and
-            (form_class._meta.fields is not None or
-             form_class._meta.exclude is not None)
-            ))
+    return hasattr(form_class, '_meta') and (
+        form_class._meta.fields is not None or
+        form_class._meta.exclude is not None
+    )

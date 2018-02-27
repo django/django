@@ -134,8 +134,14 @@ right away: the ``Question.was_published_recently()`` method returns ``True`` if
 the ``Question`` was published within the last day (which is correct) but also if
 the ``Question``’s ``pub_date`` field is in the future (which certainly isn't).
 
-To check if the bug really exists, using the Admin create a question whose date
-lies in the future and check the method using the :djadmin:`shell`::
+Confirm the bug by using the :djadmin:`shell` to check the method on a question
+whose date lies in the future:
+
+.. console::
+
+    $ python manage.py shell
+
+.. code-block:: pycon
 
     >>> import datetime
     >>> from django.utils import timezone
@@ -190,7 +196,9 @@ future. We then check the output of ``was_published_recently()`` - which
 Running tests
 -------------
 
-In the terminal, we can run our test::
+In the terminal, we can run our test:
+
+.. console::
 
     $ python manage.py test polls
 
@@ -215,7 +223,7 @@ and you'll see something like::
 
 What happened is this:
 
-* ``python manage.py test polls`` looked for tests in the ``polls`` application
+* ``manage.py test polls`` looked for tests in the ``polls`` application
 
 * it found a subclass of the :class:`django.test.TestCase` class
 
@@ -335,7 +343,13 @@ or even in the :djadmin:`shell`.
 
 We will start again with the :djadmin:`shell`, where we need to do a couple of
 things that won't be necessary in ``tests.py``. The first is to set up the test
-environment in the :djadmin:`shell`::
+environment in the :djadmin:`shell`:
+
+.. console::
+
+    $ python manage.py shell
+
+.. code-block:: pycon
 
     >>> from django.test.utils import setup_test_environment
     >>> setup_test_environment()

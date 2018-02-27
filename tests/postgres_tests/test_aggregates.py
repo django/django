@@ -1,5 +1,4 @@
 import json
-from contextlib import suppress
 
 from django.db.models.expressions import F, Value
 from django.test.testcases import skipUnlessDBFeature
@@ -8,12 +7,14 @@ from django.test.utils import Approximate
 from . import PostgreSQLTestCase
 from .models import AggregateTestModel, StatTestModel
 
-with suppress(ImportError):  # psycopg2 is not installed
+try:
     from django.contrib.postgres.aggregates import (
         ArrayAgg, BitAnd, BitOr, BoolAnd, BoolOr, Corr, CovarPop, JSONBAgg,
         RegrAvgX, RegrAvgY, RegrCount, RegrIntercept, RegrR2, RegrSlope,
         RegrSXX, RegrSXY, RegrSYY, StatAggregate, StringAgg,
     )
+except ImportError:
+    pass  # psycopg2 is not installed
 
 
 class TestGeneralAggregate(PostgreSQLTestCase):
@@ -54,6 +55,18 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         self.assertEqual(values, {'arrayagg': []})
         values = AggregateTestModel.objects.aggregate(arrayagg=ArrayAgg('old_boolean_field'))
         self.assertEqual(values, {'arrayagg': []})
+
+    def test_array_agg_lookups(self):
+        aggr1 = AggregateTestModel.objects.create()
+        aggr2 = AggregateTestModel.objects.create()
+        StatTestModel.objects.create(related_field=aggr1, int1=1, int2=0)
+        StatTestModel.objects.create(related_field=aggr1, int1=2, int2=0)
+        StatTestModel.objects.create(related_field=aggr2, int1=3, int2=0)
+        StatTestModel.objects.create(related_field=aggr2, int1=4, int2=0)
+        qs = StatTestModel.objects.values('related_field').annotate(
+            array=ArrayAgg('int1')
+        ).filter(array__overlap=[2]).values_list('array', flat=True)
+        self.assertCountEqual(qs.get(), [1, 2])
 
     def test_bit_and_general(self):
         values = AggregateTestModel.objects.filter(

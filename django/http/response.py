@@ -3,7 +3,6 @@ import json
 import re
 import sys
 import time
-from contextlib import suppress
 from email.header import Header
 from http.client import responses
 from urllib.parse import urlparse
@@ -14,8 +13,8 @@ from django.core.exceptions import DisallowedRedirect
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http.cookie import SimpleCookie
 from django.utils import timezone
-from django.utils.encoding import force_bytes, iri_to_uri
-from django.utils.http import cookie_date
+from django.utils.encoding import iri_to_uri
+from django.utils.http import http_date
 
 _charset_from_content_type_re = re.compile(r';\s*charset=(?P<charset>[^\s;]+)', re.I)
 
@@ -137,8 +136,7 @@ class HttpResponseBase:
         self._headers[header.lower()] = (header, value)
 
     def __delitem__(self, header):
-        with suppress(KeyError):
-            del self._headers[header.lower()]
+        self._headers.pop(header.lower(), False)
 
     def __getitem__(self, header):
         return self._headers[header.lower()][1]
@@ -187,8 +185,7 @@ class HttpResponseBase:
             self.cookies[key]['max-age'] = max_age
             # IE requires expires, so set it if hasn't been already.
             if not expires:
-                self.cookies[key]['expires'] = cookie_date(time.time() +
-                                                           max_age)
+                self.cookies[key]['expires'] = http_date(time.time() + max_age)
         if path is not None:
             self.cookies[key]['path'] = path
         if domain is not None:
@@ -208,8 +205,13 @@ class HttpResponseBase:
         return self.set_cookie(key, value, **kwargs)
 
     def delete_cookie(self, key, path='/', domain=None):
-        self.set_cookie(key, max_age=0, path=path, domain=domain,
-                        expires='Thu, 01-Jan-1970 00:00:00 GMT')
+        # Most browsers ignore the Set-Cookie header if the cookie name starts
+        # with __Host- or __Secure- and the cookie doesn't use the secure flag.
+        secure = key.startswith(('__Secure-', '__Host-'))
+        self.set_cookie(
+            key, max_age=0, path=path, domain=domain, secure=secure,
+            expires='Thu, 01 Jan 1970 00:00:00 GMT',
+        )
 
     # Common methods used by subclasses
 
@@ -226,9 +228,8 @@ class HttpResponseBase:
             return bytes(value)
         if isinstance(value, str):
             return bytes(value.encode(self.charset))
-
-        # Handle non-string types (#16494)
-        return force_bytes(value, self.charset)
+        # Handle non-string types.
+        return str(value).encode(self.charset)
 
     # These methods partially implement the file-like object interface.
     # See https://docs.python.org/3/library/io.html#io.IOBase
@@ -237,8 +238,10 @@ class HttpResponseBase:
     # See http://blog.dscpl.com.au/2012/10/obligations-for-calling-close-on.html
     def close(self):
         for closable in self._closable_objects:
-            with suppress(Exception):
+            try:
                 closable.close()
+            except Exception:
+                pass
         self.closed = True
         signals.request_finished.send(sender=self._handler_class)
 
@@ -304,8 +307,10 @@ class HttpResponse(HttpResponseBase):
         if hasattr(value, '__iter__') and not isinstance(value, (bytes, str)):
             content = b''.join(self.make_bytes(chunk) for chunk in value)
             if hasattr(value, 'close'):
-                with suppress(Exception):
+                try:
                     value.close()
+                except Exception:
+                    pass
         else:
             content = self.make_bytes(value)
         # Create a list of properly encoded bytestrings to support write().
@@ -484,7 +489,7 @@ class JsonResponse(HttpResponse):
     :param data: Data to be dumped into json. By default only ``dict`` objects
       are allowed to be passed due to a security flaw before EcmaScript 5. See
       the ``safe`` parameter for more information.
-    :param encoder: Should be an json encoder class. Defaults to
+    :param encoder: Should be a json encoder class. Defaults to
       ``django.core.serializers.json.DjangoJSONEncoder``.
     :param safe: Controls if only ``dict`` objects may be serialized. Defaults
       to ``True``.

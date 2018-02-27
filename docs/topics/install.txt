@@ -15,10 +15,10 @@ your operating system's package manager.
 
 .. admonition:: Django on Jython
 
-    If you use Jython_ (a Python implementation for the Java platform), you'll
-    need to follow a few additional steps. See :doc:`/howto/jython` for details.
+    Jython_ (a Python implementation for the Java platform) is not compatible
+    with Python 3, so Django ≥ 2.0 cannot run on Jython.
 
-.. _jython: http://jython.org/
+.. _jython: http://www.jython.org/
 
 .. admonition:: Python on Windows
 
@@ -59,7 +59,7 @@ very well with `nginx`_. Additionally, Django follows the WSGI spec
 (:pep:`3333`), which allows it to run on a variety of server platforms.
 
 .. _Apache: https://httpd.apache.org/
-.. _nginx: http://nginx.org/
+.. _nginx: https://nginx.org/
 .. _mod_wsgi: http://www.modwsgi.org/
 
 .. _database-installation:
@@ -121,28 +121,6 @@ database queries, Django will need permission to create a test database.
 .. _SQLite: https://www.sqlite.org/
 .. _cx_Oracle: https://oracle.github.io/python-cx_Oracle/
 .. _Oracle: https://www.oracle.com/
-
-.. _removing-old-versions-of-django:
-
-Remove any old versions of Django
-=================================
-
-If you are upgrading your installation of Django from a previous version,
-you will need to uninstall the old Django version before installing the
-new version.
-
-If you installed Django using pip_ or ``easy_install`` previously, installing
-with pip_ or ``easy_install`` again will automatically take care of the old
-version, so you don't need to do it yourself.
-
-If you previously installed Django using ``python setup.py install``,
-uninstalling is as simple as deleting the ``django`` directory from your Python
-``site-packages``. To find the directory you need to remove, you can run the
-following at your shell prompt (not the interactive Python prompt):
-
-.. code-block:: console
-
-    $ python -c "import django; print(django.__path__)"
 
 .. _install-django-code:
 
@@ -218,7 +196,7 @@ latest bug fixes and improvements, follow these instructions:
 
 2. Check out Django's main development branch like so:
 
-   .. code-block:: console
+   .. console::
 
         $ git clone https://github.com/django/django.git
 
@@ -231,7 +209,7 @@ latest bug fixes and improvements, follow these instructions:
 
 4. After setting up and activating the virtualenv, run the following command:
 
-   .. code-block:: console
+   .. console::
 
         $ pip install -e django/
 

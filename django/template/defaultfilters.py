@@ -1,7 +1,7 @@
 """Default variable filters."""
 import random as random_module
 import re
-from contextlib import suppress
+import types
 from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation
 from functools import wraps
 from operator import itemgetter
@@ -12,8 +12,8 @@ from django.utils import formats
 from django.utils.dateformat import format, time_format
 from django.utils.encoding import iri_to_uri
 from django.utils.html import (
-    avoid_wrapping, conditional_escape, escape, escapejs, linebreaks,
-    strip_tags, urlize as _urlize,
+    avoid_wrapping, conditional_escape, escape, escapejs,
+    json_script as _json_script, linebreaks, strip_tags, urlize as _urlize,
 )
 from django.utils.safestring import SafeData, mark_safe
 from django.utils.text import (
@@ -38,12 +38,11 @@ def stringfilter(func):
     passed as the first positional argument will be converted to a string.
     """
     def _dec(*args, **kwargs):
-        if args:
-            args = list(args)
-            args[0] = str(args[0])
-            if (isinstance(args[0], SafeData) and
-                    getattr(_dec._decorated_function, 'is_safe', False)):
-                return mark_safe(func(*args, **kwargs))
+        args = list(args)
+        args[0] = str(args[0])
+        if (isinstance(args[0], SafeData) and
+                getattr(_dec._decorated_function, 'is_safe', False)):
+            return mark_safe(func(*args, **kwargs))
         return func(*args, **kwargs)
 
     # Include a reference to the real function (used to check original
@@ -81,6 +80,15 @@ def capfirst(value):
 def escapejs_filter(value):
     """Hex encode characters for use in JavaScript strings."""
     return escapejs(value)
+
+
+@register.filter(is_safe=True)
+def json_script(value, element_id):
+    """
+    Output value JSON-encoded, wrapped in a <script type="application/json">
+    tag.
+    """
+    return _json_script(value, element_id)
 
 
 @register.filter(is_safe=True)
@@ -135,10 +143,7 @@ def floatformat(text, arg=-1):
     if not m and p < 0:
         return mark_safe(formats.number_format('%d' % (int(d)), 0))
 
-    if p == 0:
-        exp = Decimal(1)
-    else:
-        exp = Decimal('1.0') / (Decimal(10) ** abs(p))
+    exp = Decimal(1).scaleb(-abs(p))
     # Set the precision high enough to avoid an exception (#15789).
     tupl = d.as_tuple()
     units = len(tupl[1])
@@ -408,7 +413,7 @@ def force_escape(value):
 def linebreaks_filter(value, autoescape=True):
     """
     Replace line breaks in plain text with appropriate HTML; a single
-    newline becomes an HTML line break (``<br />``) and a new line
+    newline becomes an HTML line break (``<br>``) and a new line
     followed by a blank line becomes a paragraph break (``</p>``).
     """
     autoescape = autoescape and not isinstance(value, SafeData)
@@ -420,13 +425,13 @@ def linebreaks_filter(value, autoescape=True):
 def linebreaksbr(value, autoescape=True):
     """
     Convert all newlines in a piece of plain text to HTML line breaks
-    (``<br />``).
+    (``<br>``).
     """
     autoescape = autoescape and not isinstance(value, SafeData)
     value = normalize_newlines(value)
     if autoescape:
         value = escape(value)
-    return mark_safe(value.replace('\n', '<br />'))
+    return mark_safe(value.replace('\n', '<br>'))
 
 
 @register.filter(is_safe=True)
@@ -519,11 +524,11 @@ def first(value):
 @register.filter(is_safe=True, needs_autoescape=True)
 def join(value, arg, autoescape=True):
     """Join a list with a string, like Python's ``str.join(list)``."""
-    if autoescape:
-        value = [conditional_escape(v) for v in value]
     try:
+        if autoescape:
+            value = [conditional_escape(v) for v in value]
         data = conditional_escape(arg).join(value)
-    except AttributeError:  # fail silently but nicely
+    except TypeError:  # Fail silently if arg isn't iterable.
         return value
     return mark_safe(data)
 
@@ -569,7 +574,7 @@ def slice_filter(value, arg):
     try:
         bits = []
         for x in arg.split(':'):
-            if len(x) == 0:
+            if not x:
                 bits.append(None)
             else:
                 bits.append(int(x))
@@ -609,7 +614,7 @@ def unordered_list(value, autoescape=True):
 
     def walk_items(item_list):
         item_iterator = iter(item_list)
-        with suppress(StopIteration):
+        try:
             item = next(item_iterator)
             while True:
                 try:
@@ -617,7 +622,7 @@ def unordered_list(value, autoescape=True):
                 except StopIteration:
                     yield item, None
                     break
-                if not isinstance(next_item, str):
+                if isinstance(next_item, (list, tuple, types.GeneratorType)):
                     try:
                         iter(next_item)
                     except TypeError:
@@ -628,6 +633,8 @@ def unordered_list(value, autoescape=True):
                         continue
                 yield item, None
                 item = next_item
+        except StopIteration:
+            pass
 
     def list_formatter(item_list, tabs=1):
         indent = '\t' * tabs
@@ -847,22 +854,22 @@ def pluralize(value, arg='s'):
     Return a plural suffix if the value is not 1. By default, use 's' as the
     suffix:
 
-    * If value is 0, vote{{ value|pluralize }} display "0 votes".
-    * If value is 1, vote{{ value|pluralize }} display "1 vote".
-    * If value is 2, vote{{ value|pluralize }} display "2 votes".
+    * If value is 0, vote{{ value|pluralize }} display "votes".
+    * If value is 1, vote{{ value|pluralize }} display "vote".
+    * If value is 2, vote{{ value|pluralize }} display "votes".
 
     If an argument is provided, use that string instead:
 
-    * If value is 0, class{{ value|pluralize:"es" }} display "0 classes".
-    * If value is 1, class{{ value|pluralize:"es" }} display "1 class".
-    * If value is 2, class{{ value|pluralize:"es" }} display "2 classes".
+    * If value is 0, class{{ value|pluralize:"es" }} display "classes".
+    * If value is 1, class{{ value|pluralize:"es" }} display "class".
+    * If value is 2, class{{ value|pluralize:"es" }} display "classes".
 
     If the provided argument contains a comma, use the text before the comma
     for the singular case and the text after the comma for the plural case:
 
-    * If value is 0, cand{{ value|pluralize:"y,ies" }} display "0 candies".
-    * If value is 1, cand{{ value|pluralize:"y,ies" }} display "1 candy".
-    * If value is 2, cand{{ value|pluralize:"y,ies" }} display "2 candies".
+    * If value is 0, cand{{ value|pluralize:"y,ies" }} display "candies".
+    * If value is 1, cand{{ value|pluralize:"y,ies" }} display "candy".
+    * If value is 2, cand{{ value|pluralize:"y,ies" }} display "candies".
     """
     if ',' not in arg:
         arg = ',' + arg
@@ -877,9 +884,11 @@ def pluralize(value, arg='s'):
     except ValueError:  # Invalid string that's not a number.
         pass
     except TypeError:  # Value isn't a string or a number; maybe it's a list?
-        with suppress(TypeError):  # len() of unsized object.
+        try:
             if len(value) != 1:
                 return plural_suffix
+        except TypeError:  # len() of unsized object.
+            pass
     return singular_suffix
 
 

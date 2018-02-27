@@ -16,8 +16,6 @@ All of these functions are available from the
 
 Returns a version 4 UUID.
 
-Requires PostgreSQL 9.4 or greater.
-
 The `pgcrypto extension`_ must be installed. You can use the
 :class:`~django.contrib.postgres.operations.CryptoExtension` migration
 operation to install it.

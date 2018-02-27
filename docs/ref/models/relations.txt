@@ -173,7 +173,3 @@ Related objects reference
        If you use :meth:`~django.db.models.query.QuerySet.prefetch_related`,
        the ``add()``, ``remove()``, ``clear()``, and ``set()`` methods clear
        the prefetched cache.
-
-       .. versionchanged:: 1.11
-
-            The clearing of the prefetched cache described above was added.
