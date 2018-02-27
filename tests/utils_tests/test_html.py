@@ -249,6 +249,7 @@ class TestUtilsHtml(SimpleTestCase):
                 lazystr('Search for google.com/?q=!'),
                 'Search for <a href="http://google.com/?q=">google.com/?q=</a>!'
             ),
+            ('foo@example.com', '<a href="mailto:foo@example.com">foo@example.com</a>'),
         )
         for value, output in tests:
             with self.subTest(value=value):
@@ -258,6 +259,11 @@ class TestUtilsHtml(SimpleTestCase):
         tests = (
             ('a' + '@a' * 50000) + 'a',  # simple_email_re catastrophic test
             ('a' + '.' * 1000000) + 'a',  # trailing_punctuation catastrophic test
+            'foo@',
+            '@foo.com',
+            'foo@.example.com',
+            'foo@localhost',
+            'foo@localhost.',
         )
         for value in tests:
             with self.subTest(value=value):
