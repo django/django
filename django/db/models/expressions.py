@@ -381,10 +381,12 @@ class BaseExpression:
 
     def __hash__(self):
         path, args, kwargs = self.deconstruct()
-        h = hash(path) ^ hash(args)
-        for kwarg in kwargs.items():
-            h ^= hash(kwarg)
-        return h
+        kwargs = kwargs.copy()
+        output_field = type(kwargs.pop('output_field', None))
+        return hash((path, output_field) + args + tuple([
+            (key, tuple(value)) if isinstance(value, list) else (key, value)
+            for key, value in kwargs.items()
+        ]))
 
 
 class Expression(BaseExpression, Combinable):
