@@ -52,13 +52,16 @@ Minor features
 
 * The new :meth:`.ModelAdmin.get_deleted_objects()` method allows customizing
   the deletion process of the delete view and the "delete selected" action.
-* The ``actions.html``, ``change_list_results.html``, ``date_hierarchy.html``,
-  ``pagination.html``, ``prepopulated_fields_js.html``, ``search_form.html``
-  and ``submit_line.html`` templates can be overridden even per app or
-  per model, other than globally.
 
-* The admin change list and change form object tools can now be overridden per app,
-  per model or globally with ``change_list_object_tools.html`` and
+* The ``actions.html``, ``change_list_results.html``, ``date_hierarchy.html``,
+  ``pagination.html``, ``prepopulated_fields_js.html``, ``search_form.html``,
+  and ``submit_line.html`` templates can now be :ref:`overridden per app or
+  per model <admin-templates-overridden-per-app-or-model>` (besides overridden
+  globally).
+
+* The admin change list and change form object tools can now be :ref:`overridden
+  per app, per model, or globally <admin-templates-overridden-per-app-or-model>`
+  with ``change_list_object_tools.html`` and
   ``change_form_object_tools.html`` templates.
 
 :mod:`django.contrib.admindocs`

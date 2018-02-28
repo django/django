@@ -2674,6 +2674,8 @@ And that's it! If we placed this file in the ``templates/admin/my_app``
 directory, our link would appear on the change form for all models within
 my_app.
 
+.. _admin-templates-overridden-per-app-or-model:
+
 Templates which may be overridden per app or model
 --------------------------------------------------
 
@@ -2701,7 +2703,7 @@ app or per model. The following can:
     The ability to override the ``actions.html``, ``change_form_object_tools.html``,
     ``change_list_object_tools.html``, ``change_list_results.html``,
     ``date_hierarchy.html``, ``pagination.html``, ``prepopulated_fields_js.html``,
-    ``search_form.html``, ``submit_line.html`` templates were added.
+    ``search_form.html``, and ``submit_line.html`` templates was added.
 
 For those templates that cannot be overridden in this way, you may still
 override them for your entire project. Just place the new version in your

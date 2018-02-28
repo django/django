@@ -4,19 +4,20 @@ from django.template.library import InclusionNode, parse_bits
 
 
 class InclusionAdminNode(InclusionNode):
+    """
+    Template tag that allows its template to be overridden per model, per app,
+    or globally.
+    """
+
     def __init__(self, parser, token, func, template_name, takes_context=True):
         self.template_name = template_name
-
         params, varargs, varkw, defaults, kwonly, kwonly_defaults, _ = getfullargspec(func)
-        if len(params) > 0 and params[0] == 'self':
-            params = params[1:]  # ignore 'self'
         bits = token.split_contents()
         args, kwargs = parse_bits(
-            parser, bits[1:], params, varargs, varkw, defaults, kwonly, kwonly_defaults, takes_context, bits[0]
+            parser, bits[1:], params, varargs, varkw, defaults, kwonly,
+            kwonly_defaults, takes_context, bits[0],
         )
-        super().__init__(
-            func=func, takes_context=takes_context, args=args, kwargs=kwargs, filename=None
-        )
+        super().__init__(func, takes_context, args, kwargs, filename=None)
 
     def render(self, context):
         opts = context['opts']

@@ -7,7 +7,6 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
-from django.utils.encoding import force_text
 
 from .admin import ArticleAdmin, site
 from .models import Article, Question
@@ -29,9 +28,10 @@ class AdminTemplateTagsTest(AdminViewBasicTestCase):
         self.assertIs(template_context['extra'], True)
         self.assertIs(template_context['show_save'], True)
 
-    def test_can_override_change_form_templatetags(self):
+    def test_override_change_form_template_tags(self):
         """
-        admin_modify templatetags can follow the 'standard' search patter admin/app_label/model/template.html
+        admin_modify template tags follow the standard search pattern
+        admin/app_label/model/template.html.
         """
         factory = RequestFactory()
         article = Article.objects.all()[0]
@@ -43,31 +43,32 @@ class AdminTemplateTagsTest(AdminViewBasicTestCase):
         response.render()
         self.assertIs(response.context_data['show_publish'], True)
         self.assertIs(response.context_data['extra'], True)
-        content = force_text(response.content)
-        self.assertIs('name="_save"' in content, True)
-        self.assertIs('name="_publish"' in content, True)
-        self.assertIs('override-change_form_object_tools' in content, True)
-        self.assertIs('override-prepopulated_fields_js' in content, True)
+        content = str(response.content)
+        self.assertIn('name="_save"', content)
+        self.assertIn('name="_publish"', content)
+        self.assertIn('override-change_form_object_tools', content)
+        self.assertIn('override-prepopulated_fields_js', content)
 
-    def test_can_override_change_list_templatetags(self):
+    def test_override_change_list_template_tags(self):
         """
-        admin_list templatetags can follow the 'standard' search patter admin/app_label/model/template.html
+        admin_list template tags follow the standard search pattern
+        admin/app_label/model/template.html.
         """
         factory = RequestFactory()
         request = factory.get(reverse('admin:admin_views_article_changelist'))
         request.user = self.superuser
         admin = ArticleAdmin(Article, site)
         admin.date_hierarchy = 'date'
-        admin.search_fields = ('title', 'content',)
+        admin.search_fields = ('title', 'content')
         response = admin.changelist_view(request)
         response.render()
-        content = force_text(response.content)
-        self.assertIs('override-actions' in content, True)
-        self.assertIs('override-change_list_object_tools' in content, True)
-        self.assertIs('override-change_list_results' in content, True)
-        self.assertIs('override-date_hierarchy' in content, True)
-        self.assertIs('override-pagination' in content, True)
-        self.assertIs('override-search_form' in content, True)
+        content = str(response.content)
+        self.assertIn('override-actions', content)
+        self.assertIn('override-change_list_object_tools', content)
+        self.assertIn('override-change_list_results', content)
+        self.assertIn('override-date_hierarchy', content)
+        self.assertIn('override-pagination', content)
+        self.assertIn('override-search_form', content)
 
 
 class DateHierarchyTests(TestCase):
