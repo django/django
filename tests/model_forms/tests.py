@@ -2328,18 +2328,14 @@ class FileAndImageFieldTests(TestCase):
             p.image.delete(save=False)
 
     def test_file_path_field_blank(self):
-        """
-        Regression test for #8842: FilePathField(blank=True)
-        """
+        """FilePathField(blank=True) includes the empty option."""
         class FPForm(forms.ModelForm):
             class Meta:
                 model = FilePathModel
                 fields = '__all__'
 
         form = FPForm()
-        names = [p[1] for p in form['path'].field.choices]
-        names.sort()
-        self.assertEqual(names, ['---------', '__init__.py', 'models.py', 'test_uuid.py', 'tests.py'])
+        self.assertEqual([name for _, name in form['path'].field.choices], ['---------', 'models.py'])
 
     @skipUnless(test_images, "Pillow not installed")
     def test_image_field(self):
