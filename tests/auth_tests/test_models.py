@@ -12,6 +12,7 @@ from django.core import mail
 from django.db.models.signals import post_save
 from django.test import SimpleTestCase, TestCase, override_settings
 
+from .models import IntegerUsernameUser
 from .models.with_custom_email_field import CustomEmailField
 
 
@@ -156,6 +157,9 @@ class UserManagerTestCase(TestCase):
 
 
 class AbstractBaseUserTests(TestCase):
+
+    def test_normalize_username(self):
+        self.assertEqual(IntegerUsernameUser().normalize_username(123), 123)
 
     def test_clean_normalize_username(self):
         # The normalization happens in AbstractBaseUser.clean()

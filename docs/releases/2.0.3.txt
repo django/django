@@ -28,3 +28,6 @@ Bugfixes
 
 * Fixed crash when using a ``Window()`` expression in a subquery
   (:ticket:`29172`).
+
+* Fixed ``AbstractBaseUser.normalize_username()`` crash if the ``username``
+  argument isn't a string (:ticket:`29176`).

@@ -138,4 +138,4 @@ class AbstractBaseUser(models.Model):
 
     @classmethod
     def normalize_username(cls, username):
-        return unicodedata.normalize('NFKC', username) if username else username
+        return unicodedata.normalize('NFKC', username) if isinstance(username, str) else username
