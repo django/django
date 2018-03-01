@@ -263,8 +263,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         rhs_sql, rhs_params = rhs
         if internal_type == 'TimeField':
             return (
-                "((TIME_TO_SEC(%(lhs)s) * POW(10, 6) + MICROSECOND(%(lhs)s)) -"
-                " (TIME_TO_SEC(%(rhs)s) * POW(10, 6) + MICROSECOND(%(rhs)s)))"
+                "((TIME_TO_SEC(%(lhs)s) * 1000000 + MICROSECOND(%(lhs)s)) -"
+                " (TIME_TO_SEC(%(rhs)s) * 1000000 + MICROSECOND(%(rhs)s)))"
             ) % {'lhs': lhs_sql, 'rhs': rhs_sql}, lhs_params * 2 + rhs_params * 2
         else:
             return "TIMESTAMPDIFF(MICROSECOND, %s, %s)" % (rhs_sql, lhs_sql), rhs_params + lhs_params
