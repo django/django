@@ -161,10 +161,8 @@ def media_property(cls):
                     for medium in extend:
                         m = m + base[medium]
                 return m + Media(definition)
-            else:
-                return Media(definition)
-        else:
-            return base
+            return Media(definition)
+        return base
     return property(_media)
 
 
@@ -188,10 +186,7 @@ class Widget(metaclass=MediaDefiningClass):
     supports_microseconds = True
 
     def __init__(self, attrs=None):
-        if attrs is not None:
-            self.attrs = attrs.copy()
-        else:
-            self.attrs = {}
+        self.attrs = {} if attrs is None else attrs.copy()
 
     def __deepcopy__(self, memo):
         obj = copy.copy(self)
