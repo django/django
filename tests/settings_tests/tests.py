@@ -13,7 +13,6 @@ from django.test import (
     SimpleTestCase, TestCase, TransactionTestCase, modify_settings,
     override_settings, signals,
 )
-from django.test.runner import DiscoverRunner
 from django.test.utils import requires_tz_support
 
 from .models import Simple
@@ -461,24 +460,17 @@ class TestDatabaseMirror(TestCase):
 
     def test_with_mirror(self):
         """
-        Overriding the DATABASES settings does not take effect as the database setup has already happened. For that
-        reason we call manually call setup_databases to reconfigure the test mirrors.
-        However this will overwrite the original connection to the `other` database which breaks other tests, so we
-        store the original connection in a temporary variable and manually replace it after the test no matter what
-        the result of it is.
+        Overriding the DATABASES settings is not recommended. So we just patch the connections object according to
+        the expected behavior verified by test_runner.tests.TestDatabaseMirror
         """
-        databases = settings.DATABASES
-        databases['other']['TEST']['MIRROR'] = 'default'
 
-        old_connection = connections['other']
+        new_connections = {
+            'default': connections['default'],
+            'other': connections['default']
+        }
 
-        try:
-            with override_settings(DATABASES=databases):
-                DiscoverRunner(verbosity=3).setup_databases()
+        with mock.patch.dict(connections, new_connections):
+            Simple.objects.using('default').create()
+            Simple.objects.using('other').create()
 
-                Simple.objects.using('default').create()
-                Simple.objects.using('other').create()
-
-                self.assertEqual(Simple.objects.count(), 2)
-        finally:
-            connections['other'] = old_connection
+            self.assertEqual(Simple.objects.count(), 2)
