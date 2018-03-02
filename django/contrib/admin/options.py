@@ -1535,11 +1535,12 @@ class ModelAdmin(BaseModelAdmin):
             self.get_prepopulated_fields(request, obj),
             self.get_readonly_fields(request, obj),
             model_admin=self)
-        media = self.media + adminForm.media
+        form_media = adminForm.media
 
         inline_formsets = self.get_inline_formsets(request, formsets, inline_instances, obj)
         for inline_formset in inline_formsets:
-            media = media + inline_formset.media
+            form_media += inline_formset.media
+        media = self.media & form_media
 
         context = {
             **self.admin_site.each_context(request),
@@ -1681,18 +1682,16 @@ class ModelAdmin(BaseModelAdmin):
             formset = cl.formset = FormSet(queryset=cl.result_list)
 
         # Build the list of media to be used by the formset.
-        if formset:
-            media = self.media + formset.media
-        else:
-            media = self.media
+        form_media = formset.media if formset else forms.Media()
 
         # Build the action form and populate it with available actions.
         if actions:
             action_form = self.action_form(auto_id=None)
             action_form.fields['action'].choices = self.get_action_choices(request)
-            media += action_form.media
+            form_media += action_form.media
         else:
             action_form = None
+        media = self.media & form_media
 
         selection_note_all = ngettext(
             '%(total_count)s selected',

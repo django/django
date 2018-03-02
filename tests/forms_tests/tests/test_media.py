@@ -539,6 +539,19 @@ class FormsMediaTestCase(SimpleTestCase):
             with self.subTest(list1=list1, list2=list2):
                 self.assertEqual(Media.merge(list1, list2), expected)
 
+    def test_and(self):
+        test_values = (
+            (([1, 2], [3, 4]), [1, 2, 3, 4]),
+            (([1, 2], [2, 3]), [1, 2, 3]),
+            (([2, 3], [1, 2]), [2, 3, 1]),
+            (([1, 3], [2, 3]), [1, 3, 2]),
+            (([1, 2], [1, 3]), [1, 2, 3]),
+            (([1, 2], [3, 2]), [1, 2, 3]),
+        )
+        for (list1, list2), expected in test_values:
+            with self.subTest(list1=list1, list2=list2):
+                self.assertEqual(list((Media(js=list1) & Media(js=list2))._js), expected)
+
     def test_merge_warning(self):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter('always')
