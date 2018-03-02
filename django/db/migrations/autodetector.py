@@ -567,10 +567,6 @@ class MigrationAutodetector:
                 beginning=True,
             )
 
-            # Don't add operations which modify the database for unmanaged models
-            if not model_opts.managed:
-                continue
-
             # Generate operations for each related field
             for name, field in sorted(related_fields.items()):
                 dependencies = self._get_dependencies_for_foreign_key(field)

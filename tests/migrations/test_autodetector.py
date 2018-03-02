@@ -450,6 +450,22 @@ class AutodetectorTests(TestCase):
         "unique_together": {("parent", "knight")},
         "indexes": [models.Index(fields=["parent", "knight"], name='rabbit_circular_fk_index')],
     })
+    unmanaged_author = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+    ], {
+        'managed': False
+    })
+    unmanaged_without_fk = ModelState("testapp", "Unmanaged", [
+        ("id", models.AutoField(primary_key=True)),
+    ], {
+        'managed': False
+    })
+    unmanaged_with_fk = ModelState("testapp", "Unmanaged", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.ForeignKey("testapp.Author", models.CASCADE)),
+    ], {
+        'managed': False
+    })
 
     def repr_changes(self, changes, include_dependencies=False):
         output = ""
@@ -2257,3 +2273,46 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["AddField", "AddField"])
         self.assertOperationAttributes(changes, 'testapp', 0, 0)
+
+    def test_unmanaged_model_with_fk_to_managed_model(self):
+        """
+        #29177 - Given a newly created unmanaged model which contains a ForeignKey to a managed model,
+        the migration ought to include the ForeignKey as part of the change set.
+        """
+        changes = self.get_changes([], [self.author_empty, self.unmanaged_with_fk])
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "CreateModel", "AddField"])
+        # I have no idea how to get assertOperationFieldAttributes to play well
+        # with verifying what name *points to*, so this'll have to do.
+        self.assertOperationAttributes(changes, 'testapp', 0, 2, name="name")
+
+    def test_unmanaged_model_fk_to_another_unmanaged_model(self):
+        """
+        #29177 - Given a newly created unmanaged model which contains a ForeignKey to another unmanaged model,
+        the migration ought to include the ForeignKey as part of the change set.
+        """
+        changes = self.get_changes([], [self.unmanaged_author, self.unmanaged_with_fk])
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "CreateModel"])
+        fields_on_unmanaged_with_fk = {_[0] for _ in changes['testapp'][0].operations[1].fields}
+        self.assertEqual(fields_on_unmanaged_with_fk, {'id', 'name'})
+
+    def test_adding_an_fk_to_an_unmanaged_model_where_fk_is_also_unmanaged(self):
+        """
+        #29177 - When a ForeignKey (pointing to a managed model) is introduced on an existing unmanaged model,
+        it should turn up as a migration.
+        """
+        # I think this ought to generate a migration, but it doesn't seem to be?
+        changes = self.get_changes([self.unmanaged_author, self.unmanaged_without_fk],
+                                   [self.unmanaged_author, self.unmanaged_with_fk])
+        self.assertNumberMigrations(changes, 'testapp', 1)
+
+    def test_adding_an_fk_to_an_unmanaged_model_where_fk_is_managed(self):
+        """
+        #29177 - When a ForeignKey (pointing to an unmanaged model) is introduced on an existing unmanaged model,
+        it should turn up as a migration.
+        """
+        # I think this ought to generate a migration, but it doesn't seem to be?
+        changes = self.get_changes([self.author_empty, self.unmanaged_without_fk],
+                                   [self.author_empty, self.unmanaged_with_fk])
+        self.assertNumberMigrations(changes, 'testapp', 1)
