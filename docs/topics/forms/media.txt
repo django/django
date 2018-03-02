@@ -310,7 +310,7 @@ specified by both::
 Order of assets
 ---------------
 
-The order in which assets are inserted into the DOM if often important. For
+The order in which assets are inserted into the DOM is often important. For
 example, you may have a script that depends on jQuery. Therefore, combining
 ``Media`` objects attempts to preserve the relative order in which assets are
 defined in each ``Media`` class.
