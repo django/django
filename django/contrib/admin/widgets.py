@@ -389,10 +389,7 @@ class AutocompleteMixin:
         self.admin_site = admin_site
         self.db = using
         self.choices = choices
-        if attrs is not None:
-            self.attrs = attrs.copy()
-        else:
-            self.attrs = {}
+        self.attrs = {} if attrs is None else attrs.copy()
 
     def get_url(self):
         model = self.rel.model
