@@ -463,10 +463,10 @@ class GenericRelationsTests(TestCase):
         self.assertFalse(created)
         self.assertEqual(tag.content_object.id, diamond.id)
 
-    def test_query_content_type(self):
+    def test_query_content_type_deep_lookup(self):
         msg = "Field 'content_object' does not generate an automatic reverse relation"
         with self.assertRaisesMessage(FieldError, msg):
-            TaggedItem.objects.get(content_object='')
+            TaggedItem.objects.get(content_object__name='Diamond')
 
     def test_unsaved_instance_on_generic_foreign_key(self):
         """
@@ -580,3 +580,53 @@ class TestInitWithNoneArgument(SimpleTestCase):
         # TaggedItem requires a content_type but initializing with None should
         # be allowed.
         TaggedItem(content_object=None)
+
+
+class GenericForeignKeyFilterTest(TestCase):
+    def setUp(self):
+        self.bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
+        self.buckwheat = Vegetable.objects.create(name="Buckwheat", is_yucky=True)
+        self.object_with_generic_fk_field = TaggedItem.objects.create(tag="test_tag", content_object=self.bacon)
+
+    def test_filter_by_generic_foreign_key(self):
+        qs = TaggedItem.objects.filter(content_object=self.bacon)
+        self.assertEqual(qs.count(), 1)
+        self.assertEqual(qs[0], self.object_with_generic_fk_field)
+
+    def test_filter_by_generic_foreign_key_multiple_filters(self):
+        qs = TaggedItem.objects.filter(content_object=self.bacon, tag="test_tag")
+        self.assertEqual(qs.count(), 1)
+        self.assertEqual(qs[0], self.object_with_generic_fk_field)
+
+    def test_filter_by_generic_foreign_key_negated(self):
+        qs = TaggedItem.objects.exclude(content_object=self.bacon)
+        self.assertEqual(qs.count(), 0)
+
+    def test_filter_by_generic_foreign_key_q_obj(self):
+        qs = TaggedItem.objects.filter(Q(content_object=self.bacon))
+        self.assertEqual(qs.count(), 1)
+        self.assertEqual(qs[0], self.object_with_generic_fk_field)
+
+    def test_filter_by_generic_foreign_key_q_obj_complex(self):
+        qs = TaggedItem.objects.filter(Q(content_object=self.bacon) | ~Q(tag="test_tag"))
+        self.assertEqual(qs.count(), 1)
+        self.assertEqual(qs[0], self.object_with_generic_fk_field)
+
+    def test_get_generic_foreign_key(self):
+        item = TaggedItem.objects.get(content_object=self.bacon)
+        self.assertEqual(item, self.object_with_generic_fk_field)
+
+    def test_get_or_create_generic_foreign_key(self):
+        item, created = TaggedItem.objects.get_or_create(content_object=self.bacon)
+        self.assertEqual(item, self.object_with_generic_fk_field)
+
+    def test_get_or_create_generic_foreign_key_new_item(self):
+        item, created = TaggedItem.objects.get_or_create(content_object=self.buckwheat,
+                                                         defaults={"tag": "new_tagged_item"})
+        self.assertEqual(created, True)
+        self.assertEqual(item.tag, "new_tagged_item")
+
+    def tearDown(self):
+        TaggedItem.objects.all().delete()
+        Vegetable.objects.all().delete()
+
