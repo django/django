@@ -181,7 +181,7 @@ WebsocketConsumer
 Available as ``channels.generic.websocket.WebsocketConsumer``, this
 wraps the verbose plain-ASGI message sending and receiving into handling that
 just deals with text and binary frames::
-
+    from channels.generic.websocket import WebsocketConsumer
     class MyConsumer(WebsocketConsumer):
         groups = ["broadcast"]
 
@@ -227,7 +227,7 @@ AsyncWebsocketConsumer
 Available as ``channels.generic.websocket.AsyncWebsocketConsumer``, this has
 the exact same methods and signature as ``WebsocketConsumer`` but everything
 is async, and the functions you need to write have to be as well::
-
+    from channels.generic.websocket import AsyncWebsocketConsumer
     class MyConsumer(AsyncWebsocketConsumer):
         groups = ["broadcast"]
 
