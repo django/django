@@ -8,6 +8,8 @@ import sys
 
 from django.utils import termcolors
 
+TERMINATOR = '\x1b[{}m'.format(termcolors.RESET)
+
 
 def supports_color():
     """
@@ -23,7 +25,9 @@ def supports_color():
 
 
 class Style:
-    pass
+
+    def is_dark(self):
+        return getattr(self, 'base_palette', None) == termcolors.DARK_PALETTE
 
 
 def make_style(config_string=''):
@@ -35,7 +39,7 @@ def make_style(config_string=''):
 
     style = Style()
 
-    color_settings = termcolors.parse_color_setting(config_string)
+    base_palette, color_settings = termcolors.parse_color_setting(config_string)
 
     # The nocolor palette has all available roles.
     # Use that palette as the basis for populating
@@ -52,6 +56,8 @@ def make_style(config_string=''):
     # For backwards compatibility,
     # set style for ERROR_OUTPUT == ERROR
     style.ERROR_OUTPUT = style.ERROR
+
+    style.base_palette = base_palette
 
     return style
 

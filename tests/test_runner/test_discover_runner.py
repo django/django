@@ -1,10 +1,10 @@
 import os
 from argparse import ArgumentParser
 from contextlib import contextmanager
-from unittest import TestSuite, TextTestRunner, defaultTestLoader
+from unittest import TestSuite, defaultTestLoader
 
 from django.test import TestCase
-from django.test.runner import DiscoverRunner
+from django.test.runner import ColoredTextTestRunner, DiscoverRunner
 from django.test.utils import captured_stdout
 
 
@@ -179,7 +179,7 @@ class DiscoverRunnerTest(TestCase):
         self.assertEqual(DiscoverRunner().test_suite, TestSuite)
 
     def test_overridable_test_runner(self):
-        self.assertEqual(DiscoverRunner().test_runner, TextTestRunner)
+        self.assertEqual(DiscoverRunner().test_runner, ColoredTextTestRunner)
 
     def test_overridable_test_loader(self):
         self.assertEqual(DiscoverRunner().test_loader, defaultTestLoader)

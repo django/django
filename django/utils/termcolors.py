@@ -91,6 +91,12 @@ PALETTES = {
         'HTTP_SERVER_ERROR': {},
         'MIGRATE_HEADING': {},
         'MIGRATE_LABEL': {},
+        'TEST_SUCCESS': {},
+        'TEST_FAIL': {},
+        'TEST_ERROR': {},
+        'TEST_EXPECTED_FAILURE': {},
+        'TEST_UNEXPECTED_SUCCESS': {},
+        'TEST_INFO': {},
     },
     DARK_PALETTE: {
         'ERROR': {'fg': 'red', 'opts': ('bold',)},
@@ -110,6 +116,12 @@ PALETTES = {
         'HTTP_SERVER_ERROR': {'fg': 'magenta', 'opts': ('bold',)},
         'MIGRATE_HEADING': {'fg': 'cyan', 'opts': ('bold',)},
         'MIGRATE_LABEL': {'opts': ('bold',)},
+        'TEST_SUCCESS': {'opts': ('noreset',), 'fg': 'green'},
+        'TEST_FAIL': {'opts': ('noreset', 'bold'), 'fg': 'red'},
+        'TEST_ERROR': {'opts': ('noreset', 'bold'), 'fg': 'magenta'},
+        'TEST_EXPECTED_FAILURE': {'opts': ('noreset',), 'fg': 'green'},
+        'TEST_UNEXPECTED_SUCCESS': {'opts': ('noreset', 'bold'), 'fg': 'red'},
+        'TEST_INFO': {'opts': ('bold',), 'fg': 'white'},
     },
     LIGHT_PALETTE: {
         'ERROR': {'fg': 'red', 'opts': ('bold',)},
@@ -129,6 +141,12 @@ PALETTES = {
         'HTTP_SERVER_ERROR': {'fg': 'magenta', 'opts': ('bold',)},
         'MIGRATE_HEADING': {'fg': 'cyan', 'opts': ('bold',)},
         'MIGRATE_LABEL': {'opts': ('bold',)},
+        'TEST_SUCCESS': {'opts': ('noreset',), 'fg': 'green'},
+        'TEST_FAIL': {'opts': ('noreset',), 'fg': 'red'},
+        'TEST_ERROR': {'opts': ('noreset',), 'fg': 'magenta'},
+        'TEST_EXPECTED_FAILURE': {'opts': ('noreset',), 'fg': 'green'},
+        'TEST_UNEXPECTED_SUCCESS': {'opts': ('noreset', 'bold'), 'fg': 'red'},
+        'TEST_INFO': {'opts': ('bold',), 'fg': 'black'},
     }
 }
 DEFAULT_PALETTE = DARK_PALETTE
@@ -136,6 +154,7 @@ DEFAULT_PALETTE = DARK_PALETTE
 
 def parse_color_setting(config_string):
     """Parse a DJANGO_COLORS environment variable to produce the system palette
+    Returns tuple with name of the base palette that was used and the system palette
 
     The general form of a palette definition is:
 
@@ -166,8 +185,9 @@ def parse_color_setting(config_string):
         'bold', 'underscore', 'blink', 'reverse', 'conceal', 'noreset'
     """
     if not config_string:
-        return PALETTES[DEFAULT_PALETTE]
+        return (DEFAULT_PALETTE, PALETTES[DEFAULT_PALETTE])
 
+    base_palette = NOCOLOR_PALETTE
     # Split the color configuration into parts
     parts = config_string.lower().split(';')
     palette = PALETTES[NOCOLOR_PALETTE].copy()
@@ -175,6 +195,7 @@ def parse_color_setting(config_string):
         if part in PALETTES:
             # A default palette has been specified
             palette.update(PALETTES[part])
+            base_palette = part
         elif '=' in part:
             # Process a palette defining string
             definition = {}
@@ -211,5 +232,5 @@ def parse_color_setting(config_string):
 
     # If there are no colors specified, return the empty palette.
     if palette == PALETTES[NOCOLOR_PALETTE]:
-        return None
-    return palette
+        return (NOCOLOR_PALETTE, None)
+    return (base_palette, palette)

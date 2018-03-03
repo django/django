@@ -1295,6 +1295,15 @@ overrides the value provided by the :setting:`TEST_RUNNER` setting.
 Suppresses all user prompts. A typical prompt is a warning about deleting an
 existing test database.
 
+.. versionadded:: 2.1
+
+If the Pygments library is available, the tracebacks of failing tests and
+the SQL queries (if ``--debug-sql`` was provided) will be colored. Windows
+users will need to have the `ANSICON library`_ installed to get colored output.
+
+.. _ANSICON library: https://github.com/adoxa/ansicon
+
+
 Test runner options
 ~~~~~~~~~~~~~~~~~~~
 
@@ -1714,6 +1723,12 @@ number of roles in which color is used:
 * ``http_server_error`` - A 5XX HTTP Server Error response.
 * ``migrate_heading`` - A heading in a migrations management command.
 * ``migrate_label`` - A migration name.
+* ``test_success`` - A passing test.
+* ``test_fail`` - A failing test.
+* ``test_error`` - A test with error.
+* ``test_expected_failure`` - A test that's expectedly failing.
+* ``test_unexpected_success`` - A test that's unexpectedly passing.
+* ``test_info`` - Important test output parts.
 
 Each of these roles can be assigned a specific foreground and
 background color, from the following list:
