@@ -8,7 +8,8 @@ __pycache__/
 .tox/
 *.swp
 *.pyc
-.coverage.*
+.coverage*
+.pytest_cache
 TODO
 node_modules
 
