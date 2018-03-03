@@ -966,7 +966,7 @@ class AutoField(Field):
         return int(value)
 
     def contribute_to_class(self, cls, name, **kwargs):
-        assert not cls._meta.auto_field, "A model can't have more than one AutoField."
+        assert not cls._meta.auto_field, "Model %s can't have more than one AutoField." % cls._meta.label
         super().contribute_to_class(cls, name, **kwargs)
         cls._meta.auto_field = self
 
