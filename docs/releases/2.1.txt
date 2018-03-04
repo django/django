@@ -218,6 +218,9 @@ Models
 * :meth:`.QuerySet.order_by` and :meth:`distinct(*fields) <.QuerySet.distinct>`
   now support using field transforms.
 
+* :class:`~django.contrib.contenttypes.fields.GenericForeignKey` fields can now
+  be used in non-nested lookups
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

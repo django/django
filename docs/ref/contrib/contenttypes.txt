@@ -355,7 +355,7 @@ normal field object, these examples will *not* work::
 
 Simple lookups, however, will work:
 
-    >>> TaggedItem.objects.filter(content_object=guido)
+    >>> TaggedItem.objects.get(content_object=guido)
     <TaggedItem: bdlf>
 
 Likewise, :class:`~django.contrib.contenttypes.fields.GenericForeignKey`\s

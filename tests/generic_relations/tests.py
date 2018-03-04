@@ -629,4 +629,3 @@ class GenericForeignKeyFilterTest(TestCase):
     def tearDown(self):
         TaggedItem.objects.all().delete()
         Vegetable.objects.all().delete()
-
