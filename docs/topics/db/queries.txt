@@ -865,6 +865,15 @@ precede the definition of any keyword arguments. For example::
 
 ... would not be valid.
 
+Differently from :meth:`~django.db.models.query.QuerySet.get` method, the 
+:meth:`~django.db.models.query.QuerySet.get_or_create` method must be used 
+with the :meth:`~django.db.models.query.QuerySet.filter` lookup function. 
+For example::
+
+    Poll.objects.filter(
+        Q(first_name='Bryan') | Q(first_name='Bruce')
+        ).get_or_create({'last_name': 'Harrison'})
+
 .. seealso::
 
     The `OR lookups examples`_ in the Django unit tests show some possible uses
