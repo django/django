@@ -5,8 +5,6 @@ from django.apps import apps
 from django.conf import settings
 from django.core.management import CommandError
 from django.core.management.commands.runserver import Command as RunserverCommand
-from django.utils import six
-from django.utils.encoding import get_system_encoding
 
 from channels import __version__
 from channels.log import setup_logger
@@ -55,8 +53,6 @@ class Command(RunserverCommand):
         # Print helpful text
         quit_command = "CTRL-BREAK" if sys.platform == "win32" else "CONTROL-C"
         now = datetime.datetime.now().strftime("%B %d, %Y - %X")
-        if six.PY2:
-            now = now.decode(get_system_encoding())
         self.stdout.write(now)
         self.stdout.write((
             "Django version %(version)s, using settings %(settings)r\n"

@@ -11,7 +11,6 @@ from django.core import signals
 from django.core.handlers import base
 from django.http import FileResponse, HttpResponse, HttpResponseServerError
 from django.urls import set_script_prefix
-from django.utils import six
 from django.utils.functional import cached_property
 
 from asgiref.sync import async_to_sync, sync_to_async
@@ -65,7 +64,7 @@ class AsgiRequest(http.HttpRequest):
             self.META["REMOTE_PORT"] = self.scope["client"][1]
         if self.scope.get("server", None):
             self.META["SERVER_NAME"] = self.scope["server"][0]
-            self.META["SERVER_PORT"] = six.text_type(self.scope["server"][1])
+            self.META["SERVER_PORT"] = str(self.scope["server"][1])
         else:
             self.META["SERVER_NAME"] = "unknown"
             self.META["SERVER_PORT"] = "0"
@@ -110,7 +109,7 @@ class AsgiRequest(http.HttpRequest):
         # Body handling
         # TODO: chunked bodies
         self._body = body
-        assert isinstance(self._body, six.binary_type), "Body is not bytes"
+        assert isinstance(self._body, bytes), "Body is not bytes"
         # Add a stream-a-like for the body
         self._stream = BytesIO(self._body)
         # Other bits
@@ -252,14 +251,14 @@ class AsgiHandler(base.BaseHandler):
         # compliant clients that want things like Content-Type correct. Ugh.
         response_headers = []
         for header, value in response.items():
-            if isinstance(header, six.text_type):
+            if isinstance(header, str):
                 header = header.encode("ascii")
-            if isinstance(value, six.text_type):
+            if isinstance(value, str):
                 value = value.encode("latin1")
             response_headers.append(
                 (
-                    six.binary_type(header),
-                    six.binary_type(value),
+                    bytes(header),
+                    bytes(value),
                 )
             )
         for c in response.cookies.values():
