@@ -25,7 +25,9 @@ ASGI middlewares it contains, ``OriginValidator`` and
 ``OriginValidator`` lets you restrict the valid options for the ``Origin``
 header that is sent with every WebSocket to say where it comes from. Just wrap
 it around your WebSocket application code like this, and pass it a list of
-valid domains as the second argument::
+valid domains as the second argument. You can pass only a single domain (for example,
+``.allowed-domain.com``) or a full origin, in the format ``scheme://domain[:port]``
+(for example, ``http://allowed-domain.com:80``). Port is optional, but recommended::
 
     from channels.security.websocket import OriginValidator
 
@@ -37,9 +39,12 @@ valid domains as the second argument::
                     ...
                 ])
             ),
-            ["goodsite.com", "*.goodsite.com"],
+            [".goodsite.com", "http://.goodsite.com:80", "http://other.site.com"],
         ),
     })
+
+Note: If you want to resolve any domain, then use the origin ``*``.
+
 
 Often, the set of domains you want to restrict to is the same as the Django
 ``ALLOWED_HOSTS`` setting, which performs a similar security check for the
