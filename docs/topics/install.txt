@@ -7,8 +7,8 @@ This document will get you up and running with Django.
 Install Python
 ==============
 
-Being a Python Web framework, Django requires Python. See
-:ref:`faq-python-version-support` for details.
+Django is a Python Web framework. See :ref:`faq-python-version-support` for
+details.
 
 Get the latest version of Python at https://www.python.org/downloads/ or with
 your operating system's package manager.
@@ -34,19 +34,19 @@ testing, so you won't need to set up Apache until you're ready to
 deploy Django in production.
 
 If you want to use Django on a production site, use `Apache`_ with
-`mod_wsgi`_. mod_wsgi can operate in one of two modes: an embedded
-mode and a daemon mode. In embedded mode, mod_wsgi is similar to
+`mod_wsgi`_. mod_wsgi operates in one of two modes: embedded
+mode or daemon mode. In embedded mode, mod_wsgi is similar to
 mod_perl -- it embeds Python within Apache and loads Python code into
 memory when the server starts. Code stays in memory throughout the
 life of an Apache process, which leads to significant performance
 gains over other server arrangements. In daemon mode, mod_wsgi spawns
 an independent daemon process that handles requests. The daemon
 process can run as a different user than the Web server, possibly
-leading to improved security, and the daemon process can be restarted
+leading to improved security. The daemon process can be restarted
 without restarting the entire Apache Web server, possibly making
 refreshing your codebase more seamless. Consult the mod_wsgi
 documentation to determine which mode is right for your setup. Make
-sure you have Apache installed, with the mod_wsgi module activated.
+sure you have Apache installed with the mod_wsgi module activated.
 Django will work with any version of Apache that supports mod_wsgi.
 
 See :doc:`How to use Django with mod_wsgi </howto/deployment/wsgi/modwsgi>`
@@ -76,7 +76,7 @@ If you are developing a simple project or something you don't plan to deploy
 in a production environment, SQLite is generally the simplest option as it
 doesn't require running a separate server. However, SQLite has many differences
 from other databases, so if you are working on something substantial, it's
-recommended to develop with the same database as you plan on using in
+recommended to develop with the same database that you plan on using in
 production.
 
 In addition to the officially supported databases, there are :ref:`backends
