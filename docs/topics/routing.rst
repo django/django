@@ -99,7 +99,7 @@ a single argument, a list of Django URL objects (either ``path()`` or ``url()``)
     URLRouter([
         url("^longpoll/$", LongPollConsumer),
         url("^notifications/(?P<stream>\w+)/$", LongPollConsumer),
-        url("^$", AsgiHandler),
+        url("", AsgiHandler),
     ])
 
 Any captured groups will be provided in ``scope`` as the key ``url_route``, a
