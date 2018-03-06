@@ -15,20 +15,20 @@ For more information, please see our `contribution guide <https://channels.readt
 Quick Setup
 -----------
 
-Fork, then clone the repo:
+Fork, then clone the repo::
 
     git clone git@github.com:your-username/channels.git
 
-Make sure the tests pass:
+Make sure the tests pass::
 
     pip install -e .[tests]
     pytest
 
-Make your change. Add tests for your change. Make the tests pass:
+Make your change. Add tests for your change. Make the tests pass::
 
     pytest
 
-Make sure your code conforms to the coding style:
+Make sure your code conforms to the coding style::
 
     flake8
     isort --check-only --diff --recursive channels tests
