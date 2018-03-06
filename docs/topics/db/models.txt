@@ -897,9 +897,7 @@ information into a number of other models. You write your base class
 and put ``abstract=True`` in the :ref:`Meta <meta-options>`
 class. This model will then not be used to create any database
 table. Instead, when it is used as a base class for other models, its
-fields will be added to those of the child class. It is an error to
-have fields in the abstract base class with the same name as those in
-the child (and Django will raise an exception).
+fields will be added to those of the child class.
 
 An example::
 
@@ -919,6 +917,9 @@ The ``Student`` model will have three fields: ``name``, ``age`` and
 ``home_group``. The ``CommonInfo`` model cannot be used as a normal Django
 model, since it is an abstract base class. It does not generate a database
 table or have a manager, and cannot be instantiated or saved directly.
+
+Fields inherited from abstract base classes can be overridden with another
+field or value, or be removed with ``None``.
 
 For many uses, this type of model inheritance will be exactly what you want.
 It provides a way to factor out common information at the Python level, while
