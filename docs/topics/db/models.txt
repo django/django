@@ -899,9 +899,7 @@ information into a number of other models. You write your base class
 and put ``abstract=True`` in the :ref:`Meta <meta-options>`
 class. This model will then not be used to create any database
 table. Instead, when it is used as a base class for other models, its
-fields will be added to those of the child class. It is an error to
-have fields in the abstract base class with the same name as those in
-the child (and Django will raise an exception).
+fields will be added to those of the child class.
 
 An example::
 
