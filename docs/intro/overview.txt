@@ -181,11 +181,10 @@ application. Django encourages beautiful URL design and doesn't put any cruft
 in URLs, like ``.php`` or ``.asp``.
 
 To design URLs for an app, you create a Python module called a :doc:`URLconf
-</topics/http/urls>`. A table of contents for your app, it contains a simple
-mapping between URL patterns and Python callback functions. URLconfs also serve
-to decouple URLs from Python code.
+</topics/http/urls>`. URLconf serves as your app's table of contents by
+mapping URL patterns to Python callback functions. URLconf also decouples URLs from Python code.
 
-Here's what a URLconf might look like for the ``Reporter``/``Article``
+Here's what URLconf might look like for the ``Reporter``/``Article``
 example above:
 
 .. snippet::
