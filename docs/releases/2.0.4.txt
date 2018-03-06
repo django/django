@@ -1,0 +1,12 @@
+==========================
+Django 2.0.4 release notes
+==========================
+
+*Expected April 2, 2018*
+
+Django 2.0.4 fixes several bugs in 2.0.3.
+
+Bugfixes
+========
+
+* ...
