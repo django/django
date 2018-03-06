@@ -857,3 +857,31 @@ Versions affected
 
 * Django 2.0 `(patch) <https://github.com/django/django/commit/c37bb28677295f6edda61d8ac461014ef0d3aeb2>`__
 * Django 1.11 `(patch) <https://github.com/django/django/commit/57b95fedad5e0b83fc9c81466b7d1751c6427aae>`__
+
+March 6, 2018 - :cve:`2018-7536`
+--------------------------------
+
+Denial-of-service possibility in ``urlize`` and ``urlizetrunc`` template
+filters. `Full description
+<https://www.djangoproject.com/weblog/2018/mar/06/security-releases/>`_
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 2.0 `(patch) <https://github.com/django/django/commit/e157315da3ae7005fa0683ffc9751dbeca7306c8>`__
+* Django 1.11 `(patch) <https://github.com/django/django/commit/abf89d729f210c692a50e0ad3f75fb6bec6fae16>`__
+* Django 1.8  `(patch) <https://github.com/django/django/commit/1ca63a66ef3163149ad822701273e8a1844192c2>`__
+
+March 6, 2018 - :cve:`2018-7537`
+--------------------------------
+
+Denial-of-service possibility in ``truncatechars_html`` and
+``truncatewords_html`` template filters. `Full description
+<https://www.djangoproject.com/weblog/2018/mar/06/security-releases/>`_
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 2.0 `(patch) <https://github.com/django/django/commit/94c5da1d17a6b0d378866c66b605102c19f7988c>`__
+* Django 1.11 `(patch) <https://github.com/django/django/commit/a91436360b79a6ff995c3e5018bcc666dfaf1539>`__
+* Django 1.8  `(patch) <https://github.com/django/django/commit/d17974a287a6ea2e361daff88fcc004cbd6835fa>`__
