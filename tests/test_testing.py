@@ -1,3 +1,4 @@
+from concurrent.futures import TimeoutError
 from urllib.parse import unquote
 
 import pytest
@@ -50,6 +51,15 @@ class SimpleWebsocketApp(WebsocketConsumer):
         self.send(text_data=text_data, bytes_data=bytes_data)
 
 
+class ErrorWebsocketApp(WebsocketConsumer):
+    """
+    Barebones WebSocket ASGI app for error testing.
+    """
+
+    def receive(self, text_data=None, bytes_data=None):
+        pass
+
+
 @pytest.mark.asyncio
 async def test_websocket_communicator():
     """
@@ -72,6 +82,24 @@ async def test_websocket_communicator():
     await communicator.send_json_to({"hello": "world"})
     response = await communicator.receive_json_from()
     assert response == {"hello": "world"}
+    # Close out
+    await communicator.disconnect()
+
+
+@pytest.mark.asyncio
+async def test_timeout_disconnect():
+    """
+    Tests that disconnect() still works after a timeout.
+    """
+    communicator = WebsocketCommunicator(ErrorWebsocketApp, "/testws/")
+    # Test connection
+    connected, subprotocol = await communicator.connect()
+    assert connected
+    assert subprotocol is None
+    # Test sending text (will error internally)
+    await communicator.send_to(text_data="hello")
+    with pytest.raises(TimeoutError):
+        await communicator.receive_from()
     # Close out
     await communicator.disconnect()
 

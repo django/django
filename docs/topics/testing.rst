@@ -149,7 +149,8 @@ application, as shown in this example::
     If you don't call ``WebsocketCommunicator.disconnect()`` before your test
     suite ends, you may find yourself getting ``RuntimeWarnings`` about
     things never being awaited, as you will be killing your app off in the
-    middle of its lifecycle.
+    middle of its lifecycle. You do not, however, have to ``disconnect()`` if
+    your app already raised an error.
 
 connect
 ~~~~~~~
@@ -210,6 +211,10 @@ disconnect
 ~~~~~~~~~~
 
 Closes the socket from the client side. Takes nothing and returns nothing.
+
+You do not need to call this if the application instance you're testing already
+exited (for example, if it errored), but if you do call it, it will just
+silently return control to you.
 
 
 ChannelsLiveServerTestCase
