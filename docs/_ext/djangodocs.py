@@ -431,6 +431,9 @@ class ConsoleDirective(CodeBlock):
                 elif token[:2] == '~/':
                     token = '%HOMEPATH%\\' + token[2:]
                     changed = True
+                elif token == 'make':
+                    token = 'make.bat'
+                    changed = True
                 if '://' not in token and 'git' not in cmdline:
                     out.append(token.replace('/', '\\'))
                     changed = True
