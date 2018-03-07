@@ -149,6 +149,10 @@ class ContentFile(File):
     def close(self):
         pass
 
+    def write(self, data):
+        self.__dict__.pop('_size', None)  # Clear the computed size.
+        return self.file.write(data)
+
 
 def endswith_cr(line):
     """Return True if line (a text or byte string) ends with '\r'."""
