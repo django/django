@@ -128,6 +128,10 @@ You should run Daphne inside either a process supervisor (systemd, supervisord)
 or a container orchestration system (kubernetes, nomad) to ensure that it
 gets restarted if needed and to allow you to scale the number of processes.
 
+If you want to bind multiple Daphne instances to the same port on a machine,
+use a process supervisor that can listen on ports and pass the file descriptors
+to launched processes, and then pass the file descriptor with ``--fd NUM``.
+
 You can also specify the port and IP that Daphne binds to::
 
     daphne -b 0.0.0.0 -p 8001 myproject.asgi:application
