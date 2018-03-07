@@ -32,28 +32,28 @@ class SessionMiddleware(MiddlewareMixin):
         except AttributeError:
             pass
         else:
-            # First check if we need to delete this cookie.
-            # The session should be deleted only if the session is entirely empty
-            if settings.SESSION_COOKIE_NAME in request.COOKIES and empty:
-                response.delete_cookie(
-                    settings.SESSION_COOKIE_NAME,
-                    path=settings.SESSION_COOKIE_PATH,
-                    domain=settings.SESSION_COOKIE_DOMAIN,
-                )
-            else:
-                if accessed:
-                    patch_vary_headers(response, ('Cookie',))
-                if (modified or settings.SESSION_SAVE_EVERY_REQUEST) and not empty:
-                    if request.session.get_expire_at_browser_close():
-                        max_age = None
-                        expires = None
-                    else:
-                        max_age = request.session.get_expiry_age()
-                        expires_time = time.time() + max_age
-                        expires = http_date(expires_time)
-                    # Save the session data and refresh the client cookie.
-                    # Skip session save for 500 responses, refs #3881.
-                    if response.status_code != 500:
+            # Skip session save and cookie delete for 500 responses, refs #3881.
+            if response.status_code != 500:
+                # First check if we need to delete this cookie.
+                # The session should be deleted only if the session is entirely empty
+                if settings.SESSION_COOKIE_NAME in request.COOKIES and empty:
+                    response.delete_cookie(
+                        settings.SESSION_COOKIE_NAME,
+                        path=settings.SESSION_COOKIE_PATH,
+                        domain=settings.SESSION_COOKIE_DOMAIN,
+                    )
+                else:
+                    if accessed:
+                        patch_vary_headers(response, ('Cookie',))
+                    if (modified or settings.SESSION_SAVE_EVERY_REQUEST) and not empty:
+                        if request.session.get_expire_at_browser_close():
+                            max_age = None
+                            expires = None
+                        else:
+                            max_age = request.session.get_expiry_age()
+                            expires_time = time.time() + max_age
+                            expires = http_date(expires_time)
+                        # Save the session data and refresh the client cookie.
                         try:
                             request.session.save()
                         except UpdateError:
