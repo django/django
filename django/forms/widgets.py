@@ -542,12 +542,17 @@ class ChoiceWidget(Widget):
     checked_attribute = {'checked': True}
     option_inherits_attrs = True
 
-    def __init__(self, attrs=None, choices=()):
+    def __init__(self, attrs=None, choices=(), opt_attrs=None):
         super().__init__(attrs)
         # choices can be any iterable, but we may need to render this widget
         # multiple times. Thus, collapse it into a list so it can be consumed
         # more than once.
         self.choices = list(choices)
+
+        if opt_attrs is not None:
+            self.opt_attrs = opt_attrs.copy()
+        else:
+            self.opt_attrs = {}
 
     def __deepcopy__(self, memo):
         obj = copy.copy(self)
@@ -605,23 +610,38 @@ class ChoiceWidget(Widget):
 
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
         index = str(index) if subindex is None else "%s_%s" % (index, subindex)
-        if attrs is None:
-            attrs = {}
-        option_attrs = self.build_attrs(self.attrs, attrs) if self.option_inherits_attrs else {}
-        if selected:
-            option_attrs.update(self.checked_attribute)
-        if 'id' in option_attrs:
-            option_attrs['id'] = self.id_for_label(option_attrs['id'], index)
-        return {
+
+        option_dict = {
             'name': name,
             'value': value,
             'label': label,
             'selected': selected,
             'index': index,
-            'attrs': option_attrs,
             'type': self.input_type,
             'template_name': self.option_template_name,
         }
+
+        option_attrs = {}
+
+        if self.option_inherits_attrs:
+            option_attrs.update(self.build_attrs(self.attrs, attrs or {}))
+
+        if hasattr(self, 'opt_attrs'):
+            for key, value in self.opt_attrs.items():
+                if callable(value):
+                    option_attrs[key] = value(**option_dict)
+                else:
+                    option_attrs[key] = value
+
+        if selected:
+            option_attrs.update(self.checked_attribute)
+
+        if 'id' in option_attrs:
+            option_attrs['id'] = self.id_for_label(option_attrs['id'], index)
+
+        option_dict['attrs'] = option_attrs
+
+        return option_dict
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
