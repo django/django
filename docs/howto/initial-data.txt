@@ -3,13 +3,24 @@ Providing initial data for models
 =================================
 
 It's sometimes useful to pre-populate your database with hard-coded data when
-you're first setting up an app. You can provide initial data with fixtures or
-migrations.
+you're first setting up an app. You can provide initial data with migrations or
+fixtures.
+
+Providing initial data with migrations
+======================================
+
+If you want to automatically load initial data for an app, create a
+:ref:`data migration <data-migrations>`. Migrations are run when setting up the
+test database, so the data will be available there, subject to :ref:`some
+limitations <test-case-serialized-rollback>`.
 
 .. _initial-data-via-fixtures:
 
-Providing initial data with fixtures
-====================================
+Providing data with fixtures
+============================
+
+You can also provide data using fixtures, however, this data isn't loaded
+automatically, except if you use :attr:`.TransactionTestCase.fixtures`.
 
 A fixture is a collection of data that Django knows how to import into a
 database. The most straightforward way of creating a fixture if you've already
@@ -84,11 +95,3 @@ directories.
 
     Fixtures are also used by the :ref:`testing framework
     <topics-testing-fixtures>` to help set up a consistent test environment.
-
-Providing initial data with migrations
-======================================
-
-If you want to automatically load initial data for an app, don't use fixtures.
-Instead, create a migration for your application with
-:class:`~django.db.migrations.operations.RunPython` or
-:class:`~django.db.migrations.operations.RunSQL` operations.
