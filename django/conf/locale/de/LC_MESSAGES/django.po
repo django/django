@@ -420,7 +420,7 @@ msgid ""
 "File extension '%(extension)s' is not allowed. Allowed extensions are: "
 "'%(allowed_extensions)s'."
 msgstr ""
-"Dateiendung „%(extension)s“ ist nicht erlaubt. Erlaubte Dateiendungen: sind: "
+"Dateiendung „%(extension)s“ ist nicht erlaubt. Erlaubte Dateiendungen sind: "
 "„%(allowed_extensions)s“."
 
 msgid "Null characters are not allowed."
