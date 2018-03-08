@@ -9,4 +9,5 @@ Django 2.0.4 fixes several bugs in 2.0.3.
 Bugfixes
 ========
 
-* ...
+* Fixed a crash when filtering with an ``Exists()`` annotation of a queryset
+  containing a single field (:ticket:`29195`).

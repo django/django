@@ -960,9 +960,12 @@ class Subquery(Expression):
     def __init__(self, queryset, output_field=None, **extra):
         self.queryset = queryset
         self.extra = extra
-        if output_field is None and len(self.queryset.query.select) == 1:
-            output_field = self.queryset.query.select[0].field
         super().__init__(output_field)
+
+    def _resolve_output_field(self):
+        if len(self.queryset.query.select) == 1:
+            return self.queryset.query.select[0].field
+        return super()._resolve_output_field()
 
     def copy(self):
         clone = super().copy()
