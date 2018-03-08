@@ -417,6 +417,10 @@ class BasicExpressionsTests(TestCase):
         outer = Employee.objects.annotate(is_point_of_contact=Exists(inner))
         self.assertIs(outer.exists(), True)
 
+    def test_exist_single_field_output_field(self):
+        queryset = Company.objects.values('pk')
+        self.assertIsInstance(Exists(queryset).output_field, models.BooleanField)
+
     def test_subquery(self):
         Company.objects.filter(name='Example Inc.').update(
             point_of_contact=Employee.objects.get(firstname='Joe', lastname='Smith'),
