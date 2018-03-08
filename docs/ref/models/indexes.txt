@@ -21,7 +21,7 @@ options`_.
 ``Index`` options
 =================
 
-.. class:: Index(fields=[], name=None, db_tablespace=None)
+.. class:: Index(fields=(), name=None, db_tablespace=None)
 
     Creates an index (B-Tree) in the database.
 
@@ -30,7 +30,7 @@ options`_.
 
 .. attribute:: Index.fields
 
-A list of the name of the fields on which the index is desired.
+A list or tuple of the name of the fields on which the index is desired.
 
 By default, indexes are created with an ascending order for each column. To
 define an index with a descending order for a column, add a hyphen before the
@@ -39,6 +39,10 @@ field's name.
 For example ``Index(fields=['headline', '-pub_date'])`` would create SQL with
 ``(headline, pub_date DESC)``. Index ordering isn't supported on MySQL. In that
 case, a descending index is created as a normal index.
+
+.. versionchanged:: 2.1
+
+    Older versions don't accept a tuple.
 
 ``name``
 --------
