@@ -206,6 +206,8 @@ class SomeChildModelForm(forms.ModelForm):
         widgets = {
             'position': forms.HiddenInput,
         }
+        labels = {'readonly_field': 'Label from ModelForm.Meta'}
+        help_texts = {'readonly_field': 'Help text from ModelForm.Meta'}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -215,6 +217,7 @@ class SomeChildModelForm(forms.ModelForm):
 class SomeChildModelInline(admin.TabularInline):
     model = SomeChildModel
     form = SomeChildModelForm
+    readonly_fields = ('readonly_field',)
 
 
 site.register(TitleCollection, inlines=[TitleInline])

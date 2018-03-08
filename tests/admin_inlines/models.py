@@ -248,6 +248,7 @@ class SomeChildModel(models.Model):
     name = models.CharField(max_length=1)
     position = models.PositiveIntegerField()
     parent = models.ForeignKey(SomeParentModel, models.CASCADE)
+    readonly_field = models.CharField(max_length=1)
 
 # Other models
 
