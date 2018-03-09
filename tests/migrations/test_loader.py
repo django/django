@@ -81,6 +81,22 @@ class LoaderTests(TestCase):
         # Ensure we've included unmigrated apps in there too
         self.assertIn("basic", project_state.real_apps)
 
+    @override_settings(MIGRATION_MODULES={
+        'migrations': 'migrations.test_migrations',
+        'migrations2': 'migrations2.test_migrations_2',
+    })
+    @modify_settings(INSTALLED_APPS={'append': 'migrations2'})
+    def test_plan_handles_repeated_migrations(self):
+        """
+        _generate_plan() doesn't readd migrations already in the plan (#29180).
+        """
+        migration_loader = MigrationLoader(connection)
+        nodes = [('migrations', '0002_second'), ('migrations2', '0001_initial')]
+        self.assertEqual(
+            migration_loader.graph._generate_plan(nodes, at_end=True),
+            [('migrations', '0001_initial'), ('migrations', '0002_second'), ('migrations2', '0001_initial')]
+        )
+
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_unmigdep"})
     def test_load_unmigrated_dependency(self):
         """

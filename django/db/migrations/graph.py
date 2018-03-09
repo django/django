@@ -356,7 +356,7 @@ class MigrationGraph:
         plan = []
         for node in nodes:
             for migration in self.forwards_plan(node):
-                if migration in plan or at_end or migration not in nodes:
+                if migration not in plan and (at_end or migration not in nodes):
                     plan.append(migration)
         return plan
 
