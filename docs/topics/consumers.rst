@@ -80,7 +80,7 @@ must be coroutines, and ``self.send`` is a coroutine::
         async def websocket_receive(self, event):
             await self.send({
                 "type": "websocket.send",
-                "text": text,
+                "text": event["text"],
             })
 
 When should you use ``AsyncConsumer`` and when should you use ``SyncConsumer``?
