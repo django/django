@@ -9,6 +9,7 @@ import time
 from copy import deepcopy
 
 from django.conf import settings
+from django.core.signals import setting_changed
 from django.utils.module_loading import import_string
 
 from channels import DEFAULT_CHANNEL_LAYER
@@ -23,6 +24,14 @@ class ChannelLayerManager:
 
     def __init__(self):
         self.backends = {}
+        setting_changed.connect(self._reset_backends)
+
+    def _reset_backends(self, setting, **kwargs):
+        """
+        Removes cached channel layers when the CHANNEL_LAYERS setting changes.
+        """
+        if setting == "CHANNEL_LAYERS":
+            self.backends = {}
 
     @property
     def configs(self):

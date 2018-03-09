@@ -5,7 +5,7 @@ from django.test import override_settings
 
 from channels import DEFAULT_CHANNEL_LAYER
 from channels.exceptions import InvalidChannelLayerError
-from channels.layers import InMemoryChannelLayer, channel_layers
+from channels.layers import InMemoryChannelLayer, channel_layers, get_channel_layer
 
 
 class TestChannelLayerManager(unittest.TestCase):
@@ -40,6 +40,21 @@ class TestChannelLayerManager(unittest.TestCase):
 
         layer = channel_layers.make_test_backend(DEFAULT_CHANNEL_LAYER)
         self.assertEqual(layer.expiry, 100500)
+
+    def test_override_settings(self):
+        """
+        The channel layers cache is reset when the CHANNEL_LAYERS setting
+        changes.
+        """
+        with override_settings(CHANNEL_LAYERS={
+            "default": {
+                "BACKEND": "channels.layers.InMemoryChannelLayer",
+            },
+        }):
+            self.assertEqual(channel_layers.backends, {})
+            get_channel_layer()
+            self.assertNotEqual(channel_layers.backends, {})
+        self.assertEqual(channel_layers.backends, {})
 
 
 ### In-memory layer tests
