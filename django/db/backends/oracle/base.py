@@ -185,18 +185,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         use_returning_into = self.settings_dict["OPTIONS"].get('use_returning_into', True)
         self.features.can_return_id_from_insert = use_returning_into
 
-    def _connect_string(self):
+    def _dsn(self):
         settings_dict = self.settings_dict
         if not settings_dict['HOST'].strip():
             settings_dict['HOST'] = 'localhost'
         if settings_dict['PORT']:
-            dsn = Database.makedsn(settings_dict['HOST'],
-                                   int(settings_dict['PORT']),
-                                   settings_dict['NAME'])
-        else:
-            dsn = settings_dict['NAME']
-        return "%s/%s@%s" % (settings_dict['USER'],
-                             settings_dict['PASSWORD'], dsn)
+            return Database.makedsn(settings_dict['HOST'], int(settings_dict['PORT']), settings_dict['NAME'])
+        return settings_dict['NAME']
+
+    def _connect_string(self):
+        return '%s/\\"%s\\"@%s' % (self.settings_dict['USER'], self.settings_dict['PASSWORD'], self._dsn())
 
     def get_connection_params(self):
         conn_params = self.settings_dict['OPTIONS'].copy()
@@ -205,7 +203,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return conn_params
 
     def get_new_connection(self, conn_params):
-        return Database.connect(self._connect_string(), **conn_params)
+        return Database.connect(
+            user=self.settings_dict['USER'],
+            password=self.settings_dict['PASSWORD'],
+            dsn=self._dsn(),
+            **conn_params,
+        )
 
     def init_connection_state(self):
         cursor = self.create_cursor()
