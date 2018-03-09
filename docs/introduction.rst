@@ -182,8 +182,8 @@ You can combine multiple Consumers (which are, remember, their own ASGI apps)
 into one bigger app that represents your project using routing::
 
     application = URLRouter([
-        url("^chat/admin/$", AdminChatConsumer),
-        url("^chat/$", PublicChatConsumer),
+        url(r"^chat/admin/$", AdminChatConsumer),
+        url(r"^chat/$", PublicChatConsumer),
     ])
 
 Channels is not just built around the world of HTTP and WebSockets - it also
@@ -208,8 +208,8 @@ WebSockets and chat requests::
     application = ProtocolTypeRouter({
 
         "websocket": URLRouter([
-            url("^chat/admin/$", AdminChatConsumer),
-            url("^chat/$", PublicChatConsumer),
+            url(r"^chat/admin/$", AdminChatConsumer),
+            url(r"^chat/$", PublicChatConsumer),
         ]),
 
         "telegram": ChattyBotConsumer,
@@ -277,7 +277,7 @@ WebSocket views by just adding the right middleware around them::
     application = ProtocolTypeRouter({
         "websocket": AuthMiddlewareStack(
             URLRouter([
-                url("^front(end)/$", consumers.AsyncChatConsumer),
+                url(r"^front(end)/$", consumers.AsyncChatConsumer),
             ])
         ),
     })

@@ -30,7 +30,7 @@ in your ``routing.py``::
 
         "websocket": SessionMiddlewareStack(
             URLRouter([
-                url("^front(end)/$", consumers.AsyncChatConsumer),
+                url(r"^front(end)/$", consumers.AsyncChatConsumer),
             ])
         ),
 

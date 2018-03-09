@@ -32,7 +32,7 @@ in your ``routing.py``::
 
         "websocket": AuthMiddlewareStack(
             URLRouter([
-                url("^front(end)/$", consumers.AsyncChatConsumer),
+                url(r"^front(end)/$", consumers.AsyncChatConsumer),
             ])
         ),
 
