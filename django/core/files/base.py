@@ -2,6 +2,7 @@ import os
 from io import BytesIO, StringIO, UnsupportedOperation
 
 from django.core.files.utils import FileProxyMixin
+from django.utils.functional import cached_property
 
 
 class File(FileProxyMixin):
@@ -27,7 +28,8 @@ class File(FileProxyMixin):
     def __len__(self):
         return self.size
 
-    def _get_size_from_underlying_file(self):
+    @cached_property
+    def size(self):
         if hasattr(self.file, 'size'):
             return self.file.size
         if hasattr(self.file, 'name'):
@@ -42,17 +44,6 @@ class File(FileProxyMixin):
             self.file.seek(pos)
             return size
         raise AttributeError("Unable to determine the file's size.")
-
-    def _get_size(self):
-        if hasattr(self, '_size'):
-            return self._size
-        self._size = self._get_size_from_underlying_file()
-        return self._size
-
-    def _set_size(self, size):
-        self._size = size
-
-    size = property(_get_size, _set_size)
 
     def chunks(self, chunk_size=None):
         """
@@ -150,7 +141,7 @@ class ContentFile(File):
         pass
 
     def write(self, data):
-        self.__dict__.pop('_size', None)  # Clear the computed size.
+        self.__dict__.pop('size', None)  # Clear the computed size.
         return self.file.write(data)
 
 
