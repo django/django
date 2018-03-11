@@ -284,11 +284,11 @@ class InspectDBTransactionalTests(TransactionTestCase):
         view_model = 'class InspectdbPeopleView(models.Model):'
         view_managed = 'managed = False  # Created from a view.'
         try:
-            call_command('inspectdb', stdout=out)
+            call_command('inspectdb', table_name_filter=inspectdb_tables_only, stdout=out)
             no_views_output = out.getvalue()
             self.assertNotIn(view_model, no_views_output)
             self.assertNotIn(view_managed, no_views_output)
-            call_command('inspectdb', include_views=True, stdout=out)
+            call_command('inspectdb', table_name_filter=inspectdb_tables_only, include_views=True, stdout=out)
             with_views_output = out.getvalue()
             self.assertIn(view_model, with_views_output)
             self.assertIn(view_managed, with_views_output)
