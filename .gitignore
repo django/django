@@ -16,3 +16,6 @@ node_modules
 # IDE and Tooling files
 .idea/*
 *~
+
+# macOS
+.DS_Store

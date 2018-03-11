@@ -38,6 +38,8 @@ This documentation covers the system as a whole; individual release notes and
 instructions can be found in the individual repositories.
 
 
+.. _topics:
+
 Topics
 ------
 
@@ -46,6 +48,7 @@ Topics
 
    introduction
    installation
+   tutorial/index
    topics/consumers
    topics/routing
    topics/databases

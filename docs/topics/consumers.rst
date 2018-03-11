@@ -19,6 +19,8 @@ Channels - like routing, session handling and authentication - with any
 ASGI app, but they're generally the best way to write your application code.
 
 
+.. _sync_to_async:
+
 Basic Layout
 ------------
 
@@ -137,6 +139,8 @@ Consumers also let you deal with Channel's *channel layers*, to let them
 send messages between each other either one-to-one or via a broadcast system
 called groups. You can read more in :doc:`/topics/channel_layers`.
 
+
+.. _scope:
 
 Scope
 -----
