@@ -219,10 +219,8 @@ class BaseDatabaseSchemaEditor:
         # If it's a callable, call it
         if callable(default):
             default = default()
-        # Run it through the field's get_db_prep_save method so we can send it
-        # to the database.
-        default = field.get_db_prep_save(default, self.connection)
-        return default
+        # Convert the value so it can be sent to the database.
+        return field.get_db_prep_save(default, self.connection)
 
     def quote_value(self, value):
         """
