@@ -377,6 +377,7 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
 
 class PatternLookup(BuiltinLookup):
     param_pattern = '%%%s%%'
+    prepare_rhs = False
 
     def get_rhs_op(self, connection, rhs):
         # Assume we are in startswith. We need to produce SQL like:
@@ -404,39 +405,33 @@ class PatternLookup(BuiltinLookup):
 @Field.register_lookup
 class Contains(PatternLookup):
     lookup_name = 'contains'
-    prepare_rhs = False
 
 
 @Field.register_lookup
 class IContains(Contains):
     lookup_name = 'icontains'
-    prepare_rhs = False
 
 
 @Field.register_lookup
 class StartsWith(PatternLookup):
     lookup_name = 'startswith'
     param_pattern = '%s%%'
-    prepare_rhs = False
 
 
 @Field.register_lookup
 class IStartsWith(StartsWith):
     lookup_name = 'istartswith'
-    prepare_rhs = False
 
 
 @Field.register_lookup
 class EndsWith(PatternLookup):
     lookup_name = 'endswith'
     param_pattern = '%%%s'
-    prepare_rhs = False
 
 
 @Field.register_lookup
 class IEndsWith(EndsWith):
     lookup_name = 'iendswith'
-    prepare_rhs = False
 
 
 @Field.register_lookup
