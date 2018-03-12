@@ -93,6 +93,7 @@ triaging our announcement and upgrade Django as needed. Severity levels are:
 
 * Cross site scripting (XSS)
 * Cross site request forgery (CSRF)
+* Denial-of-service attacks
 * Broken authentication
 
 **Low**:
