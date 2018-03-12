@@ -120,7 +120,8 @@ class AutocompleteMixinTests(TestCase):
             ('00', None),
             # Language files are case sensitive.
             ('sr-cyrl', 'sr-Cyrl'),
-            ('zh-cn', 'zh-CN'),
+            ('zh-hans', 'zh-CN'),
+            ('zh-hant', 'zh-TW'),
         )
         for lang, select_lang in languages:
             with self.subTest(lang=lang):
