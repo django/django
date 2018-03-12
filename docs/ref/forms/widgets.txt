@@ -228,9 +228,9 @@ foundation for custom widgets.
         .. code-block:: pycon
 
             >>> from django import forms
-            >>> name = forms.TextInput(attrs={'size': 10, 'title': 'Your name',})
+            >>> name = forms.TextInput(attrs={'size': 10, 'title': 'Your name'})
             >>> name.render('name', 'A name')
-            '<input title="Your name" type="text" name="name" value="A name" size="10" required>'
+            '<input title="Your name" type="text" name="name" value="A name" size="10">'
 
         If you assign a value of ``True`` or ``False`` to an attribute,
         it will be rendered as an HTML5 boolean attribute::
@@ -788,8 +788,7 @@ that specifies the template used to render each choice. For example, for the
     * ``template_name``: ``'django/forms/widgets/checkbox_select.html'``
     * ``option_template_name``: ``'django/forms/widgets/checkbox_option.html'``
 
-    Similar to :class:`SelectMultiple`, but rendered as a list of check
-    buttons:
+    Similar to :class:`SelectMultiple`, but rendered as a list of checkboxes:
 
     .. code-block:: html
 
