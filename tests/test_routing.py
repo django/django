@@ -84,23 +84,65 @@ def test_url_router():
         router({"type": "http", "path": "/nonexistent/"})
 
 
-@pytest.mark.xfail
 def test_url_router_nesting():
     """
     Tests that nested URLRouters add their keyword captures together.
     """
     test_app = MagicMock(return_value=1)
     inner_router = URLRouter([
-        url(r"^book/(?P<book>[\w\-]+)/page/(\d+)/$", test_app),
+        url(r"^book/(?P<book>[\w\-]+)/page/(?P<page>\d+)/$", test_app),
+        url(r"^test/(\d+)/$", test_app),
     ])
     outer_router = URLRouter([
-        url(r"^universe/(\d+)/author/(?P<author>\w+)/$", inner_router),
+        url(r"^universe/(?P<universe>\d+)/author/(?P<author>\w+)/", inner_router),
+        url(r"^positional/(\w+)/", inner_router),
     ])
     assert outer_router({"type": "http", "path": "/universe/42/author/andrewgodwin/book/channels-guide/page/10/"}) == 1
     assert test_app.call_args[0][0]["url_route"] == {
-        "args": ("42", "10"),
-        "kwargs": {"book": "channels-guide", "author": "andrewgodwin"},
+        "args": (),
+        "kwargs": {"book": "channels-guide", "author": "andrewgodwin", "page": "10", "universe": "42"},
     }
+
+    assert outer_router({"type": "http", "path": "/positional/foo/test/3/"}) == 1
+    assert test_app.call_args[0][0]["url_route"] == {
+        "args": ("foo", "3"),
+        "kwargs": {},
+    }
+
+
+@pytest.mark.skipif(django.VERSION[0] < 2, reason="Needs Django 2.x")
+def test_url_router_nesting_path():
+    """
+    Tests that nested URLRouters add their keyword captures together when used
+    with path().
+    """
+    from django.urls import path
+    test_app = MagicMock(return_value=1)
+    inner_router = URLRouter([
+        path("test/<int:page>/", test_app),
+    ])
+
+    def asgi_middleware(inner):
+        # Some middleware which hides the fact that we have an inner URLRouter
+        def app(scope):
+            return inner(scope)
+        app._path_routing = True
+        return app
+
+    outer_router = URLRouter([
+        path("number/<int:number>/", asgi_middleware(inner_router)),
+    ])
+
+    assert inner_router({"type": "http", "path": "/test/3/"}) == 1
+    assert outer_router({"type": "http", "path": "/number/42/test/3/"}) == 1
+    assert test_app.call_args[0][0]["url_route"] == {
+        "args": (),
+        "kwargs": {"number": 42, "page": 3},
+    }
+    with pytest.raises(ValueError):
+        assert outer_router({"type": "http", "path": "/number/42/test/3/bla/"})
+    with pytest.raises(ValueError):
+        assert outer_router({"type": "http", "path": "/number/42/blub/"})
 
 
 @pytest.mark.skipif(django.VERSION[0] < 2, reason="Needs Django 2.x")

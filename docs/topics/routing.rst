@@ -103,13 +103,18 @@ a single argument, a list of Django URL objects (either ``path()`` or ``url()``)
     ])
 
 Any captured groups will be provided in ``scope`` as the key ``url_route``, a
-dict with an ``args`` key containing a list of positional regex groups and a
-``kwargs`` key with a dict of the named regex groups.
+dict with a ``kwargs`` key containing a dict of the named regex groups and
+an ``args`` key with a list of positional regex groups. Note that named
+and unnamed groups cannot be mixed: Positional groups are discarded as soon
+as a single named group is matched.
 
 For example, to pull out the named group ``stream`` in the example above, you
 would do this::
 
     stream = self.scope["url_route"]["kwargs"]["stream"]
+
+Please note that ``URLRouter`` nesting will not work properly with
+``path()`` routes if inner routers are wrapped by additional middleware.
 
 
 ChannelNameRouter

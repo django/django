@@ -53,6 +53,25 @@ class ProtocolTypeRouter:
             raise ValueError("No application configured for scope type %r" % scope["type"])
 
 
+def route_pattern_match(route, path):
+    """
+    Backport of RegexPattern.match for Django versions before 2.0. Returns
+    the remaining path and positional and keyword arguments matched.
+    """
+    if hasattr(route, "pattern"):
+        return route.pattern.match(path)
+    # Django<2.0. No converters... :-(
+    match = route.regex.search(path)
+    if match:
+        # If there are any named groups, use those as kwargs, ignoring
+        # non-named groups. Otherwise, pass all non-named arguments as
+        # positional arguments.
+        kwargs = match.groupdict()
+        args = () if kwargs else match.groups()
+        return path[match.end():], args, kwargs
+    return None
+
+
 class URLRouter:
     """
     Routes to different applications/consumers based on the URL path.
@@ -62,12 +81,24 @@ class URLRouter:
     url() or path().
     """
 
+    #: This router wants to do routing based on scope[path] or
+    #: scope[path_remaining]. ``path()`` entries in URLRouter should not be
+    #: treated as endpoints (ended with ``$``), but similar to ``include()``.
+    _path_routing = True
+
     def __init__(self, routes):
         self.routes = routes
+        # Django 2 introduced path(); older routes have no "pattern" attribute
+        if self.routes and hasattr(self.routes[0], "pattern"):
+            for route in self.routes:
+                # The inner ASGI app wants to do additional routing, route
+                # must not be an endpoint
+                if getattr(route.callback, "_path_routing", False) is True:
+                    route.pattern._is_endpoint = False
 
     def __call__(self, scope):
         # Get the path
-        path = scope.get("path", None)
+        path = scope.get("path_remaining", scope.get("path", None))
         if path is None:
             raise ValueError("No 'path' key in connection scope, cannot route URLs")
         # Remove leading / to match Django's handling
@@ -75,14 +106,20 @@ class URLRouter:
         # Run through the routes we have until one matches
         for route in self.routes:
             try:
-                match = route.resolve(path)
-                if match is not None:
+                match = route_pattern_match(route, path)
+                if match:
+                    new_path, args, kwargs = match
+                    # Shallow copy of scope.
+                    scope = dict(scope)
+                    # Only pass on the rest of the path
+                    scope["path_remaining"] = new_path
                     # Add args or kwargs into the scope
+                    outer = scope.get("url_route", {})
                     scope["url_route"] = {
-                        "args": match.args,
-                        "kwargs": match.kwargs,
+                        "args": outer.get("args", ()) + args,
+                        "kwargs": {**outer.get("kwargs", {}), **kwargs},
                     }
-                    return match.func(scope)
+                    return route.callback(scope)
             except Resolver404 as e:
                 pass
         else:
