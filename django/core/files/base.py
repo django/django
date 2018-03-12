@@ -48,7 +48,7 @@ class File(FileProxyMixin):
     def chunks(self, chunk_size=None):
         """
         Read the file and yield chunks of ``chunk_size`` bytes (defaults to
-        ``UploadedFile.DEFAULT_CHUNK_SIZE``).
+        ``File.DEFAULT_CHUNK_SIZE``).
         """
         chunk_size = chunk_size or self.DEFAULT_CHUNK_SIZE
         try:
