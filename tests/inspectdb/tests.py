@@ -10,15 +10,23 @@ from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 from .models import ColumnTypes
 
 
+def inspectdb_tables_only(table_name):
+    """
+    Limit introspection to tables created for models of this app.
+    Some databases such as Oracle are extremely slow at introspection.
+    """
+    return table_name.startswith('inspectdb_')
+
+
+def special_table_only(table_name):
+    return table_name.startswith('inspectdb_special')
+
+
 class InspectDBTestCase(TestCase):
 
     def test_stealth_table_name_filter_option(self):
         out = StringIO()
-        # Lets limit the introspection to tables created for models of this
-        # application
-        call_command('inspectdb',
-                     table_name_filter=lambda tn: tn.startswith('inspectdb_'),
-                     stdout=out)
+        call_command('inspectdb', table_name_filter=inspectdb_tables_only, stdout=out)
         error_message = "inspectdb has examined a table that should have been filtered out."
         # contrib.contenttypes is one of the apps always installed when running
         # the Django test suite, check that one of its tables hasn't been
@@ -136,11 +144,7 @@ class InspectDBTestCase(TestCase):
     @skipUnlessDBFeature('can_introspect_foreign_keys')
     def test_attribute_name_not_python_keyword(self):
         out = StringIO()
-        # Lets limit the introspection to tables created for models of this
-        # application
-        call_command('inspectdb',
-                     table_name_filter=lambda tn: tn.startswith('inspectdb_'),
-                     stdout=out)
+        call_command('inspectdb', table_name_filter=inspectdb_tables_only, stdout=out)
         output = out.getvalue()
         error_message = "inspectdb generated an attribute name which is a python keyword"
         # Recursive foreign keys should be set to 'self'
@@ -186,9 +190,7 @@ class InspectDBTestCase(TestCase):
         unsuitable for Python identifiers
         """
         out = StringIO()
-        call_command('inspectdb',
-                     table_name_filter=lambda tn: tn.startswith('inspectdb_special'),
-                     stdout=out)
+        call_command('inspectdb', table_name_filter=special_table_only, stdout=out)
         output = out.getvalue()
         base_name = 'field' if connection.features.uppercases_column_names else 'Field'
         self.assertIn("field = models.IntegerField()", output)
@@ -204,9 +206,7 @@ class InspectDBTestCase(TestCase):
         unsuitable for Python identifiers
         """
         out = StringIO()
-        call_command('inspectdb',
-                     table_name_filter=lambda tn: tn.startswith('inspectdb_special'),
-                     stdout=out)
+        call_command('inspectdb', table_name_filter=special_table_only, stdout=out)
         output = out.getvalue()
         self.assertIn("class InspectdbSpecialTableName(models.Model):", output)
 
