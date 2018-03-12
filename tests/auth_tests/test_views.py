@@ -26,6 +26,7 @@ from django.db import connection
 from django.http import HttpRequest, QueryDict
 from django.middleware.csrf import CsrfViewMiddleware, get_token
 from django.test import Client, TestCase, override_settings
+from django.test.client import RedirectCycleError
 from django.test.utils import patch_logger
 from django.urls import NoReverseMatch, reverse, reverse_lazy
 from django.utils.http import urlsafe_base64_encode
@@ -882,6 +883,33 @@ class LoginRedirectAuthenticatedUser(AuthViewsTestCase):
             url = self.do_redirect_url + '?bla=2'
             with self.assertRaisesMessage(ValueError, msg):
                 self.client.get(url)
+
+    def test_permission_required_not_logged_in(self):
+        # Not logged in ...
+        with self.settings(LOGIN_URL=self.do_redirect_url):
+            # redirected to login.
+            response = self.client.get('/permission_required_redirect/', follow=True)
+            self.assertEqual(response.status_code, 200)
+            # exception raised.
+            response = self.client.get('/permission_required_exception/', follow=True)
+            self.assertEqual(response.status_code, 403)
+            # redirected to login.
+            response = self.client.get('/login_and_permission_required_exception/', follow=True)
+            self.assertEqual(response.status_code, 200)
+
+    def test_permission_required_logged_in(self):
+        self.login()
+        # Already logged in...
+        with self.settings(LOGIN_URL=self.do_redirect_url):
+            # redirect loop encountered.
+            with self.assertRaisesMessage(RedirectCycleError, 'Redirect loop detected.'):
+                self.client.get('/permission_required_redirect/', follow=True)
+            # exception raised.
+            response = self.client.get('/permission_required_exception/', follow=True)
+            self.assertEqual(response.status_code, 403)
+            # exception raised.
+            response = self.client.get('/login_and_permission_required_exception/', follow=True)
+            self.assertEqual(response.status_code, 403)
 
 
 class LoginSuccessURLAllowedHostsTest(AuthViewsTestCase):
