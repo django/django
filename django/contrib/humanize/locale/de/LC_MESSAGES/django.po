@@ -4,12 +4,13 @@
 # André Hagenbruch, 2011
 # Claude Paroz <claude@2xlibre.net>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011,2013-2014
+# Maximilian Merz <django@mxmerz.de>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
+"PO-Revision-Date: 2018-03-13 16:07+0100\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -202,7 +203,6 @@ msgid "yesterday"
 msgstr "gestern"
 
 #, python-format
-msgctxt "naturaltime"
 msgid "%(delta)s ago"
 msgstr "vor %(delta)s"
 
@@ -234,9 +234,55 @@ msgstr[0] "vor einer Stunde"
 msgstr[1] "vor %(count)s Stunden"
 
 #, python-format
-msgctxt "naturaltime"
 msgid "%(delta)s from now"
 msgstr "in %(delta)s"
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%(delta)s from now"
+msgstr "in %(delta)s"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d Tag"
+msgstr[1] "%d Tagen"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d month"
+msgid_plural "%d months"
+msgstr[0] "%d Monat"
+msgstr[1] "%d Monaten"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] "%d Jahr"
+msgstr[1] "%d Jahren"
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d Tag"
+msgstr[1] "%d Tagen"
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d month"
+msgid_plural "%d months"
+msgstr[0] "%d Monat"
+msgstr[1] "%d Monaten"
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] "%d Jahr"
+msgstr[1] "%d Jahren"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.

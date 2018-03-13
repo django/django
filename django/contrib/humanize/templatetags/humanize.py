@@ -8,7 +8,9 @@ from django.template import defaultfilters
 from django.utils.formats import number_format
 from django.utils.safestring import mark_safe
 from django.utils.timezone import is_aware, utc
-from django.utils.translation import gettext as _, ngettext, pgettext
+from django.utils.translation import (
+    gettext as _, ngettext, npgettext_lazy, pgettext,
+)
 
 register = template.Library()
 
@@ -220,7 +222,16 @@ def naturaltime(value):
         delta = now - value
         if delta.days != 0:
             # Translators: delta will contain a string like '2 months' or '1 month, 2 weeks'
-            return _('%(delta)s ago') % {'delta': defaultfilters.timesince(value, now)}
+            return _('%(delta)s ago') % {'delta': defaultfilters.timesince(value, now, time_strings={
+                # Translators: 'naturaltime-past' strings will be included in
+                # '%(delta)s ago'
+                'year': npgettext_lazy('naturaltime-past', '%d year', '%d years'),
+                'month': npgettext_lazy('naturaltime-past', '%d month', '%d months'),
+                'week': npgettext_lazy('naturaltime-past', '%d week', '%d weeks'),
+                'day': npgettext_lazy('naturaltime-past', '%d day', '%d days'),
+                'hour': npgettext_lazy('naturaltime-past', '%d hour', '%d hours'),
+                'minute': npgettext_lazy('naturaltime-past', '%d minute', '%d minutes')
+            })}
         elif delta.seconds == 0:
             return _('now')
         elif delta.seconds < 60:
@@ -247,7 +258,16 @@ def naturaltime(value):
         delta = value - now
         if delta.days != 0:
             # Translators: delta will contain a string like '2 months' or '1 month, 2 weeks'
-            return _('%(delta)s from now') % {'delta': defaultfilters.timeuntil(value, now)}
+            return _('%(delta)s from now') % {'delta': defaultfilters.timeuntil(value, now, time_strings={
+                # Translators: 'naturaltime-future' strings will be included in
+                # '%(delta)s from now'
+                'year': npgettext_lazy('naturaltime-future', '%d year', '%d years'),
+                'month': npgettext_lazy('naturaltime-future', '%d month', '%d months'),
+                'week': npgettext_lazy('naturaltime-future', '%d week', '%d weeks'),
+                'day': npgettext_lazy('naturaltime-future', '%d day', '%d days'),
+                'hour': npgettext_lazy('naturaltime-future', '%d hour', '%d hours'),
+                'minute': npgettext_lazy('naturaltime-future', '%d minute', '%d minutes')
+            })}
         elif delta.seconds == 0:
             return _('now')
         elif delta.seconds < 60:
