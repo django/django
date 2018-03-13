@@ -278,7 +278,9 @@ class ModelBase(type):
                             )
                         )
                 else:
-                    new_class.add_to_class(field.name, copy.deepcopy(field))
+                    field = copy.deepcopy(field)
+                    field.mti_inherited = True
+                    new_class.add_to_class(field.name, field)
 
         # Copy indexes so that index names are unique when models extend an
         # abstract model.

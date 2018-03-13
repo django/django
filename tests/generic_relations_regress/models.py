@@ -26,7 +26,7 @@ class LinkProxy(Link):
 
 class Place(models.Model):
     name = models.CharField(max_length=100)
-    links = GenericRelation(Link)
+    links = GenericRelation(Link, related_query_name='places')
     link_proxy = GenericRelation(LinkProxy)
 
     def __str__(self):

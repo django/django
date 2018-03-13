@@ -263,3 +263,13 @@ class GenericRelationTests(TestCase):
         place = Place.objects.create()
         Link.objects.create(content_object=place)
         self.assertEqual(Place.objects.get(link_proxy__object_id=place.id), place)
+
+    def test_generic_reverse_relation_with_mti(self):
+        """
+        Filtering with a reverse generic relation, where the GenericRelation
+        comes from multi-table inheritance.
+        """
+        place = Place.objects.create(name='Test Place')
+        link = Link.objects.create(content_object=place)
+        result = Link.objects.filter(places=place)
+        self.assertCountEqual(result, [link])
