@@ -94,6 +94,32 @@ class HumanizeTests(SimpleTestCase):
         with translation.override('ja'), self.settings(USE_L10N=True):
             self.humanize_tester([100], ['100'], 'intcomma')
 
+    def test_dative_inflection_for_timedelta(self):
+        # Regression for #21408
+        test_list = [
+            now - datetime.timedelta(days=1),
+            now - datetime.timedelta(days=2),
+            now - datetime.timedelta(days=30),
+            now - datetime.timedelta(days=60),
+            now - datetime.timedelta(days=500),
+            now - datetime.timedelta(days=865),
+        ]
+        result_list = [
+            'vor 1\xa0Tag',
+            'vor 2\xa0Tagen',
+            'vor 1\xa0Monat',
+            'vor 2\xa0Monaten',
+            'vor 1\xa0Jahr, 4\xa0Monaten',
+            'vor 2\xa0Jahren, 4\xa0Monaten',
+        ]
+
+        orig_humanize_datetime, humanize.datetime = humanize.datetime, MockDateTime
+        try:
+            with translation.override('de'), self.settings(USE_L10N=True):
+                self.humanize_tester(test_list, result_list, 'naturaltime')
+        finally:
+            humanize.datetime = orig_humanize_datetime
+
     def test_intword(self):
         test_list = (
             '100', '1000000', '1200000', '1290000', '1000000000', '2000000000',
