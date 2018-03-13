@@ -18,6 +18,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     }
     cast_data_types = {
         'CharField': 'char(%(max_length)s)',
+        'TextField': 'char',
         'IntegerField': 'signed integer',
         'BigIntegerField': 'signed integer',
         'SmallIntegerField': 'signed integer',
