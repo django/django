@@ -57,7 +57,7 @@ class Tests(unittest.TestCase):
 
 
 @unittest.skipUnless(connection.vendor == 'oracle', 'Oracle tests')
-class HiddenNoDataFoundExceptionTest(TransactionTestCase):
+class TransactionalTests(TransactionTestCase):
     available_apps = ['backends']
 
     def test_hidden_no_data_found_exception(self):
@@ -83,3 +83,16 @@ class HiddenNoDataFoundExceptionTest(TransactionTestCase):
         finally:
             with connection.cursor() as cursor:
                 cursor.execute('DROP TRIGGER "TRG_NO_DATA_FOUND"')
+
+    def test_password_with_at_sign(self):
+        old_password = connection.settings_dict['PASSWORD']
+        connection.settings_dict['PASSWORD'] = 'p@ssword'
+        try:
+            self.assertIn('/\\"p@ssword\\"@', connection._connect_string())
+            with self.assertRaises(DatabaseError) as context:
+                connection.cursor()
+            # Database exception: "ORA-01017: invalid username/password" is
+            # expected.
+            self.assertIn('ORA-01017', context.exception.args[0].message)
+        finally:
+            connection.settings_dict['PASSWORD'] = old_password
