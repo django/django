@@ -5,6 +5,7 @@ from operator import attrgetter
 
 from django.core.exceptions import FieldError
 from django.db import connection
+from django.db.models.functions import Substr
 from django.test import TestCase, skipUnlessDBFeature
 
 from .models import Article, Author, Game, Player, Season, Tag
@@ -878,3 +879,19 @@ class LookupTests(TestCase):
         season = Season.objects.create(year=2012, nulled_text_field=None)
         self.assertTrue(Season.objects.filter(pk=season.pk, nulled_text_field__isnull=True))
         self.assertTrue(Season.objects.filter(pk=season.pk, nulled_text_field=''))
+
+    def test_pattern_lookups_with_substr(self):
+        a = Author.objects.create(name='John Smith', alias='Johx')
+        b = Author.objects.create(name='Rhonda Simpson', alias='sonx')
+        tests = (
+            ('startswith', [a]),
+            ('istartswith', [a]),
+            ('contains', [a, b]),
+            ('icontains', [a, b]),
+            ('endswith', [b]),
+            ('iendswith', [b]),
+        )
+        for lookup, result in tests:
+            with self.subTest(lookup=lookup):
+                authors = Author.objects.filter(**{'name__%s' % lookup: Substr('alias', 1, 3)})
+                self.assertCountEqual(authors, result)

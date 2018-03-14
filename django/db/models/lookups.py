@@ -397,7 +397,7 @@ class PatternLookup(BuiltinLookup):
 
     def process_rhs(self, qn, connection):
         rhs, params = super().process_rhs(qn, connection)
-        if params and not self.bilateral_transforms:
+        if self.rhs_is_direct_value() and params and not self.bilateral_transforms:
             params[0] = self.param_pattern % connection.ops.prep_for_like_query(params[0])
         return rhs, params
 
