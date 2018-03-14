@@ -18,10 +18,8 @@ def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIE
     def decorator(view_func):
         @wraps(view_func, assigned=available_attrs(view_func))
         def _wrapped_view(request, *args, **kwargs):
-
             if type(arg_position) is int:
-                request = args[arg_position]
-            
+                request = args[arg_position]            
             if test_func(request.user):
                 return view_func(request, *args, **kwargs)
             path = request.build_absolute_uri()
