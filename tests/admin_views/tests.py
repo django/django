@@ -575,8 +575,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertIs(response.context['cl'].has_related_field_in_list_display(), False)
 
     def test_limited_filter(self):
-        """Ensure admin changelist filters do not contain objects excluded via limit_choices_to.
-        This also tests relation-spanning filters (e.g. 'color__value').
+        """Admin changelist filters do not contain objects excluded via limit_choices_to.
+        Also tests relation-spanning filters (e.g. 'color__value').
         """
         response = self.client.get(reverse('admin:admin_views_thing_changelist'))
         self.assertContains(
@@ -861,7 +861,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_hide_change_password(self):
         """
-        Tests if the "change password" link in the admin is hidden if the User
+        "change password" link in the admin is hidden if the User
         does not have a usable password set.
         (against 9bea85795705d015cdadc82c68b99196a8554f5c)
         """
@@ -1396,7 +1396,7 @@ def get_perm(Model, perm):
     }],
 )
 class AdminViewPermissionsTest(TestCase):
-    """Tests for Admin Views Permissions."""
+    """Admin View Permissions."""
 
     @classmethod
     def setUpTestData(cls):
@@ -4700,7 +4700,7 @@ class RawIdFieldsTest(TestCase):
 @override_settings(ROOT_URLCONF='admin_views.urls')
 class UserAdminTest(TestCase):
     """
-    Tests user CRUD functionality.
+    CRUD functionality for Users.
     """
 
     @classmethod
@@ -4854,7 +4854,7 @@ class UserAdminTest(TestCase):
 @override_settings(ROOT_URLCONF='admin_views.urls')
 class GroupAdminTest(TestCase):
     """
-    Tests group CRUD functionality.
+    CRUD functionality for a Group.
     """
 
     @classmethod

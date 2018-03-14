@@ -2619,7 +2619,7 @@ class StumpJokeWithCustomFieldForm(forms.ModelForm):
 
 class LimitChoicesToTests(TestCase):
     """
-    Tests the functionality of ``limit_choices_to``.
+    Functionality of ``limit_choices_to``.
     """
     @classmethod
     def setUpTestData(cls):

@@ -198,7 +198,7 @@ class BaseModelBackendTest:
 
 class ModelBackendTest(BaseModelBackendTest, TestCase):
     """
-    Tests for the ModelBackend using the default User model.
+    ModelBackend using the default User model.
     """
     UserModel = User
     user_credentials = {'username': 'test', 'password': 'test'}
@@ -234,7 +234,7 @@ class ModelBackendTest(BaseModelBackendTest, TestCase):
 @override_settings(AUTH_USER_MODEL='auth_tests.ExtensionUser')
 class ExtensionUserModelBackendTest(BaseModelBackendTest, TestCase):
     """
-    Tests for the ModelBackend using the custom ExtensionUser model.
+    ModelBackend using the custom ExtensionUser model.
 
     This isn't a perfect test, because both the User and ExtensionUser are
     synchronized to the database, which wouldn't ordinary happen in
@@ -269,7 +269,7 @@ class ExtensionUserModelBackendTest(BaseModelBackendTest, TestCase):
 @override_settings(AUTH_USER_MODEL='auth_tests.CustomPermissionsUser')
 class CustomPermissionsUserModelBackendTest(BaseModelBackendTest, TestCase):
     """
-    Tests for the ModelBackend using the CustomPermissionsUser model.
+    ModelBackend using the CustomPermissionsUser model.
 
     As with the ExtensionUser test, this isn't a perfect test, because both
     the User and CustomPermissionsUser are synchronized to the database,
@@ -373,7 +373,7 @@ class SimpleRowlevelBackend:
 })
 class RowlevelBackendTest(TestCase):
     """
-    Tests for auth backend that supports object level permissions
+    Auth backend that supports object level permissions
     """
 
     def setUp(self):
@@ -412,7 +412,7 @@ class RowlevelBackendTest(TestCase):
 )
 class AnonymousUserBackendTest(SimpleTestCase):
     """
-    Tests for AnonymousUser delegating to backend.
+    Permissions for Anonymous user
     """
 
     def setUp(self):
@@ -454,7 +454,7 @@ class NoBackendsTest(TestCase):
 @override_settings(AUTHENTICATION_BACKENDS=['auth_tests.test_auth_backends.SimpleRowlevelBackend'])
 class InActiveUserBackendTest(TestCase):
     """
-    Tests for an inactive user
+    Permission for Inactive users
     """
 
     def setUp(self):
@@ -539,7 +539,7 @@ class NewModelBackend(ModelBackend):
 
 class ChangedBackendSettingsTest(TestCase):
     """
-    Tests for changes in the settings.AUTHENTICATION_BACKENDS
+    Changes in the settings.AUTHENTICATION_BACKENDS
     """
     backend = 'auth_tests.test_auth_backends.NewModelBackend'
 

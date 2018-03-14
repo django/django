@@ -165,7 +165,7 @@ class OperationWriterTests(SimpleTestCase):
 
 class WriterTests(SimpleTestCase):
     """
-    Tests the migration writer (makes migration files from Migration instances)
+    MigrationWriter makes migration files from Migration instances
     """
 
     def safe_exec(self, string, value=None):
@@ -530,7 +530,7 @@ class WriterTests(SimpleTestCase):
 
     def test_simple_migration(self):
         """
-        Tests serializing a simple migration.
+        Serialize a simple migration.
         """
         fields = {
             'charfield': models.DateTimeField(default=datetime.datetime.utcnow),
@@ -598,7 +598,9 @@ class WriterTests(SimpleTestCase):
 
     def test_sorted_imports(self):
         """
-        #24155 - Tests ordering of imports.
+        Order imports to generate same migration files
+        when run multiple times
+        #24155
         """
         migration = type("Migration", (migrations.Migration,), {
             "operations": [
@@ -618,7 +620,8 @@ class WriterTests(SimpleTestCase):
 
     def test_migration_file_header_comments(self):
         """
-        Test comments at top of file.
+        Auto generated comments containing Django version
+        at the top of the migration file.
         """
         migration = type("Migration", (migrations.Migration,), {
             "operations": []
