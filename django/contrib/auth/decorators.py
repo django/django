@@ -7,16 +7,21 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import resolve_url
 
 
-def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME):
+def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME, arg_position=None):
     """
     Decorator for views that checks that the user passes the given test,
     redirecting to the log-in page if necessary. The test should be a callable
     that takes the user object and returns True if the user passes.
+    arg_position: int, write on decoration position in args vars of request data
     """
 
     def decorator(view_func):
-        @wraps(view_func)
+        @wraps(view_func, assigned=available_attrs(view_func))
         def _wrapped_view(request, *args, **kwargs):
+
+            if type(arg_position) is int:
+                request = args[arg_position]
+            
             if test_func(request.user):
                 return view_func(request, *args, **kwargs)
             path = request.build_absolute_uri()
