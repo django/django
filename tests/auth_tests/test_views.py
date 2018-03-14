@@ -30,6 +30,7 @@ from django.test.utils import patch_logger
 from django.urls import NoReverseMatch, reverse, reverse_lazy
 from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
+from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import LANGUAGE_SESSION_KEY
 
 from .client import PasswordResetConfirmClient
@@ -438,6 +439,14 @@ class UUIDUserPasswordResetTest(CustomUserPasswordResetTest):
             password='foo',
         )
         return super()._test_confirm_start()
+
+    def test_confirm_invalid_uuid(self):
+        """A uidb64 that decodes to a non-UUID doesn't crash."""
+        _, path = self._test_confirm_start()
+        invalid_uidb64 = urlsafe_base64_encode('INVALID_UUID'.encode()).decode()
+        first, _uuidb64_, second = path.strip('/').split('/')
+        response = self.client.get('/' + '/'.join((first, invalid_uidb64, second)) + '/')
+        self.assertContains(response, 'The password reset link was invalid')
 
 
 class ChangePasswordTest(AuthViewsTestCase):
