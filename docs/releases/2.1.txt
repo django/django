@@ -310,6 +310,15 @@ If you want to continue to allow those passwords to be used, you'll
 have to define the :setting:`PASSWORD_HASHERS` setting (if you don't already)
 and include ``'django.contrib.auth.hashers.BCryptPasswordHasher'``.
 
+Moved ``wrap_label`` widget template context variable
+-----------------------------------------------------
+
+To fix the lack of ``<label>`` when using ``RadioSelect`` and
+``CheckboxSelectMultiple`` with ``MultiWidget``, the ``wrap_label`` context
+variable now appears as an attribute of each option. For example, in a custom
+``input_option.html`` template, change ``{% if wrap_label %}`` to
+``{% if widget.wrap_label %}``.
+
 Miscellaneous
 -------------
 
