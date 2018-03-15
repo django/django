@@ -50,7 +50,7 @@ class AutocompleteMixinTests(TestCase):
         form = AlbumForm()
         attrs = form['band'].field.widget.get_context(name='my_field', value=None, attrs={})['widget']['attrs']
         self.assertEqual(attrs, {
-            'class': 'my-classadmin-autocomplete',
+            'class': 'my-class admin-autocomplete',
             'data-ajax--cache': 'true',
             'data-ajax--type': 'GET',
             'data-ajax--url': '/admin_widgets/band/autocomplete/',
@@ -58,6 +58,11 @@ class AutocompleteMixinTests(TestCase):
             'data-allow-clear': 'false',
             'data-placeholder': ''
         })
+
+    def test_build_attrs_no_custom_class(self):
+        form = AlbumForm()
+        attrs = form['featuring'].field.widget.get_context(name='name', value=None, attrs={})['widget']['attrs']
+        self.assertEqual(attrs['class'], 'admin-autocomplete')
 
     def test_build_attrs_not_required_field(self):
         form = NotRequiredBandForm()
