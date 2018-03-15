@@ -413,7 +413,7 @@ class AutocompleteMixin:
             'data-theme': 'admin-autocomplete',
             'data-allow-clear': json.dumps(not self.is_required),
             'data-placeholder': '',  # Allows clearing of the input.
-            'class': attrs['class'] + 'admin-autocomplete',
+            'class': attrs['class'] + (' ' if attrs['class'] else '') + 'admin-autocomplete',
         })
         return attrs
 
