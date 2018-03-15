@@ -608,6 +608,12 @@ STATICFILES_FINDERS = [
 # Migration module overrides for apps, by app label.
 MIGRATION_MODULES = {}
 
+# By default, the migrations loader will only load .py files, to avoid
+# problems with stale .pyc files after switching git branches (for instance).
+# This setting changes the loader to use pkgutil.iter_modules to find any
+# migration modules
+MIGRATIONS_INCLUDE_PYC = False
+
 #################
 # SYSTEM CHECKS #
 #################

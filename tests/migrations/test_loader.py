@@ -1,3 +1,6 @@
+import compileall
+import os
+
 from django.db import connection, connections
 from django.db.migrations.exceptions import (
     AmbiguityError, InconsistentMigrationHistory, NodeNotFoundError,
@@ -5,6 +8,8 @@ from django.db.migrations.exceptions import (
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import TestCase, modify_settings, override_settings
+
+from .test_base import MigrationTestBase
 
 
 class RecorderTests(TestCase):
@@ -494,3 +499,28 @@ class LoaderTests(TestCase):
             ('app1', '4_auto'),
         }
         self.assertEqual(plan, expected_plan)
+
+
+class PycLoaderTests(MigrationTestBase):
+    """
+    Tests the loader with MIGRATIONS_INCLUDE_PYC enabled.
+    """
+
+    def test_loading_pyc_migrations(self):
+        """
+        Tests that .pyc migrations are loaded when MIGRATIONS_INCLUDE_PYC is True.
+        """
+        module = 'migrations.test_migrations_pyc'
+        with self.temporary_migration_module(module=module) as migration_dir:
+            # Compile all the .py files to (legacy) .pyc files, and delete the originals.
+            compileall.compile_dir(migration_dir, force=True, quiet=1, legacy=True)
+            for name in os.listdir(migration_dir):
+                if name.endswith(".py"):
+                    os.remove(os.path.join(migration_dir, name))
+            # Ensure the default loader settings don't find the compiled migration.
+            loader = MigrationLoader(connection)
+            self.assertNotIn(('migrations', '0001_initial'), loader.disk_migrations)
+            # Now make sure the compiled migration is found when MIGRATIONS_INCLUDE_PYC is True.
+            with override_settings(MIGRATIONS_INCLUDE_PYC=True):
+                loader = MigrationLoader(connection)
+                self.assertIn(('migrations', '0001_initial'), loader.disk_migrations)

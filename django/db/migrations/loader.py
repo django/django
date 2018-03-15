@@ -1,4 +1,5 @@
 import os
+import pkgutil
 import sys
 from importlib import import_module, reload
 
@@ -97,14 +98,16 @@ class MigrationLoader:
                 if was_loaded:
                     reload(module)
             self.migrated_apps.add(app_config.label)
-            directory = os.path.dirname(module.__file__)
-            # Scan for .py files
             migration_names = set()
-            for name in os.listdir(directory):
-                if name.endswith(".py"):
-                    import_name = name.rsplit(".", 1)[0]
-                    if import_name[0] not in "_.~":
-                        migration_names.add(import_name)
+            if settings.MIGRATIONS_INCLUDE_PYC:
+                migration_names.update(name for _, name, is_pkg in pkgutil.iter_modules(module.__path__) if not is_pkg)
+            else:
+                # Scan for .py files only
+                for name in os.listdir(os.path.dirname(module.__file__)):
+                    if name.endswith(".py"):
+                        import_name = name.rsplit(".", 1)[0]
+                        if import_name[0] not in "_.~":
+                            migration_names.add(import_name)
             # Load them
             for migration_name in migration_names:
                 migration_module = import_module("%s.%s" % (module_name, migration_name))
