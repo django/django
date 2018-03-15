@@ -194,6 +194,8 @@ Migrations
 
 * Added support for serialization of ``functools.partialmethod`` objects.
 
+* To support frozen environments, migrations may be loaded from ``.pyc`` files.
+
 Models
 ~~~~~~
 
@@ -365,6 +367,9 @@ Miscellaneous
   This undocumented behavior was a regression in Django 1.6 and prevented users
   with such passwords from requesting a password reset. Audit your code to
   confirm that your usage of these APIs don't rely on the old behavior.
+
+* Since migrations are now loaded from ``.pyc`` files, you might need to delete
+  them if you're working in a mixed Python 2 and Python 3 environment.
 
 .. _deprecated-features-2.1:
 
