@@ -15,8 +15,8 @@ class LookupTests(TestCase):
 
     def setUp(self):
         # Create a few Authors.
-        self.au1 = Author.objects.create(name='Author 1')
-        self.au2 = Author.objects.create(name='Author 2')
+        self.au1 = Author.objects.create(name='Author 1', alias='a1')
+        self.au2 = Author.objects.create(name='Author 2', alias='a2')
         # Create a few Articles.
         self.a1 = Article.objects.create(
             headline='Article 1',
