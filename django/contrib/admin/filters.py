@@ -164,8 +164,8 @@ class RelatedFieldListFilter(FieldListFilter):
         other_model = get_model_from_relation(field)
         self.lookup_kwarg = '%s__%s__exact' % (field_path, field.target_field.name)
         self.lookup_kwarg_isnull = '%s__isnull' % field_path
-        self.lookup_val = request.GET.get(self.lookup_kwarg)
-        self.lookup_val_isnull = request.GET.get(self.lookup_kwarg_isnull)
+        self.lookup_val = params.get(self.lookup_kwarg)
+        self.lookup_val_isnull = params.get(self.lookup_kwarg_isnull)
         super().__init__(field, request, params, model, model_admin, field_path)
         self.lookup_choices = self.field_choices(field, request, model_admin)
         if hasattr(field, 'verbose_name'):
@@ -223,8 +223,8 @@ class BooleanFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         self.lookup_kwarg = '%s__exact' % field_path
         self.lookup_kwarg2 = '%s__isnull' % field_path
-        self.lookup_val = request.GET.get(self.lookup_kwarg)
-        self.lookup_val2 = request.GET.get(self.lookup_kwarg2)
+        self.lookup_val = params.get(self.lookup_kwarg)
+        self.lookup_val2 = params.get(self.lookup_kwarg2)
         super().__init__(field, request, params, model, model_admin, field_path)
         if (self.used_parameters and self.lookup_kwarg in self.used_parameters and
                 self.used_parameters[self.lookup_kwarg] in ('1', '0')):
@@ -261,8 +261,8 @@ class ChoicesFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         self.lookup_kwarg = '%s__exact' % field_path
         self.lookup_kwarg_isnull = '%s__isnull' % field_path
-        self.lookup_val = request.GET.get(self.lookup_kwarg)
-        self.lookup_val_isnull = request.GET.get(self.lookup_kwarg_isnull)
+        self.lookup_val = params.get(self.lookup_kwarg)
+        self.lookup_val_isnull = params.get(self.lookup_kwarg_isnull)
         super().__init__(field, request, params, model, model_admin, field_path)
 
     def expected_parameters(self):
@@ -372,8 +372,8 @@ class AllValuesFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         self.lookup_kwarg = field_path
         self.lookup_kwarg_isnull = '%s__isnull' % field_path
-        self.lookup_val = request.GET.get(self.lookup_kwarg)
-        self.lookup_val_isnull = request.GET.get(self.lookup_kwarg_isnull)
+        self.lookup_val = params.get(self.lookup_kwarg)
+        self.lookup_val_isnull = params.get(self.lookup_kwarg_isnull)
         self.empty_value_display = model_admin.get_empty_value_display()
         parent_model, reverse_path = reverse_field_path(model, field_path)
         # Obey parent ModelAdmin queryset when deciding which options to show
