@@ -162,8 +162,10 @@ class HttpResponseBase:
         - a string in the correct format,
         - a naive ``datetime.datetime`` object in UTC,
         - an aware ``datetime.datetime`` object in any time zone.
+        
         If it is a ``datetime.datetime`` object then calculate ``max_age``.
         """
+        
         self.cookies[key] = value
         if expires is not None:
             if isinstance(expires, datetime.datetime):
@@ -496,8 +498,7 @@ class JsonResponse(HttpResponse):
     :param json_dumps_params: A dictionary of kwargs passed to json.dumps().
     """
 
-    def __init__(self, data, encoder=DjangoJSONEncoder, safe=True,
-                 json_dumps_params=None, **kwargs):
+    def __init__(self, data, encoder=DjangoJSONEncoder, safe=True, json_dumps_params=None, **kwargs):
         if safe and not isinstance(data, dict):
             raise TypeError(
                 'In order to allow non-dict objects to be serialized set the '

@@ -26,7 +26,6 @@ class TemplateCommand(BaseCommand):
     """
     Copy either a Django application layout template or a Django project
     layout template into the specified directory.
-
     :param style: A color style object (see django.core.management.color).
     :param app_or_project: The string 'app' or 'project'.
     :param name: The name of the application or project.

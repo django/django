@@ -45,7 +45,7 @@ class HeadersCheckMixin:
                         'the following headers: %s' % (headers - msg_headers),)
 
 
-class MailTests(HeadersCheckMixin, SimpleTestCase):
+class MailTest, SimpleTestCase)MailTe
     """
     Non-backend specific tests.
     """
