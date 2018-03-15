@@ -281,7 +281,8 @@ class BaseForm:
             error_row='<tr><td colspan="2">%s</td></tr>',
             row_ender='</td></tr>',
             help_text_html='<br><span class="helptext">%s</span>',
-            errors_on_separate_row=False)
+            errors_on_separate_row=False,
+        )
 
     def as_ul(self):
         "Return this form rendered as HTML <li>s -- excluding the <ul></ul>."
@@ -290,7 +291,8 @@ class BaseForm:
             error_row='<li>%s</li>',
             row_ender='</li>',
             help_text_html=' <span class="helptext">%s</span>',
-            errors_on_separate_row=False)
+            errors_on_separate_row=False,
+        )
 
     def as_p(self):
         "Return this form rendered as HTML <p>s."
@@ -299,7 +301,8 @@ class BaseForm:
             error_row='%s',
             row_ender='</p>',
             help_text_html=' <span class="helptext">%s</span>',
-            errors_on_separate_row=True)
+            errors_on_separate_row=True,
+        )
 
     def non_field_errors(self):
         """

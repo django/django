@@ -319,7 +319,8 @@ class TestCollectionFilesOverride(CollectionTestCase):
         os.utime(self.testfile_path, (self.orig_atime - 1, self.orig_mtime - 1))
 
         self.settings_with_test_app = self.modify_settings(
-            INSTALLED_APPS={'prepend': 'staticfiles_test_app'})
+            INSTALLED_APPS={'prepend': 'staticfiles_test_app'},
+        )
         with extend_sys_path(self.temp_dir):
             self.settings_with_test_app.enable()
 

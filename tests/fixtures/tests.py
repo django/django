@@ -334,7 +334,8 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         self._dumpdata_assert(
             ['sites', 'fixtures'],
             '[{"pk": 1, "model": "sites.site", "fields": {"domain": "example.com", "name": "example.com"}}]',
-            exclude_list=['fixtures'])
+            exclude_list=['fixtures'],
+        )
 
         # Excluding fixtures.Article/Book should leave fixtures.Category
         self._dumpdata_assert(

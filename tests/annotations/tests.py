@@ -283,9 +283,10 @@ class NonAggregateAnnotationTestCase(TestCase):
 
     def test_annotation_reverse_m2m(self):
         books = Book.objects.annotate(
-            store_name=F('store__name')).filter(
-            name='Practical Django Projects').order_by(
-            'store_name')
+            store_name=F('store__name'),
+        ).filter(
+            name='Practical Django Projects',
+        ).order_by('store_name')
 
         self.assertQuerysetEqual(
             books, [
@@ -497,7 +498,8 @@ class NonAggregateAnnotationTestCase(TestCase):
                 F('ticker_name'),
                 F('description'),
                 Value('No Tag'),
-                function='COALESCE')
+                function='COALESCE',
+            )
         ).annotate(
             tagline_lower=Lower(F('tagline'), output_field=CharField())
         ).order_by('name')

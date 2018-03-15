@@ -356,7 +356,8 @@ class ParallelTestSuite(unittest.TestSuite):
         pool = multiprocessing.Pool(
             processes=self.processes,
             initializer=self.init_worker.__func__,
-            initargs=[counter])
+            initargs=[counter],
+        )
         args = [
             (self.runner_class, index, subsuite, self.failfast)
             for index, subsuite in enumerate(self.subsuites)

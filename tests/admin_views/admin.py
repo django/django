@@ -282,8 +282,7 @@ download.short_description = 'Download subscription'
 
 
 def no_perm(modeladmin, request, selected):
-    return HttpResponse(content='No permission to perform this action',
-                        status=403)
+    return HttpResponse(content='No permission to perform this action', status=403)
 
 
 no_perm.short_description = 'No permission to run'
@@ -685,11 +684,7 @@ class ReportAdmin(admin.ModelAdmin):
 
     def get_urls(self):
         # Corner case: Don't call parent implementation
-        return [
-            url(r'^extra/$',
-                self.extra,
-                name='cable_extra'),
-        ]
+        return [url(r'^extra/$', self.extra, name='cable_extra')]
 
 
 class CustomTemplateBooleanFieldListFilter(BooleanFieldListFilter):

@@ -348,7 +348,8 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
             f.write('to be deleted in one test')
 
         self.patched_settings = self.settings(
-            STATICFILES_DIRS=settings.STATICFILES_DIRS + [temp_dir])
+            STATICFILES_DIRS=settings.STATICFILES_DIRS + [temp_dir],
+        )
         self.patched_settings.enable()
         self.addCleanup(shutil.rmtree, temp_dir)
         self._manifest_strict = storage.staticfiles_storage.manifest_strict

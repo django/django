@@ -783,8 +783,10 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="name", preserve_default=True)
         self.assertOperationFieldAttributes(changes, "testapp", 0, 0, default='Ada Lovelace')
 
-    @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',
-                return_value=models.NOT_PROVIDED)
+    @mock.patch(
+        'django.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',
+        return_value=models.NOT_PROVIDED,
+    )
     def test_alter_field_to_not_null_without_default(self, mocked_ask_method):
         """
         #23609 - Tests autodetection of nullable to non-nullable alterations.
@@ -797,8 +799,10 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="name", preserve_default=True)
         self.assertOperationFieldAttributes(changes, "testapp", 0, 0, default=models.NOT_PROVIDED)
 
-    @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',
-                return_value='Some Name')
+    @mock.patch(
+        'django.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',
+        return_value='Some Name',
+    )
     def test_alter_field_to_not_null_oneoff_default(self, mocked_ask_method):
         """
         #23609 - Tests autodetection of nullable to non-nullable alterations.

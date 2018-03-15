@@ -1068,9 +1068,11 @@ class RouterTestCase(TestCase):
 
     def test_database_routing(self):
         marty = Person.objects.using('default').create(name="Marty Alchin")
-        pro = Book.objects.using('default').create(title="Pro Django",
-                                                   published=datetime.date(2008, 12, 16),
-                                                   editor=marty)
+        pro = Book.objects.using('default').create(
+            title='Pro Django',
+            published=datetime.date(2008, 12, 16),
+            editor=marty,
+        )
         pro.authors.set([marty])
 
         # Create a book and author on the other database
@@ -1462,10 +1464,12 @@ class RouterTestCase(TestCase):
     def test_foreign_key_managers(self):
         "FK reverse relations are represented by managers, and can be controlled like managers"
         marty = Person.objects.using('other').create(pk=1, name="Marty Alchin")
-        Book.objects.using('other').create(pk=1, title="Pro Django",
-                                           published=datetime.date(2008, 12, 16),
-                                           editor=marty)
-
+        Book.objects.using('other').create(
+            pk=1,
+            title='Pro Django',
+            published=datetime.date(2008, 12, 16),
+            editor=marty,
+        )
         self.assertEqual(marty.edited.db, 'other')
         self.assertEqual(marty.edited.db_manager('default').db, 'default')
         self.assertEqual(marty.edited.db_manager('default').all().db, 'default')
@@ -1475,8 +1479,7 @@ class RouterTestCase(TestCase):
         pro = Book.objects.using('other').create(title="Pro Django",
                                                  published=datetime.date(2008, 12, 16))
 
-        Review.objects.using('other').create(source="Python Monthly",
-                                             content_object=pro)
+        Review.objects.using('other').create(source='Python Monthly', content_object=pro)
 
         self.assertEqual(pro.reviews.db, 'other')
         self.assertEqual(pro.reviews.db_manager('default').db, 'default')
@@ -1487,9 +1490,11 @@ class RouterTestCase(TestCase):
         # Create a book and author on the other database
 
         mark = Person.objects.using('other').create(name="Mark Pilgrim")
-        Book.objects.using('other').create(title="Dive into Python",
-                                           published=datetime.date(2009, 5, 4),
-                                           editor=mark)
+        Book.objects.using('other').create(
+            title='Dive into Python',
+            published=datetime.date(2009, 5, 4),
+            editor=mark,
+        )
 
         sub = Person.objects.filter(name='Mark Pilgrim')
         qs = Book.objects.filter(editor__in=sub)
@@ -1505,9 +1510,11 @@ class RouterTestCase(TestCase):
     def test_deferred_models(self):
         mark_def = Person.objects.using('default').create(name="Mark Pilgrim")
         mark_other = Person.objects.using('other').create(name="Mark Pilgrim")
-        orig_b = Book.objects.using('other').create(title="Dive into Python",
-                                                    published=datetime.date(2009, 5, 4),
-                                                    editor=mark_other)
+        orig_b = Book.objects.using('other').create(
+            title='Dive into Python',
+            published=datetime.date(2009, 5, 4),
+            editor=mark_other,
+        )
         b = Book.objects.using('other').only('title').get(pk=orig_b.pk)
         self.assertEqual(b.published, datetime.date(2009, 5, 4))
         b = Book.objects.using('other').only('title').get(pk=orig_b.pk)
@@ -1706,8 +1713,7 @@ class SignalTests(TestCase):
 
         # Create a copy of the models on the 'other' database to prevent
         # integrity errors on backends that don't defer constraints checks
-        Book.objects.using('other').create(pk=b.pk, title=b.title,
-                                           published=b.published)
+        Book.objects.using('other').create(pk=b.pk, title=b.title, published=b.published)
         Person.objects.using('other').create(pk=p.pk, name=p.name)
 
         # Test addition

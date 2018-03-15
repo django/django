@@ -3240,9 +3240,11 @@ Good luck picking a username that doesn&#39;t already exist.</p>
             bar = CharField()
 
             def clean(self):
-                raise ValidationError('<p>Non-field error.</p>',
-                                      code='secret',
-                                      params={'a': 1, 'b': 2})
+                raise ValidationError(
+                    '<p>Non-field error.</p>',
+                    code='secret',
+                    params={'a': 1, 'b': 2},
+                )
 
         control = {
             'foo': [{'code': 'required', 'message': 'This field is required.'}],

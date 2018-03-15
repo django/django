@@ -559,8 +559,8 @@ class ChangedBackendSettingsTest(TestCase):
         # Get a session for the test user
         self.assertTrue(self.client.login(
             username=self.TEST_USERNAME,
-            password=self.TEST_PASSWORD)
-        )
+            password=self.TEST_PASSWORD,
+        ))
         # Prepare a request object
         request = HttpRequest()
         request.session = self.client.session
