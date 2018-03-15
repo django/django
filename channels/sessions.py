@@ -31,13 +31,13 @@ class CookieMiddleware:
         # Go through headers to find the cookie one
         for name, value in scope.get("headers", []):
             if name == b"cookie":
-                scope["cookies"] = parse_cookie(value.decode("ascii"))
+                cookies = parse_cookie(value.decode("ascii"))
                 break
         else:
             # No cookie header found - add an empty default.
-            scope["cookies"] = {}
+            cookies = {}
         # Return inner application
-        return self.inner(scope)
+        return self.inner(dict(scope, cookies=cookies))
 
     @classmethod
     def set_cookie(
@@ -145,7 +145,7 @@ class SessionMiddlewareInstance:
 
     def __init__(self, scope, middleware):
         self.middleware = middleware
-        self.scope = scope
+        self.scope = dict(scope)
         # Make sure there are cookies in the scope
         if "cookies" not in self.scope:
             raise ValueError("No cookies in scope - SessionMiddleware needs to run inside of CookieMiddleware.")
@@ -153,7 +153,7 @@ class SessionMiddlewareInstance:
         session_key = self.scope["cookies"].get(self.middleware.cookie_name)
         self.scope["session"] = self.middleware.session_store(session_key)
         # Instantiate our inner application
-        self.inner = self.middleware.inner(scope)
+        self.inner = self.middleware.inner(self.scope)
 
     def __call__(self, receive, send):
         """

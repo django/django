@@ -81,9 +81,9 @@ query string and uses that::
         def __call__(self, scope):
             # Look up user from query string (you should also do things like
             # check it's a valid user ID, or if scope["user"] is already populated)
-            scope["user"] = User.objects.get(id=int(scope["query_string"]))
+            user = User.objects.get(id=int(scope["query_string"]))
             # Return the inner application directly and let it run everything else
-            return self.inner(scope)
+            return self.inner(dict(scope, user=user))
 
 The same principles can be applied to authenticate over non-HTTP protocols;
 for example, you might want to use someone's chat username from a chat protocol

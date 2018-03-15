@@ -36,8 +36,7 @@ class StaticFilesWrapper:
         # Only even look at HTTP requests
         if scope["type"] == "http" and self._should_handle(scope["path"]):
             # Serve static content
-            scope["static_base_url"] = self.base_url
-            return StaticFilesHandler(scope)
+            return StaticFilesHandler(dict(scope, static_base_url=self.base_url))
         # Hand off to the main app
         return self.application(scope)
 

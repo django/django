@@ -170,3 +170,20 @@ def test_url_router_path():
     # Invalid matches
     with pytest.raises(ValueError):
         router({"type": "http", "path": "/nonexistent/"})
+
+
+# @pytest.mark.xfail
+def test_path_remaining():
+    inner_router = URLRouter([
+        url(r'^no-match/$', MagicMock(return_value=1)),
+    ])
+    test_app = MagicMock(return_value=2)
+    outer_router = URLRouter([
+        url(r'^prefix/', inner_router),
+        url(r'^prefix/stuff/$', test_app),
+    ])
+    outermost_router = URLRouter([
+        url(r'', outer_router),
+    ])
+
+    assert outermost_router({"type": "http", "path": "/prefix/stuff/"}) == 2

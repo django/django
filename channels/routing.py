@@ -109,20 +109,22 @@ class URLRouter:
                 match = route_pattern_match(route, path)
                 if match:
                     new_path, args, kwargs = match
-                    # Shallow copy of scope.
-                    scope = dict(scope)
-                    # Only pass on the rest of the path
-                    scope["path_remaining"] = new_path
                     # Add args or kwargs into the scope
                     outer = scope.get("url_route", {})
-                    scope["url_route"] = {
-                        "args": outer.get("args", ()) + args,
-                        "kwargs": {**outer.get("kwargs", {}), **kwargs},
-                    }
-                    return route.callback(scope)
+                    return route.callback(dict(
+                        scope,
+                        path_remaining=new_path,
+                        url_route={
+                            "args": outer.get("args", ()) + args,
+                            "kwargs": {**outer.get("kwargs", {}), **kwargs},
+                        },
+                    ))
             except Resolver404 as e:
                 pass
         else:
+            if "path_remaining" in scope:
+                raise Resolver404("No route found for path %r." % path)
+            # We are the outermost URLRouter
             raise ValueError("No route found for path %r." % path)
 
 

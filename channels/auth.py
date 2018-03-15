@@ -137,6 +137,7 @@ class AuthMiddleware:
         if "session" not in scope:
             raise ValueError("AuthMiddleware cannot find session in scope. SessionMiddleware must be above it.")
         # Add it to the scope if it's not there already
+        scope = dict(scope)
         if "user" not in scope:
             scope["user"] = SimpleLazyObject(lambda: async_to_sync(get_user)(scope))
         # Pass control to inner application
