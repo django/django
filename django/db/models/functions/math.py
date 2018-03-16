@@ -1,4 +1,4 @@
-from django.db.models import Func, Transform, fields
+from django.db.models import Func, Transform
 from django.db.models.fields import FloatField
 
 
