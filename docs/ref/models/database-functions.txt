@@ -718,11 +718,6 @@ It can also be registered as a transform. For example::
 Accepts a single numeric field or expression and returns the value whose cosine
 is expression. Expression should be within the range -1 to 1.
 
-.. warning::
-
-    The behavior of ``ACos`` may be ``null`` if the input is null or not in the
-    range -1 to 1.
-
 Usage example::
  
     >>> # Get the arc cosine of the coordinates

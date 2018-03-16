@@ -174,6 +174,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function("regexp", 2, _sqlite_regexp)
         conn.create_function("django_format_dtdelta", 3, _sqlite_format_dtdelta)
         conn.create_function("django_power", 2, _sqlite_power)
+<<<<<<< cc10bd7ba5c256e8a5c89aab6287e265140c88fe
         conn.create_function('LPAD', 3, _sqlite_lpad)
         conn.create_function('REPEAT', 2, operator.mul)
         conn.create_function('RPAD', 3, _sqlite_rpad)
@@ -181,16 +182,29 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function('ASIN', 1, math.asin)
         conn.create_function('ATAN', 1, math.atan)
         conn.create_function('ATAN2', 2, math.atan2)
+=======
+        conn.create_function('ACOS', 1, math.acos)
+        conn.create_function('ASIN', 1, math.asin)
+        conn.create_function('ATAN', 1, math.atan)
+        conn.create_function('ATAN2', 2, lambda x, y: math.atan2(x, y))
+>>>>>>> Updated #28643 --simplified sqlite3 base.py
         conn.create_function('CEILING', 1, math.ceil)
         conn.create_function('COS', 1, math.cos)
         conn.create_function('COT', 1, lambda x: 1 / math.tan(x))
         conn.create_function('DEGREES', 1, math.degrees)
         conn.create_function('EXP', 1, math.exp)
         conn.create_function('FLOOR', 1, math.floor)
+<<<<<<< cc10bd7ba5c256e8a5c89aab6287e265140c88fe
         conn.create_function('LN', 1, lambda x: math.log(x))
         conn.create_function('LOG', 2, lambda x, y: math.log(y, x))
         conn.create_function('MOD', 2, lambda x, y: math.fmod(x, y))
         conn.create_function('PI', 0, lambda: math.pi)
+=======
+        conn.create_function('ln', 1, lambda x: math.log(x))
+        conn.create_function('LOG', 2, lambda x, y: math.log(y, x))
+        conn.create_function('MOD', 2, lambda x, y: math.fmod(x, y))
+        conn.create_function('PI', 0, _sqlite_pi)
+>>>>>>> Updated #28643 --simplified sqlite3 base.py
         conn.create_function('POWER', 2, _sqlite_power)
         conn.create_function('RADIANS', 1, math.radians)
         conn.create_function('SIN', 1, math.sin)
@@ -500,5 +514,10 @@ def _sqlite_lpad(text, length, fill_text):
     return (fill_text * length)[:length - len(text)] + text
 
 
+<<<<<<< cc10bd7ba5c256e8a5c89aab6287e265140c88fe
 def _sqlite_rpad(text, length, fill_text):
     return (text + fill_text * length)[:length]
+=======
+def _sqlite_pi():
+    return math.pi
+>>>>>>> Updated #28643 --simplified sqlite3 base.py
