@@ -263,7 +263,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             nodb_connection = self.__class__(
                 self.settings_dict.copy(),
                 alias=self.alias,
-                allow_thread_sharing=False)
+                allow_thread_sharing=False,
+            )
         return nodb_connection
 
     @cached_property

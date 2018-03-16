@@ -61,8 +61,7 @@ class DeleteCascadeTests(TestCase):
         """
         person = Person.objects.create(name='Nelson Mandela')
         award = Award.objects.create(name='Nobel', content_object=person)
-        AwardNote.objects.create(note='a peace prize',
-                                 award=award)
+        AwardNote.objects.create(note='a peace prize', award=award)
         self.assertEqual(AwardNote.objects.count(), 1)
         person.delete()
         self.assertEqual(Award.objects.count(), 0)
@@ -78,10 +77,8 @@ class DeleteCascadeTests(TestCase):
         """
         juan = Child.objects.create(name='Juan')
         paints = Toy.objects.create(name='Paints')
-        played = PlayedWith.objects.create(child=juan, toy=paints,
-                                           date=datetime.date.today())
-        PlayedWithNote.objects.create(played=played,
-                                      note='the next Jackson Pollock')
+        played = PlayedWith.objects.create(child=juan, toy=paints, date=datetime.date.today())
+        PlayedWithNote.objects.create(played=played, note='the next Jackson Pollock')
         self.assertEqual(PlayedWithNote.objects.count(), 1)
         paints.delete()
         self.assertEqual(PlayedWith.objects.count(), 0)

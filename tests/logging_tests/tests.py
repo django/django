@@ -390,8 +390,10 @@ class SetupConfigureLogging(SimpleTestCase):
     """
     Calling django.setup() initializes the logging configuration.
     """
-    @override_settings(LOGGING_CONFIG='logging_tests.tests.dictConfig',
-                       LOGGING=OLD_LOGGING)
+    @override_settings(
+        LOGGING_CONFIG='logging_tests.tests.dictConfig',
+        LOGGING=OLD_LOGGING,
+    )
     def test_configure_initializes_logging(self):
         from django import setup
         setup()

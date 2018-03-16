@@ -173,8 +173,7 @@ class CustomErrorMessageForm(forms.ModelForm):
 
 class ModelFormBaseTest(TestCase):
     def test_base_form(self):
-        self.assertEqual(list(BaseCategoryForm.base_fields),
-                         ['name', 'slug', 'url'])
+        self.assertEqual(list(BaseCategoryForm.base_fields), ['name', 'slug', 'url'])
 
     def test_no_model_class(self):
         class NoModelModelForm(forms.ModelForm):
@@ -224,8 +223,7 @@ class ModelFormBaseTest(TestCase):
                 super().__init__(*args, **kwargs)
                 self.fields['character'].required = False
 
-        char = Character.objects.create(username='user',
-                                        last_action=datetime.datetime.today())
+        char = Character.objects.create(username='user', last_action=datetime.datetime.today())
         data = {'study': 'Engineering'}
         data2 = {'study': 'Engineering', 'character': char.pk}
 
@@ -514,8 +512,7 @@ class ModelFormBaseTest(TestCase):
             """
             pass
 
-        self.assertEqual(list(SubCategoryForm.base_fields),
-                         ['name', 'slug', 'url'])
+        self.assertEqual(list(SubCategoryForm.base_fields), ['name', 'slug', 'url'])
 
     def test_subclassmeta_form(self):
         class SomeCategoryForm(forms.ModelForm):
@@ -565,8 +562,7 @@ class ModelFormBaseTest(TestCase):
                 fields = ['slug', 'url', 'name']
                 exclude = ['url']
 
-        self.assertEqual(list(OrderFields2.base_fields),
-                         ['slug', 'name'])
+        self.assertEqual(list(OrderFields2.base_fields), ['slug', 'name'])
 
     def test_default_populated_on_optional_field(self):
         class PubForm(forms.ModelForm):
@@ -934,8 +930,10 @@ class UniqueTest(TestCase):
         })
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
-        self.assertEqual(form.errors['__all__'],
-                         ['Derived book with this Suffix1 and Suffix2 already exists.'])
+        self.assertEqual(
+            form.errors['__all__'],
+            ['Derived book with this Suffix1 and Suffix2 already exists.'],
+        )
 
     def test_explicitpk_unspecified(self):
         """Test for primary_key being in the form and failing validation."""
@@ -1107,12 +1105,9 @@ class UniqueTest(TestCase):
 
 class ModelFormBasicTests(TestCase):
     def create_basic_data(self):
-        self.c1 = Category.objects.create(
-            name="Entertainment", slug="entertainment", url="entertainment")
-        self.c2 = Category.objects.create(
-            name="It's a test", slug="its-test", url="test")
-        self.c3 = Category.objects.create(
-            name="Third test", slug="third-test", url="third")
+        self.c1 = Category.objects.create(name='Entertainment', slug='entertainment', url='entertainment')
+        self.c2 = Category.objects.create(name="It's a test", slug='its-test', url='test')
+        self.c3 = Category.objects.create(name='Third test', slug='third-test', url='third')
         self.w_royko = Writer.objects.create(name='Mike Royko')
         self.w_woodward = Writer.objects.create(name='Bob Woodward')
 
@@ -1249,8 +1244,11 @@ class ModelFormBasicTests(TestCase):
             return db_field.formfield(**kwargs)
 
         # Create a ModelForm, instantiate it, and check that the output is as expected
-        ModelForm = modelform_factory(Article, fields=['headline', 'categories'],
-                                      formfield_callback=formfield_for_dbfield)
+        ModelForm = modelform_factory(
+            Article,
+            fields=['headline', 'categories'],
+            formfield_callback=formfield_for_dbfield,
+        )
         form = ModelForm()
         self.assertHTMLEqual(
             form.as_ul(),
@@ -1558,12 +1556,9 @@ class ModelFormBasicTests(TestCase):
 
 class ModelMultipleChoiceFieldTests(TestCase):
     def setUp(self):
-        self.c1 = Category.objects.create(
-            name="Entertainment", slug="entertainment", url="entertainment")
-        self.c2 = Category.objects.create(
-            name="It's a test", slug="its-test", url="test")
-        self.c3 = Category.objects.create(
-            name="Third", slug="third-test", url="third")
+        self.c1 = Category.objects.create(name='Entertainment', slug='entertainment', url='entertainment')
+        self.c2 = Category.objects.create(name="It's a test", slug='its-test', url='test')
+        self.c3 = Category.objects.create(name='Third', slug='third-test', url='third')
 
     def test_model_multiple_choice_field(self):
         f = forms.ModelMultipleChoiceField(Category.objects.all())
@@ -1669,9 +1664,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
         def my_validator(value):
             self._validator_run = True
 
-        f = forms.ModelMultipleChoiceField(queryset=Writer.objects.all(),
-                                           validators=[my_validator])
-
+        f = forms.ModelMultipleChoiceField(queryset=Writer.objects.all(), validators=[my_validator])
         f.clean([p.pk for p in Writer.objects.all()[8:9]])
         self.assertTrue(self._validator_run)
 
@@ -1680,8 +1673,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
         Test support of show_hidden_initial by ModelMultipleChoiceField.
         """
         class WriterForm(forms.Form):
-            persons = forms.ModelMultipleChoiceField(show_hidden_initial=True,
-                                                     queryset=Writer.objects.all())
+            persons = forms.ModelMultipleChoiceField(show_hidden_initial=True, queryset=Writer.objects.all())
 
         person1 = Writer.objects.create(name="Person 1")
         person2 = Writer.objects.create(name="Person 2")
@@ -1777,8 +1769,7 @@ class ModelOneToOneFieldTests(TestCase):
                 fields = '__all__'
 
         bw = BetterWriter.objects.create(name='Joe Better', score=10)
-        self.assertEqual(sorted(model_to_dict(bw)),
-                         ['id', 'name', 'score', 'writer_ptr'])
+        self.assertEqual(sorted(model_to_dict(bw)), ['id', 'name', 'score', 'writer_ptr'])
 
         form = BetterWriterForm({'name': 'Some Name', 'score': 12})
         self.assertTrue(form.is_valid())
@@ -1918,9 +1909,11 @@ class FileAndImageFieldTests(TestCase):
         form = DocumentForm(files={'myfile': SimpleUploadedFile('something.txt', b'content')})
         self.assertTrue(form.is_valid())
         doc = form.save(commit=False)
-        form = DocumentForm(instance=doc,
-                            files={'myfile': SimpleUploadedFile('something.txt', b'content')},
-                            data={'myfile-clear': 'true'})
+        form = DocumentForm(
+            instance=doc,
+            files={'myfile': SimpleUploadedFile('something.txt', b'content')},
+            data={'myfile-clear': 'true'},
+        )
         self.assertTrue(not form.is_valid())
         self.assertEqual(form.errors['myfile'],
                          ['Please either submit a file or check the clear checkbox, not both.'])
@@ -1951,7 +1944,8 @@ class FileAndImageFieldTests(TestCase):
         # Upload a file and ensure it all works as expected.
         f = TextFileForm(
             data={'description': 'Assistance'},
-            files={'file': SimpleUploadedFile('test1.txt', b'hello world')})
+            files={'file': SimpleUploadedFile('test1.txt', b'hello world')},
+        )
         self.assertTrue(f.is_valid())
         self.assertEqual(type(f.cleaned_data['file']), SimpleUploadedFile)
         instance = f.save()
@@ -1961,7 +1955,8 @@ class FileAndImageFieldTests(TestCase):
         # If the previous file has been deleted, the file name can be reused
         f = TextFileForm(
             data={'description': 'Assistance'},
-            files={'file': SimpleUploadedFile('test1.txt', b'hello world')})
+            files={'file': SimpleUploadedFile('test1.txt', b'hello world')},
+        )
         self.assertTrue(f.is_valid())
         self.assertEqual(type(f.cleaned_data['file']), SimpleUploadedFile)
         instance = f.save()
@@ -1970,14 +1965,13 @@ class FileAndImageFieldTests(TestCase):
         # Check if the max_length attribute has been inherited from the model.
         f = TextFileForm(
             data={'description': 'Assistance'},
-            files={'file': SimpleUploadedFile('test-maxlength.txt', b'hello world')})
+            files={'file': SimpleUploadedFile('test-maxlength.txt', b'hello world')},
+        )
         self.assertFalse(f.is_valid())
 
         # Edit an instance that already has the file defined in the model. This will not
         # save the file again, but leave it exactly as it is.
-        f = TextFileForm(
-            data={'description': 'Assistance'},
-            instance=instance)
+        f = TextFileForm({'description': 'Assistance'}, instance=instance)
         self.assertTrue(f.is_valid())
         self.assertEqual(f.cleaned_data['file'].name, 'tests/test1.txt')
         instance = f.save()
@@ -1989,7 +1983,9 @@ class FileAndImageFieldTests(TestCase):
         # Override the file by uploading a new one.
         f = TextFileForm(
             data={'description': 'Assistance'},
-            files={'file': SimpleUploadedFile('test2.txt', b'hello world')}, instance=instance)
+            files={'file': SimpleUploadedFile('test2.txt', b'hello world')},
+            instance=instance,
+        )
         self.assertTrue(f.is_valid())
         instance = f.save()
         self.assertEqual(instance.file.name, 'tests/test2.txt')
@@ -2008,15 +2004,15 @@ class FileAndImageFieldTests(TestCase):
 
         f = TextFileForm(
             data={'description': 'Assistance'},
-            files={'file': SimpleUploadedFile('test3.txt', b'hello world')}, instance=instance)
+            files={'file': SimpleUploadedFile('test3.txt', b'hello world')},
+            instance=instance,
+        )
         self.assertTrue(f.is_valid())
         instance = f.save()
         self.assertEqual(instance.file.name, 'tests/test3.txt')
 
         # Instance can be edited w/out re-uploading the file and existing file should be preserved.
-        f = TextFileForm(
-            data={'description': 'New Description'},
-            instance=instance)
+        f = TextFileForm({'description': 'New Description'}, instance=instance)
         f.fields['file'].required = False
         self.assertTrue(f.is_valid())
         instance = f.save()
@@ -2094,7 +2090,8 @@ class FileAndImageFieldTests(TestCase):
 
         f = ImageFileForm(
             data={'description': 'An image'},
-            files={'image': SimpleUploadedFile('test.png', image_data)})
+            files={'image': SimpleUploadedFile('test.png', image_data)},
+        )
         self.assertTrue(f.is_valid())
         self.assertEqual(type(f.cleaned_data['image']), SimpleUploadedFile)
         instance = f.save()
@@ -2107,7 +2104,8 @@ class FileAndImageFieldTests(TestCase):
         instance.image.delete(save=False)
         f = ImageFileForm(
             data={'description': 'An image'},
-            files={'image': SimpleUploadedFile('test.png', image_data)})
+            files={'image': SimpleUploadedFile('test.png', image_data)},
+        )
         self.assertTrue(f.is_valid())
         self.assertEqual(type(f.cleaned_data['image']), SimpleUploadedFile)
         instance = f.save()
@@ -2133,7 +2131,9 @@ class FileAndImageFieldTests(TestCase):
 
         f = ImageFileForm(
             data={'description': 'Changed it'},
-            files={'image': SimpleUploadedFile('test2.png', image_data2)}, instance=instance)
+            files={'image': SimpleUploadedFile('test2.png', image_data2)},
+            instance=instance,
+        )
         self.assertTrue(f.is_valid())
         instance = f.save()
         self.assertEqual(instance.image.name, 'tests/test2.png')
@@ -2147,7 +2147,8 @@ class FileAndImageFieldTests(TestCase):
 
         f = ImageFileForm(
             data={'description': 'Changed it'},
-            files={'image': SimpleUploadedFile('test2.png', image_data2)})
+            files={'image': SimpleUploadedFile('test2.png', image_data2)},
+        )
         self.assertTrue(f.is_valid())
         instance = f.save()
         self.assertEqual(instance.image.name, 'tests/test2.png')
@@ -2176,7 +2177,9 @@ class FileAndImageFieldTests(TestCase):
 
         f = OptionalImageFileForm(
             data={'description': 'And a final one'},
-            files={'image': SimpleUploadedFile('test3.png', image_data)}, instance=instance)
+            files={'image': SimpleUploadedFile('test3.png', image_data)},
+            instance=instance,
+        )
         self.assertTrue(f.is_valid())
         instance = f.save()
         self.assertEqual(instance.image.name, 'tests/test3.png')
@@ -2185,9 +2188,7 @@ class FileAndImageFieldTests(TestCase):
 
         # Editing the instance without re-uploading the image should not affect
         # the image or its width/height properties.
-        f = OptionalImageFileForm(
-            data={'description': 'New Description'},
-            instance=instance)
+        f = OptionalImageFileForm({'description': 'New Description'}, instance=instance)
         self.assertTrue(f.is_valid())
         instance = f.save()
         self.assertEqual(instance.description, 'New Description')
@@ -2212,7 +2213,8 @@ class FileAndImageFieldTests(TestCase):
         # Test callable upload_to behavior that's dependent on the value of another field in the model
         f = ImageFileForm(
             data={'description': 'And a final one', 'path': 'foo'},
-            files={'image': SimpleUploadedFile('test4.png', image_data)})
+            files={'image': SimpleUploadedFile('test4.png', image_data)},
+        )
         self.assertTrue(f.is_valid())
         instance = f.save()
         self.assertEqual(instance.image.name, 'foo/test4.png')
@@ -2378,8 +2380,7 @@ class OtherModelFormTests(TestCase):
                 model = Category
                 fields = ['description', 'url']
 
-        self.assertEqual(list(CategoryForm.base_fields),
-                         ['description', 'url'])
+        self.assertEqual(list(CategoryForm.base_fields), ['description', 'url'])
 
         self.assertHTMLEqual(
             str(CategoryForm()),
@@ -2400,8 +2401,7 @@ class OtherModelFormTests(TestCase):
         self.assertQuerysetEqual(form.cleaned_data['items'], ['Core', 'Pear'])
 
     def test_model_field_that_returns_none_to_exclude_itself_with_explicit_fields(self):
-        self.assertEqual(list(CustomFieldForExclusionForm.base_fields),
-                         ['name'])
+        self.assertEqual(list(CustomFieldForExclusionForm.base_fields), ['name'])
         self.assertHTMLEqual(
             str(CustomFieldForExclusionForm()),
             '''<tr><th><label for="id_name">Name:</label></th>

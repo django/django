@@ -67,7 +67,8 @@ class CharFieldTests(TestCase):
                     ('1', 'item1'),
                     ('2', 'item2'),
                 ],
-                db_index=True)
+                db_index=True,
+            )
 
         field = Model._meta.get_field('field')
         self.assertEqual(field.check(), [])

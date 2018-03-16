@@ -146,7 +146,8 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             localedir=localedir,
             languages=[self.__locale],
             codeset='utf-8',
-            fallback=use_null_fallback)
+            fallback=use_null_fallback,
+        )
 
     def _init_translation_catalog(self):
         """Create a base catalog using global django translations."""
