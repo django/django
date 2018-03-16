@@ -109,13 +109,6 @@ class BaseDatabaseFeatures:
     # Does the backend reset sequences between tests?
     supports_sequence_reset = True
 
-    # Can the backend determine reliably if a field is nullable?
-    # Note that this is separate from interprets_empty_strings_as_nulls,
-    # although the latter feature, when true, interferes with correct
-    # setting (and introspection) of CharFields' nullability.
-    # This is True for all core backends.
-    can_introspect_null = True
-
     # Can the backend introspect the default value of a column?
     can_introspect_default = True
 
@@ -286,6 +279,6 @@ class BaseDatabaseFeatures:
         introspection results; it should provide expectations, not run an
         introspection itself.
         """
-        if self.can_introspect_null and field and field.null:
+        if field and field.null:
             return 'NullBooleanField'
         return 'BooleanField'

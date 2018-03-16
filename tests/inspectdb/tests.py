@@ -104,10 +104,7 @@ class InspectDBTestCase(TestCase):
         if 'BooleanField' in null_bool_field_type:
             assertFieldType('null_bool_field', "models.{}()".format(null_bool_field_type))
         else:
-            if connection.features.can_introspect_null:
-                assertFieldType('null_bool_field', "models.{}(blank=True, null=True)".format(null_bool_field_type))
-            else:
-                assertFieldType('null_bool_field', "models.{}()".format(null_bool_field_type))
+            assertFieldType('null_bool_field', "models.{}(blank=True, null=True)".format(null_bool_field_type))
 
         if connection.features.can_introspect_decimal_field:
             assertFieldType('decimal_field', "models.DecimalField(max_digits=6, decimal_places=1)")
