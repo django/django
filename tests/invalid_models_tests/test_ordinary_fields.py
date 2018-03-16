@@ -46,14 +46,7 @@ class BooleanFieldTests(SimpleTestCase):
             field = models.BooleanField(null=True)
 
         field = Model._meta.get_field('field')
-        self.assertEqual(field.check(), [
-            Error(
-                'BooleanFields do not accept null values.',
-                hint='Use a NullBooleanField instead.',
-                obj=field,
-                id='fields.E110',
-            ),
-        ])
+        self.assertEqual(field.check(), [])
 
 
 @isolate_apps('invalid_models_tests')

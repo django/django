@@ -988,41 +988,19 @@ class BooleanField(Field):
     empty_strings_allowed = False
     default_error_messages = {
         'invalid': _("'%(value)s' value must be either True or False."),
+        'invalid_nullable': _("'%(value)s' value must be either None, True or False."),
     }
     description = _("Boolean (Either True or False)")
 
-    def __init__(self, *args, **kwargs):
-        kwargs['blank'] = True
-        super().__init__(*args, **kwargs)
-
-    def check(self, **kwargs):
-        return [
-            *super().check(**kwargs),
-            *self._check_null(**kwargs),
-        ]
-
-    def _check_null(self, **kwargs):
-        if getattr(self, 'null', False):
-            return [
-                checks.Error(
-                    'BooleanFields do not accept null values.',
-                    hint='Use a NullBooleanField instead.',
-                    obj=self,
-                    id='fields.E110',
-                )
-            ]
-        else:
-            return []
-
-    def deconstruct(self):
-        name, path, args, kwargs = super().deconstruct()
-        del kwargs['blank']
-        return name, path, args, kwargs
+    def __init__(self, *args, blank=True, **kwargs):
+        super().__init__(*args, blank=blank, **kwargs)
 
     def get_internal_type(self):
         return "BooleanField"
 
     def to_python(self, value):
+        if self.null and value in self.empty_values:
+            return None
         if value in (True, False):
             # if value is 1 or 0 than it's equal to True or False, but we want
             # to return a true bool for semantic reasons.
@@ -1031,8 +1009,14 @@ class BooleanField(Field):
             return True
         if value in ('f', 'False', '0'):
             return False
+        if self.null:
+            self._to_python_validation_error(value, 'invalid_nullable')
+        else:
+            self._to_python_validation_error(value, 'invalid')
+
+    def _to_python_validation_error(self, value, message_type):
         raise exceptions.ValidationError(
-            self.error_messages['invalid'],
+            self.error_messages[message_type],
             code='invalid',
             params={'value': value},
         )
@@ -1046,11 +1030,15 @@ class BooleanField(Field):
     def formfield(self, **kwargs):
         # Unlike most fields, BooleanField figures out include_blank from
         # self.null instead of self.blank.
-        if self.choices:
-            include_blank = not (self.has_default() or 'initial' in kwargs)
-            defaults = {'choices': self.get_choices(include_blank=include_blank)}
+        if self.null:
+            defaults = {'form_class': forms.NullBooleanField}
         else:
             defaults = {'form_class': forms.BooleanField}
+        if self.choices:
+            include_blank = not (self.has_default() or 'initial' in kwargs)
+            defaults.update({
+                'choices': self.get_choices(include_blank=include_blank),
+            })
         defaults.update(kwargs)
         return super().formfield(**defaults)
 

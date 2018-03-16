@@ -54,13 +54,15 @@ class BooleanFieldTests(TestCase):
         b2.refresh_from_db()
         self.assertIs(b2.bfield, False)
 
-        b3 = NullBooleanModel.objects.create(nbfield=True)
+        b3 = NullBooleanModel.objects.create(nbfield=True, nbfield_old=True)
         b3.refresh_from_db()
         self.assertIs(b3.nbfield, True)
+        self.assertIs(b3.nbfield_old, True)
 
-        b4 = NullBooleanModel.objects.create(nbfield=False)
+        b4 = NullBooleanModel.objects.create(nbfield=False, nbfield_old=False)
         b4.refresh_from_db()
         self.assertIs(b4.nbfield, False)
+        self.assertIs(b4.nbfield_old, False)
 
         # When an extra clause exists, the boolean conversions are applied with
         # an offset (#13293).
@@ -73,8 +75,8 @@ class BooleanFieldTests(TestCase):
         """
         bmt = BooleanModel.objects.create(bfield=True)
         bmf = BooleanModel.objects.create(bfield=False)
-        nbmt = NullBooleanModel.objects.create(nbfield=True)
-        nbmf = NullBooleanModel.objects.create(nbfield=False)
+        nbmt = NullBooleanModel.objects.create(nbfield=True, nbfield_old=True)
+        nbmf = NullBooleanModel.objects.create(nbfield=False, nbfield_old=False)
         m1 = FksToBooleans.objects.create(bf=bmt, nbf=nbmt)
         m2 = FksToBooleans.objects.create(bf=bmf, nbf=nbmf)
 
@@ -88,8 +90,10 @@ class BooleanFieldTests(TestCase):
         mc = FksToBooleans.objects.select_related().get(pk=m2.id)
         self.assertIs(mb.bf.bfield, True)
         self.assertIs(mb.nbf.nbfield, True)
+        self.assertIs(mb.nbf.nbfield_old, True)
         self.assertIs(mc.bf.bfield, False)
         self.assertIs(mc.nbf.nbfield, False)
+        self.assertIs(mc.nbf.nbfield_old, False)
 
     def test_null_default(self):
         """
@@ -105,6 +109,7 @@ class BooleanFieldTests(TestCase):
 
         nb = NullBooleanModel()
         self.assertIsNone(nb.nbfield)
+        self.assertIsNone(nb.nbfield_old)
         nb.save()  # no error
 
 
@@ -120,5 +125,5 @@ class ValidationTest(SimpleTestCase):
         NullBooleanField shouldn't throw a validation error when given a value
         of None.
         """
-        nullboolean = NullBooleanModel(nbfield=None)
+        nullboolean = NullBooleanModel(nbfield=None, nbfield_old=None)
         nullboolean.full_clean()

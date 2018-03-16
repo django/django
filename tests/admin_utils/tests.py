@@ -166,6 +166,10 @@ class UtilsTests(SimpleTestCase):
         expected = '<img src="%sadmin/img/icon-unknown.svg" alt="None">' % settings.STATIC_URL
         self.assertHTMLEqual(display_value, expected)
 
+        display_value = display_for_field(None, models.BooleanField(null=True), self.empty_value)
+        expected = '<img src="%sadmin/img/icon-unknown.svg" alt="None" />' % settings.STATIC_URL
+        self.assertHTMLEqual(display_value, expected)
+
         display_value = display_for_field(None, models.DecimalField(), self.empty_value)
         self.assertEqual(display_value, self.empty_value)
 

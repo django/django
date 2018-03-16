@@ -119,6 +119,14 @@ class Child7(Parent):
 # RelatedManagers
 class RelatedModel(models.Model):
     test_gfk = GenericRelation('RelationModel', content_type_field='gfk_ctype', object_id_field='gfk_id')
+    exact = models.BooleanField(null=True)
+
+    def __str__(self):
+        return str(self.pk)
+
+
+class OldRelatedModel(models.Model):
+    test_gfk = GenericRelation('RelationModel', content_type_field='gfk_ctype', object_id_field='gfk_id')
     exact = models.NullBooleanField()
 
     def __str__(self):
@@ -129,6 +137,19 @@ class RelationModel(models.Model):
     fk = models.ForeignKey(RelatedModel, models.CASCADE, related_name='test_fk')
 
     m2m = models.ManyToManyField(RelatedModel, related_name='test_m2m')
+
+    gfk_ctype = models.ForeignKey(ContentType, models.SET_NULL, null=True)
+    gfk_id = models.IntegerField(null=True)
+    gfk = GenericForeignKey(ct_field='gfk_ctype', fk_field='gfk_id')
+
+    def __str__(self):
+        return str(self.pk)
+
+
+class OldRelationModel(models.Model):
+    fk = models.ForeignKey(OldRelatedModel, models.CASCADE, related_name='test_fk')
+
+    m2m = models.ManyToManyField(OldRelatedModel, related_name='test_m2m')
 
     gfk_ctype = models.ForeignKey(ContentType, models.SET_NULL, null=True)
     gfk_id = models.IntegerField(null=True)

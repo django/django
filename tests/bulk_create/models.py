@@ -74,6 +74,7 @@ class NullableFields(models.Model):
     duration_field = models.DurationField(null=True, default=datetime.timedelta(1))
     float_field = models.FloatField(null=True, default=3.2)
     integer_field = models.IntegerField(null=True, default=2)
+    boolean_field = models.BooleanField(null=True, default=False)
     null_boolean_field = models.NullBooleanField(null=True, default=False)
     positive_integer_field = models.PositiveIntegerField(null=True, default=3)
     positive_small_integer_field = models.PositiveSmallIntegerField(null=True, default=4)
