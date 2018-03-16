@@ -132,7 +132,7 @@ class DecoratorsTest(TestCase):
 
     def test_require_safe_accepts_only_safe_methods(self):
         """
-        Test for the require_safe decorator.
+        ``require_safe`` decorator accepts only safe methods(GET and HEAD)
         A view returns either a response or an exception.
         Refs #15637.
         """

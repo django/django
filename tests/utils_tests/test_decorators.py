@@ -49,20 +49,20 @@ full_dec = decorator_from_middleware(FullMiddleware)
 
 class DecoratorFromMiddlewareTests(SimpleTestCase):
     """
-    Tests for view decorators created using
-    ``django.utils.decorators.decorator_from_middleware``.
+    View decorator created using
+    ``django.utils.decorators.decorator_from_middleware``
     """
     rf = RequestFactory()
 
     def test_process_view_middleware(self):
         """
-        Test a middleware that implements process_view.
+        Middleware that implements a ``process_view``.
         """
         process_view(self.rf.get('/'))
 
     def test_callable_process_view_middleware(self):
         """
-        Test a middleware that implements process_view, operating on a callable class.
+        Middleware that implements ``process_view``, operating on a callable class.
         """
         class_process_view(self.rf.get('/'))
 

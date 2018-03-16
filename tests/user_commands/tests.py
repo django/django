@@ -209,7 +209,7 @@ class CommandTests(SimpleTestCase):
 
 class CommandRunTests(AdminScriptTestCase):
     """
-    Tests that need to run by simulating the command line, not by call_command.
+    Need to run the tests by simulating the command line, not by call_command.
     """
     def tearDown(self):
         self.remove_settings('settings.py')

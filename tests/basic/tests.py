@@ -565,8 +565,7 @@ class ManagerTest(SimpleTestCase):
 
     def test_manager_methods(self):
         """
-        This test ensures that the correct set of methods from `QuerySet`
-        are copied onto `Manager`.
+        Correct set of methods from `QuerySet` are copied onto `Manager`.
 
         It's particularly useful to prevent accidentally leaking new methods
         into `Manager`. New `QuerySet` methods that should also be copied onto

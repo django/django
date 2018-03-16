@@ -195,7 +195,10 @@ class RelatedGeoModelTest(TestCase):
             self.assertEqual(loc.point, def_loc.point)
 
     def test09_pk_relations(self):
-        "Ensuring correct primary key column is selected across relations. See #10757."
+        """
+        Primary key column is selected correctly across relations.
+        See #10757.
+        """
         # The expected ID values -- notice the last two location IDs
         # are out of order.  Dallas and Houston have location IDs that differ
         # from their PKs -- this is done to ensure that the related location

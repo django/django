@@ -7,7 +7,9 @@ from .models import Article, IndexErrorArticle, Person
 
 
 class EarliestOrLatestTests(TestCase):
-    """Tests for the earliest() and latest() objects methods"""
+    """
+    ``earliest`` and ``latest`` objects methods
+    """
 
     @classmethod
     def setUpClass(cls):
