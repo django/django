@@ -7,8 +7,6 @@ from django.db import connection
 from django.db.backends.base.introspection import TableInfo
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
-from .models import ColumnTypes
-
 
 def inspectdb_tables_only(table_name):
     """
@@ -96,15 +94,9 @@ class InspectDBTestCase(TestCase):
         else:
             assertFieldType('big_int_field', "models.IntegerField()")
 
-        bool_field = ColumnTypes._meta.get_field('bool_field')
-        bool_field_type = connection.features.introspected_boolean_field_type(bool_field)
+        bool_field_type = connection.features.introspected_boolean_field_type
         assertFieldType('bool_field', "models.{}()".format(bool_field_type))
-        null_bool_field = ColumnTypes._meta.get_field('null_bool_field')
-        null_bool_field_type = connection.features.introspected_boolean_field_type(null_bool_field)
-        if 'BooleanField' in null_bool_field_type:
-            assertFieldType('null_bool_field', "models.{}()".format(null_bool_field_type))
-        else:
-            assertFieldType('null_bool_field', "models.{}(blank=True, null=True)".format(null_bool_field_type))
+        assertFieldType('null_bool_field', 'models.{}(blank=True, null=True)'.format(bool_field_type))
 
         if connection.features.can_introspect_decimal_field:
             assertFieldType('decimal_field', "models.DecimalField(max_digits=6, decimal_places=1)")

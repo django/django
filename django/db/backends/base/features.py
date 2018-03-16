@@ -141,6 +141,10 @@ class BaseDatabaseFeatures:
     # Can the backend introspect a TimeField, instead of a DateTimeField?
     can_introspect_time_field = True
 
+    # Some backends may not be able to differentiate BooleanField from other
+    # fields such as IntegerField.
+    introspected_boolean_field_type = 'BooleanField'
+
     # Can the backend introspect the column order (ASC/DESC) for indexes?
     supports_index_column_ordering = True
 
@@ -268,17 +272,3 @@ class BaseDatabaseFeatures:
         except NotSupportedError:
             return False
         return True
-
-    def introspected_boolean_field_type(self, field=None):
-        """
-        What is the type returned when the backend introspects a BooleanField?
-        The `field` argument may be used to give further details of the field
-        to be introspected.
-
-        The return value from this function is compared by tests against actual
-        introspection results; it should provide expectations, not run an
-        introspection itself.
-        """
-        if field and field.null:
-            return 'NullBooleanField'
-        return 'BooleanField'

@@ -285,6 +285,9 @@ Database backend API
 * ``DatabaseOperations.distinct_sql()`` now requires an additional ``params``
   argument and returns a tuple of SQL and parameters instead of a SQL string.
 
+* ``DatabaseFeatures.introspected_boolean_field_type`` is changed from a method
+  to a property.
+
 :mod:`django.contrib.gis`
 -------------------------
 

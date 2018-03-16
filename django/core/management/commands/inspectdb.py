@@ -142,11 +142,8 @@ class Command(BaseCommand):
                     # Add 'null' and 'blank', if the 'null_ok' flag was present in the
                     # table description.
                     if row[6]:  # If it's NULL...
-                        if field_type == 'BooleanField(':
-                            field_type = 'NullBooleanField('
-                        else:
-                            extra_params['blank'] = True
-                            extra_params['null'] = True
+                        extra_params['blank'] = True
+                        extra_params['null'] = True
 
                     field_desc = '%s = %s%s' % (
                         att_name,
