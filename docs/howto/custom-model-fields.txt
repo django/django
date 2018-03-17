@@ -550,6 +550,13 @@ For example::
             return ''.join([''.join(l) for l in (value.north,
                     value.east, value.south, value.west)])
 
+.. note::
+
+   If you override :meth:`~Field.get_prep_value`, you have to call
+   :meth:`~django.db.models.Model.refresh_from_db` on object after
+   you create or update it, because :meth:`~django.db.models.Model.save`
+   doesn't refresh fields from the database.
+
 .. warning::
 
     If your custom field uses the ``CHAR``, ``VARCHAR`` or ``TEXT``
