@@ -194,6 +194,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function('DEGREES', 1, math.degrees)
         conn.create_function('EXP', 1, math.exp)
         conn.create_function('FLOOR', 1, math.floor)
+<<<<<<< 143f22ada3d87ad6ea188fd568967cb597f0c007
 <<<<<<< cc10bd7ba5c256e8a5c89aab6287e265140c88fe
         conn.create_function('LN', 1, lambda x: math.log(x))
         conn.create_function('LOG', 2, lambda x, y: math.log(y, x))
@@ -205,6 +206,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function('MOD', 2, lambda x, y: math.fmod(x, y))
         conn.create_function('PI', 0, _sqlite_pi)
 >>>>>>> Updated #28643 --simplified sqlite3 base.py
+=======
+        conn.create_function('LN', 1, lambda x: math.log(x))
+        conn.create_function('LOG', 2, lambda x, y: math.log(y, x))
+        conn.create_function('MOD', 2, lambda x, y: math.fmod(x, y))
+        conn.create_function('PI', 0, lambda: math.pi)
+>>>>>>> Fixed #28643 put all tests for db/functions/math.py into a single folder math.
         conn.create_function('POWER', 2, _sqlite_power)
         conn.create_function('RADIANS', 1, math.radians)
         conn.create_function('SIN', 1, math.sin)
@@ -508,6 +515,7 @@ def _sqlite_regexp(re_pattern, re_string):
     return bool(re.search(re_pattern, str(re_string))) if re_string is not None else False
 
 
+<<<<<<< 143f22ada3d87ad6ea188fd568967cb597f0c007
 def _sqlite_lpad(text, length, fill_text):
     if len(text) >= length:
         return text[:length]
@@ -521,3 +529,7 @@ def _sqlite_rpad(text, length, fill_text):
 def _sqlite_pi():
     return math.pi
 >>>>>>> Updated #28643 --simplified sqlite3 base.py
+=======
+def _sqlite_power(x, y):
+    return x ** y
+>>>>>>> Fixed #28643 put all tests for db/functions/math.py into a single folder math.

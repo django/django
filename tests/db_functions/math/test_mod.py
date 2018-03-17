@@ -3,11 +3,7 @@ import math
 from django.db.models.functions import Mod
 from django.test import TestCase
 
-<<<<<<< 6481064d067f4644786d98777438ff7f05dc8fb9:tests/db_functions/math/test_mod.py
 from ..models import IntegerModel
-=======
-from .models import IntegerModel
->>>>>>> update tests and 2.1.txt:tests/db_functions/test_mod.py
 
 
 class ModTests(TestCase):
