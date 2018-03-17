@@ -819,9 +819,10 @@ class ModelAdminChecks(BaseModelAdminChecks):
                 return []
         elif isinstance(item, (tuple, list)):
             # item is option #2
-            field, list_filter_class = item
-            if not _issubclass(list_filter_class, FieldListFilter):
-                return must_inherit_from(parent='FieldListFilter', option='%s[1]' % label, obj=obj, id='admin.E115')
+            field, second_param = item
+            if not isinstance(second_param, str) and not issubclass(second_param, FieldListFilter):
+                return must_be("a string or subclass of 'FieldListFilter'", option='%s[1]' % label,
+                               obj=obj, id='admin.E115')
             else:
                 return []
         else:

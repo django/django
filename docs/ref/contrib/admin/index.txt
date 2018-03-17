@@ -951,8 +951,18 @@ subclass::
                           yield ('90s', _('in the nineties'))
 
     * a tuple, where the first element is a field name and the second
-      element is a class inheriting from
-      ``django.contrib.admin.FieldListFilter``, for example::
+      element is a string to use as the title, or a class inheriting from
+      ``django.contrib.admin.FieldListFilter``. For example, with a string title::
+
+          class BookAdmin(admin.ModelAdmin):
+              list_filter = (
+                  ('author__name', 'Author Name'),
+              )
+
+      This is useful for fields on a related model where the default title would
+      be confusing or not make sense without the context of the relationship.
+
+      With a ``FieldListFilter`` subclass::
 
           class PersonAdmin(admin.ModelAdmin):
               list_filter = (
@@ -988,6 +998,8 @@ subclass::
       .. versionadded:: 3.1
 
           The ``EmptyFieldListFilter`` class was added.
+
+          The ability to specify a title with a field name was added.
 
     List filter's typically appear only if the filter has more than one choice.
     A filter's ``has_output()`` method controls whether or not it appears.

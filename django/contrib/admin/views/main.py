@@ -133,9 +133,17 @@ class ChangeList:
                 spec = list_filter(request, lookup_params, self.model, self.model_admin)
             else:
                 field_path = None
+                title = None
                 if isinstance(list_filter, (tuple, list)):
-                    # This is a custom FieldListFilter class for a given field.
-                    field, field_list_filter_class = list_filter
+                    field, second_param = list_filter
+
+                    if isinstance(second_param, str):
+                        # Second parameter is an override for the default title
+                        field_list_filter_class = FieldListFilter.create
+                        title = second_param
+                    else:
+                        # This is a custom FieldListFilter class for a given field.
+                        field_list_filter_class = second_param
                 else:
                     # This is simply a field name, so use the default
                     # FieldListFilter class that has been registered for the
@@ -148,7 +156,7 @@ class ChangeList:
                 lookup_params_count = len(lookup_params)
                 spec = field_list_filter_class(
                     field, request, lookup_params,
-                    self.model, self.model_admin, field_path=field_path,
+                    self.model, self.model_admin, field_path=field_path, title=title
                 )
                 # field_list_filter_class removes any lookup_params it
                 # processes. If that happened, check if distinct() is needed to

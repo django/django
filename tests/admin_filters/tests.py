@@ -259,6 +259,10 @@ class DepartmentAdminWithEmptyFieldListFilter(ModelAdmin):
     list_filter = [('description', EmptyFieldListFilter)]
 
 
+class FieldFilterTitleOverride(ModelAdmin):
+    list_filter = [('tags__tag', 'Related Tag')]
+
+
 class ListFiltersTests(TestCase):
     request_factory = RequestFactory()
 
@@ -1474,3 +1478,19 @@ class ListFiltersTests(TestCase):
         request.user = self.alfred
         with self.assertRaises(IncorrectLookupParameters):
             modeladmin.get_changelist_instance(request)
+
+    def test_field_filter_title_override(self):
+        """
+        A field filter with a title provided to override default title.
+        """
+        request = self.request_factory.get('/')
+
+        modeladmin = BookmarkAdminGenericRelation(Bookmark, site)
+        changelist = modeladmin.get_changelist_instance(request)
+        filterspec = changelist.get_filters(request)[0][0]
+        self.assertEqual(filterspec.title, 'tag')
+
+        modeladmin = FieldFilterTitleOverride(Bookmark, site)
+        changelist = modeladmin.get_changelist_instance(request)
+        filterspec = changelist.get_filters(request)[0][0]
+        self.assertEqual(filterspec.title, 'Related Tag')
