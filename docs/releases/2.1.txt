@@ -64,6 +64,10 @@ Minor features
   with ``change_list_object_tools.html`` and
   ``change_form_object_tools.html`` templates.
 
+* In :attr:`ModelAdmin.list_filter <django.contrib.admin.ModelAdmin.list_filter>`
+  you can now provide a title along with a field name which will be used in place
+  of the default title.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

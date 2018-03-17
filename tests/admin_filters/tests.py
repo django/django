@@ -244,6 +244,10 @@ class BookmarkAdminGenericRelation(ModelAdmin):
     list_filter = ['tags__tag']
 
 
+class FieldFilterTitleOverride(ModelAdmin):
+    list_filter = [('tags__tag', 'Related Tag')]
+
+
 class ListFiltersTests(TestCase):
 
     def setUp(self):
@@ -1099,3 +1103,19 @@ class ListFiltersTests(TestCase):
         changelist = modeladmin.get_changelist_instance(request)
         changelist.get_results(request)
         self.assertEqual(changelist.full_result_count, 4)
+
+    def test_field_filter_title_override(self):
+        """
+        A field filter with a title provided to override default title.
+        """
+        request = self.request_factory.get('/')
+
+        modeladmin = BookmarkAdminGenericRelation(Bookmark, site)
+        changelist = modeladmin.get_changelist_instance(request)
+        filterspec = changelist.get_filters(request)[0][0]
+        self.assertEqual(filterspec.title, 'tag')
+
+        modeladmin = FieldFilterTitleOverride(Bookmark, site)
+        changelist = modeladmin.get_changelist_instance(request)
+        filterspec = changelist.get_filters(request)[0][0]
+        self.assertEqual(filterspec.title, 'Related Tag')
