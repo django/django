@@ -670,7 +670,7 @@ class ListFilterTests(CheckTestCase):
 
         self.assertIsInvalid(
             TestModelAdmin, ValidationTestModel,
-            "The value of 'list_filter[0][1]' must inherit from 'FieldListFilter'.",
+            "The value of 'list_filter[0][1]' must be a string or subclass of 'FieldListFilter'.",
             'admin.E115'
         )
 
@@ -690,7 +690,7 @@ class ListFilterTests(CheckTestCase):
 
         self.assertIsInvalid(
             TestModelAdmin, ValidationTestModel,
-            "The value of 'list_filter[0][1]' must inherit from 'FieldListFilter'.",
+            "The value of 'list_filter[0][1]' must be a string or subclass of 'FieldListFilter'.",
             'admin.E115'
         )
 
@@ -729,7 +729,13 @@ class ListFilterTests(CheckTestCase):
                 return qs
 
         class TestModelAdmin(ModelAdmin):
-            list_filter = ('is_active', AwesomeFilter, ('is_active', BooleanFieldListFilter), 'no')
+            list_filter = (
+                'is_active',
+                AwesomeFilter,
+                ('is_active', BooleanFieldListFilter),
+                ('band__name', 'Band Name'),
+                'no'
+            )
 
         self.assertIsValid(TestModelAdmin, ValidationTestModel)
 
