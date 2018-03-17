@@ -169,6 +169,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function("regexp", 2, _sqlite_regexp)
         conn.create_function("django_format_dtdelta", 3, _sqlite_format_dtdelta)
         conn.create_function("django_power", 2, _sqlite_power)
+        conn.create_function('LPAD', 3, _sqlite_lpad)
+        conn.create_function('RPAD', 3, _sqlite_rpad)
         conn.execute('PRAGMA foreign_keys = ON')
         return conn
 
@@ -465,6 +467,16 @@ def _sqlite_timestamp_diff(lhs, rhs):
 
 def _sqlite_regexp(re_pattern, re_string):
     return bool(re.search(re_pattern, str(re_string))) if re_string is not None else False
+
+
+def _sqlite_lpad(text, length, fill_text):
+    if len(text) >= length:
+        return text[:length]
+    return (fill_text * length)[:length - len(text)] + text
+
+
+def _sqlite_rpad(text, length, fill_text):
+    return (text + fill_text * length)[:length]
 
 
 def _sqlite_power(x, y):

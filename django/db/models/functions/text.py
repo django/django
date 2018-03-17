@@ -110,6 +110,15 @@ class Lower(Transform):
     lookup_name = 'lower'
 
 
+class LPad(Func):
+    function = 'LPAD'
+
+    def __init__(self, expression, length, fill_text=Value(' '), **extra):
+        if not hasattr(length, 'resolve_expression') and length < 0:
+            raise ValueError("'length' must be greater or equal to 0.")
+        super().__init__(expression, length, fill_text, **extra)
+
+
 class LTrim(Transform):
     function = 'LTRIM'
     lookup_name = 'ltrim'
@@ -139,6 +148,10 @@ class Right(Left):
 
     def get_substr(self):
         return Substr(self.source_expressions[0], self.source_expressions[1] * Value(-1))
+
+
+class RPad(LPad):
+    function = 'RPAD'
 
 
 class RTrim(Transform):
