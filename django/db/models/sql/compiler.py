@@ -144,7 +144,7 @@ class SQLCompiler:
                 # Is this a reference to query's base table primary key? If the
                 # expression isn't a Col-like, then skip the expression.
                 if (getattr(expr, 'target', None) == self.query.model._meta.pk and
-                        getattr(expr, 'alias', None) == self.query.base_table):
+                    getattr(expr, 'alias', None) == self.query.base_table):
                     pk = expr
                     break
             # If the main model's primary key is in the query, group by that
@@ -234,6 +234,7 @@ class SQLCompiler:
                         ki['select_fields'] = (klass_info['select_fields'] +
                                                ki['select_fields'])
                     get_select_from_parent(ki)
+
             get_select_from_parent(klass_info)
 
         ret = []
@@ -372,8 +373,8 @@ class SQLCompiler:
         if name in self.quote_cache:
             return self.quote_cache[name]
         if ((name in self.query.alias_map and name not in self.query.table_map) or
-                name in self.query.extra_select or (
-                    name in self.query.external_aliases and name not in self.query.table_map)):
+            name in self.query.extra_select or (
+                name in self.query.external_aliases and name not in self.query.table_map)):
             self.quote_cache[name] = name
             return name
         r = self.connection.ops.quote_name(name)
@@ -408,7 +409,8 @@ class SQLCompiler:
                 # If the columns list is limited, then all combined queries
                 # must have the same columns list. Set the selects defined on
                 # the query on all combined queries, if not already set.
-                if not compiler.query.values_select and self.query.values_select:
+                if (not(compiler.query.values_select or
+                        compiler.query.annotations) and self.query.values_select):
                     compiler.query.set_values(self.query.values_select)
                 parts += (compiler.as_sql(),)
             except EmptyResultSet:
@@ -604,7 +606,7 @@ class SQLCompiler:
             if model == opts.model:
                 model = None
             if from_parent and model is not None and issubclass(
-                    from_parent._meta.concrete_model, model._meta.concrete_model):
+                from_parent._meta.concrete_model, model._meta.concrete_model):
                 # Avoid loading data for already loaded parents.
                 # We end up here in the case select_related() resolution
                 # proceeds from parent model to child model. In that case the
@@ -729,6 +731,7 @@ class SQLCompiler:
         (for example, cur_depth=1 means we are looking at models with direct
         connections to the root model).
         """
+
         def _get_field_choices():
             direct_choices = (f.name for f in opts.fields if f.is_relation)
             reverse_choices = (
@@ -858,6 +861,7 @@ class SQLCompiler:
 
                     def remote_setter(obj, from_obj):
                         setattr(from_obj, name, obj)
+
                     klass_info = {
                         'model': model,
                         'field': f,
@@ -900,6 +904,7 @@ class SQLCompiler:
         Return a quoted list of arguments for the SELECT FOR UPDATE OF part of
         the query.
         """
+
         def _get_field_choices():
             """Yield all allowed field paths in breadth-first search order."""
             queue = collections.deque([(None, self.klass_info)])
@@ -918,6 +923,7 @@ class SQLCompiler:
                     (path, klass_info)
                     for klass_info in klass_info.get('related_klass_infos', [])
                 )
+
         result = []
         invalid_names = []
         for name in self.query.select_for_update_of:
