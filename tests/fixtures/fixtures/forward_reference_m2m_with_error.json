@@ -1,0 +1,26 @@
+[
+  {
+    "model": "fixtures.thing",
+    "pk": "1",
+    "fields": {
+      "key": "t1",
+      "other_things": [
+        ["t2"], ["t3"], ["t4"]
+      ]
+    }
+  },
+  {
+    "model": "fixtures.thing",
+    "pk": "2",
+    "fields": {
+      "key": "t2"
+    }
+  },
+  {
+    "model": "fixtures.thing",
+    "pk": "3",
+    "fields": {
+      "key": "t3"
+    }
+  }
+]
