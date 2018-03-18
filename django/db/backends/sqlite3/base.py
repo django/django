@@ -186,8 +186,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function('ACOS', 1, math.acos)
         conn.create_function('ASIN', 1, math.asin)
         conn.create_function('ATAN', 1, math.atan)
+<<<<<<< a24b4fb876399177ffda985828d1b82bb321b258
         conn.create_function('ATAN2', 2, lambda x, y: math.atan2(x, y))
 >>>>>>> Updated #28643 --simplified sqlite3 base.py
+=======
+        conn.create_function('ATAN2', 2, math.atan2)
+>>>>>>> Fixed 28643 import issues and doc/release 2.1.txt
         conn.create_function('CEILING', 1, math.ceil)
         conn.create_function('COS', 1, math.cos)
         conn.create_function('COT', 1, lambda x: 1 / math.tan(x))

@@ -1,5 +1,4 @@
-from django.db.models import Func, Transform
-from django.db.models.fields import FloatField
+from django.db.models import FloatField, Func, Transform
 
 
 class Abs(Transform):
