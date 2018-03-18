@@ -91,7 +91,7 @@ Add the imports of ``mark_safe`` and ``json`` and add the ``room`` view function
 
 Create the route for the room view in ``chat/urls.py``::
 
-    chat/urls.py
+    # chat/urls.py
     from django.conf.urls import url
     
     from . import views
