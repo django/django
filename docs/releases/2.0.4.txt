@@ -21,3 +21,7 @@ Bugfixes
 * Fixed ``PasswordResetConfirmView`` crash when using a user model with a
   ``UUIDField`` primary key and the reset URL contains an encoded primary key
   value that decodes to an invalid UUID (:ticket:`29206`).
+
+* Fixed a regression in Django 1.11.8 where combining two annotated
+  ``values_list()`` querysets with ``union()``, ``difference()``, or
+  ``intersection()`` crashed due to mismatching columns (:ticket:`29229`).
