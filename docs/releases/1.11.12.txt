@@ -9,4 +9,6 @@ Django 1.11.12 fixes a bug in 1.11.11.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 1.11.8 where combining two annotated
+  ``values_list()`` querysets with ``union()``, ``difference()``, or
+  ``intersection()`` crashed due to mismatching columns (:ticket:`29229`).
