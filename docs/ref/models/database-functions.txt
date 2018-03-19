@@ -800,6 +800,27 @@ Usage example::
     >>> print(author.name_lower)
     margaret smith
 
+``LPad``
+--------
+
+.. class:: LPad(expression, length, fill_text=Value(' '), **extra)
+
+.. versionadded:: 2.1
+
+Returns the value of the given text field or expression padded on the left side
+with ``fill_text`` so that the resulting value is ``length`` characters long.
+The default ``fill_text`` is a space.
+
+Usage example::
+
+    >>> from django.db.models import Value
+    >>> from django.db.models.functions import LPad
+    >>> Author.objects.create(name='John', alias='j')
+    >>> Author.objects.update(name=LPad('name', 8, Value('abc')))
+    1
+    >>> print(Author.objects.get(alias='j').name)
+    abcaJohn
+
 ``LTrim``
 ---------
 
@@ -871,6 +892,16 @@ Usage example::
     >>> author = Author.objects.annotate(last_letter=Right('name', 1)).get()
     >>> print(author.last_letter)
     h
+
+``RPad``
+--------
+
+.. class:: RPad(expression, length, fill_text=Value(' '), **extra)
+
+.. versionadded:: 2.1
+
+Similar to :class:`~django.db.models.functions.LPad`, but pads on the right
+side.
 
 ``RTrim``
 ---------

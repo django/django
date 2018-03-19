@@ -205,10 +205,12 @@ Models
 * A number of new text database functions are added:
   :class:`~django.db.models.functions.Chr`,
   :class:`~django.db.models.functions.Left`,
+  :class:`~django.db.models.functions.LPad`,
   :class:`~django.db.models.functions.LTrim`,
   :class:`~django.db.models.functions.Ord`,
   :class:`~django.db.models.functions.Replace`,
   :class:`~django.db.models.functions.Right`,
+  :class:`~django.db.models.functions.RPad`,
   :class:`~django.db.models.functions.RTrim`, and
   :class:`~django.db.models.functions.Trim`.
 
