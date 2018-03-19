@@ -16,6 +16,7 @@ from django.forms.utils import ErrorList
 from django.forms.widgets import (
     HiddenInput, MultipleHiddenInput, SelectMultiple,
 )
+from django.utils.alteration import AltersDataBase
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext, gettext_lazy as _
 
@@ -203,7 +204,7 @@ class ModelFormOptions:
         self.field_classes = getattr(options, 'field_classes', None)
 
 
-class ModelFormMetaclass(DeclarativeFieldsMetaclass):
+class ModelFormMetaclass(DeclarativeFieldsMetaclass, AltersDataBase):
     def __new__(mcs, name, bases, attrs):
         base_formfield_callback = None
         for b in bases:
@@ -213,7 +214,7 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
 
         formfield_callback = attrs.pop('formfield_callback', base_formfield_callback)
 
-        new_class = super(ModelFormMetaclass, mcs).__new__(mcs, name, bases, attrs)
+        new_class = super().__new__(mcs, name, bases, attrs)
 
         if bases == (BaseModelForm,):
             return new_class
@@ -275,7 +276,9 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
         return new_class
 
 
-class BaseModelForm(BaseForm):
+class BaseModelForm(BaseForm, metaclass=AltersDataBase):
+    data_altering_methods = ('save',)
+
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=None,
                  empty_permitted=False, instance=None, use_required_attribute=None):
@@ -461,8 +464,6 @@ class BaseModelForm(BaseForm):
             self.save_m2m = self._save_m2m
         return self.instance
 
-    save.alters_data = True
-
 
 class ModelForm(BaseModelForm, metaclass=ModelFormMetaclass):
     pass
@@ -551,7 +552,7 @@ def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
 
 # ModelFormSets ##############################################################
 
-class BaseModelFormSet(BaseFormSet):
+class BaseModelFormSet(BaseFormSet, metaclass=AltersDataBase):
     """
     A ``FormSet`` for editing a queryset and/or adding new objects to it.
     """
@@ -559,6 +560,8 @@ class BaseModelFormSet(BaseFormSet):
 
     # Set of fields that must be unique among forms of this set.
     unique_fields = set()
+
+    data_altering_methods = ('save',)
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  queryset=None, *, initial=None, **kwargs):
@@ -665,8 +668,6 @@ class BaseModelFormSet(BaseFormSet):
                     form.save_m2m()
             self.save_m2m = save_m2m
         return self.save_existing_objects(commit) + self.save_new_objects(commit)
-
-    save.alters_data = True
 
     def clean(self):
         self.validate_unique()

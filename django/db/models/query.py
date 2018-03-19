@@ -23,6 +23,7 @@ from django.db.models.functions import Trunc
 from django.db.models.query_utils import FilteredRelation, InvalidQuery, Q
 from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE
 from django.utils import timezone
+from django.utils.alteration import AltersDataBase
 from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.functional import cached_property, partition
 from django.utils.version import get_version
@@ -176,8 +177,11 @@ class FlatValuesListIterable(BaseIterable):
             yield row[0]
 
 
-class QuerySet:
+class QuerySet(metaclass=AltersDataBase):
     """Represent a lazy database lookup for a set of objects."""
+    data_altering_methods = (
+        'delete', '_raw_delete', 'update', '_update', '_insert',
+    )
 
     def __init__(self, model=None, query=None, using=None, hints=None):
         self.model = model
@@ -659,7 +663,6 @@ class QuerySet:
         self._result_cache = None
         return deleted, _rows_count
 
-    delete.alters_data = True
     delete.queryset_only = True
 
     def _raw_delete(self, using):
@@ -668,7 +671,6 @@ class QuerySet:
         query. No signals are sent and there is no protection for cascades.
         """
         return sql.DeleteQuery(self.model).delete_qs(self, using)
-    _raw_delete.alters_data = True
 
     def update(self, **kwargs):
         """
@@ -686,7 +688,6 @@ class QuerySet:
             rows = query.get_compiler(self.db).execute_sql(CURSOR)
         self._result_cache = None
         return rows
-    update.alters_data = True
 
     def _update(self, values):
         """
@@ -703,7 +704,7 @@ class QuerySet:
         query._annotations = None
         self._result_cache = None
         return query.get_compiler(self.db).execute_sql(CURSOR)
-    _update.alters_data = True
+
     _update.queryset_only = False
 
     def exists(self):
@@ -1119,7 +1120,7 @@ class QuerySet:
         query = sql.InsertQuery(self.model)
         query.insert_values(fields, objs, raw=raw)
         return query.get_compiler(using=using).execute_sql(return_id)
-    _insert.alters_data = True
+
     _insert.queryset_only = False
 
     def _batched_insert(self, objs, fields, batch_size):
