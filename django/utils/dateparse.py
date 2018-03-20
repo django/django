@@ -11,28 +11,28 @@ import re
 from django.utils.timezone import get_fixed_timezone, utc
 
 date_re = re.compile(
-    r'(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2})$'
+    r'(?P<year>[0-9]{4})-(?P<month>[0-9]{1,2})-(?P<day>[0-9]{1,2})$'
 )
 
 time_re = re.compile(
-    r'(?P<hour>\d{1,2}):(?P<minute>\d{1,2})'
-    r'(?::(?P<second>\d{1,2})(?:\.(?P<microsecond>\d{1,6})\d{0,6})?)?'
+    r'(?P<hour>[0-9]{1,2}):(?P<minute>[0-9]{1,2})'
+    r'(?::(?P<second>[0-9]{1,2})(?:\.(?P<microsecond>[0-9]{1,6})[0-9]{0,6})?)?'
 )
 
 datetime_re = re.compile(
-    r'(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2})'
-    r'[T ](?P<hour>\d{1,2}):(?P<minute>\d{1,2})'
-    r'(?::(?P<second>\d{1,2})(?:\.(?P<microsecond>\d{1,6})\d{0,6})?)?'
-    r'(?P<tzinfo>Z|[+-]\d{2}(?::?\d{2})?)?$'
+    r'(?P<year>[0-9]{4})-(?P<month>[0-9]{1,2})-(?P<day>[0-9]{1,2})'
+    r'[T ](?P<hour>[0-9]{1,2}):(?P<minute>[0-9]{1,2})'
+    r'(?::(?P<second>[0-9]{1,2})(?:\.(?P<microsecond>[0-9]{1,6})[0-9]{0,6})?)?'
+    r'(?P<tzinfo>Z|[+-][0-9]{2}(?::?[0-9]{2})?)?$'
 )
 
 standard_duration_re = re.compile(
     r'^'
-    r'(?:(?P<days>-?\d+) (days?, )?)?'
-    r'((?:(?P<hours>-?\d+):)(?=\d+:\d+))?'
-    r'(?:(?P<minutes>-?\d+):)?'
-    r'(?P<seconds>-?\d+)'
-    r'(?:\.(?P<microseconds>\d{1,6})\d{0,6})?'
+    r'(?:(?P<days>-?[0-9]+) (days?, )?)?'
+    r'((?:(?P<hours>-?[0-9]+):)(?=[0-9]+:[0-9]+))?'
+    r'(?:(?P<minutes>-?[0-9]+):)?'
+    r'(?P<seconds>-?[0-9]+)'
+    r'(?:\.(?P<microseconds>[0-9]{1,6})[0-9]{0,6})?'
     r'$'
 )
 
@@ -41,11 +41,11 @@ standard_duration_re = re.compile(
 iso8601_duration_re = re.compile(
     r'^(?P<sign>[-+]?)'
     r'P'
-    r'(?:(?P<days>\d+(.\d+)?)D)?'
+    r'(?:(?P<days>[0-9]+(.[0-9]+)?)D)?'
     r'(?:T'
-    r'(?:(?P<hours>\d+(.\d+)?)H)?'
-    r'(?:(?P<minutes>\d+(.\d+)?)M)?'
-    r'(?:(?P<seconds>\d+(.\d+)?)S)?'
+    r'(?:(?P<hours>[0-9]+(.[0-9]+)?)H)?'
+    r'(?:(?P<minutes>[0-9]+(.[0-9]+)?)M)?'
+    r'(?:(?P<seconds>[0-9]+(.[0-9]+)?)S)?'
     r')?'
     r'$'
 )
@@ -55,12 +55,12 @@ iso8601_duration_re = re.compile(
 # aren't accepted.
 postgres_interval_re = re.compile(
     r'^'
-    r'(?:(?P<days>-?\d+) (days? ?))?'
+    r'(?:(?P<days>-?[0-9]+) (days? ?))?'
     r'(?:(?P<sign>[-+])?'
-    r'(?P<hours>\d+):'
-    r'(?P<minutes>\d\d):'
-    r'(?P<seconds>\d\d)'
-    r'(?:\.(?P<microseconds>\d{1,6}))?'
+    r'(?P<hours>[0-9]+):'
+    r'(?P<minutes>[0-9][0-9]):'
+    r'(?P<seconds>[0-9][0-9])'
+    r'(?:\.(?P<microseconds>[0-9]{1,6}))?'
     r')?$'
 )
 
