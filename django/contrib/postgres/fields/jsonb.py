@@ -41,6 +41,14 @@ class JSONField(CheckFieldDefaultMixin, Field):
         self.encoder = encoder
         super().__init__(verbose_name, name, **kwargs)
 
+    def to_python(self, value):
+        if isinstance(value, str):
+            value = json.loads(value)
+        return value
+
+    def value_to_string(self, obj):
+        return json.dumps(self.value_from_object(obj))
+
     def db_type(self, connection):
         return 'jsonb'
 
