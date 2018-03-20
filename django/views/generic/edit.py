@@ -24,6 +24,10 @@ class FormMixin(ContextMixin):
 
     def get_form_class(self):
         """Return the form class to use."""
+        if not self.form_class:
+            raise ImproperlyConfigured(
+                "'form_class' is not defined. Provide either a definition of "
+                "'form_class' or an implementation of 'get_form_class()'")
         return self.form_class
 
     def get_form(self, form_class=None):
