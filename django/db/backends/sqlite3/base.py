@@ -199,7 +199,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function('RADIANS', 1, math.radians)
         conn.create_function('SIN', 1, math.sin)
         conn.create_function('SQRT', 1, math.sqrt)
-        conn.create_function('TAN', 1, math.tan)        
+        conn.create_function('TAN', 1, math.tan)
         conn.execute('PRAGMA foreign_keys = ON')
         return conn
 
