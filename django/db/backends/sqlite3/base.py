@@ -221,6 +221,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function('SIN', 1, math.sin)
         conn.create_function('SQRT', 1, math.sqrt)
         conn.create_function('TAN', 1, math.tan)
+        conn.create_function('LPAD', 3, _sqlite_lpad)
+        conn.create_function('RPAD', 3, _sqlite_rpad)
         conn.execute('PRAGMA foreign_keys = ON')
         return conn
 
