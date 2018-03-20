@@ -251,10 +251,7 @@ class BooleanFieldListFilter(FieldListFilter):
             }
 
 
-FieldListFilter.register(
-    lambda f: isinstance(f, (models.BooleanField, models.NullBooleanField)),
-    BooleanFieldListFilter
-)
+FieldListFilter.register(lambda f: isinstance(f, models.BooleanField), BooleanFieldListFilter)
 
 
 class ChoicesFieldListFilter(FieldListFilter):

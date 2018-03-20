@@ -1956,10 +1956,10 @@ class GenericIPAddressField(Field):
         })
 
 
-class NullBooleanField(Field):
-    empty_strings_allowed = False
+class NullBooleanField(BooleanField):
     default_error_messages = {
         'invalid': _("'%(value)s' value must be either None, True or False."),
+        'invalid_nullable': _("'%(value)s' value must be either None, True or False."),
     }
     description = _("Boolean (Either True, False or None)")
 
@@ -1976,35 +1976,6 @@ class NullBooleanField(Field):
 
     def get_internal_type(self):
         return "NullBooleanField"
-
-    def to_python(self, value):
-        if value is None:
-            return None
-        if value in (True, False):
-            return bool(value)
-        if value in ('None',):
-            return None
-        if value in ('t', 'True', '1'):
-            return True
-        if value in ('f', 'False', '0'):
-            return False
-        raise exceptions.ValidationError(
-            self.error_messages['invalid'],
-            code='invalid',
-            params={'value': value},
-        )
-
-    def get_prep_value(self, value):
-        value = super().get_prep_value(value)
-        if value is None:
-            return None
-        return self.to_python(value)
-
-    def formfield(self, **kwargs):
-        return super().formfield(**{
-            'form_class': forms.NullBooleanField,
-            **kwargs,
-        })
 
 
 class PositiveIntegerRelDbTypeMixin:
