@@ -27,17 +27,18 @@ class SqrtTests(TestCase):
         obj = IntegerModel.objects.annotate(
             small_d=Sqrt('small'),
             normal_d=Sqrt('normal'),
-            big_d=Sqrt('big')).first()
+            big_d=Sqrt('big'),
+        ).first()
         self.assertAlmostEqual(obj.small_d, math.sqrt(obj.small))
         self.assertAlmostEqual(obj.normal_d, math.sqrt(obj.normal))
         self.assertAlmostEqual(obj.big_d, math.sqrt(obj.big))
 
     def test_transform(self):
         try:
-            DecimalField.register_lookup(Sqrt, 'sqrt')
+            DecimalField.register_lookup(Sqrt)
             DecimalModel.objects.create(n1=Decimal('6.0'), n2=Decimal('0'))
             DecimalModel.objects.create(n1=Decimal('1.0'), n2=Decimal('0'))
             objs = DecimalModel.objects.filter(n1__sqrt__gt=2)
             self.assertQuerysetEqual(objs, [6.0], lambda a: a.n1)
         finally:
-            DecimalField._unregister_lookup(Sqrt, 'sqrt')
+            DecimalField._unregister_lookup(Sqrt)

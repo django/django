@@ -34,6 +34,9 @@ class Ceil(Transform):
     function = 'CEILING'
     lookup_name = 'ceil'
 
+    def as_oracle(self, compiler, connection):
+        return super().as_sql(compiler, connection, function='CEIL')
+
 
 class Cos(Transform):
     function = 'COS'

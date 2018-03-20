@@ -27,17 +27,18 @@ class LnTests(TestCase):
         obj = IntegerModel.objects.annotate(
             small_d=Ln('small'),
             normal_d=Ln('normal'),
-            big_d=Ln('big')).first()
+            big_d=Ln('big'),
+        ).first()
         self.assertEqual(obj.small_d, int(math.log(obj.small)))
         self.assertEqual(obj.normal_d, int(math.log(obj.normal)))
         self.assertEqual(obj.big_d, int(math.log(obj.big)))
 
     def test_transform(self):
         try:
-            DecimalField.register_lookup(Ln, 'ln')
+            DecimalField.register_lookup(Ln)
             DecimalModel.objects.create(n1=Decimal('12.0'), n2=Decimal('0'))
             DecimalModel.objects.create(n1=Decimal('1.0'), n2=Decimal('0'))
             objs = DecimalModel.objects.filter(n1__ln__gt=0)
             self.assertQuerysetEqual(objs, [12.0], lambda a: a.n1)
         finally:
-            DecimalField._unregister_lookup(Ln, 'ln')
+            DecimalField._unregister_lookup(Ln)

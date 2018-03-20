@@ -2,7 +2,6 @@
 accessor
 accessors
 Aceh
-ACos
 addslashes
 admin
 admindocs
@@ -23,10 +22,8 @@ architected
 arg
 args
 assistive
-ASin
 atomicity
 attr
-ATan
 auth
 autoclobber
 autocommit
@@ -364,7 +361,6 @@ linestring
 linework
 Livni
 ljust
-Ln
 loaddata
 localflavor
 localhost

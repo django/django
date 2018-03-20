@@ -27,17 +27,18 @@ class CosTests(TestCase):
         obj = IntegerModel.objects.annotate(
             small_cos=Cos('small'),
             normal_cos=Cos('normal'),
-            big_cos=Cos('big')).first()
+            big_cos=Cos('big'),
+        ).first()
         self.assertAlmostEqual(float(obj.small_cos), math.cos(obj.small))
         self.assertAlmostEqual(float(obj.normal_cos), math.cos(obj.normal))
         self.assertAlmostEqual(float(obj.big_cos), math.cos(obj.big))
 
     def test_transform(self):
         try:
-            DecimalField.register_lookup(Cos, 'cos')
+            DecimalField.register_lookup(Cos)
             DecimalModel.objects.create(n1=Decimal('-8.0'), n2=Decimal('0'))
             DecimalModel.objects.create(n1=Decimal('3.14'), n2=Decimal('0'))
             objs = DecimalModel.objects.filter(n1__cos__gt=-0.2)
             self.assertQuerysetEqual(objs, [-8.0], lambda a: a.n1)
         finally:
-            DecimalField._unregister_lookup(Cos, 'cos')
+            DecimalField._unregister_lookup(Cos)

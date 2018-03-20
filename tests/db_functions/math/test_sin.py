@@ -27,7 +27,7 @@ class SinTests(TestCase):
         obj = IntegerModel.objects.annotate(
             small_d=Sin('small'),
             normal_d=Sin('normal'),
-            big_d=Sin('big')
+            big_d=Sin('big'),
         ).first()
         self.assertAlmostEqual(obj.small_d, math.sin(obj.small))
         self.assertAlmostEqual(obj.normal_d, math.sin(obj.normal))
@@ -35,10 +35,10 @@ class SinTests(TestCase):
 
     def test_transform(self):
         try:
-            DecimalField.register_lookup(Sin, 'sin')
+            DecimalField.register_lookup(Sin)
             DecimalModel.objects.create(n1=Decimal('5.4'), n2=Decimal('0'))
             DecimalModel.objects.create(n1=Decimal('0.1'), n2=Decimal('0'))
             objs = DecimalModel.objects.filter(n1__sin__lt=0)
             self.assertQuerysetEqual(objs, [float(5.4)], lambda a: float(a.n1))
         finally:
-            DecimalField._unregister_lookup(Sin, 'sin')
+            DecimalField._unregister_lookup(Sin)

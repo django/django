@@ -27,17 +27,18 @@ class ASinTests(TestCase):
         obj = IntegerModel.objects.annotate(
             small_asin=ASin('small'),
             normal_asin=ASin('normal'),
-            big_asin=ASin('big')).first()
+            big_asin=ASin('big'),
+        ).first()
         self.assertAlmostEqual(obj.small_asin, math.asin(obj.small))
         self.assertAlmostEqual(obj.normal_asin, math.asin(obj.normal))
         self.assertAlmostEqual(obj.big_asin, math.asin(obj.big))
 
     def test_transform(self):
         try:
-            DecimalField.register_lookup(ASin, 'asin')
+            DecimalField.register_lookup(ASin)
             DecimalModel.objects.create(n1=Decimal('0.1'), n2=Decimal('0'))
             DecimalModel.objects.create(n1=Decimal('1.0'), n2=Decimal('0'))
             objs = DecimalModel.objects.filter(n1__asin__gt=1)
             self.assertQuerysetEqual(objs, [1.0], lambda a: a.n1)
         finally:
-            DecimalField._unregister_lookup(ASin, 'asin')
+            DecimalField._unregister_lookup(ASin)

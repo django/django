@@ -27,17 +27,18 @@ class ExpTests(TestCase):
         obj = IntegerModel.objects.annotate(
             small_d=Exp('small'),
             normal_d=Exp('normal'),
-            big_d=Exp('big')).first()
+            big_d=Exp('big'),
+        ).first()
         self.assertEqual(obj.small_d, int(math.exp(obj.small)))
         self.assertEqual(obj.normal_d, int(math.exp(obj.normal)))
         self.assertEqual(obj.big_d, int(math.exp(obj.big)))
 
     def test_transform(self):
         try:
-            DecimalField.register_lookup(Exp, 'exp')
+            DecimalField.register_lookup(Exp)
             DecimalModel.objects.create(n1=Decimal('12.0'), n2=Decimal('0'))
             DecimalModel.objects.create(n1=Decimal('-1.0'), n2=Decimal('0'))
             objs = DecimalModel.objects.filter(n1__exp__gt=10)
             self.assertQuerysetEqual(objs, [12.0], lambda a: a.n1)
         finally:
-            DecimalField._unregister_lookup(Exp, 'exp')
+            DecimalField._unregister_lookup(Exp)

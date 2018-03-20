@@ -23,7 +23,8 @@ class PowerTests(TestCase):
         obj = IntegerModel.objects.annotate(
             small_d=Power('small', 'normal'),
             normal_d=Power('normal', 'big'),
-            big_d=Power('big', 'small')).first()
+            big_d=Power('big', 'small'),
+        ).first()
         self.assertAlmostEqual(obj.small_d, obj.small**obj.normal)
         self.assertAlmostEqual(obj.normal_d, obj.normal**obj.big)
         self.assertAlmostEqual(obj.big_d, obj.big**obj.small)

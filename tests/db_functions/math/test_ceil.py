@@ -21,17 +21,18 @@ class CeilTests(TestCase):
         obj = IntegerModel.objects.annotate(
             small_ceil=Ceil('small'),
             normal_ceil=Ceil('normal'),
-            big_ceil=Ceil('big')).first()
+            big_ceil=Ceil('big'),
+        ).first()
         self.assertEqual(obj.small_ceil, math.ceil(obj.small))
         self.assertEqual(obj.normal_ceil, math.ceil(obj.normal))
         self.assertEqual(obj.big_ceil, math.ceil(obj.big))
 
     def test_transform(self):
         try:
-            DecimalField.register_lookup(Ceil, 'ceil')
+            DecimalField.register_lookup(Ceil)
             DecimalModel.objects.create(n1=Decimal('3.12'), n2=Decimal('0'))
             DecimalModel.objects.create(n1=Decimal('1.25'), n2=Decimal('0'))
             objs = DecimalModel.objects.filter(n1__ceil__gt=3)
             self.assertQuerysetEqual(objs, [float(3.12)], lambda a: float(a.n1))
         finally:
-            DecimalField._unregister_lookup(Ceil, 'ceil')
+            DecimalField._unregister_lookup(Ceil)

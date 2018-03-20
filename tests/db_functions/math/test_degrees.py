@@ -27,17 +27,18 @@ class DegreesTests(TestCase):
         obj = IntegerModel.objects.annotate(
             small_d=Degrees('small'),
             normal_d=Degrees('normal'),
-            big_d=Degrees('big')).first()
+            big_d=Degrees('big'),
+        ).first()
         self.assertAlmostEqual(float(obj.small_d), math.degrees(obj.small))
         self.assertAlmostEqual(float(obj.normal_d), math.degrees(obj.normal))
         self.assertAlmostEqual(float(obj.big_d), math.degrees(obj.big))
 
     def test_transform(self):
         try:
-            DecimalField.register_lookup(Degrees, 'degrees')
+            DecimalField.register_lookup(Degrees)
             DecimalModel.objects.create(n1=Decimal('5.4'), n2=Decimal('0'))
             DecimalModel.objects.create(n1=Decimal('-30'), n2=Decimal('0'))
             objs = DecimalModel.objects.filter(n1__degrees__gt=0)
             self.assertQuerysetEqual(objs, [float(5.4)], lambda a: float(a.n1))
         finally:
-            DecimalField._unregister_lookup(Degrees, 'degrees')
+            DecimalField._unregister_lookup(Degrees)

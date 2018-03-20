@@ -715,8 +715,7 @@ It can also be registered as a transform. For example::
 
 .. class:: ACos(expression, **extra)
 
-Accepts a single numeric field or expression and returns the value whose cosine
-is expression. Expression should be within the range -1 to 1.
+Accepts a single numeric field or expression and returns the value whose cosine is expression. Expression should be within the range -1 to 1.
 
 Usage example::
  
@@ -741,13 +740,7 @@ It can also be registered as a transform. For example::
 
 .. class:: ASin(expression, **extra)
 
-Accepts a single numeric field or expression and returns its arc sine value, 
-Expression should be in the range -1 to 1.
-
-.. warning::
-
-    The behavior of ``ASin`` may be ``null`` if the input is null or not in the
-    range -1 to 1.
+Accepts a single numeric field or expression and returns its arc sine value, expression should be in the range -1 to 1.
 
 Usage example::
  
@@ -771,12 +764,7 @@ It can also be registered as a transform. For example::
 
 .. class:: ATan(expression, **extra)
 
-Accepts a single numeric field or expression and returns the arc tangent of it, 
-that is, the value whose tangent is expression.
-
-.. warning::
-
-    The behavior of ``ATan`` may be ``null`` if the input is null.
+Accepts a single numeric field or expression and returns the arc tangent of it, that is, the value whose tangent is expression.
 
 Usage example::
  
@@ -802,10 +790,6 @@ It can also be registered as a transform. For example::
 
 Returns the arc tangent of expression1 and expression2.
 
-.. warning::
-
-    The behavior of ``ATan2`` may be ``null`` if the input is null.
-
 Usage example::
  
     >>> # Get the arc tangent of the coordinates
@@ -820,12 +804,7 @@ Usage example::
 
 .. class:: Ceil(expression, **extra)
 
-Accepts a single numeric field or expression and returns the smallest integer
-greater than or equal to expression.
-
-.. warning::
-
-    The behavior of ``Ceil`` may be ``null`` if the input is null.
+Accepts a single numeric field or expression and returns the smallest integer greater than or equal to expression.
 
 Usage example::
  
@@ -851,10 +830,6 @@ It can also be registered as a transform. For example::
 
 Accepts a single numeric field or expression (X) and returns the cosine of it.
 
-.. warning::
-
-    The behavior of ``Cos`` may be ``null`` if the input is null.
-
 Usage example::
  
     >>> # Get the cos of the coordinates
@@ -878,10 +853,6 @@ It can also be registered as a transform. For example::
 .. class:: Cot(expression, **extra)
 
 Accepts a single numeric field or expression and returns the cotangent of it.
-
-.. warning::
-
-    The behavior of ``Cot`` may be ``null`` if the input is null or 0.
 
 Usage example::
  
@@ -908,10 +879,6 @@ It can also be registered as a transform. For example::
 Accepts a single numeric field or expression and returns degrees,
 converted from radians.
 
-.. warning::
-
-    The behavior of ``Degrees`` may be ``null`` if the input is null.
-
 Usage example::
  
     >>> # Get the degrees of the coordinates
@@ -937,10 +904,6 @@ It can also be registered as a transform. For example::
 Accepts a single numeric field or expression and returns the value of
 e (the base of natural logarithms) raised to the power of expression.
 
-.. warning::
-
-    The behavior of ``Exp`` may be ``null`` if the input is null.
-
 Usage example::
  
     >>> # Get the exp() of the coordinates
@@ -963,12 +926,7 @@ It can also be registered as a transform. For example::
 
 .. class:: Floor(expression, **extra)
 
-Accepts a single numeric field or expression and returns the largest integer
-value not greater than expression.
-
-.. warning::
-
-    The behavior of ``Floor`` may be ``null`` if the input is null.
+Accepts a single numeric field or expression and returns the largest integer value not greater than expression.
 
 Usage example::
  
@@ -993,11 +951,6 @@ It can also be registered as a transform. For example::
 .. class:: Ln(expression, **extra)
 
 Accepts a single numeric field or expression and returns the natural logarithm of it.
-
-.. warning::
-
-    The behavior of ``Ln`` may be ``null`` if the input is null or less than or
-    equal to 0.
 
 Usage example::
  
@@ -1024,11 +977,6 @@ It can also be registered as a transform. For example::
 Accepts two numeric field or expressions and returns the logarithm to base
 expression1.
 
-.. warning::
-
-    The behavior of ``Log`` may be ``null`` if the input is null or less than or
-    equal to 0.
-
 Usage example::
  
     >>> # Get the log() of the coordinates
@@ -1045,10 +993,6 @@ Usage example::
 
 Modulo operation. Accepts two numeric fields or expression1 and expression2
 and returns the remainder of expression1 divided by expression2.
-
-.. warning::
-
-    The behavior of ``Mod`` may be ``null`` if the input is null or is 0.
 
 Usage example::
  
@@ -1071,12 +1015,7 @@ Returns the value of the mathematical constant π.
 
 .. class:: Power(expression1, expression2, **extra)
 
-Accepts two numeric fields or expression1 and expression2 and returns the value
-of expression1 raised to the power of expression2.
-
-.. warning::
-
-    The behavior of ``Power`` may be ``null`` if the input is null or illegal.
+Accepts two numeric fields or expression1 and expression2 and returns the value of expression1 raised to the power of expression2.
 
 Usage example::
  
@@ -1092,12 +1031,7 @@ Usage example::
 
 .. class:: Radians(expression, **extra)
 
-Accepts a single numeric field or expression and converted from degrees to radians.
-(Note that pi radians equals 180 degrees.).
-
-.. warning::
-
-    The behavior of ``Radians`` may be ``null`` if the input is null.
+Accepts a single numeric field or expression and converted from degrees to radians. (Note that pi radians equals 180 degrees.)
 
 Usage example::
  
@@ -1121,12 +1055,7 @@ It can also be registered as a transform. For example::
 
 .. class:: Round(expression, **extra)
 
-Accepts a single numeric field or expression (X) and returns the nearest integer
-to expression.
-
-.. warning::
-
-    The behavior of ``Round`` may be ``null`` if the input is null.
+Accepts a single numeric field or expression (X) and returns the nearest integer.
 
 Usage example::
  
@@ -1153,10 +1082,6 @@ It can also be registered as a transform. For example::
 Accepts a single numeric field or expression and returns the sine
 to its input.
 
-.. warning::
-
-    The behavior of ``Sin`` may be ``null`` if the input is null.
-
 Usage example::
  
     >>> # Get the sine of the coordinates
@@ -1179,12 +1104,7 @@ It can also be registered as a transform. For example::
 
 .. class:: Sqrt(expression, **extra)
 
-Accepts a single numeric field or expression (X) and returns the square root
-of a nonnegative number X.
-
-.. warning::
-
-    The behavior of ``Sqrt`` may be ``null`` if the input is null or negative.
+Accepts a single numeric field or expression (X) and returns the square root of a nonnegative number X.
 
 Usage example::
  
@@ -1208,12 +1128,7 @@ It can also be registered as a transform. For example::
 
 .. class:: Tan(expression, **extra)
 
-Accepts a single numeric field or expression (X) and returns the tangent of X, 
-where X is given in radians.
-
-.. warning::
-
-    The behavior of ``Tan`` may be ``null`` if the input is null.
+Accepts a single numeric field or expression (X) and returns the tangent of X, where X is given in radians.
 
 Usage example::
  

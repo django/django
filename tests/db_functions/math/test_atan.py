@@ -27,17 +27,18 @@ class ATanTests(TestCase):
         obj = IntegerModel.objects.annotate(
             small_atan=ATan('small'),
             normal_atan=ATan('normal'),
-            big_atan=ATan('big')).first()
+            big_atan=ATan('big'),
+        ).first()
         self.assertAlmostEqual(obj.small_atan, math.atan(obj.small))
         self.assertAlmostEqual(obj.normal_atan, math.atan(obj.normal))
         self.assertAlmostEqual(obj.big_atan, math.atan(obj.big))
 
     def test_transform(self):
         try:
-            DecimalField.register_lookup(ATan, 'atan')
+            DecimalField.register_lookup(ATan)
             DecimalModel.objects.create(n1=Decimal('3.12'), n2=Decimal('0'))
             DecimalModel.objects.create(n1=Decimal('-5'), n2=Decimal('0'))
             objs = DecimalModel.objects.filter(n1__atan__gt=0)
             self.assertQuerysetEqual(objs, [float(3.12)], lambda a: float(a.n1))
         finally:
-            DecimalField._unregister_lookup(ATan, 'atan')
+            DecimalField._unregister_lookup(ATan)

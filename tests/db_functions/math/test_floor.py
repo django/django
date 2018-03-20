@@ -27,17 +27,18 @@ class FloorTests(TestCase):
         obj = IntegerModel.objects.annotate(
             small_d=Floor('small'),
             normal_d=Floor('normal'),
-            big_d=Floor('big')).first()
+            big_d=Floor('big'),
+        ).first()
         self.assertAlmostEqual(obj.small_d, math.floor(obj.small))
         self.assertAlmostEqual(obj.normal_d, math.floor(obj.normal))
         self.assertAlmostEqual(obj.big_d, math.floor(obj.big))
 
     def test_transform(self):
         try:
-            DecimalField.register_lookup(Floor, 'floor')
+            DecimalField.register_lookup(Floor)
             DecimalModel.objects.create(n1=Decimal('5.4'), n2=Decimal('0'))
             DecimalModel.objects.create(n1=Decimal('3.4'), n2=Decimal('0'))
             objs = DecimalModel.objects.filter(n1__floor__gt=4)
             self.assertQuerysetEqual(objs, [float(5.4)], lambda a: float(a.n1))
         finally:
-            DecimalField._unregister_lookup(Floor, 'floor')
+            DecimalField._unregister_lookup(Floor)

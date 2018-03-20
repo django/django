@@ -203,12 +203,17 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return conn_params
 
     def get_new_connection(self, conn_params):
-        return Database.connect(
+        conn = Database.connect(
             user=self.settings_dict['USER'],
             password=self.settings_dict['PASSWORD'],
             dsn=self._dsn(),
             **conn_params,
         )
+        conn.create_function('COT', 1, lambda x: 1 / math.tan(x))
+        conn.create_function('DEGREES', 1, math.degrees)
+        conn.create_function('PI', 0, lambda: math.pi)
+        conn.create_function('RADIANS', 1, math.radians)
+        return conn
 
     def init_connection_state(self):
         cursor = self.create_cursor()

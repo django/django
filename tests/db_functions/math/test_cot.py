@@ -27,17 +27,18 @@ class CotTests(TestCase):
         obj = IntegerModel.objects.annotate(
             small_cot=Cot('small'),
             normal_cot=Cot('normal'),
-            big_cot=Cot('big')).first()
+            big_cot=Cot('big'),
+        ).first()
         self.assertAlmostEqual(float(obj.small_cot), 1 / math.tan(obj.small))
         self.assertAlmostEqual(float(obj.normal_cot), 1 / math.tan(obj.normal))
         self.assertAlmostEqual(float(obj.big_cot), 1 / math.tan(obj.big))
 
     def test_transform(self):
         try:
-            DecimalField.register_lookup(Cot, 'cot')
+            DecimalField.register_lookup(Cot)
             DecimalModel.objects.create(n1=Decimal('12.0'), n2=Decimal('0'))
             DecimalModel.objects.create(n1=Decimal('1.0'), n2=Decimal('0'))
             objs = DecimalModel.objects.filter(n1__cot__gt=0)
             self.assertQuerysetEqual(objs, [1.0], lambda a: a.n1)
         finally:
-            DecimalField._unregister_lookup(Cot, 'cot')
+            DecimalField._unregister_lookup(Cot)

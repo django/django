@@ -26,7 +26,8 @@ class AbsTests(TestCase):
         obj = IntegerModel.objects.annotate(
             small_abs=Abs('small'),
             normal_abs=Abs('normal'),
-            big_abs=Abs('big')).first()
+            big_abs=Abs('big'),
+        ).first()
         self.assertEqual(obj.small, obj.small_abs)
         self.assertEqual(obj.normal, obj.normal_abs)
         self.assertEqual(obj.big, -obj.big_abs)
@@ -39,4 +40,4 @@ class AbsTests(TestCase):
             objs = DecimalModel.objects.filter(n1__abs__gt=1)
             self.assertQuerysetEqual(objs, [-1.5], lambda a: a.n1)
         finally:
-            DecimalField._unregister_lookup(Abs, 'abs')
+            DecimalField._unregister_lookup(Abs)

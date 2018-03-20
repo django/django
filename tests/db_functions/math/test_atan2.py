@@ -23,6 +23,7 @@ class ATan2Tests(TestCase):
         IntegerModel.objects.create(small=0, normal=1, big=10)
         obj = IntegerModel.objects.annotate(
             atan2_sn=ATan2('small', 'normal'),
-            atan2_nb=ATan2('normal', 'big')).first()
+            atan2_nb=ATan2('normal', 'big'),
+        ).first()
         self.assertAlmostEqual(obj.atan2_sn, math.atan2(obj.small, obj.normal))
         self.assertAlmostEqual(obj.atan2_nb, math.atan2(obj.normal, obj.big))
