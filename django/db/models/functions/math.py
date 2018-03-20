@@ -1,3 +1,5 @@
+import math
+
 from django.db.models import FloatField, Func, Transform
 
 
@@ -49,11 +51,33 @@ class Cot(Transform):
     lookup_name = 'cot'
     output_field = FloatField()
 
+    def __init__(self, num):
+        super().__init__(num)
+
+    def get_tan(self):
+        return Tan(self.source_expressions[0])
+
+    def use_tan(self, compiler, connection, **extra_context):
+        return self.get_tan().as_oracle(compiler, connection, **extra_context)
+
+    as_oracle = use_tan
+
 
 class Degrees(Transform):
     function = 'DEGREES'
     lookup_name = 'degrees'
     output_field = FloatField()
+
+    def __init__(self, num):
+        super().__init__(num)
+
+    def get_degrees(self):
+        return float(math.degrees(self.source_expressions[0]))
+
+    def use_degrees(self, compiler, connection, **extra_context):
+        return self.get_degrees().as_oracle(compiler, connection, **extra_context)
+
+    as_oracle = use_degrees
 
 
 class Exp(Transform):
@@ -88,6 +112,14 @@ class Pi(Func):
     arity = 0
     output_field = FloatField()
 
+    def get_pi(self):
+        return float(math.pi)
+
+    def use_pi(self, compiler, connection, **extra_context):
+        return self.get_pi().as_oracle(compiler, connection, **extra_context)
+
+    as_oracle = use_pi
+
 
 class Power(Func):
     function = 'POWER'
@@ -99,6 +131,17 @@ class Radians(Transform):
     function = 'RADIANS'
     lookup_name = 'radians'
     output_field = FloatField()
+
+    def __init__(self, num):
+        super().__init__(num)
+
+    def get_radians(self):
+        return float(math.radians(self.source_expressions[0]))
+
+    def use_radians(self, compiler, connection, **extra_context):
+        return self.get_radians().as_oracle(compiler, connection, **extra_context)
+
+    as_oracle = use_radians
 
 
 class Round(Transform):

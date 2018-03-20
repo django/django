@@ -706,7 +706,7 @@ It can also be registered as a transform. For example::
  
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Abs
-    >>> FloatField.register_lookup(Abs, 'abs')
+    >>> FloatField.register_lookup(Abs)
     >>> # Get vectors inside the unit cube
     >>> vectors = Vector.objects.filter(x__abs__lt=1, y__abs__lt=1)
 
@@ -731,7 +731,7 @@ It can also be registered as a transform. For example::
  
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import ACos
-    >>> FloatField.register_lookup(ACos, 'acos')
+    >>> FloatField.register_lookup(ACos)
     >>> # Get vectors whose arc cos smaller than 1
     >>> vectors = Vector.objects.filter(x__acos__lt=1, y__acos__lt=1)
 
@@ -755,7 +755,7 @@ It can also be registered as a transform. For example::
  
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import ASin
-    >>> FloatField.register_lookup(ASin, 'asin')
+    >>> FloatField.register_lookup(ASin)
     >>> # Get vectors whose arc sine smaller than 1
     >>> vectors = Vector.objects.filter(x__asin__lt=1, y__asin__lt=1)
 
@@ -779,7 +779,7 @@ It can also be registered as a transform. For example::
  
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import ATan
-    >>> FloatField.register_lookup(ATan, 'atan')
+    >>> FloatField.register_lookup(ATan)
     >>> # Get vectors whose arc tangent smaller than 2
     >>> vectors = Vector.objects.filter(x__atan__lt=2, y__atan__lt=2)
 
@@ -819,7 +819,7 @@ It can also be registered as a transform. For example::
  
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Ceil
-    >>> FloatField.register_lookup(Ceil, 'ceil')
+    >>> FloatField.register_lookup(Ceil)
     >>> # Get vectors whose ceil smaller than 10
     >>> vectors = Vector.objects.filter(x__ceil_lt=10, y__ceil__lt=10)
 
@@ -843,7 +843,7 @@ It can also be registered as a transform. For example::
  
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Cos
-    >>> FloatField.register_lookup(Cos, 'cos')
+    >>> FloatField.register_lookup(Cos)
     >>> # Get vectors whose cosine smaller than 0.5
     >>> vectors = Vector.objects.filter(x__cos__lt=0.5, y__cos__lt=0.5)
 
@@ -867,7 +867,7 @@ It can also be registered as a transform. For example::
  
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Cot
-    >>> FloatField.register_lookup(Cot, 'cot')
+    >>> FloatField.register_lookup(Cot)
     >>> # Get vectors whose cotangent smaller than 1
     >>> vectors = Vector.objects.filter(x__cot__lt=1, y__cot__lt=1)
 
@@ -892,7 +892,7 @@ It can also be registered as a transform. For example::
  
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Degrees
-    >>> FloatField.register_lookup(Degrees, 'degrees')
+    >>> FloatField.register_lookup(Degrees)
     >>> # Get vectors whose degrees smaller than 360
     >>> vectors = Vector.objects.filter(x__degrees__lt=360, y__degrees__lt=360)
 
@@ -917,7 +917,7 @@ It can also be registered as a transform. For example::
  
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Exp
-    >>> FloatField.register_lookup(Exp, 'exp')
+    >>> FloatField.register_lookup(Exp)
     >>> # Get vectors whose exp() greater than 10
     >>> vectors = Vector.objects.filter(x__exp__gt=10, y__exp__gt=10)
 
@@ -941,7 +941,7 @@ It can also be registered as a transform. For example::
  
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Floor
-    >>> FloatField.register_lookup(Floor, 'floor')
+    >>> FloatField.register_lookup(Floor)
     >>> # Get vectors whose floor() greater than 10
     >>> vectors = Vector.objects.filter(x__floor__gt=10, y__floor__gt=10)
 
@@ -965,7 +965,7 @@ It can also be registered as a transform. For example::
  
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Ln
-    >>> FloatField.register_lookup(Ln, 'ln')
+    >>> FloatField.register_lookup(Ln)
     >>> # Get vectors whose value greater than e
     >>> vectors = Vector.objects.filter(x__ln__gt=1, y__ln__gt=1)
 
@@ -1046,7 +1046,7 @@ It can also be registered as a transform. For example::
  
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Radians
-    >>> FloatField.register_lookup(Radians, 'radians')
+    >>> FloatField.register_lookup(Radians)
     >>> # Get vectors whose floor() less than 1
     >>> vectors = Vector.objects.filter(x__radians__lt=1, y__radians__lt=1)
  
@@ -1070,7 +1070,7 @@ It can also be registered as a transform. For example::
  
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Round
-    >>> FloatField.register_lookup(Round, 'round')
+    >>> FloatField.register_lookup(Round)
     >>> # Get vectors whose round() less than 20
     >>> vectors = Vector.objects.filter(x__round__lt=20, y__round__lt=20)
 
@@ -1095,7 +1095,7 @@ It can also be registered as a transform. For example::
  
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Sin
-    >>> FloatField.register_lookup(Sin, 'sin')
+    >>> FloatField.register_lookup(Sin)
     >>> # Get vectors whose sin() less than 0
     >>> vectors = Vector.objects.filter(x__sin__lt=0, y__sin__lt=0)
 
@@ -1119,7 +1119,7 @@ It can also be registered as a transform. For example::
 
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Sqrt
-    >>> FloatField.register_lookup(Sqrt, 'sqrt')
+    >>> FloatField.register_lookup(Sqrt)
     >>> # Get vectors whose sqrt() less than 5
     >>> vectors = Vector.objects.filter(x__sqrt__lt=5, y__sqrt__lt=5)
 
@@ -1143,7 +1143,7 @@ It can also be registered as a transform. For example::
  
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Tan
-    >>> FloatField.register_lookup(Tan, 'tan')
+    >>> FloatField.register_lookup(Tan)
     >>> # Get vectors whose tangent less than 0
     >>> vectors = Vector.objects.filter(x__tan__lt=0, y__tan__lt=0)
 
