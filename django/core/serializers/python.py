@@ -83,6 +83,7 @@ def Deserializer(object_list, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False
     It's expected that you pass the Python objects themselves (instead of a
     stream or a string) to the constructor
     """
+    handle_forward_references = options.pop('handle_forward_references', False)
     field_names_cache = {}  # Model: <list of field_names>
 
     for d in object_list:
@@ -101,6 +102,7 @@ def Deserializer(object_list, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False
             except Exception as e:
                 raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), None)
         m2m_data = {}
+        deferred_fields = {}
 
         if Model not in field_names_cache:
             field_names_cache[Model] = {f.name for f in Model._meta.get_fields()}
@@ -118,17 +120,23 @@ def Deserializer(object_list, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False
             # Handle M2M relations
             if field.remote_field and isinstance(field.remote_field, models.ManyToManyRel):
                 try:
-                    values = base.deserialize_m2m_values(field, field_value, using)
+                    values = base.deserialize_m2m_values(field, field_value, using, handle_forward_references)
                 except base.M2MDeserializationError as e:
                     raise base.DeserializationError.WithData(e.original_exc, d['model'], d.get('pk'), e.pk)
-                m2m_data[field.name] = values
+                if values == base.DEFER_FIELD:
+                    deferred_fields[field] = field_value
+                else:
+                    m2m_data[field.name] = values
             # Handle FK fields
             elif field.remote_field and isinstance(field.remote_field, models.ManyToOneRel):
                 try:
-                    value = base.deserialize_fk_value(field, field_value, using)
+                    value = base.deserialize_fk_value(field, field_value, using, handle_forward_references)
                 except Exception as e:
                     raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), field_value)
-                data[field.attname] = value
+                if value == base.DEFER_FIELD:
+                    deferred_fields[field] = field_value
+                else:
+                    data[field.attname] = value
             # Handle all other fields
             else:
                 try:
@@ -137,7 +145,7 @@ def Deserializer(object_list, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False
                     raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), field_value)
 
         obj = base.build_instance(Model, data, using)
-        yield base.DeserializedObject(obj, m2m_data)
+        yield base.DeserializedObject(obj, m2m_data, deferred_fields)
 
 
 def _get_model(model_identifier):
