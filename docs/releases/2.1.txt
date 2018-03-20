@@ -358,6 +358,14 @@ Miscellaneous
   changed from 0 to an empty string, which mainly may require some adjustments
   in tests that compare HTML.
 
+* :meth:`.User.has_usable_password` and the
+  :func:`~django.contrib.auth.hashers.is_password_usable` function no longer
+  return ``False`` if the password is ``None`` or an empty string, or if the
+  password uses a hasher that's not in the :setting:`PASSWORD_HASHERS` setting.
+  This undocumented behavior was a regression in Django 1.6 and prevented users
+  with such passwords from requesting a password reset. Audit your code to
+  confirm that your usage of these APIs don't rely on the old behavior.
+
 .. _deprecated-features-2.1:
 
 Features deprecated in 2.1

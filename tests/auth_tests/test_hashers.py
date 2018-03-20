@@ -276,9 +276,11 @@ class TestUtilsHashPass(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, msg % 'lolcat'):
             identify_hasher('lolcat$salt$hash')
 
-    def test_bad_encoded(self):
-        self.assertFalse(is_password_usable('lètmein_badencoded'))
-        self.assertFalse(is_password_usable(''))
+    def test_is_password_usable(self):
+        passwords = ('lètmein_badencoded', '', None)
+        for password in passwords:
+            with self.subTest(password=password):
+                self.assertIs(is_password_usable(password), True)
 
     def test_low_level_pbkdf2(self):
         hasher = PBKDF2PasswordHasher()
