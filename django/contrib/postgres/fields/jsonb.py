@@ -81,9 +81,6 @@ class JSONField(CheckFieldDefaultMixin, Field):
                 params={'value': value},
             )
 
-    def value_to_string(self, obj):
-        return self.value_from_object(obj)
-
     def formfield(self, **kwargs):
         return super().formfield(**{
             'form_class': forms.JSONField,
