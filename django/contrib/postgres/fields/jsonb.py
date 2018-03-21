@@ -46,9 +46,6 @@ class JSONField(CheckFieldDefaultMixin, Field):
             value = json.loads(value)
         return value
 
-    def value_to_string(self, obj):
-        return json.dumps(self.value_from_object(obj))
-
     def db_type(self, connection):
         return 'jsonb'
 
@@ -80,6 +77,9 @@ class JSONField(CheckFieldDefaultMixin, Field):
                 code='invalid',
                 params={'value': value},
             )
+
+    def value_to_string(self, obj):
+        return self.value_from_object(obj)
 
     def formfield(self, **kwargs):
         return super().formfield(**{
