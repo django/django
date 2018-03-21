@@ -54,13 +54,8 @@ class Cot(Transform):
     def __init__(self, num):
         super().__init__(num)
 
-    def get_tan(self):
-        return Tan(self.source_expressions[0])
-
-    def use_tan(self, compiler, connection, **extra_context):
-        return self.get_tan().as_oracle(compiler, connection, **extra_context)
-
-    as_oracle = use_tan
+    def as_oracle(self, compiler, connection):
+        return super().as_sql(compiler, connection, template='1 / TAN(%(expressions)s)')
 
 
 class Degrees(Transform):
@@ -72,12 +67,14 @@ class Degrees(Transform):
         super().__init__(num)
 
     def get_degrees(self):
-        return float(math.degrees(self.source_expressions[0]))
+        degrees = math.degrees(self.source_expressions[0])
+        return float(degrees)
 
-    def use_degrees(self, compiler, connection, **extra_context):
-        return self.get_degrees().as_oracle(compiler, connection, **extra_context)
-
-    as_oracle = use_degrees
+    def as_oracle(self, compiler, connection):
+        expressions = [self.get_degrees()]
+        clone = self.copy()
+        clone.set_source_expressions(expressions)
+        return super(Degrees, clone).as_sql(compiler, connection)
 
 
 class Exp(Transform):
@@ -115,10 +112,11 @@ class Pi(Func):
     def get_pi(self):
         return float(math.pi)
 
-    def use_pi(self, compiler, connection, **extra_context):
-        return self.get_pi().as_oracle(compiler, connection, **extra_context)
-
-    as_oracle = use_pi
+    def as_oracle(self, compiler, connection):
+        expressions = [self.get_pi()]
+        clone = self.copy()
+        clone.set_source_expressions(expressions)
+        return super(Pi, clone).as_sql(compiler, connection)
 
 
 class Power(Func):
@@ -136,12 +134,14 @@ class Radians(Transform):
         super().__init__(num)
 
     def get_radians(self):
-        return float(math.radians(self.source_expressions[0]))
+        radians = math.radians(self.source_expressions[0])
+        return float(radians)
 
-    def use_radians(self, compiler, connection, **extra_context):
-        return self.get_radians().as_oracle(compiler, connection, **extra_context)
-
-    as_oracle = use_radians
+    def as_oracle(self, compiler, connection):
+        expressions = [self.get_radians()]
+        clone = self.copy()
+        clone.set_source_expressions(expressions)
+        return super(Radians, clone).as_sql(compiler, connection)
 
 
 class Round(Transform):
