@@ -211,6 +211,7 @@ class InspectDBTestCase(TestCase):
         out = StringIO()
         call_command('inspectdb', 'inspectdb_uniquetogether', stdout=out)
         output = out.getvalue()
+        self.assertIn("    unique_together = (('", output)
         unique_re = re.compile(r'.*unique_together = \((.+),\).*')
         unique_together_match = re.findall(unique_re, output)
         # There should be one unique_together tuple.

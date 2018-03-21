@@ -273,7 +273,7 @@ class Command(BaseCommand):
             if params['unique']:
                 columns = params['columns']
                 if len(columns) > 1:
-                    unique_together.append('(' + str(tuple(column_to_field_name[c] for c in columns)) + ')')
+                    unique_together.append(str(tuple(column_to_field_name[c] for c in columns)))
         managed_comment = "  # Created from a view. Don't remove." if is_view else ""
         meta = ["",
                 "    class Meta:",
