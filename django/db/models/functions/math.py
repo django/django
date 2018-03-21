@@ -52,7 +52,7 @@ class Cot(Transform):
     output_field = FloatField()
 
     def as_oracle(self, compiler, connection):
-        return super().as_sql(compiler, connection, template='1 / TAN(%(expressions)s)')
+        return super().as_sql(compiler, connection, template='(1 / TAN(%(expressions)s))')
 
 
 class Degrees(Transform):
@@ -60,15 +60,8 @@ class Degrees(Transform):
     lookup_name = 'degrees'
     output_field = FloatField()
 
-    def get_degrees(self):
-        degrees = math.degrees(self.source_expressions[0])
-        return float(degrees)
-
     def as_oracle(self, compiler, connection):
-        expressions = [self.get_degrees()]
-        clone = self.copy()
-        clone.set_source_expressions(expressions)
-        return super(Degrees, clone).as_sql(compiler, connection)
+        return super().as_sql(compiler, connection, template='((%%(expressions)s) * %s / 180)' % math.pi)
 
 
 class Exp(Transform):
@@ -103,14 +96,8 @@ class Pi(Func):
     arity = 0
     output_field = FloatField()
 
-    def get_pi(self):
-        return float(math.pi)
-
     def as_oracle(self, compiler, connection):
-        expressions = [self.get_pi()]
-        clone = self.copy()
-        clone.set_source_expressions(expressions)
-        return super(Pi, clone).as_sql(compiler, connection)
+        return super().as_sql(compiler, connection, template=str(math.pi))
 
 
 class Power(Func):
@@ -124,15 +111,8 @@ class Radians(Transform):
     lookup_name = 'radians'
     output_field = FloatField()
 
-    def get_radians(self):
-        radians = math.radians(self.source_expressions[0])
-        return float(radians)
-
     def as_oracle(self, compiler, connection):
-        expressions = [self.get_radians()]
-        clone = self.copy()
-        clone.set_source_expressions(expressions)
-        return super(Radians, clone).as_sql(compiler, connection)
+        return super().as_sql(compiler, connection, template='((%%(expressions)s) * 180 / %s)' % math.pi)
 
 
 class Round(Transform):
