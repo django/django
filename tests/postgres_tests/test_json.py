@@ -326,15 +326,41 @@ class TestSerialization(PostgreSQLTestCase):
         '[{"fields": {"field": {"a": "b", "c": null}, "field_custom": null}, '
         '"model": "postgres_tests.jsonmodel", "pk": null}]'
     )
+    test_str_data = (
+        '[{"fields": {"field": "abc", "field_custom": null}, '
+        '"model": "postgres_tests.jsonmodel", "pk": null}]'
+    )
+    test_str_data2 = (
+        '[{"fields": {"field": "{\\"a\\": \\"a\\"}", "field_custom": null}, '
+        '"model": "postgres_tests.jsonmodel", "pk": null}]'
+    )
 
     def test_dumping(self):
         instance = JSONModel(field={'a': 'b', 'c': None})
         data = serializers.serialize('json', [instance])
         self.assertJSONEqual(data, self.test_data)
 
+    def test_dumping_str(self):
+        instance = JSONModel(field='abc')
+        data = serializers.serialize('json', [instance])
+        self.assertJSONEqual(data, self.test_str_data)
+
+    def test_dumping_str2(self):
+        instance = JSONModel(field='{"a": "a"}')
+        data = serializers.serialize('json', [instance])
+        self.assertJSONEqual(data, self.test_str_data2)
+
     def test_loading(self):
         instance = list(serializers.deserialize('json', self.test_data))[0].object
         self.assertEqual(instance.field, {'a': 'b', 'c': None})
+
+    def test_loading_str(self):
+        instance = list(serializers.deserialize('json', self.test_str_data))[0].object
+        self.assertEqual(instance.field, 'abc')
+
+    def test_loading_str2(self):
+        instance = list(serializers.deserialize('json', self.test_str_data2))[0].object
+        self.assertEqual(instance.field, '{"a": "a"}')
 
 
 class TestValidation(PostgreSQLTestCase):
@@ -440,3 +466,11 @@ class TestFormField(PostgreSQLTestCase):
         field = forms.JSONField()
         self.assertIs(field.has_changed({'a': True}, '{"a": 1}'), True)
         self.assertIs(field.has_changed({'a': 1, 'b': 2}, '{"b": 2, "a": 1}'), False)
+
+
+class JSONFieldTests(PostgreSQLTestCase):
+
+    def test_to_python(self):
+        f = JSONField()
+        self.assertEqual(f.to_python({'key': 'value'}), {'key': 'value'})
+        self.assertEqual(f.to_python('{"key": "value"}'), {'key': 'value'})
