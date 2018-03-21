@@ -275,6 +275,22 @@ standard Django ``LiveServerTestCase``::
         def test_live_stuff(self):
             call_external_testing_thing(self.live_server_url)
 
+.. note::
+
+    You can't use an in-memory database for your live tests. Therefore
+    include a test database file name in your settings to tell Django to
+    use a file database if you use SQLite::
+
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.sqlite3",
+                "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+                "TEST": {
+                    "NAME": os.path.join(BASE_DIR, "db_test.sqlite3"),
+                },
+            },
+        }
+
 serve_static
 ~~~~~~~~~~~~
 
