@@ -273,10 +273,7 @@ class Command(BaseCommand):
             if params['unique']:
                 columns = params['columns']
                 if len(columns) > 1:
-                    # we do not want to include the u"" or u'' prefix
-                    # so we build the string rather than interpolate the tuple
-                    tup = '(' + ', '.join("'%s'" % column_to_field_name[c] for c in columns) + ')'
-                    unique_together.append(tup)
+                    unique_together.append('(' + str(tuple(column_to_field_name[c] for c in columns)) + ')')
         managed_comment = "  # Created from a view. Don't remove." if is_view else ""
         meta = ["",
                 "    class Meta:",
