@@ -6,7 +6,6 @@ from django.core import checks, exceptions, serializers
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.forms import CharField, Form, widgets
-from django.test import TestCase
 from django.test.utils import isolate_apps
 from django.utils.html import escape
 
@@ -444,7 +443,7 @@ class TestFormField(PostgreSQLTestCase):
         self.assertIs(field.has_changed({'a': 1, 'b': 2}, '{"b": 2, "a": 1}'), False)
 
 
-class JSONFieldTests(TestCase):
+class JSONFieldTests(PostgreSQLTestCase):
 
     def test_to_python(self):
         f = JSONField()
