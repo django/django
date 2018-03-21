@@ -61,7 +61,7 @@ class Degrees(Transform):
     output_field = FloatField()
 
     def as_oracle(self, compiler, connection):
-        return super().as_sql(compiler, connection, template='((%%(expressions)s) * %s / 180)' % math.pi)
+        return super().as_sql(compiler, connection, template='((%%(expressions)s) * 180 / %s)' % math.pi)
 
 
 class Exp(Transform):
@@ -112,7 +112,7 @@ class Radians(Transform):
     output_field = FloatField()
 
     def as_oracle(self, compiler, connection):
-        return super().as_sql(compiler, connection, template='((%%(expressions)s) * 180 / %s)' % math.pi)
+        return super().as_sql(compiler, connection, template='((%%(expressions)s) * %s / 180)' % math.pi)
 
 
 class Round(Transform):
