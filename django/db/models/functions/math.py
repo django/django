@@ -51,9 +51,6 @@ class Cot(Transform):
     lookup_name = 'cot'
     output_field = FloatField()
 
-    def __init__(self, num):
-        super().__init__(num)
-
     def as_oracle(self, compiler, connection):
         return super().as_sql(compiler, connection, template='1 / TAN(%(expressions)s)')
 
@@ -62,9 +59,6 @@ class Degrees(Transform):
     function = 'DEGREES'
     lookup_name = 'degrees'
     output_field = FloatField()
-
-    def __init__(self, num):
-        super().__init__(num)
 
     def get_degrees(self):
         degrees = math.degrees(self.source_expressions[0])
@@ -129,9 +123,6 @@ class Radians(Transform):
     function = 'RADIANS'
     lookup_name = 'radians'
     output_field = FloatField()
-
-    def __init__(self, num):
-        super().__init__(num)
 
     def get_radians(self):
         radians = math.radians(self.source_expressions[0])
