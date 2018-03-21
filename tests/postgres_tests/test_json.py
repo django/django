@@ -462,6 +462,3 @@ class JSONFieldTests(PostgreSQLTestCase):
         f = JSONField()
         self.assertEqual(f.to_python({'key': 'value'}), {'key': 'value'})
         self.assertEqual(f.to_python('{"key": "value"}'), {'key': 'value'})
-        msg = 'Value must be valid JSON.'
-        with self.assertRaisesMessage(ValidationError, msg):
-            f.to_python("{'key': 'value'}")

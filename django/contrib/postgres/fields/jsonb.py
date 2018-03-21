@@ -46,14 +46,7 @@ class JSONField(CheckFieldDefaultMixin, Field):
             try:
                 value = json.loads(value)
             except json.decoder.JSONDecodeError:
-                try:
-                    value = json.loads('"' + value + '"')
-                except json.decoder.JSONDecodeError:
-                    raise exceptions.ValidationError(
-                        self.error_messages['invalid'],
-                        code='invalid',
-                        params={'value': value},
-                    )
+                pass
         return value
 
     def db_type(self, connection):
