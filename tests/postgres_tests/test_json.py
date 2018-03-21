@@ -327,15 +327,28 @@ class TestSerialization(PostgreSQLTestCase):
         '[{"fields": {"field": {"a": "b", "c": null}, "field_custom": null}, '
         '"model": "postgres_tests.jsonmodel", "pk": null}]'
     )
+    test_str_data = (
+        '[{"fields": {"field": "abc", "field_custom": null}, '
+        '"model": "postgres_tests.jsonmodel", "pk": null}]'
+    )
 
     def test_dumping(self):
         instance = JSONModel(field={'a': 'b', 'c': None})
         data = serializers.serialize('json', [instance])
         self.assertJSONEqual(data, self.test_data)
 
+    def test_dumping_str(self):
+        instance = JSONModel(field='abc')
+        data = serializers.serialize('json', [instance])
+        self.assertJSONEqual(data, self.test_str_data)
+
     def test_loading(self):
         instance = list(serializers.deserialize('json', self.test_data))[0].object
         self.assertEqual(instance.field, {'a': 'b', 'c': None})
+
+    def test_loading_str(self):
+        instance = list(serializers.deserialize('json', self.test_str_data))[0].object
+        self.assertEqual(instance.field, 'abc')
 
 
 class TestValidation(PostgreSQLTestCase):
