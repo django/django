@@ -3,7 +3,6 @@ import uuid
 from decimal import Decimal
 
 from django.core import checks, exceptions, serializers
-from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.forms import CharField, Form, widgets
 from django.test.utils import isolate_apps
