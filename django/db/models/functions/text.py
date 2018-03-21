@@ -152,6 +152,20 @@ class Ord(Transform):
         return super().as_sql(compiler, connection, function='UNICODE', **extra_context)
 
 
+class Repeat(BytesToCharFieldConversionMixin, Func):
+    function = 'REPEAT'
+
+    def __init__(self, expression, number, **extra):
+        if not hasattr(number, 'resolve_expression') and number < 0:
+            raise ValueError("'number' must be greater or equal to 0.")
+        super().__init__(expression, number, **extra)
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        expression, number = self.source_expressions
+        rpad = RPad(expression, Length(expression) * number, expression)
+        return rpad.as_sql(compiler, connection, **extra_context)
+
+
 class Replace(Func):
     function = 'REPLACE'
 

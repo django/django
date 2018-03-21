@@ -4,6 +4,7 @@ SQLite3 backend for the sqlite3 module in the standard library.
 import datetime
 import decimal
 import math
+import operator
 import re
 import warnings
 from sqlite3 import dbapi2 as Database
@@ -170,6 +171,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function("django_format_dtdelta", 3, _sqlite_format_dtdelta)
         conn.create_function("django_power", 2, _sqlite_power)
         conn.create_function('LPAD', 3, _sqlite_lpad)
+        conn.create_function('REPEAT', 2, operator.mul)
         conn.create_function('RPAD', 3, _sqlite_rpad)
         conn.execute('PRAGMA foreign_keys = ON')
         return conn
