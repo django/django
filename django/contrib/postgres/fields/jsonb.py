@@ -43,7 +43,14 @@ class JSONField(CheckFieldDefaultMixin, Field):
 
     def to_python(self, value):
         if isinstance(value, str):
-            value = json.loads(value)
+            try:
+                value = json.loads(value)
+            except json.decoder.JSONDecodeError:
+                raise exceptions.ValidationError(
+                    self.error_messages['invalid'],
+                    code='invalid',
+                    params={'value': value},
+                )
         return value
 
     def db_type(self, connection):
