@@ -6,7 +6,7 @@ from django.db import connection
 from django.db.models import CharField, TextField, Value as V
 from django.db.models.expressions import RawSQL
 from django.db.models.functions import (
-    Coalesce, Concat, ConcatPair, Greatest, Least, Length, Lower, Now,
+    Coalesce, Concat, ConcatPair, Greatest, Least, Length, Lower, LPad, Now,
     StrIndex, Substr, Upper,
 )
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
@@ -670,4 +670,14 @@ class FunctionTests(TestCase):
         self.assertQuerysetEqual(
             Author.objects.exclude(alias=Upper(V('smithj'))),
             ['Rhonda'], lambda x: x.name
+        )
+
+    def test_func_string_combination(self):
+        Author.objects.create(name='Rhonda', alias='john_smith')
+        Author.objects.create(name='♥♣♠', alias='bytes')
+        authors = Author.objects.annotate(filled=LPad('name', Length('alias'), output_field=CharField()))
+        self.assertQuerysetEqual(
+            authors.order_by('alias'),
+            ['  ♥♣♠', '    Rhonda'],
+            lambda a: a.filled,
         )
