@@ -30,7 +30,7 @@ channel on Freenode.
 
 You can install channels from PyPI as the ``channels`` package.
 See our `installation <https://channels.readthedocs.io/en/latest/installation.html>`_
-and `getting started <https://channels.readthedocs.io/en/latest/getting-started.html>`_ docs for more.
+and `tutorial <https://channels.readthedocs.io/en/latest/tutorial/index.html>`_ docs for more.
 
 Dependencies
 ------------
