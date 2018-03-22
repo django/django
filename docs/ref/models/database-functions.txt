@@ -221,9 +221,10 @@ returned when this timezone is active will be the same as above except for:
 
     The ``week`` ``lookup_type`` is calculated based on `ISO-8601
     <https://en.wikipedia.org/wiki/ISO-8601>`_, i.e.,
-    a week starts on a Monday. The first week is the one with the majority
-    of the days, i.e., a week that starts on or before Thursday. The value
-    returned is in the range 1 to 52 or 53.
+    a week starts on a Monday. The first week of a year is the one that
+    contains the year's first Thursday, i.e. the first week has the majority
+    (four or more) of its days in the year. The value returned is in the range
+    1 to 52 or 53.
 
 Each ``lookup_name`` above has a corresponding ``Extract`` subclass (listed
 below) that should typically be used instead of the more verbose equivalent,
