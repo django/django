@@ -2888,7 +2888,7 @@ in the database <database-time-zone-definitions>`.
 
 For date and datetime fields, return the week number (1-52 or 53) according
 to `ISO-8601 <https://en.wikipedia.org/wiki/ISO-8601>`_, i.e., weeks start
-on a Monday and the first week starts on or before Thursday.
+on a Monday and the first week contains the year's first Thursday.
 
 Example::
 
