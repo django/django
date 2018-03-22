@@ -29,9 +29,9 @@ class CosTests(TestCase):
             normal_cos=Cos('normal'),
             big_cos=Cos('big'),
         ).first()
-        self.assertAlmostEqual(float(obj.small_cos), math.cos(obj.small))
-        self.assertAlmostEqual(float(obj.normal_cos), math.cos(obj.normal))
-        self.assertAlmostEqual(float(obj.big_cos), math.cos(obj.big))
+        self.assertAlmostEqual(obj.small_cos, math.cos(obj.small))
+        self.assertAlmostEqual(obj.normal_cos, math.cos(obj.normal))
+        self.assertAlmostEqual(obj.big_cos, math.cos(obj.big))
 
     def test_transform(self):
         try:

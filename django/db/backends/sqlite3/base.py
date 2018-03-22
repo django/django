@@ -173,7 +173,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function("django_timestamp_diff", 2, _sqlite_timestamp_diff)
         conn.create_function("regexp", 2, _sqlite_regexp)
         conn.create_function("django_format_dtdelta", 3, _sqlite_format_dtdelta)
-        conn.create_function("django_power", 2, _sqlite_power)
         conn.create_function('LPAD', 3, _sqlite_lpad)
         conn.create_function('REPEAT', 2, operator.mul)
         conn.create_function('RPAD', 3, _sqlite_rpad)
@@ -191,7 +190,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function('LOG', 2, lambda x, y: math.log(y, x))
         conn.create_function('MOD', 2, math.fmod)
         conn.create_function('PI', 0, lambda: math.pi)
-        conn.create_function('POWER', 2, _sqlite_power)
+        conn.create_function('POWER', 2, operator.pow)
         conn.create_function('RADIANS', 1, math.radians)
         conn.create_function('SIN', 1, math.sin)
         conn.create_function('SQRT', 1, math.sqrt)
@@ -502,7 +501,3 @@ def _sqlite_lpad(text, length, fill_text):
 
 def _sqlite_rpad(text, length, fill_text):
     return (text + fill_text * length)[:length]
-
-
-def _sqlite_power(x, y):
-    return x ** y

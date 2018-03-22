@@ -29,9 +29,9 @@ class CotTests(TestCase):
             normal_cot=Cot('normal'),
             big_cot=Cot('big'),
         ).first()
-        self.assertAlmostEqual(float(obj.small_cot), 1 / math.tan(obj.small))
-        self.assertAlmostEqual(float(obj.normal_cot), 1 / math.tan(obj.normal))
-        self.assertAlmostEqual(float(obj.big_cot), 1 / math.tan(obj.big))
+        self.assertAlmostEqual(obj.small_cot, 1 / math.tan(obj.small))
+        self.assertAlmostEqual(obj.normal_cot, 1 / math.tan(obj.normal))
+        self.assertAlmostEqual(obj.big_cot, 1 / math.tan(obj.big))
 
     def test_transform(self):
         try:

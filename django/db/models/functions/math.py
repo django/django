@@ -67,6 +67,7 @@ class Degrees(Transform):
 class Exp(Transform):
     function = 'EXP'
     lookup_name = 'exp'
+    output_field = FloatField()
 
 
 class Floor(Transform):
@@ -77,6 +78,7 @@ class Floor(Transform):
 class Ln(Transform):
     function = 'LN'
     lookup_name = 'ln'
+    output_field = FloatField()
 
 
 class Log(Func):
@@ -84,11 +86,49 @@ class Log(Func):
     arity = 2
     output_field = FloatField()
 
+    def as_postgresql(self, compiler, connection):
+        # POstgresql doesn't support Log(double precision, double precision),
+        # so convert Floatfields to numeric if present.
+        if self.output_field.get_internal_type() == 'FloatField':
+            class Tonumeric(Func):
+
+                def as_postgresql(self, compiler1=compiler, connection1=connection):
+                    return self.as_sql(compiler1, connection1, template='(%(expressions)s)::numeric')
+
+            expressions = [
+                Tonumeric(expression) for expression in self.get_source_expressions()
+            ]
+            clone = self.copy()
+            clone.set_source_expressions(expressions)
+            return super(Log, clone).as_sql(
+                compiler, connection, function='LOG', template='%(function)s(%(expressions)s)'
+            )
+        return self.as_sql(compiler, connection)
+
 
 class Mod(Func):
     function = 'MOD'
     arity = 2
     output_field = FloatField()
+
+    def as_postgresql(self, compiler, connection):
+        # POstgresql doesn't support Log(double precision, double precision),
+        # so convert Floatfields to numeric.
+        if self.output_field.get_internal_type() == 'FloatField':
+            class Tonumeric(Func):
+
+                def as_postgresql(self, compiler1=compiler, connection1=connection):
+                    return self.as_sql(compiler1, connection1, template='(%(expressions)s)::numeric')
+
+            expressions = [
+                Tonumeric(expression) for expression in self.get_source_expressions()
+            ]
+            clone = self.copy()
+            clone.set_source_expressions(expressions)
+            return super(Mod, clone).as_sql(
+                compiler, connection, function='MOD', template='%(function)s(%(expressions)s)'
+            )
+        return self.as_sql(compiler, connection)
 
 
 class Pi(Func):

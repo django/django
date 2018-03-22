@@ -13,14 +13,14 @@ class LnTests(TestCase):
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('12.9'), n2=Decimal('0.6'))
         obj = DecimalModel.objects.annotate(n1_d=Ln('n1'), n2_d=Ln('n2')).first()
-        self.assertAlmostEqual(float(obj.n1_d), math.log(obj.n1))
-        self.assertAlmostEqual(float(obj.n2_d), math.log(obj.n2))
+        self.assertAlmostEqual(obj.n1_d, math.log(obj.n1))
+        self.assertAlmostEqual(obj.n2_d, math.log(obj.n2))
 
     def test_float(self):
         FloatModel.objects.create(f1=27.5, f2=0.33)
         obj = FloatModel.objects.annotate(f1_d=Ln('f1'), f2_d=Ln('f2')).first()
-        self.assertAlmostEqual(float(obj.f1_d), math.log(obj.f1))
-        self.assertAlmostEqual(float(obj.f2_d), math.log(obj.f2))
+        self.assertAlmostEqual(obj.f1_d, math.log(obj.f1))
+        self.assertAlmostEqual(obj.f2_d, math.log(obj.f2))
 
     def test_integer(self):
         IntegerModel.objects.create(small=20, normal=15, big=1)
@@ -29,9 +29,9 @@ class LnTests(TestCase):
             normal_d=Ln('normal'),
             big_d=Ln('big'),
         ).first()
-        self.assertEqual(obj.small_d, int(math.log(obj.small)))
-        self.assertEqual(obj.normal_d, int(math.log(obj.normal)))
-        self.assertEqual(obj.big_d, int(math.log(obj.big)))
+        self.assertAlmostEqual(obj.small_d, math.log(obj.small))
+        self.assertAlmostEqual(obj.normal_d, math.log(obj.normal))
+        self.assertAlmostEqual(obj.big_d, math.log(obj.big))
 
     def test_transform(self):
         try:

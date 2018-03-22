@@ -19,8 +19,8 @@ class RadiansTests(TestCase):
     def test_float(self):
         FloatModel.objects.create(f1=-27.5, f2=0.33)
         obj = FloatModel.objects.annotate(f1_d=Radians('f1'), f2_d=Radians('f2')).first()
-        self.assertAlmostEqual(float(obj.f1_d), math.radians(obj.f1))
-        self.assertAlmostEqual(float(obj.f2_d), math.radians(obj.f2))
+        self.assertAlmostEqual(obj.f1_d, math.radians(obj.f1))
+        self.assertAlmostEqual(obj.f2_d, math.radians(obj.f2))
 
     def test_integer(self):
         IntegerModel.objects.create(small=-20, normal=15, big=-1)
