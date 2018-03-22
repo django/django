@@ -289,8 +289,8 @@ The next step is to point the root URLconf at the ``polls.urls`` module. In
 .. snippet::
     :filename: mysite/urls.py
 
-    from django.urls import include, path
     from django.contrib import admin
+    from django.urls import include, path
 
     urlpatterns = [
         path('polls/', include('polls.urls')),
