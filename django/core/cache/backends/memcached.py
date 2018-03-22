@@ -177,3 +177,13 @@ class PyLibMCCache(BaseMemcachedCache):
         # libmemcached manages its own connections. Don't call disconnect_all()
         # as it resets the failover state and creates unnecessary reconnects.
         pass
+
+    def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
+        """PyLibMC throws an exception if the stored value is too large,
+python-memcache instead returns False. We need to override set here to account
+for the difference."""
+        try:
+            super(PyLibMCCache, self).set(key, value, timeout=timeout, version=version)
+        except self._lib.TooBig:
+            # make sure the key doesn't keep its old value in case of failure to set (memcached's 1MB limit)
+            self._cache.delete(key)
