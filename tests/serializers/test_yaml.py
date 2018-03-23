@@ -176,3 +176,17 @@ class YamlSerializerTransactionTestCase(SerializersTransactionTestBase, Transact
     name: Agnes
   pk: 1
   model: serializers.author"""
+
+
+@unittest.skipUnless(HAS_YAML, "No yaml library detected")
+class UnicodeSerializerTestCase(SimpleTestCase):
+
+    def test_should_allow_unicode(self):
+        s = serializers.pyyaml.Serializer()
+        yaml_string = s.serialize([Author(name='יוניקוד')], allow_unicode=True)
+        self.assertTrue('יוניקוד' in yaml_string)
+
+    def test_should_escape_unicode(self):
+        s = serializers.pyyaml.Serializer()
+        yaml_string = s.serialize([Author(name='יוניקוד')], allow_unicode=False)
+        self.assertTrue('\\u05D9\\u05D5\\u05E0\\u05D9\\u05E7\\u05D5\\u05D3' in yaml_string)

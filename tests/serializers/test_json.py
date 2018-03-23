@@ -11,7 +11,7 @@ from django.test import SimpleTestCase, TestCase, TransactionTestCase
 from django.test.utils import isolate_apps
 from django.utils.translation import gettext_lazy, override
 
-from .models import Score
+from .models import Actor, Score
 from .tests import SerializersTestBase, SerializersTransactionTestBase
 
 
@@ -69,6 +69,15 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
         for line in json_data.splitlines():
             if re.search(r'.+,\s*$', line):
                 self.assertEqual(line, line.rstrip())
+
+    def test_ensure_ascii(self):
+        s = serializers.json.Serializer()
+
+        json_data = s.serialize([Actor(name='יוניקוד')], allow_unicode=False)
+        self.assertTrue('\\u05d9\\u05d5\\u05e0\\u05d9\\u05e7\\u05d5\\u05d3' in json_data)
+
+        json_data = s.serialize([Actor(name='יוניקוד')], allow_unicode=True)
+        self.assertTrue('יוניקוד' in json_data)
 
     @isolate_apps('serializers')
     def test_custom_encoder(self):
