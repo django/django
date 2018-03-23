@@ -1,6 +1,7 @@
 import math
 
 from django.db.models import FloatField, Func, Transform
+from .comparison import Cast
 
 
 class Abs(Transform):
@@ -90,13 +91,8 @@ class Log(Func):
         # POstgresql doesn't support Log(double precision, double precision),
         # so convert Floatfields to numeric if present.
         if self.output_field.get_internal_type() == 'FloatField':
-            class Tonumeric(Func):
-
-                def as_postgresql(self, compiler1=compiler, connection1=connection):
-                    return self.as_sql(compiler1, connection1, template='(%(expressions)s)::numeric')
-
             expressions = [
-                Tonumeric(expression) for expression in self.get_source_expressions()
+                Cast(expression, numeric) for expression in self.get_source_expressions()
             ]
             clone = self.copy()
             clone.set_source_expressions(expressions)
@@ -115,13 +111,8 @@ class Mod(Func):
         # POstgresql doesn't support Log(double precision, double precision),
         # so convert Floatfields to numeric.
         if self.output_field.get_internal_type() == 'FloatField':
-            class Tonumeric(Func):
-
-                def as_postgresql(self, compiler1=compiler, connection1=connection):
-                    return self.as_sql(compiler1, connection1, template='(%(expressions)s)::numeric')
-
             expressions = [
-                Tonumeric(expression) for expression in self.get_source_expressions()
+                Cast(expression, numeric) for expression in self.get_source_expressions()
             ]
             clone = self.copy()
             clone.set_source_expressions(expressions)
