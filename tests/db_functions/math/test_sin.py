@@ -13,8 +13,8 @@ class SinTests(TestCase):
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('-12.9'), n2=Decimal('0.6'))
         obj = DecimalModel.objects.annotate(n1_d=Sin('n1'), n2_d=Sin('n2')).first()
-        self.assertAlmostEqual(obj.n1_d, Decimal(math.sin(obj.n1)))
-        self.assertAlmostEqual(obj.n2_d, Decimal(math.sin(obj.n2)))
+        self.assertAlmostEqual(obj.n1_d, math.sin(obj.n1))
+        self.assertAlmostEqual(obj.n2_d, math.sin(obj.n2))
 
     def test_float(self):
         FloatModel.objects.create(f1=-27.5, f2=0.33)
