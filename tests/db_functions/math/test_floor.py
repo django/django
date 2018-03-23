@@ -39,6 +39,6 @@ class FloorTests(TestCase):
             DecimalModel.objects.create(n1=Decimal('5.4'), n2=Decimal('0'))
             DecimalModel.objects.create(n1=Decimal('3.4'), n2=Decimal('0'))
             objs = DecimalModel.objects.filter(n1__floor__gt=4)
-            self.assertQuerysetEqual(objs, [Decimal('5.4')], lambda x: x.n1)
+            self.assertQuerysetEqual(objs, [Decimal('5.4')], lambda a: a.n1)
         finally:
             DecimalField._unregister_lookup(Floor)
