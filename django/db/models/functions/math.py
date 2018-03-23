@@ -146,13 +146,7 @@ class Ln(Transform):
 class Log(Func):
     function = 'LOG'
     arity = 2
-
-    def _resolve_output_field(self):
-        sources = self.get_source_expressions()
-        if any(isinstance(s.output_field, DecimalField) for s in sources):
-            return DecimalField()
-        else:
-            return FloatField()
+    output_field = FloatField()
 
     def as_postgresql(self, compiler, connection):
         # Cast FloatField to DecimalField as PostgreSQL doesn't support
