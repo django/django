@@ -15,7 +15,7 @@ class LogTests(TestCase):
         self.assertAlmostEqual(obj.n_log, Decimal(math.log(obj.n2, obj.n1)))
 
     def test_float(self):
-        FloatModel.objects.create(f1=27.5, f2=131.5)
+        FloatModel.objects.create(f1=27.5, f2=31.5)
         obj = FloatModel.objects.annotate(f_log=Log('f1', 'f2')).first()
         self.assertAlmostEqual(obj.f_log, math.log(obj.f2, obj.f1))
 
