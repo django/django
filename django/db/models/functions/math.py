@@ -1,6 +1,6 @@
 import math
 
-from django.db.models import FloatField, Func, Transform
+from django.db.models import DecimalField, FloatField, Func, Transform
 from .comparison import Cast
 
 
@@ -8,29 +8,60 @@ class Abs(Transform):
     function = 'ABS'
     lookup_name = 'abs'
 
+    def _resolve_output_field(self):
+        sources = self.get_source_expressions()
+        if any(isinstance(s.output_field, DecimalField) for s in sources):
+            return DecimalField()
+        else:
+            return FloatField()
+
 
 class ACos(Transform):
     function = 'ACOS'
     lookup_name = 'acos'
-    output_field = FloatField()
+
+    def _resolve_output_field(self):
+        sources = self.get_source_expressions()
+        if any(isinstance(s.output_field, DecimalField) for s in sources):
+            return DecimalField()
+        else:
+            return FloatField()
 
 
 class ASin(Transform):
     function = 'ASIN'
     lookup_name = 'asin'
-    output_field = FloatField()
+
+    def _resolve_output_field(self):
+        sources = self.get_source_expressions()
+        if any(isinstance(s.output_field, DecimalField) for s in sources):
+            return DecimalField()
+        else:
+            return FloatField()
 
 
 class ATan(Transform):
     function = 'ATAN'
     lookup_name = 'atan'
-    output_field = FloatField()
+
+    def _resolve_output_field(self):
+        sources = self.get_source_expressions()
+        if any(isinstance(s.output_field, DecimalField) for s in sources):
+            return DecimalField()
+        else:
+            return FloatField()
 
 
 class ATan2(Func):
     function = 'ATAN2'
     arity = 2
-    output_field = FloatField()
+
+    def _resolve_output_field(self):
+        sources = self.get_source_expressions()
+        if any(isinstance(s.output_field, DecimalField) for s in sources):
+            return DecimalField()
+        else:
+            return FloatField()
 
 
 class Ceil(Transform):
@@ -44,13 +75,25 @@ class Ceil(Transform):
 class Cos(Transform):
     function = 'COS'
     lookup_name = 'cos'
-    output_field = FloatField()
+
+    def _resolve_output_field(self):
+        sources = self.get_source_expressions()
+        if any(isinstance(s.output_field, DecimalField) for s in sources):
+            return DecimalField()
+        else:
+            return FloatField()
 
 
 class Cot(Transform):
     function = 'COT'
     lookup_name = 'cot'
-    output_field = FloatField()
+
+    def _resolve_output_field(self):
+        sources = self.get_source_expressions()
+        if any(isinstance(s.output_field, DecimalField) for s in sources):
+            return DecimalField()
+        else:
+            return FloatField()
 
     def as_oracle(self, compiler, connection):
         return super().as_sql(compiler, connection, template='(1 / TAN(%(expressions)s))')
@@ -59,7 +102,13 @@ class Cot(Transform):
 class Degrees(Transform):
     function = 'DEGREES'
     lookup_name = 'degrees'
-    output_field = FloatField()
+
+    def _resolve_output_field(self):
+        sources = self.get_source_expressions()
+        if any(isinstance(s.output_field, DecimalField) for s in sources):
+            return DecimalField()
+        else:
+            return FloatField()
 
     def as_oracle(self, compiler, connection):
         return super().as_sql(compiler, connection, template='((%%(expressions)s) * 180 / %s)' % math.pi)
@@ -68,7 +117,13 @@ class Degrees(Transform):
 class Exp(Transform):
     function = 'EXP'
     lookup_name = 'exp'
-    output_field = FloatField()
+
+    def _resolve_output_field(self):
+        sources = self.get_source_expressions()
+        if any(isinstance(s.output_field, DecimalField) for s in sources):
+            return DecimalField()
+        else:
+            return FloatField()
 
 
 class Floor(Transform):
@@ -79,18 +134,31 @@ class Floor(Transform):
 class Ln(Transform):
     function = 'LN'
     lookup_name = 'ln'
-    output_field = FloatField()
+
+    def _resolve_output_field(self):
+        sources = self.get_source_expressions()
+        if any(isinstance(s.output_field, DecimalField) for s in sources):
+            return DecimalField()
+        else:
+            return FloatField()
 
 
 class Log(Func):
     function = 'LOG'
     arity = 2
-    output_field = FloatField()
+
+    def _resolve_output_field(self):
+        sources = self.get_source_expressions()
+        if any(isinstance(s.output_field, DecimalField) for s in sources):
+            return DecimalField()
+        else:
+            return FloatField()
 
     def as_postgresql(self, compiler, connection):
         # POstgresql doesn't support Log(double precision, double precision),
         # so convert Floatfields to numeric if present.
-        if self.output_field.get_internal_type() == 'FloatField':
+        sources = self.get_source_expressions()
+        if any(isinstance(s.output_field, FloatField) for s in sources):
             expressions = [
                 Cast(expression, numeric) for expression in self.get_source_expressions()
             ]
@@ -105,7 +173,13 @@ class Log(Func):
 class Mod(Func):
     function = 'MOD'
     arity = 2
-    output_field = FloatField()
+
+    def _resolve_output_field(self):
+        sources = self.get_source_expressions()
+        if any(isinstance(s.output_field, DecimalField) for s in sources):
+            return DecimalField()
+        else:
+            return FloatField()
 
     def as_postgresql(self, compiler, connection):
         # POstgresql doesn't support Log(double precision, double precision),
@@ -125,7 +199,13 @@ class Mod(Func):
 class Pi(Func):
     function = 'PI'
     arity = 0
-    output_field = FloatField()
+
+    def _resolve_output_field(self):
+        sources = self.get_source_expressions()
+        if any(isinstance(s.output_field, DecimalField) for s in sources):
+            return DecimalField()
+        else:
+            return FloatField()
 
     def as_oracle(self, compiler, connection):
         return super().as_sql(compiler, connection, template=str(math.pi))
@@ -134,13 +214,25 @@ class Pi(Func):
 class Power(Func):
     function = 'POWER'
     arity = 2
-    output_field = FloatField()
+
+    def _resolve_output_field(self):
+        sources = self.get_source_expressions()
+        if any(isinstance(s.output_field, DecimalField) for s in sources):
+            return DecimalField()
+        else:
+            return FloatField()
 
 
 class Radians(Transform):
     function = 'RADIANS'
     lookup_name = 'radians'
-    output_field = FloatField()
+
+    def _resolve_output_field(self):
+        sources = self.get_source_expressions()
+        if any(isinstance(s.output_field, DecimalField) for s in sources):
+            return DecimalField()
+        else:
+            return FloatField()
 
     def as_oracle(self, compiler, connection):
         return super().as_sql(compiler, connection, template='((%%(expressions)s) * %s / 180)' % math.pi)
@@ -154,16 +246,34 @@ class Round(Transform):
 class Sin(Transform):
     function = 'SIN'
     lookup_name = 'sin'
-    output_field = FloatField()
+
+    def _resolve_output_field(self):
+        sources = self.get_source_expressions()
+        if any(isinstance(s.output_field, DecimalField) for s in sources):
+            return DecimalField()
+        else:
+            return FloatField()
 
 
 class Sqrt(Transform):
     function = 'SQRT'
     lookup_name = 'sqrt'
-    output_field = FloatField()
+
+    def _resolve_output_field(self):
+        sources = self.get_source_expressions()
+        if any(isinstance(s.output_field, DecimalField) for s in sources):
+            return DecimalField()
+        else:
+            return FloatField()
 
 
 class Tan(Transform):
     function = 'TAN'
     lookup_name = 'tan'
-    output_field = FloatField()
+
+    def _resolve_output_field(self):
+        sources = self.get_source_expressions()
+        if any(isinstance(s.output_field, DecimalField) for s in sources):
+            return DecimalField()
+        else:
+            return FloatField()
