@@ -152,13 +152,10 @@ class Log(Func):
         # Cast FloatField to DecimalField as PostgreSQL doesn't support
         # LOG(double precision, double precision) by default.
         clone = self.copy()
-        sources = self.get_source_expressions()
-        if any(isinstance(s.output_field, DecimalField) for s in sources):
-            expressions = [
-                Cast(expression, numeric) if isinstance(expression.output_field, FloatField)
-                else expression for expression in self.get_source_expressions()
-            ]
-            clone.set_source_expressions(expressions)
+        clone.set_source_expressions([
+            Cast(expression, DecimalField()) if isinstance(expression.output_field, FloatField)
+            else expression for expression in self.get_source_expressions()
+        ])
         return clone.as_sql(compiler, connection)
 
 
