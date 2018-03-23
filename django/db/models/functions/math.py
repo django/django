@@ -1,7 +1,7 @@
 import math
 
 from django.db.models import DecimalField, FloatField, Func, Transform
-from .comparison import Cast
+from django.db.models.functions import Cast
 
 
 class Abs(Transform):
@@ -155,19 +155,14 @@ class Log(Func):
             return FloatField()
 
     def as_postgresql(self, compiler, connection):
-        # POstgresql doesn't support Log(double precision, double precision),
-        # so convert Floatfields to numeric if present.
-        sources = self.get_source_expressions()
-        if any(isinstance(s.output_field, FloatField) for s in sources):
-            expressions = [
-                Cast(expression, numeric) for expression in self.get_source_expressions()
-            ]
-            clone = self.copy()
-            clone.set_source_expressions(expressions)
-            return super(Log, clone).as_sql(
-                compiler, connection, function='LOG', template='%(function)s(%(expressions)s)'
-            )
-        return self.as_sql(compiler, connection)
+        # Cast FloatField to DecimalField as PostgreSQL doesn't support
+        # MOD(double precision, double precision) by default.
+        clone = self.copy()
+        clone.set_source_expressions([
+            Cast(expression, DecimalField()) if isinstance(expression.output_field, FloatField)
+            else expression for expression in clone.get_source_expressions()
+        ])
+        return clone.as_sql(compiler, connection)
 
 
 class Mod(Func):
@@ -184,16 +179,12 @@ class Mod(Func):
     def as_postgresql(self, compiler, connection):
         # POstgresql doesn't support Log(double precision, double precision),
         # so convert Floatfields to numeric.
-        if self.output_field.get_internal_type() == 'FloatField':
-            expressions = [
-                Cast(expression, numeric) for expression in self.get_source_expressions()
-            ]
-            clone = self.copy()
-            clone.set_source_expressions(expressions)
-            return super(Mod, clone).as_sql(
-                compiler, connection, function='MOD', template='%(function)s(%(expressions)s)'
-            )
-        return self.as_sql(compiler, connection)
+        clone = self.copy()
+        clone.set_source_expressions([
+            Cast(expression, DecimalField()) if isinstance(expression.output_field, FloatField)
+            else expression for expression in clone.get_source_expressions()
+        ])
+        return clone.as_sql(compiler, connection)
 
 
 class Pi(Func):
