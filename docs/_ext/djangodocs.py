@@ -14,11 +14,7 @@ from sphinx.directives import CodeBlock
 from sphinx.domains.std import Cmdoption
 from sphinx.util.console import bold
 from sphinx.util.nodes import set_source_info
-
-try:
-    from sphinx.writers.html import SmartyPantsHTMLTranslator as HTMLTranslator
-except ImportError:  # Sphinx 1.6+
-    from sphinx.writers.html import HTMLTranslator
+from sphinx.writers.html import HTMLTranslator
 
 # RE for option descriptions without a '--' prefix
 simple_option_desc_re = re.compile(
