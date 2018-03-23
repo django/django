@@ -156,11 +156,11 @@ class Log(Func):
 
     def as_postgresql(self, compiler, connection):
         # Cast FloatField to DecimalField as PostgreSQL doesn't support
-        # MOD(double precision, double precision) by default.
+        # LOG(double precision, double precision) by default.
         clone = self.copy()
         clone.set_source_expressions([
             Cast(expression, DecimalField()) if isinstance(expression.output_field, FloatField)
-            else expression for expression in clone.get_source_expressions()
+            else expression for expression in self.get_source_expressions()
         ])
         return clone.as_sql(compiler, connection)
 
@@ -179,12 +179,7 @@ class Mod(Func):
     def as_postgresql(self, compiler, connection):
         # POstgresql doesn't support Log(double precision, double precision),
         # so convert Floatfields to numeric.
-        clone = self.copy()
-        clone.set_source_expressions([
-            Cast(expression, DecimalField()) if isinstance(expression.output_field, FloatField)
-            else expression for expression in clone.get_source_expressions()
-        ])
-        return clone.as_sql(compiler, connection)
+        return as_postgresql_Log_Mod(self, compiler, connection)
 
 
 class Pi(Func):
@@ -268,3 +263,15 @@ class Tan(Transform):
             return DecimalField()
         else:
             return FloatField()
+
+
+def as_postgresql_Log_Mod(obj, compiler, connection):
+    # Cast FloatField to DecimalField as PostgreSQL doesn't support
+    # LOG(double precision, double precision) and
+    # MOD(double precision, double precision) by default.
+    clone = obj.copy()
+    clone.set_source_expressions([
+        Cast(expression, DecimalField()) if isinstance(expression.output_field, FloatField)
+        else expression for expression in obj.get_source_expressions()
+    ])
+    return clone.as_sql(compiler, connection)
