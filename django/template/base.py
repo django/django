@@ -367,19 +367,18 @@ class Lexer:
                 self.verbatim = False
         if in_tag and not self.verbatim:
             if token_string.startswith(VARIABLE_TAG_START):
-                token = Token(TOKEN_VAR, token_string[2:-2].strip(), position, lineno)
+                return Token(TOKEN_VAR, token_string[2:-2].strip(), position, lineno)
             elif token_string.startswith(BLOCK_TAG_START):
                 if block_content[:9] in ('verbatim', 'verbatim '):
                     self.verbatim = 'end%s' % block_content
-                token = Token(TOKEN_BLOCK, block_content, position, lineno)
+                return Token(TOKEN_BLOCK, block_content, position, lineno)
             elif token_string.startswith(COMMENT_TAG_START):
                 content = ''
                 if token_string.find(TRANSLATOR_COMMENT_MARK):
                     content = token_string[2:-2].strip()
-                token = Token(TOKEN_COMMENT, content, position, lineno)
+                return Token(TOKEN_COMMENT, content, position, lineno)
         else:
-            token = Token(TOKEN_TEXT, token_string, position, lineno)
-        return token
+            return Token(TOKEN_TEXT, token_string, position, lineno)
 
 
 class DebugLexer(Lexer):
