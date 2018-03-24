@@ -74,6 +74,7 @@ page::
     objects such as Django's ``QuerySet`` to use a more efficient ``count()``
     method when available.
 
+.. _using-paginator-in-view:
 
 Using ``Paginator`` in a view
 ==============================
@@ -97,7 +98,9 @@ The view function looks like this::
         return render(request, 'list.html', {'contacts': contacts})
 
 In the template :file:`list.html`, you'll want to include navigation between
-pages along with any interesting information from the objects themselves::
+pages along with any interesting information from the objects themselves:
+
+.. code-block:: html+django
 
     {% for contact in contacts %}
         {# Each "contact" is a Contact model object. #}
