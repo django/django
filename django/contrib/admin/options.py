@@ -1,6 +1,7 @@
 import copy
 import json
 import operator
+import re
 from collections import OrderedDict
 from functools import partial, reduce, update_wrapper
 from urllib.parse import quote as urlquote
@@ -1650,7 +1651,14 @@ class ModelAdmin(BaseModelAdmin):
         # Handle POSTed bulk-edit data.
         if request.method == 'POST' and cl.list_editable and '_save' in request.POST:
             FormSet = self.get_changelist_formset(request)
-            formset = cl.formset = FormSet(request.POST, request.FILES, queryset=self.get_queryset(request))
+            # Get the objects ids to filter the queryset to get only the objects that will be updated.
+            regexp = re.compile('{prefix}-(\d+)-id$'.format(prefix=FormSet.get_default_prefix()))
+            objects_id = []
+            for key, value in request.POST.items():
+                if regexp.match(key):
+                    objects_id.append(value)
+            formset = cl.formset = FormSet(request.POST, request.FILES,
+                                           queryset=self.get_queryset(request).filter(pk__in=objects_id))
             if formset.is_valid():
                 changecount = 0
                 for form in formset.forms:
@@ -1672,7 +1680,6 @@ class ModelAdmin(BaseModelAdmin):
                         'name': model_ngettext(opts, changecount),
                     }
                     self.message_user(request, msg, messages.SUCCESS)
-
                 return HttpResponseRedirect(request.get_full_path())
 
         # Handle GET -- construct a formset for display.
