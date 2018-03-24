@@ -126,11 +126,6 @@ pages along with any interesting information from the objects themselves::
         </span>
     </div>
 
-When using the class-based view :class:`~django.views.generic.list.ListView` or
-:class:`~django.views.generic.list.MultipleObjectMixin`, the page object will be in the context
-under the name `page_obj`, so all instances of `contacts` in the template example will need to be
-changed to `page_obj`.
-
 ``Paginator`` objects
 =====================
 
