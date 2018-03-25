@@ -149,7 +149,7 @@ Put the following code in ``chat/templates/chat/index.html``::
         
         document.querySelector('#room-name-submit').onclick = function(e) {
             var roomName = document.querySelector('#room-name-input').value;
-            window.location.pathname = '/chat/' + roomName;
+            window.location.pathname = '/chat/' + roomName + '/';
         };
     </script>
     </html>
