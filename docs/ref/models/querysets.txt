@@ -1857,8 +1857,20 @@ The above example can be rewritten using ``get_or_create()`` like so::
 
 Any keyword arguments passed to ``get_or_create()`` — *except* an optional one
 called ``defaults`` — will be used in a :meth:`get()` call. If an object is
-found, ``get_or_create()`` returns a tuple of that object and ``False``. If
-multiple objects are found, ``get_or_create`` raises
+found, ``get_or_create()`` returns a tuple of that object and ``False``.
+
+You can specify more complex conditions for the retrieved object by chaining
+``get_or_create()`` with ``filter()`` and using :class:`Q objects
+<django.db.models.Q>`. For example, to retrieve Robert or Bob Marley if either
+exists, and create the latter otherwise::
+
+    from django.db.models import Q
+
+    obj, created = Person.objects.filter(
+        Q(first_name='Bob') | Q(first_name='Robert'),
+    ).get_or_create(last_name='Marley', defaults={'first_name': 'Bob'})
+
+If multiple objects are found, ``get_or_create()`` raises
 :exc:`~django.core.exceptions.MultipleObjectsReturned`. If an object is *not*
 found, ``get_or_create()`` will instantiate and save a new object, returning a
 tuple of the new object and ``True``. The new object will be created roughly
