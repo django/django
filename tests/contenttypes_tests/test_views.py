@@ -10,7 +10,8 @@ from django.test import TestCase, override_settings
 
 from .models import (
     Article, Author, FooWithBrokenAbsoluteUrl, FooWithoutUrl, FooWithUrl,
-    ModelWithNullFKToSite, SchemeIncludedURL, Site as MockSite,
+    ModelWithM2MToSite, ModelWithNullFKToSite, SchemeIncludedURL,
+    Site as MockSite,
 )
 
 
@@ -106,6 +107,36 @@ class ContentTypesViewsTests(TestCase):
         url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(ModelWithNullFKToSite).id, obj.pk)
         response = self.client.get(url)
         self.assertRedirects(response, '%s' % obj.get_absolute_url(), fetch_redirect_response=False)
+
+    @mock.patch('django.apps.apps.get_model')
+    def test_shortcut_view_with_site_m2m(self, get_model):
+        """
+        When the object has a ManyToManyField to Site, redirect to the
+        domain of the first site found in the m2m relationship.
+        """
+        get_model.side_effect = lambda *args, **kwargs: MockSite if args[0] == 'sites.Site' else ModelWithM2MToSite
+
+        # get_current_site() will lookup a Site object, so these must match the
+        # domains in the MockSite model.
+        Site.objects.bulk_create([
+            Site(domain='example2.com', name='example2.com'),
+            Site(domain='example3.com', name='example3.com'),
+        ])
+        MockSite.objects.bulk_create([
+            MockSite(pk=1, domain='example1.com'),
+            MockSite(pk=2, domain='example2.com'),
+            MockSite(pk=3, domain='example3.com'),
+        ])
+        ct = ContentType.objects.get_for_model(ModelWithM2MToSite)
+        site_3_obj = ModelWithM2MToSite.objects.create(title='Not Linked to Current Site')
+        site_3_obj.sites.add(MockSite.objects.get(pk=3))
+        expected_url = 'http://example3.com%s' % site_3_obj.get_absolute_url()
+
+        with self.settings(SITE_ID=2):
+            # Redirects to the domain of the first Site found in the m2m
+            # relationship (ordering is arbitrary).
+            response = self.client.get('/shortcut/%s/%s/' % (ct.pk, site_3_obj.pk))
+            self.assertRedirects(response, expected_url, fetch_redirect_response=False)
 
 
 class ShortcutViewTests(TestCase):
