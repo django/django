@@ -230,7 +230,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             cursor.execute(
                 "ALTER SESSION SET CURRENT_SCHEMA = %s" %
                 self.settings_dict['SCHEMA']
-        )
+            )
         cursor.close()
         if 'operators' not in self.__dict__:
             # Ticket #14149: Check whether our LIKE implementation will
