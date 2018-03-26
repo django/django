@@ -104,6 +104,19 @@ class Log(DecimalInputMixin, OutputFieldMixin, Func):
     function = 'LOG'
     arity = 2
 
+    def as_sqlite(self, compiler, connection):
+        if not getattr(connection.ops, 'spatialite', False):
+            return self.as_sql(compiler, connection)
+        # As documented this function ought to be Log(b, x) returning the
+        # logarithm of x to the base b, but it turns out that, unlike all other
+        # backends, the function is actually Log(x, b) like Python's math.log().
+        # Although the spatialite backend inherits from the sqlite3 backend,
+        # the spatialite function takes precedence over the one created using
+        # create_function().
+        clone = self.copy()
+        clone.set_source_expressions(self.get_source_expressions()[::-1])
+        return clone.as_sql(compiler, connection)
+
 
 class Mod(DecimalInputMixin, OutputFieldMixin, Func):
     function = 'MOD'
