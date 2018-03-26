@@ -1,6 +1,24 @@
 import math
+import sys
 
-from django.db.models import FloatField, Func, Transform
+from django.db.models import DecimalField, FloatField, Func, Transform
+from django.db.models.functions import Cast
+
+
+class DecimalInputMixin:
+
+    def as_postgresql(self, compiler, connection):
+        # Cast FloatField to DecimalField as PostgreSQL doesn't support the
+        # following function signatures by default:
+        # - LOG(double precision, double precision)
+        # - MOD(double precision, double precision)
+        output_field = DecimalField(decimal_places=sys.float_info.dig, max_digits=1000)
+        clone = self.copy()
+        clone.set_source_expressions([
+            Cast(expression, output_field) if isinstance(expression.output_field, FloatField)
+            else expression for expression in self.get_source_expressions()
+        ])
+        return clone.as_sql(compiler, connection)
 
 
 class Abs(Transform):
@@ -81,26 +99,16 @@ class Ln(Transform):
     output_field = FloatField()
 
 
-class Log(Func):
+class Log(DecimalInputMixin, Func):
     function = 'LOG'
     arity = 2
     output_field = FloatField()
 
-    def as_postgresql(self, compiler, connection):
-        # Cast FloatField to DecimalField as PostgreSQL doesn't support
-        # LOG(double precision, double precision) by default.
-        return as_postgresql_log_mod(self, compiler, connection)
 
-
-class Mod(Func):
+class Mod(DecimalInputMixin, Func):
     function = 'MOD'
     arity = 2
     output_field = FloatField()
-
-    def as_postgresql(self, compiler, connection):
-        # Cast FloatField to DecimalField as PostgreSQL doesn't support
-        # LOG(double precision, double precision) by default.
-        return as_postgresql_log_mod(self, compiler, connection)
 
 
 class Pi(Func):
@@ -148,21 +156,3 @@ class Tan(Transform):
     function = 'TAN'
     lookup_name = 'tan'
     output_field = FloatField()
-
-
-def as_postgresql_log_mod(obj, compiler, connection):
-        # Cast FloatField to DecimalField as PostgreSQL doesn't support
-        # LOG(double precision, double precision) by default.
-        clone = obj.copy()
-        sources = obj.get_source_expressions()
-        if any(isinstance(s.output_field, FloatField) for s in sources):
-            class Tonumeric(Func):
-
-                def as_postgresql(self, compiler1=compiler, connection1=connection):
-                    return self.as_sql(compiler1, connection1, template='(%(expressions)s)::numeric')
-
-            clone.set_source_expressions([
-                Tonumeric(expression) if isinstance(expression.output_field, FloatField)
-                else expression for expression in sources
-            ])
-        return clone.as_sql(compiler, connection)
