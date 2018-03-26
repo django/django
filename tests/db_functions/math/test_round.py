@@ -11,9 +11,9 @@ class RoundTests(TestCase):
 
     def assertRoundEqual(self, num1, num2):
         if num1 - num2 == 1:
-            self.assertAlmostEqual(num1-1, num2)
+            self.assertAlmostEqual(num1 - 1, num2)
         elif num1 - num2 == -1:
-            self.assertAlmostEqual(num1+1, num2)
+            self.assertAlmostEqual(num1 + 1, num2)
         else:
             self.assertAlmostEqual(num1, num2)
 
