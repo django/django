@@ -15,8 +15,8 @@ class FloorTests(TestCase):
         obj = DecimalModel.objects.annotate(n1_floor=Floor('n1'), n2_floor=Floor('n2')).first()
         self.assertIsInstance(obj.n1_floor, Decimal)
         self.assertIsInstance(obj.n2_floor, Decimal)
-        self.assertEqual(obj.n1_floor, math.floor(obj.n1))
-        self.assertEqual(obj.n2_floor, math.floor(obj.n2))
+        self.assertEqual(obj.n1_floor, Decimal(math.floor(obj.n1)))
+        self.assertEqual(obj.n2_floor, Decimal(math.floor(obj.n2)))
 
     def test_float(self):
         FloatModel.objects.create(f1=-27.5, f2=0.33)

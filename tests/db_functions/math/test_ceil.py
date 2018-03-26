@@ -15,8 +15,8 @@ class CeilTests(TestCase):
         obj = DecimalModel.objects.annotate(n1_ceil=Ceil('n1'), n2_ceil=Ceil('n2')).first()
         self.assertIsInstance(obj.n1_ceil, Decimal)
         self.assertIsInstance(obj.n2_ceil, Decimal)
-        self.assertEqual(obj.n1_ceil, math.ceil(obj.n1))
-        self.assertEqual(obj.n2_ceil, math.ceil(obj.n2))
+        self.assertEqual(obj.n1_ceil, Decimal(math.ceil(obj.n1)))
+        self.assertEqual(obj.n2_ceil, Decimal(math.ceil(obj.n2)))
 
     def test_float(self):
         FloatModel.objects.create(f1=-12.5, f2=21.33)

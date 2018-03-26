@@ -11,8 +11,8 @@ class PowerTests(TestCase):
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('1.0'), n2=Decimal('-0.6'))
         obj = DecimalModel.objects.annotate(n_power=Power('n1', 'n2')).first()
-        self.assertIsInstance(obj.n_power, float)
-        self.assertAlmostEqual(obj.n_power, obj.n1 ** obj.n2)
+        self.assertIsInstance(obj.n_power, Decimal)
+        self.assertAlmostEqual(obj.n_power, Decimal(obj.n1 ** obj.n2))
 
     def test_float(self):
         FloatModel.objects.create(f1=2.3, f2=1.1)
