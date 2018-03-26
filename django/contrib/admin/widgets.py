@@ -371,8 +371,9 @@ SELECT2_TRANSLATIONS = {x.lower(): x for x in [
     'eu', 'fa', 'fi', 'fr', 'gl', 'he', 'hi', 'hr', 'hu', 'id', 'is',
     'it', 'ja', 'km', 'ko', 'lt', 'lv', 'mk', 'ms', 'nb', 'nl', 'pl',
     'pt-BR', 'pt', 'ro', 'ru', 'sk', 'sr-Cyrl', 'sr', 'sv', 'th',
-    'tr', 'uk', 'vi', 'zh-CN', 'zh-TW',
+    'tr', 'uk', 'vi',
 ]}
+SELECT2_TRANSLATIONS.update({'zh-hans': 'zh-CN', 'zh-hant': 'zh-TW'})
 
 
 class AutocompleteMixin:
@@ -412,7 +413,7 @@ class AutocompleteMixin:
             'data-theme': 'admin-autocomplete',
             'data-allow-clear': json.dumps(not self.is_required),
             'data-placeholder': '',  # Allows clearing of the input.
-            'class': attrs['class'] + 'admin-autocomplete',
+            'class': attrs['class'] + (' ' if attrs['class'] else '') + 'admin-autocomplete',
         })
         return attrs
 

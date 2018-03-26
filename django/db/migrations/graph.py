@@ -352,6 +352,14 @@ class MigrationGraph:
     def _nodes_and_edges(self):
         return len(self.nodes), sum(len(node.parents) for node in self.node_map.values())
 
+    def _generate_plan(self, nodes, at_end):
+        plan = []
+        for node in nodes:
+            for migration in self.forwards_plan(node):
+                if migration not in plan and (at_end or migration not in nodes):
+                    plan.append(migration)
+        return plan
+
     def make_state(self, nodes=None, at_end=True, real_apps=None):
         """
         Given a migration node or nodes, return a complete ProjectState for it.
@@ -364,11 +372,7 @@ class MigrationGraph:
             return ProjectState()
         if not isinstance(nodes[0], tuple):
             nodes = [nodes]
-        plan = []
-        for node in nodes:
-            for migration in self.forwards_plan(node):
-                if migration in plan or at_end or migration not in nodes:
-                    plan.append(migration)
+        plan = self._generate_plan(nodes, at_end)
         project_state = ProjectState(real_apps=real_apps)
         for node in plan:
             project_state = self.nodes[node].mutate_state(project_state, preserve=False)

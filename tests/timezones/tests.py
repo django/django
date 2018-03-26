@@ -160,15 +160,18 @@ class LegacyDatabaseTests(TestCase):
         self.assertQuerysetEqual(
             Session.objects.annotate(dt=Min('events__dt')).order_by('dt'),
             [morning_min_dt, afternoon_min_dt],
-            transform=lambda d: d.dt)
+            transform=lambda d: d.dt,
+        )
         self.assertQuerysetEqual(
             Session.objects.annotate(dt=Min('events__dt')).filter(dt__lt=afternoon_min_dt),
             [morning_min_dt],
-            transform=lambda d: d.dt)
+            transform=lambda d: d.dt,
+        )
         self.assertQuerysetEqual(
             Session.objects.annotate(dt=Min('events__dt')).filter(dt__gte=afternoon_min_dt),
             [afternoon_min_dt],
-            transform=lambda d: d.dt)
+            transform=lambda d: d.dt,
+        )
 
     def test_query_datetimes(self):
         Event.objects.create(dt=datetime.datetime(2011, 1, 1, 1, 30, 0))
@@ -389,15 +392,18 @@ class NewDatabaseTests(TestCase):
         self.assertQuerysetEqual(
             Session.objects.annotate(dt=Min('events__dt')).order_by('dt'),
             [morning_min_dt, afternoon_min_dt],
-            transform=lambda d: d.dt)
+            transform=lambda d: d.dt,
+        )
         self.assertQuerysetEqual(
             Session.objects.annotate(dt=Min('events__dt')).filter(dt__lt=afternoon_min_dt),
             [morning_min_dt],
-            transform=lambda d: d.dt)
+            transform=lambda d: d.dt,
+        )
         self.assertQuerysetEqual(
             Session.objects.annotate(dt=Min('events__dt')).filter(dt__gte=afternoon_min_dt),
             [afternoon_min_dt],
-            transform=lambda d: d.dt)
+            transform=lambda d: d.dt,
+        )
 
     @skipUnlessDBFeature('has_zoneinfo_database')
     def test_query_datetimes(self):

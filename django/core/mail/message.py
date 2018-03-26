@@ -397,8 +397,7 @@ class EmailMessage:
                 filename.encode('ascii')
             except UnicodeEncodeError:
                 filename = ('utf-8', '', filename)
-            attachment.add_header('Content-Disposition', 'attachment',
-                                  filename=filename)
+            attachment.add_header('Content-Disposition', 'attachment', filename=filename)
         return attachment
 
     def _set_list_header_if_not_empty(self, msg, header, values):

@@ -173,8 +173,7 @@ class SyndicationFeed:
                     if latest_date is None or item_date > latest_date:
                         latest_date = item_date
 
-        # datetime.now(tz=utc) is slower, as documented in django.utils.timezone.now
-        return latest_date or datetime.datetime.utcnow().replace(tzinfo=utc)
+        return latest_date or datetime.datetime.now(utc)
 
 
 class Enclosure:

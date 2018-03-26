@@ -157,6 +157,25 @@ this, you use the :attr:`Widget.attrs` argument when creating the widget::
         url = forms.URLField()
         comment = forms.CharField(widget=forms.TextInput(attrs={'size': '40'}))
 
+You can also modify a widget in the form definition::
+
+    class CommentForm(forms.Form):
+        name = forms.CharField()
+        url = forms.URLField()
+        comment = forms.CharField()
+
+        name.widget.attrs.update({'class': 'special'})
+        comment.widget.attrs.update(size='40')
+
+Or if the field isn't declared directly on the form (such as model form fields),
+you can use the :attr:`Form.fields` attribute::
+
+    class CommentForm(forms.ModelForm):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.fields['name'].widget.attrs.update({'class': 'special'})
+            self.fields['comment'].widget.attrs.update(size='40')
+
 Django will then include the extra attributes in the rendered output:
 
     >>> f = CommentForm(auto_id=False)
@@ -209,9 +228,9 @@ foundation for custom widgets.
         .. code-block:: pycon
 
             >>> from django import forms
-            >>> name = forms.TextInput(attrs={'size': 10, 'title': 'Your name',})
+            >>> name = forms.TextInput(attrs={'size': 10, 'title': 'Your name'})
             >>> name.render('name', 'A name')
-            '<input title="Your name" type="text" name="name" value="A name" size="10" required>'
+            '<input title="Your name" type="text" name="name" value="A name" size="10">'
 
         If you assign a value of ``True`` or ``False`` to an attribute,
         it will be rendered as an HTML5 boolean attribute::
@@ -769,8 +788,7 @@ that specifies the template used to render each choice. For example, for the
     * ``template_name``: ``'django/forms/widgets/checkbox_select.html'``
     * ``option_template_name``: ``'django/forms/widgets/checkbox_option.html'``
 
-    Similar to :class:`SelectMultiple`, but rendered as a list of check
-    buttons:
+    Similar to :class:`SelectMultiple`, but rendered as a list of checkboxes:
 
     .. code-block:: html
 

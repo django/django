@@ -28,6 +28,13 @@ class DeserializationError(Exception):
         return cls("%s: (%s:pk=%s) field_value was '%s'" % (original_exc, model, fk, field_value))
 
 
+class M2MDeserializationError(Exception):
+    """Something bad happened during deserialization of a ManyToManyField."""
+    def __init__(self, original_exc, pk):
+        self.original_exc = original_exc
+        self.pk = pk
+
+
 class ProgressBar:
     progress_width = 75
 
@@ -235,3 +242,42 @@ def build_instance(Model, data, db):
         except Model.DoesNotExist:
             pass
     return obj
+
+
+def deserialize_m2m_values(field, field_value, using):
+    model = field.remote_field.model
+    if hasattr(model._default_manager, 'get_by_natural_key'):
+        def m2m_convert(value):
+            if hasattr(value, '__iter__') and not isinstance(value, str):
+                return model._default_manager.db_manager(using).get_by_natural_key(*value).pk
+            else:
+                return model._meta.pk.to_python(value)
+    else:
+        def m2m_convert(v):
+            return model._meta.pk.to_python(v)
+
+    try:
+        values = []
+        for pk in field_value:
+            values.append(m2m_convert(pk))
+        return values
+    except Exception as e:
+        raise M2MDeserializationError(e, pk)
+
+
+def deserialize_fk_value(field, field_value, using):
+    if field_value is None:
+        return None
+    model = field.remote_field.model
+    default_manager = model._default_manager
+    field_name = field.remote_field.field_name
+    if (hasattr(default_manager, 'get_by_natural_key') and
+            hasattr(field_value, '__iter__') and not isinstance(field_value, str)):
+        obj = default_manager.db_manager(using).get_by_natural_key(*field_value)
+        value = getattr(obj, field_name)
+        # If this is a natural foreign key to an object that has a FK/O2O as
+        # the foreign key, use the FK value.
+        if model._meta.pk.remote_field:
+            value = value.pk
+        return value
+    return model._meta.get_field(field_name).to_python(field_value)

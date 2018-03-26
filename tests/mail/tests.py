@@ -1300,7 +1300,8 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
 
     @override_settings(
         EMAIL_HOST_USER="not empty username",
-        EMAIL_HOST_PASSWORD="not empty password")
+        EMAIL_HOST_PASSWORD='not empty password',
+    )
     def test_email_authentication_use_settings(self):
         backend = smtp.EmailBackend()
         self.assertEqual(backend.username, 'not empty username')
@@ -1308,7 +1309,8 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
 
     @override_settings(
         EMAIL_HOST_USER="not empty username",
-        EMAIL_HOST_PASSWORD="not empty password")
+        EMAIL_HOST_PASSWORD='not empty password',
+    )
     def test_email_authentication_override_settings(self):
         backend = smtp.EmailBackend(username='username', password='password')
         self.assertEqual(backend.username, 'username')
@@ -1316,7 +1318,8 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
 
     @override_settings(
         EMAIL_HOST_USER="not empty username",
-        EMAIL_HOST_PASSWORD="not empty password")
+        EMAIL_HOST_PASSWORD='not empty password',
+    )
     def test_email_disabled_authentication(self):
         backend = smtp.EmailBackend(username='', password='')
         self.assertEqual(backend.username, '')

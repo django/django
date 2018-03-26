@@ -258,18 +258,21 @@ class InlineAdminFormSet:
 
     def fields(self):
         fk = getattr(self.formset, "fk", None)
+        empty_form = self.formset.empty_form
+        meta_labels = empty_form._meta.labels or {}
+        meta_help_texts = empty_form._meta.help_texts or {}
         for i, field_name in enumerate(flatten_fieldsets(self.fieldsets)):
             if fk and fk.name == field_name:
                 continue
             if field_name in self.readonly_fields:
                 yield {
-                    'label': label_for_field(field_name, self.opts.model, self.opts),
+                    'label': meta_labels.get(field_name) or label_for_field(field_name, self.opts.model, self.opts),
                     'widget': {'is_hidden': False},
                     'required': False,
-                    'help_text': help_text_for_field(field_name, self.opts.model),
+                    'help_text': meta_help_texts.get(field_name) or help_text_for_field(field_name, self.opts.model),
                 }
             else:
-                form_field = self.formset.empty_form.fields[field_name]
+                form_field = empty_form.fields[field_name]
                 label = form_field.label
                 if label is None:
                     label = label_for_field(field_name, self.opts.model, self.opts)

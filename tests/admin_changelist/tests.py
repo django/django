@@ -905,11 +905,8 @@ class AdminLogNodeTestCase(TestCase):
         """
         context = Context({'user': CustomIdUser()})
         template_string = '{% load log %}{% get_admin_log 10 as admin_log for_user user %}'
-
         template = Template(template_string)
-
-        # Rendering should be u'' since this templatetag just logs,
-        # it doesn't render any string.
+        # This template tag just logs.
         self.assertEqual(template.render(context), '')
 
     def test_get_admin_log_templatetag_no_user(self):

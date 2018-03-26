@@ -26,7 +26,7 @@ class LinkProxy(Link):
 
 class Place(models.Model):
     name = models.CharField(max_length=100)
-    links = GenericRelation(Link)
+    links = GenericRelation(Link, related_query_name='places')
     link_proxy = GenericRelation(LinkProxy)
 
     def __str__(self):
@@ -169,7 +169,7 @@ class HasLinkThing(HasLinks):
 
 
 class A(models.Model):
-    flag = models.NullBooleanField()
+    flag = models.BooleanField(null=True)
     content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')

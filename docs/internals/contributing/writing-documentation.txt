@@ -45,11 +45,17 @@ documentation is transformed into HTML, PDF, and any other output format.
 __ http://sphinx-doc.org/
 __ http://docutils.sourceforge.net/
 
-To actually build the documentation locally, you'll currently need to install
-Sphinx -- ``pip install Sphinx`` should do the trick.
+To build the documentation locally, install Sphinx:
 
-Then, building the HTML is easy; just ``make html`` (or ``make.bat html`` on
-Windows) from the ``docs`` directory.
+.. console::
+
+     $ pip install Sphinx
+
+Then from the ``docs`` directory, build the HTML:
+
+.. console::
+
+     $ make html
 
 To get started contributing, you'll want to read the :ref:`reStructuredText
 Primer <sphinx:rst-primer>`. After that, you'll want to read about the

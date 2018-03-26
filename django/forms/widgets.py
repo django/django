@@ -621,12 +621,12 @@ class ChoiceWidget(Widget):
             'attrs': option_attrs,
             'type': self.input_type,
             'template_name': self.option_template_name,
+            'wrap_label': True,
         }
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         context['widget']['optgroups'] = self.optgroups(name, context['widget']['value'], attrs)
-        context['wrap_label'] = True
         return context
 
     def id_for_label(self, id_, index='0'):

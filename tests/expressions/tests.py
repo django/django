@@ -373,7 +373,8 @@ class BasicExpressionsTests(TestCase):
         # other lookups could not reuse.
         qs = Employee.objects.filter(
             company_ceo_set__num_chairs=F('company_ceo_set__num_employees'),
-            company_ceo_set__num_chairs__gte=1)
+            company_ceo_set__num_chairs__gte=1,
+        )
         self.assertEqual(str(qs.query).count('JOIN'), 1)
 
     def test_ticket_18375_kwarg_ordering_2(self):
@@ -416,6 +417,10 @@ class BasicExpressionsTests(TestCase):
 
         outer = Employee.objects.annotate(is_point_of_contact=Exists(inner))
         self.assertIs(outer.exists(), True)
+
+    def test_exist_single_field_output_field(self):
+        queryset = Company.objects.values('pk')
+        self.assertIsInstance(Exists(queryset).output_field, models.BooleanField)
 
     def test_subquery(self):
         Company.objects.filter(name='Example Inc.').update(
@@ -789,17 +794,20 @@ class ExpressionsTests(TestCase):
         self.assertQuerysetEqual(
             Employee.objects.filter(firstname__contains=F('lastname')),
             ["<Employee: %Joh\\nny %Joh\\n>", "<Employee: Jean-Claude Claude>", "<Employee: Johnny John>"],
-            ordered=False)
+            ordered=False,
+        )
 
         self.assertQuerysetEqual(
             Employee.objects.filter(firstname__startswith=F('lastname')),
             ["<Employee: %Joh\\nny %Joh\\n>", "<Employee: Johnny John>"],
-            ordered=False)
+            ordered=False,
+        )
 
         self.assertQuerysetEqual(
             Employee.objects.filter(firstname__endswith=F('lastname')),
             ["<Employee: Jean-Claude Claude>"],
-            ordered=False)
+            ordered=False,
+        )
 
     def test_insensitive_patterns_escape(self):
         r"""
@@ -821,17 +829,20 @@ class ExpressionsTests(TestCase):
         self.assertQuerysetEqual(
             Employee.objects.filter(firstname__icontains=F('lastname')),
             ["<Employee: %Joh\\nny %joh\\n>", "<Employee: Jean-Claude claude>", "<Employee: Johnny john>"],
-            ordered=False)
+            ordered=False,
+        )
 
         self.assertQuerysetEqual(
             Employee.objects.filter(firstname__istartswith=F('lastname')),
             ["<Employee: %Joh\\nny %joh\\n>", "<Employee: Johnny john>"],
-            ordered=False)
+            ordered=False,
+        )
 
         self.assertQuerysetEqual(
             Employee.objects.filter(firstname__iendswith=F('lastname')),
             ["<Employee: Jean-Claude claude>"],
-            ordered=False)
+            ordered=False,
+        )
 
 
 class ExpressionsNumericTests(TestCase):

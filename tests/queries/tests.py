@@ -2235,7 +2235,8 @@ class ValuesQuerysetTests(TestCase):
         # testing for ticket 14930 issues
         qs = Number.objects.extra(
             select={'value_plus_one': 'num+1', 'value_minus_one': 'num-1'},
-            order_by=['value_minus_one'])
+            order_by=['value_minus_one'],
+        )
         qs = qs.values('num')
 
     def test_extra_select_params_values_order_in_extra(self):
@@ -2243,7 +2244,8 @@ class ValuesQuerysetTests(TestCase):
         qs = Number.objects.extra(
             select={'value_plus_x': 'num+%s'},
             select_params=[1],
-            order_by=['value_plus_x'])
+            order_by=['value_plus_x'],
+        )
         qs = qs.filter(num=72)
         qs = qs.values('num')
         self.assertSequenceEqual(qs, [{'num': 72}])

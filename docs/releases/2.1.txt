@@ -194,6 +194,8 @@ Migrations
 
 * Added support for serialization of ``functools.partialmethod`` objects.
 
+* To support frozen environments, migrations may be loaded from ``.pyc`` files.
+
 Models
 ~~~~~~
 
@@ -204,10 +206,15 @@ Models
 
 * A number of new text database functions are added:
   :class:`~django.db.models.functions.Chr`,
-  :class:`~django.db.models.functions.Ord`,
   :class:`~django.db.models.functions.Left`,
-  :class:`~django.db.models.functions.Right`, and
-  :class:`~django.db.models.functions.Replace`.
+  :class:`~django.db.models.functions.LPad`,
+  :class:`~django.db.models.functions.LTrim`,
+  :class:`~django.db.models.functions.Ord`,
+  :class:`~django.db.models.functions.Replace`,
+  :class:`~django.db.models.functions.Right`,
+  :class:`~django.db.models.functions.RPad`,
+  :class:`~django.db.models.functions.RTrim`, and
+  :class:`~django.db.models.functions.Trim`.
 
 * The new :class:`~django.db.models.functions.TruncWeek` function truncates
   :class:`~django.db.models.DateField` and
@@ -220,6 +227,10 @@ Models
 
 * :class:`~django.contrib.contenttypes.fields.GenericForeignKey` fields can now
   be used in non-nested lookups
+
+* :class:`~django.db.models.BooleanField` can now be ``null=True``. This is
+  encouraged instead of :class:`~django.db.models.NullBooleanField`, which will
+  likely be deprecated in the future.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -279,6 +290,9 @@ Database backend API
 * ``DatabaseOperations.distinct_sql()`` now requires an additional ``params``
   argument and returns a tuple of SQL and parameters instead of a SQL string.
 
+* ``DatabaseFeatures.introspected_boolean_field_type`` is changed from a method
+  to a property.
+
 :mod:`django.contrib.gis`
 -------------------------
 
@@ -313,6 +327,15 @@ If you want to continue to allow those passwords to be used, you'll
 have to define the :setting:`PASSWORD_HASHERS` setting (if you don't already)
 and include ``'django.contrib.auth.hashers.BCryptPasswordHasher'``.
 
+Moved ``wrap_label`` widget template context variable
+-----------------------------------------------------
+
+To fix the lack of ``<label>`` when using ``RadioSelect`` and
+``CheckboxSelectMultiple`` with ``MultiWidget``, the ``wrap_label`` context
+variable now appears as an attribute of each option. For example, in a custom
+``input_option.html`` template, change ``{% if wrap_label %}`` to
+``{% if widget.wrap_label %}``.
+
 Miscellaneous
 -------------
 
@@ -339,6 +362,17 @@ Miscellaneous
 * The value of :class:`~django.forms.SelectDateWidget`'s empty options is
   changed from 0 to an empty string, which mainly may require some adjustments
   in tests that compare HTML.
+
+* :meth:`.User.has_usable_password` and the
+  :func:`~django.contrib.auth.hashers.is_password_usable` function no longer
+  return ``False`` if the password is ``None`` or an empty string, or if the
+  password uses a hasher that's not in the :setting:`PASSWORD_HASHERS` setting.
+  This undocumented behavior was a regression in Django 1.6 and prevented users
+  with such passwords from requesting a password reset. Audit your code to
+  confirm that your usage of these APIs don't rely on the old behavior.
+
+* Since migrations are now loaded from ``.pyc`` files, you might need to delete
+  them if you're working in a mixed Python 2 and Python 3 environment.
 
 .. _deprecated-features-2.1:
 

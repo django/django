@@ -1,10 +1,10 @@
 import os
-import unittest
 from unittest import mock, skipUnless
 
 from django.conf import settings
 from django.contrib.gis.geoip2 import HAS_GEOIP2
 from django.contrib.gis.geos import GEOSGeometry
+from django.test import SimpleTestCase
 
 if HAS_GEOIP2:
     from django.contrib.gis.geoip2 import GeoIP2, GeoIP2Exception
@@ -18,7 +18,7 @@ if HAS_GEOIP2:
     HAS_GEOIP2 and getattr(settings, "GEOIP_PATH", None),
     "GeoIP is required along with the GEOIP_PATH setting."
 )
-class GeoIPTest(unittest.TestCase):
+class GeoIPTest(SimpleTestCase):
     addr = '128.249.1.1'
     fqdn = 'tmc.edu'
 
@@ -52,6 +52,12 @@ class GeoIPTest(unittest.TestCase):
                 e = TypeError
             with self.assertRaises(e):
                 GeoIP2(bad, 0)
+
+    def test_no_database_file(self):
+        invalid_path = os.path.join(os.path.dirname(__file__), 'data')
+        msg = 'Could not load a database from %s.' % invalid_path
+        with self.assertRaisesMessage(GeoIP2Exception, msg):
+            GeoIP2(invalid_path)
 
     def test02_bad_query(self):
         "GeoIP query parameter checking."

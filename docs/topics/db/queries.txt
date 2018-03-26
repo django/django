@@ -1225,13 +1225,11 @@ be found in the :doc:`related objects reference </ref/models/relations>`.
     Replace the set of related objects.
 
 To assign the members of a related set, use the ``set()`` method with an
-iterable of object instances or a list of primary key values. For example::
+iterable of object instances. For example, if ``e1`` and ``e2`` are ``Entry``
+instances::
 
     b = Blog.objects.get(id=1)
     b.entry_set.set([e1, e2])
-
-In this example, ``e1`` and ``e2`` can be full Entry instances, or integer
-primary key values.
 
 If the ``clear()`` method is available, any pre-existing objects will be
 removed from the ``entry_set`` before all objects in the iterable (in this
@@ -1249,9 +1247,9 @@ Many-to-many relationships
 --------------------------
 
 Both ends of a many-to-many relationship get automatic API access to the other
-end. The API works just as a "backward" one-to-many relationship, above.
+end. The API works similar to a "backward" one-to-many relationship, above.
 
-The only difference is in the attribute naming: The model that defines the
+One difference is in the attribute naming: The model that defines the
 :class:`~django.db.models.ManyToManyField` uses the attribute name of that
 field itself, whereas the "reverse" model uses the lowercased model name of the
 original model, plus ``'_set'`` (just like reverse one-to-many relationships).
@@ -1272,6 +1270,15 @@ Like :class:`~django.db.models.ForeignKey`,
 if the :class:`~django.db.models.ManyToManyField` in ``Entry`` had specified
 ``related_name='entries'``, then each ``Author`` instance would have an
 ``entries`` attribute instead of ``entry_set``.
+
+Another difference from one-to-many relationships is that in addition to model
+instances,  the ``add()``, ``set()``, and ``remove()`` methods on many-to-many
+relationships accept primary key values. For example, if ``e1`` and ``e2`` are
+``Entry`` instances, then these ``set()`` calls work identically::
+
+    a = Author.objects.get(id=5)
+    a.entry_set.set([e1, e2])
+    a.entry_set.set([e1.pk, e2.pk])
 
 One-to-one relationships
 ------------------------

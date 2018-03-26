@@ -92,7 +92,6 @@ class IntrospectionTests(TransactionTestCase):
             [30, 30, 254]
         )
 
-    @skipUnlessDBFeature('can_introspect_null')
     def test_get_table_description_nullable(self):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)

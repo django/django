@@ -158,6 +158,13 @@ class UserManagerTestCase(TestCase):
 
 class AbstractBaseUserTests(TestCase):
 
+    def test_has_usable_password(self):
+        """
+        Passwords are usable even if they don't correspond to a hasher in
+        settings.PASSWORD_HASHERS.
+        """
+        self.assertIs(User(password='some-gibbberish').has_usable_password(), True)
+
     def test_normalize_username(self):
         self.assertEqual(IntegerUsernameUser().normalize_username(123), 123)
 

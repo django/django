@@ -12,6 +12,7 @@ from django.contrib.auth.forms import (
 )
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect, QueryDict
 from django.shortcuts import resolve_url
 from django.urls import reverse_lazy
@@ -285,7 +286,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
             # urlsafe_base64_decode() decodes to bytestring
             uid = urlsafe_base64_decode(uidb64).decode()
             user = UserModel._default_manager.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
+        except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist, ValidationError):
             user = None
         return user
 

@@ -283,9 +283,10 @@ class NonAggregateAnnotationTestCase(TestCase):
 
     def test_annotation_reverse_m2m(self):
         books = Book.objects.annotate(
-            store_name=F('store__name')).filter(
-            name='Practical Django Projects').order_by(
-            'store_name')
+            store_name=F('store__name'),
+        ).filter(
+            name='Practical Django Projects',
+        ).order_by('store_name')
 
         self.assertQuerysetEqual(
             books, [
@@ -497,7 +498,8 @@ class NonAggregateAnnotationTestCase(TestCase):
                 F('ticker_name'),
                 F('description'),
                 Value('No Tag'),
-                function='COALESCE')
+                function='COALESCE',
+            )
         ).annotate(
             tagline_lower=Lower(F('tagline'), output_field=CharField())
         ).order_by('name')
@@ -519,13 +521,15 @@ class NonAggregateAnnotationTestCase(TestCase):
         books = Book.objects.annotate(
             is_book=Value(True, output_field=BooleanField()),
             is_pony=Value(False, output_field=BooleanField()),
-            is_none=Value(None, output_field=NullBooleanField()),
+            is_none=Value(None, output_field=BooleanField(null=True)),
+            is_none_old=Value(None, output_field=NullBooleanField()),
         )
         self.assertGreater(len(books), 0)
         for book in books:
             self.assertIs(book.is_book, True)
             self.assertIs(book.is_pony, False)
             self.assertIsNone(book.is_none)
+            self.assertIsNone(book.is_none_old)
 
     def test_annotation_in_f_grouped_by_annotation(self):
         qs = (

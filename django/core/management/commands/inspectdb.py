@@ -142,11 +142,8 @@ class Command(BaseCommand):
                     # Add 'null' and 'blank', if the 'null_ok' flag was present in the
                     # table description.
                     if row[6]:  # If it's NULL...
-                        if field_type == 'BooleanField(':
-                            field_type = 'NullBooleanField('
-                        else:
-                            extra_params['blank'] = True
-                            extra_params['null'] = True
+                        extra_params['blank'] = True
+                        extra_params['null'] = True
 
                     field_desc = '%s = %s%s' % (
                         att_name,
@@ -272,19 +269,24 @@ class Command(BaseCommand):
         to the given database table name.
         """
         unique_together = []
+        has_unsupported_constraint = False
         for params in constraints.values():
             if params['unique']:
                 columns = params['columns']
+                if None in columns:
+                    has_unsupported_constraint = True
+                columns = [x for x in columns if x is not None]
                 if len(columns) > 1:
-                    # we do not want to include the u"" or u'' prefix
-                    # so we build the string rather than interpolate the tuple
-                    tup = '(' + ', '.join("'%s'" % column_to_field_name[c] for c in columns) + ')'
-                    unique_together.append(tup)
+                    unique_together.append(str(tuple(column_to_field_name[c] for c in columns)))
         managed_comment = "  # Created from a view. Don't remove." if is_view else ""
-        meta = ["",
-                "    class Meta:",
-                "        managed = False%s" % managed_comment,
-                "        db_table = '%s'" % table_name]
+        meta = ['']
+        if has_unsupported_constraint:
+            meta.append('    # A unique constraint could not be introspected.')
+        meta += [
+            '    class Meta:',
+            '        managed = False%s' % managed_comment,
+            '        db_table = %r' % table_name
+        ]
         if unique_together:
             tup = '(' + ', '.join(unique_together) + ',)'
             meta += ["        unique_together = %s" % tup]

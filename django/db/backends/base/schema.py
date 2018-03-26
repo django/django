@@ -219,10 +219,8 @@ class BaseDatabaseSchemaEditor:
         # If it's a callable, call it
         if callable(default):
             default = default()
-        # Run it through the field's get_db_prep_save method so we can send it
-        # to the database.
-        default = field.get_db_prep_save(default, self.connection)
-        return default
+        # Convert the value so it can be sent to the database.
+        return field.get_db_prep_save(default, self.connection)
 
     def quote_value(self, value):
         """
@@ -462,7 +460,7 @@ class BaseDatabaseSchemaEditor:
         # Reset connection if required
         if self.connection.features.connection_persists_old_columns:
             self.connection.close()
-        # Remove all deferred statements referencing the deleted table.
+        # Remove all deferred statements referencing the deleted column.
         for sql in list(self.deferred_sql):
             if isinstance(sql, Statement) and sql.references_column(model._meta.db_table, field.column):
                 self.deferred_sql.remove(sql)

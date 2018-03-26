@@ -117,49 +117,18 @@ def Deserializer(object_list, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False
 
             # Handle M2M relations
             if field.remote_field and isinstance(field.remote_field, models.ManyToManyRel):
-                model = field.remote_field.model
-                if hasattr(model._default_manager, 'get_by_natural_key'):
-                    def m2m_convert(value):
-                        if hasattr(value, '__iter__') and not isinstance(value, str):
-                            return model._default_manager.db_manager(using).get_by_natural_key(*value).pk
-                        else:
-                            return model._meta.pk.to_python(value)
-                else:
-                    def m2m_convert(v):
-                        return model._meta.pk.to_python(v)
-
                 try:
-                    m2m_data[field.name] = []
-                    for pk in field_value:
-                        m2m_data[field.name].append(m2m_convert(pk))
-                except Exception as e:
-                    raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), pk)
-
+                    values = base.deserialize_m2m_values(field, field_value, using)
+                except base.M2MDeserializationError as e:
+                    raise base.DeserializationError.WithData(e.original_exc, d['model'], d.get('pk'), e.pk)
+                m2m_data[field.name] = values
             # Handle FK fields
             elif field.remote_field and isinstance(field.remote_field, models.ManyToOneRel):
-                model = field.remote_field.model
-                if field_value is not None:
-                    try:
-                        default_manager = model._default_manager
-                        field_name = field.remote_field.field_name
-                        if hasattr(default_manager, 'get_by_natural_key'):
-                            if hasattr(field_value, '__iter__') and not isinstance(field_value, str):
-                                obj = default_manager.db_manager(using).get_by_natural_key(*field_value)
-                                value = getattr(obj, field.remote_field.field_name)
-                                # If this is a natural foreign key to an object that
-                                # has a FK/O2O as the foreign key, use the FK value
-                                if model._meta.pk.remote_field:
-                                    value = value.pk
-                            else:
-                                value = model._meta.get_field(field_name).to_python(field_value)
-                            data[field.attname] = value
-                        else:
-                            data[field.attname] = model._meta.get_field(field_name).to_python(field_value)
-                    except Exception as e:
-                        raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), field_value)
-                else:
-                    data[field.attname] = None
-
+                try:
+                    value = base.deserialize_fk_value(field, field_value, using)
+                except Exception as e:
+                    raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), field_value)
+                data[field.attname] = value
             # Handle all other fields
             else:
                 try:
