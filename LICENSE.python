@@ -1,3 +1,14 @@
+Django is licensed under the three-clause BSD license; see the file
+LICENSE for details.
+
+Django includes code from the Python standard library, which is licensed under
+the Python license, a permissive open source license. The copyright and license
+is included below for compliance with Python's terms.
+
+----------------------------------------------------------------------
+
+Copyright (c) 2001-present Python Software Foundation; All Rights Reserved
+
 A. HISTORY OF THE SOFTWARE
 ==========================
 
