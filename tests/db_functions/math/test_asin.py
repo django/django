@@ -13,12 +13,16 @@ class ASinTests(TestCase):
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('0.9'), n2=Decimal('0.6'))
         obj = DecimalModel.objects.annotate(n1_asin=ASin('n1'), n2_asin=ASin('n2')).first()
+        self.assertIsInstance(obj.n1_asin, float)
+        self.assertIsInstance(obj.n2_asin, float)
         self.assertAlmostEqual(obj.n1_asin, math.asin(obj.n1))
         self.assertAlmostEqual(obj.n2_asin, math.asin(obj.n2))
 
     def test_float(self):
         FloatModel.objects.create(f1=-0.5, f2=0.87)
         obj = FloatModel.objects.annotate(f1_asin=ASin('f1'), f2_asin=ASin('f2')).first()
+        self.assertIsInstance(obj.f1_asin, float)
+        self.assertIsInstance(obj.f2_asin, float)
         self.assertAlmostEqual(obj.f1_asin, math.asin(obj.f1))
         self.assertAlmostEqual(obj.f2_asin, math.asin(obj.f2))
 
@@ -29,6 +33,9 @@ class ASinTests(TestCase):
             normal_asin=ASin('normal'),
             big_asin=ASin('big'),
         ).first()
+        self.assertIsInstance(obj.small_asin, float)
+        self.assertIsInstance(obj.normal_asin, float)
+        self.assertIsInstance(obj.big_asin, float)
         self.assertAlmostEqual(obj.small_asin, math.asin(obj.small))
         self.assertAlmostEqual(obj.normal_asin, math.asin(obj.normal))
         self.assertAlmostEqual(obj.big_asin, math.asin(obj.big))

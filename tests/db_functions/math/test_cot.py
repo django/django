@@ -13,12 +13,16 @@ class CotTests(TestCase):
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('-12.9'), n2=Decimal('0.6'))
         obj = DecimalModel.objects.annotate(n1_cot=Cot('n1'), n2_cot=Cot('n2')).first()
+        self.assertIsInstance(obj.n1_cot, float)
+        self.assertIsInstance(obj.n2_cot, float)
         self.assertAlmostEqual(obj.n1_cot, 1 / math.tan(obj.n1))
         self.assertAlmostEqual(obj.n2_cot, 1 / math.tan(obj.n2))
 
     def test_float(self):
         FloatModel.objects.create(f1=-27.5, f2=0.33)
         obj = FloatModel.objects.annotate(f1_cot=Cot('f1'), f2_cot=Cot('f2')).first()
+        self.assertIsInstance(obj.f1_cot, float)
+        self.assertIsInstance(obj.f2_cot, float)
         self.assertAlmostEqual(obj.f1_cot, 1 / math.tan(obj.f1))
         self.assertAlmostEqual(obj.f2_cot, 1 / math.tan(obj.f2))
 
@@ -29,6 +33,9 @@ class CotTests(TestCase):
             normal_cot=Cot('normal'),
             big_cot=Cot('big'),
         ).first()
+        self.assertIsInstance(obj.small_cot, float)
+        self.assertIsInstance(obj.normal_cot, float)
+        self.assertIsInstance(obj.big_cot, float)
         self.assertAlmostEqual(obj.small_cot, 1 / math.tan(obj.small))
         self.assertAlmostEqual(obj.normal_cot, 1 / math.tan(obj.normal))
         self.assertAlmostEqual(obj.big_cot, 1 / math.tan(obj.big))

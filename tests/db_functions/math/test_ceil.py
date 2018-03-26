@@ -13,12 +13,16 @@ class CeilTests(TestCase):
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('12.9'), n2=Decimal('0.6'))
         obj = DecimalModel.objects.annotate(n1_ceil=Ceil('n1'), n2_ceil=Ceil('n2')).first()
+        self.assertIsInstance(obj.n1_ceil, Decimal)
+        self.assertIsInstance(obj.n2_ceil, Decimal)
         self.assertEqual(obj.n1_ceil, math.ceil(obj.n1))
         self.assertEqual(obj.n2_ceil, math.ceil(obj.n2))
 
     def test_float(self):
         FloatModel.objects.create(f1=-12.5, f2=21.33)
         obj = FloatModel.objects.annotate(f1_ceil=Ceil('f1'), f2_ceil=Ceil('f2')).first()
+        self.assertIsInstance(obj.f1_ceil, float)
+        self.assertIsInstance(obj.f2_ceil, float)
         self.assertEqual(obj.f1_ceil, math.ceil(obj.f1))
         self.assertEqual(obj.f2_ceil, math.ceil(obj.f2))
 
@@ -29,6 +33,9 @@ class CeilTests(TestCase):
             normal_ceil=Ceil('normal'),
             big_ceil=Ceil('big'),
         ).first()
+        self.assertIsInstance(obj.small_ceil, int)
+        self.assertIsInstance(obj.normal_ceil, int)
+        self.assertIsInstance(obj.big_ceil, int)
         self.assertEqual(obj.small_ceil, math.ceil(obj.small))
         self.assertEqual(obj.normal_ceil, math.ceil(obj.normal))
         self.assertEqual(obj.big_ceil, math.ceil(obj.big))

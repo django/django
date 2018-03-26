@@ -12,12 +12,16 @@ class AbsTests(TestCase):
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('-0.8'), n2=Decimal('1.2'))
         obj = DecimalModel.objects.annotate(n1_abs=Abs('n1'), n2_abs=Abs('n2')).first()
+        self.assertIsInstance(obj.n1_abs, Decimal)
+        self.assertIsInstance(obj.n2_abs, Decimal)
         self.assertEqual(obj.n1, -obj.n1_abs)
         self.assertEqual(obj.n2, obj.n2_abs)
 
     def test_float(self):
         obj = FloatModel.objects.create(f1=-0.5, f2=12)
         obj = FloatModel.objects.annotate(f1_abs=Abs('f1'), f2_abs=Abs('f2')).first()
+        self.assertIsInstance(obj.f1_abs, float)
+        self.assertIsInstance(obj.f2_abs, float)
         self.assertEqual(obj.f1, -obj.f1_abs)
         self.assertEqual(obj.f2, obj.f2_abs)
 
@@ -28,6 +32,9 @@ class AbsTests(TestCase):
             normal_abs=Abs('normal'),
             big_abs=Abs('big'),
         ).first()
+        self.assertIsInstance(obj.small_abs, int)
+        self.assertIsInstance(obj.normal_abs, int)
+        self.assertIsInstance(obj.big_abs, int)
         self.assertEqual(obj.small, obj.small_abs)
         self.assertEqual(obj.normal, obj.normal_abs)
         self.assertEqual(obj.big, -obj.big_abs)

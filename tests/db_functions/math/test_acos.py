@@ -13,12 +13,16 @@ class ACosTests(TestCase):
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('-0.9'), n2=Decimal('0.6'))
         obj = DecimalModel.objects.annotate(n1_acos=ACos('n1'), n2_acos=ACos('n2')).first()
+        self.assertIsInstance(obj.n1_acos, float)
+        self.assertIsInstance(obj.n2_acos, float)
         self.assertAlmostEqual(obj.n1_acos, math.acos(obj.n1))
         self.assertAlmostEqual(obj.n2_acos, math.acos(obj.n2))
 
     def test_float(self):
         FloatModel.objects.create(f1=-0.5, f2=0.33)
         obj = FloatModel.objects.annotate(f1_acos=ACos('f1'), f2_acos=ACos('f2')).first()
+        self.assertIsInstance(obj.f1_acos, float)
+        self.assertIsInstance(obj.f2_acos, float)
         self.assertAlmostEqual(obj.f1_acos, math.acos(obj.f1))
         self.assertAlmostEqual(obj.f2_acos, math.acos(obj.f2))
 
@@ -29,6 +33,9 @@ class ACosTests(TestCase):
             normal_acos=ACos('normal'),
             big_acos=ACos('big'),
         ).first()
+        self.assertIsInstance(obj.small_acos, float)
+        self.assertIsInstance(obj.normal_acos, float)
+        self.assertIsInstance(obj.big_acos, float)
         self.assertAlmostEqual(obj.small_acos, math.acos(obj.small))
         self.assertAlmostEqual(obj.normal_acos, math.acos(obj.normal))
         self.assertAlmostEqual(obj.big_acos, math.acos(obj.big))
