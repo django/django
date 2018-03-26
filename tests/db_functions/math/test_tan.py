@@ -12,26 +12,26 @@ class TanTests(TestCase):
 
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('-12.9'), n2=Decimal('0.6'))
-        obj = DecimalModel.objects.annotate(n1_d=Tan('n1'), n2_d=Tan('n2')).first()
-        self.assertAlmostEqual(obj.n1_d, math.tan(obj.n1))
-        self.assertAlmostEqual(obj.n2_d, math.tan(obj.n2))
+        obj = DecimalModel.objects.annotate(n1_tan=Tan('n1'), n2_tan=Tan('n2')).first()
+        self.assertAlmostEqual(obj.n1_tan, math.tan(obj.n1))
+        self.assertAlmostEqual(obj.n2_tan, math.tan(obj.n2))
 
     def test_float(self):
         FloatModel.objects.create(f1=-27.5, f2=0.33)
-        obj = FloatModel.objects.annotate(f1_d=Tan('f1'), f2_d=Tan('f2')).first()
-        self.assertAlmostEqual(obj.f1_d, math.tan(obj.f1))
-        self.assertAlmostEqual(obj.f2_d, math.tan(obj.f2))
+        obj = FloatModel.objects.annotate(f1_tan=Tan('f1'), f2_tan=Tan('f2')).first()
+        self.assertAlmostEqual(obj.f1_tan, math.tan(obj.f1))
+        self.assertAlmostEqual(obj.f2_tan, math.tan(obj.f2))
 
     def test_integer(self):
         IntegerModel.objects.create(small=-20, normal=15, big=-1)
         obj = IntegerModel.objects.annotate(
-            small_d=Tan('small'),
-            normal_d=Tan('normal'),
-            big_d=Tan('big'),
+            small_tan=Tan('small'),
+            normal_tan=Tan('normal'),
+            big_tan=Tan('big'),
         ).first()
-        self.assertAlmostEqual(obj.small_d, math.tan(obj.small))
-        self.assertAlmostEqual(obj.normal_d, math.tan(obj.normal))
-        self.assertAlmostEqual(obj.big_d, math.tan(obj.big))
+        self.assertAlmostEqual(obj.small_tan, math.tan(obj.small))
+        self.assertAlmostEqual(obj.normal_tan, math.tan(obj.normal))
+        self.assertAlmostEqual(obj.big_tan, math.tan(obj.big))
 
     def test_transform(self):
         try:

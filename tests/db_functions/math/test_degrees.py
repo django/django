@@ -12,26 +12,26 @@ class DegreesTests(TestCase):
 
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('-12.9'), n2=Decimal('0.6'))
-        obj = DecimalModel.objects.annotate(n1_d=Degrees('n1'), n2_d=Degrees('n2')).first()
-        self.assertAlmostEqual(obj.n1_d, math.degrees(obj.n1))
-        self.assertAlmostEqual(obj.n2_d, math.degrees(obj.n2))
+        obj = DecimalModel.objects.annotate(n1_degrees=Degrees('n1'), n2_degrees=Degrees('n2')).first()
+        self.assertAlmostEqual(obj.n1_degrees, math.degrees(obj.n1))
+        self.assertAlmostEqual(obj.n2_degrees, math.degrees(obj.n2))
 
     def test_float(self):
         FloatModel.objects.create(f1=-27.5, f2=0.33)
-        obj = FloatModel.objects.annotate(f1_d=Degrees('f1'), f2_d=Degrees('f2')).first()
-        self.assertAlmostEqual(obj.f1_d, math.degrees(obj.f1))
-        self.assertAlmostEqual(obj.f2_d, math.degrees(obj.f2))
+        obj = FloatModel.objects.annotate(f1_degrees=Degrees('f1'), f2_degrees=Degrees('f2')).first()
+        self.assertAlmostEqual(obj.f1_degrees, math.degrees(obj.f1))
+        self.assertAlmostEqual(obj.f2_degrees, math.degrees(obj.f2))
 
     def test_integer(self):
         IntegerModel.objects.create(small=-20, normal=15, big=-1)
         obj = IntegerModel.objects.annotate(
-            small_d=Degrees('small'),
-            normal_d=Degrees('normal'),
-            big_d=Degrees('big'),
+            small_degrees=Degrees('small'),
+            normal_degrees=Degrees('normal'),
+            big_degrees=Degrees('big'),
         ).first()
-        self.assertAlmostEqual(obj.small_d, math.degrees(obj.small))
-        self.assertAlmostEqual(obj.normal_d, math.degrees(obj.normal))
-        self.assertAlmostEqual(obj.big_d, math.degrees(obj.big))
+        self.assertAlmostEqual(obj.small_degrees, math.degrees(obj.small))
+        self.assertAlmostEqual(obj.normal_degrees, math.degrees(obj.normal))
+        self.assertAlmostEqual(obj.big_degrees, math.degrees(obj.big))
 
     def test_transform(self):
         try:

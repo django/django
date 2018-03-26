@@ -11,13 +11,13 @@ class ATan2Tests(TestCase):
 
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('-9.9'), n2=Decimal('4.6'))
-        obj = DecimalModel.objects.annotate(atan2=ATan2('n1', 'n2')).first()
-        self.assertAlmostEqual(obj.atan2, math.atan2(obj.n1, obj.n2))
+        obj = DecimalModel.objects.annotate(n_atan2=ATan2('n1', 'n2')).first()
+        self.assertAlmostEqual(obj.n_atan2, math.atan2(obj.n1, obj.n2))
 
     def test_float(self):
         FloatModel.objects.create(f1=-25, f2=0.33)
-        obj = FloatModel.objects.annotate(atan2=ATan2('f1', 'f2')).first()
-        self.assertAlmostEqual(obj.atan2, math.atan2(obj.f1, obj.f2))
+        obj = FloatModel.objects.annotate(f_atan2=ATan2('f1', 'f2')).first()
+        self.assertAlmostEqual(obj.f_atan2, math.atan2(obj.f1, obj.f2))
 
     def test_integer(self):
         IntegerModel.objects.create(small=0, normal=1, big=10)

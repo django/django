@@ -12,26 +12,26 @@ class RadiansTests(TestCase):
 
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('-12.9'), n2=Decimal('0.6'))
-        obj = DecimalModel.objects.annotate(n1_d=Radians('n1'), n2_d=Radians('n2')).first()
-        self.assertAlmostEqual(obj.n1_d, math.radians(obj.n1))
-        self.assertAlmostEqual(obj.n2_d, math.radians(obj.n2))
+        obj = DecimalModel.objects.annotate(n1_radians=Radians('n1'), n2_radians=Radians('n2')).first()
+        self.assertAlmostEqual(obj.n1_radians, math.radians(obj.n1))
+        self.assertAlmostEqual(obj.n2_radians, math.radians(obj.n2))
 
     def test_float(self):
         FloatModel.objects.create(f1=-27.5, f2=0.33)
-        obj = FloatModel.objects.annotate(f1_d=Radians('f1'), f2_d=Radians('f2')).first()
-        self.assertAlmostEqual(obj.f1_d, math.radians(obj.f1))
-        self.assertAlmostEqual(obj.f2_d, math.radians(obj.f2))
+        obj = FloatModel.objects.annotate(f1_radians=Radians('f1'), f2_radians=Radians('f2')).first()
+        self.assertAlmostEqual(obj.f1_radians, math.radians(obj.f1))
+        self.assertAlmostEqual(obj.f2_radians, math.radians(obj.f2))
 
     def test_integer(self):
         IntegerModel.objects.create(small=-20, normal=15, big=-1)
         obj = IntegerModel.objects.annotate(
-            small_d=Radians('small'),
-            normal_d=Radians('normal'),
-            big_d=Radians('big'),
+            small_radians=Radians('small'),
+            normal_radians=Radians('normal'),
+            big_radians=Radians('big'),
         ).first()
-        self.assertAlmostEqual(obj.small_d, math.radians(obj.small))
-        self.assertAlmostEqual(obj.normal_d, math.radians(obj.normal))
-        self.assertAlmostEqual(obj.big_d, math.radians(obj.big))
+        self.assertAlmostEqual(obj.small_radians, math.radians(obj.small))
+        self.assertAlmostEqual(obj.normal_radians, math.radians(obj.normal))
+        self.assertAlmostEqual(obj.big_radians, math.radians(obj.big))
 
     def test_transform(self):
         try:

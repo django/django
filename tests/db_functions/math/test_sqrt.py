@@ -12,26 +12,26 @@ class SqrtTests(TestCase):
 
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('12.9'), n2=Decimal('0.6'))
-        obj = DecimalModel.objects.annotate(n1_d=Sqrt('n1'), n2_d=Sqrt('n2')).first()
-        self.assertAlmostEqual(obj.n1_d, math.sqrt(obj.n1))
-        self.assertAlmostEqual(obj.n2_d, math.sqrt(obj.n2))
+        obj = DecimalModel.objects.annotate(n1_sqrt=Sqrt('n1'), n2_sqrt=Sqrt('n2')).first()
+        self.assertAlmostEqual(obj.n1_sqrt, math.sqrt(obj.n1))
+        self.assertAlmostEqual(obj.n2_sqrt, math.sqrt(obj.n2))
 
     def test_float(self):
         FloatModel.objects.create(f1=27.5, f2=0.33)
-        obj = FloatModel.objects.annotate(f1_d=Sqrt('f1'), f2_d=Sqrt('f2')).first()
-        self.assertAlmostEqual(obj.f1_d, math.sqrt(obj.f1))
-        self.assertAlmostEqual(obj.f2_d, math.sqrt(obj.f2))
+        obj = FloatModel.objects.annotate(f1_sqrt=Sqrt('f1'), f2_sqrt=Sqrt('f2')).first()
+        self.assertAlmostEqual(obj.f1_sqrt, math.sqrt(obj.f1))
+        self.assertAlmostEqual(obj.f2_sqrt, math.sqrt(obj.f2))
 
     def test_integer(self):
         IntegerModel.objects.create(small=20, normal=15, big=1)
         obj = IntegerModel.objects.annotate(
-            small_d=Sqrt('small'),
-            normal_d=Sqrt('normal'),
-            big_d=Sqrt('big'),
+            small_sqrt=Sqrt('small'),
+            normal_sqrt=Sqrt('normal'),
+            big_sqrt=Sqrt('big'),
         ).first()
-        self.assertAlmostEqual(obj.small_d, math.sqrt(obj.small))
-        self.assertAlmostEqual(obj.normal_d, math.sqrt(obj.normal))
-        self.assertAlmostEqual(obj.big_d, math.sqrt(obj.big))
+        self.assertAlmostEqual(obj.small_sqrt, math.sqrt(obj.small))
+        self.assertAlmostEqual(obj.normal_sqrt, math.sqrt(obj.normal))
+        self.assertAlmostEqual(obj.big_sqrt, math.sqrt(obj.big))
 
     def test_transform(self):
         try:

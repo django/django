@@ -12,26 +12,26 @@ class FloorTests(TestCase):
 
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('-12.9'), n2=Decimal('0.6'))
-        obj = DecimalModel.objects.annotate(n1_d=Floor('n1'), n2_d=Floor('n2')).first()
-        self.assertEqual(obj.n1_d, math.floor(obj.n1))
-        self.assertEqual(obj.n2_d, math.floor(obj.n2))
+        obj = DecimalModel.objects.annotate(n1_floor=Floor('n1'), n2_floor=Floor('n2')).first()
+        self.assertEqual(obj.n1_floor, math.floor(obj.n1))
+        self.assertEqual(obj.n2_floor, math.floor(obj.n2))
 
     def test_float(self):
         FloatModel.objects.create(f1=-27.5, f2=0.33)
-        obj = FloatModel.objects.annotate(f1_d=Floor('f1'), f2_d=Floor('f2')).first()
-        self.assertEqual(obj.f1_d, math.floor(obj.f1))
-        self.assertEqual(obj.f2_d, math.floor(obj.f2))
+        obj = FloatModel.objects.annotate(f1_floor=Floor('f1'), f2_floor=Floor('f2')).first()
+        self.assertEqual(obj.f1_floor, math.floor(obj.f1))
+        self.assertEqual(obj.f2_floor, math.floor(obj.f2))
 
     def test_integer(self):
         IntegerModel.objects.create(small=-20, normal=15, big=-1)
         obj = IntegerModel.objects.annotate(
-            small_d=Floor('small'),
-            normal_d=Floor('normal'),
-            big_d=Floor('big'),
+            small_floor=Floor('small'),
+            normal_floor=Floor('normal'),
+            big_floor=Floor('big'),
         ).first()
-        self.assertEqual(obj.small_d, math.floor(obj.small))
-        self.assertEqual(obj.normal_d, math.floor(obj.normal))
-        self.assertEqual(obj.big_d, math.floor(obj.big))
+        self.assertEqual(obj.small_floor, math.floor(obj.small))
+        self.assertEqual(obj.normal_floor, math.floor(obj.normal))
+        self.assertEqual(obj.big_floor, math.floor(obj.big))
 
     def test_transform(self):
         try:

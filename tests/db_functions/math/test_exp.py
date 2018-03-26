@@ -12,26 +12,26 @@ class ExpTests(TestCase):
 
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('-12.9'), n2=Decimal('0.6'))
-        obj = DecimalModel.objects.annotate(n1_d=Exp('n1'), n2_d=Exp('n2')).first()
-        self.assertAlmostEqual(obj.n1_d, math.exp(obj.n1))
-        self.assertAlmostEqual(obj.n2_d, math.exp(obj.n2))
+        obj = DecimalModel.objects.annotate(n1_exp=Exp('n1'), n2_exp=Exp('n2')).first()
+        self.assertAlmostEqual(obj.n1_exp, math.exp(obj.n1))
+        self.assertAlmostEqual(obj.n2_exp, math.exp(obj.n2))
 
     def test_float(self):
         FloatModel.objects.create(f1=-27.5, f2=0.33)
-        obj = FloatModel.objects.annotate(f1_d=Exp('f1'), f2_d=Exp('f2')).first()
-        self.assertAlmostEqual(obj.f1_d, math.exp(obj.f1))
-        self.assertAlmostEqual(obj.f2_d, math.exp(obj.f2))
+        obj = FloatModel.objects.annotate(f1_exp=Exp('f1'), f2_exp=Exp('f2')).first()
+        self.assertAlmostEqual(obj.f1_exp, math.exp(obj.f1))
+        self.assertAlmostEqual(obj.f2_exp, math.exp(obj.f2))
 
     def test_integer(self):
         IntegerModel.objects.create(small=-20, normal=15, big=-1)
         obj = IntegerModel.objects.annotate(
-            small_d=Exp('small'),
-            normal_d=Exp('normal'),
-            big_d=Exp('big'),
+            small_exp=Exp('small'),
+            normal_exp=Exp('normal'),
+            big_exp=Exp('big'),
         ).first()
-        self.assertAlmostEqual(obj.small_d, math.exp(obj.small))
-        self.assertAlmostEqual(obj.normal_d, math.exp(obj.normal))
-        self.assertAlmostEqual(obj.big_d, math.exp(obj.big))
+        self.assertAlmostEqual(obj.small_exp, math.exp(obj.small))
+        self.assertAlmostEqual(obj.normal_exp, math.exp(obj.normal))
+        self.assertAlmostEqual(obj.big_exp, math.exp(obj.big))
 
     def test_transform(self):
         try:
