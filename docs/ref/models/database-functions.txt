@@ -1065,6 +1065,11 @@ Usage example::
     >>> vector = Vector.objects.annotate(x_r=Round('x'), y_r=Round('y')).get()
     >>> print(vector.x_r, vector.y_r)
     (5.0, -2)
+
+.. warning::
+
+    If two multiples are equally close (for example, 0.5), results of round() vary
+    from database to database.
  
 It can also be registered as a transform. For example::
  
