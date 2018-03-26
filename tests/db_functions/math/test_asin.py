@@ -39,6 +39,6 @@ class ASinTests(TestCase):
             DecimalModel.objects.create(n1=Decimal('0.1'), n2=Decimal('0'))
             DecimalModel.objects.create(n1=Decimal('1.0'), n2=Decimal('0'))
             objs = DecimalModel.objects.filter(n1__asin__gt=1)
-            self.assertQuerysetEqual(objs, [1.0], lambda a: a.n1)
+            self.assertQuerysetEqual(objs, [Decimal('1.0')], lambda a: a.n1)
         finally:
             DecimalField._unregister_lookup(ASin)

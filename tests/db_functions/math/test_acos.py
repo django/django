@@ -39,6 +39,6 @@ class ACosTests(TestCase):
             DecimalModel.objects.create(n1=Decimal('0.5'), n2=Decimal('0'))
             DecimalModel.objects.create(n1=Decimal('-0.9'), n2=Decimal('0'))
             objs = DecimalModel.objects.filter(n1__acos__lt=2)
-            self.assertQuerysetEqual(objs, [0.5], lambda a: a.n1)
+            self.assertQuerysetEqual(objs, [Decimal('0.5')], lambda a: a.n1)
         finally:
             DecimalField._unregister_lookup(ACos)
