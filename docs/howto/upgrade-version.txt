@@ -59,12 +59,12 @@ warnings before upgrading ensures that you're informed about areas of the code
 that need altering.
 
 In Python, deprecation warnings are silenced by default. You must turn them on
-using the ``-Wall`` Python command line option or the :envvar:`PYTHONWARNINGS`
+using the ``-Wa`` Python command line option or the :envvar:`PYTHONWARNINGS`
 environment variable. For example, to show warnings while running tests:
 
 .. console::
 
-    $ python -Wall manage.py test
+    $ python -Wa manage.py test
 
 If you're not using the Django test runner, you may need to also ensure that
 any console output is not captured which would hide deprecation warnings. For
@@ -72,7 +72,7 @@ example, if you use `py.test`:
 
 .. code-block:: console
 
-    $ PYTHONWARNINGS=all py.test tests --capture=no
+    $ PYTHONWARNINGS=always py.test tests --capture=no
 
 Resolve any deprecation warnings with your current version of Django before
 continuing the upgrade process.
@@ -108,7 +108,7 @@ use the flag if you test your app manually using ``manage.py runserver``):
 
 .. console::
 
-    $ python -Wall manage.py test
+    $ python -Wa manage.py test
 
 After you have run the tests, fix any failures. While you have the release
 notes fresh in your mind, it may also be a good time to take advantage of new
