@@ -38,11 +38,11 @@ class WebsocketConsumer(SyncConsumer):
     def connect(self):
         self.accept()
 
-    def accept(self):
+    def accept(self, subprotocol=None):
         """
         Accepts an incoming socket
         """
-        super().send({"type": "websocket.accept"})
+        super().send({"type": "websocket.accept", "subprotocol": subprotocol})
 
     def websocket_receive(self, message):
         """
@@ -179,11 +179,11 @@ class AsyncWebsocketConsumer(AsyncConsumer):
     async def connect(self):
         await self.accept()
 
-    async def accept(self):
+    async def accept(self, subprotocol=None):
         """
         Accepts an incoming socket
         """
-        await super().send({"type": "websocket.accept"})
+        await super().send({"type": "websocket.accept", "subprotocol": subprotocol})
 
     async def websocket_receive(self, message):
         """

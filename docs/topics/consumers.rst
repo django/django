@@ -192,9 +192,14 @@ just deals with text and binary frames::
         groups = ["broadcast"]
 
         def connect(self):
-            # Called on connection. Either call
+            # Called on connection. 
+            # To accept the connection call:
             self.accept()
-            # Or to reject the connection, call
+            # Or accept the connection and specify a chosen subprotocol.
+            # A list of subprotocols specified by the connecting client 
+            # will be available in self.scope['subprotocols']
+            self.accept("subprotocol")
+            # To reject the connection, call:
             self.close()
 
         def receive(self, text_data=None, bytes_data=None):
@@ -240,9 +245,14 @@ is async, and the functions you need to write have to be as well::
         groups = ["broadcast"]
 
         async def connect(self):
-            # Called on connection. Either call
+            # Called on connection. 
+            # To accept the connection call:
             await self.accept()
-            # Or to reject the connection, call
+            # Or accept the connection and specify a chosen subprotocol.
+            # A list of subprotocols specified by the connecting client 
+            # will be available in self.scope['subprotocols']
+            await self.accept("subprotocol")
+            # To reject the connection, call:
             await self.close()
 
         async def receive(self, text_data=None, bytes_data=None):

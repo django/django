@@ -48,6 +48,23 @@ async def test_websocket_consumer():
 
 
 @pytest.mark.asyncio
+async def test_websocket_consumer_subprotocol():
+    """
+    Tests that WebsocketConsumer correctly handles subprotocols.
+    """
+    class TestConsumer(WebsocketConsumer):
+        def connect(self):
+            assert self.scope["subprotocols"] == ["subprotocol1", "subprotocol2"]
+            self.accept("subprotocol2")
+
+    # Test a normal connection with subprotocols
+    communicator = WebsocketCommunicator(TestConsumer, "/testws/", subprotocols=["subprotocol1", "subprotocol2"])
+    connected, subprotocol = await communicator.connect()
+    assert connected
+    assert subprotocol == "subprotocol2"
+
+
+@pytest.mark.asyncio
 async def test_websocket_consumer_groups():
     """
     Tests that WebsocketConsumer adds and removes channels from groups.
@@ -119,6 +136,23 @@ async def test_async_websocket_consumer():
     # Close out
     await communicator.disconnect()
     assert "disconnected" in results
+
+
+@pytest.mark.asyncio
+async def test_async_websocket_consumer_subprotocol():
+    """
+    Tests that AsyncWebsocketConsumer correctly handles subprotocols.
+    """
+    class TestConsumer(AsyncWebsocketConsumer):
+        async def connect(self):
+            assert self.scope["subprotocols"] == ["subprotocol1", "subprotocol2"]
+            await self.accept("subprotocol2")
+
+    # Test a normal connection with subprotocols
+    communicator = WebsocketCommunicator(TestConsumer, "/testws/", subprotocols=["subprotocol1", "subprotocol2"])
+    connected, subprotocol = await communicator.connect()
+    assert connected
+    assert subprotocol == "subprotocol2"
 
 
 @pytest.mark.asyncio
