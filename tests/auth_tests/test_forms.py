@@ -797,6 +797,17 @@ class UserChangeFormTest(ReloadFormsMixin, TestDataMixin, TestCase):
             form = UserChangeForm(data, instance=user)
             self.assertTrue(form.is_valid())
 
+    def test_password_excluded(self):
+        class UserChangeFormWithoutPassword(UserChangeForm):
+            password = None
+
+            class Meta:
+                model = User
+                exclude = ['password']
+
+        form = UserChangeFormWithoutPassword()
+        self.assertNotIn('password', form.fields)
+
 
 @override_settings(TEMPLATES=AUTH_TEMPLATES)
 class PasswordResetFormTest(TestDataMixin, TestCase):
