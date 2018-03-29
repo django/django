@@ -2,6 +2,22 @@ from django.db.models import Func, IntegerField, Transform, Value, fields
 from django.db.models.functions import Coalesce
 
 
+class BytesToCharFieldConversionMixin:
+    """
+    Convert CharField results from bytes to str.
+
+    MySQL returns long data types (bytes) instead of chars when it can't
+    determine the length of the result string. For example:
+        LPAD(column1, CHAR_LENGTH(column2), ' ')
+    returns the LONGTEXT (bytes) instead of VARCHAR.
+    """
+    def convert_value(self, value, expression, connection):
+        if connection.features.db_functions_convert_bytes_to_str:
+            if self.output_field.get_internal_type() == 'CharField' and isinstance(value, bytes):
+                return value.decode()
+        return super().convert_value(value, expression, connection)
+
+
 class Chr(Transform):
     function = 'CHR'
     lookup_name = 'chr'
@@ -110,7 +126,7 @@ class Lower(Transform):
     lookup_name = 'lower'
 
 
-class LPad(Func):
+class LPad(BytesToCharFieldConversionMixin, Func):
     function = 'LPAD'
 
     def __init__(self, expression, length, fill_text=Value(' '), **extra):
