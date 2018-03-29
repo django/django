@@ -648,6 +648,10 @@ class ModelFormBaseTest(TestCase):
         m1 = mf1.save(commit=False)
         self.assertEqual(m1.mode, mode)
 
+    def test_renderer_kwarg(self):
+        custom = object()
+        self.assertIs(ProductForm(renderer=custom).renderer, custom)
+
     def test_default_splitdatetime_field(self):
         class PubForm(forms.ModelForm):
             datetime_published = forms.SplitDateTimeField(required=False)
