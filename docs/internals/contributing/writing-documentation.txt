@@ -58,9 +58,7 @@ Then from the ``docs`` directory, build the HTML:
      $ make html
 
 To get started contributing, you'll want to read the :ref:`reStructuredText
-Primer <sphinx:rst-primer>`. After that, you'll want to read about the
-:ref:`Sphinx-specific markup <sphinx:sphinxmarkup>` that's used to manage
-metadata, indexing, and cross-references.
+reference <sphinx:rst-index>`.
 
 Your locally-built documentation will be themed differently than the
 documentation at `docs.djangoproject.com <https://docs.djangoproject.com>`_.
@@ -231,8 +229,8 @@ documentation:
 Django-specific markup
 ======================
 
-Besides the :ref:`Sphinx built-in markup <sphinx:sphinxmarkup>`, Django's
-docs defines some extra description units:
+Besides :ref:`Sphinx's built-in markup <sphinx:rst-index>`, Django's docs
+define some extra description units:
 
 * Settings::
 
