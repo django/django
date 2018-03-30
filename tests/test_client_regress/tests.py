@@ -631,7 +631,7 @@ class AssertFormErrorTests(SimpleTestCase):
         except AssertionError as e:
             self.assertIn(
                 "The form 'form' in context 0 does not contain the non-field "
-                "error 'Some error.' (actual errors: )",
+                "error 'Some error.' (actual errors: none)",
                 str(e)
             )
         try:
@@ -639,7 +639,7 @@ class AssertFormErrorTests(SimpleTestCase):
         except AssertionError as e:
             self.assertIn(
                 "abc: The form 'form' in context 0 does not contain the "
-                "non-field error 'Some error.' (actual errors: )",
+                "non-field error 'Some error.' (actual errors: none)",
                 str(e)
             )
 

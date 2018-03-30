@@ -429,7 +429,7 @@ class SimpleTestCase(unittest.TestCase):
                         msg_prefix + "The form '%s' in context %d does not"
                         " contain the non-field error '%s'"
                         " (actual errors: %s)" %
-                        (form, i, err, non_field_errors)
+                        (form, i, err, non_field_errors or 'none')
                     )
         if not found_form:
             self.fail(msg_prefix + "The form '%s' was not used to render the response" % form)
