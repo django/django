@@ -5,7 +5,6 @@ during development, and SHOULD NOT be used in a production setting.
 import mimetypes
 import posixpath
 import re
-import stat
 from pathlib import Path
 
 from django.http import (
@@ -50,8 +49,6 @@ def serve(request, path, document_root=None, show_indexes=False):
     content_type = content_type or 'application/octet-stream'
     response = FileResponse(fullpath.open('rb'), content_type=content_type)
     response["Last-Modified"] = http_date(statobj.st_mtime)
-    if stat.S_ISREG(statobj.st_mode):
-        response["Content-Length"] = statobj.st_size
     if encoding:
         response["Content-Encoding"] = encoding
     return response

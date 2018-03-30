@@ -1054,17 +1054,45 @@ Attributes
 ``FileResponse`` objects
 ========================
 
-.. class:: FileResponse
+.. class:: FileResponse(open_file, as_attachment=False, filename='', **kwargs)
 
-:class:`FileResponse` is a subclass of :class:`StreamingHttpResponse` optimized
-for binary files. It uses `wsgi.file_wrapper`_ if provided by the wsgi server,
-otherwise it streams the file out in small chunks.
+    :class:`FileResponse` is a subclass of :class:`StreamingHttpResponse`
+    optimized for binary files. It uses `wsgi.file_wrapper`_ if provided by the
+    wsgi server, otherwise it streams the file out in small chunks.
+
+    If `as_attachment` is True, Django will set the ``Content-Disposition``
+    header so as to ask the browser to offer the file as a download to the user.
+    If ``open_file`` has no name or if the name of ``open_file`` is not
+    appropriate, you can provide a custom file name through the ``filename``
+    parameter.
+
+    The ``Content-Length``, ``Content-Type``, and ``Content-Disposition``
+    headers are also set when they can be guessed from the ``open_file``
+    content.
+
+    .. versionadded:: 2.1
+
+        The ``as_attachment`` and ``filename`` keywords argument were added.
+        Moreover, ``FileResponse`` tries its best to set the ``Content``
+        headers.
 
 .. _wsgi.file_wrapper: https://www.python.org/dev/peps/pep-3333/#optional-platform-specific-file-handling
 
-``FileResponse`` expects a file open in binary mode like so::
+``FileResponse`` accepts any file-like object with binary content, for example
+a file open in binary mode like so::
 
     >>> from django.http import FileResponse
     >>> response = FileResponse(open('myfile.png', 'rb'))
 
 The file will be closed automatically, so don't open it with a context manager.
+
+Methods
+-------
+
+.. method:: FileResponse.set_headers(open_file)
+
+    .. versionadded:: 2.1
+
+    This method is automatically called during the response initialization and
+    set various headers (``Content-Length``, ``Content-Type``, and
+    ``Content-Disposition``) depending on ``open_file``.
