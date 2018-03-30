@@ -232,9 +232,14 @@ class DatabaseOperations(BaseDatabaseOperations):
         elif internal_type == 'DateTimeField':
             if settings.USE_TZ:
                 converters.append(self.convert_datetimefield_value)
+        elif internal_type == 'CharField':
+            converters.append(self.convert_charfield_value)
         elif internal_type == 'UUIDField':
             converters.append(self.convert_uuidfield_value)
         return converters
+
+    def convert_charfield_value(self, value, expression, connection):
+        return value.decode() if isinstance(value, bytes) else value
 
     def convert_textfield_value(self, value, expression, connection):
         if value is not None:
