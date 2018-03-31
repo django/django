@@ -2125,5 +2125,5 @@ aware of certain limitations:
 * When an English variant is activated and English strings are missing, the
   fallback language will not be the :setting:`LANGUAGE_CODE` of the project,
   but the original strings. For example, an English user visiting a site with
-  Spanish as the default language and original strings written in Russian will
-  fallback to Russian, not to Spanish.
+  :setting:`LANGUAGE_CODE` set to Spanish and original strings written in
+  Russian will see Russian text rather than Spanish.
