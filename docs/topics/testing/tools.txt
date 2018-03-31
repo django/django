@@ -1189,8 +1189,6 @@ easy::
 
         def test_cache_middleware(self):
             with self.modify_settings(MIDDLEWARE={
-                'append': ['django.middleware.cache.FetchFromCacheMiddleware'],
-                'prepend': ['django.middleware.cache.UpdateCacheMiddleware'],
                 'remove': [
                     'django.contrib.sessions.middleware.SessionMiddleware',
                     'django.contrib.auth.middleware.AuthenticationMiddleware',
