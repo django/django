@@ -1189,8 +1189,6 @@ easy::
 
         def test_cache_middleware(self):
             with self.modify_settings(MIDDLEWARE={
-                'append': 'django.middleware.cache.FetchFromCacheMiddleware',
-                'prepend': 'django.middleware.cache.UpdateCacheMiddleware',
                 'remove': [
                     'django.contrib.sessions.middleware.SessionMiddleware',
                     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -1240,8 +1238,18 @@ decorator::
     class MiddlewareTestCase(TestCase):
 
         @modify_settings(MIDDLEWARE={
-            'append': 'django.middleware.cache.FetchFromCacheMiddleware',
-            'prepend': 'django.middleware.cache.UpdateCacheMiddleware',
+            'remove': [
+                'django.contrib.sessions.middleware.SessionMiddleware',
+                'django.contrib.auth.middleware.AuthenticationMiddleware',
+                'django.contrib.messages.middleware.MessageMiddleware',
+            ],
+        )
+        @modify_settings(MIDDLEWARE={
+            'append': ['django.middleware.cache.FetchFromCacheMiddleware'],
+            'prepend': [
+                'django.middleware.cache.UpdateCacheMiddleware',
+                'django.contrib.sessions.middleware.SessionMiddleware',
+            ],
         })
         def test_cache_middleware(self):
             response = self.client.get('/')
@@ -1252,8 +1260,18 @@ The decorator can also be applied to test case classes::
     from django.test import TestCase, modify_settings
 
     @modify_settings(MIDDLEWARE={
-        'append': 'django.middleware.cache.FetchFromCacheMiddleware',
-        'prepend': 'django.middleware.cache.UpdateCacheMiddleware',
+        'remove': [
+            'django.contrib.sessions.middleware.SessionMiddleware',
+            'django.contrib.auth.middleware.AuthenticationMiddleware',
+            'django.contrib.messages.middleware.MessageMiddleware',
+        ],
+    )
+    @modify_settings(MIDDLEWARE={
+        'append': ['django.middleware.cache.FetchFromCacheMiddleware'],
+        'prepend': [
+            'django.middleware.cache.UpdateCacheMiddleware',
+            'django.contrib.sessions.middleware.SessionMiddleware',
+        ],
     })
     class MiddlewareTestCase(TestCase):
 
@@ -1270,6 +1288,16 @@ The decorator can also be applied to test case classes::
     find that the original test case classes are still equally affected by the
     decorator. For a given class, :func:`~django.test.modify_settings` is
     always applied after :func:`~django.test.override_settings`.
+
+
+.. note::
+
+    When using :func:`~django.test.modify_settings` to prepend, append and
+    remove from the same settings, make sure to not mix remove with append and
+    prepend in the same dictionary, since it matters whether a key is first
+    added and then removed. Dictionary key order is not preserved in Python<3.6.
+    Instead, add the decorator several times (as shown in the examples here).
+
 
 .. warning::
 
