@@ -1189,8 +1189,8 @@ easy::
 
         def test_cache_middleware(self):
             with self.modify_settings(MIDDLEWARE={
-                'append': 'django.middleware.cache.FetchFromCacheMiddleware',
-                'prepend': 'django.middleware.cache.UpdateCacheMiddleware',
+                'append': ['django.middleware.cache.FetchFromCacheMiddleware'],
+                'prepend': ['django.middleware.cache.UpdateCacheMiddleware'],
                 'remove': [
                     'django.contrib.sessions.middleware.SessionMiddleware',
                     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -1240,8 +1240,8 @@ decorator::
     class MiddlewareTestCase(TestCase):
 
         @modify_settings(MIDDLEWARE={
-            'append': 'django.middleware.cache.FetchFromCacheMiddleware',
-            'prepend': 'django.middleware.cache.UpdateCacheMiddleware',
+            'append': ['django.middleware.cache.FetchFromCacheMiddleware'],
+            'prepend': ['django.middleware.cache.UpdateCacheMiddleware'],
         })
         def test_cache_middleware(self):
             response = self.client.get('/')
@@ -1252,8 +1252,8 @@ The decorator can also be applied to test case classes::
     from django.test import TestCase, modify_settings
 
     @modify_settings(MIDDLEWARE={
-        'append': 'django.middleware.cache.FetchFromCacheMiddleware',
-        'prepend': 'django.middleware.cache.UpdateCacheMiddleware',
+        'append': ['django.middleware.cache.FetchFromCacheMiddleware'],
+        'prepend': ['django.middleware.cache.UpdateCacheMiddleware'],
     })
     class MiddlewareTestCase(TestCase):
 
