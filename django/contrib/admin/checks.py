@@ -20,6 +20,13 @@ from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.inspect import get_func_args
 
 
+def issubclass_(cls, clsinfo):
+    try:
+        return issubclass(cls, clsinfo)
+    except TypeError:
+        return False
+
+
 def check_admin_app(app_configs, **kwargs):
     from django.contrib.admin.sites import all_sites
     errors = []
@@ -341,7 +348,7 @@ class BaseModelAdminChecks:
 
     def _check_form(self, obj):
         """ Check that form subclasses BaseModelForm. """
-        if not issubclass(obj.form, BaseModelForm):
+        if not issubclass_(obj.form, BaseModelForm):
             return must_inherit_from(parent='BaseModelForm', option='form',
                                      obj=obj, id='admin.E016')
         else:
@@ -643,7 +650,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
 
         from django.contrib.admin.options import InlineModelAdmin
 
-        if not issubclass(inline, InlineModelAdmin):
+        if not issubclass_(inline, InlineModelAdmin):
             return [
                 checks.Error(
                     "'%s' must inherit from 'InlineModelAdmin'." % inline_label,
@@ -659,7 +666,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                     id='admin.E105',
                 )
             ]
-        elif not issubclass(inline.model, models.Model):
+        elif not issubclass_(inline.model, models.Model):
             return must_be('a Model', option='%s.model' % inline_label, obj=obj, id='admin.E106')
         else:
             return inline(obj.model, obj.admin_site).check()
@@ -762,11 +769,11 @@ class ModelAdminChecks(BaseModelAdminChecks):
 
         if callable(item) and not isinstance(item, models.Field):
             # If item is option 3, it should be a ListFilter...
-            if not issubclass(item, ListFilter):
+            if not issubclass_(item, ListFilter):
                 return must_inherit_from(parent='ListFilter', option=label,
                                          obj=obj, id='admin.E113')
             # ...  but not a FieldListFilter.
-            elif issubclass(item, FieldListFilter):
+            elif issubclass_(item, FieldListFilter):
                 return [
                     checks.Error(
                         "The value of '%s' must not inherit from 'FieldListFilter'." % label,
@@ -779,7 +786,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
         elif isinstance(item, (tuple, list)):
             # item is option #2
             field, list_filter_class = item
-            if not issubclass(list_filter_class, FieldListFilter):
+            if not issubclass_(list_filter_class, FieldListFilter):
                 return must_inherit_from(parent='FieldListFilter', option='%s[1]' % label, obj=obj, id='admin.E115')
             else:
                 return []
@@ -1028,7 +1035,7 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
     def _check_formset(self, obj):
         """ Check formset is a subclass of BaseModelFormSet. """
 
-        if not issubclass(obj.formset, BaseModelFormSet):
+        if not issubclass_(obj.formset, BaseModelFormSet):
             return must_inherit_from(parent='BaseModelFormSet', option='formset', obj=obj, id='admin.E206')
         else:
             return []

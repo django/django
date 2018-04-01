@@ -225,11 +225,16 @@ class FormCheckTests(CheckTestCase):
         class TestModelAdmin(ModelAdmin):
             form = FakeForm
 
-        self.assertIsInvalid(
-            TestModelAdmin, ValidationTestModel,
-            "The value of 'form' must inherit from 'BaseModelForm'.",
-            'admin.E016'
-        )
+        class TestModelAdmin2(ModelAdmin):
+            form = 'not form'
+
+        for modeladmin in (TestModelAdmin, TestModelAdmin2):
+            with self.subTest(modeladmin):
+                self.assertIsInvalid(
+                    modeladmin, ValidationTestModel,
+                    "The value of 'form' must inherit from 'BaseModelForm'.",
+                    'admin.E016'
+                )
 
     def test_fieldsets_with_custom_form_validation(self):
 
@@ -653,6 +658,19 @@ class ListFilterTests(CheckTestCase):
             TestModelAdmin, ValidationTestModel,
             "The value of 'list_filter[0][1]' must inherit from 'FieldListFilter'.",
             'admin.E115'
+        )
+
+    def test_list_filter_is_func(self):
+        def get_filter():
+            pass
+
+        class TestModelAdmin(ModelAdmin):
+            list_filter = (get_filter,)
+
+        self.assertIsInvalid(
+            TestModelAdmin, ValidationTestModel,
+            "The value of 'list_filter[0]' must inherit from 'ListFilter'.",
+            'admin.E113'
         )
 
     def test_not_associated_with_field_name(self):
