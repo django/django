@@ -765,7 +765,10 @@ def default_if_none(value, arg):
 @register.filter(is_safe=False)
 def divisibleby(value, arg):
     """Return True if the value is divisible by the argument."""
-    return int(value) % int(arg) == 0
+    if (value):
+        return int(value) % int(arg) == 0
+    else:
+        return ''
 
 
 @register.filter(is_safe=False)

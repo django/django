@@ -9,3 +9,6 @@ class FunctionTests(SimpleTestCase):
 
     def test_false(self):
         self.assertIs(divisibleby(4, 3), False)
+
+    def test_false_fail_silently(self):
+        self.assertIs(divisibleby(None, 3), '')
