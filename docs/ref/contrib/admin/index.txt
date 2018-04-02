@@ -2231,12 +2231,9 @@ adds some of its own (the shared features are actually defined in the
 - :meth:`~ModelAdmin.formfield_for_choice_field`
 - :meth:`~ModelAdmin.formfield_for_foreignkey`
 - :meth:`~ModelAdmin.formfield_for_manytomany`
-- :meth:`~ModelAdmin.has_add_permission`
-- :meth:`~ModelAdmin.has_change_permission`
-- :meth:`~ModelAdmin.has_delete_permission`
 - :meth:`~ModelAdmin.has_module_permission`
 
-The ``InlineModelAdmin`` class adds:
+The ``InlineModelAdmin`` class adds or customizes:
 
 .. attribute:: InlineModelAdmin.model
 
@@ -2397,6 +2394,21 @@ The ``InlineModelAdmin`` class adds:
     Override this method to programmatically determine the minimum number of
     inline forms. For example, this may be based on the model instance
     (passed as the keyword argument ``obj``).
+
+.. method:: InlineModelAdmin.has_add_permission(request)
+
+    Should return ``True`` if adding an inline object is permitted, ``False``
+    otherwise.
+
+.. method:: InlineModelAdmin.has_change_permission(request, obj=None)
+
+    Should return ``True`` if editing an inline object is permitted, ``False``
+    otherwise. ``obj`` is the parent object being edited.
+
+.. method:: InlineModelAdmin.has_delete_permission(request, obj=None)
+
+    Should return ``True`` if deleting an inline object is permitted, ``False``
+    otherwise. ``obj`` is the parent object being edited.
 
 Working with a model with two or more foreign keys to the same parent model
 ---------------------------------------------------------------------------
