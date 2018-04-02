@@ -430,7 +430,7 @@ Several parts of the new ``ChatConsumer`` code deserve further explanation:
 * self.accept()
     * Accepts the WebSocket connection.
     * If you do not call accept() within the connect() method then the
-      connection will be rejected and closed. You might want reject a connection
+      connection will be rejected and closed. You might want to reject a connection
       for example because the requesting user is not authorized to perform the
       requested action.
     * It is recommended that accept() be called as the *last* action in connect()
