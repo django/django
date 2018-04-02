@@ -1057,3 +1057,5 @@ otherwise it streams the file out in small chunks.
 
     >>> from django.http import FileResponse
     >>> response = FileResponse(open('myfile.png', 'rb'))
+
+The file will be closed automatically, so don't open it with a context manager.
