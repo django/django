@@ -18,9 +18,6 @@ from django.template import Context, Engine
 from django.utils import archive
 from django.utils.version import get_docs_version
 
-_drive_re = re.compile('^([a-z]):', re.I)
-_url_drive_re = re.compile('^([a-z])[:|]', re.I)
-
 
 class TemplateCommand(BaseCommand):
     """
