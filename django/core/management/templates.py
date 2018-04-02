@@ -2,7 +2,6 @@ import cgi
 import mimetypes
 import os
 import posixpath
-import re
 import shutil
 import stat
 import tempfile
