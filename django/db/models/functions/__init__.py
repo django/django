@@ -6,8 +6,8 @@ from .datetime import (
     TruncQuarter, TruncSecond, TruncTime, TruncWeek, TruncYear,
 )
 from .text import (
-    Chr, Concat, ConcatPair, Left, Length, Lower, LPad, LTrim, Ord, Replace,
-    Right, RPad, RTrim, StrIndex, Substr, Trim, Upper,
+    Chr, Concat, ConcatPair, Left, Length, Lower, LPad, LTrim, Ord, Repeat,
+    Replace, Right, RPad, RTrim, StrIndex, Substr, Trim, Upper,
 )
 from .window import (
     CumeDist, DenseRank, FirstValue, Lag, LastValue, Lead, NthValue, Ntile,
@@ -25,8 +25,8 @@ __all__ = [
     'TruncWeek', 'TruncYear',
     # text
     'Chr', 'Concat', 'ConcatPair', 'Left', 'Length', 'Lower', 'LPad', 'LTrim',
-    'Ord', 'Replace', 'Right', 'RPad', 'RTrim', 'StrIndex', 'Substr', 'Trim',
-    'Upper',
+    'Ord', 'Repeat', 'Replace', 'Right', 'RPad', 'RTrim', 'StrIndex', 'Substr',
+    'Trim', 'Upper',
     # window
     'CumeDist', 'DenseRank', 'FirstValue', 'Lag', 'LastValue', 'Lead',
     'NthValue', 'Ntile', 'PercentRank', 'Rank', 'RowNumber',

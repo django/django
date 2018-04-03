@@ -210,6 +210,7 @@ Models
   :class:`~django.db.models.functions.LPad`,
   :class:`~django.db.models.functions.LTrim`,
   :class:`~django.db.models.functions.Ord`,
+  :class:`~django.db.models.functions.Repeat`,
   :class:`~django.db.models.functions.Replace`,
   :class:`~django.db.models.functions.Right`,
   :class:`~django.db.models.functions.RPad`,
