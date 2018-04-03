@@ -1041,3 +1041,27 @@ class AdminPasswordChangeFormTest(TestDataMixin, TestCase):
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data['password1'], data['password1'])
         self.assertEqual(form.cleaned_data['password2'], data['password2'])
+
+    def test_non_matching_passwords(self):
+        user = User.objects.get(username='testclient')
+        data = {'password1': 'password1', 'password2': 'password2'}
+        form = AdminPasswordChangeForm(user, data)
+        self.assertEqual(form.errors['password2'], [form.error_messages['password_mismatch']])
+
+    def test_missing_passwords(self):
+        user = User.objects.get(username='testclient')
+        data = {'password1': '', 'password2': ''}
+        form = AdminPasswordChangeForm(user, data)
+        required_error = [Field.default_error_messages['required']]
+        self.assertEqual(form.errors['password1'], required_error)
+        self.assertEqual(form.errors['password2'], required_error)
+
+    def test_one_password(self):
+        user = User.objects.get(username='testclient')
+        form1 = AdminPasswordChangeForm(user, {'password1': '', 'password2': 'test'})
+        required_error = [Field.default_error_messages['required']]
+        self.assertEqual(form1.errors['password1'], required_error)
+        self.assertNotIn('password2', form1.errors)
+        form2 = AdminPasswordChangeForm(user, {'password1': 'test', 'password2': ''})
+        self.assertEqual(form2.errors['password2'], required_error)
+        self.assertNotIn('password1', form2.errors)
