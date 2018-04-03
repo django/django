@@ -523,7 +523,7 @@ class PycLoaderTests(MigrationTestBase):
         """
         with self.temporary_migration_module(module='migrations.test_migrations_bad_pyc'):
             msg = (
-                "Couldn't import '\w+.migrations.0001_initial' as it appears "
+                r"Couldn't import '\w+.migrations.0001_initial' as it appears "
                 "to be a stale .pyc file."
             )
             with self.assertRaisesRegex(ImportError, msg):
