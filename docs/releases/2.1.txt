@@ -166,7 +166,8 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* The widget for ``ImageField`` now renders with the HTML attribute
+  ``accept="image/*"``.
 
 Generic Views
 ~~~~~~~~~~~~~
