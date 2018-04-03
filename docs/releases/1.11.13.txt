@@ -1,0 +1,12 @@
+============================
+Django 1.11.13 release notes
+============================
+
+*Expected May 1, 2018*
+
+Django 1.11.13 fixes several bugs in 1.11.12.
+
+Bugfixes
+========
+
+* ...
