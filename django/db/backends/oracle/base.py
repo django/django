@@ -226,6 +226,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             " NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF'" +
             (" TIME_ZONE = 'UTC'" if settings.USE_TZ else '')
         )
+        if 'SCHEMA' in self.settings_dict:
+            cursor.execute(
+                "ALTER SESSION SET CURRENT_SCHEMA = %s" %
+                self.settings_dict['SCHEMA']
+            )
         cursor.close()
         if 'operators' not in self.__dict__:
             # Ticket #14149: Check whether our LIKE implementation will
