@@ -135,7 +135,7 @@ pygments_style = 'trac'
 # branch, which is located at this URL.
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
-    'sphinx': ('http://sphinx-doc.org/', None),
+    'sphinx': ('http://www.sphinx-doc.org/en/master/', None),
     'psycopg2': ('http://initd.org/psycopg/docs/', None),
 }
 
