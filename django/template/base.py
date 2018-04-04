@@ -850,21 +850,24 @@ class Variable:
                             raise VariableDoesNotExist("Failed lookup for key "
                                                        "[%s] in %r",
                                                        (bit, current))  # missing attribute
-                if callable(current):
-                    if getattr(current, 'do_not_call_in_templates', False):
-                        pass
-                    elif getattr(current, 'alters_data', False):
-                        current = context.template.engine.string_if_invalid
-                    else:
-                        try:  # method call (assuming no args required)
-                            current = current()
-                        except TypeError:
-                            try:
-                                getcallargs(current)
-                            except TypeError:  # arguments *were* required
-                                current = context.template.engine.string_if_invalid  # invalid method call
-                            else:
-                                raise
+
+            # if statement should be outside of the previous for.
+            # callable test should be after evaluating the full variable
+            if callable(current):
+                if getattr(current, 'do_not_call_in_templates', False):
+                    pass
+                elif getattr(current, 'alters_data', False):
+                    current = context.template.engine.string_if_invalid
+                else:
+                    try:  # method call (assuming no args required)
+                        current = current()
+                    except TypeError:
+                        try:
+                            getcallargs(current)
+                        except TypeError:  # arguments *were* required
+                            current = context.template.engine.string_if_invalid  # invalid method call
+                        else:
+                            raise
         except Exception as e:
             template_name = getattr(context, 'template_name', None) or 'unknown'
             logger.debug(
