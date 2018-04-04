@@ -2973,7 +2973,7 @@ lookups. Takes a :class:`datetime.time` value.
 Example::
 
     Entry.objects.filter(pub_date__time=datetime.time(14, 30))
-    Entry.objects.filter(pub_date__time__between=(datetime.time(8), datetime.time(17)))
+    Entry.objects.filter(pub_date__time__range=(datetime.time(8), datetime.time(17)))
 
 (No equivalent SQL code fragment is included for this lookup because
 implementation of the relevant query varies among different database engines.)
