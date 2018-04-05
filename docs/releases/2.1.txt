@@ -380,6 +380,9 @@ Miscellaneous
   value now matches objects that have the specified key and a null value rather
   than objects that don't have the key.
 
+* The admin CSS class ``field-box`` is renamed to ``fieldBox`` to prevent
+  conflicts with the class given to model fields named "box".
+
 .. _deprecated-features-2.1:
 
 Features deprecated in 2.1
