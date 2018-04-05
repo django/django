@@ -5706,10 +5706,10 @@ class TestLabelVisibility(TestCase):
         self.assert_field_visible(response, 'second')
 
     def assert_field_visible(self, response, field_name):
-        self.assertContains(response, '<div class="field-box field-%s">' % field_name)
+        self.assertContains(response, '<div class="fieldBox field-%s">' % field_name)
 
     def assert_field_hidden(self, response, field_name):
-        self.assertContains(response, '<div class="field-box field-%s hidden">' % field_name)
+        self.assertContains(response, '<div class="fieldBox field-%s hidden">' % field_name)
 
     def assert_fieldline_visible(self, response):
         self.assertContains(response, '<div class="form-row field-first field-second">')
