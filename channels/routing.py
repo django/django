@@ -8,6 +8,11 @@ from django.urls.exceptions import Resolver404
 
 from channels.http import AsgiHandler
 
+try:
+    from django.urls.resolvers import URLResolver
+except ImportError:  # Django 1.11
+    from django.urls import RegexURLResolver as URLResolver
+
 
 """
 All Routing instances inside this file are also valid ASGI applications - with
@@ -95,6 +100,13 @@ class URLRouter:
                 # must not be an endpoint
                 if getattr(route.callback, "_path_routing", False) is True:
                     route.pattern._is_endpoint = False
+
+        for route in self.routes:
+            if not route.callback and isinstance(route, URLResolver):
+                raise ImproperlyConfigured(
+                    "%s: include() is not supported in URLRouter. Use nested"
+                    " URLRouter instances instead." % (route,)
+                )
 
     def __call__(self, scope):
         # Get the path
