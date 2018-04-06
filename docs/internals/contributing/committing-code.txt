@@ -59,13 +59,9 @@ Once you're ready:
     $ # Delete the pull request branch.
     $ git branch -d pr/xxxx
 
-For changes on your own branches, force push to your fork after rebasing on
-master but before merging and pushing to upstream. This allows the commit
-hashes on master and your branch to match which automatically closes the pull
-request. Since you can't push to other contributors' branches, comment on the
-pull request "Merged in XXXXXXX" (replacing with the commit hash) after you
-merge it. Trac checks for this message format to indicate on the ticket page
-whether or not a pull request is merged.
+Force push to the branch after rebasing on master but before merging and
+pushing to upstream. This allows the commit hashes on master and the branch to
+match which automatically closes the pull request.
 
 If a pull request doesn't need to be merged as multiple commits, you can use
 GitHub's "Squash and merge" button on the website. Edit the commit message as
@@ -162,10 +158,6 @@ Django's Git repository:
   format will automatically close the referenced ticket and post a comment
   to it with the full commit message.
 
-  If your commit closes a ticket and is in a branch, use the branch name
-  first, then the "Fixed #xxxxx." For example:
-  "[1.4.x] Fixed #123 -- Added whizbang feature."
-
   For the curious, we're using a `Trac plugin`_ for this.
 
 .. note::
@@ -201,6 +193,14 @@ Django's Git repository:
   There's a `script on the wiki
   <https://code.djangoproject.com/wiki/CommitterTips#AutomatingBackports>`_
   to automate this.
+
+  If the commit fixes a regression, include this in the commit message:
+
+  .. code-block:: none
+
+    Regression in 6ecccad711b52f9273b1acb07a57d3f806e93928.
+
+  (use the commit hash where the regression was introduced).
 
 Reverting commits
 =================

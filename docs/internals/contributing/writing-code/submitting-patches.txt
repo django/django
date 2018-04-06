@@ -273,6 +273,10 @@ Bugs
 
 * Is there a proper regression test (the test should fail before the fix
   is applied)?
+* If it's a bug that :ref:`qualifies for a backport <supported-versions-policy>`
+  to the stable version of Django, is there a release note in
+  ``docs/releases/A.B.C.txt``? Bug fixes that will be applied only to the
+  master branch don't need a release note.
 
 New Features
 ------------
