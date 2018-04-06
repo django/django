@@ -12,6 +12,7 @@ from django.conf import settings
 from django.forms.utils import to_current_timezone
 from django.templatetags.static import static
 from django.utils import datetime_safe, formats
+from django.utils.datastructures import OrderedSet
 from django.utils.dates import MONTHS
 from django.utils.formats import get_format
 from django.utils.html import format_html, html_safe
@@ -135,6 +136,16 @@ class Media:
         combined._js = self.merge(self._js, other._js)
         combined._css = {
             medium: self.merge(self._css.get(medium, []), other._css.get(medium, []))
+            for medium in self._css.keys() | other._css.keys()
+        }
+        return combined
+
+    def __and__(self, other):
+        combined = Media()
+        combined._js = OrderedSet(self._js + other._js)
+        combined._css = {
+            medium: OrderedSet(self._css.get(medium, []) +
+                               other._css.get(medium, []))
             for medium in self._css.keys() | other._css.keys()
         }
         return combined
