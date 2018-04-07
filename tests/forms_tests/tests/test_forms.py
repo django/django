@@ -2336,7 +2336,7 @@ Password: <input type="password" name="password" required>
         self.assertEqual(p.cleaned_data['birthday'], datetime.date(1940, 10, 9))
 
     def test_class_prefix(self):
-        # Prefix can be also specified at the class level.
+        # Prefix can be also specified at the class level(idea for new feature).
         class Person(Form):
             first_name = CharField()
             prefix = 'foo'
