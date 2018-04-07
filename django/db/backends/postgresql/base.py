@@ -9,7 +9,7 @@ import warnings
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.db import DEFAULT_DB_ALIAS
+from django.db import connections
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.utils import DatabaseError as WrappedDatabaseError
 from django.utils.functional import cached_property
@@ -255,16 +255,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 "to avoid running initialization queries against the production "
                 "database when it's not needed (for example, when running tests). "
                 "Django was unable to create a connection to the 'postgres' database "
-                "and will use the default database instead.",
+                "and will use the first PostgreSQL database instead.",
                 RuntimeWarning
             )
-            settings_dict = self.settings_dict.copy()
-            settings_dict['NAME'] = settings.DATABASES[DEFAULT_DB_ALIAS]['NAME']
-            nodb_connection = self.__class__(
-                self.settings_dict.copy(),
-                alias=self.alias,
-                allow_thread_sharing=False,
-            )
+            for connection in connections.all():
+                if connection.vendor == 'postgresql' and connection.settings_dict['NAME'] != 'postgres':
+                    return self.__class__(
+                        {**self.settings_dict, 'NAME': connection.settings_dict['NAME']},
+                        alias=self.alias,
+                        allow_thread_sharing=False,
+                    )
         return nodb_connection
 
     @cached_property

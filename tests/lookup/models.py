@@ -5,6 +5,7 @@ This demonstrates features of the database API.
 """
 
 from django.db import models
+from django.db.models.lookups import IsNull
 
 
 class Alarm(models.Model):
@@ -53,6 +54,12 @@ class NulledTextField(models.TextField):
 class NulledTransform(models.Transform):
     lookup_name = 'nulled'
     template = 'NULL'
+
+
+@NulledTextField.register_lookup
+class IsNullWithNoneAsRHS(IsNull):
+    lookup_name = 'isnull_none_rhs'
+    can_use_none_as_rhs = True
 
 
 class Season(models.Model):

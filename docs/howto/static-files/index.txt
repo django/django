@@ -18,12 +18,8 @@ Configuring static files
 
       STATIC_URL = '/static/'
 
-3. In your templates, either hardcode the url like
-   ``/static/my_app/example.jpg`` or, preferably, use the :ttag:`static`
-   template tag to build the URL for the given relative path by using the
-   configured :setting:`STATICFILES_STORAGE` storage (this makes it much easier
-   when you want to switch to a content delivery network (CDN) for serving
-   static files).
+3. In your templates, use the :ttag:`static` template tag to build the URL for
+   the given relative path using the configured :setting:`STATICFILES_STORAGE`.
 
    .. _staticfiles-in-templates:
 

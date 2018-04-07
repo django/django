@@ -8,7 +8,9 @@ from django.db import connection
 from django.db.models.functions import Substr
 from django.test import TestCase, skipUnlessDBFeature
 
-from .models import Article, Author, Game, Player, Season, Tag
+from .models import (
+    Article, Author, Game, IsNullWithNoneAsRHS, Player, Season, Tag,
+)
 
 
 class LookupTests(TestCase):
@@ -895,3 +897,11 @@ class LookupTests(TestCase):
             with self.subTest(lookup=lookup):
                 authors = Author.objects.filter(**{'name__%s' % lookup: Substr('alias', 1, 3)})
                 self.assertCountEqual(authors, result)
+
+    def test_custom_lookup_none_rhs(self):
+        """Lookup.can_use_none_as_rhs=True allows None as a lookup value."""
+        season = Season.objects.create(year=2012, nulled_text_field=None)
+        query = Season.objects.get_queryset().query
+        field = query.model._meta.get_field('nulled_text_field')
+        self.assertIsInstance(query.build_lookup(['isnull_none_rhs'], field, None), IsNullWithNoneAsRHS)
+        self.assertTrue(Season.objects.filter(pk=season.pk, nulled_text_field__isnull_none_rhs=True))

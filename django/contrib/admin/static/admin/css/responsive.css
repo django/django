@@ -207,13 +207,13 @@ input[type="submit"], button {
         min-height: 0;
     }
 
-    fieldset .field-box {
+    fieldset .fieldBox {
         float: none;
         margin: 0 -10px;
         padding: 0 10px;
     }
 
-    fieldset .field-box + .field-box {
+    fieldset .fieldBox + .fieldBox {
         margin-top: 10px;
         padding-top: 10px;
         border-top: 1px solid #eee;
@@ -572,7 +572,7 @@ input[type="submit"], button {
         width: auto;
     }
 
-    fieldset .field-box + .field-box {
+    fieldset .fieldBox + .fieldBox {
         margin-top: 15px;
         padding-top: 15px;
     }

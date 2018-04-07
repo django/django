@@ -12,7 +12,7 @@ from django.db.models import F
 from django.db.models.fields import Field, IntegerField
 from django.db.models.functions import Upper
 from django.db.models.lookups import Contains, Exact
-from django.template import Context, Template
+from django.template import Context, Template, TemplateSyntaxError
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
@@ -893,31 +893,24 @@ class ChangeListTests(TestCase):
         self.assertNotIn('Add ', response.rendered_content)
 
 
-class AdminLogNodeTestCase(TestCase):
+class GetAdminLogTests(TestCase):
 
-    def test_get_admin_log_templatetag_custom_user(self):
+    def test_custom_user_pk_not_named_id(self):
         """
-        Regression test for ticket #20088: admin log depends on User model
-        having id field as primary key.
-
-        The old implementation raised an AttributeError when trying to use
-        the id field.
+        {% get_admin_log %} works if the user model's primary key isn't named
+        'id'.
         """
         context = Context({'user': CustomIdUser()})
-        template_string = '{% load log %}{% get_admin_log 10 as admin_log for_user user %}'
-        template = Template(template_string)
+        template = Template('{% load log %}{% get_admin_log 10 as admin_log for_user user %}')
         # This template tag just logs.
         self.assertEqual(template.render(context), '')
 
-    def test_get_admin_log_templatetag_no_user(self):
-        """
-        The {% get_admin_log %} tag should work without specifying a user.
-        """
+    def test_no_user(self):
+        """{% get_admin_log %} works without specifying a user."""
         user = User(username='jondoe', password='secret', email='super@example.com')
         user.save()
         ct = ContentType.objects.get_for_model(User)
         LogEntry.objects.log_action(user.pk, ct.pk, user.pk, repr(user), 1)
-
         t = Template(
             '{% load log %}'
             '{% get_admin_log 100 as admin_log %}'
@@ -926,6 +919,26 @@ class AdminLogNodeTestCase(TestCase):
             '{% endfor %}'
         )
         self.assertEqual(t.render(Context({})), 'Added "<User: jondoe>".')
+
+    def test_missing_args(self):
+        msg = "'get_admin_log' statements require two arguments"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            Template('{% load log %}{% get_admin_log 10 as %}')
+
+    def test_non_integer_limit(self):
+        msg = "First argument to 'get_admin_log' must be an integer"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            Template('{% load log %}{% get_admin_log "10" as admin_log for_user user %}')
+
+    def test_without_as(self):
+        msg = "Second argument to 'get_admin_log' must be 'as'"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            Template('{% load log %}{% get_admin_log 10 ad admin_log for_user user %}')
+
+    def test_without_for_user(self):
+        msg = "Fourth argument to 'get_admin_log' must be 'for_user'"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            Template('{% load log %}{% get_admin_log 10 as admin_log foruser user %}')
 
 
 @override_settings(ROOT_URLCONF='admin_changelist.urls')

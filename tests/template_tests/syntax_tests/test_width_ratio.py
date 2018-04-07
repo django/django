@@ -142,3 +142,13 @@ class WidthRatioTagTests(SimpleTestCase):
     def test_widthratio21(self):
         output = self.engine.render_to_string('widthratio21', {'a': float('inf'), 'b': 2})
         self.assertEqual(output, '')
+
+    @setup({'t': '{% widthratio a b 100 as variable %}-{{ variable }}-'})
+    def test_zerodivisionerror_as_var(self):
+        output = self.engine.render_to_string('t', {'a': 0, 'b': 0})
+        self.assertEqual(output, '-0-')
+
+    @setup({'t': '{% widthratio a b c as variable %}-{{ variable }}-'})
+    def test_typeerror_as_var(self):
+        output = self.engine.render_to_string('t', {'a': 'a', 'c': 100, 'b': 100})
+        self.assertEqual(output, '--')

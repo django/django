@@ -4,6 +4,7 @@ from decimal import Decimal
 
 from django.core import checks, exceptions, serializers
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models import Q
 from django.forms import CharField, Form, widgets
 from django.test.utils import isolate_apps
 from django.utils.html import escape
@@ -175,6 +176,20 @@ class TestQuerying(PostgreSQLTestCase):
         self.assertSequenceEqual(
             JSONModel.objects.filter(field__a__isnull=False),
             [self.objs[7], self.objs[8]]
+        )
+
+    def test_none_key(self):
+        self.assertSequenceEqual(JSONModel.objects.filter(field__j=None), [self.objs[8]])
+
+    def test_none_key_exclude(self):
+        obj = JSONModel.objects.create(field={'j': 1})
+        self.assertSequenceEqual(JSONModel.objects.exclude(field__j=None), [obj])
+
+    def test_isnull_key_or_none(self):
+        obj = JSONModel.objects.create(field={'a': None})
+        self.assertSequenceEqual(
+            JSONModel.objects.filter(Q(field__a__isnull=True) | Q(field__a=None)),
+            self.objs[:7] + self.objs[9:] + [obj]
         )
 
     def test_contains(self):

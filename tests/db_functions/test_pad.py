@@ -1,5 +1,5 @@
-from django.db.models import Value
-from django.db.models.functions import LPad, RPad
+from django.db.models import CharField, Value
+from django.db.models.functions import Length, LPad, RPad
 from django.test import TestCase
 
 from .models import Author
@@ -32,3 +32,13 @@ class PadTests(TestCase):
             with self.subTest(function=function):
                 with self.assertRaisesMessage(ValueError, "'length' must be greater or equal to 0."):
                     function('name', -1)
+
+    def test_combined_with_length(self):
+        Author.objects.create(name='Rhonda', alias='john_smith')
+        Author.objects.create(name='♥♣♠', alias='bytes')
+        authors = Author.objects.annotate(filled=LPad('name', Length('alias'), output_field=CharField()))
+        self.assertQuerysetEqual(
+            authors.order_by('alias'),
+            ['  ♥♣♠', '    Rhonda'],
+            lambda a: a.filled,
+        )

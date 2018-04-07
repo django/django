@@ -1,4 +1,4 @@
-import os
+import pkgutil
 import sys
 from importlib import import_module, reload
 
@@ -97,17 +97,20 @@ class MigrationLoader:
                 if was_loaded:
                     reload(module)
             self.migrated_apps.add(app_config.label)
-            directory = os.path.dirname(module.__file__)
-            # Scan for .py files
-            migration_names = set()
-            for name in os.listdir(directory):
-                if name.endswith(".py"):
-                    import_name = name.rsplit(".", 1)[0]
-                    if import_name[0] not in "_.~":
-                        migration_names.add(import_name)
-            # Load them
+            migration_names = {name for _, name, is_pkg in pkgutil.iter_modules(module.__path__) if not is_pkg}
+            # Load migrations
             for migration_name in migration_names:
-                migration_module = import_module("%s.%s" % (module_name, migration_name))
+                migration_path = '%s.%s' % (module_name, migration_name)
+                try:
+                    migration_module = import_module(migration_path)
+                except ImportError as e:
+                    if 'bad magic number' in str(e):
+                        raise ImportError(
+                            "Couldn't import %r as it appears to be a stale "
+                            ".pyc file." % migration_path
+                        ) from e
+                    else:
+                        raise
                 if not hasattr(migration_module, "Migration"):
                     raise BadMigrationError(
                         "Migration %s in app %s has no Migration class" % (migration_name, app_config.label)

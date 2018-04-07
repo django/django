@@ -855,6 +855,25 @@ Usage example::
     >>> print(author.name_code_point)
     77
 
+``Repeat``
+----------
+
+.. class:: Repeat(expression, number, **extra)
+
+.. versionadded:: 2.1
+
+Returns the value of the given text field or expression repeated ``number``
+times.
+
+Usage example::
+
+    >>> from django.db.models.functions import Repeat
+    >>> Author.objects.create(name='John', alias='j')
+    >>> Author.objects.update(name=Repeat('name', 3))
+    1
+    >>> print(Author.objects.get(alias='j').name)
+    JohnJohnJohn
+
 ``Replace``
 -----------
 

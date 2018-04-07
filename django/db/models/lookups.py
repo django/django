@@ -12,6 +12,7 @@ from django.utils.functional import cached_property
 class Lookup:
     lookup_name = None
     prepare_rhs = True
+    can_use_none_as_rhs = False
 
     def __init__(self, lhs, rhs):
         self.lhs, self.rhs = lhs, rhs

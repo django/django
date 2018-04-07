@@ -48,6 +48,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             SET V_I = P_I;
         END;
     """
+    db_functions_convert_bytes_to_str = True
 
     @cached_property
     def _mysql_storage_engine(self):
