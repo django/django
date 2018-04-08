@@ -12,3 +12,6 @@ Bugfixes
 * Fixed a regression in Django 1.11.8 where altering a field with a unique
   constraint may drop and rebuild more foreign keys than necessary
   (:ticket:`29193`).
+
+* Fixed crashes in ``django.contrib.admindocs`` when a view is a callable
+  object, such as ``django.contrib.syndication.views.Feed`` (:ticket:`29296`).

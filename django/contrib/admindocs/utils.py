@@ -18,6 +18,12 @@ else:
     docutils_is_available = True
 
 
+def get_view_name(view_func):
+    mod_name = view_func.__module__
+    view_name = getattr(view_func, '__qualname__', view_func.__class__.__name__)
+    return mod_name + '.' + view_name
+
+
 def trim_docstring(docstring):
     """
     Uniformly trim leading/trailing whitespace from docstrings.

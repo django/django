@@ -23,6 +23,8 @@ from django.utils.inspect import (
 from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
 
+from .utils import get_view_name
+
 # Exclude methods starting with these strings from documentation
 MODEL_METHODS_EXCLUDE = ('_', 'add_', 'delete', 'save', 'set_')
 
@@ -128,18 +130,13 @@ class TemplateFilterIndexView(BaseAdminDocsView):
 class ViewIndexView(BaseAdminDocsView):
     template_name = 'admin_doc/view_index.html'
 
-    @staticmethod
-    def _get_full_name(func):
-        mod_name = func.__module__
-        return '%s.%s' % (mod_name, func.__qualname__)
-
     def get_context_data(self, **kwargs):
         views = []
         urlconf = import_module(settings.ROOT_URLCONF)
         view_functions = extract_views_from_urlpatterns(urlconf.urlpatterns)
         for (func, regex, namespace, name) in view_functions:
             views.append({
-                'full_name': self._get_full_name(func),
+                'full_name': get_view_name(func),
                 'url': simplify_regex(regex),
                 'url_name': ':'.join((namespace or []) + (name and [name] or [])),
                 'namespace': ':'.join((namespace or [])),
