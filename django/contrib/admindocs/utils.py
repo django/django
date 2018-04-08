@@ -5,6 +5,7 @@ from email.errors import HeaderParseError
 from email.parser import HeaderParser
 
 from django.urls import reverse
+from django.utils import six
 from django.utils.encoding import force_bytes
 from django.utils.safestring import mark_safe
 
@@ -16,6 +17,16 @@ except ImportError:
     docutils_is_available = False
 else:
     docutils_is_available = True
+
+
+def get_view_name(view_func):
+    mod_name = view_func.__module__
+    if six.PY3:
+        view_name = getattr(view_func, '__qualname__', view_func.__class__.__name__)
+    else:
+        # PY2 does not support __qualname__
+        view_name = getattr(view_func, '__name__', view_func.__class__.__name__)
+    return mod_name + '.' + view_name
 
 
 def trim_docstring(docstring):

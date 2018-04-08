@@ -2,6 +2,8 @@ from django import http
 from django.conf import settings
 from django.utils.deprecation import MiddlewareMixin
 
+from .utils import get_view_name
+
 
 class XViewMiddleware(MiddlewareMixin):
     """
@@ -24,5 +26,5 @@ class XViewMiddleware(MiddlewareMixin):
         if request.method == 'HEAD' and (request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS or
                                          (request.user.is_active and request.user.is_staff)):
             response = http.HttpResponse()
-            response['X-View'] = "%s.%s" % (view_func.__module__, view_func.__name__)
+            response['X-View'] = get_view_name(view_func)
             return response

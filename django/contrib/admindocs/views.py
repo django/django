@@ -15,7 +15,6 @@ from django.db import models
 from django.http import Http404
 from django.template.engine import Engine
 from django.urls import get_mod_func, get_resolver, get_urlconf, reverse
-from django.utils import six
 from django.utils.decorators import method_decorator
 from django.utils.inspect import (
     func_accepts_kwargs, func_accepts_var_args, func_has_no_args,
@@ -23,6 +22,8 @@ from django.utils.inspect import (
 )
 from django.utils.translation import ugettext as _
 from django.views.generic import TemplateView
+
+from .utils import get_view_name
 
 # Exclude methods starting with these strings from documentation
 MODEL_METHODS_EXCLUDE = ('_', 'add_', 'delete', 'save', 'set_')
@@ -129,23 +130,13 @@ class TemplateFilterIndexView(BaseAdminDocsView):
 class ViewIndexView(BaseAdminDocsView):
     template_name = 'admin_doc/view_index.html'
 
-    @staticmethod
-    def _get_full_name(func):
-        mod_name = func.__module__
-        if six.PY3:
-            return '%s.%s' % (mod_name, func.__qualname__)
-        else:
-            # PY2 does not support __qualname__
-            func_name = getattr(func, '__name__', func.__class__.__name__)
-            return '%s.%s' % (mod_name, func_name)
-
     def get_context_data(self, **kwargs):
         views = []
         urlconf = import_module(settings.ROOT_URLCONF)
         view_functions = extract_views_from_urlpatterns(urlconf.urlpatterns)
         for (func, regex, namespace, name) in view_functions:
             views.append({
-                'full_name': self._get_full_name(func),
+                'full_name': get_view_name(func),
                 'url': simplify_regex(regex),
                 'url_name': ':'.join((namespace or []) + (name and [name] or [])),
                 'namespace': ':'.join((namespace or [])),

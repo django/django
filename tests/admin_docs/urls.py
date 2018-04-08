@@ -13,4 +13,6 @@ urlpatterns = [
     url(r'^', include(ns_patterns, namespace='test')),
     url(r'^xview/func/$', views.xview_dec(views.xview)),
     url(r'^xview/class/$', views.xview_dec(views.XViewClass.as_view())),
+    url(r'^xview/callable_object/$', views.xview_dec(views.XViewCallableObject())),
+    url(r'^xview/callable_object_without_xview/$', views.XViewCallableObject()),
 ]
