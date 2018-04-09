@@ -640,6 +640,17 @@ you must render model states using the ``clear_delayed_apps_cache()`` method as
 described in :ref:`writing your own migration operation
 <writing-your-own-migration-operation>`.
 
+Server-side cursors on PostgreSQL
+---------------------------------
+
+The change to make :meth:`.QuerySet.iterator()` use server-side cursors on
+PostgreSQL prevents running Django with `pgBouncer` in transaction pooling
+mode. To reallow that, use the :setting:`DISABLE_SERVER_SIDE_CURSORS
+<DATABASE-DISABLE_SERVER_SIDE_CURSORS>` setting (added in Django 1.11.1) in
+:setting:`DATABASES`.
+
+See :ref:`transaction-pooling-server-side-cursors` for more discussion.
+
 Miscellaneous
 -------------
 
