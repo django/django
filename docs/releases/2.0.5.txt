@@ -9,4 +9,5 @@ Django 2.0.5 fixes several bugs in 2.0.4.
 Bugfixes
 ========
 
-* ...
+* Corrected the import paths that ``inspectdb`` generates for
+  ``django.contrib.postgres`` fields (:ticket:`29307`).
