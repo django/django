@@ -14,12 +14,28 @@ from django.utils.encoding import force_bytes
 logger = logging.getLogger('django.db.backends.schema')
 
 
+def _is_relevant_relation(relation, altered_field):
+    """
+    When altering the given field, must constraints on its model from the given
+    relation be temporarily dropped?
+    """
+    field = relation.field
+    if field.many_to_many:
+        # M2M reverse field
+        return False
+    if altered_field.primary_key and field.to_fields == [None]:
+        # Foreign key constraint on the primary key, which is being altered.
+        return True
+    # Is the constraint targeting the field being altered?
+    return altered_field.name in field.to_fields
+
+
 def _related_non_m2m_objects(old_field, new_field):
     # Filter out m2m objects from reverse relations.
     # Return (old_relation, new_relation) tuples.
     return zip(
-        (obj for obj in old_field.model._meta.related_objects if not obj.field.many_to_many),
-        (obj for obj in new_field.model._meta.related_objects if not obj.field.many_to_many)
+        (obj for obj in old_field.model._meta.related_objects if _is_relevant_relation(obj, old_field)),
+        (obj for obj in new_field.model._meta.related_objects if _is_relevant_relation(obj, new_field))
     )
 
 
@@ -735,7 +751,7 @@ class BaseDatabaseSchemaEditor:
         # Rebuild FKs that pointed to us if we previously had to drop them
         if drop_foreign_keys:
             for rel in new_field.model._meta.related_objects:
-                if not rel.many_to_many and rel.field.db_constraint:
+                if _is_relevant_relation(rel, new_field) and rel.field.db_constraint:
                     self.execute(self._create_fk_sql(rel.related_model, rel.field, "_fk"))
         # Does it have check constraints we need to add?
         if old_db_params['check'] != new_db_params['check'] and new_db_params['check']:

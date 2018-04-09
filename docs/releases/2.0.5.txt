@@ -11,3 +11,7 @@ Bugfixes
 
 * Corrected the import paths that ``inspectdb`` generates for
   ``django.contrib.postgres`` fields (:ticket:`29307`).
+
+* Fixed a regression in Django 1.11.8 where altering a field with a unique
+  constraint may drop and rebuild more foreign keys than necessary
+  (:ticket:`29193`).

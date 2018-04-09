@@ -9,4 +9,6 @@ Django 1.11.13 fixes several bugs in 1.11.12.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 1.11.8 where altering a field with a unique
+  constraint may drop and rebuild more foreign keys than necessary
+  (:ticket:`29193`).
