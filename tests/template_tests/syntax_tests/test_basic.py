@@ -312,6 +312,21 @@ class BasicSyntaxTests(SimpleTestCase):
         output = self.engine.render_to_string('basic-syntax38', {"var": {"callable": lambda: "foo bar"}})
         self.assertEqual(output, 'foo bar')
 
+    @setup({'basic-syntax39': '{{ A.attr }}'})
+    def test_basic_syntax39(self):
+        """
+        Access class attribute
+        """
+
+        class A:
+            def __init__(self, value):
+                pass
+
+            attr = "Hello"
+
+        output = self.engine.render_to_string("basic-syntax39", {"A": A})
+        self.assertEqual(output, 'Hello')
+
     @setup({'template': '{% block content %}'})
     def test_unclosed_block(self):
         msg = "Unclosed tag on line 1: 'block'. Looking for one of: endblock."
