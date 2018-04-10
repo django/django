@@ -77,7 +77,7 @@ Create an Article via the Reporter object::
 Create a new article, and add it to the article set::
 
     >>> new_article2 = Article(headline="Paul's story", pub_date=date(2006, 1, 17))
-    >>> r.article_set.add(new_article2)
+    >>> r.article_set.add(new_article2, bulk=False)
     >>> new_article2.reporter
     <Reporter: John Smith>
     >>> new_article2.reporter.id
