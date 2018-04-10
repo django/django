@@ -257,9 +257,10 @@ class ModelChoiceFieldTests(TestCase):
             (self.c3.pk, 'Third'),
         ])
 
-    def test_queryset_result_cache_is_reused(self):
+    def test_queryset_cached_on__len__(self):
         f = forms.ModelChoiceField(Category.objects.all())
         with self.assertNumQueries(1):
+            self.assertEqual(4, len(f.choices))
             # list() calls __len__() and __iter__(); no duplicate queries.
             self.assertEqual(list(f.choices), [
                 ('', '---------'),
@@ -267,6 +268,19 @@ class ModelChoiceFieldTests(TestCase):
                 (self.c2.pk, 'A test'),
                 (self.c3.pk, 'Third'),
             ])
+
+    def test_queryset_cached_on__iter__(self):
+        f = forms.ModelChoiceField(Category.objects.all())
+        with self.assertNumQueries(1):
+            # Call __iter__ first.
+            choices = [(val, label) for val, label in f.choices]
+            self.assertEqual(choices, [
+                ('', '---------'),
+                (self.c1.pk, 'Entertainment'),
+                (self.c2.pk, 'A test'),
+                (self.c3.pk, 'Third'),
+            ])
+            self.assertEqual(4, len(f.choices))
 
     def test_num_queries(self):
         """
