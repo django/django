@@ -228,6 +228,9 @@ class BaseCommand:
             self, prog="%s %s" % (os.path.basename(prog_name), subcommand),
             description=self.help or None,
         )
+        # Add command-specific arguments first so that they appear in the
+        # --help output before arguments common to all commands.
+        self.add_arguments(parser)
         parser.add_argument('--version', action='version', version=self.get_version())
         parser.add_argument(
             '-v', '--verbosity', action='store', dest='verbosity', default=1,
@@ -251,7 +254,6 @@ class BaseCommand:
             '--no-color', action='store_true', dest='no_color',
             help="Don't colorize the command output.",
         )
-        self.add_arguments(parser)
         return parser
 
     def add_arguments(self, parser):
