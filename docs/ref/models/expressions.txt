@@ -228,6 +228,21 @@ primary key value rather than a model instance::
     >> car.built_by
     3
 
+.. _using-f-to-sort-null-values:
+
+Using ``F()`` to sort null values
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Use ``F()`` and the ``nulls_first`` or ``nulls_last`` keyword argument to
+:meth:`.Expression.asc` or :meth:`~.Expression.desc` to control the ordering of
+a field's null values. By default, the ordering depends on your database.
+
+For example, to sort companies that haven't been contacted (``last_contacted``
+is null) after companies that have been contacted::
+
+    from django.db.models import F
+    Company.object.order_by(F('last_contacted').desc(nulls_last=True))
+
 .. _func-expressions:
 
 ``Func()`` expressions
@@ -971,12 +986,14 @@ calling the appropriate methods on the wrapped expression.
         Returns the expression ready to be sorted in ascending order.
 
         ``nulls_first`` and ``nulls_last`` define how null values are sorted.
+        See :ref:`using-f-to-sort-null-values` for example usage.
 
     .. method:: desc(nulls_first=False, nulls_last=False)
 
         Returns the expression ready to be sorted in descending order.
 
         ``nulls_first`` and ``nulls_last`` define how null values are sorted.
+        See :ref:`using-f-to-sort-null-values` for example usage.
 
     .. method:: reverse_ordering()
 
