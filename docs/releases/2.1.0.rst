@@ -1,0 +1,127 @@
+2.1.0 Release Notes
+===================
+
+Channels 2.1 brings a few new major changes to Channels as well as some more
+minor fixes. In addition, if you've not yet seen it, we now have a long-form
+:doc:`tutorial </tutorial/index>` to better introduce some of the concepts
+and sync versus async styles of coding.
+
+
+Major Changes
+-------------
+
+Async HTTP Consumer
+~~~~~~~~~~~~~~~~~~~
+
+There is a new native-async HTTP consumer class,
+``channels.generic.http.AsyncHttpConsumer``. This allows much easier writing
+of long-poll endpoints or other long-lived HTTP connection handling that
+benefits from native async support.
+
+You can read more about it in the :doc:`/topics/consumers` documentation.
+
+
+WebSocket Consumers
+~~~~~~~~~~~~~~~~~~~
+
+These consumer classes now all have built-in group join and leave functionality,
+which will make a consumer join all group names that are in the iterable
+``groups`` on the consumer class (this can be a static list or a ``@property``
+method).
+
+In addition, the ``accept`` methods on both variants now take an optional
+``subprotocol`` argument, which will be sent back to the WebSocket client as
+the subprotocol the server has selected. The client's advertised subprotocols
+can, as always, be found in the scope as ``scope["subprotocols"]``.
+
+
+Nested URL Routing
+~~~~~~~~~~~~~~~~~~
+
+``URLRouter`` instances can now be nested inside each other and, like Django's
+URL handling and ``include``, will strip off the matched part of the URL in the
+outer router and leave only the unmatched portion for the inner router, allowing
+reuseable routing files.
+
+
+Login and Logout
+~~~~~~~~~~~~~~~~
+
+As well as overhauling the internals of the ``AuthMiddleware``, there are now
+also ``login`` and ``logout`` async functions you can call in consumers to
+log users in and out of the current session.
+
+Due to the way cookies are sent back to clients, these come with some caveats;
+read more about them and how to use them properly in :doc:`/topics/authentication`.
+
+
+In-Memory Channel Layer
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The in-memory channel layer has been extended to have full expiry and group
+support so it should now be suitable for drop-in replacement for most
+test scenarios.
+
+
+Testing
+~~~~~~~
+
+The ``ChannelsLiveServerTestCase`` has been rewritten to use a new method for
+launching Daphne that should be more resilient (and faster), and now shares
+code with the Daphne test suite itself.
+
+Ports are now left up to the operating
+system to decide rather than being picked from within a set range. It also now
+supports static files when the Django ``staticfiles`` app is enabled.
+
+In addition, the Communicator classes have gained a ``receive_nothing`` method
+that allows you to assert that the application didn't send anything, rather
+than writing this yourself using exception handling. See more in the
+:doc:`/topics/testing` documentation.
+
+
+Origin header validation
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+As well as removing the ``print`` statements that accidentally got into the
+last release, this has been overhauled to more correctly match against headers
+according to the Origin header spec and align with Django's ``ALLOWED_HOSTS``
+setting.
+
+It can now also enforce protocol (``http`` versus ``https``) and port, both
+optionally.
+
+
+Bugfixes & Small Changes
+------------------------
+
+* ``print`` statements that accidentally got left in the ``Origin`` validation
+  code were removed.
+
+* The ``runserver`` command now shows the version of Channels you are running.
+
+* Orphaned tasks that may have caused warnings during test runs or occasionally
+  live site traffic are now correctly killed off rather than letting them die
+  later on and print warning messages.
+
+* ``WebsocketCommunicator`` now accepts a query string passed into the
+  constructor and adds it to the scope rather than just ignoring it.
+
+* Test handlers will correctly handle changing the ``CHANNEL_LAYERS`` setting
+  via decorators and wipe the internal channel layer cache.
+
+* ``SessionMiddleware`` can be safely nested inside itself rather than causing
+  a runtime error.
+
+
+Backwards Incompatible Changes
+------------------------------
+
+* The format taken by the ``OriginValidator`` for its domains has changed and
+  ``*.example.com`` is no longer allowed; instead, use ``.example.com`` to match
+  a domain and all its subdomains.
+
+* If you previously nested ``URLRouter`` instances inside each other both would
+  have been matching on the full URL before, whereas now they will match on the
+  unmatched portion of the URL, meaning your URL routes would break if you had
+  intended this usage.

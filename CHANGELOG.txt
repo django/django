@@ -1,6 +1,25 @@
 Full release notes, with more details and upgrade information, are available at:
 https://channels.readthedocs.io/en/latest/releases
 
+2.1.0 (2018-04-11)
+------------------
+
+* Async HTTP Consumers and WebSocket Consumers both gained new functionality
+  (groups, subprotocols, and an async HTTP variant)
+
+* URLRouters now allow nesting
+
+* Async login and logout functions for sessions
+
+* Expiry and groups in the in-memory channel layer
+
+* Improved Live Server test case
+
+* More powerful OriginValidator
+
+* Other small changes and fixes in the full release notes.
+
+
 2.0.2 (2018-02-08)
 ------------------
 
