@@ -769,6 +769,11 @@ class AggregationTests(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             Author.objects.annotate(friends=Count('friends'))
 
+    def test_fk_attname_conflict(self):
+        msg = "The annotation 'contact_id' conflicts with a field on the model."
+        with self.assertRaisesMessage(ValueError, msg):
+            Book.objects.annotate(contact_id=F('publisher_id'))
+
     def test_values_queryset_non_conflict(self):
         # Regression for #14707 -- If you're using a values query set, some potential conflicts are avoided.
 
