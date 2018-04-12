@@ -1599,6 +1599,7 @@ class SchemaTests(TransactionTestCase):
             class Meta:
                 app_label = 'schema'
 
+        self.isolated_local_models = [Book._meta.get_field('tags').remote_field.through]
         with connection.schema_editor() as editor:
             editor.create_model(Tag)
             editor.create_model(Book)
