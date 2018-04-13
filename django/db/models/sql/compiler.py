@@ -411,9 +411,8 @@ class SQLCompiler:
                 # If the columns list is limited, then all combined queries
                 # must have the same columns list. Set the selects defined on
                 # the query on all combined queries, if not already set.
-                if (not compiler.query.values_select and not compiler.query.annotations and
-                        self.query.values_select):
-                    compiler.query.set_values(self.query.values_select)
+                if not compiler.query.values_select and self.query.values_select:
+                    compiler.query.set_values(tuple(self.query.values_select) + tuple(self.query.annotation_select))
                 parts += (compiler.as_sql(),)
             except EmptyResultSet:
                 # Omit the empty queryset with UNION and with DIFFERENCE if the
