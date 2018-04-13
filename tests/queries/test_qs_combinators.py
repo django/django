@@ -1,4 +1,4 @@
-from django.db.models import F, IntegerField, Value
+from django.db.models import Exists, F, IntegerField, OuterRef, Value
 from django.db.utils import DatabaseError, NotSupportedError
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
@@ -129,6 +129,14 @@ class QuerySetSetOperationTests(TestCase):
             num=Value(1, IntegerField()),
         ).values_list('num', 'count')
         self.assertCountEqual(qs1.union(qs2), [(1, 0), (2, 1)])
+
+    def test_union_with_values_list_on_annotated_and_unannotated(self):
+        ReservedName.objects.create(name='rn1', order=1)
+        qs1 = Number.objects.annotate(
+            has_reserved_name=Exists(ReservedName.objects.filter(order=OuterRef('num')))
+        ).filter(has_reserved_name=True)
+        qs2 = Number.objects.filter(num=9)
+        self.assertCountEqual(qs1.union(qs2).values_list('num', flat=True), [1, 9])
 
     def test_count_union(self):
         qs1 = Number.objects.filter(num__lte=1).values('num')
