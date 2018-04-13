@@ -209,12 +209,13 @@ class BaseModelAdminChecks:
         elif not isinstance(obj.fieldsets, (list, tuple)):
             return must_be('a list or tuple', option='fieldsets', obj=obj, id='admin.E007')
         else:
+            seen_fields = []
             return list(chain.from_iterable(
-                self._check_fieldsets_item(obj, obj.model, fieldset, 'fieldsets[%d]' % index)
+                self._check_fieldsets_item(obj, obj.model, fieldset, 'fieldsets[%d]' % index, seen_fields)
                 for index, fieldset in enumerate(obj.fieldsets)
             ))
 
-    def _check_fieldsets_item(self, obj, model, fieldset, label):
+    def _check_fieldsets_item(self, obj, model, fieldset, label, seen_fields):
         """ Check an item of `fieldsets`, i.e. check that this is a pair of a
         set name and a dictionary containing "fields" key. """
 
@@ -235,8 +236,8 @@ class BaseModelAdminChecks:
         elif not isinstance(fieldset[1]['fields'], (list, tuple)):
             return must_be('a list or tuple', option="%s[1]['fields']" % label, obj=obj, id='admin.E008')
 
-        fields = flatten(fieldset[1]['fields'])
-        if len(fields) != len(set(fields)):
+        seen_fields.extend(flatten(fieldset[1]['fields']))
+        if len(seen_fields) != len(set(seen_fields)):
             return [
                 checks.Error(
                     "There are duplicate field(s) in '%s[1]'." % label,
