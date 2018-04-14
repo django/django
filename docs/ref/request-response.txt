@@ -748,7 +748,7 @@ Methods
 
     Sets a header unless it has already been set.
 
-.. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False)
+.. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False, samesite=None)
 
     Sets a cookie. The parameters are the same as in the
     :class:`~http.cookies.Morsel` cookie object in the Python standard library.
@@ -773,8 +773,17 @@ Methods
       when it is honored, it can be a useful way to mitigate the
       risk of a client-side script from accessing the protected cookie
       data.
+    * Use ``samesite='Strict'`` or ``samesite='Lax'`` to tell the browser not
+      to send this cookie when performing a cross-origin request. `SameSite`_
+      isn't supported by all browsers, so it's not a replacement for Django's
+      CSRF protection, but rather a defense in depth measure.
+
+    .. versionchanged:: 2.1
+
+        The ``samesite`` argument was added.
 
     .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
+    .. _SameSite: https://www.owasp.org/index.php/SameSite
 
     .. warning::
 
@@ -784,7 +793,7 @@ Methods
         to store a cookie of more than 4096 bytes, but many browsers will not
         set the cookie correctly.
 
-.. method:: HttpResponse.set_signed_cookie(key, value, salt='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=True)
+.. method:: HttpResponse.set_signed_cookie(key, value, salt='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=True, samesite=None)
 
     Like :meth:`~HttpResponse.set_cookie()`, but
     :doc:`cryptographic signing </topics/signing>` the cookie before setting

@@ -79,6 +79,17 @@ class SetCookieTests(SimpleTestCase):
         response.set_cookie('test', cookie_value)
         self.assertEqual(response.cookies['test'].value, cookie_value)
 
+    def test_samesite(self):
+        response = HttpResponse()
+        response.set_cookie('example', samesite='Lax')
+        self.assertEqual(response.cookies['example']['samesite'], 'Lax')
+        response.set_cookie('example', samesite='strict')
+        self.assertEqual(response.cookies['example']['samesite'], 'strict')
+
+    def test_invalid_samesite(self):
+        with self.assertRaisesMessage(ValueError, 'samesite must be "lax" or "strict".'):
+            HttpResponse().set_cookie('example', samesite='invalid')
+
 
 class DeleteCookieTests(SimpleTestCase):
 

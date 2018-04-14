@@ -746,6 +746,11 @@ class CookieTests(unittest.TestCase):
         # document.cookie parses whitespace.
         self.assertEqual(parse_cookie('  =  b  ;  ;  =  ;   c  =  ;  '), {'': 'b', 'c': ''})
 
+    def test_samesite(self):
+        c = SimpleCookie('name=value; samesite=lax; httponly')
+        self.assertEqual(c['name']['samesite'], 'lax')
+        self.assertIn('SameSite=lax', c.output())
+
     def test_httponly_after_load(self):
         c = SimpleCookie()
         c.load("name=val")

@@ -365,6 +365,20 @@ This is useful if you have multiple Django instances running under the same
 hostname. They can use different cookie paths, and each instance will only see
 its own CSRF cookie.
 
+.. setting:: CSRF_COOKIE_SAMESITE
+
+``CSRF_COOKIE_SAMESITE``
+------------------------
+
+.. versionadded:: 2.1
+
+Default: ``'Lax'``
+
+The value of the `SameSite`_ flag on the CSRF cookie. This flag prevents the
+cookie from being sent in cross-site requests.
+
+See :setting:`SESSION_COOKIE_SAMESITE` for details about ``SameSite``.
+
 .. setting:: CSRF_COOKIE_SECURE
 
 ``CSRF_COOKIE_SECURE``
@@ -3025,6 +3039,44 @@ This is useful if you have multiple Django instances running under the same
 hostname. They can use different cookie paths, and each instance will only see
 its own session cookie.
 
+.. setting:: SESSION_COOKIE_SAMESITE
+
+``SESSION_COOKIE_SAMESITE``
+---------------------------
+
+.. versionadded:: 2.1
+
+Default: ``'Lax'``
+
+The value of the `SameSite`_ flag on the session cookie. This flag prevents the
+cookie from being sent in cross-site requests thus preventing CSRF attacks and
+making some methods of stealing session cookie impossible.
+
+Possible values for the setting are:
+
+* ``'Strict'``: prevents the cookie from being sent by the browser to the
+  target site in all cross-site browsing context, even when following a regular
+  link.
+
+  For example, for a GitHub-like website this would mean that if a logged-in
+  user follows a link to a private GitHub project posted on a corporate
+  discussion forum or email, GitHub will not receive the session cookie and the
+  user won't be able to access the project. A bank website, however, most
+  likely doesn't want to allow any transactional pages to be linked from
+  external sites so the ``'Strict'`` flag would be appropriate.
+
+* ``'Lax'`` (default): provides a balance between security and usability for
+  websites that want to maintain user's logged-in session after the user
+  arrives from an external link.
+
+  In the GitHub scenario, the session cookie would be allowed when following a
+  regular link from an external website and be blocked in CSRF-prone request
+  methods (e.g. ``POST``).
+
+* ``None``: disables the flag.
+
+.. _SameSite: https://www.owasp.org/index.php/SameSite
+
 .. setting:: SESSION_COOKIE_SECURE
 
 ``SESSION_COOKIE_SECURE``
@@ -3425,6 +3477,7 @@ Security
   * :setting:`CSRF_COOKIE_DOMAIN`
   * :setting:`CSRF_COOKIE_NAME`
   * :setting:`CSRF_COOKIE_PATH`
+  * :setting:`CSRF_COOKIE_SAMESITE`
   * :setting:`CSRF_COOKIE_SECURE`
   * :setting:`CSRF_FAILURE_VIEW`
   * :setting:`CSRF_HEADER_NAME`

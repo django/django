@@ -660,6 +660,16 @@ class SessionMiddlewareTests(TestCase):
             str(response.cookies[settings.SESSION_COOKIE_NAME])
         )
 
+    @override_settings(SESSION_COOKIE_SAMESITE='Strict')
+    def test_samesite_session_cookie(self):
+        request = RequestFactory().get('/')
+        response = HttpResponse()
+        middleware = SessionMiddleware()
+        middleware.process_request(request)
+        request.session['hello'] = 'world'
+        response = middleware.process_response(request, response)
+        self.assertEqual(response.cookies[settings.SESSION_COOKIE_NAME]['samesite'], 'Strict')
+
     @override_settings(SESSION_COOKIE_HTTPONLY=False)
     def test_no_httponly_session_cookie(self):
         request = RequestFactory().get('/')
