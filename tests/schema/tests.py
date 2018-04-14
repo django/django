@@ -59,6 +59,9 @@ class SchemaTests(TransactionTestCase):
         # local_models should contain test dependent model classes that will be
         # automatically removed from the app cache on test tear down.
         self.local_models = []
+        # isolated_local_models contains models that are in test methods
+        # decorated with @isolate_apps.
+        self.isolated_local_models = []
 
     def tearDown(self):
         # Delete any tables made for our models
@@ -73,6 +76,10 @@ class SchemaTests(TransactionTestCase):
                     if through and through._meta.auto_created:
                         del new_apps.all_models['schema'][through._meta.model_name]
                 del new_apps.all_models['schema'][model._meta.model_name]
+        if self.isolated_local_models:
+            with connection.schema_editor() as editor:
+                for model in self.isolated_local_models:
+                    editor.delete_model(model)
 
     def delete_tables(self):
         "Deletes all model tables for our models for a clean test environment"
