@@ -586,6 +586,14 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
             max_age = resp2.cookies.get('csrfcookie').get('max-age')
             self.assertEqual(max_age, '')
 
+    def test_csrf_cookie_samesite(self):
+        req = self._get_GET_no_csrf_cookie_request()
+        with self.settings(CSRF_COOKIE_NAME='csrfcookie', CSRF_COOKIE_SAMESITE='Strict'):
+            self.mw.process_view(req, token_view, (), {})
+            resp = token_view(req)
+            resp2 = self.mw.process_response(req, resp)
+            self.assertEqual(resp2.cookies['csrfcookie']['samesite'], 'Strict')
+
     def test_process_view_token_too_long(self):
         """
         If the token is longer than expected, it is ignored and a new token is

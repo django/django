@@ -112,7 +112,8 @@ Minor features
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Added the :setting:`SESSION_COOKIE_SAMESITE` setting to set the ``SameSite``
+  cookie flag on session cookies.
 
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -143,7 +144,8 @@ Cache
 CSRF
 ~~~~
 
-* ...
+* Added the :setting:`CSRF_COOKIE_SAMESITE` setting to set the ``SameSite``
+  cookie flag on CSRF cookies.
 
 Database backends
 ~~~~~~~~~~~~~~~~~
@@ -238,6 +240,9 @@ Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
 * Added :meth:`.HttpRequest.get_full_path_info`.
+
+* Added the ``samesite`` argument to :meth:`.HttpResponse.set_cookie` to allow
+  setting the ``SameSite`` cookie flag.
 
 Serialization
 ~~~~~~~~~~~~~
@@ -337,6 +342,16 @@ To fix the lack of ``<label>`` when using ``RadioSelect`` and
 variable now appears as an attribute of each option. For example, in a custom
 ``input_option.html`` template, change ``{% if wrap_label %}`` to
 ``{% if widget.wrap_label %}``.
+
+``SameSite`` cookies
+--------------------
+
+The cookies used for ``django.contrib.sessions``, ``django.contrib.messages``,
+and Django's CSRF protection now set the ``SameSite`` flag to ``Lax`` by
+default. Browsers that respect this flag won't send these cookies on
+cross-origin requests. If you rely on the old behavior, set the
+:setting:`SESSION_COOKIE_SAMESITE` and/or :setting:`CSRF_COOKIE_SAMESITE`
+setting to ``None``.
 
 Miscellaneous
 -------------
