@@ -1134,13 +1134,16 @@ class ModelChoiceIterator:
             yield ("", self.field.empty_label)
         queryset = self.queryset
         # Can't use iterator() when queryset uses prefetch_related()
-        if not queryset._prefetch_related_lookups and queryset._result_cache is None:
+        if not queryset._prefetch_related_lookups:
             queryset = queryset.iterator()
         for obj in queryset:
             yield self.choice(obj)
 
     def __len__(self):
-        return len(self.queryset) + (1 if self.field.empty_label is not None else 0)
+        # count() adds a query but uses less memory since the QuerySet results
+        # won't be cached. In most cases, the choices will only be iterated on,
+        # and __len__() won't be called.
+        return self.queryset.count() + (1 if self.field.empty_label is not None else 0)
 
     def choice(self, obj):
         return (self.field.prepare_value(obj), self.field.label_from_instance(obj))
