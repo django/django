@@ -115,6 +115,17 @@ class ModelChoiceFieldTests(TestCase):
             (c4.pk, 'Fourth'),
         ])
 
+    def test_choices_bool(self):
+        f = forms.ModelChoiceField(Category.objects.all(), empty_label=None)
+        self.assertIs(bool(f.choices), True)
+        Category.objects.all().delete()
+        self.assertIs(bool(f.choices), False)
+
+    def test_choices_bool_empty_label(self):
+        f = forms.ModelChoiceField(Category.objects.all(), empty_label='--------')
+        Category.objects.all().delete()
+        self.assertIs(bool(f.choices), True)
+
     def test_deepcopies_widget(self):
         class ModelChoiceForm(forms.Form):
             category = forms.ModelChoiceField(Category.objects.all())
