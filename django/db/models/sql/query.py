@@ -1264,7 +1264,7 @@ class Query:
         joinpromoter = JoinPromoter(q_object.connector, len(q_object.children), current_negated)
         for child in q_object.children:
             if not isinstance(child, Node):
-                child = self._prepare_lookup(child)
+                child = self._expand_forward_related_filter(child)
             if isinstance(child, Node):
                 child_clause, needed_inner = self._add_q(
                     child, used_aliases, branch_negated,
@@ -1282,14 +1282,12 @@ class Query:
         needed_inner = joinpromoter.update_join_types(self)
         return target_clause, needed_inner
 
-    def _prepare_lookup(self, lookup):
+    def _expand_forward_related_filter(self, lookup):
         """
-        If the node is carrying generic foreign key lookup and the lookup is
-        simple (no double underscores), convert it to a Q node carrying the
-        double content_type and object_id lookup. Otherwise returns the original
-        lookup
-        :param lookup: a tuple (lookup, value)
-        :return: a transformed lookup - tuple (lookup, value) or a Q object
+        If the lookup is simple (no double underscores) and the node is
+        carrying generic foreign key lookup, convert it to a Q node carrying
+        the double content_type and object_id lookup. Otherwise returns the
+        original lookup
         """
         arg, val = lookup
         split_arg = arg.split(LOOKUP_SEP)
