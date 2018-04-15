@@ -235,7 +235,7 @@ sophisticated, but will produce incorrect results for some languages::
         'name': name
     }
 
-Don't try to implement your own singular-or-plural logic, it won't be correct.
+Don't try to implement your own singular-or-plural logic; it won't be correct.
 In a case like this, consider something like the following::
 
     text = ngettext(
