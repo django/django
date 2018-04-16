@@ -12,6 +12,7 @@ from django.utils.http import http_date
 from django.utils.timezone import get_default_timezone, is_naive, make_aware
 from django.utils.translation import get_language
 
+
 def add_domain(domain, url, secure=False):
     protocol = 'https' if secure else 'http'
     if url.startswith('//'):
