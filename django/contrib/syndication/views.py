@@ -10,7 +10,6 @@ from django.utils.encoding import iri_to_uri
 from django.utils.html import escape
 from django.utils.http import http_date
 from django.utils.timezone import get_default_timezone, is_naive, make_aware
-from django.utils.translation import get_language
 
 
 def add_domain(domain, url, secure=False):
@@ -29,6 +28,7 @@ class FeedDoesNotExist(ObjectDoesNotExist):
 
 class Feed:
     feed_type = feedgenerator.DefaultFeed
+    language = settings.LANGUAGE_CODE
     title_template = None
     description_template = None
 
@@ -135,7 +135,7 @@ class Feed:
             subtitle=self._get_dynamic_attr('subtitle', obj),
             link=link,
             description=self._get_dynamic_attr('description', obj),
-            language=get_language() if get_language() else settings.LANGUAGE_CODE,
+            language=self.language,
             feed_url=add_domain(
                 current_site.domain,
                 self._get_dynamic_attr('feed_url', obj) or request.path,
