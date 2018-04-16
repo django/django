@@ -244,15 +244,15 @@ class MethodDecoratorTests(SimpleTestCase):
                 "A method"
                 pass
 
-        for Test in (TestPlain, TestMethodAndClass, TestIterable):
-            self.assertIs(getattr(Test().method, 'myattr', False), True)
-            self.assertIs(getattr(Test().method, 'myattr2', False), True)
-
-            self.assertIs(getattr(Test.method, 'myattr', False), True)
-            self.assertIs(getattr(Test.method, 'myattr2', False), True)
-
-            self.assertEqual(Test.method.__doc__, 'A method')
-            self.assertEqual(Test.method.__name__, 'method')
+        tests = (TestPlain, TestMethodAndClass, TestIterable)
+        for Test in tests:
+            with self.subTest(Test=Test):
+                self.assertIs(getattr(Test().method, 'myattr', False), True)
+                self.assertIs(getattr(Test().method, 'myattr2', False), True)
+                self.assertIs(getattr(Test.method, 'myattr', False), True)
+                self.assertIs(getattr(Test.method, 'myattr2', False), True)
+                self.assertEqual(Test.method.__doc__, 'A method')
+                self.assertEqual(Test.method.__name__, 'method')
 
     def test_bad_iterable(self):
         decorators = {myattr_dec_m, myattr2_dec_m}
