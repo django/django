@@ -1,4 +1,5 @@
 import datetime
+import pickle
 import unittest
 import uuid
 from copy import deepcopy
@@ -584,6 +585,11 @@ class BasicExpressionsTests(TestCase):
         inner = Company.objects.filter(num_employees=OuterRef('ceo__salary') + 2)
         outer = Company.objects.filter(pk__in=Subquery(inner.values('pk')))
         self.assertEqual(outer.get().name, 'Test GmbH')
+
+    def test_pickle_expression(self):
+        expr = Value(1, output_field=models.IntegerField())
+        expr.convert_value  # populate cached property
+        self.assertEqual(pickle.loads(pickle.dumps(expr)), expr)
 
 
 class IterableLookupInnerExpressionsTests(TestCase):

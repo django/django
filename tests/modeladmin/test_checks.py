@@ -166,6 +166,19 @@ class FieldsetsCheckTests(CheckTestCase):
             'admin.E012'
         )
 
+    def test_duplicate_fields_in_fieldsets(self):
+        class TestModelAdmin(ModelAdmin):
+            fieldsets = [
+                (None, {'fields': ['name']}),
+                (None, {'fields': ['name']}),
+            ]
+
+        self.assertIsInvalid(
+            TestModelAdmin, ValidationTestModel,
+            "There are duplicate field(s) in 'fieldsets[1][1]'.",
+            'admin.E012'
+        )
+
     def test_fieldsets_with_custom_form_validation(self):
         class BandAdmin(ModelAdmin):
             fieldsets = (('Band', {'fields': ('name',)}),)
@@ -604,7 +617,8 @@ class ListFilterTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin, ValidationTestModel,
             "The value of 'list_filter[0]' must inherit from 'ListFilter'.",
-            'admin.E113')
+            'admin.E113'
+        )
 
     def test_not_filter_again(self):
         class RandomClass:
@@ -908,7 +922,8 @@ class InlinesCheckTests(CheckTestCase):
         self.assertIsInvalidRegexp(
             TestModelAdmin, ValidationTestModel,
             r"'.*\.ValidationTestInline' must have a 'model' attribute\.",
-            'admin.E105')
+            'admin.E105'
+        )
 
     def test_invalid_model_type(self):
         class SomethingBad:

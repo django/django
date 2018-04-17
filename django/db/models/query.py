@@ -7,6 +7,7 @@ import operator
 import warnings
 from collections import OrderedDict, namedtuple
 from functools import lru_cache
+from itertools import chain
 
 from django.conf import settings
 from django.core import exceptions
@@ -981,7 +982,10 @@ class QuerySet:
         clone = self._chain()
         names = self._fields
         if names is None:
-            names = {f.name for f in self.model._meta.get_fields()}
+            names = set(chain.from_iterable(
+                (field.name, field.attname) if hasattr(field, 'attname') else (field.name,)
+                for field in self.model._meta.get_fields()
+            ))
 
         for alias, annotation in annotations.items():
             if alias in names:
