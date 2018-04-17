@@ -40,7 +40,7 @@ To install pip on your machine, go to
 https://pip.pypa.io/en/latest/installing/, and follow the ``Installing with
 get-pip.py`` instructions.
 
-.. _pip: https://pypi.python.org/pypi/pip
+.. _pip: https://pypi.org/project/pip/
 
 Install ``virtualenv`` and ``virtualenvwrapper``
 ================================================
@@ -62,8 +62,8 @@ command prompt, you'll need to activate the environment again using::
 
     workon myproject
 
-.. _virtualenv: https://pypi.python.org/pypi/virtualenv
-.. _virtualenvwrapper: https://pypi.python.org/pypi/virtualenvwrapper-win
+.. _virtualenv: https://pypi.org/project/virtualenv/
+.. _virtualenvwrapper: https://pypi.org/project/virtualenvwrapper-win/
 
 Install Django
 ==============

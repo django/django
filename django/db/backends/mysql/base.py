@@ -1,7 +1,7 @@
 """
 MySQL database backend for Django.
 
-Requires mysqlclient: https://pypi.python.org/pypi/mysqlclient/
+Requires mysqlclient: https://pypi.org/project/mysqlclient/
 """
 import re
 

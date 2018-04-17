@@ -40,7 +40,7 @@ invalidating caches.
 This functionality from the `django-transaction-hooks`_ package has been
 integrated into Django.
 
-.. _django-transaction-hooks: https://pypi.python.org/pypi/django-transaction-hooks
+.. _django-transaction-hooks: https://pypi.org/project/django-transaction-hooks/
 
 Password validation
 -------------------

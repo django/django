@@ -715,7 +715,7 @@ Management Commands
     filesystem for changes every second. That caused a small delay before
     reloads and reduced battery life on laptops.
 
-    .. _pyinotify: https://pypi.python.org/pypi/pyinotify
+    .. _pyinotify: https://pypi.org/project/pyinotify/
 
   * In addition, the development server automatically reloads when a
     translation file is updated, i.e. after running
@@ -737,7 +737,7 @@ Management Commands
   :class:`~django.db.migrations.operations.RunSQL` operation of migrations,
   which benefits from the improved behavior.
 
-.. _sqlparse: https://pypi.python.org/pypi/sqlparse
+.. _sqlparse: https://pypi.org/project/sqlparse/
 
 Models
 ~~~~~~
@@ -1202,7 +1202,7 @@ a :exc:`ValueError` when encountering them, you will have to install pytz_. You
 may be affected by this problem if you use Django's time zone-related date
 formats or :mod:`django.contrib.syndication`.
 
-.. _pytz: https://pypi.python.org/pypi/pytz/
+.. _pytz: https://pypi.org/project/pytz/
 
 ``remove()`` and ``clear()`` methods of related managers
 --------------------------------------------------------

@@ -72,7 +72,7 @@ provides several security enhancements to the request/response cycle. The new
 :option:`check --deploy` option allows you to check your production settings
 file for ways to increase the security of your site.
 
-.. _django-secure: https://pypi.python.org/pypi/django-secure
+.. _django-secure: https://pypi.org/project/django-secure/
 
 New PostgreSQL specific functionality
 -------------------------------------
@@ -1493,7 +1493,7 @@ in Django 1.10. The functionality it provided (validating checksum using the
 Luhn algorithm) was undocumented and not used in Django. The module has been
 moved to the `django-localflavor`_ package (version 1.1+).
 
-.. _django-localflavor: https://pypi.python.org/pypi/django-localflavor
+.. _django-localflavor: https://pypi.org/project/django-localflavor/
 
 ``InlineAdminForm.original_content_type_id``
 --------------------------------------------

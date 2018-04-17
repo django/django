@@ -309,7 +309,7 @@ Now you're ready to actually put the release out there. To do this:
    This just tests that the tarballs are available (i.e. redirects are up) and
    that they install correctly, but it'll catch silly mistakes.
 
-   __ https://pypi.python.org/pypi/virtualenvwrapper
+   __ https://pypi.org/project/virtualenvwrapper/
 
 #. Ask a few people on IRC to verify the checksums by visiting the checksums
    file (e.g. https://www.djangoproject.com/m/pgp/Django-1.5b1.checksum.txt)

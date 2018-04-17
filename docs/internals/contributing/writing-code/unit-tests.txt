@@ -258,20 +258,20 @@ and install the Geospatial libraries</ref/contrib/gis/install/index>`.
 Each of these dependencies is optional. If you're missing any of them, the
 associated tests will be skipped.
 
-.. _argon2-cffi: https://pypi.python.org/pypi/argon2_cffi
-.. _bcrypt: https://pypi.python.org/pypi/bcrypt
-.. _docutils: https://pypi.python.org/pypi/docutils
-.. _geoip2: https://pypi.python.org/pypi/geoip2
-.. _jinja2: https://pypi.python.org/pypi/jinja2
-.. _numpy: https://pypi.python.org/pypi/numpy
-.. _Pillow: https://pypi.python.org/pypi/Pillow/
+.. _argon2-cffi: https://pypi.org/project/argon2_cffi/
+.. _bcrypt: https://pypi.org/project/bcrypt/
+.. _docutils: https://pypi.org/project/docutils/
+.. _geoip2: https://pypi.org/project/geoip2/
+.. _jinja2: https://pypi.org/project/jinja2/
+.. _numpy: https://pypi.org/project/numpy/
+.. _Pillow: https://pypi.org/project/Pillow/
 .. _PyYAML: https://pyyaml.org/wiki/PyYAML
-.. _pytz: https://pypi.python.org/pypi/pytz/
-.. _setuptools: https://pypi.python.org/pypi/setuptools/
+.. _pytz: https://pypi.org/project/pytz/
+.. _setuptools: https://pypi.org/project/setuptools/
 .. _memcached: https://memcached.org/
 .. _gettext: https://www.gnu.org/software/gettext/manual/gettext.html
-.. _selenium: https://pypi.python.org/pypi/selenium
-.. _sqlparse: https://pypi.python.org/pypi/sqlparse
+.. _selenium: https://pypi.org/project/selenium/
+.. _sqlparse: https://pypi.org/project/sqlparse/
 .. _pip requirements files: https://pip.pypa.io/en/latest/user_guide/#requirements-files
 
 Code coverage

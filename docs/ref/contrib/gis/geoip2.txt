@@ -18,7 +18,7 @@ Additionally, it is recommended to install the `libmaxminddb C library`__, so
 that ``geoip2`` can leverage the C library's faster speed.
 
 __ https://geoip2.readthedocs.io/
-__ https://pypi.python.org/pypi/geoip2
+__ https://pypi.org/project/geoip2/
 __ https://dev.maxmind.com/geoip/geoip2/geolite2/
 __ https://github.com/maxmind/libmaxminddb
 

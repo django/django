@@ -34,7 +34,7 @@ Test your installation by importing it in the Python interactive interpreter::
 
 If that command doesn't raise any errors, the installation worked.
 
-.. _available on PyPI: https://pypi.python.org/pypi/reportlab
+.. _available on PyPI: https://pypi.org/project/reportlab/
 .. _user guide: https://www.reportlab.com/docs/reportlab-userguide.pdf
 
 Write your view

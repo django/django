@@ -374,7 +374,7 @@ class ImageField(FileField):
             return [
                 checks.Error(
                     'Cannot use ImageField because Pillow is not installed.',
-                    hint=('Get Pillow at https://pypi.python.org/pypi/Pillow '
+                    hint=('Get Pillow at https://pypi.org/project/Pillow/ '
                           'or run command "pip install Pillow".'),
                     obj=self,
                     id='fields.E210',
