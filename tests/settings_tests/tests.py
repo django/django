@@ -234,7 +234,8 @@ class SettingsTests(SimpleTestCase):
         settings.TEST = 'test'
         self.assertEqual('test', settings.TEST)
         del settings.TEST
-        with self.assertRaises(AttributeError):
+        msg = "'Settings' object has no attribute 'TEST'"
+        with self.assertRaisesMessage(AttributeError, msg):
             getattr(settings, 'TEST')
 
     def test_settings_delete_wrapped(self):
