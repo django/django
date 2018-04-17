@@ -17,12 +17,12 @@ Python and Django projects share common problems. Wouldn't it be great if we
 could save some of this repeated work?
 
 Reusability is the way of life in Python. `The Python Package Index (PyPI)
-<https://pypi.python.org/pypi>`_ has a vast range of packages you can use in
-your own Python programs. Check out `Django Packages
-<https://djangopackages.org>`_ for existing reusable apps you could incorporate
-in your project. Django itself is also just a Python package. This means that
-you can take existing Python packages or Django apps and compose them into your
-own web project. You only need to write the parts that make your project unique.
+<https://pypi.org/>`_ has a vast range of packages you can use in your own
+Python programs. Check out `Django Packages <https://djangopackages.org>`_ for
+existing reusable apps you could incorporate in your project. Django itself is
+also just a Python package. This means that you can take existing Python
+packages or Django apps and compose them into your own web project. You only
+need to write the parts that make your project unique.
 
 Let's say you were starting a new project that needed a polls app like the one
 we've been working on. How do you make this app reusable? Luckily, you're well
@@ -110,8 +110,8 @@ two packages now. If you need help, you can refer to :ref:`how to install
 Django with pip<installing-official-release>`. You can install ``setuptools``
 the same way.
 
-.. _setuptools: https://pypi.python.org/pypi/setuptools
-.. _pip: https://pypi.python.org/pypi/pip
+.. _setuptools: https://pypi.org/project/setuptools/
+.. _pip: https://pypi.org/project/pip/
 
 Packaging your app
 ==================
@@ -287,8 +287,6 @@ working. We'll now fix this by installing our new ``django-polls`` package.
 3. To uninstall the package, use pip::
 
     pip uninstall django-polls
-
-.. _pip: https://pypi.python.org/pypi/pip
 
 Publishing your app
 ===================

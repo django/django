@@ -133,7 +133,7 @@ wherever you would have historically used::
 If you want to continue to use the base unittest library, you can --
 you just won't get any of the nice new unittest2 features.
 
-.. _unittest2: https://pypi.python.org/pypi/unittest2
+.. _unittest2: https://pypi.org/project/unittest2/
 
 Transaction context managers
 ----------------------------

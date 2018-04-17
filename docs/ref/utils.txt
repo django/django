@@ -657,7 +657,7 @@ escaping HTML.
     the return value will be ``"Joel is a slug"``.
 
     If you are looking for a more robust solution, take a look at the `bleach
-    <https://pypi.python.org/pypi/bleach>`_ Python library.
+    <https://pypi.org/project/bleach/>`_ Python library.
 
 .. function:: html_safe()
 

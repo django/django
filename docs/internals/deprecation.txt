@@ -632,9 +632,6 @@ details on these changes.
 
 * Support for the Python Imaging Library (PIL) module will be removed, as it
   no longer appears to be actively maintained & does not work on Python 3.
-  You are advised to install `Pillow`_, which should be used instead.
-
-  .. _`Pillow`: https://pypi.python.org/pypi/Pillow
 
 * The following private APIs will be removed:
 
