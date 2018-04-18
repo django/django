@@ -474,11 +474,11 @@ Spelling check
 Before you commit your docs, it's a good idea to run the spelling checker.
 You'll need to install a couple packages first:
 
-* `pyenchant <https://pypi.python.org/pypi/pyenchant/>`_ (which requires
+* `pyenchant <https://pypi.org/project/pyenchant/>`_ (which requires
   `enchant <https://www.abisource.com/projects/enchant/>`_)
 
 * `sphinxcontrib-spelling
-  <https://pypi.python.org/pypi/sphinxcontrib-spelling/>`_
+  <https://pypi.org/project/sphinxcontrib-spelling/>`_
 
 Then from the ``docs`` directory, run ``make spelling``. Wrong words (if any)
 along with the file and line number where they occur will be saved to

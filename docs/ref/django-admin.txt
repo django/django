@@ -856,7 +856,7 @@ second). This offers better scaling to large projects, reduction in response
 time to code modification, more robust change detection, and battery usage
 reduction.
 
-.. _pyinotify: https://pypi.python.org/pypi/pyinotify/
+.. _pyinotify: https://pypi.org/project/pyinotify/
 
 When you start the server, and each time you change Python code while the
 server is running, the system check framework will check your entire Django

@@ -648,7 +648,7 @@ Python logging module.
         subclass the :class:`~django.utils.log.AdminEmailHandler` class and
         override this method.
 
-.. _Sentry: https://pypi.python.org/pypi/sentry
+.. _Sentry: https://pypi.org/project/sentry/
 
 Filters
 -------

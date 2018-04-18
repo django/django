@@ -261,8 +261,8 @@ Minor features
   `PIL`_ is pending deprecation (support to be removed in Django 1.8).
   To upgrade, you should **first** uninstall PIL, **then** install Pillow.
 
-.. _`Pillow`: https://pypi.python.org/pypi/Pillow
-.. _`PIL`: https://pypi.python.org/pypi/PIL
+.. _`Pillow`: https://pypi.org/project/Pillow/
+.. _`PIL`: https://pypi.org/project/PIL/
 
 * :class:`~django.forms.ModelForm` accepts several new ``Meta``
   options.

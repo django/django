@@ -332,4 +332,4 @@ For details about the JavaScript code style used by Django, see
 :doc:`javascript`.
 
 .. _editorconfig: http://editorconfig.org/
-.. _flake8: https://pypi.python.org/pypi/flake8
+.. _flake8: https://pypi.org/project/flake8/
