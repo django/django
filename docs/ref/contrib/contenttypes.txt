@@ -342,16 +342,22 @@ remain set to their original values and the ``GenericForeignKey`` returns
     >>> guido.delete()
     >>> t.content_object  # returns None
 
-Due to the way :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
-is implemented, you cannot use such fields directly with filters (``filter()``
-and ``exclude()``, for example) via the database API. Because a
-:class:`~django.contrib.contenttypes.fields.GenericForeignKey` isn't a
-normal field object, these examples will *not* work::
+Generic foreign key relations may be used in ``filter()``, ``exclude()`` and
+``get()`` lookups directly:
+
+    >>> TaggedItem.objects.get(content_object=guido)
+    <TaggedItem: bdlf>
+
+However, due to the way :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
+is implemented, you cannot use such fields with filters for nested lookups
+via the database API. Because a :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
+may point to any model, it is not clear which model's field we refer to. As a result,
+these examples will *not* work::
 
     # This will fail
-    >>> TaggedItem.objects.filter(content_object=guido)
+    >>> TaggedItem.objects.filter(content_object__username='Guido')
     # This will also fail
-    >>> TaggedItem.objects.get(content_object=guido)
+    >>> TaggedItem.objects.get(content_object__username='Guido')
 
 Likewise, :class:`~django.contrib.contenttypes.fields.GenericForeignKey`\s
 does not appear in :class:`~django.forms.ModelForm`\s.

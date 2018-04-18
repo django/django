@@ -1263,6 +1263,8 @@ class Query:
                                          negated=q_object.negated)
         joinpromoter = JoinPromoter(q_object.connector, len(q_object.children), current_negated)
         for child in q_object.children:
+            if not isinstance(child, Node):
+                child = self._expand_forward_related_filter(child)
             if isinstance(child, Node):
                 child_clause, needed_inner = self._add_q(
                     child, used_aliases, branch_negated,
@@ -1279,6 +1281,29 @@ class Query:
                 target_clause.add(child_clause, connector)
         needed_inner = joinpromoter.update_join_types(self)
         return target_clause, needed_inner
+
+    def _expand_forward_related_filter(self, lookup):
+        """
+        If the lookup is simple (no double underscores) and the node is
+        carrying generic foreign key lookup, convert it to a Q node carrying
+        the double content_type and object_id lookup. Otherwise returns the
+        original lookup
+        """
+        arg, val = lookup
+        split_arg = arg.split(LOOKUP_SEP)
+        if len(split_arg) == 1:  # if there's no double underscore
+            name = split_arg[0]
+            meta = self.get_meta()
+            try:
+                field = meta.get_field(name)  # get content type field
+            except FieldDoesNotExist:
+                field = None
+            if field is not None and field.is_relation \
+                    and not field.related_model:
+                # related field's get_forward_related_filter gets the correct
+                # lookup for a given val
+                return Q(**field.get_forward_related_filter(val))
+        return lookup
 
     def build_filtered_relation_q(self, q_object, reuse, branch_negated=False, current_negated=False):
         """Add a FilteredRelation object to the current filter."""
@@ -1353,9 +1378,10 @@ class Query:
                 if field.is_relation and not field.related_model:
                     raise FieldError(
                         "Field %r does not generate an automatic reverse "
-                        "relation and therefore cannot be used for reverse "
-                        "querying. If it is a GenericForeignKey, consider "
-                        "adding a GenericRelation." % name
+                        "relation for nested lookups and therefore cannot be "
+                        "used for reverse querying for related properties. If "
+                        "it is a GenericForeignKey, consider adding a "
+                        "GenericRelation." % name
                     )
                 try:
                     model = field.model._meta.concrete_model
