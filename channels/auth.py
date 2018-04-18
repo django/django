@@ -5,7 +5,6 @@ from django.contrib.auth import (
 )
 from django.contrib.auth.models import AnonymousUser
 from django.utils.crypto import constant_time_compare
-from django.utils.functional import SimpleLazyObject
 from django.utils.translation import LANGUAGE_SESSION_KEY
 
 from asgiref.sync import async_to_sync
@@ -139,7 +138,9 @@ class AuthMiddleware:
         # Add it to the scope if it's not there already
         scope = dict(scope)
         if "user" not in scope:
-            scope["user"] = SimpleLazyObject(lambda: async_to_sync(get_user)(scope))
+            # We can't make this a LazyObject because there's no way to await attribute access,
+            # and this is an async function under the hood.
+            scope["user"] = async_to_sync(get_user)(scope)
         # Pass control to inner application
         return self.inner(scope)
 
