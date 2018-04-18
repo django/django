@@ -91,10 +91,7 @@ options that make it very powerful.
     :class:`~django.db.models.query.QuerySet`, ``RawQuerySet`` doesn't
     implement all methods you can use with ``QuerySet``. For example,
     ``__bool__()`` and ``__len__()`` are not defined in ``RawQuerySet``, and
-    thus all ``RawQuerySet`` instances are considered ``True``. The reason
-    these methods are not implemented in ``RawQuerySet`` is that implementing
-    them without internal caching would be a performance drawback and adding
-    such caching would be backward incompatible.
+    thus all ``RawQuerySet`` instances are considered ``True``.
 
 Mapping query fields to model fields
 ------------------------------------

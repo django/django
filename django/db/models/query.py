@@ -1277,6 +1277,7 @@ class RawQuerySet:
         self.query = query or sql.RawQuery(sql=raw_query, using=self.db, params=params)
         self.params = params or ()
         self.translations = translations or {}
+        self._result_cache = None
 
     def resolve_model_init_order(self):
         """Resolve the init field names and value positions."""
@@ -1288,7 +1289,15 @@ class RawQuerySet:
         model_init_names = [f.attname for f in model_init_fields]
         return model_init_names, model_init_order, annotation_fields
 
+    def _fetch_all(self):
+        if self._result_cache is None:
+            self._result_cache = list(self.iterator())
+
     def __iter__(self):
+        self._fetch_all()
+        return iter(self._result_cache)
+
+    def iterator(self):
         # Cache some things for performance reasons outside the loop.
         db = self.db
         compiler = connections[db].ops.compiler('SQLCompiler')(

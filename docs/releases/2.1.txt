@@ -401,6 +401,9 @@ Miscellaneous
 * The admin CSS class ``field-box`` is renamed to ``fieldBox`` to prevent
   conflicts with the class given to model fields named "box".
 
+* ``QuerySet.raw()`` now caches its results like regular querysets. Use
+  ``iterator()`` if you don't want caching.
+
 .. _deprecated-features-2.1:
 
 Features deprecated in 2.1

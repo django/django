@@ -318,3 +318,15 @@ class RawQueryTests(TestCase):
         c = Coffee.objects.create(brand='starbucks', price=20.5)
         qs = Coffee.objects.raw("SELECT * FROM raw_query_coffee WHERE price >= %s", params=[Decimal(20)])
         self.assertEqual(list(qs), [c])
+
+    def test_result_caching(self):
+        with self.assertNumQueries(1):
+            books = Book.objects.raw('SELECT * FROM raw_query_book')
+            list(books)
+            list(books)
+
+    def test_iterator(self):
+        with self.assertNumQueries(2):
+            books = Book.objects.raw('SELECT * FROM raw_query_book')
+            list(books.iterator())
+            list(books.iterator())
