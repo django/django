@@ -1,0 +1,37 @@
+2.1.1 Release Notes
+===================
+
+Channels 2.1.1 is a bugfix release for an important bug in the new async
+authentication code.
+
+
+Major Changes
+-------------
+
+None.
+
+
+Bugfixes & Small Changes
+------------------------
+
+Previously, the object in ``scope["user"]`` was one of Django's
+SimpleLazyObjects, which then called our ``get_user`` async function via
+``async_to_sync``.
+
+This worked fine when called from SyncConsumers, but because
+async environments do not run attribute access in an async fashion, when
+the body of an async consumer tried to call it, the ``asgiref`` library
+flagged an error where the code was trying to call a synchronous function
+during a async context.
+
+To fix this, the User object is now loaded non-lazily on application startup.
+This introduces a blocking call during the synchronous application
+constructor, so the ASGI spec has been updated to recommend that constructors
+for ASGI apps are called in a threadpool and Daphne 2.1.1 implements this
+and is recommended for use with this release.
+
+
+Backwards Incompatible Changes
+------------------------------
+
+None.

@@ -1,6 +1,13 @@
 Full release notes, with more details and upgrade information, are available at:
 https://channels.readthedocs.io/en/latest/releases
 
+2.1.1 (2018-04-18)
+------------------
+
+* The scope["user"] object is no longer a lazy object, as this conflicts with
+  any async-based consumers.
+
+
 2.1.0 (2018-04-11)
 ------------------
 
