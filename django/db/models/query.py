@@ -727,7 +727,9 @@ class QuerySet:
     def raw(self, raw_query, params=None, translations=None, using=None):
         if using is None:
             using = self.db
-        return RawQuerySet(raw_query, model=self.model, params=params, translations=translations, using=using)
+        qs = RawQuerySet(raw_query, model=self.model, params=params, translations=translations, using=using)
+        qs._prefetch_related_lookups = self._prefetch_related_lookups[:]
+        return qs
 
     def _values(self, *fields, **expressions):
         clone = self._chain()
@@ -1278,6 +1280,8 @@ class RawQuerySet:
         self.params = params or ()
         self.translations = translations or {}
         self._result_cache = None
+        self._prefetch_related_lookups = ()
+        self._prefetch_done = False
 
     def resolve_model_init_order(self):
         """Resolve the init field names and value positions."""
@@ -1289,9 +1293,33 @@ class RawQuerySet:
         model_init_names = [f.attname for f in model_init_fields]
         return model_init_names, model_init_order, annotation_fields
 
+    def prefetch_related(self, *lookups):
+        """Same as QuerySet.prefetch_related()"""
+        clone = self._clone()
+        if lookups == (None,):
+            clone._prefetch_related_lookups = ()
+        else:
+            clone._prefetch_related_lookups = clone._prefetch_related_lookups + lookups
+        return clone
+
+    def _prefetch_related_objects(self):
+        prefetch_related_objects(self._result_cache, *self._prefetch_related_lookups)
+        self._prefetch_done = True
+
+    def _clone(self):
+        """Same as QuerySet._clone()"""
+        c = self.__class__(
+            self.raw_query, model=self.model, query=self.query, params=self.params,
+            translations=self.translations, using=self._db, hints=self._hints
+        )
+        c._prefetch_related_lookups = self._prefetch_related_lookups[:]
+        return c
+
     def _fetch_all(self):
         if self._result_cache is None:
             self._result_cache = list(self.iterator())
+        if self._prefetch_related_lookups and not self._prefetch_done:
+            self._prefetch_related_objects()
 
     def __len__(self):
         self._fetch_all()
