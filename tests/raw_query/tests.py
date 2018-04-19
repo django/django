@@ -330,3 +330,11 @@ class RawQueryTests(TestCase):
             books = Book.objects.raw('SELECT * FROM raw_query_book')
             list(books.iterator())
             list(books.iterator())
+
+    def test_bool(self):
+        self.assertIs(bool(Book.objects.raw('SELECT * FROM raw_query_book')), True)
+        self.assertIs(bool(Book.objects.raw('SELECT * FROM raw_query_book WHERE id = 0')), False)
+
+    def test_len(self):
+        self.assertEqual(len(Book.objects.raw('SELECT * FROM raw_query_book')), 4)
+        self.assertEqual(len(Book.objects.raw('SELECT * FROM raw_query_book WHERE id = 0')), 0)

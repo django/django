@@ -85,14 +85,6 @@ options that make it very powerful.
     both rows will match. To prevent this, perform the correct typecasting
     before using the value in a query.
 
-.. warning::
-
-    While a ``RawQuerySet`` instance can be iterated over like a normal
-    :class:`~django.db.models.query.QuerySet`, ``RawQuerySet`` doesn't
-    implement all methods you can use with ``QuerySet``. For example,
-    ``__bool__()`` and ``__len__()`` are not defined in ``RawQuerySet``, and
-    thus all ``RawQuerySet`` instances are considered ``True``.
-
 Mapping query fields to model fields
 ------------------------------------
 

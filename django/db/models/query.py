@@ -1293,6 +1293,14 @@ class RawQuerySet:
         if self._result_cache is None:
             self._result_cache = list(self.iterator())
 
+    def __len__(self):
+        self._fetch_all()
+        return len(self._result_cache)
+
+    def __bool__(self):
+        self._fetch_all()
+        return bool(self._result_cache)
+
     def __iter__(self):
         self._fetch_all()
         return iter(self._result_cache)
