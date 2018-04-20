@@ -6,6 +6,7 @@ This module provides a middleware that adds current_app attribute to request obj
 
 from django.utils.deprecation import MiddlewareMixin  # isort:skip
 
+
 class CurrentAppMiddleware(MiddlewareMixin):
     def process_view(self, request, *args, **kwargs):
         namespace = request.resolver_match.namespace
