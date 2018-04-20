@@ -181,11 +181,6 @@ Attributes set by application code
 Django doesn't set these attributes itself but makes use of them if set by your
 application.
 
-.. attribute:: HttpRequest.current_app
-
-    The :ttag:`url` template tag will use its value as the ``current_app``
-    argument to :func:`~django.urls.reverse()`.
-
 .. attribute:: HttpRequest.urlconf
 
     This will be used as the root URLconf for the current request, overriding
@@ -229,6 +224,13 @@ middleware class is listed in :setting:`MIDDLEWARE`.
             ... # Do something for logged-in users.
         else:
             ... # Do something for anonymous users.
+
+
+.. attribute:: HttpRequest.current_app
+    From the :class:`~django.middleware.currentappmiddleware.CurrentAppMiddleware`:
+    The :ttag:`url` template tag will use its value as the ``current_app``
+    argument to :func:`~django.urls.reverse()`.
+
 
 Methods
 -------
