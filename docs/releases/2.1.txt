@@ -415,6 +415,9 @@ Miscellaneous
 * ``QuerySet.raw()`` now caches its results like regular querysets. Use
   ``iterator()`` if you don't want caching.
 
+* The database router :meth:`allow_relation` method is called in more cases.
+  Improperly written routers may need to be updated accordingly.
+
 .. _deprecated-features-2.1:
 
 Features deprecated in 2.1
