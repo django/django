@@ -163,6 +163,9 @@ A database Router is a class that provides up to four methods:
     used by foreign key and many to many operations to determine if a
     relation should be allowed between two objects.
 
+    If no router has an opinion (i.e. all routers return ``None``), only
+    relations within the same database are allowed.
+
 .. method:: allow_migrate(db, app_label, model_name=None, **hints)
 
     Determine if the migration operation is allowed to run on the database with
