@@ -133,7 +133,10 @@ class AppConfig:
         # Obtain app name here rather than in AppClass.__init__ to keep
         # all error checking for entries in INSTALLED_APPS in one place.
         try:
-            app_name = cls.name
+            if type(cls.name) == tuple:
+                app_name = cls.name[0]
+            else:
+                app_name = cls.name
         except AttributeError:
             raise ImproperlyConfigured(
                 "'%s' must supply a name attribute." % entry)
