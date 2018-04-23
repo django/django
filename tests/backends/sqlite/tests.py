@@ -9,7 +9,7 @@ from django.db.utils import NotSupportedError
 from django.test import TestCase, TransactionTestCase, override_settings
 from django.test.utils import isolate_apps
 
-from ..models import Author, Item, Object, Square
+from ..models import Author, Food, FoodQuoted, Item, Object, Square
 
 
 @unittest.skipUnless(connection.vendor == 'sqlite', 'SQLite tests')
@@ -162,3 +162,24 @@ class ThreadSharing(TransactionTestCase):
         thread.start()
         thread.join()
         self.assertEqual(Object.objects.count(), 2)
+
+
+@unittest.skipUnless(connection.vendor == 'sqlite', 'SQLite tests')
+class IntrospectionTests(TestCase):
+    def test_get_primary_key_column(self):
+        """
+        Validate that we can get the field name of the primary key.
+        Supports quoted and non-quoted field names.
+        """
+        with connection.schema_editor(collect_sql=True) as editor:
+            editor.create_model(Food)
+            editor.create_model(FoodQuoted)
+        with connection.cursor() as cursor:
+            quoted_field = connection.introspection.get_primary_key_column(
+                cursor, FoodQuoted._meta.db_table
+            )
+            self.assertEqual(quoted_field, 'id')
+            field = connection.introspection.get_primary_key_column(
+                cursor, Food._meta.db_table
+            )
+            self.assertEqual(field, 'id')
