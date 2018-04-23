@@ -160,7 +160,7 @@ class ArrayField(CheckFieldDefaultMixin, Field):
                     error,
                     prefix=self.error_messages['item_invalid'],
                     code='item_invalid',
-                    params={'nth': index},
+                    params={'nth': index + 1},
                 )
         if isinstance(self.base_field, ArrayField):
             if len({len(i) for i in value}) > 1:
@@ -179,7 +179,7 @@ class ArrayField(CheckFieldDefaultMixin, Field):
                     error,
                     prefix=self.error_messages['item_invalid'],
                     code='item_invalid',
-                    params={'nth': index},
+                    params={'nth': index + 1},
                 )
 
     def formfield(self, **kwargs):
