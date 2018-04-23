@@ -712,6 +712,10 @@ The ``permission_required`` decorator
         def my_view(request):
             ...
 
+    This also avoids a redirect loop when :class:`.LoginView`'s
+    ``redirect_authenticated_user=True`` and the logged-in user doesn't have
+    all of the required permissions.
+
 .. currentmodule:: django.contrib.auth.mixins
 
 The ``PermissionRequiredMixin`` mixin
@@ -980,6 +984,10 @@ implementation details see :ref:`using-the-views`.
         this "`social media fingerprinting
         <https://robinlinus.github.io/socialmedia-leak/>`_" information
         leakage, host all images and your favicon on a separate domain.
+
+        Enabling ``redirect_authenticated_user`` can also result in a redirect
+        loop when using the :func:`.permission_required` decorator
+        unless the ``raise_exception`` parameter is used.
 
     * ``success_url_allowed_hosts``: A :class:`set` of hosts, in addition to
       :meth:`request.get_host() <django.http.HttpRequest.get_host>`, that are

@@ -14,7 +14,7 @@ from .models import (
 )
 
 
-class PrefetchRelatedTests(TestCase):
+class TestDataMixin:
     @classmethod
     def setUpTestData(cls):
         cls.book1 = Book.objects.create(title='Poems')
@@ -38,6 +38,8 @@ class PrefetchRelatedTests(TestCase):
         cls.reader1.books_read.add(cls.book1, cls.book4)
         cls.reader2.books_read.add(cls.book2, cls.book4)
 
+
+class PrefetchRelatedTests(TestDataMixin, TestCase):
     def assertWhereContains(self, sql, needle):
         where_idx = sql.index('WHERE')
         self.assertEqual(
@@ -279,6 +281,38 @@ class PrefetchRelatedTests(TestCase):
 
         sql = queries[-1]['sql']
         self.assertWhereContains(sql, self.author1.id)
+
+
+class RawQuerySetTests(TestDataMixin, TestCase):
+    def test_basic(self):
+        with self.assertNumQueries(2):
+            books = Book.objects.raw(
+                "SELECT * FROM prefetch_related_book WHERE id = %s",
+                (self.book1.id,)
+            ).prefetch_related('authors')
+            book1 = list(books)[0]
+
+        with self.assertNumQueries(0):
+            self.assertCountEqual(book1.authors.all(), [self.author1, self.author2, self.author3])
+
+    def test_prefetch_before_raw(self):
+        with self.assertNumQueries(2):
+            books = Book.objects.prefetch_related('authors').raw(
+                "SELECT * FROM prefetch_related_book WHERE id = %s",
+                (self.book1.id,)
+            )
+            book1 = list(books)[0]
+
+        with self.assertNumQueries(0):
+            self.assertCountEqual(book1.authors.all(), [self.author1, self.author2, self.author3])
+
+    def test_clear(self):
+        with self.assertNumQueries(5):
+            with_prefetch = Author.objects.raw(
+                "SELECT * FROM prefetch_related_author"
+            ).prefetch_related('books')
+            without_prefetch = with_prefetch.prefetch_related(None)
+            [list(a.books.all()) for a in without_prefetch]
 
 
 class CustomPrefetchTests(TestCase):

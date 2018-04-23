@@ -20,6 +20,14 @@ from django.test.utils import get_runner
 from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.log import DEFAULT_LOGGING
 
+try:
+    import MySQLdb
+except ImportError:
+    pass
+else:
+    # Ignore informational warnings from QuerySet.explain().
+    warnings.filterwarnings('ignore', '\(1003, *', category=MySQLdb.Warning)
+
 # Make deprecation warnings errors to ensure no usage of deprecated features.
 warnings.simplefilter("error", RemovedInDjango30Warning)
 # Make runtime warning errors to ensure no usage of error prone patterns.

@@ -188,10 +188,9 @@ Put the following in the ``tests.py`` file in the ``polls`` application:
             future_question = Question(pub_date=time)
             self.assertIs(future_question.was_published_recently(), False)
 
-What we have done here is created a :class:`django.test.TestCase` subclass
-with a method that creates a ``Question`` instance with a ``pub_date`` in the
-future. We then check the output of ``was_published_recently()`` - which
-*ought* to be False.
+Here we have created a :class:`django.test.TestCase` subclass with a method that
+creates a ``Question`` instance with a ``pub_date`` in the future. We then check
+the output of ``was_published_recently()`` - which *ought* to be False.
 
 Running tests
 -------------

@@ -53,7 +53,7 @@ class SimpleArrayField(forms.CharField):
                     error,
                     prefix=self.error_messages['item_invalid'],
                     code='item_invalid',
-                    params={'nth': index},
+                    params={'nth': index + 1},
                 ))
         if errors:
             raise ValidationError(errors)
@@ -70,7 +70,7 @@ class SimpleArrayField(forms.CharField):
                     error,
                     prefix=self.error_messages['item_invalid'],
                     code='item_invalid',
-                    params={'nth': index},
+                    params={'nth': index + 1},
                 ))
         if errors:
             raise ValidationError(errors)
@@ -86,7 +86,7 @@ class SimpleArrayField(forms.CharField):
                     error,
                     prefix=self.error_messages['item_invalid'],
                     code='item_invalid',
-                    params={'nth': index},
+                    params={'nth': index + 1},
                 ))
         if errors:
             raise ValidationError(errors)
@@ -193,7 +193,7 @@ class SplitArrayField(forms.Field):
                     error,
                     self.error_messages['item_invalid'],
                     code='item_invalid',
-                    params={'nth': index},
+                    params={'nth': index + 1},
                 ))
                 cleaned_data.append(None)
             else:
