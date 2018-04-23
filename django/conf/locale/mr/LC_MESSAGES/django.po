@@ -948,51 +948,51 @@ msgstr ""
 
 msgctxt "alt. month"
 msgid "January"
-msgstr ""
+msgstr "जानेवारी"
 
 msgctxt "alt. month"
 msgid "February"
-msgstr ""
+msgstr "फेब्रुवारी"
 
 msgctxt "alt. month"
 msgid "March"
-msgstr ""
+msgstr "मार्च"
 
 msgctxt "alt. month"
 msgid "April"
-msgstr ""
+msgstr "एप्रिल"
 
 msgctxt "alt. month"
 msgid "May"
-msgstr ""
+msgstr "मे"
 
 msgctxt "alt. month"
 msgid "June"
-msgstr ""
+msgstr "जून"
 
 msgctxt "alt. month"
 msgid "July"
-msgstr ""
+msgstr "जुलै"
 
 msgctxt "alt. month"
 msgid "August"
-msgstr ""
+msgstr "ऑगस्ट"
 
 msgctxt "alt. month"
 msgid "September"
-msgstr ""
+msgstr "सप्टेंबर"
 
 msgctxt "alt. month"
 msgid "October"
-msgstr ""
+msgstr "ऑक्टोबर"
 
 msgctxt "alt. month"
 msgid "November"
-msgstr ""
+msgstr "नोव्हेंबर"
 
 msgctxt "alt. month"
 msgid "December"
-msgstr ""
+msgstr "डिसेंबर"
 
 msgid "This is not a valid IPv6 address."
 msgstr ""
