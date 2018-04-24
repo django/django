@@ -26,7 +26,7 @@ except ImportError:
     pass
 else:
     # Ignore informational warnings from QuerySet.explain().
-    warnings.filterwarnings('ignore', '\(1003, *', category=MySQLdb.Warning)
+    warnings.filterwarnings('ignore', r'\(1003, *', category=MySQLdb.Warning)
 
 # Make deprecation warnings errors to ensure no usage of deprecated features.
 warnings.simplefilter("error", RemovedInDjango30Warning)
