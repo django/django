@@ -111,13 +111,3 @@ class Author(models.Model):
 
 class Book(models.Model):
     author = models.ForeignKey(Author, models.CASCADE, to_field='name')
-
-
-class Food(models.Model):
-    id = models.AutoField(primary_key=True, null=False)
-    long_desc = models.TextField(null=False, blank=True)
-
-
-class FoodQuoted(models.Model):
-    id = models.AutoField(primary_key=True, null=False, db_column='"id"')
-    long_desc = models.TextField(null=False, blank=True)

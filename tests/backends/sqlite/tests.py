@@ -9,7 +9,7 @@ from django.db.utils import NotSupportedError
 from django.test import TestCase, TransactionTestCase, override_settings
 from django.test.utils import isolate_apps
 
-from ..models import Author, Food, FoodQuoted, Item, Object, Square
+from ..models import Author, Item, Object, Square
 
 
 @unittest.skipUnless(connection.vendor == 'sqlite', 'SQLite tests')
@@ -171,15 +171,18 @@ class IntrospectionTests(TestCase):
         Validate that we can get the field name of the primary key.
         Supports quoted and non-quoted field names.
         """
-        with connection.schema_editor(collect_sql=True) as editor:
-            editor.create_model(Food)
-            editor.create_model(FoodQuoted)
         with connection.cursor() as cursor:
-            quoted_field = connection.introspection.get_primary_key_column(
-                cursor, FoodQuoted._meta.db_table
+            cursor.execute(
+                'CREATE TABLE `test_primary_one` (id int PRIMARY KEY NOT NULL);'
             )
-            self.assertEqual(quoted_field, 'id')
+            cursor.execute(
+                'CREATE TABLE `test_primary_two` ("id" int PRIMARY KEY NOT NULL);'
+            )
             field = connection.introspection.get_primary_key_column(
-                cursor, Food._meta.db_table
+                cursor, 'test_primary_one'
+            )
+            quoted_field = connection.introspection.get_primary_key_column(
+                cursor, 'test_primary_two'
             )
             self.assertEqual(field, 'id')
+            self.assertEqual(quoted_field, 'id')
