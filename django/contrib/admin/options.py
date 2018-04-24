@@ -303,6 +303,15 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         except AttributeError:
             return mark_safe(self.admin_site.empty_value_display)
 
+    def get_not_empty_value_display(self):
+        """
+        Return the not_empty_value_display set on ModelAdmin or AdminSite.
+        """
+        try:
+            return mark_safe(self.not_empty_value_display)
+        except AttributeError:
+            return mark_safe(self.admin_site.not_empty_value_display)
+
     def get_exclude(self, request, obj=None):
         """
         Hook for specifying exclude.

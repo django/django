@@ -260,6 +260,19 @@ subclass::
 
             view_birth_date.empty_value_display = '???'
 
+.. attribute:: ModelAdmin.not_empty_value_display
+
+    This attribute overrides the default display value for ``Not Empty`` option
+    on admin's related filter. The default value is ``Not Empty``. For example::
+
+        from django.contrib import admin
+
+        class AuthorAdmin(admin.ModelAdmin):
+            not_empty_value_display = '-not-empty-'
+
+    You can also override this attribute for all admin pages with
+    :attr:`AdminSite.not_empty_value_display`.
+
 .. attribute:: ModelAdmin.exclude
 
     This attribute, if given, should be a list of field names to exclude from
@@ -2823,6 +2836,13 @@ Templates can override or extend base admin templates as described in
     ``ModelAdmin`` basis and on a custom field within a ``ModelAdmin`` by
     setting an ``empty_value_display`` attribute on the field. See
     :attr:`ModelAdmin.empty_value_display` for examples.
+
+.. attribute:: AdminSite.not_empty_value_display
+
+    This attribute overrides the default display value for ``Not Empty`` option
+    on admin's sites related filter. Defaults to ``Not Empty``. The value can
+    also be overridden on a per ``ModelAdmin`` basis by setting
+    ``empty_value_display`` attribute. See :attr:`ModelAdmin.empty_value_display`.
 
 .. attribute:: AdminSite.login_template
 

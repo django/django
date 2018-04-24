@@ -147,3 +147,8 @@ class EmptyValueChildAdmin(admin.ModelAdmin):
     def age_display(self, obj):
         return obj.age
     age_display.empty_value_display = '&dagger;'
+
+
+class NotEmptyValueChildAdmin(admin.ModelAdmin):
+    not_empty_value_display = '-not-empty-'
+    list_filter = ['parent', 'age']
