@@ -192,7 +192,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         fields_sql = create_sql[create_sql.index('(') + 1:create_sql.rindex(')')]
         for field_desc in fields_sql.split(','):
             field_desc = field_desc.strip()
-            m = re.match(r"\"?([\w-]+)\"?.*PRIMARY KEY(?: AUTOINCREMENT)?.*", field_desc)
+            m = re.match('"?([\w-]+)"?.*PRIMARY KEY.*', field_desc)
             if m:
                 return m.group(1)
         return None

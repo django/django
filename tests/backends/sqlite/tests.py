@@ -162,27 +162,3 @@ class ThreadSharing(TransactionTestCase):
         thread.start()
         thread.join()
         self.assertEqual(Object.objects.count(), 2)
-
-
-@unittest.skipUnless(connection.vendor == 'sqlite', 'SQLite tests')
-class IntrospectionTests(TestCase):
-    def test_get_primary_key_column(self):
-        """
-        Validate that we can get the field name of the primary key.
-        Supports quoted and non-quoted field names.
-        """
-        with connection.cursor() as cursor:
-            cursor.execute(
-                'CREATE TABLE `test_primary_one` (id int PRIMARY KEY NOT NULL);'
-            )
-            cursor.execute(
-                'CREATE TABLE `test_primary_two` ("id" int PRIMARY KEY NOT NULL);'
-            )
-            field = connection.introspection.get_primary_key_column(
-                cursor, 'test_primary_one'
-            )
-            quoted_field = connection.introspection.get_primary_key_column(
-                cursor, 'test_primary_two'
-            )
-            self.assertEqual(field, 'id')
-            self.assertEqual(quoted_field, 'id')
