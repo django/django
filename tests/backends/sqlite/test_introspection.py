@@ -8,13 +8,18 @@ from django.test import TestCase
 class IntrospectionTests(TestCase):
     def test_get_primary_key_column(self):
         """Get the primary key column regardless of whether or not it has quotation."""
-        testable_primary_key_columns = ('id', '[id]', '`id`', '"id"')
+        testable_column_strings = (
+            ('id', 'id'), ('[id]', 'id'), ('`id`', 'id'), ('"id"', 'id'),
+            ('[id col]', 'id col'), ('`id col`', 'id col'), ('"id col"', 'id col')
+        )
         with connection.cursor() as cursor:
-            for column in testable_primary_key_columns:
+            for test in testable_column_strings:
+                column, expected_string = test
                 sql = "CREATE TABLE `test_primary` (%s int PRIMARY KEY NOT NULL);" % column
-                try:
-                    cursor.execute(sql)
-                    field = connection.introspection.get_primary_key_column(cursor, 'test_primary')
-                    self.assertEqual(field, 'id')
-                finally:
-                    cursor.execute('DROP TABLE `test_primary`;')
+                with self.subTest(column=column):
+                    try:
+                        cursor.execute(sql)
+                        field = connection.introspection.get_primary_key_column(cursor, 'test_primary')
+                        self.assertEqual(field, expected_string)
+                    finally:
+                        cursor.execute('DROP TABLE `test_primary`;')
