@@ -206,6 +206,16 @@ class CommandTests(SimpleTestCase):
         self.assertIn('need_me', out.getvalue())
         self.assertIn('needme2', out.getvalue())
 
+    def test_subparser(self):
+        out = StringIO()
+        management.call_command('subparser', 'foo', 12, stdout=out)
+        self.assertIn('bar', out.getvalue())
+
+    def test_subparser_invalid_option(self):
+        msg = "Error: invalid choice: 'test' (choose from 'foo')"
+        with self.assertRaisesMessage(CommandError, msg):
+            management.call_command('subparser', 'test', 12)
+
 
 class CommandRunTests(AdminScriptTestCase):
     """

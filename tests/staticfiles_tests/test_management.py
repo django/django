@@ -16,7 +16,7 @@ from django.contrib.staticfiles.management.commands import (
 )
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import CommandError, call_command
-from django.test import override_settings
+from django.test import RequestFactory, override_settings
 from django.test.utils import extend_sys_path
 from django.utils import timezone
 from django.utils._os import symlinks_supported
@@ -43,6 +43,18 @@ class TestRunserver(StaticFilesTestCase):
         with mock.patch('django.middleware.common.CommonMiddleware') as mocked:
             command.get_handler(use_static_handler=True, insecure_serving=True)
             self.assertEqual(mocked.call_count, 1)
+
+    def test_404_response(self):
+        command = runserver.Command()
+        handler = command.get_handler(use_static_handler=True, insecure_serving=True)
+        missing_static_file = os.path.join(settings.STATIC_URL, 'unknown.css')
+        req = RequestFactory().get(missing_static_file)
+        with override_settings(DEBUG=False):
+            response = handler.get_response(req)
+            self.assertEqual(response.status_code, 404)
+        with override_settings(DEBUG=True):
+            response = handler.get_response(req)
+            self.assertEqual(response.status_code, 404)
 
 
 class TestFindStatic(TestDefaults, CollectionTestCase):
@@ -162,6 +174,31 @@ class TestCollection(TestDefaults, CollectionTestCase):
         self.assertFileNotFound('test/.hidden')
         self.assertFileNotFound('test/backup~')
         self.assertFileNotFound('test/CVS')
+
+
+class TestCollectionVerbosity(CollectionTestCase):
+    copying_msg = 'Copying '
+    run_collectstatic_in_setUp = False
+    staticfiles_copied_msg = 'static files copied to'
+
+    def test_verbosity_0(self):
+        stdout = StringIO()
+        self.run_collectstatic(verbosity=0, stdout=stdout)
+        self.assertEqual(stdout.getvalue(), '')
+
+    def test_verbosity_1(self):
+        stdout = StringIO()
+        self.run_collectstatic(verbosity=1, stdout=stdout)
+        output = stdout.getvalue()
+        self.assertIn(self.staticfiles_copied_msg, output)
+        self.assertNotIn(self.copying_msg, output)
+
+    def test_verbosity_2(self):
+        stdout = StringIO()
+        self.run_collectstatic(verbosity=2, stdout=stdout)
+        output = stdout.getvalue()
+        self.assertIn(self.staticfiles_copied_msg, output)
+        self.assertIn(self.copying_msg, output)
 
 
 class TestCollectionClear(CollectionTestCase):

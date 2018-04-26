@@ -1,5 +1,5 @@
-import os
 import socket
+from pathlib import Path
 
 import geoip2.database
 
@@ -79,27 +79,27 @@ class GeoIP2:
         if not isinstance(path, str):
             raise TypeError('Invalid path type: %s' % type(path).__name__)
 
-        if os.path.isdir(path):
+        path = Path(path)
+        if path.is_dir():
             # Constructing the GeoIP database filenames using the settings
             # dictionary. If the database files for the GeoLite country
             # and/or city datasets exist, then try to open them.
-            country_db = os.path.join(path, country or GEOIP_SETTINGS['GEOIP_COUNTRY'])
-            if os.path.isfile(country_db):
-                self._country = geoip2.database.Reader(country_db, mode=cache)
+            country_db = path / (country or GEOIP_SETTINGS['GEOIP_COUNTRY'])
+            if country_db.is_file():
+                self._country = geoip2.database.Reader(str(country_db), mode=cache)
                 self._country_file = country_db
 
-            city_db = os.path.join(path, city or GEOIP_SETTINGS['GEOIP_CITY'])
-            if os.path.isfile(city_db):
-                self._city = geoip2.database.Reader(city_db, mode=cache)
+            city_db = path / (city or GEOIP_SETTINGS['GEOIP_CITY'])
+            if city_db.is_file():
+                self._city = geoip2.database.Reader(str(city_db), mode=cache)
                 self._city_file = city_db
-
             if not self._reader:
                 raise GeoIP2Exception('Could not load a database from %s.' % path)
-        elif os.path.isfile(path):
+        elif path.is_file():
             # Otherwise, some detective work will be needed to figure out
             # whether the given database path is for the GeoIP country or city
             # databases.
-            reader = geoip2.database.Reader(path, mode=cache)
+            reader = geoip2.database.Reader(str(path), mode=cache)
             db_type = reader.metadata().database_type
 
             if db_type.endswith('City'):

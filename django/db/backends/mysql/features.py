@@ -49,6 +49,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         END;
     """
     db_functions_convert_bytes_to_str = True
+    # Alias MySQL's TRADITIONAL to TEXT for consistency with other backends.
+    supported_explain_formats = {'JSON', 'TEXT', 'TRADITIONAL'}
 
     @cached_property
     def _mysql_storage_engine(self):
@@ -80,6 +82,11 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def supports_over_clause(self):
         return self.connection.mysql_version >= (8, 0, 2)
+
+    @cached_property
+    def needs_explain_extended(self):
+        # EXTENDED is deprecated (and not required) in 5.7 and removed in 8.0.
+        return self.connection.mysql_version < (5, 7)
 
     @cached_property
     def supports_transactions(self):

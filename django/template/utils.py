@@ -1,6 +1,6 @@
 import functools
-import os
 from collections import Counter, OrderedDict
+from pathlib import Path
 
 from django.apps import apps
 from django.conf import settings
@@ -98,12 +98,10 @@ def get_app_template_dirs(dirname):
     dirname is the name of the subdirectory containing templates inside
     installed applications.
     """
-    template_dirs = []
-    for app_config in apps.get_app_configs():
-        if not app_config.path:
-            continue
-        template_dir = os.path.join(app_config.path, dirname)
-        if os.path.isdir(template_dir):
-            template_dirs.append(template_dir)
+    template_dirs = [
+        str(Path(app_config.path) / dirname)
+        for app_config in apps.get_app_configs()
+        if app_config.path and (Path(app_config.path) / dirname).is_dir()
+    ]
     # Immutable return value because it will be cached and shared by callers.
     return tuple(template_dirs)
