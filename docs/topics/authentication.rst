@@ -69,6 +69,8 @@ that takes a scope, rather than the event-running coroutine.
 Here's a simple example of a middleware that just takes a user ID out of the
 query string and uses that::
 
+    from django.db import close_old_connections
+
     class QueryAuthMiddleware:
         """
         Custom middleware (insecure) that takes user IDs from the query string.
@@ -82,8 +84,16 @@ query string and uses that::
             # Look up user from query string (you should also do things like
             # check it's a valid user ID, or if scope["user"] is already populated)
             user = User.objects.get(id=int(scope["query_string"]))
+            close_old_connections()
             # Return the inner application directly and let it run everything else
             return self.inner(dict(scope, user=user))
+
+.. warning::
+
+    Right now you will need to call ``close_old_connections()`` after any
+    database code you call inside a middleware's scope-setup method to ensure
+    you don't leak idle database connections. We hope to call this automatically
+    in future versions of Channels.
 
 The same principles can be applied to authenticate over non-HTTP protocols;
 for example, you might want to use someone's chat username from a chat protocol
