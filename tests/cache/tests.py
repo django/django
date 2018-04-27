@@ -141,6 +141,10 @@ class DummyCacheTests(SimpleTestCase):
         with self.assertRaises(ValueError):
             cache.decr('does_not_exist')
 
+    def test_touch(self):
+        """Dummy cache can't do touch()."""
+        self.assertIs(cache.touch('whatever'), False)
+
     def test_data_types(self):
         "All data types are ignored equally by the dummy cache"
         stuff = {
@@ -427,6 +431,23 @@ class BaseCacheTests:
         self.assertEqual(cache.get("expire2"), "newvalue")
         self.assertFalse(cache.has_key("expire3"))
 
+    def test_touch(self):
+        # cache.touch() updates the timeout.
+        cache.set('expire1', 'very quickly', timeout=1)
+        self.assertIs(cache.touch('expire1', timeout=4), True)
+        time.sleep(2)
+        self.assertTrue(cache.has_key('expire1'))
+        time.sleep(3)
+        self.assertFalse(cache.has_key('expire1'))
+
+        # cache.touch() works without the timeout argument.
+        cache.set('expire1', 'very quickly', timeout=1)
+        self.assertIs(cache.touch('expire1'), True)
+        time.sleep(2)
+        self.assertTrue(cache.has_key('expire1'))
+
+        self.assertIs(cache.touch('nonexistent'), False)
+
     def test_unicode(self):
         # Unicode values can be cached
         stuff = {
@@ -549,6 +570,11 @@ class BaseCacheTests:
         self.assertEqual(cache.get('key3'), 'sausage')
         self.assertEqual(cache.get('key4'), 'lobster bisque')
 
+        cache.set('key5', 'belgian fries', timeout=1)
+        cache.touch('key5', timeout=None)
+        time.sleep(2)
+        self.assertEqual(cache.get('key5'), 'belgian fries')
+
     def test_zero_timeout(self):
         """
         Passing in zero into timeout results in a value that is not cached
@@ -562,6 +588,10 @@ class BaseCacheTests:
         cache.set_many({'key3': 'sausage', 'key4': 'lobster bisque'}, 0)
         self.assertIsNone(cache.get('key3'))
         self.assertIsNone(cache.get('key4'))
+
+        cache.set('key5', 'belgian fries', timeout=5)
+        cache.touch('key5', timeout=0)
+        self.assertIsNone(cache.get('key5'))
 
     def test_float_timeout(self):
         # Make sure a timeout given as a float doesn't crash anything.
