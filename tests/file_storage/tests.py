@@ -943,9 +943,10 @@ class FileLikeObjectTestCase(LiveServerTestCase):
     def tearDown(self):
         shutil.rmtree(self.temp_dir)
 
-    def test_urllib2_urlopen(self):
+    def test_urllib_request_urlopen(self):
         """
-        Test the File storage API with a file like object coming from urllib2.urlopen()
+        Test the File storage API with a file-like object coming from
+        urllib.request.urlopen().
         """
         file_like_object = urlopen(self.live_server_url + '/')
         f = File(file_like_object)
