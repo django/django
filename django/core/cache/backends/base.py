@@ -124,6 +124,13 @@ class BaseCache:
         """
         raise NotImplementedError('subclasses of BaseCache must provide a set() method')
 
+    def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
+        """
+        Update the key's expiry time using timeout. Return True if successful
+        or False if the key does not exist.
+        """
+        raise NotImplementedError('subclasses of BaseCache must provide a touch() method')
+
     def delete(self, key, version=None):
         """
         Delete a key from the cache, failing silently.

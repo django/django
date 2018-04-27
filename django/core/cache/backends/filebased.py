@@ -9,7 +9,13 @@ import time
 import zlib
 
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
+from django.core.files import locks
 from django.core.files.move import file_move_safe
+
+
+def _write_content(f, expiry, value):
+    f.write(pickle.dumps(expiry, pickle.HIGHEST_PROTOCOL))
+    f.write(zlib.compress(pickle.dumps(value, pickle.HIGHEST_PROTOCOL)))
 
 
 class FileBasedCache(BaseCache):
@@ -45,13 +51,29 @@ class FileBasedCache(BaseCache):
         try:
             with open(fd, 'wb') as f:
                 expiry = self.get_backend_timeout(timeout)
-                f.write(pickle.dumps(expiry, pickle.HIGHEST_PROTOCOL))
-                f.write(zlib.compress(pickle.dumps(value, pickle.HIGHEST_PROTOCOL)))
+                _write_content(f, expiry, value)
             file_move_safe(tmp_path, fname, allow_overwrite=True)
             renamed = True
         finally:
             if not renamed:
                 os.remove(tmp_path)
+
+    def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
+        try:
+            with open(self._key_to_file(key, version), 'r+b') as f:
+                try:
+                    locks.lock(f, locks.LOCK_EX)
+                    if self._is_expired(f):
+                        return False
+                    else:
+                        previous_value = pickle.loads(zlib.decompress(f.read()))
+                        f.seek(0)
+                        _write_content(f, self.get_backend_timeout(timeout), previous_value)
+                        return True
+                finally:
+                    locks.unlock(f)
+        except FileNotFoundError:
+            return False
 
     def delete(self, key, version=None):
         self._delete(self._key_to_file(key, version))
