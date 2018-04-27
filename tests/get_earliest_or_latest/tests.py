@@ -1,7 +1,7 @@
-import warnings
 from datetime import datetime
 
 from django.test import TestCase
+from django.utils.deprecation import RemovedInDjango30Warning
 
 from .models import Article, IndexErrorArticle, Person
 
@@ -169,16 +169,12 @@ class EarliestOrLatestTests(TestCase):
 
     def test_field_name_kwarg_deprecation(self):
         Person.objects.create(name='Deprecator', birthday=datetime(1950, 1, 1))
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')
-            Person.objects.latest(field_name='birthday')
-
-        self.assertEqual(len(warns), 1)
-        self.assertEqual(
-            str(warns[0].message),
+        msg = (
             'The field_name keyword argument to earliest() and latest() '
-            'is deprecated in favor of passing positional arguments.',
+            'is deprecated in favor of passing positional arguments.'
         )
+        with self.assertWarnsMessage(RemovedInDjango30Warning, msg):
+            Person.objects.latest(field_name='birthday')
 
 
 class TestFirstLast(TestCase):

@@ -277,6 +277,9 @@ Tests
   dictionary as JSON if ``content_type='application/json'``. You can customize
   the JSON encoder with test client's ``json_encoder`` parameter.
 
+* The new :meth:`.SimpleTestCase.assertWarnsMessage` method is a simpler
+  version of :meth:`~unittest.TestCase.assertWarnsRegex`.
+
 URLs
 ~~~~
 

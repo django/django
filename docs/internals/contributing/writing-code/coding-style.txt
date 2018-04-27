@@ -62,10 +62,14 @@ Python style
 
 * In docstrings, follow the style of existing docstrings and :pep:`257`.
 
-* In tests, use :meth:`~django.test.SimpleTestCase.assertRaisesMessage` instead
-  of :meth:`~unittest.TestCase.assertRaises` so you can check the exception
-  message. Use :meth:`~unittest.TestCase.assertRaisesRegex` only if you need
-  regular expression matching.
+* In tests, use
+  :meth:`~django.test.SimpleTestCase.assertRaisesMessage` and
+  :meth:`~django.test.SimpleTestCase.assertWarnsMessage`
+  instead of :meth:`~unittest.TestCase.assertRaises` and
+  :meth:`~unittest.TestCase.assertWarns` so you can check the
+  exception or warning message. Use :meth:`~unittest.TestCase.assertRaisesRegex`
+  and :meth:`~unittest.TestCase.assertWarnsRegex` only if you need regular
+  expression matching.
 
 * In test docstrings, state the expected behavior that each test demonstrates.
   Don't include preambles such as "Tests that" or "Ensures that".

@@ -585,10 +585,23 @@ class SimpleTestCase(unittest.TestCase):
         )
 
     @contextmanager
-    def _assert_raises_message_cm(self, expected_exception, expected_message):
-        with self.assertRaises(expected_exception) as cm:
+    def _assert_raises_or_warns_cm(self, func, cm_attr, expected_exception, expected_message):
+        with func(expected_exception) as cm:
             yield cm
-        self.assertIn(expected_message, str(cm.exception))
+        self.assertIn(expected_message, str(getattr(cm, cm_attr)))
+
+    def _assertFooMessage(self, func, cm_attr, expected_exception, expected_message, *args, **kwargs):
+        callable_obj = None
+        if args:
+            callable_obj = args[0]
+            args = args[1:]
+        cm = self._assert_raises_or_warns_cm(func, cm_attr, expected_exception, expected_message)
+        # Assertion used in context manager fashion.
+        if callable_obj is None:
+            return cm
+        # Assertion was passed a callable.
+        with cm:
+            callable_obj(*args, **kwargs)
 
     def assertRaisesMessage(self, expected_exception, expected_message, *args, **kwargs):
         """
@@ -601,18 +614,20 @@ class SimpleTestCase(unittest.TestCase):
             args: Function to be called and extra positional args.
             kwargs: Extra kwargs.
         """
-        callable_obj = None
-        if args:
-            callable_obj = args[0]
-            args = args[1:]
+        return self._assertFooMessage(
+            self.assertRaises, 'exception', expected_exception, expected_message,
+            *args, **kwargs
+        )
 
-        cm = self._assert_raises_message_cm(expected_exception, expected_message)
-        # Assertion used in context manager fashion.
-        if callable_obj is None:
-            return cm
-        # Assertion was passed a callable.
-        with cm:
-            callable_obj(*args, **kwargs)
+    def assertWarnsMessage(self, expected_warning, expected_message, *args, **kwargs):
+        """
+        Same as assertRaisesMessage but for assertWarns() instead of
+        assertRaises().
+        """
+        return self._assertFooMessage(
+            self.assertWarns, 'warning', expected_warning, expected_message,
+            *args, **kwargs
+        )
 
     def assertFieldOutput(self, fieldclass, valid, invalid, field_args=None,
                           field_kwargs=None, empty_value=''):

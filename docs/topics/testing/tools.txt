@@ -692,6 +692,8 @@ A subclass of :class:`unittest.TestCase` that adds this functionality:
 
   * Checking that a callable :meth:`raises a certain exception
     <SimpleTestCase.assertRaisesMessage>`.
+  * Checking that a callable :meth:`triggers a certain warning
+    <SimpleTestCase.assertWarnsMessage>`.
   * Testing form field :meth:`rendering and error treatment
     <SimpleTestCase.assertFieldOutput>`.
   * Testing :meth:`HTML responses for the presence/lack of a given fragment
@@ -1361,6 +1363,15 @@ your test suite.
 
         with self.assertRaisesMessage(ValueError, 'invalid literal for int()'):
             int('a')
+
+.. method:: SimpleTestCase.assertWarnsMessage(expected_warning, expected_message, callable, *args, **kwargs)
+            SimpleTestCase.assertWarnsMessage(expected_warning, expected_message)
+
+    .. versionadded:: 2.1
+
+    Analogous to :meth:`SimpleTestCase.assertRaisesMessage` but for
+    :meth:`~unittest.TestCase.assertWarnsRegex` instead of
+    :meth:`~unittest.TestCase.assertRaisesRegex`.
 
 .. method:: SimpleTestCase.assertFieldOutput(fieldclass, valid, invalid, field_args=None, field_kwargs=None, empty_value='')
 

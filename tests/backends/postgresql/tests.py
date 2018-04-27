@@ -1,5 +1,4 @@
 import unittest
-import warnings
 from unittest import mock
 
 from django.core.exceptions import ImproperlyConfigured
@@ -24,7 +23,14 @@ class Tests(TestCase):
         self.assertIsNone(nodb_conn.settings_dict['NAME'])
 
         # Now assume the 'postgres' db isn't available
-        with warnings.catch_warnings(record=True) as w:
+        msg = (
+            "Normally Django will use a connection to the 'postgres' database "
+            "to avoid running initialization queries against the production "
+            "database when it's not needed (for example, when running tests). "
+            "Django was unable to create a connection to the 'postgres' "
+            "database and will use the first PostgreSQL database instead."
+        )
+        with self.assertWarnsMessage(RuntimeWarning, msg):
             with mock.patch('django.db.backends.base.base.BaseDatabaseWrapper.connect',
                             side_effect=mocked_connect, autospec=True):
                 with mock.patch.object(
@@ -32,13 +38,9 @@ class Tests(TestCase):
                     'settings_dict',
                     {**connection.settings_dict, 'NAME': 'postgres'},
                 ):
-                    warnings.simplefilter('always', RuntimeWarning)
                     nodb_conn = connection._nodb_connection
         self.assertIsNotNone(nodb_conn.settings_dict['NAME'])
         self.assertEqual(nodb_conn.settings_dict['NAME'], connections['other'].settings_dict['NAME'])
-        # Check a RuntimeWarning has been emitted
-        self.assertEqual(len(w), 1)
-        self.assertEqual(w[0].message.__class__, RuntimeWarning)
 
     def test_database_name_too_long(self):
         from django.db.backends.postgresql.base import DatabaseWrapper

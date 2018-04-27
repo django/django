@@ -441,13 +441,10 @@ class BackendTestCase(TransactionTestCase):
                 cursor.execute("SELECT 3" + new_connection.features.bare_select_suffix)
                 cursor.execute("SELECT 4" + new_connection.features.bare_select_suffix)
 
-            with warnings.catch_warnings(record=True) as w:
+            msg = "Limit for query logging exceeded, only the last 3 queries will be returned."
+            with self.assertWarnsMessage(UserWarning, msg):
                 self.assertEqual(3, len(new_connection.queries))
-                self.assertEqual(1, len(w))
-                self.assertEqual(
-                    str(w[0].message),
-                    "Limit for query logging exceeded, only the last 3 queries will be returned."
-                )
+
         finally:
             BaseDatabaseWrapper.queries_limit = old_queries_limit
             new_connection.close()

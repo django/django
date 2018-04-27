@@ -1,5 +1,6 @@
 import os
 import unittest
+import warnings
 from io import StringIO
 from unittest import mock
 
@@ -861,6 +862,30 @@ class AssertRaisesMsgTest(SimpleTestCase):
         def func1():
             raise ValueError("[.*x+]y?")
         with self.assertRaisesMessage(ValueError, "[.*x+]y?"):
+            func1()
+
+
+class AssertWarnsMessageTests(SimpleTestCase):
+
+    def test_context_manager(self):
+        with self.assertWarnsMessage(UserWarning, 'Expected message'):
+            warnings.warn('Expected message', UserWarning)
+
+    def test_context_manager_failure(self):
+        msg = "Expected message' not found in 'Unexpected message'"
+        with self.assertRaisesMessage(AssertionError, msg):
+            with self.assertWarnsMessage(UserWarning, 'Expected message'):
+                warnings.warn('Unexpected message', UserWarning)
+
+    def test_callable(self):
+        def func():
+            warnings.warn('Expected message', UserWarning)
+        self.assertWarnsMessage(UserWarning, 'Expected message', func)
+
+    def test_special_re_chars(self):
+        def func1():
+            warnings.warn('[.*x+]y?', UserWarning)
+        with self.assertWarnsMessage(UserWarning, '[.*x+]y?'):
             func1()
 
 

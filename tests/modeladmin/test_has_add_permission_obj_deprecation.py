@@ -1,5 +1,3 @@
-import warnings
-
 from django.contrib.admin.options import ModelAdmin, TabularInline
 from django.utils.deprecation import RemovedInDjango30Warning
 
@@ -52,12 +50,9 @@ class HasAddPermissionObjTests(CheckTestCase):
         class BandAdmin(ModelAdmin):
             inlines = [SongInlineAdmin]
 
-        with warnings.catch_warnings(record=True) as recorded:
-            warnings.simplefilter('always')
-            self.assertIsValid(BandAdmin, Band)
-        self.assertEqual(len(recorded), 1)
-        self.assertIs(recorded[0].category, RemovedInDjango30Warning)
-        self.assertEqual(str(recorded[0].message), (
+        msg = (
             "Update SongInlineAdmin.has_add_permission() to accept a "
             "positional `obj` argument."
-        ))
+        )
+        with self.assertWarnsMessage(RemovedInDjango30Warning, msg):
+            self.assertIsValid(BandAdmin, Band)
