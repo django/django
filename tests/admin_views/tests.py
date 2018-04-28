@@ -25,7 +25,7 @@ from django.template.response import TemplateResponse
 from django.test import (
     TestCase, modify_settings, override_settings, skipUnlessDBFeature,
 )
-from django.test.utils import override_script_prefix, patch_logger
+from django.test.utils import override_script_prefix
 from django.urls import NoReverseMatch, resolve, reverse
 from django.utils import formats, translation
 from django.utils.cache import get_max_age
@@ -747,12 +747,11 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             self.assertContains(response, '%Y-%m-%d %H:%M:%S')
 
     def test_disallowed_filtering(self):
-        with patch_logger('django.security.DisallowedModelAdminLookup', 'error') as calls:
+        with self.assertLogs('django.security.DisallowedModelAdminLookup', 'ERROR'):
             response = self.client.get(
                 "%s?owner__email__startswith=fuzzy" % reverse('admin:admin_views_album_changelist')
             )
-            self.assertEqual(response.status_code, 400)
-            self.assertEqual(len(calls), 1)
+        self.assertEqual(response.status_code, 400)
 
         # Filters are allowed if explicitly included in list_filter
         response = self.client.get("%s?color__value__startswith=red" % reverse('admin:admin_views_thing_changelist'))
@@ -777,18 +776,16 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_disallowed_to_field(self):
-        with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
-            url = reverse('admin:admin_views_section_changelist')
+        url = reverse('admin:admin_views_section_changelist')
+        with self.assertLogs('django.security.DisallowedModelAdminToField', 'ERROR'):
             response = self.client.get(url, {TO_FIELD_VAR: 'missing_field'})
-            self.assertEqual(response.status_code, 400)
-            self.assertEqual(len(calls), 1)
+        self.assertEqual(response.status_code, 400)
 
         # Specifying a field that is not referred by any other model registered
         # to this admin site should raise an exception.
-        with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
+        with self.assertLogs('django.security.DisallowedModelAdminToField', 'ERROR'):
             response = self.client.get(reverse('admin:admin_views_section_changelist'), {TO_FIELD_VAR: 'name'})
-            self.assertEqual(response.status_code, 400)
-            self.assertEqual(len(calls), 1)
+        self.assertEqual(response.status_code, 400)
 
         # #23839 - Primary key should always be allowed, even if the referenced model isn't registered.
         response = self.client.get(reverse('admin:admin_views_notreferenced_changelist'), {TO_FIELD_VAR: 'id'})
@@ -815,30 +812,26 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         # #25622 - Specifying a field of a model only referred by a generic
         # relation should raise DisallowedModelAdminToField.
         url = reverse('admin:admin_views_referencedbygenrel_changelist')
-        with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
+        with self.assertLogs('django.security.DisallowedModelAdminToField', 'ERROR'):
             response = self.client.get(url, {TO_FIELD_VAR: 'object_id'})
-            self.assertEqual(response.status_code, 400)
-            self.assertEqual(len(calls), 1)
+        self.assertEqual(response.status_code, 400)
 
         # We also want to prevent the add, change, and delete views from
         # leaking a disallowed field value.
-        with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
+        with self.assertLogs('django.security.DisallowedModelAdminToField', 'ERROR'):
             response = self.client.post(reverse('admin:admin_views_section_add'), {TO_FIELD_VAR: 'name'})
-            self.assertEqual(response.status_code, 400)
-            self.assertEqual(len(calls), 1)
+        self.assertEqual(response.status_code, 400)
 
         section = Section.objects.create()
-        with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
-            url = reverse('admin:admin_views_section_change', args=(section.pk,))
+        url = reverse('admin:admin_views_section_change', args=(section.pk,))
+        with self.assertLogs('django.security.DisallowedModelAdminToField', 'ERROR'):
             response = self.client.post(url, {TO_FIELD_VAR: 'name'})
-            self.assertEqual(response.status_code, 400)
-            self.assertEqual(len(calls), 1)
+        self.assertEqual(response.status_code, 400)
 
-        with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
-            url = reverse('admin:admin_views_section_delete', args=(section.pk,))
+        url = reverse('admin:admin_views_section_delete', args=(section.pk,))
+        with self.assertLogs('django.security.DisallowedModelAdminToField', 'ERROR'):
             response = self.client.post(url, {TO_FIELD_VAR: 'name'})
-            self.assertEqual(response.status_code, 400)
-            self.assertEqual(len(calls), 1)
+        self.assertEqual(response.status_code, 400)
 
     def test_allowed_filtering_15103(self):
         """

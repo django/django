@@ -27,7 +27,6 @@ from django.http import HttpRequest, QueryDict
 from django.middleware.csrf import CsrfViewMiddleware, get_token
 from django.test import Client, TestCase, override_settings
 from django.test.client import RedirectCycleError
-from django.test.utils import patch_logger
 from django.urls import NoReverseMatch, reverse, reverse_lazy
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import LANGUAGE_SESSION_KEY
@@ -186,29 +185,27 @@ class PasswordResetTest(AuthViewsTestCase):
         # produce a meaningful reset URL, we need to be certain that the
         # HTTP_HOST header isn't poisoned. This is done as a check when get_host()
         # is invoked, but we check here as a practical consequence.
-        with patch_logger('django.security.DisallowedHost', 'error') as logger_calls:
+        with self.assertLogs('django.security.DisallowedHost', 'ERROR'):
             response = self.client.post(
                 '/password_reset/',
                 {'email': 'staffmember@example.com'},
                 HTTP_HOST='www.example:dr.frankenstein@evil.tld'
             )
-            self.assertEqual(response.status_code, 400)
-            self.assertEqual(len(mail.outbox), 0)
-            self.assertEqual(len(logger_calls), 1)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(len(mail.outbox), 0)
 
     # Skip any 500 handler action (like sending more mail...)
     @override_settings(DEBUG_PROPAGATE_EXCEPTIONS=True)
     def test_poisoned_http_host_admin_site(self):
         "Poisoned HTTP_HOST headers can't be used for reset emails on admin views"
-        with patch_logger('django.security.DisallowedHost', 'error') as logger_calls:
+        with self.assertLogs('django.security.DisallowedHost', 'ERROR'):
             response = self.client.post(
                 '/admin_password_reset/',
                 {'email': 'staffmember@example.com'},
                 HTTP_HOST='www.example:dr.frankenstein@evil.tld'
             )
-            self.assertEqual(response.status_code, 400)
-            self.assertEqual(len(mail.outbox), 0)
-            self.assertEqual(len(logger_calls), 1)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(len(mail.outbox), 0)
 
     def _test_confirm_start(self):
         # Start by creating the email
@@ -1153,10 +1150,9 @@ class ChangelistTests(AuthViewsTestCase):
     # repeated password__startswith queries.
     def test_changelist_disallows_password_lookups(self):
         # A lookup that tries to filter on password isn't OK
-        with patch_logger('django.security.DisallowedModelAdminLookup', 'error') as logger_calls:
+        with self.assertLogs('django.security.DisallowedModelAdminLookup', 'ERROR'):
             response = self.client.get(reverse('auth_test_admin:auth_user_changelist') + '?password__startswith=sha1$')
-            self.assertEqual(response.status_code, 400)
-            self.assertEqual(len(logger_calls), 1)
+        self.assertEqual(response.status_code, 400)
 
     def test_user_change_email(self):
         data = self.get_user_data(self.admin)

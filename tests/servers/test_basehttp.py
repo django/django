@@ -5,7 +5,6 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.core.servers.basehttp import WSGIRequestHandler
 from django.test import SimpleTestCase
 from django.test.client import RequestFactory
-from django.test.utils import patch_logger
 
 
 class Stub:
@@ -34,22 +33,19 @@ class WSGIRequestHandlerTestCase(SimpleTestCase):
                 'error': [500, 503],
             }
 
-            def _log_level_code(level, status_code):
-                with patch_logger('django.server', level) as messages:
-                    handler.log_message('GET %s %s', 'A', str(status_code))
-                return messages
-
             for level, status_codes in level_status_codes.items():
                 for status_code in status_codes:
                     # The correct level gets the message.
-                    messages = _log_level_code(level, status_code)
-                    self.assertIn('GET A %d' % status_code, messages[0])
+                    with self.assertLogs('django.server', level.upper()) as cm:
+                        handler.log_message('GET %s %s', 'A', str(status_code))
+                    self.assertIn('GET A %d' % status_code, cm.output[0])
 
                     # Incorrect levels shouldn't have any messages.
                     for wrong_level in level_status_codes:
                         if wrong_level != level:
-                            messages = _log_level_code(wrong_level, status_code)
-                            self.assertEqual(len(messages), 0)
+                            with self.assertRaisesMessage(AssertionError, 'no logs'):
+                                with self.assertLogs('django.template', level.upper()):
+                                    handler.log_message('GET %s %s', 'A', str(status_code))
         finally:
             logger.handlers = original_handlers
 
@@ -59,12 +55,12 @@ class WSGIRequestHandlerTestCase(SimpleTestCase):
 
         handler = WSGIRequestHandler(request, '192.168.0.2', None)
 
-        with patch_logger('django.server', 'error') as messages:
+        with self.assertLogs('django.server', 'ERROR') as cm:
             handler.log_message("GET %s %s", '\x16\x03', "4")
         self.assertIn(
             "You're accessing the development server over HTTPS, "
             "but it only supports HTTP.",
-            messages[0]
+            cm.records[0].getMessage()
         )
 
     def test_strips_underscore_headers(self):
@@ -107,8 +103,8 @@ class WSGIRequestHandlerTestCase(SimpleTestCase):
         request = Stub(makefile=makefile)
         server = Stub(base_environ={}, get_app=lambda: test_app)
 
-        # We don't need to check stderr, but we don't want it in test output
-        with patch_logger('django.server', 'info'):
+        # Prevent logging from appearing in test output.
+        with self.assertLogs('django.server', 'INFO'):
             # instantiating a handler runs the request as side effect
             WSGIRequestHandler(request, '192.168.0.2', server)
 

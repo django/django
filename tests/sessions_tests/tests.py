@@ -32,7 +32,6 @@ from django.http import HttpResponse
 from django.test import (
     RequestFactory, TestCase, ignore_warnings, override_settings,
 )
-from django.test.utils import patch_logger
 from django.utils import timezone
 
 from .models import SessionStore as CustomDatabaseSession
@@ -313,11 +312,10 @@ class SessionTestsMixin:
 
     def test_decode_failure_logged_to_security(self):
         bad_encode = base64.b64encode(b'flaskdj:alkdjf')
-        with patch_logger('django.security.SuspiciousSession', 'warning') as calls:
+        with self.assertLogs('django.security.SuspiciousSession', 'WARNING') as cm:
             self.assertEqual({}, self.session.decode(bad_encode))
-            # check that the failed decode is logged
-            self.assertEqual(len(calls), 1)
-            self.assertIn('corrupted', calls[0])
+        # The failed decode is logged.
+        self.assertIn('corrupted', cm.output[0])
 
     def test_actual_expiry(self):
         # this doesn't work with JSONSerializer (serializing timedelta)
