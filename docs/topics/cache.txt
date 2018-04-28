@@ -734,6 +734,7 @@ a cached item, for example:
     >>> key = make_template_fragment_key('sidebar', [username])
     >>> cache.delete(key) # invalidates cached template fragment
 
+.. _low-level-cache-api:
 
 The low-level cache API
 =======================
@@ -890,6 +891,22 @@ Finally, if you want to delete all the keys in the cache, use
 from the cache, not just the keys set by your application. ::
 
     >>> cache.clear()
+
+``cache.touch()`` sets a new expiration for a key. For example, to update a key
+to expire 10 seconds from now::
+
+    >>> cache.touch('a', 10)
+    True
+
+Like other methods, the ``timeout`` argument is optional and defaults to the
+``TIMEOUT`` option of the appropriate backend in the :setting:`CACHES` setting.
+
+``touch()`` returns ``True`` if the key was successfully touched, ``False``
+otherwise.
+
+.. versionchanged:: 2.1
+
+    The ``cache.touch()`` method was added.
 
 You can also increment or decrement a key that already exists using the
 ``incr()`` or ``decr()`` methods, respectively. By default, the existing cache

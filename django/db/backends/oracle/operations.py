@@ -223,7 +223,8 @@ END;
     def fetch_returned_insert_id(self, cursor):
         try:
             return int(cursor._insert_id_var.getvalue())
-        except TypeError:
+        except (IndexError, TypeError):
+            # cx_Oracle < 6.3 returns None, >= 6.3 raises IndexError.
             raise DatabaseError(
                 'The database did not return a new row id. Probably "ORA-1403: '
                 'no data found" was raised internally but was hidden by the '

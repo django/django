@@ -104,6 +104,11 @@ class DatabaseCache(BaseDatabaseCache):
         self.validate_key(key)
         return self._base_set('add', key, value, timeout)
 
+    def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
+        key = self.make_key(key, version=version)
+        self.validate_key(key)
+        return self._base_set('touch', key, None, timeout)
+
     def _base_set(self, mode, key, value, timeout=DEFAULT_TIMEOUT):
         timeout = self.get_backend_timeout(timeout)
         db = router.db_for_write(self.cache_model_class)
@@ -157,7 +162,16 @@ class DatabaseCache(BaseDatabaseCache):
                                 current_expires = converter(current_expires, expression, connection)
 
                     exp = connection.ops.adapt_datetimefield_value(exp)
-                    if result and (mode == 'set' or (mode == 'add' and current_expires < now)):
+                    if result and mode == 'touch':
+                        cursor.execute(
+                            'UPDATE %s SET %s = %%s WHERE %s = %%s' % (
+                                table,
+                                quote_name('expires'),
+                                quote_name('cache_key')
+                            ),
+                            [exp, key]
+                        )
+                    elif result and (mode == 'set' or (mode == 'add' and current_expires < now)):
                         cursor.execute(
                             'UPDATE %s SET %s = %%s, %s = %%s WHERE %s = %%s' % (
                                 table,
@@ -167,7 +181,7 @@ class DatabaseCache(BaseDatabaseCache):
                             ),
                             [b64encoded, exp, key]
                         )
-                    else:
+                    elif mode != 'touch':
                         cursor.execute(
                             'INSERT INTO %s (%s, %s, %s) VALUES (%%s, %%s, %%s)' % (
                                 table,
@@ -177,6 +191,8 @@ class DatabaseCache(BaseDatabaseCache):
                             ),
                             [key, b64encoded, exp]
                         )
+                    else:
+                        return False  # touch failed.
             except DatabaseError:
                 # To be threadsafe, updates/inserts are allowed to fail silently
                 return False
