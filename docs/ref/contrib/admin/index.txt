@@ -1068,7 +1068,8 @@ subclass::
     automatically generate the value for ``SlugField`` fields from one or more
     other fields. The generated value is produced by concatenating the values
     of the source fields, and then by transforming that result into a valid
-    slug (e.g. substituting dashes for spaces).
+    slug (e.g. substituting dashes for spaces; lowercasing ASCII letters; and
+    removing various English stop words such as 'a', 'an', 'as', and similar).
 
     Fields are prepopulated on add forms but not on change forms. It's usually
     undesired that slugs change after an object is created (which would cause
