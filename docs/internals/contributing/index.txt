@@ -32,7 +32,7 @@ development:
 * :doc:`Report bugs <bugs-and-features>` in our `ticket tracker`_.
 
 * Join the |django-developers| mailing list and share your ideas for how
-  to improve Django. We're always open to suggestions.
+  to improve Django. We're always open to suggestions. You can also interact via the `#django-dev`_ IRC channel.
 
 * :doc:`Submit patches <writing-code/submitting-patches>` for new and/or
   fixed behavior. If you're looking for an easy way to start contributing
