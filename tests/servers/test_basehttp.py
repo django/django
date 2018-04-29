@@ -1,4 +1,3 @@
-import logging
 from io import BytesIO
 
 from django.core.handlers.wsgi import WSGIRequest
@@ -18,36 +17,26 @@ class Stub:
 class WSGIRequestHandlerTestCase(SimpleTestCase):
 
     def test_log_message(self):
-        # Silence the django.server logger by replacing its StreamHandler with
-        # NullHandler.
-        logger = logging.getLogger('django.server')
-        original_handlers = logger.handlers
-        logger.handlers = [logging.NullHandler()]
-        try:
-            request = WSGIRequest(RequestFactory().get('/').environ)
-            request.makefile = lambda *args, **kwargs: BytesIO()
-            handler = WSGIRequestHandler(request, '192.168.0.2', None)
-            level_status_codes = {
-                'info': [200, 301, 304],
-                'warning': [400, 403, 404],
-                'error': [500, 503],
-            }
-
-            for level, status_codes in level_status_codes.items():
-                for status_code in status_codes:
-                    # The correct level gets the message.
-                    with self.assertLogs('django.server', level.upper()) as cm:
-                        handler.log_message('GET %s %s', 'A', str(status_code))
-                    self.assertIn('GET A %d' % status_code, cm.output[0])
-
-                    # Incorrect levels shouldn't have any messages.
-                    for wrong_level in level_status_codes:
-                        if wrong_level != level:
-                            with self.assertRaisesMessage(AssertionError, 'no logs'):
-                                with self.assertLogs('django.template', level.upper()):
-                                    handler.log_message('GET %s %s', 'A', str(status_code))
-        finally:
-            logger.handlers = original_handlers
+        request = WSGIRequest(RequestFactory().get('/').environ)
+        request.makefile = lambda *args, **kwargs: BytesIO()
+        handler = WSGIRequestHandler(request, '192.168.0.2', None)
+        level_status_codes = {
+            'info': [200, 301, 304],
+            'warning': [400, 403, 404],
+            'error': [500, 503],
+        }
+        for level, status_codes in level_status_codes.items():
+            for status_code in status_codes:
+                # The correct level gets the message.
+                with self.assertLogs('django.server', level.upper()) as cm:
+                    handler.log_message('GET %s %s', 'A', str(status_code))
+                self.assertIn('GET A %d' % status_code, cm.output[0])
+                # Incorrect levels don't have any messages.
+                for wrong_level in level_status_codes:
+                    if wrong_level != level:
+                        with self.assertLogs('django.server', 'INFO') as cm:
+                            handler.log_message('GET %s %s', 'A', str(status_code))
+                        self.assertNotEqual(cm.records[0].levelname, wrong_level.upper())
 
     def test_https(self):
         request = WSGIRequest(RequestFactory().get('/').environ)
