@@ -1189,6 +1189,7 @@ class Model(metaclass=ModelBase):
                 *cls._check_field_name_clashes(),
                 *cls._check_model_name_db_lookup_clashes(),
                 *cls._check_property_name_related_field_accessor_clashes(),
+                *cls._check_single_primary_key(),
             )
             errors.extend(clash_errors)
             # If there are field name clashes, hide consequent column name
@@ -1434,6 +1435,19 @@ class Model(metaclass=ModelBase):
                         id='models.E025',
                     )
                 )
+        return errors
+
+    @classmethod
+    def _check_single_primary_key(cls):
+        errors = []
+        if sum(1 for f in cls._meta.local_fields if f.primary_key) > 1:
+            errors.append(
+                checks.Error(
+                    "Model can not contain more than one 'primary_key' field.",
+                    obj=cls,
+                    id='models.E026',
+                )
+            )
         return errors
 
     @classmethod
