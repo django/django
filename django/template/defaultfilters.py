@@ -425,13 +425,13 @@ def linebreaks_filter(value, autoescape=True):
 def linebreaksbr(value, autoescape=True):
     """
     Convert all newlines in a piece of plain text to HTML line breaks
-    (``<br />``).
+    (``<br>``).
     """
     autoescape = autoescape and not isinstance(value, SafeData)
     value = normalize_newlines(value)
     if autoescape:
         value = escape(value)
-    return mark_safe(value.replace(r'\n', '<br />'))
+    return mark_safe(value.replace(r'\n', '<br>'))
 
 
 @register.filter(is_safe=True)
