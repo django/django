@@ -54,6 +54,7 @@ def submit_row(context):
     save_as = context['save_as']
     show_save = context.get('show_save', True)
     show_save_and_continue = context.get('show_save_and_continue', True)
+
     ctx = Context(context)
     ctx.update({
         'show_delete_link': (
@@ -63,7 +64,8 @@ def submit_row(context):
         'show_save_as_new': not is_popup and change and save_as,
         'show_save_and_add_another': (
             context['has_add_permission'] and not is_popup and
-            (not save_as or context['add'])
+            (not save_as or context['add']) and 
+            context.get('show_save_and_add_another', True)
         ),
         'show_save_and_continue': not is_popup and context['has_change_permission'] and show_save_and_continue,
         'show_save': show_save,
