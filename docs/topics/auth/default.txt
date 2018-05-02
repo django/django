@@ -158,6 +158,8 @@ code.
 
 The Django admin site uses permissions as follows:
 
+* Access to view objects is limited to users with the "view" or "change"
+  permission for that type of object.
 * Access to view the "add" form and add an object is limited to users with
   the "add" permission for that type of object.
 * Access to view the change list, view the "change" form and change an
@@ -168,6 +170,7 @@ The Django admin site uses permissions as follows:
 
 Permissions can be set not only per type of object, but also per specific
 object instance. By using the
+:meth:`~django.contrib.admin.ModelAdmin.has_view_permission`,
 :meth:`~django.contrib.admin.ModelAdmin.has_add_permission`,
 :meth:`~django.contrib.admin.ModelAdmin.has_change_permission` and
 :meth:`~django.contrib.admin.ModelAdmin.has_delete_permission` methods provided
@@ -213,6 +216,7 @@ to test for basic permissions you should use:
 * add: ``user.has_perm('foo.add_bar')``
 * change: ``user.has_perm('foo.change_bar')``
 * delete: ``user.has_perm('foo.delete_bar')``
+* view: ``user.has_perm('foo.view_bar')``
 
 The :class:`~django.contrib.auth.models.Permission` model is rarely accessed
 directly.

@@ -50,6 +50,7 @@ class ChangeListTests(TestCase):
 
     def setUp(self):
         self.factory = RequestFactory()
+        self.superuser = User.objects.create_superuser(username='super', email='a@b.com', password='xxx')
 
     def _create_superuser(self, username):
         return User.objects.create_superuser(username=username, email='a@b.com', password='xxx')
@@ -70,6 +71,7 @@ class ChangeListTests(TestCase):
 
         m = OrderedByFBandAdmin(Band, custom_site)
         request = self.factory.get('/band/')
+        request.user = self.superuser
         cl = m.get_changelist_instance(request)
         self.assertEqual(cl.get_ordering_field_columns(), {3: 'desc', 2: 'asc'})
 
@@ -80,12 +82,14 @@ class ChangeListTests(TestCase):
         """
         m = ChildAdmin(Child, custom_site)
         request = self.factory.get('/child/')
+        request.user = self.superuser
         cl = m.get_changelist_instance(request)
         self.assertEqual(cl.queryset.query.select_related, {'parent': {}})
 
     def test_select_related_as_tuple(self):
         ia = InvitationAdmin(Invitation, custom_site)
         request = self.factory.get('/invitation/')
+        request.user = self.superuser
         cl = ia.get_changelist_instance(request)
         self.assertEqual(cl.queryset.query.select_related, {'player': {}})
 
@@ -93,6 +97,7 @@ class ChangeListTests(TestCase):
         ia = InvitationAdmin(Invitation, custom_site)
         ia.list_select_related = ()
         request = self.factory.get('/invitation/')
+        request.user = self.superuser
         cl = ia.get_changelist_instance(request)
         self.assertIs(cl.queryset.query.select_related, False)
 
@@ -105,6 +110,7 @@ class ChangeListTests(TestCase):
 
         ia = GetListSelectRelatedAdmin(Invitation, custom_site)
         request = self.factory.get('/invitation/')
+        request.user = self.superuser
         cl = ia.get_changelist_instance(request)
         self.assertEqual(cl.queryset.query.select_related, {'player': {}, 'band': {}})
 
@@ -115,6 +121,7 @@ class ChangeListTests(TestCase):
         """
         new_child = Child.objects.create(name='name', parent=None)
         request = self.factory.get('/child/')
+        request.user = self.superuser
         m = ChildAdmin(Child, custom_site)
         cl = m.get_changelist_instance(request)
         cl.formset = None
@@ -131,6 +138,7 @@ class ChangeListTests(TestCase):
         """
         new_child = Child.objects.create(name='name', parent=None)
         request = self.factory.get('/child/')
+        request.user = self.superuser
         # Set a new empty display value on AdminSite.
         admin.site.empty_value_display = '???'
         m = ChildAdmin(Child, admin.site)
@@ -149,6 +157,7 @@ class ChangeListTests(TestCase):
         """
         new_child = Child.objects.create(name='name', parent=None)
         request = self.factory.get('/child/')
+        request.user = self.superuser
         m = EmptyValueChildAdmin(Child, admin.site)
         cl = m.get_changelist_instance(request)
         cl.formset = None
@@ -172,6 +181,7 @@ class ChangeListTests(TestCase):
         new_parent = Parent.objects.create(name='parent')
         new_child = Child.objects.create(name='name', parent=new_parent)
         request = self.factory.get('/child/')
+        request.user = self.superuser
         m = ChildAdmin(Child, custom_site)
         cl = m.get_changelist_instance(request)
         cl.formset = None
@@ -194,6 +204,7 @@ class ChangeListTests(TestCase):
         new_parent = Parent.objects.create(name='parent')
         new_child = Child.objects.create(name='name', parent=new_parent)
         request = self.factory.get('/child/')
+        request.user = self.superuser
         m = ChildAdmin(Child, custom_site)
 
         # Test with list_editable fields
@@ -233,6 +244,7 @@ class ChangeListTests(TestCase):
         for i in range(200):
             Child.objects.create(name='name %s' % i, parent=new_parent)
         request = self.factory.get('/child/', data={'p': -1})  # Anything outside range
+        request.user = self.superuser
         m = ChildAdmin(Child, custom_site)
 
         # Test with list_editable fields
@@ -248,6 +260,7 @@ class ChangeListTests(TestCase):
             Child.objects.create(name='name %s' % i, parent=new_parent)
 
         request = self.factory.get('/child/')
+        request.user = self.superuser
         m = CustomPaginationAdmin(Child, custom_site)
 
         cl = m.get_changelist_instance(request)
@@ -267,6 +280,7 @@ class ChangeListTests(TestCase):
 
         m = BandAdmin(Band, custom_site)
         request = self.factory.get('/band/', data={'genres': blues.pk})
+        request.user = self.superuser
 
         cl = m.get_changelist_instance(request)
         cl.get_results(request)
@@ -286,6 +300,7 @@ class ChangeListTests(TestCase):
 
         m = GroupAdmin(Group, custom_site)
         request = self.factory.get('/group/', data={'members': lead.pk})
+        request.user = self.superuser
 
         cl = m.get_changelist_instance(request)
         cl.get_results(request)
@@ -307,6 +322,7 @@ class ChangeListTests(TestCase):
 
         m = ConcertAdmin(Concert, custom_site)
         request = self.factory.get('/concert/', data={'group__members': lead.pk})
+        request.user = self.superuser
 
         cl = m.get_changelist_instance(request)
         cl.get_results(request)
@@ -327,6 +343,7 @@ class ChangeListTests(TestCase):
 
         m = QuartetAdmin(Quartet, custom_site)
         request = self.factory.get('/quartet/', data={'members': lead.pk})
+        request.user = self.superuser
 
         cl = m.get_changelist_instance(request)
         cl.get_results(request)
@@ -347,6 +364,7 @@ class ChangeListTests(TestCase):
 
         m = ChordsBandAdmin(ChordsBand, custom_site)
         request = self.factory.get('/chordsband/', data={'members': lead.pk})
+        request.user = self.superuser
 
         cl = m.get_changelist_instance(request)
         cl.get_results(request)
@@ -366,6 +384,7 @@ class ChangeListTests(TestCase):
 
         m = ParentAdmin(Parent, custom_site)
         request = self.factory.get('/parent/', data={'child__name': 'Daniel'})
+        request.user = self.superuser
 
         cl = m.get_changelist_instance(request)
         # Make sure distinct() was called
@@ -382,6 +401,7 @@ class ChangeListTests(TestCase):
 
         m = ParentAdmin(Parent, custom_site)
         request = self.factory.get('/parent/', data={SEARCH_VAR: 'daniel'})
+        request.user = self.superuser
 
         cl = m.get_changelist_instance(request)
         # Make sure distinct() was called
@@ -401,6 +421,7 @@ class ChangeListTests(TestCase):
 
         m = ConcertAdmin(Concert, custom_site)
         request = self.factory.get('/concert/', data={SEARCH_VAR: 'vox'})
+        request.user = self.superuser
 
         cl = m.get_changelist_instance(request)
         # There's only one Concert instance
@@ -414,10 +435,12 @@ class ChangeListTests(TestCase):
         m.search_fields = ['group__pk']
 
         request = self.factory.get('/concert/', data={SEARCH_VAR: band.pk})
+        request.user = self.superuser
         cl = m.get_changelist_instance(request)
         self.assertEqual(cl.queryset.count(), 1)
 
         request = self.factory.get('/concert/', data={SEARCH_VAR: band.pk + 5})
+        request.user = self.superuser
         cl = m.get_changelist_instance(request)
         self.assertEqual(cl.queryset.count(), 0)
 
@@ -429,10 +452,12 @@ class ChangeListTests(TestCase):
         m.search_fields = ['name__iexact']
 
         request = self.factory.get('/', data={SEARCH_VAR: 'woodstock'})
+        request.user = self.superuser
         cl = m.get_changelist_instance(request)
         self.assertCountEqual(cl.queryset, [concert])
 
         request = self.factory.get('/', data={SEARCH_VAR: 'wood'})
+        request.user = self.superuser
         cl = m.get_changelist_instance(request)
         self.assertCountEqual(cl.queryset, [])
 
@@ -445,10 +470,12 @@ class ChangeListTests(TestCase):
         Field.register_lookup(Contains, 'cc')
         try:
             request = self.factory.get('/', data={SEARCH_VAR: 'Hype'})
+            request.user = self.superuser
             cl = m.get_changelist_instance(request)
             self.assertCountEqual(cl.queryset, [concert])
 
             request = self.factory.get('/', data={SEARCH_VAR: 'Woodstock'})
+            request.user = self.superuser
             cl = m.get_changelist_instance(request)
             self.assertCountEqual(cl.queryset, [])
         finally:
@@ -467,10 +494,12 @@ class ChangeListTests(TestCase):
             m.search_fields = ['group__members__age__exactly']
 
             request = self.factory.get('/', data={SEARCH_VAR: '20'})
+            request.user = self.superuser
             cl = m.get_changelist_instance(request)
             self.assertCountEqual(cl.queryset, [concert])
 
             request = self.factory.get('/', data={SEARCH_VAR: '21'})
+            request.user = self.superuser
             cl = m.get_changelist_instance(request)
             self.assertCountEqual(cl.queryset, [])
         finally:
@@ -486,10 +515,12 @@ class ChangeListTests(TestCase):
         m.search_fields = ['pk__exact']
 
         request = self.factory.get('/', data={SEARCH_VAR: 'abc'})
+        request.user = self.superuser
         cl = m.get_changelist_instance(request)
         self.assertCountEqual(cl.queryset, [abc])
 
         request = self.factory.get('/', data={SEARCH_VAR: 'abcd'})
+        request.user = self.superuser
         cl = m.get_changelist_instance(request)
         self.assertCountEqual(cl.queryset, [abcd])
 
@@ -501,11 +532,13 @@ class ChangeListTests(TestCase):
         m = BandAdmin(Band, custom_site)
         for lookup_params in ({}, {'name': 'test'}):
             request = self.factory.get('/band/', lookup_params)
+            request.user = self.superuser
             cl = m.get_changelist_instance(request)
             self.assertFalse(cl.queryset.query.distinct)
 
         # A ManyToManyField in params does have distinct applied.
         request = self.factory.get('/band/', {'genres': '0'})
+        request.user = self.superuser
         cl = m.get_changelist_instance(request)
         self.assertTrue(cl.queryset.query.distinct)
 
@@ -520,6 +553,7 @@ class ChangeListTests(TestCase):
             Child.objects.create(name='filtered %s' % i, parent=parent)
 
         request = self.factory.get('/child/')
+        request.user = self.superuser
 
         # Test default queryset
         m = ChildAdmin(Child, custom_site)
@@ -540,8 +574,7 @@ class ChangeListTests(TestCase):
         Regression test for #13196: output of functions should be  localized
         in the changelist.
         """
-        superuser = User.objects.create_superuser(username='super', email='super@localhost', password='secret')
-        self.client.force_login(superuser)
+        self.client.force_login(self.superuser)
         event = Event.objects.create(date=datetime.date.today())
         response = self.client.get(reverse('admin:admin_changelist_event_changelist'))
         self.assertContains(response, formats.localize(event.date))
@@ -597,6 +630,7 @@ class ChangeListTests(TestCase):
 
         # Add "show all" parameter to request
         request = self.factory.get('/child/', data={ALL_VAR: ''})
+        request.user = self.superuser
 
         # Test valid "show all" request (number of total objects is under max)
         m = ChildAdmin(Child, custom_site)
@@ -856,6 +890,7 @@ class ChangeListTests(TestCase):
         # instantiating and setting up ChangeList object
         m = GroupAdmin(Group, custom_site)
         request = self.factory.get('/group/')
+        request.user = self.superuser
         cl = m.get_changelist_instance(request)
         per_page = cl.list_per_page = 10
 

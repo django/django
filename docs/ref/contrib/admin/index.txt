@@ -1623,7 +1623,7 @@ templates used by the :class:`ModelAdmin` views:
     a ``list`` or ``tuple`` of :class:`~django.contrib.admin.InlineModelAdmin`
     objects, as described below in the :class:`~django.contrib.admin.InlineModelAdmin`
     section. For example, the following would return inlines without the default
-    filtering based on add, change, and delete permissions::
+    filtering based on add, change, delete, and view permissions::
 
         class MyModelAdmin(admin.ModelAdmin):
             inlines = (MyInline,)
@@ -1887,6 +1887,19 @@ templates used by the :class:`ModelAdmin` views:
     Override this method to customize the lookups permitted for your
     :class:`~django.contrib.admin.ModelAdmin` subclass.
 
+.. method:: ModelAdmin.has_view_permission(request, obj=None)
+
+    .. versionadded:: 2.1
+
+    Should return ``True`` if viewing ``obj`` is permitted, ``False`` otherwise.
+    If obj is ``None``, should return ``True`` or ``False`` to indicate whether
+    viewing of objects of this type is permitted in general (e.g., ``False``
+    will be interpreted as meaning that the current user is not permitted to
+    view any object of this type).
+
+    The default implementation returns ``True`` if the user has either the
+    "change" or "view" permission.
+
 .. method:: ModelAdmin.has_add_permission(request)
 
     Should return ``True`` if adding an object is permitted, ``False``
@@ -1914,7 +1927,8 @@ templates used by the :class:`ModelAdmin` views:
     accessing the module's index page is permitted, ``False`` otherwise.
     Uses :meth:`User.has_module_perms()
     <django.contrib.auth.models.User.has_module_perms>` by default. Overriding
-    it does not restrict access to the add, change or delete views,
+    it does not restrict access to the view, add, change, or delete views,
+    :meth:`~ModelAdmin.has_view_permission`,
     :meth:`~ModelAdmin.has_add_permission`,
     :meth:`~ModelAdmin.has_change_permission`, and
     :meth:`~ModelAdmin.has_delete_permission` should be used for that.
@@ -2862,7 +2876,8 @@ Templates can override or extend base admin templates as described in
 
       * ``object_name``: class name of the model
       * ``name``: plural name of the model
-      * ``perms``: a ``dict`` tracking ``add``, ``change``, and ``delete`` permissions
+      * ``perms``: a ``dict`` tracking ``add``, ``change``, ``delete``, and
+        ``view`` permissions
       * ``admin_url``: admin changelist URL for the model
       * ``add_url``: admin URL to add a new model instance
 

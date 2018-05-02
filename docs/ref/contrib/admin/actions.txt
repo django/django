@@ -340,6 +340,9 @@ Conditionally enabling or disabling actions
     Finally, you can conditionally enable or disable actions on a per-request
     (and hence per-user basis) by overriding :meth:`ModelAdmin.get_actions`.
 
+    This doesn't return any actions if the user doesn't have the "change"
+    permission for the model.
+
     This returns a dictionary of actions allowed. The keys are action names, and
     the values are ``(function, name, short_description)`` tuples.
 

@@ -224,7 +224,9 @@ class InlineAdminFormSet:
     A wrapper around an inline formset for use in the admin system.
     """
     def __init__(self, inline, formset, fieldsets, prepopulated_fields=None,
-                 readonly_fields=None, model_admin=None):
+                 readonly_fields=None, model_admin=None, has_add_permission=True,
+                 has_change_permission=True, has_delete_permission=True,
+                 has_view_permission=True):
         self.opts = inline
         self.formset = formset
         self.fieldsets = fieldsets
@@ -236,13 +238,21 @@ class InlineAdminFormSet:
             prepopulated_fields = {}
         self.prepopulated_fields = prepopulated_fields
         self.classes = ' '.join(inline.classes) if inline.classes else ''
+        self.has_add_permission = has_add_permission
+        self.has_change_permission = has_change_permission
+        self.has_delete_permission = has_delete_permission
+        self.has_view_permission = has_view_permission
 
     def __iter__(self):
+        readonly_fields_for_editing = self.readonly_fields
+        if not self.has_change_permission:
+            readonly_fields_for_editing += flatten_fieldsets(self.fieldsets)
+
         for form, original in zip(self.formset.initial_forms, self.formset.get_queryset()):
             view_on_site_url = self.opts.get_view_on_site_url(original)
             yield InlineAdminForm(
                 self.formset, form, self.fieldsets, self.prepopulated_fields,
-                original, self.readonly_fields, model_admin=self.opts,
+                original, readonly_fields_for_editing, model_admin=self.opts,
                 view_on_site_url=view_on_site_url,
             )
         for form in self.formset.extra_forms:
@@ -250,11 +260,12 @@ class InlineAdminFormSet:
                 self.formset, form, self.fieldsets, self.prepopulated_fields,
                 None, self.readonly_fields, model_admin=self.opts,
             )
-        yield InlineAdminForm(
-            self.formset, self.formset.empty_form,
-            self.fieldsets, self.prepopulated_fields, None,
-            self.readonly_fields, model_admin=self.opts,
-        )
+        if self.has_add_permission:
+            yield InlineAdminForm(
+                self.formset, self.formset.empty_form,
+                self.fieldsets, self.prepopulated_fields, None,
+                self.readonly_fields, model_admin=self.opts,
+            )
 
     def fields(self):
         fk = getattr(self.formset, "fk", None)
@@ -264,7 +275,7 @@ class InlineAdminFormSet:
         for i, field_name in enumerate(flatten_fieldsets(self.fieldsets)):
             if fk and fk.name == field_name:
                 continue
-            if field_name in self.readonly_fields:
+            if not self.has_change_permission or field_name in self.readonly_fields:
                 yield {
                     'label': meta_labels.get(field_name) or label_for_field(field_name, self.opts.model, self.opts),
                     'widget': {'is_hidden': False},

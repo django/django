@@ -26,6 +26,21 @@ latest release of each series.
 What's new in Django 2.1
 ========================
 
+Model "view" permission
+-----------------------
+
+A "view" permission is added to the model :attr:`Meta.default_permissions
+<django.db.models.Options.default_permissions>`. The new permissions will be
+create automatically when running :djadmin:`migrate`.
+
+This allows giving users read-only access to models in the admin.
+:meth:`.ModelAdmin.has_view_permission` is new. The implementation is backwards
+compatible in that there isn't a need to assign the "view" permission to allow
+users who have the "change" permission to edit objects.
+
+There are a couple of :ref:`backwards incompatible considerations
+<view_permission_backwards_incompatible>`.
+
 Minor features
 --------------
 
@@ -371,6 +386,34 @@ default. Browsers that respect this flag won't send these cookies on
 cross-origin requests. If you rely on the old behavior, set the
 :setting:`SESSION_COOKIE_SAMESITE` and/or :setting:`CSRF_COOKIE_SAMESITE`
 setting to ``None``.
+
+.. _view_permission_backwards_incompatible:
+
+Considerations for the new model "view" permission
+--------------------------------------------------
+
+Custom admin forms need to take the view-only case into account
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+With the new "view" permission, existing custom admin forms may raise errors
+when a user doesn't have the change permission because the form might access
+nonexistent fields. Fix this by overriding :meth:`.ModelAdmin.get_form` and
+checking if the user has the "change" permissions and returning the default
+form if not::
+
+    class MyAdmin(admin.ModelAdmin):
+        def get_form(self, request, obj=None, **kwargs):
+            if not self.has_change_permission(request, obj):
+                return super().get_form(request, obj, **kwargs)
+            return CustomForm
+
+New default view permission could allow unwanted access to admin views
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you have a custom permission with a codename of the form
+``can_view_<modelname>``, the new view permission handling in the admin will
+allow view access to the changelist and detail pages for those models. If this
+is unwanted, you must change your custom permission codename.
 
 Miscellaneous
 -------------
