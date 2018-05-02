@@ -431,7 +431,7 @@ def linebreaksbr(value, autoescape=True):
     value = normalize_newlines(value)
     if autoescape:
         value = escape(value)
-    return mark_safe(value.replace('\n', '<br>'))
+    return mark_safe(value.replace(r'\n', '<br>'))
 
 
 @register.filter(is_safe=True)
