@@ -630,7 +630,7 @@ The ``manage_articles.html`` template might look like this:
 
 .. code-block:: html+django
 
-    <form method="post" action="">
+    <form method="post">
         {{ formset.management_form }}
         <table>
             {% for form in formset %}
@@ -644,7 +644,7 @@ deal with the management form:
 
 .. code-block:: html+django
 
-    <form method="post" action="">
+    <form method="post">
         <table>
             {{ formset }}
         </table>
@@ -662,7 +662,7 @@ If you manually render fields in the template, you can render
 
 .. code-block:: html+django
 
-    <form method="post" action="">
+    <form method="post">
         {{ formset.management_form }}
         {% for form in formset %}
             <ul>

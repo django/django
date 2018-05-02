@@ -41,7 +41,7 @@ To take advantage of CSRF protection in your views, follow these steps:
 
    .. code-block:: html+django
 
-       <form action="" method="post">{% csrf_token %}
+       <form method="post">{% csrf_token %}
 
    This should not be done for POST forms that target external URLs, since
    that would cause the CSRF token to be leaked, leading to a vulnerability.
@@ -179,7 +179,7 @@ to ``{% csrf_token %}`` in the Django template language. For example:
 
 .. code-block:: html+jinja
 
-    <form action="" method="post">{{ csrf_input }}
+    <form method="post">{{ csrf_input }}
 
 The decorator method
 --------------------
