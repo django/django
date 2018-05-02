@@ -1064,14 +1064,14 @@ There are three ways to render a formset in a Django template.
 
 First, you can let the formset do most of the work::
 
-    <form method="post" action="">
+    <form method="post">
         {{ formset }}
     </form>
 
 Second, you can manually render the formset, but let the form deal with
 itself::
 
-    <form method="post" action="">
+    <form method="post">
         {{ formset.management_form }}
         {% for form in formset %}
             {{ form }}
@@ -1084,7 +1084,7 @@ form as shown above. See the :ref:`management form documentation
 
 Third, you can manually render each field::
 
-    <form method="post" action="">
+    <form method="post">
         {{ formset.management_form }}
         {% for form in formset %}
             {% for field in form %}
@@ -1097,7 +1097,7 @@ If you opt to use this third method and you don't iterate over the fields with
 a ``{% for %}`` loop, you'll need to render the primary key field. For example,
 if you were rendering the ``name`` and ``age`` fields of a model::
 
-    <form method="post" action="">
+    <form method="post">
         {{ formset.management_form }}
         {% for form in formset %}
             {{ form.id }}
