@@ -64,7 +64,7 @@ class CsrfViewMiddlewareTestMixin:
 
     def _check_token_present(self, response, csrf_id=None):
         text = str(response.content, response.charset)
-        match = re.search("name='csrfmiddlewaretoken' value='(.*?)'", text)
+        match = re.search('name="csrfmiddlewaretoken" value="(.*?)"', text)
         csrf_token = csrf_id or self._csrf_id
         self.assertTrue(
             match and equivalent_tokens(csrf_token, match.group(1)),
