@@ -724,7 +724,7 @@ class OtherModelTests(SimpleTestCase):
 
         self.assertEqual(Model.check(), [
             Error(
-                "Model can not contain more than one 'primary_key' field.",
+                "The model cannot have more than one field with 'primary_key=True'.",
                 obj=Model,
                 id='models.E026',
             )

@@ -295,7 +295,8 @@ Models
   as it collides with the query lookup syntax.
 * **models.E025**: The property ``<property name>`` clashes with a related
   field accessor.
-* **models.E026**: Model can not contain more than one ``primary_key`` field.
+* **models.E026**: The model cannot have more than one field with
+  ``primary_key=True``.
 
 Security
 --------
