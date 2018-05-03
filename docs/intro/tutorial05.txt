@@ -162,7 +162,7 @@ what we can do in an automated test, so let's turn that into an automated test.
 
 A conventional place for an application's tests is in the application's
 ``tests.py`` file; the testing system will automatically find tests in any file
-whose name begins with ``test``.
+whose name begins with ``test`` (function names in ``TestCase`` classes must begin with ``test``).
 
 Put the following in the ``tests.py`` file in the ``polls`` application:
 
