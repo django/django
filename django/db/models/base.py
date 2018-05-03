@@ -1443,7 +1443,8 @@ class Model(metaclass=ModelBase):
         if sum(1 for f in cls._meta.local_fields if f.primary_key) > 1:
             errors.append(
                 checks.Error(
-                    "Model can not contain more than one 'primary_key' field.",
+                    "The model cannot have more than one field with "
+                    "'primary_key=True'.",
                     obj=cls,
                     id='models.E026',
                 )
