@@ -8,6 +8,7 @@ from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.views.main import ALL_VAR, SEARCH_VAR
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.db import connection
 from django.db.models import F
 from django.db.models.fields import Field, IntegerField
 from django.db.models.functions import Upper
@@ -15,6 +16,7 @@ from django.db.models.lookups import Contains, Exact
 from django.template import Context, Template, TemplateSyntaxError
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
+from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 from django.utils import formats
 
@@ -732,9 +734,9 @@ class ChangeListTests(TestCase):
             'form-INITIAL_FORMS': '3',
             'form-MIN_NUM_FORMS': '0',
             'form-MAX_NUM_FORMS': '1000',
-            'form-0-id': str(d.pk),
-            'form-1-id': str(c.pk),
-            'form-2-id': str(a.pk),
+            'form-0-uuid': str(d.pk),
+            'form-1-uuid': str(c.pk),
+            'form-2-uuid': str(a.pk),
             'form-0-load': '9.0',
             'form-0-speed': '9.0',
             'form-1-load': '5.0',
@@ -763,6 +765,83 @@ class ChangeListTests(TestCase):
         self.assertEqual(d.speed, float(data['form-0-speed']))
         # No new swallows were created.
         self.assertEqual(len(Swallow.objects.all()), 4)
+
+    def test_get_edited_object_ids(self):
+        a = Swallow.objects.create(origin='Swallow A', load=4, speed=1)
+        b = Swallow.objects.create(origin='Swallow B', load=2, speed=2)
+        c = Swallow.objects.create(origin='Swallow C', load=5, speed=5)
+        superuser = self._create_superuser('superuser')
+        self.client.force_login(superuser)
+        changelist_url = reverse('admin:admin_changelist_swallow_changelist')
+        m = SwallowAdmin(Swallow, custom_site)
+        data = {
+            'form-TOTAL_FORMS': '3',
+            'form-INITIAL_FORMS': '3',
+            'form-MIN_NUM_FORMS': '0',
+            'form-MAX_NUM_FORMS': '1000',
+            'form-0-uuid': str(a.pk),
+            'form-1-uuid': str(b.pk),
+            'form-2-uuid': str(c.pk),
+            'form-0-load': '9.0',
+            'form-0-speed': '9.0',
+            'form-1-load': '5.0',
+            'form-1-speed': '5.0',
+            'form-2-load': '5.0',
+            'form-2-speed': '4.0',
+            '_save': 'Save',
+        }
+        request = self.factory.post(changelist_url, data=data)
+        pks = m._get_edited_object_pks(request, prefix='form')
+        self.assertEqual(sorted(pks), sorted([str(a.pk), str(b.pk), str(c.pk)]))
+
+    def test_get_list_editable_queryset(self):
+        a = Swallow.objects.create(origin='Swallow A', load=4, speed=1)
+        Swallow.objects.create(origin='Swallow B', load=2, speed=2)
+        data = {
+            'form-TOTAL_FORMS': '2',
+            'form-INITIAL_FORMS': '2',
+            'form-MIN_NUM_FORMS': '0',
+            'form-MAX_NUM_FORMS': '1000',
+            'form-0-uuid': str(a.pk),
+            'form-0-load': '10',
+            '_save': 'Save',
+        }
+        superuser = self._create_superuser('superuser')
+        self.client.force_login(superuser)
+        changelist_url = reverse('admin:admin_changelist_swallow_changelist')
+        m = SwallowAdmin(Swallow, custom_site)
+        request = self.factory.post(changelist_url, data=data)
+        queryset = m._get_list_editable_queryset(request, prefix='form')
+        self.assertEqual(queryset.count(), 1)
+        data['form-0-uuid'] = 'INVALD_PRIMARY_KEY'
+        # The unfiltered queryset is returned if there's invalid data.
+        request = self.factory.post(changelist_url, data=data)
+        queryset = m._get_list_editable_queryset(request, prefix='form')
+        self.assertEqual(queryset.count(), 2)
+
+    def test_changelist_view_list_editable_changed_objects_uses_filter(self):
+        """list_editable edits use a filtered queryset to limit memory usage."""
+        a = Swallow.objects.create(origin='Swallow A', load=4, speed=1)
+        Swallow.objects.create(origin='Swallow B', load=2, speed=2)
+        data = {
+            'form-TOTAL_FORMS': '2',
+            'form-INITIAL_FORMS': '2',
+            'form-MIN_NUM_FORMS': '0',
+            'form-MAX_NUM_FORMS': '1000',
+            'form-0-uuid': str(a.pk),
+            'form-0-load': '10',
+            '_save': 'Save',
+        }
+        superuser = self._create_superuser('superuser')
+        self.client.force_login(superuser)
+        changelist_url = reverse('admin:admin_changelist_swallow_changelist')
+        with CaptureQueriesContext(connection) as context:
+            response = self.client.post(changelist_url, data=data)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('WHERE', context.captured_queries[4]['sql'])
+            self.assertIn('IN', context.captured_queries[4]['sql'])
+            # Check only the first few characters since the UUID may have dashes.
+            self.assertIn(str(a.pk)[:8], context.captured_queries[4]['sql'])
 
     def test_deterministic_order_for_unordered_model(self):
         """
