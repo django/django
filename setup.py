@@ -61,6 +61,11 @@ EXCLUDE_FROM_PACKAGES = ['django.conf.project_template',
 version = __import__('django').get_version()
 
 
+def read(fname):
+    with open(os.path.join(os.path.dirname(__file__), fname)) as f:
+        return f.read()
+
+
 setup(
     name='Django',
     version=version,
@@ -70,6 +75,7 @@ setup(
     author_email='foundation@djangoproject.com',
     description=('A high-level Python Web framework that encourages '
                  'rapid development and clean, pragmatic design.'),
+    long_description=read('README.rst'),
     license='BSD',
     packages=find_packages(exclude=EXCLUDE_FROM_PACKAGES),
     include_package_data=True,
