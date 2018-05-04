@@ -167,6 +167,38 @@ All attributes should be considered read-only, unless stated otherwise.
     underscores in WSGI environment variables. It matches the behavior of
     Web servers like Nginx and Apache 2.4+.
 
+    :attr:`HttpRequest.headers` is a simpler way to access all HTTP-prefixd
+    headers, plus ``CONTENT_LENGTH`` and ``CONTENT_TYPE``.
+
+.. attribute:: HttpRequest.headers
+
+    .. versionadded:: 2.2
+
+    A case insensitive, dict-like object that provides access to all
+    HTTP-prefixed headers (plus ``Content-Length`` and ``Content-Type``) from
+    the request.
+
+    The name of each header is stylized with title-casing (e.g. ``User-Agent``)
+    when it's displayed. You can access headers case-insensitively::
+
+        >>> request.headers
+        {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6', ...}
+
+        >>> 'User-Agent' in request.headers
+        True
+        >>> 'user-agent' in request.headers
+        True
+
+        >>> request.headers['User-Agent']
+        Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6)
+        >>> request.headers['user-agent']
+        Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6)
+
+        >>> request.headers.get('User-Agent')
+        Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6)
+        >>> request.headers.get('user-agent')
+        Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6)
+
 .. attribute:: HttpRequest.resolver_match
 
     An instance of :class:`~django.urls.ResolverMatch` representing the

@@ -266,7 +266,8 @@ Models
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Added :attr:`.HttpRequest.headers` to allow simple access to a request's
+  headers.
 
 Serialization
 ~~~~~~~~~~~~~

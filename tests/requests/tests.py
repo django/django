@@ -5,7 +5,7 @@ from urllib.parse import urlencode
 from django.core.exceptions import DisallowedHost
 from django.core.handlers.wsgi import LimitedStream, WSGIRequest
 from django.http import HttpRequest, RawPostDataException, UnreadablePostError
-from django.http.request import split_domain_port
+from django.http.request import HttpHeaders, split_domain_port
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import FakePayload
 
@@ -830,3 +830,85 @@ class BuildAbsoluteURITests(SimpleTestCase):
         for location, expected_url in tests:
             with self.subTest(location=location):
                 self.assertEqual(request.build_absolute_uri(location=location), expected_url)
+
+
+class RequestHeadersTests(SimpleTestCase):
+    ENVIRON = {
+        # Non-headers are ignored.
+        'PATH_INFO': '/somepath/',
+        'REQUEST_METHOD': 'get',
+        'wsgi.input': BytesIO(b''),
+        'SERVER_NAME': 'internal.com',
+        'SERVER_PORT': 80,
+        # These non-HTTP prefixed headers are included.
+        'CONTENT_TYPE': 'text/html',
+        'CONTENT_LENGTH': '100',
+        # All HTTP-prefixed headers are included.
+        'HTTP_ACCEPT': '*',
+        'HTTP_HOST': 'example.com',
+        'HTTP_USER_AGENT': 'python-requests/1.2.0',
+    }
+
+    def test_base_request_headers(self):
+        request = HttpRequest()
+        request.META = self.ENVIRON
+        self.assertEqual(dict(request.headers), {
+            'Content-Type': 'text/html',
+            'Content-Length': '100',
+            'Accept': '*',
+            'Host': 'example.com',
+            'User-Agent': 'python-requests/1.2.0',
+        })
+
+    def test_wsgi_request_headers(self):
+        request = WSGIRequest(self.ENVIRON)
+        self.assertEqual(dict(request.headers), {
+            'Content-Type': 'text/html',
+            'Content-Length': '100',
+            'Accept': '*',
+            'Host': 'example.com',
+            'User-Agent': 'python-requests/1.2.0',
+        })
+
+    def test_wsgi_request_headers_getitem(self):
+        request = WSGIRequest(self.ENVIRON)
+        self.assertEqual(request.headers['User-Agent'], 'python-requests/1.2.0')
+        self.assertEqual(request.headers['user-agent'], 'python-requests/1.2.0')
+        self.assertEqual(request.headers['Content-Type'], 'text/html')
+        self.assertEqual(request.headers['Content-Length'], '100')
+
+    def test_wsgi_request_headers_get(self):
+        request = WSGIRequest(self.ENVIRON)
+        self.assertEqual(request.headers.get('User-Agent'), 'python-requests/1.2.0')
+        self.assertEqual(request.headers.get('user-agent'), 'python-requests/1.2.0')
+        self.assertEqual(request.headers.get('Content-Type'), 'text/html')
+        self.assertEqual(request.headers.get('Content-Length'), '100')
+
+
+class HttpHeadersTests(SimpleTestCase):
+    def test_basic(self):
+        environ = {
+            'CONTENT_TYPE': 'text/html',
+            'CONTENT_LENGTH': '100',
+            'HTTP_HOST': 'example.com',
+        }
+        headers = HttpHeaders(environ)
+        self.assertEqual(sorted(headers), ['Content-Length', 'Content-Type', 'Host'])
+        self.assertEqual(headers, {
+            'Content-Type': 'text/html',
+            'Content-Length': '100',
+            'Host': 'example.com',
+        })
+
+    def test_parse_header_name(self):
+        tests = (
+            ('PATH_INFO', None),
+            ('HTTP_ACCEPT', 'Accept'),
+            ('HTTP_USER_AGENT', 'User-Agent'),
+            ('HTTP_X_FORWARDED_PROTO', 'X-Forwarded-Proto'),
+            ('CONTENT_TYPE', 'Content-Type'),
+            ('CONTENT_LENGTH', 'Content-Length'),
+        )
+        for header, expected in tests:
+            with self.subTest(header=header):
+                self.assertEqual(HttpHeaders.parse_header_name(header), expected)
