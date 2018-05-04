@@ -1,5 +1,7 @@
 import copy
+from functools import wraps
 from collections import OrderedDict
+from collections.abc import Mapping
 
 
 class OrderedSet:
@@ -280,3 +282,60 @@ class DictWrapper(dict):
         if use_func:
             return self.func(value)
         return value
+
+
+def _destruct_iterable_mapping_values(data):
+    for i, elem in enumerate(data):
+        if len(elem) != 2:
+            raise ValueError("dictionary update sequence element #{} has "
+                             "length {}; 2 is required".format(i, len(elem)))
+
+        # TODO: Include tests
+        if not isinstance(elem[0], str):
+            raise ValueError('Element key invalid, only strings are allowed')
+
+        yield tuple(elem)
+
+
+def lowercased_key(method):
+    @wraps(method)
+    def wrapped(self, key, *args, **kwargs):
+        return method(self, key.lower(), *args, **kwargs)
+    return wrapped
+
+
+class ImmutableCaseInsensitiveDict(Mapping):
+    """An immutable case-insensitive dictionary that still preserves
+    the case of the original keys used to create it."""
+
+    def __init__(self, data):
+        if not isinstance(data, Mapping):
+            data = {k: v for k, v in _destruct_iterable_mapping_values(data)}
+        self._store = {k.lower(): (k, v) for k, v in data.items()}
+
+    @lowercased_key
+    def __getitem__(self, key):
+        return self._store[key][1]
+
+    def __len__(self):
+        return len(self._store)
+
+    def __eq__(self, other):
+        if not isinstance(other, Mapping):
+            return NotImplemented
+        return {
+            k.lower(): v for k, v in self.items()
+        } == {
+            k.lower(): v for k, v in other.items()
+        }
+
+    def __iter__(self):
+        return (original_key for original_key, value in self._store.values())
+
+    def __repr__(self):
+        return repr({key: value for key, value in self._store.values()})
+
+    def copy(self):
+        return ImmutableCaseInsensitiveDict({
+            k: v[1] for k, v in self._store.items()
+        })

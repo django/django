@@ -7,7 +7,7 @@ import copy
 from django.test import SimpleTestCase
 from django.utils.datastructures import (
     DictWrapper, ImmutableList, MultiValueDict, MultiValueDictKeyError,
-    OrderedSet,
+    OrderedSet, ImmutableCaseInsensitiveDict
 )
 
 
@@ -155,3 +155,97 @@ class DictWrapperTests(SimpleTestCase):
             "Normal: %(a)s. Modified: %(xx_a)s" % d,
             'Normal: a. Modified: *a'
         )
+
+
+class ImmutableCaseInsensitiveDictTests(SimpleTestCase):
+    def setUp(self):
+        self.dict_1 = ImmutableCaseInsensitiveDict({
+            'Accept': 'application/json',
+            'content-type': 'text/html'
+        })
+
+    def test_list(self):
+        self.assertEqual(
+            sorted(list(self.dict_1)),
+            sorted(['Accept', 'content-type']))
+
+    def test_dict(self):
+        self.assertEqual(dict(self.dict_1), {
+            'Accept': 'application/json',
+            'content-type': 'text/html'
+        })
+
+    def test_repr(self):
+        self.assertEqual(repr(self.dict_1), repr({
+            'Accept': 'application/json',
+            'content-type': 'text/html'
+        }))
+
+    def test_str(self):
+        self.assertEqual(str(self.dict_1), str({
+            'Accept': 'application/json',
+            'content-type': 'text/html'
+        }))
+
+    def test_equals(self):
+        self.assertTrue(self.dict_1 == {
+            'Accept': 'application/json',
+            'content-type': 'text/html'
+        })
+
+        self.assertTrue(self.dict_1 == {
+            'accept': 'application/json',
+            'Content-Type': 'text/html'
+        })
+
+    def test_items(self):
+        other = {
+            'Accept': 'application/json',
+            'content-type': 'text/html'
+        }
+        self.assertEqual(list(self.dict_1.items()), list(other.items()))
+
+    def test_copy(self):
+        copy = self.dict_1.copy()
+
+        # id(copy) != id(self.dict_1)
+        self.assertIsNot(copy, self.dict_1)
+        self.assertEqual(copy, self.dict_1)
+
+    def test_getitem(self):
+        self.assertEqual(self.dict_1['Accept'], 'application/json')
+        self.assertEqual(self.dict_1['accept'], 'application/json')
+        self.assertEqual(self.dict_1['aCCept'], 'application/json')
+
+        self.assertEqual(self.dict_1['content-type'], 'text/html')
+        self.assertEqual(self.dict_1['Content-Type'], 'text/html')
+        self.assertEqual(self.dict_1['Content-type'], 'text/html')
+
+    def test_membership(self):
+        self.assertTrue('Accept' in self.dict_1)
+        self.assertTrue('accept' in self.dict_1)
+        self.assertTrue('aCCept' in self.dict_1)
+
+        self.assertTrue('content-type' in self.dict_1)
+        self.assertTrue('Content-Type' in self.dict_1)
+
+    def test_delitem(self):
+        "del should raise a TypeError because this is immutable"
+        # Preconditions
+        self.assertTrue('Accept' in self.dict_1)
+        with self.assertRaises(TypeError):
+            del self.dict_1['Accept']
+
+        # Postconditions
+        self.assertTrue('Accept' in self.dict_1)
+
+    def test_setitem(self):
+        "del should raise a TypeError because this is immutable"
+        # Preconditions
+        self.assertEqual(len(self.dict_1), 2)
+
+        with self.assertRaises(TypeError):
+            self.dict_1['New Key'] = 1
+
+        # Postconditions
+        self.assertEqual(len(self.dict_1), 2)
