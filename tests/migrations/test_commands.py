@@ -1116,6 +1116,16 @@ class MakeMigrationsTests(MigrationTestBase):
         # Command output indicates the migration is created.
         self.assertIn(" - Create model SillyModel", out.getvalue())
 
+    @override_settings(MIGRATION_MODULES={'migrations': 'some.nonexistent.path'})
+    def test_makemigrations_migrations_modules_nonexistent_toplevel_package(self):
+        msg = (
+            'Could not locate an appropriate location to create migrations '
+            'package some.nonexistent.path. Make sure the toplevel package '
+            'exists and can be imported.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            call_command('makemigrations', 'migrations', empty=True, verbosity=0)
+
     def test_makemigrations_interactive_by_default(self):
         """
         The user is prompted to merge by default if there are conflicts and
