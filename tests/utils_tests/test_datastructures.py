@@ -6,8 +6,8 @@ import copy
 
 from django.test import SimpleTestCase
 from django.utils.datastructures import (
-    DictWrapper, ImmutableList, MultiValueDict, MultiValueDictKeyError,
-    OrderedSet, ImmutableCaseInsensitiveDict, EnvironHeaders
+    DictWrapper, EnvironHeaders, ImmutableCaseInsensitiveDict, ImmutableList,
+    MultiValueDict, MultiValueDictKeyError, OrderedSet,
 )
 
 
@@ -203,7 +203,7 @@ class ImmutableCaseInsensitiveDictTests(SimpleTestCase):
             'Accept': 'application/json',
             'content-type': 'text/html'
         }
-        self.assertEqual(list(self.dict_1.items()), list(other.items()))
+        self.assertEqual(sorted(self.dict_1.items()), sorted(other.items()))
 
     def test_copy(self):
         copy = self.dict_1.copy()

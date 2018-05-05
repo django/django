@@ -1,7 +1,7 @@
 import copy
-from functools import wraps
 from collections import OrderedDict
 from collections.abc import Mapping
+from functools import wraps
 
 
 class OrderedSet:

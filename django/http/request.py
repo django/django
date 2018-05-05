@@ -13,7 +13,8 @@ from django.core.exceptions import (
 from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser, MultiPartParserError
 from django.utils.datastructures import (
-    ImmutableList, MultiValueDict, EnvironHeaders)
+    EnvironHeaders, ImmutableList, MultiValueDict,
+)
 from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.encoding import escape_uri_path, iri_to_uri
 from django.utils.functional import cached_property
