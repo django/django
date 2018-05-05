@@ -1057,10 +1057,15 @@ class SQLCompiler:
             cursor = self.connection.cursor()
         try:
             cursor.execute(sql, params)
-        except Exception:
+        except Exception as e:
             # Might fail for server-side cursors (e.g. connection closed)
-            cursor.close()
-            raise
+            try:
+                cursor.close()
+            except Exception:
+                # If we got an error creating the cursor, then closing it
+                # will always fail. Raise the outer exception instead of the
+                # obscure "cursor _django_curs_xxxx does not exist".
+                raise e from None
 
         if result_type == CURSOR:
             # Give the caller the cursor to process and close.
