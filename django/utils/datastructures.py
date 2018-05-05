@@ -339,3 +339,30 @@ class ImmutableCaseInsensitiveDict(Mapping):
         return ImmutableCaseInsensitiveDict({
             k: v[1] for k, v in self._store.items()
         })
+
+
+class EnvironHeaders(ImmutableCaseInsensitiveDict):
+    IGNORE_EXCEPTIONS = {'HTTP_CONTENT_TYPE', 'HTTP_CONTENT_LENGTH'}
+    SPECIAL_UNCHANGED_HEADERS = {'CONTENT_TYPE', 'CONTENT_LENGTH'}
+    HTTP_PREFIX = 'HTTP_'
+
+    def __init__(self, environ):
+        headers = {
+            self.parse_cgi_header(k): v for k, v in environ.items()
+            if self.parse_cgi_header(k)}
+        super().__init__(headers)
+
+    @classmethod
+    def parse_cgi_header(cls, cgi_header):
+        ignore_header = (
+            cgi_header in cls.IGNORE_EXCEPTIONS or
+            not cgi_header.startswith(cls.HTTP_PREFIX) and
+            cgi_header not in cls.SPECIAL_UNCHANGED_HEADERS)
+
+        if ignore_header:
+            return None
+
+        if cgi_header not in cls.SPECIAL_UNCHANGED_HEADERS:
+            cgi_header = cgi_header[len(cls.HTTP_PREFIX):]
+
+        return cgi_header.replace('_', '-').title()
