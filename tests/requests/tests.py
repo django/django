@@ -806,3 +806,121 @@ class BuildAbsoluteURITests(SimpleTestCase):
         for location, expected_url in tests:
             with self.subTest(location=location):
                 self.assertEqual(request.build_absolute_uri(location=location), expected_url)
+
+
+class CaseInsensitiveHeadersTestCase(SimpleTestCase):
+    TESTING_ENVIRON = {
+        'PATH_INFO': '/somepath/',
+        'REQUEST_METHOD': 'get',
+        'wsgi.input': BytesIO(b''),
+        'SERVER_NAME': 'internal.com',
+        'SERVER_PORT': 80,
+
+        # Special Headers
+        'CONTENT_TYPE': 'text/html',
+        'CONTENT_LENGTH': '100',
+
+        # Invalid Headers
+        'HTTP_CONTENT_TYPE': 'text/html',
+        'HTTP_CONTENT_LENGTH': '100',
+
+        # Regular headers:
+        'HTTP_ACCEPT': '*',
+        'HTTP_HOST': 'example.com',
+        'HTTP_USER_AGENT': 'python-requests/1.2.0',
+        'HTTP_REFERER': 'https://docs.djangoproject.com',
+        'HTTP_IF_MATCH': 'py7h0n',
+        'HTTP_IF_NONE_MATCH': 'dj4n60',
+        'HTTP_IF_MODIFIED_SINCE': 'Sat, 12 Feb 2011 17:38:44 GMT',
+        'HTTP_ACCEPT_ENCODING': 'gzip, deflate, br',
+        'HTTP_CONNECTION': 'keep-alive',
+        'HTTP_PRAGMA': 'no-cache',
+        'HTTP_CACHE_CONTROL': 'no-cache',
+        'HTTP_UPGRADE_INSECURE_REQUESTS': '1',
+        'HTTP_ACCEPT_LANGUAGE': 'es-419,es;q=0.9,en;q=0.8,en-US;q=0.7',
+        'HTTP_COOKIE': '%7B%22hello%22%3A%22world%22%7D;another=value',
+
+        # Special headers used by AWS and other services
+        'HTTP_X_PROTO': 'https',
+        'HTTP_X_FORWARDED_HOST': 'forward.com',
+        'HTTP_X_FORWARDED_PORT': '80',
+        'HTTP_X_FORWARDED_PROTOCOL': 'https',
+
+        # Custom headers
+        'HTTP_X_CUSTOM_HEADER_1': 'custom_header_1',
+        'HTTP_X_CUSTOM_HEADER_2': 'custom_header_2',
+    }
+
+    def test_base_request_headers(self):
+        request = HttpRequest()
+        request.META = self.TESTING_ENVIRON
+
+        self.assertEqual(dict(request.headers), {
+            'Content-Type': 'text/html',
+            'Content-Length': '100',
+            'Accept': '*', 'Host': 'example.com',
+            'User-Agent': 'python-requests/1.2.0',
+            'Referer': 'https://docs.djangoproject.com',
+            'If-Match': 'py7h0n',
+            'If-None-Match': 'dj4n60',
+            'If-Modified-Since': 'Sat, 12 Feb 2011 17:38:44 GMT',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Connection': 'keep-alive',
+            'Pragma': 'no-cache',
+            'Cache-Control': 'no-cache',
+            'Upgrade-Insecure-Requests': '1',
+            'Accept-Language': 'es-419,es;q=0.9,en;q=0.8,en-US;q=0.7',
+            'Cookie': '%7B%22hello%22%3A%22world%22%7D;another=value',
+            'X-Proto': 'https',
+            'X-Forwarded-Host': 'forward.com',
+            'X-Forwarded-Port': '80',
+            'X-Forwarded-Protocol': 'https',
+            'X-Custom-Header-1': 'custom_header_1',
+            'X-Custom-Header-2': 'custom_header_2'})
+
+    def test_wsgi_request_headers(self):
+        request = WSGIRequest(self.TESTING_ENVIRON)
+
+        self.assertEqual(dict(request.headers), {
+            'Content-Type': 'text/html',
+            'Content-Length': '100',
+            'Accept': '*', 'Host': 'example.com',
+            'User-Agent': 'python-requests/1.2.0',
+            'Referer': 'https://docs.djangoproject.com',
+            'If-Match': 'py7h0n',
+            'If-None-Match': 'dj4n60',
+            'If-Modified-Since': 'Sat, 12 Feb 2011 17:38:44 GMT',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Connection': 'keep-alive',
+            'Pragma': 'no-cache',
+            'Cache-Control': 'no-cache',
+            'Upgrade-Insecure-Requests': '1',
+            'Accept-Language': 'es-419,es;q=0.9,en;q=0.8,en-US;q=0.7',
+            'Cookie': '%7B%22hello%22%3A%22world%22%7D;another=value',
+            'X-Proto': 'https',
+            'X-Forwarded-Host': 'forward.com',
+            'X-Forwarded-Port': '80',
+            'X-Forwarded-Protocol': 'https',
+            'X-Custom-Header-1': 'custom_header_1',
+            'X-Custom-Header-2': 'custom_header_2'})
+
+    def test_wsgi_request_headers_getitem(self):
+        request = WSGIRequest(self.TESTING_ENVIRON)
+
+        self.assertEqual(request.headers['User-Agent'], 'python-requests/1.2.0')
+        self.assertEqual(
+            request.headers['X-Custom-Header-1'], 'custom_header_1')
+        self.assertEqual(request.headers['Pragma'], 'no-cache')
+        self.assertEqual(request.headers['Content-Type'], 'text/html')
+        self.assertEqual(request.headers['Content-Length'], '100')
+
+    def test_wsgi_request_headers_get(self):
+        request = WSGIRequest(self.TESTING_ENVIRON)
+
+        self.assertEqual(
+            request.headers.get('User-Agent'), 'python-requests/1.2.0')
+        self.assertEqual(
+            request.headers.get('X-Custom-Header-1'), 'custom_header_1')
+        self.assertEqual(request.headers.get('Pragma'), 'no-cache')
+        self.assertEqual(request.headers.get('Content-Type'), 'text/html')
+        self.assertEqual(request.headers.get('Content-Length'), '100')
