@@ -290,7 +290,6 @@ def _destruct_iterable_mapping_values(data):
             raise ValueError("dictionary update sequence element #{} has "
                              "length {}; 2 is required".format(i, len(elem)))
 
-        # TODO: Include tests
         if not isinstance(elem[0], str):
             raise ValueError('Element key invalid, only strings are allowed')
 

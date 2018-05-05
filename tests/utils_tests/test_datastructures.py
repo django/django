@@ -164,6 +164,10 @@ class ImmutableCaseInsensitiveDictTests(SimpleTestCase):
             'content-type': 'text/html'
         })
 
+    def test_create_dict_with_invalid_values(self):
+        with self.assertRaises(ValueError):
+            ImmutableCaseInsensitiveDict([('Key1', 'Val1'), 'Key2'])
+
     def test_list(self):
         self.assertEqual(
             sorted(list(self.dict_1)),
