@@ -1658,14 +1658,9 @@ class ModelAdmin(BaseModelAdmin):
         # Handle POSTed bulk-edit data.
         if request.method == 'POST' and cl.list_editable and '_save' in request.POST:
             FormSet = self.get_changelist_formset(request)
-            # Get the objects ids to filter the queryset to get only the objects that will be updated.
-            regexp = re.compile('{prefix}-(\d+)-id$'.format(prefix=FormSet.get_default_prefix()))
-            objects_id = []
-            for key, value in request.POST.items():
-                if regexp.match(key):
-                    objects_id.append(value)
+            objects_queryset = self.get_changelist_objects(request, FormSet.get_default_prefix())
             formset = cl.formset = FormSet(request.POST, request.FILES,
-                                           queryset=self.get_queryset(request).filter(pk__in=objects_id))
+                                           queryset=objects_queryset)
             if formset.is_valid():
                 changecount = 0
                 for form in formset.forms:
@@ -1741,6 +1736,18 @@ class ModelAdmin(BaseModelAdmin):
             'admin/%s/change_list.html' % app_label,
             'admin/change_list.html'
         ], context)
+
+    def get_changelist_objects(self, request, formset_prefix):
+        """
+        Helper to get the objects that will be updated in the changelist view.
+        """
+        regexp = re.compile('{prefix}-(\d+)-id$'.format(prefix=formset_prefix))
+        objects_pk = []
+        for key, value in request.POST.items():
+            if regexp.match(key):
+                objects_pk.append(value)
+
+        return self.get_queryset(request) # .filter(pk__in=objects_pk)
 
     def get_deleted_objects(self, objs, request):
         """
