@@ -3,19 +3,10 @@ import datetime
 
 from django.utils.html import avoid_wrapping
 from django.utils.timezone import is_aware, utc
-from django.utils.translation import gettext, ngettext_lazy
-
-TIMESINCE_CHUNKS = (
-    (60 * 60 * 24 * 365, ngettext_lazy('%d year', '%d years')),
-    (60 * 60 * 24 * 30, ngettext_lazy('%d month', '%d months')),
-    (60 * 60 * 24 * 7, ngettext_lazy('%d week', '%d weeks')),
-    (60 * 60 * 24, ngettext_lazy('%d day', '%d days')),
-    (60 * 60, ngettext_lazy('%d hour', '%d hours')),
-    (60, ngettext_lazy('%d minute', '%d minutes'))
-)
+from django.utils.translation import gettext, ngettext_lazy, npgettext_lazy
 
 
-def timesince(d, now=None, reversed=False):
+def timesince(d, now=None, reversed=False, context=''):
     """
     Take two datetime objects and return the time between d and now as a nicely
     formatted string, e.g. "10 minutes". If d occurs after now, return
@@ -29,6 +20,26 @@ def timesince(d, now=None, reversed=False):
     Adapted from
     http://web.archive.org/web/20060617175230/http://blog.natbat.co.uk/archive/2003/Jun/14/time_since
     """
+    # Needed to fix #21408.
+    if context:
+        TIMESINCE_CHUNKS = (
+            (60 * 60 * 24 * 365, npgettext_lazy(context, '%d year', '%d years')),
+            (60 * 60 * 24 * 30, npgettext_lazy(context, '%d month', '%d months')),
+            (60 * 60 * 24 * 7, npgettext_lazy(context, '%d week', '%d weeks')),
+            (60 * 60 * 24, npgettext_lazy(context, '%d day', '%d days')),
+            (60 * 60, npgettext_lazy(context, '%d hour', '%d hours')),
+            (60, npgettext_lazy(context, '%d minute', '%d minutes'))
+        )
+    else:
+        TIMESINCE_CHUNKS = (
+            (60 * 60 * 24 * 365, ngettext_lazy('%d year', '%d years')),
+            (60 * 60 * 24 * 30, ngettext_lazy('%d month', '%d months')),
+            (60 * 60 * 24 * 7, ngettext_lazy('%d week', '%d weeks')),
+            (60 * 60 * 24, ngettext_lazy('%d day', '%d days')),
+            (60 * 60, ngettext_lazy('%d hour', '%d hours')),
+            (60, ngettext_lazy('%d minute', '%d minutes'))
+        )
+
     # Convert datetime.date to datetime.datetime for comparison.
     if not isinstance(d, datetime.datetime):
         d = datetime.datetime(d.year, d.month, d.day)
@@ -69,8 +80,8 @@ def timesince(d, now=None, reversed=False):
     return result
 
 
-def timeuntil(d, now=None):
+def timeuntil(d, now=None, context=''):
     """
     Like timesince, but return a string measuring the time until the given time.
     """
-    return timesince(d, now, reversed=True)
+    return timesince(d, now, reversed=True, context=context)
