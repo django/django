@@ -2482,13 +2482,13 @@ Password: <input type="password" name="password" required>
                 return 'VALID: %r' % sorted(form.cleaned_data.items())
 
             t = Template(
-                '<form action="" method="post">\n'
+                '<form method="post">\n'
                 '<table>\n{{ form }}\n</table>\n<input type="submit" required>\n</form>'
             )
             return t.render(Context({'form': form}))
 
         # Case 1: GET (an empty form, with no errors).)
-        self.assertHTMLEqual(my_function('GET', {}), """<form action="" method="post">
+        self.assertHTMLEqual(my_function('GET', {}), """<form method="post">
 <table>
 <tr><th>Username:</th><td><input type="text" name="username" maxlength="10" required></td></tr>
 <tr><th>Password1:</th><td><input type="password" name="password1" required></td></tr>
@@ -2499,7 +2499,7 @@ Password: <input type="password" name="password" required>
         # Case 2: POST with erroneous data (a redisplayed form, with errors).)
         self.assertHTMLEqual(
             my_function('POST', {'username': 'this-is-a-long-username', 'password1': 'foo', 'password2': 'bar'}),
-            """<form action="" method="post">
+            """<form method="post">
 <table>
 <tr><td colspan="2"><ul class="errorlist nonfield"><li>Please make sure your passwords match.</li></ul></td></tr>
 <tr><th>Username:</th><td><ul class="errorlist">
@@ -2535,13 +2535,13 @@ Password: <input type="password" name="password" required>
         # fields. Note, however, that this flexibility comes with the responsibility of
         # displaying all the errors, including any that might not be associated with a
         # particular field.
-        t = Template('''<form action="">
+        t = Template('''<form>
 {{ form.username.errors.as_ul }}<p><label>Your username: {{ form.username }}</label></p>
 {{ form.password1.errors.as_ul }}<p><label>Password: {{ form.password1 }}</label></p>
 {{ form.password2.errors.as_ul }}<p><label>Password (again): {{ form.password2 }}</label></p>
 <input type="submit" required>
 </form>''')
-        self.assertHTMLEqual(t.render(Context({'form': UserRegistration(auto_id=False)})), """<form action="">
+        self.assertHTMLEqual(t.render(Context({'form': UserRegistration(auto_id=False)})), """<form>
 <p><label>Your username: <input type="text" name="username" maxlength="10" required></label></p>
 <p><label>Password: <input type="password" name="password1" required></label></p>
 <p><label>Password (again): <input type="password" name="password2" required></label></p>
@@ -2549,7 +2549,7 @@ Password: <input type="password" name="password" required>
 </form>""")
         self.assertHTMLEqual(
             t.render(Context({'form': UserRegistration({'username': 'django'}, auto_id=False)})),
-            """<form action="">
+            """<form>
 <p><label>Your username: <input type="text" name="username" value="django" maxlength="10" required></label></p>
 <ul class="errorlist"><li>This field is required.</li></ul><p>
 <label>Password: <input type="password" name="password1" required></label></p>
@@ -2563,13 +2563,13 @@ Password: <input type="password" name="password" required>
         # a field by using the 'label' argument to a Field class. If you don't specify
         # 'label', Django will use the field name with underscores converted to spaces,
         # and the initial letter capitalized.
-        t = Template('''<form action="">
+        t = Template('''<form>
 <p><label>{{ form.username.label }}: {{ form.username }}</label></p>
 <p><label>{{ form.password1.label }}: {{ form.password1 }}</label></p>
 <p><label>{{ form.password2.label }}: {{ form.password2 }}</label></p>
 <input type="submit" required>
 </form>''')
-        self.assertHTMLEqual(t.render(Context({'form': UserRegistration(auto_id=False)})), """<form action="">
+        self.assertHTMLEqual(t.render(Context({'form': UserRegistration(auto_id=False)})), """<form>
 <p><label>Username: <input type="text" name="username" maxlength="10" required></label></p>
 <p><label>Password1: <input type="password" name="password1" required></label></p>
 <p><label>Password2: <input type="password" name="password2" required></label></p>
@@ -2580,19 +2580,19 @@ Password: <input type="password" name="password" required>
         # wrapped around it, but *only* if the given field has an "id" attribute.
         # Recall from above that passing the "auto_id" argument to a Form gives each
         # field an "id" attribute.
-        t = Template('''<form action="">
+        t = Template('''<form>
 <p>{{ form.username.label_tag }} {{ form.username }}</p>
 <p>{{ form.password1.label_tag }} {{ form.password1 }}</p>
 <p>{{ form.password2.label_tag }} {{ form.password2 }}</p>
 <input type="submit" required>
 </form>''')
-        self.assertHTMLEqual(t.render(Context({'form': UserRegistration(auto_id=False)})), """<form action="">
+        self.assertHTMLEqual(t.render(Context({'form': UserRegistration(auto_id=False)})), """<form>
 <p>Username: <input type="text" name="username" maxlength="10" required></p>
 <p>Password1: <input type="password" name="password1" required></p>
 <p>Password2: <input type="password" name="password2" required></p>
 <input type="submit" required>
 </form>""")
-        self.assertHTMLEqual(t.render(Context({'form': UserRegistration(auto_id='id_%s')})), """<form action="">
+        self.assertHTMLEqual(t.render(Context({'form': UserRegistration(auto_id='id_%s')})), """<form>
 <p><label for="id_username">Username:</label>
 <input id="id_username" type="text" name="username" maxlength="10" required></p>
 <p><label for="id_password1">Password1:</label>
@@ -2604,7 +2604,7 @@ Password: <input type="password" name="password" required>
 
         # User form.[field].help_text to output a field's help text. If the given field
         # does not have help text, nothing will be output.
-        t = Template('''<form action="">
+        t = Template('''<form>
 <p>{{ form.username.label_tag }} {{ form.username }}<br>{{ form.username.help_text }}</p>
 <p>{{ form.password1.label_tag }} {{ form.password1 }}</p>
 <p>{{ form.password2.label_tag }} {{ form.password2 }}</p>
@@ -2612,7 +2612,7 @@ Password: <input type="password" name="password" required>
 </form>''')
         self.assertHTMLEqual(
             t.render(Context({'form': UserRegistration(auto_id=False)})),
-            """<form action="">
+            """<form>
 <p>Username: <input type="text" name="username" maxlength="10" required><br>
 Good luck picking a username that doesn&#39;t already exist.</p>
 <p>Password1: <input type="password" name="password1" required></p>
@@ -2629,7 +2629,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         # the errors caused by Form.clean() -- use {{ form.non_field_errors }} in the
         # template. If used on its own, it is displayed as a <ul> (or an empty string, if
         # the list of errors is empty). You can also use it in {% if %} statements.
-        t = Template('''<form action="">
+        t = Template('''<form>
 {{ form.username.errors.as_ul }}<p><label>Your username: {{ form.username }}</label></p>
 {{ form.password1.errors.as_ul }}<p><label>Password: {{ form.password1 }}</label></p>
 {{ form.password2.errors.as_ul }}<p><label>Password (again): {{ form.password2 }}</label></p>
@@ -2639,14 +2639,14 @@ Good luck picking a username that doesn&#39;t already exist.</p>
             t.render(Context({
                 'form': UserRegistration({'username': 'django', 'password1': 'foo', 'password2': 'bar'}, auto_id=False)
             })),
-            """<form action="">
+            """<form>
 <p><label>Your username: <input type="text" name="username" value="django" maxlength="10" required></label></p>
 <p><label>Password: <input type="password" name="password1" required></label></p>
 <p><label>Password (again): <input type="password" name="password2" required></label></p>
 <input type="submit" required>
 </form>"""
         )
-        t = Template('''<form action="">
+        t = Template('''<form>
 {{ form.non_field_errors }}
 {{ form.username.errors.as_ul }}<p><label>Your username: {{ form.username }}</label></p>
 {{ form.password1.errors.as_ul }}<p><label>Password: {{ form.password1 }}</label></p>
@@ -2657,7 +2657,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
             t.render(Context({
                 'form': UserRegistration({'username': 'django', 'password1': 'foo', 'password2': 'bar'}, auto_id=False)
             })),
-            """<form action="">
+            """<form>
 <ul class="errorlist nonfield"><li>Please make sure your passwords match.</li></ul>
 <p><label>Your username: <input type="text" name="username" value="django" maxlength="10" required></label></p>
 <p><label>Password: <input type="password" name="password1" required></label></p>

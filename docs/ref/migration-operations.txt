@@ -275,7 +275,7 @@ be removed (elided) when :ref:`squashing migrations <migration-squashing>`.
     want the operation not to do anything in the given direction. This is
     especially useful in making the operation reversible.
 
-.. _sqlparse: https://pypi.python.org/pypi/sqlparse
+.. _sqlparse: https://pypi.org/project/sqlparse/
 
 ``RunPython``
 -------------

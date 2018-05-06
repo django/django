@@ -2345,7 +2345,7 @@ class OtherModelFormTests(TestCase):
                 return ', '.join(c.name for c in obj.colours.all())
 
         field = ColorModelChoiceField(ColourfulItem.objects.prefetch_related('colours'))
-        with self.assertNumQueries(2):  # would be 3 if prefetch is ignored
+        with self.assertNumQueries(3):  # would be 4 if prefetch is ignored
             self.assertEqual(tuple(field.choices), (
                 ('', '---------'),
                 (multicolor_item.pk, 'blue, red'),

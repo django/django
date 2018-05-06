@@ -468,7 +468,8 @@ posted using this name but instead using one of the loggers below.
 
 Log messages related to the handling of requests. 5XX responses are
 raised as ``ERROR`` messages; 4XX responses are raised as ``WARNING``
-messages.
+messages. Requests that are logged to the ``django.security`` logger aren't
+logged to ``django.request``.
 
 Messages to this logger have the following extra context:
 
@@ -648,7 +649,7 @@ Python logging module.
         subclass the :class:`~django.utils.log.AdminEmailHandler` class and
         override this method.
 
-.. _Sentry: https://pypi.python.org/pypi/sentry
+.. _Sentry: https://pypi.org/project/sentry/
 
 Filters
 -------

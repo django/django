@@ -223,6 +223,10 @@ class Query:
 
         self._filtered_relations = {}
 
+        self.explain_query = False
+        self.explain_format = None
+        self.explain_options = {}
+
     @property
     def extra(self):
         if self._extra is None:
@@ -510,6 +514,14 @@ class Query:
         q.set_limits(high=1)
         compiler = q.get_compiler(using=using)
         return compiler.has_results()
+
+    def explain(self, using, format=None, **options):
+        q = self.clone()
+        q.explain_query = True
+        q.explain_format = format
+        q.explain_options = options
+        compiler = q.get_compiler(using=using)
+        return '\n'.join(compiler.explain_query())
 
     def combine(self, rhs, connector):
         """

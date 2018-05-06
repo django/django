@@ -17,7 +17,6 @@ An example: i18n middleware would need to distinguish caches by the
 "Accept-language" header.
 """
 import hashlib
-import logging
 import re
 import time
 
@@ -28,12 +27,11 @@ from django.utils.encoding import force_bytes, iri_to_uri
 from django.utils.http import (
     http_date, parse_etags, parse_http_date_safe, quote_etag,
 )
+from django.utils.log import log_response
 from django.utils.timezone import get_current_timezone_name
 from django.utils.translation import get_language
 
 cc_delim_re = re.compile(r'\s*,\s*')
-
-logger = logging.getLogger('django.request')
 
 
 def patch_cache_control(response, **kwargs):
@@ -106,14 +104,13 @@ def set_response_etag(response):
 
 
 def _precondition_failed(request):
-    logger.warning(
+    response = HttpResponse(status=412)
+    log_response(
         'Precondition Failed: %s', request.path,
-        extra={
-            'status_code': 412,
-            'request': request,
-        },
+        response=response,
+        request=request,
     )
-    return HttpResponse(status=412)
+    return response
 
 
 def _not_modified(request, response=None):

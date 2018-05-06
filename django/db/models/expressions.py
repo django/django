@@ -153,6 +153,11 @@ class BaseExpression:
         if output_field is not None:
             self.output_field = output_field
 
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state.pop('convert_value', None)
+        return state
+
     def get_db_converters(self, connection):
         return (
             []

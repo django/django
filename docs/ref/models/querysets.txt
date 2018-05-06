@@ -2476,6 +2476,49 @@ Class method that returns an instance of :class:`~django.db.models.Manager`
 with a copy of the ``QuerySet``’s methods. See
 :ref:`create-manager-with-queryset-methods` for more details.
 
+``explain()``
+~~~~~~~~~~~~~
+
+.. versionadded:: 2.1
+
+.. method:: explain(format=None, **options)
+
+Returns a string of the ``QuerySet``’s execution plan, which details how the
+database would execute the query, including any indexes or joins that would be
+used. Knowing these details may help you improve the performance of slow
+queries.
+
+For example, when using PostgreSQL::
+
+    >>> print(Blog.objects.filter(title='My Blog').explain())
+    Seq Scan on blog  (cost=0.00..35.50 rows=10 width=12)
+      Filter: (title = 'My Blog'::bpchar)
+
+The output differs significantly between databases.
+
+``explain()`` is supported by all built-in database backends except Oracle
+because an implementation there isn't straightforward.
+
+The ``format`` parameter changes the output format from the databases's default,
+usually text-based. PostgreSQL supports ``'TEXT'``, ``'JSON'``, ``'YAML'``, and
+``'XML'``. MySQL supports ``'TEXT'`` (also called ``'TRADITIONAL'``) and
+``'JSON'``.
+
+Some databases accept flags that can return more information about the query.
+Pass these flags as keyword arguments. For example, when using PostgreSQL::
+
+    >>> print(Blog.objects.filter(title='My Blog').explain(verbose=True))
+    Seq Scan on public.blog  (cost=0.00..35.50 rows=10 width=12) (actual time=0.004..0.004 rows=10 loops=1)
+      Output: id, title
+      Filter: (blog.title = 'My Blog'::bpchar)
+    Planning time: 0.064 ms
+    Execution time: 0.058 ms
+
+On some databases, flags may cause the query to be executed which could have
+adverse effects on your database. For example, PostgreSQL's ``ANALYZE`` flag
+could result in changes to data if there are triggers or if a function is
+called, even for a ``SELECT`` query.
+
 .. _field-lookups:
 
 ``Field`` lookups

@@ -149,6 +149,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             raise ImproperlyConfigured(
                 "settings.DATABASES is improperly configured. "
                 "Please supply the NAME value.")
+        if len(settings_dict['NAME'] or '') > self.ops.max_name_length():
+            raise ImproperlyConfigured(
+                'Database names longer than %d characters are not supported by '
+                'PostgreSQL. Supply a shorter NAME in settings.DATABASES.'
+                % self.ops.max_name_length()
+            )
         conn_params = {
             'database': settings_dict['NAME'] or 'postgres',
             **settings_dict['OPTIONS'],

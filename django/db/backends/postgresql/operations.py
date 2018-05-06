@@ -7,6 +7,7 @@ from django.db.backends.base.operations import BaseDatabaseOperations
 
 class DatabaseOperations(BaseDatabaseOperations):
     cast_char_field_without_max_length = 'varchar'
+    explain_prefix = 'EXPLAIN'
 
     def unification_cast_sql(self, output_field):
         internal_type = output_field.get_internal_type()
@@ -258,3 +259,17 @@ class DatabaseOperations(BaseDatabaseOperations):
                 'and FOLLOWING.'
             )
         return start_, end_
+
+    def explain_query_prefix(self, format=None, **options):
+        prefix = super().explain_query_prefix(format)
+        extra = {}
+        if format:
+            extra['FORMAT'] = format
+        if options:
+            extra.update({
+                name.upper(): 'true' if value else 'false'
+                for name, value in options.items()
+            })
+        if extra:
+            prefix += ' (%s)' % ', '.join('%s %s' % i for i in extra.items())
+        return prefix

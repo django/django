@@ -2,6 +2,7 @@ import unittest
 import warnings
 from unittest import mock
 
+from django.core.exceptions import ImproperlyConfigured
 from django.db import DatabaseError, connection, connections
 from django.test import TestCase
 
@@ -38,6 +39,18 @@ class Tests(TestCase):
         # Check a RuntimeWarning has been emitted
         self.assertEqual(len(w), 1)
         self.assertEqual(w[0].message.__class__, RuntimeWarning)
+
+    def test_database_name_too_long(self):
+        from django.db.backends.postgresql.base import DatabaseWrapper
+        settings = connection.settings_dict.copy()
+        max_name_length = connection.ops.max_name_length()
+        settings['NAME'] = 'a' + (max_name_length * 'a')
+        msg = (
+            'Database names longer than %d characters are not supported by '
+            'PostgreSQL. Supply a shorter NAME in settings.DATABASES.'
+        ) % max_name_length
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            DatabaseWrapper(settings).get_connection_params()
 
     def test_connect_and_rollback(self):
         """

@@ -19,6 +19,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         'DateField': 'TEXT',
         'DateTimeField': 'TEXT',
     }
+    explain_prefix = 'EXPLAIN QUERY PLAN'
 
     def bulk_batch_size(self, fields, objs):
         """

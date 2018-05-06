@@ -192,9 +192,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         fields_sql = create_sql[create_sql.index('(') + 1:create_sql.rindex(')')]
         for field_desc in fields_sql.split(','):
             field_desc = field_desc.strip()
-            m = re.search('"(.*)".*PRIMARY KEY( AUTOINCREMENT)?', field_desc)
+            m = re.match('(?:(?:["`\[])(.*)(?:["`\]])|(\w+)).*PRIMARY KEY.*', field_desc)
             if m:
-                return m.groups()[0]
+                return m.group(1) if m.group(1) else m.group(2)
         return None
 
     def _table_info(self, cursor, name):

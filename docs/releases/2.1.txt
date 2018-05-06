@@ -141,6 +141,9 @@ Cache
 * The :ref:`local-memory cache backend <local-memory-caching>` now uses a
   least-recently-used (LRU) culling strategy rather than a pseudo-random one.
 
+* The new ``touch()`` method of the :ref:`low-level cache API
+  <low-level-cache-api>` updates the timeout of cache keys.
+
 CSRF
 ~~~~
 
@@ -235,6 +238,11 @@ Models
 * :class:`~django.db.models.BooleanField` can now be ``null=True``. This is
   encouraged instead of :class:`~django.db.models.NullBooleanField`, which will
   likely be deprecated in the future.
+
+* The new :meth:`.QuerySet.explain` method displays the database's execution
+  plan of a queryset's query.
+
+*  :meth:`.QuerySet.raw` now supports :meth:`~.QuerySet.prefetch_related`.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -397,6 +405,9 @@ Miscellaneous
 
 * The admin CSS class ``field-box`` is renamed to ``fieldBox`` to prevent
   conflicts with the class given to model fields named "box".
+
+* ``QuerySet.raw()`` now caches its results like regular querysets. Use
+  ``iterator()`` if you don't want caching.
 
 .. _deprecated-features-2.1:
 

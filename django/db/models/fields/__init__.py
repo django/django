@@ -816,8 +816,7 @@ class Field(RegisterLookupMixin):
         if self.choices:
             choices = list(self.choices)
             if include_blank:
-                named_groups = isinstance(choices[0][1], (list, tuple))
-                blank_defined = not named_groups and any(choice in ('', None) for choice, __ in choices)
+                blank_defined = any(choice in ('', None) for choice, _ in self.flatchoices)
                 if not blank_defined:
                     choices = blank_choice + choices
             return choices

@@ -250,8 +250,20 @@ class BaseDatabaseFeatures:
     # Convert CharField results from bytes to str in database functions.
     db_functions_convert_bytes_to_str = False
 
+    # What formats does the backend EXPLAIN syntax support?
+    supported_explain_formats = set()
+
+    # Does DatabaseOperations.explain_query_prefix() raise ValueError if
+    # unknown kwargs are passed to QuerySet.explain()?
+    validates_explain_options = True
+
     def __init__(self, connection):
         self.connection = connection
+
+    @cached_property
+    def supports_explaining_query_execution(self):
+        """Does this backend support explaining query execution?"""
+        return self.connection.ops.explain_prefix is not None
 
     @cached_property
     def supports_transactions(self):
