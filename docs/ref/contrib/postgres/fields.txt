@@ -53,8 +53,8 @@ may be a good choice for the :ref:`range fields <range-fields>` and
         It is possible to nest array fields - you can specify an instance of
         ``ArrayField`` as the ``base_field``. For example::
 
-            from django.db import models
             from django.contrib.postgres.fields import ArrayField
+            from django.db import models
 
             class ChessBoard(models.Model):
                 board = ArrayField(
@@ -109,8 +109,8 @@ Querying ``ArrayField``
 There are a number of custom lookups and transforms for :class:`ArrayField`.
 We will use the following example model::
 
-    from django.db import models
     from django.contrib.postgres.fields import ArrayField
+    from django.db import models
 
     class Post(models.Model):
         name = models.CharField(max_length=200)
