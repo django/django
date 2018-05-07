@@ -219,9 +219,8 @@ def naturaltime(value):
     if value < now:
         delta = now - value
         if delta.days != 0:
-            return pgettext(
-                'naturaltime', '%(delta)s ago'
-            ) % {'delta': defaultfilters.timesince(value, now)}
+            # Translators: delta will contain a string like '2 months' or '1 month, 2 weeks'
+            return _('%(delta)s ago') % {'delta': defaultfilters.timesince(value, now)}
         elif delta.seconds == 0:
             return _('now')
         elif delta.seconds < 60:
@@ -247,9 +246,8 @@ def naturaltime(value):
     else:
         delta = value - now
         if delta.days != 0:
-            return pgettext(
-                'naturaltime', '%(delta)s from now'
-            ) % {'delta': defaultfilters.timeuntil(value, now)}
+            # Translators: delta will contain a string like '2 months' or '1 month, 2 weeks'
+            return _('%(delta)s from now') % {'delta': defaultfilters.timeuntil(value, now)}
         elif delta.seconds == 0:
             return _('now')
         elif delta.seconds < 60:
