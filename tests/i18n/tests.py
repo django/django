@@ -88,7 +88,7 @@ class TranslationTests(SimpleTestCase):
 
     def test_plural_null(self):
         g = trans_null.ngettext
-        self.assertEqual(g('%d year', '%d years', -1) % -1, '-1 years')
+        self.assertEqual(g('%d year', '%d years', -1) % -1, '-1 year')
         self.assertEqual(g('%d year', '%d years', 0) % 0, '0 years')
         self.assertEqual(g('%d year', '%d years', 1) % 1, '1 year')
         self.assertEqual(g('%d year', '%d years', 2) % 2, '2 years')
