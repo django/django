@@ -86,6 +86,12 @@ class TranslationTests(SimpleTestCase):
         self.assertEqual(ngettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}, "0 octet")
         self.assertEqual(ngettext("%(size)d byte", "%(size)d bytes", 2) % {'size': 2}, "2 octets")
 
+    def test_plural_null(self):
+        g = trans_null.ngettext
+        self.assertEqual(g('%d year', '%d years', 0) % 0, '0 years')
+        self.assertEqual(g('%d year', '%d years', 1) % 1, '1 year')
+        self.assertEqual(g('%d year', '%d years', 2) % 2, '2 years')
+
     def test_override(self):
         activate('de')
         try:
