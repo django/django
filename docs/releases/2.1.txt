@@ -423,6 +423,9 @@ Miscellaneous
   to insert untranslated content into the database), use the new
   :ref:`@no_translations decorator <management-commands-and-locales>`.
 
+* Management commands no longer allow the abbreviated forms of the
+  ``--settings`` and ``--pythonpath`` arguments.
+
 .. _deprecated-features-2.1:
 
 Features deprecated in 2.1

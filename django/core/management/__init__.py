@@ -311,7 +311,7 @@ class ManagementUtility:
         # Preprocess options to extract --settings and --pythonpath.
         # These options could affect the commands that are available, so they
         # must be processed early.
-        parser = CommandParser(usage='%(prog)s subcommand [options] [args]', add_help=False)
+        parser = CommandParser(usage='%(prog)s subcommand [options] [args]', add_help=False, allow_abbrev=False)
         parser.add_argument('--settings')
         parser.add_argument('--pythonpath')
         parser.add_argument('args', nargs='*')  # catch-all
