@@ -120,6 +120,12 @@ class PaginationTests(unittest.TestCase):
             paginator.validate_number(None)
         with self.assertRaises(PageNotAnInteger):
             paginator.validate_number('x')
+
+    def test_float_integer_page(self):
+        paginator = Paginator([1, 2, 3], 2)
+        self.assertEqual(paginator.validate_number(1.0), 1)
+
+    def test_no_content_allow_empty_first_page(self):
         # With no content and allow_empty_first_page=True, 1 is a valid page number
         paginator = Paginator([], 2)
         self.assertEqual(paginator.validate_number(1), 1)
