@@ -13,7 +13,7 @@ gettext_noop = gettext_lazy = _ = gettext
 
 
 def ngettext(singular, plural, number):
-    if number == 1:
+    if abs(number) == 1:
         return singular
     return plural
 
