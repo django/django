@@ -35,6 +35,8 @@ class Paginator:
     def validate_number(self, number):
         """Validate the given 1-based page number."""
         try:
+            if isinstance(number, float) and not number.is_integer():
+                raise ValueError
             number = int(number)
         except (TypeError, ValueError):
             raise PageNotAnInteger(_('That page number is not an integer'))

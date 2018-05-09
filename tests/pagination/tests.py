@@ -120,6 +120,8 @@ class PaginationTests(unittest.TestCase):
             paginator.validate_number(None)
         with self.assertRaises(PageNotAnInteger):
             paginator.validate_number('x')
+        with self.assertRaises(PageNotAnInteger):
+            paginator.validate_number(1.2)
 
     def test_float_integer_page(self):
         paginator = Paginator([1, 2, 3], 2)
