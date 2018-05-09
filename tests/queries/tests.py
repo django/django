@@ -2193,6 +2193,13 @@ class EmptyQuerySetTests(TestCase):
         self.assertQuerysetEqual(q.values(), [])
         self.assertQuerysetEqual(q.values_list(), [])
 
+    def test_property_empty(self):
+        # property empty return True when QuerySet is EmptyQuerySet
+        # call this property should not open queries.
+        with self.assertNumQueries(0):
+            self.assertTrue(Author.objects.none().empty)
+            self.assertFalse(Author.objects.all().empty)
+
 
 class ValuesQuerysetTests(TestCase):
     @classmethod

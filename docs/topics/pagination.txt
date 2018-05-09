@@ -139,9 +139,9 @@ Required arguments
 ``object_list``
     A list, tuple, ``QuerySet``, or other sliceable object with a ``count()``
     or ``__len__()`` method. For consistent pagination, ``QuerySet``\s should
-    be ordered, e.g. with an :meth:`~django.db.models.query.QuerySet.order_by`
-    clause or with a default :attr:`~django.db.models.Options.ordering` on the
-    model.
+    be ordered, if not, it will raise a warning, unless it is guaranteed to
+    return no results, e.g. with an :meth:`~django.db.models.query.QuerySet.order_by`
+    clause or with a default :attr:`~django.db.models.Options.ordering` on the model.
 
     .. admonition:: Performance issues paginating large ``QuerySet``\s
 

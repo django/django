@@ -142,6 +142,11 @@ Here's the formal declaration of a ``QuerySet``:
         :meth:`order_by()` clause or a default ordering on the model.
         ``False`` otherwise.
 
+    .. attribute:: empty
+
+        ``True`` if the query is guaranteed to return no results, because it is
+        an ``EmptyQuerySet`` created with ``none()``.
+
     .. attribute:: db
 
         The database that will be used if this query is executed now.

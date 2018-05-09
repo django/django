@@ -351,6 +351,9 @@ class ModelPaginationTests(TestCase):
         self.assertIsInstance(p.object_list, list)
 
     def test_paginating_unordered_queryset_raises_warning(self):
+        """
+        Unordered object list warning with an non-empty queryset.
+        """
         with warnings.catch_warnings(record=True) as warns:
             # Prevent the RuntimeWarning subclass from appearing as an
             # exception due to the warnings.simplefilter() in runtests.py.
@@ -373,6 +376,9 @@ class ModelPaginationTests(TestCase):
         """
         class ObjectList:
             ordered = False
+
+            def __len__(self):
+                return 1
         object_list = ObjectList()
         with warnings.catch_warnings(record=True) as warns:
             warnings.filterwarnings('always', category=UnorderedObjectListWarning)
@@ -382,3 +388,36 @@ class ModelPaginationTests(TestCase):
             "Pagination may yield inconsistent results with an unordered "
             "object_list: {!r}.".format(object_list)
         ))
+
+    def test_paginating_empty_unordered_queryset(self):
+        """
+        Empty unordered QuerySet not warning, such as Article.objects.none().
+        """
+        with warnings.catch_warnings(record=True) as warns:
+            # Prevent the RuntimeWarning subclass from appearing as an
+            # exception due to the warnings.simplefilter() in runtests.py.
+            warnings.filterwarnings('always', category=UnorderedObjectListWarning)
+            Paginator(Article.objects.none(), 5)
+        self.assertEqual(len(warns), 0)
+
+    def test_paginating_empty_unordered_object_list(self):
+        """
+        Empty unordered objects not warning, if bool(object_list) is False
+        """
+        class ObjectList:
+            ordered = False
+
+            def __len__(self):
+                return 0
+        object_list = ObjectList()
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.filterwarnings('always', category=UnorderedObjectListWarning)
+            Paginator(object_list, 5)
+        self.assertEqual(len(warns), 0)
+
+    def test_paginator_init_queries(self):
+        """
+        There should be none quesies while init the Paginator.
+        """
+        self.assertNumQueries(0, Paginator, Article.objects.all().order_by('id'), 5)
+        self.assertNumQueries(0, Paginator, Article.objects.none(), 5)

@@ -1110,6 +1110,13 @@ class QuerySet:
             return False
 
     @property
+    def empty(self):
+        """
+        Return True if the QuerySet is empty (EmptyQuerySet).
+        """
+        return isinstance(self, EmptyQuerySet)
+
+    @property
     def db(self):
         """Return the database used if this query is executed now."""
         if self._for_write:
