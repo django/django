@@ -246,11 +246,17 @@ Suppose we want to get the total discount for all clients based on the
     >>> a_year_ago = date.today() - timedelta(days=365)
     >>> # Get the discount for each Client based on the account type
     >>> Client.objects.aggregate(
-    ...     total_discount=Coalesce(Sum(Case(
-    ...         When(account_type=Client.PLATINUM, then=Value(10)),
-    ...         When(account_type=Client.GOLD, then=Value(5)),
-    ...         When(account_type=Client.REGULAR, then=Value(1)),
-    ...         default=Value(0),
-    ...         output_field=IntegerField(),
-    ...     )), Value(0)))
+    ...     total_discount=Coalesce(
+    ...         Sum(
+    ...             Case(
+    ...                 When(account_type=Client.PLATINUM, then=Value(10)),
+    ...                 When(account_type=Client.GOLD, then=Value(5)),
+    ...                 When(account_type=Client.REGULAR, then=Value(1)),
+    ...                 default=Value(0),
+    ...                 output_field=IntegerField(),
+    ...             ),
+    ...         ),
+    ...         Value(0),
+    ...     )
+    ... )
     {'total_discount': 21}
