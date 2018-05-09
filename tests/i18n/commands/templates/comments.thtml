@@ -1,13 +1,19 @@
 {% load i18n %}
 
 {# ignored comment #1 #}{% trans "Translatable literal #9a" %}
-{# Translators: ignored i18n comment #1 #}{% trans "Translatable literal #9b" %}
-{# Translators: ignored i18n comment #2 #}{# ignored comment #2 #}{% trans "Translatable literal #9c" %}
-{# ignored comment #3 #}{# Translators: ignored i18n comment #3 #}{% trans "Translatable literal #9d" %}
+{# Translators: i18n comment #1 #}{% trans "Translatable literal #9b" %}
+{# Translators: i18n comment #2 #}{# ignored comment #2 #}{% trans "Translatable literal #9c" %}
+{# ignored comment #3 #}{# Translators: i18n comment #3 #}{% trans "Translatable literal #9d" %}
 {# ignored comment #4 #}{% trans "Translatable literal #9e" %}{# ignored comment #5 #}
-{# Translators: ignored i18n comment #4 #}{% trans "Translatable literal #9f" %}{# Translators: valid i18n comment #5 #}
+{# Translators: i18n comment #4 #}{% trans "Translatable literal #9f" %}{# Translators: valid i18n comment #5 #}
 {% trans "Translatable literal #9g" %}{# Translators: valid i18n comment #6 #}
 {# ignored comment #6 #}{% trans "Translatable literal #9h" %}{# Translators: valid i18n comment #7 #}
 {% trans "Translatable literal #9i" %}
 {# Translators: valid i18n comment #8 #}{# Translators: valid i18n comment #9 #}
 {% trans "Translatable literal #9j" %}
+{% comment %}Translators: i18n comment #9w{% endcomment %}{% trans "Translatable literal #9w" %} {% comment %}Translators: i18n comment #9w after{% endcomment %}
+something {% comment %}Translators: i18n comment #9z{% endcomment %}  DEMO DATA IN BETWEEN {% trans "Translatable literal #9z" %}
+{% comment %}Translators: i18n comment #9x{% endcomment %}
+{% trans "Translatable literal #9x" %}
+
+{# Translators: valid i18n comment #10 #}{# Translators: valid i18n comment #11 #} {% trans "Translatable literal #10a" %}

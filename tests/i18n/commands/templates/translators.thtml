@@ -1,0 +1,27 @@
+{% load i18n %}
+
+{# Translators: Abbreviated month name 'Jan' #}
+{% trans "Jan" %}
+
+{# Translators: Abbreviated month name 'Feb'#}{% trans "Feb" %}
+
+{% comment %}Translators: Abbreviated month name 'Mar'{% endcomment %}{% trans "Mar" %}
+
+{# Translators: Abbreviated month name 'Apr' #} {% trans "Apr" %}
+
+{% comment %}Translators: Abbreviated month name 'May'{% endcomment %} {% trans "May" %}
+
+{# Translators: Abbreviated month name 'Jun'#}
+{% trans "Jun" %}
+
+{# Translators: Abbreviated month name 'Jul'#}
+
+{% trans "Jul" %}
+
+{% comment %}Translators: Abbreviated month name 'Aug'{% endcomment %}
+
+{% trans "Aug" %}
+
+{% trans "Sep" %} {#Translators: Abbreviated month name 'Sep'#} some text after
+
+{% trans "Oct" %} some text in between {% comment %}Translators: Abbreviated month name 'Oct'{% endcomment %}
