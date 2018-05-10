@@ -112,9 +112,9 @@ class BlockTranslateNode(Node):
         result = []
         vars = []
         for token in tokens:
-            if token.token_type == TokenType.text:
+            if token.token_type == TokenType.TEXT:
                 result.append(token.contents.replace('%', '%%'))
-            elif token.token_type == TokenType.var:
+            elif token.token_type == TokenType.VAR:
                 result.append('%%(%s)s' % token.contents)
                 vars.append(token.contents)
         msg = ''.join(result)
@@ -510,7 +510,7 @@ def do_block_translate(parser, token):
     plural = []
     while parser.tokens:
         token = parser.next_token()
-        if token.token_type in (TokenType.var, TokenType.text):
+        if token.token_type in (TokenType.VAR, TokenType.TEXT):
             singular.append(token)
         else:
             break
@@ -519,7 +519,7 @@ def do_block_translate(parser, token):
             raise TemplateSyntaxError("'blocktrans' doesn't allow other block tags inside it")
         while parser.tokens:
             token = parser.next_token()
-            if token.token_type in (TokenType.var, TokenType.text):
+            if token.token_type in (TokenType.VAR, TokenType.TEXT):
                 plural.append(token)
             else:
                 break

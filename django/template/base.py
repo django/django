@@ -3,10 +3,10 @@ This is the Django template system.
 
 How it works:
 
-The Lexer.tokenize() function converts a template string (i.e., a string
+The Lexer.tokenize() method converts a template string (i.e., a string
 containing markup with custom template tags) to tokens, which can be either
-plain text (TokenType.text), variables (TokenType.var) or block statements
-(TokenType.block).
+plain text (TokenType.TEXT), variables (TokenType.VAR), or block statements
+(TokenType.BLOCK).
 
 The Parser() class takes a list of tokens in its constructor, and its parse()
 method returns a compiled template -- which is, under the hood, a list of
@@ -98,10 +98,10 @@ logger = logging.getLogger('django.template')
 
 
 class TokenType(Enum):
-    text = 0
-    var = 1
-    block = 2
-    comment = 3
+    TEXT = 0
+    VAR = 1
+    BLOCK = 2
+    COMMENT = 3
 
 
 class VariableDoesNotExist(Exception):
@@ -291,7 +291,7 @@ class Token:
         A token representing a string from the template.
 
         token_type
-            A TokenType, either .text, .var, .block, or .comment.
+            A TokenType, either .TEXT, .VAR, .BLOCK, or .COMMENT.
 
         contents
             The token source string.
@@ -365,18 +365,18 @@ class Lexer:
                 self.verbatim = False
         if in_tag and not self.verbatim:
             if token_string.startswith(VARIABLE_TAG_START):
-                return Token(TokenType.var, token_string[2:-2].strip(), position, lineno)
+                return Token(TokenType.VAR, token_string[2:-2].strip(), position, lineno)
             elif token_string.startswith(BLOCK_TAG_START):
                 if block_content[:9] in ('verbatim', 'verbatim '):
                     self.verbatim = 'end%s' % block_content
-                return Token(TokenType.block, block_content, position, lineno)
+                return Token(TokenType.BLOCK, block_content, position, lineno)
             elif token_string.startswith(COMMENT_TAG_START):
                 content = ''
                 if token_string.find(TRANSLATOR_COMMENT_MARK):
                     content = token_string[2:-2].strip()
-                return Token(TokenType.comment, content, position, lineno)
+                return Token(TokenType.COMMENT, content, position, lineno)
         else:
-            return Token(TokenType.text, token_string, position, lineno)
+            return Token(TokenType.TEXT, token_string, position, lineno)
 
 
 class DebugLexer(Lexer):
@@ -438,9 +438,9 @@ class Parser:
         while self.tokens:
             token = self.next_token()
             # Use the raw values here for TokenType.* for a tiny performance boost.
-            if token.token_type.value == 0:  # TokenType.text
+            if token.token_type.value == 0:  # TokenType.TEXT
                 self.extend_nodelist(nodelist, TextNode(token.contents), token)
-            elif token.token_type.value == 1:  # TokenType.var
+            elif token.token_type.value == 1:  # TokenType.VAR
                 if not token.contents:
                     raise self.error(token, 'Empty variable tag on line %d' % token.lineno)
                 try:
@@ -449,7 +449,7 @@ class Parser:
                     raise self.error(token, e)
                 var_node = VariableNode(filter_expression)
                 self.extend_nodelist(nodelist, var_node, token)
-            elif token.token_type.value == 2:  # TokenType.block
+            elif token.token_type.value == 2:  # TokenType.BLOCK
                 try:
                     command = token.contents.split()[0]
                 except IndexError:
@@ -486,7 +486,7 @@ class Parser:
     def skip_past(self, endtag):
         while self.tokens:
             token = self.next_token()
-            if token.token_type == TokenType.block and token.contents == endtag:
+            if token.token_type == TokenType.BLOCK and token.contents == endtag:
                 return
         self.unclosed_block_tag([endtag])
 
