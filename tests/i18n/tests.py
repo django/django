@@ -297,6 +297,11 @@ class TranslationTests(SimpleTestCase):
         with translation.override(None):
             self.assertIs(get_language_bidi(), False)
 
+    def test_language_bidi_null(self):
+        self.assertIs(trans_null.get_language_bidi(), False)
+        with override_settings(LANGUAGE_CODE='he'):
+            self.assertIs(get_language_bidi(), True)
+
 
 class TranslationThreadSafetyTests(SimpleTestCase):
 
@@ -1649,6 +1654,9 @@ class CountrySpecificLanguageTests(SimpleTestCase):
         self.assertFalse(check_for_language('tr-TR.UTF8'))
         self.assertFalse(check_for_language('de-DE.utf-8'))
 
+    def test_check_for_language_null(self):
+        self.assertIs(trans_null.check_for_language('en'), True)
+
     def test_get_language_from_request(self):
         # issue 19919
         r = self.rf.get('/')
@@ -1661,6 +1669,13 @@ class CountrySpecificLanguageTests(SimpleTestCase):
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'bg-bg,en-US;q=0.8,en;q=0.6,ru;q=0.4'}
         lang = get_language_from_request(r)
         self.assertEqual('bg', lang)
+
+    def test_get_language_from_request_null(self):
+        lang = trans_null.get_language_from_request(None)
+        self.assertEqual(lang, 'en')
+        with override_settings(LANGUAGE_CODE='de'):
+            lang = trans_null.get_language_from_request(None)
+            self.assertEqual(lang, 'de')
 
     def test_specific_language_codes(self):
         # issue 11915
