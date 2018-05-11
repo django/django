@@ -257,7 +257,7 @@ class ImmutableCaseInsensitiveDictTests(SimpleTestCase):
 
 class EnvironHeadersTestCase(SimpleTestCase):
     def test_parse_cgi_headers_basics(self):
-        parser = EnvironHeaders.parse_cgi_header
+        parser = EnvironHeaders.parse_cgi_header_name
 
         self.assertEqual(parser('HTTP_ACCEPT'), 'Accept')
         self.assertEqual(parser('HTTP_HOST'), 'Host')
@@ -268,7 +268,7 @@ class EnvironHeadersTestCase(SimpleTestCase):
         self.assertEqual(parser('HTTP_COOKIE'), 'Cookie')
 
     def test_parse_cgi_headers_special_and_custom(self):
-        parser = EnvironHeaders.parse_cgi_header
+        parser = EnvironHeaders.parse_cgi_header_name
 
         self.assertEqual(parser('HTTP_X_PROTO'), 'X-Proto')
         self.assertEqual(parser('HTTP_X_FORWARDED_PROTO'), 'X-Forwarded-Proto')
@@ -278,7 +278,7 @@ class EnvironHeadersTestCase(SimpleTestCase):
         self.assertEqual(parser('HTTP_X_CUSTOM_HEADER_2'), 'X-Custom-Header-2')
 
     def test_parse_cgi_headers_cgi_exceptions_and_invalids(self):
-        parser = EnvironHeaders.parse_cgi_header
+        parser = EnvironHeaders.parse_cgi_header_name
 
         self.assertIsNone(parser('HTTP_CONTENT_TYPE'))
         self.assertIsNone(parser('HTTP_CONTENT_LENGTH'))

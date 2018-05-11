@@ -346,13 +346,21 @@ class EnvironHeaders(ImmutableCaseInsensitiveDict):
     HTTP_PREFIX = 'HTTP_'
 
     def __init__(self, environ):
+        header_name_generator = ((
+            self.parse_cgi_header_name(header_name), value
+            ) for header_name, value in environ.items())
         headers = {
-            self.parse_cgi_header(k): v for k, v in environ.items()
-            if self.parse_cgi_header(k)}
+            header: value for header, value in header_name_generator if header
+        }
+
         super().__init__(headers)
 
     @classmethod
-    def parse_cgi_header(cls, cgi_header):
+    def _style_header_name(cls, header_name):
+        return header_name.title()
+
+    @classmethod
+    def parse_cgi_header_name(cls, cgi_header):
         ignore_header = (
             cgi_header in cls.IGNORE_EXCEPTIONS or
             not cgi_header.startswith(cls.HTTP_PREFIX) and
@@ -364,4 +372,4 @@ class EnvironHeaders(ImmutableCaseInsensitiveDict):
         if cgi_header not in cls.SPECIAL_UNCHANGED_HEADERS:
             cgi_header = cgi_header[len(cls.HTTP_PREFIX):]
 
-        return cgi_header.replace('_', '-').title()
+        return cls._style_header_name(cgi_header.replace('_', '-'))
