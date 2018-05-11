@@ -2082,3 +2082,28 @@ class RouteForWriteTestCase(TestCase):
         self.assertEqual(e.mode, RouterUsed.WRITE)
         self.assertEqual(e.model, Book)
         self.assertEqual(e.hints, {'instance': auth})
+
+
+class NoRelationRouter:
+    """Disallow all relations."""
+    def allow_relation(self, obj1, obj2, **hints):
+        return False
+
+
+@override_settings(DATABASE_ROUTERS=[NoRelationRouter()])
+class RelationAssignmentTests(TestCase):
+    """allow_relation() is called with unsaved model instances."""
+    multi_db = True
+    router_prevents_msg = 'the current database router prevents this relation'
+
+    def test_foreign_key_relation(self):
+        person = Person(name='Someone')
+        pet = Pet()
+        with self.assertRaisesMessage(ValueError, self.router_prevents_msg):
+            pet.owner = person
+
+    def test_reverse_one_to_one_relation(self):
+        user = User(username='Someone', password='fake_hash')
+        profile = UserProfile()
+        with self.assertRaisesMessage(ValueError, self.router_prevents_msg):
+            user.userprofile = profile
