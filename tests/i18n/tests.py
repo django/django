@@ -286,6 +286,7 @@ class TranslationTests(SimpleTestCase):
         for lang, locale in tests:
             with self.subTest(lang=lang):
                 self.assertEqual(to_locale(lang), locale)
+                self.assertEqual(trans_null.to_locale(lang), locale)
 
     def test_to_language(self):
         self.assertEqual(trans_real.to_language('en_US'), 'en-us')

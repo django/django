@@ -4,6 +4,8 @@
 
 from django.conf import settings
 
+from .trans_real import to_locale as trans_real_to_locale
+
 
 def gettext(message):
     return message
@@ -52,12 +54,7 @@ def check_for_language(x):
     return True
 
 
-def to_locale(language):
-    p = language.find('-')
-    if p >= 0:
-        return language[:p].lower() + '_' + language[p + 1:].upper()
-    else:
-        return language.lower()
+to_locale = trans_real_to_locale
 
 
 def get_language_from_request(request, check_path=False):
