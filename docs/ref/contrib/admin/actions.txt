@@ -220,8 +220,8 @@ example, you might write a simple export function that uses Django's
 :doc:`serialization functions </topics/serialization>` to dump some selected
 objects as JSON::
 
-    from django.http import HttpResponse
     from django.core import serializers
+    from django.http import HttpResponse
 
     def export_as_json(modeladmin, request, queryset):
         response = HttpResponse(content_type="application/json")

@@ -210,7 +210,7 @@ The default implementation simply adds the object being displayed to the
 template, but you can override it to send more::
 
     from django.views.generic import DetailView
-    from books.models import Publisher, Book
+    from books.models import Book, Publisher
 
     class PublisherDetail(DetailView):
 
@@ -409,8 +409,8 @@ custom view::
 Then we'd write our new view -- ``get_object`` is the method that retrieves the
 object -- so we simply override it and wrap the call::
 
-    from django.views.generic import DetailView
     from django.utils import timezone
+    from django.views.generic import DetailView
     from books.models import Author
 
     class AuthorDetailView(DetailView):

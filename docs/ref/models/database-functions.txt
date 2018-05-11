@@ -979,7 +979,7 @@ than 0. If ``length`` is ``None``, then the rest of the string will be returned.
 Usage example::
 
     >>> # Set the alias to the first 5 characters of the name as lowercase
-    >>> from django.db.models.functions import Substr, Lower
+    >>> from django.db.models.functions import Lower, Substr
     >>> Author.objects.create(name='Margaret Smith')
     >>> Author.objects.update(alias=Lower(Substr('name', 1, 5)))
     1

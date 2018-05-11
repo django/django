@@ -277,7 +277,7 @@ will be stored in a special error dictionary key,
 :data:`~django.core.exceptions.NON_FIELD_ERRORS`. This key is used for errors
 that are tied to the entire model instead of to a specific field::
 
-    from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
+    from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
     try:
         article.full_clean()
     except ValidationError as e:

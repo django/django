@@ -295,8 +295,8 @@ You can override the error messages from ``NON_FIELD_ERRORS`` raised by model
 validation by adding the :data:`~django.core.exceptions.NON_FIELD_ERRORS` key
 to the ``error_messages`` dictionary of the ``ModelForm``’s inner ``Meta`` class::
 
-    from django.forms import ModelForm
     from django.core.exceptions import NON_FIELD_ERRORS
+    from django.forms import ModelForm
 
     class ArticleForm(ModelForm):
         class Meta:
@@ -573,7 +573,7 @@ fields like you would in a regular ``Form``.
 If you want to specify a field's validators, you can do so by defining
 the field declaratively and setting its ``validators`` parameter::
 
-    from django.forms import ModelForm, CharField
+    from django.forms import CharField, ModelForm
     from myapp.models import Article
 
     class ArticleForm(ModelForm):

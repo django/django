@@ -48,7 +48,7 @@ keyword.
 
 Some examples::
 
-    >>> from django.db.models import When, F, Q
+    >>> from django.db.models import F, Q, When
     >>> # String arguments refer to fields; the following two examples are equivalent:
     >>> When(account_type=Client.GOLD, then='name')
     >>> When(account_type=Client.GOLD, then=F('name'))
@@ -88,7 +88,7 @@ A simple example::
 
     >>>
     >>> from datetime import date, timedelta
-    >>> from django.db.models import CharField, Case, Value, When
+    >>> from django.db.models import Case, CharField, Value, When
     >>> Client.objects.create(
     ...     name='Jane Doe',
     ...     account_type=Client.REGULAR,

@@ -86,7 +86,7 @@ show how you can display the results. This example assumes you have a
 
 The view function looks like this::
 
-    from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+    from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
     from django.shortcuts import render
 
     def listing(request):

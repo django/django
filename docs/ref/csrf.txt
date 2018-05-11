@@ -202,8 +202,8 @@ both is fine, and will incur minimal overhead.
 
     Usage::
 
-        from django.views.decorators.csrf import csrf_protect
         from django.shortcuts import render
+        from django.views.decorators.csrf import csrf_protect
 
         @csrf_protect
         def my_view(request):
@@ -400,8 +400,8 @@ class-based views<decorating-class-based-views>`.
     This decorator marks a view as being exempt from the protection ensured by
     the middleware. Example::
 
-        from django.views.decorators.csrf import csrf_exempt
         from django.http import HttpResponse
+        from django.views.decorators.csrf import csrf_exempt
 
         @csrf_exempt
         def my_view(request):
@@ -417,8 +417,8 @@ class-based views<decorating-class-based-views>`.
 
     Example::
 
-        from django.views.decorators.csrf import requires_csrf_token
         from django.shortcuts import render
+        from django.views.decorators.csrf import requires_csrf_token
 
         @requires_csrf_token
         def my_view(request):
