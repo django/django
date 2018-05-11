@@ -348,7 +348,7 @@ class EnvironHeaders(ImmutableCaseInsensitiveDict):
     def __init__(self, environ):
         header_name_generator = ((
             self.parse_cgi_header_name(header_name), value
-            ) for header_name, value in environ.items())
+        ) for header_name, value in environ.items())
         headers = {
             header: value for header, value in header_name_generator if header
         }
