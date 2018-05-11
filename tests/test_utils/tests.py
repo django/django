@@ -9,7 +9,7 @@ from django.conf.urls import url
 from django.contrib.staticfiles.finders import get_finder, get_finders
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.storage import default_storage
-from django.db import connection, models, router
+from django.db import ConnectionHandler, connection, models, router
 from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
 from django.template.loader import render_to_string
@@ -19,7 +19,7 @@ from django.test import (
 )
 from django.test.html import HTMLParseError, parse_html
 from django.test.utils import (
-    CaptureQueriesContext, isolate_apps, override_settings,
+    CaptureQueriesContext, isolate_apps, override_settings, setup_databases,
     setup_test_environment,
 )
 from django.urls import NoReverseMatch, reverse
@@ -1173,3 +1173,19 @@ class IsolatedAppsTests(SimpleTestCase):
         self.assertEqual(MethodDecoration._meta.apps, method_apps)
         self.assertEqual(ContextManager._meta.apps, context_apps)
         self.assertEqual(NestedContextManager._meta.apps, nested_context_apps)
+
+
+class SetupDatabasesTests(SimpleTestCase):
+    def test_mirror_database_uses_the_same_connection(self):
+        test_connections = ConnectionHandler({
+            'default': {
+                'NAME': 'db',
+            },
+            'mirror': {
+                'NAME': 'db',
+                'TEST': {'MIRROR': 'default'},
+            },
+        })
+        with mock.patch('django.test.utils.connections', test_connections):
+            setup_databases(verbosity=0, interactive=False)
+        self.assertEqual(test_connections['default'], test_connections['mirror'])
