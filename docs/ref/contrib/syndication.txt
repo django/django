@@ -367,7 +367,7 @@ Here's a full example::
 And the accompanying URLconf::
 
     from django.urls import path
-    from myproject.feeds import RssSiteNewsFeed, AtomSiteNewsFeed
+    from myproject.feeds import AtomSiteNewsFeed, RssSiteNewsFeed
 
     urlpatterns = [
         # ...

@@ -26,7 +26,7 @@ Some examples
 
 .. code-block:: python
 
-    from django.db.models import F, Count, Value
+    from django.db.models import Count, F, Value
     from django.db.models.functions import Length, Upper
 
     # Find companies that have more employees than chairs.
@@ -252,7 +252,7 @@ is null) after companies that have been contacted::
 database functions like ``COALESCE`` and ``LOWER``, or aggregates like ``SUM``.
 They can be used directly::
 
-    from django.db.models import Func, F
+    from django.db.models import F, Func
 
     queryset.annotate(field_lower=Func(F('field'), function='LOWER'))
 

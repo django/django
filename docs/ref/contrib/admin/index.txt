@@ -128,7 +128,7 @@ The ``register`` decorator
     argument::
 
         from django.contrib import admin
-        from .models import Author, Reader, Editor
+        from .models import Author, Editor, Reader
         from myproject.admin_site import custom_admin_site
 
         @admin.register(Author, Reader, Editor, site=custom_admin_site)
@@ -502,12 +502,12 @@ subclass::
     that we'd like to use for large text fields instead of the default
     ``<textarea>``. Here's how we'd do that::
 
-        from django.db import models
         from django.contrib import admin
+        from django.db import models
 
         # Import our custom widget and our model from where they're defined
-        from myapp.widgets import RichTextEditorWidget
         from myapp.models import MyModel
+        from myapp.widgets import RichTextEditorWidget
 
         class MyModelAdmin(admin.ModelAdmin):
             formfield_overrides = {
@@ -581,8 +581,8 @@ subclass::
       the same as the callable, but ``self`` in this context is the model
       instance. Here's a full model example::
 
-          from django.db import models
           from django.contrib import admin
+          from django.db import models
 
           class Person(models.Model):
               name = models.CharField(max_length=50)
@@ -616,8 +616,8 @@ subclass::
 
       Here's a full example model::
 
-          from django.db import models
           from django.contrib import admin
+          from django.db import models
           from django.utils.html import format_html
 
           class Person(models.Model):
@@ -670,8 +670,8 @@ subclass::
 
       Here's a full example model::
 
-          from django.db import models
           from django.contrib import admin
+          from django.db import models
 
           class Person(models.Model):
               first_name = models.CharField(max_length=50)
@@ -699,8 +699,8 @@ subclass::
 
       For example::
 
-        from django.db import models
         from django.contrib import admin
+        from django.db import models
         from django.utils.html import format_html
 
         class Person(models.Model):
@@ -2572,8 +2572,8 @@ Using generic relations as an inline
 It is possible to use an inline with generically related objects. Let's say
 you have the following models::
 
-    from django.db import models
     from django.contrib.contenttypes.fields import GenericForeignKey
+    from django.db import models
 
     class Image(models.Model):
         image = models.ImageField(upload_to="images")
@@ -3001,7 +3001,7 @@ respectively::
 
     # urls.py
     from django.urls import path
-    from myproject.admin import basic_site, advanced_site
+    from myproject.admin import advanced_site, basic_site
 
     urlpatterns = [
         path('basic-admin/', basic_site.urls),
@@ -3111,7 +3111,7 @@ password box.
 
     For example, to get a list of all additions done through the admin::
 
-        from django.contrib.admin.models import LogEntry, ADDITION
+        from django.contrib.admin.models import ADDITION, LogEntry
 
         LogEntry.objects.filter(action_flag=ADDITION)
 

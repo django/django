@@ -279,8 +279,8 @@ want it to be published:
 .. snippet::
     :filename: views.py
 
-    from django.shortcuts import render
     from django.http import HttpResponseRedirect
+    from django.shortcuts import render
 
     from .forms import NameForm
 

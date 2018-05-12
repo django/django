@@ -1023,7 +1023,7 @@ If you want to use a different ``Client`` class (for example, a subclass
 with customized behavior), use the :attr:`~SimpleTestCase.client_class` class
 attribute::
 
-    from django.test import TestCase, Client
+    from django.test import Client, TestCase
 
     class MyTestClient(Client):
         # Specialized methods for your environment
