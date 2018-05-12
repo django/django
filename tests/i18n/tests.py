@@ -30,8 +30,8 @@ from django.utils.translation import (
     LANGUAGE_SESSION_KEY, activate, check_for_language, deactivate,
     get_language, get_language_bidi, get_language_from_request,
     get_language_info, gettext, gettext_lazy, ngettext, ngettext_lazy,
-    npgettext, npgettext_lazy, pgettext, to_locale, trans_null, trans_real,
-    ugettext, ugettext_lazy, ungettext, ungettext_lazy,
+    npgettext, npgettext_lazy, pgettext, to_language, to_locale, trans_null,
+    trans_real, ugettext, ugettext_lazy, ungettext, ungettext_lazy,
 )
 
 from .forms import CompanyForm, I18nForm, SelectDateForm
@@ -288,8 +288,8 @@ class TranslationTests(SimpleTestCase):
                 self.assertEqual(to_locale(lang), locale)
 
     def test_to_language(self):
-        self.assertEqual(trans_real.to_language('en_US'), 'en-us')
-        self.assertEqual(trans_real.to_language('sr_Lat'), 'sr-lat')
+        self.assertEqual(to_language('en_US'), 'en-us')
+        self.assertEqual(to_language('sr_Lat'), 'sr-lat')
 
     def test_language_bidi(self):
         self.assertIs(get_language_bidi(), False)

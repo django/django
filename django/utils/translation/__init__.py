@@ -10,7 +10,7 @@ __all__ = [
     'activate', 'deactivate', 'override', 'deactivate_all',
     'get_language', 'get_language_from_request',
     'get_language_info', 'get_language_bidi',
-    'check_for_language', 'to_locale', 'templatize',
+    'check_for_language', 'to_language', 'to_locale', 'templatize',
     'gettext', 'gettext_lazy', 'gettext_noop',
     'ugettext', 'ugettext_lazy', 'ugettext_noop',
     'ngettext', 'ngettext_lazy',
@@ -191,6 +191,15 @@ def get_language_bidi():
 
 def check_for_language(lang_code):
     return _trans.check_for_language(lang_code)
+
+
+def to_language(locale):
+    """Turn a locale name (en_US) into a language name (en-us)."""
+    p = locale.find('_')
+    if p >= 0:
+        return locale[:p].lower() + '-' + locale[p + 1:].lower()
+    else:
+        return locale.lower()
 
 
 def to_locale(language):
