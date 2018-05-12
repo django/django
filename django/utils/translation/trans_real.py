@@ -16,7 +16,7 @@ from django.core.signals import setting_changed
 from django.dispatch import receiver
 from django.utils.safestring import SafeData, mark_safe
 
-from . import LANGUAGE_SESSION_KEY, to_locale
+from . import LANGUAGE_SESSION_KEY, to_language, to_locale
 
 # Translations are cached in a dictionary for every language.
 # The active translations are stored by threadid to make them thread local.
@@ -55,15 +55,6 @@ def reset_cache(**kwargs):
         check_for_language.cache_clear()
         get_languages.cache_clear()
         get_supported_language_variant.cache_clear()
-
-
-def to_language(locale):
-    """Turn a locale name (en_US) into a language name (en-us)."""
-    p = locale.find('_')
-    if p >= 0:
-        return locale[:p].lower() + '-' + locale[p + 1:].lower()
-    else:
-        return locale.lower()
 
 
 class DjangoTranslation(gettext_module.GNUTranslations):
