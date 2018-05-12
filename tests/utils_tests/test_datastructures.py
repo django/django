@@ -180,14 +180,32 @@ class ImmutableCaseInsensitiveDictTests(SimpleTestCase):
         })
 
     def test_repr(self):
-        self.assertEqual(repr(self.dict_1), repr({
+        dict_1 = ImmutableCaseInsensitiveDict({
             'Accept': 'application/json',
+        })
+        dict_2 = ImmutableCaseInsensitiveDict({
+            'content-type': 'text/html'
+        })
+
+        self.assertEqual(repr(dict_1), repr({
+            'Accept': 'application/json',
+        }))
+        self.assertEqual(repr(dict_2), repr({
             'content-type': 'text/html'
         }))
 
     def test_str(self):
-        self.assertEqual(str(self.dict_1), str({
+        dict_1 = ImmutableCaseInsensitiveDict({
             'Accept': 'application/json',
+        })
+        dict_2 = ImmutableCaseInsensitiveDict({
+            'content-type': 'text/html'
+        })
+
+        self.assertEqual(str(dict_1), str({
+            'Accept': 'application/json',
+        }))
+        self.assertEqual(str(dict_2), str({
             'content-type': 'text/html'
         }))
 
