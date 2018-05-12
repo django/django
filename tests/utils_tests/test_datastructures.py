@@ -234,7 +234,7 @@ class ImmutableCaseInsensitiveDictTests(SimpleTestCase):
         self.assertTrue('Content-Type' in self.dict_1)
 
     def test_delitem(self):
-        "del should raise a TypeError because this is immutable"
+        """del should raise a TypeError because this is immutable"""
         # Preconditions
         self.assertTrue('Accept' in self.dict_1)
         with self.assertRaises(TypeError):

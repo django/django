@@ -252,6 +252,8 @@ Requests and Responses
 * Added the ``samesite`` argument to :meth:`.HttpResponse.set_cookie` to allow
   setting the ``SameSite`` cookie flag.
 
+* Added :attr:`.HttpRequest.headers`.
+
 Serialization
 ~~~~~~~~~~~~~
 

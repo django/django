@@ -137,9 +137,8 @@ All attributes should be considered read-only, unless stated otherwise.
 
     A dictionary containing the `WSGI environ \
     <https://www.python.org/dev/peps/pep-0333/#environ-variables>`_.
-    Available request headers are prefixed with the string ``HTTP_``.
-    If you're looking for the original header names sent by the client,
-    use :attr:`~HttpRequest.headers` instead. Here are some examples:
+    Available request headers are prefixed with the string ``HTTP_`` and
+    depend on the client and server, but are some examples:
 
     * ``CONTENT_LENGTH`` -- The length of the request body (as a string).
     * ``CONTENT_TYPE`` -- The MIME type of the request body.
@@ -162,7 +161,8 @@ All attributes should be considered read-only, unless stated otherwise.
     converting all characters to uppercase, replacing any hyphens with
     underscores and adding an ``HTTP_`` prefix to the name. So, for example, a
     header called ``X-Bender`` would be mapped to the ``META`` key
-    ``HTTP_X_BENDER``. See also :attr:`~HttpRequest.headers`.
+    ``HTTP_X_BENDER``. See :attr:`~HttpRequest.headers` for a dictionary of
+    case-insensitive, hyphened headers (``request.headers['User-Agent']``)
 
     Note that :djadmin:`runserver` strips all headers with underscores in the
     name, so you won't see them in ``META``. This prevents header-spoofing
@@ -173,22 +173,26 @@ All attributes should be considered read-only, unless stated otherwise.
 .. _headers:
 .. attribute:: HttpRequest.headers
 
-    A case-insensitive dictionary containing headers passed by the client.
-    Header case is preserved when turning it into a dictionary,
-    or iterating over it (you'll see the original header sent).
+    .. versionadded:: 2.1
+
+    A case-insensitive dictionary containing the headers headers passed
+    by the client.
+    The name of each header is arbitrarily title cased (``User-Agent``) when
+    headers are printed or inspected (``str``, ``repr``).
+
     But when accessing elements with ``headers.get``, ``headers[]`` or
     checking membership (``in``), case is ignored. Examples::
 
-            'Accept' in request.headers  # True
-            'accept' in request.headers  # True
+            'User-Agent' in request.headers  # True
+            'user-agent' in request.headers  # True
 
             # getitem:
-            request.headers['Accept']  # Returns the value of Accept
-            request.headers['accept']  # Returns the value of Accept
+            request.headers['User-Agent']  # Returns the value of Accept
+            request.headers['user-agent']  # Returns the value of Accept
 
             # .get():
-            request.headers.get('Accept')  # Returns the value of Accept
-            request.headers.get('accept')  # Returns the value of Accept
+            request.headers.get('User-Agent')  # Returns the value of User-Agent
+            request.headers.get('user-agent')  # Returns the value of Accept
 
 
 .. attribute:: HttpRequest.resolver_match
