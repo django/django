@@ -192,7 +192,7 @@ Here's an example view that takes a ``subject``, ``message`` and ``from_email``
 from the request's POST data, sends that to admin@example.com and redirects to
 "/contact/thanks/" when it's done::
 
-    from django.core.mail import send_mail, BadHeaderError
+    from django.core.mail import BadHeaderError, send_mail
     from django.http import HttpResponse, HttpResponseRedirect
 
     def send_email(request):

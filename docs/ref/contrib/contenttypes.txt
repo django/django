@@ -241,9 +241,9 @@ generic (sometimes called "polymorphic") relationships between models.
 
 A simple example is a tagging system, which might look like this::
 
-    from django.db import models
     from django.contrib.contenttypes.fields import GenericForeignKey
     from django.contrib.contenttypes.models import ContentType
+    from django.db import models
 
     class TaggedItem(models.Model):
         tag = models.SlugField()
@@ -371,8 +371,8 @@ Reverse generic relations
 If you know which models you'll be using most often, you can also add
 a "reverse" generic relationship to enable an additional API. For example::
 
-    from django.db import models
     from django.contrib.contenttypes.fields import GenericRelation
+    from django.db import models
 
     class Bookmark(models.Model):
         url = models.URLField()

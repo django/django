@@ -620,7 +620,7 @@ example, coordinates will be expressed in `EPSG SRID 32140`__,
 a coordinate system specific to south Texas **only** and in units of
 **meters**, not degrees::
 
-    >>> from django.contrib.gis.geos import Point, GEOSGeometry
+    >>> from django.contrib.gis.geos import GEOSGeometry, Point
     >>> pnt = Point(954158.1, 4215137.1, srid=32140)
 
 Note that ``pnt`` may also be constructed with EWKT, an "extended" form of
@@ -722,7 +722,7 @@ Let's dive right in.  Create a file called ``admin.py`` inside the
 Next, edit your ``urls.py`` in the ``geodjango`` application folder as follows::
 
     from django.contrib.gis import admin
-    from django.urls import path, include
+    from django.urls import include, path
 
     urlpatterns = [
         path('admin/', admin.site.urls),

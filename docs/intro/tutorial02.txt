@@ -383,7 +383,7 @@ the Python import path to your :file:`mysite/settings.py` file.
 
 Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
 
-    >>> from polls.models import Question, Choice   # Import the model classes we just wrote.
+    >>> from polls.models import Choice, Question  # Import the model classes we just wrote.
 
     # No questions are in the system yet.
     >>> Question.objects.all()
@@ -469,7 +469,7 @@ the :doc:`time zone support docs </topics/i18n/timezones>`.
 Save these changes and start a new Python interactive shell by running
 ``python manage.py shell`` again::
 
-    >>> from polls.models import Question, Choice
+    >>> from polls.models import Choice, Question
 
     # Make sure our __str__() addition worked.
     >>> Question.objects.all()

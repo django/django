@@ -38,8 +38,8 @@ many projects they are typically the most commonly used views.
 
     **Example myapp/views.py**::
 
-        from django.views.generic.detail import DetailView
         from django.utils import timezone
+        from django.views.generic.detail import DetailView
 
         from articles.models import Article
 
@@ -107,8 +107,8 @@ many projects they are typically the most commonly used views.
 
     **Example views.py**::
 
-        from django.views.generic.list import ListView
         from django.utils import timezone
+        from django.views.generic.list import ListView
 
         from articles.models import Article
 

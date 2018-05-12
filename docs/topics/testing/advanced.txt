@@ -38,7 +38,7 @@ Example
 The following is a simple unit test using the request factory::
 
     from django.contrib.auth.models import AnonymousUser, User
-    from django.test import TestCase, RequestFactory
+    from django.test import RequestFactory, TestCase
 
     from .views import MyView, my_view
 

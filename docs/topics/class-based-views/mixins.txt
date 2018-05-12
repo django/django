@@ -521,8 +521,8 @@ write our own ``get_context_data()`` to make the
 ``AuthorInterestForm`` available to the template. We'll skip the
 ``get_object()`` override from before for clarity::
 
-    from django.views.generic import DetailView
     from django import forms
+    from django.views.generic import DetailView
     from books.models import Author
 
     class AuthorInterestForm(forms.Form):
@@ -542,8 +542,8 @@ can find the author we're talking about, and we have to remember to set
 ``template_name`` to ensure that form errors will render the same
 template as ``AuthorDisplay`` is using on ``GET``::
 
-    from django.urls import reverse
     from django.http import HttpResponseForbidden
+    from django.urls import reverse
     from django.views.generic import FormView
     from django.views.generic.detail import SingleObjectMixin
 

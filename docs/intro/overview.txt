@@ -69,7 +69,7 @@ necessary:
 .. code-block:: python
 
     # Import the models we created from our "news" app
-    >>> from news.models import Reporter, Article
+    >>> from news.models import Article, Reporter
 
     # No reporters are in the system yet.
     >>> Reporter.objects.all()

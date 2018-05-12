@@ -26,8 +26,8 @@ Fields
         to render any HTML, but it is used to process the submitted data and
         validate it. For example::
 
-            >>> from django.contrib.postgres.forms import SimpleArrayField
             >>> from django import forms
+            >>> from django.contrib.postgres.forms import SimpleArrayField
 
             >>> class NumberListForm(forms.Form):
             ...     numbers = SimpleArrayField(forms.IntegerField())
@@ -48,8 +48,8 @@ Fields
         value is used to split the submitted data. It allows you to chain
         ``SimpleArrayField`` for multidimensional data::
 
-            >>> from django.contrib.postgres.forms import SimpleArrayField
             >>> from django import forms
+            >>> from django.contrib.postgres.forms import SimpleArrayField
 
             >>> class GridForm(forms.Form):
             ...     places = SimpleArrayField(SimpleArrayField(IntegerField()), delimiter='|')

@@ -140,8 +140,8 @@ the proper storage for that file), you can use file storage systems directly.
 You can create an instance of some custom file storage class, or -- often more
 useful -- you can use the global default storage system::
 
-    >>> from django.core.files.storage import default_storage
     >>> from django.core.files.base import ContentFile
+    >>> from django.core.files.storage import default_storage
 
     >>> path = default_storage.save('/path/to/file', ContentFile('new content'))
     >>> path
@@ -169,8 +169,8 @@ which implements basic local filesystem file storage.
 For example, the following code will store uploaded files under
 ``/media/photos`` regardless of what your :setting:`MEDIA_ROOT` setting is::
 
-    from django.db import models
     from django.core.files.storage import FileSystemStorage
+    from django.db import models
 
     fs = FileSystemStorage(location='/media/photos')
 

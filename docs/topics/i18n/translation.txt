@@ -84,8 +84,8 @@ as a shorter alias, ``_``, to save typing.
 In this example, the text ``"Welcome to my site."`` is marked as a translation
 string::
 
-    from django.utils.translation import gettext as _
     from django.http import HttpResponse
+    from django.utils.translation import gettext as _
 
     def my_view(request):
         output = _("Welcome to my site.")
@@ -94,8 +94,8 @@ string::
 Obviously, you could code this without using the alias. This example is
 identical to the previous one::
 
-    from django.utils.translation import gettext
     from django.http import HttpResponse
+    from django.utils.translation import gettext
 
     def my_view(request):
         output = gettext("Welcome to my site.")
@@ -205,8 +205,8 @@ of its value.)
 
 For example::
 
-    from django.utils.translation import ngettext
     from django.http import HttpResponse
+    from django.utils.translation import ngettext
 
     def hello_world(request, count):
         page = ngettext(
