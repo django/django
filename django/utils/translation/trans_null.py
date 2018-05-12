@@ -4,8 +4,6 @@
 
 from django.conf import settings
 
-from .trans_real import to_locale as trans_real_to_locale
-
 
 def gettext(message):
     return message
@@ -52,9 +50,6 @@ def get_language_bidi():
 
 def check_for_language(x):
     return True
-
-
-to_locale = trans_real_to_locale
 
 
 def get_language_from_request(request, check_path=False):
