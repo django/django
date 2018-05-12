@@ -15,7 +15,8 @@ from django.core.exceptions import AppRegistryNotReady
 from django.core.signals import setting_changed
 from django.dispatch import receiver
 from django.utils.safestring import SafeData, mark_safe
-from django.utils.translation import LANGUAGE_SESSION_KEY
+
+from . import LANGUAGE_SESSION_KEY, to_locale
 
 # Translations are cached in a dictionary for every language.
 # The active translations are stored by threadid to make them thread local.
@@ -54,23 +55,6 @@ def reset_cache(**kwargs):
         check_for_language.cache_clear()
         get_languages.cache_clear()
         get_supported_language_variant.cache_clear()
-
-
-def to_locale(language):
-    """Turn a language name (en-us) into a locale name (en_US)."""
-    language = language.lower()
-    parts = language.split('-')
-    try:
-        country = parts[1]
-    except IndexError:
-        return language
-    else:
-        # A language with > 2 characters after the dash only has its first
-        # character after the dash capitalized; e.g. sr-latn becomes sr_Latn.
-        # A language with 2 characters after the dash has both characters
-        # capitalized; e.g. en-us becomes en_US.
-        parts[1] = country.title() if len(country) > 2 else country.upper()
-    return parts[0] + '_' + '-'.join(parts[1:])
 
 
 def to_language(locale):
