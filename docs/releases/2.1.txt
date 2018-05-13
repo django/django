@@ -35,7 +35,7 @@ Minor features
 * :attr:`.ModelAdmin.search_fields` now accepts any lookup such as
   ``field__exact``.
 
-* jQuery is upgraded from version 2.2.3 to 3.2.1.
+* jQuery is upgraded from version 2.2.3 to 3.3.1.
 
 * The new :meth:`.ModelAdmin.delete_queryset` method allows customizing the
   deletion process of the "delete selected objects" action.
