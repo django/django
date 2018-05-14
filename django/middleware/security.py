@@ -16,6 +16,7 @@ class SecurityMiddleware(MiddlewareMixin):
         self.redirect_host = settings.SECURE_SSL_HOST
         self.redirect_exempt = [re.compile(r) for r in settings.SECURE_REDIRECT_EXEMPT]
         self.get_response = get_response
+        self.referrer_policy = getattr(settings, 'SECURE_REFERRER_POLICY', None)
 
     def process_request(self, request):
         path = request.path.lstrip("/")
@@ -42,5 +43,8 @@ class SecurityMiddleware(MiddlewareMixin):
 
         if self.xss_filter:
             response.setdefault('x-xss-protection', '1; mode=block')
+
+        if self.referrer_policy is not None:
+            response.setdefault('referrer-policy', self.referrer_policy)
 
         return response
