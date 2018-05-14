@@ -1,7 +1,6 @@
 import copy
 from collections import OrderedDict
 from collections.abc import Mapping
-from functools import wraps
 
 
 class OrderedSet:
@@ -296,13 +295,6 @@ def _destruct_iterable_mapping_values(data):
         yield tuple(elem)
 
 
-def lowercased_key(method):
-    @wraps(method)
-    def wrapped(self, key, *args, **kwargs):
-        return method(self, key.lower(), *args, **kwargs)
-    return wrapped
-
-
 class ImmutableCaseInsensitiveDict(Mapping):
     """An immutable case-insensitive dictionary that still preserves
     the case of the original keys used to create it."""
@@ -312,9 +304,8 @@ class ImmutableCaseInsensitiveDict(Mapping):
             data = {k: v for k, v in _destruct_iterable_mapping_values(data)}
         self._store = {k.lower(): (k, v) for k, v in data.items()}
 
-    @lowercased_key
     def __getitem__(self, key):
-        return self._store[key][1]
+        return self._store[key.lower()][1]
 
     def __len__(self):
         return len(self._store)

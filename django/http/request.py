@@ -68,11 +68,9 @@ class HttpRequest:
             return '<%s>' % self.__class__.__name__
         return '<%s: %s %r>' % (self.__class__.__name__, self.method, self.get_full_path())
 
-    @property
+    @cached_property
     def headers(self):
-        if not getattr(self, '__headers', None):
-            self.__headers = EnvironHeaders(self.META)
-        return self.__headers
+        return EnvironHeaders(self.META)
 
     def _get_raw_host(self):
         """
