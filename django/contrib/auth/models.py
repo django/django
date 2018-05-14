@@ -1,5 +1,7 @@
 from django.contrib import auth
-from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.base_user import (
+    AbstractBaseUser, AnonymousBaseUser, BaseUserManager,
+)
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
@@ -9,15 +11,6 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from .validators import UnicodeUsernameValidator
-
-
-def update_last_login(sender, user, **kwargs):
-    """
-    A signal receiver which updates the last_login date for
-    the user logging in.
-    """
-    user.last_login = timezone.now()
-    user.save(update_fields=['last_login'])
 
 
 class PermissionManager(models.Manager):
@@ -364,36 +357,11 @@ class User(AbstractUser):
         swappable = 'AUTH_USER_MODEL'
 
 
-class AnonymousUser:
-    id = None
-    pk = None
-    username = ''
+class AnonymousUser(AnonymousBaseUser):
     is_staff = False
-    is_active = False
     is_superuser = False
     _groups = EmptyManager(Group)
     _user_permissions = EmptyManager(Permission)
-
-    def __str__(self):
-        return 'AnonymousUser'
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__)
-
-    def __hash__(self):
-        return 1  # instances always return the same hash value
-
-    def save(self):
-        raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
-
-    def delete(self):
-        raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
-
-    def set_password(self, raw_password):
-        raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
-
-    def check_password(self, raw_password):
-        raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
 
     @property
     def groups(self):
@@ -417,14 +385,3 @@ class AnonymousUser:
 
     def has_module_perms(self, module):
         return _user_has_module_perms(self, module)
-
-    @property
-    def is_anonymous(self):
-        return True
-
-    @property
-    def is_authenticated(self):
-        return False
-
-    def get_username(self):
-        return self.username

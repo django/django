@@ -22,7 +22,7 @@ class AuthConfig(AppConfig):
         last_login_field = getattr(get_user_model(), 'last_login', None)
         # Register the handler only if UserModel.last_login is a field.
         if isinstance(last_login_field, DeferredAttribute):
-            from .models import update_last_login
+            from .base_user import update_last_login
             user_logged_in.connect(update_last_login, dispatch_uid='update_last_login')
         checks.register(check_user_model, checks.Tags.models)
         checks.register(check_models_permissions, checks.Tags.models)
