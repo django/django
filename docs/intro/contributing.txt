@@ -53,7 +53,7 @@ We'll be walking you through contributing a patch to Django for the first time.
 By the end of this tutorial, you should have a basic understanding of both the
 tools and the processes involved. Specifically, we'll be covering the following:
 
-* Installing Git.
+* Installing Dependencies. 
 * How to download a development copy of Django.
 * Running Django's test suite.
 * Writing a test for your patch.
@@ -85,8 +85,11 @@ Code of Conduct
 As a contributor, you can help us keep the Django community open and inclusive.
 Please read and follow our `Code of Conduct <https://www.djangoproject.com/conduct/>`_.
 
-Installing Git
-==============
+Installing Dependencies
+=======================
+
+Git 
+---
 
 For this tutorial, you'll need Git installed to download the current
 development version of Django and to generate patch files for the changes you
@@ -100,6 +103,16 @@ If you're not that familiar with Git, you can always find out more about its
 commands (once it's installed) by typing ``git help`` into the command line.
 
 __ https://git-scm.com/download
+
+Libraries
+---------
+
+You will need to install the following libraries to run the tests:
+
+- Header files and static lib for python (known as ``python3-dev`` on ubuntu)
+- `zlib <http://zlib.net/>`__
+- `libmemcached <http://libmemcached.org>`__
+
 
 Getting a copy of Django's development version
 ==============================================
