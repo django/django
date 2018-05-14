@@ -96,6 +96,18 @@ class ContentTypesViewsTests(TestCase):
         response = self.client.get(short_url)
         self.assertEqual(response.status_code, 404)
 
+
+@override_settings(ROOT_URLCONF='contenttypes_tests.urls')
+class ContentTypesViewsSiteRelTests(TestCase):
+
+    def setUp(self):
+        Site.objects.clear_cache()
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.site_2 = Site.objects.create(domain='example2.com', name='example2.com')
+        cls.site_3 = Site.objects.create(domain='example3.com', name='example3.com')
+
     @mock.patch('django.apps.apps.get_model')
     def test_shortcut_view_with_null_site_fk(self, get_model):
         """
@@ -106,7 +118,7 @@ class ContentTypesViewsTests(TestCase):
         obj = ModelWithNullFKToSite.objects.create(title='title')
         url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(ModelWithNullFKToSite).id, obj.pk)
         response = self.client.get(url)
-        expected_url = 'http://testserver%s' % obj.get_absolute_url()
+        expected_url = 'http://example.com%s' % obj.get_absolute_url()
         self.assertRedirects(response, expected_url, fetch_redirect_response=False)
 
     @mock.patch('django.apps.apps.get_model')
@@ -120,21 +132,17 @@ class ContentTypesViewsTests(TestCase):
 
         # get_current_site() will lookup a Site object, so these must match the
         # domains in the MockSite model.
-        Site.objects.bulk_create([
-            Site(domain='example2.com', name='example2.com'),
-            Site(domain='example3.com', name='example3.com'),
-        ])
         MockSite.objects.bulk_create([
-            MockSite(pk=1, domain='example1.com'),
-            MockSite(pk=2, domain='example2.com'),
-            MockSite(pk=3, domain='example3.com'),
+            MockSite(pk=1, domain='example.com'),
+            MockSite(pk=self.site_2.pk, domain=self.site_2.domain),
+            MockSite(pk=self.site_3.pk, domain=self.site_3.domain),
         ])
         ct = ContentType.objects.get_for_model(ModelWithM2MToSite)
         site_3_obj = ModelWithM2MToSite.objects.create(title='Not Linked to Current Site')
-        site_3_obj.sites.add(MockSite.objects.get(pk=3))
-        expected_url = 'http://example3.com%s' % site_3_obj.get_absolute_url()
+        site_3_obj.sites.add(MockSite.objects.get(pk=self.site_3.pk))
+        expected_url = 'http://%s%s' % (self.site_3.domain, site_3_obj.get_absolute_url())
 
-        with self.settings(SITE_ID=2):
+        with self.settings(SITE_ID=self.site_2.pk):
             # Redirects to the domain of the first Site found in the m2m
             # relationship (ordering is arbitrary).
             response = self.client.get('/shortcut/%s/%s/' % (ct.pk, site_3_obj.pk))
@@ -143,18 +151,18 @@ class ContentTypesViewsTests(TestCase):
         obj_with_sites = ModelWithM2MToSite.objects.create(title='Linked to Current Site')
         obj_with_sites.sites.set(MockSite.objects.all())
         shortcut_url = '/shortcut/%s/%s/' % (ct.pk, obj_with_sites.pk)
-        expected_url = 'http://example2.com%s' % obj_with_sites.get_absolute_url()
+        expected_url = 'http://%s%s' % (self.site_2.domain, obj_with_sites.get_absolute_url())
 
-        with self.settings(SITE_ID=2):
+        with self.settings(SITE_ID=self.site_2.pk):
             # Redirects to the domain of the Site matching the current site's
             # domain.
             response = self.client.get(shortcut_url)
             self.assertRedirects(response, expected_url, fetch_redirect_response=False)
 
-        with self.settings(SITE_ID=None, ALLOWED_HOSTS=['example2.com']):
+        with self.settings(SITE_ID=None, ALLOWED_HOSTS=[self.site_2.domain]):
             # Redirects to the domain of the Site matching the request's host
             # header.
-            response = self.client.get(shortcut_url, SERVER_NAME='example2.com')
+            response = self.client.get(shortcut_url, SERVER_NAME=self.site_2.domain)
             self.assertRedirects(response, expected_url, fetch_redirect_response=False)
 
 
