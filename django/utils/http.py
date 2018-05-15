@@ -4,6 +4,7 @@ import datetime
 import re
 import unicodedata
 import warnings
+import string
 from binascii import Error as BinasciiError
 from email.utils import formatdate
 from urllib.parse import (
@@ -206,7 +207,7 @@ def base36_to_int(s):
 
 def int_to_base36(i):
     """Convert an integer to a base36 string."""
-    char_set = '0123456789abcdefghijklmnopqrstuvwxyz'
+    char_set = string.digits + string.lowercase
     if i < 0:
         raise ValueError("Negative base36 conversion input.")
     if i < 36:
