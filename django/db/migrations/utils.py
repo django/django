@@ -4,6 +4,7 @@ import re
 COMPILED_REGEX_TYPE = type(re.compile(''))
 TRIVAL_FIELD_ATTRS = ("verbose_name", "blank", "editable", "help_text")
 
+
 class RegexObject:
     def __init__(self, obj):
         self.pattern = obj.pattern

@@ -89,10 +89,10 @@ class MigrationAutodetector:
             return obj
 
     def _dbrelated_fields(self, field_dec):
-        return {k:v for k, v in field_dec[2].items() if k not in TRIVAL_FIELD_ATTRS}
+        return {k: v for k, v in field_dec[2].items() if k not in TRIVAL_FIELD_ATTRS}
 
     def has_dbrelated_change(self, old_field_dec, new_field_dec):
-        old_fields  = self._dbrelated_fields(old_field_dec)
+        old_fields = self._dbrelated_fields(old_field_dec)
         new_fields = self._dbrelated_fields(new_field_dec)
         return new_fields != old_fields
 

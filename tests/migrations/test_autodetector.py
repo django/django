@@ -760,7 +760,6 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertEqual(len(changes), 0)
 
-
     def test_supports_functools_partial(self):
         def _content_file_name(instance, filename, key, **kwargs):
             return '{}/{}'.format(instance, filename)
