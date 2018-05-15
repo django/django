@@ -53,6 +53,10 @@ class AutodetectorTests(TestCase):
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=400)),
     ])
+    author_name_help_text = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(max_length=200, null=True, help_text="help")),
+    ])
     author_name_renamed = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
         ("names", models.CharField(max_length=200)),
@@ -719,6 +723,12 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["AlterField"])
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="name", preserve_default=True)
+
+    def test_alter_field_trivial(self):
+        """Tests autodetection of new fields."""
+        changes = self.get_changes([self.author_name_null], [self.author_name_help_text])
+        # Right number/type of migrations?
+        self.assertEqual(len(changes), 0)
 
     def test_supports_functools_partial(self):
         def _content_file_name(instance, filename, key, **kwargs):
