@@ -1060,21 +1060,21 @@ Attributes
     optimized for binary files. It uses `wsgi.file_wrapper`_ if provided by the
     wsgi server, otherwise it streams the file out in small chunks.
 
-    If `as_attachment` is True, Django will set the ``Content-Disposition``
-    header so as to ask the browser to offer the file as a download to the user.
-    If ``open_file`` has no name or if the name of ``open_file`` is not
-    appropriate, you can provide a custom file name through the ``filename``
-    parameter.
+    If ``as_attachment=True``, the ``Content-Disposition`` header is set, which
+    asks the browser to offer the file to the user as a download.
+
+    If ``open_file`` doesn't have a name or if the name of ``open_file`` isn't
+    appropriate, provide a custom file name using the ``filename``  parameter.
 
     The ``Content-Length``, ``Content-Type``, and ``Content-Disposition``
-    headers are also set when they can be guessed from the ``open_file``
-    content.
+    headers are automatically set when they can be guessed from contents of
+    ``open_file``.
 
     .. versionadded:: 2.1
 
         The ``as_attachment`` and ``filename`` keywords argument were added.
-        Moreover, ``FileResponse`` tries its best to set the ``Content``
-        headers.
+        Also, ``FileResponse`` sets the ``Content`` headers if it can guess
+        them.
 
 .. _wsgi.file_wrapper: https://www.python.org/dev/peps/pep-3333/#optional-platform-specific-file-handling
 

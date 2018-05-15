@@ -403,8 +403,7 @@ class FileResponse(StreamingHttpResponse):
             self.file_to_stream = None
             return super()._set_streaming_content(value)
 
-        self.file_to_stream = value
-        filelike = value
+        self.file_to_stream = filelike = value
         if hasattr(filelike, 'close'):
             self._closable_objects.append(filelike)
         value = iter(lambda: filelike.read(self.block_size), b'')
@@ -413,8 +412,8 @@ class FileResponse(StreamingHttpResponse):
 
     def set_headers(self, filelike):
         """
-        Set some common response headers depending on the `filelike` response
-        content and on the self.as_attachment value.
+        Set some common response headers (Content-Length, Content-Type, and
+        Content-Disposition) based on the `filelike` response content.
         """
         encoding_map = {
             'bzip2': 'application/x-bzip',
@@ -431,8 +430,8 @@ class FileResponse(StreamingHttpResponse):
         if self.get('Content-Type', '').startswith(settings.DEFAULT_CONTENT_TYPE):
             if filename:
                 content_type, encoding = mimetypes.guess_type(filename)
-                # Encoding is not set to prevent browsers to automatically
-                # uncompress files.
+                # Encoding isn't set to prevent browsers from automatically
+                # uncompressing files.
                 content_type = encoding_map.get(encoding, content_type)
                 self['Content-Type'] = content_type or 'application/octet-stream'
             else:
