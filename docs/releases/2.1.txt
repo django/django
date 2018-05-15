@@ -255,6 +255,11 @@ Requests and Responses
 * Added the ``samesite`` argument to :meth:`.HttpResponse.set_cookie` to allow
   setting the ``SameSite`` cookie flag.
 
+* The new ``as_attachment`` argument for :class:`~django.http.FileResponse`
+  sets the ``Content-Disposition`` header to make the browser ask if the user
+  wants to download the file. ``FileResponse`` also tries to set the
+  ``Content-Type`` and ``Content-Length`` headers where appropriate.
+
 Serialization
 ~~~~~~~~~~~~~
 

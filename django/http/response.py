@@ -1,11 +1,13 @@
 import datetime
 import json
+import mimetypes
+import os
 import re
 import sys
 import time
 from email.header import Header
 from http.client import responses
-from urllib.parse import urlparse
+from urllib.parse import quote, urlparse
 
 from django.conf import settings
 from django.core import signals, signing
@@ -391,16 +393,59 @@ class FileResponse(StreamingHttpResponse):
     """
     block_size = 4096
 
+    def __init__(self, *args, as_attachment=False, filename='', **kwargs):
+        self.as_attachment = as_attachment
+        self.filename = filename
+        super().__init__(*args, **kwargs)
+
     def _set_streaming_content(self, value):
-        if hasattr(value, 'read'):
-            self.file_to_stream = value
-            filelike = value
-            if hasattr(filelike, 'close'):
-                self._closable_objects.append(filelike)
-            value = iter(lambda: filelike.read(self.block_size), b'')
-        else:
+        if not hasattr(value, 'read'):
             self.file_to_stream = None
+            return super()._set_streaming_content(value)
+
+        self.file_to_stream = filelike = value
+        if hasattr(filelike, 'close'):
+            self._closable_objects.append(filelike)
+        value = iter(lambda: filelike.read(self.block_size), b'')
+        self.set_headers(filelike)
         super()._set_streaming_content(value)
+
+    def set_headers(self, filelike):
+        """
+        Set some common response headers (Content-Length, Content-Type, and
+        Content-Disposition) based on the `filelike` response content.
+        """
+        encoding_map = {
+            'bzip2': 'application/x-bzip',
+            'gzip': 'application/gzip',
+            'xz': 'application/x-xz',
+        }
+        filename = getattr(filelike, 'name', None)
+        filename = filename if (isinstance(filename, str) and filename) else self.filename
+        if os.path.isabs(filename):
+            self['Content-Length'] = os.path.getsize(filelike.name)
+        elif hasattr(filelike, 'getbuffer'):
+            self['Content-Length'] = filelike.getbuffer().nbytes
+
+        if self.get('Content-Type', '').startswith(settings.DEFAULT_CONTENT_TYPE):
+            if filename:
+                content_type, encoding = mimetypes.guess_type(filename)
+                # Encoding isn't set to prevent browsers from automatically
+                # uncompressing files.
+                content_type = encoding_map.get(encoding, content_type)
+                self['Content-Type'] = content_type or 'application/octet-stream'
+            else:
+                self['Content-Type'] = 'application/octet-stream'
+
+        if self.as_attachment:
+            filename = self.filename or os.path.basename(filename)
+            if filename:
+                try:
+                    filename.encode('ascii')
+                    file_expr = 'filename="{}"'.format(filename)
+                except UnicodeEncodeError:
+                    file_expr = "filename*=utf-8''{}".format(quote(filename))
+                self['Content-Disposition'] = 'attachment; {}'.format(file_expr)
 
 
 class HttpResponseRedirectBase(HttpResponse):
