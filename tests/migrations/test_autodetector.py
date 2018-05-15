@@ -256,9 +256,9 @@ class AutodetectorTests(TestCase):
         ("id", models.AutoField(primary_key=True)),
         ("publishers", models.ManyToManyField("testapp.Publisher")),
     ])
-    author_with_m2m_blank = ModelState("testapp", "Author", [
+    author_with_m2m_null = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
-        ("publishers", models.ManyToManyField("testapp.Publisher", blank=True)),
+        ("publishers", models.ManyToManyField("testapp.Publisher", null=True)),
     ])
     author_with_m2m_through = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
@@ -1861,7 +1861,7 @@ class AutodetectorTests(TestCase):
 
     def test_alter_many_to_many(self):
         changes = self.get_changes(
-            [self.author_with_m2m, self.publisher], [self.author_with_m2m_blank, self.publisher]
+            [self.author_with_m2m, self.publisher], [self.author_with_m2m_null, self.publisher]
         )
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
