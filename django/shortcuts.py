@@ -20,7 +20,7 @@ def render_to_response(template_name, context=None, content_type=None, status=No
     django.template.loader.render_to_string() with the passed arguments.
     """
     warnings.warn(
-        'render_to_response() is deprecated in favor render(). It has the '
+        'render_to_response() is deprecated in favor of render(). It has the '
         'same signature except that it also requires a request.',
         RemovedInDjango30Warning, stacklevel=2,
     )
