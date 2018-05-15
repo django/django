@@ -12,7 +12,8 @@ Checks can be triggered explicitly via the :djadmin:`check` command. Checks are
 triggered implicitly before most commands, including :djadmin:`runserver` and
 :djadmin:`migrate`. For performance reasons, checks are not run as part of the
 WSGI stack that is used in deployment. If you need to run system checks on your
-deployment server, trigger them explicitly using :djadmin:`check`.
+deployment server, which refers to the server where the Django application is installed. 
+To trigger the checks on the deployment server, explicitly use the command :djadmin:`check`.
 
 Serious errors will prevent Django commands (such as :djadmin:`runserver`) from
 running at all. Minor problems are reported to the console. If you have inspected
