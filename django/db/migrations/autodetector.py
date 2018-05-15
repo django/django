@@ -10,7 +10,7 @@ from django.db.migrations.operations.models import AlterModelOptions
 from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.utils import (
-    COMPILED_REGEX_TYPE, RegexObject, get_migration_name_timestamp,
+    COMPILED_REGEX_TYPE, TRIVAL_FIELD_ATTRS, RegexObject, get_migration_name_timestamp,
 )
 
 from .topological_sort import stable_topological_sort
@@ -86,6 +86,14 @@ class MigrationAutodetector:
             )
         else:
             return obj
+
+    def _dbrelated_fields(self, field_dec):
+        return {k:v for k, v in field_dec[2].items() if k not in TRIVAL_FIELD_ATTRS}
+
+    def has_dbrelated_change(self, old_field_dec, new_field_dec):
+        old_fields  = self._dbrelated_fields(old_field_dec)
+        new_fields = self._dbrelated_fields(new_field_dec)
+        return new_fields != old_fields
 
     def only_relation_agnostic_fields(self, fields):
         """
@@ -928,7 +936,7 @@ class MigrationAutodetector:
                     new_field.remote_field.through = old_field.remote_field.through
             old_field_dec = self.deep_deconstruct(old_field)
             new_field_dec = self.deep_deconstruct(new_field)
-            if old_field_dec != new_field_dec:
+            if old_field_dec != new_field_dec and self.has_dbrelated_change(old_field_dec, new_field_dec):
                 both_m2m = old_field.many_to_many and new_field.many_to_many
                 neither_m2m = not old_field.many_to_many and not new_field.many_to_many
                 if both_m2m or neither_m2m:
