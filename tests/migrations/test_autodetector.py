@@ -53,6 +53,22 @@ class AutodetectorTests(TestCase):
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=400)),
     ])
+    author_name_help_text = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(max_length=200, null=True, help_text="help")),
+    ])
+    author_name_verbose = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(max_length=200, null=True, verbose_name="Authorae")),
+    ])
+    author_name_editable = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(max_length=200, null=True, editable=False)),
+    ])
+    author_name_blank = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(max_length=200, null=True, blank=True)),
+    ])
     author_name_renamed = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
         ("names", models.CharField(max_length=200)),
@@ -252,9 +268,9 @@ class AutodetectorTests(TestCase):
         ("id", models.AutoField(primary_key=True)),
         ("publishers", models.ManyToManyField("testapp.Publisher")),
     ])
-    author_with_m2m_blank = ModelState("testapp", "Author", [
+    author_with_m2m_null = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
-        ("publishers", models.ManyToManyField("testapp.Publisher", blank=True)),
+        ("publishers", models.ManyToManyField("testapp.Publisher", null=True)),
     ])
     author_with_m2m_through = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
@@ -719,6 +735,30 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["AlterField"])
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="name", preserve_default=True)
+
+    def test_alter_field_trivial_help_text(self):
+        """Tests autodetection of new fields."""
+        changes = self.get_changes([self.author_name_null], [self.author_name_help_text])
+        # Right number/type of migrations?
+        self.assertEqual(len(changes), 0)
+
+    def test_alter_field_trivial_verbose(self):
+        """Tests autodetection of new fields."""
+        changes = self.get_changes([self.author_name_null], [self.author_name_verbose])
+        # Right number/type of migrations?
+        self.assertEqual(len(changes), 0)
+
+    def test_alter_field_trivial_blank(self):
+        """Tests autodetection of new fields."""
+        changes = self.get_changes([self.author_name_null], [self.author_name_blank])
+        # Right number/type of migrations?
+        self.assertEqual(len(changes), 0)
+
+    def test_alter_field_trivial_editable(self):
+        """Tests autodetection of new fields."""
+        changes = self.get_changes([self.author_name_null], [self.author_name_editable])
+        # Right number/type of migrations?
+        self.assertEqual(len(changes), 0)
 
     def test_supports_functools_partial(self):
         def _content_file_name(instance, filename, key, **kwargs):
@@ -1851,7 +1891,7 @@ class AutodetectorTests(TestCase):
 
     def test_alter_many_to_many(self):
         changes = self.get_changes(
-            [self.author_with_m2m, self.publisher], [self.author_with_m2m_blank, self.publisher]
+            [self.author_with_m2m, self.publisher], [self.author_with_m2m_null, self.publisher]
         )
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
