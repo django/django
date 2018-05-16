@@ -107,6 +107,12 @@ setup(
         'Topic :: Software Development :: Libraries :: Application Frameworks',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
+    project_urls={
+        'Documentation': 'https://docs.djangoproject.com/',
+        'Funding': 'https://www.djangoproject.com/fundraising/',
+        'Source': 'https://github.com/django/django',
+        'Tracker': 'https://code.djangoproject.com/',
+    },
 )
 
 
