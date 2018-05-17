@@ -240,8 +240,6 @@ compare against Django's default settings.
 
 .. django-admin-option:: --output {hash,unified}
 
-.. versionadded:: 2.0
-
 Specifies the output format. Available values are ``hash`` and ``unified``.
 ``hash`` is the default mode that displays the output that's described above.
 ``unified`` displays the output similar to ``diff -u``. Default settings are
@@ -437,8 +435,6 @@ Specifies a single app to look for fixtures in rather than looking in all apps.
 
 .. django-admin-option:: --format FORMAT
 
-.. versionadded:: 2.0
-
 Specifies the :ref:`serialization format <serialization-formats>` (e.g.,
 ``json`` or ``xml``) for fixtures :ref:`read from stdin
 <loading-fixtures-stdin>`.
@@ -582,8 +578,6 @@ specify you want to load data into the ``master`` database.
 Loading fixtures from ``stdin``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 2.0
-
 You can use a dash as the fixture name to load input from ``sys.stdin``. For
 example::
 
@@ -694,8 +688,6 @@ Using this option makes it harder for technically skilled translators to
 understand each message's context.
 
 .. django-admin-option:: --add-location [{full,file,never}]
-
-.. versionadded:: 2.0
 
 Controls ``#: filename:line`` comment lines in language files. If the option
 is:
@@ -1129,8 +1121,6 @@ behavior, as optimization is meant to be safe.
 Suppresses all user prompts.
 
 .. django-admin-option:: --squashed-name SQUASHED_NAME
-
-.. versionadded:: 2.0
 
 Sets the name of the squashed migration. When omitted, the name is based on the
 first and last migration, with ``_squashed_`` in between.

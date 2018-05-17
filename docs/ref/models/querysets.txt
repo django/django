@@ -712,10 +712,6 @@ not having any author::
     >>> Entry.objects.values_list('authors')
     <QuerySet [('Noam Chomsky',), ('George Orwell',), (None,)]>
 
-.. versionchanged:: 2.0
-
-    The ``named`` parameter was added.
-
 ``dates()``
 ~~~~~~~~~~~
 
@@ -1737,10 +1733,6 @@ raised if ``select_for_update()`` is used in autocommit mode.
     PostgreSQL doesn't support ``select_for_update()`` with
     :class:`~django.db.models.expressions.Window` expressions.
 
-.. versionchanged:: 2.0
-
-    The ``of`` argument was added.
-
 ``raw()``
 ~~~~~~~~~
 
@@ -2099,10 +2091,6 @@ Example::
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
 
-.. versionchanged:: 2.0
-
-    The ``field_name`` parameter was added.
-
 ``iterator()``
 ~~~~~~~~~~~~~~
 
@@ -2167,10 +2155,6 @@ psycopg mailing list <https://www.postgresql.org/message-id/4D2F2C71.8080805%40d
     between the number of rows transferred and the data discarded if the loop
     is exited early.
 
-.. versionchanged:: 2.0
-
-    The ``chunk_size`` parameter was added.
-
 ``latest()``
 ~~~~~~~~~~~~
 
@@ -2204,10 +2188,6 @@ given parameters.
 
 Note that ``earliest()`` and ``latest()`` exist purely for convenience and
 readability.
-
-.. versionchanged:: 2.0
-
-    Support for several arguments was added.
 
 .. admonition:: ``earliest()`` and ``latest()`` may return instances with null dates.
 
@@ -2988,8 +2968,6 @@ in the database <database-time-zone-definitions>`.
 ``quarter``
 ~~~~~~~~~~~
 
-.. versionadded:: 2.0
-
 For date and datetime fields, a 'quarter of the year' match. Allows chaining
 additional field lookups. Takes an integer value between 1 and 4 representing
 the quarter of the year.
@@ -3216,8 +3194,6 @@ of the return value
 ``filter``
 ~~~~~~~~~~
 
-.. versionadded:: 2.0
-
 An optional :class:`Q object <django.db.models.Q>` that's used to filter the
 rows that are aggregated.
 
@@ -3427,8 +3403,6 @@ lookups or :class:`Prefetch` objects you want to prefetch for. For example::
 
 ``FilteredRelation()`` objects
 ------------------------------
-
-.. versionadded:: 2.0
 
 .. class:: FilteredRelation(relation_name, *, condition=Q())
 

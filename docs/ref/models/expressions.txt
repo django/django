@@ -388,8 +388,6 @@ The ``Aggregate`` API is as follows:
 
     .. attribute:: window_compatible
 
-        .. versionadded:: 2.0
-
         Defaults to ``True`` since most aggregate functions can be used as the
         source expression in :class:`~django.db.models.expressions.Window`.
 
@@ -416,10 +414,6 @@ and :ref:`filtering-on-annotations` for example usage.
 
 The ``**extra`` kwargs are ``key=value`` pairs that can be interpolated
 into the ``template`` attribute.
-
-.. versionchanged:: 2.0
-
-    The ``filter`` argument was added.
 
 Creating your own Aggregate Functions
 -------------------------------------
@@ -694,8 +688,6 @@ should avoid them if possible.
 Window functions
 ----------------
 
-.. versionadded:: 2.0
-
 Window functions provide a way to apply functions on partitions. Unlike a
 normal aggregation function which computes a final result for each set defined
 by the group by, window functions operate on :ref:`frames <window-frames>` and
@@ -902,8 +894,6 @@ calling the appropriate methods on the wrapped expression.
 
     .. attribute:: contains_over_clause
 
-        .. versionadded:: 2.0
-
         Tells Django that this expression contains a
         :class:`~django.db.models.expressions.Window` expression. It's used,
         for example, to disallow window function expressions in queries that
@@ -911,14 +901,10 @@ calling the appropriate methods on the wrapped expression.
 
     .. attribute:: filterable
 
-        .. versionadded:: 2.0
-
         Tells Django that this expression can be referenced in
         :meth:`.QuerySet.filter`. Defaults to ``True``.
 
     .. attribute:: window_compatible
-
-        .. versionadded:: 2.0
 
         Tells Django that this expression can be used as the source expression
         in :class:`~django.db.models.expressions.Window`. Defaults to

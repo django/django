@@ -2,8 +2,6 @@
 Database instrumentation
 ========================
 
-.. versionadded:: 2.0
-
 To help you understand and control the queries issued by your code, Django
 provides a hook for installing wrapper functions around the execution of
 database queries. For example, wrappers can count queries, measure query

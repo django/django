@@ -1102,8 +1102,6 @@ subclass::
 
 .. attribute:: ModelAdmin.autocomplete_fields
 
-    .. versionadded:: 2.0
-
     ``autocomplete_fields`` is a list of ``ForeignKey`` and/or
     ``ManyToManyField`` fields you would like to change to `Select2
     <https://select2.org/>`_ autocomplete inputs.
@@ -1524,8 +1522,6 @@ templates used by the :class:`ModelAdmin` views:
     that at this point the parent object and its form have already been saved.
 
 .. method:: ModelAdmin.get_autocomplete_fields(request)
-
-    .. versionadded:: 2.0
 
     The ``get_autocomplete_fields()`` method is given the ``HttpRequest`` and is
     expected to return a ``list`` or ``tuple`` of field names that will be

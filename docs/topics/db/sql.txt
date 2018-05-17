@@ -372,7 +372,3 @@ Calling stored procedures
 
         with connection.cursor() as cursor:
             cursor.callproc('test_procedure', [1, 'test'])
-
-    .. versionchanged:: 2.0
-
-        The ``kparams`` argument was added.

@@ -1160,12 +1160,6 @@ blue.
         >>> rst.name  # Stored in a random path in the vsimem filesystem.
         '/vsimem/da300bdb-129d-49a8-b336-e410a9428dad'
 
-    .. versionchanged:: 2.0
-
-       Added the ability to read and write rasters in GDAL's memory-based
-       virtual filesystem. ``GDALRaster`` objects can now be converted to and
-       from binary data in-memory.
-
     .. attribute:: name
 
         The name of the source which is equivalent to the input file path or the name
@@ -1406,16 +1400,12 @@ blue.
 
     .. attribute:: info
 
-        .. versionadded:: 2.0
-
         Returns a string with a summary of the raster. This is equivalent to
         the `gdalinfo`__ command line utility.
 
         __ http://www.gdal.org/gdalinfo.html
 
     .. attribute:: metadata
-
-        .. versionadded:: 2.0
 
         The metadata of this raster, represented as a nested dictionary. The
         first-level key is the metadata domain. The second-level contains the
@@ -1440,14 +1430,10 @@ blue.
 
     .. attribute:: vsi_buffer
 
-       .. versionadded:: 2.0
-
         A ``bytes`` representation of this raster. Returns ``None`` for rasters
         that are not stored in GDAL's virtual filesystem.
 
     .. attribute:: is_vsi_based
-
-       .. versionadded:: 2.0
 
         A boolean indicating if this raster is stored in GDAL's virtual
         filesystem.
@@ -1542,8 +1528,6 @@ blue.
 
     .. method:: color_interp(as_string=False)
 
-        .. versionadded:: 2.0
-
         The color interpretation for the band, as an integer between 0and 16.
         If ``as_string`` is ``True``, the data type is returned as a string
         with the following possible values:
@@ -1617,8 +1601,6 @@ blue.
                    [3, 3, 3, 3]], dtype=uint8)
 
     .. attribute:: metadata
-
-        .. versionadded:: 2.0
 
         The metadata of this band. The functionality is identical to
         :attr:`GDALRaster.metadata`.
@@ -1720,8 +1702,6 @@ Key               Default  Usage
     data" value is set to ``None``.
 
 .. object:: papsz_options
-
-    .. versionadded:: 2.0
 
     A dictionary with raster creation options. The key-value pairs of the
     input dictionary are passed to the driver on creation of the raster.

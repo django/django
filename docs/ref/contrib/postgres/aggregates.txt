@@ -28,8 +28,6 @@ General-purpose aggregation functions
 
     .. attribute:: distinct
 
-        .. versionadded:: 2.0
-
         An optional boolean argument that determines if array values
         will be distinct. Defaults to ``False``.
 

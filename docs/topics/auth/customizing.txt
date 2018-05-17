@@ -628,12 +628,6 @@ password resets. You must then provide some key implementation details:
         first name. If implemented, this replaces the username in the greeting
         to the user in the header of :mod:`django.contrib.admin`.
 
-    .. versionchanged:: 2.0
-
-        In older versions, subclasses are required to implement
-        ``get_short_name()`` and ``get_full_name()`` as ``AbstractBaseUser``
-        has implementations that raise ``NotImplementedError``.
-
     .. admonition:: Importing ``AbstractBaseUser``
 
         ``AbstractBaseUser`` and ``BaseUserManager`` are importable from

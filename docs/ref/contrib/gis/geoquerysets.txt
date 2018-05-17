@@ -322,10 +322,6 @@ MySQL, PostGIS, SpatiaLite  ``ST_IsValid(poly)``
 Oracle                      ``SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT(poly, 0.05) = 'TRUE'``
 ==========================  ================================================================
 
-.. versionchanged:: 2.0
-
-    MySQL support was added.
-
 .. fieldlookup:: overlaps
 
 ``overlaps``
@@ -630,10 +626,6 @@ On PostgreSQL, the ``'spheroid'`` option uses `ST_DistanceSpheroid
 simpler `ST_Distance <https://postgis.net/docs/ST_Distance.html>`__ function is
 used with projected coordinate systems. Rasters are converted to geometries for
 spheroid based lookups.
-
-.. versionadded:: 2.0
-
-    MySQL support was added.
 
 .. fieldlookup:: distance_gt
 

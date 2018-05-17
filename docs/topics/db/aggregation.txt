@@ -368,10 +368,6 @@ Each ``Author`` in the result set will have the ``num_books`` and
     rows. The aggregation ``filter`` argument is only useful when using two or
     more aggregations over the same relations with different conditionals.
 
-.. versionchanged:: 2.0
-
-    The ``filter`` argument was added to aggregates.
-
 Order of ``annotate()`` and ``filter()`` clauses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

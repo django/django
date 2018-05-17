@@ -335,12 +335,6 @@ For example::
 Combining ``Media`` objects with assets in a conflicting order results in a
 ``MediaOrderConflictWarning``.
 
-.. versionchanged:: 2.0
-
-    In older versions, the assets of ``Media`` objects are concatenated rather
-    than merged in a way that tries to preserve the relative ordering of the
-    elements in each list.
-
 ``Media`` on Forms
 ==================
 

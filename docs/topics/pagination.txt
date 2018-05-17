@@ -176,8 +176,6 @@ Methods
 
 .. method:: Paginator.get_page(number)
 
-    .. versionadded:: 2.0
-
     Returns a :class:`Page` object with the given 1-based index, while also
     handling out of range and invalid page numbers.
 

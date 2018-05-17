@@ -82,10 +82,6 @@ Keyword Argument       Description
                        representation -- the default value is 8.
 =====================  =====================================================
 
-.. versionchanged:: 2.0
-
-    MySQL support was added.
-
 ``AsGML``
 =========
 
@@ -171,8 +167,6 @@ __ https://www.w3.org/Graphics/SVG/
 ===========
 
 .. class:: Azimuth(point_a, point_b, **extra)
-
-.. versionadded:: 2.0
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_Azimuth.html>`__,
 SpatiaLite (LWGEOM)
@@ -323,10 +317,6 @@ representation of the geometry.
 The ``precision`` keyword argument controls the number of characters in the
 result.
 
-.. versionchanged:: 2.0
-
-    MySQL support was added.
-
 __ https://en.wikipedia.org/wiki/Geohash
 
 ``Intersection``
@@ -353,10 +343,6 @@ intersection between them.
 Accepts a geographic field or expression and tests if the value is well formed.
 Returns ``True`` if its value is a valid geometry and ``False`` otherwise.
 
-.. versionchanged:: 2.0
-
-    MySQL support was added.
-
 ``Length``
 ==========
 
@@ -381,8 +367,6 @@ MySQL doesn't support length calculations on geographic SRSes.
 ===================
 
 .. class:: LineLocatePoint(linestring, point, **extra)
-
-.. versionadded:: 2.0
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_LineLocatePoint.html>`__,
 SpatiaLite

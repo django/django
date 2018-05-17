@@ -58,8 +58,6 @@ than 30 characters and shouldn't start with a number (0-9) or underscore (_).
 
 .. attribute:: Index.db_tablespace
 
-.. versionadded:: 2.0
-
 The name of the :doc:`database tablespace </topics/db/tablespaces>` to use for
 this index. For single field indexes, if ``db_tablespace`` isn't provided, the
 index is created in the ``db_tablespace`` of the field.

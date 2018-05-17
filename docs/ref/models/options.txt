@@ -147,10 +147,6 @@ Django quotes column and table names behind the scenes.
 
     See the :meth:`~django.db.models.query.QuerySet.latest` docs for more.
 
-    .. versionchanged:: 2.0
-
-        Support for a list of fields was added.
-
 ``managed``
 -----------
 
@@ -290,10 +286,6 @@ Django quotes column and table names behind the scenes.
 
     Default ordering also affects :ref:`aggregation queries
     <aggregation-ordering-interaction>`.
-
-    .. versionchanged:: 2.0
-
-        Support for query expressions was added.
 
 .. warning::
 

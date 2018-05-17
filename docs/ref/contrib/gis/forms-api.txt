@@ -179,8 +179,6 @@ Widget classes
 
     .. attribute:: default_zoom
 
-        .. versionadded:: 2.0
-
         The default map zoom is ``12``.
 
     The :class:`OpenLayersWidget` note about JavaScript file hosting above also

@@ -58,10 +58,6 @@ The ``File`` class
 
         It can be used as a context manager, e.g. ``with file.open() as f:``.
 
-        .. versionchanged:: 2.0
-
-            Context manager support was added.
-
     .. method:: __iter__()
 
         Iterate over the file yielding one line at a time.

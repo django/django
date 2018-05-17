@@ -306,8 +306,6 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 .. class:: ProhibitNullCharactersValidator(message=None, code=None)
 
-    .. versionadded:: 2.0
-
     Raises a :exc:`~django.core.exceptions.ValidationError` if ``str(value)``
     contains one or more nulls characters (``'\x00'``).
 
