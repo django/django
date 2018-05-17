@@ -51,6 +51,8 @@ def mock_inputs(inputs):
                 assert '__proxy__' not in prompt
                 response = None
                 for key, val in inputs.items():
+                    if val == 'KeyboardInterrupt':
+                        raise KeyboardInterrupt
                     # get() fallback because sometimes 'key' is the actual
                     # prompt rather than a shortcut name.
                     prompt_msgs = MOCK_INPUT_KEY_TO_PROMPTS.get(key, key)
@@ -625,6 +627,19 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             )
 
         test(self)
+
+    @mock_inputs({'username': 'KeyboardInterrupt'})
+    def test_keyboard_interrupt(self):
+        new_io = StringIO()
+        with self.assertRaises(SystemExit):
+            call_command(
+                'createsuperuser',
+                interactive=True,
+                stdin=MockTTY(),
+                stdout=new_io,
+                stderr=new_io,
+            )
+        self.assertEqual(new_io.getvalue(), '\nOperation cancelled.\n')
 
     def test_existing_username(self):
         """Creation fails if the username already exists."""
