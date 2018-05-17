@@ -275,6 +275,12 @@ Requests and Responses
   wants to download the file. ``FileResponse`` also tries to set the
   ``Content-Type`` and ``Content-Length`` headers where appropriate.
 
+Security
+~~~~~~~~
+
+* :class:`~django.middleware.security.SecurityMiddleware` can now send
+  :ref:`the Referrer-Policy header <referrer-policy>`.
+
 Serialization
 ~~~~~~~~~~~~~
 
