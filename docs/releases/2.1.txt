@@ -82,11 +82,6 @@ Minor features
 * :meth:`.InlineModelAdmin.has_add_permission` is now passed the parent object
   as the second positional argument, ``obj``.
 
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -96,11 +91,6 @@ Minor features
 * :class:`~django.contrib.auth.forms.UserCreationForm` and
   :class:`~django.contrib.auth.forms.UserChangeForm` no longer need to be
   rewritten for a custom user model.
-
-:mod:`django.contrib.contenttypes`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -112,46 +102,11 @@ Minor features
 * :class:`~django.contrib.gis.forms.widgets.OpenLayersWidget` is now based on
   OpenLayers 4.6.5 (previously 3.20.1).
 
-:mod:`django.contrib.messages`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.postgres`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Added the :setting:`SESSION_COOKIE_SAMESITE` setting to set the ``SameSite``
   cookie flag on session cookies.
-
-:mod:`django.contrib.sitemaps`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sites`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.staticfiles`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.syndication`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 Cache
 ~~~~~
@@ -168,37 +123,11 @@ CSRF
 * Added the :setting:`CSRF_COOKIE_SAMESITE` setting to set the ``SameSite``
   cookie flag on CSRF cookies.
 
-Database backends
-~~~~~~~~~~~~~~~~~
-
-* ...
-
-Email
-~~~~~
-
-* ...
-
-File Storage
-~~~~~~~~~~~~
-
-* ...
-
-File Uploads
-~~~~~~~~~~~~
-
-* ...
-
-
 Forms
 ~~~~~
 
 * The widget for ``ImageField`` now renders with the HTML attribute
   ``accept="image/*"``.
-
-Generic Views
-~~~~~~~~~~~~~
-
-* ...
 
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
@@ -275,16 +204,6 @@ Requests and Responses
   wants to download the file. ``FileResponse`` also tries to set the
   ``Content-Type`` and ``Content-Length`` headers where appropriate.
 
-Serialization
-~~~~~~~~~~~~~
-
-* ...
-
-Signals
-~~~~~~~
-
-* ...
-
 Templates
 ~~~~~~~~~
 
@@ -302,16 +221,6 @@ Tests
 
 * The new :meth:`.SimpleTestCase.assertWarnsMessage` method is a simpler
   version of :meth:`~unittest.TestCase.assertWarnsRegex`.
-
-URLs
-~~~~
-
-* ...
-
-Validators
-~~~~~~~~~~
-
-* ...
 
 .. _backwards-incompatible-2.1:
 
@@ -507,8 +416,6 @@ Features removed in 2.1
 These features have reached the end of their deprecation cycle and are removed
 in Django 2.1. See :ref:`deprecated-features-1.11` for details, including how
 to remove usage of these features.
-in Django 2.1. See :ref:`deprecated-features-1.11` and for details, including
-how to remove usage of these features.
 
 * ``contrib.auth.views.login()``, ``logout()``, ``password_change()``,
   ``password_change_done()``, ``password_reset()``, ``password_reset_done()``,
