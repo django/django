@@ -31,7 +31,7 @@ Model "view" permission
 
 A "view" permission is added to the model :attr:`Meta.default_permissions
 <django.db.models.Options.default_permissions>`. The new permissions will be
-create automatically when running :djadmin:`migrate`.
+created automatically when running :djadmin:`migrate`.
 
 This allows giving users read-only access to models in the admin.
 :meth:`.ModelAdmin.has_view_permission` is new. The implementation is backwards
