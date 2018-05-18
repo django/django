@@ -244,9 +244,10 @@ class InlineAdminFormSet:
         self.has_view_permission = has_view_permission
 
     def __iter__(self):
-        readonly_fields_for_editing = self.readonly_fields
-        if not self.has_change_permission:
-            readonly_fields_for_editing += flatten_fieldsets(self.fieldsets)
+        if self.has_change_permission:
+            readonly_fields_for_editing = self.readonly_fields
+        else:
+            readonly_fields_for_editing = self.readonly_fields + flatten_fieldsets(self.fieldsets)
 
         for form, original in zip(self.formset.initial_forms, self.formset.get_queryset()):
             view_on_site_url = self.opts.get_view_on_site_url(original)
