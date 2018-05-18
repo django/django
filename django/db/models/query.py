@@ -478,14 +478,14 @@ class QuerySet:
         Return a tuple of (object, created), where created is a boolean
         specifying whether an object was created.
         """
-        lookup, params = self._extract_model_params(defaults, **kwargs)
         # The get() needs to be targeted at the write database in order
         # to avoid potential transaction consistency problems.
         self._for_write = True
         try:
-            return self.get(**lookup), False
+            return self.get(**kwargs), False
         except self.model.DoesNotExist:
-            return self._create_object_from_params(lookup, params)
+            params = self._extract_model_params(defaults, **kwargs)
+            return self._create_object_from_params(kwargs, params)
 
     def update_or_create(self, defaults=None, **kwargs):
         """
@@ -495,13 +495,13 @@ class QuerySet:
         specifying whether an object was created.
         """
         defaults = defaults or {}
-        lookup, params = self._extract_model_params(defaults, **kwargs)
         self._for_write = True
         with transaction.atomic(using=self.db):
             try:
-                obj = self.select_for_update().get(**lookup)
+                obj = self.select_for_update().get(**kwargs)
             except self.model.DoesNotExist:
-                obj, created = self._create_object_from_params(lookup, params)
+                params = self._extract_model_params(defaults, **kwargs)
+                obj, created = self._create_object_from_params(kwargs, params)
                 if created:
                     return obj, created
             for k, v in defaults.items():
@@ -528,15 +528,10 @@ class QuerySet:
 
     def _extract_model_params(self, defaults, **kwargs):
         """
-        Prepare `lookup` (kwargs that are valid model attributes), `params`
-        (for creating a model instance) based on given kwargs; for use by
-        get_or_create() and update_or_create().
+        Prepare `params` for creating a model instance based on the given
+        kwargs; for use by get_or_create() and update_or_create().
         """
         defaults = defaults or {}
-        lookup = kwargs.copy()
-        for f in self.model._meta.fields:
-            if f.attname in lookup:
-                lookup[f.name] = lookup.pop(f.attname)
         params = {k: v for k, v in kwargs.items() if LOOKUP_SEP not in k}
         params.update(defaults)
         property_names = self.model._meta._property_names
@@ -554,7 +549,7 @@ class QuerySet:
                     self.model._meta.object_name,
                     "', '".join(sorted(invalid_params)),
                 ))
-        return lookup, params
+        return params
 
     def _earliest_or_latest(self, *fields, field_name=None):
         """

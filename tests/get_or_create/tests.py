@@ -5,9 +5,8 @@ from threading import Thread
 
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, IntegrityError, connection
-from django.test import (
-    SimpleTestCase, TestCase, TransactionTestCase, skipUnlessDBFeature,
-)
+from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.utils.functional import lazy
 
 from .models import (
     Author, Book, DefaultPerson, ManualPrimaryKeyTest, Person, Profile,
@@ -177,6 +176,15 @@ class GetOrCreateTests(TestCase):
             first_name="John", last_name="Lennon",
             defaults={"birthday": lambda: raise_exception()},
         )
+
+    def test_defaults_not_evaluated_unless_needed(self):
+        """`defaults` aren't evaluated if the instance isn't created."""
+        def raise_exception():
+            raise AssertionError
+        obj, created = Person.objects.get_or_create(
+            first_name='John', defaults=lazy(raise_exception, object)(),
+        )
+        self.assertFalse(created)
 
 
 class GetOrCreateTestsWithManualPKs(TestCase):
@@ -443,6 +451,19 @@ class UpdateOrCreateTests(TestCase):
         self.assertIs(created, False)
         self.assertEqual(obj.last_name, 'NotHarrison')
 
+    def test_defaults_not_evaluated_unless_needed(self):
+        """`defaults` aren't evaluated if the instance isn't created."""
+        Person.objects.create(
+            first_name='John', last_name='Lennon', birthday=date(1940, 10, 9)
+        )
+
+        def raise_exception():
+            raise AssertionError
+        obj, created = Person.objects.get_or_create(
+            first_name='John', defaults=lazy(raise_exception, object)(),
+        )
+        self.assertFalse(created)
+
 
 class UpdateOrCreateTestsWithManualPKs(TestCase):
 
@@ -515,15 +536,17 @@ class UpdateOrCreateTransactionTests(TransactionTestCase):
         self.assertEqual(updated_person.last_name, 'NotLennon')
 
 
-class InvalidCreateArgumentsTests(SimpleTestCase):
+class InvalidCreateArgumentsTests(TransactionTestCase):
+    available_apps = ['get_or_create']
     msg = "Invalid field name(s) for model Thing: 'nonexistent'."
+    bad_field_msg = "Cannot resolve keyword 'nonexistent' into field. Choices are: id, name, tags"
 
     def test_get_or_create_with_invalid_defaults(self):
         with self.assertRaisesMessage(FieldError, self.msg):
             Thing.objects.get_or_create(name='a', defaults={'nonexistent': 'b'})
 
     def test_get_or_create_with_invalid_kwargs(self):
-        with self.assertRaisesMessage(FieldError, self.msg):
+        with self.assertRaisesMessage(FieldError, self.bad_field_msg):
             Thing.objects.get_or_create(name='a', nonexistent='b')
 
     def test_update_or_create_with_invalid_defaults(self):
@@ -531,11 +554,11 @@ class InvalidCreateArgumentsTests(SimpleTestCase):
             Thing.objects.update_or_create(name='a', defaults={'nonexistent': 'b'})
 
     def test_update_or_create_with_invalid_kwargs(self):
-        with self.assertRaisesMessage(FieldError, self.msg):
+        with self.assertRaisesMessage(FieldError, self.bad_field_msg):
             Thing.objects.update_or_create(name='a', nonexistent='b')
 
     def test_multiple_invalid_fields(self):
-        with self.assertRaisesMessage(FieldError, "Invalid field name(s) for model Thing: 'invalid', 'nonexistent'"):
+        with self.assertRaisesMessage(FieldError, self.bad_field_msg):
             Thing.objects.update_or_create(name='a', nonexistent='b', defaults={'invalid': 'c'})
 
     def test_property_attribute_without_setter_defaults(self):
@@ -543,5 +566,6 @@ class InvalidCreateArgumentsTests(SimpleTestCase):
             Thing.objects.update_or_create(name='a', defaults={'name_in_all_caps': 'FRANK'})
 
     def test_property_attribute_without_setter_kwargs(self):
-        with self.assertRaisesMessage(FieldError, "Invalid field name(s) for model Thing: 'name_in_all_caps'"):
+        msg = "Cannot resolve keyword 'name_in_all_caps' into field. Choices are: id, name, tags"
+        with self.assertRaisesMessage(FieldError, msg):
             Thing.objects.update_or_create(name_in_all_caps='FRANK', defaults={'name': 'Frank'})
