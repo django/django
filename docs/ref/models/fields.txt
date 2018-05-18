@@ -1257,6 +1257,11 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     Cascade deletes. Django emulates the behavior of the SQL constraint ON
     DELETE CASCADE and also deletes the object containing the ForeignKey.
 
+    :meth:`.Model.delete` isn't called on related models, but the
+    :data:`~django.db.models.signals.pre_delete` and
+    :data:`~django.db.models.signals.post_delete` signals are sent for all
+    deleted objects.
+
 * .. attribute:: PROTECT
 
     Prevent deletion of the referenced object by raising
