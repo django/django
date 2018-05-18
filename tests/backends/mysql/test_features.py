@@ -1,6 +1,7 @@
 from unittest import mock, skipUnless
 
 from django.db import connection
+from django.db.backends.mysql.features import DatabaseFeatures
 from django.test import TestCase
 
 
@@ -17,3 +18,15 @@ class TestFeatures(TestCase):
         with mock.patch('django.db.connection.features._mysql_storage_engine', 'MyISAM'):
             self.assertFalse(connection.features.supports_transactions)
         del connection.features.supports_transactions
+
+    def test_skip_locked_no_wait(self):
+        with mock.MagicMock() as _connection:
+            _connection.mysql_version = (8, 0, 1)
+            database_features = DatabaseFeatures(_connection)
+            self.assertTrue(database_features.has_select_for_update_skip_locked)
+            self.assertTrue(database_features.has_select_for_update_nowait)
+        with mock.MagicMock() as _connection:
+            _connection.mysql_version = (8, 0, 0)
+            database_features = DatabaseFeatures(_connection)
+            self.assertFalse(database_features.has_select_for_update_skip_locked)
+            self.assertFalse(database_features.has_select_for_update_nowait)

@@ -10,7 +10,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     # MySQL doesn't support sliced subqueries with IN/ALL/ANY/SOME.
     allow_sliced_subqueries_with_in = False
     has_select_for_update = True
-    has_select_for_update_nowait = False
     supports_forward_references = False
     supports_regex_backreferencing = False
     supports_date_lookup_using_string = False
@@ -82,6 +81,12 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def supports_over_clause(self):
         return self.connection.mysql_version >= (8, 0, 2)
+
+    @cached_property
+    def has_select_for_update_skip_locked(self):
+        return self.connection.mysql_version >= (8, 0, 1)
+
+    has_select_for_update_nowait = has_select_for_update_skip_locked
 
     @cached_property
     def needs_explain_extended(self):
