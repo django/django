@@ -16,6 +16,7 @@ from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.loader import AmbiguityError
 from django.db.migrations.state import ModelState, ProjectState
 from django.utils.module_loading import module_has_submodule
+from django.utils.text import Truncator
 
 
 class Command(BaseCommand):
@@ -49,6 +50,10 @@ class Command(BaseCommand):
             help='Detect if tables already exist and fake-apply initial migrations if so. Make sure '
                  'that the current database schema matches your initial migration before using this '
                  'flag. Django will only check for an existing table name.',
+        )
+        parser.add_argument(
+            '--plan', action='store_true',
+            help='Shows a list of the migration actions that will be performed.',
         )
         parser.add_argument(
             '--run-syncdb', action='store_true',
@@ -134,8 +139,20 @@ class Command(BaseCommand):
             targets = executor.loader.graph.leaf_nodes()
 
         plan = executor.migration_plan(targets)
-        run_syncdb = options['run_syncdb'] and executor.loader.unmigrated_apps
 
+        if options['plan']:
+            self.stdout.write('Planned operations:', self.style.MIGRATE_LABEL)
+            if not plan:
+                self.stdout.write('  No planned migration operations.')
+            for migration, backwards in plan:
+                self.stdout.write(str(migration), self.style.MIGRATE_HEADING)
+                for operation in migration.operations:
+                    message, is_error = self.describe_operation(operation, backwards)
+                    style = self.style.WARNING if is_error else None
+                    self.stdout.write('    ' + message, style)
+            return
+
+        run_syncdb = options['run_syncdb'] and executor.loader.unmigrated_apps
         # Print some useful info
         if self.verbosity >= 1:
             self.stdout.write(self.style.MIGRATE_HEADING("Operations to perform:"))
@@ -309,3 +326,27 @@ class Command(BaseCommand):
             # Deferred SQL is executed when exiting the editor's context.
             if self.verbosity >= 1:
                 self.stdout.write("    Running deferred SQL...\n")
+
+    @staticmethod
+    def describe_operation(operation, backwards):
+        """Return a string that describes a migration operation for --plan."""
+        prefix = ''
+        if hasattr(operation, 'code'):
+            code = operation.reverse_code if backwards else operation.code
+            action = code.__doc__ if code else ''
+        elif hasattr(operation, 'sql'):
+            action = operation.reverse_sql if backwards else operation.sql
+        else:
+            action = ''
+            if backwards:
+                prefix = 'Undo '
+        if action is None:
+            action = 'IRREVERSIBLE'
+            is_error = True
+        else:
+            action = action.replace('\n', '')
+            is_error = False
+        if action:
+            action = ' -> ' + action
+        truncated = Truncator(action)
+        return prefix + operation.describe() + truncated.chars(40), is_error
