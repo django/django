@@ -324,6 +324,12 @@ If you have a custom permission with a codename of the form
 allow view access to the changelist and detail pages for those models. If this
 is unwanted, you must change your custom permission codename.
 
+``ModelAdmin.get_actions`` requires "change" permission
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:meth:`.ModelAdmin.get_actions` returns empty :class:`~collections.OrderedDict`
+when requests doesn't have `"change"` permission.
+
 Miscellaneous
 -------------
 
