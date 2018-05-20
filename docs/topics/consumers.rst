@@ -318,10 +318,15 @@ primitives to implement a HTTP endpoint::
                 ("Content-Type", "text/plain"),
             ])
 
-You are expected to implement your own ``self.handle`` method. The
+You are expected to implement your own ``handle`` method. The
 method receives the whole request body as a single bytestring.  Headers
 may either be passed as a list of tuples or as a dictionary. The
 response body content is expected to be a bytestring.
+
+You can also implement a ``disconnect`` method if you want to run code on
+disconnect - for example, to shut down any coroutines you launched. This will
+run even on an unclean disconnection, so don't expect that ``handle`` has
+finished running cleanly.
 
 If you need more control over the response, e.g. for implementing long
 polling, use the lower level ``self.send_headers`` and ``self.send_body``

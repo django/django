@@ -14,16 +14,19 @@ class AsyncHttpConsumer(AsyncConsumer):
         """
         self.send = send
         body = []
-        while True:
-            message = await receive()
-            if message["type"] == "http.disconnect":
-                return
-            else:
-                if "body" in message:
-                    body.append(message["body"])
-                if not message.get("more_body"):
-                    await self.handle(b"".join(body))
+        try:
+            while True:
+                message = await receive()
+                if message["type"] == "http.disconnect":
                     return
+                else:
+                    if "body" in message:
+                        body.append(message["body"])
+                    if not message.get("more_body"):
+                        await self.handle(b"".join(body))
+                        return
+        finally:
+            await self.disconnect()
 
     async def send_headers(self, *, status=200, headers=None):
         """
@@ -78,3 +81,10 @@ class AsyncHttpConsumer(AsyncConsumer):
         raise NotImplementedError(
             "Subclasses of AsyncHttpConsumer must provide a handle() method."
         )
+
+    async def disconnect(self):
+        """
+        Overrideable place to run disconnect handling. Do not send anything
+        from here.
+        """
+        pass
