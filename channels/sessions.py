@@ -9,7 +9,10 @@ from django.http import parse_cookie
 from django.http.cookie import SimpleCookie
 from django.utils import timezone
 from django.utils.encoding import force_str
+from django.utils.functional import LazyObject
 from django.utils.http import cookie_date
+
+from channels.db import database_sync_to_async
 
 
 class CookieMiddleware:
@@ -154,19 +157,22 @@ class SessionMiddlewareInstance:
             if "cookies" not in self.scope:
                 raise ValueError("No cookies in scope - SessionMiddleware needs to run inside of CookieMiddleware.")
             # Parse the headers in the scope into cookies
-            session_key = self.scope["cookies"].get(self.middleware.cookie_name)
-            self.scope["session"] = self.middleware.session_store(session_key)
+            self.scope["session"] = LazyObject()
             self.activated = True
         # Instantiate our inner application
         self.inner = self.middleware.inner(self.scope)
 
-    def __call__(self, receive, send):
+    async def __call__(self, receive, send):
         """
         We intercept the send() callable so we can do session saves and
         add session cookie overrides to send back.
         """
+        # Resolve the session now we can do it in a blocking way
+        session_key = self.scope["cookies"].get(self.middleware.cookie_name)
+        self.scope["session"]._wrapped = await database_sync_to_async(self.middleware.session_store)(session_key)
+        # Override send
         self.real_send = send
-        return self.inner(receive, self.send)
+        return await self.inner(receive, self.send)
 
     async def send(self, message):
         """

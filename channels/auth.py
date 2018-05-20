@@ -5,10 +5,11 @@ from django.contrib.auth import (
 )
 from django.contrib.auth.models import AnonymousUser
 from django.utils.crypto import constant_time_compare
+from django.utils.functional import LazyObject
 from django.utils.translation import LANGUAGE_SESSION_KEY
 
-from asgiref.sync import async_to_sync
 from channels.db import database_sync_to_async
+from channels.middleware import BaseMiddleware
 from channels.sessions import CookieMiddleware, SessionMiddleware
 
 
@@ -122,27 +123,24 @@ def _get_user_session_key(session):
     return get_user_model()._meta.pk.to_python(session[SESSION_KEY])
 
 
-class AuthMiddleware:
+class AuthMiddleware(BaseMiddleware):
     """
     Middleware which populates scope["user"] from a Django session.
     Requires SessionMiddleware to function.
     """
 
-    def __init__(self, inner):
-        self.inner = inner
-
-    def __call__(self, scope):
+    def populate_scope(self, scope):
         # Make sure we have a session
         if "session" not in scope:
             raise ValueError("AuthMiddleware cannot find session in scope. SessionMiddleware must be above it.")
         # Add it to the scope if it's not there already
-        scope = dict(scope)
         if "user" not in scope:
             # We can't make this a LazyObject because there's no way to await attribute access,
             # and this is an async function under the hood.
-            scope["user"] = async_to_sync(get_user)(scope)
-        # Pass control to inner application
-        return self.inner(scope)
+            scope["user"] = LazyObject()
+
+    async def resolve_scope(self, scope):
+        scope["user"]._wrapped = await get_user(scope)
 
 
 # Handy shortcut for applying all three layers at once
