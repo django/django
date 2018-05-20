@@ -129,7 +129,13 @@ a warning.
 
 The generic consumers below do this for you, so this is only needed if you
 are writing your own consumer class based on ``AsyncConsumer`` or
-``SyncConsumer``.
+``SyncConsumer``. However, if you override their ``__call__`` method, or
+block the handling methods that it calls from returning, you may still run into
+this; take a look at their source code if you want more information.
+
+Additionally, if you launch your own background coroutines, make sure to also
+shut them down when the connection is finished, or you'll leak coroutines into
+the server.
 
 
 Channel Layers
