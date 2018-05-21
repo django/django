@@ -4,7 +4,7 @@ be executed through ``django-admin`` or ``manage.py``).
 """
 import os
 import sys
-from argparse import ArgumentParser
+from argparse import ArgumentParser, HelpFormatter
 from io import TextIOBase
 
 import django
@@ -86,6 +86,29 @@ def no_translations(handle_func):
                 translation.activate(saved_locale)
         return res
     return wrapped
+
+
+class DjangoHelpFormatter(HelpFormatter):
+    """
+    Customized formatter so that command-specific arguments appear in the
+    --help output before arguments common to all commands.
+    """
+    show_last = {
+        '--version', '--verbosity', '--traceback', '--settings', '--pythonpath',
+        '--no-color',
+    }
+
+    def _reordered_actions(self, actions):
+        return sorted(
+            actions,
+            key=lambda a: set(a.option_strings) & self.show_last != set()
+        )
+
+    def add_usage(self, usage, actions, *args, **kwargs):
+        super().add_usage(usage, self._reordered_actions(actions), *args, **kwargs)
+
+    def add_arguments(self, actions):
+        super().add_arguments(self._reordered_actions(actions))
 
 
 class OutputWrapper(TextIOBase):
@@ -229,12 +252,10 @@ class BaseCommand:
         parser = CommandParser(
             prog='%s %s' % (os.path.basename(prog_name), subcommand),
             description=self.help or None,
+            formatter_class=DjangoHelpFormatter,
             missing_args_message=getattr(self, 'missing_args_message', None),
             called_from_command_line=getattr(self, '_called_from_command_line', None),
         )
-        # Add command-specific arguments first so that they appear in the
-        # --help output before arguments common to all commands.
-        self.add_arguments(parser)
         parser.add_argument('--version', action='version', version=self.get_version())
         parser.add_argument(
             '-v', '--verbosity', action='store', dest='verbosity', default=1,
@@ -258,6 +279,7 @@ class BaseCommand:
             '--no-color', action='store_true', dest='no_color',
             help="Don't colorize the command output.",
         )
+        self.add_arguments(parser)
         return parser
 
     def add_arguments(self, parser):
