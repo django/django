@@ -6,12 +6,15 @@ from unittest import mock
 
 from django.conf import ENVIRONMENT_VARIABLE, LazySettings, Settings, settings
 from django.core.exceptions import ImproperlyConfigured
+from django.db import connections
 from django.http import HttpRequest
 from django.test import (
     SimpleTestCase, TestCase, TransactionTestCase, modify_settings,
     override_settings, signals,
 )
 from django.test.utils import requires_tz_support
+
+from .models import Simple
 
 
 @modify_settings(ITEMS={
@@ -453,3 +456,29 @@ class TestListSettings(unittest.TestCase):
             finally:
                 del sys.modules['fake_settings_module']
                 delattr(settings_module, setting)
+
+
+class TestDatabaseMirror(TestCase):
+
+    def test_without_mirror(self):
+        Simple.objects.using('default').create()
+        Simple.objects.using('other').create()
+
+        self.assertEqual(Simple.objects.count(), 1)
+
+    def test_with_mirror(self):
+        """
+        Overriding the DATABASES settings is not recommended. So we just patch the connections object according to
+        the expected behavior verified by test_runner.tests.TestDatabaseMirror
+        """
+
+        new_connections = {
+            'default': connections['default'],
+            'other': connections['default']
+        }
+
+        with mock.patch.dict(connections, new_connections):
+            Simple.objects.using('default').create()
+            Simple.objects.using('other').create()
+
+            self.assertEqual(Simple.objects.count(), 2)

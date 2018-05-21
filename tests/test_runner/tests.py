@@ -359,3 +359,22 @@ class EmptyDefaultDatabaseTest(unittest.TestCase):
         connection = testcases.connections[db.utils.DEFAULT_DB_ALIAS]
         self.assertEqual(connection.settings_dict['ENGINE'], 'django.db.backends.dummy')
         connections_support_transactions()
+
+
+class TestDatabaseMirror(unittest.TestCase):
+    def test_mirror_database_uses_the_same_connection_as_the_base_one(self):
+        tested_connections = db.ConnectionHandler({
+            'default': {
+                'NAME': 'dummy'
+            },
+            'mirror': {
+                'NAME': 'dummy',
+                'TEST': {
+                    'MIRROR': 'default'
+                }
+            }
+        })
+
+        with mock.patch('django.test.utils.connections', new=tested_connections):
+            DiscoverRunner(verbosity=0).setup_databases()
+            self.assertEqual(tested_connections['default'], tested_connections['mirror'])
