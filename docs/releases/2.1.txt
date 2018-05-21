@@ -145,6 +145,11 @@ Management Commands
 * The new :option:`inspectdb --include-views` option allows creating models
   for database views.
 
+* The :class:`~django.core.management.BaseCommand` class now uses a custom help
+  formatter so that the standard options like ``--verbosity`` or ``--settings``
+  appear last in the help output, giving a more prominent position to subclassed
+  command's options.
+
 Migrations
 ~~~~~~~~~~
 
