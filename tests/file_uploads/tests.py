@@ -10,7 +10,9 @@ from urllib.parse import quote
 
 from django.core.files import temp as tempfile
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.http.multipartparser import MultiPartParser, parse_header
+from django.http.multipartparser import (
+    MultiPartParser, MultiPartParserError, parse_header,
+)
 from django.test import SimpleTestCase, TestCase, client, override_settings
 
 from . import uploadhandler
@@ -558,7 +560,7 @@ class DirectoryCreationTests(SimpleTestCase):
         self.assertEqual(exc_info.exception.args[0], "%s exists and is not a directory." % UPLOAD_TO)
 
 
-class MultiParserTests(unittest.TestCase):
+class MultiParserTests(SimpleTestCase):
 
     def test_empty_upload_handlers(self):
         # We're not actually parsing here; just checking if the parser properly
@@ -567,6 +569,27 @@ class MultiParserTests(unittest.TestCase):
             'CONTENT_TYPE': 'multipart/form-data; boundary=_foo',
             'CONTENT_LENGTH': '1'
         }, StringIO('x'), [], 'utf-8')
+
+    def test_invalid_content_type(self):
+        with self.assertRaisesMessage(MultiPartParserError, 'Invalid Content-Type: text/plain'):
+            MultiPartParser({
+                'CONTENT_TYPE': 'text/plain',
+                'CONTENT_LENGTH': '1',
+            }, StringIO('x'), [], 'utf-8')
+
+    def test_negative_content_length(self):
+        with self.assertRaisesMessage(MultiPartParserError, 'Invalid content length: -1'):
+            MultiPartParser({
+                'CONTENT_TYPE': 'multipart/form-data; boundary=_foo',
+                'CONTENT_LENGTH': -1,
+            }, StringIO('x'), [], 'utf-8')
+
+    def test_bad_type_content_length(self):
+        multipart_parser = MultiPartParser({
+            'CONTENT_TYPE': 'multipart/form-data; boundary=_foo',
+            'CONTENT_LENGTH': 'a',
+        }, StringIO('x'), [], 'utf-8')
+        self.assertEqual(multipart_parser._content_length, 0)
 
     def test_rfc2231_parsing(self):
         test_data = (
