@@ -353,7 +353,7 @@ body.popup .submit-row {
     width: 2.2em;
 }
 
-.vTextField {
+.vTextField, .vUUIDField {
     width: 20em;
 }
 
