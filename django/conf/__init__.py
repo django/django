@@ -56,6 +56,8 @@ class LazySettings(LazyObject):
         if self._wrapped is empty:
             self._setup(name)
         val = getattr(self._wrapped, name)
+        if name == 'SECRET_KEY' and not val:
+            raise ImproperlyConfigured('The SECRET_KEY setting must not be empty.')
         self.__dict__[name] = val
         return val
 
@@ -172,7 +174,13 @@ class UserSettingsHolder:
     def __getattr__(self, name):
         if name in self._deleted:
             raise AttributeError
-        return getattr(self.default_settings, name)
+        try:
+            value = getattr(self.default_settings, name)
+        except AttributeError:
+            if name == 'SECRET_KEY':
+                raise ImproperlyConfigured('The SECRET_KEY setting must be set.')
+            raise
+        return value
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)

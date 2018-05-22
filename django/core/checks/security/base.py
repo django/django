@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 
 from .. import Tags, Warning, register
 
@@ -182,11 +183,16 @@ def check_ssl_redirect(app_configs, **kwargs):
 
 @register(Tags.security, deploy=True)
 def check_secret_key(app_configs, **kwargs):
-    passed_check = (
-        getattr(settings, 'SECRET_KEY', None) and
-        len(set(settings.SECRET_KEY)) >= SECRET_KEY_MIN_UNIQUE_CHARACTERS and
-        len(settings.SECRET_KEY) >= SECRET_KEY_MIN_LENGTH
-    )
+    try:
+        getattr(settings, 'SECRET_KEY')
+    except (AttributeError, ImproperlyConfigured):
+        passed_check = False
+    else:
+        passed_check = (
+            settings.SECRET_KEY and
+            len(set(settings.SECRET_KEY)) >= SECRET_KEY_MIN_UNIQUE_CHARACTERS and
+            len(settings.SECRET_KEY) >= SECRET_KEY_MIN_LENGTH
+        )
     return [] if passed_check else [W009]
 
 
