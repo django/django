@@ -10,7 +10,7 @@ from django.core.management import BaseCommand, CommandError, find_commands
 from django.core.management.utils import find_command, popen_wrapper
 from django.db import connection
 from django.test import SimpleTestCase, override_settings
-from django.test.utils import captured_stderr, extend_sys_path
+from django.test.utils import captured_stderr, captured_stdout, extend_sys_path
 from django.utils import translation
 
 from .management.commands import dance
@@ -204,6 +204,14 @@ class CommandTests(SimpleTestCase):
         management.call_command('required_option', '--need-me=foo', needme2='bar', stdout=out)
         self.assertIn('need_me', out.getvalue())
         self.assertIn('needme2', out.getvalue())
+
+    def test_command_add_arguments_overrides_common_arguments(self):
+        with captured_stdout() as out:
+            try:
+                management.call_command('common_args', '--version')
+            except SystemExit:
+                pass
+        self.assertIn('A.B.C', out.getvalue())
 
     def test_subparser(self):
         out = StringIO()

@@ -4,7 +4,7 @@ be executed through ``django-admin`` or ``manage.py``).
 """
 import os
 import sys
-from argparse import ArgumentParser
+from argparse import ArgumentError, ArgumentParser
 from io import TextIOBase
 
 import django
@@ -235,13 +235,13 @@ class BaseCommand:
         # Add command-specific arguments first so that they appear in the
         # --help output before arguments common to all commands.
         self.add_arguments(parser)
-        parser.add_argument('--version', action='version', version=self.get_version())
-        parser.add_argument(
+        self._try_add_argument(parser, '--version', action='version', version=self.get_version())
+        self._try_add_argument(parser,
             '-v', '--verbosity', action='store', dest='verbosity', default=1,
             type=int, choices=[0, 1, 2, 3],
             help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output',
         )
-        parser.add_argument(
+        self._try_add_argument(parser,
             '--settings',
             help=(
                 'The Python path to a settings module, e.g. '
@@ -249,16 +249,24 @@ class BaseCommand:
                 'DJANGO_SETTINGS_MODULE environment variable will be used.'
             ),
         )
-        parser.add_argument(
+        self._try_add_argument(parser,
             '--pythonpath',
             help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".',
         )
-        parser.add_argument('--traceback', action='store_true', help='Raise on CommandError exceptions')
-        parser.add_argument(
+        self._try_add_argument(parser, '--traceback', action='store_true', help='Raise on CommandError exceptions')
+        self._try_add_argument(parser,
             '--no-color', action='store_true', dest='no_color',
             help="Don't colorize the command output.",
         )
         return parser
+    
+    @staticmethod
+    def _try_add_argument(parser, *args, **kwargs):
+        try:
+            parser.add_argument(*args, **kwargs)
+        except ArgumentError:
+            # Conflicting argument was already added by self.add_arguments(). Leave it.
+            pass
 
     def add_arguments(self, parser):
         """
