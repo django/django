@@ -1592,9 +1592,15 @@ class ModelAdmin(BaseModelAdmin):
         for inline_formset in inline_formsets:
             media = media + inline_formset.media
 
+        if add:
+            title = _('Add %s')
+        elif self.has_change_permission(request, obj):
+            title = _('Change %s')
+        else:
+            title = _('View %s')
         context = {
             **self.admin_site.each_context(request),
-            'title': (_('Add %s') if add else _('Change %s')) % opts.verbose_name,
+            'title': title % opts.verbose_name,
             'adminform': adminForm,
             'object_id': object_id,
             'original': obj,
