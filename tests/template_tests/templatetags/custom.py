@@ -3,6 +3,7 @@ import operator
 from django import template
 from django.template.defaultfilters import stringfilter
 from django.utils.html import escape, format_html
+from django.utils.safestring import mark_safe
 
 register = template.Library()
 
@@ -11,6 +12,13 @@ register = template.Library()
 @stringfilter
 def trim(value, num):
     return value[:num]
+
+
+@register.filter
+@mark_safe
+def make_data_div(value):
+    """A filter that uses a decorator (@mark_safe)."""
+    return '<div data-name="%s"></div>' % value
 
 
 @register.filter
