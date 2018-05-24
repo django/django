@@ -64,7 +64,13 @@ def route_pattern_match(route, path):
     the remaining path and positional and keyword arguments matched.
     """
     if hasattr(route, "pattern"):
-        return route.pattern.match(path)
+        match = route.pattern.match(path)
+        if match:
+            path, args, kwargs = match
+            kwargs.update(route.default_args)
+            return path, args, kwargs
+        return match
+
     # Django<2.0. No converters... :-(
     match = route.regex.search(path)
     if match:
@@ -73,6 +79,8 @@ def route_pattern_match(route, path):
         # positional arguments.
         kwargs = match.groupdict()
         args = () if kwargs else match.groups()
+        if kwargs is not None:
+            kwargs.update(route.default_args)
         return path[match.end():], args, kwargs
     return None
 

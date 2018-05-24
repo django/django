@@ -58,12 +58,14 @@ def test_url_router():
     """
     posarg_app = MagicMock(return_value=4)
     kwarg_app = MagicMock(return_value=5)
+    defaultkwarg_app = MagicMock(return_value=6)
     router = URLRouter([
         url(r"^$", MagicMock(return_value=1)),
         url(r"^foo/$", MagicMock(return_value=2)),
         url(r"^bar", MagicMock(return_value=3)),
         url(r"^posarg/(\d+)/$", posarg_app),
         url(r"^kwarg/(?P<name>\w+)/$", kwarg_app),
+        url(r"^defaultkwargs/$", defaultkwarg_app, kwargs={"default": 42}),
     ])
     # Valid basic matches
     assert router({"type": "http", "path": "/"}) == 1
@@ -80,6 +82,10 @@ def test_url_router():
     assert kwarg_app.call_args[0][0]["url_route"] == {"args": tuple(), "kwargs": {"name": "hello"}}
     assert router({"type": "http", "path": "/kwarg/hellothere/"}) == 5
     assert kwarg_app.call_args[0][0]["url_route"] == {"args": tuple(), "kwargs": {"name": "hellothere"}}
+    # Valid default keyword arguments
+    assert router({"type": "http", "path": "/defaultkwargs/"}) == 6
+    assert defaultkwarg_app.call_args[0][0]["url_route"] == {"args": tuple(), "kwargs": {"default": 42}}
+
     # Invalid matches
     with pytest.raises(ValueError):
         router({"type": "http", "path": "/nonexistent/"})
