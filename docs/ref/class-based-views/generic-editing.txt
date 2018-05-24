@@ -10,6 +10,12 @@ editing content:
 * :class:`django.views.generic.edit.UpdateView`
 * :class:`django.views.generic.edit.DeleteView`
 
+.. seealso::
+
+    The :doc:`messages framework </ref/contrib/messages>` contains
+    :class:`~django.contrib.messages.views.SuccessMessageMixin`, which
+    facilitates presenting messages about successful form submissions.
+
 .. note::
 
     Some of the examples on this page assume that an ``Author`` model has been
