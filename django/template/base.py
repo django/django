@@ -53,7 +53,7 @@ times with multiple contexts)
 import logging
 import re
 from enum import Enum
-from inspect import getcallargs, getfullargspec
+from inspect import getcallargs, getfullargspec, unwrap
 
 from django.template.context import (  # NOQA: imported for backwards compatibility
     BaseContext, Context, ContextPopException, RequestContext,
@@ -707,7 +707,7 @@ class FilterExpression:
         # First argument, filter input, is implied.
         plen = len(provided) + 1
         # Check to see if a decorator is providing the real function.
-        func = getattr(func, '_decorated_function', func)
+        func = unwrap(func)
 
         args, _, _, defaults, _, _, _ = getfullargspec(func)
         alen = len(args)
