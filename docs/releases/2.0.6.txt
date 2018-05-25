@@ -9,4 +9,5 @@ Django 2.0.6 fixes several bugs in 2.0.5.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression that broke custom template filters that use decorators
+  (:ticket:`29400`).
