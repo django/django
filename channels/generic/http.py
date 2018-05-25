@@ -24,7 +24,6 @@ class AsyncHttpConsumer(AsyncConsumer):
                         body.append(message["body"])
                     if not message.get("more_body"):
                         await self.handle(b"".join(body))
-                        return
         finally:
             await self.disconnect()
 
