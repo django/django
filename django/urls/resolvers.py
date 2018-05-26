@@ -69,11 +69,13 @@ def get_resolver(urlconf=None):
 
 
 @functools.lru_cache(maxsize=None)
-def get_ns_resolver(ns_pattern, resolver):
+def get_ns_resolver(ns_pattern, resolver, converters):
     # Build a namespaced resolver for the given parent URLconf pattern.
     # This makes it possible to have captured parameters in the parent
     # URLconf pattern.
-    ns_resolver = URLResolver(RegexPattern(ns_pattern), resolver.url_patterns)
+    pattern = RegexPattern(ns_pattern)
+    pattern.converters = dict(converters)
+    ns_resolver = URLResolver(pattern, resolver.url_patterns)
     return URLResolver(RegexPattern(r'^/'), [ns_resolver])
 
 
@@ -438,13 +440,15 @@ class URLResolver:
                         for name in url_pattern.reverse_dict:
                             for matches, pat, defaults, converters in url_pattern.reverse_dict.getlist(name):
                                 new_matches = normalize(p_pattern + pat)
+                                new_converters = dict(self.pattern.converters, **url_pattern.pattern.converters)
+                                new_converters = dict(new_converters, **converters)
                                 lookups.appendlist(
                                     name,
                                     (
                                         new_matches,
                                         p_pattern + pat,
                                         dict(defaults, **url_pattern.default_kwargs),
-                                        dict(self.pattern.converters, **converters)
+                                        new_converters
                                     )
                                 )
                         for namespace, (prefix, sub_pattern) in url_pattern.namespace_dict.items():
