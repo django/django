@@ -342,6 +342,33 @@ def create_simple_test_method(validator, expected, value, num):
 # Dynamically assemble a test class with the contents of TEST_DATA
 
 
+class TestURLValidator(SimpleTestCase):
+    def test_validate_scheme(self):
+        v = URLValidator(schemes=["http", "https"])
+        self.assertTrue(v.validate_scheme("http"))
+        self.assertTrue(v.validate_scheme("https"))
+        self.assertFalse(v.validate_scheme("ftp"))
+
+    def test_validate_scheme_override_false(self):
+        class CustomURLValidator(URLValidator):
+            def validate_scheme(self, scheme):
+                return False
+
+        v = CustomURLValidator(schemes=["http"])
+        for scheme in ["http", "https", "ftp"]:
+            with self.assertRaises(ValidationError):
+                v("%s://example.com" % (scheme))
+
+    def test_validate_scheme_override_true(self):
+        class CustomURLValidator(URLValidator):
+            def validate_scheme(self, scheme):
+                return True
+
+        v = CustomURLValidator(schemes=["http"])
+        for scheme in ["http", "https", "ftp"]:
+            v("%s://example.com" % (scheme))
+
+
 class TestSimpleValidators(SimpleTestCase):
     def test_single_message(self):
         v = ValidationError('Not Valid')

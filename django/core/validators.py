@@ -110,7 +110,7 @@ class URLValidator(RegexValidator):
     def __call__(self, value):
         # Check first if the scheme is valid
         scheme = value.split('://')[0].lower()
-        if scheme not in self.schemes:
+        if not self.validate_scheme(scheme):
             raise ValidationError(self.message, code=self.code)
 
         # Then check full URL
@@ -147,6 +147,9 @@ class URLValidator(RegexValidator):
         # that's used to indicate absolute names in DNS.
         if len(urlsplit(value).netloc) > 253:
             raise ValidationError(self.message, code=self.code)
+
+    def validate_scheme(self, scheme):
+        return scheme in self.schemes
 
 
 integer_validator = RegexValidator(
