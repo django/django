@@ -5,11 +5,11 @@ import os
 
 class Command(TemplateCommand):
     help = (
-        "Creates a Django management command for the given command name  "
-        "in the management/commands folder of the specified app."
+        "Creates a Django management command in the management/commands folder "
+        "of the specified app."
     )
 
-    missing_args_message = "You must provide an application and command name"
+    missing_args_message = "You must provide an application name, and a command name"
 
     def handle(self, **options):
         app_name = options.pop('name')

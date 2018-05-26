@@ -20,12 +20,12 @@ from django.utils.version import get_docs_version
 
 class TemplateCommand(BaseCommand):
     """
-    Copy a Django template layout template into the specified directory.
+    Copy a Django layout template into the specified directory.
 
     Type of: app, project, (management) command
 
     :param style: A color style object (see django.core.management.color).
-    :param template_type: The string 'app', 'project', or 'command'.
+    :param template_type: The string 'app', 'command', or 'project'.
     :param name: The name of the template object.
     :param directory: The directory to which the template should be copied.
     :param options: The additional variables passed to templates
@@ -78,12 +78,8 @@ class TemplateCommand(BaseCommand):
             top_dir = os.path.abspath(path.expanduser(target))
             
             if not os.path.exists(top_dir):
-                # Creating recursive directories to store management commands is valid
-                if template_type == "command":
-                    os.makedirs(top_dir)
-                else: 
-                    raise CommandError("Destination directory '%s' does not "
-                                       "exist, please create it first." % top_dir)
+                raise CommandError("Destination directory '%s' does not "
+                                   "exist, please create it first." % top_dir)
 
         extensions = tuple(handle_extensions(options['extensions']))
         extra_files = []
@@ -311,7 +307,7 @@ class TemplateCommand(BaseCommand):
         Extract the given file to a temporarily and return
         the path of the directory with the extracted content.
         """
-        prefix = 'django_%s_template_' % self.tempalte_type
+        prefix = 'django_%s_template_' % self.template_type
         tempdir = tempfile.mkdtemp(prefix=prefix, suffix='_extract')
         self.paths_to_remove.append(tempdir)
         if self.verbosity >= 2:

@@ -2,7 +2,6 @@ from django.core.management.templates import TemplateCommand
 
 
 class Command(TemplateCommand):
-    """
     help = (
         "Help information"
     )
