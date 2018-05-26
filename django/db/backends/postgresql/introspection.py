@@ -29,16 +29,6 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     ignored_tables = []
 
-    _get_indexes_query = """
-        SELECT attr.attname, idx.indkey, idx.indisunique, idx.indisprimary
-        FROM pg_catalog.pg_class c, pg_catalog.pg_class c2,
-            pg_catalog.pg_index idx, pg_catalog.pg_attribute attr
-        WHERE c.oid = idx.indrelid
-            AND idx.indexrelid = c2.oid
-            AND attr.attrelid = c.oid
-            AND attr.attnum = idx.indkey[0]
-            AND c.relname = %s"""
-
     def get_field_type(self, data_type, description):
         field_type = super().get_field_type(data_type, description)
         if description.default and 'nextval' in description.default:
