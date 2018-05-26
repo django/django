@@ -222,41 +222,33 @@ class SelectForUpdateTests(TransactionTestCase):
         FieldError is raised if a non-relation field is specified in of=(...).
         """
         msg = (
-            'Invalid field name(s) given in select_for_update(of=(...)): %s. '
-            'Only relational fields followed in the query are allowed. '
-            'Choices are: self, born, born__country.'
+            'Invalid field name given in select_for_update(of=(...)): %s. '
+            'The field is not a one to one or many to one relation. '
+        )
+        invalid_of = [
+            ('name',),
+            ('born__name',)
+        ]
+        for of in invalid_of:
+            with self.subTest(of=of):
+                with self.assertRaisesMessage(FieldError, msg % of[0]):
+                    with transaction.atomic():
+                        Person.objects.select_related('born__country').select_for_update(of=of).get()
+
+        msg = (
+            'Invalid field name given in select_for_update(of=(...)): %s. '
+            'The relation does not exist.'
         )
         invalid_of = [
             ('nonexistent',),
-            ('name',),
             ('born__nonexistent',),
-            ('born__name',),
             ('born__nonexistent', 'born__name'),
         ]
         for of in invalid_of:
             with self.subTest(of=of):
-                with self.assertRaisesMessage(FieldError, msg % ', '.join(of)):
+                with self.assertRaisesMessage(FieldError, msg % of[0]):
                     with transaction.atomic():
                         Person.objects.select_related('born__country').select_for_update(of=of).get()
-
-    @skipUnlessDBFeature('has_select_for_update', 'has_select_for_update_of')
-    def test_related_but_unselected_of_argument_raises_error(self):
-        """
-        FieldError is raised if a relation field that is not followed in the
-        query is specified in of=(...).
-        """
-        msg = (
-            'Invalid field name(s) given in select_for_update(of=(...)): %s. '
-            'Only relational fields followed in the query are allowed. '
-            'Choices are: self, born, profile.'
-        )
-        for name in ['born__country', 'died', 'died__country']:
-            with self.subTest(name=name):
-                with self.assertRaisesMessage(FieldError, msg % name):
-                    with transaction.atomic():
-                        Person.objects.select_related(
-                            'born', 'profile',
-                        ).exclude(profile=None).select_for_update(of=(name,)).get()
 
     @skipUnlessDBFeature('has_select_for_update', 'has_select_for_update_of')
     def test_reverse_one_to_one_of_arguments(self):
