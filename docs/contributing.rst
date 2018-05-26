@@ -56,6 +56,32 @@ one of them, pop into the IRC channel at ``#django-channels`` on Freenode or
 get in touch with Andrew directly at andrew@aeracode.org.
 
 
+How do I get started and run the tests?
+---------------------------------------
+
+First, you should first clone the git repository to a local directory::
+
+    git clone https://github.com/django/channels.git channels
+
+Next, you may want to make a virtual environment to run the tests and develop
+in; you can use either ``virtualenvwrapper``, ``pipenv`` or just plain
+``virtualenv`` for this.
+
+Then, ``cd`` into the ``channels`` directory and install it editable into
+your environment::
+
+    cd channels/
+    pip install -e .[tests]
+
+Note the ``[tests]`` section there; that tells ``pip`` that you want to install
+the ``tests`` extra, which will bring in testing depedencies like
+``pytest-django``.
+
+Then, you can run the tests::
+
+    ``pytest``
+
+
 Can you pay me for my time?
 ---------------------------
 
