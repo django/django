@@ -1812,7 +1812,7 @@ class ModelAdmin(BaseModelAdmin):
         Hook for customizing the delete process for the delete view and the
         "delete selected" action.
         """
-        return get_deleted_objects(objs, request.user, self.admin_site)
+        return get_deleted_objects(objs, request, self.admin_site)
 
     @csrf_protect_m
     def delete_view(self, request, object_id, extra_context=None):
