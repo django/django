@@ -148,7 +148,7 @@ class TemplateCommand(BaseCommand):
 
                 if path.exists(new_path):
                     raise CommandError("%s already exists, overlaying a "
-                                       "template` into an existing "
+                                       "template into an existing "
                                        "directory won't replace conflicting "
                                        "files" % new_path)
 
