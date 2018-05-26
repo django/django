@@ -807,6 +807,8 @@ class ForeignKey(ForeignObject):
             on_delete=on_delete,
         )
         kwargs.setdefault('db_index', True)
+        if parent_link:
+            kwargs['returning'] = True
 
         super().__init__(to, on_delete, from_fields=['self'], to_fields=[to_field], **kwargs)
 

@@ -250,6 +250,18 @@ Database backend API
   constraints or uniqueness errors while inserting or set
   ``DatabaseFeatures.supports_ignore_conflicts`` to ``False``.
 
+* ``DatabaseFeatures.can_return_id_from_insert`` has been renamed to
+  ``DatabaseFeatures.can_return_columns_from_insert``.
+
+* ``DatabaseFeatures.can_return_ids_from_bulk_insert`` has been renamed to
+  ``DatabaseFeatures.can_return_rows_from_bulk_insert``.
+
+* ``DatabaseOperations.fetch_returned_insert_id`` has been renamed to
+  ``DatabaseOperations.fetch_returned_insert_columns`` and has to return a
+  list now.
+
+* ``DatabaseOperations.last_insert_id`` has to return a list now.
+
 :mod:`django.contrib.gis`
 -------------------------
 

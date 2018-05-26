@@ -279,3 +279,11 @@ class PropertyNamesTests(SimpleTestCase):
         # Instance only descriptors don't appear in _property_names.
         self.assertEqual(AbstractPerson().test_instance_only_descriptor, 1)
         self.assertEqual(AbstractPerson._meta._property_names, frozenset(['pk', 'test_property']))
+
+
+class ReturningFieldsTest(SimpleTestCase):
+
+    def test_pk(self):
+        self.assertIn(CommonAncestor._meta.pk, CommonAncestor._meta.returning_fields)
+        self.assertIn(Person._meta.pk, Person._meta.returning_fields)
+        self.assertNotIn(Person._meta.get_field('id'), Person._meta.returning_fields)

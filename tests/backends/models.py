@@ -3,6 +3,7 @@ from django.contrib.contenttypes.fields import (
 )
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.db.models.functions import Now
 
 
 class Square(models.Model):
@@ -111,3 +112,7 @@ class Author(models.Model):
 
 class Book(models.Model):
     author = models.ForeignKey(Author, models.CASCADE, to_field='name')
+
+
+class ReturningModel(models.Model):
+    created = models.DateTimeField(default=Now, returning=True, editable=False)

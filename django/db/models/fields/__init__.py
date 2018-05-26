@@ -136,12 +136,13 @@ class Field(RegisterLookupMixin):
                  db_index=False, rel=None, default=NOT_PROVIDED, editable=True,
                  serialize=True, unique_for_date=None, unique_for_month=None,
                  unique_for_year=None, choices=None, help_text='', db_column=None,
-                 db_tablespace=None, auto_created=False, validators=(),
+                 db_tablespace=None, auto_created=False, returning=False, validators=(),
                  error_messages=None):
         self.name = name
         self.verbose_name = verbose_name  # May be set by set_attributes_from_name
         self._verbose_name = verbose_name  # Store original for deconstruction
         self.primary_key = primary_key
+        self.returning = returning or (primary_key and default is NOT_PROVIDED)
         self.max_length, self._unique = max_length, unique
         self.blank, self.null = blank, null
         self.remote_field = rel
@@ -449,6 +450,7 @@ class Field(RegisterLookupMixin):
             "db_column": None,
             "db_tablespace": None,
             "auto_created": False,
+            "returning": self.primary_key and self.default is NOT_PROVIDED,
             "validators": [],
             "error_messages": None,
         }

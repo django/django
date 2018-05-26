@@ -826,3 +826,13 @@ class Options:
             if isinstance(attr, property):
                 names.append(name)
         return frozenset(names)
+
+    @cached_property
+    def returning_fields(self):
+        """Fields to be returned after a database insert."""
+        return [
+            field for field in self._get_fields(
+                forward=True, reverse=False, include_parents=PROXY_PARENTS
+            )
+            if getattr(field, 'returning', False)
+        ]

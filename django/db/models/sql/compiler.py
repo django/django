@@ -1126,7 +1126,6 @@ class SQLCompiler:
 
 
 class SQLInsertCompiler(SQLCompiler):
-    return_id = False
 
     def field_as_sql(self, field, val):
         """
@@ -1251,15 +1250,15 @@ class SQLInsertCompiler(SQLCompiler):
         # queries and generate their own placeholders. Doing that isn't
         # necessary and it should be possible to use placeholders and
         # expressions in bulk inserts too.
-        can_bulk = (not self.return_id and self.connection.features.has_bulk_insert)
+        can_bulk = self.connection.features.has_bulk_insert
 
         placeholder_rows, param_rows = self.assemble_as_sql(fields, value_rows)
 
         ignore_conflicts_suffix_sql = self.connection.ops.ignore_conflicts_suffix_sql(
             ignore_conflicts=self.query.ignore_conflicts
         )
-        if self.return_id and self.connection.features.can_return_id_from_insert:
-            if self.connection.features.can_return_ids_from_bulk_insert:
+        if self.connection.features.can_return_columns_from_insert:
+            if self.connection.features.can_return_rows_from_bulk_insert:
                 result.append(self.connection.ops.bulk_insert_sql(fields, placeholder_rows))
                 params = param_rows
             else:
@@ -1267,12 +1266,14 @@ class SQLInsertCompiler(SQLCompiler):
                 params = [param_rows[0]]
             if ignore_conflicts_suffix_sql:
                 result.append(ignore_conflicts_suffix_sql)
-            col = "%s.%s" % (qn(opts.db_table), qn(opts.pk.column))
             r_fmt, r_params = self.connection.ops.return_insert_id()
             # Skip empty r_fmt to allow subclasses to customize behavior for
             # 3rd party backends. Refs #19096.
-            if r_fmt:
-                result.append(r_fmt % col)
+            columns = []
+            for field in opts.returning_fields:
+                columns.append("%s.%s" % (qn(opts.db_table), qn(field.column)))
+            if r_fmt and columns:
+                result.append(r_fmt % ", ".join(columns))
                 params += [r_params]
             return [(" ".join(result), tuple(chain.from_iterable(params)))]
 
@@ -1289,25 +1290,27 @@ class SQLInsertCompiler(SQLCompiler):
                 for p, vals in zip(placeholder_rows, param_rows)
             ]
 
-    def execute_sql(self, return_id=False):
-        assert not (
-            return_id and len(self.query.objs) != 1 and
-            not self.connection.features.can_return_ids_from_bulk_insert
+    def execute_sql(self):
+        return_id = (
+            len(self.query.objs) == 1 or
+            self.connection.features.can_return_rows_from_bulk_insert
         )
-        self.return_id = return_id
         with self.connection.cursor() as cursor:
             for sql, params in self.as_sql():
                 cursor.execute(sql, params)
-            if not return_id:
-                return
-            if self.connection.features.can_return_ids_from_bulk_insert and len(self.query.objs) > 1:
-                return self.connection.ops.fetch_returned_insert_ids(cursor)
-            if self.connection.features.can_return_id_from_insert:
+            if not (return_id and self.query.get_meta().returning_fields):
+                return []
+            if self.connection.features.can_return_rows_from_bulk_insert and len(self.query.objs) > 1:
+                return self.connection.ops.fetch_returned_insert_rows(cursor)
+            if self.connection.features.can_return_columns_from_insert:
                 assert len(self.query.objs) == 1
-                return self.connection.ops.fetch_returned_insert_id(cursor)
-            return self.connection.ops.last_insert_id(
-                cursor, self.query.get_meta().db_table, self.query.get_meta().pk.column
-            )
+                return self.connection.ops.fetch_returned_insert_columns(cursor)
+            if self.query.get_meta().pk.get_internal_type() in ['AutoField', 'BigAutoField']:
+                # The PK could be a custom field. Only AutoFields are supported in MySQL and SQLite.
+                return self.connection.ops.last_insert_id(
+                    cursor, self.query.get_meta().db_table, self.query.get_meta().pk
+                )
+            return []
 
 
 class SQLDeleteCompiler(SQLCompiler):

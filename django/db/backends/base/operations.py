@@ -172,13 +172,12 @@ class BaseDatabaseOperations:
         else:
             return ['DISTINCT'], []
 
-    def fetch_returned_insert_id(self, cursor):
+    def fetch_returned_insert_columns(self, cursor):
         """
         Given a cursor object that has just performed an INSERT...RETURNING
-        statement into a table that has an auto-incrementing ID, return the
-        newly created ID.
+        statement into a table, return the newly created data.
         """
-        return cursor.fetchone()[0]
+        return cursor.fetchone()
 
     def field_cast_sql(self, db_type, internal_type):
         """
@@ -251,7 +250,7 @@ class BaseDatabaseOperations:
 
         `pk_name` is the name of the primary-key column.
         """
-        return cursor.lastrowid
+        return [cursor.lastrowid]
 
     def lookup_cast(self, lookup_type, internal_type=None):
         """
