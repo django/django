@@ -1,4 +1,5 @@
 from django.core.management.templates import TemplateCommand
+from django.apps import apps
 import os
 
 
@@ -14,6 +15,8 @@ class Command(TemplateCommand):
         app_name = options.pop('name')
         command_name = options.pop('command')
 
-        target = os.path.abspath(os.path.join(os.getcwd(), app_name, "management", "commands"))
+        app_path = apps.get_app_config(app_name).path
+
+        target = os.path.abspath(os.path.join(app_path, "management", "commands"))
 
         super().handle('command', command_name, target, **options)
