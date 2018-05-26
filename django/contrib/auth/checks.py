@@ -4,6 +4,7 @@ from types import MethodType
 from django.apps import apps
 from django.conf import settings
 from django.core import checks
+from django.db.models import ManyToManyField
 
 from .management import _get_builtin_permissions
 
@@ -45,6 +46,22 @@ def check_user_model(app_configs=None, **kwargs):
                 id='auth.E002',
             )
         )
+
+    # Check that REQUIRED_FIELDS does not contain M2M fields without a custom manager.
+    if isinstance(cls.REQUIRED_FIELDS, (list, tuple)):
+        for field_name in cls.REQUIRED_FIELDS:
+            if isinstance(cls._meta.get_field(field_name), ManyToManyField):
+                errors.append(
+                    checks.Error(
+                        "The ManyToManyField named '%s' "
+                        "for a custom user model must not be included in 'REQUIRED_FIELDS' without "
+                        "defining a custom manager class that would handle it." % (
+                            field_name
+                        ),
+                        obj=cls,
+                        id='auth.W011',
+                    )
+                )
 
     # Check that the username field is unique
     if not cls._meta.get_field(cls.USERNAME_FIELD).unique:
