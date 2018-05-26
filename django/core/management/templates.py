@@ -20,14 +20,15 @@ from django.utils.version import get_docs_version
 
 class TemplateCommand(BaseCommand):
     """
-    Copy either a Django application layout template or a Django project
-    layout template into the specified directory.
+    Copy a Django template layout template into the specified directory.
+
+    Type of: app, project, (management) command
 
     :param style: A color style object (see django.core.management.color).
-    :param app_or_project: The string 'app' or 'project'.
-    :param name: The name of the application or project.
+    :param template_type: The string 'app', 'project', or 'command'.
+    :param name: The name of the template object.
     :param directory: The directory to which the template should be copied.
-    :param options: The additional variables passed to project or app templates
+    :param options: The additional variables passed to templates
     """
     requires_system_checks = False
     # The supported URL schemes
@@ -39,7 +40,8 @@ class TemplateCommand(BaseCommand):
     )
 
     def add_arguments(self, parser):
-        parser.add_argument('name', help='Name of the application or project.')
+        parser.add_argument('name', help='Name of the application, or project.')
+        parser.add_argument('command', help='Name of the command.', nargs='?')
         parser.add_argument('directory', nargs='?', help='Optional destination directory')
         parser.add_argument('--template', help='The path or URL to load the template from.')
         parser.add_argument(
@@ -56,12 +58,12 @@ class TemplateCommand(BaseCommand):
                  'with commas, or use -n multiple times.'
         )
 
-    def handle(self, app_or_project, name, target=None, **options):
-        self.app_or_project = app_or_project
+    def handle(self, template_type, name, target=None, **options):
+        self.template_type = template_type
         self.paths_to_remove = []
         self.verbosity = options['verbosity']
 
-        self.validate_name(name, app_or_project)
+        self.validate_name(name, template_type)
 
         # if some directory is given, make sure it's nicely expanded
         if target is None:
@@ -74,9 +76,14 @@ class TemplateCommand(BaseCommand):
                 raise CommandError(e)
         else:
             top_dir = os.path.abspath(path.expanduser(target))
+            
             if not os.path.exists(top_dir):
-                raise CommandError("Destination directory '%s' does not "
-                                   "exist, please create it first." % top_dir)
+                # Creating recursive directories to store management commands is valid
+                if template_type == "command":
+                    os.makedirs(top_dir)
+                else: 
+                    raise CommandError("Destination directory '%s' does not "
+                                       "exist, please create it first." % top_dir)
 
         extensions = tuple(handle_extensions(options['extensions']))
         extra_files = []
@@ -85,15 +92,15 @@ class TemplateCommand(BaseCommand):
         if self.verbosity >= 2:
             self.stdout.write("Rendering %s template files with "
                               "extensions: %s\n" %
-                              (app_or_project, ', '.join(extensions)))
+                              (template_type, ', '.join(extensions)))
             self.stdout.write("Rendering %s template files with "
                               "filenames: %s\n" %
-                              (app_or_project, ', '.join(extra_files)))
+                              (template_type, ', '.join(extra_files)))
 
-        base_name = '%s_name' % app_or_project
-        base_subdir = '%s_template' % app_or_project
-        base_directory = '%s_directory' % app_or_project
-        camel_case_name = 'camel_case_%s_name' % app_or_project
+        base_name = '%s_name' % template_type
+        base_subdir = '%s_template' % template_type
+        base_directory = '%s_directory' % template_type
+        camel_case_name = 'camel_case_%s_name' % template_type
         camel_case_value = ''.join(x for x in name.title() if x != '_')
 
         context = Context({
@@ -141,7 +148,7 @@ class TemplateCommand(BaseCommand):
 
                 if path.exists(new_path):
                     raise CommandError("%s already exists, overlaying a "
-                                       "project or app into an existing "
+                                       "template` into an existing "
                                        "directory won't replace conflicting "
                                        "files" % new_path)
 
@@ -179,7 +186,7 @@ class TemplateCommand(BaseCommand):
 
     def handle_template(self, template, subdir):
         """
-        Determine where the app or project templates are.
+        Determine where the templates are.
         Use django.__path__[0] as the default because the Django install
         directory isn't known.
         """
@@ -201,14 +208,14 @@ class TemplateCommand(BaseCommand):
                 return self.extract(absolute_path)
 
         raise CommandError("couldn't handle %s template %s." %
-                           (self.app_or_project, template))
+                           (self.template_type, template))
 
-    def validate_name(self, name, app_or_project):
-        a_or_an = 'an' if app_or_project == 'app' else 'a'
+    def validate_name(self, name, template_type):
+        a_or_an = 'an' if template_type == 'app' else 'a'
         if name is None:
             raise CommandError('you must provide {an} {app} name'.format(
                 an=a_or_an,
-                app=app_or_project,
+                app=template_type,
             ))
         # Check it's a valid directory name.
         if not name.isidentifier():
@@ -216,7 +223,7 @@ class TemplateCommand(BaseCommand):
                 "'{name}' is not a valid {app} name. Please make sure the "
                 "name is a valid identifier.".format(
                     name=name,
-                    app=app_or_project,
+                    app=template_type,
                 )
             )
         # Check it cannot be imported.
@@ -231,7 +238,7 @@ class TemplateCommand(BaseCommand):
                 "another name.".format(
                     name=name,
                     an=a_or_an,
-                    app=app_or_project,
+                    app=template_type,
                 )
             )
 
@@ -248,7 +255,7 @@ class TemplateCommand(BaseCommand):
                 display_url = url
             return filename, display_url
 
-        prefix = 'django_%s_template_' % self.app_or_project
+        prefix = 'django_%s_template_' % self.template_type
         tempdir = tempfile.mkdtemp(prefix=prefix, suffix='_download')
         self.paths_to_remove.append(tempdir)
         filename, display_url = cleanup_url(url)
@@ -304,7 +311,7 @@ class TemplateCommand(BaseCommand):
         Extract the given file to a temporarily and return
         the path of the directory with the extracted content.
         """
-        prefix = 'django_%s_template_' % self.app_or_project
+        prefix = 'django_%s_template_' % self.tempalte_type
         tempdir = tempfile.mkdtemp(prefix=prefix, suffix='_extract')
         self.paths_to_remove.append(tempdir)
         if self.verbosity >= 2:

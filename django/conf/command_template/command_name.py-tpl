@@ -1,0 +1,22 @@
+from django.core.management.templates import TemplateCommand
+
+
+class Command(TemplateCommand):
+    """
+    help = (
+        "Help information"
+    )
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            'argument', action='store', dest='argument', help='Required argument',
+        )
+        parser.add_argument(
+            '--optional', action='store', dest='optional', help='Optional argument',
+        )
+
+    def handle(self, **options):
+        argument = options['argument']
+        optional = options['optional']
+
+        self.stdout.write(self.style.SUCCESS("Executed with arg {}, optional {}".format(argument, optional)))
