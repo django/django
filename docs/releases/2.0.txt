@@ -98,7 +98,7 @@ Minor features
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The new :attr:`.ModelAdmin.autocomplete_fields` attribute and
-  :meth:`.ModelAdmin.get_autocomplete_fields` method allow using an
+  :meth:`.ModelAdmin.get_autocomplete_fields` method allow using a
   `Select2 <https://select2.org>`_ search widget for ``ForeignKey`` and
   ``ManyToManyField``.
 
