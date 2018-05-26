@@ -29,10 +29,18 @@ This tutorial is written for Channels 2.0, which supports Python 3.5+ and Django
 your version of Channels by using the version switcher at the bottom left corner
 of this page, or update Channels to the newest version.
 
-This tutorial also uses Docker to install and run Redis. We use Redis as the
+This tutorial also **uses Docker** to install and run Redis. We use Redis as the
 backing store for the channel layer, which is an optional component of the
 Channels library that we use in the tutorial. `Install Docker`_ from its
-official website.
+official website - there are official runtimes for Mac OS and Windows that
+make it easy to use, and packages for many Linux distributions where it can
+run natively.
+
+.. note::
+    While you can run the standard Django ``runserver`` without the need
+    for Docker, the channels features we'll be using in later parts of the
+    tutorial will need Redis to run, and we recommend Docker as the easiest
+    way to do this.
 
 .. _the Django tutorial: https://docs.djangoproject.com/en/2.0/intro/tutorial01/
 .. _Django installed: https://docs.djangoproject.com/en/2.0/intro/install/
