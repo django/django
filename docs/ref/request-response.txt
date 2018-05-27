@@ -793,7 +793,7 @@ Methods
         to store a cookie of more than 4096 bytes, but many browsers will not
         set the cookie correctly.
 
-.. method:: HttpResponse.set_signed_cookie(key, value, salt='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=True, samesite=None)
+.. method:: HttpResponse.set_signed_cookie(key, value, salt='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False, samesite=None)
 
     Like :meth:`~HttpResponse.set_cookie()`, but
     :doc:`cryptographic signing </topics/signing>` the cookie before setting
