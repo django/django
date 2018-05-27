@@ -2066,7 +2066,7 @@ object. See :ref:`how-django-processes-a-request` for details.
 ``SECRET_KEY``
 --------------
 
-Default: Not defined
+Default: ``''`` (Empty string)
 
 A secret key for a particular Django installation. This is used to provide
 :doc:`cryptographic signing </topics/signing>`, and should be set to a unique,
@@ -2079,9 +2079,7 @@ Uses of the key shouldn't assume that it's text or bytes. Every use should go
 through :func:`~django.utils.encoding.force_text` or
 :func:`~django.utils.encoding.force_bytes` to convert it to the desired type.
 
-Django will refuse to start if :setting:`SECRET_KEY` is set to an empty value.
-:class:`~django.core.exceptions.ImproperlyConfigured` is raised if
-``SECRET_KEY`` is accessed but not set.
+Django will refuse to start if :setting:`SECRET_KEY` is not set.
 
 .. warning::
 
@@ -2113,10 +2111,6 @@ affect them.
     The default :file:`settings.py` file created by :djadmin:`django-admin
     startproject <startproject>` creates a unique ``SECRET_KEY`` for
     convenience.
-
-.. versionchanged:: 2.1
-
-    In older versions, ``SECRET_KEY`` defaults to an empty string.
 
 .. setting:: SECURE_BROWSER_XSS_FILTER
 
