@@ -160,7 +160,9 @@ class SQLCompiler:
                 }
                 expressions = [pk] + [
                     expr for expr in expressions
-                    if expr in having or getattr(expr, 'alias', None) not in pk_aliases
+                    if expr in having or (
+                        getattr(expr, 'alias', None) is not None and expr.alias not in pk_aliases
+                    )
                 ]
         elif self.connection.features.allows_group_by_selected_pks:
             # Filter out all expressions associated with a table's primary key

@@ -14,3 +14,6 @@ Bugfixes
 
 * Fixed detection of custom URL converters in included patterns
   (:ticket:`29415`).
+
+* Fixed a regression that added an unnecessary subquery to the ``GROUP BY``
+  clause on MySQL when using a ``RawSQL`` annotation (:ticket:`29416`).
