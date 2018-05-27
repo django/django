@@ -74,34 +74,6 @@ issued by the middleware.
 * Sends broken link notification emails to :setting:`MANAGERS` (see
   :doc:`/howto/error-reporting`).
 
-Exception middleware
---------------------
-
-.. module:: django.middleware.exception
-   :synopsis: Middleware to return responses for exceptions.
-
-.. class:: ExceptionMiddleware
-
-Catches exceptions raised during the request/response cycle and returns the
-appropriate response.
-
-* :class:`~django.http.Http404` is processed by
-  :data:`~django.conf.urls.handler404` (or a more friendly debug page if
-  :setting:`DEBUG=True <DEBUG>`).
-* :class:`~django.core.exceptions.PermissionDenied` is processed
-  by :data:`~django.conf.urls.handler403`.
-* ``MultiPartParserError`` is processed by :data:`~django.conf.urls.handler400`.
-* :class:`~django.core.exceptions.SuspiciousOperation` is processed by
-  :data:`~django.conf.urls.handler400`  (or a more friendly debug page if
-  :setting:`DEBUG=True <DEBUG>`).
-* Any other exception is processed by :data:`~django.conf.urls.handler500`
-  (or a more friendly debug page if :setting:`DEBUG=True <DEBUG>`).
-
-Django uses this middleware regardless of whether or not you include it in
-:setting:`MIDDLEWARE`, however, you may want to subclass if your own middleware
-needs to transform any of these exceptions into the appropriate responses.
-:class:`~django.middleware.locale.LocaleMiddleware` does this, for example.
-
 GZip middleware
 ---------------
 
