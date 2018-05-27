@@ -182,8 +182,9 @@ def write_pot_file(potfile, msgs):
         found, header_read = False, False
         for line in pot_lines:
             if not found and not header_read:
-                found = True
-                line = line.replace('charset=CHARSET', 'charset=UTF-8')
+                if 'charset=CHARSET' in line:
+                    found = True
+                    line = line.replace('charset=CHARSET', 'charset=UTF-8')
             if not line and not found:
                 header_read = True
             lines.append(line)
