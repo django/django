@@ -2132,6 +2132,22 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
                 'Some non-ASCII text for testing ticket #18091:',
                 'üäö €'])
 
+class StartCommand(AdminScriptTestCase):
+
+    def test_invalid_name(self):
+        """startcommand validates that command name is a valid Python identifier."""
+        for bad_name in ('7testcommand', '../testcommand', '🐍'):
+            args = ['startcommand', 'test', bad_name]
+            testproject_dir = os.path.join(self.test_dir, bad_name)
+            self.addCleanup(shutil.rmtree, testproject_dir, True)
+
+            out, err = self.run_django_admin(args)
+            self.assertOutput(
+                err,
+                "CommandError: '{}' is not a valid command name. Please make "
+                "sure the name is a valid identifier.".format(bad_name)
+            )
+            self.assertFalse(os.path.exists(testproject_dir))
 
 class StartApp(AdminScriptTestCase):
 
