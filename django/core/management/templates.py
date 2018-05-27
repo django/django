@@ -76,7 +76,7 @@ class TemplateCommand(BaseCommand):
                 raise CommandError(e)
         else:
             top_dir = os.path.abspath(path.expanduser(target))
-            
+
             if not os.path.exists(top_dir):
                 raise CommandError("Destination directory '%s' does not "
                                    "exist, please create it first." % top_dir)

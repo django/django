@@ -10,7 +10,7 @@ distributing. In this document, we will be building a custom ``closepoll``
 command for the ``polls`` application from the
 :doc:`tutorial</intro/tutorial01>`.
 
-To do this, use the ``startcommand`` helper, and specify the appplication to
+To do this, use the ``startcommand`` helper, and specify the application to
 add the command to, and the command name itself. 
 
 Django will register a ``manage.py`` command for each Python module in that

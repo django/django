@@ -1,6 +1,7 @@
-from django.core.management.templates import TemplateCommand
-from django.apps import apps
 import os
+
+from django.apps import apps
+from django.core.management.templates import TemplateCommand
 
 
 class Command(TemplateCommand):
