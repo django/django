@@ -299,6 +299,13 @@ class SettingsTests(SimpleTestCase):
         finally:
             del sys.modules['fake_settings_module']
 
+    def test_lazy_settings_no_secret_key(self):
+        lazy_settings = LazySettings()
+        lazy_settings.configure()
+        msg = 'The SECRET_KEY setting must be set.'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            lazy_settings.SECRET_KEY
+
     def test_secret_key_empty_string(self):
         settings_module = ModuleType('fake_settings_module')
         settings_module.SECRET_KEY = ''
@@ -309,6 +316,13 @@ class SettingsTests(SimpleTestCase):
                 Settings('fake_settings_module')
         finally:
             del sys.modules['fake_settings_module']
+
+    def test_lazy_settings_secret_key_empty_string(self):
+        lazy_settings = LazySettings()
+        lazy_settings.configure(SECRET_KEY='')
+        msg = 'The SECRET_KEY setting must not be empty.'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            lazy_settings.SECRET_KEY
 
     def test_no_settings_module(self):
         msg = (
