@@ -14,10 +14,8 @@ logger = logging.getLogger('django.request')
 
 
 class BaseHandler:
-    _request_middleware = None
     _view_middleware = None
     _template_response_middleware = None
-    _response_middleware = None
     _exception_middleware = None
     _middleware_chain = None
 
@@ -27,10 +25,8 @@ class BaseHandler:
 
         Must be called after the environment is fixed (see __call__ in subclasses).
         """
-        self._request_middleware = []
         self._view_middleware = []
         self._template_response_middleware = []
-        self._response_middleware = []
         self._exception_middleware = []
 
         handler = convert_exception_to_response(self._get_response)
