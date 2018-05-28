@@ -22,7 +22,7 @@ from django.core.cache.backends.base import (
 from django.utils.module_loading import import_string
 
 __all__ = [
-    'cache', 'DEFAULT_CACHE_ALIAS', 'InvalidCacheBackendError',
+    'cache', 'caches', 'DEFAULT_CACHE_ALIAS', 'InvalidCacheBackendError',
     'CacheKeyWarning', 'BaseCache',
 ]
 
