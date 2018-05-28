@@ -98,6 +98,17 @@ Wire these new views into the ``polls.urls`` module by adding the following
         path('<int:question_id>/vote/', views.vote, name='vote'),
     ]
 
+.. snippet::
+    :filename: mysite/urls.py
+
+    from django.contrib import admin
+    from django.urls import include, path
+
+    urlpatterns = [
+        path('admin/', admin.site.urls),
+        path('polls/', include('polls.urls')),
+    ]
+
 Take a look in your browser, at "/polls/34/". It'll run the ``detail()``
 method and display whatever ID you provide in the URL. Try
 "/polls/34/results/" and "/polls/34/vote/" too -- these will display the
