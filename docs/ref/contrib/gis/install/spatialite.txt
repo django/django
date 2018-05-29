@@ -27,6 +27,9 @@ __ https://www.gaia-gis.it/gaia-sins/
 
         SPATIALITE_LIBRARY_PATH = 'mod_spatialite'
 
+    Your operating system may require a different variant such as
+    ``mod_spatialite.so`` (observed with Debian Buster and Ubuntu 18.04).
+
 .. _spatialite_source:
 
 Installing from source
