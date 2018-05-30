@@ -4,6 +4,7 @@ from django.core.checks import Error, Warning as DjangoWarning
 from django.db import connection, models
 from django.test import SimpleTestCase, TestCase, skipIfDBFeature
 from django.test.utils import isolate_apps, override_settings
+from django.utils.functional import lazy
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 
@@ -185,6 +186,12 @@ class CharFieldTests(TestCase):
     def test_choices_containing_lazy(self):
         class Model(models.Model):
             field = models.CharField(max_length=10, choices=[['1', _('1')], ['2', _('2')]])
+
+        self.assertEqual(Model._meta.get_field('field').check(), [])
+
+    def test_lazy_choices(self):
+        class Model(models.Model):
+            field = models.CharField(max_length=10, choices=lazy(lambda: [[1, '1'], [2, '2']], tuple)())
 
         self.assertEqual(Model._meta.get_field('field').check(), [])
 
