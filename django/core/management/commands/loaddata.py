@@ -109,8 +109,11 @@ class Command(BaseCommand):
             return
 
         with connection.constraint_checks_disabled():
+            self.objs_with_deferred_fields = []
             for fixture_label in fixture_labels:
                 self.load_label(fixture_label)
+            for obj in self.objs_with_deferred_fields:
+                obj.save_deferred_fields(using=self.using)
 
         # Since we disabled constraint checks, we must manually check for
         # any invalid keys that might have been added
@@ -163,6 +166,7 @@ class Command(BaseCommand):
 
                 objects = serializers.deserialize(
                     ser_fmt, fixture, using=self.using, ignorenonexistent=self.ignore,
+                    handle_forward_references=True,
                 )
 
                 for obj in objects:
@@ -189,6 +193,8 @@ class Command(BaseCommand):
                                 'error_msg': e,
                             },)
                             raise
+                    if obj.deferred_fields:
+                        self.objs_with_deferred_fields.append(obj)
                 if objects and show_progress:
                     self.stdout.write('')  # add a newline after progress indicator
                 self.loaded_object_count += loaded_objects_in_fixture

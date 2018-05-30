@@ -116,3 +116,21 @@ class Book(models.Model):
 
 class PrimaryKeyUUIDModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+
+
+class NaturalKeyThing(models.Model):
+    key = models.CharField(max_length=100)
+    other_thing = models.ForeignKey('NaturalKeyThing', on_delete=models.CASCADE, null=True)
+    other_things = models.ManyToManyField('NaturalKeyThing', related_name='thing_m2m_set')
+
+    class Manager(models.Manager):
+        def get_by_natural_key(self, key):
+            return self.get(key=key)
+
+    objects = Manager()
+
+    def natural_key(self):
+        return (self.key,)
+
+    def __str__(self):
+        return self.key

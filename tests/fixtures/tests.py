@@ -17,7 +17,8 @@ from django.db import IntegrityError, connection
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from .models import (
-    Article, Category, PrimaryKeyUUIDModel, ProxySpy, Spy, Tag, Visa,
+    Article, Category, NaturalKeyThing, PrimaryKeyUUIDModel, ProxySpy, Spy,
+    Tag, Visa,
 )
 
 
@@ -780,3 +781,21 @@ class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
             '<Article: Time to reform copyright>',
             '<Article: Poker has no place on ESPN>',
         ])
+
+
+class ForwardReferenceTests(TestCase):
+    def test_forward_reference_fk(self):
+        management.call_command('loaddata', 'forward_reference_fk.json', verbosity=0)
+        self.assertEqual(NaturalKeyThing.objects.count(), 2)
+        t1, t2 = NaturalKeyThing.objects.all()
+        self.assertEqual(t1.other_thing, t2)
+        self.assertEqual(t2.other_thing, t1)
+
+    def test_forward_reference_m2m(self):
+        management.call_command('loaddata', 'forward_reference_m2m.json', verbosity=0)
+        self.assertEqual(NaturalKeyThing.objects.count(), 3)
+        t1 = NaturalKeyThing.objects.get_by_natural_key('t1')
+        self.assertQuerysetEqual(
+            t1.other_things.order_by('key'),
+            ['<NaturalKeyThing: t2>', '<NaturalKeyThing: t3>']
+        )
