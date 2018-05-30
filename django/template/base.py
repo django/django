@@ -590,7 +590,7 @@ filter_raw_string = r"""
 ^(?P<var>[%(var_chars)s]+|%(num)s)|
  (?:\s*%(filter_sep)s\s*
      (?P<filter_name>\w+)
-         (?:%(arg_sep)s
+         (?:%(arg_sep)s\s*
              (?:
               (?P<constant_arg>%(constant)s)|
               (?P<var_arg>[%(var_chars)s]+|%(num)s)
