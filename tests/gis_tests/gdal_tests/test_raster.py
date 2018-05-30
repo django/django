@@ -284,10 +284,9 @@ class GDALRasterTests(SimpleTestCase):
                 self.rs.metadata
             return
 
-        self.assertEqual(
-            self.rs.metadata,
-            {'DEFAULT': {'AREA_OR_POINT': 'Area'}, 'IMAGE_STRUCTURE': {'INTERLEAVE': 'BAND'}},
-        )
+        data = self.rs.metadata
+        self.assertEqual(data['DEFAULT'], {'AREA_OR_POINT': 'Area'})
+        self.assertEqual(data['IMAGE_STRUCTURE'], {'INTERLEAVE': 'BAND'})
 
         # Create file-based raster from scratch
         source = GDALRaster({
