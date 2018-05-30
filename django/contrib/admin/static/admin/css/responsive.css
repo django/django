@@ -38,11 +38,9 @@ input[type="submit"], button {
     /* Header */
 
     #header {
-        display: flex;
         flex-direction: column;
         padding: 15px 30px;
-        height: auto;
-        line-height: 1;
+        justify-content: flex-start;
     }
 
     #branding h1 {
