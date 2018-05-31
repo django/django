@@ -9,4 +9,5 @@ Django 1.11.14 fixes several bugs in 1.11.13.
 Bugfixes
 ========
 
-* ...
+* Fixed ``WKBWriter.write()`` and ``write_hex()`` for empty polygons on
+  GEOS 3.6.1+ (:ticket:`29460`).
