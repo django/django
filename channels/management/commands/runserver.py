@@ -23,8 +23,8 @@ class Command(RunserverCommand):
         super().add_arguments(parser)
         parser.add_argument("--noasgi", action="store_false", dest="use_asgi", default=True,
             help="Run the old WSGI-based runserver rather than the ASGI-based one")
-        parser.add_argument("--http_timeout", action="store", dest="http_timeout", type=int, default=60,
-            help="Specify the daphne http_timeout interval in seconds (default: 60)")
+        parser.add_argument("--http_timeout", action="store", dest="http_timeout", type=int, default=None,
+            help="Specify the daphne http_timeout interval in seconds (default: no timeout)")
         parser.add_argument("--websocket_handshake_timeout", action="store", dest="websocket_handshake_timeout",
             type=int, default=5,
             help="Specify the daphne websocket_handshake_timeout interval in seconds (default: 5)")
@@ -32,7 +32,7 @@ class Command(RunserverCommand):
     def handle(self, *args, **options):
         self.verbosity = options.get("verbosity", 1)
         self.logger = setup_logger("django.channels", self.verbosity)
-        self.http_timeout = options.get("http_timeout", 60)
+        self.http_timeout = options.get("http_timeout", None)
         self.websocket_handshake_timeout = options.get("websocket_handshake_timeout", 5)
         # Check Channels is installed right
         if not hasattr(settings, "ASGI_APPLICATION"):
