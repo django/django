@@ -17,3 +17,6 @@ Bugfixes
 
 * Fixed a regression that added an unnecessary subquery to the ``GROUP BY``
   clause on MySQL when using a ``RawSQL`` annotation (:ticket:`29416`).
+
+* Fixed ``WKBWriter.write()`` and ``write_hex()`` for empty polygons on
+  GEOS 3.6.1+ (:ticket:`29460`).
