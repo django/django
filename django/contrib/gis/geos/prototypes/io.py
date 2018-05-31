@@ -2,7 +2,9 @@ import threading
 from ctypes import POINTER, Structure, byref, c_char, c_char_p, c_int, c_size_t
 
 from django.contrib.gis.geos.base import GEOSBase
-from django.contrib.gis.geos.libgeos import GEOM_PTR, GEOSFuncFactory
+from django.contrib.gis.geos.libgeos import (
+    GEOM_PTR, GEOSFuncFactory, geos_version_info,
+)
 from django.contrib.gis.geos.prototypes.errcheck import (
     check_geom, check_sized_string, check_string,
 )
@@ -236,7 +238,7 @@ class WKBWriter(IOBase):
         from django.contrib.gis.geos import Polygon
         geom = self._handle_empty_point(geom)
         wkb = wkb_writer_write(self.ptr, geom.ptr, byref(c_size_t()))
-        if isinstance(geom, Polygon) and geom.empty:
+        if geos_version_info()['version'] < '3.6.1' and isinstance(geom, Polygon) and geom.empty:
             # Fix GEOS output for empty polygon.
             # See https://trac.osgeo.org/geos/ticket/680.
             wkb = wkb[:-8] + b'\0' * 4
@@ -247,7 +249,7 @@ class WKBWriter(IOBase):
         from django.contrib.gis.geos.polygon import Polygon
         geom = self._handle_empty_point(geom)
         wkb = wkb_writer_write_hex(self.ptr, geom.ptr, byref(c_size_t()))
-        if isinstance(geom, Polygon) and geom.empty:
+        if geos_version_info()['version'] < '3.6.1' and isinstance(geom, Polygon) and geom.empty:
             wkb = wkb[:-16] + b'0' * 8
         return wkb
 
