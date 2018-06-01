@@ -262,6 +262,8 @@ subclass::
 
 .. attribute:: ModelAdmin.not_empty_value_display
 
+.. versionadded:: 2.2
+
     This attribute overrides the default display value for ``Not Empty`` option
     on admin's related filter. The default value is ``Not Empty``. For example::
 
