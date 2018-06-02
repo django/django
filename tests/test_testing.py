@@ -2,9 +2,11 @@ from concurrent.futures import TimeoutError
 from urllib.parse import unquote
 
 import pytest
+from django.conf.urls import url
 
 from channels.consumer import AsyncConsumer
 from channels.generic.websocket import WebsocketConsumer
+from channels.routing import URLRouter
 from channels.testing import HttpCommunicator, WebsocketCommunicator
 
 
@@ -60,6 +62,18 @@ class ErrorWebsocketApp(WebsocketConsumer):
         pass
 
 
+class KwargsWebSocketApp(WebsocketConsumer):
+    """
+    WebSocket ASGI app used for testing the kwargs arguments in the url_route.
+    """
+
+    def connect(self):
+        self.accept()
+        self.send(
+            text_data=self.scope["url_route"]["kwargs"]["message"],
+        )
+
+
 @pytest.mark.asyncio
 async def test_websocket_communicator():
     """
@@ -83,6 +97,25 @@ async def test_websocket_communicator():
     response = await communicator.receive_json_from()
     assert response == {"hello": "world"}
     # Close out
+    await communicator.disconnect()
+
+
+@pytest.mark.asyncio
+async def test_websocket_application():
+    """
+    Tests that the WebSocket communicator class works with the
+    URLRoute application.
+    """
+    application = URLRouter([
+        url(r"^testws/(?P<message>\w+)/$", KwargsWebSocketApp),
+    ])
+    communicator = WebsocketCommunicator(application, "/testws/test/")
+    connected, subprotocol = await communicator.connect()
+    # Test connection
+    assert connected
+    assert subprotocol is None
+    message = await communicator.receive_from()
+    assert message == "test"
     await communicator.disconnect()
 
 

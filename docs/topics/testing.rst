@@ -188,6 +188,27 @@ application, as shown in this example::
     middle of its lifecycle. You do not, however, have to ``disconnect()`` if
     your app already raised an error.
 
+You can also pass the ``application`` built with ``URLRouter`` instead of the
+plain consumer class. This lets you route to the specific consumer in the
+``application`` with the given path on the ``WebsocketCommunicator`` class::
+
+    from channels.testing import WebsocketCommunicator
+    application = URLRouter([
+        url(r"^testws/(?P<message>\w+)/$", KwargsWebSocketApp),
+    ])
+    communicator = WebsocketCommunicator(application, "/testws/test/")
+    assert connected
+    # Test on connection welcome message
+    message = await communicator.receive_from()
+    assert message == 'test'
+    # Close
+    await communicator.disconnect()
+
+.. note::
+
+    You can only connect to a single url on the ``URLRouter`` with one
+    instance of ``WebsocketCommunicator`` class.
+
 connect
 ~~~~~~~
 
