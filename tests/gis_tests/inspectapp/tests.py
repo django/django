@@ -62,6 +62,7 @@ class InspectDbTests(TestCase):
     INSTALLED_APPS={'append': 'django.contrib.gis'},
 )
 class OGRInspectTest(TestCase):
+    expected_srid = 'srid=-1' if GDAL_VERSION < (2, 2) else ''
     maxDiff = 1024
 
     def test_poly(self):
@@ -76,7 +77,7 @@ class OGRInspectTest(TestCase):
             '    float = models.FloatField()',
             '    int = models.{}()'.format('BigIntegerField' if GDAL_VERSION >= (2, 0) else 'FloatField'),
             '    str = models.CharField(max_length=80)',
-            '    geom = models.PolygonField(srid=-1)',
+            '    geom = models.PolygonField(%s)' % self.expected_srid,
         ]
 
         self.assertEqual(model_def, '\n'.join(expected))
@@ -84,7 +85,7 @@ class OGRInspectTest(TestCase):
     def test_poly_multi(self):
         shp_file = os.path.join(TEST_DATA, 'test_poly', 'test_poly.shp')
         model_def = ogrinspect(shp_file, 'MyModel', multi_geom=True)
-        self.assertIn('geom = models.MultiPolygonField(srid=-1)', model_def)
+        self.assertIn('geom = models.MultiPolygonField(%s)' % self.expected_srid, model_def)
         # Same test with a 25D-type geometry field
         shp_file = os.path.join(TEST_DATA, 'gas_lines', 'gas_leitung.shp')
         model_def = ogrinspect(shp_file, 'MyModel', multi_geom=True)
@@ -103,7 +104,7 @@ class OGRInspectTest(TestCase):
             '    population = models.{}()'.format('BigIntegerField' if GDAL_VERSION >= (2, 0) else 'FloatField'),
             '    density = models.FloatField()',
             '    created = models.DateField()',
-            '    geom = models.PointField(srid=-1)',
+            '    geom = models.PointField(%s)' % self.expected_srid,
         ]
 
         self.assertEqual(model_def, '\n'.join(expected))
