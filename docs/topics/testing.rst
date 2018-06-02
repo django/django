@@ -188,9 +188,9 @@ application, as shown in this example::
     middle of its lifecycle. You do not, however, have to ``disconnect()`` if
     your app already raised an error.
 
-You can also pass the ``application`` built with ``URLRouter`` instead of the
-plain consumer class. This lets you route to the specific consumer in the
-``application`` with the given path on the ``WebsocketCommunicator`` class::
+You can also pass an ``application`` built with ``URLRouter`` instead of the
+plain consumer class. This lets you test applications that require positional
+or keyword arguments in the ``scope``::
 
     from channels.testing import WebsocketCommunicator
     application = URLRouter([
@@ -206,8 +206,9 @@ plain consumer class. This lets you route to the specific consumer in the
 
 .. note::
 
-    You can only connect to a single url on the ``URLRouter`` with one
-    instance of ``WebsocketCommunicator`` class.
+    Since the ``WebsocketCommunicator`` class takes a URL in its contructor,
+    a single Communicator can only test a single URL. If you want to test
+    multiple different URLs, use multiple Communicators.
 
 connect
 ~~~~~~~
