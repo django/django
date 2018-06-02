@@ -259,3 +259,16 @@ synchronous. You can read more about the new testing framework in the
 Also of note is that the live test case class has been renamed from
 ``ChannelLiveServerTestCase`` to ``ChannelsLiveServerTestCase`` - note the extra
 ``s``.
+
+
+Exception Handling
+~~~~~~~~~~~~~~~~~~
+
+Because the code that's handling a socket is now in the same process as the
+socket itself, Channels 2 implements cleaner exception handling than before -
+if your application raises an unhandled error, it will close the connection
+(HTTP or WebSocket in the case of Daphne) and log the error to console.
+
+Addiitonally, sending malformed messages down to the client is now caught
+and raises exceptions where you're sending, rather than silently failing and
+logging to the server console.
