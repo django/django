@@ -269,6 +269,6 @@ socket itself, Channels 2 implements cleaner exception handling than before -
 if your application raises an unhandled error, it will close the connection
 (HTTP or WebSocket in the case of Daphne) and log the error to console.
 
-Addiitonally, sending malformed messages down to the client is now caught
+Additionally, sending malformed messages down to the client is now caught
 and raises exceptions where you're sending, rather than silently failing and
 logging to the server console.
