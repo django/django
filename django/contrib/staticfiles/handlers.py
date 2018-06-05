@@ -57,9 +57,6 @@ class StaticFilesHandler(WSGIHandler):
             try:
                 return self.serve(request)
             except Http404 as e:
-                if settings.DEBUG:
-                    from django.views import debug
-                    return debug.technical_404_response(request, e)
                 return response_for_exception(request, e)
         return super().get_response(request)
 
