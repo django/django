@@ -88,7 +88,6 @@ class WSGIRequest(HttpRequest):
                 pass
             else:
                 self.encoding = self.content_params['charset']
-        self._post_parse_error = False
         try:
             content_length = int(environ.get('CONTENT_LENGTH'))
         except (ValueError, TypeError):

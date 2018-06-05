@@ -57,7 +57,6 @@ class HttpRequest:
         self.path_info = ''
         self.method = None
         self.resolver_match = None
-        self._post_parse_error = False
         self.content_type = None
         self.content_params = None
 
@@ -289,7 +288,6 @@ class HttpRequest:
     def _mark_post_parse_error(self):
         self._post = QueryDict()
         self._files = MultiValueDict()
-        self._post_parse_error = True
 
     def _load_post_and_files(self):
         """Populate self._post and self._files if the content-type is a form type"""
@@ -313,9 +311,6 @@ class HttpRequest:
                 # formatting the error the request handler might access
                 # self.POST, set self._post and self._file to prevent
                 # attempts to parse POST data again.
-                # Mark that an error occurred. This allows self.__repr__ to
-                # be explicit about it instead of simply representing an
-                # empty POST
                 self._mark_post_parse_error()
                 raise
         elif self.content_type == 'application/x-www-form-urlencoded':
