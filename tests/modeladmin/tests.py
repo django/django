@@ -11,7 +11,7 @@ from django.contrib.admin.widgets import (
     AdminDateWidget, AdminRadioSelect, AutocompleteSelect,
     AutocompleteSelectMultiple,
 )
-from django.contrib.auth.models import Permission, User
+from django.contrib.auth.models import User
 from django.db import models
 from django.forms.widgets import Select
 from django.test import SimpleTestCase, TestCase
@@ -675,18 +675,6 @@ class ModelAdminTests(TestCase):
         self.assertEqual(model_count, {'bands': 1})
         self.assertEqual(perms_needed, set())
         self.assertEqual(protected, [])
-
-    def test_get_actions_requires_change_perm(self):
-        user = User.objects.create_user(username='bob', email='bob@test.com', password='test')
-        mock_request = MockRequest()
-        mock_request.user = user
-        mock_request.GET = {}
-        ma = ModelAdmin(Band, self.site)
-        self.assertEqual(list(ma.get_actions(mock_request).keys()), [])
-        p = Permission.objects.get(codename='change_band', content_type=get_content_type_for_model(Band()))
-        user.user_permissions.add(p)
-        mock_request.user = User.objects.get(pk=user.pk)
-        self.assertEqual(list(ma.get_actions(mock_request).keys()), ['delete_selected'])
 
 
 class ModelAdminPermissionTests(SimpleTestCase):

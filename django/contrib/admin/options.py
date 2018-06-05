@@ -861,9 +861,6 @@ class ModelAdmin(BaseModelAdmin):
         # want *any* actions enabled on this page.
         if self.actions is None or IS_POPUP_VAR in request.GET:
             return OrderedDict()
-        # The change permission is required to use actions.
-        if not self.has_change_permission(request):
-            return OrderedDict()
 
         actions = []
 
@@ -1692,8 +1689,6 @@ class ModelAdmin(BaseModelAdmin):
         # Actions with no confirmation
         if (actions and request.method == 'POST' and
                 'index' in request.POST and '_save' not in request.POST):
-            if not self.has_change_permission(request):
-                raise PermissionDenied
             if selected:
                 response = self.response_action(request, queryset=cl.get_queryset(request))
                 if response:
@@ -1710,8 +1705,6 @@ class ModelAdmin(BaseModelAdmin):
         if (actions and request.method == 'POST' and
                 helpers.ACTION_CHECKBOX_NAME in request.POST and
                 'index' not in request.POST and '_save' not in request.POST):
-            if not self.has_change_permission(request):
-                raise PermissionDenied
             if selected:
                 response = self.response_action(request, queryset=cl.get_queryset(request))
                 if response:
