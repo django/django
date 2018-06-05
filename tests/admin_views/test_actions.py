@@ -429,8 +429,11 @@ class AdminActionsPermissionTests(TestCase):
             ACTION_CHECKBOX_NAME: [self.s1.pk],
             'action': 'delete_selected',
         }
-        response = self.client.post(reverse('admin:admin_views_subscriber_changelist'), action_data)
-        self.assertEqual(response.status_code, 403)
+        url = reverse('admin:admin_views_subscriber_changelist')
+        response = self.client.post(url, action_data)
+        self.assertRedirects(response, url, fetch_redirect_response=False)
+        response = self.client.get(response.url)
+        self.assertContains(response, 'No action selected.')
 
     def test_model_admin_no_delete_permission_externalsubscriber(self):
         """
