@@ -1558,7 +1558,7 @@ class ModelAdmin(BaseModelAdmin):
 
     def _get_edited_object_pks(self, request, prefix):
         """Return POST data values of list_editable primary keys."""
-        pk_pattern = re.compile('{}-\d+-{}$'.format(prefix, self.model._meta.pk.name))
+        pk_pattern = re.compile(r'{}-\d+-{}$'.format(prefix, self.model._meta.pk.name))
         return [value for key, value in request.POST.items() if pk_pattern.match(key)]
 
     def _get_list_editable_queryset(self, request, prefix):
