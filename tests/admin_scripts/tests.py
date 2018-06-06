@@ -403,6 +403,15 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
         self.assertNoOutput(out)
         self.assertOutput(err, "No installed app with label 'admin_scripts'.")
 
+    def test_builtin_with_short_options_settings(self):
+        """
+        django-admin builtin accept short flag -s for settings.
+        """
+        args = ['check', '-s', 'test_project.settings', 'admin_scripts']
+        out, err = self.run_django_admin(args)
+        self.assertNoOutput(out)
+        self.assertOutput(err, "No installed app with label 'admin_scripts'.")
+
     def test_builtin_with_environment(self):
         "minimal: django-admin builtin commands fail if settings are provided in the environment"
         args = ['check', 'admin_scripts']
@@ -729,6 +738,15 @@ class ManageDefaultSettings(AdminScriptTestCase):
     def test_builtin_with_settings(self):
         "default: manage.py builtin commands succeed if settings are provided as argument"
         args = ['check', '--settings=test_project.settings', 'admin_scripts']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, SYSTEM_CHECK_MSG)
+
+    def test_builtin_with_short_options_settings(self):
+        """
+        manage.py builtin accept short flag -s for settings.
+        """
+        args = ['check', '-s', 'test_project.settings', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, SYSTEM_CHECK_MSG)
