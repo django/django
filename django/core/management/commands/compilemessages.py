@@ -86,6 +86,7 @@ class Command(BaseCommand):
         locales = locale or all_locales
         locales = set(locales).difference(exclude)
 
+        self.has_errors = False
         for basedir in basedirs:
             if locales:
                 dirs = [os.path.join(basedir, l, 'LC_MESSAGES') for l in locales]
@@ -98,6 +99,9 @@ class Command(BaseCommand):
             if locations:
                 self.compile_messages(locations)
 
+        if self.has_errors:
+            raise CommandError('compilemessages generated one or more errors.')
+
     def compile_messages(self, locations):
         """
         Locations is a list of tuples: [(directory, file), ...]
@@ -107,15 +111,21 @@ class Command(BaseCommand):
                 self.stdout.write('processing file %s in %s\n' % (f, dirpath))
             po_path = os.path.join(dirpath, f)
             if has_bom(po_path):
-                raise CommandError("The %s file has a BOM (Byte Order Mark). "
-                                   "Django only supports .po files encoded in "
-                                   "UTF-8 and without any BOM." % po_path)
+                self.stderr.write(
+                    'The %s file has a BOM (Byte Order Mark). Django only '
+                    'supports .po files encoded in UTF-8 and without any BOM.' % po_path
+                )
+                self.has_errors = True
+                continue
             base_path = os.path.splitext(po_path)[0]
 
             # Check writability on first location
             if i == 0 and not is_writable(base_path + '.mo'):
-                self.stderr.write("The po files under %s are in a seemingly not writable location. "
-                                  "mo files will not be updated/created." % dirpath)
+                self.stderr.write(
+                    'The po files under %s are in a seemingly not writable location. '
+                    'mo files will not be updated/created.' % dirpath
+                )
+                self.has_errors = True
                 return
 
             args = [self.program] + self.program_options + [
@@ -124,7 +134,7 @@ class Command(BaseCommand):
             output, errors, status = popen_wrapper(args)
             if status:
                 if errors:
-                    msg = "Execution of %s failed: %s" % (self.program, errors)
+                    self.stderr.write('Execution of %s failed: %s.' % (self.program, errors))
                 else:
-                    msg = "Execution of %s failed" % self.program
-                raise CommandError(msg)
+                    self.stderr.write('Execution of %s failed.' % self.program)
+                self.has_errors = True
