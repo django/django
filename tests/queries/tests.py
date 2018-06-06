@@ -1636,7 +1636,8 @@ class Queries5Tests(TestCase):
             ['<Ranking: 1: a3>', '<Ranking: 2: a2>', '<Ranking: 3: a1>']
         )
 
-        qs = Ranking.objects.extra(select={'good': 'case when `rank` > 2 then 1 else 0 end'})
+        sql = 'case when %s > 2 then 1 else 0 end' % connection.ops.quote_name('rank')
+        qs = Ranking.objects.extra(select={'good': sql})
         self.assertEqual(
             [o.good for o in qs.extra(order_by=('-good',))],
             [True, False, False]
@@ -1657,7 +1658,8 @@ class Queries5Tests(TestCase):
     def test_ticket7256(self):
         # An empty values() call includes all aliases, including those from an
         # extra()
-        qs = Ranking.objects.extra(select={'good': 'case when `rank` > 2 then 1 else 0 end'})
+        sql = 'case when %s > 2 then 1 else 0 end' % connection.ops.quote_name('rank')
+        qs = Ranking.objects.extra(select={'good': sql})
         dicts = qs.values().order_by('id')
         for d in dicts:
             del d['id']
