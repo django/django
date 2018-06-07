@@ -351,6 +351,35 @@ To simplify a few parts of Django's database handling, `sqlparse
 <https://pypi.org/project/sqlparse/>`_ is now a required dependency. It's
 automatically installed along with Django.
 
+``cached_property`` aliases
+---------------------------
+
+In usage like::
+
+    from django.utils.functional import cached_property
+
+    class A:
+
+        @cached_property
+        def base(self):
+            return ...
+
+        alias = base
+
+``alias`` is not cached. Such usage now raises ``TypeError: Cannot assign the
+same cached_property to two different names ('base' and 'alias').`` on Python
+3.6 and later.
+
+Use this instead::
+
+    import operator
+
+    class A:
+
+        ...
+
+        alias = property(operator.attrgetter('base'))
+
 Miscellaneous
 -------------
 
