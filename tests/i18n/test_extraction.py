@@ -128,6 +128,8 @@ class ExtractorTests(POFileAssertionMixin, RunInTmpDirMixin, SimpleTestCase):
 
 class BasicExtractorTests(ExtractorTests):
 
+    POT_FILE = 'locale/django.pot'
+
     @override_settings(USE_I18N=False)
     def test_use_i18n_false(self):
         """
@@ -393,6 +395,14 @@ class BasicExtractorTests(ExtractorTests):
         with open(BR_PO_BASE + '.po', 'r', encoding='utf-8') as fp:
             po_contents = fp.read()
             self.assertMsgStr("Größe", po_contents)
+
+    def test_pot_charset_header_is_utf8(self):
+        self.assertFalse(os.path.exists(self.POT_FILE))
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0, keep_pot=True)
+        self.assertTrue(os.path.exists(self.POT_FILE))
+        with open(self.POT_FILE, 'r', encoding='utf-8') as fp:
+            contents = fp.read()
+            self.assertIn(r'; charset=UTF-8\n"', contents)
 
 
 class JavascriptExtractorTests(ExtractorTests):
