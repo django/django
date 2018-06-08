@@ -1,0 +1,12 @@
+==========================
+Django 2.0.6 release notes
+==========================
+
+*July 2, 2018*
+
+Django 2.0.7 fixes several bugs in 2.0.6.
+
+Bugfixes
+========
+
+* ...
