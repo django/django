@@ -10,16 +10,19 @@ distributing. In this document, we will be building a custom ``closepoll``
 command for the ``polls`` application from the
 :doc:`tutorial</intro/tutorial01>`.
 
-To do this, just add a ``management/commands`` directory to the application.
+To do this, use the ``startcommand`` helper, and specify the application to
+add the command to, and the command name itself. 
+
 Django will register a ``manage.py`` command for each Python module in that
-directory whose name doesn't begin with an underscore. For example::
+directory whose name doesn't begin with an underscore. For example, with an 
+existing ``polls`` application, running ``startcommand polls closepoll`` will
+generate the following::
 
     polls/
         __init__.py
         models.py
         management/
             commands/
-                _private.py
                 closepoll.py
         tests.py
         views.py
@@ -27,10 +30,9 @@ directory whose name doesn't begin with an underscore. For example::
 In this example, the ``closepoll`` command will be made available to any project
 that includes the ``polls`` application in :setting:`INSTALLED_APPS`.
 
-The ``_private.py`` module will not be available as a management command.
-
-The ``closepoll.py`` module has only one requirement -- it must define a class
-``Command`` that extends :class:`BaseCommand` or one of its
+The generated management command file satisfies the one requirement of
+management commands -- it must define a class ``Command`` that extends
+:class:`BaseCommand` or one of its
 :ref:`subclasses<ref-basecommand-subclasses>`.
 
 .. admonition:: Standalone scripts
