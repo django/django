@@ -238,7 +238,7 @@ class Command(BaseCommand):
                  'commas, or use -e multiple times.',
         )
         parser.add_argument(
-            '--symlinks', '-s', action='store_true', dest='symlinks',
+            '--symlinks', action='store_true', dest='symlinks',
             help='Follows symlinks to directories when examining source code '
                  'and templates for translation strings.',
         )

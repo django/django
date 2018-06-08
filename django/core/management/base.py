@@ -263,7 +263,7 @@ class BaseCommand:
             help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output',
         )
         parser.add_argument(
-            '--settings',
+            '-s', '--settings',
             help=(
                 'The Python path to a settings module, e.g. '
                 '"myproject.settings.main". If this isn\'t provided, the '
