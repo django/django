@@ -577,7 +577,9 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
     authentication.  It authenticates using usernames passed in
     :attr:`request.META['REMOTE_USER'] <django.http.HttpRequest.META>`.  See
     the :doc:`Authenticating against REMOTE_USER </howto/auth-remote-user>`
-    documentation.
+    documentation. Please note that all underscores are stripped from 
+    names by :djadmin:`runserver`, and thus they will not be visible in
+    ``META``.
 
     If you need more control, you can create your own authentication backend
     that inherits from this class and override these attributes or methods:
