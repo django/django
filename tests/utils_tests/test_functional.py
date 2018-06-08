@@ -63,6 +63,18 @@ class FunctionalTestCase(unittest.TestCase):
 
             other = cached_property(other_value, name='other')
 
+            @cached_property
+            def __value(self):
+                return 1, object()
+
+            def get_value(self):
+                return self.__value
+
+            def __other_value(self):
+                return 1
+
+            private_other = cached_property(__other_value, name='private_other')
+
         # docstring should be preserved
         self.assertEqual(A.value.__doc__, "Here is the docstring...")
 
@@ -74,15 +86,20 @@ class FunctionalTestCase(unittest.TestCase):
         # check that it returns the right thing
         self.assertEqual(a.value[0], 1)
 
+        # check mingled method name
+        self.assertEqual(a.get_value(), a.get_value())
+
         # check that state isn't shared between instances
         a2 = A()
         self.assertNotEqual(a.value, a2.value)
+        self.assertNotEqual(a.get_value(), a2.get_value())
 
         # check that it behaves like a property when there's no instance
         self.assertIsInstance(A.value, cached_property)
 
         # check that overriding name works
         self.assertEqual(a.other, 1)
+        self.assertEqual(a.private_other, 1)
         self.assertTrue(callable(a.other_value))
 
     def test_lazy_equality(self):

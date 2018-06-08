@@ -34,7 +34,12 @@ class cached_property:
         """
         if instance is None:
             return self
-        res = instance.__dict__[self.name] = self.func(instance)
+        # in case of mangled method
+        if self.name.startswith("__") and cls:
+            _property = "_{}{}".format(cls.__name__, self.name)
+        else:
+            _property = self.name
+        res = instance.__dict__[_property] = self.func(instance)
         return res
 
 
