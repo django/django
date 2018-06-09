@@ -134,7 +134,7 @@ class Command(BaseCommand):
                     raise processed
                 if processed:
                     self.log("Post-processed '%s' as '%s'" %
-                             (original_path, processed_path), level=1)
+                             (original_path, processed_path), level=2)
                     self.post_processed_files.append(original_path)
                 else:
                     self.log("Skipped post-processing '%s'" % original_path)

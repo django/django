@@ -179,6 +179,7 @@ class TestCollection(TestDefaults, CollectionTestCase):
 class TestCollectionVerbosity(CollectionTestCase):
     copying_msg = 'Copying '
     run_collectstatic_in_setUp = False
+    post_process_msg = 'Post-processed'
     staticfiles_copied_msg = 'static files copied to'
 
     def test_verbosity_0(self):
@@ -199,6 +200,18 @@ class TestCollectionVerbosity(CollectionTestCase):
         output = stdout.getvalue()
         self.assertIn(self.staticfiles_copied_msg, output)
         self.assertIn(self.copying_msg, output)
+
+    @override_settings(STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage')
+    def test_verbosity_1_with_post_process(self):
+        stdout = StringIO()
+        self.run_collectstatic(verbosity=1, stdout=stdout, post_process=True)
+        self.assertNotIn(self.post_process_msg, stdout.getvalue())
+
+    @override_settings(STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage')
+    def test_verbosity_2_with_post_process(self):
+        stdout = StringIO()
+        self.run_collectstatic(verbosity=2, stdout=stdout, post_process=True)
+        self.assertIn(self.post_process_msg, stdout.getvalue())
 
 
 class TestCollectionClear(CollectionTestCase):
