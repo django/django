@@ -113,7 +113,7 @@ class GEOSGeometryBase(GEOSBase):
         parts = ewkt.split(b';', 1)
         if len(parts) == 2:
             srid_part, wkt = parts
-            match = re.match(b'SRID=(?P<srid>\-?\d+)', srid_part)
+            match = re.match(br'SRID=(?P<srid>\-?\d+)', srid_part)
             if not match:
                 raise ValueError('EWKT has invalid SRID part.')
             srid = int(match.group('srid'))
