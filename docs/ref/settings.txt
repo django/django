@@ -2191,7 +2191,7 @@ method.
 
 This takes some explanation. By default, ``is_secure()`` is able to determine
 whether a request is secure by looking at whether the requested URL uses
-"https://". This is important for Django's CSRF protection, and may be used
+``https://``. This is important for Django's CSRF protection, and may be used
 by your own code or third-party apps.
 
 If your Django app is behind a proxy, though, the proxy may be "swallowing" the
