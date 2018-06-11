@@ -10,7 +10,7 @@ Program                   Description                           Required        
 ========================  ====================================  ================================  ===================================
 :doc:`GEOS <../geos>`     Geometry Engine Open Source           Yes                               3.6, 3.5, 3.4
 `PROJ.4`_                 Cartographic Projections library      Yes (PostgreSQL and SQLite only)  4.9, 4.8, 4.7, 4.6, 4.5, 4.4
-:doc:`GDAL <../gdal>`     Geospatial Data Abstraction Library   Yes                               2.2, 2.1, 2.0, 1.11, 1.10, 1.9
+:doc:`GDAL <../gdal>`     Geospatial Data Abstraction Library   Yes                               2.2, 2.1, 2.0, 1.11
 :doc:`GeoIP <../geoip2>`  IP-based geolocation library          No                                2
 `PostGIS`__               Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             2.4, 2.3, 2.2, 2.1
 `SpatiaLite`__            Spatial extensions for SQLite         Yes (SQLite only)                 4.3, 4.2, 4.1
@@ -24,8 +24,6 @@ totally fine with GeoDjango. Your mileage may vary.
     GEOS 3.4.0 2013-08-11
     GEOS 3.5.0 2015-08-15
     GEOS 3.6.0 2016-10-25
-    GDAL 1.9.0 2012-01-03
-    GDAL 1.10.0 2013-04-29
     GDAL 1.11.0 2014-04-25
     GDAL 2.0.0 2015-06
     GDAL 2.1.0 2016-04

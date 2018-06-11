@@ -207,7 +207,7 @@ Database backend API
 :mod:`django.contrib.gis`
 -------------------------
 
-* ...
+* Support for GDAL 1.9 and 1.10 is dropped.
 
 Miscellaneous
 -------------
