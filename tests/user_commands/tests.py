@@ -220,6 +220,12 @@ class CommandTests(SimpleTestCase):
         with self.assertRaisesMessage(CommandError, msg):
             management.call_command('subparser', 'test', 12)
 
+    def test_create_parser_kwargs(self):
+        """BaseCommand.create_parser() passes kwargs to CommandParser."""
+        epilog = 'some epilog text'
+        parser = BaseCommand().create_parser('prog_name', 'subcommand', epilog=epilog)
+        self.assertEqual(parser.epilog, epilog)
+
 
 class CommandRunTests(AdminScriptTestCase):
     """

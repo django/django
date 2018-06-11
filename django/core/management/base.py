@@ -244,7 +244,7 @@ class BaseCommand:
         """
         return django.get_version()
 
-    def create_parser(self, prog_name, subcommand):
+    def create_parser(self, prog_name, subcommand, **kwargs):
         """
         Create and return the ``ArgumentParser`` which will be used to
         parse the arguments to this command.
@@ -255,6 +255,7 @@ class BaseCommand:
             formatter_class=DjangoHelpFormatter,
             missing_args_message=getattr(self, 'missing_args_message', None),
             called_from_command_line=getattr(self, '_called_from_command_line', None),
+            **kwargs
         )
         parser.add_argument('--version', action='version', version=self.get_version())
         parser.add_argument(

@@ -255,6 +255,19 @@ the :meth:`~BaseCommand.handle` method must be implemented.
                 super().__init__(*args, **kwargs)
                 # ...
 
+.. method:: BaseCommand.create_parser(prog_name, subcommand, **kwargs)
+
+    Returns a ``CommandParser`` instance, which is an
+    :class:`~argparse.ArgumentParser` subclass with a few customizations for
+    Django.
+
+    You can customize the instance by overriding this method and calling
+    ``super()`` with ``kwargs`` of :class:`~argparse.ArgumentParser` parameters.
+
+    .. versionchanged:: 2.2
+
+        ``kwargs`` was added.
+
 .. method:: BaseCommand.add_arguments(parser)
 
     Entry point to add parser arguments to handle command line arguments passed
