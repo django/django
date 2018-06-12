@@ -104,7 +104,7 @@ class JsI18NTests(SimpleTestCase):
             response = self.client.get('/jsi18n/')
             self.assertEqual(
                 response.context['catalog']['{count} plural3'],
-                ['{count} plural3', '{count} plural3s', '{count} plural3 p3t']
+                ['{count} plural3 p3', '{count} plural3 p3s', '{count} plural3 p3t']
             )
 
     def test_i18n_english_variant(self):
