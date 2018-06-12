@@ -388,8 +388,9 @@ class JavaScriptCatalog(View):
         catalog = {}
         trans_cat = self.translation._catalog
         trans_fallback_cat = self.translation._fallback._catalog if self.translation._fallback else {}
+        seen_keys = set()
         for key, value in itertools.chain(six.iteritems(trans_cat), six.iteritems(trans_fallback_cat)):
-            if key == '' or key in catalog:
+            if key == '' or key in seen_keys:
                 continue
             if isinstance(key, six.string_types):
                 catalog[key] = value
@@ -400,6 +401,7 @@ class JavaScriptCatalog(View):
                 pdict.setdefault(msgid, {})[cnt] = value
             else:
                 raise TypeError(key)
+            seen_keys.add(key)
         for k, v in pdict.items():
             catalog[k] = [v.get(i, '') for i in range(maxcnts[k] + 1)]
         return catalog
