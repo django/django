@@ -1,6 +1,20 @@
 Full release notes, with more details and upgrade information, are available at:
 https://channels.readthedocs.io/en/latest/releases
 
+2.1.2 (2018-06-13)
+------------------
+
+* AsyncHttpConsumer now has a disconnect() method you can override
+
+* Session and authentication middleware is now non-blocking.
+
+* URL routing context now includes default arguments from the URLconf.
+
+* The FORCE_SCRIPT_NAME setting is now respected in ASGI mode.
+
+* ALLOWED_HOSTS is now set correctly during LiveServerTests.
+
+
 2.1.1 (2018-04-18)
 ------------------
 

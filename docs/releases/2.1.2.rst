@@ -1,0 +1,48 @@
+2.1.2 Release Notes
+===================
+
+Channels 2.1.2 is another bugfix release in the 2.1 series.
+
+Special thanks to people at the DjangoCon Europe sprints who helped out with
+several of these fixes.
+
+
+Major Changes
+-------------
+
+Session and authentication middleware has been overhauled to be non-blocking.
+Previously, these middlewares potentially did database or session store access
+in the synchronous ASGI constructor, meaning they would block the entire event
+loop while doing so.
+
+Instead, they have now been modified to add LazyObjects into the scope in the
+places where the session or user will be, and then when the processing goes
+through their asynchronous portion, those stores are accessed in a non-blocking
+fashion.
+
+This should be an un-noticeable change for end users, but if you see weird
+behaviour or an unresolved LazyObject, let us know.
+
+
+Bugfixes & Small Changes
+------------------------
+
+* AsyncHttpConsumer now has a disconnect() method you can override if you
+  want to perform actions (such as leaving groups) when a long-running HTTP
+  request disconnects.
+
+* URL routing context now includes default arguments from the URLconf in the
+  context's ``url_route`` key, alongside captured arguments/groups from the
+  URL pattern.
+
+* The FORCE_SCRIPT_NAME setting is now respected in ASGI mode, and lets you
+  override where Django thinks the root URL of your application is mounted.
+
+* ALLOWED_HOSTS is now set correctly during LiveServerTests, meaning you will
+  no longer get ``400 Bad Request`` errors during these test runs.
+
+
+Backwards Incompatible Changes
+------------------------------
+
+None.
