@@ -1,6 +1,7 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connections
 from django.test.testcases import TransactionTestCase
+from django.test.utils import modify_settings
 
 from channels.routing import get_default_application
 from daphne.testing import DaphneProcess
@@ -35,6 +36,10 @@ class ChannelsLiveServerTestCase(TransactionTestCase):
 
         super(ChannelsLiveServerTestCase, self)._pre_setup()
 
+        self._live_server_modified_settings = modify_settings(
+            ALLOWED_HOSTS={"append": self.host},
+        )
+        self._live_server_modified_settings.enable()
         self._server_process = self.ProtocolServerProcess(
             self.host,
             get_default_application(),
@@ -46,6 +51,7 @@ class ChannelsLiveServerTestCase(TransactionTestCase):
     def _post_teardown(self):
         self._server_process.terminate()
         self._server_process.join()
+        self._live_server_modified_settings.disable()
         super(ChannelsLiveServerTestCase, self)._post_teardown()
 
     def _is_in_memory_db(self, connection):
