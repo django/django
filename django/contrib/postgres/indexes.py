@@ -53,17 +53,40 @@ class BrinIndex(PostgresIndex):
 class GinIndex(PostgresIndex):
     suffix = 'gin'
 
-    def __init__(self, *, fastupdate=None, gin_pending_list_limit=None, **kwargs):
+    def __init__(self, *, fastupdate=None, gin_pending_list_limit=None, operator_class=None, **kwargs):
         self.fastupdate = fastupdate
         self.gin_pending_list_limit = gin_pending_list_limit
+        self.operator_class = operator_class
+        paths = [field.split('.') for field in kwargs['fields']]
+        kwargs['fields'] = [path[0] for path in paths]
+        self.paths = [path[1:] for path in paths]
         super().__init__(**kwargs)
 
+    def create_sql(self, model, schema_editor, using=''):
+        statement = super().create_sql(model, schema_editor, using)
+        columns = statement.parts['columns']
+        quote_name = columns.quote_name
+        columns.quote_name = lambda x: x
+        for field, path in zip(self.fields, self.paths):
+            if not path:
+                expr = quote_name(field)
+            else:
+                expr = '({} -> {})'.format(
+                    quote_name(field),
+                    ' -> '.join("'{}'".format(key) for key in path))
+            columns.rename_column_references(
+                model._meta.db_table, field, expr)
+        return statement
+        
     def deconstruct(self):
         path, args, kwargs = super().deconstruct()
         if self.fastupdate is not None:
             kwargs['fastupdate'] = self.fastupdate
         if self.gin_pending_list_limit is not None:
             kwargs['gin_pending_list_limit'] = self.gin_pending_list_limit
+        if self.operator_class is not None:
+            kwargs['operator_class'] = self.operator_class
+        kwargs['fields'] = ['.'.join([field] + path) for field, path in zip(self.fields, self.paths)]
         return path, args, kwargs
 
     def get_with_params(self):
