@@ -9,6 +9,7 @@ from django.core import checks
 from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP
+from django.db.models.expressions import Combinable, F, OrderBy
 from django.forms.models import (
     BaseModelForm, BaseModelFormSet, _get_foreign_key,
 )
@@ -485,7 +486,13 @@ class BaseModelAdminChecks:
 
     def _check_ordering_item(self, obj, model, field_name, label):
         """ Check that `ordering` refers to existing fields. """
-
+        if isinstance(field_name, (Combinable, OrderBy)):
+            if not isinstance(field_name, OrderBy):
+                field_name = field_name.asc()
+            if isinstance(field_name.expression, F):
+                field_name = field_name.expression.name
+            else:
+                return []
         if field_name == '?' and len(obj.ordering) != 1:
             return [
                 checks.Error(

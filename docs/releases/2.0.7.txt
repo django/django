@@ -11,3 +11,6 @@ Bugfixes
 
 * Fixed admin changelist crash when using a query expression without ``asc()``
   or ``desc()`` in the page's ordering (:ticket:`29428`).
+
+* Fixed admin check crash when using a query expression in
+  ``ModelAdmin.ordering`` (:ticket:`29428`).
