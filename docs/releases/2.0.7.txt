@@ -9,4 +9,5 @@ Django 2.0.7 fixes several bugs in 2.0.6.
 Bugfixes
 ========
 
-* ...
+* Fixed admin changelist crash when using a query expression without ``asc()``
+  or ``desc()`` in the page's ordering (:ticket:`29428`).
