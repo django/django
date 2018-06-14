@@ -3,6 +3,8 @@ from django.contrib.admin import BooleanFieldListFilter, SimpleListFilter
 from django.contrib.admin.options import VERTICAL, ModelAdmin, TabularInline
 from django.contrib.admin.sites import AdminSite
 from django.core.checks import Error
+from django.db.models import F
+from django.db.models.functions import Upper
 from django.forms.models import BaseModelFormSet
 from django.test import SimpleTestCase
 
@@ -826,6 +828,23 @@ class OrderingCheckTests(CheckTestCase):
     def test_valid_case(self):
         class TestModelAdmin(ModelAdmin):
             ordering = ('name', 'pk')
+
+        self.assertIsValid(TestModelAdmin, ValidationTestModel)
+
+    def test_invalid_expression(self):
+        class TestModelAdmin(ModelAdmin):
+            ordering = (F('nonexistent'), )
+
+        self.assertIsInvalid(
+            TestModelAdmin, ValidationTestModel,
+            "The value of 'ordering[0]' refers to 'nonexistent', which is not "
+            "an attribute of 'modeladmin.ValidationTestModel'.",
+            'admin.E033'
+        )
+
+    def test_valid_expression(self):
+        class TestModelAdmin(ModelAdmin):
+            ordering = (Upper('name'), Upper('band__name').desc())
 
         self.assertIsValid(TestModelAdmin, ValidationTestModel)
 
