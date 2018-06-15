@@ -743,14 +743,14 @@ privileges:
 * CREATE PROCEDURE WITH ADMIN OPTION
 * CREATE TRIGGER WITH ADMIN OPTION
 
-Note that, while the RESOURCE role has the required CREATE TABLE, CREATE
-SEQUENCE, CREATE PROCEDURE and CREATE TRIGGER privileges, and a user
-granted RESOURCE WITH ADMIN OPTION can grant RESOURCE, such a user cannot
-grant the individual privileges (e.g. CREATE TABLE), and thus RESOURCE
-WITH ADMIN OPTION is not usually sufficient for running tests.
+While the ``RESOURCE`` role has the required ``CREATE TABLE``,
+``CREATE SEQUENCE``, ``CREATE PROCEDURE``, and ``CREATE TRIGGER`` privileges,
+and a user granted ``RESOURCE WITH ADMIN OPTION`` can grant ``RESOURCE``, such
+a user cannot grant the individual privileges (e.g. ``CREATE TABLE``), and thus
+``RESOURCE WITH ADMIN OPTION`` is not usually sufficient for running tests.
 
 Some test suites also create views; to run these, the user also needs
-the CREATE VIEW WITH ADMIN OPTION privilege. In particular, this is needed
+the ``CREATE VIEW WITH ADMIN OPTION`` privilege. In particular, this is needed
 for Django's own test suite.
 
 All of these privileges are included in the DBA role, which is appropriate
@@ -809,11 +809,11 @@ Threaded option
 
 If you plan to run Django in a multithreaded environment (e.g. Apache using the
 default MPM module on any modern operating system), then you **must** set
-the ``threaded`` option of your Oracle database configuration to True::
+the ``threaded`` option of your Oracle database configuration to ``True``::
 
-            'OPTIONS': {
-                'threaded': True,
-            },
+    'OPTIONS': {
+        'threaded': True,
+    },
 
 Failure to do this may result in crashes and other odd behavior.
 
@@ -825,14 +825,14 @@ retrieve the value of an ``AutoField`` when inserting new rows.  This behavior
 may result in a ``DatabaseError`` in certain unusual setups, such as when
 inserting into a remote table, or into a view with an ``INSTEAD OF`` trigger.
 The ``RETURNING INTO`` clause can be disabled by setting the
-``use_returning_into`` option of the database configuration to False::
+``use_returning_into`` option of the database configuration to ``False``::
 
-            'OPTIONS': {
-                'use_returning_into': False,
-            },
+    'OPTIONS': {
+        'use_returning_into': False,
+    },
 
 In this case, the Oracle backend will use a separate ``SELECT`` query to
-retrieve AutoField values.
+retrieve ``AutoField`` values.
 
 Naming issues
 -------------
@@ -868,8 +868,8 @@ particular, take care to avoid using the names ``date``,
 NULL and empty strings
 ----------------------
 
-Django generally prefers to use the empty string ('') rather than
-NULL, but Oracle treats both identically. To get around this, the
+Django generally prefers to use the empty string (``''``) rather than
+``NULL``, but Oracle treats both identically. To get around this, the
 Oracle backend ignores an explicit ``null`` option on fields that
 have the empty string as a possible value and generates DDL as if
 ``null=True``. When fetching from the database, it is assumed that
