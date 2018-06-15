@@ -1574,7 +1574,7 @@ class ModelAdmin(BaseModelAdmin):
                 form = ModelForm(instance=obj)
                 formsets, inline_instances = self._create_formsets(request, obj, change=True)
 
-        if not add and not self.has_change_permission(request):
+        if not add and not self.has_change_permission(request, obj):
             readonly_fields = flatten_fieldsets(self.get_fieldsets(request, obj))
         else:
             readonly_fields = self.get_readonly_fields(request, obj)

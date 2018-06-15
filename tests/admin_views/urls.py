@@ -16,6 +16,7 @@ urlpatterns = [
     url(r'^test_admin/admin7/', admin.site7.urls),
     # All admin views accept `extra_context` to allow adding it like this:
     url(r'^test_admin/admin8/', (admin.site.get_urls(), 'admin', 'admin-extra-context'), {'extra_context': {}}),
+    url(r'^test_admin/admin9/', admin.site9.urls),
     url(r'^test_admin/has_permission_admin/', custom_has_permission_admin.site.urls),
     url(r'^test_admin/autocomplete_admin/', autocomplete_site.urls),
 ]
