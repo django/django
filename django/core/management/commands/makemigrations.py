@@ -60,7 +60,7 @@ class Command(BaseCommand):
         self.migration_name = options['name']
         check_changes = options['check_changes']
 
-        # Make sure the app they asked for exists
+        # Make sure the app they asked for is a valid app name and exist.
         app_labels = set(app_labels)
         bad_app_labels = set()
         for app_label in app_labels:
@@ -70,7 +70,13 @@ class Command(BaseCommand):
                 bad_app_labels.add(app_label)
         if bad_app_labels:
             for app_label in bad_app_labels:
-                self.stderr.write("App '%s' could not be found. Is it in INSTALLED_APPS?" % app_label)
+                if not app_label.isidentifier():
+                    self.stderr.write(
+                        "'%s' is not a valid app name. Please make sure the "
+                        "name is a valid identifier." % app_label
+                    )
+                else:
+                    self.stderr.write("App '%s' could not be found. Is it in INSTALLED_APPS?" % app_label)
             sys.exit(2)
 
         # Load the current graph state. Pass in None for the connection so
