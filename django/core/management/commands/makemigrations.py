@@ -73,7 +73,15 @@ class Command(BaseCommand):
                 bad_app_labels.add(app_label)
         if bad_app_labels:
             for app_label in bad_app_labels:
-                self.stderr.write("App '%s' could not be found. Is it in INSTALLED_APPS?" % app_label)
+                if '.' in app_label:
+                    self.stderr.write(
+                        "'%s' is not a valid app label. Did you mean '%s'?" % (
+                            app_label,
+                            app_label.split('.')[-1],
+                        )
+                    )
+                else:
+                    self.stderr.write("App '%s' could not be found. Is it in INSTALLED_APPS?" % app_label)
             sys.exit(2)
 
         # Load the current graph state. Pass in None for the connection so
