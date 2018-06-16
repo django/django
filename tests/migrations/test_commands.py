@@ -786,6 +786,12 @@ class MakeMigrationsTests(MigrationTestBase):
             call_command("makemigrations", "this_app_does_not_exist", stderr=err)
         self.assertIn("'this_app_does_not_exist' could not be found.", err.getvalue())
 
+    def test_makemigrations_app_name_with_dots(self):
+        err = io.StringIO()
+        with self.assertRaises(SystemExit):
+            call_command('makemigrations', 'invalid.app.label', stderr=err)
+        self.assertIn("'invalid.app.label' is not a valid app label. Did you mean 'label'?", err.getvalue())
+
     def test_makemigrations_empty_no_app_specified(self):
         """
         makemigrations exits if no app is specified with 'empty' mode.
