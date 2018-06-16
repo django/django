@@ -2622,15 +2622,18 @@ SQL equivalent::
 ``in``
 ~~~~~~
 
-In a given iterable; often a list, tuple, or queryset.
+In a given iterable; often a list, tuple, or queryset. It's not a common use
+case, but strings (being iterables) are accepted.
 
-Example::
+Examples::
 
     Entry.objects.filter(id__in=[1, 3, 4])
+    Entry.objects.filter(headline__in='abc')
 
-SQL equivalent::
+SQL equivalents::
 
     SELECT ... WHERE id IN (1, 3, 4);
+    SELECT ... WHERE headline IN ('a', 'b', 'c');
 
 You can also use a queryset to dynamically evaluate the list of values
 instead of providing a list of literal values::
