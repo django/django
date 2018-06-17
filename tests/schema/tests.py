@@ -12,7 +12,7 @@ from django.db.models.deletion import CASCADE, PROTECT
 from django.db.models.fields import (
     AutoField, BigAutoField, BigIntegerField, BinaryField, BooleanField,
     CharField, DateField, DateTimeField, IntegerField, PositiveIntegerField,
-    SlugField, TextField, TimeField,
+    SlugField, TextField, TimeField, UUIDField,
 )
 from django.db.models.fields.related import (
     ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
@@ -601,6 +601,19 @@ class SchemaTests(TransactionTestCase):
         new_field.set_attributes_from_name('id')
         new_field.model = Author
         with connection.schema_editor() as editor:
+            editor.alter_field(Author, old_field, new_field, strict=True)
+
+    def test_alter_not_unique_field_to_primary_key(self):
+        # Create the table.
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        # Change UUIDField to primary key.
+        old_field = Author._meta.get_field('uuid')
+        new_field = UUIDField(primary_key=True)
+        new_field.set_attributes_from_name('uuid')
+        new_field.model = Author
+        with connection.schema_editor() as editor:
+            editor.remove_field(Author, Author._meta.get_field('id'))
             editor.alter_field(Author, old_field, new_field, strict=True)
 
     def test_alter_text_field(self):
