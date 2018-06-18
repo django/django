@@ -1117,6 +1117,9 @@ subclass::
     You must define :attr:`~ModelAdmin.search_fields` on the related object's
     ``ModelAdmin`` because the autocomplete search uses it.
 
+    To avoid unauthorized data disclosure, users must have the ``view`` or
+    ``change`` permission to the related object in order to use autocomplete.
+
     Ordering and pagination of the results are controlled by the related
     ``ModelAdmin``'s :meth:`~ModelAdmin.get_ordering` and
     :meth:`~ModelAdmin.get_paginator` methods.
