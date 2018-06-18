@@ -82,6 +82,9 @@ Minor features
 * :meth:`.InlineModelAdmin.has_add_permission` is now passed the parent object
   as the second positional argument, ``obj``.
 
+* Admin actions may now :ref:`specify permissions <admin-action-permissions>`
+  to limit their availability to certain users.
+
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 

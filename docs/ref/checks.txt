@@ -579,6 +579,8 @@ with the admin site:
   which does not refer to a Field.
 * **admin.E128**: The value of ``date_hierarchy`` must be a ``DateField`` or
   ``DateTimeField``.
+* **admin.E129**: ``<modeladmin>`` must define a ``has_<foo>_permission()``
+  method for the ``<action>`` action.
 
 ``InlineModelAdmin``
 ~~~~~~~~~~~~~~~~~~~~
