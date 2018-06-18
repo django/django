@@ -23,10 +23,6 @@ def delete_selected(modeladmin, request, queryset):
     opts = modeladmin.model._meta
     app_label = opts.app_label
 
-    # Check that the user has delete permission for the actual model
-    if not modeladmin.has_delete_permission(request):
-        raise PermissionDenied
-
     # Populate deletable_objects, a data structure of all related objects that
     # will also be deleted.
     deletable_objects, model_count, perms_needed, protected = modeladmin.get_deleted_objects(queryset, request)
@@ -79,4 +75,5 @@ def delete_selected(modeladmin, request, queryset):
     ], context)
 
 
+delete_selected.allowed_permissions = ('delete',)
 delete_selected.short_description = gettext_lazy("Delete selected %(verbose_name_plural)s")
