@@ -66,6 +66,22 @@ class Command(BaseCommand):
         self.verbosity = options['verbosity']
         self.interactive = options['interactive']
 
+        # Make sure the app they asked for exists
+        if options['app_label']:
+            app_label = options['app_label']
+            try:
+                apps.get_app_config(app_label)
+            except LookupError:
+                if '.' in app_label:
+                    raise CommandError(
+                        "'%s' is not a valid app label. Did you mean '%s'?" % (
+                            app_label,
+                            app_label.split('.')[-1],
+                        )
+                    )
+                else:
+                    raise CommandError("App '%s' could not be found. Is it in INSTALLED_APPS?" % app_label)
+
         # Import the 'management' module within each installed app, to register
         # dispatcher events.
         for app_config in apps.get_app_configs():
