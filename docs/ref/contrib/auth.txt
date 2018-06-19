@@ -427,7 +427,11 @@ can be used for notification when a user logs in or out.
         The class of the user that just logged in.
 
     ``request``
-        The current :class:`~django.http.HttpRequest` instance.
+        The current :class:`~django.http.HttpRequest` instance. This instance
+        contains the session *before* it is cleared by the authentication
+        backend, so if you need to associate data from or perform actions on
+        the anonymous instance with the new user, that can be done in this
+        signal.
 
     ``user``
         The user instance that just logged in.
