@@ -456,7 +456,8 @@ to remove usage of these features.
 
 * The ``Model._meta.has_auto_field`` attribute is removed.
 
-* Support for regular expression groups with ``iLmsu#`` in ``url()`` is removed.
+* ``url()``'s support for inline flags in regular expression groups (``(?i)``,
+  ``(?L)``, ``(?m)``, ``(?s)``, and ``(?u)``) is removed.
 
 * Support for ``Widget.render()`` methods without the ``renderer`` argument
   is removed.
