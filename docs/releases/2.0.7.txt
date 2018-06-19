@@ -14,3 +14,5 @@ Bugfixes
 
 * Fixed admin check crash when using a query expression in
   ``ModelAdmin.ordering`` (:ticket:`29428`).
+
+* Fixed ``__regex`` and ``__iregex`` lookups with MySQL 8 (:ticket:`29451`).
