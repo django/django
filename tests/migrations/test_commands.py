@@ -1408,20 +1408,20 @@ class AppLabelErrorTests(TestCase):
     app. 'django.contrib.auth' must be in INSTALLED_APPS for some of these
     tests.
     """
+    nonexistent_app_error = "No installed app with label 'nonexistent_app'."
+    did_you_mean_auth_error = (
+        "No installed app with label 'django.contrib.auth'. Did you mean "
+        "'auth'?"
+    )
+
     def test_makemigrations_nonexistent_app_label(self):
         err = io.StringIO()
         with self.assertRaises(SystemExit):
             call_command('makemigrations', 'nonexistent_app', stderr=err)
-        self.assertIn(
-            "App 'nonexistent_app' could not be found. Is it in "
-            "INSTALLED_APPS?", err.getvalue()
-        )
+        self.assertIn(self.nonexistent_app_error, err.getvalue())
 
     def test_makemigrations_app_name_specified_as_label(self):
         err = io.StringIO()
         with self.assertRaises(SystemExit):
             call_command('makemigrations', 'django.contrib.auth', stderr=err)
-        self.assertIn(
-            "'django.contrib.auth' is not a valid app label. Did you mean 'auth'?",
-            err.getvalue()
-        )
+        self.assertIn(self.did_you_mean_auth_error, err.getvalue())
