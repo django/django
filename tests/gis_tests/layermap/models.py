@@ -17,7 +17,7 @@ class State(NamedModel):
 
 class County(NamedModel):
     state = models.ForeignKey(State, models.CASCADE)
-    mpoly = models.MultiPolygonField(srid=4269)  # Multipolygon in NAD83
+    mpoly = models.MultiPolygonField(srid=4269, null=True)  # Multipolygon in NAD83
 
 
 class CountyFeat(NamedModel):
