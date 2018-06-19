@@ -148,8 +148,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'iexact': 'LIKE %s',
         'contains': 'LIKE BINARY %s',
         'icontains': 'LIKE %s',
-        'regex': 'REGEXP BINARY %s',
-        'iregex': 'REGEXP %s',
         'gt': '> %s',
         'gte': '>= %s',
         'lt': '< %s',

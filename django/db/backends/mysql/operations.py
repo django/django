@@ -272,3 +272,14 @@ class DatabaseOperations(BaseDatabaseOperations):
             ) % (lhs_sql, rhs_sql), lhs_params + rhs_params
         else:
             return "(TIMESTAMPDIFF(SECOND, %s, %s) * POW(10, 6))" % (rhs_sql, lhs_sql), rhs_params + lhs_params
+
+    def regex_lookup(self, lookup_type):
+        # REGEXP BINARY doesn't work correctly in MySQL 8+ and REGEXP_LIKE
+        # doesn't exist in MySQL 5.6.
+        if self.connection.mysql_version < (8, 0, 0):
+            if lookup_type == 'regex':
+                return '%s REGEXP BINARY %s'
+            return '%s REGEXP %s'
+
+        match_option = 'c' if lookup_type == 'regex' else 'i'
+        return "REGEXP_LIKE(%%s, %%s, '%s')" % match_option
