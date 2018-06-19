@@ -17,7 +17,7 @@ class DatabaseClient(BaseDatabaseClient):
     executable_name = 'psql'
 
     @classmethod
-    def runshell_db(cls, conn_params):
+    def runshell_db(cls, conn_params, command):
         args = [cls.executable_name]
 
         host = conn_params.get('host', '')
@@ -32,6 +32,8 @@ class DatabaseClient(BaseDatabaseClient):
             args += ['-h', host]
         if port:
             args += ['-p', str(port)]
+        if command:
+            args += ['-c', "%s" % command]
         args += [dbname]
 
         temp_pgpass = None
@@ -67,5 +69,5 @@ class DatabaseClient(BaseDatabaseClient):
                 if 'PGPASSFILE' in os.environ:  # unit tests need cleanup
                     del os.environ['PGPASSFILE']
 
-    def runshell(self):
-        DatabaseClient.runshell_db(self.connection.get_connection_params())
+    def runshell(self, command=''):
+        DatabaseClient.runshell_db(self.connection.get_connection_params(), command)
