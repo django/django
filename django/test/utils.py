@@ -382,6 +382,8 @@ class override_settings(TestContextDecorator):
     with the ``with`` statement. In either event, entering/exiting are called
     before and after, respectively, the function/block is executed.
     """
+    enable_exception = None
+
     def __init__(self, **kwargs):
         self.options = kwargs
         super().__init__()
@@ -401,18 +403,35 @@ class override_settings(TestContextDecorator):
         self.wrapped = settings._wrapped
         settings._wrapped = override
         for key, new_value in self.options.items():
-            setting_changed.send(sender=settings._wrapped.__class__,
-                                 setting=key, value=new_value, enter=True)
+            try:
+                setting_changed.send(
+                    sender=settings._wrapped.__class__,
+                    setting=key, value=new_value, enter=True,
+                )
+            except Exception as exc:
+                self.enable_exception = exc
+                self.disable()
 
     def disable(self):
         if 'INSTALLED_APPS' in self.options:
             apps.unset_installed_apps()
         settings._wrapped = self.wrapped
         del self.wrapped
+        responses = []
         for key in self.options:
             new_value = getattr(settings, key, None)
-            setting_changed.send(sender=settings._wrapped.__class__,
-                                 setting=key, value=new_value, enter=False)
+            responses_for_setting = setting_changed.send_robust(
+                sender=settings._wrapped.__class__,
+                setting=key, value=new_value, enter=False,
+            )
+            responses.extend(responses_for_setting)
+        if self.enable_exception is not None:
+            exc = self.enable_exception
+            self.enable_exception = None
+            raise exc
+        for _, response in responses:
+            if isinstance(response, Exception):
+                raise response
 
     def save_options(self, test_func):
         if test_func._overridden_settings is None:
