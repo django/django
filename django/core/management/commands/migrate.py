@@ -100,12 +100,18 @@ class Command(BaseCommand):
 
         # If they supplied command line arguments, work out what they mean.
         target_app_labels_only = True
-        if options['app_label'] and options['migration_name']:
-            app_label, migration_name = options['app_label'], options['migration_name']
+        if options['app_label']:
+            # Validate app_label.
+            app_label = options['app_label']
+            try:
+                apps.get_app_config(app_label)
+            except LookupError as err:
+                raise CommandError(str(err))
             if app_label not in executor.loader.migrated_apps:
-                raise CommandError(
-                    "App '%s' does not have migrations." % app_label
-                )
+                raise CommandError("App '%s' does not have migrations." % app_label)
+
+        if options['app_label'] and options['migration_name']:
+            migration_name = options['migration_name']
             if migration_name == "zero":
                 targets = [(app_label, None)]
             else:
@@ -123,11 +129,6 @@ class Command(BaseCommand):
                 targets = [(app_label, migration.name)]
             target_app_labels_only = False
         elif options['app_label']:
-            app_label = options['app_label']
-            if app_label not in executor.loader.migrated_apps:
-                raise CommandError(
-                    "App '%s' does not have migrations." % app_label
-                )
             targets = [key for key in executor.loader.graph.leaf_nodes() if key[0] == app_label]
         else:
             targets = executor.loader.graph.leaf_nodes()
