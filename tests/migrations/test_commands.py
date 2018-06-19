@@ -193,6 +193,19 @@ class MigrateTests(MigrationTestBase):
         with self.assertRaisesMessage(CommandError, "Conflicting migrations detected"):
             call_command("migrate", "migrations")
 
+    def test_migrate_nonexistent_app_error(self):
+        """
+        migrate exits if a nonexistent app is specified.
+        """
+        msg = "App 'this_app_dose_not_exist' could not be found. Is it in INSTALLED_APPS?"
+        with self.assertRaisesMessage(CommandError, msg):
+            call_command("migrate", "this_app_dose_not_exist")
+
+    def test_migrate_app_name_with_dots(self):
+        msg = "'invalid.app.label' is not a valid app label. Did you mean 'label'?"
+        with self.assertRaisesMessage(CommandError, msg):
+            call_command("migrate", "invalid.app.label")
+
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_showmigrations_list(self):
         """
