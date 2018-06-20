@@ -709,8 +709,7 @@ class LoginURLSettings(AuthViewsTestCase):
     """Tests for settings.LOGIN_URL."""
     def assertLoginURLEquals(self, url):
         response = self.client.get('/login_required/')
-        self.assertEqual(response.status_code, 302)
-        self.assertURLEqual(response.url, url)
+        self.assertRedirects(response, url, fetch_redirect_response=False)
 
     @override_settings(LOGIN_URL='/login/')
     def test_standard_login_url(self):

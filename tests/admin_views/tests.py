@@ -1827,7 +1827,6 @@ class AdminViewPermissionsTest(TestCase):
             response = self.client.get(change_url_3)
             self.assertEqual(response.status_code, 200)
             response = self.client.post(change_url_3, {'name': 'changed'})
-            self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, self.index_url)
             self.assertEqual(RowLevelChangePermissionModel.objects.get(id=3).name, 'odd id mult 3')
             response = self.client.get(change_url_6)
@@ -5559,7 +5558,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
 
-    def assertURLEqual(self, url1, url2):
+    def assertURLEqual(self, url1, url2, msg_prefix=''):
         """
         Assert that two URLs are equal despite the ordering
         of their querystring. Refs #22360.
@@ -5730,31 +5729,19 @@ class AdminKeepChangeListFiltersTests(TestCase):
 
         post_data['_save'] = 1
         response = self.client.post(self.get_change_url(), data=post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertURLEqual(
-            response.url,
-            self.get_changelist_url()
-        )
+        self.assertRedirects(response, self.get_changelist_url())
         post_data.pop('_save')
 
         # Test redirect on "Save and continue".
         post_data['_continue'] = 1
         response = self.client.post(self.get_change_url(), data=post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertURLEqual(
-            response.url,
-            self.get_change_url()
-        )
+        self.assertRedirects(response, self.get_change_url())
         post_data.pop('_continue')
 
         # Test redirect on "Save and add new".
         post_data['_addanother'] = 1
         response = self.client.post(self.get_change_url(), data=post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertURLEqual(
-            response.url,
-            self.get_add_url()
-        )
+        self.assertRedirects(response, self.get_add_url())
         post_data.pop('_addanother')
 
     def test_add_view(self):
@@ -5778,43 +5765,27 @@ class AdminKeepChangeListFiltersTests(TestCase):
         # Test redirect on "Save".
         post_data['_save'] = 1
         response = self.client.post(self.get_add_url(), data=post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertURLEqual(
-            response.url,
-            self.get_change_url(User.objects.get(username='dummy').pk)
-        )
+        self.assertRedirects(response, self.get_change_url(User.objects.get(username='dummy').pk))
         post_data.pop('_save')
 
         # Test redirect on "Save and continue".
         post_data['username'] = 'dummy2'
         post_data['_continue'] = 1
         response = self.client.post(self.get_add_url(), data=post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertURLEqual(
-            response.url,
-            self.get_change_url(User.objects.get(username='dummy2').pk)
-        )
+        self.assertRedirects(response, self.get_change_url(User.objects.get(username='dummy2').pk))
         post_data.pop('_continue')
 
         # Test redirect on "Save and add new".
         post_data['username'] = 'dummy3'
         post_data['_addanother'] = 1
         response = self.client.post(self.get_add_url(), data=post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertURLEqual(
-            response.url,
-            self.get_add_url()
-        )
+        self.assertRedirects(response, self.get_add_url())
         post_data.pop('_addanother')
 
     def test_delete_view(self):
         # Test redirect on "Delete".
         response = self.client.post(self.get_delete_url(), {'post': 'yes'})
-        self.assertEqual(response.status_code, 302)
-        self.assertURLEqual(
-            response.url,
-            self.get_changelist_url()
-        )
+        self.assertRedirects(response, self.get_changelist_url())
 
     def test_url_prefix(self):
         context = {
