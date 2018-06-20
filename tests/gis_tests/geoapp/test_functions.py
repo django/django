@@ -214,7 +214,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
     def test_envelope(self):
         countries = Country.objects.annotate(envelope=functions.Envelope('mpoly'))
         for country in countries:
-            self.assertIsInstance(country.envelope, Polygon)
+            self.assertTrue(country.envelope.equals(country.mpoly.envelope))
 
     @skipUnlessDBFeature("has_ForcePolygonCW_function")
     def test_force_polygon_cw(self):
