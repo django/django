@@ -8,6 +8,7 @@ from django.conf import settings
 from django.conf.urls import url
 from django.contrib.staticfiles.finders import get_finder, get_finders
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.core import signals
 from django.core.files.storage import default_storage
 from django.db import connection, models, router
 from django.forms import EmailField, IntegerField
@@ -1073,6 +1074,19 @@ class OverrideSettingsTests(SimpleTestCase):
         with self.settings(STATICFILES_DIRS=[test_path]):
             finder = get_finder('django.contrib.staticfiles.finders.FileSystemFinder')
             self.assertIn(expected_location, finder.locations)
+
+    def test_enter_catches_signal_handler_error(self):
+        def setting_changed_receiver(*args, **kwargs):
+            if kwargs['setting'] == 'RAISES_ERROR':
+                raise Exception("Error in setting_changed_receiver")
+
+        with self.settings(RAISES_ERROR='Before'):
+            self.assertEqual(settings.RAISES_ERROR, 'Before')
+            signals.setting_changed.connect(setting_changed_receiver)
+            with override_settings(RAISES_ERROR='After'):
+                self.assertEqual(settings.RAISES_ERROR, 'After')
+            self.assertEqual(settings.RAISES_ERROR, 'Before')
+            signals.setting_changed.disconnect(setting_changed_receiver)
 
 
 class TestBadSetUpTestData(TestCase):

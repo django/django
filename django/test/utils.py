@@ -401,8 +401,11 @@ class override_settings(TestContextDecorator):
         self.wrapped = settings._wrapped
         settings._wrapped = override
         for key, new_value in self.options.items():
-            setting_changed.send(sender=settings._wrapped.__class__,
-                                 setting=key, value=new_value, enter=True)
+            try:
+                setting_changed.send(sender=settings._wrapped.__class__,
+                                     setting=key, value=new_value, enter=True)
+            except Exception:
+                pass  # We should probably output something to the console here.
 
     def disable(self):
         if 'INSTALLED_APPS' in self.options:
@@ -411,8 +414,11 @@ class override_settings(TestContextDecorator):
         del self.wrapped
         for key in self.options:
             new_value = getattr(settings, key, None)
-            setting_changed.send(sender=settings._wrapped.__class__,
-                                 setting=key, value=new_value, enter=False)
+            try:
+                setting_changed.send(sender=settings._wrapped.__class__,
+                                     setting=key, value=new_value, enter=False)
+            except Exception:
+                pass
 
     def save_options(self, test_func):
         if test_func._overridden_settings is None:
