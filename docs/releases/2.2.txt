@@ -56,7 +56,8 @@ Minor features
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Added Oracle support for the
+  :class:`~django.contrib.gis.db.models.functions.Envelope` function.
 
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
