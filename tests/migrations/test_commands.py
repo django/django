@@ -13,7 +13,7 @@ from django.db import (
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.migrations.exceptions import InconsistentMigrationHistory
 from django.db.migrations.recorder import MigrationRecorder
-from django.test import override_settings
+from django.test import TestCase, override_settings
 
 from .models import UnicodeModel, UnserializableModel
 from .routers import TestRouter
@@ -779,19 +779,6 @@ class MakeMigrationsTests(MigrationTestBase):
             call_command("makemigrations", merge=True, stdout=out)
         self.assertIn("No conflicts detected to merge.", out.getvalue())
 
-    def test_makemigrations_no_app_sys_exit(self):
-        """makemigrations exits if a nonexistent app is specified."""
-        err = io.StringIO()
-        with self.assertRaises(SystemExit):
-            call_command("makemigrations", "this_app_does_not_exist", stderr=err)
-        self.assertIn("'this_app_does_not_exist' could not be found.", err.getvalue())
-
-    def test_makemigrations_app_name_with_dots(self):
-        err = io.StringIO()
-        with self.assertRaises(SystemExit):
-            call_command('makemigrations', 'invalid.app.label', stderr=err)
-        self.assertIn("'invalid.app.label' is not a valid app label. Did you mean 'label'?", err.getvalue())
-
     def test_makemigrations_empty_no_app_specified(self):
         """
         makemigrations exits if no app is specified with 'empty' mode.
@@ -1412,3 +1399,29 @@ class SquashMigrationsTests(MigrationTestBase):
             )
             squashed_migration_file = os.path.join(migration_dir, '0001_%s.py' % squashed_name)
             self.assertTrue(os.path.exists(squashed_migration_file))
+
+
+class AppLabelErrorTests(TestCase):
+    """
+    This class inherits TestCase because MigrationTestBase uses
+    `availabe_apps = ['migrations']` which means that it's the only installed
+    app. 'django.contrib.auth' must be in INSTALLED_APPS for some of these
+    tests.
+    """
+    def test_makemigrations_nonexistent_app_label(self):
+        err = io.StringIO()
+        with self.assertRaises(SystemExit):
+            call_command('makemigrations', 'nonexistent_app', stderr=err)
+        self.assertIn(
+            "App 'nonexistent_app' could not be found. Is it in "
+            "INSTALLED_APPS?", err.getvalue()
+        )
+
+    def test_makemigrations_app_name_specified_as_label(self):
+        err = io.StringIO()
+        with self.assertRaises(SystemExit):
+            call_command('makemigrations', 'django.contrib.auth', stderr=err)
+        self.assertIn(
+            "'django.contrib.auth' is not a valid app label. Did you mean 'auth'?",
+            err.getvalue()
+        )
