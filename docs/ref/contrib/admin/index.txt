@@ -2831,7 +2831,8 @@ Templates can override or extend base admin templates as described in
 .. attribute:: AdminSite.login_form
 
     Subclass of :class:`~django.contrib.auth.forms.AuthenticationForm` that
-    will be used by the admin site login view.
+    will be used by the admin site login view. This attribute can be specified
+    as a string to avoid an ``AppRegistryNotReady`` exception.
 
 .. attribute:: AdminSite.logout_template
 

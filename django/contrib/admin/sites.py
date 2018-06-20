@@ -51,7 +51,10 @@ class AdminSite:
 
     _empty_value_display = '-'
 
-    login_form = None
+    # Since this module gets imported in the application's root package,
+    # it cannot import models from other applications at the module level,
+    # using a string and importing the form at runtime bypass this problem
+    login_form = 'django.contrib.admin.forms.AdminAuthenticationForm'
     index_template = None
     app_index_template = None
     login_template = None
@@ -374,10 +377,6 @@ class AdminSite:
             return HttpResponseRedirect(index_path)
 
         from django.contrib.auth.views import LoginView
-        # Since this module gets imported in the application's root package,
-        # it cannot import models from other applications at the module level,
-        # and django.contrib.admin.forms eventually imports User.
-        from django.contrib.admin.forms import AdminAuthenticationForm
         context = {
             **self.each_context(request),
             'title': _('Log in'),
@@ -389,9 +388,11 @@ class AdminSite:
             context[REDIRECT_FIELD_NAME] = reverse('admin:index', current_app=self.name)
         context.update(extra_context or {})
 
+        login_form = import_string(self.login_form) if isinstance(self.login_form, str) else self.login_form
+
         defaults = {
             'extra_context': context,
-            'authentication_form': self.login_form or AdminAuthenticationForm,
+            'authentication_form': login_form,
             'template_name': self.login_template or 'admin/login.html',
         }
         request.current_app = self.name
