@@ -1073,7 +1073,7 @@ subclass::
             # Test definitions as before.
             call_setup_methods()
 
-        def testFluffyAnimals(self):
+        def test_fluffy_animals(self):
             # A test that uses the fixtures.
             call_some_test_code()
 
