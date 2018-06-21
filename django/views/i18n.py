@@ -175,31 +175,6 @@ js_catalog_template = r"""
 """
 
 
-def render_javascript_catalog(catalog=None, plural=None):
-    template = Engine().from_string(js_catalog_template)
-
-    def indent(s):
-        return s.replace('\n', '\n  ')
-
-    context = Context({
-        'catalog_str': indent(json.dumps(
-            catalog, sort_keys=True, indent=2)) if catalog else None,
-        'formats_str': indent(json.dumps(
-            get_formats(), sort_keys=True, indent=2)),
-        'plural': plural,
-    })
-
-    return HttpResponse(template.render(context), 'text/javascript')
-
-
-def null_javascript_catalog(request, domain=None, packages=None):
-    """
-    Return "identity" versions of the JavaScript i18n functions -- i.e.,
-    versions that don't actually do anything.
-    """
-    return render_javascript_catalog()
-
-
 class JavaScriptCatalog(View):
     """
     Return the selected language catalog as a JavaScript library.
