@@ -206,6 +206,7 @@ class I18NViewTests(SimpleTestCase):
                 catalog = gettext.translation('djangojs', locale_dir, [lang_code])
                 trans_txt = catalog.gettext('this is to be translated')
                 response = self.client.get('/jsi18n/')
+                self.assertEqual(response['Content-Type'], 'text/javascript; charset="utf-8"')
                 # response content must include a line like:
                 # "this is to be translated": <value of trans_txt Python variable>
                 # json.dumps() is used to be able to check unicode strings
