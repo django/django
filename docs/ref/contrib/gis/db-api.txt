@@ -382,6 +382,7 @@ Function                              PostGIS  Oracle          MySQL        Spat
 :class:`Difference`                   X        X               X            X
 :class:`Distance`                     X        X               X            X
 :class:`Envelope`                     X        X               X            X
+:class:`ForcePolygonCW`               X                                     X
 :class:`ForceRHR`                     X
 :class:`GeoHash`                      X                        X (≥ 5.7.5)  X (LWGEOM)
 :class:`Intersection`                 X        X               X            X
