@@ -59,6 +59,9 @@ Minor features
 * Added Oracle support for the
   :class:`~django.contrib.gis.db.models.functions.Envelope` function.
 
+* Added SpatiaLite support for the :lookup:`coveredby` and :lookup:`covers`
+  lookups.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -47,6 +47,8 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         'contains': SpatialiteNullCheckOperator(func='Contains'),
         'intersects': SpatialiteNullCheckOperator(func='Intersects'),
         'relate': SpatialiteNullCheckOperator(func='Relate'),
+        'coveredby': SpatialiteNullCheckOperator(func='CoveredBy'),
+        'covers': SpatialiteNullCheckOperator(func='Covers'),
         # Returns true if B's bounding box completely contains A's bounding box.
         'contained': SpatialOperator(func='MbrWithin'),
         # Returns true if A's bounding box completely contains B's bounding box.
