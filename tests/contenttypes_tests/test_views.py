@@ -2,14 +2,15 @@ import datetime
 from unittest import mock
 
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.views import shortcut
 from django.contrib.sites.models import Site
-from django.db import models
+from django.contrib.sites.shortcuts import get_current_site
+from django.http import Http404, HttpRequest
 from django.test import TestCase, override_settings
-from django.test.utils import isolate_apps
 
 from .models import (
-    Article, Author, ModelWithNullFKToSite, SchemeIncludedURL,
-    Site as MockSite,
+    Article, Author, FooWithBrokenAbsoluteUrl, FooWithoutUrl, FooWithUrl,
+    ModelWithNullFKToSite, SchemeIncludedURL, Site as MockSite,
 )
 
 
@@ -106,19 +107,44 @@ class ContentTypesViewsTests(TestCase):
         response = self.client.get(url)
         self.assertRedirects(response, '%s' % obj.get_absolute_url(), fetch_redirect_response=False)
 
-    @isolate_apps('contenttypes_tests')
-    def test_create_contenttype_on_the_spot(self):
-        """
-        ContentTypeManager.get_for_model() creates the corresponding content
-        type if it doesn't exist in the database.
-        """
-        class ModelCreatedOnTheFly(models.Model):
-            name = models.CharField()
 
-            class Meta:
-                verbose_name = 'a model created on the fly'
+class ShortcutViewTests(TestCase):
 
-        ct = ContentType.objects.get_for_model(ModelCreatedOnTheFly)
-        self.assertEqual(ct.app_label, 'contenttypes_tests')
-        self.assertEqual(ct.model, 'modelcreatedonthefly')
-        self.assertEqual(str(ct), 'modelcreatedonthefly')
+    def setUp(self):
+        self.request = HttpRequest()
+        self.request.META = {'SERVER_NAME': 'Example.com', 'SERVER_PORT': '80'}
+
+    @override_settings(ALLOWED_HOSTS=['example.com'])
+    def test_not_dependent_on_sites_app(self):
+        """
+        The view returns a complete URL regardless of whether the sites
+        framework is installed.
+        """
+        user_ct = ContentType.objects.get_for_model(FooWithUrl)
+        obj = FooWithUrl.objects.create(name='john')
+        with self.modify_settings(INSTALLED_APPS={'append': 'django.contrib.sites'}):
+            response = shortcut(self.request, user_ct.id, obj.id)
+            self.assertEqual(
+                'http://%s/users/john/' % get_current_site(self.request).domain,
+                response._headers.get('location')[1]
+            )
+        with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'}):
+            response = shortcut(self.request, user_ct.id, obj.id)
+            self.assertEqual('http://Example.com/users/john/', response._headers.get('location')[1])
+
+    def test_model_without_get_absolute_url(self):
+        """The view returns 404 when Model.get_absolute_url() isn't defined."""
+        user_ct = ContentType.objects.get_for_model(FooWithoutUrl)
+        obj = FooWithoutUrl.objects.create(name='john')
+        with self.assertRaises(Http404):
+            shortcut(self.request, user_ct.id, obj.id)
+
+    def test_model_with_broken_get_absolute_url(self):
+        """
+        The view doesn't catch an AttributeError raised by
+        Model.get_absolute_url() (#8997).
+        """
+        user_ct = ContentType.objects.get_for_model(FooWithBrokenAbsoluteUrl)
+        obj = FooWithBrokenAbsoluteUrl.objects.create(name='john')
+        with self.assertRaises(AttributeError):
+            shortcut(self.request, user_ct.id, obj.id)
