@@ -279,6 +279,21 @@ SpatiaLite  ``Disjoint(poly, geom)``
 *Availability*: `PostGIS <https://postgis.net/docs/ST_Equals.html>`__,
 Oracle, MySQL, SpatiaLite, PGRaster (Conversion)
 
+Tests if the geometry field is spatially equal to the lookup geometry.
+
+Example::
+
+    Zipcode.objects.filter(poly__equals=geom)
+
+==========  =================================================
+Backend     SQL Equivalent
+==========  =================================================
+PostGIS     ``ST_Equals(poly, geom)``
+Oracle      ``SDO_EQUAL(poly, geom)``
+MySQL       ``MBREquals(poly, geom)``
+SpatiaLite  ``Equals(poly, geom)``
+==========  =================================================
+
 .. fieldlookup:: exact
 .. fieldlookup:: same_as
 
@@ -287,6 +302,23 @@ Oracle, MySQL, SpatiaLite, PGRaster (Conversion)
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_Geometry_Same.html>`__,
 Oracle, MySQL, SpatiaLite, PGRaster (Bilateral)
+
+Tests if the geometry field is "equal" to the lookup geometry. On Oracle and
+SpatiaLite it tests spatial equality, while on MySQL and PostGIS it tests
+equality of bounding boxes.
+
+Example::
+
+    Zipcode.objects.filter(poly=geom)
+
+==========  =================================================
+Backend     SQL Equivalent
+==========  =================================================
+PostGIS     ``poly ~= geom``
+Oracle      ``SDO_EQUAL(poly, geom)``
+MySQL       ``MBREquals(poly, geom)``
+SpatiaLite  ``Equals(poly, geom)``
+==========  =================================================
 
 .. fieldlookup:: intersects
 
