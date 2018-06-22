@@ -284,7 +284,7 @@ class JavaScriptCatalog(View):
         ) if context['catalog'] else None
         context['formats_str'] = indent(json.dumps(context['formats'], sort_keys=True, indent=2))
 
-        return HttpResponse(template.render(Context(context)), 'text/javascript')
+        return HttpResponse(template.render(Context(context)), 'text/javascript; charset="utf-8"')
 
 
 class JSONCatalog(JavaScriptCatalog):
