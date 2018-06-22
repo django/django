@@ -218,7 +218,10 @@ Database backend API
 Miscellaneous
 -------------
 
-* ...
+* On SQLite, ``PositiveIntegerField`` and ``PositiveSmallIntegerField`` now
+  include a check constraint to prevent negative values in the database. If you
+  have existing invalid data and run a migration that recreates a table, you'll
+  see ``CHECK constraint failed``.
 
 .. _deprecated-features-2.2:
 

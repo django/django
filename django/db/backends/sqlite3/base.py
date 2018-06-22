@@ -76,6 +76,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'TimeField': 'time',
         'UUIDField': 'char(32)',
     }
+    data_type_check_constraints = {
+        'PositiveIntegerField': '"%(column)s" >= 0',
+        'PositiveSmallIntegerField': '"%(column)s" >= 0',
+    }
     data_types_suffix = {
         'AutoField': 'AUTOINCREMENT',
         'BigAutoField': 'AUTOINCREMENT',
