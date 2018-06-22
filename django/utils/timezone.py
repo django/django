@@ -75,8 +75,9 @@ def get_default_timezone():
     Return the default time zone as a tzinfo instance.
 
     This is the time zone defined by settings.TIME_ZONE.
+    For 'UTC' use module level utc object.
     """
-    return pytz.timezone(settings.TIME_ZONE)
+    return utc if settings.TIME_ZONE.upper() == 'UTC' else pytz.timezone(settings.TIME_ZONE)
 
 
 # This function exists for consistency with get_current_timezone_name
