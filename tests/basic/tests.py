@@ -65,7 +65,7 @@ class ModelInstanceCreationTests(TestCase):
         self.assertEqual(a.headline, 'Fourth article')
 
     def test_cannot_create_instance_with_invalid_kwargs(self):
-        with self.assertRaisesMessage(TypeError, "'foo' is an invalid keyword argument for this function"):
+        with self.assertRaisesMessage(TypeError, "Article() got an unexpected keyword argument 'foo'"):
             Article(
                 id=None,
                 headline='Some headline',
