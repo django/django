@@ -39,3 +39,6 @@ class FunctionTests(SimpleTestCase):
 
     def test_integer(self):
         self.assertEqual(make_list(1234), ['1', '2', '3', '4'])
+
+    def test_string_with_separator(self):
+        self.assertEqual(make_list('try#split#this', '#'), ['try', 'split', 'this'])

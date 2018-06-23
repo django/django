@@ -196,13 +196,15 @@ def lower(value):
 
 @register.filter(is_safe=False)
 @stringfilter
-def make_list(value):
+def make_list(value, string_delimiter=None):
     """
     Return the value turned into a list.
 
     For an integer, it's a list of digits.
-    For a string, it's a list of characters.
+    For a string, it's a list of characters, or strings if string_separator is provided.
     """
+    if string_delimiter is not None:
+        return value.split(string_delimiter)
     return list(value)
 
 
