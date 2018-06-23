@@ -1434,6 +1434,14 @@ class AppLabelErrorTests(TestCase):
         with self.assertRaisesMessage(CommandError, self.did_you_mean_auth_error):
             call_command('migrate', 'django.contrib.auth')
 
+    def test_sqlmigrate_nonexistent_app_label(self):
+        with self.assertRaisesMessage(CommandError, self.nonexistent_app_error):
+            call_command('sqlmigrate', 'nonexistent_app', '0002')
+
+    def test_sqlmigrate_app_name_specified_as_label(self):
+        with self.assertRaisesMessage(CommandError, self.did_you_mean_auth_error):
+            call_command('sqlmigrate', 'django.contrib.auth', '0002')
+
     def test_squashmigrations_nonexistent_app_label(self):
         with self.assertRaisesMessage(CommandError, self.nonexistent_app_error):
             call_command('squashmigrations', 'nonexistent_app', '0002')
