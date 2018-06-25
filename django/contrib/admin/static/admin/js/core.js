@@ -156,14 +156,6 @@ function findPosY(obj) {
 // ----------------------------------------------------------------------------
 // String object extensions
 // ----------------------------------------------------------------------------
-    String.prototype.pad_left = function(pad_length, pad_string) {
-        var new_string = this;
-        for (var i = 0; new_string.length < pad_length; i++) {
-            new_string = pad_string + new_string;
-        }
-        return new_string;
-    };
-
     String.prototype.strptime = function(format) {
         var split_format = format.split(/[.\-/]/);
         var date = this.split(/[.\-/]/);
