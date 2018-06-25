@@ -81,12 +81,7 @@ class Fieldset:
     def media(self):
         if 'collapse' in self.classes:
             extra = '' if settings.DEBUG else '.min'
-            js = [
-                'vendor/jquery/jquery%s.js' % extra,
-                'jquery.init.js',
-                'collapse%s.js' % extra,
-            ]
-            return forms.Media(js=['admin/js/%s' % url for url in js])
+            return forms.Media(js=['admin/js/collapse%s.js' % extra])
         return forms.Media()
 
     def __iter__(self):

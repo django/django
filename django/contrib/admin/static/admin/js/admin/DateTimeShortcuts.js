@@ -63,7 +63,6 @@
         },
         // Add a warning when the time zone in the browser and backend do not match.
         addTimezoneWarning: function(inp) {
-            var $ = django.jQuery;
             var warningClass = DateTimeShortcuts.timezoneWarningClass;
             var timezoneOffset = DateTimeShortcuts.timezoneOffset / 3600;
 
@@ -73,7 +72,7 @@
             }
 
             // Check if warning is already there.
-            if ($(inp).siblings('.' + warningClass).length) {
+            if (inp.parentNode.querySelectorAll('.' + warningClass).length) {
                 return;
             }
 
@@ -95,13 +94,11 @@
             }
             message = interpolate(message, [timezoneOffset]);
 
-            var $warning = $('<span>');
-            $warning.attr('class', warningClass);
-            $warning.text(message);
-
-            $(inp).parent()
-                .append($('<br>'))
-                .append($warning);
+            var warning = document.createElement('span');
+            warning.className = warningClass;
+            warning.textContent = message;
+            inp.parentNode.appendChild(document.createElement('br'));
+            inp.parentNode.appendChild(warning);
         },
         // Add clock widget to a given field
         addClock: function(inp) {
@@ -115,7 +112,7 @@
             inp.parentNode.insertBefore(shortcuts_span, inp.nextSibling);
             var now_link = document.createElement('a');
             now_link.setAttribute('href', "#");
-            now_link.appendChild(document.createTextNode(gettext('Now')));
+            now_link.textContent = gettext('Now');
             now_link.addEventListener('click', function(e) {
                 e.preventDefault();
                 DateTimeShortcuts.handleClockQuicklink(num, -1);
@@ -345,7 +342,7 @@
                 e.preventDefault();
                 DateTimeShortcuts.dismissCalendar(num);
             });
-            django.jQuery(document).on('keyup', function(event) {
+            document.addEventListener('keyup', function(event) {
                 if (event.which === 27) {
                     // ESC key closes popup
                     DateTimeShortcuts.dismissCalendar(num);
