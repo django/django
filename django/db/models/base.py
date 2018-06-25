@@ -481,7 +481,7 @@ class Model(metaclass=ModelBase):
                 except (AttributeError, FieldDoesNotExist):
                     pass
             for kwarg in kwargs:
-                raise TypeError("%s() got an unexpected keyword argument '%s'" % (cls.__name__, list(kwargs)[0]))
+                raise TypeError("%s() got an unexpected keyword argument '%s'" % (cls.__name__, kwarg))
         super().__init__()
         post_init.send(sender=cls, instance=self)
 
