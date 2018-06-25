@@ -7,7 +7,7 @@ to handle not only HTTP, but protocols that require long-running connections
 too - WebSockets, MQTT, chatbots, amateur radio, and more.
 
 It does this while preserving Django's synchronous and easy-to-use nature,
-allowing you to choose how your write your code - synchronous in a style like
+allowing you to choose how you write your code - synchronous in a style like
 Django views, fully asynchronous, or a mixture of both. On top of this, it
 provides integrations with Django's auth system, session system, and more,
 making it easier than ever to extend your HTTP-only project to other protocols.
