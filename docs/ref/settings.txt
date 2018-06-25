@@ -2984,22 +2984,20 @@ This setting also affects cookies set by :mod:`django.contrib.messages`.
 
 Default: ``True``
 
-Whether to use ``HTTPOnly`` flag on the session cookie. If this is set to
-``True``, client-side JavaScript will not to be able to access the
-session cookie.
+Whether to use ``HttpOnly`` flag on the session cookie. If this is set to
+``True``, client-side JavaScript will not to be able to access the session
+cookie.
 
-HTTPOnly_ is a flag included in a Set-Cookie HTTP response header. It
-is not part of the :rfc:`2109` standard for cookies, and it isn't honored
-consistently by all browsers. However, when it is honored, it can be a
-useful way to mitigate the risk of a client side script accessing the
-protected cookie data.
+HttpOnly_ is a flag included in a Set-Cookie HTTP response header. It's part of
+the :rfc:`6265` standard for cookies and can be a useful way to mitigate the
+risk of a client-side script accessing the protected cookie data.
 
 This makes it less trivial for an attacker to escalate a cross-site scripting
 vulnerability into full hijacking of a user's session. There aren't many good
 reasons for turning this off. Your code shouldn't read session cookies from
 JavaScript.
 
-.. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
+.. _HttpOnly: https://www.owasp.org/index.php/HttpOnly
 
 .. setting:: SESSION_COOKIE_NAME
 

@@ -293,7 +293,7 @@ requests. These include:
 * Support for lookups spanning relations in admin's
   :attr:`~django.contrib.admin.ModelAdmin.list_filter`.
 
-* Support for HTTPOnly_ cookies.
+* Support for HttpOnly_ cookies.
 
 * :meth:`~django.core.mail.mail_admins()` and
   :meth:`~django.core.mail.mail_managers()` now support easily attaching
@@ -315,7 +315,7 @@ requests. These include:
 * Support for combining :class:`F expressions <django.db.models.F>`
   with ``timedelta`` values when retrieving or updating database values.
 
-.. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
+.. _HttpOnly: https://www.owasp.org/index.php/HttpOnly
 
 .. _backwards-incompatible-changes-1.3:
 

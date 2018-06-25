@@ -458,7 +458,7 @@ SESSION_COOKIE_DOMAIN = None
 SESSION_COOKIE_SECURE = False
 # The path of the session cookie.
 SESSION_COOKIE_PATH = '/'
-# Whether to use the non-RFC standard httpOnly flag (IE, FF3+, others)
+# Whether to use the HttpOnly flag.
 SESSION_COOKIE_HTTPONLY = True
 # Whether to set the flag restricting cookie leaks on cross-site requests.
 # This can be 'Lax', 'Strict', or None to disable the flag.
