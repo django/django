@@ -74,13 +74,7 @@ function findPosY(obj) {
 (function() {
     'use strict';
     Date.prototype.getTwelveHours = function() {
-        var hours = this.getHours();
-        if (hours === 0) {
-            return 12;
-        }
-        else {
-            return hours <= 12 ? hours : hours - 12;
-        }
+        return this.getHours() % 12 || 12;
     };
 
     Date.prototype.getTwoDigitMonth = function() {
