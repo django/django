@@ -111,10 +111,6 @@ function findPosY(obj) {
         return this.getTwoDigitHour() + ':' + this.getTwoDigitMinute();
     };
 
-    Date.prototype.getHourMinuteSecond = function() {
-        return this.getTwoDigitHour() + ':' + this.getTwoDigitMinute() + ':' + this.getTwoDigitSecond();
-    };
-
     Date.prototype.getFullMonthName = function() {
         return typeof window.CalendarNamespace === "undefined"
             ? this.getTwoDigitMonth()
