@@ -1108,8 +1108,6 @@ tests can't rely upon the fact that your views will be available at a
 particular URL. Decorate your test class or test method with
 ``@override_settings(ROOT_URLCONF=...)`` for URLconf configuration.
 
-.. _emptying-test-outbox:
-
 Multi-database support
 ----------------------
 
@@ -1323,6 +1321,8 @@ SERIALIZATION_MODULES            Serializers cache
 LOCALE_PATHS, LANGUAGE_CODE      Default translation and loaded translations
 MEDIA_ROOT, DEFAULT_FILE_STORAGE Default file storage
 ================================ ========================
+
+.. _emptying-test-outbox:
 
 Emptying the test outbox
 ------------------------
