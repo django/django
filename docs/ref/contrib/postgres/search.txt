@@ -78,7 +78,7 @@ the user provides are passed through the stemming algorithms, and then it
 looks for matches for all of the resulting terms.
 
 If ``phrase`` is True, then the terms are treated as a single phrase. If
-``phrase`` is False, which is the default, then terms are reated as separate
+``phrase`` is False, which is the default, then terms are treated as separate
 keywords.
 
     >>> from django.contrib.postgres.search import SearchQuery
