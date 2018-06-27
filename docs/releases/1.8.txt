@@ -49,9 +49,7 @@ The ``Model._meta`` object has been part of Django since the days of pre-0.96
 "Magic Removal" -- it just wasn't an official, stable API. In recognition of
 this, we've endeavored to maintain backwards-compatibility with the old
 API endpoint where possible. However, API endpoints that aren't part of the
-new official API have been deprecated and will eventually be removed. A
-:ref:`guide to migrating from the old API to the new API
-<migrating-old-meta-api>` has been provided.
+new official API have been deprecated and will eventually be removed.
 
 Multiple template engines
 -------------------------
@@ -991,8 +989,7 @@ will work with both Django 1.8 and older versions::
     for relation in opts.get_all_related_objects():
         to_model = getattr(relation, 'related_model', relation.model)
 
-Also note that ``get_all_related_objects()`` is deprecated in 1.8. See the
-:ref:`upgrade guide <migrating-old-meta-api>` for the new API.
+Also note that ``get_all_related_objects()`` is deprecated in 1.8.
 
 Database backend API
 --------------------
@@ -1221,9 +1218,6 @@ deprecated and will be removed in Django 1.10:
 * ``get_field_by_name()``
 * ``get_fields_with_model()``
 * ``get_m2m_with_model()``
-
-A :ref:`migration guide <migrating-old-meta-api>` has been provided to assist
-in converting your code from the old API to the new, official API.
 
 Loading ``cycle`` and ``firstof`` template tags from ``future`` library
 -----------------------------------------------------------------------
