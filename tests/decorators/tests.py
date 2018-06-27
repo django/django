@@ -271,6 +271,21 @@ class MethodDecoratorTests(SimpleTestCase):
                 self.assertEqual(Test.method.__doc__, 'A method')
                 self.assertEqual(Test.method.__name__, 'method')
 
+    def test_new_attribute(self):
+        """A decorator that sets a new attribute on the method."""
+        def decorate(func):
+            func.x = 1
+            return func
+
+        class MyClass:
+            @method_decorator(decorate)
+            def method(self):
+                return True
+
+        obj = MyClass()
+        self.assertEqual(obj.method.x, 1)
+        self.assertIs(obj.method(), True)
+
     def test_bad_iterable(self):
         decorators = {myattr_dec_m, myattr2_dec_m}
         msg = "'set' object is not subscriptable"
