@@ -127,9 +127,10 @@ class SearchQueryCombinable:
 class SearchQuery(SearchQueryCombinable, Value):
     output_field = SearchQueryField()
 
-    def __init__(self, value, output_field=None, *, config=None, invert=False):
+    def __init__(self, value, output_field=None, *, config=None, invert=False, phrase=False):
         self.config = config
         self.invert = invert
+        self.phrase = phrase
         super().__init__(value, output_field=output_field)
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
@@ -145,10 +146,16 @@ class SearchQuery(SearchQueryCombinable, Value):
         params = [self.value]
         if self.config:
             config_sql, config_params = compiler.compile(self.config)
-            template = 'plainto_tsquery({}::regconfig, %s)'.format(config_sql)
+            if self.phrase:
+                template = 'phraseto_tsquery({}::regconfig, %s)'.format(config_sql)
+            else:
+                template = 'plainto_tsquery({}::regconfig, %s)'.format(config_sql)
             params = config_params + [self.value]
         else:
-            template = 'plainto_tsquery(%s)'
+            if self.phrase:
+                template = 'phraseto_tsquery(%s)'
+            else:
+                template = 'plainto_tsquery(%s)'
         if self.invert:
             template = '!!({})'.format(template)
         return template, params

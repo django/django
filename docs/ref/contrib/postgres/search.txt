@@ -70,12 +70,22 @@ and ``weight`` parameters.
 ``SearchQuery``
 ===============
 
-.. class:: SearchQuery(value, config=None)
+.. class:: SearchQuery(value, config=None, phrase=False)
 
 ``SearchQuery`` translates the terms the user provides into a search query
 object that the database compares to a search vector. By default, all the words
 the user provides are passed through the stemming algorithms, and then it
 looks for matches for all of the resulting terms.
+
+If ``phrase`` is True, then the terms are treated as a single phrase. If
+``phrase`` is False, which is the default, then terms are reated as separate
+keywords.
+
+    >>> from django.contrib.postgres.search import SearchQuery
+    >>> SearchQuery('red tomato')  # two keywords
+    >>> SearchQuery('tomato red')  # same as above, exact same results
+    >>> SearchQuery('red tomato', phrase=True)  # a phrase
+    >>> SearchQuery('tomato red', phrase=True)  # a different phrase
 
 ``SearchQuery`` terms can be combined logically to provide more flexibility::
 
