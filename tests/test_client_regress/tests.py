@@ -1196,6 +1196,10 @@ class RequestMethodStringDataTests(SimpleTestCase):
         response = self.client.head('/body/', data='', content_type='application/json')
         self.assertEqual(response.content, b'')
 
+    def test_json_bytes(self):
+        response = self.client.post('/body/', data=b"{'value': 37}", content_type='application/json')
+        self.assertEqual(response.content, b"{'value': 37}")
+
     def test_json(self):
         response = self.client.get('/json_response/')
         self.assertEqual(response.json(), {'key': 'value'})

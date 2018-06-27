@@ -310,7 +310,7 @@ class RequestFactory:
                 charset = match.group(1)
             else:
                 charset = settings.DEFAULT_CHARSET
-            return data.encode(charset)
+            return force_bytes(data, encoding=charset)
 
     def _encode_json(self, data, content_type):
         """
