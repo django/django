@@ -218,7 +218,7 @@ class BaseExpression:
     def contains_column_references(self):
         return any(expr and expr.contains_column_references for expr in self.get_source_expressions())
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, **kwargs):
         """
         Provide the chance to do any preprocessing or validation before being
         added to the query.
@@ -236,7 +236,7 @@ class BaseExpression:
         c = self.copy()
         c.is_summary = summarize
         c.set_source_expressions([
-            expr.resolve_expression(query, allow_joins, reuse, summarize)
+            expr.resolve_expression(query, allow_joins, reuse, summarize, **kwargs)
             if expr else None
             for expr in c.get_source_expressions()
         ])
@@ -439,11 +439,11 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
         sql = connection.ops.combine_expression(self.connector, expressions)
         return expression_wrapper % sql, expression_params
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, **kwargs):
         c = self.copy()
         c.is_summary = summarize
-        c.lhs = c.lhs.resolve_expression(query, allow_joins, reuse, summarize, for_save)
-        c.rhs = c.rhs.resolve_expression(query, allow_joins, reuse, summarize, for_save)
+        c.lhs = c.lhs.resolve_expression(query, allow_joins, reuse, summarize, **kwargs)
+        c.rhs = c.rhs.resolve_expression(query, allow_joins, reuse, summarize, **kwargs)
         return c
 
 
@@ -505,7 +505,7 @@ class F(Combinable):
     def __repr__(self):
         return "{}({})".format(self.__class__.__name__, self.name)
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, **kwargs):
         return query.resolve_ref(self.name, allow_joins, reuse, summarize)
 
     def asc(self, **kwargs):
@@ -542,7 +542,7 @@ class ResolvedOuterRef(F):
 
 
 class OuterRef(F):
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
+    def resolve_expression(self, *args, **kwargs):
         if isinstance(self.name, self.__class__):
             return self.name
         return ResolvedOuterRef(self.name)
@@ -590,11 +590,11 @@ class Func(SQLiteNumericMixin, Expression):
     def set_source_expressions(self, exprs):
         self.source_expressions = exprs
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, **kwargs):
         c = self.copy()
         c.is_summary = summarize
         for pos, arg in enumerate(c.source_expressions):
-            c.source_expressions[pos] = arg.resolve_expression(query, allow_joins, reuse, summarize, for_save)
+            c.source_expressions[pos] = arg.resolve_expression(query, allow_joins, reuse, summarize, **kwargs)
         return c
 
     def as_sql(self, compiler, connection, function=None, template=None, arg_joiner=None, **extra_context):
@@ -660,9 +660,9 @@ class Value(Expression):
             return 'NULL', []
         return '%s', [val]
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        c = super().resolve_expression(query, allow_joins, reuse, summarize, for_save)
-        c.for_save = for_save
+    def resolve_expression(self, *args, **kwargs):
+        c = super().resolve_expression(*args, **kwargs)
+        c.for_save = kwargs.get('for_save', False)
         return c
 
     def get_group_by_cols(self):
@@ -977,7 +977,7 @@ class Subquery(Expression):
         clone.queryset = clone.queryset.all()
         return clone
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, **kwargs):
         clone = self.copy()
         clone.is_summary = summarize
         clone.queryset.query.bump_prefix(query)
@@ -993,7 +993,7 @@ class Subquery(Expression):
             if hasattr(child, 'resolve_expression'):
                 resolved = child.resolve_expression(
                     query=query, allow_joins=allow_joins, reuse=reuse,
-                    summarize=summarize, for_save=for_save,
+                    summarize=summarize, **kwargs
                 )
                 # Add table alias to the parent query's aliases to prevent
                 # quoting.

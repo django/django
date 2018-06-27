@@ -15,8 +15,8 @@ class StatAggregate(Aggregate):
             raise ValueError('Both y and x must be provided.')
         super().__init__(y, x, output_field=output_field, filter=filter)
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        return super().resolve_expression(query, allow_joins, reuse, summarize)
+    def resolve_expression(self, *args, **kwargs):
+        return super().resolve_expression(*args, **kwargs)
 
 
 class Corr(StatAggregate):

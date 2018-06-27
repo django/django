@@ -61,13 +61,13 @@ class SearchVector(SearchVectorCombinable, Func):
             weight = Value(weight)
         self.weight = weight
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        resolved = super().resolve_expression(query, allow_joins, reuse, summarize, for_save)
+    def resolve_expression(self, *args, **kwargs):
+        resolved = super().resolve_expression(*args, **kwargs)
         if self.config:
             if not hasattr(self.config, 'resolve_expression'):
-                resolved.config = Value(self.config).resolve_expression(query, allow_joins, reuse, summarize, for_save)
+                resolved.config = Value(self.config).resolve_expression(*args, **kwargs)
             else:
-                resolved.config = self.config.resolve_expression(query, allow_joins, reuse, summarize, for_save)
+                resolved.config = self.config.resolve_expression(*args, **kwargs)
         return resolved
 
     def as_sql(self, compiler, connection, function=None, template=None):
@@ -132,13 +132,13 @@ class SearchQuery(SearchQueryCombinable, Value):
         self.invert = invert
         super().__init__(value, output_field=output_field)
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        resolved = super().resolve_expression(query, allow_joins, reuse, summarize, for_save)
+    def resolve_expression(self, *args, **kwargs):
+        resolved = super().resolve_expression(*args, **kwargs)
         if self.config:
             if not hasattr(self.config, 'resolve_expression'):
-                resolved.config = Value(self.config).resolve_expression(query, allow_joins, reuse, summarize, for_save)
+                resolved.config = Value(self.config).resolve_expression(*args, **kwargs)
             else:
-                resolved.config = self.config.resolve_expression(query, allow_joins, reuse, summarize, for_save)
+                resolved.config = self.config.resolve_expression(*args, **kwargs)
         return resolved
 
     def as_sql(self, compiler, connection):

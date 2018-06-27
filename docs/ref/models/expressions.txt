@@ -910,7 +910,7 @@ calling the appropriate methods on the wrapped expression.
         in :class:`~django.db.models.expressions.Window`. Defaults to
         ``False``.
 
-    .. method:: resolve_expression(query=None, allow_joins=True, reuse=None, summarize=False, for_save=False)
+    .. method:: resolve_expression(query=None, allow_joins=True, reuse=None, summarize=False, for_save=False, for_where=False)
 
         Provides the chance to do any pre-processing or validation of
         the expression before it's added to the query. ``resolve_expression()``
@@ -926,6 +926,12 @@ calling the appropriate methods on the wrapped expression.
 
         ``summarize`` is a boolean that, when ``True``, signals that the
         query being computed is a terminal aggregate query.
+
+        .. versionadded:: 2.2
+
+        ``for_where`` is a boolean that, when ``True`` indicates that the
+        expression is to be used in the ``WHERE`` clause of a query, and
+        will not be used in a ``SELECT``.
 
     .. method:: get_source_expressions()
 
