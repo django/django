@@ -58,6 +58,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return self.connection.pg_version >= 90500
 
     @cached_property
+    def is_postgresql_9_6(self):
+        return self.connection.pg_version >= 90600
+
+    @cached_property
     def is_postgresql_10(self):
         return self.connection.pg_version >= 100000
 
@@ -67,3 +71,4 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_brin_autosummarize = is_postgresql_10
     has_gin_pending_list_limit = is_postgresql_9_5
     supports_ignore_conflicts = is_postgresql_9_5
+    has_phraseto_tsquery = is_postgresql_9_6
