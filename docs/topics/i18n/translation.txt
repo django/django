@@ -845,7 +845,7 @@ If you want to select a language within a template, you can use the
 While the first occurrence of "Welcome to our page" uses the current language,
 the second will always be in English.
 
-.. _template-translation-vars:
+.. _i18n-template-tags:
 
 Other tags
 ----------
@@ -880,8 +880,13 @@ locale's direction. If ``True``, it's a right-to-left language, e.g. Hebrew,
 Arabic. If ``False`` it's a left-to-right language, e.g. English, French,
 German, etc.
 
-If you enable the ``django.template.context_processors.i18n`` context processor
-then each ``RequestContext`` will have access to ``LANGUAGES``,
+.. _template-translation-vars:
+
+``i18n`` context processor
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you enable the :class:`django.template.context_processors.i18n` context
+processor, then each ``RequestContext`` will have access to ``LANGUAGES``,
 ``LANGUAGE_CODE``, and ``LANGUAGE_BIDI`` as defined above.
 
 .. templatetag:: get_language_info
