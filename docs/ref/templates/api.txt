@@ -690,14 +690,20 @@ the request's IP address (``request.META['REMOTE_ADDR']``) is in the
 ``django.template.context_processors.i18n``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If this processor is enabled, every ``RequestContext`` will contain these two
+.. function:: i18n
+
+If this processor is enabled, every ``RequestContext`` will contain these
 variables:
 
 * ``LANGUAGES`` -- The value of the :setting:`LANGUAGES` setting.
+* ``LANGUAGE_BIDI`` -- ``True`` if the current language is a right-to-left
+  language, e.g. Hebrew, Arabic. ``False`` if it's a left-to-right language,
+  e.g. English, French, German.
 * ``LANGUAGE_CODE`` -- ``request.LANGUAGE_CODE``, if it exists. Otherwise,
   the value of the :setting:`LANGUAGE_CODE` setting.
 
-See :doc:`/topics/i18n/index` for more.
+See :ref:`i18n template tags <i18n-template-tags>` for template tags that
+generate the same values.
 
 ``django.template.context_processors.media``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
