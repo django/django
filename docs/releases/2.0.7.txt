@@ -16,3 +16,6 @@ Bugfixes
   ``ModelAdmin.ordering`` (:ticket:`29428`).
 
 * Fixed ``__regex`` and ``__iregex`` lookups with MySQL 8 (:ticket:`29451`).
+
+* Fixed migrations crash with namespace packages on Python 3.7
+  (:ticket:`28814`).
