@@ -93,8 +93,8 @@ details on these changes.
 
 * The ``Model._meta.has_auto_field`` attribute will be removed.
 
-* Support for regular expression groups with ``iLmsu#`` in ``url()`` will be
-  removed.
+* ``url()``'s support for inline flags in regular expression groups (``(?i)``,
+  ``(?L)``, ``(?m)``, ``(?s)``, and ``(?u)``) will be removed.
 
 * Support for ``Widget.render()`` methods without the ``renderer`` argument
   will be removed.

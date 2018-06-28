@@ -82,6 +82,9 @@ Minor features
 * :meth:`.InlineModelAdmin.has_add_permission` is now passed the parent object
   as the second positional argument, ``obj``.
 
+* Admin actions may now :ref:`specify permissions <admin-action-permissions>`
+  to limit their availability to certain users.
+
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -144,6 +147,11 @@ Management Commands
 
 * The new :option:`inspectdb --include-views` option allows creating models
   for database views.
+
+* The :class:`~django.core.management.BaseCommand` class now uses a custom help
+  formatter so that the standard options like ``--verbosity`` or ``--settings``
+  appear last in the help output, giving a more prominent position to subclassed
+  command's options.
 
 Migrations
 ~~~~~~~~~~
@@ -448,7 +456,8 @@ to remove usage of these features.
 
 * The ``Model._meta.has_auto_field`` attribute is removed.
 
-* Support for regular expression groups with ``iLmsu#`` in ``url()`` is removed.
+* ``url()``'s support for inline flags in regular expression groups (``(?i)``,
+  ``(?L)``, ``(?m)``, ``(?s)``, and ``(?u)``) is removed.
 
 * Support for ``Widget.render()`` methods without the ``renderer`` argument
   is removed.

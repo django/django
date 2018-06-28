@@ -56,7 +56,11 @@ Minor features
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Added Oracle support for the
+  :class:`~django.contrib.gis.db.models.functions.Envelope` function.
+
+* Added SpatiaLite support for the :lookup:`coveredby` and :lookup:`covers`
+  lookups.
 
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -182,7 +186,9 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* The new :meth:`.SimpleTestCase.assertURLEqual` assertion checks for a given
+  URL, ignoring the ordering of the query string.
+  :meth:`~.SimpleTestCase.assertRedirects` uses the new assertion.
 
 URLs
 ~~~~
@@ -207,12 +213,15 @@ Database backend API
 :mod:`django.contrib.gis`
 -------------------------
 
-* ...
+* Support for GDAL 1.9 and 1.10 is dropped.
 
 Miscellaneous
 -------------
 
-* ...
+* On SQLite, ``PositiveIntegerField`` and ``PositiveSmallIntegerField`` now
+  include a check constraint to prevent negative values in the database. If you
+  have existing invalid data and run a migration that recreates a table, you'll
+  see ``CHECK constraint failed``.
 
 .. _deprecated-features-2.2:
 

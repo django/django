@@ -1857,6 +1857,12 @@ Field API reference
     Besides saving to the database, the field also needs to know how to
     serialize its value:
 
+    .. method:: value_from_object(obj)
+
+        Returns the field's value for the given model instance.
+
+        This method is often used by :meth:`value_to_string`.
+
     .. method:: value_to_string(obj)
 
         Converts ``obj`` to a string. Used to serialize the value of the field.

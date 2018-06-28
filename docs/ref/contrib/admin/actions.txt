@@ -340,9 +340,6 @@ Conditionally enabling or disabling actions
     Finally, you can conditionally enable or disable actions on a per-request
     (and hence per-user basis) by overriding :meth:`ModelAdmin.get_actions`.
 
-    This doesn't return any actions if the user doesn't have the "change"
-    permission for the model.
-
     This returns a dictionary of actions allowed. The keys are action names, and
     the values are ``(function, name, short_description)`` tuples.
 
@@ -360,3 +357,52 @@ Conditionally enabling or disabling actions
                     if 'delete_selected' in actions:
                         del actions['delete_selected']
                 return actions
+
+.. _admin-action-permissions:
+
+Setting permissions for actions
+-------------------------------
+
+.. versionadded:: 2.1
+
+Actions may limit their availability to users with specific permissions by
+setting an ``allowed_permissions`` attribute on the action function::
+
+    def make_published(modeladmin, request, queryset):
+        queryset.update(status='p')
+    make_published.allowed_permissions = ('change',)
+
+The ``make_published()`` action will only be available to users that pass the
+:meth:`.ModelAdmin.has_change_permission` check.
+
+If ``allowed_permissions`` has more than one permission, the action will be
+available as long as the user passes at least one of the checks.
+
+Available values for ``allowed_permissions`` and the corresponding method
+checks are:
+
+- ``'add'``: :meth:`.ModelAdmin.has_add_permission`
+- ``'change'``: :meth:`.ModelAdmin.has_change_permission`
+- ``'delete'``: :meth:`.ModelAdmin.has_delete_permission`
+- ``'view'``: :meth:`.ModelAdmin.has_view_permission`
+
+You can specify any other value as long as you implement a corresponding
+``has_<value>_permission(self, request)`` method on the ``ModelAdmin``.
+
+For example::
+
+    from django.contrib import admin
+    from django.contrib.auth import get_permission_codename
+
+    class ArticleAdmin(admin.ModelAdmin):
+        actions = ['make_published']
+
+        def make_published(self, request, queryset):
+            queryset.update(status='p')
+        make_published.allowed_permissions = ('publish',)
+
+        def has_publish_permission(self, request):
+            """Does the user have the publish permission?"""
+            opts = self.opts
+            codename = get_permission_codename('publish', opts)
+            return request.user.has_perm('%s.%s' % (opts.app_label, codename))

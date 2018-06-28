@@ -6,6 +6,7 @@ from django.db.models import (
     BooleanField, CharField, Count, DateTimeField, ExpressionWrapper, F, Func,
     IntegerField, NullBooleanField, Q, Sum, Value,
 )
+from django.db.models.expressions import RawSQL
 from django.db.models.functions import Length, Lower
 from django.test import TestCase, skipUnlessDBFeature
 
@@ -321,6 +322,17 @@ class NonAggregateAnnotationTestCase(TestCase):
         publishers = Publisher.objects.values('id', 'book__rating').annotate(total=Sum('book__rating'))
         for publisher in publishers.filter(pk=self.p1.pk):
             self.assertEqual(publisher['book__rating'], publisher['total'])
+
+    @skipUnlessDBFeature('allows_group_by_pk')
+    def test_rawsql_group_by_collapse(self):
+        raw = RawSQL('SELECT MIN(id) FROM annotations_book', [])
+        qs = Author.objects.values('id').annotate(
+            min_book_id=raw,
+            count_friends=Count('friends'),
+        ).order_by()
+        _, _, group_by = qs.query.get_compiler(using='default').pre_sql_setup()
+        self.assertEqual(len(group_by), 1)
+        self.assertNotEqual(raw, group_by[0])
 
     def test_defer_annotation(self):
         """

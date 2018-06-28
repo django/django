@@ -13,7 +13,7 @@ from django.db import (
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.migrations.exceptions import InconsistentMigrationHistory
 from django.db.migrations.recorder import MigrationRecorder
-from django.test import override_settings
+from django.test import TestCase, override_settings
 
 from .models import UnicodeModel, UnserializableModel
 from .routers import TestRouter
@@ -779,13 +779,6 @@ class MakeMigrationsTests(MigrationTestBase):
             call_command("makemigrations", merge=True, stdout=out)
         self.assertIn("No conflicts detected to merge.", out.getvalue())
 
-    def test_makemigrations_no_app_sys_exit(self):
-        """makemigrations exits if a nonexistent app is specified."""
-        err = io.StringIO()
-        with self.assertRaises(SystemExit):
-            call_command("makemigrations", "this_app_does_not_exist", stderr=err)
-        self.assertIn("'this_app_does_not_exist' could not be found.", err.getvalue())
-
     def test_makemigrations_empty_no_app_specified(self):
         """
         makemigrations exits if no app is specified with 'empty' mode.
@@ -1406,3 +1399,53 @@ class SquashMigrationsTests(MigrationTestBase):
             )
             squashed_migration_file = os.path.join(migration_dir, '0001_%s.py' % squashed_name)
             self.assertTrue(os.path.exists(squashed_migration_file))
+
+
+class AppLabelErrorTests(TestCase):
+    """
+    This class inherits TestCase because MigrationTestBase uses
+    `availabe_apps = ['migrations']` which means that it's the only installed
+    app. 'django.contrib.auth' must be in INSTALLED_APPS for some of these
+    tests.
+    """
+    nonexistent_app_error = "No installed app with label 'nonexistent_app'."
+    did_you_mean_auth_error = (
+        "No installed app with label 'django.contrib.auth'. Did you mean "
+        "'auth'?"
+    )
+
+    def test_makemigrations_nonexistent_app_label(self):
+        err = io.StringIO()
+        with self.assertRaises(SystemExit):
+            call_command('makemigrations', 'nonexistent_app', stderr=err)
+        self.assertIn(self.nonexistent_app_error, err.getvalue())
+
+    def test_makemigrations_app_name_specified_as_label(self):
+        err = io.StringIO()
+        with self.assertRaises(SystemExit):
+            call_command('makemigrations', 'django.contrib.auth', stderr=err)
+        self.assertIn(self.did_you_mean_auth_error, err.getvalue())
+
+    def test_migrate_nonexistent_app_label(self):
+        with self.assertRaisesMessage(CommandError, self.nonexistent_app_error):
+            call_command('migrate', 'nonexistent_app')
+
+    def test_migrate_app_name_specified_as_label(self):
+        with self.assertRaisesMessage(CommandError, self.did_you_mean_auth_error):
+            call_command('migrate', 'django.contrib.auth')
+
+    def test_sqlmigrate_nonexistent_app_label(self):
+        with self.assertRaisesMessage(CommandError, self.nonexistent_app_error):
+            call_command('sqlmigrate', 'nonexistent_app', '0002')
+
+    def test_sqlmigrate_app_name_specified_as_label(self):
+        with self.assertRaisesMessage(CommandError, self.did_you_mean_auth_error):
+            call_command('sqlmigrate', 'django.contrib.auth', '0002')
+
+    def test_squashmigrations_nonexistent_app_label(self):
+        with self.assertRaisesMessage(CommandError, self.nonexistent_app_error):
+            call_command('squashmigrations', 'nonexistent_app', '0002')
+
+    def test_squashmigrations_app_name_specified_as_label(self):
+        with self.assertRaisesMessage(CommandError, self.did_you_mean_auth_error):
+            call_command('squashmigrations', 'django.contrib.auth', '0002')

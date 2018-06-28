@@ -267,10 +267,16 @@ queryset is calculated::
 
 *Availability*: `MySQL
 <https://dev.mysql.com/doc/refman/en/gis-general-property-functions.html#function_st-envelope>`__,
+`Oracle
+<https://docs.oracle.com/database/121/SPATL/sdo_geom-sdo_mbr.htm#GUID-646638D0-2C5F-490A-AF63-DE9B7A4C97C1__CHDJCEIH>`__,
 `PostGIS <https://postgis.net/docs/ST_Envelope.html>`__, SpatiaLite
 
 Accepts a single geographic field or expression and returns the geometry
 representing the bounding box of the geometry.
+
+.. versionchanged:: 2.2
+
+    Oracle support was added.
 
 ``ForcePolygonCW``
 ==================

@@ -116,14 +116,14 @@ class Settings:
             if setting.isupper():
                 setting_value = getattr(mod, setting)
 
-                if setting == 'SECRET_KEY' and not setting_value:
-                    raise ImproperlyConfigured('The SECRET_KEY setting must not be empty.')
-
                 if (setting in tuple_settings and
                         not isinstance(setting_value, (list, tuple))):
                     raise ImproperlyConfigured("The %s setting must be a list or a tuple. " % setting)
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
+
+        if not self.SECRET_KEY:
+            raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
 
         if self.is_overridden('DEFAULT_CONTENT_TYPE'):
             warnings.warn('The DEFAULT_CONTENT_TYPE setting is deprecated.', RemovedInDjango30Warning)
@@ -139,11 +139,6 @@ class Settings:
             # we don't do this unconditionally (breaks Windows).
             os.environ['TZ'] = self.TIME_ZONE
             time.tzset()
-
-    def __getattr__(self, name):
-        if name == 'SECRET_KEY':
-            raise ImproperlyConfigured('The SECRET_KEY setting must be set.')
-        raise AttributeError("'%s' object has no attribute '%s'" % (self.__class__.__name__, name))
 
     def is_overridden(self, setting):
         return setting in self._explicit_settings

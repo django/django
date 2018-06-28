@@ -8,9 +8,9 @@ geospatial libraries:
 ========================  ====================================  ================================  ===================================
 Program                   Description                           Required                          Supported Versions
 ========================  ====================================  ================================  ===================================
-:doc:`GEOS <../geos>`     Geometry Engine Open Source           Yes                               3.5, 3.4
+:doc:`GEOS <../geos>`     Geometry Engine Open Source           Yes                               3.6, 3.5, 3.4
 `PROJ.4`_                 Cartographic Projections library      Yes (PostgreSQL and SQLite only)  4.9, 4.8, 4.7, 4.6, 4.5, 4.4
-:doc:`GDAL <../gdal>`     Geospatial Data Abstraction Library   Yes                               2.2, 2.1, 2.0, 1.11, 1.10, 1.9
+:doc:`GDAL <../gdal>`     Geospatial Data Abstraction Library   Yes                               2.3, 2.2, 2.1, 2.0, 1.11
 :doc:`GeoIP <../geoip2>`  IP-based geolocation library          No                                2
 `PostGIS`__               Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             2.4, 2.3, 2.2, 2.1
 `SpatiaLite`__            Spatial extensions for SQLite         Yes (SQLite only)                 4.3, 4.2, 4.1
@@ -23,12 +23,12 @@ totally fine with GeoDjango. Your mileage may vary.
     Libs release dates:
     GEOS 3.4.0 2013-08-11
     GEOS 3.5.0 2015-08-15
-    GDAL 1.9.0 2012-01-03
-    GDAL 1.10.0 2013-04-29
+    GEOS 3.6.0 2016-10-25
     GDAL 1.11.0 2014-04-25
     GDAL 2.0.0 2015-06
     GDAL 2.1.0 2016-04
     GDAL 2.2.0 2017-05
+    GDAL 2.3.0 2018-05
     PostGIS 2.1.0 2013-08-17
     PostGIS 2.2.0 2015-10-17
     PostGIS 2.3.0 2016-09-26
@@ -97,16 +97,15 @@ internal geometry representation used by GeoDjango (it's behind the "lazy"
 geometries).  Specifically, the C API library is called (e.g., ``libgeos_c.so``)
 directly from Python using ctypes.
 
-First, download GEOS 3.4.2 from the GEOS website and untar the source
-archive::
+First, download GEOS from the GEOS website and untar the source archive::
 
-    $ wget http://download.osgeo.org/geos/geos-3.4.2.tar.bz2
-    $ tar xjf geos-3.4.2.tar.bz2
+    $ wget http://download.osgeo.org/geos/geos-X.Y.Z.tar.bz2
+    $ tar xjf geos-X.Y.Z.tar.bz2
 
 Next, change into the directory where GEOS was unpacked, run the configure
 script, compile, and install::
 
-    $ cd geos-3.4.2
+    $ cd geos-X.Y.Z
     $ ./configure
     $ make
     $ sudo make install
@@ -158,15 +157,15 @@ reference systems.
 
 First, download the PROJ.4 source code and datum shifting files [#]_::
 
-    $ wget http://download.osgeo.org/proj/proj-4.9.1.tar.gz
-    $ wget http://download.osgeo.org/proj/proj-datumgrid-1.5.tar.gz
+    $ wget http://download.osgeo.org/proj/proj-X.Y.Z.tar.gz
+    $ wget http://download.osgeo.org/proj/proj-datumgrid-X.Y.tar.gz
 
 Next, untar the source code archive, and extract the datum shifting files in the
 ``nad`` subdirectory.  This must be done *prior* to configuration::
 
-    $ tar xzf proj-4.9.1.tar.gz
-    $ cd proj-4.9.1/nad
-    $ tar xzf ../../proj-datumgrid-1.5.tar.gz
+    $ tar xzf proj-X.Y.Z.tar.gz
+    $ cd proj-X.Y.Z/nad
+    $ tar xzf ../../proj-datumgrid-X.Y.tar.gz
     $ cd ..
 
 Finally, configure, make and install PROJ.4::
@@ -188,9 +187,9 @@ supports :doc:`GDAL's vector data <../gdal>` capabilities [#]_.
 
 First download the latest GDAL release version and untar the archive::
 
-    $ wget http://download.osgeo.org/gdal/1.11.2/gdal-1.11.2.tar.gz
-    $ tar xzf gdal-1.11.2.tar.gz
-    $ cd gdal-1.11.2
+    $ wget http://download.osgeo.org/gdal/X.Y.Z/gdal-X.Y.Z.tar.gz
+    $ tar xzf gdal-X.Y.Z.tar.gz
+    $ cd gdal-X.Y.Z
 
 Configure, make and install::
 

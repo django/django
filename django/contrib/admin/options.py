@@ -1,6 +1,7 @@
 import copy
 import json
 import operator
+import re
 from collections import OrderedDict
 from functools import partial, reduce, update_wrapper
 from urllib.parse import quote as urlquote
@@ -851,19 +852,8 @@ class ModelAdmin(BaseModelAdmin):
         return helpers.checkbox.render(helpers.ACTION_CHECKBOX_NAME, str(obj.pk))
     action_checkbox.short_description = mark_safe('<input type="checkbox" id="action-toggle">')
 
-    def get_actions(self, request):
-        """
-        Return a dictionary mapping the names of all actions for this
-        ModelAdmin to a tuple of (callable, name, description) for each action.
-        """
-        # If self.actions is explicitly set to None that means that we don't
-        # want *any* actions enabled on this page.
-        if self.actions is None or IS_POPUP_VAR in request.GET:
-            return OrderedDict()
-        # The change permission is required to use actions.
-        if not self.has_change_permission(request):
-            return OrderedDict()
-
+    def _get_base_actions(self):
+        """Return the list of actions, prior to any request-based filtering."""
         actions = []
 
         # Gather actions from the admin site first
@@ -878,8 +868,34 @@ class ModelAdmin(BaseModelAdmin):
             actions.extend(self.get_action(action) for action in class_actions)
 
         # get_action might have returned None, so filter any of those out.
-        actions = filter(None, actions)
+        return filter(None, actions)
 
+    def _filter_actions_by_permissions(self, request, actions):
+        """Filter out any actions that the user doesn't have access to."""
+        filtered_actions = []
+        for action in actions:
+            callable = action[0]
+            if not hasattr(callable, 'allowed_permissions'):
+                filtered_actions.append(action)
+                continue
+            permission_checks = (
+                getattr(self, 'has_%s_permission' % permission)
+                for permission in callable.allowed_permissions
+            )
+            if any(has_permission(request) for has_permission in permission_checks):
+                filtered_actions.append(action)
+        return filtered_actions
+
+    def get_actions(self, request):
+        """
+        Return a dictionary mapping the names of all actions for this
+        ModelAdmin to a tuple of (callable, name, description) for each action.
+        """
+        # If self.actions is set to None that means actions are disabled on
+        # this page.
+        if self.actions is None or IS_POPUP_VAR in request.GET:
+            return OrderedDict()
+        actions = self._filter_actions_by_permissions(request, self._get_base_actions())
         # Convert the actions into an OrderedDict keyed by name.
         return OrderedDict(
             (name, (func, name, desc))
@@ -1576,7 +1592,7 @@ class ModelAdmin(BaseModelAdmin):
                 form = ModelForm(instance=obj)
                 formsets, inline_instances = self._create_formsets(request, obj, change=True)
 
-        if not add and not self.has_change_permission(request):
+        if not add and not self.has_change_permission(request, obj):
             readonly_fields = flatten_fieldsets(self.get_fieldsets(request, obj))
         else:
             readonly_fields = self.get_readonly_fields(request, obj)
@@ -1633,6 +1649,27 @@ class ModelAdmin(BaseModelAdmin):
     def change_view(self, request, object_id, form_url='', extra_context=None):
         return self.changeform_view(request, object_id, form_url, extra_context)
 
+    def _get_edited_object_pks(self, request, prefix):
+        """Return POST data values of list_editable primary keys."""
+        pk_pattern = re.compile(r'{}-\d+-{}$'.format(prefix, self.model._meta.pk.name))
+        return [value for key, value in request.POST.items() if pk_pattern.match(key)]
+
+    def _get_list_editable_queryset(self, request, prefix):
+        """
+        Based on POST data, return a queryset of the objects that were edited
+        via list_editable.
+        """
+        object_pks = self._get_edited_object_pks(request, prefix)
+        queryset = self.get_queryset(request)
+        validate = queryset.model._meta.pk.to_python
+        try:
+            for pk in object_pks:
+                validate(pk)
+        except ValidationError:
+            # Disable the optimization if the POST data was tampered with.
+            return queryset
+        return queryset.filter(pk__in=object_pks)
+
     @csrf_protect_m
     def changelist_view(self, request, extra_context=None):
         """
@@ -1670,8 +1707,6 @@ class ModelAdmin(BaseModelAdmin):
         # Actions with no confirmation
         if (actions and request.method == 'POST' and
                 'index' in request.POST and '_save' not in request.POST):
-            if not self.has_change_permission(request):
-                raise PermissionDenied
             if selected:
                 response = self.response_action(request, queryset=cl.get_queryset(request))
                 if response:
@@ -1688,8 +1723,6 @@ class ModelAdmin(BaseModelAdmin):
         if (actions and request.method == 'POST' and
                 helpers.ACTION_CHECKBOX_NAME in request.POST and
                 'index' not in request.POST and '_save' not in request.POST):
-            if not self.has_change_permission(request):
-                raise PermissionDenied
             if selected:
                 response = self.response_action(request, queryset=cl.get_queryset(request))
                 if response:
@@ -1713,7 +1746,8 @@ class ModelAdmin(BaseModelAdmin):
             if not self.has_change_permission(request):
                 raise PermissionDenied
             FormSet = self.get_changelist_formset(request)
-            formset = cl.formset = FormSet(request.POST, request.FILES, queryset=self.get_queryset(request))
+            modified_objects = self._get_list_editable_queryset(request, FormSet.get_default_prefix())
+            formset = cl.formset = FormSet(request.POST, request.FILES, queryset=modified_objects)
             if formset.is_valid():
                 changecount = 0
                 for form in formset.forms:
@@ -1796,7 +1830,7 @@ class ModelAdmin(BaseModelAdmin):
         Hook for customizing the delete process for the delete view and the
         "delete selected" action.
         """
-        return get_deleted_objects(objs, request.user, self.admin_site)
+        return get_deleted_objects(objs, request, self.admin_site)
 
     @csrf_protect_m
     def delete_view(self, request, object_id, extra_context=None):

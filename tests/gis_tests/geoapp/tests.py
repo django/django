@@ -421,6 +421,8 @@ class GeoLookupTest(TestCase):
             ('relate', (Point(1, 1), 'T*T***FF*')),
             ('same_as', Point(1, 1)),
             ('exact', Point(1, 1)),
+            ('coveredby', Point(1, 1)),
+            ('covers', Point(1, 1)),
         ]
         for lookup, geom in queries:
             with self.subTest(lookup=lookup):

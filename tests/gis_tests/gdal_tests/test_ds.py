@@ -15,12 +15,7 @@ wgs_84_wkt = (
     '0.017453292519943295]]'
 )
 # Using a regex because of small differences depending on GDAL versions.
-# AUTHORITY part has been added in GDAL 2.2.
-wgs_84_wkt_regex = (
-    r'^GEOGCS\["GCS_WGS_1984",DATUM\["WGS_1984",SPHEROID\["WGS_(19)?84",'
-    r'6378137,298.257223563\]\],PRIMEM\["Greenwich",0\],UNIT\["Degree",'
-    r'0.017453292519943295\](,AUTHORITY\["EPSG","4326"\])?\]$'
-)
+wgs_84_wkt_regex = r'^GEOGCS\["(GCS_)?WGS[ _](19)?84".*$'
 
 # List of acceptable data sources.
 ds_list = (

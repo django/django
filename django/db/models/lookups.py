@@ -6,6 +6,7 @@ from django.core.exceptions import EmptyResultSet
 from django.db.models.expressions import Func, Value
 from django.db.models.fields import DateTimeField, Field, IntegerField
 from django.db.models.query_utils import RegisterLookupMixin
+from django.utils.datastructures import OrderedSet
 from django.utils.functional import cached_property
 
 
@@ -326,7 +327,7 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
 
         if self.rhs_is_direct_value():
             try:
-                rhs = set(self.rhs)
+                rhs = OrderedSet(self.rhs)
             except TypeError:  # Unhashable items in self.rhs
                 rhs = self.rhs
 

@@ -708,7 +708,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
                 db = router.db_for_write(self.model, instance=self.instance)
                 with transaction.atomic(using=db, savepoint=False):
                     if clear:
-                        self.clear()
+                        self.clear(bulk=bulk)
                         self.add(*objs, bulk=bulk)
                     else:
                         old_objs = set(self.using(db).all())

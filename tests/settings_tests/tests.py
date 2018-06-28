@@ -291,20 +291,8 @@ class SettingsTests(SimpleTestCase):
     def test_no_secret_key(self):
         settings_module = ModuleType('fake_settings_module')
         sys.modules['fake_settings_module'] = settings_module
-        msg = 'The SECRET_KEY setting must be set.'
+        msg = 'The SECRET_KEY setting must not be empty.'
         try:
-            settings = Settings('fake_settings_module')
-            with self.assertRaisesMessage(ImproperlyConfigured, msg):
-                settings.SECRET_KEY
-        finally:
-            del sys.modules['fake_settings_module']
-
-    def test_secret_key_empty_string(self):
-        settings_module = ModuleType('fake_settings_module')
-        settings_module.SECRET_KEY = ''
-        sys.modules['fake_settings_module'] = settings_module
-        try:
-            msg = 'The SECRET_KEY setting must not be empty.'
             with self.assertRaisesMessage(ImproperlyConfigured, msg):
                 Settings('fake_settings_module')
         finally:

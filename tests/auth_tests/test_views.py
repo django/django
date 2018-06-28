@@ -3,7 +3,7 @@ import itertools
 import os
 import re
 from importlib import import_module
-from urllib.parse import ParseResult, quote, urlparse
+from urllib.parse import quote
 
 from django.apps import apps
 from django.conf import settings
@@ -23,7 +23,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.sites.requests import RequestSite
 from django.core import mail
 from django.db import connection
-from django.http import HttpRequest, QueryDict
+from django.http import HttpRequest
 from django.middleware.csrf import CsrfViewMiddleware, get_token
 from django.test import Client, TestCase, override_settings
 from django.test.client import RedirectCycleError
@@ -69,23 +69,6 @@ class AuthViewsTestCase(TestCase):
         """Assert that error is found in response.context['form'] errors"""
         form_errors = list(itertools.chain(*response.context['form'].errors.values()))
         self.assertIn(str(error), form_errors)
-
-    def assertURLEqual(self, url, expected, parse_qs=False):
-        """
-        Given two URLs, make sure all their components (the ones given by
-        urlparse) are equal, only comparing components that are present in both
-        URLs.
-        If `parse_qs` is True, then the querystrings are parsed with QueryDict.
-        This is useful if you don't want the order of parameters to matter.
-        Otherwise, the query strings are compared as-is.
-        """
-        fields = ParseResult._fields
-
-        for attr, x, y in zip(fields, urlparse(url), urlparse(expected)):
-            if parse_qs and attr == 'query':
-                x, y = QueryDict(x), QueryDict(y)
-            if x and y and x != y:
-                self.fail("%r != %r (%s doesn't match)" % (url, expected, attr))
 
 
 @override_settings(ROOT_URLCONF='django.contrib.auth.urls')
@@ -724,10 +707,9 @@ class LoginTest(AuthViewsTestCase):
 
 class LoginURLSettings(AuthViewsTestCase):
     """Tests for settings.LOGIN_URL."""
-    def assertLoginURLEquals(self, url, parse_qs=False):
+    def assertLoginURLEquals(self, url):
         response = self.client.get('/login_required/')
-        self.assertEqual(response.status_code, 302)
-        self.assertURLEqual(response.url, url, parse_qs=parse_qs)
+        self.assertRedirects(response, url, fetch_redirect_response=False)
 
     @override_settings(LOGIN_URL='/login/')
     def test_standard_login_url(self):
@@ -751,7 +733,7 @@ class LoginURLSettings(AuthViewsTestCase):
 
     @override_settings(LOGIN_URL='/login/?pretty=1')
     def test_login_url_with_querystring(self):
-        self.assertLoginURLEquals('/login/?pretty=1&next=/login_required/', parse_qs=True)
+        self.assertLoginURLEquals('/login/?pretty=1&next=/login_required/')
 
     @override_settings(LOGIN_URL='http://remote.example.com/login/?next=/default/')
     def test_remote_login_url_with_next_querystring(self):

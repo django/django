@@ -940,17 +940,7 @@ class BaseInlineFormSet(BaseModelFormSet):
         # form (it may have been saved after the formset was originally
         # instantiated).
         setattr(form.instance, self.fk.name, self.instance)
-        # Use commit=False so we can assign the parent key afterwards, then
-        # save the object.
-        obj = form.save(commit=False)
-        pk_value = getattr(self.instance, self.fk.remote_field.field_name)
-        setattr(obj, self.fk.get_attname(), getattr(pk_value, 'pk', pk_value))
-        if commit:
-            obj.save()
-        # form.save_m2m() can be called via the formset later on if commit=False
-        if commit and hasattr(form, 'save_m2m'):
-            form.save_m2m()
-        return obj
+        return super().save_new(form, commit=commit)
 
     def add_fields(self, form, index):
         super().add_fields(form, index)

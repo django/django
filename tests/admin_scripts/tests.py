@@ -2213,11 +2213,7 @@ class DiffSettings(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "+ FOO = 'bar'")
-        self.assertOutput(out, "- INSTALLED_APPS = []")
-        self.assertOutput(
-            out,
-            "+ INSTALLED_APPS = ['django.contrib.auth', 'django.contrib.contenttypes', 'admin_scripts']"
-        )
+        self.assertOutput(out, "- SECRET_KEY = ''")
         self.assertOutput(out, "+ SECRET_KEY = 'django_tests_secret_key'")
         self.assertNotInOutput(out, "  APPEND_SLASH = True")
 
@@ -2233,12 +2229,7 @@ class DiffSettings(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertOutput(out, "  APPEND_SLASH = True")
         self.assertOutput(out, "+ FOO = 'bar'")
-        self.assertOutput(out, "- INSTALLED_APPS = []")
-        self.assertOutput(
-            out,
-            "+ INSTALLED_APPS = ['django.contrib.auth', 'django.contrib.contenttypes', 'admin_scripts']"
-        )
-        self.assertOutput(out, "+ SECRET_KEY = 'django_tests_secret_key'")
+        self.assertOutput(out, "- SECRET_KEY = ''")
 
 
 class Dumpdata(AdminScriptTestCase):

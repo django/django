@@ -205,6 +205,11 @@ class CommandTests(SimpleTestCase):
         self.assertIn('need_me', out.getvalue())
         self.assertIn('needme2', out.getvalue())
 
+    def test_command_add_arguments_after_common_arguments(self):
+        out = StringIO()
+        management.call_command('common_args', stdout=out)
+        self.assertIn('Detected that --version already exists', out.getvalue())
+
     def test_subparser(self):
         out = StringIO()
         management.call_command('subparser', 'foo', 12, stdout=out)
@@ -214,6 +219,12 @@ class CommandTests(SimpleTestCase):
         msg = "Error: invalid choice: 'test' (choose from 'foo')"
         with self.assertRaisesMessage(CommandError, msg):
             management.call_command('subparser', 'test', 12)
+
+    def test_create_parser_kwargs(self):
+        """BaseCommand.create_parser() passes kwargs to CommandParser."""
+        epilog = 'some epilog text'
+        parser = BaseCommand().create_parser('prog_name', 'subcommand', epilog=epilog)
+        self.assertEqual(parser.epilog, epilog)
 
 
 class CommandRunTests(AdminScriptTestCase):

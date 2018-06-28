@@ -256,7 +256,7 @@ class ModelDetailView(BaseAdminDocsView):
         methods = []
         # Gather model methods.
         for func_name, func in model.__dict__.items():
-            if inspect.isfunction(func):
+            if inspect.isfunction(func) or isinstance(func, property):
                 try:
                     for exclude in MODEL_METHODS_EXCLUDE:
                         if func_name.startswith(exclude):
@@ -267,9 +267,15 @@ class ModelDetailView(BaseAdminDocsView):
                 verbose = verbose and (
                     utils.parse_rst(utils.trim_docstring(verbose), 'model', _('model:') + opts.model_name)
                 )
-                # If a method has no arguments, show it as a 'field', otherwise
-                # as a 'method with arguments'.
-                if func_has_no_args(func) and not func_accepts_kwargs(func) and not func_accepts_var_args(func):
+                # Show properties and methods without arguments as fields.
+                # Otherwise, show as a 'method with arguments'.
+                if isinstance(func, property):
+                    fields.append({
+                        'name': func_name,
+                        'data_type': get_return_data_type(func_name),
+                        'verbose': verbose or ''
+                    })
+                elif func_has_no_args(func) and not func_accepts_kwargs(func) and not func_accepts_var_args(func):
                     fields.append({
                         'name': func_name,
                         'data_type': get_return_data_type(func_name),
