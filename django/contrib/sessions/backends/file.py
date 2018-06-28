@@ -59,7 +59,10 @@ class SessionStore(SessionBase):
         Return the modification time of the file storing the session's content.
         """
         modification = os.stat(self._key_to_file()).st_mtime
-        return datetime.datetime.fromtimestamp(modification, timezone.utc if settings.USE_TZ else None)
+        if settings.USE_TZ:
+            modification = datetime.datetime.utcfromtimestamp(modification)
+            return modification.replace(tzinfo=timezone.utc)
+        return datetime.datetime.fromtimestamp(modification)
 
     def _expiry_date(self, session_data):
         """
