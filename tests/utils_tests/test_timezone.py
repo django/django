@@ -190,6 +190,10 @@ class TimezoneTests(SimpleTestCase):
     def test_get_default_timezone(self):
         self.assertEqual(timezone.get_default_timezone_name(), 'America/Chicago')
 
+    def test_get_default_timezone_utc(self):
+        with override_settings(USE_TZ=True, TIME_ZONE='UTC'):
+            self.assertIs(timezone.get_default_timezone(), timezone.utc)
+
     def test_fixedoffset_timedelta(self):
         delta = datetime.timedelta(hours=1)
         self.assertEqual(timezone.get_fixed_timezone(delta).utcoffset(''), delta)
