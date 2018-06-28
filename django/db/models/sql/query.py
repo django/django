@@ -934,8 +934,14 @@ class Query:
                 if (reuse is None or a in reuse) and j == join
             ]
         if reuse_aliases:
-            self.ref_alias(reuse_aliases[0])
-            return reuse_aliases[0]
+            if join.table_alias in reuse_aliases:
+                reuse_alias = join.table_alias
+            else:
+                # Reuse the most recent alias of the joined table
+                # (a many-to-many relation may be joined multiple times).
+                reuse_alias = reuse_aliases[-1]
+            self.ref_alias(reuse_alias)
+            return reuse_alias
 
         # No reuse is possible, so we need a new alias.
         alias, _ = self.table_alias(join.table_name, create=True, filtered_relation=join.filtered_relation)
