@@ -15,17 +15,18 @@ from django.test.utils import CaptureQueriesContext
 from .models import (
     FK1, Annotation, Article, Author, BaseA, Book, CategoryItem,
     CategoryRelationship, Celebrity, Channel, Chapter, Child, ChildObjectA,
-    Classroom, Company, Cover, CustomPk, CustomPkTag, Detail, DumbCategory,
-    Eaten, Employment, ExtraInfo, Fan, Food, Identifier, Individual, Item, Job,
-    JobResponsibilities, Join, LeafA, LeafB, LoopX, LoopZ, ManagedModel,
-    Member, ModelA, ModelB, ModelC, ModelD, MyObject, NamedCategory, Node,
-    Note, NullableName, Number, ObjectA, ObjectB, ObjectC, OneToOneCategory,
-    Order, OrderItem, Page, Paragraph, Person, Plaything, PointerA, Program,
-    ProxyCategory, ProxyObjectA, ProxyObjectB, Ranking, Related,
-    RelatedIndividual, RelatedObject, Report, ReportComment, ReservedName,
-    Responsibility, School, SharedConnection, SimpleCategory, SingleObject,
-    SpecialCategory, Staff, StaffUser, Student, Tag, Task, Teacher,
-    Ticket21203Child, Ticket21203Parent, Ticket23605A, Ticket23605B,
+    Classroom, CommonMixedCaseForeignKeys, Company, Cover, CustomPk,
+    CustomPkTag, Detail, DumbCategory, Eaten, Employment, ExtraInfo, Fan, Food,
+    Identifier, Individual, Item, Job, JobResponsibilities, Join, LeafA, LeafB,
+    LoopX, LoopZ, ManagedModel, Member, MixedCaseDbColumnCategoryItem,
+    MixedCaseFieldCategoryItem, ModelA, ModelB, ModelC, ModelD, MyObject,
+    NamedCategory, Node, Note, NullableName, Number, ObjectA, ObjectB, ObjectC,
+    OneToOneCategory, Order, OrderItem, Page, Paragraph, Person, Plaything,
+    PointerA, Program, ProxyCategory, ProxyObjectA, ProxyObjectB, Ranking,
+    Related, RelatedIndividual, RelatedObject, Report, ReportComment,
+    ReservedName, Responsibility, School, SharedConnection, SimpleCategory,
+    SingleObject, SpecialCategory, Staff, StaffUser, Student, Tag, Task,
+    Teacher, Ticket21203Child, Ticket21203Parent, Ticket23605A, Ticket23605B,
     Ticket23605C, TvChef, Valid, X,
 )
 
@@ -1172,6 +1173,32 @@ class Queries1Tests(TestCase):
         with self.assertRaisesMessage(FieldError, msg):
             Tag.objects.filter(unknown_field__name='generic')
 
+    def test_common_mixed_case_foreign_keys(self):
+        """
+        Valid query should be generated when fields fetched from joined tables
+        include FKs whose names only differ by case.
+        """
+        c1 = SimpleCategory.objects.create(name='c1')
+        c2 = SimpleCategory.objects.create(name='c2')
+        c3 = SimpleCategory.objects.create(name='c3')
+        category = CategoryItem.objects.create(category=c1)
+        mixed_case_field_category = MixedCaseFieldCategoryItem.objects.create(CaTeGoRy=c2)
+        mixed_case_db_column_category = MixedCaseDbColumnCategoryItem.objects.create(category=c3)
+        CommonMixedCaseForeignKeys.objects.create(
+            category=category,
+            mixed_case_field_category=mixed_case_field_category,
+            mixed_case_db_column_category=mixed_case_db_column_category,
+        )
+        qs = CommonMixedCaseForeignKeys.objects.values(
+            'category',
+            'mixed_case_field_category',
+            'mixed_case_db_column_category',
+            'category__category',
+            'mixed_case_field_category__CaTeGoRy',
+            'mixed_case_db_column_category__category',
+        )
+        self.assertTrue(qs.first())
+
 
 class Queries2Tests(TestCase):
     @classmethod
@@ -1609,7 +1636,8 @@ class Queries5Tests(TestCase):
             ['<Ranking: 1: a3>', '<Ranking: 2: a2>', '<Ranking: 3: a1>']
         )
 
-        qs = Ranking.objects.extra(select={'good': 'case when rank > 2 then 1 else 0 end'})
+        sql = 'case when %s > 2 then 1 else 0 end' % connection.ops.quote_name('rank')
+        qs = Ranking.objects.extra(select={'good': sql})
         self.assertEqual(
             [o.good for o in qs.extra(order_by=('-good',))],
             [True, False, False]
@@ -1630,7 +1658,8 @@ class Queries5Tests(TestCase):
     def test_ticket7256(self):
         # An empty values() call includes all aliases, including those from an
         # extra()
-        qs = Ranking.objects.extra(select={'good': 'case when rank > 2 then 1 else 0 end'})
+        sql = 'case when %s > 2 then 1 else 0 end' % connection.ops.quote_name('rank')
+        qs = Ranking.objects.extra(select={'good': sql})
         dicts = qs.values().order_by('id')
         for d in dicts:
             del d['id']
@@ -1891,6 +1920,9 @@ class Queries6Tests(TestCase):
         qs = Tag.objects.exclude(category=None).exclude(category__name='foo')
         self.assertEqual(str(qs.query).count(' INNER JOIN '), 1)
 
+    def test_distinct_ordered_sliced_subquery_aggregation(self):
+        self.assertEqual(Tag.objects.distinct().order_by('category__name')[:3].count(), 3)
+
 
 class RawQueriesTests(TestCase):
     def setUp(self):
@@ -2001,7 +2033,7 @@ class QuerysetOrderedTests(unittest.TestCase):
         self.assertIs(qs.order_by('num_notes').ordered, True)
 
 
-@skipUnlessDBFeature('allow_sliced_subqueries')
+@skipUnlessDBFeature('allow_sliced_subqueries_with_in')
 class SubqueryTests(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -2205,7 +2237,8 @@ class ValuesQuerysetTests(TestCase):
         # testing for ticket 14930 issues
         qs = Number.objects.extra(
             select={'value_plus_one': 'num+1', 'value_minus_one': 'num-1'},
-            order_by=['value_minus_one'])
+            order_by=['value_minus_one'],
+        )
         qs = qs.values('num')
 
     def test_extra_select_params_values_order_in_extra(self):
@@ -2213,7 +2246,8 @@ class ValuesQuerysetTests(TestCase):
         qs = Number.objects.extra(
             select={'value_plus_x': 'num+%s'},
             select_params=[1],
-            order_by=['value_plus_x'])
+            order_by=['value_plus_x'],
+        )
         qs = qs.filter(num=72)
         qs = qs.values('num')
         self.assertSequenceEqual(qs, [{'num': 72}])
@@ -2351,11 +2385,11 @@ class QuerySetSupportsPythonIdioms(TestCase):
 
     def test_slicing_cannot_filter_queryset_once_sliced(self):
         with self.assertRaisesMessage(AssertionError, "Cannot filter a query once a slice has been taken."):
-            Article.objects.all()[0:5].filter(id=1, )
+            Article.objects.all()[0:5].filter(id=1)
 
     def test_slicing_cannot_reorder_queryset_once_sliced(self):
         with self.assertRaisesMessage(AssertionError, "Cannot reorder a query once a slice has been taken."):
-            Article.objects.all()[0:5].order_by('id', )
+            Article.objects.all()[0:5].order_by('id')
 
     def test_slicing_cannot_combine_queries_once_sliced(self):
         with self.assertRaisesMessage(AssertionError, "Cannot combine queries once a slice has been taken."):
@@ -3581,7 +3615,7 @@ class RelatedLookupTypeTests(TestCase):
         When passing proxy model objects, child objects, or parent objects,
         lookups work fine.
         """
-        out_a = ['<ObjectA: oa>', ]
+        out_a = ['<ObjectA: oa>']
         out_b = ['<ObjectB: ob>', '<ObjectB: pob>']
         out_c = ['<ObjectC: >']
 

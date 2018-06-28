@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytz
 
@@ -8,7 +8,7 @@ from django.db.models.functions import (
     Extract, ExtractDay, ExtractHour, ExtractMinute, ExtractMonth,
     ExtractQuarter, ExtractSecond, ExtractWeek, ExtractWeekDay, ExtractYear,
     Trunc, TruncDate, TruncDay, TruncHour, TruncMinute, TruncMonth,
-    TruncQuarter, TruncSecond, TruncTime, TruncYear,
+    TruncQuarter, TruncSecond, TruncTime, TruncWeek, TruncYear,
 )
 from django.test import (
     TestCase, override_settings, skipIfDBFeature, skipUnlessDBFeature,
@@ -34,6 +34,10 @@ def truncate_to(value, kind, tzinfo=None):
             if isinstance(value, datetime):
                 return value.replace(hour=0, minute=0, second=0, microsecond=0)
             return value
+        if kind == 'week':
+            if isinstance(value, datetime):
+                return (value - timedelta(days=value.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
+            return value - timedelta(days=value.weekday())
         if kind == 'month':
             if isinstance(value, datetime):
                 return value.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
@@ -536,6 +540,7 @@ class DateFunctionTests(TestCase):
         test_date_kind('year')
         test_date_kind('quarter')
         test_date_kind('month')
+        test_date_kind('week')
         test_date_kind('day')
         test_time_kind('hour')
         test_time_kind('minute')
@@ -543,6 +548,7 @@ class DateFunctionTests(TestCase):
         test_datetime_kind('year')
         test_datetime_kind('quarter')
         test_datetime_kind('month')
+        test_datetime_kind('week')
         test_datetime_kind('day')
         test_datetime_kind('hour')
         test_datetime_kind('minute')
@@ -655,6 +661,30 @@ class DateFunctionTests(TestCase):
 
         with self.assertRaisesMessage(ValueError, "Cannot truncate TimeField 'start_time' to DateTimeField"):
             list(DTModel.objects.annotate(truncated=TruncMonth('start_time', output_field=TimeField())))
+
+    def test_trunc_week_func(self):
+        start_datetime = datetime(2015, 6, 15, 14, 30, 50, 321)
+        end_datetime = truncate_to(datetime(2016, 6, 15, 14, 10, 50, 123), 'week')
+        if settings.USE_TZ:
+            start_datetime = timezone.make_aware(start_datetime, is_dst=False)
+            end_datetime = timezone.make_aware(end_datetime, is_dst=False)
+        self.create_model(start_datetime, end_datetime)
+        self.create_model(end_datetime, start_datetime)
+        self.assertQuerysetEqual(
+            DTModel.objects.annotate(extracted=TruncWeek('start_datetime')).order_by('start_datetime'),
+            [
+                (start_datetime, truncate_to(start_datetime, 'week')),
+                (end_datetime, truncate_to(end_datetime, 'week')),
+            ],
+            lambda m: (m.start_datetime, m.extracted)
+        )
+        self.assertEqual(DTModel.objects.filter(start_datetime=TruncWeek('start_datetime')).count(), 1)
+
+        with self.assertRaisesMessage(ValueError, "Cannot truncate TimeField 'start_time' to DateTimeField"):
+            list(DTModel.objects.annotate(truncated=TruncWeek('start_time')))
+
+        with self.assertRaisesMessage(ValueError, "Cannot truncate TimeField 'start_time' to DateTimeField"):
+            list(DTModel.objects.annotate(truncated=TruncWeek('start_time', output_field=TimeField())))
 
     def test_trunc_date_func(self):
         start_datetime = datetime(2015, 6, 15, 14, 30, 50, 321)
@@ -960,6 +990,7 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
         test_date_kind('year')
         test_date_kind('quarter')
         test_date_kind('month')
+        test_date_kind('week')
         test_date_kind('day')
         test_time_kind('hour')
         test_time_kind('minute')
@@ -967,6 +998,7 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
         test_datetime_kind('year')
         test_datetime_kind('quarter')
         test_datetime_kind('month')
+        test_datetime_kind('week')
         test_datetime_kind('day')
         test_datetime_kind('hour')
         test_datetime_kind('minute')

@@ -267,7 +267,7 @@ class DateMixin:
         if self.uses_datetime_field:
             value = datetime.datetime.combine(value, datetime.time.min)
             if settings.USE_TZ:
-                value = timezone.make_aware(value, timezone.get_current_timezone())
+                value = timezone.make_aware(value)
         return value
 
     def _make_single_date_lookup(self, date):

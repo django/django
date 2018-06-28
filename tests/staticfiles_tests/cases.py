@@ -34,8 +34,8 @@ class BaseStaticFilesMixin:
 
     def static_template_snippet(self, path, asvar=False):
         if asvar:
-            return "{%% load static from staticfiles %%}{%% static '%s' as var %%}{{ var }}" % path
-        return "{%% load static from staticfiles %%}{%% static '%s' %%}" % path
+            return "{%% load static from static %%}{%% static '%s' as var %%}{{ var }}" % path
+        return "{%% load static from static %%}{%% static '%s' %%}" % path
 
     def assertStaticRenders(self, path, result, asvar=False, **kwargs):
         template = self.static_template_snippet(path, asvar)
@@ -61,6 +61,8 @@ class CollectionTestCase(BaseStaticFilesMixin, SimpleTestCase):
     is separated because some test cases need those asserts without
     all these tests.
     """
+    run_collectstatic_in_setUp = True
+
     def setUp(self):
         super().setUp()
         temp_dir = tempfile.mkdtemp()
@@ -68,7 +70,8 @@ class CollectionTestCase(BaseStaticFilesMixin, SimpleTestCase):
         # rather than as a context manager
         self.patched_settings = self.settings(STATIC_ROOT=temp_dir)
         self.patched_settings.enable()
-        self.run_collectstatic()
+        if self.run_collectstatic_in_setUp:
+            self.run_collectstatic()
         # Same comment as in runtests.teardown.
         self.addCleanup(shutil.rmtree, temp_dir)
 

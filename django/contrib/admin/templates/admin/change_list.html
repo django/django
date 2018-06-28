@@ -3,9 +3,9 @@
 
 {% block extrastyle %}
   {{ block.super }}
-  <link rel="stylesheet" type="text/css" href="{% static "admin/css/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "admin/css/changelists.css" %}">
   {% if cl.formset %}
-    <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}" />
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}">
   {% endif %}
   {% if cl.formset or action_form %}
     <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
@@ -42,14 +42,7 @@
     {% block object-tools %}
         <ul class="object-tools">
           {% block object-tools-items %}
-            {% if has_add_permission %}
-            <li>
-              {% url cl.opts|admin_urlname:'add' as add_url %}
-              <a href="{% add_preserved_filters add_url is_popup to_field %}" class="addlink">
-                {% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}
-              </a>
-            </li>
-            {% endif %}
+            {% change_list_object_tools %}
           {% endblock %}
         </ul>
     {% endblock %}

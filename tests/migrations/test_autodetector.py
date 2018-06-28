@@ -237,13 +237,13 @@ class AutodetectorTests(TestCase):
     author_proxy_options = ModelState("testapp", "AuthorProxy", [], {
         "proxy": True,
         "verbose_name": "Super Author",
-    }, ("testapp.author", ))
-    author_proxy_notproxy = ModelState("testapp", "AuthorProxy", [], {}, ("testapp.author", ))
-    author_proxy_third = ModelState("thirdapp", "AuthorProxy", [], {"proxy": True}, ("testapp.author", ))
-    author_proxy_third_notproxy = ModelState("thirdapp", "AuthorProxy", [], {}, ("testapp.author", ))
-    author_proxy_proxy = ModelState("testapp", "AAuthorProxyProxy", [], {"proxy": True}, ("testapp.authorproxy", ))
-    author_unmanaged = ModelState("testapp", "AuthorUnmanaged", [], {"managed": False}, ("testapp.author", ))
-    author_unmanaged_managed = ModelState("testapp", "AuthorUnmanaged", [], {}, ("testapp.author", ))
+    }, ("testapp.author",))
+    author_proxy_notproxy = ModelState("testapp", "AuthorProxy", [], {}, ("testapp.author",))
+    author_proxy_third = ModelState("thirdapp", "AuthorProxy", [], {"proxy": True}, ("testapp.author",))
+    author_proxy_third_notproxy = ModelState("thirdapp", "AuthorProxy", [], {}, ("testapp.author",))
+    author_proxy_proxy = ModelState("testapp", "AAuthorProxyProxy", [], {"proxy": True}, ("testapp.authorproxy",))
+    author_unmanaged = ModelState("testapp", "AuthorUnmanaged", [], {"managed": False}, ("testapp.author",))
+    author_unmanaged_managed = ModelState("testapp", "AuthorUnmanaged", [], {}, ("testapp.author",))
     author_unmanaged_default_pk = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True))])
     author_unmanaged_custom_pk = ModelState("testapp", "Author", [
         ("pk_field", models.IntegerField(primary_key=True)),
@@ -430,14 +430,14 @@ class AutodetectorTests(TestCase):
     custom_user = ModelState("thirdapp", "CustomUser", [
         ("id", models.AutoField(primary_key=True)),
         ("username", models.CharField(max_length=255)),
-    ], bases=(AbstractBaseUser, ))
+    ], bases=(AbstractBaseUser,))
     custom_user_no_inherit = ModelState("thirdapp", "CustomUser", [
         ("id", models.AutoField(primary_key=True)),
         ("username", models.CharField(max_length=255)),
     ])
     aardvark = ModelState("thirdapp", "Aardvark", [("id", models.AutoField(primary_key=True))])
     aardvark_testapp = ModelState("testapp", "Aardvark", [("id", models.AutoField(primary_key=True))])
-    aardvark_based_on_author = ModelState("testapp", "Aardvark", [], bases=("testapp.Author", ))
+    aardvark_based_on_author = ModelState("testapp", "Aardvark", [], bases=("testapp.Author",))
     aardvark_pk_fk_author = ModelState("testapp", "Aardvark", [
         ("id", models.OneToOneField("testapp.Author", models.CASCADE, primary_key=True)),
     ])
@@ -783,8 +783,10 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="name", preserve_default=True)
         self.assertOperationFieldAttributes(changes, "testapp", 0, 0, default='Ada Lovelace')
 
-    @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',
-                return_value=models.NOT_PROVIDED)
+    @mock.patch(
+        'django.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',
+        return_value=models.NOT_PROVIDED,
+    )
     def test_alter_field_to_not_null_without_default(self, mocked_ask_method):
         """
         #23609 - Tests autodetection of nullable to non-nullable alterations.
@@ -797,8 +799,10 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="name", preserve_default=True)
         self.assertOperationFieldAttributes(changes, "testapp", 0, 0, default=models.NOT_PROVIDED)
 
-    @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',
-                return_value='Some Name')
+    @mock.patch(
+        'django.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',
+        return_value='Some Name',
+    )
     def test_alter_field_to_not_null_oneoff_default(self, mocked_ask_method):
         """
         #23609 - Tests autodetection of nullable to non-nullable alterations.
@@ -820,6 +824,163 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["RenameField"])
         self.assertOperationAttributes(changes, 'testapp', 0, 0, old_name="name", new_name="names")
+
+    def test_rename_field_foreign_key_to_field(self):
+        before = [
+            ModelState('app', 'Foo', [
+                ('id', models.AutoField(primary_key=True)),
+                ('field', models.IntegerField(unique=True)),
+            ]),
+            ModelState('app', 'Bar', [
+                ('id', models.AutoField(primary_key=True)),
+                ('foo', models.ForeignKey('app.Foo', models.CASCADE, to_field='field')),
+            ]),
+        ]
+        after = [
+            ModelState('app', 'Foo', [
+                ('id', models.AutoField(primary_key=True)),
+                ('renamed_field', models.IntegerField(unique=True)),
+            ]),
+            ModelState('app', 'Bar', [
+                ('id', models.AutoField(primary_key=True)),
+                ('foo', models.ForeignKey('app.Foo', models.CASCADE, to_field='renamed_field')),
+            ]),
+        ]
+        changes = self.get_changes(before, after, MigrationQuestioner({'ask_rename': True}))
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, 'app', 1)
+        self.assertOperationTypes(changes, 'app', 0, ['RenameField'])
+        self.assertOperationAttributes(changes, 'app', 0, 0, old_name='field', new_name='renamed_field')
+
+    def test_rename_foreign_object_fields(self):
+        fields = ('first', 'second')
+        renamed_fields = ('first_renamed', 'second_renamed')
+        before = [
+            ModelState('app', 'Foo', [
+                ('id', models.AutoField(primary_key=True)),
+                ('first', models.IntegerField()),
+                ('second', models.IntegerField()),
+            ], options={'unique_together': {fields}}),
+            ModelState('app', 'Bar', [
+                ('id', models.AutoField(primary_key=True)),
+                ('first', models.IntegerField()),
+                ('second', models.IntegerField()),
+                ('foo', models.ForeignObject(
+                    'app.Foo', models.CASCADE, from_fields=fields, to_fields=fields,
+                )),
+            ]),
+        ]
+        # Case 1: to_fields renames.
+        after = [
+            ModelState('app', 'Foo', [
+                ('id', models.AutoField(primary_key=True)),
+                ('first_renamed', models.IntegerField()),
+                ('second_renamed', models.IntegerField()),
+            ], options={'unique_together': {renamed_fields}}),
+            ModelState('app', 'Bar', [
+                ('id', models.AutoField(primary_key=True)),
+                ('first', models.IntegerField()),
+                ('second', models.IntegerField()),
+                ('foo', models.ForeignObject(
+                    'app.Foo', models.CASCADE, from_fields=fields, to_fields=renamed_fields,
+                )),
+            ]),
+        ]
+        changes = self.get_changes(before, after, MigrationQuestioner({'ask_rename': True}))
+        self.assertNumberMigrations(changes, 'app', 1)
+        self.assertOperationTypes(changes, 'app', 0, ['RenameField', 'RenameField', 'AlterUniqueTogether'])
+        self.assertOperationAttributes(
+            changes, 'app', 0, 0, model_name='foo', old_name='first', new_name='first_renamed',
+        )
+        self.assertOperationAttributes(
+            changes, 'app', 0, 1, model_name='foo', old_name='second', new_name='second_renamed',
+        )
+        # Case 2: from_fields renames.
+        after = [
+            ModelState('app', 'Foo', [
+                ('id', models.AutoField(primary_key=True)),
+                ('first', models.IntegerField()),
+                ('second', models.IntegerField()),
+            ], options={'unique_together': {fields}}),
+            ModelState('app', 'Bar', [
+                ('id', models.AutoField(primary_key=True)),
+                ('first_renamed', models.IntegerField()),
+                ('second_renamed', models.IntegerField()),
+                ('foo', models.ForeignObject(
+                    'app.Foo', models.CASCADE, from_fields=renamed_fields, to_fields=fields,
+                )),
+            ]),
+        ]
+        changes = self.get_changes(before, after, MigrationQuestioner({'ask_rename': True}))
+        self.assertNumberMigrations(changes, 'app', 1)
+        self.assertOperationTypes(changes, 'app', 0, ['RenameField', 'RenameField'])
+        self.assertOperationAttributes(
+            changes, 'app', 0, 0, model_name='bar', old_name='first', new_name='first_renamed',
+        )
+        self.assertOperationAttributes(
+            changes, 'app', 0, 1, model_name='bar', old_name='second', new_name='second_renamed',
+        )
+
+    def test_rename_field_preserved_db_column(self):
+        """
+        RenameField is used if a field is renamed and db_column equal to the
+        old field's column is added.
+        """
+        before = [
+            ModelState('app', 'Foo', [
+                ('id', models.AutoField(primary_key=True)),
+                ('field', models.IntegerField()),
+            ]),
+        ]
+        after = [
+            ModelState('app', 'Foo', [
+                ('id', models.AutoField(primary_key=True)),
+                ('renamed_field', models.IntegerField(db_column='field')),
+            ]),
+        ]
+        changes = self.get_changes(before, after, MigrationQuestioner({'ask_rename': True}))
+        self.assertNumberMigrations(changes, 'app', 1)
+        self.assertOperationTypes(changes, 'app', 0, ['RenameField', 'AlterField'])
+        self.assertOperationAttributes(
+            changes, 'app', 0, 0, model_name='foo', old_name='field', new_name='renamed_field',
+        )
+        self.assertOperationAttributes(changes, 'app', 0, 1, model_name='foo', name='renamed_field')
+        self.assertEqual(changes['app'][0].operations[-1].field.deconstruct(), (
+            'renamed_field', 'django.db.models.IntegerField', [], {'db_column': 'field'},
+        ))
+
+    def test_rename_related_field_preserved_db_column(self):
+        before = [
+            ModelState('app', 'Foo', [
+                ('id', models.AutoField(primary_key=True)),
+            ]),
+            ModelState('app', 'Bar', [
+                ('id', models.AutoField(primary_key=True)),
+                ('foo', models.ForeignKey('app.Foo', models.CASCADE)),
+            ]),
+        ]
+        after = [
+            ModelState('app', 'Foo', [
+                ('id', models.AutoField(primary_key=True)),
+            ]),
+            ModelState('app', 'Bar', [
+                ('id', models.AutoField(primary_key=True)),
+                ('renamed_foo', models.ForeignKey('app.Foo', models.CASCADE, db_column='foo_id')),
+            ]),
+        ]
+        changes = self.get_changes(before, after, MigrationQuestioner({'ask_rename': True}))
+        self.assertNumberMigrations(changes, 'app', 1)
+        self.assertOperationTypes(changes, 'app', 0, ['RenameField', 'AlterField'])
+        self.assertOperationAttributes(
+            changes, 'app', 0, 0, model_name='bar', old_name='foo', new_name='renamed_foo',
+        )
+        self.assertOperationAttributes(changes, 'app', 0, 1, model_name='bar', name='renamed_foo')
+        self.assertEqual(changes['app'][0].operations[-1].field.deconstruct(), (
+            'renamed_foo',
+            'django.db.models.ForeignKey',
+            [],
+            {'to': 'app.Foo', 'on_delete': models.CASCADE, 'db_column': 'foo_id'},
+        ))
 
     def test_rename_model(self):
         """Tests autodetection of renamed models."""
@@ -2071,7 +2232,7 @@ class AutodetectorTests(TestCase):
             tenant = ModelState("a", "Tenant", [
                 ("id", models.AutoField(primary_key=True)),
                 ("primary_address", models.ForeignKey("b.Address", models.CASCADE))],
-                bases=(AbstractBaseUser, )
+                bases=(AbstractBaseUser,)
             )
             address = ModelState("b", "Address", [
                 ("id", models.AutoField(primary_key=True)),
@@ -2105,7 +2266,7 @@ class AutodetectorTests(TestCase):
             tenant = ModelState("b", "Tenant", [
                 ("id", models.AutoField(primary_key=True)),
                 ("primary_address", models.ForeignKey("a.Address", models.CASCADE))],
-                bases=(AbstractBaseUser, )
+                bases=(AbstractBaseUser,)
             )
             changes = self.get_changes([], [address, tenant])
         # Right number/type of migrations?

@@ -49,6 +49,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
 
         resolved_path = []
         ns_pattern = ''
+        ns_converters = {}
         while path:
             ns = path.pop()
             current_ns = current_path.pop() if current_path else None
@@ -74,6 +75,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
                 extra, resolver = resolver.namespace_dict[ns]
                 resolved_path.append(ns)
                 ns_pattern = ns_pattern + extra
+                ns_converters.update(resolver.pattern.converters)
             except KeyError as key:
                 if resolved_path:
                     raise NoReverseMatch(
@@ -83,7 +85,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
                 else:
                     raise NoReverseMatch("%s is not a registered namespace" % key)
         if ns_pattern:
-            resolver = get_ns_resolver(ns_pattern, resolver)
+            resolver = get_ns_resolver(ns_pattern, resolver, tuple(ns_converters.items()))
 
     return iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs))
 

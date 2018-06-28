@@ -62,9 +62,8 @@ class ModelIterable(BaseIterable):
         related_populators = get_related_populators(klass_info, select, db)
         for row in compiler.results_iter(results):
             obj = model_cls.from_db(db, init_list, row[model_fields_start:model_fields_end])
-            if related_populators:
-                for rel_populator in related_populators:
-                    rel_populator.populate(row, obj)
+            for rel_populator in related_populators:
+                rel_populator.populate(row, obj)
             if annotation_col_map:
                 for attr_name, col_pos in annotation_col_map.items():
                     setattr(obj, attr_name, row[col_pos])
@@ -158,9 +157,7 @@ class NamedValuesListIterable(ValuesListIterable):
             names = queryset._fields
         else:
             query = queryset.query
-            names = list(query.extra_select)
-            names.extend(query.values_select)
-            names.extend(query.annotation_select)
+            names = [*query.extra_select, *query.values_select, *query.annotation_select]
         tuple_class = self.create_namedtuple_class(*names)
         new = tuple.__new__
         for row in super().__iter__():
@@ -176,7 +173,8 @@ class FlatValuesListIterable(BaseIterable):
     def __iter__(self):
         queryset = self.queryset
         compiler = queryset.query.get_compiler(queryset.db)
-        return chain.from_iterable(compiler.results_iter(chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size))
+        for row in compiler.results_iter(chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size):
+            yield row[0]
 
 
 class QuerySet:
@@ -222,9 +220,7 @@ class QuerySet:
     def __getstate__(self):
         # Force the cache to be fully populated.
         self._fetch_all()
-        obj_dict = self.__dict__.copy()
-        obj_dict[DJANGO_VERSION_PICKLE_KEY] = get_version()
-        return obj_dict
+        return {**self.__dict__, DJANGO_VERSION_PICKLE_KEY: get_version()}
 
     def __setstate__(self, state):
         msg = None
@@ -461,6 +457,9 @@ class QuerySet:
             objs_with_pk, objs_without_pk = partition(lambda o: o.pk is None, objs)
             if objs_with_pk:
                 self._batched_insert(objs_with_pk, fields, batch_size)
+                for obj_with_pk in objs_with_pk:
+                    obj_with_pk._state.adding = False
+                    obj_with_pk._state.db = self.db
             if objs_without_pk:
                 fields = [f for f in fields if not isinstance(f, AutoField)]
                 ids = self._batched_insert(objs_without_pk, fields, batch_size)
@@ -565,7 +564,6 @@ class QuerySet:
         if fields and field_name is not None:
             raise ValueError('Cannot use both positional arguments and the field_name keyword argument.')
 
-        order_by = None
         if field_name is not None:
             warnings.warn(
                 'The field_name keyword argument to earliest() and latest() '
@@ -705,6 +703,8 @@ class QuerySet:
             "Cannot update a query once a slice has been taken."
         query = self.query.chain(sql.UpdateQuery)
         query.add_update_fields(values)
+        # Clear any annotations so that they won't be present in subqueries.
+        query._annotations = None
         self._result_cache = None
         return query.get_compiler(self.db).execute_sql(CURSOR)
     _update.alters_data = True
@@ -720,6 +720,9 @@ class QuerySet:
         prefetch_related_objects(self._result_cache, *self._prefetch_related_lookups)
         self._prefetch_done = True
 
+    def explain(self, *, format=None, **options):
+        return self.query.explain(using=self.db, format=format, **options)
+
     ##################################################
     # PUBLIC METHODS THAT RETURN A QUERYSET SUBCLASS #
     ##################################################
@@ -727,7 +730,9 @@ class QuerySet:
     def raw(self, raw_query, params=None, translations=None, using=None):
         if using is None:
             using = self.db
-        return RawQuerySet(raw_query, model=self.model, params=params, translations=translations, using=using)
+        qs = RawQuerySet(raw_query, model=self.model, params=params, translations=translations, using=using)
+        qs._prefetch_related_lookups = self._prefetch_related_lookups[:]
+        return qs
 
     def _values(self, *fields, **expressions):
         clone = self._chain()
@@ -779,8 +784,8 @@ class QuerySet:
         Return a list of date objects representing all available dates for
         the given field_name, scoped to 'kind'.
         """
-        assert kind in ("year", "month", "day"), \
-            "'kind' must be one of 'year', 'month' or 'day'."
+        assert kind in ('year', 'month', 'week', 'day'), \
+            "'kind' must be one of 'year', 'month', 'week', or 'day'."
         assert order in ('ASC', 'DESC'), \
             "'order' must be either 'ASC' or 'DESC'."
         return self.annotate(
@@ -795,8 +800,8 @@ class QuerySet:
         Return a list of datetime objects representing all available
         datetimes for the given field_name, scoped to 'kind'.
         """
-        assert kind in ("year", "month", "day", "hour", "minute", "second"), \
-            "'kind' must be one of 'year', 'month', 'day', 'hour', 'minute' or 'second'."
+        assert kind in ('year', 'month', 'week', 'day', 'hour', 'minute', 'second'), \
+            "'kind' must be one of 'year', 'month', 'week', 'day', 'hour', 'minute', or 'second'."
         assert order in ('ASC', 'DESC'), \
             "'order' must be either 'ASC' or 'DESC'."
         if settings.USE_TZ:
@@ -985,7 +990,10 @@ class QuerySet:
         clone = self._chain()
         names = self._fields
         if names is None:
-            names = {f.name for f in self.model._meta.get_fields()}
+            names = set(chain.from_iterable(
+                (field.name, field.attname) if hasattr(field, 'attname') else (field.name,)
+                for field in self.model._meta.get_fields()
+            ))
 
         for alias, annotation in annotations.items():
             if alias in names:
@@ -1274,6 +1282,9 @@ class RawQuerySet:
         self.query = query or sql.RawQuery(sql=raw_query, using=self.db, params=params)
         self.params = params or ()
         self.translations = translations or {}
+        self._result_cache = None
+        self._prefetch_related_lookups = ()
+        self._prefetch_done = False
 
     def resolve_model_init_order(self):
         """Resolve the init field names and value positions."""
@@ -1285,7 +1296,47 @@ class RawQuerySet:
         model_init_names = [f.attname for f in model_init_fields]
         return model_init_names, model_init_order, annotation_fields
 
+    def prefetch_related(self, *lookups):
+        """Same as QuerySet.prefetch_related()"""
+        clone = self._clone()
+        if lookups == (None,):
+            clone._prefetch_related_lookups = ()
+        else:
+            clone._prefetch_related_lookups = clone._prefetch_related_lookups + lookups
+        return clone
+
+    def _prefetch_related_objects(self):
+        prefetch_related_objects(self._result_cache, *self._prefetch_related_lookups)
+        self._prefetch_done = True
+
+    def _clone(self):
+        """Same as QuerySet._clone()"""
+        c = self.__class__(
+            self.raw_query, model=self.model, query=self.query, params=self.params,
+            translations=self.translations, using=self._db, hints=self._hints
+        )
+        c._prefetch_related_lookups = self._prefetch_related_lookups[:]
+        return c
+
+    def _fetch_all(self):
+        if self._result_cache is None:
+            self._result_cache = list(self.iterator())
+        if self._prefetch_related_lookups and not self._prefetch_done:
+            self._prefetch_related_objects()
+
+    def __len__(self):
+        self._fetch_all()
+        return len(self._result_cache)
+
+    def __bool__(self):
+        self._fetch_all()
+        return bool(self._result_cache)
+
     def __iter__(self):
+        self._fetch_all()
+        return iter(self._result_cache)
+
+    def iterator(self):
         # Cache some things for performance reasons outside the loop.
         db = self.db
         compiler = connections[db].ops.compiler('SQLCompiler')(
@@ -1517,7 +1568,7 @@ def prefetch_related_objects(model_instances, *related_lookups):
                 # same relationships to stop infinite recursion. So, if we
                 # are already on an automatically added lookup, don't add
                 # the new lookups from relationships we've seen already.
-                if not (lookup in auto_lookups and descriptor in followed_descriptors):
+                if not (prefetch_to in done_queries and lookup in auto_lookups and descriptor in followed_descriptors):
                     done_queries[prefetch_to] = obj_list
                     new_lookups = normalize_prefetch_lookups(reversed(additional_lookups), prefetch_to)
                     auto_lookups.update(new_lookups)
@@ -1771,9 +1822,8 @@ class RelatedPopulator:
             obj = None
         else:
             obj = self.model_cls.from_db(self.db, self.init_list, obj_data)
-            if self.related_populators:
-                for rel_iter in self.related_populators:
-                    rel_iter.populate(row, obj)
+            for rel_iter in self.related_populators:
+                rel_iter.populate(row, obj)
         self.local_setter(from_obj, obj)
         if obj is not None:
             self.remote_setter(obj, from_obj)

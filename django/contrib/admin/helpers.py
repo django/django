@@ -203,8 +203,7 @@ class AdminReadonlyField:
             result_repr = self.empty_value_display
         else:
             if f is None:
-                boolean = getattr(attr, "boolean", False)
-                if boolean:
+                if getattr(attr, 'boolean', False):
                     result_repr = _boolean_icon(value)
                 else:
                     if hasattr(value, "__html__"):
@@ -225,7 +224,9 @@ class InlineAdminFormSet:
     A wrapper around an inline formset for use in the admin system.
     """
     def __init__(self, inline, formset, fieldsets, prepopulated_fields=None,
-                 readonly_fields=None, model_admin=None):
+                 readonly_fields=None, model_admin=None, has_add_permission=True,
+                 has_change_permission=True, has_delete_permission=True,
+                 has_view_permission=True):
         self.opts = inline
         self.formset = formset
         self.fieldsets = fieldsets
@@ -237,13 +238,22 @@ class InlineAdminFormSet:
             prepopulated_fields = {}
         self.prepopulated_fields = prepopulated_fields
         self.classes = ' '.join(inline.classes) if inline.classes else ''
+        self.has_add_permission = has_add_permission
+        self.has_change_permission = has_change_permission
+        self.has_delete_permission = has_delete_permission
+        self.has_view_permission = has_view_permission
 
     def __iter__(self):
+        if self.has_change_permission:
+            readonly_fields_for_editing = self.readonly_fields
+        else:
+            readonly_fields_for_editing = self.readonly_fields + flatten_fieldsets(self.fieldsets)
+
         for form, original in zip(self.formset.initial_forms, self.formset.get_queryset()):
             view_on_site_url = self.opts.get_view_on_site_url(original)
             yield InlineAdminForm(
                 self.formset, form, self.fieldsets, self.prepopulated_fields,
-                original, self.readonly_fields, model_admin=self.opts,
+                original, readonly_fields_for_editing, model_admin=self.opts,
                 view_on_site_url=view_on_site_url,
             )
         for form in self.formset.extra_forms:
@@ -251,26 +261,30 @@ class InlineAdminFormSet:
                 self.formset, form, self.fieldsets, self.prepopulated_fields,
                 None, self.readonly_fields, model_admin=self.opts,
             )
-        yield InlineAdminForm(
-            self.formset, self.formset.empty_form,
-            self.fieldsets, self.prepopulated_fields, None,
-            self.readonly_fields, model_admin=self.opts,
-        )
+        if self.has_add_permission:
+            yield InlineAdminForm(
+                self.formset, self.formset.empty_form,
+                self.fieldsets, self.prepopulated_fields, None,
+                self.readonly_fields, model_admin=self.opts,
+            )
 
     def fields(self):
         fk = getattr(self.formset, "fk", None)
+        empty_form = self.formset.empty_form
+        meta_labels = empty_form._meta.labels or {}
+        meta_help_texts = empty_form._meta.help_texts or {}
         for i, field_name in enumerate(flatten_fieldsets(self.fieldsets)):
             if fk and fk.name == field_name:
                 continue
-            if field_name in self.readonly_fields:
+            if not self.has_change_permission or field_name in self.readonly_fields:
                 yield {
-                    'label': label_for_field(field_name, self.opts.model, self.opts),
+                    'label': meta_labels.get(field_name) or label_for_field(field_name, self.opts.model, self.opts),
                     'widget': {'is_hidden': False},
                     'required': False,
-                    'help_text': help_text_for_field(field_name, self.opts.model),
+                    'help_text': meta_help_texts.get(field_name) or help_text_for_field(field_name, self.opts.model),
                 }
             else:
-                form_field = self.formset.empty_form.fields[field_name]
+                form_field = empty_form.fields[field_name]
                 label = form_field.label
                 if label is None:
                     label = label_for_field(field_name, self.opts.model, self.opts)
@@ -331,15 +345,15 @@ class InlineAdminForm(AdminForm):
             )
 
     def needs_explicit_pk_field(self):
-        # Auto fields are editable (oddly), so need to check for auto or non-editable pk
-        if self.form._meta.model._meta.auto_field or not self.form._meta.model._meta.pk.editable:
-            return True
-        # Also search any parents for an auto field. (The pk info is propagated to child
-        # models so that does not need to be checked in parents.)
-        for parent in self.form._meta.model._meta.get_parent_list():
-            if parent._meta.auto_field or not parent._meta.model._meta.pk.editable:
-                return True
-        return False
+        return (
+            # Auto fields are editable, so check for auto or non-editable pk.
+            self.form._meta.model._meta.auto_field or not self.form._meta.model._meta.pk.editable or
+            # Also search any parents for an auto field. (The pk info is
+            # propagated to child models so that does not need to be checked
+            # in parents.)
+            any(parent._meta.auto_field or not parent._meta.model._meta.pk.editable
+                for parent in self.form._meta.model._meta.get_parent_list())
+        )
 
     def pk_field(self):
         return AdminField(self.form, self.formset._pk_field.name, False)
@@ -368,9 +382,8 @@ class InlineFieldset(Fieldset):
     def __iter__(self):
         fk = getattr(self.formset, "fk", None)
         for field in self.fields:
-            if fk and fk.name == field:
-                continue
-            yield Fieldline(self.form, field, self.readonly_fields, model_admin=self.model_admin)
+            if not fk or fk.name != field:
+                yield Fieldline(self.form, field, self.readonly_fields, model_admin=self.model_admin)
 
 
 class AdminErrorList(forms.utils.ErrorList):

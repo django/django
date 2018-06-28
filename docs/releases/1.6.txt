@@ -193,7 +193,7 @@ Minor features
   option is now performed independently from handling of the locale that
   should be active during the execution of the command. The latter can now be
   influenced by the new
-  :attr:`~django.core.management.BaseCommand.leave_locale_alone` internal
+  ``BaseCommand.leave_locale_alone`` internal
   option. See :ref:`management-commands-and-locales` for more details.
 
 * The :attr:`~django.views.generic.edit.DeletionMixin.success_url` of
@@ -261,8 +261,8 @@ Minor features
   `PIL`_ is pending deprecation (support to be removed in Django 1.8).
   To upgrade, you should **first** uninstall PIL, **then** install Pillow.
 
-.. _`Pillow`: https://pypi.python.org/pypi/Pillow
-.. _`PIL`: https://pypi.python.org/pypi/PIL
+.. _`Pillow`: https://pypi.org/project/Pillow/
+.. _`PIL`: https://pypi.org/project/PIL/
 
 * :class:`~django.forms.ModelForm` accepts several new ``Meta``
   options.

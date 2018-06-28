@@ -1,4 +1,5 @@
 import ctypes
+import itertools
 import json
 import pickle
 import random
@@ -17,7 +18,6 @@ from django.contrib.gis.shortcuts import numpy
 from django.template import Context
 from django.template.engine import Engine
 from django.test import SimpleTestCase
-from django.utils.encoding import force_bytes
 
 from ..test_data import TestDataMixin
 
@@ -160,7 +160,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         ref_pnt = GEOSGeometry('POINT(5 23)')
 
         wkt_f = BytesIO()
-        wkt_f.write(force_bytes(ref_pnt.wkt))
+        wkt_f.write(ref_pnt.wkt.encode())
         wkb_f = BytesIO()
         wkb_f.write(bytes(ref_pnt.wkb))
 
@@ -186,6 +186,22 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertNotEqual(g, None)
             self.assertNotEqual(g, {'foo': 'bar'})
             self.assertNotEqual(g, False)
+
+    def test_hash(self):
+        point_1 = Point(5, 23)
+        point_2 = Point(5, 23, srid=4326)
+        point_3 = Point(5, 23, srid=32632)
+        multipoint_1 = MultiPoint(point_1, srid=4326)
+        multipoint_2 = MultiPoint(point_2)
+        multipoint_3 = MultiPoint(point_3)
+        self.assertNotEqual(hash(point_1), hash(point_2))
+        self.assertNotEqual(hash(point_1), hash(point_3))
+        self.assertNotEqual(hash(point_2), hash(point_3))
+        self.assertNotEqual(hash(multipoint_1), hash(multipoint_2))
+        self.assertEqual(hash(multipoint_2), hash(multipoint_3))
+        self.assertNotEqual(hash(multipoint_1), hash(point_1))
+        self.assertNotEqual(hash(multipoint_2), hash(point_2))
+        self.assertNotEqual(hash(multipoint_3), hash(point_3))
 
     def test_eq_with_srid(self):
         "Testing non-equivalence with different srids."
@@ -635,21 +651,56 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertEqual(d1, a)
 
     def test_buffer(self):
-        "Testing buffer()."
-        for bg in self.geometries.buffer_geoms:
+        bg = self.geometries.buffer_geoms[0]
+        g = fromstr(bg.wkt)
+
+        # Can't use a floating-point for the number of quadsegs.
+        with self.assertRaises(ctypes.ArgumentError):
+            g.buffer(bg.width, quadsegs=1.1)
+
+        self._test_buffer(self.geometries.buffer_geoms, 'buffer')
+
+    def test_buffer_with_style(self):
+        bg = self.geometries.buffer_with_style_geoms[0]
+        g = fromstr(bg.wkt)
+
+        # Can't use a floating-point for the number of quadsegs.
+        with self.assertRaises(ctypes.ArgumentError):
+            g.buffer_with_style(bg.width, quadsegs=1.1)
+
+        # Can't use a floating-point for the end cap style.
+        with self.assertRaises(ctypes.ArgumentError):
+            g.buffer_with_style(bg.width, end_cap_style=1.2)
+        # Can't use a end cap style that is not in the enum.
+        with self.assertRaises(GEOSException):
+            g.buffer_with_style(bg.width, end_cap_style=55)
+
+        # Can't use a floating-point for the join style.
+        with self.assertRaises(ctypes.ArgumentError):
+            g.buffer_with_style(bg.width, join_style=1.3)
+        # Can't use a join style that is not in the enum.
+        with self.assertRaises(GEOSException):
+            g.buffer_with_style(bg.width, join_style=66)
+
+        self._test_buffer(
+            itertools.chain(self.geometries.buffer_geoms, self.geometries.buffer_with_style_geoms),
+            'buffer_with_style',
+        )
+
+    def _test_buffer(self, geometries, buffer_method_name):
+        for bg in geometries:
             g = fromstr(bg.wkt)
 
             # The buffer we expect
             exp_buf = fromstr(bg.buffer_wkt)
-            quadsegs = bg.quadsegs
-            width = bg.width
-
-            # Can't use a floating-point for the number of quadsegs.
-            with self.assertRaises(ctypes.ArgumentError):
-                g.buffer(width, float(quadsegs))
 
             # Constructing our buffer
-            buf = g.buffer(width, quadsegs)
+            buf_kwargs = {
+                kwarg_name: getattr(bg, kwarg_name)
+                for kwarg_name in ('width', 'quadsegs', 'end_cap_style', 'join_style', 'mitre_limit')
+                if hasattr(bg, kwarg_name)
+            }
+            buf = getattr(g, buffer_method_name)(**buf_kwargs)
             self.assertEqual(exp_buf.num_coords, buf.num_coords)
             self.assertEqual(len(exp_buf), len(buf))
 
@@ -1264,7 +1315,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         mp = MultiPolygon(p1, p2)
         path, args, kwargs = mp.deconstruct()
         self.assertEqual(path, 'django.contrib.gis.geos.collections.MultiPolygon')
-        self.assertEqual(args, (p1, p2, ))
+        self.assertEqual(args, (p1, p2))
         self.assertEqual(kwargs, {})
 
         poly = Polygon(((0, 0), (0, 1), (1, 1), (0, 0)))

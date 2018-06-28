@@ -362,7 +362,7 @@ class ModelState:
         self.fields = fields
         self.options = options or {}
         self.options.setdefault('indexes', [])
-        self.bases = bases or (models.Model, )
+        self.bases = bases or (models.Model,)
         self.managers = managers or []
         # Sanity-check that fields is NOT a dict. It must be ordered.
         if isinstance(self.fields, dict):
@@ -553,8 +553,7 @@ class ModelState:
     def render(self, apps):
         """Create a Model object from our current state into the given apps."""
         # First, make a Meta object
-        meta_contents = {'app_label': self.app_label, "apps": apps}
-        meta_contents.update(self.options)
+        meta_contents = {'app_label': self.app_label, 'apps': apps, **self.options}
         meta = type("Meta", (), meta_contents)
         # Then, work out our bases
         try:

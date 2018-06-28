@@ -15,7 +15,8 @@ from django.core.exceptions import AppRegistryNotReady
 from django.core.signals import setting_changed
 from django.dispatch import receiver
 from django.utils.safestring import SafeData, mark_safe
-from django.utils.translation import LANGUAGE_SESSION_KEY
+
+from . import LANGUAGE_SESSION_KEY, to_language, to_locale
 
 # Translations are cached in a dictionary for every language.
 # The active translations are stored by threadid to make them thread local.
@@ -54,32 +55,6 @@ def reset_cache(**kwargs):
         check_for_language.cache_clear()
         get_languages.cache_clear()
         get_supported_language_variant.cache_clear()
-
-
-def to_locale(language):
-    """Turn a language name (en-us) into a locale name (en_US)."""
-    language = language.lower()
-    parts = language.split('-')
-    try:
-        country = parts[1]
-    except IndexError:
-        return language
-    else:
-        # A language with > 2 characters after the dash only has its first
-        # character after the dash capitalized; e.g. sr-latn becomes sr_Latn.
-        # A language with 2 characters after the dash has both characters
-        # capitalized; e.g. en-us becomes en_US.
-        parts[1] = country.title() if len(country) > 2 else country.upper()
-    return parts[0] + '_' + '-'.join(parts[1:])
-
-
-def to_language(locale):
-    """Turn a locale name (en_US) into a language name (en-us)."""
-    p = locale.find('_')
-    if p >= 0:
-        return locale[:p].lower() + '-' + locale[p + 1:].lower()
-    else:
-        return locale.lower()
 
 
 class DjangoTranslation(gettext_module.GNUTranslations):
@@ -146,7 +121,8 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             localedir=localedir,
             languages=[self.__locale],
             codeset='utf-8',
-            fallback=use_null_fallback)
+            fallback=use_null_fallback,
+        )
 
     def _init_translation_catalog(self):
         """Create a base catalog using global django translations."""
@@ -202,6 +178,8 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             self._catalog = other._catalog.copy()
         else:
             self._catalog.update(other._catalog)
+        if other._fallback:
+            self.add_fallback(other._fallback)
 
     def language(self):
         """Return the translation language."""
@@ -377,7 +355,12 @@ def all_locale_paths():
     """
     globalpath = os.path.join(
         os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
-    return [globalpath] + list(settings.LOCALE_PATHS)
+    app_paths = []
+    for app_config in apps.get_app_configs():
+        locale_path = os.path.join(app_config.path, 'locale')
+        if os.path.exists(locale_path):
+            app_paths.append(locale_path)
+    return [globalpath] + list(settings.LOCALE_PATHS) + app_paths
 
 
 @functools.lru_cache(maxsize=1000)
@@ -394,10 +377,10 @@ def check_for_language(lang_code):
     # First, a quick check to make sure lang_code is well-formed (#21458)
     if lang_code is None or not language_code_re.search(lang_code):
         return False
-    for path in all_locale_paths():
-        if gettext_module.find('django', path, [to_locale(lang_code)]) is not None:
-            return True
-    return False
+    return any(
+        gettext_module.find('django', path, [to_locale(lang_code)]) is not None
+        for path in all_locale_paths()
+    )
 
 
 @functools.lru_cache()
@@ -411,11 +394,11 @@ def get_languages():
 @functools.lru_cache(maxsize=1000)
 def get_supported_language_variant(lang_code, strict=False):
     """
-    Return the language-code that's listed in supported languages, possibly
+    Return the language code that's listed in supported languages, possibly
     selecting a more generic variant. Raise LookupError if nothing is found.
 
-    If `strict` is False (the default), look for an alternative
-    country-specific variant when the currently checked is not found.
+    If `strict` is False (the default), look for a country-specific variant
+    when neither the language code nor its generic variant is found.
 
     lru_cache should have a maxsize to prevent from memory exhaustion attacks,
     as the provided language codes are taken from the HTTP request. See also
@@ -445,11 +428,10 @@ def get_supported_language_variant(lang_code, strict=False):
 
 def get_language_from_path(path, strict=False):
     """
-    Return the language-code if there is a valid language-code
-    found in the `path`.
+    Return the language code if there's a valid language code found in `path`.
 
-    If `strict` is False (the default), the function will look for an alternative
-    country-specific variant when the currently checked is not found.
+    If `strict` is False (the default), look for a country-specific variant
+    when neither the language code nor its generic variant is found.
     """
     regex_match = language_code_prefix_re.match(path)
     if not regex_match:

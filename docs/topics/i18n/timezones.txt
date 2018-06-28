@@ -204,7 +204,7 @@ Include a form in ``template.html`` that will ``POST`` to this view:
             <option value="{{ tz }}"{% if tz == TIME_ZONE %} selected{% endif %}>{{ tz }}</option>
             {% endfor %}
         </select>
-        <input type="submit" value="Set" />
+        <input type="submit" value="Set">
     </form>
 
 .. _time-zones-in-forms:

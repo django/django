@@ -1,8 +1,10 @@
 """
 SQLite3 backend for the sqlite3 module in the standard library.
 """
+import datetime
 import decimal
 import math
+import operator
 import re
 import warnings
 from sqlite3 import dbapi2 as Database
@@ -14,9 +16,8 @@ from django.db import utils
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.utils import timezone
-from django.utils.dateparse import (
-    parse_date, parse_datetime, parse_duration, parse_time,
-)
+from django.utils.dateparse import parse_datetime, parse_time
+from django.utils.duration import duration_microseconds
 
 from .client import DatabaseClient                          # isort:skip
 from .creation import DatabaseCreation                      # isort:skip
@@ -33,13 +34,11 @@ def decoder(conv_func):
     return lambda s: conv_func(s.decode())
 
 
-Database.register_converter("bool", lambda s: s == b'1')
+Database.register_converter("bool", b'1'.__eq__)
 Database.register_converter("time", decoder(parse_time))
-Database.register_converter("date", decoder(parse_date))
 Database.register_converter("datetime", decoder(parse_datetime))
 Database.register_converter("timestamp", decoder(parse_datetime))
 Database.register_converter("TIMESTAMP", decoder(parse_datetime))
-Database.register_converter("decimal", decoder(decimal.Decimal))
 
 Database.register_adapter(decimal.Decimal, backend_utils.rev_typecast_decimal)
 
@@ -76,6 +75,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'TextField': 'text',
         'TimeField': 'time',
         'UUIDField': 'char(32)',
+    }
+    data_type_check_constraints = {
+        'PositiveIntegerField': '"%(column)s" >= 0',
+        'PositiveSmallIntegerField': '"%(column)s" >= 0',
     }
     data_types_suffix = {
         'AutoField': 'AUTOINCREMENT',
@@ -137,8 +140,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         kwargs = {
             'database': settings_dict['NAME'],
             'detect_types': Database.PARSE_DECLTYPES | Database.PARSE_COLNAMES,
+            **settings_dict['OPTIONS'],
         }
-        kwargs.update(settings_dict['OPTIONS'])
         # Always allow the underlying SQLite connection to be shareable
         # between multiple threads. The safe-guarding will be handled at a
         # higher level by the `BaseDatabaseWrapper.allow_thread_sharing`
@@ -171,6 +174,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function("regexp", 2, _sqlite_regexp)
         conn.create_function("django_format_dtdelta", 3, _sqlite_format_dtdelta)
         conn.create_function("django_power", 2, _sqlite_power)
+        conn.create_function('LPAD', 3, _sqlite_lpad)
+        conn.create_function('REPEAT', 2, operator.mul)
+        conn.create_function('RPAD', 3, _sqlite_rpad)
         conn.execute('PRAGMA foreign_keys = ON')
         return conn
 
@@ -229,13 +235,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         `disable_constraint_checking()` and `enable_constraint_checking()`, to
         determine if rows with invalid references were entered while constraint
         checks were off.
-
-        Raise an IntegrityError on the first invalid foreign key reference
-        encountered (if any) and provide detailed information about the
-        invalid reference in the error message.
-
-        Backends can override this method if they can more directly apply
-        constraint checking (e.g. via "SET CONSTRAINTS ALL IMMEDIATE")
         """
         with self.cursor() as cursor:
             if table_names is None:
@@ -337,6 +336,9 @@ def _sqlite_date_trunc(lookup_type, dt):
         return '%i-%02i-01' % (dt.year, month_in_quarter)
     elif lookup_type == 'month':
         return "%i-%02i-01" % (dt.year, dt.month)
+    elif lookup_type == 'week':
+        dt = dt - datetime.timedelta(days=dt.weekday())
+        return "%i-%02i-%02i" % (dt.year, dt.month, dt.day)
     elif lookup_type == 'day':
         return "%i-%02i-%02i" % (dt.year, dt.month, dt.day)
 
@@ -405,6 +407,9 @@ def _sqlite_datetime_trunc(lookup_type, dt, tzname):
         return '%i-%02i-01 00:00:00' % (dt.year, month_in_quarter)
     elif lookup_type == 'month':
         return "%i-%02i-01 00:00:00" % (dt.year, dt.month)
+    elif lookup_type == 'week':
+        dt = dt - datetime.timedelta(days=dt.weekday())
+        return "%i-%02i-%02i 00:00:00" % (dt.year, dt.month, dt.day)
     elif lookup_type == 'day':
         return "%i-%02i-%02i 00:00:00" % (dt.year, dt.month, dt.day)
     elif lookup_type == 'hour':
@@ -429,20 +434,11 @@ def _sqlite_format_dtdelta(conn, lhs, rhs):
     """
     LHS and RHS can be either:
     - An integer number of microseconds
-    - A string representing a timedelta object
     - A string representing a datetime
     """
     try:
-        if isinstance(lhs, int):
-            lhs = str(decimal.Decimal(lhs) / decimal.Decimal(1000000))
-        real_lhs = parse_duration(lhs)
-        if real_lhs is None:
-            real_lhs = backend_utils.typecast_timestamp(lhs)
-        if isinstance(rhs, int):
-            rhs = str(decimal.Decimal(rhs) / decimal.Decimal(1000000))
-        real_rhs = parse_duration(rhs)
-        if real_rhs is None:
-            real_rhs = backend_utils.typecast_timestamp(rhs)
+        real_lhs = datetime.timedelta(0, 0, lhs) if isinstance(lhs, int) else backend_utils.typecast_timestamp(lhs)
+        real_rhs = datetime.timedelta(0, 0, rhs) if isinstance(rhs, int) else backend_utils.typecast_timestamp(rhs)
         if conn.strip() == '+':
             out = real_lhs + real_rhs
         else:
@@ -472,11 +468,21 @@ def _sqlite_time_diff(lhs, rhs):
 def _sqlite_timestamp_diff(lhs, rhs):
     left = backend_utils.typecast_timestamp(lhs)
     right = backend_utils.typecast_timestamp(rhs)
-    return (left - right).total_seconds() * 1000000
+    return duration_microseconds(left - right)
 
 
 def _sqlite_regexp(re_pattern, re_string):
     return bool(re.search(re_pattern, str(re_string))) if re_string is not None else False
+
+
+def _sqlite_lpad(text, length, fill_text):
+    if len(text) >= length:
+        return text[:length]
+    return (fill_text * length)[:length - len(text)] + text
+
+
+def _sqlite_rpad(text, length, fill_text):
+    return (text + fill_text * length)[:length]
 
 
 def _sqlite_power(x, y):

@@ -2,7 +2,9 @@ import threading
 from ctypes import POINTER, Structure, byref, c_byte, c_char_p, c_int, c_size_t
 
 from django.contrib.gis.geos.base import GEOSBase
-from django.contrib.gis.geos.libgeos import GEOM_PTR, GEOSFuncFactory
+from django.contrib.gis.geos.libgeos import (
+    GEOM_PTR, GEOSFuncFactory, geos_version_tuple,
+)
 from django.contrib.gis.geos.prototypes.errcheck import (
     check_geom, check_sized_string, check_string,
 )
@@ -233,7 +235,7 @@ class WKBWriter(IOBase):
         from django.contrib.gis.geos import Polygon
         geom = self._handle_empty_point(geom)
         wkb = wkb_writer_write(self.ptr, geom.ptr, byref(c_size_t()))
-        if isinstance(geom, Polygon) and geom.empty:
+        if geos_version_tuple() < (3, 6, 1) and isinstance(geom, Polygon) and geom.empty:
             # Fix GEOS output for empty polygon.
             # See https://trac.osgeo.org/geos/ticket/680.
             wkb = wkb[:-8] + b'\0' * 4
@@ -244,7 +246,7 @@ class WKBWriter(IOBase):
         from django.contrib.gis.geos.polygon import Polygon
         geom = self._handle_empty_point(geom)
         wkb = wkb_writer_write_hex(self.ptr, geom.ptr, byref(c_size_t()))
-        if isinstance(geom, Polygon) and geom.empty:
+        if geos_version_tuple() < (3, 6, 1) and isinstance(geom, Polygon) and geom.empty:
             wkb = wkb[:-16] + b'0' * 8
         return wkb
 
@@ -300,8 +302,7 @@ thread_context = ThreadLocalIO()
 # These module-level routines return the I/O object that is local to the
 # thread. If the I/O object does not exist yet it will be initialized.
 def wkt_r():
-    if not thread_context.wkt_r:
-        thread_context.wkt_r = _WKTReader()
+    thread_context.wkt_r = thread_context.wkt_r or _WKTReader()
     return thread_context.wkt_r
 
 
@@ -316,8 +317,7 @@ def wkt_w(dim=2, trim=False, precision=None):
 
 
 def wkb_r():
-    if not thread_context.wkb_r:
-        thread_context.wkb_r = _WKBReader()
+    thread_context.wkb_r = thread_context.wkb_r or _WKBReader()
     return thread_context.wkb_r
 
 

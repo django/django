@@ -1,7 +1,7 @@
 """
 MySQL database backend for Django.
 
-Requires mysqlclient: https://pypi.python.org/pypi/mysqlclient/
+Requires mysqlclient: https://pypi.org/project/mysqlclient/
 """
 import re
 
@@ -32,17 +32,17 @@ from .schema import DatabaseSchemaEditor                    # isort:skip
 from .validation import DatabaseValidation                  # isort:skip
 
 version = Database.version_info
-if version < (1, 3, 3):
-    raise ImproperlyConfigured("mysqlclient 1.3.3 or newer is required; you have %s" % Database.__version__)
+if version < (1, 3, 7):
+    raise ImproperlyConfigured('mysqlclient 1.3.7 or newer is required; you have %s.' % Database.__version__)
 
 
 # MySQLdb returns TIME columns as timedelta -- they are more like timedelta in
 # terms of actual behavior as they are signed and include days -- and Django
 # expects time.
-django_conversions = conversions.copy()
-django_conversions.update({
-    FIELD_TYPE.TIME: backend_utils.typecast_time,
-})
+django_conversions = {
+    **conversions,
+    **{FIELD_TYPE.TIME: backend_utils.typecast_time},
+}
 
 # This should match the numerical portion of the version numbers (we can treat
 # versions like 5.0.24 and 5.0.24a as the same).
@@ -141,8 +141,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'iexact': 'LIKE %s',
         'contains': 'LIKE BINARY %s',
         'icontains': 'LIKE %s',
-        'regex': 'REGEXP BINARY %s',
-        'iregex': 'REGEXP %s',
         'gt': '> %s',
         'gte': '>= %s',
         'lt': '< %s',
@@ -286,13 +284,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         `disable_constraint_checking()` and `enable_constraint_checking()`, to
         determine if rows with invalid references were entered while constraint
         checks were off.
-
-        Raise an IntegrityError on the first invalid foreign key reference
-        encountered (if any) and provide detailed information about the
-        invalid reference in the error message.
-
-        Backends can override this method if they can more directly apply
-        constraint checking (e.g. via "SET CONSTRAINTS ALL IMMEDIATE")
         """
         with self.cursor() as cursor:
             if table_names is None:

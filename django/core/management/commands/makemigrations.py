@@ -4,7 +4,9 @@ from itertools import takewhile
 
 from django.apps import apps
 from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import (
+    BaseCommand, CommandError, no_translations,
+)
 from django.db import DEFAULT_DB_ALIAS, connections, router
 from django.db.migrations import Migration
 from django.db.migrations.autodetector import MigrationAutodetector
@@ -51,6 +53,7 @@ class Command(BaseCommand):
             help='Exit with a non-zero status if model changes are missing migrations.',
         )
 
+    @no_translations
     def handle(self, *app_labels, **options):
         self.verbosity = options['verbosity']
         self.interactive = options['interactive']
@@ -62,15 +65,14 @@ class Command(BaseCommand):
 
         # Make sure the app they asked for exists
         app_labels = set(app_labels)
-        bad_app_labels = set()
+        has_bad_labels = False
         for app_label in app_labels:
             try:
                 apps.get_app_config(app_label)
-            except LookupError:
-                bad_app_labels.add(app_label)
-        if bad_app_labels:
-            for app_label in bad_app_labels:
-                self.stderr.write("App '%s' could not be found. Is it in INSTALLED_APPS?" % app_label)
+            except LookupError as err:
+                self.stderr.write(str(err))
+                has_bad_labels = True
+        if has_bad_labels:
             sys.exit(2)
 
         # Load the current graph state. Pass in None for the connection so
@@ -276,7 +278,7 @@ class Command(BaseCommand):
                     biggest_number = max(x for x in numbers if x is not None)
                 except ValueError:
                     biggest_number = 1
-                subclass = type("Migration", (Migration, ), {
+                subclass = type("Migration", (Migration,), {
                     "dependencies": [(app_label, migration.name) for migration in merge_migrations],
                 })
                 migration_name = "%04i_%s" % (

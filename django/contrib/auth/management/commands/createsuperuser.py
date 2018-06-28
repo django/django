@@ -69,34 +69,19 @@ class Command(BaseCommand):
         # instead of raw IDs.
         fake_user_data = {}
         verbose_field_name = self.username_field.verbose_name
-
-        # Do quick and dirty validation if --noinput
-        if not options['interactive']:
-            try:
-                if not username:
-                    raise CommandError("You must use --%s with --noinput." % self.UserModel.USERNAME_FIELD)
-                username = self.username_field.clean(username, None)
-
-                for field_name in self.UserModel.REQUIRED_FIELDS:
-                    if options[field_name]:
-                        field = self.UserModel._meta.get_field(field_name)
-                        user_data[field_name] = field.clean(options[field_name], None)
-                    else:
-                        raise CommandError("You must use --%s with --noinput." % field_name)
-            except exceptions.ValidationError as e:
-                raise CommandError('; '.join(e.messages))
-
-        else:
-            # Prompt for username/password, and any other required fields.
-            # Enclose this whole thing in a try/except to catch
-            # KeyboardInterrupt and exit gracefully.
-            default_username = get_default_username()
-            try:
-
+        try:
+            if options['interactive']:
                 if hasattr(self.stdin, 'isatty') and not self.stdin.isatty():
-                    raise NotRunningInTTYException("Not running in a TTY")
-
-                # Get a username
+                    raise NotRunningInTTYException
+                default_username = get_default_username()
+                if username:
+                    error_msg = self._validate_username(username, verbose_field_name, database)
+                    if error_msg:
+                        self.stderr.write(error_msg)
+                        username = None
+                elif username == '':
+                    raise CommandError('%s cannot be blank.' % capfirst(verbose_field_name))
+                # Prompt for username.
                 while username is None:
                     input_msg = capfirst(verbose_field_name)
                     if default_username:
@@ -110,21 +95,29 @@ class Command(BaseCommand):
                         ) if username_rel else ''
                     )
                     username = self.get_input_data(self.username_field, input_msg, default_username)
-                    if not username:
-                        continue
-                    if self.username_field.unique:
-                        try:
-                            self.UserModel._default_manager.db_manager(database).get_by_natural_key(username)
-                        except self.UserModel.DoesNotExist:
-                            pass
-                        else:
-                            self.stderr.write("Error: That %s is already taken." % verbose_field_name)
+                    if username:
+                        error_msg = self._validate_username(username, verbose_field_name, database)
+                        if error_msg:
+                            self.stderr.write(error_msg)
                             username = None
+                            continue
+            else:
+                if username is None:
+                    raise CommandError('You must use --%s with --noinput.' % self.UserModel.USERNAME_FIELD)
+                else:
+                    error_msg = self._validate_username(username, verbose_field_name, database)
+                    if error_msg:
+                        raise CommandError(error_msg)
 
-                if not username:
-                    raise CommandError('%s cannot be blank.' % capfirst(verbose_field_name))
-
-                for field_name in self.UserModel.REQUIRED_FIELDS:
+            # Prompt for required fields.
+            for field_name in self.UserModel.REQUIRED_FIELDS:
+                if not options['interactive']:
+                    if options[field_name]:
+                        field = self.UserModel._meta.get_field(field_name)
+                        user_data[field_name] = field.clean(options[field_name], None)
+                    else:
+                        raise CommandError('You must use --%s with --noinput.' % field_name)
+                else:
                     field = self.UserModel._meta.get_field(field_name)
                     user_data[field_name] = options[field_name]
                     while user_data[field_name] is None:
@@ -142,41 +135,39 @@ class Command(BaseCommand):
                         # Wrap any foreign keys in fake model instances
                         if field.remote_field:
                             fake_user_data[field_name] = field.remote_field.model(input_value)
-
-                # Get a password
-                while password is None:
-                    password = getpass.getpass()
-                    password2 = getpass.getpass('Password (again): ')
-                    if password != password2:
-                        self.stderr.write("Error: Your passwords didn't match.")
-                        password = None
-                        # Don't validate passwords that don't match.
-                        continue
-
-                    if password.strip() == '':
-                        self.stderr.write("Error: Blank passwords aren't allowed.")
-                        password = None
-                        # Don't validate blank passwords.
-                        continue
-
-                    try:
-                        validate_password(password2, self.UserModel(**fake_user_data))
-                    except exceptions.ValidationError as err:
-                        self.stderr.write('\n'.join(err.messages))
-                        response = input('Bypass password validation and create user anyway? [y/N]: ')
-                        if response.lower() != 'y':
+                    # Prompt for a password.
+                    while password is None:
+                        password = getpass.getpass()
+                        password2 = getpass.getpass('Password (again): ')
+                        if password != password2:
+                            self.stderr.write("Error: Your passwords didn't match.")
                             password = None
+                            # Don't validate passwords that don't match.
+                            continue
 
-            except KeyboardInterrupt:
-                self.stderr.write("\nOperation cancelled.")
-                sys.exit(1)
-
-            except NotRunningInTTYException:
-                self.stdout.write(
-                    "Superuser creation skipped due to not running in a TTY. "
-                    "You can run `manage.py createsuperuser` in your project "
-                    "to create one manually."
-                )
+                        if password.strip() == '':
+                            self.stderr.write("Error: Blank passwords aren't allowed.")
+                            password = None
+                            # Don't validate blank passwords.
+                            continue
+                        try:
+                            validate_password(password2, self.UserModel(**fake_user_data))
+                        except exceptions.ValidationError as err:
+                            self.stderr.write('\n'.join(err.messages))
+                            response = input('Bypass password validation and create user anyway? [y/N]: ')
+                            if response.lower() != 'y':
+                                password = None
+        except KeyboardInterrupt:
+            self.stderr.write('\nOperation cancelled.')
+            sys.exit(1)
+        except exceptions.ValidationError as e:
+            raise CommandError('; '.join(e.messages))
+        except NotRunningInTTYException:
+            self.stdout.write(
+                'Superuser creation skipped due to not running in a TTY. '
+                'You can run `manage.py createsuperuser` in your project '
+                'to create one manually.'
+            )
 
         if username:
             user_data[self.UserModel.USERNAME_FIELD] = username
@@ -200,3 +191,19 @@ class Command(BaseCommand):
             val = None
 
         return val
+
+    def _validate_username(self, username, verbose_field_name, database):
+        """Validate username. If invalid, return a string error message."""
+        if self.username_field.unique:
+            try:
+                self.UserModel._default_manager.db_manager(database).get_by_natural_key(username)
+            except self.UserModel.DoesNotExist:
+                pass
+            else:
+                return 'Error: That %s is already taken.' % verbose_field_name
+        if not username:
+            return '%s cannot be blank.' % capfirst(verbose_field_name)
+        try:
+            self.username_field.clean(username, None)
+        except exceptions.ValidationError as e:
+            return '; '.join(e.messages)

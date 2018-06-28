@@ -2,6 +2,10 @@ import unittest
 
 from django.db import connection
 from django.db.models.fields import BooleanField, NullBooleanField
+from django.db.utils import DatabaseError
+from django.test import TransactionTestCase
+
+from ..models import Square
 
 
 @unittest.skipUnless(connection.vendor == 'oracle', 'Oracle tests')
@@ -26,17 +30,6 @@ class Tests(unittest.TestCase):
             cursor.execute("BEGIN %s := 'X'; END; ", [var])
             self.assertEqual(var.getvalue(), 'X')
 
-    def test_long_string(self):
-        """Text longer than 4000 chars can be saved and read."""
-        with connection.cursor() as cursor:
-            cursor.execute('CREATE TABLE ltext ("TEXT" NCLOB)')
-            long_str = ''.join(str(x) for x in range(4000))
-            cursor.execute('INSERT INTO ltext VALUES (%s)', [long_str])
-            cursor.execute('SELECT text FROM ltext')
-            row = cursor.fetchone()
-            self.assertEqual(long_str, row[0].read())
-            cursor.execute('DROP TABLE ltext')
-
     def test_client_encoding(self):
         """Client encoding is set correctly."""
         connection.ensure_connection()
@@ -57,7 +50,49 @@ class Tests(unittest.TestCase):
 
     def test_boolean_constraints(self):
         """Boolean fields have check constraints on their values."""
-        for field in (BooleanField(), NullBooleanField()):
+        for field in (BooleanField(), NullBooleanField(), BooleanField(null=True)):
             with self.subTest(field=field):
                 field.set_attributes_from_name('is_nice')
                 self.assertIn('"IS_NICE" IN (0,1)', field.db_check(connection))
+
+
+@unittest.skipUnless(connection.vendor == 'oracle', 'Oracle tests')
+class TransactionalTests(TransactionTestCase):
+    available_apps = ['backends']
+
+    def test_hidden_no_data_found_exception(self):
+        # "ORA-1403: no data found" exception is hidden by Oracle OCI library
+        # when an INSERT statement is used with a RETURNING clause (see #28859).
+        with connection.cursor() as cursor:
+            # Create trigger that raises "ORA-1403: no data found".
+            cursor.execute("""
+                CREATE OR REPLACE TRIGGER "TRG_NO_DATA_FOUND"
+                AFTER INSERT ON "BACKENDS_SQUARE"
+                FOR EACH ROW
+                BEGIN
+                    RAISE NO_DATA_FOUND;
+                END;
+            """)
+        try:
+            with self.assertRaisesMessage(DatabaseError, (
+                'The database did not return a new row id. Probably "ORA-1403: '
+                'no data found" was raised internally but was hidden by the '
+                'Oracle OCI library (see https://code.djangoproject.com/ticket/28859).'
+            )):
+                Square.objects.create(root=2, square=4)
+        finally:
+            with connection.cursor() as cursor:
+                cursor.execute('DROP TRIGGER "TRG_NO_DATA_FOUND"')
+
+    def test_password_with_at_sign(self):
+        old_password = connection.settings_dict['PASSWORD']
+        connection.settings_dict['PASSWORD'] = 'p@ssword'
+        try:
+            self.assertIn('/\\"p@ssword\\"@', connection._connect_string())
+            with self.assertRaises(DatabaseError) as context:
+                connection.cursor()
+            # Database exception: "ORA-01017: invalid username/password" is
+            # expected.
+            self.assertIn('ORA-01017', context.exception.args[0].message)
+        finally:
+            connection.settings_dict['PASSWORD'] = old_password

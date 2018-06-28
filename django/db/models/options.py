@@ -92,7 +92,7 @@ class Options:
         self.unique_together = []
         self.index_together = []
         self.select_on_save = False
-        self.default_permissions = ('add', 'change', 'delete')
+        self.default_permissions = ('add', 'change', 'delete', 'view')
         self.permissions = []
         self.object_name = None
         self.app_label = app_label
@@ -753,10 +753,9 @@ class Options:
 
         # We must keep track of which models we have already seen. Otherwise we
         # could include the same field multiple times from different models.
-        topmost_call = False
-        if seen_models is None:
+        topmost_call = seen_models is None
+        if topmost_call:
             seen_models = set()
-            topmost_call = True
         seen_models.add(self.model)
 
         # Creates a cache key composed of all arguments
@@ -785,9 +784,8 @@ class Options:
                 for obj in parent._meta._get_fields(
                         forward=forward, reverse=reverse, include_parents=include_parents,
                         include_hidden=include_hidden, seen_models=seen_models):
-                    if getattr(obj, 'parent_link', False) and obj.model != self.concrete_model:
-                        continue
-                    fields.append(obj)
+                    if not getattr(obj, 'parent_link', False) or obj.model == self.concrete_model:
+                        fields.append(obj)
         if reverse and not self.proxy:
             # Tree is computed once and cached until the app cache is expired.
             # It is composed of a list of fields pointing to the current model

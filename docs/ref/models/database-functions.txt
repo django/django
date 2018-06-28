@@ -178,10 +178,6 @@ Django usually uses the databases' extract function, so you may use any
 ``lookup_name`` that your database supports. A ``tzinfo`` subclass, usually
 provided by ``pytz``, can be passed to extract a value in a specific timezone.
 
-.. versionchanged:: 2.0
-
-    Support for ``DurationField`` was added.
-
 Given the datetime ``2015-06-15 23:30:01.000321+00:00``, the built-in
 ``lookup_name``\s return:
 
@@ -221,9 +217,10 @@ returned when this timezone is active will be the same as above except for:
 
     The ``week`` ``lookup_type`` is calculated based on `ISO-8601
     <https://en.wikipedia.org/wiki/ISO-8601>`_, i.e.,
-    a week starts on a Monday. The first week is the one with the majority
-    of the days, i.e., a week that starts on or before Thursday. The value
-    returned is in the range 1 to 52 or 53.
+    a week starts on a Monday. The first week of a year is the one that
+    contains the year's first Thursday, i.e. the first week has the majority
+    (four or more) of its days in the year. The value returned is in the range
+    1 to 52 or 53.
 
 Each ``lookup_name`` above has a corresponding ``Extract`` subclass (listed
 below) that should typically be used instead of the more verbose equivalent,
@@ -272,8 +269,6 @@ Usage example::
     .. attribute:: lookup_name = 'week'
 
 .. class:: ExtractQuarter(expression, tzinfo=None, **extra)
-
-    .. versionadded:: 2.0
 
     .. attribute:: lookup_name = 'quarter'
 
@@ -439,6 +434,7 @@ return:
 * "year": 2015-01-01 00:00:00+00:00
 * "quarter": 2015-04-01 00:00:00+00:00
 * "month": 2015-06-01 00:00:00+00:00
+* "week": 2015-06-15 00:00:00+00:00
 * "day": 2015-06-15 00:00:00+00:00
 * "hour": 2015-06-15 14:00:00+00:00
 * "minute": 2015-06-15 14:30:00+00:00
@@ -452,6 +448,7 @@ values returned when this timezone is active will be:
 * "year": 2015-01-01 00:00:00+11:00
 * "quarter": 2015-04-01 00:00:00+10:00
 * "month": 2015-06-01 00:00:00+10:00
+* "week": 2015-06-16 00:00:00+10:00
 * "day": 2015-06-16 00:00:00+10:00
 * "hour": 2015-06-16 00:00:00+10:00
 * "minute": 2015-06-16 00:30:00+10:00
@@ -504,9 +501,15 @@ Usage example::
 
     .. attribute:: kind = 'month'
 
-.. class:: TruncQuarter(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncWeek(expression, output_field=None, tzinfo=None, **extra)
 
-    .. versionadded:: 2.0
+    .. versionadded:: 2.1
+
+    Truncates to midnight on the Monday of the week.
+
+    .. attribute:: kind = 'week'
+
+.. class:: TruncQuarter(expression, output_field=None, tzinfo=None, **extra)
 
     .. attribute:: kind = 'quarter'
 
@@ -675,6 +678,28 @@ that deal with time-parts can be used with ``TimeField``::
 Text functions
 ==============
 
+``Chr``
+-------
+
+.. class:: Chr(expression, **extra)
+
+.. versionadded:: 2.1
+
+Accepts a numeric field or expression and returns the text representation of
+the expression as a single character. It works the same as Python's :func:`chr`
+function.
+
+Like :class:`Length`, it can be registered as a transform on ``IntegerField``.
+The default lookup name is ``chr``.
+
+Usage example::
+
+    >>> from django.db.models.functions import Chr
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.filter(name__startswith=Chr(ord('M'))).get()
+    >>> print(author.name)
+    Margaret Smith
+
 ``Concat``
 ----------
 
@@ -706,6 +731,23 @@ Usage example::
     >>> print(author.screen_name)
     Margaret Smith (Maggie)
 
+``Left``
+--------
+
+.. class:: Left(expression, length, **extra)
+
+.. versionadded:: 2.1
+
+Returns the first ``length`` characters of the given text field or expression.
+
+Usage example::
+
+    >>> from django.db.models.functions import Left
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.annotate(first_initial=Left('name', 1)).get()
+    >>> print(author.first_initial)
+    M
+
 ``Length``
 ----------
 
@@ -729,7 +771,7 @@ It can also be registered as a transform. For example::
 
     >>> from django.db.models import CharField
     >>> from django.db.models.functions import Length
-    >>> CharField.register_lookup(Length, 'length')
+    >>> CharField.register_lookup(Length)
     >>> # Get authors whose name is longer than 7 characters
     >>> authors = Author.objects.filter(name__length__gt=7)
 
@@ -751,12 +793,142 @@ Usage example::
     >>> print(author.name_lower)
     margaret smith
 
+``LPad``
+--------
+
+.. class:: LPad(expression, length, fill_text=Value(' '), **extra)
+
+.. versionadded:: 2.1
+
+Returns the value of the given text field or expression padded on the left side
+with ``fill_text`` so that the resulting value is ``length`` characters long.
+The default ``fill_text`` is a space.
+
+Usage example::
+
+    >>> from django.db.models import Value
+    >>> from django.db.models.functions import LPad
+    >>> Author.objects.create(name='John', alias='j')
+    >>> Author.objects.update(name=LPad('name', 8, Value('abc')))
+    1
+    >>> print(Author.objects.get(alias='j').name)
+    abcaJohn
+
+``LTrim``
+---------
+
+.. class:: LTrim(expression, **extra)
+
+.. versionadded:: 2.1
+
+Similar to :class:`~django.db.models.functions.Trim`, but removes only leading
+spaces.
+
+``Ord``
+-------
+
+.. class:: Ord(expression, **extra)
+
+.. versionadded:: 2.1
+
+Accepts a single text field or expression and returns the Unicode code point
+value for the first character of that expression. It works similar to Python's
+:func:`ord` function, but an exception isn't raised if the expression is more
+than one character long.
+
+It can also be registered as a transform as described in :class:`Length`.
+The default lookup name is ``ord``.
+
+Usage example::
+
+    >>> from django.db.models.functions import Ord
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.annotate(name_code_point=Ord('name')).get()
+    >>> print(author.name_code_point)
+    77
+
+``Repeat``
+----------
+
+.. class:: Repeat(expression, number, **extra)
+
+.. versionadded:: 2.1
+
+Returns the value of the given text field or expression repeated ``number``
+times.
+
+Usage example::
+
+    >>> from django.db.models.functions import Repeat
+    >>> Author.objects.create(name='John', alias='j')
+    >>> Author.objects.update(name=Repeat('name', 3))
+    1
+    >>> print(Author.objects.get(alias='j').name)
+    JohnJohnJohn
+
+``Replace``
+-----------
+
+.. class:: Replace(expression, text, replacement=Value(''), **extra)
+
+.. versionadded:: 2.1
+
+Replaces all occurrences of ``text`` with ``replacement`` in ``expression``.
+The default replacement text is the empty string. The arguments to the function
+are case-sensitive.
+
+Usage example::
+
+    >>> from django.db.models import Value
+    >>> from django.db.models.functions import Replace
+    >>> Author.objects.create(name='Margaret Johnson')
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> Author.objects.update(name=Replace('name', Value('Margaret'), Value('Margareth')))
+    2
+    >>> Author.objects.values('name')
+    <QuerySet [{'name': 'Margareth Johnson'}, {'name': 'Margareth Smith'}]>
+
+``Right``
+---------
+
+.. class:: Right(expression, length, **extra)
+
+.. versionadded:: 2.1
+
+Returns the last ``length`` characters of the given text field or expression.
+
+Usage example::
+
+    >>> from django.db.models.functions import Right
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.annotate(last_letter=Right('name', 1)).get()
+    >>> print(author.last_letter)
+    h
+
+``RPad``
+--------
+
+.. class:: RPad(expression, length, fill_text=Value(' '), **extra)
+
+.. versionadded:: 2.1
+
+Similar to :class:`~django.db.models.functions.LPad`, but pads on the right
+side.
+
+``RTrim``
+---------
+
+.. class:: RTrim(expression, **extra)
+
+.. versionadded:: 2.1
+
+Similar to :class:`~django.db.models.functions.Trim`, but removes only trailing
+spaces.
+
 ``StrIndex``
 ------------
 
 .. class:: StrIndex(string, substring, **extra)
-
-.. versionadded:: 2.0
 
 Returns a positive integer corresponding to the 1-indexed position of the first
 occurrence of ``substring`` inside ``string``, or 0 if ``substring`` is not
@@ -797,12 +969,31 @@ than 0. If ``length`` is ``None``, then the rest of the string will be returned.
 Usage example::
 
     >>> # Set the alias to the first 5 characters of the name as lowercase
-    >>> from django.db.models.functions import Substr, Lower
+    >>> from django.db.models.functions import Lower, Substr
     >>> Author.objects.create(name='Margaret Smith')
     >>> Author.objects.update(alias=Lower(Substr('name', 1, 5)))
     1
     >>> print(Author.objects.get(name='Margaret Smith').alias)
     marga
+
+``Trim``
+--------
+
+.. class:: Trim(expression, **extra)
+
+.. versionadded:: 2.1
+
+Returns the value of the given text field or expression with leading and
+trailing spaces removed.
+
+Usage example::
+
+    >>> from django.db.models.functions import Trim
+    >>> Author.objects.create(name='  John  ', alias='j')
+    >>> Author.objects.update(name=Trim('name'))
+    1
+    >>> print(Author.objects.get(alias='j').name)
+    John
 
 ``Upper``
 ---------
@@ -826,8 +1017,6 @@ Usage example::
 
 Window functions
 ================
-
-.. versionadded:: 2.0
 
 There are a number of functions to use in a
 :class:`~django.db.models.expressions.Window` expression for computing the rank

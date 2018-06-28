@@ -13,7 +13,7 @@ Windows Authentication or Apache and `mod_authnz_ldap`_, `CAS`_, `Cosign`_,
 .. _CAS: https://www.apereo.org/projects/cas
 .. _Cosign: http://weblogin.org
 .. _WebAuth: https://www.stanford.edu/services/webauth/
-.. _mod_auth_sspi: http://sourceforge.net/projects/mod-auth-sspi
+.. _mod_auth_sspi: https://sourceforge.net/projects/mod-auth-sspi
 
 When the Web server takes care of authentication it typically sets the
 ``REMOTE_USER`` environment variable for use in the underlying application.  In

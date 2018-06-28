@@ -383,7 +383,7 @@ applications. This generic name was kept for backwards-compatibility.
 
 Requires Jinja2_ to be installed:
 
-.. code-block:: console
+.. console::
 
     $ pip install Jinja2
 

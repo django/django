@@ -4,13 +4,13 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # lardissone <lardissone@gmail.com>, 2014
 # poli <poli@devartis.com>, 2014
-# Ramiro Morales, 2013-2017
+# Ramiro Morales, 2013-2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:55+0000\n"
+"POT-Creation-Date: 2017-12-01 21:10+0100\n"
+"PO-Revision-Date: 2018-01-22 14:52+0000\n"
 "Last-Translator: Ramiro Morales\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
 "language/es_AR/)\n"
@@ -160,6 +160,9 @@ msgstr "japonés"
 
 msgid "Georgian"
 msgstr "georgiano"
+
+msgid "Kabyle"
+msgstr "cabilio"
 
 msgid "Kazakh"
 msgstr "kazajo"
@@ -1003,54 +1006,54 @@ msgstr "Dic."
 
 msgctxt "alt. month"
 msgid "January"
-msgstr "Enero"
+msgstr "enero"
 
 msgctxt "alt. month"
 msgid "February"
-msgstr "Febrero"
+msgstr "febrero"
 
 msgctxt "alt. month"
 msgid "March"
-msgstr "Marzo"
+msgstr "marzo"
 
 msgctxt "alt. month"
 msgid "April"
-msgstr "Abril"
+msgstr "abril"
 
 msgctxt "alt. month"
 msgid "May"
-msgstr "Mayo"
+msgstr "mayo"
 
 msgctxt "alt. month"
 msgid "June"
-msgstr "Junio"
+msgstr "junio"
 
 msgctxt "alt. month"
 msgid "July"
-msgstr "Julio"
+msgstr "julio"
 
 msgctxt "alt. month"
 msgid "August"
-msgstr "Agosto"
+msgstr "agosto"
 
 msgctxt "alt. month"
 msgid "September"
-msgstr "Setiembre"
+msgstr "setiembre"
 
 msgctxt "alt. month"
 msgid "October"
-msgstr "Octubre"
+msgstr "octubre"
 
 msgctxt "alt. month"
 msgid "November"
-msgstr "Noviembre"
+msgstr "noviembre"
 
 msgctxt "alt. month"
 msgid "December"
-msgstr "Diciembre"
+msgstr "diciembre"
 
 msgid "This is not a valid IPv6 address."
-msgstr "Esta no es una direción IPv6 válida."
+msgstr "Esta no es una dirección IPv6 válida."
 
 #, python-format
 msgctxt "String to return when truncating text"
@@ -1265,4 +1268,4 @@ msgid "Django Community"
 msgstr "Comunidad Django"
 
 msgid "Connect, get help, or contribute"
-msgstr "Conécteses, consiga ayuda o contribuya"
+msgstr "Conéctese, consiga ayuda o contribuya"

@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Branko Kokanovic <branko@kokanovic.org>, 2018
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
@@ -8,8 +9,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2018-01-30 10:24+0000\n"
+"Last-Translator: Branko Kokanovic <branko@kokanovic.org>\n"
 "Language-Team: Serbian (http://www.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
@@ -97,22 +98,22 @@ msgstr "Изабрали сте акцију али нисте изменили 
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Обавештење: %s сат сте испред серверског времена."
+msgstr[1] "Обавештење: %s сата сте испред серверског времена."
+msgstr[2] "Обавештење: %s сати сте испред серверског времена."
 
 #, javascript-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Обавештење: %s сат сте иза серверског времена."
+msgstr[1] "Обавештење: %s сата сте иза серверског времена."
+msgstr[2] "Обавештење: %s сати сте иза серверског времена."
 
 msgid "Now"
 msgstr "Тренутно време"
 
 msgid "Choose a Time"
-msgstr ""
+msgstr "Одаберите време"
 
 msgid "Choose a time"
 msgstr "Одабир времена"
@@ -127,7 +128,7 @@ msgid "Noon"
 msgstr "Подне"
 
 msgid "6 p.m."
-msgstr ""
+msgstr "18ч"
 
 msgid "Cancel"
 msgstr "Поништи"
@@ -136,7 +137,7 @@ msgid "Today"
 msgstr "Данас"
 
 msgid "Choose a Date"
-msgstr ""
+msgstr "Одаберите датум"
 
 msgid "Yesterday"
 msgstr "Јуче"
@@ -145,68 +146,68 @@ msgid "Tomorrow"
 msgstr "Сутра"
 
 msgid "January"
-msgstr ""
+msgstr "Јануар"
 
 msgid "February"
-msgstr ""
+msgstr "Фебруар"
 
 msgid "March"
-msgstr ""
+msgstr "Март"
 
 msgid "April"
-msgstr ""
+msgstr "Април"
 
 msgid "May"
-msgstr ""
+msgstr "Мај"
 
 msgid "June"
-msgstr ""
+msgstr "Јун"
 
 msgid "July"
-msgstr ""
+msgstr "Јул"
 
 msgid "August"
-msgstr ""
+msgstr "Август"
 
 msgid "September"
-msgstr ""
+msgstr "Септембар"
 
 msgid "October"
-msgstr ""
+msgstr "Октобар"
 
 msgid "November"
-msgstr ""
+msgstr "Новембар"
 
 msgid "December"
-msgstr ""
+msgstr "Децембар"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr ""
+msgstr "Н"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr ""
+msgstr "П"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr ""
+msgstr "У"
 
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr ""
+msgstr "С"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr ""
+msgstr "Ч"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr ""
+msgstr "П"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr ""
+msgstr "С"
 
 msgid "Show"
 msgstr "Покажи"

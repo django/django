@@ -6,13 +6,13 @@
 # Jirka Vejrazka <Jirka.Vejrazka@gmail.com>, 2011
 # Tomáš Ehrlich <tomas.ehrlich@gmail.com>, 2015
 # Vláďa Macek <macek@sandbox.cz>, 2012-2014
-# Vláďa Macek <macek@sandbox.cz>, 2015-2017
+# Vláďa Macek <macek@sandbox.cz>, 2015-2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 12:22+0000\n"
+"POT-Creation-Date: 2017-12-01 21:10+0100\n"
+"PO-Revision-Date: 2018-01-06 20:09+0000\n"
 "Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -31,7 +31,7 @@ msgid "Asturian"
 msgstr "Asturian"
 
 msgid "Azerbaijani"
-msgstr "Ázerbájdžánština"
+msgstr "ázerbájdžánštinou"
 
 msgid "Bulgarian"
 msgstr "bulharsky"
@@ -64,7 +64,7 @@ msgid "German"
 msgstr "německy"
 
 msgid "Lower Sorbian"
-msgstr "Dolnolužická srbština"
+msgstr "dolnolužickou srbštinou"
 
 msgid "Greek"
 msgstr "řecky"
@@ -91,10 +91,10 @@ msgid "Colombian Spanish"
 msgstr "kolumbijskou španělštinou"
 
 msgid "Mexican Spanish"
-msgstr "Mexická španělština"
+msgstr "mexickou španělštinou"
 
 msgid "Nicaraguan Spanish"
-msgstr "Nikaragujskou španělštinou"
+msgstr "nikaragujskou španělštinou"
 
 msgid "Venezuelan Spanish"
 msgstr "venezuelskou španělštinou"
@@ -136,7 +136,7 @@ msgid "Croatian"
 msgstr "chorvatsky"
 
 msgid "Upper Sorbian"
-msgstr "Hornolužická srbština"
+msgstr "hornolužickou srbštinou"
 
 msgid "Hungarian"
 msgstr "maďarsky"
@@ -161,6 +161,9 @@ msgstr "japonsky"
 
 msgid "Georgian"
 msgstr "gruzínsky"
+
+msgid "Kabyle"
+msgstr "kabylštinou"
 
 msgid "Kazakh"
 msgstr "kazašsky"
@@ -193,13 +196,13 @@ msgid "Mongolian"
 msgstr "mongolsky"
 
 msgid "Marathi"
-msgstr "Marathi"
+msgstr "marathi"
 
 msgid "Burmese"
 msgstr "barmštinou"
 
 msgid "Norwegian Bokmål"
-msgstr "Bokmål Norština"
+msgstr "bokmål norštinou"
 
 msgid "Nepali"
 msgstr "nepálsky"
@@ -274,7 +277,7 @@ msgid "Ukrainian"
 msgstr "ukrajinsky"
 
 msgid "Urdu"
-msgstr "Urdština"
+msgstr "urdsky"
 
 msgid "Vietnamese"
 msgstr "vietnamsky"

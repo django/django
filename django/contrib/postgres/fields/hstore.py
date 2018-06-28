@@ -6,15 +6,18 @@ from django.core import exceptions
 from django.db.models import Field, TextField, Transform
 from django.utils.translation import gettext_lazy as _
 
+from .mixins import CheckFieldDefaultMixin
+
 __all__ = ['HStoreField']
 
 
-class HStoreField(Field):
+class HStoreField(CheckFieldDefaultMixin, Field):
     empty_strings_allowed = False
     description = _('Map of strings to strings/nulls')
     default_error_messages = {
         'not_a_string': _('The value of "%(key)s" is not a string or null.'),
     }
+    _default_hint = ('dict', '{}')
 
     def db_type(self, connection):
         return 'hstore'
@@ -44,11 +47,10 @@ class HStoreField(Field):
         return json.dumps(self.value_from_object(obj))
 
     def formfield(self, **kwargs):
-        defaults = {
+        return super().formfield(**{
             'form_class': forms.HStoreField,
-        }
-        defaults.update(kwargs)
-        return super().formfield(**defaults)
+            **kwargs,
+        })
 
     def get_prep_value(self, value):
         value = super().get_prep_value(value)

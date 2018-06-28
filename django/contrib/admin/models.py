@@ -13,6 +13,12 @@ ADDITION = 1
 CHANGE = 2
 DELETION = 3
 
+ACTION_FLAG_CHOICES = (
+    (ADDITION, _('Addition')),
+    (CHANGE, _('Change')),
+    (DELETION, _('Deletion')),
+)
+
 
 class LogEntryManager(models.Manager):
     use_in_migrations = True
@@ -50,7 +56,7 @@ class LogEntry(models.Model):
     object_id = models.TextField(_('object id'), blank=True, null=True)
     # Translators: 'repr' means representation (https://docs.python.org/3/library/functions.html#repr)
     object_repr = models.CharField(_('object repr'), max_length=200)
-    action_flag = models.PositiveSmallIntegerField(_('action flag'))
+    action_flag = models.PositiveSmallIntegerField(_('action flag'), choices=ACTION_FLAG_CHOICES)
     # change_message is either a string or a JSON structure
     change_message = models.TextField(_('change message'), blank=True)
 

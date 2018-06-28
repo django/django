@@ -63,17 +63,16 @@ class CommandTests(SimpleTestCase):
             dance.Command.requires_system_checks = True
         self.assertIn("CommandError", stderr.getvalue())
 
-    def test_deactivate_locale_set(self):
-        # Deactivate translation when set to true
+    def test_no_translations_deactivate_translations(self):
+        """
+        When the Command handle method is decorated with @no_translations,
+        translations are deactivated inside the command.
+        """
+        current_locale = translation.get_language()
         with translation.override('pl'):
-            result = management.call_command('leave_locale_alone_false', stdout=StringIO())
+            result = management.call_command('no_translations', stdout=StringIO())
             self.assertIsNone(result)
-
-    def test_configured_locale_preserved(self):
-        # Leaves locale from settings when set to false
-        with translation.override('pl'):
-            result = management.call_command('leave_locale_alone_true', stdout=StringIO())
-            self.assertEqual(result, "pl")
+        self.assertEqual(translation.get_language(), current_locale)
 
     def test_find_command_without_PATH(self):
         """
@@ -194,6 +193,39 @@ class CommandTests(SimpleTestCase):
         with self.assertRaisesMessage(TypeError, msg):
             management.call_command('dance', unrecognized=1, unrecognized2=1)
 
+    def test_call_command_with_required_parameters_in_options(self):
+        out = StringIO()
+        management.call_command('required_option', need_me='foo', needme2='bar', stdout=out)
+        self.assertIn('need_me', out.getvalue())
+        self.assertIn('needme2', out.getvalue())
+
+    def test_call_command_with_required_parameters_in_mixed_options(self):
+        out = StringIO()
+        management.call_command('required_option', '--need-me=foo', needme2='bar', stdout=out)
+        self.assertIn('need_me', out.getvalue())
+        self.assertIn('needme2', out.getvalue())
+
+    def test_command_add_arguments_after_common_arguments(self):
+        out = StringIO()
+        management.call_command('common_args', stdout=out)
+        self.assertIn('Detected that --version already exists', out.getvalue())
+
+    def test_subparser(self):
+        out = StringIO()
+        management.call_command('subparser', 'foo', 12, stdout=out)
+        self.assertIn('bar', out.getvalue())
+
+    def test_subparser_invalid_option(self):
+        msg = "Error: invalid choice: 'test' (choose from 'foo')"
+        with self.assertRaisesMessage(CommandError, msg):
+            management.call_command('subparser', 'test', 12)
+
+    def test_create_parser_kwargs(self):
+        """BaseCommand.create_parser() passes kwargs to CommandParser."""
+        epilog = 'some epilog text'
+        parser = BaseCommand().create_parser('prog_name', 'subcommand', epilog=epilog)
+        self.assertEqual(parser.epilog, epilog)
+
 
 class CommandRunTests(AdminScriptTestCase):
     """
@@ -210,6 +242,16 @@ class CommandRunTests(AdminScriptTestCase):
         out, err = self.run_manage(['reverse_url'])
         self.assertNoOutput(err)
         self.assertEqual(out.strip(), '/PREFIX/some/url/')
+
+    def test_disallowed_abbreviated_options(self):
+        """
+        To avoid conflicts with custom options, commands don't allow
+        abbreviated forms of the --setting and --pythonpath options.
+        """
+        self.write_settings('settings.py', apps=['user_commands'])
+        out, err = self.run_manage(['set_option', '--set', 'foo'])
+        self.assertNoOutput(err)
+        self.assertEqual(out.strip(), 'Set foo')
 
 
 class UtilsTests(SimpleTestCase):

@@ -2,6 +2,7 @@
 #
 # Translators:
 # Abel Radac <abelradac@gmail.com>, 2017
+# Bogdan Mateescu, 2018
 # mihneasim <contact@mesimian.com>, 2011
 # Daniel Ursache-Dogariu, 2011
 # Denis Darii <denis.darii@gmail.com>, 2011,2014
@@ -13,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:13+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-12-01 21:10+0100\n"
+"PO-Revision-Date: 2018-01-17 09:13+0000\n"
+"Last-Translator: Bogdan Mateescu\n"
 "Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
@@ -165,6 +166,9 @@ msgstr "Japoneză"
 
 msgid "Georgian"
 msgstr "Georgiană"
+
+msgid "Kabyle"
+msgstr ""
 
 msgid "Kazakh"
 msgstr "Kazahă"
@@ -779,7 +783,7 @@ msgstr ""
 
 #, python-format
 msgid "\"%(pk)s\" is not a valid value."
-msgstr ""
+msgstr "\"%(pk)s\" nu este o valoare validă."
 
 #, python-format
 msgid ""
@@ -1245,9 +1249,12 @@ msgid ""
 "View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
 "target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
 msgstr ""
+"Vezi <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">notele de lansare</a> pentru Django "
+"%(version)s"
 
 msgid "The install worked successfully! Congratulations!"
-msgstr ""
+msgstr "Instalarea a funcționat cu succes! Felicitări!"
 
 #, python-format
 msgid ""
@@ -1258,19 +1265,19 @@ msgid ""
 msgstr ""
 
 msgid "Django Documentation"
-msgstr ""
+msgstr "Documentația Django"
 
 msgid "Topics, references, &amp; how-to's"
 msgstr ""
 
 msgid "Tutorial: A Polling App"
-msgstr ""
+msgstr "Tutorial: O aplicație de votare"
 
 msgid "Get started with Django"
 msgstr ""
 
 msgid "Django Community"
-msgstr ""
+msgstr "Comunitatea Django"
 
 msgid "Connect, get help, or contribute"
-msgstr ""
+msgstr "Conectați-vă, obțineți ajutor sau contribuiți"

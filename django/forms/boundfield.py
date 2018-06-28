@@ -79,12 +79,9 @@ class BoundField:
         attributes passed as attrs. If a widget isn't specified, use the
         field's default widget.
         """
-        if not widget:
-            widget = self.field.widget
-
+        widget = widget or self.field.widget
         if self.field.localize:
             widget.is_localized = True
-
         attrs = attrs or {}
         attrs = self.build_widget_attrs(attrs, widget)
         if self.auto_id and 'id' not in widget.attrs:
@@ -153,7 +150,7 @@ class BoundField:
         if id_:
             id_for_label = widget.id_for_label(id_)
             if id_for_label:
-                attrs = dict(attrs or {}, **{'for': id_for_label})
+                attrs = {**(attrs or {}), 'for': id_for_label}
             if self.field.required and hasattr(self.form, 'required_css_class'):
                 attrs = attrs or {}
                 if 'class' in attrs:
@@ -219,8 +216,7 @@ class BoundField:
         return data
 
     def build_widget_attrs(self, attrs, widget=None):
-        if not widget:
-            widget = self.field.widget
+        widget = widget or self.field.widget
         attrs = dict(attrs)  # Copy attrs to avoid modifying the argument.
         if widget.use_required_attribute(self.initial) and self.field.required and self.form.use_required_attribute:
             attrs['required'] = True
@@ -252,7 +248,7 @@ class BoundWidget:
         return self.tag(wrap_label=True)
 
     def tag(self, wrap_label=False):
-        context = {'widget': self.data, 'wrap_label': wrap_label}
+        context = {'widget': {**self.data, 'wrap_label': wrap_label}}
         return self.parent_widget._render(self.template_name, context, self.renderer)
 
     @property

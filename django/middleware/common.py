@@ -130,7 +130,8 @@ class BrokenLinkEmailsMiddleware(MiddlewareMixin):
                     ),
                     "Referrer: %s\nRequested URL: %s\nUser agent: %s\n"
                     "IP address: %s\n" % (referer, path, ua, ip),
-                    fail_silently=True)
+                    fail_silently=True,
+                )
         return response
 
     def is_internal_request(self, domain, referer):

@@ -136,15 +136,15 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'iendswith': "LIKE UPPER(TRANSLATE(%s USING NCHAR_CS)) ESCAPE TRANSLATE('\\' USING NCHAR_CS)",
     }
 
-    _likec_operators = _standard_operators.copy()
-    _likec_operators.update({
+    _likec_operators = {
+        **_standard_operators,
         'contains': "LIKEC %s ESCAPE '\\'",
         'icontains': "LIKEC UPPER(%s) ESCAPE '\\'",
         'startswith': "LIKEC %s ESCAPE '\\'",
         'endswith': "LIKEC %s ESCAPE '\\'",
         'istartswith': "LIKEC UPPER(%s) ESCAPE '\\'",
         'iendswith': "LIKEC UPPER(%s) ESCAPE '\\'",
-    })
+    }
 
     # The patterns below are used to generate SQL pattern lookup clauses when
     # the right-hand side of the lookup isn't a raw string (it might be an expression
@@ -185,18 +185,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         use_returning_into = self.settings_dict["OPTIONS"].get('use_returning_into', True)
         self.features.can_return_id_from_insert = use_returning_into
 
-    def _connect_string(self):
+    def _dsn(self):
         settings_dict = self.settings_dict
         if not settings_dict['HOST'].strip():
             settings_dict['HOST'] = 'localhost'
         if settings_dict['PORT']:
-            dsn = Database.makedsn(settings_dict['HOST'],
-                                   int(settings_dict['PORT']),
-                                   settings_dict['NAME'])
-        else:
-            dsn = settings_dict['NAME']
-        return "%s/%s@%s" % (settings_dict['USER'],
-                             settings_dict['PASSWORD'], dsn)
+            return Database.makedsn(settings_dict['HOST'], int(settings_dict['PORT']), settings_dict['NAME'])
+        return settings_dict['NAME']
+
+    def _connect_string(self):
+        return '%s/\\"%s\\"@%s' % (self.settings_dict['USER'], self.settings_dict['PASSWORD'], self._dsn())
 
     def get_connection_params(self):
         conn_params = self.settings_dict['OPTIONS'].copy()
@@ -205,7 +203,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return conn_params
 
     def get_new_connection(self, conn_params):
-        return Database.connect(self._connect_string(), **conn_params)
+        return Database.connect(
+            user=self.settings_dict['USER'],
+            password=self.settings_dict['PASSWORD'],
+            dsn=self._dsn(),
+            **conn_params,
+        )
 
     def init_connection_state(self):
         cursor = self.create_cursor()
@@ -350,6 +353,8 @@ class OracleParam:
         elif string_size > 4000:
             # Mark any string param greater than 4000 characters as a CLOB.
             self.input_size = Database.CLOB
+        elif isinstance(param, datetime.datetime):
+            self.input_size = Database.TIMESTAMP
         else:
             self.input_size = None
 
@@ -400,6 +405,14 @@ class FormatStylePlaceholderCursor:
         return decimal.Decimal(value) if '.' in value else int(value)
 
     @staticmethod
+    def _get_decimal_converter(precision, scale):
+        if scale == 0:
+            return int
+        context = decimal.Context(prec=precision)
+        quantize_value = decimal.Decimal(1).scaleb(-scale)
+        return lambda v: decimal.Decimal(v).quantize(quantize_value, context=context)
+
+    @staticmethod
     def _output_type_handler(cursor, name, defaultType, length, precision, scale):
         """
         Called for each db column fetched from cursors. Return numbers as the
@@ -419,7 +432,7 @@ class FormatStylePlaceholderCursor:
             elif precision > 0:
                 # NUMBER(p,s) column: decimal-precision fixed point.
                 # This comes from IntegerField and DecimalField columns.
-                outconverter = int if scale == 0 else decimal.Decimal
+                outconverter = FormatStylePlaceholderCursor._get_decimal_converter(precision, scale)
             else:
                 # No type information. This normally comes from a
                 # mathematical expression in the SELECT list. Guess int

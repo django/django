@@ -13,9 +13,6 @@ class GDALRasterBase(GDALBase):
         nested dictionary, where the first-level key is the metadata domain and
         the second-level is the metadata item names and values for that domain.
         """
-        if not capi.get_ds_metadata_domain_list:
-            raise ValueError('GDAL ≥ 1.11 is required for using the metadata property.')
-
         # The initial metadata domain list contains the default domain.
         # The default is returned if domain name is None.
         domain_list = ['DEFAULT']

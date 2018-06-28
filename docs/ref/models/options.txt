@@ -147,10 +147,6 @@ Django quotes column and table names behind the scenes.
 
     See the :meth:`~django.db.models.query.QuerySet.latest` docs for more.
 
-    .. versionchanged:: 2.0
-
-        Support for a list of fields was added.
-
 ``managed``
 -----------
 
@@ -291,10 +287,6 @@ Django quotes column and table names behind the scenes.
     Default ordering also affects :ref:`aggregation queries
     <aggregation-ordering-interaction>`.
 
-    .. versionchanged:: 2.0
-
-        Support for query expressions was added.
-
 .. warning::
 
     Ordering is not a free operation. Each field you add to the ordering
@@ -313,7 +305,7 @@ Django quotes column and table names behind the scenes.
 .. attribute:: Options.permissions
 
     Extra permissions to enter into the permissions table when creating this object.
-    Add, delete and change permissions are automatically created for each
+    Add, change, delete, and view permissions are automatically created for each
     model. This example specifies an extra permission, ``can_deliver_pizzas``::
 
         permissions = (("can_deliver_pizzas", "Can deliver pizzas"),)
@@ -326,11 +318,15 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.default_permissions
 
-    Defaults to ``('add', 'change', 'delete')``. You may customize this list,
-    for example, by setting this to an empty list if your app doesn't require
-    any of the default permissions. It must be specified on the model before
-    the model is created by :djadmin:`migrate` in order to prevent any omitted
-    permissions from being created.
+    Defaults to ``('add', 'change', 'delete', 'view')``. You may customize this
+    list, for example, by setting this to an empty list if your app doesn't
+    require any of the default permissions. It must be specified on the model
+    before the model is created by :djadmin:`migrate` in order to prevent any
+    omitted permissions from being created.
+
+    .. versionchanged:: 2.1
+
+        The ``view`` permission was added.
 
 ``proxy``
 ---------

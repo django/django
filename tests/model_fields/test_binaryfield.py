@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.db import models
 from django.test import TestCase
 
 from .models import DataModel
@@ -25,3 +26,11 @@ class BinaryFieldTests(TestCase):
         dm = DataModel(short_data=self.binary_data * 4)
         with self.assertRaises(ValidationError):
             dm.full_clean()
+
+    def test_editable(self):
+        field = models.BinaryField()
+        self.assertIs(field.editable, False)
+        field = models.BinaryField(editable=True)
+        self.assertIs(field.editable, True)
+        field = models.BinaryField(editable=False)
+        self.assertIs(field.editable, False)

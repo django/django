@@ -50,9 +50,7 @@ class Approximate:
         return repr(self.val)
 
     def __eq__(self, other):
-        if self.val == other:
-            return True
-        return round(abs(self.val - other), self.places) == 0
+        return self.val == other or round(abs(self.val - other), self.places) == 0
 
 
 class ContextList(list):
@@ -160,7 +158,7 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, paral
 
     old_names = []
 
-    for signature, (db_name, aliases) in test_databases.items():
+    for db_name, aliases in test_databases.values():
         first_alias = None
         for alias in aliases:
             connection = connections[alias]
@@ -300,9 +298,7 @@ def teardown_databases(old_config, verbosity, parallel=0, keepdb=False):
 
 
 def get_runner(settings, test_runner_class=None):
-    if not test_runner_class:
-        test_runner_class = settings.TEST_RUNNER
-
+    test_runner_class = test_runner_class or settings.TEST_RUNNER
     test_path = test_runner_class.split('.')
     # Allow for relative paths
     if len(test_path) > 1:
@@ -423,8 +419,10 @@ class override_settings(TestContextDecorator):
             test_func._overridden_settings = self.options
         else:
             # Duplicate dict to prevent subclasses from altering their parent.
-            test_func._overridden_settings = dict(
-                test_func._overridden_settings, **self.options)
+            test_func._overridden_settings = {
+                **test_func._overridden_settings,
+                **self.options,
+            }
 
     def decorate_class(self, cls):
         from django.test import SimpleTestCase
@@ -551,10 +549,7 @@ def compare_xml(want, got):
         got_children = children(got_element)
         if len(want_children) != len(got_children):
             return False
-        for want, got in zip(want_children, got_children):
-            if not check_element(want, got):
-                return False
-        return True
+        return all(check_element(want, got) for want, got in zip(want_children, got_children))
 
     def first_node(document):
         for node in document.childNodes:
@@ -643,7 +638,10 @@ class ignore_warnings(TestContextDecorator):
 def patch_logger(logger_name, log_level, log_kwargs=False):
     """
     Context manager that takes a named logger and the logging level
-    and provides a simple mock-like list of messages received
+    and provides a simple mock-like list of messages received.
+
+    Use unitttest.assertLogs() if you only need Python 3 support. This
+    private API will be removed after Python 2 EOL in 2020 (#27753).
     """
     calls = []
 
@@ -836,6 +834,9 @@ class isolate_apps(TestContextDecorator):
 def tag(*tags):
     """Decorator to add tags to a test class or method."""
     def decorator(obj):
-        setattr(obj, 'tags', set(tags))
+        if hasattr(obj, 'tags'):
+            obj.tags = obj.tags.union(tags)
+        else:
+            setattr(obj, 'tags', set(tags))
         return obj
     return decorator

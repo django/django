@@ -68,6 +68,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         'Centroid': 'SDO_GEOM.SDO_CENTROID',
         'Difference': 'SDO_GEOM.SDO_DIFFERENCE',
         'Distance': 'SDO_GEOM.SDO_DISTANCE',
+        'Envelope': 'SDO_GEOM_MBR',
         'Intersection': 'SDO_GEOM.SDO_INTERSECTION',
         'IsValid': 'SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT',
         'Length': 'SDO_GEOM.SDO_LENGTH',
@@ -105,9 +106,9 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
     }
 
     unsupported_functions = {
-        'AsGeoJSON', 'AsKML', 'AsSVG', 'Azimuth', 'Envelope', 'ForceRHR',
-        'GeoHash', 'LineLocatePoint', 'MakeValid', 'MemSize', 'Scale',
-        'SnapToGrid', 'Translate',
+        'AsGeoJSON', 'AsKML', 'AsSVG', 'Azimuth',
+        'ForcePolygonCW', 'ForceRHR', 'GeoHash', 'LineLocatePoint',
+        'MakeValid', 'MemSize', 'Scale', 'SnapToGrid', 'Translate',
     }
 
     def geo_quote_name(self, name):

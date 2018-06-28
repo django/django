@@ -2,7 +2,7 @@
 #
 # Translators:
 # Adiyat Mubarak <adiyatmubarak@gmail.com>, 2017
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2017
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2018
 # Jannis Leidel <jannis@leidel.info>, 2011
 # M Asep Indrayana <me@drayanaindra.com>, 2015
 # oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2016
@@ -13,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:13+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-12-01 21:10+0100\n"
+"PO-Revision-Date: 2018-01-11 07:10+0000\n"
+"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -164,6 +164,9 @@ msgstr "Jepang"
 
 msgid "Georgian"
 msgstr "Georgia"
+
+msgid "Kabyle"
+msgstr "Kabyle"
 
 msgid "Kazakh"
 msgstr "Kazakhstan"
@@ -740,7 +743,7 @@ msgid "Please correct the duplicate values below."
 msgstr "Perbaiki nilai ganda di bawah ini."
 
 msgid "The inline value did not match the parent instance."
-msgstr ""
+msgstr "Nilai dibarisan tidak cocok dengan instance induk."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
@@ -1114,6 +1117,12 @@ msgid ""
 "If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
 "\" ...> for links to third-party sites."
 msgstr ""
+"Jika anda sedang menggunakan etiket <meta name=\"referrer\" content=\"no-"
+"referrer\"> atau menyertakan kepala 'Referrer-Policy: no-referrer', harap "
+"memindahkan mereka. Perlindungan CSRF membutuhkan kepala 'Referer' untuk "
+"melakukan pemeriksaan pengarahan ketat. Jika anda sedang khawatir mengenai "
+"pribadi, gunakan cara lain seperti <a rel=\"noreferrer\" ...> untuk tautan "
+"pada situs pihak-ketiga."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1202,6 +1211,8 @@ msgid ""
 "View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
 "target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
 msgstr ""
+"Lihat <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> untuk Django %(version)s"
 
 msgid "The install worked successfully! Congratulations!"
 msgstr "Selamat! Pemasangan berjalan lancar!"
@@ -1213,6 +1224,10 @@ msgid ""
 "\">DEBUG=True</a> is in your settings file and you have not configured any "
 "URLs."
 msgstr ""
+"Anda sedang elihat halaman ini karena <a href=\"https://docs.djangoproject."
+"com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> berada di berkas pengaturan anda dan anda belum "
+"mengkonfigurasi URL apapun."
 
 msgid "Django Documentation"
 msgstr "Dokumentasi Django"
@@ -1221,7 +1236,7 @@ msgid "Topics, references, &amp; how-to's"
 msgstr "Topik, referensi &amp; cara pemakaian"
 
 msgid "Tutorial: A Polling App"
-msgstr ""
+msgstr "Tutorial: Sebuah aplikasi jejak pendapat"
 
 msgid "Get started with Django"
 msgstr "Memulai dengan Django"
@@ -1230,4 +1245,4 @@ msgid "Django Community"
 msgstr "Komunitas Django"
 
 msgid "Connect, get help, or contribute"
-msgstr ""
+msgstr "Terhubung, minta bantuan, atau membantu"

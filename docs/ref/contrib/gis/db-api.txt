@@ -329,8 +329,8 @@ Lookup Type                        PostGIS    Oracle    MySQL [#]_   SpatiaLite 
 :lookup:`contained`                X                    X            X          N
 :lookup:`contains <gis-contains>`  X          X         X            X          B
 :lookup:`contains_properly`        X                                            B
-:lookup:`coveredby`                X          X                                 B
-:lookup:`covers`                   X          X                                 B
+:lookup:`coveredby`                X          X                      X          B
+:lookup:`covers`                   X          X                      X          B
 :lookup:`crosses`                  X                                 X          C
 :lookup:`disjoint`                 X          X         X            X          B
 :lookup:`distance_gt`              X          X                      X          N
@@ -381,7 +381,8 @@ Function                              PostGIS  Oracle          MySQL        Spat
 :class:`Centroid`                     X        X               X            X
 :class:`Difference`                   X        X               X            X
 :class:`Distance`                     X        X               X            X
-:class:`Envelope`                     X                        X            X
+:class:`Envelope`                     X        X               X            X
+:class:`ForcePolygonCW`               X                                     X
 :class:`ForceRHR`                     X
 :class:`GeoHash`                      X                        X (≥ 5.7.5)  X (LWGEOM)
 :class:`Intersection`                 X        X               X            X

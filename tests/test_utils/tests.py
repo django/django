@@ -1,5 +1,6 @@
 import os
 import unittest
+import warnings
 from io import StringIO
 from unittest import mock
 
@@ -691,15 +692,15 @@ class HTMLEqualTests(SimpleTestCase):
 
     def test_contains_html(self):
         response = HttpResponse('''<body>
-        This is a form: <form action="" method="get">
+        This is a form: <form method="get">
             <input type="text" name="Hello" />
         </form></body>''')
 
         self.assertNotContains(response, "<input name='Hello' type='text'>")
-        self.assertContains(response, '<form action="" method="get">')
+        self.assertContains(response, '<form method="get">')
 
         self.assertContains(response, "<input name='Hello' type='text'>", html=True)
-        self.assertNotContains(response, '<form action="" method="get">', html=True)
+        self.assertNotContains(response, '<form method="get">', html=True)
 
         invalid_response = HttpResponse('''<body <bad>>''')
 
@@ -864,6 +865,30 @@ class AssertRaisesMsgTest(SimpleTestCase):
             func1()
 
 
+class AssertWarnsMessageTests(SimpleTestCase):
+
+    def test_context_manager(self):
+        with self.assertWarnsMessage(UserWarning, 'Expected message'):
+            warnings.warn('Expected message', UserWarning)
+
+    def test_context_manager_failure(self):
+        msg = "Expected message' not found in 'Unexpected message'"
+        with self.assertRaisesMessage(AssertionError, msg):
+            with self.assertWarnsMessage(UserWarning, 'Expected message'):
+                warnings.warn('Unexpected message', UserWarning)
+
+    def test_callable(self):
+        def func():
+            warnings.warn('Expected message', UserWarning)
+        self.assertWarnsMessage(UserWarning, 'Expected message', func)
+
+    def test_special_re_chars(self):
+        def func1():
+            warnings.warn('[.*x+]y?', UserWarning)
+        with self.assertWarnsMessage(UserWarning, '[.*x+]y?'):
+            func1()
+
+
 class AssertFieldOutputTests(SimpleTestCase):
 
     def test_assert_field_output(self):
@@ -884,6 +909,54 @@ class AssertFieldOutputTests(SimpleTestCase):
                 'required': 'This is really required.',
             }
         self.assertFieldOutput(MyCustomField, {}, {}, empty_value=None)
+
+
+class AssertURLEqualTests(SimpleTestCase):
+    def test_equal(self):
+        valid_tests = (
+            ('http://example.com/?', 'http://example.com/'),
+            ('http://example.com/?x=1&', 'http://example.com/?x=1'),
+            ('http://example.com/?x=1&y=2', 'http://example.com/?y=2&x=1'),
+            ('http://example.com/?x=1&y=2', 'http://example.com/?y=2&x=1'),
+            ('http://example.com/?x=1&y=2&a=1&a=2', 'http://example.com/?a=1&a=2&y=2&x=1'),
+            ('/path/to/?x=1&y=2&z=3', '/path/to/?z=3&y=2&x=1'),
+            ('?x=1&y=2&z=3', '?z=3&y=2&x=1'),
+        )
+        for url1, url2 in valid_tests:
+            with self.subTest(url=url1):
+                self.assertURLEqual(url1, url2)
+
+    def test_not_equal(self):
+        invalid_tests = (
+            # Protocol must be the same.
+            ('http://example.com/', 'https://example.com/'),
+            ('http://example.com/?x=1&x=2', 'https://example.com/?x=2&x=1'),
+            ('http://example.com/?x=1&y=bar&x=2', 'https://example.com/?y=bar&x=2&x=1'),
+            # Parameters of the same name must be in the same order.
+            ('/path/to?a=1&a=2', '/path/to/?a=2&a=1')
+        )
+        for url1, url2 in invalid_tests:
+            with self.subTest(url=url1), self.assertRaises(AssertionError):
+                self.assertURLEqual(url1, url2)
+
+    def test_message(self):
+        msg = (
+            "Expected 'http://example.com/?x=1&x=2' to equal "
+            "'https://example.com/?x=2&x=1'"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertURLEqual('http://example.com/?x=1&x=2', 'https://example.com/?x=2&x=1')
+
+    def test_msg_prefix(self):
+        msg = (
+            "Prefix: Expected 'http://example.com/?x=1&x=2' to equal "
+            "'https://example.com/?x=2&x=1'"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertURLEqual(
+                'http://example.com/?x=1&x=2', 'https://example.com/?x=2&x=1',
+                msg_prefix='Prefix: ',
+            )
 
 
 class FirstUrls:

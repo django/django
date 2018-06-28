@@ -17,7 +17,7 @@ class SpatialProxy(DeferredAttribute):
         self._field = field
         self._klass = klass
         self._load_func = load_func or klass
-        super().__init__(field.attname, klass)
+        super().__init__(field.attname)
 
     def __get__(self, instance, cls=None):
         """

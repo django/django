@@ -1,5 +1,5 @@
 import builtins
-import collections
+import collections.abc
 import datetime
 import decimal
 import enum
@@ -50,7 +50,7 @@ class DatetimeSerializer(BaseSerializer):
     def serialize(self):
         if self.value.tzinfo is not None and self.value.tzinfo != utc:
             self.value = self.value.astimezone(utc)
-        value_repr = repr(self.value).replace("<UTC>", "utc")
+        value_repr = repr(self.value).replace("datetime.timezone(datetime.timedelta(0), 'UTC')", 'utc')
         if isinstance(self.value, datetime_safe.datetime):
             value_repr = "datetime.%s" % value_repr
         imports = ["import datetime"]
@@ -119,9 +119,8 @@ class EnumSerializer(BaseSerializer):
     def serialize(self):
         enum_class = self.value.__class__
         module = enum_class.__module__
-        imports = {"import %s" % module}
         v_string, v_imports = serializer_factory(self.value.value).serialize()
-        imports.update(v_imports)
+        imports = {'import %s' % module, *v_imports}
         return "%s.%s(%s)" % (module, enum_class.__name__, v_string), imports
 
 
@@ -161,18 +160,18 @@ class FunctionTypeSerializer(BaseSerializer):
 
 class FunctoolsPartialSerializer(BaseSerializer):
     def serialize(self):
-        imports = {'import functools'}
         # Serialize functools.partial() arguments
         func_string, func_imports = serializer_factory(self.value.func).serialize()
         args_string, args_imports = serializer_factory(self.value.args).serialize()
         keywords_string, keywords_imports = serializer_factory(self.value.keywords).serialize()
         # Add any imports needed by arguments
-        imports.update(func_imports)
-        imports.update(args_imports)
-        imports.update(keywords_imports)
+        imports = {'import functools', *func_imports, *args_imports, *keywords_imports}
         return (
-            "functools.partial(%s, *%s, **%s)" % (
-                func_string, args_string, keywords_string,
+            'functools.%s(%s, *%s, **%s)' % (
+                self.value.__class__.__name__,
+                func_string,
+                args_string,
+                keywords_string,
             ),
             imports,
         )
@@ -218,14 +217,12 @@ class OperationSerializer(BaseSerializer):
 
 class RegexSerializer(BaseSerializer):
     def serialize(self):
-        imports = {"import re"}
         regex_pattern, pattern_imports = serializer_factory(self.value.pattern).serialize()
         # Turn off default implicit flags (e.g. re.U) because regexes with the
         # same implicit and explicit flags aren't equal.
         flags = self.value.flags ^ re.compile('').flags
         regex_flags, flag_imports = serializer_factory(flags).serialize()
-        imports.update(pattern_imports)
-        imports.update(flag_imports)
+        imports = {'import re', *pattern_imports, *flag_imports}
         args = [regex_pattern]
         if flags:
             args.append(regex_flags)
@@ -340,11 +337,11 @@ def serializer_factory(value):
         return BaseSimpleSerializer(value)
     if isinstance(value, decimal.Decimal):
         return DecimalSerializer(value)
-    if isinstance(value, functools.partial):
+    if isinstance(value, (functools.partial, functools.partialmethod)):
         return FunctoolsPartialSerializer(value)
     if isinstance(value, (types.FunctionType, types.BuiltinFunctionType, types.MethodType)):
         return FunctionTypeSerializer(value)
-    if isinstance(value, collections.Iterable):
+    if isinstance(value, collections.abc.Iterable):
         return IterableSerializer(value)
     if isinstance(value, (COMPILED_REGEX_TYPE, RegexObject)):
         return RegexSerializer(value)

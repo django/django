@@ -1,5 +1,37 @@
-from django.db.models import Func, Transform, Value, fields
+from django.db.models import Func, IntegerField, Transform, Value, fields
 from django.db.models.functions import Coalesce
+
+
+class BytesToCharFieldConversionMixin:
+    """
+    Convert CharField results from bytes to str.
+
+    MySQL returns long data types (bytes) instead of chars when it can't
+    determine the length of the result string. For example:
+        LPAD(column1, CHAR_LENGTH(column2), ' ')
+    returns the LONGTEXT (bytes) instead of VARCHAR.
+    """
+    def convert_value(self, value, expression, connection):
+        if connection.features.db_functions_convert_bytes_to_str:
+            if self.output_field.get_internal_type() == 'CharField' and isinstance(value, bytes):
+                return value.decode()
+        return super().convert_value(value, expression, connection)
+
+
+class Chr(Transform):
+    function = 'CHR'
+    lookup_name = 'chr'
+
+    def as_mysql(self, compiler, connection):
+        return super().as_sql(
+            compiler, connection, function='CHAR', template='%(function)s(%(expressions)s USING utf16)'
+        )
+
+    def as_oracle(self, compiler, connection):
+        return super().as_sql(compiler, connection, template='%(function)s(%(expressions)s USING NCHAR_CS)')
+
+    def as_sqlite(self, compiler, connection, **extra_context):
+        return super().as_sql(compiler, connection, function='CHAR', **extra_context)
 
 
 class ConcatPair(Func):
@@ -55,6 +87,30 @@ class Concat(Func):
         return ConcatPair(expressions[0], self._paired(expressions[1:]))
 
 
+class Left(Func):
+    function = 'LEFT'
+    arity = 2
+
+    def __init__(self, expression, length, **extra):
+        """
+        expression: the name of a field, or an expression returning a string
+        length: the number of characters to return from the start of the string
+        """
+        if not hasattr(length, 'resolve_expression'):
+            if length < 1:
+                raise ValueError("'length' must be greater than 0.")
+        super().__init__(expression, length, **extra)
+
+    def get_substr(self):
+        return Substr(self.source_expressions[0], Value(1), self.source_expressions[1])
+
+    def use_substr(self, compiler, connection, **extra_context):
+        return self.get_substr().as_oracle(compiler, connection, **extra_context)
+
+    as_oracle = use_substr
+    as_sqlite = use_substr
+
+
 class Length(Transform):
     """Return the number of characters in the expression."""
     function = 'LENGTH'
@@ -68,6 +124,69 @@ class Length(Transform):
 class Lower(Transform):
     function = 'LOWER'
     lookup_name = 'lower'
+
+
+class LPad(BytesToCharFieldConversionMixin, Func):
+    function = 'LPAD'
+
+    def __init__(self, expression, length, fill_text=Value(' '), **extra):
+        if not hasattr(length, 'resolve_expression') and length < 0:
+            raise ValueError("'length' must be greater or equal to 0.")
+        super().__init__(expression, length, fill_text, **extra)
+
+
+class LTrim(Transform):
+    function = 'LTRIM'
+    lookup_name = 'ltrim'
+
+
+class Ord(Transform):
+    function = 'ASCII'
+    lookup_name = 'ord'
+    output_field = IntegerField()
+
+    def as_mysql(self, compiler, connection, **extra_context):
+        return super().as_sql(compiler, connection, function='ORD', **extra_context)
+
+    def as_sqlite(self, compiler, connection, **extra_context):
+        return super().as_sql(compiler, connection, function='UNICODE', **extra_context)
+
+
+class Repeat(BytesToCharFieldConversionMixin, Func):
+    function = 'REPEAT'
+
+    def __init__(self, expression, number, **extra):
+        if not hasattr(number, 'resolve_expression') and number < 0:
+            raise ValueError("'number' must be greater or equal to 0.")
+        super().__init__(expression, number, **extra)
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        expression, number = self.source_expressions
+        rpad = RPad(expression, Length(expression) * number, expression)
+        return rpad.as_sql(compiler, connection, **extra_context)
+
+
+class Replace(Func):
+    function = 'REPLACE'
+
+    def __init__(self, expression, text, replacement=Value(''), **extra):
+        super().__init__(expression, text, replacement, **extra)
+
+
+class Right(Left):
+    function = 'RIGHT'
+
+    def get_substr(self):
+        return Substr(self.source_expressions[0], self.source_expressions[1] * Value(-1))
+
+
+class RPad(LPad):
+    function = 'RPAD'
+
+
+class RTrim(Transform):
+    function = 'RTRIM'
+    lookup_name = 'rtrim'
 
 
 class StrIndex(Func):
@@ -106,6 +225,11 @@ class Substr(Func):
 
     def as_oracle(self, compiler, connection):
         return super().as_sql(compiler, connection, function='SUBSTR')
+
+
+class Trim(Transform):
+    function = 'TRIM'
+    lookup_name = 'trim'
 
 
 class Upper(Transform):

@@ -271,6 +271,14 @@ TEST_DATA = [
     (DecimalValidator(max_digits=5, decimal_places=2), Decimal('7304E-3'), ValidationError),
     (DecimalValidator(max_digits=5, decimal_places=5), Decimal('70E-5'), None),
     (DecimalValidator(max_digits=5, decimal_places=5), Decimal('70E-6'), ValidationError),
+    # 'Enter a number.' errors
+    *[
+        (DecimalValidator(decimal_places=2, max_digits=10), Decimal(value), ValidationError)
+        for value in (
+            'NaN', '-NaN', '+NaN', 'sNaN', '-sNaN', '+sNaN',
+            'Inf', '-Inf', '+Inf', 'Infinity', '-Infinity', '-Infinity',
+        )
+    ],
 
     (validate_image_file_extension, ContentFile('contents', name='file.jpg'), None),
     (validate_image_file_extension, ContentFile('contents', name='file.png'), None),

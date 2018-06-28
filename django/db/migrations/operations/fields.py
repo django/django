@@ -270,17 +270,26 @@ class RenameField(FieldOperation):
         model_state = state.models[app_label, self.model_name_lower]
         # Rename the field
         fields = model_state.fields
+        found = False
+        delay = True
         for index, (name, field) in enumerate(fields):
-            if name == self.old_name:
+            if not found and name == self.old_name:
                 fields[index] = (self.new_name, field)
-                # Delay rendering of relationships if it's not a relational
-                # field and not referenced by a foreign key.
-                delay = (
-                    not field.is_relation and
-                    not is_referenced_by_foreign_key(state, self.model_name_lower, field, self.name)
-                )
-                break
-        else:
+                found = True
+            # Fix from_fields to refer to the new field.
+            from_fields = getattr(field, 'from_fields', None)
+            if from_fields:
+                field.from_fields = tuple([
+                    self.new_name if from_field_name == self.old_name else from_field_name
+                    for from_field_name in from_fields
+                ])
+            # Delay rendering of relationships if it's not a relational
+            # field and not referenced by a foreign key.
+            delay = delay and (
+                not field.is_relation and
+                not is_referenced_by_foreign_key(state, self.model_name_lower, field, self.name)
+            )
+        if not found:
             raise FieldDoesNotExist(
                 "%s.%s has no field named '%s'" % (app_label, self.model_name, self.old_name)
             )
@@ -292,6 +301,24 @@ class RenameField(FieldOperation):
                     [self.new_name if n == self.old_name else n for n in together]
                     for together in options[option]
                 ]
+        # Fix to_fields to refer to the new field.
+        model_tuple = app_label, self.model_name_lower
+        for (model_app_label, model_name), model_state in state.models.items():
+            for index, (name, field) in enumerate(model_state.fields):
+                remote_field = field.remote_field
+                if remote_field:
+                    remote_model_tuple = self._get_model_tuple(
+                        remote_field.model, model_app_label, model_name
+                    )
+                    if remote_model_tuple == model_tuple:
+                        if getattr(remote_field, 'field_name', None) == self.old_name:
+                            remote_field.field_name = self.new_name
+                        to_fields = getattr(field, 'to_fields', None)
+                        if to_fields:
+                            field.to_fields = tuple([
+                                self.new_name if to_field_name == self.old_name else to_field_name
+                                for to_field_name in to_fields
+                            ])
         state.reload_model(app_label, self.model_name_lower, delay=delay)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):

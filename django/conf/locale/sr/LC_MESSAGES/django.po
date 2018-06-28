@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Branko Kokanovic <branko@kokanovic.org>, 2018
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:13+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-12-01 21:10+0100\n"
+"PO-Revision-Date: 2018-01-30 10:00+0000\n"
+"Last-Translator: Branko Kokanovic <branko@kokanovic.org>\n"
 "Language-Team: Serbian (http://www.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
@@ -160,6 +161,9 @@ msgstr "јапански"
 msgid "Georgian"
 msgstr "грузијски"
 
+msgid "Kabyle"
+msgstr "кабилски"
+
 msgid "Kazakh"
 msgstr "казашки"
 
@@ -293,7 +297,7 @@ msgid "Static Files"
 msgstr "Статички фајлови"
 
 msgid "Syndication"
-msgstr ""
+msgstr "Удруживање садржаја"
 
 msgid "That page number is not an integer"
 msgstr "Задати број стране није цео број"
@@ -1248,6 +1252,9 @@ msgid ""
 "\">DEBUG=True</a> is in your settings file and you have not configured any "
 "URLs."
 msgstr ""
+"Ова страна је приказана јер је <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> у вашим подешавањима и нисте конфигурисали ниједан URL."
 
 msgid "Django Documentation"
 msgstr "Ђанго документација"

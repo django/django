@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Bestony <xiqingongzi@gmail.com>, 2017-2018
 # Daniel Duan <DaNmarner@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
@@ -9,20 +10,23 @@
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
 # Ronald White <ouyanghongyu@gmail.com>, 2014
 # pylemon <leeway1985@gmail.com>, 2013
+# Ray Wang <pivstone@gmail.com>, 2017
 # slene <vslene@gmail.com>, 2011
 # Sun Liwen <sunliwen@gmail.com>, 2014
 # Liping Wang <lynn.config@gmail.com>, 2016
 # Xiang Yu <bupt.aswmtjdsj@gmail.com>, 2014
 # Yin Jifeng <jifeng.yin@gmail.com>, 2013
+# Zhengyang Wang <sufforest@gmail.com>, 2017
 # Ziang Song <songziang@gmail.com>, 2011-2012
+# Ziya Tang <tcztzy@gmail.com>, 2018
 # Kevin Sze <leiarix@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:13+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-12-01 21:10+0100\n"
+"PO-Revision-Date: 2018-01-17 01:14+0000\n"
+"Last-Translator: Ziya Tang <tcztzy@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -172,6 +176,9 @@ msgstr "日语"
 msgid "Georgian"
 msgstr "格鲁吉亚语"
 
+msgid "Kabyle"
+msgstr "卡拜尔语"
+
 msgid "Kazakh"
 msgstr "哈萨克语"
 
@@ -308,13 +315,13 @@ msgid "Syndication"
 msgstr "联合"
 
 msgid "That page number is not an integer"
-msgstr "页号不是整数"
+msgstr "页码不是整数"
 
 msgid "That page number is less than 1"
-msgstr "页号少于1"
+msgstr "页码小于 1"
 
 msgid "That page contains no results"
-msgstr "本页结果未空"
+msgstr "本页结果为空"
 
 msgid "Enter a valid value."
 msgstr "输入一个有效的值。"
@@ -408,7 +415,7 @@ msgstr ""
 "名：'%(allowed_extensions)s'。"
 
 msgid "Null characters are not allowed."
-msgstr ""
+msgstr "不允许是用空字符串。"
 
 msgid "and"
 msgstr "和"
@@ -459,7 +466,7 @@ msgid "'%(value)s' value must be either True or False."
 msgstr "’%(value)s‘ 必须为 True 或者 False。"
 
 msgid "Boolean (Either True or False)"
-msgstr "布尔值（真或假）"
+msgstr "布尔值（True或False）"
 
 #, python-format
 msgid "String (up to %(max_length)s)"
@@ -542,7 +549,7 @@ msgid "'%(value)s' value must be either None, True or False."
 msgstr "’%(value)s‘ 必须为None，True或者False。"
 
 msgid "Boolean (Either True, False or None)"
-msgstr "布尔值（真、假或无)"
+msgstr "布尔值（True、False或None）"
 
 msgid "Positive integer"
 msgstr "正整数"
@@ -722,14 +729,14 @@ msgid "Please correct the duplicate values below."
 msgstr "请修正重复的数据."
 
 msgid "The inline value did not match the parent instance."
-msgstr ""
+msgstr "内联值与父实例不匹配。"
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "选择一个有效的选项： 该选择不在可用的选项中。"
 
 #, python-format
 msgid "\"%(pk)s\" is not a valid value."
-msgstr ""
+msgstr "\"%(pk)s\" 不是一个有效值."
 
 #, python-format
 msgid ""
@@ -1091,6 +1098,10 @@ msgid ""
 "If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
 "\" ...> for links to third-party sites."
 msgstr ""
+"如果您正在使用 <meta name=\"referrer\" content=\"no-referrer\"> tag 或 包含"
+"了“Referrer-Policy: no-referrer”的头部， 请移除它们。CSRF保护机制要"
+"求“Referer”头部进行严格的referer检查.如果您关心隐私问题，请使用其它替代方式，"
+"如 <a rel=\"noreferrer\" ...> 到第三方站点的链接。"
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1114,7 +1125,7 @@ msgid "No year specified"
 msgstr "没有指定年"
 
 msgid "Date out of range"
-msgstr ""
+msgstr "日期不在访问中。"
 
 msgid "No month specified"
 msgstr "没有指定月"
@@ -1146,7 +1157,7 @@ msgid "No %(verbose_name)s found matching the query"
 msgstr "没有找到符合查询的 %(verbose_name)s"
 
 msgid "Page is not 'last', nor can it be converted to an int."
-msgstr "page 不等于 'last'，或者它不能被转为数字。"
+msgstr "页码既不为'last'，也不能被转为数字。"
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
@@ -1168,16 +1179,20 @@ msgid "Index of %(directory)s"
 msgstr "%(directory)s的索引"
 
 msgid "Django: the Web framework for perfectionists with deadlines."
-msgstr ""
+msgstr "Django：按时交付完美主义者的 Web 框架"
 
 #, python-format
 msgid ""
 "View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
 "target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
 msgstr ""
+"查看 Django %(version)s 的 <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/releases/\" target=\"_blank\" rel=\"noopener\">release notes</a> "
 
 msgid "The install worked successfully! Congratulations!"
 msgstr ""
+"安装成功！\n"
+"祝贺！"
 
 #, python-format
 msgid ""
@@ -1186,21 +1201,24 @@ msgid ""
 "\">DEBUG=True</a> is in your settings file and you have not configured any "
 "URLs."
 msgstr ""
+"您现在看见这个页面，因为您设置了 <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> 并且您还没有配置任何URLs。"
 
 msgid "Django Documentation"
-msgstr ""
+msgstr "Django 文档"
 
 msgid "Topics, references, &amp; how-to's"
-msgstr ""
+msgstr "主题，参考和指南"
 
 msgid "Tutorial: A Polling App"
-msgstr ""
+msgstr "教程：投票应用"
 
 msgid "Get started with Django"
-msgstr ""
+msgstr "开始使用 Django"
 
 msgid "Django Community"
-msgstr ""
+msgstr "Django 社区"
 
 msgid "Connect, get help, or contribute"
-msgstr ""
+msgstr "联系，获取帮助，贡献代码"

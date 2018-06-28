@@ -554,14 +554,14 @@ class ExecutorTests(MigrationTestBase):
 
         migrations = executor.loader.graph.nodes
         expected = [
-            ("render_start", ),
-            ("render_success", ),
+            ("render_start",),
+            ("render_success",),
             ("apply_start", migrations['migrations', '0001_initial'], False),
             ("apply_success", migrations['migrations', '0001_initial'], False),
             ("apply_start", migrations['migrations', '0002_second'], False),
             ("apply_success", migrations['migrations', '0002_second'], False),
-            ("render_start", ),
-            ("render_success", ),
+            ("render_start",),
+            ("render_success",),
             ("unapply_start", migrations['migrations', '0002_second'], False),
             ("unapply_success", migrations['migrations', '0002_second'], False),
             ("unapply_start", migrations['migrations', '0001_initial'], False),

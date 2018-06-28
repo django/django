@@ -164,8 +164,8 @@ Identifier  Information
             serializer is only available if PyYAML_ is installed.
 ==========  ==============================================================
 
-.. _json: http://json.org/
-.. _PyYAML: http://www.pyyaml.org/
+.. _json: https://json.org/
+.. _PyYAML: https://www.pyyaml.org/
 
 XML
 ---
@@ -220,7 +220,7 @@ This example links the given user with the permission models with PKs 46 and 47.
     accepted in the XML 1.0 standard, the serialization will fail with a
     :exc:`ValueError` exception. Read also the W3C's explanation of `HTML,
     XHTML, XML and Control Codes
-    <http://www.w3.org/International/questions/qa-controls>`_.
+    <https://www.w3.org/International/questions/qa-controls>`_.
 
 .. _serialization-formats-json:
 
@@ -300,7 +300,7 @@ The JSON serializer uses ``DjangoJSONEncoder`` for encoding. A subclass of
 :class:`~decimal.Decimal`, ``Promise`` (``django.utils.functional.lazy()`` objects), :class:`~uuid.UUID`
    A string representation of the object.
 
-.. _ecma-262: http://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15
+.. _ecma-262: https://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15
 
 YAML
 ----

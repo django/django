@@ -41,7 +41,7 @@ To take advantage of CSRF protection in your views, follow these steps:
 
    .. code-block:: html+django
 
-       <form action="" method="post">{% csrf_token %}
+       <form method="post">{% csrf_token %}
 
    This should not be done for POST forms that target external URLs, since
    that would cause the CSRF token to be leaked, leading to a vulnerability.
@@ -179,7 +179,7 @@ to ``{% csrf_token %}`` in the Django template language. For example:
 
 .. code-block:: html+jinja
 
-    <form action="" method="post">{{ csrf_input }}
+    <form method="post">{{ csrf_input }}
 
 The decorator method
 --------------------
@@ -202,8 +202,8 @@ both is fine, and will incur minimal overhead.
 
     Usage::
 
-        from django.views.decorators.csrf import csrf_protect
         from django.shortcuts import render
+        from django.views.decorators.csrf import csrf_protect
 
         @csrf_protect
         def my_view(request):
@@ -400,8 +400,8 @@ class-based views<decorating-class-based-views>`.
     This decorator marks a view as being exempt from the protection ensured by
     the middleware. Example::
 
-        from django.views.decorators.csrf import csrf_exempt
         from django.http import HttpResponse
+        from django.views.decorators.csrf import csrf_exempt
 
         @csrf_exempt
         def my_view(request):
@@ -417,8 +417,8 @@ class-based views<decorating-class-based-views>`.
 
     Example::
 
-        from django.views.decorators.csrf import requires_csrf_token
         from django.shortcuts import render
+        from django.views.decorators.csrf import requires_csrf_token
 
         @requires_csrf_token
         def my_view(request):
@@ -513,6 +513,7 @@ A number of settings can be used to control Django's CSRF behavior:
 * :setting:`CSRF_COOKIE_HTTPONLY`
 * :setting:`CSRF_COOKIE_NAME`
 * :setting:`CSRF_COOKIE_PATH`
+* :setting:`CSRF_COOKIE_SAMESITE`
 * :setting:`CSRF_COOKIE_SECURE`
 * :setting:`CSRF_FAILURE_VIEW`
 * :setting:`CSRF_HEADER_NAME`

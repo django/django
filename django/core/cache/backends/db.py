@@ -7,7 +7,6 @@ from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 from django.db import DatabaseError, connections, models, router, transaction
 from django.utils import timezone
-from django.utils.encoding import force_bytes
 from django.utils.inspect import func_supports_parameter
 
 
@@ -31,7 +30,7 @@ class Options:
 
 class BaseDatabaseCache(BaseCache):
     def __init__(self, table, params):
-        BaseCache.__init__(self, params)
+        super().__init__(params)
         self._table = table
 
         class CacheEntry:
@@ -52,11 +51,20 @@ class DatabaseCache(BaseDatabaseCache):
         self.validate_key(key)
         db = router.db_for_read(self.cache_model_class)
         connection = connections[db]
-        table = connection.ops.quote_name(self._table)
+        quote_name = connection.ops.quote_name
+        table = quote_name(self._table)
 
         with connection.cursor() as cursor:
-            cursor.execute("SELECT cache_key, value, expires FROM %s "
-                           "WHERE cache_key = %%s" % table, [key])
+            cursor.execute(
+                'SELECT %s, %s, %s FROM %s WHERE %s = %%s' % (
+                    quote_name('cache_key'),
+                    quote_name('value'),
+                    quote_name('expires'),
+                    table,
+                    quote_name('cache_key'),
+                ),
+                [key]
+            )
             row = cursor.fetchone()
         if row is None:
             return default
@@ -74,12 +82,17 @@ class DatabaseCache(BaseDatabaseCache):
             db = router.db_for_write(self.cache_model_class)
             connection = connections[db]
             with connection.cursor() as cursor:
-                cursor.execute("DELETE FROM %s "
-                               "WHERE cache_key = %%s" % table, [key])
+                cursor.execute(
+                    'DELETE FROM %s WHERE %s = %%s' % (
+                        table,
+                        quote_name('cache_key'),
+                    ),
+                    [key]
+                )
             return default
 
         value = connection.ops.process_clob(row[1])
-        return pickle.loads(base64.b64decode(force_bytes(value)))
+        return pickle.loads(base64.b64decode(value.encode()))
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
@@ -91,11 +104,17 @@ class DatabaseCache(BaseDatabaseCache):
         self.validate_key(key)
         return self._base_set('add', key, value, timeout)
 
+    def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
+        key = self.make_key(key, version=version)
+        self.validate_key(key)
+        return self._base_set('touch', key, None, timeout)
+
     def _base_set(self, mode, key, value, timeout=DEFAULT_TIMEOUT):
         timeout = self.get_backend_timeout(timeout)
         db = router.db_for_write(self.cache_model_class)
         connection = connections[db]
-        table = connection.ops.quote_name(self._table)
+        quote_name = connection.ops.quote_name
+        table = quote_name(self._table)
 
         with connection.cursor() as cursor:
             cursor.execute("SELECT COUNT(*) FROM %s" % table)
@@ -121,8 +140,15 @@ class DatabaseCache(BaseDatabaseCache):
                 # so be careful about changes here - test suite will NOT pick
                 # regressions.
                 with transaction.atomic(using=db):
-                    cursor.execute("SELECT cache_key, expires FROM %s "
-                                   "WHERE cache_key = %%s" % table, [key])
+                    cursor.execute(
+                        'SELECT %s, %s FROM %s WHERE %s = %%s' % (
+                            quote_name('cache_key'),
+                            quote_name('expires'),
+                            table,
+                            quote_name('cache_key'),
+                        ),
+                        [key]
+                    )
                     result = cursor.fetchone()
 
                     if result:
@@ -136,14 +162,37 @@ class DatabaseCache(BaseDatabaseCache):
                                 current_expires = converter(current_expires, expression, connection)
 
                     exp = connection.ops.adapt_datetimefield_value(exp)
-                    if result and (mode == 'set' or (mode == 'add' and current_expires < now)):
-                        cursor.execute("UPDATE %s SET value = %%s, expires = %%s "
-                                       "WHERE cache_key = %%s" % table,
-                                       [b64encoded, exp, key])
+                    if result and mode == 'touch':
+                        cursor.execute(
+                            'UPDATE %s SET %s = %%s WHERE %s = %%s' % (
+                                table,
+                                quote_name('expires'),
+                                quote_name('cache_key')
+                            ),
+                            [exp, key]
+                        )
+                    elif result and (mode == 'set' or (mode == 'add' and current_expires < now)):
+                        cursor.execute(
+                            'UPDATE %s SET %s = %%s, %s = %%s WHERE %s = %%s' % (
+                                table,
+                                quote_name('value'),
+                                quote_name('expires'),
+                                quote_name('cache_key'),
+                            ),
+                            [b64encoded, exp, key]
+                        )
+                    elif mode != 'touch':
+                        cursor.execute(
+                            'INSERT INTO %s (%s, %s, %s) VALUES (%%s, %%s, %%s)' % (
+                                table,
+                                quote_name('cache_key'),
+                                quote_name('value'),
+                                quote_name('expires'),
+                            ),
+                            [key, b64encoded, exp]
+                        )
                     else:
-                        cursor.execute("INSERT INTO %s (cache_key, value, expires) "
-                                       "VALUES (%%s, %%s, %%s)" % table,
-                                       [key, b64encoded, exp])
+                        return False  # touch failed.
             except DatabaseError:
                 # To be threadsafe, updates/inserts are allowed to fail silently
                 return False
@@ -167,7 +216,7 @@ class DatabaseCache(BaseDatabaseCache):
 
         db = router.db_for_read(self.cache_model_class)
         connection = connections[db]
-        table = connection.ops.quote_name(self._table)
+        quote_name = connection.ops.quote_name
 
         if settings.USE_TZ:
             now = datetime.utcnow()
@@ -176,9 +225,14 @@ class DatabaseCache(BaseDatabaseCache):
         now = now.replace(microsecond=0)
 
         with connection.cursor() as cursor:
-            cursor.execute("SELECT cache_key FROM %s "
-                           "WHERE cache_key = %%s and expires > %%s" % table,
-                           [key, connection.ops.adapt_datetimefield_value(now)])
+            cursor.execute(
+                'SELECT %s FROM %s WHERE %s = %%s and expires > %%s' % (
+                    quote_name('cache_key'),
+                    quote_name(self._table),
+                    quote_name('cache_key'),
+                ),
+                [key, connection.ops.adapt_datetimefield_value(now)]
+            )
             return cursor.fetchone() is not None
 
     def _cull(self, db, cursor, now):

@@ -136,10 +136,6 @@ The functions defined in this module share the following properties:
     8601 (e.g. ``P4DT1H15M20S`` which is equivalent to ``4 1:15:20``) or
     PostgreSQL's day-time interval format (e.g. ``3 days 04:05:06``).
 
-    .. versionchanged:: 2.0
-
-        Support for PostgreSQL's interval format was added.
-
 ``django.utils.decorators``
 ===========================
 
@@ -657,7 +653,7 @@ escaping HTML.
     the return value will be ``"Joel is a slug"``.
 
     If you are looking for a more robust solution, take a look at the `bleach
-    <https://pypi.python.org/pypi/bleach>`_ Python library.
+    <https://pypi.org/project/bleach/>`_ Python library.
 
 .. function:: html_safe()
 
@@ -681,6 +677,10 @@ escaping HTML.
     operate on ``MultiValueDict`` and non-string values.
 
 .. function:: cookie_date(epoch_seconds=None)
+
+    .. deprecated:: 2.1
+
+        Use :func:`http_date` instead, which follows the latest RFC.
 
     Formats the time to ensure compatibility with Netscape's cookie standard.
 
@@ -931,8 +931,7 @@ appropriate entities.
       :ref:`aware <naive_vs_aware_datetimes>` datetime representing the
       current time in UTC. Note that :func:`now` will always return
       times in UTC regardless of the value of :setting:`TIME_ZONE`;
-      you can use :func:`localtime` to convert to a time in the current
-      time zone.
+      you can use :func:`localtime` to get the time in the current time zone.
 
 .. function:: is_aware(value)
 
@@ -1088,6 +1087,23 @@ functions without the ``u``.
     If ``check_path`` is ``True``, the function first checks the requested URL
     for whether its path begins with a language code listed in the
     :setting:`LANGUAGES` setting.
+
+.. function:: get_supported_language_variant(lang_code, strict=False)
+
+    .. versionadded:: 2.1
+
+    Returns ``lang_code`` if it's in the :setting:`LANGUAGES` setting, possibly
+    selecting a more generic variant. For example, ``'es'`` is returned if
+    ``lang_code`` is ``'es-ar'`` and ``'es'`` is in :setting:`LANGUAGES` but
+    ``'es-ar'`` isn't.
+
+    If ``strict`` is ``False`` (the default), a country-specific variant may
+    be returned when neither the language code nor its generic variant is found.
+    For example, if only ``'es-co'`` is in :setting:`LANGUAGES`, that's
+    returned for ``lang_code``\s like ``'es'`` and ``'es-ar'``. Those matches
+    aren't returned if ``strict=True``.
+
+    Raises :exc:`LookupError` if nothing is found.
 
 .. function:: to_locale(language)
 

@@ -3,6 +3,7 @@ import uuid
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.utils import timezone
+from django.utils.duration import duration_microseconds
 from django.utils.encoding import force_text
 
 
@@ -10,21 +11,22 @@ class DatabaseOperations(BaseDatabaseOperations):
     compiler_module = "django.db.backends.mysql.compiler"
 
     # MySQL stores positive fields as UNSIGNED ints.
-    integer_field_ranges = dict(
-        BaseDatabaseOperations.integer_field_ranges,
-        PositiveSmallIntegerField=(0, 65535),
-        PositiveIntegerField=(0, 4294967295),
-    )
+    integer_field_ranges = {
+        **BaseDatabaseOperations.integer_field_ranges,
+        'PositiveSmallIntegerField': (0, 65535),
+        'PositiveIntegerField': (0, 4294967295),
+    }
     cast_data_types = {
         'CharField': 'char(%(max_length)s)',
+        'TextField': 'char',
         'IntegerField': 'signed integer',
         'BigIntegerField': 'signed integer',
         'SmallIntegerField': 'signed integer',
-        'FloatField': 'signed',
         'PositiveIntegerField': 'unsigned integer',
         'PositiveSmallIntegerField': 'unsigned integer',
     }
     cast_char_field_without_max_length = 'char'
+    explain_prefix = 'EXPLAIN'
 
     def date_extract_sql(self, lookup_type, field_name):
         # http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
@@ -51,6 +53,10 @@ class DatabaseOperations(BaseDatabaseOperations):
             return "CAST(DATE_FORMAT(%s, '%s') AS DATE)" % (field_name, format_str)
         elif lookup_type == 'quarter':
             return "MAKEDATE(YEAR(%s), 1) + INTERVAL QUARTER(%s) QUARTER - INTERVAL 1 QUARTER" % (
+                field_name, field_name
+            )
+        elif lookup_type == 'week':
+            return "DATE_SUB(%s, INTERVAL WEEKDAY(%s) DAY)" % (
                 field_name, field_name
             )
         else:
@@ -84,6 +90,12 @@ class DatabaseOperations(BaseDatabaseOperations):
                 "INTERVAL QUARTER({field_name}) QUARTER - " +
                 "INTERVAL 1 QUARTER, '%%Y-%%m-01 00:00:00') AS DATETIME)"
             ).format(field_name=field_name)
+        if lookup_type == 'week':
+            return (
+                "CAST(DATE_FORMAT(DATE_SUB({field_name}, "
+                "INTERVAL WEEKDAY({field_name}) DAY), "
+                "'%%Y-%%m-%%d 00:00:00') AS DATETIME)"
+            ).format(field_name=field_name)
         try:
             i = fields.index(lookup_type) + 1
         except ValueError:
@@ -106,7 +118,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             return "TIME(%s)" % (field_name)
 
     def date_interval_sql(self, timedelta):
-        return "INTERVAL '%06f' SECOND_MICROSECOND" % timedelta.total_seconds()
+        return 'INTERVAL %s MICROSECOND' % duration_microseconds(timedelta)
 
     def format_for_duration_arithmetic(self, sql):
         return 'INTERVAL %s MICROSECOND' % sql
@@ -219,7 +231,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         elif internal_type in ['BooleanField', 'NullBooleanField']:
             converters.append(self.convert_booleanfield_value)
         elif internal_type == 'DateTimeField':
-            converters.append(self.convert_datetimefield_value)
+            if settings.USE_TZ:
+                converters.append(self.convert_datetimefield_value)
         elif internal_type == 'UUIDField':
             converters.append(self.convert_uuidfield_value)
         return converters
@@ -236,8 +249,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def convert_datetimefield_value(self, value, expression, connection):
         if value is not None:
-            if settings.USE_TZ:
-                value = timezone.make_aware(value, self.connection.timezone)
+            value = timezone.make_aware(value, self.connection.timezone)
         return value
 
     def convert_uuidfield_value(self, value, expression, connection):
@@ -253,8 +265,31 @@ class DatabaseOperations(BaseDatabaseOperations):
         rhs_sql, rhs_params = rhs
         if internal_type == 'TimeField':
             return (
-                "((TIME_TO_SEC(%(lhs)s) * POW(10, 6) + MICROSECOND(%(lhs)s)) -"
-                " (TIME_TO_SEC(%(rhs)s) * POW(10, 6) + MICROSECOND(%(rhs)s)))"
+                "((TIME_TO_SEC(%(lhs)s) * 1000000 + MICROSECOND(%(lhs)s)) -"
+                " (TIME_TO_SEC(%(rhs)s) * 1000000 + MICROSECOND(%(rhs)s)))"
             ) % {'lhs': lhs_sql, 'rhs': rhs_sql}, lhs_params * 2 + rhs_params * 2
         else:
             return "TIMESTAMPDIFF(MICROSECOND, %s, %s)" % (rhs_sql, lhs_sql), rhs_params + lhs_params
+
+    def explain_query_prefix(self, format=None, **options):
+        # Alias MySQL's TRADITIONAL to TEXT for consistency with other backends.
+        if format and format.upper() == 'TEXT':
+            format = 'TRADITIONAL'
+        prefix = super().explain_query_prefix(format, **options)
+        if format:
+            prefix += ' FORMAT=%s' % format
+        if self.connection.features.needs_explain_extended and format is None:
+            # EXTENDED and FORMAT are mutually exclusive options.
+            prefix += ' EXTENDED'
+        return prefix
+
+    def regex_lookup(self, lookup_type):
+        # REGEXP BINARY doesn't work correctly in MySQL 8+ and REGEXP_LIKE
+        # doesn't exist in MySQL 5.6.
+        if self.connection.mysql_version < (8, 0, 0):
+            if lookup_type == 'regex':
+                return '%s REGEXP BINARY %s'
+            return '%s REGEXP %s'
+
+        match_option = 'c' if lookup_type == 'regex' else 'i'
+        return "REGEXP_LIKE(%%s, %%s, '%s')" % match_option

@@ -142,7 +142,7 @@ class SessionBase:
     def is_empty(self):
         "Return True when there is no session_key and the session is empty."
         try:
-            return not bool(self._session_key) and not self._session_cache
+            return not self._session_key and not self._session_cache
         except AttributeError:
             return True
 
@@ -151,8 +151,7 @@ class SessionBase:
         while True:
             session_key = get_random_string(32, VALID_KEY_CHARS)
             if not self.exists(session_key):
-                break
-        return session_key
+                return session_key
 
     def _get_or_create_session_key(self):
         if self._session_key is None:
@@ -241,8 +240,7 @@ class SessionBase:
 
         if isinstance(expiry, datetime):
             return expiry
-        if not expiry:   # Checks both None and 0 cases
-            expiry = settings.SESSION_COOKIE_AGE
+        expiry = expiry or settings.SESSION_COOKIE_AGE   # Checks both None and 0 cases
         return modification + timedelta(seconds=expiry)
 
     def set_expiry(self, value):

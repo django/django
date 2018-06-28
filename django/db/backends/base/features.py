@@ -32,7 +32,7 @@ class BaseDatabaseFeatures:
     # If True, don't use integer foreign keys referring to, e.g., positive
     # integer primary keys.
     related_fields_match_type = False
-    allow_sliced_subqueries = True
+    allow_sliced_subqueries_with_in = True
     has_select_for_update = False
     has_select_for_update_nowait = False
     has_select_for_update_skip_locked = False
@@ -109,13 +109,6 @@ class BaseDatabaseFeatures:
     # Does the backend reset sequences between tests?
     supports_sequence_reset = True
 
-    # Can the backend determine reliably if a field is nullable?
-    # Note that this is separate from interprets_empty_strings_as_nulls,
-    # although the latter feature, when true, interferes with correct
-    # setting (and introspection) of CharFields' nullability.
-    # This is True for all core backends.
-    can_introspect_null = True
-
     # Can the backend introspect the default value of a column?
     can_introspect_default = True
 
@@ -147,6 +140,10 @@ class BaseDatabaseFeatures:
 
     # Can the backend introspect a TimeField, instead of a DateTimeField?
     can_introspect_time_field = True
+
+    # Some backends may not be able to differentiate BooleanField from other
+    # fields such as IntegerField.
+    introspected_boolean_field_type = 'BooleanField'
 
     # Can the backend introspect the column order (ASC/DESC) for indexes?
     supports_index_column_ordering = True
@@ -250,8 +247,23 @@ class BaseDatabaseFeatures:
     # Does the backend support keyword parameters for cursor.callproc()?
     supports_callproc_kwargs = False
 
+    # Convert CharField results from bytes to str in database functions.
+    db_functions_convert_bytes_to_str = False
+
+    # What formats does the backend EXPLAIN syntax support?
+    supported_explain_formats = set()
+
+    # Does DatabaseOperations.explain_query_prefix() raise ValueError if
+    # unknown kwargs are passed to QuerySet.explain()?
+    validates_explain_options = True
+
     def __init__(self, connection):
         self.connection = connection
+
+    @cached_property
+    def supports_explaining_query_execution(self):
+        """Does this backend support explaining query execution?"""
+        return self.connection.ops.explain_prefix is not None
 
     @cached_property
     def supports_transactions(self):
@@ -275,17 +287,3 @@ class BaseDatabaseFeatures:
         except NotSupportedError:
             return False
         return True
-
-    def introspected_boolean_field_type(self, field=None):
-        """
-        What is the type returned when the backend introspects a BooleanField?
-        The `field` argument may be used to give further details of the field
-        to be introspected.
-
-        The return value from this function is compared by tests against actual
-        introspection results; it should provide expectations, not run an
-        introspection itself.
-        """
-        if self.can_introspect_null and field and field.null:
-            return 'NullBooleanField'
-        return 'BooleanField'

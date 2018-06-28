@@ -1,0 +1,25 @@
+==========================
+Django 2.0.5 release notes
+==========================
+
+*May 1, 2018*
+
+Django 2.0.5 fixes several bugs in 2.0.4.
+
+Bugfixes
+========
+
+* Corrected the import paths that ``inspectdb`` generates for
+  ``django.contrib.postgres`` fields (:ticket:`29307`).
+
+* Fixed a regression in Django 1.11.8 where altering a field with a unique
+  constraint may drop and rebuild more foreign keys than necessary
+  (:ticket:`29193`).
+
+* Fixed crashes in ``django.contrib.admindocs`` when a view is a callable
+  object, such as ``django.contrib.syndication.views.Feed`` (:ticket:`29296`).
+
+* Fixed a regression in Django 1.11.12 where ``QuerySet.values()`` or
+  ``values_list()`` after combining an annotated and unannotated queryset with
+  ``union()``, ``difference()``, or ``intersection()`` crashed due to mismatching
+  columns (:ticket:`29286`).

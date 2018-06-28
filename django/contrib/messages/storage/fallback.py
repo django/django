@@ -45,8 +45,7 @@ class FallbackStorage(BaseStorage):
         """
         for storage in self.storages:
             if messages:
-                messages = storage._store(messages, response,
-                                          remove_oldest=False)
+                messages = storage._store(messages, response, remove_oldest=False)
             # Even if there are no more messages, continue iterating to ensure
             # storages which contained messages are flushed.
             elif storage in self._used_storages:

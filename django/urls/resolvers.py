@@ -68,11 +68,13 @@ def get_resolver(urlconf=None):
 
 
 @functools.lru_cache(maxsize=None)
-def get_ns_resolver(ns_pattern, resolver):
+def get_ns_resolver(ns_pattern, resolver, converters):
     # Build a namespaced resolver for the given parent URLconf pattern.
     # This makes it possible to have captured parameters in the parent
     # URLconf pattern.
-    ns_resolver = URLResolver(RegexPattern(ns_pattern), resolver.url_patterns)
+    pattern = RegexPattern(ns_pattern)
+    pattern.converters = dict(converters)
+    ns_resolver = URLResolver(pattern, resolver.url_patterns)
     return URLResolver(RegexPattern(r'^/'), [ns_resolver])
 
 
@@ -182,7 +184,7 @@ class RegexPattern(CheckURLMixin):
             )
 
     def __str__(self):
-        return self._regex
+        return str(self._regex)
 
 
 _PATH_PARAMETER_COMPONENT_RE = re.compile(
@@ -270,7 +272,7 @@ class RoutePattern(CheckURLMixin):
         return re.compile(_route_to_regex(route, self._is_endpoint)[0])
 
     def __str__(self):
-        return self._route
+        return str(self._route)
 
 
 class LocalePrefixPattern:
@@ -393,9 +395,7 @@ class URLResolver:
         warnings = []
         for pattern in self.url_patterns:
             warnings.extend(check_resolver(pattern))
-        if not warnings:
-            warnings = self.pattern.check()
-        return warnings
+        return warnings or self.pattern.check()
 
     def _populate(self):
         # Short-circuit if called recursively in this thread to prevent
@@ -440,8 +440,8 @@ class URLResolver:
                                     (
                                         new_matches,
                                         p_pattern + pat,
-                                        dict(defaults, **url_pattern.default_kwargs),
-                                        dict(self.pattern.converters, **converters)
+                                        {**defaults, **url_pattern.default_kwargs},
+                                        {**self.pattern.converters, **url_pattern.pattern.converters, **converters}
                                     )
                                 )
                         for namespace, (prefix, sub_pattern) in url_pattern.namespace_dict.items():
@@ -500,7 +500,7 @@ class URLResolver:
                 else:
                     if sub_match:
                         # Merge captured arguments in match with submatch
-                        sub_match_dict = dict(kwargs, **self.default_kwargs)
+                        sub_match_dict = {**kwargs, **self.default_kwargs}
                         # Update the sub_match_dict with the kwargs from the sub_match.
                         sub_match_dict.update(sub_match.kwargs)
                         # If there are *any* named groups, ignore all non-named groups.
@@ -572,12 +572,7 @@ class URLResolver:
                 else:
                     if set(kwargs).symmetric_difference(params).difference(defaults):
                         continue
-                    matches = True
-                    for k, v in defaults.items():
-                        if kwargs.get(k, v) != v:
-                            matches = False
-                            break
-                    if not matches:
+                    if any(kwargs.get(k, v) != v for k, v in defaults.items()):
                         continue
                     candidate_subs = kwargs
                 # Convert the candidate subs to text using Converter.to_url().

@@ -57,9 +57,9 @@ are required.
 * ``recipient_list``: A list of strings, each an email address. Each
   member of ``recipient_list`` will see the other recipients in the "To:"
   field of the email message.
-* ``fail_silently``: A boolean. If it's ``False``, ``send_mail`` will raise
-  an :exc:`smtplib.SMTPException`. See the :mod:`smtplib` docs for a list of
-  possible exceptions, all of which are subclasses of
+* ``fail_silently``: A boolean. When it's ``False``, ``send_mail()`` will raise
+  an :exc:`smtplib.SMTPException` if an error occurs. See the :mod:`smtplib`
+  docs for a list of possible exceptions, all of which are subclasses of
   :exc:`~smtplib.SMTPException`.
 * ``auth_user``: The optional username to use to authenticate to the SMTP
   server. If this isn't provided, Django will use the value of the
@@ -192,7 +192,7 @@ Here's an example view that takes a ``subject``, ``message`` and ``from_email``
 from the request's POST data, sends that to admin@example.com and redirects to
 "/contact/thanks/" when it's done::
 
-    from django.core.mail import send_mail, BadHeaderError
+    from django.core.mail import BadHeaderError, send_mail
     from django.http import HttpResponse, HttpResponseRedirect
 
     def send_email(request):

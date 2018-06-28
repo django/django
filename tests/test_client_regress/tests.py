@@ -631,7 +631,7 @@ class AssertFormErrorTests(SimpleTestCase):
         except AssertionError as e:
             self.assertIn(
                 "The form 'form' in context 0 does not contain the non-field "
-                "error 'Some error.' (actual errors: )",
+                "error 'Some error.' (actual errors: none)",
                 str(e)
             )
         try:
@@ -639,7 +639,7 @@ class AssertFormErrorTests(SimpleTestCase):
         except AssertionError as e:
             self.assertIn(
                 "abc: The form 'form' in context 0 does not contain the "
-                "non-field error 'Some error.' (actual errors: )",
+                "non-field error 'Some error.' (actual errors: none)",
                 str(e)
             )
 
@@ -1195,6 +1195,10 @@ class RequestMethodStringDataTests(SimpleTestCase):
         self.assertEqual(response.content, b'')
         response = self.client.head('/body/', data='', content_type='application/json')
         self.assertEqual(response.content, b'')
+
+    def test_json_bytes(self):
+        response = self.client.post('/body/', data=b"{'value': 37}", content_type='application/json')
+        self.assertEqual(response.content, b"{'value': 37}")
 
     def test_json(self):
         response = self.client.get('/json_response/')

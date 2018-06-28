@@ -71,16 +71,16 @@
                 showClear();
             }
         });
-        $(options.allToggle).show().click(function() {
+        $(options.allToggle).show().on('click', function() {
             checker($(this).prop("checked"));
             updateCounter();
         });
-        $("a", options.acrossQuestions).click(function(event) {
+        $("a", options.acrossQuestions).on('click', function(event) {
             event.preventDefault();
             $(options.acrossInput).val(1);
             showClear();
         });
-        $("a", options.acrossClears).click(function(event) {
+        $("a", options.acrossClears).on('click', function(event) {
             event.preventDefault();
             $(options.allToggle).prop("checked", false);
             clearAcross();
@@ -88,7 +88,7 @@
             updateCounter();
         });
         lastChecked = null;
-        $(actionCheckboxes).click(function(event) {
+        $(actionCheckboxes).on('click', function(event) {
             if (!event) { event = window.event; }
             var target = event.target ? event.target : event.srcElement;
             if (lastChecked && $.data(lastChecked) !== $.data(target) && event.shiftKey === true) {
@@ -112,12 +112,12 @@
         $('form#changelist-form table#result_list tr').on('change', 'td:gt(0) :input', function() {
             list_editable_changed = true;
         });
-        $('form#changelist-form button[name="index"]').click(function(event) {
+        $('form#changelist-form button[name="index"]').on('click', function(event) {
             if (list_editable_changed) {
                 return confirm(gettext("You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost."));
             }
         });
-        $('form#changelist-form input[name="_save"]').click(function(event) {
+        $('form#changelist-form input[name="_save"]').on('click', function(event) {
             var action_changed = false;
             $('select option:selected', options.actionContainer).each(function() {
                 if ($(this).val()) {

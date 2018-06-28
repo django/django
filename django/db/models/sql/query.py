@@ -6,7 +6,9 @@ themselves do not have to (and could be backed by things other than SQL
 databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
-from collections import Counter, Iterator, Mapping, OrderedDict, namedtuple
+import functools
+from collections import Counter, OrderedDict, namedtuple
+from collections.abc import Iterator, Mapping
 from itertools import chain, count, product
 from string import ascii_uppercase
 
@@ -17,6 +19,7 @@ from django.db import DEFAULT_DB_ALIAS, NotSupportedError, connections
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Col, Ref
+from django.db.models.fields import Field
 from django.db.models.fields.related_lookups import MultiColSource
 from django.db.models.lookups import Lookup
 from django.db.models.query_utils import (
@@ -55,7 +58,7 @@ def get_children_from_q(q):
 
 JoinInfo = namedtuple(
     'JoinInfo',
-    ('final_field', 'targets', 'opts', 'joins', 'path')
+    ('final_field', 'targets', 'opts', 'joins', 'path', 'transform_function')
 )
 
 
@@ -219,6 +222,10 @@ class Query:
         self.deferred_loading = (frozenset(), True)
 
         self._filtered_relations = {}
+
+        self.explain_query = False
+        self.explain_format = None
+        self.explain_options = {}
 
     @property
     def extra(self):
@@ -508,6 +515,14 @@ class Query:
         compiler = q.get_compiler(using=using)
         return compiler.has_results()
 
+    def explain(self, using, format=None, **options):
+        q = self.clone()
+        q.explain_query = True
+        q.explain_format = format
+        q.explain_options = options
+        compiler = q.get_compiler(using=using)
+        return '\n'.join(compiler.explain_query())
+
     def combine(self, rhs, connector):
         """
         Merge the 'rhs' query into the current one (with any 'rhs' effects
@@ -666,10 +681,9 @@ class Query:
             workset = {}
             for model, values in seen.items():
                 for field in model._meta.local_fields:
-                    if field in values:
-                        continue
-                    m = field.model._meta.concrete_model
-                    add_to_dict(workset, m, field)
+                    if field not in values:
+                        m = field.model._meta.concrete_model
+                        add_to_dict(workset, m, field)
             for model, values in must_include.items():
                 # If we haven't included a model in workset, we don't add the
                 # corresponding must_include fields for that model, since an
@@ -805,9 +819,9 @@ class Query:
         if isinstance(self.group_by, tuple):
             self.group_by = tuple([col.relabeled_clone(change_map) for col in self.group_by])
         self.select = tuple([col.relabeled_clone(change_map) for col in self.select])
-        if self._annotations:
-            self._annotations = OrderedDict(
-                (key, col.relabeled_clone(change_map)) for key, col in self._annotations.items())
+        self._annotations = self._annotations and OrderedDict(
+            (key, col.relabeled_clone(change_map)) for key, col in self._annotations.items()
+        )
 
         # 2. Rename the alias in the internal table/alias datastructures.
         for old_alias, new_alias in change_map.items():
@@ -1061,30 +1075,29 @@ class Query:
         and get_transform().
         """
         # __exact is the default lookup if one isn't given.
-        if not lookups:
-            lookups = ['exact']
-
+        lookups = lookups or ['exact']
         for name in lookups[:-1]:
             lhs = self.try_transform(lhs, name)
         # First try get_lookup() so that the lookup takes precedence if the lhs
         # supports both transform and lookup for the name.
-        lookup_class = lhs.get_lookup(lookups[-1])
+        lookup_name = lookups[-1]
+        lookup_class = lhs.get_lookup(lookup_name)
         if not lookup_class:
             if lhs.field.is_relation:
-                raise FieldError('Related Field got invalid lookup: {}'.format(lookups[-1]))
+                raise FieldError('Related Field got invalid lookup: {}'.format(lookup_name))
             # A lookup wasn't found. Try to interpret the name as a transform
             # and do an Exact lookup against it.
-            lhs = self.try_transform(lhs, lookups[-1])
-            lookup_class = lhs.get_lookup('exact')
-
-        if not lookup_class:
-            return
+            lhs = self.try_transform(lhs, lookup_name)
+            lookup_name = 'exact'
+            lookup_class = lhs.get_lookup(lookup_name)
+            if not lookup_class:
+                return
 
         lookup = lookup_class(lhs, rhs)
         # Interpret '__exact=None' as the sql 'is NULL'; otherwise, reject all
-        # uses of None as a query value.
-        if lookup.rhs is None:
-            if lookup.lookup_name not in ('exact', 'iexact'):
+        # uses of None as a query value unless the lookup supports it.
+        if lookup.rhs is None and not lookup.can_use_none_as_rhs:
+            if lookup_name not in ('exact', 'iexact'):
                 raise ValueError("Cannot use None as a query value")
             return lhs.get_lookup('isnull')(lhs, True)
 
@@ -1093,7 +1106,7 @@ class Query:
         # DEFAULT_DB_ALIAS isn't nice but it's the best that can be done here.
         # A similar thing is done in is_nullable(), too.
         if (connections[DEFAULT_DB_ALIAS].features.interprets_empty_strings_as_nulls and
-                lookup.lookup_name == 'exact' and lookup.rhs == ''):
+                lookup_name == 'exact' and lookup.rhs == ''):
             return lhs.get_lookup('isnull')(lhs, True)
 
         return lookup
@@ -1188,8 +1201,7 @@ class Query:
             # lookup parts
             self._lookup_joins = join_info.joins
         except MultiJoin as e:
-            return self.split_exclude(filter_expr, LOOKUP_SEP.join(parts[:e.level]),
-                                      can_reuse, e.names_with_path)
+            return self.split_exclude(filter_expr, can_reuse, e.names_with_path)
 
         # Update used_joins before trimming since they are reused to determine
         # which joins could be later promoted to INNER.
@@ -1215,7 +1227,7 @@ class Query:
         clause.add(condition, AND)
 
         require_outer = lookup_type == 'isnull' and condition.rhs is True and not current_negated
-        if current_negated and (lookup_type != 'isnull' or condition.rhs is False):
+        if current_negated and (lookup_type != 'isnull' or condition.rhs is False) and condition.rhs is not None:
             require_outer = True
             if (lookup_type != 'isnull' and (
                     self.is_nullable(targets[0]) or
@@ -1431,8 +1443,11 @@ class Query:
         generate a MultiJoin exception.
 
         Return the final field involved in the joins, the target field (used
-        for any 'where' constraint), the final 'opts' value, the joins and the
-        field path travelled to generate the joins.
+        for any 'where' constraint), the final 'opts' value, the joins, the
+        field path traveled to generate the joins, and a transform function
+        that takes a field and alias and is equivalent to `field.get_col(alias)`
+        in the simple case but wraps field transforms if they were included in
+        names.
 
         The target field is the field containing the concrete value. Final
         field can be something different, for example foreign key pointing to
@@ -1441,10 +1456,46 @@ class Query:
         key field for example).
         """
         joins = [alias]
-        # First, generate the path for the names
-        path, final_field, targets, rest = self.names_to_path(
-            names, opts, allow_many, fail_on_missing=True)
+        # The transform can't be applied yet, as joins must be trimmed later.
+        # To avoid making every caller of this method look up transforms
+        # directly, compute transforms here and and create a partial that
+        # converts fields to the appropriate wrapped version.
 
+        def final_transformer(field, alias):
+            return field.get_col(alias)
+
+        # Try resolving all the names as fields first. If there's an error,
+        # treat trailing names as lookups until a field can be resolved.
+        last_field_exception = None
+        for pivot in range(len(names), 0, -1):
+            try:
+                path, final_field, targets, rest = self.names_to_path(
+                    names[:pivot], opts, allow_many, fail_on_missing=True,
+                )
+            except FieldError as exc:
+                if pivot == 1:
+                    # The first item cannot be a lookup, so it's safe
+                    # to raise the field error here.
+                    raise
+                else:
+                    last_field_exception = exc
+            else:
+                # The transforms are the remaining items that couldn't be
+                # resolved into fields.
+                transforms = names[pivot:]
+                break
+        for name in transforms:
+            def transform(field, alias, *, name, previous):
+                try:
+                    wrapped = previous(field, alias)
+                    return self.try_transform(wrapped, name)
+                except FieldError:
+                    # FieldError is raised if the transform doesn't exist.
+                    if isinstance(final_field, Field) and last_field_exception:
+                        raise last_field_exception
+                    else:
+                        raise
+            final_transformer = functools.partial(transform, name=name, previous=final_transformer)
         # Then, add the path to the query's joins. Note that we can't trim
         # joins at this stage - we will need the information about join type
         # of the trimmed joins.
@@ -1472,7 +1523,7 @@ class Query:
             joins.append(alias)
             if filtered_relation:
                 filtered_relation.path = joins[:]
-        return JoinInfo(final_field, targets, opts, joins, path)
+        return JoinInfo(final_field, targets, opts, joins, path, final_transformer)
 
     def trim_joins(self, targets, joins, path):
         """
@@ -1513,7 +1564,7 @@ class Query:
                 # that case we need to return a Ref to the subquery's annotation.
                 return Ref(name, self.annotation_select[name])
             else:
-                return self.annotation_select[name]
+                return self.annotations[name]
         else:
             field_list = name.split(LOOKUP_SEP)
             join_info = self.setup_joins(field_list, self.get_meta(), self.get_initial_alias(), can_reuse=reuse)
@@ -1526,16 +1577,16 @@ class Query:
             col = targets[0].get_col(join_list[-1], join_info.targets[0])
             return col
 
-    def split_exclude(self, filter_expr, prefix, can_reuse, names_with_path):
+    def split_exclude(self, filter_expr, can_reuse, names_with_path):
         """
         When doing an exclude against any kind of N-to-many relation, we need
         to use a subquery. This method constructs the nested query, given the
         original exclude filter (filter_expr) and the portion up to the first
         N-to-many relation field.
 
-        As an example we could have original filter ~Q(child__name='foo').
-        We would get here with filter_expr = child__name, prefix = child and
-        can_reuse is a set of joins usable for filters in the original query.
+        For example, if the origin filter is ~Q(child__name='foo'), filter_expr
+        is ('child__name', 'foo') and can_reuse is a set of joins usable for
+        filters in the original query.
 
         We will turn this into equivalent of:
             WHERE NOT (pk IN (SELECT parent_id FROM thetable
@@ -1685,7 +1736,7 @@ class Query:
                     join_info.path,
                 )
                 for target in targets:
-                    cols.append(target.get_col(final_alias))
+                    cols.append(join_info.transform_function(target, final_alias))
             if cols:
                 self.set_select(cols)
         except MultiJoin:
@@ -1749,7 +1800,7 @@ class Query:
         """
         group_by = list(self.select)
         if self.annotation_select:
-            for alias, annotation in self.annotation_select.items():
+            for annotation in self.annotation_select.values():
                 for col in annotation.get_group_by_cols():
                     group_by.append(col)
         self.group_by = tuple(group_by)
@@ -2049,10 +2100,10 @@ class Query:
         # used. The proper fix would be to defer all decisions where
         # is_nullable() is needed to the compiler stage, but that is not easy
         # to do currently.
-        if connections[DEFAULT_DB_ALIAS].features.interprets_empty_strings_as_nulls and field.empty_strings_allowed:
-            return True
-        else:
-            return field.null
+        return (
+            connections[DEFAULT_DB_ALIAS].features.interprets_empty_strings_as_nulls and
+            field.empty_strings_allowed
+        ) or field.null
 
 
 def get_order_dir(field, default='ASC'):

@@ -85,17 +85,6 @@ options that make it very powerful.
     both rows will match. To prevent this, perform the correct typecasting
     before using the value in a query.
 
-.. warning::
-
-    While a ``RawQuerySet`` instance can be iterated over like a normal
-    :class:`~django.db.models.query.QuerySet`, ``RawQuerySet`` doesn't
-    implement all methods you can use with ``QuerySet``. For example,
-    ``__bool__()`` and ``__len__()`` are not defined in ``RawQuerySet``, and
-    thus all ``RawQuerySet`` instances are considered ``True``. The reason
-    these methods are not implemented in ``RawQuerySet`` is that implementing
-    them without internal caching would be a performance drawback and adding
-    such caching would be backward incompatible.
-
 Mapping query fields to model fields
 ------------------------------------
 
@@ -383,7 +372,3 @@ Calling stored procedures
 
         with connection.cursor() as cursor:
             cursor.callproc('test_procedure', [1, 'test'])
-
-    .. versionchanged:: 2.0
-
-        The ``kparams`` argument was added.

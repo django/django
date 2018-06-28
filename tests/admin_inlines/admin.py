@@ -7,9 +7,9 @@ from .models import (
     Consigliere, EditablePKBook, ExtraTerrestrial, Fashionista, Holder,
     Holder2, Holder3, Holder4, Inner, Inner2, Inner3, Inner4Stacked,
     Inner4Tabular, NonAutoPKBook, NonAutoPKBookChild, Novel,
-    ParentModelWithCustomPk, Poll, Profile, ProfileCollection, Question,
-    ReadOnlyInline, ShoppingWeakness, Sighting, SomeChildModel,
-    SomeParentModel, SottoCapo, Title, TitleCollection,
+    NovelReadonlyChapter, ParentModelWithCustomPk, Poll, Profile,
+    ProfileCollection, Question, ReadOnlyInline, ShoppingWeakness, Sighting,
+    SomeChildModel, SomeParentModel, SottoCapo, Title, TitleCollection,
 )
 
 site = admin.AdminSite(name="admin")
@@ -153,6 +153,17 @@ class NovelAdmin(admin.ModelAdmin):
     inlines = [ChapterInline]
 
 
+class ReadOnlyChapterInline(admin.TabularInline):
+    model = Chapter
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+
+class NovelReadonlyChapterAdmin(admin.ModelAdmin):
+    inlines = [ReadOnlyChapterInline]
+
+
 class ConsigliereInline(admin.TabularInline):
     model = Consigliere
 
@@ -206,6 +217,8 @@ class SomeChildModelForm(forms.ModelForm):
         widgets = {
             'position': forms.HiddenInput,
         }
+        labels = {'readonly_field': 'Label from ModelForm.Meta'}
+        help_texts = {'readonly_field': 'Help text from ModelForm.Meta'}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -215,6 +228,7 @@ class SomeChildModelForm(forms.ModelForm):
 class SomeChildModelInline(admin.TabularInline):
     model = SomeChildModel
     form = SomeChildModelForm
+    readonly_fields = ('readonly_field',)
 
 
 site.register(TitleCollection, inlines=[TitleInline])
@@ -228,6 +242,7 @@ site.register(Holder3, inlines=[InnerInline3])
 
 site.register(Poll, PollAdmin)
 site.register(Novel, NovelAdmin)
+site.register(NovelReadonlyChapter, NovelReadonlyChapterAdmin)
 site.register(Fashionista, inlines=[InlineWeakness])
 site.register(Holder4, Holder4Admin)
 site.register(Author, AuthorAdmin)

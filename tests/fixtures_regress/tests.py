@@ -2,7 +2,6 @@
 import json
 import os
 import re
-import warnings
 from io import StringIO
 
 from django.core import management, serializers
@@ -209,18 +208,12 @@ class TestFixtures(TestCase):
         using explicit filename.
         Test for ticket #18213 -- warning conditions are caught correctly
         """
-        with warnings.catch_warnings(record=True) as warning_list:
-            warnings.simplefilter("always")
+        msg = "No fixture data found for 'bad_fixture2'. (File format may be invalid.)"
+        with self.assertWarnsMessage(RuntimeWarning, msg):
             management.call_command(
                 'loaddata',
                 'bad_fixture2.xml',
                 verbosity=0,
-            )
-            warning = warning_list.pop()
-            self.assertEqual(warning.category, RuntimeWarning)
-            self.assertEqual(
-                str(warning.message),
-                "No fixture data found for 'bad_fixture2'. (File format may be invalid.)"
             )
 
     def test_invalid_data_no_ext(self):
@@ -229,18 +222,12 @@ class TestFixtures(TestCase):
         without file extension.
         Test for ticket #18213 -- warning conditions are caught correctly
         """
-        with warnings.catch_warnings(record=True) as warning_list:
-            warnings.simplefilter("always")
+        msg = "No fixture data found for 'bad_fixture2'. (File format may be invalid.)"
+        with self.assertWarnsMessage(RuntimeWarning, msg):
             management.call_command(
                 'loaddata',
                 'bad_fixture2',
                 verbosity=0,
-            )
-            warning = warning_list.pop()
-            self.assertEqual(warning.category, RuntimeWarning)
-            self.assertEqual(
-                str(warning.message),
-                "No fixture data found for 'bad_fixture2'. (File format may be invalid.)"
             )
 
     def test_empty(self):
@@ -248,35 +235,26 @@ class TestFixtures(TestCase):
         Test for ticket #18213 -- Loading a fixture file with no data output a warning.
         Previously empty fixture raises an error exception, see ticket #4371.
         """
-        with warnings.catch_warnings(record=True) as warning_list:
-            warnings.simplefilter("always")
+        msg = "No fixture data found for 'empty'. (File format may be invalid.)"
+        with self.assertWarnsMessage(RuntimeWarning, msg):
             management.call_command(
                 'loaddata',
                 'empty',
                 verbosity=0,
             )
-            warning = warning_list.pop()
-            self.assertEqual(warning.category, RuntimeWarning)
-            self.assertEqual(str(warning.message), "No fixture data found for 'empty'. (File format may be invalid.)")
 
     def test_error_message(self):
         """
         Regression for #9011 - error message is correct.
         Change from error to warning for ticket #18213.
         """
-        with warnings.catch_warnings(record=True) as warning_list:
-            warnings.simplefilter("always")
+        msg = "No fixture data found for 'bad_fixture2'. (File format may be invalid.)"
+        with self.assertWarnsMessage(RuntimeWarning, msg):
             management.call_command(
                 'loaddata',
                 'bad_fixture2',
                 'animal',
                 verbosity=0,
-            )
-            warning = warning_list.pop()
-            self.assertEqual(warning.category, RuntimeWarning)
-            self.assertEqual(
-                str(warning.message),
-                "No fixture data found for 'bad_fixture2'. (File format may be invalid.)"
             )
 
     def test_pg_sequence_resetting_checks(self):

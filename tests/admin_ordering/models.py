@@ -27,7 +27,7 @@ class SongInlineDefaultOrdering(admin.StackedInline):
 
 class SongInlineNewOrdering(admin.StackedInline):
     model = Song
-    ordering = ('duration', )
+    ordering = ('duration',)
 
 
 class DynOrderingBandAdmin(admin.ModelAdmin):

@@ -89,6 +89,12 @@ Database installation
     postgis
     spatialite
 
+:setting:`DATABASES` configuration
+----------------------------------
+
+Set the :setting:`ENGINE <DATABASE-ENGINE>` setting to one of the :ref:`spatial
+backends <spatial-backends>`.
+
 Add ``django.contrib.gis`` to :setting:`INSTALLED_APPS`
 -------------------------------------------------------
 
@@ -225,7 +231,7 @@ __ https://www.python.org/ftp/python/
 Postgres.app
 ~~~~~~~~~~~~
 
-`Postgres.app <http://postgresapp.com/>`_ is a standalone PostgreSQL server
+`Postgres.app <https://postgresapp.com/>`_ is a standalone PostgreSQL server
 that includes the PostGIS extension. You will also need to install ``gdal`` and
 ``libgeoip`` with :ref:`homebrew`.
 
@@ -299,8 +305,8 @@ your ``.profile`` to be able to run the package programs from the command-line::
     export PATH=/Library/Frameworks/GDAL.framework/Programs:$PATH
     export PATH=/usr/local/pgsql/bin:$PATH
 
-__ http://www.kyngchaos.com/software/frameworks
-__ http://www.kyngchaos.com/software/postgres
+__ https://www.kyngchaos.com/software/frameworks
+__ https://www.kyngchaos.com/software/postgres
 
 .. _psycopg2_kyngchaos:
 

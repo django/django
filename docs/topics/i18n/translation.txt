@@ -84,8 +84,8 @@ as a shorter alias, ``_``, to save typing.
 In this example, the text ``"Welcome to my site."`` is marked as a translation
 string::
 
-    from django.utils.translation import gettext as _
     from django.http import HttpResponse
+    from django.utils.translation import gettext as _
 
     def my_view(request):
         output = _("Welcome to my site.")
@@ -94,8 +94,8 @@ string::
 Obviously, you could code this without using the alias. This example is
 identical to the previous one::
 
-    from django.utils.translation import gettext
     from django.http import HttpResponse
+    from django.utils.translation import gettext
 
     def my_view(request):
         output = gettext("Welcome to my site.")
@@ -137,6 +137,13 @@ For this reason, you should use named-string interpolation (e.g., ``%(day)s``)
 instead of positional interpolation (e.g., ``%s`` or ``%d``) whenever you
 have more than a single parameter. If you used positional interpolation,
 translations wouldn't be able to reorder placeholder text.
+
+Since string extraction is done by the ``xgettext`` command, only syntaxes
+supported by ``gettext`` are supported by Django. Python f-strings_ and
+`JavaScript template strings`_ are not yet supported by ``xgettext``.
+
+.. _f-strings: https://docs.python.org/3/reference/lexical_analysis.html#f-strings
+.. _JavaScript template strings: https://savannah.gnu.org/bugs/?50920
 
 .. _translator-comments:
 
@@ -198,8 +205,8 @@ of its value.)
 
 For example::
 
-    from django.utils.translation import ngettext
     from django.http import HttpResponse
+    from django.utils.translation import ngettext
 
     def hello_world(request, count):
         page = ngettext(
@@ -235,7 +242,7 @@ sophisticated, but will produce incorrect results for some languages::
         'name': name
     }
 
-Don't try to implement your own singular-or-plural logic, it won't be correct.
+Don't try to implement your own singular-or-plural logic; it won't be correct.
 In a case like this, consider something like the following::
 
     text = ngettext(
@@ -421,7 +428,7 @@ Working with lazy translation objects
 The result of a ``gettext_lazy()`` call can be used wherever you would use a
 string (a :class:`str` object) in other Django code, but it may not work with
 arbitrary Python code. For example, the following won't work because the
-`requests <https://pypi.python.org/pypi/requests/>`_ library doesn't handle
+`requests <https://pypi.org/project/requests/>`_ library doesn't handle
 ``gettext_lazy`` objects::
 
     body = gettext_lazy("I \u2764 Django")  # (unicode :heart:)
@@ -610,7 +617,7 @@ filters::
     </h1>
     <p>
     {% for stage in tour_stages %}
-        {% cycle start end %}: {{ stage }}{% if forloop.counter|divisibleby:2 %}<br />{% else %}, {% endif %}
+        {% cycle start end %}: {{ stage }}{% if forloop.counter|divisibleby:2 %}<br>{% else %}, {% endif %}
     {% endfor %}
     </p>
 
@@ -891,9 +898,9 @@ use the ``{% get_language_info %}`` tag::
 
 You can then access the information::
 
-    Language code: {{ lang.code }}<br />
-    Name of language: {{ lang.name_local }}<br />
-    Name in English: {{ lang.name }}<br />
+    Language code: {{ lang.code }}<br>
+    Name of language: {{ lang.name_local }}<br>
+    Name in English: {{ lang.name }}<br>
     Bi-directional: {{ lang.bidi }}
     Name in the active language: {{ lang.name_translated }}
 
@@ -1410,8 +1417,8 @@ function will return the URL in the active language. Example::
 
 .. warning::
 
-    In most cases, it's best to use translated URLs only within a
-    language-code-prefixed block of patterns (using
+    In most cases, it's best to use translated URLs only within a language code
+    prefixed block of patterns (using
     :func:`~django.conf.urls.i18n.i18n_patterns`), to avoid the possibility
     that a carelessly translated URL causes a collision with a non-translated
     URL pattern.
@@ -1652,13 +1659,13 @@ To workaround this, you can escape percent signs by adding a second percent
 sign::
 
     from django.utils.translation import gettext as _
-    output = _("10%% interest)
+    output = _("10%% interest")
 
 Or you can use ``no-python-format`` so that all percent signs are treated as
 literals::
 
     # xgettext:no-python-format
-    output = _("10% interest)
+    output = _("10% interest")
 
 .. _creating-message-files-from-js-code:
 
@@ -1686,7 +1693,7 @@ This is only needed for people who either want to extract message IDs or compile
 message files (``.po``). Translation work itself just involves editing existing
 files of this type, but if you want to create your own message files, or want to
 test or compile a changed message file, download `a precompiled binary
-installer <http://mlocati.github.io/gettext-iconv-windows/>`_.
+installer <https://mlocati.github.io/articles/gettext-iconv-windows.html>`_.
 
 You may also use ``gettext`` binaries you have obtained elsewhere, so long as
 the ``xgettext --version`` command works properly. Do not attempt to use Django
@@ -1761,10 +1768,14 @@ Activate this view by adding the following line to your URLconf::
     language-independent itself to work correctly.
 
 The view expects to be called via the ``POST`` method, with a ``language``
-parameter set in request. If session support is enabled, the view
-saves the language choice in the user's session. Otherwise, it saves the
-language choice in a cookie that is by default named ``django_language``.
-(The name can be changed through the :setting:`LANGUAGE_COOKIE_NAME` setting.)
+parameter set in request. If session support is enabled, the view saves the
+language choice in the user's session. It also saves the language choice in a
+cookie that is named ``django_language`` by default. (The name can be changed
+through the :setting:`LANGUAGE_COOKIE_NAME` setting.)
+
+.. versionchanged:: 2.1
+
+    In older versions, the cookie is only set if session support isn't enabled.
 
 After setting the language choice, Django looks for a ``next`` parameter in the
 ``POST`` or ``GET`` data. If that is found and Django considers it to be a safe
@@ -1784,7 +1795,7 @@ Here's example HTML template code:
     {% load i18n %}
 
     <form action="{% url 'set_language' %}" method="post">{% csrf_token %}
-        <input name="next" type="hidden" value="{{ redirect_to }}" />
+        <input name="next" type="hidden" value="{{ redirect_to }}">
         <select name="language">
             {% get_current_language as LANGUAGE_CODE %}
             {% get_available_languages as LANGUAGES %}
@@ -1795,7 +1806,7 @@ Here's example HTML template code:
                 </option>
             {% endfor %}
         </select>
-        <input type="submit" value="Go" />
+        <input type="submit" value="Go">
     </form>
 
 In this example, Django looks up the URL of the page to which the user will be
@@ -2072,9 +2083,19 @@ translations for the same literal:
     following a similar but not identical algorithm. See
     :class:`.JavaScriptCatalog` for more details.
 
+    You can also put :ref:`custom format files <custom-format-files>` in the
+    :setting:`LOCALE_PATHS` directories if you also set
+    :setting:`FORMAT_MODULE_PATH`.
+
 In all cases the name of the directory containing the translation is expected to
 be named using :term:`locale name` notation. E.g. ``de``, ``pt_BR``, ``es_AR``,
-etc.
+etc. Untranslated strings for territorial language variants use the translations
+of the generic language. For example, untranslated ``pt_BR`` strings use ``pt``
+translations.
+
+.. versionchanged:: 2.1
+
+    Fallback to the generic language as described above was added.
 
 This way, you can write applications that include their own translations, and
 you can override base translations in your project. Or, you can just build
@@ -2111,5 +2132,5 @@ aware of certain limitations:
 * When an English variant is activated and English strings are missing, the
   fallback language will not be the :setting:`LANGUAGE_CODE` of the project,
   but the original strings. For example, an English user visiting a site with
-  Spanish as the default language and original strings written in Russian will
-  fallback to Russian, not to Spanish.
+  :setting:`LANGUAGE_CODE` set to Spanish and original strings written in
+  Russian will see Russian text rather than Spanish.

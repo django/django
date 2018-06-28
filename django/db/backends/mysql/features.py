@@ -7,9 +7,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     update_can_self_select = False
     allows_group_by_pk = True
     related_fields_match_type = True
-    allow_sliced_subqueries = False
+    # MySQL doesn't support sliced subqueries with IN/ALL/ANY/SOME.
+    allow_sliced_subqueries_with_in = False
     has_select_for_update = True
-    has_select_for_update_nowait = False
     supports_forward_references = False
     supports_regex_backreferencing = False
     supports_date_lookup_using_string = False
@@ -17,6 +17,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_introspect_binary_field = False
     can_introspect_small_integer_field = True
     can_introspect_positive_integer_field = True
+    introspected_boolean_field_type = 'IntegerField'
     supports_index_column_ordering = False
     supports_timezones = False
     requires_explicit_null_ordering_when_grouping = True
@@ -46,6 +47,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             SET V_I = P_I;
         END;
     """
+    db_functions_convert_bytes_to_str = True
+    # Alias MySQL's TRADITIONAL to TEXT for consistency with other backends.
+    supported_explain_formats = {'JSON', 'TEXT', 'TRADITIONAL'}
 
     @cached_property
     def _mysql_storage_engine(self):
@@ -67,9 +71,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             cursor.execute("SELECT 1 FROM mysql.time_zone LIMIT 1")
             return cursor.fetchone() is not None
 
-    def introspected_boolean_field_type(self, *args, **kwargs):
-        return 'IntegerField'
-
     @cached_property
     def is_sql_auto_is_null_enabled(self):
         with self.connection.cursor() as cursor:
@@ -80,6 +81,17 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def supports_over_clause(self):
         return self.connection.mysql_version >= (8, 0, 2)
+
+    @cached_property
+    def has_select_for_update_skip_locked(self):
+        return self.connection.mysql_version >= (8, 0, 1)
+
+    has_select_for_update_nowait = has_select_for_update_skip_locked
+
+    @cached_property
+    def needs_explain_extended(self):
+        # EXTENDED is deprecated (and not required) in 5.7 and removed in 8.0.
+        return self.connection.mysql_version < (5, 7)
 
     @cached_property
     def supports_transactions(self):

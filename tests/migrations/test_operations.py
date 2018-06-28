@@ -409,7 +409,7 @@ class OperationTests(OperationTestBase):
             "ProxyPony",
             [],
             options={"proxy": True},
-            bases=("test_crprmo.Pony", ),
+            bases=("test_crprmo.Pony",),
         )
         self.assertEqual(operation.describe(), "Create proxy model ProxyPony")
         new_state = project_state.clone()
@@ -443,7 +443,7 @@ class OperationTests(OperationTestBase):
             "UnmanagedPony",
             [],
             options={"proxy": True},
-            bases=("test_crummo.Pony", ),
+            bases=("test_crummo.Pony",),
         )
         self.assertEqual(operation.describe(), "Create proxy model UnmanagedPony")
         new_state = project_state.clone()
@@ -722,7 +722,7 @@ class OperationTests(OperationTestBase):
 
         project_state = self.apply_operations(app_label, project_state, operations=[
             migrations.RenameModel("Pony", "Pony2"),
-        ])
+        ], atomic=connection.features.supports_atomic_references_rename)
         Pony = project_state.apps.get_model(app_label, "Pony2")
         Rider = project_state.apps.get_model(app_label, "Rider")
         pony = Pony.objects.create()
@@ -801,6 +801,34 @@ class OperationTests(OperationTestBase):
         self.assertEqual(Rider.objects.count(), 2)
         self.assertEqual(PonyRider.objects.count(), 2)
         self.assertEqual(pony.riders.count(), 2)
+
+    def test_rename_m2m_model_after_rename_field(self):
+        """RenameModel renames a many-to-many column after a RenameField."""
+        app_label = 'test_rename_multiple'
+        project_state = self.apply_operations(app_label, ProjectState(), operations=[
+            migrations.CreateModel('Pony', fields=[
+                ('id', models.AutoField(primary_key=True)),
+                ('name', models.CharField(max_length=20)),
+            ]),
+            migrations.CreateModel('Rider', fields=[
+                ('id', models.AutoField(primary_key=True)),
+                ('pony', models.ForeignKey('test_rename_multiple.Pony', models.CASCADE)),
+            ]),
+            migrations.CreateModel('PonyRider', fields=[
+                ('id', models.AutoField(primary_key=True)),
+                ('riders', models.ManyToManyField('Rider')),
+            ]),
+            migrations.RenameField(model_name='pony', old_name='name', new_name='fancy_name'),
+            migrations.RenameModel(old_name='Rider', new_name='Jockey'),
+        ], atomic=connection.features.supports_atomic_references_rename)
+        Pony = project_state.apps.get_model(app_label, 'Pony')
+        Jockey = project_state.apps.get_model(app_label, 'Jockey')
+        PonyRider = project_state.apps.get_model(app_label, 'PonyRider')
+        # No "no such column" error means the column was renamed correctly.
+        pony = Pony.objects.create(fancy_name='a good name')
+        jockey = Jockey.objects.create(pony=pony)
+        ponyrider = PonyRider.objects.create()
+        ponyrider.riders.add(jockey)
 
     def test_add_field(self):
         """
@@ -1231,12 +1259,13 @@ class OperationTests(OperationTestBase):
         second_state = first_state.clone()
         operation = migrations.AlterModelTable(name='pony', table=None)
         operation.state_forwards(app_label, second_state)
-        with connection.schema_editor() as editor:
+        atomic_rename = connection.features.supports_atomic_references_rename
+        with connection.schema_editor(atomic=atomic_rename) as editor:
             operation.database_forwards(app_label, editor, first_state, second_state)
         self.assertTableExists(new_m2m_table)
         self.assertTableNotExists(original_m2m_table)
         # And test reversal
-        with connection.schema_editor() as editor:
+        with connection.schema_editor(atomic=atomic_rename) as editor:
             operation.database_backwards(app_label, editor, second_state, first_state)
         self.assertTableExists(original_m2m_table)
         self.assertTableNotExists(new_m2m_table)
@@ -1453,6 +1482,34 @@ class OperationTests(OperationTestBase):
         state.add_model(ModelState('app', 'model', []))
         with self.assertRaisesMessage(FieldDoesNotExist, "app.model has no field named 'field'"):
             migrations.RenameField('model', 'field', 'new_field').state_forwards('app', state)
+
+    def test_rename_referenced_field_state_forward(self):
+        state = ProjectState()
+        state.add_model(ModelState('app', 'Model', [
+            ('id', models.AutoField(primary_key=True)),
+            ('field', models.IntegerField(unique=True)),
+        ]))
+        state.add_model(ModelState('app', 'OtherModel', [
+            ('id', models.AutoField(primary_key=True)),
+            ('fk', models.ForeignKey('Model', models.CASCADE, to_field='field')),
+            ('fo', models.ForeignObject('Model', models.CASCADE, from_fields=('fk',), to_fields=('field',))),
+        ]))
+        operation = migrations.RenameField('Model', 'field', 'renamed')
+        new_state = state.clone()
+        operation.state_forwards('app', new_state)
+        self.assertEqual(new_state.models['app', 'othermodel'].fields[1][1].remote_field.field_name, 'renamed')
+        self.assertEqual(new_state.models['app', 'othermodel'].fields[1][1].from_fields, ['self'])
+        self.assertEqual(new_state.models['app', 'othermodel'].fields[1][1].to_fields, ('renamed',))
+        self.assertEqual(new_state.models['app', 'othermodel'].fields[2][1].from_fields, ('fk',))
+        self.assertEqual(new_state.models['app', 'othermodel'].fields[2][1].to_fields, ('renamed',))
+        operation = migrations.RenameField('OtherModel', 'fk', 'renamed_fk')
+        new_state = state.clone()
+        operation.state_forwards('app', new_state)
+        self.assertEqual(new_state.models['app', 'othermodel'].fields[1][1].remote_field.field_name, 'renamed')
+        self.assertEqual(new_state.models['app', 'othermodel'].fields[1][1].from_fields, ('self',))
+        self.assertEqual(new_state.models['app', 'othermodel'].fields[1][1].to_fields, ('renamed',))
+        self.assertEqual(new_state.models['app', 'othermodel'].fields[2][1].from_fields, ('renamed_fk',))
+        self.assertEqual(new_state.models['app', 'othermodel'].fields[2][1].to_fields, ('renamed',))
 
     def test_alter_unique_together(self):
         """

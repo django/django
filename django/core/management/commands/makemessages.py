@@ -182,8 +182,9 @@ def write_pot_file(potfile, msgs):
         found, header_read = False, False
         for line in pot_lines:
             if not found and not header_read:
-                found = True
-                line = line.replace('charset=CHARSET', 'charset=UTF-8')
+                if 'charset=CHARSET' in line:
+                    found = True
+                    line = line.replace('charset=CHARSET', 'charset=UTF-8')
             if not line and not found:
                 header_read = True
             lines.append(line)
@@ -207,7 +208,6 @@ class Command(BaseCommand):
     build_file_class = BuildFile
 
     requires_system_checks = False
-    leave_locale_alone = True
 
     msgmerge_options = ['-q', '--previous']
     msguniq_options = ['--to-code=utf-8']
@@ -502,8 +502,7 @@ class Command(BaseCommand):
                         if os.path.abspath(dirpath).startswith(os.path.dirname(path)):
                             locale_dir = path
                             break
-                    if not locale_dir:
-                        locale_dir = self.default_locale_path or NO_LOCALE_DIR
+                    locale_dir = locale_dir or self.default_locale_path or NO_LOCALE_DIR
                     all_files.append(self.translatable_file_class(dirpath, filename, locale_dir))
         return sorted(all_files)
 

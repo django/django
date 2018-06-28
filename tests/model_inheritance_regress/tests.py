@@ -27,18 +27,15 @@ class ModelInheritanceTest(TestCase):
         # 'narrow()' API would require a similar approach.
 
         # Create a child-parent-grandparent chain
-        place1 = Place(
-            name="Guido's House of Pasta",
-            address='944 W. Fullerton')
+        place1 = Place(name="Guido's House of Pasta", address='944 W. Fullerton')
         place1.save_base(raw=True)
         restaurant = Restaurant(
             place_ptr=place1,
             serves_hot_dogs=True,
-            serves_pizza=False)
+            serves_pizza=False,
+        )
         restaurant.save_base(raw=True)
-        italian_restaurant = ItalianRestaurant(
-            restaurant_ptr=restaurant,
-            serves_gnocchi=True)
+        italian_restaurant = ItalianRestaurant(restaurant_ptr=restaurant, serves_gnocchi=True)
         italian_restaurant.save_base(raw=True)
 
         # Create a child-parent chain with an explicit parent link
@@ -142,18 +139,15 @@ class ModelInheritanceTest(TestCase):
         # Regression test for #7276: calling delete() on a model with
         # multi-table inheritance should delete the associated rows from any
         # ancestor tables, as well as any descendent objects.
-        place1 = Place(
-            name="Guido's House of Pasta",
-            address='944 W. Fullerton')
+        place1 = Place(name="Guido's House of Pasta", address='944 W. Fullerton')
         place1.save_base(raw=True)
         restaurant = Restaurant(
             place_ptr=place1,
             serves_hot_dogs=True,
-            serves_pizza=False)
+            serves_pizza=False,
+        )
         restaurant.save_base(raw=True)
-        italian_restaurant = ItalianRestaurant(
-            restaurant_ptr=restaurant,
-            serves_gnocchi=True)
+        italian_restaurant = ItalianRestaurant(restaurant_ptr=restaurant, serves_gnocchi=True)
         italian_restaurant.save_base(raw=True)
 
         ident = ItalianRestaurant.objects.all()[0].id
@@ -162,7 +156,8 @@ class ModelInheritanceTest(TestCase):
             name='a',
             address='xx',
             serves_hot_dogs=True,
-            serves_pizza=False)
+            serves_pizza=False,
+        )
 
         # This should delete both Restaurants, plus the related places, plus
         # the ItalianRestaurant.
@@ -270,18 +265,18 @@ class ModelInheritanceTest(TestCase):
         article = ArticleWithAuthor.objects.create(
             author="fred",
             headline="Hey there!",
-            pub_date=datetime.datetime(2009, 3, 1, 8, 0, 0))
-        update = ArticleWithAuthor.objects.filter(
-            author="fred").update(headline="Oh, no!")
+            pub_date=datetime.datetime(2009, 3, 1, 8, 0, 0),
+        )
+        update = ArticleWithAuthor.objects.filter(author='fred').update(headline='Oh, no!')
         self.assertEqual(update, 1)
-        update = ArticleWithAuthor.objects.filter(
-            pk=article.pk).update(headline="Oh, no!")
+        update = ArticleWithAuthor.objects.filter(pk=article.pk).update(headline='Oh, no!')
         self.assertEqual(update, 1)
 
         derivedm1 = DerivedM.objects.create(
             customPK=44,
             base_name="b1",
-            derived_name="d1")
+            derived_name='d1',
+        )
         self.assertEqual(derivedm1.customPK, 44)
         self.assertEqual(derivedm1.base_name, 'b1')
         self.assertEqual(derivedm1.derived_name, 'd1')
@@ -320,7 +315,8 @@ class ModelInheritanceTest(TestCase):
             headline="Problems in Django",
             pub_date=datetime.datetime.now(),
             quality=10,
-            assignee="adrian")
+            assignee='adrian',
+        )
 
     def test_abstract_base_class_m2m_relation_inheritance(self):
         # many-to-many relations defined on an abstract base class are
@@ -330,8 +326,7 @@ class ModelInheritanceTest(TestCase):
         p3 = Person.objects.create(name='Carol')
         p4 = Person.objects.create(name='Dave')
 
-        birthday = BirthdayParty.objects.create(
-            name='Birthday party for Alice')
+        birthday = BirthdayParty.objects.create(name='Birthday party for Alice')
         birthday.attendees.set([p1, p3])
 
         bachelor = BachelorParty.objects.create(name='Bachelor party for Bob')
@@ -351,8 +346,7 @@ class ModelInheritanceTest(TestCase):
         self.assertFalse(hasattr(p2, 'messybachelorparty_set'))
 
         # ... but it does inherit the m2m from its parent
-        messy = MessyBachelorParty.objects.create(
-            name='Bachelor party for Dave')
+        messy = MessyBachelorParty.objects.create(name='Bachelor party for Dave')
         messy.attendees.set([p4])
         messy_parent = messy.bachelorparty_ptr
 

@@ -456,7 +456,7 @@ class Post(models.Model):
         default=datetime.date.today,
         help_text="Some help text for the date (with unicode ŠĐĆŽćžšđ)"
     )
-    public = models.NullBooleanField()
+    public = models.BooleanField(null=True, blank=True)
 
     def awesomeness_level(self):
         return "Very awesome."
@@ -582,6 +582,14 @@ class ReadablePizza(Pizza):
         proxy = True
 
 
+# No default permissions are created for this model and both name and toppings
+# are readonly for this model's admin.
+class ReadOnlyPizza(Pizza):
+    class Meta:
+        proxy = True
+        default_permissions = ()
+
+
 class Album(models.Model):
     owner = models.ForeignKey(User, models.SET_NULL, null=True, blank=True)
     title = models.CharField(max_length=30)
@@ -684,7 +692,7 @@ class OtherStory(models.Model):
 class ComplexSortedPerson(models.Model):
     name = models.CharField(max_length=100)
     age = models.PositiveIntegerField()
-    is_employee = models.NullBooleanField()
+    is_employee = models.BooleanField(null=True)
 
 
 class PluggableSearchPerson(models.Model):

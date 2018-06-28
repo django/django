@@ -2,19 +2,19 @@
 #
 # Translators:
 # Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2012-2013
-# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2013-2017
+# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2013-2018
 # batisteo <bapdarth@yahoo·fr>, 2011
 # Dinu Gherman <gherman@darwin.in-berlin.de>, 2011
 # kristjan <kristjan.schmidt@googlemail.com>, 2011
-# Nikolay Korotkiy <sikmir@gmail.com>, 2017
+# Nikolay Korotkiy <sikmir@gmail.com>, 2017-2018
 # Adamo Mesha <adam.raizen@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:13+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-12-01 21:10+0100\n"
+"PO-Revision-Date: 2018-02-27 21:45+0000\n"
+"Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
 "Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
 "eo/)\n"
 "MIME-Version: 1.0\n"
@@ -163,6 +163,9 @@ msgstr "Japana"
 
 msgid "Georgian"
 msgstr "Kartvela"
+
+msgid "Kabyle"
+msgstr "Kabila"
 
 msgid "Kazakh"
 msgstr "Kazaĥa"
@@ -415,7 +418,7 @@ msgstr ""
 "estas: '%(allowed_extensions)s'."
 
 msgid "Null characters are not allowed."
-msgstr ""
+msgstr "Nulsignoj ne estas permesitaj."
 
 msgid "and"
 msgstr "kaj"
@@ -758,7 +761,7 @@ msgstr "Elektu validan elekton. Ĉi tiu elekto ne estas el la eblaj elektoj."
 
 #, python-format
 msgid "\"%(pk)s\" is not a valid value."
-msgstr ""
+msgstr "\"%(pk)s\" ne estas valida valoro."
 
 #, python-format
 msgid ""
@@ -1230,7 +1233,7 @@ msgid ""
 msgstr ""
 
 msgid "Django Documentation"
-msgstr ""
+msgstr "Djanga dokumentaro"
 
 msgid "Topics, references, &amp; how-to's"
 msgstr ""
@@ -1242,7 +1245,7 @@ msgid "Get started with Django"
 msgstr ""
 
 msgid "Django Community"
-msgstr ""
+msgstr "Djanga komunumo"
 
 msgid "Connect, get help, or contribute"
 msgstr ""

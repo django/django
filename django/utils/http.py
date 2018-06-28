@@ -3,6 +3,7 @@ import calendar
 import datetime
 import re
 import unicodedata
+import warnings
 from binascii import Error as BinasciiError
 from email.utils import formatdate
 from urllib.parse import (
@@ -13,6 +14,7 @@ from urllib.parse import (
 
 from django.core.exceptions import TooManyFieldsSent
 from django.utils.datastructures import MultiValueDict
+from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.encoding import force_bytes
 from django.utils.functional import keep_lazy_text
 
@@ -118,6 +120,11 @@ def cookie_date(epoch_seconds=None):
 
     Output a string in the format 'Wdy, DD-Mon-YYYY HH:MM:SS GMT'.
     """
+    warnings.warn(
+        'cookie_date() is deprecated in favor of http_date(), which follows '
+        'the format of the latest RFC.',
+        RemovedInDjango30Warning, stacklevel=2,
+    )
     rfcdate = formatdate(epoch_seconds)
     return '%s-%s-%s GMT' % (rfcdate[:7], rfcdate[8:11], rfcdate[12:25])
 
@@ -275,7 +282,7 @@ def is_same_domain(host, pattern):
     )
 
 
-def is_safe_url(url, allowed_hosts=None, require_https=False):
+def is_safe_url(url, allowed_hosts, require_https=False):
     """
     Return ``True`` if the url is a safe redirection (i.e. it doesn't point to
     a different host and uses a safe scheme).
@@ -324,7 +331,6 @@ def _urlsplit(url, scheme='', allow_fragments=True):
     Note that we don't break the components up in smaller bits
     (e.g. netloc is a single string) and we don't expand % escapes."""
     url, scheme, _coerce_result = _coerce_args(url, scheme)
-    allow_fragments = bool(allow_fragments)
     netloc = query = fragment = ''
     i = url.find(':')
     if i > 0:

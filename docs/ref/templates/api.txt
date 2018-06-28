@@ -149,12 +149,6 @@ what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
     It's required for preserving APIs that rely on a globally available,
     implicitly configured engine. Any other use is strongly discouraged.
 
-    .. versionchanged:: 2.0
-
-        In older versions, raises
-        :exc:`~django.core.exceptions.ImproperlyConfigured` if multiple
-        engines are configured rather than returning the first engine.
-
 .. method:: Engine.from_string(template_code)
 
     Compiles the given template code and returns a :class:`Template` object.
@@ -908,8 +902,10 @@ loaders that come with Django:
     ``Template`` in memory. The cached ``Template`` instance is returned for
     subsequent requests to load the same template.
 
-    This loader is automatically enabled if :setting:`DEBUG` is ``False`` and
-    :setting:`OPTIONS['loaders'] <TEMPLATES-OPTIONS>` isn't specified.
+    This loader is automatically enabled if :setting:`OPTIONS['loaders']
+    <TEMPLATES-OPTIONS>` isn't specified and :setting:`OPTIONS['debug']
+    <TEMPLATES-OPTIONS>` is ``False`` (the latter option defaults to the value
+    of :setting:`DEBUG`).
 
     You can also enable template caching with some custom template loaders
     using settings like this::
@@ -1036,7 +1032,7 @@ Template origin
 Templates have an ``origin`` containing attributes depending on the source
 they are loaded from.
 
-.. class:: Origin
+.. class:: Origin(name, template_name=None, loader=None)
 
     .. attribute:: name
 
@@ -1054,3 +1050,14 @@ they are loaded from.
 
         If the template is instantiated directly rather than through a
         template loader, this is ``None``.
+
+    .. attribute:: loader
+
+        The template loader instance that constructed this ``Origin``.
+
+        If the template is instantiated directly rather than through a
+        template loader, this is ``None``.
+
+        :class:`django.template.loaders.cached.Loader` requires all of its
+        wrapped loaders to set this attribute, typically by instantiating
+        the ``Origin`` with ``loader=self``.

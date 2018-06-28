@@ -13,7 +13,7 @@
 # Karol <kfuks2@o2.pl>, 2012
 # konryd <inactive+konryd@transifex.com>, 2011
 # konryd <inactive+konryd@transifex.com>, 2011
-# Łukasz Rekucki <lrekucki@gmail.com>, 2011
+# Łukasz Rekucki (lqc) <lrekucki@gmail.com>, 2011
 # m_aciek <maciej.olko@gmail.com>, 2016-2017
 # m_aciek <maciej.olko@gmail.com>, 2015
 # Michał Pasternak <michal.dtz@gmail.com>, 2013
@@ -30,8 +30,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-20 23:18+0000\n"
+"POT-Creation-Date: 2017-12-01 21:10+0100\n"
+"PO-Revision-Date: 2017-12-02 15:59+0000\n"
 "Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -182,6 +182,9 @@ msgstr "japoński"
 
 msgid "Georgian"
 msgstr "gruziński"
+
+msgid "Kabyle"
+msgstr "kabylski"
 
 msgid "Kazakh"
 msgstr "kazachski"

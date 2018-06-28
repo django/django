@@ -8,7 +8,7 @@ class IntegerFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
 
     def test_integerfield_1(self):
         f = IntegerField()
-        self.assertWidgetRendersTo(f, '<input type="number" name="f" id="id_f" required />')
+        self.assertWidgetRendersTo(f, '<input type="number" name="f" id="id_f" required>')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean('')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
@@ -50,7 +50,7 @@ class IntegerFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
 
     def test_integerfield_3(self):
         f = IntegerField(max_value=10)
-        self.assertWidgetRendersTo(f, '<input max="10" type="number" name="f" id="id_f" required />')
+        self.assertWidgetRendersTo(f, '<input max="10" type="number" name="f" id="id_f" required>')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean(None)
         self.assertEqual(1, f.clean(1))
@@ -65,7 +65,7 @@ class IntegerFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
 
     def test_integerfield_4(self):
         f = IntegerField(min_value=10)
-        self.assertWidgetRendersTo(f, '<input id="id_f" type="number" name="f" min="10" required />')
+        self.assertWidgetRendersTo(f, '<input id="id_f" type="number" name="f" min="10" required>')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean(None)
         with self.assertRaisesMessage(ValidationError, "'Ensure this value is greater than or equal to 10.'"):
@@ -79,7 +79,7 @@ class IntegerFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
 
     def test_integerfield_5(self):
         f = IntegerField(min_value=10, max_value=20)
-        self.assertWidgetRendersTo(f, '<input id="id_f" max="20" type="number" name="f" min="10" required />')
+        self.assertWidgetRendersTo(f, '<input id="id_f" max="20" type="number" name="f" min="10" required>')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean(None)
         with self.assertRaisesMessage(ValidationError, "'Ensure this value is greater than or equal to 10.'"):
@@ -100,7 +100,7 @@ class IntegerFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         number input specific attributes.
         """
         f1 = IntegerField(localize=True)
-        self.assertWidgetRendersTo(f1, '<input id="id_f" name="f" type="text" required />')
+        self.assertWidgetRendersTo(f1, '<input id="id_f" name="f" type="text" required>')
 
     def test_integerfield_float(self):
         f = IntegerField()

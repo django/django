@@ -4,7 +4,6 @@ Field classes.
 
 import copy
 import datetime
-import itertools
 import math
 import os
 import re
@@ -21,7 +20,7 @@ from django.forms.boundfield import BoundField
 from django.forms.utils import from_current_timezone, to_current_timezone
 from django.forms.widgets import (
     FILE_INPUT_CONTRADICTION, CheckboxInput, ClearableFileInput, DateInput,
-    DateTimeInput, EmailInput, HiddenInput, MultipleHiddenInput,
+    DateTimeInput, EmailInput, FileInput, HiddenInput, MultipleHiddenInput,
     NullBooleanSelect, NumberInput, Select, SelectMultiple,
     SplitDateTimeWidget, SplitHiddenDateTimeWidget, TextInput, TimeInput,
     URLInput,
@@ -112,7 +111,7 @@ class Field:
         messages.update(error_messages or {})
         self.error_messages = messages
 
-        self.validators = list(itertools.chain(self.default_validators, validators))
+        self.validators = [*self.default_validators, *validators]
 
         super().__init__()
 
@@ -352,7 +351,7 @@ class DecimalField(IntegerField):
         super().validate(value)
         if value in self.empty_values:
             return
-        if not math.isfinite(value):
+        if not value.is_finite():
             raise ValidationError(self.error_messages['invalid'], code='invalid')
 
     def widget_attrs(self, widget):
@@ -361,7 +360,7 @@ class DecimalField(IntegerField):
             if self.decimal_places is not None:
                 # Use exponential notation for small values since they might
                 # be parsed as 0 otherwise. ref #20765
-                step = str(Decimal('1') / 10 ** self.decimal_places).lower()
+                step = str(Decimal(1).scaleb(-self.decimal_places)).lower()
             else:
                 step = 'any'
             attrs.setdefault('step', step)
@@ -592,11 +591,7 @@ class FileField(Field):
         return data
 
     def has_changed(self, initial, data):
-        if self.disabled:
-            return False
-        if data is None:
-            return False
-        return True
+        return not self.disabled and data is not None
 
 
 class ImageField(FileField):
@@ -650,6 +645,12 @@ class ImageField(FileField):
         if hasattr(f, 'seek') and callable(f.seek):
             f.seek(0)
         return f
+
+    def widget_attrs(self, widget):
+        attrs = super().widget_attrs(widget)
+        if isinstance(widget, FileInput) and 'accept' not in widget.attrs:
+            attrs.setdefault('accept', 'image/*')
+        return attrs
 
 
 class URLField(CharField):
@@ -975,6 +976,8 @@ class MultiValueField(Field):
         for f in fields:
             f.error_messages.setdefault('incomplete',
                                         self.error_messages['incomplete'])
+            if self.disabled:
+                f.disabled = True
             if self.require_all_fields:
                 # Set 'required' to False on the individual fields, because the
                 # required validation will be handled by MultiValueField, not
@@ -1001,6 +1004,8 @@ class MultiValueField(Field):
         """
         clean_data = []
         errors = []
+        if self.disabled and not isinstance(value, list):
+            value = self.widget.decompress(value)
         if not value or isinstance(value, (list, tuple)):
             if not value or not [v for v in value if v not in self.empty_values]:
                 if self.required:

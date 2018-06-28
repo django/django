@@ -275,14 +275,6 @@ more efficiently - faster, and using fewer system resources.
 
 * :doc:`Performance and optimization overview <topics/performance>`
 
-Python compatibility
-====================
-
-Django aims to be compatible with multiple different flavors and versions of
-Python:
-
-* :doc:`Jython support <howto/jython>`
-
 Geographic framework
 ====================
 

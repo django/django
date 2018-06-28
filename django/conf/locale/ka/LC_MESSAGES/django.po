@@ -2,15 +2,16 @@
 #
 # Translators:
 # André Bouatchidzé <a@anbz.net>, 2013-2015
-# avsd05 <avsd05@gmail.com>, 2011
+# David A. <avsd05@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Tornike Beradze <beradze@europe.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:13+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-12-01 21:10+0100\n"
+"PO-Revision-Date: 2018-02-07 12:13+0000\n"
+"Last-Translator: Tornike Beradze <beradze@europe.com>\n"
 "Language-Team: Georgian (http://www.transifex.com/django/django/language/"
 "ka/)\n"
 "MIME-Version: 1.0\n"
@@ -86,7 +87,7 @@ msgid "Argentinian Spanish"
 msgstr "არგენტინის ესპანური"
 
 msgid "Colombian Spanish"
-msgstr ""
+msgstr "კოლუმბიური ესპანური"
 
 msgid "Mexican Spanish"
 msgstr "მექსიკური ესპანური"
@@ -159,6 +160,9 @@ msgstr "იაპონური"
 
 msgid "Georgian"
 msgstr "ქართული"
+
+msgid "Kabyle"
+msgstr ""
 
 msgid "Kazakh"
 msgstr "ყაზახური"
@@ -633,7 +637,7 @@ msgid "Enter a valid date/time."
 msgstr "შეიყვანეთ სწორი თარიღი და დრო."
 
 msgid "Enter a valid duration."
-msgstr ""
+msgstr "შეიყვანეთ სწორი დროის პერიოდი."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""

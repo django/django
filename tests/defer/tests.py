@@ -233,8 +233,7 @@ class TestDefer2(AssertionMixin, TestCase):
         fetched parent model PK if it happens to be available.
         """
         s1 = Secondary.objects.create(first="x1", second="y1")
-        bc = BigChild.objects.create(name="b1", value="foo", related=s1,
-                                     other="bar")
+        bc = BigChild.objects.create(name='b1', value='foo', related=s1, other='bar')
         bc_deferred = BigChild.objects.only('name').get(pk=bc.pk)
         with self.assertNumQueries(0):
             bc_deferred.id

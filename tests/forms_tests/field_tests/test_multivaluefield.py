@@ -62,6 +62,21 @@ class MultiValueFieldTest(SimpleTestCase):
             'some text,JP,2007-04-25 06:24:00',
         )
 
+    def test_clean_disabled_multivalue(self):
+        class ComplexFieldForm(Form):
+            f = ComplexField(disabled=True, widget=ComplexMultiWidget)
+
+        inputs = (
+            'some text,JP,2007-04-25 06:24:00',
+            ['some text', ['J', 'P'], ['2007-04-25', '6:24:00']],
+        )
+        for data in inputs:
+            with self.subTest(data=data):
+                form = ComplexFieldForm({}, initial={'f': data})
+                form.full_clean()
+                self.assertEqual(form.errors, {})
+                self.assertEqual(form.cleaned_data, {'f': inputs[0]})
+
     def test_bad_choice(self):
         msg = "'Select a valid choice. X is not one of the available choices.'"
         with self.assertRaisesMessage(ValidationError, msg):
@@ -113,15 +128,15 @@ class MultiValueFieldTest(SimpleTestCase):
             form.as_table(),
             """
             <tr><th><label for="id_field1_0">Field1:</label></th>
-            <td><input type="text" name="field1_0" id="id_field1_0" required />
-            <select multiple="multiple" name="field1_1" id="id_field1_1" required>
+            <td><input type="text" name="field1_0" id="id_field1_0" required>
+            <select multiple name="field1_1" id="id_field1_1" required>
             <option value="J">John</option>
             <option value="P">Paul</option>
             <option value="G">George</option>
             <option value="R">Ringo</option>
             </select>
-            <input type="text" name="field1_2_0" id="id_field1_2_0" required />
-            <input type="text" name="field1_2_1" id="id_field1_2_1" required /></td></tr>
+            <input type="text" name="field1_2_0" id="id_field1_2_0" required>
+            <input type="text" name="field1_2_1" id="id_field1_2_1" required></td></tr>
             """,
         )
 
@@ -136,15 +151,15 @@ class MultiValueFieldTest(SimpleTestCase):
             form.as_table(),
             """
             <tr><th><label for="id_field1_0">Field1:</label></th>
-            <td><input type="text" name="field1_0" value="some text" id="id_field1_0" required />
-            <select multiple="multiple" name="field1_1" id="id_field1_1" required>
+            <td><input type="text" name="field1_0" value="some text" id="id_field1_0" required>
+            <select multiple name="field1_1" id="id_field1_1" required>
             <option value="J" selected>John</option>
             <option value="P" selected>Paul</option>
             <option value="G">George</option>
             <option value="R">Ringo</option>
             </select>
-            <input type="text" name="field1_2_0" value="2007-04-25" id="id_field1_2_0" required />
-            <input type="text" name="field1_2_1" value="06:24:00" id="id_field1_2_1" required /></td></tr>
+            <input type="text" name="field1_2_0" value="2007-04-25" id="id_field1_2_0" required>
+            <input type="text" name="field1_2_1" value="06:24:00" id="id_field1_2_1" required></td></tr>
             """,
         )
 

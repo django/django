@@ -2,6 +2,7 @@
 #
 # Translators:
 # BJ Jang <qgis.tr.kr@gmail.com>, 2014
+# 준구 강 <chr0m3.kr@gmail.com>, 2017
 # Jiyoon, Ha <cryptography@konkuk.ac.kr>, 2016
 # lqez <ez.amiryo@gmail.com>, 2017
 # hoseung2 <ghyutjik123@gmail.com>, 2017
@@ -10,7 +11,7 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Le Tartuffe <magno79@gmail.com>, 2014,2016
 # JuneHyeon Bae <devunt@gmail.com>, 2014
-# Chr0m3 <chr0m3.kr@gmail.com>, 2015
+# 준구 강 <chr0m3.kr@gmail.com>, 2015
 # Kagami Sascha Rosylight <saschanaz@outlook.com>, 2017
 # Subin Choi <os1742@gmail.com>, 2016
 # Taesik Yoon <xotlr43@gmail.com>, 2015
@@ -18,9 +19,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 03:53+0000\n"
-"Last-Translator: lqez <ez.amiryo@gmail.com>\n"
+"POT-Creation-Date: 2017-12-01 21:10+0100\n"
+"PO-Revision-Date: 2017-12-11 14:17+0000\n"
+"Last-Translator: 준구 강 <chr0m3.kr@gmail.com>\n"
 "Language-Team: Korean (http://www.transifex.com/django/django/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -168,6 +169,9 @@ msgstr "일본어"
 
 msgid "Georgian"
 msgstr "조지아어"
+
+msgid "Kabyle"
+msgstr "커바일어"
 
 msgid "Kazakh"
 msgstr "카자흐어"
@@ -1188,7 +1192,7 @@ msgid "Index of %(directory)s"
 msgstr "Index of %(directory)s"
 
 msgid "Django: the Web framework for perfectionists with deadlines."
-msgstr ""
+msgstr "Django: 마감에 쫓기는 완벽주의자를 위한 웹 프레임워크"
 
 #, python-format
 msgid ""
@@ -1216,10 +1220,10 @@ msgid "Django Documentation"
 msgstr "Django 문서"
 
 msgid "Topics, references, &amp; how-to's"
-msgstr ""
+msgstr "주제, 레퍼런스, &amp; 입문참조하다"
 
 msgid "Tutorial: A Polling App"
-msgstr ""
+msgstr "튜토리얼: 폴링 애플리케이션"
 
 msgid "Get started with Django"
 msgstr "Django와 함께 시작하기"
@@ -1228,4 +1232,4 @@ msgid "Django Community"
 msgstr "Django 커뮤니티"
 
 msgid "Connect, get help, or contribute"
-msgstr ""
+msgstr "연결하고, 도움을 받거나 기여하기"

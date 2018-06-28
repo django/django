@@ -769,6 +769,11 @@ class AggregationTests(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             Author.objects.annotate(friends=Count('friends'))
 
+    def test_fk_attname_conflict(self):
+        msg = "The annotation 'contact_id' conflicts with a field on the model."
+        with self.assertRaisesMessage(ValueError, msg):
+            Book.objects.annotate(contact_id=F('publisher_id'))
+
     def test_values_queryset_non_conflict(self):
         # Regression for #14707 -- If you're using a values query set, some potential conflicts are avoided.
 
@@ -1474,6 +1479,11 @@ class AggregationTests(TestCase):
         vals1 = Book.objects.values('rating', 'price').distinct().aggregate(result=Sum('rating'))
         vals2 = Book.objects.aggregate(result=Sum('rating') - Value(4.0))
         self.assertEqual(vals1, vals2)
+
+    def test_annotate_values_list_flat(self):
+        """Find ages that are shared by at least two authors."""
+        qs = Author.objects.values_list('age', flat=True).annotate(age_count=Count('age')).filter(age_count__gt=1)
+        self.assertSequenceEqual(qs, [29])
 
 
 class JoinPromotionTests(TestCase):

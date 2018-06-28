@@ -1,0 +1,16 @@
+============================
+Django 1.11.14 release notes
+============================
+
+*Expected July 2, 2018*
+
+Django 1.11.14 fixes several bugs in 1.11.13.
+
+Bugfixes
+========
+
+* Fixed ``WKBWriter.write()`` and ``write_hex()`` for empty polygons on
+  GEOS 3.6.1+ (:ticket:`29460`).
+
+* Fixed a regression in Django 1.10 that could result in large memory usage
+  when making edits using ``ModelAdmin.list_editable`` (:ticket:`28462`).

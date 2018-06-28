@@ -19,7 +19,7 @@ __all__ = ['ArrayField']
 class ArrayField(CheckFieldDefaultMixin, Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'item_invalid': _('Item %(nth)s in the array did not validate: '),
+        'item_invalid': _('Item %(nth)s in the array did not validate:'),
         'nested_array_mismatch': _('Nested arrays must have the same length.'),
     }
     _default_hint = ('list', '[]')
@@ -160,7 +160,7 @@ class ArrayField(CheckFieldDefaultMixin, Field):
                     error,
                     prefix=self.error_messages['item_invalid'],
                     code='item_invalid',
-                    params={'nth': index},
+                    params={'nth': index + 1},
                 )
         if isinstance(self.base_field, ArrayField):
             if len({len(i) for i in value}) > 1:
@@ -179,17 +179,16 @@ class ArrayField(CheckFieldDefaultMixin, Field):
                     error,
                     prefix=self.error_messages['item_invalid'],
                     code='item_invalid',
-                    params={'nth': index},
+                    params={'nth': index + 1},
                 )
 
     def formfield(self, **kwargs):
-        defaults = {
+        return super().formfield(**{
             'form_class': SimpleArrayField,
             'base_field': self.base_field.formfield(),
             'max_length': self.size,
-        }
-        defaults.update(kwargs)
-        return super().formfield(**defaults)
+            **kwargs,
+        })
 
 
 @ArrayField.register_lookup

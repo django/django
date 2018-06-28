@@ -356,7 +356,8 @@ class ParallelTestSuite(unittest.TestSuite):
         pool = multiprocessing.Pool(
             processes=self.processes,
             initializer=self.init_worker.__func__,
-            initargs=[counter])
+            initargs=[counter],
+        )
         args = [
             (self.runner_class, index, subsuite, self.failfast)
             for index, subsuite in enumerate(self.subsuites)
@@ -522,6 +523,11 @@ class DiscoverRunner:
             suite.addTest(test)
 
         if self.tags or self.exclude_tags:
+            if self.verbosity >= 2:
+                if self.tags:
+                    print('Including test tag(s): %s.' % ', '.join(sorted(self.tags)))
+                if self.exclude_tags:
+                    print('Excluding test tag(s): %s.' % ', '.join(sorted(self.exclude_tags)))
             suite = filter_tests_by_tags(suite, self.tags, self.exclude_tags)
         suite = reorder_suite(suite, self.reorder_by, self.reverse)
 
@@ -531,8 +537,7 @@ class DiscoverRunner:
             # Since tests are distributed across processes on a per-TestCase
             # basis, there's no need for more processes than TestCases.
             parallel_units = len(parallel_suite.subsuites)
-            if self.parallel > parallel_units:
-                self.parallel = parallel_units
+            self.parallel = min(self.parallel, parallel_units)
 
             # If there's only one TestCase, parallelization isn't needed.
             if self.parallel > 1:

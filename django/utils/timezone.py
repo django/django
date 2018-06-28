@@ -2,9 +2,10 @@
 Timezone-related classes and functions.
 """
 
+import datetime
 import functools
 from contextlib import ContextDecorator
-from datetime import datetime, timedelta, tzinfo
+from datetime import timedelta, tzinfo
 from threading import local
 
 import pytz
@@ -52,7 +53,8 @@ class FixedOffset(tzinfo):
 
 
 # UTC time zone as a tzinfo instance.
-utc = pytz.utc
+# (Use utc = datetime.timezone.utc here when PY35 isn't supported.)
+utc = datetime.timezone(ZERO, 'UTC')
 
 
 def get_fixed_timezone(offset):
@@ -98,12 +100,7 @@ def get_current_timezone_name():
 
 def _get_timezone_name(timezone):
     """Return the name of ``timezone``."""
-    try:
-        # for pytz timezones
-        return timezone.zone
-    except AttributeError:
-        # for regular tzinfo objects
-        return timezone.tzname(None)
+    return timezone.tzname(None)
 
 # Timezone selection functions.
 
@@ -177,7 +174,7 @@ def template_localtime(value, use_tz=None):
     This function is designed for use by the template engine.
     """
     should_convert = (
-        isinstance(value, datetime) and
+        isinstance(value, datetime.datetime) and
         (settings.USE_TZ if use_tz is None else use_tz) and
         not is_naive(value) and
         getattr(value, 'convert_to_local_time', True)
@@ -224,11 +221,7 @@ def now():
     """
     Return an aware or naive datetime.datetime, depending on settings.USE_TZ.
     """
-    if settings.USE_TZ:
-        # timeit shows that datetime.now(tz=utc) is 24% slower
-        return datetime.utcnow().replace(tzinfo=utc)
-    else:
-        return datetime.now()
+    return datetime.datetime.now(utc if settings.USE_TZ else None)
 
 
 # By design, these four functions don't perform any checks on their arguments.

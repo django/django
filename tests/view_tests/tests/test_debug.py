@@ -14,9 +14,8 @@ from django.db import DatabaseError, connection
 from django.shortcuts import render
 from django.template import TemplateDoesNotExist
 from django.test import RequestFactory, SimpleTestCase, override_settings
-from django.test.utils import LoggingCaptureMixin, patch_logger
+from django.test.utils import LoggingCaptureMixin
 from django.urls import reverse
-from django.utils.encoding import force_bytes
 from django.utils.functional import SimpleLazyObject
 from django.utils.safestring import mark_safe
 from django.utils.version import PY36
@@ -58,22 +57,25 @@ class CallableSettingWrapperTests(SimpleTestCase):
 
 
 @override_settings(DEBUG=True, ROOT_URLCONF='view_tests.urls')
-class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
+class DebugViewTests(SimpleTestCase):
 
     def test_files(self):
-        response = self.client.get('/raises/')
+        with self.assertLogs('django.request', 'ERROR'):
+            response = self.client.get('/raises/')
         self.assertEqual(response.status_code, 500)
 
         data = {
             'file_data.txt': SimpleUploadedFile('file_data.txt', b'haha'),
         }
-        response = self.client.post('/raises/', data)
+        with self.assertLogs('django.request', 'ERROR'):
+            response = self.client.post('/raises/', data)
         self.assertContains(response, 'file_data.txt', status_code=500)
         self.assertNotContains(response, 'haha', status_code=500)
 
     def test_400(self):
         # When DEBUG=True, technical_500_template() is called.
-        response = self.client.get('/raises400/')
+        with self.assertLogs('django.security', 'WARNING'):
+            response = self.client.get('/raises400/')
         self.assertContains(response, '<div class="context" id="', status_code=400)
 
     # Ensure no 403.html template exists to test the default case.
@@ -140,7 +142,8 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
         Numeric IDs and fancy traceback context blocks line numbers shouldn't be localized.
         """
         with self.settings(DEBUG=True, USE_L10N=True):
-            response = self.client.get('/raises500/')
+            with self.assertLogs('django.request', 'ERROR'):
+                response = self.client.get('/raises500/')
             # We look for a HTML fragment of the form
             # '<div class="context" id="c38123208">', not '<div class="context" id="c38,123,208"'
             self.assertContains(response, '<div class="context" id="', status_code=500)
@@ -153,15 +156,16 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
             )
 
     def test_template_exceptions(self):
-        try:
-            self.client.get(reverse('template_exception'))
-        except Exception:
-            raising_loc = inspect.trace()[-1][-2][0].strip()
-            self.assertNotEqual(
-                raising_loc.find("raise Exception('boom')"), -1,
-                "Failed to find 'raise Exception' in last frame of "
-                "traceback, instead found: %s" % raising_loc
-            )
+        with self.assertLogs('django.request', 'ERROR'):
+            try:
+                self.client.get(reverse('template_exception'))
+            except Exception:
+                raising_loc = inspect.trace()[-1][-2][0].strip()
+                self.assertNotEqual(
+                    raising_loc.find("raise Exception('boom')"), -1,
+                    "Failed to find 'raise Exception' in last frame of "
+                    "traceback, instead found: %s" % raising_loc
+                )
 
     def test_template_loader_postmortem(self):
         """Tests for not existing file"""
@@ -172,7 +176,7 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
             with override_settings(TEMPLATES=[{
                 'BACKEND': 'django.template.backends.django.DjangoTemplates',
                 'DIRS': [tempdir],
-            }]):
+            }]), self.assertLogs('django.request', 'ERROR'):
                 response = self.client.get(reverse('raises_template_does_not_exist', kwargs={"path": template_name}))
             self.assertContains(response, "%s (Source does not exist)" % template_path, status_code=500, count=2)
             # Assert as HTML.
@@ -188,8 +192,9 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
         """
         Make sure if you don't specify a template, the debug view doesn't blow up.
         """
-        with self.assertRaises(TemplateDoesNotExist):
-            self.client.get('/render_no_template/')
+        with self.assertLogs('django.request', 'ERROR'):
+            with self.assertRaises(TemplateDoesNotExist):
+                self.client.get('/render_no_template/')
 
     @override_settings(ROOT_URLCONF='view_tests.default_urls')
     def test_default_urlconf_template(self):
@@ -254,9 +259,9 @@ class NonDjangoTemplatesDebugViewTests(SimpleTestCase):
 
     def test_400(self):
         # When DEBUG=True, technical_500_template() is called.
-        with patch_logger('django.security.SuspiciousOperation', 'error'):
+        with self.assertLogs('django.security', 'WARNING'):
             response = self.client.get('/raises400/')
-            self.assertContains(response, '<div class="context" id="', status_code=400)
+        self.assertContains(response, '<div class="context" id="', status_code=400)
 
     def test_403(self):
         response = self.client.get('/raises403/')
@@ -269,7 +274,8 @@ class NonDjangoTemplatesDebugViewTests(SimpleTestCase):
     def test_template_not_found_error(self):
         # Raises a TemplateDoesNotExist exception and shows the debug view.
         url = reverse('raises_template_does_not_exist', kwargs={"path": "notfound.html"})
-        response = self.client.get(url)
+        with self.assertLogs('django.request', 'ERROR'):
+            response = self.client.get(url)
         self.assertContains(response, '<div class="context" id="', status_code=500)
 
 
@@ -325,7 +331,7 @@ class ExceptionReporterTests(SimpleTestCase):
 
         for newline in ['\n', '\r\n', '\r']:
             fd, filename = tempfile.mkstemp(text=False)
-            os.write(fd, force_bytes(newline.join(LINES) + newline))
+            os.write(fd, (newline.join(LINES) + newline).encode())
             os.close(fd)
 
             try:
@@ -769,7 +775,7 @@ class ExceptionReportTestMixin:
             self.assertContains(response, 'sauce', status_code=500)
             self.assertNotContains(response, 'worcestershire', status_code=500)
         if check_for_POST_params:
-            for k, v in self.breakfast_data.items():
+            for k in self.breakfast_data:
                 # All POST parameters' names are shown.
                 self.assertContains(response, k, status_code=500)
             # Non-sensitive POST parameters' values are shown.
@@ -858,7 +864,7 @@ class ExceptionReportTestMixin:
             self.assertNotIn('worcestershire', body_html)
 
             if check_for_POST_params:
-                for k, v in self.breakfast_data.items():
+                for k in self.breakfast_data:
                     # All POST parameters' names are shown.
                     self.assertIn(k, body_plain)
                 # Non-sensitive POST parameters' values are shown.

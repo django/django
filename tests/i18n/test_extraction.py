@@ -1,6 +1,7 @@
 import os
 import re
 import shutil
+import tempfile
 import time
 import warnings
 from io import StringIO
@@ -12,7 +13,7 @@ from django.core import management
 from django.core.management import execute_from_command_line
 from django.core.management.base import CommandError
 from django.core.management.commands.makemessages import (
-    Command as MakeMessagesCommand,
+    Command as MakeMessagesCommand, write_pot_file,
 )
 from django.core.management.utils import find_command
 from django.test import SimpleTestCase, override_settings
@@ -193,10 +194,6 @@ class BasicExtractorTests(ExtractorTests):
         # #21406 -- Should adjust for eaten line numbers
         self.assertMsgId("Get my line number", po_contents)
         self.assertLocationCommentPresent(self.PO_FILE, 'Get my line number', 'templates', 'test.html')
-
-    def test_force_en_us_locale(self):
-        """Value of locale-munging option used by the command is the right one"""
-        self.assertTrue(MakeMessagesCommand.leave_locale_alone)
 
     def test_extraction_error(self):
         msg = (
@@ -397,6 +394,26 @@ class BasicExtractorTests(ExtractorTests):
         with open(BR_PO_BASE + '.po', 'r', encoding='utf-8') as fp:
             po_contents = fp.read()
             self.assertMsgStr("Größe", po_contents)
+
+    def test_pot_charset_header_is_utf8(self):
+        """Content-Type: ... charset=CHARSET is replaced with charset=UTF-8"""
+        msgs = (
+            '# SOME DESCRIPTIVE TITLE.\n'
+            '# (some lines truncated as they are not relevant)\n'
+            '"Content-Type: text/plain; charset=CHARSET\\n"\n'
+            '"Content-Transfer-Encoding: 8bit\\n"\n'
+            '\n'
+            '#: somefile.py:8\n'
+            'msgid "mañana; charset=CHARSET"\n'
+            'msgstr ""\n'
+        )
+        with tempfile.NamedTemporaryFile() as pot_file:
+            pot_filename = pot_file.name
+        write_pot_file(pot_filename, msgs)
+        with open(pot_filename, 'r', encoding='utf-8') as fp:
+            pot_contents = fp.read()
+            self.assertIn('Content-Type: text/plain; charset=UTF-8', pot_contents)
+            self.assertIn('mañana; charset=CHARSET', pot_contents)
 
 
 class JavascriptExtractorTests(ExtractorTests):
@@ -629,13 +646,11 @@ class KeepPotFileExtractorTests(ExtractorTests):
         self.assertFalse(os.path.exists(self.POT_FILE))
 
     def test_keep_pot_explicitly_disabled(self):
-        management.call_command('makemessages', locale=[LOCALE], verbosity=0,
-                                keep_pot=False)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0, keep_pot=False)
         self.assertFalse(os.path.exists(self.POT_FILE))
 
     def test_keep_pot_enabled(self):
-        management.call_command('makemessages', locale=[LOCALE], verbosity=0,
-                                keep_pot=True)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0, keep_pot=True)
         self.assertTrue(os.path.exists(self.POT_FILE))
 
 
