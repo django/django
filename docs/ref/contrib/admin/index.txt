@@ -864,8 +864,9 @@ subclass::
     should be of one of the following types:
 
     * a field name, where the specified field should be either a
-      ``BooleanField``, ``CharField``, ``DateField``, ``DateTimeField``,
-      ``IntegerField``, ``ForeignKey`` or ``ManyToManyField``, for example::
+      ``BooleanField``, ``CharField``, ``TextField``, ``DateField``,
+      ``DateTimeField``, ``IntegerField``, ``ForeignKey`` or
+      ``ManyToManyField``, for example::
 
           class PersonAdmin(admin.ModelAdmin):
               list_filter = ('is_staff', 'company')
