@@ -336,7 +336,11 @@ class FileSystemStorage(Storage):
         If timezone support is enabled, make an aware datetime object in UTC;
         otherwise make a naive one in the local timezone.
         """
-        return datetime.fromtimestamp(ts, timezone.utc if settings.USE_TZ else None)
+        if settings.USE_TZ:
+            # Safe to use .replace() because UTC doesn't have DST
+            return datetime.utcfromtimestamp(ts).replace(tzinfo=timezone.utc)
+        else:
+            return datetime.fromtimestamp(ts)
 
     def get_accessed_time(self, name):
         return self._datetime_from_timestamp(os.path.getatime(self.path(name)))
