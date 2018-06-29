@@ -504,8 +504,8 @@ class AdminSite:
 
         return TemplateResponse(request, self.index_template or 'admin/index.html', context)
 
-    def app_index(self, request, app_url, extra_context=None):
-        app_label = self._app_label_url_map[app_url]
+    def app_index(self, request, app_label, extra_context=None):
+        app_label = self._app_label_url_map[app_label]
         app_dict = self._build_app_dict(request, app_label)
         if not app_dict:
             raise Http404('The requested admin page does not exist.')
