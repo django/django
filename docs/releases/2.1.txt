@@ -126,6 +126,12 @@ CSRF
 * Added the :setting:`CSRF_COOKIE_SAMESITE` setting to set the ``SameSite``
   cookie flag on CSRF cookies.
 
+Database Backends
+~~~~~~~~~~~~~~~~~
+
+* The Oracle backend client is modified so that the dbshell management command
+  will be called wrapped with rlwrap when rlwrap is available.
+
 Forms
 ~~~~~
 
