@@ -255,7 +255,7 @@ and put the following Python code in it:
 This is the simplest view possible in Django. To call the view, we need to map
 it to a URL - and for this we need a URLconf.
 
-To create a URLconf in the polls directory, create a file called ``urls.py``.
+To create a URLconf in the polls directory, create a file called :file:`urls.py`.
 Your app directory should now look like::
 
     polls/
@@ -269,7 +269,7 @@ Your app directory should now look like::
         urls.py
         views.py
 
-In the ``polls/urls.py`` file include the following code:
+In the :file:`polls/urls.py` file include the following code:
 
 .. snippet::
     :filename: polls/urls.py
@@ -283,7 +283,7 @@ In the ``polls/urls.py`` file include the following code:
     ]
 
 The next step is to point the root URLconf at the ``polls.urls`` module. In
-``mysite/urls.py``, add an import for ``django.urls.include`` and insert an
+:file:`mysite/urls.py`, add an import for ``django.urls.include`` and insert an
 :func:`~django.urls.include` in the ``urlpatterns`` list, so you have:
 
 .. snippet::
@@ -304,8 +304,8 @@ included URLconf for further processing.
 
 The idea behind :func:`~django.urls.include` is to make it easy to
 plug-and-play URLs. Since polls are in their own URLconf
-(``polls/urls.py``), they can be placed under "/polls/", or under
-"/fun_polls/", or under "/content/polls/", or any other path root, and the
+(:file:`polls/urls.py`), they can be placed under :file:`/polls/`, or under
+:file:`/fun_polls/`, or under :file:`/content/polls/`, or any other path root, and the
 app will still work.
 
 .. admonition:: When to use :func:`~django.urls.include()`
