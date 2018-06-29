@@ -1108,6 +1108,8 @@ tests can't rely upon the fact that your views will be available at a
 particular URL. Decorate your test class or test method with
 ``@override_settings(ROOT_URLCONF=...)`` for URLconf configuration.
 
+.. _testing-multi-db:
+
 Multi-database support
 ----------------------
 
