@@ -18,10 +18,11 @@ from django.core.exceptions import (
     TooManyFilesSent,
 )
 from django.core.files.uploadhandler import SkipFile, StopFutureHandlers, StopUpload
-from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import force_str
+from django.utils.datastructures import ImmutableMultiValueDict, MultiValueDict
+from django.utils.encoding import force_str, force_text
 from django.utils.http import parse_header_parameters
 from django.utils.regex_helper import _lazy_re_compile
+from django.utils.text import unescape_entities
 
 __all__ = ("MultiPartParser", "MultiPartParserError", "InputStreamExhausted")
 
@@ -49,8 +50,8 @@ class MultiPartParser:
     """
     An RFC 7578 multipart/form-data parser.
 
-    ``MultiValueDict.parse()`` reads the input stream in ``chunk_size`` chunks
-    and returns a tuple of ``(MultiValueDict(POST), MultiValueDict(FILES))``.
+    ``MultiPartParser.parse()`` reads the input stream in ``chunk_size`` chunks
+    and returns a tuple of ``(QueryDict(POST), ImmutableMultiValueDict(FILES))``.
     """
 
     boundary_re = _lazy_re_compile(r"[ -~]{0,200}[!-~]")
@@ -132,8 +133,8 @@ class MultiPartParser:
 
     def _parse(self):
         """
-        Parse the POST data and break it into a FILES MultiValueDict and a POST
-        MultiValueDict.
+        Parse the POST data and break it into a FILES ImmutableMultiValueDict
+        and a POST QueryDict.
 
         Return a tuple containing the POST and FILES dictionary, respectively.
         """
@@ -145,7 +146,7 @@ class MultiPartParser:
         # HTTP spec says that Content-Length >= 0 is valid
         # handling content-length == 0 before continuing
         if self._content_length == 0:
-            return QueryDict(encoding=self._encoding), MultiValueDict()
+            return QueryDict(encoding=self._encoding), ImmutableMultiValueDict()
 
         # See if any of the handlers take care of the parsing.
         # This allows overriding everything if need be.
@@ -163,7 +164,7 @@ class MultiPartParser:
 
         # Create the data structures to be used later.
         self._post = QueryDict(mutable=True)
-        self._files = MultiValueDict()
+        self._files = ImmutableMultiValueDict(mutable=True)
 
         # Instantiate the parser and stream:
         stream = LazyStream(ChunkIter(self._input_data, self._chunk_size))
@@ -361,7 +362,7 @@ class MultiPartParser:
         # Signal that the upload has completed.
         # any() shortcircuits if a handler's upload_complete() returns a value.
         any(handler.upload_complete() for handler in handlers)
-        self._post._mutable = False
+        self._post._mutable = self._files._mutable = False
         return self._post, self._files
 
     def handle_file_complete(self, old_field_name, counters):
