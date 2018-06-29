@@ -272,7 +272,7 @@ All parameters are optional and can be set at any time prior to calling the
   new connection is created when ``send()`` is called.
 
 * ``attachments``: A list of attachments to put on the message. These can
-  be either ``email.MIMEBase.MIMEBase`` instances, or ``(filename,
+  be either :class:`~email.mime.base.MIMEBase` instances, or ``(filename,
   content, mimetype)`` triples.
 
 * ``headers``: A dictionary of extra headers to put on the message. The
@@ -310,7 +310,7 @@ The class has the following methods:
   recipients will not raise an exception.
 
 * ``message()`` constructs a ``django.core.mail.SafeMIMEText`` object (a
-  subclass of Python's ``email.MIMEText.MIMEText`` class) or a
+  subclass of Python's :class:`~email.mime.text.MIMEText` class) or a
   ``django.core.mail.SafeMIMEMultipart`` object holding the message to be
   sent. If you ever need to extend the
   :class:`~django.core.mail.EmailMessage` class, you'll probably want to
@@ -326,8 +326,8 @@ The class has the following methods:
 * ``attach()`` creates a new file attachment and adds it to the message.
   There are two ways to call ``attach()``:
 
-  * You can pass it a single argument that is an
-    ``email.MIMEBase.MIMEBase`` instance. This will be inserted directly
+  * You can pass it a single argument that is a
+    :class:`~email.mime.base.MIMEBase` instance. This will be inserted directly
     into the resulting message.
 
   * Alternatively, you can pass ``attach()`` three arguments:
