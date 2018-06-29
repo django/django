@@ -25,12 +25,13 @@ class EmptyPage(InvalidPage):
 class Paginator:
 
     def __init__(self, object_list, per_page, orphans=0,
-                 allow_empty_first_page=True):
+                 allow_empty_first_page=True, count_object_list=None):
         self.object_list = object_list
         self._check_object_list_is_ordered()
         self.per_page = int(per_page)
         self.orphans = int(orphans)
         self.allow_empty_first_page = allow_empty_first_page
+        self.count_object_list = count_object_list
 
     def validate_number(self, number):
         """Validate the given 1-based page number."""
@@ -83,13 +84,17 @@ class Paginator:
     @cached_property
     def count(self):
         """Return the total number of objects, across all pages."""
+        object_list = self.object_list
+        if self.count_object_list is not None:
+            object_list = self.count_object_list
+
         try:
-            return self.object_list.count()
+            return object_list.count()
         except (AttributeError, TypeError):
             # AttributeError if object_list has no count() method.
             # TypeError if object_list.count() requires arguments
             # (i.e. is of type list).
-            return len(self.object_list)
+            return len(object_list)
 
     @cached_property
     def num_pages(self):

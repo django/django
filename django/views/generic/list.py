@@ -47,15 +47,26 @@ class MultipleObjectMixin(ContextMixin):
 
         return queryset
 
+    def get_count_queryset(self):
+        """
+        Return the list of items used for count queries of this view
+        or None to use the value returned by get_queryset.
+
+        The return value must be an iterable and may be an instance of
+        `QuerySet` in which case `QuerySet` specific behavior will be enabled.
+        """
+        return None
+
     def get_ordering(self):
         """Return the field or fields to use for ordering the queryset."""
         return self.ordering
 
-    def paginate_queryset(self, queryset, page_size):
+    def paginate_queryset(self, queryset, page_size, count_queryset=None):
         """Paginate the queryset, if needed."""
         paginator = self.get_paginator(
             queryset, page_size, orphans=self.get_paginate_orphans(),
-            allow_empty_first_page=self.get_allow_empty())
+            allow_empty_first_page=self.get_allow_empty(),
+            count_queryset=count_queryset)
         page_kwarg = self.page_kwarg
         page = self.kwargs.get(page_kwarg) or self.request.GET.get(page_kwarg) or 1
         try:
@@ -81,11 +92,12 @@ class MultipleObjectMixin(ContextMixin):
         return self.paginate_by
 
     def get_paginator(self, queryset, per_page, orphans=0,
-                      allow_empty_first_page=True, **kwargs):
+                      allow_empty_first_page=True, count_queryset=None, **kwargs):
         """Return an instance of the paginator for this view."""
         return self.paginator_class(
             queryset, per_page, orphans=orphans,
-            allow_empty_first_page=allow_empty_first_page, **kwargs)
+            allow_empty_first_page=allow_empty_first_page,
+            count_object_list=count_queryset, **kwargs)
 
     def get_paginate_orphans(self):
         """
@@ -110,13 +122,14 @@ class MultipleObjectMixin(ContextMixin):
         else:
             return None
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, *, object_list=None, count_object_list=None, **kwargs):
         """Get the context for this view."""
         queryset = object_list if object_list is not None else self.object_list
         page_size = self.get_paginate_by(queryset)
         context_object_name = self.get_context_object_name(queryset)
         if page_size:
-            paginator, page, queryset, is_paginated = self.paginate_queryset(queryset, page_size)
+            count_queryset = count_object_list if count_object_list else self.count_object_list
+            paginator, page, queryset, is_paginated = self.paginate_queryset(queryset, page_size, count_queryset=count_queryset)
             context = {
                 'paginator': paginator,
                 'page_obj': page,
@@ -140,6 +153,7 @@ class BaseListView(MultipleObjectMixin, View):
     """A base view for displaying a list of objects."""
     def get(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()
+        self.count_object_list = self.get_count_queryset()
         allow_empty = self.get_allow_empty()
 
         if not allow_empty:
