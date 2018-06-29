@@ -213,6 +213,73 @@ class MultiValueDict(dict):
         return {key: self[key] for key in self}
 
 
+class ImmutableMultiValueDict(MultiValueDict):
+    _mutable = False
+
+    def __init__(self, key_to_list_mapping=(), mutable=False):
+        super().__init__(key_to_list_mapping)
+        self._mutable = mutable
+
+    def _assert_mutable(self):
+        if not self._mutable:
+            raise AttributeError(
+                "This ImmutableMultiValueDict instance is immutable"
+            )
+
+    def __setitem__(self, key, value):
+        self._assert_mutable()
+        super().__setitem__(key, value)
+
+    def __delitem__(self, key):
+        self._assert_mutable()
+        super().__delitem__(key)
+
+    def __copy__(self):
+        result = self.__class__(mutable=True)
+        for key, value in self.lists():
+            result.setlist(key, value)
+        return result
+
+    def __deepcopy__(self, memo):
+        result = self.__class__(mutable=True)
+        memo[id(self)] = result
+        for key, value in self.lists():
+            result.setlist(copy.deepcopy(key, memo), copy.deepcopy(value, memo))
+        return result
+
+    def setlist(self, key, list_):
+        self._assert_mutable()
+        super().setlist(key, list_)
+
+    def setlistdefault(self, key, default_list=None):
+        self._assert_mutable()
+        return super().setlistdefault(key, default_list)
+
+    def appendlist(self, key, value):
+        self._assert_mutable()
+        super().appendlist(key, value)
+
+    def pop(self, key, *args):
+        self._assert_mutable()
+        return super().pop(key, *args)
+
+    def popitem(self):
+        self._assert_mutable()
+        return super().popitem()
+
+    def clear(self):
+        self._assert_mutable()
+        super().clear()
+
+    def setdefault(self, key, default=None):
+        self._assert_mutable()
+        return super().setdefault(key, default)
+
+    def copy(self):
+        """Return a mutable copy of this object."""
+        return self.__deepcopy__({})
+
+
 class ImmutableList(tuple):
     """
     A tuple-like object that raises useful errors when it is asked to mutate.

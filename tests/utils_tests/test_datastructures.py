@@ -6,8 +6,8 @@ import copy
 
 from django.test import SimpleTestCase
 from django.utils.datastructures import (
-    DictWrapper, ImmutableList, MultiValueDict, MultiValueDictKeyError,
-    OrderedSet,
+    DictWrapper, ImmutableList, ImmutableMultiValueDict, MultiValueDict,
+    MultiValueDictKeyError, OrderedSet,
 )
 
 
@@ -122,6 +122,71 @@ class MultiValueDictTests(SimpleTestCase):
         x = MultiValueDict({'a': None, 'b': []})
         self.assertIsNone(x.getlist('a'))
         self.assertEqual(x.getlist('b'), [])
+
+
+class ImmutableMultiValueDictTests(SimpleTestCase):
+
+    def test_immutability(self):
+        q = ImmutableMultiValueDict()
+        with self.assertRaises(AttributeError):
+            q.__setitem__('something', 'bar')
+        with self.assertRaises(AttributeError):
+            q.setlist('foo', ['bar'])
+        with self.assertRaises(AttributeError):
+            q.appendlist('foo', ['bar'])
+        with self.assertRaises(AttributeError):
+            q.update({'foo': 'bar'})
+        with self.assertRaises(AttributeError):
+            q.pop('foo')
+        with self.assertRaises(AttributeError):
+            q.popitem()
+        with self.assertRaises(AttributeError):
+            q.clear()
+
+    def test_mutable_copy(self):
+        """A copy of a QueryDict is mutable."""
+        q = ImmutableMultiValueDict().copy()
+        with self.assertRaises(KeyError):
+            q.__getitem__("foo")
+        q['name'] = 'john'
+        self.assertEqual(q['name'], 'john')
+
+    def test_basic_mutable_operations(self):
+        q = ImmutableMultiValueDict(mutable=True)
+        q['name'] = 'john'
+        self.assertEqual(q.get('foo', 'default'), 'default')
+        self.assertEqual(q.get('name', 'default'), 'john')
+        self.assertEqual(q.getlist('name'), ['john'])
+        self.assertEqual(q.getlist('foo'), [])
+
+        q.setlist('foo', ['bar', 'baz'])
+        self.assertEqual(q.get('foo', 'default'), 'baz')
+        self.assertEqual(q.getlist('foo'), ['bar', 'baz'])
+
+        q.appendlist('foo', 'another')
+        self.assertEqual(q.getlist('foo'), ['bar', 'baz', 'another'])
+        self.assertEqual(q['foo'], 'another')
+        self.assertIn('foo', q)
+
+        self.assertCountEqual(q, ['foo', 'name'])
+        self.assertCountEqual(q.items(), [('foo', 'another'), ('name', 'john')])
+        self.assertCountEqual(q.lists(), [('foo', ['bar', 'baz', 'another']), ('name', ['john'])])
+        self.assertCountEqual(q.keys(), ['foo', 'name'])
+        self.assertCountEqual(q.values(), ['another', 'john'])
+
+        q.update({'foo': 'hello'})
+        self.assertEqual(q['foo'], 'hello')
+        self.assertEqual(q.get('foo', 'not available'), 'hello')
+        self.assertEqual(q.getlist('foo'), ['bar', 'baz', 'another', 'hello'])
+        self.assertEqual(q.pop('foo'), ['bar', 'baz', 'another', 'hello'])
+        self.assertEqual(q.pop('foo', 'not there'), 'not there')
+        self.assertEqual(q.get('foo', 'not there'), 'not there')
+        self.assertEqual(q.setdefault('foo', 'bar'), 'bar')
+        self.assertEqual(q['foo'], 'bar')
+        self.assertEqual(q.getlist('foo'), ['bar'])
+
+        q.clear()
+        self.assertEqual(len(q), 0)
 
 
 class ImmutableListTests(SimpleTestCase):
