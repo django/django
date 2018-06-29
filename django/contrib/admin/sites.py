@@ -64,6 +64,7 @@ class AdminSite:
         self.name = name
         self._actions = {'delete_selected': actions.delete_selected}
         self._global_actions = self._actions.copy()
+        self._app_label_url_map = {} # to be able to reverse custom app_label urls
         all_sites.add(self)
 
     def check(self, app_configs):
@@ -265,11 +266,14 @@ class AdminSite:
         # app_index
         valid_app_labels = []
         for model, model_admin in self._registry.items():
+            app_url, model_url = self.get_url_for_app_model(model, model_admin)
+
             urlpatterns += [
-                path('%s/%s/' % (model._meta.app_label, model._meta.model_name), include(model_admin.urls)),
+                path('%s/%s/' % (app_url, model_url), include(model_admin.urls)),
             ]
-            if model._meta.app_label not in valid_app_labels:
-                valid_app_labels.append(model._meta.app_label)
+            if app_url not in valid_app_labels:
+                valid_app_labels.append(app_url)
+                self._app_label_url_map[app_url] = model._meta.app_label
 
         # If there were ModelAdmins registered, we should have a list of app
         # labels for which we need to allow access to the app_index view,
@@ -279,6 +283,9 @@ class AdminSite:
                 re_path(regex, wrap(self.app_index), name='app_list'),
             ]
         return urlpatterns
+
+    def get_url_for_app_model(self, model, model_admin, **kwargs):
+        return model._meta.app_label, model._meta.model_name
 
     @property
     def urls(self):
@@ -498,7 +505,8 @@ class AdminSite:
 
         return TemplateResponse(request, self.index_template or 'admin/index.html', context)
 
-    def app_index(self, request, app_label, extra_context=None):
+    def app_index(self, request, app_url, extra_context=None):
+        app_label = self._app_label_url_map[app_url]
         app_dict = self._build_app_dict(request, app_label)
         if not app_dict:
             raise Http404('The requested admin page does not exist.')
