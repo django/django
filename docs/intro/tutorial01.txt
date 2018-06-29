@@ -56,7 +56,7 @@ code, then run the following command:
 
    $ django-admin startproject mysite
 
-This will create a ``mysite`` directory in your current directory. If it didn't
+This will create a :file:`mysite` directory in your current directory. If it didn't
 work, see :ref:`troubleshooting-django-admin`.
 
 .. note::
