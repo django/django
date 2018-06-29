@@ -240,7 +240,7 @@ This directory structure will house the poll application.
 Write your first view
 =====================
 
-Let's write the first view. Open the file ``polls/views.py``
+Let's write the first view. Open the file :file:`polls/views.py`
 and put the following Python code in it:
 
 .. snippet::
