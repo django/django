@@ -265,9 +265,7 @@ class AdminSite:
         # app_index
         valid_app_labels = []
         for model, model_admin in self._registry.items():
-            urlpatterns += [
-                path('%s/%s/' % (model._meta.app_label, model._meta.model_name), include(model_admin.urls)),
-            ]
+            urlpatterns.extend(self.get_urls_for_model(model, model_admin))
             if model._meta.app_label not in valid_app_labels:
                 valid_app_labels.append(model._meta.app_label)
 
@@ -283,6 +281,9 @@ class AdminSite:
     @property
     def urls(self):
         return self.get_urls(), 'admin', self.name
+    
+    def get_urls_for_model(self, model, model_admin):
+        return [path('%s/%s/' % (model._meta.app_label, model._meta.model_name), include(model_admin.urls))]        
 
     def each_context(self, request):
         """
