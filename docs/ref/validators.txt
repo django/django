@@ -233,34 +233,34 @@ to, or in lieu of custom ``field.clean()`` methods.
 ``MaxValueValidator``
 ---------------------
 
-.. class:: MaxValueValidator(max_value, message=None)
+.. class:: MaxValueValidator(limit_value, message=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
-    ``'max_value'`` if ``value`` is greater than ``max_value``.
+    ``'max_value'`` if ``value`` is greater than ``limit_value``.
 
 ``MinValueValidator``
 ---------------------
 
-.. class:: MinValueValidator(min_value, message=None)
+.. class:: MinValueValidator(limit_value, message=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
-    ``'min_value'`` if ``value`` is less than ``min_value``.
+    ``'min_value'`` if ``value`` is less than ``limit_value``.
 
 ``MaxLengthValidator``
 ----------------------
 
-.. class:: MaxLengthValidator(max_length, message=None)
+.. class:: MaxLengthValidator(limit_value, message=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
-    ``'max_length'`` if the length of ``value`` is greater than ``max_length``.
+    ``'max_length'`` if the length of ``value`` is greater than ``limit_value``.
 
 ``MinLengthValidator``
 ----------------------
 
-.. class:: MinLengthValidator(min_length, message=None)
+.. class:: MinLengthValidator(limit_value, message=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
-    ``'min_length'`` if the length of ``value`` is less than ``min_length``.
+    ``'min_length'`` if the length of ``value`` is less than ``limit_value``.
 
 ``DecimalValidator``
 --------------------
