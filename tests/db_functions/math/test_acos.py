@@ -11,6 +11,11 @@ from ..models import DecimalModel, FloatModel, IntegerModel
 
 class ACosTests(TestCase):
 
+    def test_null(self):
+        IntegerModel.objects.create()
+        obj = IntegerModel.objects.annotate(null_acos=ACos('normal')).first()
+        self.assertIsNone(obj.null_acos)
+
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('-0.9'), n2=Decimal('0.6'))
         obj = DecimalModel.objects.annotate(n1_acos=ACos('n1'), n2_acos=ACos('n2')).first()

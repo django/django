@@ -1,3 +1,4 @@
+from django.db import connection
 from django.db.models import CharField, Value
 from django.db.models.functions import Length, LPad, RPad
 from django.test import TestCase
@@ -8,6 +9,7 @@ from ..models import Author
 class PadTests(TestCase):
     def test_pad(self):
         Author.objects.create(name='John', alias='j')
+        none_value = '' if connection.features.interprets_empty_strings_as_nulls else None
         tests = (
             (LPad('name', 7, Value('xy')), 'xyxJohn'),
             (RPad('name', 7, Value('xy')), 'Johnxyx'),
@@ -21,6 +23,10 @@ class PadTests(TestCase):
             (RPad('name', 2), 'Jo'),
             (LPad('name', 0), ''),
             (RPad('name', 0), ''),
+            (LPad('name', None), none_value),
+            (RPad('name', None), none_value),
+            (LPad('goes_by', 1), none_value),
+            (RPad('goes_by', 1), none_value),
         )
         for function, padded_name in tests:
             with self.subTest(function=function):

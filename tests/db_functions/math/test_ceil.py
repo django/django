@@ -11,6 +11,11 @@ from ..models import DecimalModel, FloatModel, IntegerModel
 
 class CeilTests(TestCase):
 
+    def test_null(self):
+        IntegerModel.objects.create()
+        obj = IntegerModel.objects.annotate(null_ceil=Ceil('normal')).first()
+        self.assertIsNone(obj.null_ceil)
+
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('12.9'), n2=Decimal('0.6'))
         obj = DecimalModel.objects.annotate(n1_ceil=Ceil('n1'), n2_ceil=Ceil('n2')).first()

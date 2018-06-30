@@ -3,6 +3,7 @@ SQLite3 backend for the sqlite3 module in the standard library.
 """
 import datetime
 import decimal
+import functools
 import math
 import operator
 import re
@@ -32,6 +33,19 @@ def decoder(conv_func):
     Convert bytestrings from Python's sqlite3 interface to a regular string.
     """
     return lambda s: conv_func(s.decode())
+
+
+def none_guard(func):
+    """
+    Decorator that returns None if any of the arguments to the decorated
+    function are None. Many SQL functions return NULL if any of their arguments
+    are NULL. This decorator simplifies the implementation of this for the
+    custom functions registered below.
+    """
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        return None if None in args else func(*args, **kwargs)
+    return wrapper
 
 
 Database.register_converter("bool", b'1'.__eq__)
@@ -171,30 +185,30 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function("django_time_trunc", 2, _sqlite_time_trunc)
         conn.create_function("django_time_diff", 2, _sqlite_time_diff)
         conn.create_function("django_timestamp_diff", 2, _sqlite_timestamp_diff)
-        conn.create_function("regexp", 2, _sqlite_regexp)
         conn.create_function("django_format_dtdelta", 3, _sqlite_format_dtdelta)
+        conn.create_function('regexp', 2, _sqlite_regexp)
+        conn.create_function('ACOS', 1, none_guard(math.acos))
+        conn.create_function('ASIN', 1, none_guard(math.asin))
+        conn.create_function('ATAN', 1, none_guard(math.atan))
+        conn.create_function('ATAN2', 2, none_guard(math.atan2))
+        conn.create_function('CEILING', 1, none_guard(math.ceil))
+        conn.create_function('COS', 1, none_guard(math.cos))
+        conn.create_function('COT', 1, none_guard(lambda x: 1 / math.tan(x)))
+        conn.create_function('DEGREES', 1, none_guard(math.degrees))
+        conn.create_function('EXP', 1, none_guard(math.exp))
+        conn.create_function('FLOOR', 1, none_guard(math.floor))
+        conn.create_function('LN', 1, none_guard(math.log))
+        conn.create_function('LOG', 2, none_guard(lambda x, y: math.log(y, x)))
         conn.create_function('LPAD', 3, _sqlite_lpad)
-        conn.create_function('REPEAT', 2, operator.mul)
-        conn.create_function('RPAD', 3, _sqlite_rpad)
-        conn.create_function('ACOS', 1, math.acos)
-        conn.create_function('ASIN', 1, math.asin)
-        conn.create_function('ATAN', 1, math.atan)
-        conn.create_function('ATAN2', 2, math.atan2)
-        conn.create_function('CEILING', 1, math.ceil)
-        conn.create_function('COS', 1, math.cos)
-        conn.create_function('COT', 1, lambda x: 1 / math.tan(x))
-        conn.create_function('DEGREES', 1, math.degrees)
-        conn.create_function('EXP', 1, math.exp)
-        conn.create_function('FLOOR', 1, math.floor)
-        conn.create_function('LN', 1, math.log)
-        conn.create_function('LOG', 2, lambda x, y: math.log(y, x))
-        conn.create_function('MOD', 2, math.fmod)
+        conn.create_function('MOD', 2, none_guard(math.fmod))
         conn.create_function('PI', 0, lambda: math.pi)
-        conn.create_function('POWER', 2, operator.pow)
-        conn.create_function('RADIANS', 1, math.radians)
-        conn.create_function('SIN', 1, math.sin)
-        conn.create_function('SQRT', 1, math.sqrt)
-        conn.create_function('TAN', 1, math.tan)
+        conn.create_function('POWER', 2, none_guard(operator.pow))
+        conn.create_function('RADIANS', 1, none_guard(math.radians))
+        conn.create_function('REPEAT', 2, none_guard(operator.mul))
+        conn.create_function('RPAD', 3, _sqlite_rpad)
+        conn.create_function('SIN', 1, none_guard(math.sin))
+        conn.create_function('SQRT', 1, none_guard(math.sqrt))
+        conn.create_function('TAN', 1, none_guard(math.tan))
         conn.execute('PRAGMA foreign_keys = ON')
         return conn
 
@@ -356,6 +370,8 @@ def _sqlite_date_trunc(lookup_type, dt):
 
 
 def _sqlite_time_trunc(lookup_type, dt):
+    if dt is None:
+        return None
     try:
         dt = backend_utils.typecast_time(dt)
     except (ValueError, TypeError):
@@ -432,6 +448,7 @@ def _sqlite_time_extract(lookup_type, dt):
     return getattr(dt, lookup_type)
 
 
+@none_guard
 def _sqlite_format_dtdelta(conn, lhs, rhs):
     """
     LHS and RHS can be either:
@@ -452,6 +469,7 @@ def _sqlite_format_dtdelta(conn, lhs, rhs):
     return str(out)
 
 
+@none_guard
 def _sqlite_time_diff(lhs, rhs):
     left = backend_utils.typecast_time(lhs)
     right = backend_utils.typecast_time(rhs)
@@ -467,21 +485,25 @@ def _sqlite_time_diff(lhs, rhs):
     )
 
 
+@none_guard
 def _sqlite_timestamp_diff(lhs, rhs):
     left = backend_utils.typecast_timestamp(lhs)
     right = backend_utils.typecast_timestamp(rhs)
     return duration_microseconds(left - right)
 
 
+@none_guard
 def _sqlite_regexp(re_pattern, re_string):
-    return bool(re.search(re_pattern, str(re_string))) if re_string is not None else False
+    return bool(re.search(re_pattern, str(re_string)))
 
 
+@none_guard
 def _sqlite_lpad(text, length, fill_text):
     if len(text) >= length:
         return text[:length]
     return (fill_text * length)[:length - len(text)] + text
 
 
+@none_guard
 def _sqlite_rpad(text, length, fill_text):
     return (text + fill_text * length)[:length]

@@ -66,11 +66,14 @@ class DateFunctionTests(TestCase):
 
     def create_model(self, start_datetime, end_datetime):
         return DTModel.objects.create(
-            name=start_datetime.isoformat(),
-            start_datetime=start_datetime, end_datetime=end_datetime,
-            start_date=start_datetime.date(), end_date=end_datetime.date(),
-            start_time=start_datetime.time(), end_time=end_datetime.time(),
-            duration=(end_datetime - start_datetime),
+            name=start_datetime.isoformat() if start_datetime else 'None',
+            start_datetime=start_datetime,
+            end_datetime=end_datetime,
+            start_date=start_datetime.date() if start_datetime else None,
+            end_date=end_datetime.date() if end_datetime else None,
+            start_time=start_datetime.time() if start_datetime else None,
+            end_time=end_datetime.time() if end_datetime else None,
+            duration=(end_datetime - start_datetime) if start_datetime and end_datetime else None,
         )
 
     def test_extract_year_exact_lookup(self):
@@ -214,6 +217,12 @@ class DateFunctionTests(TestCase):
         self.assertEqual(DTModel.objects.filter(start_datetime__hour=Extract('start_datetime', 'hour')).count(), 2)
         self.assertEqual(DTModel.objects.filter(start_date__month=Extract('start_date', 'month')).count(), 2)
         self.assertEqual(DTModel.objects.filter(start_time__hour=Extract('start_time', 'hour')).count(), 2)
+
+    def test_extract_none(self):
+        self.create_model(None, None)
+        for t in (Extract('start_datetime', 'year'), Extract('start_date', 'year'), Extract('start_time', 'hour')):
+            with self.subTest(t):
+                self.assertIsNone(DTModel.objects.annotate(extracted=t).first().extracted)
 
     @skipUnlessDBFeature('has_native_duration_field')
     def test_extract_duration(self):
@@ -608,6 +617,12 @@ class DateFunctionTests(TestCase):
         qs = DTModel.objects.filter(start_datetime__date=Trunc('start_datetime', 'day', output_field=DateField()))
         self.assertEqual(qs.count(), 2)
 
+    def test_trunc_none(self):
+        self.create_model(None, None)
+        for t in (Trunc('start_datetime', 'year'), Trunc('start_date', 'year'), Trunc('start_time', 'hour')):
+            with self.subTest(t):
+                self.assertIsNone(DTModel.objects.annotate(truncated=t).first().truncated)
+
     def test_trunc_year_func(self):
         start_datetime = datetime(2015, 6, 15, 14, 30, 50, 321)
         end_datetime = truncate_to(datetime(2016, 6, 15, 14, 10, 50, 123), 'year')
@@ -761,6 +776,10 @@ class DateFunctionTests(TestCase):
         with self.assertRaisesMessage(ValueError, "Cannot truncate TimeField 'start_time' to DateField"):
             list(DTModel.objects.annotate(truncated=TruncDate('start_time', output_field=TimeField())))
 
+    def test_trunc_date_none(self):
+        self.create_model(None, None)
+        self.assertIsNone(DTModel.objects.annotate(truncated=TruncDate('start_datetime')).first().truncated)
+
     def test_trunc_time_func(self):
         start_datetime = datetime(2015, 6, 15, 14, 30, 50, 321)
         end_datetime = datetime(2016, 6, 15, 14, 10, 50, 123)
@@ -784,6 +803,10 @@ class DateFunctionTests(TestCase):
 
         with self.assertRaisesMessage(ValueError, "Cannot truncate DateField 'start_date' to TimeField"):
             list(DTModel.objects.annotate(truncated=TruncTime('start_date', output_field=DateField())))
+
+    def test_trunc_time_none(self):
+        self.create_model(None, None)
+        self.assertIsNone(DTModel.objects.annotate(truncated=TruncTime('start_datetime')).first().truncated)
 
     def test_trunc_day_func(self):
         start_datetime = datetime(2015, 6, 15, 14, 30, 50, 321)

@@ -1249,6 +1249,12 @@ class FTimeDeltaTests(TestCase):
         ]
         self.assertEqual(delta_math, ['e4'])
 
+        queryset = Experiment.objects.annotate(shifted=ExpressionWrapper(
+            F('start') + Value(None, output_field=models.DurationField()),
+            output_field=models.DateTimeField(),
+        ))
+        self.assertIsNone(queryset.first().shifted)
+
     @skipUnlessDBFeature('supports_temporal_subtraction')
     def test_date_subtraction(self):
         queryset = Experiment.objects.annotate(
@@ -1266,6 +1272,18 @@ class FTimeDeltaTests(TestCase):
         less_than_5_days = {e.name for e in queryset.filter(completion_duration__lt=datetime.timedelta(days=5))}
         self.assertEqual(less_than_5_days, {'e0', 'e1', 'e2'})
 
+        queryset = Experiment.objects.annotate(difference=ExpressionWrapper(
+            F('completed') - Value(None, output_field=models.DateField()),
+            output_field=models.DurationField(),
+        ))
+        self.assertIsNone(queryset.first().difference)
+
+        queryset = Experiment.objects.annotate(shifted=ExpressionWrapper(
+            F('completed') - Value(None, output_field=models.DurationField()),
+            output_field=models.DateField(),
+        ))
+        self.assertIsNone(queryset.first().shifted)
+
     @skipUnlessDBFeature('supports_temporal_subtraction')
     def test_time_subtraction(self):
         Time.objects.create(time=datetime.time(12, 30, 15, 2345))
@@ -1280,6 +1298,18 @@ class FTimeDeltaTests(TestCase):
             datetime.timedelta(hours=1, minutes=15, seconds=15, microseconds=2345)
         )
 
+        queryset = Time.objects.annotate(difference=ExpressionWrapper(
+            F('time') - Value(None, output_field=models.TimeField()),
+            output_field=models.DurationField(),
+        ))
+        self.assertIsNone(queryset.first().difference)
+
+        queryset = Time.objects.annotate(shifted=ExpressionWrapper(
+            F('time') - Value(None, output_field=models.DurationField()),
+            output_field=models.TimeField(),
+        ))
+        self.assertIsNone(queryset.first().shifted)
+
     @skipUnlessDBFeature('supports_temporal_subtraction')
     def test_datetime_subtraction(self):
         under_estimate = [
@@ -1291,6 +1321,18 @@ class FTimeDeltaTests(TestCase):
             e.name for e in Experiment.objects.filter(estimated_time__lt=F('end') - F('start'))
         ]
         self.assertEqual(over_estimate, ['e4'])
+
+        queryset = Experiment.objects.annotate(difference=ExpressionWrapper(
+            F('start') - Value(None, output_field=models.DateTimeField()),
+            output_field=models.DurationField(),
+        ))
+        self.assertIsNone(queryset.first().difference)
+
+        queryset = Experiment.objects.annotate(shifted=ExpressionWrapper(
+            F('start') - Value(None, output_field=models.DurationField()),
+            output_field=models.DateTimeField(),
+        ))
+        self.assertIsNone(queryset.first().shifted)
 
     @skipUnlessDBFeature('supports_temporal_subtraction')
     def test_datetime_subtraction_microseconds(self):

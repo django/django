@@ -11,6 +11,11 @@ from ..models import DecimalModel, FloatModel, IntegerModel
 
 class SinTests(TestCase):
 
+    def test_null(self):
+        IntegerModel.objects.create()
+        obj = IntegerModel.objects.annotate(null_sin=Sin('normal')).first()
+        self.assertIsNone(obj.null_sin)
+
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('-12.9'), n2=Decimal('0.6'))
         obj = DecimalModel.objects.annotate(n1_sin=Sin('n1'), n2_sin=Sin('n2')).first()

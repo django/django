@@ -139,7 +139,7 @@ class LPad(BytesToCharFieldConversionMixin, Func):
     function = 'LPAD'
 
     def __init__(self, expression, length, fill_text=Value(' '), **extra):
-        if not hasattr(length, 'resolve_expression') and length < 0:
+        if not hasattr(length, 'resolve_expression') and length is not None and length < 0:
             raise ValueError("'length' must be greater or equal to 0.")
         super().__init__(expression, length, fill_text, **extra)
 
@@ -165,13 +165,14 @@ class Repeat(BytesToCharFieldConversionMixin, Func):
     function = 'REPEAT'
 
     def __init__(self, expression, number, **extra):
-        if not hasattr(number, 'resolve_expression') and number < 0:
+        if not hasattr(number, 'resolve_expression') and number is not None and number < 0:
             raise ValueError("'number' must be greater or equal to 0.")
         super().__init__(expression, number, **extra)
 
     def as_oracle(self, compiler, connection, **extra_context):
         expression, number = self.source_expressions
-        rpad = RPad(expression, Length(expression) * number, expression)
+        length = None if number is None else Length(expression) * number
+        rpad = RPad(expression, length, expression)
         return rpad.as_sql(compiler, connection, **extra_context)
 
 

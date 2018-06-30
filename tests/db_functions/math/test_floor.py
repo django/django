@@ -11,6 +11,11 @@ from ..models import DecimalModel, FloatModel, IntegerModel
 
 class FloorTests(TestCase):
 
+    def test_null(self):
+        IntegerModel.objects.create()
+        obj = IntegerModel.objects.annotate(null_floor=Floor('normal')).first()
+        self.assertIsNone(obj.null_floor)
+
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('-12.9'), n2=Decimal('0.6'))
         obj = DecimalModel.objects.annotate(n1_floor=Floor('n1'), n2_floor=Floor('n2')).first()
