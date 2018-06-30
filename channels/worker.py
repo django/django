@@ -28,6 +28,8 @@ class Worker(StatelessServer):
             ))
         # Wait for them all to exit
         await asyncio.wait(listeners)
+        # See if any of the listeners had an error (e.g. channel layer error)
+        [listener.result() for listener in listeners]
 
     async def listener(self, channel):
         """
