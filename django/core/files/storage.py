@@ -285,6 +285,15 @@ class FileSystemStorage(Storage):
 
         if self.file_permissions_mode is not None:
             os.chmod(full_path, self.file_permissions_mode)
+        else:
+            # If the file was moved, check that permissions are like those of a
+            # newly created file. We determine first the 'should-be' permissions
+            # for new files, then update the file perms if they don't match.
+            cur_umask = os.umask(0)
+            os.umask(cur_umask)
+            new_file_perms = 0o666 & ~cur_umask
+            if os.stat(full_path).st_mode & 0o666 != new_file_perms:
+                os.chmod(full_path, new_file_perms)
 
         # Store filenames with forward slashes, even on Windows.
         return name.replace('\\', '/')

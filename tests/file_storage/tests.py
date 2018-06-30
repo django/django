@@ -1,5 +1,6 @@
 import os
 import shutil
+import stat
 import sys
 import tempfile
 import threading
@@ -827,6 +828,23 @@ class FileFieldStorageTests(TestCase):
         self.assertTrue(temp_storage.exists('tests/file_obj'))
         with temp_storage.open('tests/file_obj') as f:
             self.assertEqual(f.read(), b'some content')
+
+    @unittest.skipIf(sys.platform.startswith('win'), "Windows doesn't support moving open files.")
+    # The file's source and destination must be on the same filesystem.
+    def test_move_temporary_uploaded_file(self):
+        """
+        The temporary uploaded file is moved rather than copied to the
+        destination.
+        """
+        with TemporaryUploadedFile('something.txt', 'text/plain', 0, 'UTF-8') as tmp_file:
+            tmp_file_path = tmp_file.temporary_file_path()
+            doc = Storage.objects.create(normal=tmp_file)
+            self.assertFalse(os.path.exists(tmp_file_path), 'Temporary file still exists')
+        # Unless FILE_UPLOAD_PERMISSIONS is set, file should be user/group/world readable.
+        file_perms = os.stat(doc.normal.path).st_mode
+        self.assertTrue(file_perms & stat.S_IRUSR)
+        self.assertTrue(file_perms & stat.S_IRGRP)
+        self.assertTrue(file_perms & stat.S_IROTH)
 
     def test_stringio(self):
         # Test passing StringIO instance as content argument to save
