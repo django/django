@@ -21,6 +21,8 @@ class PadTests(TestCase):
             (RPad('name', 2), 'Jo'),
             (LPad('name', 0), ''),
             (RPad('name', 0), ''),
+            (LPad('goes_by', 0), None),
+            (RPad('goes_by', 0), None)
         )
         for function, padded_name in tests:
             with self.subTest(function=function):
