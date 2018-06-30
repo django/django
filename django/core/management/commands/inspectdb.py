@@ -15,11 +15,11 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            'table', action='store', nargs='*', type=str,
+            'table', nargs='*', type=str,
             help='Selects what tables or views should be introspected.',
         )
         parser.add_argument(
-            '--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
+            '--database', default=DEFAULT_DB_ALIAS,
             help='Nominates a database to introspect. Defaults to using the "default" database.',
         )
         parser.add_argument(

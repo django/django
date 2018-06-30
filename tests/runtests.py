@@ -405,11 +405,11 @@ if __name__ == "__main__":
         help='Tells Django to NOT prompt the user for input of any kind.',
     )
     parser.add_argument(
-        '--failfast', action='store_true', dest='failfast',
+        '--failfast', action='store_true',
         help='Tells Django to stop running the test suite after first failed test.',
     )
     parser.add_argument(
-        '-k', '--keepdb', action='store_true', dest='keepdb',
+        '-k', '--keepdb', action='store_true',
         help='Tells Django to preserve the test database between runs.',
     )
     parser.add_argument(
@@ -433,15 +433,15 @@ if __name__ == "__main__":
              'test side effects not apparent with normal execution lineup.',
     )
     parser.add_argument(
-        '--selenium', dest='selenium', action=ActionSelenium, metavar='BROWSERS',
+        '--selenium', action=ActionSelenium, metavar='BROWSERS',
         help='A comma-separated list of browsers to run the Selenium tests against.',
     )
     parser.add_argument(
-        '--debug-sql', action='store_true', dest='debug_sql',
+        '--debug-sql', action='store_true',
         help='Turn on the SQL query logger within tests.',
     )
     parser.add_argument(
-        '--parallel', dest='parallel', nargs='?', default=0, type=int,
+        '--parallel', nargs='?', default=0, type=int,
         const=default_test_processes(), metavar='N',
         help='Run tests using up to N parallel processes.',
     )

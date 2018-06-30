@@ -19,15 +19,15 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--no-startup', action='store_true', dest='no_startup',
+            '--no-startup', action='store_true',
             help='When using plain Python, ignore the PYTHONSTARTUP environment variable and ~/.pythonrc.py script.',
         )
         parser.add_argument(
-            '-i', '--interface', choices=self.shells, dest='interface',
+            '-i', '--interface', choices=self.shells,
             help='Specify an interactive interpreter interface. Available options: "ipython", "bpython", and "python"',
         )
         parser.add_argument(
-            '-c', '--command', dest='command',
+            '-c', '--command',
             help='Instead of opening an interactive shell, run a command as Django and exit.',
         )
 
