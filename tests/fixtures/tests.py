@@ -650,6 +650,52 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             format='xml', use_natural_foreign_keys=True
         )
 
+    def test_yaml_collection_style(self):
+        # Load fixture to have some test data
+        management.call_command('loaddata', 'fixture3', verbosity=0)
+
+        self.assertQuerysetEqual(Article.objects.all(), [
+            '<Article: XML identified as leading cause of cancer>',
+            '<Article: Poker on TV is great!>',
+        ], ordered=False)
+
+        # Dump in YAML with various collection style options
+        self._dumpdata_assert(
+            ['fixtures'],
+            "- model: fixtures.article\n"
+            "  pk: 2\n"
+            "  fields: {headline: Poker on TV is great!, pub_date: !!timestamp '2006-06-16 11:00:00'}\n"
+            "- model: fixtures.article\n"
+            "  pk: 5\n"
+            "  fields: {headline: XML identified as leading cause of cancer, pub_date: !!timestamp '2006-06-16\n"
+            "      16:00:00'}",
+            format='yaml', yaml_collection_style='auto',
+        )
+
+        self._dumpdata_assert(
+            ['fixtures'],
+            "[{model: fixtures.article, pk: 2, fields: {headline: Poker on TV is great!, pub_date: !!timestamp "
+            "'2006-06-16\n"
+            "        11:00:00'}}, {model: fixtures.article, pk: 5, fields: {headline: XML identified\n"
+            "        as leading cause of cancer, pub_date: !!timestamp '2006-06-16 16:00:00'}}]",
+            format='yaml', yaml_collection_style='flow',
+        )
+
+        self._dumpdata_assert(
+            ['fixtures'],
+            "- model: fixtures.article\n"
+            "  pk: 2\n"
+            "  fields:\n"
+            "    headline: Poker on TV is great!\n"
+            "    pub_date: 2006-06-16 11:00:00\n"
+            "- model: fixtures.article\n"
+            "  pk: 5\n"
+            "  fields:\n"
+            "    headline: XML identified as leading cause of cancer\n"
+            "    pub_date: 2006-06-16 16:00:00",
+            format='yaml', yaml_collection_style='block',
+        )
+
     def test_loading_with_exclude_app(self):
         Site.objects.all().delete()
         management.call_command('loaddata', 'fixture1', exclude=['fixtures'], verbosity=0)

@@ -170,7 +170,9 @@ Internationalization
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :option:`dumpdata --yaml-collection-style` allows more control over
+  the YAML output. Using the `block` style gives output that is easier to use
+  with version control, while the `flow` style is more compact.
 
 Migrations
 ~~~~~~~~~~
@@ -206,6 +208,11 @@ Serialization
   references <natural-keys-and-forward-references>` by passing
   ``handle_forward_references=True`` to ``serializers.deserialize()``.
   Additionally, :djadmin:`loaddata` handles forward references automatically.
+
+* The PyYAML serialization has a new option `yaml_collection_style` that allows
+  more control about how collections are serialized ('flow' for single-line
+  flow style, 'block' for one-element-per-line block style, 'mixed' for PyYAML
+  default mixed style).
 
 Signals
 ~~~~~~~

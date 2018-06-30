@@ -278,6 +278,22 @@ formats are listed in :ref:`serialization-formats`.
 Specifies the number of indentation spaces to use in the output. Defaults to
 ``None`` which displays all data on single line.
 
+.. django-admin-option:: --yaml-collection-style {mixed,flow,block}
+
+.. versionadded:: 2.2
+
+Specifies the style to use for collections when pretty-printing YAML
+output. Defaults to mixed.
+
+When using the ``flow`` style, containers are serialized into a single line
+(and since the entire dump is treated as an array of model instances
+internally, this outputs a single line with all instances). This style is the
+most compact. When using the `block` style, all container elements are output
+on their own line. This style is the easiest to edit manually or use with
+version control. When using the `mixed` style, the decision is left to PyYAML,
+which uses the ``block`` style for containers that contain nested containers,
+and the ``flow`` style otherwise.
+
 .. django-admin-option:: --exclude EXCLUDE, -e EXCLUDE
 
 Prevents specific applications or models (specified in the form of

@@ -4,6 +4,7 @@ YAML serializer.
 Requires PyYaml (http://pyyaml.org/), but that's checked for in __init__.
 """
 
+import argparse
 import collections
 import decimal
 from io import StringIO
@@ -35,11 +36,34 @@ class DjangoSafeDumper(SafeDumper):
 DjangoSafeDumper.add_representer(decimal.Decimal, DjangoSafeDumper.represent_decimal)
 DjangoSafeDumper.add_representer(collections.OrderedDict, DjangoSafeDumper.represent_ordered_dict)
 
+# Maps collection styles passed to serialize into the corresponding
+# default_flow_style to pass to PyYAML
+COLLECTION_STYLES = {
+    'mixed': None,
+    'block': False,
+    'flow': True,
+}
+
 
 class Serializer(PythonSerializer):
     """Convert a queryset to YAML."""
 
     internal_use_only = False
+
+    @classmethod
+    def add_arguments(cls, parser):
+        # Default is set to suppress, so the default from the serialize
+        # method is used and prevent duplicating the default here.
+        parser.add_argument(
+            '--yaml-collection-style', dest='yaml_collection_style',
+            default=argparse.SUPPRESS, choices=COLLECTION_STYLES.keys(),
+            help="Specifies the style to use for collections when pretty-printing YAML output."
+        )
+
+    def serialize(self, *args, yaml_collection_style='mixed', **kwargs):
+        # Convert the yaml_collection_style argument into the form PyYAML expects.
+        default_flow_style = COLLECTION_STYLES[yaml_collection_style]
+        super().serialize(*args, default_flow_style=default_flow_style, **kwargs)
 
     def handle_field(self, obj, field):
         # A nasty special case: base YAML doesn't support serialization of time
