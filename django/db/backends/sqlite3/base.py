@@ -40,7 +40,7 @@ Database.register_converter("datetime", decoder(parse_datetime))
 Database.register_converter("timestamp", decoder(parse_datetime))
 Database.register_converter("TIMESTAMP", decoder(parse_datetime))
 
-Database.register_adapter(decimal.Decimal, backend_utils.rev_typecast_decimal)
+Database.register_adapter(decimal.Decimal, str)
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):
