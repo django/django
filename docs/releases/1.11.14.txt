@@ -2,7 +2,7 @@
 Django 1.11.14 release notes
 ============================
 
-*Expected July 2, 2018*
+*July 2, 2018*
 
 Django 1.11.14 fixes several bugs in 1.11.13.
 
