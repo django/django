@@ -151,8 +151,23 @@ This is the recommended way to install Django.
    administrator privileges. The :doc:`contributing tutorial
    </intro/contributing>` walks through how to create a virtualenv.
 
-3. After you've created and activated a virtual environment, enter the command
-   ``pip install Django`` at the shell prompt.
+3. After you've created and activated a virtual environment, enter the following command at the shell prompt:
+
+   .. console::
+
+       $ pip install Django
+
+You can also include optional dependencies like so:
+
+   .. console::
+
+        $ pip install Django[postgresql,memcached,numpy]
+
+   `(Note no space between package names)`
+
+It's a nice option if you want to install Django along with popular default
+packages in one go. Refer to a :doc:`full list of optional extra dependencies
+</misc/optional_extra_dependencies>` that can be installed in this way.
 
 .. _pip: https://pip.pypa.io/
 .. _virtualenv: https://virtualenv.pypa.io/

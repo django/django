@@ -1,0 +1,54 @@
+===========================
+Optional extra dependencies
+===========================
+
+Here you can find a list of optional packages you can install along with
+`pip`
+
+============= =================
+Databases
+===============================
+postgressql   psycopg2
+mysql         mysqlclient
+oracle        cx_Oracle
+============= =================
+
+============= =================
+Testing
+===============================
+selenium      selenium
+============= =================
+
+============= =================
+Documentation
+===============================
+admindocs     docutils
+============= =================
+
+============= =================
+Cache
+===============================
+memcached     python3-memcached
+pylibmc       pylibmc
+============= =================
+
+============= =================
+Templates
+===============================
+jinja2        Jinja2
+============= =================
+
+============= =================
+Other
+===============================
+argon2        argon2-cffi
+bcrypt        bcrypt
+geoip         geoip2
+numpy         numpy
+images        Pillow
+yaml          PyYAML
+test-parallel tblib
+sqlparser     sqlparser
+============= =================
+
+
