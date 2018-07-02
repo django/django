@@ -52,12 +52,12 @@ class MigrationQuestioner:
                 filenames = os.listdir(list(migrations_module.__path__)[0])
             return not any(x.endswith(".py") for x in filenames if x != "__init__.py")
 
-    def ask_not_null_addition(self, field_name, model_name):
+    def ask_not_null_addition(self, field_instance, model_name):
         """Adding a NOT NULL field to a model."""
         # None means quit
         return None
 
-    def ask_not_null_alteration(self, field_name, model_name):
+    def ask_not_null_alteration(self, field_instance, model_name):
         """Changing a NULL field to NOT NULL."""
         # None means quit
         return None
@@ -74,7 +74,7 @@ class MigrationQuestioner:
         """Do you really want to merge these migrations?"""
         return self.defaults.get("ask_merge", False)
 
-    def ask_auto_now_add_addition(self, field_name, model_name):
+    def ask_auto_now_add_addition(self, field_instance, model_name):
         """Adding an auto_now_add field to a model."""
         # None means quit
         return None
@@ -105,7 +105,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                     return value
             result = input("Please select a valid option: ")
 
-    def _ask_default(self, default=''):
+    def _ask_default(self, field_instance, default=''):
         """
         Prompt for a default value.
 
@@ -135,17 +135,21 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                 sys.exit(1)
             else:
                 try:
-                    return eval(code, {}, {"datetime": datetime_safe, "timezone": timezone})
+                    code = eval(code, {}, {"datetime": datetime_safe, "timezone": timezone})
+                    if field_instance.to_python(code):
+                        return code
                 except (SyntaxError, NameError) as e:
                     print("Invalid input: %s" % e)
+                except TypeError:
+                    raise Exception(field_instance, code)
 
-    def ask_not_null_addition(self, field_name, model_name):
+    def ask_not_null_addition(self, field_instance, model_name):
         """Adding a NOT NULL field to a model."""
         if not self.dry_run:
             choice = self._choice_input(
                 "You are trying to add a non-nullable field '%s' to %s without a default; "
                 "we can't do that (the database needs something to populate existing rows).\n"
-                "Please select a fix:" % (field_name, model_name),
+                "Please select a fix:" % (field_instance.name, model_name),
                 [
                     ("Provide a one-off default now (will be set on all existing "
                      "rows with a null value for this column)"),
@@ -155,17 +159,17 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
             if choice == 2:
                 sys.exit(3)
             else:
-                return self._ask_default()
+                return self._ask_default(field_instance)
         return None
 
-    def ask_not_null_alteration(self, field_name, model_name):
+    def ask_not_null_alteration(self, field_instance, model_name):
         """Changing a NULL field to NOT NULL."""
         if not self.dry_run:
             choice = self._choice_input(
                 "You are trying to change the nullable field '%s' on %s to non-nullable "
                 "without a default; we can't do that (the database needs something to "
                 "populate existing rows).\n"
-                "Please select a fix:" % (field_name, model_name),
+                "Please select a fix:" % (field_instance.name, model_name),
                 [
                     ("Provide a one-off default now (will be set on all existing "
                      "rows with a null value for this column)"),
@@ -180,7 +184,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
             elif choice == 3:
                 sys.exit(3)
             else:
-                return self._ask_default()
+                return self._ask_default(field_instance)
         return None
 
     def ask_rename(self, model_name, old_name, new_name, field_instance):
@@ -203,13 +207,13 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
             False,
         )
 
-    def ask_auto_now_add_addition(self, field_name, model_name):
+    def ask_auto_now_add_addition(self, field_instance, model_name):
         """Adding an auto_now_add field to a model."""
         if not self.dry_run:
             choice = self._choice_input(
                 "You are trying to add the field '{}' with 'auto_now_add=True' "
                 "to {} without a default; the database needs something to "
-                "populate existing rows.\n".format(field_name, model_name),
+                "populate existing rows.\n".format(field_instance.name, model_name),
                 [
                     "Provide a one-off default now (will be set on all "
                     "existing rows)",
@@ -219,7 +223,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
             if choice == 2:
                 sys.exit(3)
             else:
-                return self._ask_default(default='timezone.now')
+                return self._ask_default(field_instance, default='timezone.now')
         return None
 
 
