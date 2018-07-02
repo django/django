@@ -1750,6 +1750,46 @@ See the :doc:`/topics/db/sql` for more information.
   filtering. As such, it should generally be called from the ``Manager`` or
   from a fresh ``QuerySet`` instance.
 
+Operators that return new ``QuerySet``\s
+----------------------------------------
+
+Combined querysets must use the same model.
+
+AND (``&``)
+~~~~~~~~~~~
+
+Combines two ``QuerySet``\s using the SQL ``AND`` operator.
+
+The following are equivalent::
+
+    Model.objects.filter(x=1) & Model.objects.filter(y=2)
+    Model.objects.filter(x=1, y=2)
+    from django.db.models import Q
+    Model.objects.filter(Q(x=1) & Q(y=2))
+
+SQL equivalent:
+
+.. code-block:: sql
+
+    SELECT ... WHERE x=1 AND y=2
+
+OR (``|``)
+~~~~~~~~~~
+
+Combines two ``QuerySet``\s using the SQL ``OR`` operator.
+
+The following are equivalent::
+
+    Model.objects.filter(x=1) | Model.objects.filter(y=2)
+    from django.db.models import Q
+    Model.objects.filter(Q(x=1) | Q(y=2))
+
+SQL equivalent:
+
+.. code-block:: sql
+
+    SELECT ... WHERE x=1 OR y=2
+
 Methods that do not return ``QuerySet``\s
 -----------------------------------------
 

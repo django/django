@@ -907,7 +907,7 @@ class BaseDatabaseSchemaEditor:
         return ''
 
     def _create_index_sql(self, model, fields, *, name=None, suffix='', using='',
-                          db_tablespace=None, col_suffixes=(), sql=None):
+                          db_tablespace=None, col_suffixes=(), sql=None, opclasses=()):
         """
         Return the SQL statement to create the index for one or several fields.
         `sql` can be specified if the syntax differs from the standard (GIS
@@ -929,9 +929,12 @@ class BaseDatabaseSchemaEditor:
             table=Table(table, self.quote_name),
             name=IndexName(table, columns, suffix, create_index_name),
             using=using,
-            columns=Columns(table, columns, self.quote_name, col_suffixes=col_suffixes),
+            columns=self._index_columns(table, columns, col_suffixes, opclasses),
             extra=tablespace_sql,
         )
+
+    def _index_columns(self, table, columns, col_suffixes, opclasses):
+        return Columns(table, columns, self.quote_name, col_suffixes=col_suffixes)
 
     def _model_indexes_sql(self, model):
         """

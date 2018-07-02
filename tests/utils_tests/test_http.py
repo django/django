@@ -165,6 +165,10 @@ class IsSafeURLTests(unittest.TestCase):
         # Basic auth without host is not allowed.
         self.assertIs(is_safe_url(r'http://testserver\@example.com', allowed_hosts=None), False)
 
+    def test_allowed_hosts_str(self):
+        self.assertIs(is_safe_url('http://good.com/good', allowed_hosts='good.com'), True)
+        self.assertIs(is_safe_url('http://good.co/evil', allowed_hosts='good.com'), False)
+
     def test_secure_param_https_urls(self):
         secure_urls = (
             'https://example.com/p',
