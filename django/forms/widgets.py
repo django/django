@@ -607,7 +607,7 @@ class ChoiceWidget(Widget):
         index = str(index) if subindex is None else "%s_%s" % (index, subindex)
         if attrs is None:
             attrs = {}
-        option_attrs = self.build_attrs(self.attrs, attrs) if self.option_inherits_attrs else {}
+        option_attrs = self.build_attrs(self.attrs if self.option_inherits_attrs else {}, attrs)
         if selected:
             option_attrs.update(self.checked_attribute)
         if 'id' in option_attrs:
