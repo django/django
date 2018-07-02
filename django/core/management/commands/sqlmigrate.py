@@ -18,7 +18,7 @@ class Command(BaseCommand):
             help='Nominates a database to create SQL for. Defaults to the "default" database.',
         )
         parser.add_argument(
-            '--backwards', action='store_true', dest='backwards',
+            '--backwards', action='store_true',
             help='Creates SQL to unapply the migration, rather than to apply it',
         )
 

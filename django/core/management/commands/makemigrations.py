@@ -29,15 +29,15 @@ class Command(BaseCommand):
             help='Specify the app label(s) to create migrations for.',
         )
         parser.add_argument(
-            '--dry-run', action='store_true', dest='dry_run',
+            '--dry-run', action='store_true',
             help="Just show what migrations would be made; don't actually write them.",
         )
         parser.add_argument(
-            '--merge', action='store_true', dest='merge',
+            '--merge', action='store_true',
             help="Enable fixing of migration conflicts.",
         )
         parser.add_argument(
-            '--empty', action='store_true', dest='empty',
+            '--empty', action='store_true',
             help="Create an empty migration.",
         )
         parser.add_argument(
@@ -45,7 +45,7 @@ class Command(BaseCommand):
             help='Tells Django to NOT prompt the user for input of any kind.',
         )
         parser.add_argument(
-            '-n', '--name', action='store', dest='name', default=None,
+            '-n', '--name',
             help="Use this name for migration file(s).",
         )
         parser.add_argument(

@@ -216,20 +216,20 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--locale', '-l', default=[], dest='locale', action='append',
+            '--locale', '-l', default=[], action='append',
             help='Creates or updates the message files for the given locale(s) (e.g. pt_BR). '
                  'Can be used multiple times.',
         )
         parser.add_argument(
-            '--exclude', '-x', default=[], dest='exclude', action='append',
+            '--exclude', '-x', default=[], action='append',
             help='Locales to exclude. Default is none. Can be used multiple times.',
         )
         parser.add_argument(
-            '--domain', '-d', default='django', dest='domain',
+            '--domain', '-d', default='django',
             help='The domain of the message files (default: "django").',
         )
         parser.add_argument(
-            '--all', '-a', action='store_true', dest='all',
+            '--all', '-a', action='store_true',
             help='Updates the message files for all existing locales.',
         )
         parser.add_argument(
@@ -239,7 +239,7 @@ class Command(BaseCommand):
                  'commas, or use -e multiple times.',
         )
         parser.add_argument(
-            '--symlinks', '-s', action='store_true', dest='symlinks',
+            '--symlinks', '-s', action='store_true',
             help='Follows symlinks to directories when examining source code '
                  'and templates for translation strings.',
         )
@@ -254,15 +254,15 @@ class Command(BaseCommand):
             help="Don't ignore the common glob-style patterns 'CVS', '.*', '*~' and '*.pyc'.",
         )
         parser.add_argument(
-            '--no-wrap', action='store_true', dest='no_wrap',
+            '--no-wrap', action='store_true',
             help="Don't break long message lines into several lines.",
         )
         parser.add_argument(
-            '--no-location', action='store_true', dest='no_location',
+            '--no-location', action='store_true',
             help="Don't write '#: filename:line' lines.",
         )
         parser.add_argument(
-            '--add-location', dest='add_location',
+            '--add-location',
             choices=('full', 'file', 'never'), const='full', nargs='?',
             help=(
                 "Controls '#: filename:line' lines. If the option is 'full' "
@@ -273,11 +273,11 @@ class Command(BaseCommand):
             ),
         )
         parser.add_argument(
-            '--no-obsolete', action='store_true', dest='no_obsolete',
+            '--no-obsolete', action='store_true',
             help="Remove obsolete message strings.",
         )
         parser.add_argument(
-            '--keep-pot', action='store_true', dest='keep_pot',
+            '--keep-pot', action='store_true',
             help="Keep .pot file after making messages. Useful when debugging.",
         )
 

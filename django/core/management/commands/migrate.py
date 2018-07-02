@@ -36,22 +36,22 @@ class Command(BaseCommand):
             help='Tells Django to NOT prompt the user for input of any kind.',
         )
         parser.add_argument(
-            '--database', action='store', dest='database',
+            '--database',
             default=DEFAULT_DB_ALIAS,
             help='Nominates a database to synchronize. Defaults to the "default" database.',
         )
         parser.add_argument(
-            '--fake', action='store_true', dest='fake',
+            '--fake', action='store_true',
             help='Mark migrations as run without actually running them.',
         )
         parser.add_argument(
-            '--fake-initial', action='store_true', dest='fake_initial',
+            '--fake-initial', action='store_true',
             help='Detect if tables already exist and fake-apply initial migrations if so. Make sure '
                  'that the current database schema matches your initial migration before using this '
                  'flag. Django will only check for an existing table name.',
         )
         parser.add_argument(
-            '--run-syncdb', action='store_true', dest='run_syncdb',
+            '--run-syncdb', action='store_true',
             help='Creates tables for apps without migrations.',
         )
 

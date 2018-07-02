@@ -18,7 +18,7 @@ class Command(BaseCommand):
             help='App label of the application to squash migrations for.',
         )
         parser.add_argument(
-            'start_migration_name', default=None, nargs='?',
+            'start_migration_name', nargs='?',
             help='Migrations will be squashed starting from and including this migration.',
         )
         parser.add_argument(
@@ -26,7 +26,7 @@ class Command(BaseCommand):
             help='Migrations will be squashed until and including this migration.',
         )
         parser.add_argument(
-            '--no-optimize', action='store_true', dest='no_optimize',
+            '--no-optimize', action='store_true',
             help='Do not try to optimize the squashed operations.',
         )
         parser.add_argument(
@@ -34,7 +34,7 @@ class Command(BaseCommand):
             help='Tells Django to NOT prompt the user for input of any kind.',
         )
         parser.add_argument(
-            '--squashed-name', dest='squashed_name',
+            '--squashed-name',
             help='Sets the name of the new squashed migration.',
         )
 

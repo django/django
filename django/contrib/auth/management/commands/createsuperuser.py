@@ -30,7 +30,6 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
             '--%s' % self.UserModel.USERNAME_FIELD,
-            dest=self.UserModel.USERNAME_FIELD, default=None,
             help='Specifies the login for the superuser.',
         )
         parser.add_argument(
@@ -44,13 +43,13 @@ class Command(BaseCommand):
             ),
         )
         parser.add_argument(
-            '--database', action='store', dest='database',
+            '--database',
             default=DEFAULT_DB_ALIAS,
             help='Specifies the database to use. Default is "default".',
         )
         for field in self.UserModel.REQUIRED_FIELDS:
             parser.add_argument(
-                '--%s' % field, dest=field, default=None,
+                '--%s' % field,
                 help='Specifies the %s for the superuser.' % field,
             )
 

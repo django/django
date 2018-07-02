@@ -51,16 +51,16 @@ class Command(BaseCommand):
                  "pattern. Use multiple times to ignore more.",
         )
         parser.add_argument(
-            '-n', '--dry-run', action='store_true', dest='dry_run',
+            '-n', '--dry-run', action='store_true',
             help="Do everything except modify the filesystem.",
         )
         parser.add_argument(
-            '-c', '--clear', action='store_true', dest='clear',
+            '-c', '--clear', action='store_true',
             help="Clear the existing files using the storage "
                  "before trying to copy or link the original file.",
         )
         parser.add_argument(
-            '-l', '--link', action='store_true', dest='link',
+            '-l', '--link', action='store_true',
             help="Create a symbolic link to each file instead of copying.",
         )
         parser.add_argument(
