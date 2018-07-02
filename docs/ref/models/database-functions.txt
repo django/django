@@ -678,7 +678,7 @@ that deal with time-parts can be used with ``TimeField``::
 Math Functions
 ==============
 
-.. versionadded:: 2.1
+.. versionadded:: 2.2
 
 We'll be using the following model in examples of math functions::
  

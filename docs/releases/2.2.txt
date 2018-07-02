@@ -166,6 +166,8 @@ Models
 
 * Added support for PostgreSQL operator classes (:attr:`.Index.opclasses`).
 
+* Added many :ref:`math database functions <math-functions>`.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

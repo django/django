@@ -190,8 +190,6 @@ Models
 * :meth:`.QuerySet.order_by` and :meth:`distinct(*fields) <.QuerySet.distinct>`
   now support using field transforms.
 
-* Added many :ref:`math database functions <math-functions>`.
-
 * :class:`~django.db.models.BooleanField` can now be ``null=True``. This is
   encouraged instead of :class:`~django.db.models.NullBooleanField`, which will
   likely be deprecated in the future.
