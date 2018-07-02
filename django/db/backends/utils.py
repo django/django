@@ -187,12 +187,6 @@ def typecast_timestamp(s):  # does NOT store time zone information
 # Converters from Python to database (string) #
 ###############################################
 
-def rev_typecast_decimal(d):
-    if d is None:
-        return None
-    return str(d)
-
-
 def split_identifier(identifier):
     """
     Split a SQL identifier into a two element tuple of (namespace, name).
