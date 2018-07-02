@@ -553,6 +553,9 @@ class MigrationAutodetector:
                     None,
                     True
                 ))
+            for _, field in model_state.fields:
+                if field.has_default()  and not hasattr(field, "auto_now_add"):
+                    field.to_python(field.default)
             # Generate creation operation
             self.add_operation(
                 app_label,
@@ -576,6 +579,8 @@ class MigrationAutodetector:
                 dependencies = self._get_dependencies_for_foreign_key(field)
                 # Depend on our own model being created
                 dependencies.append((app_label, model_name, None, True))
+                if field.has_default()  and not hasattr(field, "auto_now_add"):
+                    field.to_python(field.default)
                 # Make operation
                 self.add_operation(
                     app_label,
@@ -846,9 +851,11 @@ class MigrationAutodetector:
         if not preserve_default:
             field = field.clone()
             if isinstance(field, time_fields) and field.auto_now_add:
-                field.default = self.questioner.ask_auto_now_add_addition(field_name, model_name)
+                field.default = self.questioner.ask_auto_now_add_addition(field, model_name)
             else:
-                field.default = self.questioner.ask_not_null_addition(field_name, model_name)
+                field.default = self.questioner.ask_not_null_addition(field, model_name)
+            if field.has_default() and not  field.is_relation and not hasattr(field, "auto_now_add"):
+                field.to_python(field.default)
         self.add_operation(
             app_label,
             operations.AddField(
@@ -937,12 +944,14 @@ class MigrationAutodetector:
                     if (old_field.null and not new_field.null and not new_field.has_default() and
                             not new_field.many_to_many):
                         field = new_field.clone()
-                        new_default = self.questioner.ask_not_null_alteration(field_name, model_name)
+                        new_default = self.questioner.ask_not_null_alteration(field, model_name)
                         if new_default is not models.NOT_PROVIDED:
                             field.default = new_default
                             preserve_default = False
                     else:
                         field = new_field
+                        if field.has_default() and not hasattr(field, "auto_now_add"):
+                            field.to_python(field.default)
                     self.add_operation(
                         app_label,
                         operations.AlterField(
