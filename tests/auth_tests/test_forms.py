@@ -25,6 +25,10 @@ from .models.custom_user import (
     CustomUser, CustomUserWithoutIsActiveField, ExtensionUser,
 )
 from .models.with_custom_email_field import CustomEmailField
+from .models.with_foreign_key import (
+    CustomUserWithFK, Email as CustomUserWithFKEmail,
+    Group as CustomUserWithFKGroup,
+)
 from .models.with_integer_username import IntegerUsernameUser
 from .settings import AUTH_TEMPLATES
 
@@ -58,6 +62,9 @@ class TestDataMixin:
         cls.u5 = User.objects.create(username='unmanageable_password', password='$')
         cls.u6 = User.objects.create(username='unknown_password', password='foo$bar')
         cls.u7 = ExtensionUser.objects.create(username='extension_client', date_of_birth='1998-02-24')
+        email = CustomUserWithFKEmail.objects.create(email='foo@example.com')
+        group = CustomUserWithFKGroup.objects.create(name='the group')
+        cls.u8 = CustomUserWithFK.custom_objects.create(username=email, email=email, group=group)
 
 
 class UserCreationFormTest(ReloadFormsMixin, TestDataMixin, TestCase):
@@ -311,6 +318,23 @@ class UserCreationFormTest(ReloadFormsMixin, TestDataMixin, TestCase):
             }
             form = UserCreationForm(data)
             self.assertTrue(form.is_valid())
+
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithFK')
+    def test_with_custom_user_model_username_not_charfield(self):
+        email = CustomUserWithFKEmail.objects.create(email='foo@bar.com')
+        group = CustomUserWithFKGroup.objects.create(name='foo')
+
+        data = {
+            'username': email.pk,
+            'password1': 'test_password',
+            'password2': 'test_password',
+            'email': email.email,
+            'group': group.pk,
+        }
+        from django.contrib.auth.forms import UserCreationForm
+        self.assertEqual(UserCreationForm.Meta.model, CustomUserWithFK)
+        form = UserCreationForm(data)
+        self.assertTrue(form.is_valid(), msg=form.errors.as_text())
 
 
 # To verify that the login form rejects inactive users, use an authentication
@@ -784,6 +808,62 @@ class UserChangeFormTest(ReloadFormsMixin, TestDataMixin, TestCase):
             }
             form = UserChangeForm(data, instance=self.u7)
             self.assertTrue(form.is_valid())
+
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithFK')
+    def test_custom_form_username_not_charfield(self):
+        from django.contrib.auth.forms import UserChangeForm
+        self.assertEqual(UserChangeForm.Meta.model, CustomUserWithFK)
+
+        email = CustomUserWithFKEmail.objects.create(email='different-address@example.com')
+        self.assertNotEqual(self.u8.username.email, email.email)
+        self.assertNotEqual(self.u8.email.email, email.email)
+
+        class CustomUserChangeForm(UserChangeForm):
+            class Meta(UserChangeForm.Meta):
+                model = CustomUserWithFK
+                fields = ('username', 'email', 'password')
+
+        data = {
+            'username': email.pk,
+            'email': email.email,
+        }
+        form = CustomUserChangeForm(data, instance=self.u8)
+        self.assertTrue(form.is_valid(), msg=form.errors.as_text())
+        self.assertEqual(form.cleaned_data['username'], email)
+        self.assertEqual(form.cleaned_data['email'], email)
+
+        form.save()
+        self.u8.refresh_from_db()
+        self.assertEqual(self.u8.username.email, email.email)
+        self.assertEqual(self.u8.email.email, email.email)
+
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithFK')
+    def test_with_custom_user_model_username_not_charfield(self):
+        from django.contrib.auth.forms import UserChangeForm
+        self.assertEqual(UserChangeForm.Meta.model, CustomUserWithFK)
+
+        email = CustomUserWithFKEmail.objects.create(email='another-address@example.com')
+        group = CustomUserWithFKGroup.objects.create(name='different group')
+        self.assertNotEqual(self.u8.username.email, email.email)
+        self.assertNotEqual(self.u8.email.email, email.email)
+        self.assertNotEqual(self.u8.group.name, group.name)
+
+        data = {
+            'username': email.pk,
+            'email': email.email,
+            'group': group.pk,
+        }
+        form = UserChangeForm(data, instance=self.u8)
+        self.assertTrue(form.is_valid(), msg=form.errors.as_text())
+        self.assertEqual(form.cleaned_data['username'], email)
+        self.assertEqual(form.cleaned_data['email'], email)
+        self.assertEqual(form.cleaned_data['group'], group)
+
+        form.save()
+        self.u8.refresh_from_db()
+        self.assertEqual(self.u8.username.email, email.email)
+        self.assertEqual(self.u8.email.email, email.email)
+        self.assertEqual(self.u8.group.name, group.name)
 
     def test_customer_user_model_with_different_username_field(self):
         with override_settings(AUTH_USER_MODEL='auth_tests.CustomUser'):
