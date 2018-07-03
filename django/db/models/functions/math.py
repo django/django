@@ -1,7 +1,7 @@
 import math
 import sys
 
-from django.db.models import DecimalField, FloatField, Func, Transform
+from django.db.models import DecimalField, FloatField, Func, IntegerField, Transform
 from django.db.models.functions import Cast
 
 
@@ -56,9 +56,7 @@ class ATan2(OutputFieldMixin, Func):
     arity = 2
 
     def as_sqlite(self, compiler, connection):
-        if not getattr(connection.ops, 'spatialite', False):
-            return self.as_sql(compiler, connection)
-        if connection.ops.spatial_version < (4, 3, 0):
+        if not getattr(connection.ops, 'spatialite', False) or connection.ops.spatial_version < (4, 3, 0):
             return self.as_sql(compiler, connection)
         # As documented this function ought to be ATan2(y, x) returning the
         # inverse tangent of y / x, but it turns out that, unlike all other
@@ -70,7 +68,7 @@ class ATan2(OutputFieldMixin, Func):
         # create_function().
         clone = self.copy()
         clone.set_source_expressions([
-            Cast(expression, FloatField()) if not isinstance(expression.output_field, FloatField)
+            Cast(expression, FloatField()) if isinstance(expression.output_field, IntegerField)
             else expression for expression in self.get_source_expressions()[::-1]
         ])
         return clone.as_sql(compiler, connection)
