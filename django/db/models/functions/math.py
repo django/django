@@ -1,7 +1,9 @@
 import math
 import sys
 
-from django.db.models import DecimalField, FloatField, Func, IntegerField, Transform
+from django.db.models import (
+    DecimalField, FloatField, Func, IntegerField, Transform,
+)
 from django.db.models.functions import Cast
 
 
