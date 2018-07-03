@@ -247,7 +247,7 @@ you'd like the changes to be stored as a *migration*.
 Migrations are how Django stores changes to your models (and thus your
 database schema) - they're just files on disk. You can read the migration
 for your new model if you like; it's the file
-``polls/migrations/0001_initial.py``. Don't worry, you're not expected to read
+:file:`polls/migrations/0001_initial.py`. Don't worry, you're not expected to read
 them every time Django makes one, but they're designed to be human-editable
 in case you want to manually tweak how Django changes things.
 
@@ -353,7 +353,7 @@ make new ones - it specializes in upgrading your database live, without
 losing data. We'll cover them in more depth in a later part of the tutorial,
 but for now, remember the three-step guide to making model changes:
 
-* Change your models (in ``models.py``).
+* Change your models (in :file:`models.py`).
 * Run :djadmin:`python manage.py makemigrations <makemigrations>` to create
   migrations for those changes
 * Run :djadmin:`python manage.py migrate <migrate>` to apply those changes to
@@ -419,7 +419,7 @@ Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
 
 Wait a minute. ``<Question: Question object (1)>`` isn't a helpful
 representation of this object. Let's fix that by editing the ``Question`` model
-(in the ``polls/models.py`` file) and adding a
+(in the :file:`polls/models.py` file) and adding a
 :meth:`~django.db.models.Model.__str__` method to both ``Question`` and
 ``Choice``:
 

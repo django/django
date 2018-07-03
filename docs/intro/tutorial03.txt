@@ -61,7 +61,7 @@ refer to :doc:`/topics/http/urls` for more information.
 Writing more views
 ==================
 
-Now let's add a few more views to ``polls/views.py``. These views are
+Now let's add a few more views to :file:`polls/views.py`. These views are
 slightly different, because they take an argument:
 
 .. snippet::
@@ -167,7 +167,7 @@ you want to change the way the page looks, you'll have to edit this Python code.
 So let's use Django's template system to separate the design from Python by
 creating a template that the view can use.
 
-First, create a directory called ``templates`` in your ``polls`` directory.
+First, create a directory called :file:`templates` in your :file:`polls` directory.
 Django will look for templates in there.
 
 Your project's :setting:`TEMPLATES` setting describes how Django will load and
@@ -176,17 +176,17 @@ backend whose :setting:`APP_DIRS <TEMPLATES-APP_DIRS>` option is set to
 ``True``. By convention ``DjangoTemplates`` looks for a "templates"
 subdirectory in each of the :setting:`INSTALLED_APPS`.
 
-Within the ``templates`` directory you have just created, create another
-directory called ``polls``, and within that create a file called
-``index.html``. In other words, your template should be at
-``polls/templates/polls/index.html``. Because of how the ``app_directories``
+Within the :file:`templates` directory you have just created, create another
+directory called :file:`polls`, and within that create a file called
+:file:`index.html`. In other words, your template should be at
+:file:`polls/templates/polls/index.html`. Because of how the ``app_directories``
 template loader works as described above, you can refer to this template within
 Django simply as ``polls/index.html``.
 
 .. admonition:: Template namespacing
 
     Now we *might* be able to get away with putting our templates directly in
-    ``polls/templates`` (rather than creating another ``polls`` subdirectory),
+    :file:`polls/templates` (rather than creating another :file:`polls` subdirectory),
     but it would actually be a bad idea. Django will choose the first template
     it finds whose name matches, and if you had a template with the same name
     in a *different* application, Django would be unable to distinguish between
@@ -209,7 +209,7 @@ Put the following code in that template:
         <p>No polls are available.</p>
     {% endif %}
 
-Now let's update our ``index`` view in ``polls/views.py`` to use the template:
+Now let's update our ``index`` view in :file:`polls/views.py` to use the template:
 
 .. snippet::
     :filename: polls/views.py
@@ -405,7 +405,7 @@ defined below::
 
 If you want to change the URL of the polls detail view to something else,
 perhaps to something like ``polls/specifics/12/`` instead of doing it in the
-template (or templates) you would change it in ``polls/urls.py``::
+template (or templates) you would change it in :file:`polls/urls.py`::
 
     ...
     # added the word 'specifics'
@@ -422,7 +422,7 @@ view, and so might an app on the same project that is for a blog. How does one
 make it so that Django knows which app view to create for a url when using the
 ``{% url %}`` template tag?
 
-The answer is to add namespaces to your  URLconf. In the ``polls/urls.py``
+The answer is to add namespaces to your  URLconf. In the :file:`polls/urls.py`
 file, go ahead and add an ``app_name`` to set the application namespace:
 
 .. snippet::

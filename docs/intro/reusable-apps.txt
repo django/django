@@ -38,8 +38,8 @@ projects and ready to publish for others to install and use.
     as "modules").
 
     A package can be imported with ``import foo.bar`` or ``from foo import
-    bar``. For a directory (like ``polls``) to form a package, it must contain
-    a special file ``__init__.py``, even if this file is empty.
+    bar``. For a directory (like :file:`polls`) to form a package, it must contain
+    a special file :file:`__init__.py`, even if this file is empty.
 
     A Django *application* is just a Python package that is specifically
     intended for use in a Django project. An application may use common Django
@@ -86,14 +86,14 @@ After the previous tutorials, our project should look like this::
             admin/
                 base_site.html
 
-You created ``mysite/templates`` in :doc:`Tutorial 7 </intro/tutorial07>`,
-and ``polls/templates`` in :doc:`Tutorial 3 </intro/tutorial03>`. Now perhaps
+You created :file:`mysite/templates` in :doc:`Tutorial 7 </intro/tutorial07>`,
+and :file:`polls/templates` in :doc:`Tutorial 3 </intro/tutorial03>`. Now perhaps
 it is clearer why we chose to have separate template directories for the
 project and application: everything that is part of the polls application is in
-``polls``. It makes the application self-contained and easier to drop into a
+:file:`polls`. It makes the application self-contained and easier to drop into a
 new project.
 
-The ``polls`` directory could now be copied into a new Django project and
+The :file:`polls` directory could now be copied into a new Django project and
 immediately reused. It's not quite ready to be published though. For that, we
 need to package the app to make it easy for others to install.
 
@@ -120,8 +120,8 @@ Python *packaging* refers to preparing your app in a specific format that can
 be easily installed and used. Django itself is packaged very much like
 this. For a small app like polls, this process isn't too difficult.
 
-1. First, create a parent directory for ``polls``, outside of your Django
-   project. Call this directory ``django-polls``.
+1. First, create a parent directory for :file:`polls`, outside of your Django
+   project. Call this directory :file:`django-polls`.
 
    .. admonition::  Choosing a name for your app
 
@@ -137,9 +137,9 @@ this. For a small app like polls, this process isn't too difficult.
        </ref/contrib/index>`, for example ``auth``, ``admin``, or
        ``messages``.
 
-2. Move the ``polls`` directory into the ``django-polls`` directory.
+2. Move the :file:`polls` directory into the :file:`django-polls` directory.
 
-3. Create a file ``django-polls/README.rst`` with the following contents:
+3. Create a file :file:`django-polls/README.rst` with the following contents:
 
    .. snippet::
        :filename: django-polls/README.rst
@@ -174,18 +174,18 @@ this. For a small app like polls, this process isn't too difficult.
 
        5. Visit http://127.0.0.1:8000/polls/ to participate in the poll.
 
-4. Create a ``django-polls/LICENSE`` file. Choosing a license is beyond the
+4. Create a :file:`django-polls/LICENSE` file. Choosing a license is beyond the
    scope of this tutorial, but suffice it to say that code released publicly
    without a license is *useless*. Django and many Django-compatible apps are
    distributed under the BSD license; however, you're free to pick your own
    license. Just be aware that your licensing choice will affect who is able
    to use your code.
 
-5. Next we'll create a ``setup.py`` file which provides details about how to
+5. Next we'll create a :file:`setup.py` file which provides details about how to
    build and install the app.  A full explanation of this file is beyond the
    scope of this tutorial, but the `setuptools docs
    <https://setuptools.readthedocs.io/en/latest/>`_ have a good
-   explanation. Create a file ``django-polls/setup.py`` with the following
+   explanation. Create a file :file:`django-polls/setup.py` with the following
    contents:
 
    .. snippet::
@@ -227,10 +227,10 @@ this. For a small app like polls, this process isn't too difficult.
        )
 
 6. Only Python modules and packages are included in the package by default. To
-   include additional files, we'll need to create a ``MANIFEST.in`` file. The
+   include additional files, we'll need to create a :file:`MANIFEST.in` file. The
    setuptools docs referred to in the previous step discuss this file in more
-   details. To include the templates, the ``README.rst`` and our ``LICENSE``
-   file, create a file ``django-polls/MANIFEST.in`` with the following
+   details. To include the templates, the :file:`README.rst` and our :file:`LICENSE`
+   file, create a file :file:`django-polls/MANIFEST.in` with the following
    contents:
 
    .. snippet::
@@ -242,18 +242,18 @@ this. For a small app like polls, this process isn't too difficult.
        recursive-include polls/templates *
 
 7. It's optional, but recommended, to include detailed documentation with your
-   app. Create an empty directory ``django-polls/docs`` for future
-   documentation. Add an additional line to ``django-polls/MANIFEST.in``::
+   app. Create an empty directory :file:`django-polls/docs` for future
+   documentation. Add an additional line to :file:`django-polls/MANIFEST.in`::
 
     recursive-include docs *
 
-   Note that the ``docs`` directory won't be included in your package unless
+   Note that the :file:`docs` directory won't be included in your package unless
    you add some files to it. Many Django apps also provide their documentation
    online through sites like `readthedocs.org <https://readthedocs.org>`_.
 
 8. Try building your package with ``python setup.py sdist`` (run from inside
-   ``django-polls``). This creates a directory called ``dist`` and builds your
-   new package, ``django-polls-0.1.tar.gz``.
+   :file:`django-polls`). This creates a directory called :file:`dist` and builds your
+   new package, :file:`django-polls-0.1.tar.gz`.
 
 For more information on packaging, see Python's `Tutorial on Packaging and
 Distributing Projects <https://packaging.python.org/distributing/>`_.
@@ -261,7 +261,7 @@ Distributing Projects <https://packaging.python.org/distributing/>`_.
 Using your own package
 ======================
 
-Since we moved the ``polls`` directory out of the project, it's no longer
+Since we moved the :file:`polls` directory out of the project, it's no longer
 working. We'll now fix this by installing our new ``django-polls`` package.
 
 .. admonition:: Installing as a user library

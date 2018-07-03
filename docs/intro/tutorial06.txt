@@ -24,9 +24,9 @@ single location that can easily be served in production.
 Customize your *app's* look and feel
 ====================================
 
-First, create a directory called ``static`` in your ``polls`` directory. Django
+First, create a directory called :file:`static` in your :file:`polls` directory. Django
 will look for static files there, similarly to how Django finds templates
-inside ``polls/templates/``.
+inside :file:`polls/templates/`.
 
 Django's :setting:`STATICFILES_FINDERS` setting contains a list
 of finders that know how to discover static files from various
@@ -35,9 +35,9 @@ looks for a "static" subdirectory in each of the
 :setting:`INSTALLED_APPS`, like the one in ``polls`` we just created. The admin
 site uses the same directory structure for its static files.
 
-Within the ``static`` directory you have just created, create another directory
-called ``polls`` and within that create a file called ``style.css``. In other
-words, your stylesheet should be at ``polls/static/polls/style.css``. Because
+Within the :file:`static` directory you have just created, create another directory
+called :file:`polls` and within that create a file called :file:`style.css`. In other
+words, your stylesheet should be at :file:`polls/static/polls/style.css`. Because
 of how the ``AppDirectoriesFinder`` staticfile finder works, you can refer to
 this static file in Django simply as ``polls/style.css``, similar to how you
 reference the path for templates.
@@ -45,7 +45,7 @@ reference the path for templates.
 .. admonition:: Static file namespacing
 
     Just like templates, we *might* be able to get away with putting our static
-    files directly in ``polls/static`` (rather than creating another ``polls``
+    files directly in :file:`polls/static` (rather than creating another :file:`polls`
     subdirectory), but it would actually be a bad idea. Django will choose the
     first static file it finds whose name matches, and if you had a static file
     with the same name in a *different* application, Django would be unable to
@@ -54,7 +54,7 @@ reference the path for templates.
     by putting those static files inside *another* directory named for the
     application itself.
 
-Put the following code in that stylesheet (``polls/static/polls/style.css``):
+Put the following code in that stylesheet (:file:`polls/static/polls/style.css`):
 
 .. snippet:: css
     :filename: polls/static/polls/style.css
@@ -63,7 +63,7 @@ Put the following code in that stylesheet (``polls/static/polls/style.css``):
         color: green;
     }
 
-Next, add the following at the top of ``polls/templates/polls/index.html``:
+Next, add the following at the top of :file:`polls/templates/polls/index.html`:
 
 .. snippet:: html+django
     :filename: polls/templates/polls/index.html
@@ -81,12 +81,12 @@ green (Django style!) which means that your stylesheet was properly loaded.
 Adding a background-image
 =========================
 
-Next, we'll create a subdirectory for images. Create an ``images`` subdirectory
-in the ``polls/static/polls/`` directory. Inside this directory, put an image
-called ``background.gif``. In other words, put your image in
-``polls/static/polls/images/background.gif``.
+Next, we'll create a subdirectory for images. Create an :file:`images` subdirectory
+in the :file:`polls/static/polls/` directory. Inside this directory, put an image
+called :file:`background.gif`. In other words, put your image in
+:file:`polls/static/polls/images/background.gif`.
 
-Then, add to your stylesheet (``polls/static/polls/style.css``):
+Then, add to your stylesheet (:file:`polls/static/polls/style.css`):
 
 .. snippet:: css
     :filename: polls/static/polls/style.css

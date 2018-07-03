@@ -293,8 +293,8 @@ system.
 Customizing your *project's* templates
 --------------------------------------
 
-Create a ``templates`` directory in your project directory (the one that
-contains ``manage.py``). Templates can live anywhere on your filesystem that
+Create a :file:`templates` directory in your project directory (the one that
+contains :file:`manage.py`). Templates can live anywhere on your filesystem that
 Django can access. (Django runs as whatever user your server runs.) However,
 keeping your templates within the project is a good convention to follow.
 
@@ -328,14 +328,14 @@ when loading Django templates; it's a search path.
     Just like the static files, we *could* have all our templates together, in
     one big templates directory, and it would work perfectly well. However,
     templates that belong to a particular application should be placed in that
-    application's template directory (e.g. ``polls/templates``) rather than the
-    project's (``templates``). We'll discuss in more detail in the
+    application's template directory (e.g. :file:`polls/templates`) rather than the
+    project's (:file:`templates`). We'll discuss in more detail in the
     :doc:`reusable apps tutorial </intro/reusable-apps>` *why* we do this.
 
-Now create a directory called ``admin`` inside ``templates``, and copy the
+Now create a directory called ``admin`` inside :file:`templates`, and copy the
 template ``admin/base_site.html`` from within the default Django admin
 template directory in the source code of Django itself
-(``django/contrib/admin/templates``) into that directory.
+(:file:`django/contrib/admin/templates`) into that directory.
 
 .. admonition:: Where are the Django source files?
 
@@ -379,7 +379,7 @@ Customizing your *application's* templates
 Astute readers will ask: But if :setting:`DIRS <TEMPLATES-DIRS>` was empty by
 default, how was Django finding the default admin templates? The answer is
 that, since :setting:`APP_DIRS <TEMPLATES-APP_DIRS>` is set to ``True``,
-Django automatically looks for a ``templates/`` subdirectory within each
+Django automatically looks for a :file:`templates/` subdirectory within each
 application package, for use as a fallback (don't forget that
 ``django.contrib.admin`` is an application).
 
