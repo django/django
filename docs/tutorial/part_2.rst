@@ -404,7 +404,7 @@ appended to the chat log.
 Several parts of the new ``ChatConsumer`` code deserve further explanation:
 
 * self.scope['url_route']['kwargs']['room_name']
-    * Obtains the ``'room_name'`` parameter from the URL route in ``chat/routes.py``
+    * Obtains the ``'room_name'`` parameter from the URL route in ``chat/routing.py``
       that opened the WebSocket connection to the consumer.
     * Every consumer has a :ref:`scope <scope>` that contains information about its connection,
       including in particular any positional or keyword arguments from the URL
