@@ -11,9 +11,9 @@ class DecimalInputMixin:
 
     def as_postgresql(self, compiler, connection):
         # Cast FloatField to DecimalField as PostgreSQL doesn't support the
-        # following function signatures by default:
-        # - LOG(double precision, double precision)
-        # - MOD(double precision, double precision)
+        # following function signatures:
+        # - LOG(double, double)
+        # - MOD(double, double)
         output_field = DecimalField(decimal_places=sys.float_info.dig, max_digits=1000)
         clone = self.copy()
         clone.set_source_expressions([
@@ -26,11 +26,8 @@ class DecimalInputMixin:
 class OutputFieldMixin:
 
     def _resolve_output_field(self):
-        sources = self.get_source_expressions()
-        if any(isinstance(s.output_field, DecimalField) for s in sources):
-            return DecimalField()
-        else:
-            return FloatField()
+        has_decimals = any(isinstance(s.output_field, DecimalField) for s in self.get_source_expressions())
+        return DecimalField() if has_decimals else FloatField()
 
 
 class Abs(Transform):
@@ -60,14 +57,11 @@ class ATan2(OutputFieldMixin, Func):
     def as_sqlite(self, compiler, connection):
         if not getattr(connection.ops, 'spatialite', False) or connection.ops.spatial_version < (4, 3, 0):
             return self.as_sql(compiler, connection)
-        # As documented this function ought to be ATan2(y, x) returning the
-        # inverse tangent of y / x, but it turns out that, unlike all other
-        # backends, the function is actually ATan2(x, y). In addition, it
-        # doesn't handle integer inputs properly, so these need to be casted to
-        # floats.
-        # Although the spatialite backend inherits from the sqlite3 backend,
-        # the spatialite function takes precedence over the one created using
-        # create_function().
+        # This function is usually ATan2(y, x), returning the inverse tangent
+        # of y / x, but it's ATan2(x, y) on SpatiaLite 4.3+.
+        # Cast integers to float to avoid inconsistent/buggy behavior if the
+        # arguments are mixed between integer and float or decimal.
+        # https://www.gaia-gis.it/fossil/libspatialite/tktview?name=0f72cca3a2
         clone = self.copy()
         clone.set_source_expressions([
             Cast(expression, FloatField()) if isinstance(expression.output_field, IntegerField)
@@ -127,12 +121,8 @@ class Log(DecimalInputMixin, OutputFieldMixin, Func):
     def as_sqlite(self, compiler, connection):
         if not getattr(connection.ops, 'spatialite', False):
             return self.as_sql(compiler, connection)
-        # As documented this function ought to be Log(b, x) returning the
-        # logarithm of x to the base b, but it turns out that, unlike all other
-        # backends, the function is actually Log(x, b) like Python's math.log().
-        # Although the spatialite backend inherits from the sqlite3 backend,
-        # the spatialite function takes precedence over the one created using
-        # create_function().
+        # This function is usually Log(b, x) returning the logarithm of x to
+        # the base b, but on SpatiaLite it's Log(x, b).
         clone = self.copy()
         clone.set_source_expressions(self.get_source_expressions()[::-1])
         return clone.as_sql(compiler, connection)

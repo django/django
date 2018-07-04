@@ -680,8 +680,8 @@ Math Functions
 
 .. versionadded:: 2.2
 
-We'll be using the following model in examples of math functions::
- 
+We'll be using the following model in math function examples::
+
     class Vector(models.Model):
         x = models.FloatField()
         y = models.FloatField()
@@ -690,20 +690,19 @@ We'll be using the following model in examples of math functions::
 -------
 
 .. class:: Abs(expression, **extra)
- 
-Accepts a single numeric field or expression and returns the absolute value.
- 
+
+Returns the absolute value of a numeric field or expression.
+
 Usage example::
- 
-    >>> # Get the absolute value of the coordinates
+
     >>> from django.db.models.functions import Abs
     >>> Vector.objects.create(x=-0.5, y=1.1)
     >>> vector = Vector.objects.annotate(x_abs=Abs('x'), y_abs=Abs('y')).get()
-    >>> print(vector.x_abs, vector.y_abs)
+    >>> vector.x_abs, vector.y_abs
     (0.5, 1.1)
- 
+
 It can also be registered as a transform. For example::
- 
+
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Abs
     >>> FloatField.register_lookup(Abs)
@@ -715,24 +714,23 @@ It can also be registered as a transform. For example::
 
 .. class:: ACos(expression, **extra)
 
-Accepts a single numeric field or expression and returns the value whose cosine is expression. Expression should be within the range -1 to 1.
+Returns the arccosine of a numeric field or expression. The expression value
+must be within the range -1 to 1.
 
 Usage example::
- 
-    >>> # Get the arc cosine of the coordinates
+
     >>> from django.db.models.functions import ACos
     >>> Vector.objects.create(x=0.5, y=-0.9)
-    >>> vector = Vector.objects.annotate(
-                x_acos=ACos('x'), y_acos=ACos('y')).get()
-    >>> print(vector.x_acos, vector.y_acos)
+    >>> vector = Vector.objects.annotate(x_acos=ACos('x'), y_acos=ACos('y')).get()
+    >>> vector.x_acos, vector.y_acos
     (1.0471975511965979, 2.6905658417935308)
- 
+
 It can also be registered as a transform. For example::
- 
+
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import ACos
     >>> FloatField.register_lookup(ACos)
-    >>> # Get vectors whose arc cos smaller than 1
+    >>> # Get vectors whose arccosine is less than 1
     >>> vectors = Vector.objects.filter(x__acos__lt=1, y__acos__lt=1)
 
 ``ASin``
@@ -740,23 +738,23 @@ It can also be registered as a transform. For example::
 
 .. class:: ASin(expression, **extra)
 
-Accepts a single numeric field or expression and returns its arc sine value, expression should be in the range -1 to 1.
+Returns the arcsine of a numeric field or expression. The expression value must
+be in the range -1 to 1.
 
 Usage example::
- 
-    >>> # Get the arc sine of the coordinates
+
     >>> from django.db.models.functions import ASin
     >>> Vector.objects.create(x=0, y=1)
     >>> vector = Vector.objects.annotate(x_asin=ASin('x'), y_asin=ASin('y')).get()
-    >>> print(vector.x_asin, vector.y_asin)
+    >>> vector.x_asin, vector.y_asin
     (0.0, 1.5707963267948966)
- 
+
 It can also be registered as a transform. For example::
- 
+
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import ASin
     >>> FloatField.register_lookup(ASin)
-    >>> # Get vectors whose arc sine smaller than 1
+    >>> # Get vectors whose arcsine is less than 1
     >>> vectors = Vector.objects.filter(x__asin__lt=1, y__asin__lt=1)
 
 ``ATan``
@@ -764,23 +762,22 @@ It can also be registered as a transform. For example::
 
 .. class:: ATan(expression, **extra)
 
-Accepts a single numeric field or expression and returns the arc tangent of it, that is, the value whose tangent is expression.
+Returns the arctangent of a numeric field or expression.
 
 Usage example::
- 
-    >>> # Get the arc tangent of the coordinates
+
     >>> from django.db.models.functions import ATan
     >>> Vector.objects.create(x=3.12, y=6.987)
     >>> vector = Vector.objects.annotate(x_atan=ATan('x'), y_atan=ATan('y')).get()
-    >>> print(vector.x_atan, vector.y_atan)
+    >>> vector.x_atan, vector.y_atan
     (1.2606282660069106, 1.428638798133829)
- 
+
 It can also be registered as a transform. For example::
- 
+
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import ATan
     >>> FloatField.register_lookup(ATan)
-    >>> # Get vectors whose arc tangent smaller than 2
+    >>> # Get vectors whose arctangent is less than 2
     >>> vectors = Vector.objects.filter(x__atan__lt=2, y__atan__lt=2)
 
 ``ATan2``
@@ -788,63 +785,61 @@ It can also be registered as a transform. For example::
 
 .. class:: ATan2(expression1, expression2, **extra)
 
-Returns the arc tangent of expression1 and expression2.
+Returns the arctangent of ``expression1 / expression2``.
 
 Usage example::
- 
-    >>> # Get the arc tangent of the coordinates
+
     >>> from django.db.models.functions import ATan2
     >>> Vector.objects.create(x=2.5, y=1.9)
     >>> vector = Vector.objects.annotate(atan2=ATan2('x', 'y')).get()
-    >>> print(vector.atan2)
-    (0.9209258773829491)
+    >>> vector.atan2
+    0.9209258773829491
 
 ``Ceil``
 --------
 
 .. class:: Ceil(expression, **extra)
 
-Accepts a single numeric field or expression and returns the smallest integer greater than or equal to expression.
+Returns the smallest integer greater than or equal to a numeric field or
+expression.
 
 Usage example::
- 
-    >>> # Get the ceil of the coordinates
+
     >>> from django.db.models.functions import Ceil
     >>> Vector.objects.create(x=3.12, y=7.0)
     >>> vector = Vector.objects.annotate(x_ceil=Ceil('x'), y_ceil=Ceil('y')).get()
-    >>> print(vector.x_ceil, vector.y_ceil)
+    >>> vector.x_ceil, vector.y_ceil
     (4.0, 7.0)
- 
+
 It can also be registered as a transform. For example::
- 
+
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Ceil
     >>> FloatField.register_lookup(Ceil)
-    >>> # Get vectors whose ceil smaller than 10
-    >>> vectors = Vector.objects.filter(x__ceil_lt=10, y__ceil__lt=10)
+    >>> # Get vectors whose ceil is less than 10
+    >>> vectors = Vector.objects.filter(x__ceil__lt=10, y__ceil__lt=10)
 
 ``Cos``
 -------
 
 .. class:: Cos(expression, **extra)
 
-Accepts a single numeric field or expression (X) and returns the cosine of it.
+Returns the cosine  of a numeric field or expression.
 
 Usage example::
- 
-    >>> # Get the cos of the coordinates
+
     >>> from django.db.models.functions import Cos
     >>> Vector.objects.create(x=-8.0, y=3.1415926)
     >>> vector = Vector.objects.annotate(x_cos=Cos('x'), y_cos=Cos('y')).get()
-    >>> print(vector.x_cos, vector.y_cos)
+    >>> vector.x_cos, vector.y_cos
     (-0.14550003380861354, -0.9999999999999986)
- 
+
 It can also be registered as a transform. For example::
- 
+
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Cos
     >>> FloatField.register_lookup(Cos)
-    >>> # Get vectors whose cosine smaller than 0.5
+    >>> # Get vectors whose cosine is less than 0.5
     >>> vectors = Vector.objects.filter(x__cos__lt=0.5, y__cos__lt=0.5)
 
 ``Cot``
@@ -852,23 +847,22 @@ It can also be registered as a transform. For example::
 
 .. class:: Cot(expression, **extra)
 
-Accepts a single numeric field or expression and returns the cotangent of it.
+Returns the cotangent of a numeric field or expression.
 
 Usage example::
- 
-    >>> # Get the cotangent of the coordinates
+
     >>> from django.db.models.functions import Cot
     >>> Vector.objects.create(x=12.0, y=1.0)
     >>> vector = Vector.objects.annotate(x_cot=Cot('x'), y_cot=Cot('y')).get()
-    >>> print(vector.x_cot, vector.y_cot)
+    >>> vector.x_cot, vector.y_cot
     (-1.5726734063976826, 0.642092615934331)
- 
+
 It can also be registered as a transform. For example::
- 
+
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Cot
     >>> FloatField.register_lookup(Cot)
-    >>> # Get vectors whose cotangent smaller than 1
+    >>> # Get vectors whose cotangent is less than 1
     >>> vectors = Vector.objects.filter(x__cot__lt=1, y__cot__lt=1)
 
 ``Degrees``
@@ -876,24 +870,22 @@ It can also be registered as a transform. For example::
 
 .. class:: Degrees(expression, **extra)
 
-Accepts a single numeric field or expression and returns degrees,
-converted from radians.
+Converts a numeric field or expression from radians to degrees.
 
 Usage example::
- 
-    >>> # Get the degrees of the coordinates
+
     >>> from django.db.models.functions import Degrees
-    >>> Vector.objects.create(x=5.4, y=-30.0)
+    >>> Vector.objects.create(x=-1.57, y=3.14)
     >>> vector = Vector.objects.annotate(x_d=Degrees('x'), y_d=Degrees('y')).get()
-    >>> print(vector.x_d, vector.y_d)
-    (309.3972093706446, -1718.8733853924696)
- 
+    >>> vector.x_d, vector.y_d
+    (-89.95437383553924, 179.9087476710785)
+
 It can also be registered as a transform. For example::
- 
+
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Degrees
     >>> FloatField.register_lookup(Degrees)
-    >>> # Get vectors whose degrees smaller than 360
+    >>> # Get vectors whose degrees are less than 360
     >>> vectors = Vector.objects.filter(x__degrees__lt=360, y__degrees__lt=360)
 
 ``Exp``
@@ -901,24 +893,23 @@ It can also be registered as a transform. For example::
 
 .. class:: Exp(expression, **extra)
 
-Accepts a single numeric field or expression and returns the value of
-e (the base of natural logarithms) raised to the power of expression.
+Returns the value of ``e`` (the natural logarithm base) raised to the power of
+a numeric field or expression.
 
 Usage example::
- 
-    >>> # Get the exp() of the coordinates
+
     >>> from django.db.models.functions import Exp
     >>> Vector.objects.create(x=5.4, y=-2.0)
     >>> vector = Vector.objects.annotate(x_exp=Exp('x'), y_exp=Exp('y')).get()
-    >>> print(vector.x_exp, vector.y_exp)
+    >>> vector.x_exp, vector.y_exp
     (221.40641620418717, 0.1353352832366127)
- 
+
 It can also be registered as a transform. For example::
- 
+
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Exp
     >>> FloatField.register_lookup(Exp)
-    >>> # Get vectors whose exp() greater than 10
+    >>> # Get vectors whose exp() is greater than 10
     >>> vectors = Vector.objects.filter(x__exp__gt=10, y__exp__gt=10)
 
 ``Floor``
@@ -926,23 +917,23 @@ It can also be registered as a transform. For example::
 
 .. class:: Floor(expression, **extra)
 
-Accepts a single numeric field or expression and returns the largest integer value not greater than expression.
+Returns the largest integer value not greater than a numeric field or
+expression.
 
 Usage example::
- 
-    >>> # Get the floor() of the coordinates
+
     >>> from django.db.models.functions import Floor
     >>> Vector.objects.create(x=5.4, y=-2.3)
     >>> vector = Vector.objects.annotate(x_floor=Floor('x'), y_floor=Floor('y')).get()
-    >>> print(vector.x_floor, vector.y_floor)
-    (5, -3)
- 
+    >>> vector.x_floor, vector.y_floor
+    (5.0, -3.0)
+
 It can also be registered as a transform. For example::
- 
+
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Floor
     >>> FloatField.register_lookup(Floor)
-    >>> # Get vectors whose floor() greater than 10
+    >>> # Get vectors whose floor() is greater than 10
     >>> vectors = Vector.objects.filter(x__floor__gt=10, y__floor__gt=10)
 
 ``Ln``
@@ -950,19 +941,18 @@ It can also be registered as a transform. For example::
 
 .. class:: Ln(expression, **extra)
 
-Accepts a single numeric field or expression and returns the natural logarithm of it.
+Returns the natural logarithm a numeric field or expression.
 
 Usage example::
- 
-    >>> # Get the ln() of the coordinates
+
     >>> from django.db.models.functions import Ln
     >>> Vector.objects.create(x=5.4, y=233.0)
     >>> vector = Vector.objects.annotate(x_ln=Ln('x'), y_ln=Ln('y')).get()
-    >>> print(vector.x_ln, vector.y_ln)
+    >>> vector.x_ln, vector.y_ln
     (1.6863989535702288, 5.4510384535657)
- 
+
 It can also be registered as a transform. For example::
- 
+
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Ln
     >>> FloatField.register_lookup(Ln)
@@ -974,109 +964,101 @@ It can also be registered as a transform. For example::
 
 .. class:: Log(expression1, expression2, **extra)
 
-Accepts two numeric field or expressions and returns the logarithm to base
-expression1.
+Accepts two numeric fields or expressions and returns the logarithm of
+the first to base of the second.
 
 Usage example::
- 
-    >>> # Get the log() of the coordinates
+
     >>> from django.db.models.functions import Log
     >>> Vector.objects.create(x=2.0, y=4.0)
-    >>> vector = Vector.objects.annotate(x_log=Log('x', 'y')).get()
-    >>> print(vector.x_log)
-    (2.0)
+    >>> vector = Vector.objects.annotate(log=Log('x', 'y')).get()
+    >>> vector.log
+    2.0
 
 ``Mod``
 -------
 
 .. class:: Mod(expression1, expression2, **extra)
 
-Modulo operation. Accepts two numeric fields or expression1 and expression2
-and returns the remainder of expression1 divided by expression2.
+Accepts two numeric fields or expressions and returns the remainder of
+the first divided by the second (modulo operation).
 
 Usage example::
- 
-    >>> # Get the mod() of the coordinates
+
     >>> from django.db.models.functions import Mod
-    >>> Vector.objects.create(x=5.4, 2.3)
-    >>> vector = Vector.objects.annotate(x_mod=Mod('x'), y_mod=Mod('y')).get()
-    >>> print(vector.x_mod, vector.y_mod)
-    (0.8)
- 
+    >>> Vector.objects.create(x=5.4, y=2.3)
+    >>> vector = Vector.objects.annotate(mod=Mod('x', 'y')).get()
+    >>> vector.mod
+    0.8
+
 ``Pi``
 ------
 
 .. class:: Pi(**extra)
 
-Returns the value of the mathematical constant π. 
+Returns the value of the mathematical constant ``π``.
 
 ``Power``
 ---------
 
 .. class:: Power(expression1, expression2, **extra)
 
-Accepts two numeric fields or expression1 and expression2 and returns the value of expression1 raised to the power of expression2.
+Accepts two numeric fields or expressions and returns the value of the first
+raised to the power of the second.
 
 Usage example::
- 
-    >>> # Get the Power() of the coordinates
+
     >>> from django.db.models.functions import Power
     >>> Vector.objects.create(x=2, y=-2)
-    >>> vector = Vector.objects.annotate(p=Power('x')).get()
-    >>> print(vector.p)
-    (0.25)
+    >>> vector = Vector.objects.annotate(power=Power('x', 'y')).get()
+    >>> vector.power
+    0.25
 
 ``Radians``
 -----------
 
 .. class:: Radians(expression, **extra)
 
-Accepts a single numeric field or expression and converted from degrees to radians. (Note that pi radians equals 180 degrees.)
+Converts a numeric field or expression from degrees to radians.
 
 Usage example::
- 
-    >>> # Get the radians() of the coordinates
+
     >>> from django.db.models.functions import Radians
-    >>> Vector.objects.create(x=5.4, y=-2.3)
+    >>> Vector.objects.create(x=-90, y=180)
     >>> vector = Vector.objects.annotate(x_r=Radians('x'), y_r=Radians('y')).get()
-    >>> print(vector.x_r, vector.y_r)
-    (0.0942477796076938, -0.04014257279586958)
- 
+    >>> vector.x_r, vector.y_r
+    (-1.5707963267948966, 3.141592653589793)
+
 It can also be registered as a transform. For example::
- 
+
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Radians
     >>> FloatField.register_lookup(Radians)
-    >>> # Get vectors whose floor() less than 1
+    >>> # Get vectors whose radians are less than 1
     >>> vectors = Vector.objects.filter(x__radians__lt=1, y__radians__lt=1)
- 
+
 ``Round``
 ---------
 
 .. class:: Round(expression, **extra)
 
-Accepts a single numeric field or expression (X) and returns the nearest integer.
+Rounds a numeric field or expression to the nearest integer. Whether half
+values are rounded up or down depends on the database.
 
 Usage example::
- 
-    >>> # Get the round() of the coordinates
+
     >>> from django.db.models.functions import Round
     >>> Vector.objects.create(x=5.4, y=-2.3)
     >>> vector = Vector.objects.annotate(x_r=Round('x'), y_r=Round('y')).get()
-    >>> print(vector.x_r, vector.y_r)
-    (5.0, -2)
+    >>> vector.x_r, vector.y_r
+    (5.0, -2.0)
 
-.. warning::
-
-    If two multiples are equally close (for example, 0.5), results of round() vary
-    from database to database.
- 
 It can also be registered as a transform. For example::
- 
+
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Round
     >>> FloatField.register_lookup(Round)
-    >>> # Get vectors whose round() less than 20
+    >>> # Get vectors whose round() is less than 20
     >>> vectors = Vector.objects.filter(x__round__lt=20, y__round__lt=20)
 
 ``Sin``
@@ -1084,24 +1066,22 @@ It can also be registered as a transform. For example::
 
 .. class:: Sin(expression, **extra)
 
-Accepts a single numeric field or expression and returns the sine
-to its input.
+Returns the sine of a numeric field or expression.
 
 Usage example::
- 
-    >>> # Get the sine of the coordinates
+
     >>> from django.db.models.functions import Sin
     >>> Vector.objects.create(x=5.4, y=-2.3)
     >>> vector = Vector.objects.annotate(x_sin=Sin('x'), y_sin=Sin('y')).get()
-    >>> print(vector.x_sin, vector.y_sin)
+    >>> vector.x_sin, vector.y_sin
     (-0.7727644875559871, -0.7457052121767203)
- 
+
 It can also be registered as a transform. For example::
- 
+
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Sin
     >>> FloatField.register_lookup(Sin)
-    >>> # Get vectors whose sin() less than 0
+    >>> # Get vectors whose sin() is less than 0
     >>> vectors = Vector.objects.filter(x__sin__lt=0, y__sin__lt=0)
 
 ``Sqrt``
@@ -1109,23 +1089,22 @@ It can also be registered as a transform. For example::
 
 .. class:: Sqrt(expression, **extra)
 
-Accepts a single numeric field or expression (X) and returns the square root of a nonnegative number X.
+Returns the square root of a nonnegative numeric field or expression.
 
 Usage example::
- 
-    >>> # Get the square root of the coordinates
+
     >>> from django.db.models.functions import Sqrt
     >>> Vector.objects.create(x=4.0, y=12.0)
     >>> vector = Vector.objects.annotate(x_sqrt=Sqrt('x'), y_sqrt=Sqrt('y')).get()
-    >>> print(vector.x_sqrt, vector.y_sqrt)
+    >>> vector.x_sqrt, vector.y_sqrt
     (2.0, 3.46410)
- 
+
 It can also be registered as a transform. For example::
 
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Sqrt
     >>> FloatField.register_lookup(Sqrt)
-    >>> # Get vectors whose sqrt() less than 5
+    >>> # Get vectors whose sqrt() is less than 5
     >>> vectors = Vector.objects.filter(x__sqrt__lt=5, y__sqrt__lt=5)
 
 ``Tan``
@@ -1133,23 +1112,22 @@ It can also be registered as a transform. For example::
 
 .. class:: Tan(expression, **extra)
 
-Accepts a single numeric field or expression (X) and returns the tangent of X, where X is given in radians.
+Returns the tangent of a numeric field or expression.
 
 Usage example::
- 
-    >>> # Get the tangent of the coordinates
+
     >>> from django.db.models.functions import Tan
-    >>> Vector.objects.create(x=0.0, y=12.0)
+    >>> Vector.objects.create(x=0, y=12)
     >>> vector = Vector.objects.annotate(x_tan=Tan('x'), y_tan=Tan('y')).get()
-    >>> print(vector.x_tan, vector.y_tan)
+    >>> vector.x_tan, vector.y_tan
     (0.0, -0.6358599286615808)
- 
+
 It can also be registered as a transform. For example::
- 
+
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Tan
     >>> FloatField.register_lookup(Tan)
-    >>> # Get vectors whose tangent less than 0
+    >>> # Get vectors whose tangent is less than 0
     >>> vectors = Vector.objects.filter(x__tan__lt=0, y__tan__lt=0)
 
 .. _text-functions:
