@@ -1,0 +1,12 @@
+==========================
+Django 2.0.8 release notes
+==========================
+
+*Expected August 1, 2018*
+
+Django 2.0.8 fixes several bugs in 2.0.7.
+
+Bugfixes
+========
+
+* ...
