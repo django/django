@@ -1804,7 +1804,7 @@ For example::
 
     {{ value|json_script:"hello-data" }}
 
-If ``value`` is a the dictionary ``{'hello': 'world'}``, the output will be:
+If ``value`` is the dictionary ``{'hello': 'world'}``, the output will be:
 
 .. code-block:: html
 
