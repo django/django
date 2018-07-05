@@ -897,7 +897,7 @@ calling the appropriate methods on the wrapped expression.
         Tells Django that this expression contains a
         :class:`~django.db.models.expressions.Window` expression. It's used,
         for example, to disallow window function expressions in queries that
-        modify data. Defaults to ``True``.
+        modify data.
 
     .. attribute:: filterable
 
