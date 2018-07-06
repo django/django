@@ -418,13 +418,11 @@ object -- so we simply override it and wrap the call::
         queryset = Author.objects.all()
 
         def get_object(self):
-            # Call the superclass
-            object = super().get_object()
+            obj = super().get_object()
             # Record the last accessed date
-            object.last_accessed = timezone.now()
-            object.save()
-            # Return the object
-            return object
+            obj.last_accessed = timezone.now()
+            obj.save()
+            return obj
 
 .. note::
 
