@@ -422,7 +422,7 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 .. module:: django.utils.functional
     :synopsis: Functional programming tools.
 
-.. class:: cached_property(object, name)
+.. class:: cached_property(func, name=None)
 
     The ``@cached_property`` decorator caches the result of a method with a
     single ``self`` argument as a property. The cached result will persist
