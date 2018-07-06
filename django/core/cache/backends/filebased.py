@@ -15,6 +15,7 @@ from django.core.files.move import file_move_safe
 
 class FileBasedCache(BaseCache):
     cache_suffix = '.djcache'
+    pickle_protocol = pickle.HIGHEST_PROTOCOL
 
     def __init__(self, dir, params):
         super().__init__(params)
@@ -39,8 +40,8 @@ class FileBasedCache(BaseCache):
 
     def _write_content(self, file, timeout, value):
         expiry = self.get_backend_timeout(timeout)
-        file.write(pickle.dumps(expiry, pickle.HIGHEST_PROTOCOL))
-        file.write(zlib.compress(pickle.dumps(value, pickle.HIGHEST_PROTOCOL)))
+        file.write(pickle.dumps(expiry, self.pickle_protocol))
+        file.write(zlib.compress(pickle.dumps(value, self.pickle_protocol)))
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         self._createdir()  # Cache dir can be deleted at any time.
