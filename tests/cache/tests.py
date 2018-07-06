@@ -312,6 +312,7 @@ class BaseCacheTests:
         cache.set('d', 'd')
         self.assertEqual(cache.get_many(['a', 'c', 'd']), {'a': 'a', 'c': 'c', 'd': 'd'})
         self.assertEqual(cache.get_many(['a', 'b', 'e']), {'a': 'a', 'b': 'b'})
+        self.assertEqual(cache.get_many(iter(['a', 'b', 'e'])), {'a': 'a', 'b': 'b'})
 
     def test_delete(self):
         # Cache keys can be deleted
