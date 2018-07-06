@@ -99,7 +99,7 @@ The ``ContentFile`` class
 
         from django.core.files.base import ContentFile
 
-        f1 = ContentFile("esta sentencia está en español")
+        f1 = ContentFile("esta frase está en español")
         f2 = ContentFile(b"these are bytes")
 
 .. currentmodule:: django.core.files.images
