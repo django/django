@@ -264,12 +264,17 @@ class AdminSite:
         # Add in each model's views, and create a list of valid URLS for the
         # app_index
         valid_app_labels = []
+        app_label_url_pair = []
         for model, model_admin in self._registry.items():
+            app_url, model_url = self.get_url_for_app_model(model, model_admin)
             urlpatterns += [
-                path('%s/%s/' % (model._meta.app_label, model._meta.model_name), include(model_admin.urls)),
+                path('%s/%s/' % (app_url, model_url), include(model_admin.urls)),
             ]
             if model._meta.app_label not in valid_app_labels:
                 valid_app_labels.append(model._meta.app_label)
+
+            if (model._meta.app_label, app_url) not in app_label_url_pair:
+                app_label_url_pair.append((model._meta.app_label, app_url))
 
         # If there were ModelAdmins registered, we should have a list of app
         # labels for which we need to allow access to the app_index view,
@@ -278,7 +283,19 @@ class AdminSite:
             urlpatterns += [
                 re_path(regex, wrap(self.app_index), name='app_list'),
             ]
+
+            # A new url pattern, <app>_index.
+            # reverse('admin:polls_index') = /admin/survey/
+            # "polls" is the actual app_label while "survey" is the chosen url for that app.
+            for app_label, app_url in app_label_url_pair:
+                urlpatterns += [
+                    path('%s/' % app_url, self.app_index, name='%s_index' % app_label,
+                         kwargs={'app_label': app_label})
+                ]
         return urlpatterns
+
+    def get_url_for_app_model(self, model, model_admin, **kwargs):
+        return model._meta.app_label, model._meta.model_name
 
     @property
     def urls(self):
