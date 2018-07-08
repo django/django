@@ -175,7 +175,7 @@ All attributes should be considered read-only, unless stated otherwise.
 .. _headers:
 .. attribute:: HttpRequest.headers
 
-    .. versionadded:: 2.1
+    .. versionadded:: 2.2
 
     A case-insensitive dictionary containing the headers passed by the client.
     The name of each header is Title-Cased (``User-Agent``) when
