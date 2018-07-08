@@ -699,10 +699,10 @@ class SQLCompiler:
             results = []
             for item in opts.ordering:
 
-                def _join_strings(*strings):
-                    return LOOKUP_SEP.join(filter(None, strings))
-
-                new_prefix = _join_strings(prefix, name)
+                if prefix is None:
+                    new_prefix = name
+                else:
+                    new_prefix = prefix + LOOKUP_SEP + name
 
                 results.extend(self.convert_to_expression(item, opts, alias, order,
                                                           already_seen, new_prefix))
