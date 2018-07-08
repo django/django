@@ -534,3 +534,18 @@ class CheckAllowedHostsTest(SimpleTestCase):
     @override_settings(ALLOWED_HOSTS=['.example.com'])
     def test_allowed_hosts_set(self):
         self.assertEqual(self.func(None), [])
+
+
+class CheckTypeOfAllowedHostsTest(SimpleTestCase):
+    @property
+    def func(self):
+        from django.core.checks.security.base import check_type_of_allowed_hosts
+        return check_type_of_allowed_hosts
+
+    @override_settings(ALLOWED_HOSTS='example.com')
+    def test_allowed_hosts_is_string(self):
+        self.assertEqual(self.func(None), [base.W022])
+
+    @override_settings(ALLOWED_HOSTS=['example.com'])
+    def test_allowed_hosts_is_list(self):
+        self.assertEqual(self.func(None), [])
