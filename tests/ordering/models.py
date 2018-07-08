@@ -47,3 +47,15 @@ class Reference(models.Model):
 
     class Meta:
         ordering = ('article',)
+
+
+class CircularAuthor(models.Model):
+    class Meta:
+        ordering = ('circulararticle',)
+
+
+class CircularArticle(models.Model):
+    author = models.ForeignKey(CircularAuthor, models.CASCADE)
+
+    class Meta:
+        ordering = ('author',)

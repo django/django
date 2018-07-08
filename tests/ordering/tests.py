@@ -1,11 +1,12 @@
 from datetime import datetime
 from operator import attrgetter
 
+from django.core.exceptions import FieldError
 from django.db.models import DateTimeField, F, Max, OuterRef, Subquery
 from django.db.models.functions import Upper
 from django.test import TestCase
 
-from .models import Article, Author, Reference
+from .models import Article, Author, CircularArticle, Reference
 
 
 class OrderingTests(TestCase):
@@ -393,3 +394,8 @@ class OrderingTests(TestCase):
         r1 = Reference.objects.create(article_id=self.a1.pk)
         r2 = Reference.objects.create(article_id=self.a2.pk)
         self.assertSequenceEqual(Reference.objects.all(), [r2, r1])
+
+    def test_circular_ordering(self):
+        msg = 'Infinite loop caused by ordering.'
+        with self.assertRaisesMessage(FieldError, msg):
+            list(CircularArticle.objects.all())
