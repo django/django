@@ -1,10 +1,10 @@
-from unittest import mock, skip
 from operator import attrgetter
+from unittest import mock, skip
 
-from django.test import TestCase
 from django.db import models
+from django.test import TestCase
 
-from .models import Musician, Album, Song
+from .models import Album, Musician, Song
 
 
 class OrderWithExpressionTests(TestCase):

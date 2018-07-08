@@ -2,6 +2,7 @@ import collections
 import functools
 import re
 import warnings
+from copy import deepcopy
 from itertools import chain
 
 from django.core.exceptions import EmptyResultSet, FieldError
@@ -661,7 +662,6 @@ class SQLCompiler:
 
         if hasattr(name, 'resolve_expression'):
 
-            from copy import deepcopy
             field = deepcopy(name)
 
             if not isinstance(field, OrderBy):
