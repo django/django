@@ -1,7 +1,6 @@
 import os
 import sys
 import unittest
-import warnings
 from types import ModuleType
 from unittest import mock
 
@@ -292,20 +291,8 @@ class SettingsTests(SimpleTestCase):
     def test_no_secret_key(self):
         settings_module = ModuleType('fake_settings_module')
         sys.modules['fake_settings_module'] = settings_module
-        msg = 'The SECRET_KEY setting must be set.'
+        msg = 'The SECRET_KEY setting must not be empty.'
         try:
-            settings = Settings('fake_settings_module')
-            with self.assertRaisesMessage(ImproperlyConfigured, msg):
-                settings.SECRET_KEY
-        finally:
-            del sys.modules['fake_settings_module']
-
-    def test_secret_key_empty_string(self):
-        settings_module = ModuleType('fake_settings_module')
-        settings_module.SECRET_KEY = ''
-        sys.modules['fake_settings_module'] = settings_module
-        try:
-            msg = 'The SECRET_KEY setting must not be empty.'
             with self.assertRaisesMessage(ImproperlyConfigured, msg):
                 Settings('fake_settings_module')
         finally:
@@ -349,15 +336,11 @@ class TestComplexSettingOverride(SimpleTestCase):
 
     def test_complex_override_warning(self):
         """Regression test for #19031"""
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-
+        msg = 'Overriding setting TEST_WARN can lead to unexpected behavior.'
+        with self.assertWarnsMessage(UserWarning, msg) as cm:
             with override_settings(TEST_WARN='override'):
                 self.assertEqual(settings.TEST_WARN, 'override')
-
-            self.assertEqual(len(w), 1)
-            self.assertEqual(w[0].filename, __file__)
-            self.assertEqual(str(w[0].message), 'Overriding setting TEST_WARN can lead to unexpected behavior.')
+        self.assertEqual(cm.filename, __file__)
 
 
 class SecureProxySslHeaderTest(SimpleTestCase):

@@ -30,8 +30,8 @@ from django.utils.translation import (
     LANGUAGE_SESSION_KEY, activate, check_for_language, deactivate,
     get_language, get_language_bidi, get_language_from_request,
     get_language_info, gettext, gettext_lazy, ngettext, ngettext_lazy,
-    npgettext, npgettext_lazy, pgettext, to_locale, trans_null, trans_real,
-    ugettext, ugettext_lazy, ungettext, ungettext_lazy,
+    npgettext, npgettext_lazy, pgettext, to_language, to_locale, trans_null,
+    trans_real, ugettext, ugettext_lazy, ungettext, ungettext_lazy,
 )
 
 from .forms import CompanyForm, I18nForm, SelectDateForm
@@ -85,6 +85,12 @@ class TranslationTests(SimpleTestCase):
         self.assertEqual(ngettext("%d year", "%d years", 2) % 2, "2 années")
         self.assertEqual(ngettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}, "0 octet")
         self.assertEqual(ngettext("%(size)d byte", "%(size)d bytes", 2) % {'size': 2}, "2 octets")
+
+    def test_plural_null(self):
+        g = trans_null.ngettext
+        self.assertEqual(g('%d year', '%d years', 0) % 0, '0 years')
+        self.assertEqual(g('%d year', '%d years', 1) % 1, '1 year')
+        self.assertEqual(g('%d year', '%d years', 2) % 2, '2 years')
 
     def test_override(self):
         activate('de')
@@ -282,13 +288,18 @@ class TranslationTests(SimpleTestCase):
                 self.assertEqual(to_locale(lang), locale)
 
     def test_to_language(self):
-        self.assertEqual(trans_real.to_language('en_US'), 'en-us')
-        self.assertEqual(trans_real.to_language('sr_Lat'), 'sr-lat')
+        self.assertEqual(to_language('en_US'), 'en-us')
+        self.assertEqual(to_language('sr_Lat'), 'sr-lat')
 
     def test_language_bidi(self):
         self.assertIs(get_language_bidi(), False)
         with translation.override(None):
             self.assertIs(get_language_bidi(), False)
+
+    def test_language_bidi_null(self):
+        self.assertIs(trans_null.get_language_bidi(), False)
+        with override_settings(LANGUAGE_CODE='he'):
+            self.assertIs(get_language_bidi(), True)
 
 
 class TranslationThreadSafetyTests(SimpleTestCase):
@@ -1642,6 +1653,9 @@ class CountrySpecificLanguageTests(SimpleTestCase):
         self.assertFalse(check_for_language('tr-TR.UTF8'))
         self.assertFalse(check_for_language('de-DE.utf-8'))
 
+    def test_check_for_language_null(self):
+        self.assertIs(trans_null.check_for_language('en'), True)
+
     def test_get_language_from_request(self):
         # issue 19919
         r = self.rf.get('/')
@@ -1654,6 +1668,13 @@ class CountrySpecificLanguageTests(SimpleTestCase):
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'bg-bg,en-US;q=0.8,en;q=0.6,ru;q=0.4'}
         lang = get_language_from_request(r)
         self.assertEqual('bg', lang)
+
+    def test_get_language_from_request_null(self):
+        lang = trans_null.get_language_from_request(None)
+        self.assertEqual(lang, 'en')
+        with override_settings(LANGUAGE_CODE='de'):
+            lang = trans_null.get_language_from_request(None)
+            self.assertEqual(lang, 'de')
 
     def test_specific_language_codes(self):
         # issue 11915

@@ -190,8 +190,6 @@ data on the fly, render progress bars, and even send data to another storage
 location directly without storing it locally. See :ref:`custom_upload_handlers`
 for details on how you can customize or completely replace upload behavior.
 
-.. _modifying_upload_handlers_on_the_fly:
-
 Where uploaded data is stored
 -----------------------------
 
@@ -215,6 +213,8 @@ Changing upload handler behavior
 
 There are a few settings which control Django's file upload behavior. See
 :ref:`File Upload Settings <file-upload-settings>` for details.
+
+.. _modifying_upload_handlers_on_the_fly:
 
 Modifying upload handlers on the fly
 ------------------------------------

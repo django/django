@@ -17,7 +17,7 @@ from django.core.exceptions import (
 )
 from django.core.paginator import InvalidPage
 from django.db import models
-from django.db.models.expressions import F, OrderBy
+from django.db.models.expressions import Combinable, F, OrderBy
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.timezone import make_aware
@@ -81,8 +81,10 @@ class ChangeList:
         self.get_results(request)
         if self.is_popup:
             title = gettext('Select %s')
-        else:
+        elif self.model_admin.has_change_permission(request):
             title = gettext('Select %s to change')
+        else:
+            title = gettext('Select %s to view')
         self.title = title % self.opts.verbose_name
         self.pk_attname = self.lookup_opts.pk.attname
 
@@ -324,7 +326,9 @@ class ChangeList:
             # the right column numbers absolutely, because there might be more
             # than one column associated with that ordering, so we guess.
             for field in ordering:
-                if isinstance(field, OrderBy):
+                if isinstance(field, (Combinable, OrderBy)):
+                    if not isinstance(field, OrderBy):
+                        field = field.asc()
                     if isinstance(field.expression, F):
                         order_type = 'desc' if field.descending else 'asc'
                         field = field.expression.name

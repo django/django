@@ -1,4 +1,3 @@
-import warnings
 from urllib.parse import urljoin
 
 from django.contrib.staticfiles import storage
@@ -22,24 +21,16 @@ class StaticDeprecationTests(SimpleTestCase):
     def test_templatetag_deprecated(self):
         msg = '{% load staticfiles %} is deprecated in favor of {% load static %}.'
         template = "{% load staticfiles %}{% static 'main.js' %}"
-        with warnings.catch_warnings(record=True) as recorded:
-            warnings.simplefilter('always')
+        with self.assertWarnsMessage(RemovedInDjango30Warning, msg):
             template = Template(template)
         rendered = template.render(Context())
         self.assertEqual(rendered, 'https://example.com/assets/main.js')
-        self.assertEqual(len(recorded), 1)
-        self.assertIs(recorded[0].category, RemovedInDjango30Warning)
-        self.assertEqual(str(recorded[0].message), msg)
 
     def test_static_deprecated(self):
         msg = (
             'django.contrib.staticfiles.templatetags.static() is deprecated in '
             'favor of django.templatetags.static.static().'
         )
-        with warnings.catch_warnings(record=True) as recorded:
-            warnings.simplefilter('always')
+        with self.assertWarnsMessage(RemovedInDjango30Warning, msg):
             url = static('main.js')
         self.assertEqual(url, 'https://example.com/assets/main.js')
-        self.assertEqual(len(recorded), 1)
-        self.assertIs(recorded[0].category, RemovedInDjango30Warning)
-        self.assertEqual(str(recorded[0].message), msg)

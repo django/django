@@ -39,6 +39,19 @@ class IndexesTests(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, msg):
             models.Index()
 
+    def test_opclasses_requires_index_name(self):
+        with self.assertRaisesMessage(ValueError, 'An index must be named to use opclasses.'):
+            models.Index(opclasses=['jsonb_path_ops'])
+
+    def test_opclasses_requires_list_or_tuple(self):
+        with self.assertRaisesMessage(ValueError, 'Index.opclasses must be a list or tuple.'):
+            models.Index(name='test_opclass', fields=['field'], opclasses='jsonb_path_ops')
+
+    def test_opclasses_and_fields_same_length(self):
+        msg = 'Index.fields and Index.opclasses must have the same number of elements.'
+        with self.assertRaisesMessage(ValueError, msg):
+            models.Index(name='test_opclass', fields=['field', 'other'], opclasses=['jsonb_path_ops'])
+
     def test_max_name_length(self):
         msg = 'Index names cannot be longer than 30 characters.'
         with self.assertRaisesMessage(ValueError, msg):

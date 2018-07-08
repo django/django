@@ -3,11 +3,17 @@
     {{ widget }}
     {% block links %}
         {% spaceless %}
-        {% if can_change_related %}
-        <a class="related-widget-wrapper-link change-related" id="change_id_{{ name }}"
+        {% if can_change_related or can_view_related %}
+        <a class="related-widget-wrapper-link {% if can_change_related %}change-related{% else %}view-related{% endif %}"
+            id="change_id_{{ name }}"
             data-href-template="{{ change_related_template_url }}?{{ url_params }}"
+            {% if can_change_related %}
             title="{% blocktrans %}Change selected {{ model }}{% endblocktrans %}">
             <img src="{% static 'admin/img/icon-changelink.svg' %}" alt="{% trans 'Change' %}">
+            {% else %}
+            title="{% blocktrans %}View selected {{ model }}{% endblocktrans %}">
+            <img src="{% static 'admin/img/icon-viewlink.svg' %}" alt="{% trans 'View' %}">
+            {% endif %}
         </a>
         {% endif %}
         {% if can_add_related %}

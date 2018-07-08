@@ -573,7 +573,7 @@ def slice_filter(value, arg):
     """
     try:
         bits = []
-        for x in arg.split(':'):
+        for x in str(arg).split(':'):
             if not x:
                 bits.append(None)
             else:

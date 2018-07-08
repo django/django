@@ -187,12 +187,6 @@ def typecast_timestamp(s):  # does NOT store time zone information
 # Converters from Python to database (string) #
 ###############################################
 
-def rev_typecast_decimal(d):
-    if d is None:
-        return None
-    return str(d)
-
-
 def split_identifier(identifier):
     """
     Split a SQL identifier into a two element tuple of (namespace, name).
@@ -231,18 +225,14 @@ def format_number(value, max_digits, decimal_places):
     """
     if value is None:
         return None
-    if isinstance(value, decimal.Decimal):
-        context = decimal.getcontext().copy()
-        if max_digits is not None:
-            context.prec = max_digits
-        if decimal_places is not None:
-            value = value.quantize(decimal.Decimal(1).scaleb(-decimal_places), context=context)
-        else:
-            context.traps[decimal.Rounded] = 1
-            value = context.create_decimal(value)
-        return "{:f}".format(value)
+    context = decimal.getcontext().copy()
+    if max_digits is not None:
+        context.prec = max_digits
     if decimal_places is not None:
-        return "%.*f" % (decimal_places, value)
+        value = value.quantize(decimal.Decimal(1).scaleb(-decimal_places), context=context)
+    else:
+        context.traps[decimal.Rounded] = 1
+        value = context.create_decimal(value)
     return "{:f}".format(value)
 
 

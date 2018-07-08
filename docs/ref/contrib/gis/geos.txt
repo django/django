@@ -203,13 +203,6 @@ The ``srid`` parameter, if given, is set as the SRID of the created geometry if
     ...
     ValueError: Input geometry already has SRID: 1.
 
-.. versionchanged:: 2.0
-
-    In older versions, the ``srid`` parameter is handled differently for WKT
-    and WKB input. For WKT, ``srid`` is used only if the input geometry doesn't
-    have an SRID. For WKB, ``srid`` (if given) replaces the SRID of the input
-    geometry.
-
 The following input formats, along with their corresponding Python types,
 are accepted:
 
@@ -224,10 +217,6 @@ GeoJSON_                 ``str``
 
 For the GeoJSON format, the SRID is set based on the ``crs`` member. If ``crs``
 isn't provided, the SRID defaults to 4326.
-
-.. versionchanged:: 2.0
-
-    In older versions, SRID isn't set for geometries initialized from GeoJSON.
 
 .. _GeoJSON: https://tools.ietf.org/html/rfc7946
 

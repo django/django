@@ -52,14 +52,6 @@ def check_for_language(x):
     return True
 
 
-def to_locale(language):
-    p = language.find('-')
-    if p >= 0:
-        return language[:p].lower() + '_' + language[p + 1:].upper()
-    else:
-        return language.lower()
-
-
 def get_language_from_request(request, check_path=False):
     return settings.LANGUAGE_CODE
 

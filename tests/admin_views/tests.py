@@ -25,7 +25,7 @@ from django.template.response import TemplateResponse
 from django.test import (
     TestCase, modify_settings, override_settings, skipUnlessDBFeature,
 )
-from django.test.utils import override_script_prefix, patch_logger
+from django.test.utils import override_script_prefix
 from django.urls import NoReverseMatch, resolve, reverse
 from django.utils import formats, translation
 from django.utils.cache import get_max_age
@@ -747,12 +747,11 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             self.assertContains(response, '%Y-%m-%d %H:%M:%S')
 
     def test_disallowed_filtering(self):
-        with patch_logger('django.security.DisallowedModelAdminLookup', 'error') as calls:
+        with self.assertLogs('django.security.DisallowedModelAdminLookup', 'ERROR'):
             response = self.client.get(
                 "%s?owner__email__startswith=fuzzy" % reverse('admin:admin_views_album_changelist')
             )
-            self.assertEqual(response.status_code, 400)
-            self.assertEqual(len(calls), 1)
+        self.assertEqual(response.status_code, 400)
 
         # Filters are allowed if explicitly included in list_filter
         response = self.client.get("%s?color__value__startswith=red" % reverse('admin:admin_views_thing_changelist'))
@@ -777,18 +776,16 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_disallowed_to_field(self):
-        with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
-            url = reverse('admin:admin_views_section_changelist')
+        url = reverse('admin:admin_views_section_changelist')
+        with self.assertLogs('django.security.DisallowedModelAdminToField', 'ERROR'):
             response = self.client.get(url, {TO_FIELD_VAR: 'missing_field'})
-            self.assertEqual(response.status_code, 400)
-            self.assertEqual(len(calls), 1)
+        self.assertEqual(response.status_code, 400)
 
         # Specifying a field that is not referred by any other model registered
         # to this admin site should raise an exception.
-        with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
+        with self.assertLogs('django.security.DisallowedModelAdminToField', 'ERROR'):
             response = self.client.get(reverse('admin:admin_views_section_changelist'), {TO_FIELD_VAR: 'name'})
-            self.assertEqual(response.status_code, 400)
-            self.assertEqual(len(calls), 1)
+        self.assertEqual(response.status_code, 400)
 
         # #23839 - Primary key should always be allowed, even if the referenced model isn't registered.
         response = self.client.get(reverse('admin:admin_views_notreferenced_changelist'), {TO_FIELD_VAR: 'id'})
@@ -815,30 +812,26 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         # #25622 - Specifying a field of a model only referred by a generic
         # relation should raise DisallowedModelAdminToField.
         url = reverse('admin:admin_views_referencedbygenrel_changelist')
-        with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
+        with self.assertLogs('django.security.DisallowedModelAdminToField', 'ERROR'):
             response = self.client.get(url, {TO_FIELD_VAR: 'object_id'})
-            self.assertEqual(response.status_code, 400)
-            self.assertEqual(len(calls), 1)
+        self.assertEqual(response.status_code, 400)
 
         # We also want to prevent the add, change, and delete views from
         # leaking a disallowed field value.
-        with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
+        with self.assertLogs('django.security.DisallowedModelAdminToField', 'ERROR'):
             response = self.client.post(reverse('admin:admin_views_section_add'), {TO_FIELD_VAR: 'name'})
-            self.assertEqual(response.status_code, 400)
-            self.assertEqual(len(calls), 1)
+        self.assertEqual(response.status_code, 400)
 
         section = Section.objects.create()
-        with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
-            url = reverse('admin:admin_views_section_change', args=(section.pk,))
+        url = reverse('admin:admin_views_section_change', args=(section.pk,))
+        with self.assertLogs('django.security.DisallowedModelAdminToField', 'ERROR'):
             response = self.client.post(url, {TO_FIELD_VAR: 'name'})
-            self.assertEqual(response.status_code, 400)
-            self.assertEqual(len(calls), 1)
+        self.assertEqual(response.status_code, 400)
 
-        with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
-            url = reverse('admin:admin_views_section_delete', args=(section.pk,))
+        url = reverse('admin:admin_views_section_delete', args=(section.pk,))
+        with self.assertLogs('django.security.DisallowedModelAdminToField', 'ERROR'):
             response = self.client.post(url, {TO_FIELD_VAR: 'name'})
-            self.assertEqual(response.status_code, 400)
-            self.assertEqual(len(calls), 1)
+        self.assertEqual(response.status_code, 400)
 
     def test_allowed_filtering_15103(self):
         """
@@ -1401,6 +1394,7 @@ class AdminViewPermissionsTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
+        cls.viewuser = User.objects.create_user(username='viewuser', password='secret', is_staff=True)
         cls.adduser = User.objects.create_user(username='adduser', password='secret', is_staff=True)
         cls.changeuser = User.objects.create_user(username='changeuser', password='secret', is_staff=True)
         cls.deleteuser = User.objects.create_user(username='deleteuser', password='secret', is_staff=True)
@@ -1422,6 +1416,8 @@ class AdminViewPermissionsTest(TestCase):
         # Setup permissions, for our users who can add, change, and delete.
         opts = Article._meta
 
+        # User who can view Articles
+        cls.viewuser.user_permissions.add(get_perm(Article, get_permission_codename('view', opts)))
         # User who can add Articles
         cls.adduser.user_permissions.add(get_perm(Article, get_permission_codename('add', opts)))
         # User who can change Articles
@@ -1474,6 +1470,11 @@ class AdminViewPermissionsTest(TestCase):
             'username': 'joepublic',
             'password': 'secret',
         }
+        cls.viewuser_login = {
+            REDIRECT_FIELD_NAME: cls.index_url,
+            'username': 'viewuser',
+            'password': 'secret',
+        }
         cls.no_username_login = {
             REDIRECT_FIELD_NAME: cls.index_url,
             'password': 'secret',
@@ -1509,6 +1510,14 @@ class AdminViewPermissionsTest(TestCase):
         # check to ensure if there are multiple email addresses a user doesn't get a 500
         login = self.client.post(login_url, self.super_email_login)
         self.assertContains(login, ERROR_MESSAGE)
+
+        # View User
+        response = self.client.get(self.index_url)
+        self.assertEqual(response.status_code, 302)
+        login = self.client.post(login_url, self.viewuser_login)
+        self.assertRedirects(login, self.index_url)
+        self.assertFalse(login.context)
+        self.client.get(reverse('admin:logout'))
 
         # Add User
         response = self.client.get(self.index_url)
@@ -1664,6 +1673,27 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(Article.objects.count(), 3)
         self.client.get(reverse('admin:logout'))
 
+        # View User should not have access to add articles
+        self.client.force_login(self.viewuser)
+        response = self.client.get(reverse('admin:admin_views_article_add'))
+        self.assertEqual(response.status_code, 403)
+        # Try POST just to make sure
+        post = self.client.post(reverse('admin:admin_views_article_add'), add_dict)
+        self.assertEqual(post.status_code, 403)
+        self.assertEqual(Article.objects.count(), 3)
+        # Now give the user permission to add but not change.
+        self.viewuser.user_permissions.add(get_perm(Article, get_permission_codename('add', Article._meta)))
+        response = self.client.get(reverse('admin:admin_views_article_add'))
+        self.assertContains(response, '<input type="submit" value="Save and view" name="_continue">')
+        post = self.client.post(reverse('admin:admin_views_article_add'), add_dict, follow=False)
+        self.assertEqual(post.status_code, 302)
+        self.assertEqual(Article.objects.count(), 4)
+        article = Article.objects.latest('pk')
+        response = self.client.get(reverse('admin:admin_views_article_change', args=(article.pk,)))
+        self.assertContains(response, '<li class="success">The article "Døm ikke" was added successfully.</li>')
+        article.delete()
+        self.client.get(reverse('admin:logout'))
+
         # Add user may login and POST to add view, then redirect to admin root
         self.client.force_login(self.adduser)
         addpage = self.client.get(reverse('admin:admin_views_article_add'))
@@ -1675,7 +1705,7 @@ class AdminViewPermissionsTest(TestCase):
         post = self.client.post(reverse('admin:admin_views_article_add'), add_dict)
         self.assertRedirects(post, self.index_url)
         self.assertEqual(Article.objects.count(), 4)
-        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(len(mail.outbox), 2)
         self.assertEqual(mail.outbox[0].subject, 'Greetings from a created object')
         self.client.get(reverse('admin:logout'))
 
@@ -1729,12 +1759,29 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(post.status_code, 403)
         self.client.get(reverse('admin:logout'))
 
+        # view user should be able to view the article but not change any of them
+        # (the POST can be sent, but no modification occures)
+        self.client.force_login(self.viewuser)
+        response = self.client.get(article_changelist_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['title'], 'Select article to view')
+        response = self.client.get(article_change_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['title'], 'View article')
+        self.assertContains(response, '<a href="/test_admin/admin/admin_views/article/" class="closelink">Close</a>')
+        post = self.client.post(article_change_url, change_dict)
+        self.assertEqual(post.status_code, 302)
+        self.assertEqual(Article.objects.get(pk=self.a1.pk).content, '<p>Middle content</p>')
+        self.client.get(reverse('admin:logout'))
+
         # change user can view all items and edit them
         self.client.force_login(self.changeuser)
         response = self.client.get(article_changelist_url)
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['title'], 'Select article to change')
         response = self.client.get(article_change_url)
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['title'], 'Change article')
         post = self.client.post(article_change_url, change_dict)
         self.assertRedirects(post, article_changelist_url)
         self.assertEqual(Article.objects.get(pk=self.a1.pk).content, '<p>edited article</p>')
@@ -1758,9 +1805,14 @@ class AdminViewPermissionsTest(TestCase):
         # Test redirection when using row-level change permissions. Refs #11513.
         r1 = RowLevelChangePermissionModel.objects.create(id=1, name="odd id")
         r2 = RowLevelChangePermissionModel.objects.create(id=2, name="even id")
+        r3 = RowLevelChangePermissionModel.objects.create(id=3, name='odd id mult 3')
+        r6 = RowLevelChangePermissionModel.objects.create(id=6, name='even id mult 3')
         change_url_1 = reverse('admin:admin_views_rowlevelchangepermissionmodel_change', args=(r1.pk,))
         change_url_2 = reverse('admin:admin_views_rowlevelchangepermissionmodel_change', args=(r2.pk,))
-        for login_user in [self.superuser, self.adduser, self.changeuser, self.deleteuser]:
+        change_url_3 = reverse('admin:admin_views_rowlevelchangepermissionmodel_change', args=(r3.pk,))
+        change_url_6 = reverse('admin:admin_views_rowlevelchangepermissionmodel_change', args=(r6.pk,))
+        logins = [self.superuser, self.viewuser, self.adduser, self.changeuser, self.deleteuser]
+        for login_user in logins:
             self.client.force_login(login_user)
             response = self.client.get(change_url_1)
             self.assertEqual(response.status_code, 403)
@@ -1772,6 +1824,17 @@ class AdminViewPermissionsTest(TestCase):
             response = self.client.post(change_url_2, {'name': 'changed'})
             self.assertEqual(RowLevelChangePermissionModel.objects.get(id=2).name, 'changed')
             self.assertRedirects(response, self.index_url)
+            response = self.client.get(change_url_3)
+            self.assertEqual(response.status_code, 200)
+            response = self.client.post(change_url_3, {'name': 'changed'})
+            self.assertRedirects(response, self.index_url)
+            self.assertEqual(RowLevelChangePermissionModel.objects.get(id=3).name, 'odd id mult 3')
+            response = self.client.get(change_url_6)
+            self.assertEqual(response.status_code, 200)
+            response = self.client.post(change_url_6, {'name': 'changed'})
+            self.assertEqual(RowLevelChangePermissionModel.objects.get(id=6).name, 'changed')
+            self.assertRedirects(response, self.index_url)
+
             self.client.get(reverse('admin:logout'))
 
         for login_user in [self.joepublicuser, self.nostaffuser]:
@@ -1787,6 +1850,18 @@ class AdminViewPermissionsTest(TestCase):
             self.assertEqual(RowLevelChangePermissionModel.objects.get(id=2).name, 'changed')
             self.assertContains(response, 'login-form')
             self.client.get(reverse('admin:logout'))
+
+    def test_change_view_without_object_change_permission(self):
+        """
+        The object should be read-only if the user has permission to view it
+        and change objects of that type but not to change the current object.
+        """
+        change_url = reverse('admin9:admin_views_article_change', args=(self.a1.pk,))
+        self.client.force_login(self.viewuser)
+        response = self.client.get(change_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['title'], 'View article')
+        self.assertContains(response, '<a href="/test_admin/admin9/admin_views/article/" class="closelink">Close</a>')
 
     def test_change_view_save_as_new(self):
         """
@@ -1833,6 +1908,15 @@ class AdminViewPermissionsTest(TestCase):
 
         # add user should not be able to delete articles
         self.client.force_login(self.adduser)
+        response = self.client.get(delete_url)
+        self.assertEqual(response.status_code, 403)
+        post = self.client.post(delete_url, delete_dict)
+        self.assertEqual(post.status_code, 403)
+        self.assertEqual(Article.objects.count(), 3)
+        self.client.logout()
+
+        # view user should not be able to delete articles
+        self.client.force_login(self.viewuser)
         response = self.client.get(delete_url)
         self.assertEqual(response.status_code, 403)
         post = self.client.post(delete_url, delete_dict)
@@ -1897,6 +1981,12 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(response.status_code, 403)
         self.client.get(reverse('admin:logout'))
 
+        # view user can view all items
+        self.client.force_login(self.viewuser)
+        response = self.client.get(reverse('admin:admin_views_article_history', args=(self.a1.pk,)))
+        self.assertEqual(response.status_code, 200)
+        self.client.get(reverse('admin:logout'))
+
         # change user can view all items and edit them
         self.client.force_login(self.changeuser)
         response = self.client.get(reverse('admin:admin_views_article_history', args=(self.a1.pk,)))
@@ -1905,7 +1995,8 @@ class AdminViewPermissionsTest(TestCase):
         # Test redirection when using row-level change permissions. Refs #11513.
         rl1 = RowLevelChangePermissionModel.objects.create(name="odd id")
         rl2 = RowLevelChangePermissionModel.objects.create(name="even id")
-        for login_user in [self.superuser, self.adduser, self.changeuser, self.deleteuser]:
+        logins = [self.superuser, self.viewuser, self.adduser, self.changeuser, self.deleteuser]
+        for login_user in logins:
             self.client.force_login(login_user)
             url = reverse('admin:admin_views_rowlevelchangepermissionmodel_history', args=(rl1.pk,))
             response = self.client.get(url)
@@ -2079,6 +2170,12 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(response, 'Articles')
         self.client.logout()
 
+        self.client.force_login(self.viewuser)
+        response = self.client.get(self.index_url)
+        self.assertContains(response, 'admin_views')
+        self.assertContains(response, 'Articles')
+        self.client.logout()
+
         self.client.force_login(self.adduser)
         response = self.client.get(self.index_url)
         self.assertContains(response, 'admin_views')
@@ -2108,6 +2205,12 @@ class AdminViewPermissionsTest(TestCase):
         self.client.force_login(self.superuser)
         response = self.client.get(index_url)
         self.assertContains(response, sections)
+        self.assertNotContains(response, articles)
+        self.client.logout()
+
+        self.client.force_login(self.viewuser)
+        response = self.client.get(index_url)
+        self.assertNotContains(response, 'admin_views')
         self.assertNotContains(response, articles)
         self.client.logout()
 
@@ -3752,6 +3855,52 @@ class AdminInlineTests(TestCase):
         self.assertEqual(Widget.objects.count(), 1)
         self.assertEqual(Widget.objects.all()[0].name, "Widget 1 Updated")
 
+    def test_simple_inline_permissions(self):
+        """
+        Changes aren't allowed without change permissions for the inline object.
+        """
+        # User who can view Articles
+        permissionuser = User.objects.create_user(
+            username='permissionuser', password='secret',
+            email='vuser@example.com', is_staff=True,
+        )
+        permissionuser.user_permissions.add(get_perm(Collector, get_permission_codename('view', Collector._meta)))
+        permissionuser.user_permissions.add(get_perm(Widget, get_permission_codename('view', Widget._meta)))
+        self.client.force_login(permissionuser)
+        # Without add permission, a new inline can't be added.
+        self.post_data['widget_set-0-name'] = 'Widget 1'
+        collector_url = reverse('admin:admin_views_collector_change', args=(self.collector.pk,))
+        response = self.client.post(collector_url, self.post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Widget.objects.count(), 0)
+        # But after adding the permisson it can.
+        permissionuser.user_permissions.add(get_perm(Widget, get_permission_codename('add', Widget._meta)))
+        self.post_data['widget_set-0-name'] = "Widget 1"
+        collector_url = reverse('admin:admin_views_collector_change', args=(self.collector.pk,))
+        response = self.client.post(collector_url, self.post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Widget.objects.count(), 1)
+        self.assertEqual(Widget.objects.first().name, 'Widget 1')
+        widget_id = Widget.objects.first().id
+        # Without the change permission, a POST doesn't change the object.
+        self.post_data['widget_set-INITIAL_FORMS'] = '1'
+        self.post_data['widget_set-0-id'] = str(widget_id)
+        self.post_data['widget_set-0-name'] = 'Widget 1 Updated'
+        response = self.client.post(collector_url, self.post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Widget.objects.count(), 1)
+        self.assertEqual(Widget.objects.first().name, 'Widget 1')
+        # Now adding the change permission and editing works.
+        permissionuser.user_permissions.remove(get_perm(Widget, get_permission_codename('add', Widget._meta)))
+        permissionuser.user_permissions.add(get_perm(Widget, get_permission_codename('change', Widget._meta)))
+        self.post_data['widget_set-INITIAL_FORMS'] = '1'
+        self.post_data['widget_set-0-id'] = str(widget_id)
+        self.post_data['widget_set-0-name'] = 'Widget 1 Updated'
+        response = self.client.post(collector_url, self.post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Widget.objects.count(), 1)
+        self.assertEqual(Widget.objects.first().name, 'Widget 1 Updated')
+
     def test_explicit_autofield_inline(self):
         "A model with an explicit autofield primary key can be saved as inlines. Regression for #8093"
         # First add a new inline
@@ -4762,9 +4911,18 @@ class UserAdminTest(TestCase):
             '_continue': '1',
         })
         new_user = User.objects.get(username='newuser')
-        self.assertRedirects(response, reverse('admin:auth_user_change', args=(new_user.pk,)))
+        new_user_url = reverse('admin:auth_user_change', args=(new_user.pk,))
+        self.assertRedirects(response, new_user_url, fetch_redirect_response=False)
         self.assertEqual(User.objects.count(), user_count + 1)
         self.assertTrue(new_user.has_usable_password())
+        response = self.client.get(new_user_url)
+        self.assertContains(
+            response,
+            '<li class="success">The user "<a href="%s">'
+            '%s</a>" was added successfully. You may edit it again below.</li>'
+            % (new_user_url, new_user),
+            html=True,
+        )
 
     def test_password_mismatch(self):
         response = self.client.post(reverse('admin:auth_user_add'), {
@@ -5400,7 +5558,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
 
-    def assertURLEqual(self, url1, url2):
+    def assertURLEqual(self, url1, url2, msg_prefix=''):
         """
         Assert that two URLs are equal despite the ordering
         of their querystring. Refs #22360.
@@ -5571,31 +5729,19 @@ class AdminKeepChangeListFiltersTests(TestCase):
 
         post_data['_save'] = 1
         response = self.client.post(self.get_change_url(), data=post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertURLEqual(
-            response.url,
-            self.get_changelist_url()
-        )
+        self.assertRedirects(response, self.get_changelist_url())
         post_data.pop('_save')
 
         # Test redirect on "Save and continue".
         post_data['_continue'] = 1
         response = self.client.post(self.get_change_url(), data=post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertURLEqual(
-            response.url,
-            self.get_change_url()
-        )
+        self.assertRedirects(response, self.get_change_url())
         post_data.pop('_continue')
 
         # Test redirect on "Save and add new".
         post_data['_addanother'] = 1
         response = self.client.post(self.get_change_url(), data=post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertURLEqual(
-            response.url,
-            self.get_add_url()
-        )
+        self.assertRedirects(response, self.get_add_url())
         post_data.pop('_addanother')
 
     def test_add_view(self):
@@ -5619,43 +5765,27 @@ class AdminKeepChangeListFiltersTests(TestCase):
         # Test redirect on "Save".
         post_data['_save'] = 1
         response = self.client.post(self.get_add_url(), data=post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertURLEqual(
-            response.url,
-            self.get_change_url(User.objects.get(username='dummy').pk)
-        )
+        self.assertRedirects(response, self.get_change_url(User.objects.get(username='dummy').pk))
         post_data.pop('_save')
 
         # Test redirect on "Save and continue".
         post_data['username'] = 'dummy2'
         post_data['_continue'] = 1
         response = self.client.post(self.get_add_url(), data=post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertURLEqual(
-            response.url,
-            self.get_change_url(User.objects.get(username='dummy2').pk)
-        )
+        self.assertRedirects(response, self.get_change_url(User.objects.get(username='dummy2').pk))
         post_data.pop('_continue')
 
         # Test redirect on "Save and add new".
         post_data['username'] = 'dummy3'
         post_data['_addanother'] = 1
         response = self.client.post(self.get_add_url(), data=post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertURLEqual(
-            response.url,
-            self.get_add_url()
-        )
+        self.assertRedirects(response, self.get_add_url())
         post_data.pop('_addanother')
 
     def test_delete_view(self):
         # Test redirect on "Delete".
         response = self.client.post(self.get_delete_url(), {'post': 'yes'})
-        self.assertEqual(response.status_code, 302)
-        self.assertURLEqual(
-            response.url,
-            self.get_changelist_url()
-        )
+        self.assertRedirects(response, self.get_changelist_url())
 
     def test_url_prefix(self):
         context = {

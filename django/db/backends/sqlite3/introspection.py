@@ -192,7 +192,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         fields_sql = create_sql[create_sql.index('(') + 1:create_sql.rindex(')')]
         for field_desc in fields_sql.split(','):
             field_desc = field_desc.strip()
-            m = re.match('(?:(?:["`\[])(.*)(?:["`\]])|(\w+)).*PRIMARY KEY.*', field_desc)
+            m = re.match(r'(?:(?:["`\[])(.*)(?:["`\]])|(\w+)).*PRIMARY KEY.*', field_desc)
             if m:
                 return m.group(1) if m.group(1) else m.group(2)
         return None
@@ -231,6 +231,32 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         one or more columns.
         """
         constraints = {}
+        # Find inline check constraints.
+        try:
+            table_schema = cursor.execute(
+                "SELECT sql FROM sqlite_master WHERE type='table' and name=%s" % (
+                    self.connection.ops.quote_name(table_name),
+                )
+            ).fetchone()[0]
+        except TypeError:
+            # table_name is a view.
+            pass
+        else:
+            fields_with_check_constraints = [
+                schema_row.strip().split(' ')[0][1:-1]
+                for schema_row in table_schema.split(',')
+                if schema_row.find('CHECK') >= 0
+            ]
+            for field_name in fields_with_check_constraints:
+                # An arbitrary made up name.
+                constraints['__check__%s' % field_name] = {
+                    'columns': [field_name],
+                    'primary_key': False,
+                    'unique': False,
+                    'foreign_key': False,
+                    'check': True,
+                    'index': False,
+                }
         # Get the index info
         cursor.execute("PRAGMA index_list(%s)" % self.connection.ops.quote_name(table_name))
         for row in cursor.fetchall():

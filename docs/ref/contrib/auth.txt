@@ -51,10 +51,6 @@ Fields
         Optional (:attr:`blank=True <django.db.models.Field.blank>`). 150
         characters or fewer.
 
-        .. versionchanged:: 2.0
-
-            The ``max_length`` increased from 30 to 150 characters.
-
     .. attribute:: email
 
         Optional (:attr:`blank=True <django.db.models.Field.blank>`). Email

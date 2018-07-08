@@ -638,7 +638,10 @@ class ignore_warnings(TestContextDecorator):
 def patch_logger(logger_name, log_level, log_kwargs=False):
     """
     Context manager that takes a named logger and the logging level
-    and provides a simple mock-like list of messages received
+    and provides a simple mock-like list of messages received.
+
+    Use unitttest.assertLogs() if you only need Python 3 support. This
+    private API will be removed after Python 2 EOL in 2020 (#27753).
     """
     calls = []
 

@@ -10,7 +10,7 @@ __all__ = [
     'activate', 'deactivate', 'override', 'deactivate_all',
     'get_language', 'get_language_from_request',
     'get_language_info', 'get_language_bidi',
-    'check_for_language', 'to_locale', 'templatize',
+    'check_for_language', 'to_language', 'to_locale', 'templatize',
     'gettext', 'gettext_lazy', 'gettext_noop',
     'ugettext', 'ugettext_lazy', 'ugettext_noop',
     'ngettext', 'ngettext_lazy',
@@ -193,8 +193,29 @@ def check_for_language(lang_code):
     return _trans.check_for_language(lang_code)
 
 
+def to_language(locale):
+    """Turn a locale name (en_US) into a language name (en-us)."""
+    p = locale.find('_')
+    if p >= 0:
+        return locale[:p].lower() + '-' + locale[p + 1:].lower()
+    else:
+        return locale.lower()
+
+
 def to_locale(language):
-    return _trans.to_locale(language)
+    """Turn a language name (en-us) into a locale name (en_US)."""
+    language = language.lower()
+    parts = language.split('-')
+    try:
+        country = parts[1]
+    except IndexError:
+        return language
+    # A language with > 2 characters after the dash only has its first
+    # character after the dash capitalized; e.g. sr-latn becomes sr_Latn.
+    # A language with 2 characters after the dash has both characters
+    # capitalized; e.g. en-us becomes en_US.
+    parts[1] = country.title() if len(country) > 2 else country.upper()
+    return parts[0] + '_' + '-'.join(parts[1:])
 
 
 def get_language_from_request(request, check_path=False):

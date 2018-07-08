@@ -171,8 +171,8 @@ Put the following in the ``tests.py`` file in the ``polls`` application:
 
     import datetime
 
-    from django.utils import timezone
     from django.test import TestCase
+    from django.utils import timezone
 
     from .models import Question
 

@@ -156,6 +156,10 @@ class RowLevelChangePermissionModelAdmin(admin.ModelAdmin):
         """ Only allow changing objects with even id number """
         return request.user.is_staff and (obj is not None) and (obj.id % 2 == 0)
 
+    def has_view_permission(self, request, obj=None):
+        """Only allow viewing objects if id is a multiple of 3."""
+        return request.user.is_staff and obj is not None and obj.id % 3 == 0
+
 
 class CustomArticleAdmin(admin.ModelAdmin):
     """
@@ -1112,3 +1116,13 @@ site6.register(Article, ArticleAdmin6)
 site6.register(Actor, ActorAdmin6)
 site6.register(Chapter, ChapterAdmin6)
 site6.register(Color, ColorAdmin6)
+
+
+class ArticleAdmin9(admin.ModelAdmin):
+    def has_change_permission(self, request, obj=None):
+        # Simulate that the user can't change a specific object.
+        return obj is None
+
+
+site9 = admin.AdminSite(name='admin9')
+site9.register(Article, ArticleAdmin9)

@@ -3,6 +3,8 @@ from django.contrib.admin import BooleanFieldListFilter, SimpleListFilter
 from django.contrib.admin.options import VERTICAL, ModelAdmin, TabularInline
 from django.contrib.admin.sites import AdminSite
 from django.core.checks import Error
+from django.db.models import F
+from django.db.models.functions import Upper
 from django.forms.models import BaseModelFormSet
 from django.test import SimpleTestCase
 
@@ -829,6 +831,23 @@ class OrderingCheckTests(CheckTestCase):
 
         self.assertIsValid(TestModelAdmin, ValidationTestModel)
 
+    def test_invalid_expression(self):
+        class TestModelAdmin(ModelAdmin):
+            ordering = (F('nonexistent'), )
+
+        self.assertIsInvalid(
+            TestModelAdmin, ValidationTestModel,
+            "The value of 'ordering[0]' refers to 'nonexistent', which is not "
+            "an attribute of 'modeladmin.ValidationTestModel'.",
+            'admin.E033'
+        )
+
+    def test_valid_expression(self):
+        class TestModelAdmin(ModelAdmin):
+            ordering = (Upper('name'), Upper('band__name').desc())
+
+        self.assertIsValid(TestModelAdmin, ValidationTestModel)
+
 
 class ListSelectRelatedCheckTests(CheckTestCase):
 
@@ -1271,3 +1290,22 @@ class AutocompleteFieldsTests(CheckTestCase):
         site = AdminSite()
         site.register(User, UserAdmin)
         self.assertIsValid(Admin, ValidationTestModel, admin_site=site)
+
+
+class ActionsCheckTests(CheckTestCase):
+
+    def test_custom_permissions_require_matching_has_method(self):
+        def custom_permission_action(modeladmin, request, queryset):
+            pass
+
+        custom_permission_action.allowed_permissions = ('custom',)
+
+        class BandAdmin(ModelAdmin):
+            actions = (custom_permission_action,)
+
+        self.assertIsInvalid(
+            BandAdmin, Band,
+            'BandAdmin must define a has_custom_permission() method for the '
+            'custom_permission_action action.',
+            id='admin.E129',
+        )

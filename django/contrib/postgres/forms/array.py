@@ -13,7 +13,7 @@ from ..utils import prefix_validation_error
 
 class SimpleArrayField(forms.CharField):
     default_error_messages = {
-        'item_invalid': _('Item %(nth)s in the array did not validate: '),
+        'item_invalid': _('Item %(nth)s in the array did not validate:'),
     }
 
     def __init__(self, base_field, *, delimiter=',', max_length=None, min_length=None, **kwargs):
@@ -167,7 +167,7 @@ class SplitArrayWidget(forms.Widget):
 
 class SplitArrayField(forms.Field):
     default_error_messages = {
-        'item_invalid': _('Item %(nth)s in the array did not validate: '),
+        'item_invalid': _('Item %(nth)s in the array did not validate:'),
     }
 
     def __init__(self, base_field, size, *, remove_trailing_nulls=False, **kwargs):

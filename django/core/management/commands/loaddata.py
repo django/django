@@ -39,11 +39,11 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('args', metavar='fixture', nargs='+', help='Fixture labels.')
         parser.add_argument(
-            '--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
+            '--database', default=DEFAULT_DB_ALIAS,
             help='Nominates a specific database to load fixtures into. Defaults to the "default" database.',
         )
         parser.add_argument(
-            '--app', action='store', dest='app_label', default=None,
+            '--app', dest='app_label',
             help='Only look for fixtures in the specified app.',
         )
         parser.add_argument(
@@ -52,11 +52,11 @@ class Command(BaseCommand):
                  'currently exist on the model.',
         )
         parser.add_argument(
-            '-e', '--exclude', dest='exclude', action='append', default=[],
+            '-e', '--exclude', action='append', default=[],
             help='An app_label or app_label.ModelName to exclude. Can be used multiple times.',
         )
         parser.add_argument(
-            '--format', action='store', dest='format', default=None,
+            '--format',
             help='Format of serialized data when reading from stdin.',
         )
 

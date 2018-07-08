@@ -539,7 +539,7 @@ class BaseDatabaseSchemaEditor:
                 fks_dropped.add((old_field.column,))
                 self.execute(self._delete_constraint_sql(self.sql_delete_fk, model, fk_name))
         # Has unique been removed?
-        if old_field.unique and (not new_field.unique or (not old_field.primary_key and new_field.primary_key)):
+        if old_field.unique and (not new_field.unique or self._field_became_primary_key(old_field, new_field)):
             # Find the unique constraint for this field
             constraint_names = self._constraint_names(model, [old_field.column], unique=True, primary_key=False)
             if strict and len(constraint_names) != 1:
@@ -689,9 +689,7 @@ class BaseDatabaseSchemaEditor:
         if old_field.primary_key and not new_field.primary_key:
             self._delete_primary_key(model, strict)
         # Added a unique?
-        if (not old_field.unique and new_field.unique) or (
-            old_field.primary_key and not new_field.primary_key and new_field.unique
-        ):
+        if self._unique_should_be_added(old_field, new_field):
             self.execute(self._create_unique_sql(model, [new_field.column]))
         # Added an index? Add an index if db_index switched to True or a unique
         # constraint will no longer be used in lieu of an index. The following
@@ -710,7 +708,7 @@ class BaseDatabaseSchemaEditor:
         if old_field.primary_key and new_field.primary_key and old_type != new_type:
             rels_to_update.extend(_related_non_m2m_objects(old_field, new_field))
         # Changed to become primary key?
-        if not old_field.primary_key and new_field.primary_key:
+        if self._field_became_primary_key(old_field, new_field):
             # Make the new one
             self.execute(
                 self.sql_create_pk % {
@@ -909,7 +907,7 @@ class BaseDatabaseSchemaEditor:
         return ''
 
     def _create_index_sql(self, model, fields, *, name=None, suffix='', using='',
-                          db_tablespace=None, col_suffixes=(), sql=None):
+                          db_tablespace=None, col_suffixes=(), sql=None, opclasses=()):
         """
         Return the SQL statement to create the index for one or several fields.
         `sql` can be specified if the syntax differs from the standard (GIS
@@ -931,9 +929,12 @@ class BaseDatabaseSchemaEditor:
             table=Table(table, self.quote_name),
             name=IndexName(table, columns, suffix, create_index_name),
             using=using,
-            columns=Columns(table, columns, self.quote_name, col_suffixes=col_suffixes),
+            columns=self._index_columns(table, columns, col_suffixes, opclasses),
             extra=tablespace_sql,
         )
+
+    def _index_columns(self, table, columns, col_suffixes, opclasses):
+        return Columns(table, columns, self.quote_name, col_suffixes=col_suffixes)
 
     def _model_indexes_sql(self, model):
         """
@@ -965,6 +966,14 @@ class BaseDatabaseSchemaEditor:
 
     def _field_should_be_indexed(self, model, field):
         return field.db_index and not field.unique
+
+    def _field_became_primary_key(self, old_field, new_field):
+        return not old_field.primary_key and new_field.primary_key
+
+    def _unique_should_be_added(self, old_field, new_field):
+        return (not old_field.unique and new_field.unique) or (
+            old_field.primary_key and not new_field.primary_key and new_field.unique
+        )
 
     def _rename_field_sql(self, table, old_field, new_field, new_type):
         return self.sql_rename_column % {

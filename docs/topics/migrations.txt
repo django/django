@@ -352,8 +352,19 @@ Historical models
 When you run migrations, Django is working from historical versions of your
 models stored in the migration files. If you write Python code using the
 :class:`~django.db.migrations.operations.RunPython` operation, or if you have
-``allow_migrate`` methods on your database routers, you will be exposed to
-these versions of your models.
+``allow_migrate`` methods on your database routers, you **need to use** these
+historical model versions rather than importing them directly.
+
+.. warning::
+
+  If you import models directly rather than using the historical models,
+  your migrations *may work initially* but will fail in the future when you
+  try to re-run old migrations (commonly, when you set up a new installation
+  and run through all the migrations to set up the database).
+
+  This means that historical model problems may not be immediately obvious.
+  If you run into this kind of failure, it's OK to edit the migration to use
+  the historical models rather than direct imports and commit those changes.
 
 Because it's impossible to serialize arbitrary Python code, these historical
 models will not have any custom methods that you have defined. They will,

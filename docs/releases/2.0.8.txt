@@ -1,0 +1,13 @@
+==========================
+Django 2.0.8 release notes
+==========================
+
+*Expected August 1, 2018*
+
+Django 2.0.8 fixes several bugs in 2.0.7.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 2.0.7 that broke the ``regex`` lookup on MariaDB
+  (even though MariaDB isn't officially supported) (:ticket:`29544`).

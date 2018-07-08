@@ -432,7 +432,8 @@ class AdminSite:
                 'object_name': model._meta.object_name,
                 'perms': perms,
             }
-            if perms.get('change'):
+            if perms.get('change') or perms.get('view'):
+                model_dict['view_only'] = not perms.get('change')
                 try:
                     model_dict['admin_url'] = reverse('admin:%s_%s_changelist' % info, current_app=self.name)
                 except NoReverseMatch:

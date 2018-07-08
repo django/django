@@ -2,7 +2,6 @@ import datetime
 import decimal
 from collections import defaultdict
 
-from django.contrib.auth import get_permission_codename
 from django.core.exceptions import FieldDoesNotExist
 from django.db import models, router
 from django.db.models.constants import LOOKUP_SEP
@@ -117,7 +116,7 @@ def flatten_fieldsets(fieldsets):
     return field_names
 
 
-def get_deleted_objects(objs, user, admin_site):
+def get_deleted_objects(objs, request, admin_site):
     """
     Find all objects related to ``objs`` that should also be deleted. ``objs``
     must be a homogeneous iterable of objects (e.g. a QuerySet).
@@ -136,12 +135,15 @@ def get_deleted_objects(objs, user, admin_site):
     perms_needed = set()
 
     def format_callback(obj):
-        has_admin = obj.__class__ in admin_site._registry
+        model = obj.__class__
+        has_admin = model in admin_site._registry
         opts = obj._meta
 
         no_edit_link = '%s: %s' % (capfirst(opts.verbose_name), obj)
 
         if has_admin:
+            if not admin_site._registry[model].has_delete_permission(request, obj):
+                perms_needed.add(opts.verbose_name)
             try:
                 admin_url = reverse('%s:%s_%s_change'
                                     % (admin_site.name,
@@ -152,10 +154,6 @@ def get_deleted_objects(objs, user, admin_site):
                 # Change url doesn't exist -- don't display link to edit
                 return no_edit_link
 
-            if 'delete' in opts.default_permissions:
-                p = '%s.%s' % (opts.app_label, get_permission_codename('delete', opts))
-                if not user.has_perm(p):
-                    perms_needed.add(opts.verbose_name)
             # Display a link to the admin page.
             return format_html('{}: <a href="{}">{}</a>',
                                capfirst(opts.verbose_name),

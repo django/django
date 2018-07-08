@@ -38,11 +38,9 @@ input[type="submit"], button {
     /* Header */
 
     #header {
-        display: flex;
         flex-direction: column;
         padding: 15px 30px;
-        height: auto;
-        line-height: 1;
+        justify-content: flex-start;
     }
 
     #branding h1 {
@@ -810,10 +808,14 @@ input[type="submit"], button {
         width: 100%;
     }
 
-    .submit-row input, .submit-row input.default, .submit-row a {
+    .submit-row input, .submit-row input.default, .submit-row a, .submit-row a.closelink {
         float: none;
         margin: 0 0 10px;
         text-align: center;
+    }
+
+    .submit-row a.closelink {
+        padding: 10px 0;
     }
 
     .submit-row p.deletelink-box {

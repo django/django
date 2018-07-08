@@ -319,7 +319,10 @@ class OtherRouter:
         return self.db_for_read(model, **hints)
 
     def allow_relation(self, obj1, obj2, **hints):
-        return None
+        # ContentType objects are created during a post-migrate signal while
+        # performing fixture teardown using the default database alias and
+        # don't abide by the database specified by this router.
+        return True
 
     def allow_migrate(self, db, app_label, **hints):
         return True

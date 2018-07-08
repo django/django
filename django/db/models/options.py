@@ -92,7 +92,7 @@ class Options:
         self.unique_together = []
         self.index_together = []
         self.select_on_save = False
-        self.default_permissions = ('add', 'change', 'delete')
+        self.default_permissions = ('add', 'change', 'delete', 'view')
         self.permissions = []
         self.object_name = None
         self.app_label = app_label

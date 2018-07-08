@@ -82,10 +82,6 @@ Keyword Argument       Description
                        representation -- the default value is 8.
 =====================  =====================================================
 
-.. versionchanged:: 2.0
-
-    MySQL support was added.
-
 ``AsGML``
 =========
 
@@ -171,8 +167,6 @@ __ https://www.w3.org/Graphics/SVG/
 ===========
 
 .. class:: Azimuth(point_a, point_b, **extra)
-
-.. versionadded:: 2.0
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_Azimuth.html>`__,
 SpatiaLite (LWGEOM)
@@ -273,10 +267,16 @@ queryset is calculated::
 
 *Availability*: `MySQL
 <https://dev.mysql.com/doc/refman/en/gis-general-property-functions.html#function_st-envelope>`__,
+`Oracle
+<https://docs.oracle.com/database/121/SPATL/sdo_geom-sdo_mbr.htm#GUID-646638D0-2C5F-490A-AF63-DE9B7A4C97C1__CHDJCEIH>`__,
 `PostGIS <https://postgis.net/docs/ST_Envelope.html>`__, SpatiaLite
 
 Accepts a single geographic field or expression and returns the geometry
 representing the bounding box of the geometry.
+
+.. versionchanged:: 2.2
+
+    Oracle support was added.
 
 ``ForcePolygonCW``
 ==================
@@ -323,10 +323,6 @@ representation of the geometry.
 The ``precision`` keyword argument controls the number of characters in the
 result.
 
-.. versionchanged:: 2.0
-
-    MySQL support was added.
-
 __ https://en.wikipedia.org/wiki/Geohash
 
 ``Intersection``
@@ -353,10 +349,6 @@ intersection between them.
 Accepts a geographic field or expression and tests if the value is well formed.
 Returns ``True`` if its value is a valid geometry and ``False`` otherwise.
 
-.. versionchanged:: 2.0
-
-    MySQL support was added.
-
 ``Length``
 ==========
 
@@ -381,8 +373,6 @@ MySQL doesn't support length calculations on geographic SRSes.
 ===================
 
 .. class:: LineLocatePoint(linestring, point, **extra)
-
-.. versionadded:: 2.0
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_LineLocatePoint.html>`__,
 SpatiaLite

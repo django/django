@@ -16,6 +16,7 @@ from django.utils.cache import patch_vary_headers
 from django.utils.crypto import constant_time_compare, get_random_string
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import is_same_domain
+from django.utils.log import log_response
 
 logger = logging.getLogger('django.security.csrf')
 
@@ -146,14 +147,14 @@ class CsrfViewMiddleware(MiddlewareMixin):
         return None
 
     def _reject(self, request, reason):
-        logger.warning(
+        response = _get_failure_view()(request, reason=reason)
+        log_response(
             'Forbidden (%s): %s', reason, request.path,
-            extra={
-                'status_code': 403,
-                'request': request,
-            }
+            response=response,
+            request=request,
+            logger=logger,
         )
-        return _get_failure_view()(request, reason=reason)
+        return response
 
     def _get_token(self, request):
         if settings.CSRF_USE_SESSIONS:

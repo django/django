@@ -168,7 +168,7 @@ For example::
 Register custom converter classes in your URLconf using
 :func:`~django.urls.register_converter`::
 
-    from django.urls import register_converter, path
+    from django.urls import path, register_converter
 
     from . import converters, views
 
@@ -614,8 +614,8 @@ You can obtain these in template code by using:
 
 Or in Python code::
 
-    from django.urls import reverse
     from django.http import HttpResponseRedirect
+    from django.urls import reverse
 
     def redirect_to_year(request):
         # ...

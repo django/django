@@ -282,3 +282,14 @@ class DatabaseOperations(BaseDatabaseOperations):
             # EXTENDED and FORMAT are mutually exclusive options.
             prefix += ' EXTENDED'
         return prefix
+
+    def regex_lookup(self, lookup_type):
+        # REGEXP BINARY doesn't work correctly in MySQL 8+ and REGEXP_LIKE
+        # doesn't exist in MySQL 5.6 or in MariaDB.
+        if self.connection.mysql_version < (8, 0, 0) or self.connection.mysql_is_mariadb:
+            if lookup_type == 'regex':
+                return '%s REGEXP BINARY %s'
+            return '%s REGEXP %s'
+
+        match_option = 'c' if lookup_type == 'regex' else 'i'
+        return "REGEXP_LIKE(%%s, %%s, '%s')" % match_option

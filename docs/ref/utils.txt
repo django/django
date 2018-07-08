@@ -136,10 +136,6 @@ The functions defined in this module share the following properties:
     8601 (e.g. ``P4DT1H15M20S`` which is equivalent to ``4 1:15:20``) or
     PostgreSQL's day-time interval format (e.g. ``3 days 04:05:06``).
 
-    .. versionchanged:: 2.0
-
-        Support for PostgreSQL's interval format was added.
-
 ``django.utils.decorators``
 ===========================
 
@@ -426,7 +422,7 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 .. module:: django.utils.functional
     :synopsis: Functional programming tools.
 
-.. class:: cached_property(object, name)
+.. class:: cached_property(func, name=None)
 
     The ``@cached_property`` decorator caches the result of a method with a
     single ``self`` argument as a property. The cached result will persist

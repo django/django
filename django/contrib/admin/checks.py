@@ -10,6 +10,7 @@ from django.core import checks
 from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP
+from django.db.models.expressions import Combinable, F, OrderBy
 from django.forms.models import (
     BaseModelForm, BaseModelFormSet, _get_foreign_key,
 )
@@ -489,7 +490,13 @@ class BaseModelAdminChecks:
 
     def _check_ordering_item(self, obj, model, field_name, label):
         """ Check that `ordering` refers to existing fields. """
-
+        if isinstance(field_name, (Combinable, OrderBy)):
+            if not isinstance(field_name, OrderBy):
+                field_name = field_name.asc()
+            if isinstance(field_name.expression, F):
+                field_name = field_name.expression.name
+            else:
+                return []
         if field_name == '?' and len(obj.ordering) != 1:
             return [
                 checks.Error(
@@ -572,6 +579,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
             *self._check_list_editable(admin_obj),
             *self._check_search_fields(admin_obj),
             *self._check_date_hierarchy(admin_obj),
+            *self._check_action_permission_methods(admin_obj),
         ]
 
     def _check_save_as(self, obj):
@@ -883,6 +891,32 @@ class ModelAdminChecks(BaseModelAdminChecks):
                     return must_be('a DateField or DateTimeField', option='date_hierarchy', obj=obj, id='admin.E128')
                 else:
                     return []
+
+    def _check_action_permission_methods(self, obj):
+        """
+        Actions with an allowed_permission attribute require the ModelAdmin to
+        implement a has_<perm>_permission() method for each permission.
+        """
+        actions = obj._get_base_actions()
+        errors = []
+        for func, name, _ in actions:
+            if not hasattr(func, 'allowed_permissions'):
+                continue
+            for permission in func.allowed_permissions:
+                method_name = 'has_%s_permission' % permission
+                if not hasattr(obj, method_name):
+                    errors.append(
+                        checks.Error(
+                            '%s must define a %s() method for the %s action.' % (
+                                obj.__class__.__name__,
+                                method_name,
+                                func.__name__,
+                            ),
+                            obj=obj.__class__,
+                            id='admin.E129',
+                        )
+                    )
+        return errors
 
 
 class InlineModelAdminChecks(BaseModelAdminChecks):

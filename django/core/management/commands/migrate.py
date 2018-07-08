@@ -4,7 +4,9 @@ from importlib import import_module
 
 from django.apps import apps
 from django.core.checks import Tags, run_checks
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import (
+    BaseCommand, CommandError, no_translations,
+)
 from django.core.management.sql import (
     emit_post_migrate_signal, emit_pre_migrate_signal,
 )
@@ -34,22 +36,22 @@ class Command(BaseCommand):
             help='Tells Django to NOT prompt the user for input of any kind.',
         )
         parser.add_argument(
-            '--database', action='store', dest='database',
+            '--database',
             default=DEFAULT_DB_ALIAS,
             help='Nominates a database to synchronize. Defaults to the "default" database.',
         )
         parser.add_argument(
-            '--fake', action='store_true', dest='fake',
+            '--fake', action='store_true',
             help='Mark migrations as run without actually running them.',
         )
         parser.add_argument(
-            '--fake-initial', action='store_true', dest='fake_initial',
+            '--fake-initial', action='store_true',
             help='Detect if tables already exist and fake-apply initial migrations if so. Make sure '
                  'that the current database schema matches your initial migration before using this '
                  'flag. Django will only check for an existing table name.',
         )
         parser.add_argument(
-            '--run-syncdb', action='store_true', dest='run_syncdb',
+            '--run-syncdb', action='store_true',
             help='Creates tables for apps without migrations.',
         )
 
@@ -58,6 +60,7 @@ class Command(BaseCommand):
         issues.extend(super()._run_checks(**kwargs))
         return issues
 
+    @no_translations
     def handle(self, *args, **options):
 
         self.verbosity = options['verbosity']
@@ -97,12 +100,18 @@ class Command(BaseCommand):
 
         # If they supplied command line arguments, work out what they mean.
         target_app_labels_only = True
-        if options['app_label'] and options['migration_name']:
-            app_label, migration_name = options['app_label'], options['migration_name']
+        if options['app_label']:
+            # Validate app_label.
+            app_label = options['app_label']
+            try:
+                apps.get_app_config(app_label)
+            except LookupError as err:
+                raise CommandError(str(err))
             if app_label not in executor.loader.migrated_apps:
-                raise CommandError(
-                    "App '%s' does not have migrations." % app_label
-                )
+                raise CommandError("App '%s' does not have migrations." % app_label)
+
+        if options['app_label'] and options['migration_name']:
+            migration_name = options['migration_name']
             if migration_name == "zero":
                 targets = [(app_label, None)]
             else:
@@ -120,11 +129,6 @@ class Command(BaseCommand):
                 targets = [(app_label, migration.name)]
             target_app_labels_only = False
         elif options['app_label']:
-            app_label = options['app_label']
-            if app_label not in executor.loader.migrated_apps:
-                raise CommandError(
-                    "App '%s' does not have migrations." % app_label
-                )
             targets = [key for key in executor.loader.graph.leaf_nodes() if key[0] == app_label]
         else:
             targets = executor.loader.graph.leaf_nodes()

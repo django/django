@@ -162,10 +162,18 @@ class ForwardManyToOneDescriptor:
         try:
             rel_obj = self.field.get_cached_value(instance)
         except KeyError:
-            val = self.field.get_local_related_value(instance)
-            if None in val:
-                rel_obj = None
+            has_value = None not in self.field.get_local_related_value(instance)
+            ancestor_link = instance._meta.get_ancestor_link(self.field.model) if has_value else None
+            if ancestor_link and ancestor_link.is_cached(instance):
+                # An ancestor link will exist if this field is defined on a
+                # multi-table inheritance parent of the instance's class.
+                ancestor = ancestor_link.get_cached_value(instance)
+                # The value might be cached on an ancestor if the instance
+                # originated from walking down the inheritance chain.
+                rel_obj = self.field.get_cached_value(ancestor, default=None)
             else:
+                rel_obj = None
+            if rel_obj is None and has_value:
                 rel_obj = self.get_object(instance)
                 remote_field = self.field.remote_field
                 # If this is a one-to-one relation, set the reverse accessor
@@ -205,11 +213,10 @@ class ForwardManyToOneDescriptor:
         elif value is not None:
             if instance._state.db is None:
                 instance._state.db = router.db_for_write(instance.__class__, instance=value)
-            elif value._state.db is None:
+            if value._state.db is None:
                 value._state.db = router.db_for_write(value.__class__, instance=instance)
-            elif value._state.db is not None and instance._state.db is not None:
-                if not router.allow_relation(value, instance):
-                    raise ValueError('Cannot assign "%r": the current database router prevents this relation.' % value)
+            if not router.allow_relation(value, instance):
+                raise ValueError('Cannot assign "%r": the current database router prevents this relation.' % value)
 
         remote_field = self.field.remote_field
         # If we're setting the value of a OneToOneField to None, we need to clear
@@ -451,11 +458,10 @@ class ReverseOneToOneDescriptor:
         else:
             if instance._state.db is None:
                 instance._state.db = router.db_for_write(instance.__class__, instance=value)
-            elif value._state.db is None:
+            if value._state.db is None:
                 value._state.db = router.db_for_write(value.__class__, instance=instance)
-            elif value._state.db is not None and instance._state.db is not None:
-                if not router.allow_relation(value, instance):
-                    raise ValueError('Cannot assign "%r": the current database router prevents this relation.' % value)
+            if not router.allow_relation(value, instance):
+                raise ValueError('Cannot assign "%r": the current database router prevents this relation.' % value)
 
             related_pk = tuple(getattr(instance, field.attname) for field in self.related.field.foreign_related_fields)
             # Set the value of the related field to the value of the related object's related field
@@ -702,7 +708,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
                 db = router.db_for_write(self.model, instance=self.instance)
                 with transaction.atomic(using=db, savepoint=False):
                     if clear:
-                        self.clear()
+                        self.clear(bulk=bulk)
                         self.add(*objs, bulk=bulk)
                     else:
                         old_objs = set(self.using(db).all())

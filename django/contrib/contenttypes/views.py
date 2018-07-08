@@ -1,6 +1,6 @@
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.sites.requests import RequestSite
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404, HttpResponseRedirect
 from django.utils.translation import gettext as _
@@ -43,27 +43,32 @@ def shortcut(request, content_type_id, object_id):
 
     # Otherwise, we need to introspect the object's relationships for a
     # relation to the Site object
-    object_domain = None
+    try:
+        object_domain = get_current_site(request).domain
+    except ObjectDoesNotExist:
+        object_domain = None
 
     if apps.is_installed('django.contrib.sites'):
         Site = apps.get_model('sites.Site')
-
         opts = obj._meta
 
-        # First, look for a many-to-many relationship to Site.
         for field in opts.many_to_many:
+            # Look for a many-to-many relationship to Site.
             if field.remote_field.model is Site:
-                try:
-                    # Caveat: In the case of multiple related Sites, this just
-                    # selects the *first* one, which is arbitrary.
-                    object_domain = getattr(obj, field.name).all()[0].domain
-                except IndexError:
-                    pass
-                if object_domain is not None:
+                site_qs = getattr(obj, field.name).all()
+                if object_domain and site_qs.filter(domain=object_domain).exists():
+                    # The current site's domain matches a site attached to the
+                    # object.
                     break
-
-        # Next, look for a many-to-one relationship to Site.
-        if object_domain is None:
+                # Caveat: In the case of multiple related Sites, this just
+                # selects the *first* one, which is arbitrary.
+                site = site_qs.first()
+                if site:
+                    object_domain = site.domain
+                    break
+        else:
+            # No many-to-many relationship to Site found. Look for a
+            # many-to-one relationship to Site.
             for field in obj._meta.fields:
                 if field.remote_field and field.remote_field.model is Site:
                     try:
@@ -72,19 +77,7 @@ def shortcut(request, content_type_id, object_id):
                         continue
                     if site is not None:
                         object_domain = site.domain
-                    if object_domain is not None:
                         break
-
-        # Fall back to the current site (if possible).
-        if object_domain is None:
-            try:
-                object_domain = Site.objects.get_current(request).domain
-            except Site.DoesNotExist:
-                pass
-
-    else:
-        # Fall back to the current request's site.
-        object_domain = RequestSite(request).domain
 
     # If all that malarkey found an object domain, use it. Otherwise, fall back
     # to whatever get_absolute_url() returned.

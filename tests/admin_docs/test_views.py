@@ -208,6 +208,10 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
         """
         self.assertContains(self.response, "<td>baz, rox, *some_args, **some_kwargs</td>")
 
+    def test_instance_of_property_methods_are_displayed(self):
+        """Model properties are displayed as fields."""
+        self.assertContains(self.response, '<td>a_property</td>')
+
     def test_method_data_types(self):
         company = Company.objects.create(name="Django")
         person = Person.objects.create(first_name="Human", last_name="User", company=company)

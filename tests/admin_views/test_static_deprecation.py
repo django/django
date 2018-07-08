@@ -1,5 +1,3 @@
-import warnings
-
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.test import SimpleTestCase
@@ -19,12 +17,8 @@ class AdminStaticDeprecationTests(SimpleTestCase):
         old_url = staticfiles_storage.base_url
         staticfiles_storage.base_url = '/test/'
         try:
-            with warnings.catch_warnings(record=True) as recorded:
-                warnings.simplefilter('always')
+            with self.assertWarnsMessage(RemovedInDjango30Warning, msg):
                 url = static('path')
             self.assertEqual(url, '/test/path')
-            self.assertEqual(len(recorded), 1)
-            self.assertIs(recorded[0].category, RemovedInDjango30Warning)
-            self.assertEqual(str(recorded[0].message), msg)
         finally:
             staticfiles_storage.base_url = old_url

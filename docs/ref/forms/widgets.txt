@@ -878,8 +878,6 @@ Composite widgets
     .. attribute:: SplitDateTimeWidget.date_attrs
     .. attribute:: SplitDateTimeWidget.time_attrs
 
-        .. versionadded:: 2.0
-
         Similar to :attr:`Widget.attrs`. A dictionary containing HTML
         attributes to be set on the rendered :class:`DateInput` and
         :class:`TimeInput` widgets, respectively. If these attributes aren't

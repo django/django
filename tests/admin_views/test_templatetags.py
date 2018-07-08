@@ -72,6 +72,9 @@ class AdminTemplateTagsTest(AdminViewBasicTestCase):
 class DateHierarchyTests(TestCase):
     factory = RequestFactory()
 
+    def setUp(self):
+        self.superuser = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
+
     def test_choice_links(self):
         modeladmin = ModelAdmin(Question, site)
         modeladmin.date_hierarchy = 'posted'
@@ -97,6 +100,7 @@ class DateHierarchyTests(TestCase):
             with self.subTest(query=query):
                 query = {'posted__%s' % q: val for q, val in query.items()}
                 request = self.factory.get('/', query)
+                request.user = self.superuser
                 changelist = modeladmin.get_changelist_instance(request)
                 spec = date_hierarchy(changelist)
                 choices = [choice['link'] for choice in spec['choices']]

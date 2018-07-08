@@ -12,7 +12,7 @@ from django.db.models.deletion import CASCADE, PROTECT
 from django.db.models.fields import (
     AutoField, BigAutoField, BigIntegerField, BinaryField, BooleanField,
     CharField, DateField, DateTimeField, IntegerField, PositiveIntegerField,
-    SlugField, TextField, TimeField,
+    SlugField, TextField, TimeField, UUIDField,
 )
 from django.db.models.fields.related import (
     ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
@@ -22,7 +22,7 @@ from django.db.transaction import TransactionManagementError, atomic
 from django.test import (
     TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
 )
-from django.test.utils import CaptureQueriesContext, isolate_apps, patch_logger
+from django.test.utils import CaptureQueriesContext, isolate_apps
 from django.utils import timezone
 
 from .fields import (
@@ -601,6 +601,19 @@ class SchemaTests(TransactionTestCase):
         new_field.set_attributes_from_name('id')
         new_field.model = Author
         with connection.schema_editor() as editor:
+            editor.alter_field(Author, old_field, new_field, strict=True)
+
+    def test_alter_not_unique_field_to_primary_key(self):
+        # Create the table.
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        # Change UUIDField to primary key.
+        old_field = Author._meta.get_field('uuid')
+        new_field = UUIDField(primary_key=True)
+        new_field.set_attributes_from_name('uuid')
+        new_field.model = Author
+        with connection.schema_editor() as editor:
+            editor.remove_field(Author, Author._meta.get_field('id'))
             editor.alter_field(Author, old_field, new_field, strict=True)
 
     def test_alter_text_field(self):
@@ -1573,11 +1586,11 @@ class SchemaTests(TransactionTestCase):
         new_field = CharField(max_length=255, unique=True)
         new_field.model = Author
         new_field.set_attributes_from_name('name')
-        with patch_logger('django.db.backends.schema', 'debug') as logger_calls:
+        with self.assertLogs('django.db.backends.schema', 'DEBUG') as cm:
             with connection.schema_editor() as editor:
                 editor.alter_field(Author, Author._meta.get_field('name'), new_field)
-            # One SQL statement is executed to alter the field.
-            self.assertEqual(len(logger_calls), 1)
+        # One SQL statement is executed to alter the field.
+        self.assertEqual(len(cm.records), 1)
 
     @isolate_apps('schema')
     @unittest.skipIf(connection.vendor == 'sqlite', 'SQLite remakes the table on field alteration.')
@@ -1606,11 +1619,11 @@ class SchemaTests(TransactionTestCase):
         new_field = SlugField(max_length=75, unique=True)
         new_field.model = Tag
         new_field.set_attributes_from_name('slug')
-        with patch_logger('django.db.backends.schema', 'debug') as logger_calls:
+        with self.assertLogs('django.db.backends.schema', 'DEBUG') as cm:
             with connection.schema_editor() as editor:
                 editor.alter_field(Tag, Tag._meta.get_field('slug'), new_field)
-            # One SQL statement is executed to alter the field.
-            self.assertEqual(len(logger_calls), 1)
+        # One SQL statement is executed to alter the field.
+        self.assertEqual(len(cm.records), 1)
         # Ensure that the field is still unique.
         Tag.objects.create(title='foo', slug='foo')
         with self.assertRaises(IntegrityError):

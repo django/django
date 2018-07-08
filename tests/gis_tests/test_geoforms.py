@@ -5,7 +5,6 @@ from django.contrib.gis.forms import BaseGeometryWidget, OpenLayersWidget
 from django.contrib.gis.geos import GEOSGeometry
 from django.forms import ValidationError
 from django.test import SimpleTestCase, override_settings
-from django.test.utils import patch_logger
 from django.utils.html import escape
 
 
@@ -120,7 +119,7 @@ class GeometryFieldTest(SimpleTestCase):
             'pt3': 'PNT(0)',  # invalid
         })
 
-        with patch_logger('django.contrib.gis', 'error') as logger_calls:
+        with self.assertLogs('django.contrib.gis', 'ERROR') as logger_calls:
             output = str(form)
 
         # The first point can't use assertInHTML() due to non-deterministic
@@ -142,9 +141,9 @@ class GeometryFieldTest(SimpleTestCase):
         )
         # Only the invalid PNT(0) triggers an error log entry.
         # Deserialization is called in form clean and in widget rendering.
-        self.assertEqual(len(logger_calls), 2)
+        self.assertEqual(len(logger_calls.records), 2)
         self.assertEqual(
-            logger_calls[0],
+            logger_calls.records[0].getMessage(),
             "Error creating geometry from value 'PNT(0)' (String input "
             "unrecognized as WKT EWKT, and HEXEWKB.)"
         )

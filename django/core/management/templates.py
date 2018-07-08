@@ -32,9 +32,6 @@ class TemplateCommand(BaseCommand):
     requires_system_checks = False
     # The supported URL schemes
     url_schemes = ['http', 'https', 'ftp']
-    # Can't perform any active locale changes during this command, because
-    # setting might not be available at all.
-    leave_locale_alone = True
     # Rewrite the following suffixes when determining the target filename.
     rewrite_template_suffixes = (
         # Allow shipping invalid .py files without byte-compilation.

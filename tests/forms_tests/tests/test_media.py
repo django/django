@@ -1,5 +1,3 @@
-import warnings
-
 from django.forms import CharField, Form, Media, MultiWidget, TextInput
 from django.template import Context, Template
 from django.test import SimpleTestCase, override_settings
@@ -540,10 +538,6 @@ class FormsMediaTestCase(SimpleTestCase):
                 self.assertEqual(Media.merge(list1, list2), expected)
 
     def test_merge_warning(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
+        msg = 'Detected duplicate Media files in an opposite order:\n1\n2'
+        with self.assertWarnsMessage(RuntimeWarning, msg):
             self.assertEqual(Media.merge([1, 2], [2, 1]), [1, 2])
-            self.assertEqual(
-                str(w[-1].message),
-                'Detected duplicate Media files in an opposite order:\n1\n2'
-            )

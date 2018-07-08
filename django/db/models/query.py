@@ -1568,7 +1568,7 @@ def prefetch_related_objects(model_instances, *related_lookups):
                 # same relationships to stop infinite recursion. So, if we
                 # are already on an automatically added lookup, don't add
                 # the new lookups from relationships we've seen already.
-                if not (lookup in auto_lookups and descriptor in followed_descriptors):
+                if not (prefetch_to in done_queries and lookup in auto_lookups and descriptor in followed_descriptors):
                     done_queries[prefetch_to] = obj_list
                     new_lookups = normalize_prefetch_lookups(reversed(additional_lookups), prefetch_to)
                     auto_lookups.update(new_lookups)

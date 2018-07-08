@@ -3,7 +3,7 @@ import itertools
 import os
 import re
 from importlib import import_module
-from urllib.parse import ParseResult, quote, urlparse
+from urllib.parse import quote
 
 from django.apps import apps
 from django.conf import settings
@@ -23,11 +23,10 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.sites.requests import RequestSite
 from django.core import mail
 from django.db import connection
-from django.http import HttpRequest, QueryDict
+from django.http import HttpRequest
 from django.middleware.csrf import CsrfViewMiddleware, get_token
 from django.test import Client, TestCase, override_settings
 from django.test.client import RedirectCycleError
-from django.test.utils import patch_logger
 from django.urls import NoReverseMatch, reverse, reverse_lazy
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import LANGUAGE_SESSION_KEY
@@ -70,23 +69,6 @@ class AuthViewsTestCase(TestCase):
         """Assert that error is found in response.context['form'] errors"""
         form_errors = list(itertools.chain(*response.context['form'].errors.values()))
         self.assertIn(str(error), form_errors)
-
-    def assertURLEqual(self, url, expected, parse_qs=False):
-        """
-        Given two URLs, make sure all their components (the ones given by
-        urlparse) are equal, only comparing components that are present in both
-        URLs.
-        If `parse_qs` is True, then the querystrings are parsed with QueryDict.
-        This is useful if you don't want the order of parameters to matter.
-        Otherwise, the query strings are compared as-is.
-        """
-        fields = ParseResult._fields
-
-        for attr, x, y in zip(fields, urlparse(url), urlparse(expected)):
-            if parse_qs and attr == 'query':
-                x, y = QueryDict(x), QueryDict(y)
-            if x and y and x != y:
-                self.fail("%r != %r (%s doesn't match)" % (url, expected, attr))
 
 
 @override_settings(ROOT_URLCONF='django.contrib.auth.urls')
@@ -186,29 +168,27 @@ class PasswordResetTest(AuthViewsTestCase):
         # produce a meaningful reset URL, we need to be certain that the
         # HTTP_HOST header isn't poisoned. This is done as a check when get_host()
         # is invoked, but we check here as a practical consequence.
-        with patch_logger('django.security.DisallowedHost', 'error') as logger_calls:
+        with self.assertLogs('django.security.DisallowedHost', 'ERROR'):
             response = self.client.post(
                 '/password_reset/',
                 {'email': 'staffmember@example.com'},
                 HTTP_HOST='www.example:dr.frankenstein@evil.tld'
             )
-            self.assertEqual(response.status_code, 400)
-            self.assertEqual(len(mail.outbox), 0)
-            self.assertEqual(len(logger_calls), 1)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(len(mail.outbox), 0)
 
     # Skip any 500 handler action (like sending more mail...)
     @override_settings(DEBUG_PROPAGATE_EXCEPTIONS=True)
     def test_poisoned_http_host_admin_site(self):
         "Poisoned HTTP_HOST headers can't be used for reset emails on admin views"
-        with patch_logger('django.security.DisallowedHost', 'error') as logger_calls:
+        with self.assertLogs('django.security.DisallowedHost', 'ERROR'):
             response = self.client.post(
                 '/admin_password_reset/',
                 {'email': 'staffmember@example.com'},
                 HTTP_HOST='www.example:dr.frankenstein@evil.tld'
             )
-            self.assertEqual(response.status_code, 400)
-            self.assertEqual(len(mail.outbox), 0)
-            self.assertEqual(len(logger_calls), 1)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(len(mail.outbox), 0)
 
     def _test_confirm_start(self):
         # Start by creating the email
@@ -727,10 +707,9 @@ class LoginTest(AuthViewsTestCase):
 
 class LoginURLSettings(AuthViewsTestCase):
     """Tests for settings.LOGIN_URL."""
-    def assertLoginURLEquals(self, url, parse_qs=False):
+    def assertLoginURLEquals(self, url):
         response = self.client.get('/login_required/')
-        self.assertEqual(response.status_code, 302)
-        self.assertURLEqual(response.url, url, parse_qs=parse_qs)
+        self.assertRedirects(response, url, fetch_redirect_response=False)
 
     @override_settings(LOGIN_URL='/login/')
     def test_standard_login_url(self):
@@ -754,7 +733,7 @@ class LoginURLSettings(AuthViewsTestCase):
 
     @override_settings(LOGIN_URL='/login/?pretty=1')
     def test_login_url_with_querystring(self):
-        self.assertLoginURLEquals('/login/?pretty=1&next=/login_required/', parse_qs=True)
+        self.assertLoginURLEquals('/login/?pretty=1&next=/login_required/')
 
     @override_settings(LOGIN_URL='http://remote.example.com/login/?next=/default/')
     def test_remote_login_url_with_next_querystring(self):
@@ -1153,10 +1132,9 @@ class ChangelistTests(AuthViewsTestCase):
     # repeated password__startswith queries.
     def test_changelist_disallows_password_lookups(self):
         # A lookup that tries to filter on password isn't OK
-        with patch_logger('django.security.DisallowedModelAdminLookup', 'error') as logger_calls:
+        with self.assertLogs('django.security.DisallowedModelAdminLookup', 'ERROR'):
             response = self.client.get(reverse('auth_test_admin:auth_user_changelist') + '?password__startswith=sha1$')
-            self.assertEqual(response.status_code, 400)
-            self.assertEqual(len(logger_calls), 1)
+        self.assertEqual(response.status_code, 400)
 
     def test_user_change_email(self):
         data = self.get_user_data(self.admin)

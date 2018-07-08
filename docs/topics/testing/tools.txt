@@ -692,12 +692,15 @@ A subclass of :class:`unittest.TestCase` that adds this functionality:
 
   * Checking that a callable :meth:`raises a certain exception
     <SimpleTestCase.assertRaisesMessage>`.
+  * Checking that a callable :meth:`triggers a certain warning
+    <SimpleTestCase.assertWarnsMessage>`.
   * Testing form field :meth:`rendering and error treatment
     <SimpleTestCase.assertFieldOutput>`.
   * Testing :meth:`HTML responses for the presence/lack of a given fragment
     <SimpleTestCase.assertContains>`.
   * Verifying that a template :meth:`has/hasn't been used to generate a given
     response content <SimpleTestCase.assertTemplateUsed>`.
+  * Verifying that two :meth:`URLs <SimpleTestCase.assertURLEqual>` are equal.
   * Verifying a HTTP :meth:`redirect <SimpleTestCase.assertRedirects>` is
     performed by the app.
   * Robustly testing two :meth:`HTML fragments <SimpleTestCase.assertHTMLEqual>`
@@ -1021,7 +1024,7 @@ If you want to use a different ``Client`` class (for example, a subclass
 with customized behavior), use the :attr:`~SimpleTestCase.client_class` class
 attribute::
 
-    from django.test import TestCase, Client
+    from django.test import Client, TestCase
 
     class MyTestClient(Client):
         # Specialized methods for your environment
@@ -1070,7 +1073,7 @@ subclass::
             # Test definitions as before.
             call_setup_methods()
 
-        def testFluffyAnimals(self):
+        def test_fluffy_animals(self):
             # A test that uses the fixtures.
             call_some_test_code()
 
@@ -1105,7 +1108,7 @@ tests can't rely upon the fact that your views will be available at a
 particular URL. Decorate your test class or test method with
 ``@override_settings(ROOT_URLCONF=...)`` for URLconf configuration.
 
-.. _emptying-test-outbox:
+.. _testing-multi-db:
 
 Multi-database support
 ----------------------
@@ -1321,6 +1324,8 @@ LOCALE_PATHS, LANGUAGE_CODE      Default translation and loaded translations
 MEDIA_ROOT, DEFAULT_FILE_STORAGE Default file storage
 ================================ ========================
 
+.. _emptying-test-outbox:
+
 Emptying the test outbox
 ------------------------
 
@@ -1361,6 +1366,15 @@ your test suite.
 
         with self.assertRaisesMessage(ValueError, 'invalid literal for int()'):
             int('a')
+
+.. method:: SimpleTestCase.assertWarnsMessage(expected_warning, expected_message, callable, *args, **kwargs)
+            SimpleTestCase.assertWarnsMessage(expected_warning, expected_message)
+
+    .. versionadded:: 2.1
+
+    Analogous to :meth:`SimpleTestCase.assertRaisesMessage` but for
+    :meth:`~unittest.TestCase.assertWarnsRegex` instead of
+    :meth:`~unittest.TestCase.assertRaisesRegex`.
 
 .. method:: SimpleTestCase.assertFieldOutput(fieldclass, valid, invalid, field_args=None, field_kwargs=None, empty_value='')
 
@@ -1465,6 +1479,15 @@ your test suite.
 
     You can use this as a context manager in the same way as
     :meth:`~SimpleTestCase.assertTemplateUsed`.
+
+.. method:: SimpleTestCase.assertURLEqual(url1, url2, msg_prefix='')
+
+    .. versionadded:: 2.2
+
+    Asserts that two URLs are the same, ignoring the order of query string
+    parameters except for parameters with the same name. For example,
+    ``/path/?x=1&y=2`` is equal to ``/path/?y=2&x=1``, but
+    ``/path/?a=1&a=2`` isn't equal to ``/path/?a=2&a=1``.
 
 .. method:: SimpleTestCase.assertRedirects(response, expected_url, status_code=302, target_status_code=200, msg_prefix='', fetch_redirect_response=True)
 

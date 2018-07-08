@@ -3,7 +3,7 @@ from unittest import skipUnless
 from django.contrib.gis.db.models import F, GeometryField, Value, functions
 from django.contrib.gis.geos import Point, Polygon
 from django.db import connection
-from django.db.models import Count
+from django.db.models import Count, Min
 from django.test import TestCase, skipUnlessDBFeature
 
 from ..utils import postgis
@@ -56,7 +56,7 @@ class GeoExpressionsTests(TestCase):
             poly=Polygon(((1, 1), (1, 2), (2, 2), (2, 1), (1, 1))),
         )
         qs = City.objects.values('name').annotate(
-            distance=functions.Distance('multifields__point', multi_field.city.point),
+            distance=Min(functions.Distance('multifields__point', multi_field.city.point)),
         ).annotate(count=Count('multifields'))
         self.assertTrue(qs.first())
 

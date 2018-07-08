@@ -4,7 +4,7 @@ be executed through ``django-admin`` or ``manage.py``).
 """
 import os
 import sys
-from argparse import ArgumentParser
+from argparse import ArgumentParser, HelpFormatter
 from io import TextIOBase
 
 import django
@@ -71,6 +71,44 @@ def handle_default_options(options):
         os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
     if options.pythonpath:
         sys.path.insert(0, options.pythonpath)
+
+
+def no_translations(handle_func):
+    """Decorator that forces a command to run with translations deactivated."""
+    def wrapped(*args, **kwargs):
+        from django.utils import translation
+        saved_locale = translation.get_language()
+        translation.deactivate_all()
+        try:
+            res = handle_func(*args, **kwargs)
+        finally:
+            if saved_locale is not None:
+                translation.activate(saved_locale)
+        return res
+    return wrapped
+
+
+class DjangoHelpFormatter(HelpFormatter):
+    """
+    Customized formatter so that command-specific arguments appear in the
+    --help output before arguments common to all commands.
+    """
+    show_last = {
+        '--version', '--verbosity', '--traceback', '--settings', '--pythonpath',
+        '--no-color',
+    }
+
+    def _reordered_actions(self, actions):
+        return sorted(
+            actions,
+            key=lambda a: set(a.option_strings) & self.show_last != set()
+        )
+
+    def add_usage(self, usage, actions, *args, **kwargs):
+        super().add_usage(usage, self._reordered_actions(actions), *args, **kwargs)
+
+    def add_arguments(self, actions):
+        super().add_arguments(self._reordered_actions(actions))
 
 
 class OutputWrapper(TextIOBase):
@@ -171,19 +209,6 @@ class BaseCommand:
         is the list of application's configuration provided by the
         app registry.
 
-    ``leave_locale_alone``
-        A boolean indicating whether the locale set in settings should be
-        preserved during the execution of the command instead of translations
-        being deactivated.
-
-        Default value is ``False``.
-
-        Make sure you know what you are doing if you decide to change the value
-        of this option in your custom command if it creates database content
-        that is locale-sensitive and such content shouldn't contain any
-        translations (like it happens e.g. with django.contrib.auth
-        permissions) as activating any locale might cause unintended effects.
-
     ``stealth_options``
         A tuple of any options the command uses which aren't defined by the
         argument parser.
@@ -194,7 +219,6 @@ class BaseCommand:
     # Configuration shortcuts that alter various logic.
     _called_from_command_line = False
     output_transaction = False  # Whether to wrap the output in a "BEGIN; COMMIT;"
-    leave_locale_alone = False
     requires_migrations_checks = False
     requires_system_checks = True
     # Arguments, common to all commands, which aren't defined by the argument
@@ -220,7 +244,7 @@ class BaseCommand:
         """
         return django.get_version()
 
-    def create_parser(self, prog_name, subcommand):
+    def create_parser(self, prog_name, subcommand, **kwargs):
         """
         Create and return the ``ArgumentParser`` which will be used to
         parse the arguments to this command.
@@ -228,15 +252,14 @@ class BaseCommand:
         parser = CommandParser(
             prog='%s %s' % (os.path.basename(prog_name), subcommand),
             description=self.help or None,
+            formatter_class=DjangoHelpFormatter,
             missing_args_message=getattr(self, 'missing_args_message', None),
             called_from_command_line=getattr(self, '_called_from_command_line', None),
+            **kwargs
         )
-        # Add command-specific arguments first so that they appear in the
-        # --help output before arguments common to all commands.
-        self.add_arguments(parser)
         parser.add_argument('--version', action='version', version=self.get_version())
         parser.add_argument(
-            '-v', '--verbosity', action='store', dest='verbosity', default=1,
+            '-v', '--verbosity', default=1,
             type=int, choices=[0, 1, 2, 3],
             help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output',
         )
@@ -254,9 +277,10 @@ class BaseCommand:
         )
         parser.add_argument('--traceback', action='store_true', help='Raise on CommandError exceptions')
         parser.add_argument(
-            '--no-color', action='store_true', dest='no_color',
+            '--no-color', action='store_true',
             help="Don't colorize the command output.",
         )
+        self.add_arguments(parser)
         return parser
 
     def add_arguments(self, parser):
@@ -323,33 +347,20 @@ class BaseCommand:
         if options.get('stderr'):
             self.stderr = OutputWrapper(options['stderr'], self.stderr.style_func)
 
-        saved_locale = None
-        if not self.leave_locale_alone:
-            # Deactivate translations, because django-admin creates database
-            # content like permissions, and those shouldn't contain any
-            # translations.
-            from django.utils import translation
-            saved_locale = translation.get_language()
-            translation.deactivate_all()
-
-        try:
-            if self.requires_system_checks and not options.get('skip_checks'):
-                self.check()
-            if self.requires_migrations_checks:
-                self.check_migrations()
-            output = self.handle(*args, **options)
-            if output:
-                if self.output_transaction:
-                    connection = connections[options.get('database', DEFAULT_DB_ALIAS)]
-                    output = '%s\n%s\n%s' % (
-                        self.style.SQL_KEYWORD(connection.ops.start_transaction_sql()),
-                        output,
-                        self.style.SQL_KEYWORD(connection.ops.end_transaction_sql()),
-                    )
-                self.stdout.write(output)
-        finally:
-            if saved_locale is not None:
-                translation.activate(saved_locale)
+        if self.requires_system_checks and not options.get('skip_checks'):
+            self.check()
+        if self.requires_migrations_checks:
+            self.check_migrations()
+        output = self.handle(*args, **options)
+        if output:
+            if self.output_transaction:
+                connection = connections[options.get('database', DEFAULT_DB_ALIAS)]
+                output = '%s\n%s\n%s' % (
+                    self.style.SQL_KEYWORD(connection.ops.start_transaction_sql()),
+                    output,
+                    self.style.SQL_KEYWORD(connection.ops.end_transaction_sql()),
+                )
+            self.stdout.write(output)
         return output
 
     def _run_checks(self, **kwargs):

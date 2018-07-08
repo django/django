@@ -128,7 +128,7 @@ The ``register`` decorator
     argument::
 
         from django.contrib import admin
-        from .models import Author, Reader, Editor
+        from .models import Author, Editor, Reader
         from myproject.admin_site import custom_admin_site
 
         @admin.register(Author, Reader, Editor, site=custom_admin_site)
@@ -502,12 +502,12 @@ subclass::
     that we'd like to use for large text fields instead of the default
     ``<textarea>``. Here's how we'd do that::
 
-        from django.db import models
         from django.contrib import admin
+        from django.db import models
 
         # Import our custom widget and our model from where they're defined
-        from myapp.widgets import RichTextEditorWidget
         from myapp.models import MyModel
+        from myapp.widgets import RichTextEditorWidget
 
         class MyModelAdmin(admin.ModelAdmin):
             formfield_overrides = {
@@ -581,8 +581,8 @@ subclass::
       the same as the callable, but ``self`` in this context is the model
       instance. Here's a full model example::
 
-          from django.db import models
           from django.contrib import admin
+          from django.db import models
 
           class Person(models.Model):
               name = models.CharField(max_length=50)
@@ -616,8 +616,8 @@ subclass::
 
       Here's a full example model::
 
-          from django.db import models
           from django.contrib import admin
+          from django.db import models
           from django.utils.html import format_html
 
           class Person(models.Model):
@@ -670,8 +670,8 @@ subclass::
 
       Here's a full example model::
 
-          from django.db import models
           from django.contrib import admin
+          from django.db import models
 
           class Person(models.Model):
               first_name = models.CharField(max_length=50)
@@ -699,8 +699,8 @@ subclass::
 
       For example::
 
-        from django.db import models
         from django.contrib import admin
+        from django.db import models
         from django.utils.html import format_html
 
         class Person(models.Model):
@@ -1102,8 +1102,6 @@ subclass::
 
 .. attribute:: ModelAdmin.autocomplete_fields
 
-    .. versionadded:: 2.0
-
     ``autocomplete_fields`` is a list of ``ForeignKey`` and/or
     ``ManyToManyField`` fields you would like to change to `Select2
     <https://select2.org/>`_ autocomplete inputs.
@@ -1118,6 +1116,9 @@ subclass::
 
     You must define :attr:`~ModelAdmin.search_fields` on the related object's
     ``ModelAdmin`` because the autocomplete search uses it.
+
+    To avoid unauthorized data disclosure, users must have the ``view`` or
+    ``change`` permission to the related object in order to use autocomplete.
 
     Ordering and pagination of the results are controlled by the related
     ``ModelAdmin``'s :meth:`~ModelAdmin.get_ordering` and
@@ -1525,8 +1526,6 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.get_autocomplete_fields(request)
 
-    .. versionadded:: 2.0
-
     The ``get_autocomplete_fields()`` method is given the ``HttpRequest`` and is
     expected to return a ``list`` or ``tuple`` of field names that will be
     displayed with an autocomplete widget as described above in the
@@ -1623,7 +1622,7 @@ templates used by the :class:`ModelAdmin` views:
     a ``list`` or ``tuple`` of :class:`~django.contrib.admin.InlineModelAdmin`
     objects, as described below in the :class:`~django.contrib.admin.InlineModelAdmin`
     section. For example, the following would return inlines without the default
-    filtering based on add, change, and delete permissions::
+    filtering based on add, change, delete, and view permissions::
 
         class MyModelAdmin(admin.ModelAdmin):
             inlines = (MyInline,)
@@ -1887,6 +1886,19 @@ templates used by the :class:`ModelAdmin` views:
     Override this method to customize the lookups permitted for your
     :class:`~django.contrib.admin.ModelAdmin` subclass.
 
+.. method:: ModelAdmin.has_view_permission(request, obj=None)
+
+    .. versionadded:: 2.1
+
+    Should return ``True`` if viewing ``obj`` is permitted, ``False`` otherwise.
+    If obj is ``None``, should return ``True`` or ``False`` to indicate whether
+    viewing of objects of this type is permitted in general (e.g., ``False``
+    will be interpreted as meaning that the current user is not permitted to
+    view any object of this type).
+
+    The default implementation returns ``True`` if the user has either the
+    "change" or "view" permission.
+
 .. method:: ModelAdmin.has_add_permission(request)
 
     Should return ``True`` if adding an object is permitted, ``False``
@@ -1914,7 +1926,8 @@ templates used by the :class:`ModelAdmin` views:
     accessing the module's index page is permitted, ``False`` otherwise.
     Uses :meth:`User.has_module_perms()
     <django.contrib.auth.models.User.has_module_perms>` by default. Overriding
-    it does not restrict access to the add, change or delete views,
+    it does not restrict access to the view, add, change, or delete views,
+    :meth:`~ModelAdmin.has_view_permission`,
     :meth:`~ModelAdmin.has_add_permission`,
     :meth:`~ModelAdmin.has_change_permission`, and
     :meth:`~ModelAdmin.has_delete_permission` should be used for that.
@@ -2115,13 +2128,13 @@ jQuery
 Django admin JavaScript makes use of the `jQuery`_ library.
 
 To avoid conflicts with user-supplied scripts or libraries, Django's jQuery
-(version 3.2.1) is namespaced as ``django.jQuery``. If you want to use jQuery
+(version 3.3.1) is namespaced as ``django.jQuery``. If you want to use jQuery
 in your own admin JavaScript without including a second copy, you can use the
 ``django.jQuery`` object on changelist and add/edit views.
 
 .. versionchanged:: 2.1
 
-    jQuery was upgraded from 2.2.3 to 3.2.1.
+    jQuery was upgraded from 2.2.3 to 3.3.1.
 
 The :class:`ModelAdmin` class requires jQuery by default, so there is no need
 to add jQuery to your ``ModelAdmin``’s list of media resources unless you have
@@ -2572,8 +2585,8 @@ Using generic relations as an inline
 It is possible to use an inline with generically related objects. Let's say
 you have the following models::
 
-    from django.db import models
     from django.contrib.contenttypes.fields import GenericForeignKey
+    from django.db import models
 
     class Image(models.Model):
         image = models.ImageField(upload_to="images")
@@ -2862,7 +2875,8 @@ Templates can override or extend base admin templates as described in
 
       * ``object_name``: class name of the model
       * ``name``: plural name of the model
-      * ``perms``: a ``dict`` tracking ``add``, ``change``, and ``delete`` permissions
+      * ``perms``: a ``dict`` tracking ``add``, ``change``, ``delete``, and
+        ``view`` permissions
       * ``admin_url``: admin changelist URL for the model
       * ``add_url``: admin URL to add a new model instance
 
@@ -3001,7 +3015,7 @@ respectively::
 
     # urls.py
     from django.urls import path
-    from myproject.admin import basic_site, advanced_site
+    from myproject.admin import advanced_site, basic_site
 
     urlpatterns = [
         path('basic-admin/', basic_site.urls),
@@ -3111,7 +3125,7 @@ password box.
 
     For example, to get a list of all additions done through the admin::
 
-        from django.contrib.admin.models import LogEntry, ADDITION
+        from django.contrib.admin.models import ADDITION, LogEntry
 
         LogEntry.objects.filter(action_flag=ADDITION)
 

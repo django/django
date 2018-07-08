@@ -167,8 +167,6 @@ directly in HTML.
 
 .. method:: Form.errors.get_json_data(escape_html=False)
 
-.. versionadded:: 2.0
-
 Returns the errors as a dictionary suitable for serializing to JSON.
 :meth:`Form.errors.as_json()` returns serialized JSON, while this returns the
 error data before it's serialized.

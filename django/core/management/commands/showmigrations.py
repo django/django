@@ -12,7 +12,7 @@ class Command(BaseCommand):
             help='App labels of applications to limit the output to.',
         )
         parser.add_argument(
-            '--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
+            '--database', default=DEFAULT_DB_ALIAS,
             help='Nominates a database to synchronize. Defaults to the "default" database.',
         )
 
