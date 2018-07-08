@@ -652,12 +652,29 @@ class SQLCompiler:
         return result, params
 
     def find_ordering_name(self, name, opts, alias=None, default_order='ASC',
-                           already_seen=None):
+                           already_seen=None, prefix=None):
         """
         Return the table alias (the name might be ambiguous, the alias will
         not be) and column name for ordering by the given 'name' parameter.
         The 'name' is of the form 'field1__field2__...__fieldN'.
         """
+
+        if hasattr(name, 'resolve_expression'):
+
+            from copy import deepcopy
+            field = deepcopy(name)
+
+            if not isinstance(field, OrderBy):
+                field = field.asc()
+            if not self.query.standard_ordering:
+                field.reverse_ordering()
+
+            new_name = prefix + LOOKUP_SEP + field.expression.name
+
+            field.expression.name = new_name
+
+            return [(field, False)]
+
         name, order = get_order_dir(name, default_order)
         descending = order == 'DESC'
         pieces = name.split(LOOKUP_SEP)
@@ -676,8 +693,14 @@ class SQLCompiler:
 
             results = []
             for item in opts.ordering:
-                results.extend(self.find_ordering_name(item, opts, alias,
-                                                       order, already_seen))
+
+                def _join_strings(*strings):
+                    return LOOKUP_SEP.join(filter(None, strings))
+
+                new_prefix = _join_strings(prefix, name)
+
+                results.extend(self.find_ordering_name(item, opts, alias, order,
+                                                       already_seen, new_prefix))
             return results
         targets, alias, _ = self.query.trim_joins(targets, joins, path)
         return [(OrderBy(transform_function(t, alias), descending=descending), False) for t in targets]
