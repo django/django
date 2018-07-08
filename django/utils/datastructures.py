@@ -326,9 +326,7 @@ class ImmutableCaseInsensitiveDict(Mapping):
         return repr({key: value for key, value in self._store.values()})
 
     def copy(self):
-        return ImmutableCaseInsensitiveDict({
-            k: v[1] for k, v in self._store.items()
-        })
+        return self
 
 
 class EnvironHeaders(ImmutableCaseInsensitiveDict):

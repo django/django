@@ -230,8 +230,7 @@ class ImmutableCaseInsensitiveDictTests(SimpleTestCase):
     def test_copy(self):
         copy = self.dict_1.copy()
 
-        # id(copy) != id(self.dict_1)
-        self.assertIsNot(copy, self.dict_1)
+        self.assertIs(copy, self.dict_1)
         self.assertEqual(copy, self.dict_1)
 
     def test_getitem(self):
