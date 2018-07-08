@@ -312,7 +312,7 @@ class SQLCompiler:
             if not self.query._extra or col not in self.query._extra:
                 # 'col' is of the form 'field' or 'field1__field2' or
                 # '-field1__field2__field', etc.
-                order_by.extend(self.find_ordering_name(
+                order_by.extend(self.convert_to_expression(
                     field, self.query.get_meta(), default_order=asc))
             else:
                 if col not in self.query.extra_select:
@@ -652,17 +652,22 @@ class SQLCompiler:
                     params.append(p)
         return result, params
 
-    def find_ordering_name(self, name, opts, alias=None, default_order='ASC',
-                           already_seen=None, prefix=None):
+    def convert_to_expression(self, field, opts, alias=None, default_order='ASC',
+                              already_seen=None, prefix=None):
         """
-        Return the table alias (the name might be ambiguous, the alias will
-        not be) and column name for ordering by the given 'name' parameter.
-        The 'name' is of the form 'field1__field2__...__fieldN'.
+        Return the equivalent OrderBy expressions for the given field.
+        The 'field' is either of the form 'field1__field2__...__fieldN'
+        or is already an unresolved OrderBy expression.
         """
 
-        if hasattr(name, 'resolve_expression'):
+        if hasattr(field, 'resolve_expression'):
+            # If the original input was of the form
+            # 'field1__field2__...__fieldN' and the model for 'fieldN'
+            # has an OrderBy expression then we return that expression
+            # but prefixed by the original input, e.g.
+            # 'field1__field2__...__fieldN__expression'
 
-            field = deepcopy(name)
+            field = deepcopy(field)
 
             if not isinstance(field, OrderBy):
                 field = field.asc()
@@ -675,7 +680,7 @@ class SQLCompiler:
 
             return [(field, False)]
 
-        name, order = get_order_dir(name, default_order)
+        name, order = get_order_dir(field, default_order)
         descending = order == 'DESC'
         pieces = name.split(LOOKUP_SEP)
         field, targets, alias, joins, path, opts, transform_function = self._setup_joins(pieces, opts, alias)
@@ -699,8 +704,8 @@ class SQLCompiler:
 
                 new_prefix = _join_strings(prefix, name)
 
-                results.extend(self.find_ordering_name(item, opts, alias, order,
-                                                       already_seen, new_prefix))
+                results.extend(self.convert_to_expression(item, opts, alias, order,
+                                                          already_seen, new_prefix))
             return results
         targets, alias, _ = self.query.trim_joins(targets, joins, path)
         return [(OrderBy(transform_function(t, alias), descending=descending), False) for t in targets]
