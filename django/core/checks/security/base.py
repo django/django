@@ -106,6 +106,11 @@ W021 = Warning(
     id='security.W021',
 )
 
+W022 = Warning(
+    "ALLOWED_HOSTS should be list, not string.",
+    id='security.W022',
+)
+
 
 def _security_middleware():
     return 'django.middleware.security.SecurityMiddleware' in settings.MIDDLEWARE
@@ -208,3 +213,8 @@ def check_xframe_deny(app_configs, **kwargs):
 @register(Tags.security, deploy=True)
 def check_allowed_hosts(app_configs, **kwargs):
     return [] if settings.ALLOWED_HOSTS else [W020]
+
+
+@register(Tags.security, deploy=True)
+def check_type_of_allowed_hosts(app_configs, **kwargs):
+    return [] if not isinstance(settings.ALLOWED_HOSTS, str) else [W022]
