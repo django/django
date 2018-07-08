@@ -5,7 +5,7 @@ that the producer of the string has already turned characters that should not
 be interpreted by the HTML engine (e.g. '<') into the appropriate entities.
 """
 
-from django.utils.functional import Promise, wraps
+from django.utils.functional import wraps
 
 
 class SafeData:
@@ -79,8 +79,6 @@ def mark_safe(s):
     """
     if hasattr(s, '__html__'):
         return s
-    if isinstance(s, (str, Promise)):
-        return SafeText(s)
     if callable(s):
         return _safety_decorator(mark_safe, s)
-    return SafeText(str(s))
+    return SafeText(s)
