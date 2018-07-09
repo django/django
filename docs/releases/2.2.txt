@@ -239,4 +239,5 @@ Features deprecated in 2.2
 Miscellaneous
 -------------
 
-* ...
+* ``django.utils.timezone.FixedOffset`` is deprecated in favor of
+  :class:`datetime.timezone`.

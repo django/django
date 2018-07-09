@@ -35,7 +35,8 @@ from .models import (
 
 # These tests use the EAT (Eastern Africa Time) and ICT (Indochina Time)
 # who don't have Daylight Saving Time, so we can represent them easily
-# with FixedOffset, and use them directly as tzinfo in the constructors.
+# with fixed offset timezones and use them directly as tzinfo in the
+# constructors.
 
 # settings.TIME_ZONE is forced to EAT. Most tests use a variant of
 # datetime.datetime(2011, 9, 1, 13, 20, 30), which translates to

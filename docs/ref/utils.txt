@@ -125,8 +125,12 @@ The functions defined in this module share the following properties:
     Parses a string and returns a :class:`datetime.datetime`.
 
     UTC offsets are supported; if ``value`` describes one, the result's
-    ``tzinfo`` attribute is a :class:`~django.utils.timezone.FixedOffset`
-    instance.
+    ``tzinfo`` attribute is a :class:`datetime.timezone` instance.
+
+    .. versionchanged:: 2.2
+
+        In older versions, the ``tzinfo`` attribute is a
+        :class:`~django.utils.timezone.FixedOffset` instance.
 
 .. function:: parse_duration(value)
 
@@ -855,6 +859,10 @@ appropriate entities.
 
     A :class:`~datetime.tzinfo` subclass modeling a fixed offset from UTC.
     ``offset`` is an integer number of minutes east of UTC.
+
+    .. deprecated:: 2.2
+
+        Use :class:`datetime.timezone` instead.
 
 .. function:: get_fixed_timezone(offset)
 
