@@ -43,7 +43,7 @@ class BaseContext:
         return repr(self.dicts)
 
     def __iter__(self):
-        yield from reversed(self.dicts)
+        return reversed(self.dicts)
 
     def push(self, *args, **kwargs):
         dicts = []
