@@ -99,10 +99,7 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
         return s
     if isinstance(s, memoryview):
         return bytes(s)
-    if isinstance(s, Promise) or not isinstance(s, str):
-        return str(s).encode(encoding, errors)
-    else:
-        return s.encode(encoding, errors)
+    return str(s).encode(encoding, errors)
 
 
 smart_str = smart_text
