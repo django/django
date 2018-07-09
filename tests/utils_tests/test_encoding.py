@@ -58,7 +58,11 @@ class TestEncodingUtils(SimpleTestCase):
         self.assertEqual(result, b'This is an exception, voil')
 
     def test_force_bytes_memory_view(self):
-        self.assertEqual(force_bytes(memoryview(b'abc')), b'abc')
+        data = b'abc'
+        result = force_bytes(memoryview(data))
+        # Type check is needed because memoryview(bytes) == bytes.
+        self.assertIs(type(result), bytes)
+        self.assertEqual(result, data)
 
     def test_smart_bytes(self):
         class Test:
