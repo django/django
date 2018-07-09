@@ -401,7 +401,7 @@ class RequestFactory:
         }
         if data:
             r.update({
-                'CONTENT_LENGTH': len(data),
+                'CONTENT_LENGTH': str(len(data)),
                 'CONTENT_TYPE': content_type,
                 'wsgi.input': FakePayload(data),
             })

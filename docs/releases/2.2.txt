@@ -228,6 +228,9 @@ Miscellaneous
   have existing invalid data and run a migration that recreates a table, you'll
   see ``CHECK constraint failed``.
 
+* For consistency with WSGI servers, the test client now sets the
+  ``Content-Length`` header to a string rather than an integer.
+
 .. _deprecated-features-2.2:
 
 Features deprecated in 2.2
