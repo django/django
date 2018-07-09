@@ -448,7 +448,7 @@ def safeseq(value):
     individually, as safe, after converting them to strings. Return a list
     with the results.
     """
-    return [mark_safe(str(obj)) for obj in value]
+    return [mark_safe(obj) for obj in value]
 
 
 @register.filter(is_safe=True)
