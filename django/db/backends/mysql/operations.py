@@ -1,3 +1,4 @@
+import decimal
 import uuid
 
 from django.conf import settings
@@ -260,10 +261,22 @@ class DatabaseOperations(BaseDatabaseOperations):
     def binary_placeholder_sql(self, value):
         return '_binary %s' if value is not None and not hasattr(value, 'as_sql') else '%s'
 
+    def convert_durationfield_value(self, value, expression, connection):
+        # DurationFields can return a Decimal in MariaDB.
+        if isinstance(value, decimal.Decimal):
+            value = float(value)
+        return super().convert_durationfield_value(value, expression, connection)
+
     def subtract_temporals(self, internal_type, lhs, rhs):
         lhs_sql, lhs_params = lhs
         rhs_sql, rhs_params = rhs
         if internal_type == 'TimeField':
+            if self.connection.mysql_is_mariadb:
+                # MariaDB includes the microsecond component in TIME_TO_SEC as
+                # a decimal. MySQL returns an integer without microseconds.
+                return '((TIME_TO_SEC(%(lhs)s) - TIME_TO_SEC(%(rhs)s)) * 1000000)' % {
+                    'lhs': lhs_sql, 'rhs': rhs_sql
+                }, lhs_params + rhs_params
             return (
                 "((TIME_TO_SEC(%(lhs)s) * 1000000 + MICROSECOND(%(lhs)s)) -"
                 " (TIME_TO_SEC(%(rhs)s) * 1000000 + MICROSECOND(%(rhs)s)))"

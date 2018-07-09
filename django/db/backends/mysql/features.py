@@ -80,18 +80,20 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def supports_over_clause(self):
+        if self.connection.mysql_is_mariadb:
+            return self.connection.mysql_version >= (10, 2)
         return self.connection.mysql_version >= (8, 0, 2)
 
     @cached_property
     def has_select_for_update_skip_locked(self):
-        return self.connection.mysql_version >= (8, 0, 1)
+        return not self.connection.mysql_is_mariadb and self.connection.mysql_version >= (8, 0, 1)
 
     has_select_for_update_nowait = has_select_for_update_skip_locked
 
     @cached_property
     def needs_explain_extended(self):
-        # EXTENDED is deprecated (and not required) in 5.7 and removed in 8.0.
-        return self.connection.mysql_version < (5, 7)
+        # EXTENDED is deprecated (and not required) in MySQL 5.7.
+        return not self.connection.mysql_is_mariadb and self.connection.mysql_version < (5, 7)
 
     @cached_property
     def supports_transactions(self):
