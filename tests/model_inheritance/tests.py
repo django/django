@@ -461,8 +461,8 @@ class InheritanceSameModelNameTests(SimpleTestCase):
         ForeignReferent = Referent
 
         self.assertFalse(hasattr(Referenced, related_name))
-        self.assertTrue(Referenced.model_inheritance_referent_references.rel.model, LocalReferent)
-        self.assertTrue(Referenced.tests_referent_references.rel.model, ForeignReferent)
+        self.assertIs(Referenced.model_inheritance_referent_references.field.model, LocalReferent)
+        self.assertIs(Referenced.tests_referent_references.field.model, ForeignReferent)
 
 
 class InheritanceUniqueTests(TestCase):
