@@ -28,7 +28,7 @@ class TestEncodingUtils(SimpleTestCase):
 
     def test_force_text_lazy(self):
         s = SimpleLazyObject(lambda: 'x')
-        self.assertTrue(type(force_text(s)), str)
+        self.assertIs(type(force_text(s)), str)
 
     def test_force_text_DjangoUnicodeDecodeError(self):
         msg = (
