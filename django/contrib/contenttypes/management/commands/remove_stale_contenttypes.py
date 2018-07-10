@@ -60,7 +60,7 @@ Are you sure you want to delete these content types?
 If you're unsure, answer 'no'.\n""" % content_type_display)
                     ok_to_delete = input("Type 'yes' to continue, or 'no' to cancel: ")
                 else:
-                    ok_to_delete = False
+                    ok_to_delete = 'yes'
 
                 if ok_to_delete == 'yes':
                     for ct in to_remove:

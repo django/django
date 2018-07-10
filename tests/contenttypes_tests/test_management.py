@@ -52,14 +52,11 @@ class RemoveStaleContentTypesTests(TestCase):
         self.assertEqual(ContentType.objects.count(), self.before_count)
 
     def test_interactive_false(self):
-        """
-        non-interactive mode of remove_stale_contenttypes doesn't delete
-        stale content types.
-        """
+        """non-interactive mode deletes stale content types."""
         with captured_stdout() as stdout:
             call_command('remove_stale_contenttypes', interactive=False, verbosity=2)
-        self.assertIn("Stale content types remain.", stdout.getvalue())
-        self.assertEqual(ContentType.objects.count(), self.before_count + 1)
+        self.assertIn('Deleting stale content type', stdout.getvalue())
+        self.assertEqual(ContentType.objects.count(), self.before_count)
 
     def test_unavailable_content_type_model(self):
         """A ContentType isn't created if the model isn't available."""
