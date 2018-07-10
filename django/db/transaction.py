@@ -287,3 +287,13 @@ def non_atomic_requests(using=None):
         if using is None:
             using = DEFAULT_DB_ALIAS
         return lambda view: _non_atomic_requests(view, using)
+
+
+def call_on_commit(f):
+    """
+    only call the decorated function at transaction commit
+    warning the return value will be ignored
+    """
+    def handle(*args, **kwargs):
+        on_commit(lambda: f(*args, **kwargs))
+    return handle
