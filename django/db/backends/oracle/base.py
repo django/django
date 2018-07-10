@@ -527,14 +527,6 @@ class FormatStylePlaceholderCursor:
         self._guess_input_sizes(formatted)
         return self.cursor.executemany(query, [self._param_generator(p) for p in formatted])
 
-    def fetchmany(self, size=None):
-        if size is None:
-            size = self.arraysize
-        return tuple(self.cursor.fetchmany(size))
-
-    def fetchall(self):
-        return tuple(self.cursor.fetchall())
-
     def close(self):
         try:
             self.cursor.close()
