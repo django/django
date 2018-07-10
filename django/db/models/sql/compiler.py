@@ -849,7 +849,6 @@ class SQLCompiler:
                     select, model._meta, alias, cur_depth + 1,
                     next, restricted)
                 get_related_klass_infos(klass_info, next_klass_infos)
-            fields_not_found = set(requested).difference(fields_found)
             for name in list(requested):
                 # Filtered relations work only on the topmost level.
                 if cur_depth > 1:
