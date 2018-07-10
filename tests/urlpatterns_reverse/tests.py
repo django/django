@@ -1137,19 +1137,44 @@ class ErroneousViewTests(SimpleTestCase):
 class ViewLoadingTests(SimpleTestCase):
     def test_view_loading(self):
         self.assertEqual(get_callable('urlpatterns_reverse.views.empty_view'), empty_view)
-
-        # passing a callable should return the callable
         self.assertEqual(get_callable(empty_view), empty_view)
 
-    def test_exceptions(self):
-        # A missing view (identified by an AttributeError) should raise
-        # ViewDoesNotExist, ...
-        with self.assertRaisesMessage(ViewDoesNotExist, "View does not exist in"):
+    def test_view_does_not_exist(self):
+        msg = "View does not exist in module urlpatterns_reverse.views."
+        with self.assertRaisesMessage(ViewDoesNotExist, msg):
             get_callable('urlpatterns_reverse.views.i_should_not_exist')
-        # ... but if the AttributeError is caused by something else don't
-        # swallow it.
-        with self.assertRaises(AttributeError):
+
+    def test_attributeerror_not_hidden(self):
+        msg = 'I am here to confuse django.urls.get_callable'
+        with self.assertRaisesMessage(AttributeError, msg):
             get_callable('urlpatterns_reverse.views_broken.i_am_broken')
+
+    def test_non_string_value(self):
+        msg = "'1' is not a callable or a dot-notation path"
+        with self.assertRaisesMessage(ViewDoesNotExist, msg):
+            get_callable(1)
+
+    def test_string_without_dot(self):
+        msg = "Could not import 'test'. The path must be fully qualified."
+        with self.assertRaisesMessage(ImportError, msg):
+            get_callable('test')
+
+    def test_module_does_not_exist(self):
+        with self.assertRaisesMessage(ImportError, "No module named 'foo'"):
+            get_callable('foo.bar')
+
+    def test_parent_module_does_not_exist(self):
+        msg = 'Parent module urlpatterns_reverse.foo does not exist.'
+        with self.assertRaisesMessage(ViewDoesNotExist, msg):
+            get_callable('urlpatterns_reverse.foo.bar')
+
+    def test_not_callable(self):
+        msg = (
+            "Could not import 'urlpatterns_reverse.tests.resolve_test_data'. "
+            "View is not callable."
+        )
+        with self.assertRaisesMessage(ViewDoesNotExist, msg):
+            get_callable('urlpatterns_reverse.tests.resolve_test_data')
 
 
 class IncludeTests(SimpleTestCase):
