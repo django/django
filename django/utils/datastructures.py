@@ -1,5 +1,6 @@
 import copy
 from collections import OrderedDict
+from collections.abc import Mapping
 
 
 class OrderedSet:
@@ -280,3 +281,84 @@ class DictWrapper(dict):
         if use_func:
             return self.func(value)
         return value
+
+
+def _destruct_iterable_mapping_values(data):
+    for i, elem in enumerate(data):
+        if len(elem) != 2:
+            raise ValueError("dictionary update sequence element #{} has "
+                             "length {}; 2 is required".format(i, len(elem)))
+
+        if not isinstance(elem[0], str):
+            raise ValueError('Element key invalid, only strings are allowed')
+
+        yield tuple(elem)
+
+
+class ImmutableCaseInsensitiveDict(Mapping):
+    """An immutable case-insensitive dictionary that still preserves
+    the case of the original keys used to create it."""
+
+    def __init__(self, data):
+        if not isinstance(data, Mapping):
+            data = {k: v for k, v in _destruct_iterable_mapping_values(data)}
+        self._store = {k.lower(): (k, v) for k, v in data.items()}
+
+    def __getitem__(self, key):
+        return self._store[key.lower()][1]
+
+    def __len__(self):
+        return len(self._store)
+
+    def __eq__(self, other):
+        if not isinstance(other, Mapping):
+            return NotImplemented
+        return {
+            k.lower(): v for k, v in self.items()
+        } == {
+            k.lower(): v for k, v in other.items()
+        }
+
+    def __iter__(self):
+        return (original_key for original_key, value in self._store.values())
+
+    def __repr__(self):
+        return repr({key: value for key, value in self._store.values()})
+
+    def copy(self):
+        return self
+
+
+class EnvironHeaders(ImmutableCaseInsensitiveDict):
+    IGNORE_EXCEPTIONS = {'HTTP_CONTENT_TYPE', 'HTTP_CONTENT_LENGTH'}
+    SPECIAL_UNCHANGED_HEADERS = {'CONTENT_TYPE', 'CONTENT_LENGTH'}
+    HTTP_PREFIX = 'HTTP_'
+
+    def __init__(self, environ):
+        header_name_generator = ((
+            self.parse_cgi_header_name(header_name), value
+        ) for header_name, value in environ.items())
+        headers = {
+            header: value for header, value in header_name_generator if header
+        }
+
+        super().__init__(headers)
+
+    @classmethod
+    def _style_header_name(cls, header_name):
+        return header_name.title()
+
+    @classmethod
+    def parse_cgi_header_name(cls, cgi_header):
+        ignore_header = (
+            cgi_header in cls.IGNORE_EXCEPTIONS or
+            not cgi_header.startswith(cls.HTTP_PREFIX) and
+            cgi_header not in cls.SPECIAL_UNCHANGED_HEADERS)
+
+        if ignore_header:
+            return None
+
+        if cgi_header not in cls.SPECIAL_UNCHANGED_HEADERS:
+            cgi_header = cgi_header[len(cls.HTTP_PREFIX):]
+
+        return cls._style_header_name(cgi_header.replace('_', '-'))

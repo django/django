@@ -135,7 +135,10 @@ All attributes should be considered read-only, unless stated otherwise.
 
 .. attribute:: HttpRequest.META
 
-    A dictionary containing all available HTTP headers. Available headers
+    A dictionary containing the `WSGI environ \
+    <https://www.python.org/dev/peps/pep-0333/#environ-variables>`_,
+    including all available HTTP headers.
+    Available request headers are prefixed with the string ``HTTP_`` and
     depend on the client and server, but here are some examples:
 
     * ``CONTENT_LENGTH`` -- The length of the request body (as a string).
@@ -160,12 +163,38 @@ All attributes should be considered read-only, unless stated otherwise.
     underscores and adding an ``HTTP_`` prefix to the name. So, for example, a
     header called ``X-Bender`` would be mapped to the ``META`` key
     ``HTTP_X_BENDER``.
+    See :attr:`~HttpRequest.headers` for more convenient header access
+    (``request.headers['User-Agent']``).
 
     Note that :djadmin:`runserver` strips all headers with underscores in the
     name, so you won't see them in ``META``. This prevents header-spoofing
     based on ambiguity between underscores and dashes both being normalizing to
     underscores in WSGI environment variables. It matches the behavior of
     Web servers like Nginx and Apache 2.4+.
+
+.. _headers:
+.. attribute:: HttpRequest.headers
+
+    .. versionadded:: 2.2
+
+    A case-insensitive dictionary containing the headers passed by the client.
+    The name of each header is Title-Cased (``User-Agent``) when
+    headers are printed or inspected (``str``, ``repr``).
+
+    When accessing elements with ``headers.get``, ``headers[]`` or
+    checking membership (``in``), case is ignored. Examples::
+
+            'User-Agent' in request.headers  # True
+            'user-agent' in request.headers  # True
+
+            # getitem:
+            request.headers['User-Agent']  # Returns the value of User-Agent
+            request.headers['user-agent']  # Returns the value of User-Agent
+
+            # .get():
+            request.headers.get('User-Agent')  # Returns the value of User-Agent
+            request.headers.get('user-agent')  # Returns the value of User-Agent
+
 
 .. attribute:: HttpRequest.resolver_match
 

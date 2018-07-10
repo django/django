@@ -12,7 +12,9 @@ from django.core.exceptions import (
 )
 from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser, MultiPartParserError
-from django.utils.datastructures import ImmutableList, MultiValueDict
+from django.utils.datastructures import (
+    EnvironHeaders, ImmutableList, MultiValueDict,
+)
 from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.encoding import escape_uri_path, iri_to_uri
 from django.utils.functional import cached_property
@@ -64,6 +66,10 @@ class HttpRequest:
         if self.method is None or not self.get_full_path():
             return '<%s>' % self.__class__.__name__
         return '<%s: %s %r>' % (self.__class__.__name__, self.method, self.get_full_path())
+
+    @cached_property
+    def headers(self):
+        return EnvironHeaders(self.META)
 
     def _get_raw_host(self):
         """

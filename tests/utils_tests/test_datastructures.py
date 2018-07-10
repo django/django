@@ -6,8 +6,8 @@ import copy
 
 from django.test import SimpleTestCase
 from django.utils.datastructures import (
-    DictWrapper, ImmutableList, MultiValueDict, MultiValueDictKeyError,
-    OrderedSet,
+    DictWrapper, EnvironHeaders, ImmutableCaseInsensitiveDict, ImmutableList,
+    MultiValueDict, MultiValueDictKeyError, OrderedSet,
 )
 
 
@@ -155,3 +155,247 @@ class DictWrapperTests(SimpleTestCase):
             "Normal: %(a)s. Modified: %(xx_a)s" % d,
             'Normal: a. Modified: *a'
         )
+
+
+class ImmutableCaseInsensitiveDictTests(SimpleTestCase):
+    def setUp(self):
+        self.dict_1 = ImmutableCaseInsensitiveDict({
+            'Accept': 'application/json',
+            'content-type': 'text/html'
+        })
+
+    def test_create_dict_with_invalid_values(self):
+        with self.assertRaises(ValueError):
+            ImmutableCaseInsensitiveDict([('Key1', 'Val1'), 'Key2'])
+
+    def test_list(self):
+        self.assertEqual(
+            sorted(list(self.dict_1)),
+            sorted(['Accept', 'content-type']))
+
+    def test_dict(self):
+        self.assertEqual(dict(self.dict_1), {
+            'Accept': 'application/json',
+            'content-type': 'text/html'
+        })
+
+    def test_repr(self):
+        dict_1 = ImmutableCaseInsensitiveDict({
+            'Accept': 'application/json',
+        })
+        dict_2 = ImmutableCaseInsensitiveDict({
+            'content-type': 'text/html'
+        })
+
+        self.assertEqual(repr(dict_1), repr({
+            'Accept': 'application/json',
+        }))
+        self.assertEqual(repr(dict_2), repr({
+            'content-type': 'text/html'
+        }))
+
+    def test_str(self):
+        dict_1 = ImmutableCaseInsensitiveDict({
+            'Accept': 'application/json',
+        })
+        dict_2 = ImmutableCaseInsensitiveDict({
+            'content-type': 'text/html'
+        })
+
+        self.assertEqual(str(dict_1), str({
+            'Accept': 'application/json',
+        }))
+        self.assertEqual(str(dict_2), str({
+            'content-type': 'text/html'
+        }))
+
+    def test_equals(self):
+        self.assertTrue(self.dict_1 == {
+            'Accept': 'application/json',
+            'content-type': 'text/html'
+        })
+
+        self.assertTrue(self.dict_1 == {
+            'accept': 'application/json',
+            'Content-Type': 'text/html'
+        })
+
+    def test_items(self):
+        other = {
+            'Accept': 'application/json',
+            'content-type': 'text/html'
+        }
+        self.assertEqual(sorted(self.dict_1.items()), sorted(other.items()))
+
+    def test_copy(self):
+        copy = self.dict_1.copy()
+
+        self.assertIs(copy, self.dict_1)
+        self.assertEqual(copy, self.dict_1)
+
+    def test_getitem(self):
+        self.assertEqual(self.dict_1['Accept'], 'application/json')
+        self.assertEqual(self.dict_1['accept'], 'application/json')
+        self.assertEqual(self.dict_1['aCCept'], 'application/json')
+
+        self.assertEqual(self.dict_1['content-type'], 'text/html')
+        self.assertEqual(self.dict_1['Content-Type'], 'text/html')
+        self.assertEqual(self.dict_1['Content-type'], 'text/html')
+
+    def test_membership(self):
+        self.assertTrue('Accept' in self.dict_1)
+        self.assertTrue('accept' in self.dict_1)
+        self.assertTrue('aCCept' in self.dict_1)
+
+        self.assertTrue('content-type' in self.dict_1)
+        self.assertTrue('Content-Type' in self.dict_1)
+
+    def test_delitem(self):
+        """del should raise a TypeError because this is immutable"""
+        # Preconditions
+        self.assertTrue('Accept' in self.dict_1)
+        with self.assertRaises(TypeError):
+            del self.dict_1['Accept']
+
+        # Postconditions
+        self.assertTrue('Accept' in self.dict_1)
+
+    def test_setitem(self):
+        "del should raise a TypeError because this is immutable"
+        # Preconditions
+        self.assertEqual(len(self.dict_1), 2)
+
+        with self.assertRaises(TypeError):
+            self.dict_1['New Key'] = 1
+
+        # Postconditions
+        self.assertEqual(len(self.dict_1), 2)
+
+
+class EnvironHeadersTestCase(SimpleTestCase):
+    def test_parse_cgi_headers_basics(self):
+        parser = EnvironHeaders.parse_cgi_header_name
+
+        self.assertEqual(parser('HTTP_ACCEPT'), 'Accept')
+        self.assertEqual(parser('HTTP_HOST'), 'Host')
+        self.assertEqual(parser('HTTP_USER_AGENT'), 'User-Agent')
+        self.assertEqual(parser('HTTP_REFERER'), 'Referer')
+        self.assertEqual(parser('HTTP_IF_MATCH'), 'If-Match')
+        self.assertEqual(parser('HTTP_ACCEPT_ENCODING'), 'Accept-Encoding')
+        self.assertEqual(parser('HTTP_COOKIE'), 'Cookie')
+
+    def test_parse_cgi_headers_special_and_custom(self):
+        parser = EnvironHeaders.parse_cgi_header_name
+
+        self.assertEqual(parser('HTTP_X_PROTO'), 'X-Proto')
+        self.assertEqual(parser('HTTP_X_FORWARDED_PROTO'), 'X-Forwarded-Proto')
+        self.assertEqual(parser('HTTP_X_FORWARDED_HOST'), 'X-Forwarded-Host')
+        self.assertEqual(parser('HTTP_X_FORWARDED_PORT'), 'X-Forwarded-Port')
+        self.assertEqual(parser('HTTP_X_CUSTOM_HEADER_1'), 'X-Custom-Header-1')
+        self.assertEqual(parser('HTTP_X_CUSTOM_HEADER_2'), 'X-Custom-Header-2')
+
+    def test_parse_cgi_headers_cgi_exceptions_and_invalids(self):
+        parser = EnvironHeaders.parse_cgi_header_name
+
+        self.assertIsNone(parser('HTTP_CONTENT_TYPE'))
+        self.assertIsNone(parser('HTTP_CONTENT_LENGTH'))
+
+        self.assertEqual(parser('CONTENT_TYPE'), 'Content-Type')
+        self.assertEqual(parser('CONTENT_LENGTH'), 'Content-Length')
+
+    def test_basic_environ_special_cases_and_exceptions(self):
+        environ = {
+            'HTTP_CONTENT_TYPE': 'text/html',
+            'HTTP_CONTENT_LENGTH': '100',
+            'CONTENT_TYPE': 'text/html',
+            'CONTENT_LENGTH': '100',
+            'HTTP_ACCEPT': '*',
+            'HTTP_HOST': 'example.com',
+        }
+        headers = EnvironHeaders(environ)
+        expected = ['Accept', 'Content-Length', 'Content-Type', 'Host']
+
+        self.assertEqual(sorted(headers), expected)
+
+    def test_basic_valid_environ(self):
+        environ = {
+            'CONTENT_TYPE': 'text/html',
+            'CONTENT_LENGTH': '100',
+            'HTTP_ACCEPT': '*',
+            'HTTP_HOST': 'example.com',
+            'HTTP_USER_AGENT': 'python-requests/1.2.0',
+            'HTTP_REFERER': 'https://docs.djangoproject.com',
+            'HTTP_IF_MATCH': 'py7h0n',
+            'HTTP_IF_NONE_MATCH': 'dj4n60',
+            'HTTP_IF_MODIFIED_SINCE': 'Sat, 12 Feb 2011 17:38:44 GMT',
+            'HTTP_ACCEPT_ENCODING': 'gzip, deflate, br',
+            'HTTP_CONNECTION': 'keep-alive',
+            'HTTP_PRAGMA': 'no-cache',
+            'HTTP_CACHE_CONTROL': 'no-cache', 'HTTP_UPGRADE_INSECURE_REQUESTS': '1',
+            'HTTP_ACCEPT_LANGUAGE': 'es-419,es;q=0.9,en;q=0.8,en-US;q=0.7',
+            'HTTP_COOKIE': '%7B%22hello%22%3A%22world%22%7D;another=value'
+        }
+        headers = EnvironHeaders(environ)
+        expected = [
+            'Accept', 'Accept-Encoding', 'Accept-Language', 'Cache-Control',
+            'Connection', 'Content-Length', 'Content-Type',
+            'Cookie', 'Host', 'If-Match', 'If-Modified-Since', 'If-None-Match',
+            'Pragma', 'Referer', 'Upgrade-Insecure-Requests', 'User-Agent']
+
+        self.assertEqual(sorted(headers), expected)
+        self.assertEqual(dict(headers), {
+            'Content-Type': 'text/html',
+            'Content-Length': '100',
+            'Accept': '*',
+            'Host': 'example.com',
+            'User-Agent': 'python-requests/1.2.0',
+            'Referer': 'https://docs.djangoproject.com',
+            'If-Match': 'py7h0n',
+            'If-None-Match': 'dj4n60',
+            'If-Modified-Since': 'Sat, 12 Feb 2011 17:38:44 GMT',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Connection': 'keep-alive',
+            'Pragma': 'no-cache',
+            'Cache-Control': 'no-cache',
+            'Upgrade-Insecure-Requests': '1',
+            'Accept-Language': 'es-419,es;q=0.9,en;q=0.8,en-US;q=0.7',
+            'Cookie': '%7B%22hello%22%3A%22world%22%7D;another=value'})
+
+    def test_custom_and_special_services_headers(self):
+        environ = {
+            'CONTENT_TYPE': 'text/html',
+            'CONTENT_LENGTH': '100',
+            'HTTP_ACCEPT': '*',
+            'HTTP_HOST': 'example.com',
+            'HTTP_USER_AGENT': 'python-requests/1.2.0',
+
+            # Special headers used by AWS and other services
+            'HTTP_X_PROTO': 'https',
+            'HTTP_X_FORWARDED_HOST': 'forward.com',
+            'HTTP_X_FORWARDED_PORT': '80',
+            'HTTP_X_FORWARDED_PROTOCOL': 'https',
+
+            # Custom headers
+            'HTTP_X_CUSTOM_HEADER_1': 'custom_header_1',
+            'HTTP_X_CUSTOM_HEADER_2': 'custom_header_2',
+        }
+        headers = EnvironHeaders(environ)
+        expected = [
+            'Accept', 'Content-Length', 'Content-Type', 'Host', 'User-Agent',
+            'X-Custom-Header-1', 'X-Custom-Header-2', 'X-Forwarded-Host',
+            'X-Forwarded-Port', 'X-Forwarded-Protocol', 'X-Proto']
+
+        self.assertEqual(sorted(headers), expected)
+
+        self.assertEqual(dict(headers), {
+            'Content-Type': 'text/html',
+            'Content-Length': '100',
+            'Accept': '*',
+            'Host': 'example.com',
+            'User-Agent': 'python-requests/1.2.0',
+            'X-Proto': 'https',
+            'X-Forwarded-Host': 'forward.com',
+            'X-Forwarded-Port': '80',
+            'X-Forwarded-Protocol': 'https',
+            'X-Custom-Header-1': 'custom_header_1',
+            'X-Custom-Header-2': 'custom_header_2'})
