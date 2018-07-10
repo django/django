@@ -346,11 +346,7 @@ class HttpRequest:
             raise UnreadablePostError(*e.args) from e
 
     def __iter__(self):
-        while True:
-            buf = self.readline()
-            if not buf:
-                break
-            yield buf
+        return iter(self.readline, b'')
 
     def xreadlines(self):
         warnings.warn(
