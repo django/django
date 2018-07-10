@@ -16,7 +16,7 @@ class OptimizerTests(SimpleTestCase):
         Handy shortcut for getting results + number of loops
         """
         optimizer = MigrationOptimizer()
-        return optimizer.optimize(operations, app_label), optimizer._iterations
+        return optimizer.optimize(operations, app_label=app_label), optimizer._iterations
 
     def assertOptimizesTo(self, operations, expected, exact=None, less_than=None, app_label=None):
         result, iterations = self.optimize(operations, app_label)

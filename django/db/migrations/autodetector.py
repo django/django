@@ -355,7 +355,11 @@ class MigrationAutodetector:
         # Optimize migrations
         for app_label, migrations in self.migrations.items():
             for migration in migrations:
-                migration.operations = MigrationOptimizer().optimize(migration.operations, app_label=app_label)
+                migration.operations = MigrationOptimizer().optimize(
+                    migration.operations,
+                    from_state=self.from_state.models,
+                    app_label=app_label
+                )
 
     def check_dependency(self, operation, dependency):
         """

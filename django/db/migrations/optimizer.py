@@ -9,7 +9,7 @@ class MigrationOptimizer:
     nothing.
     """
 
-    def optimize(self, operations, app_label=None):
+    def optimize(self, operations, from_state=None, app_label=None):
         """
         Main optimization entry point. Pass in a list of Operation instances,
         get out a new list of Operation instances.
@@ -32,13 +32,13 @@ class MigrationOptimizer:
         # Internal tracking variable for test assertions about # of loops
         self._iterations = 0
         while True:
-            result = self.optimize_inner(operations, app_label)
+            result = self.optimize_inner(operations, from_state, app_label)
             self._iterations += 1
             if result == operations:
                 return result
             operations = result
 
-    def optimize_inner(self, operations, app_label=None):
+    def optimize_inner(self, operations, from_state=None, app_label=None):
         """Inner optimization loop."""
         new_operations = []
         for i, operation in enumerate(operations):
@@ -46,7 +46,19 @@ class MigrationOptimizer:
             for j, other in enumerate(operations[i + 1:]):
                 in_between = operations[i + 1:i + j + 1]
                 result = operation.reduce(other, in_between, app_label)
-                if isinstance(result, list):
+                can_optimize = isinstance(result, list)
+
+                try:
+                    model_name = getattr(operation, "model_name", None) or operation.name
+                    state = from_state[app_label, model_name]
+
+                    # flatten unique/indexed/order_with_respect fields into a set
+                    unique = {k for i in state.options.values() for j in i for k in j}
+                    can_optimize = can_optimize and operation.name not in unique
+                except (AttributeError, KeyError, TypeError):
+                    pass
+
+                if can_optimize:
                     # Optimize! Add result, then remaining others, then return
                     new_operations.extend(result)
                     new_operations.extend(in_between)
