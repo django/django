@@ -197,6 +197,7 @@ or keyword arguments in the ``scope``::
         url(r"^testws/(?P<message>\w+)/$", KwargsWebSocketApp),
     ])
     communicator = WebsocketCommunicator(application, "/testws/test/")
+    connected, subprotocol = await communicator.connect()
     assert connected
     # Test on connection welcome message
     message = await communicator.receive_from()
