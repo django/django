@@ -595,12 +595,14 @@ class OverwritingStorageTests(FileStorageTests):
             self.assertEqual(stored_name_1, name)
             self.assertTrue(self.storage.exists(name))
             self.assertTrue(os.path.exists(os.path.join(self.temp_dir, name)))
-            self.assertEqual(self.storage.open(name).read(), content_1)
+            with self.storage.open(name) as fp:
+                self.assertEqual(fp.read(), content_1)
             stored_name_2 = self.storage.save(name, f_2)
             self.assertEqual(stored_name_2, name)
             self.assertTrue(self.storage.exists(name))
             self.assertTrue(os.path.exists(os.path.join(self.temp_dir, name)))
-            self.assertEqual(self.storage.open(name).read(), content_2)
+            with self.storage.open(name) as fp:
+                self.assertEqual(fp.read(), content_2)
         finally:
             self.storage.delete(name)
 
