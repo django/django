@@ -51,9 +51,11 @@ class RenameMethodsTests(SimpleTestCase):
         """
         Ensure `old` complains when only `old` is defined.
         """
-        class Manager(metaclass=RenameManagerMethods):
-            def old(self):
-                pass
+        msg = '`Manager.old` method should be renamed `new`.'
+        with self.assertWarnsMessage(DeprecationWarning, msg):
+            class Manager(metaclass=RenameManagerMethods):
+                def old(self):
+                    pass
         manager = Manager()
 
         with warnings.catch_warnings(record=True) as recorded:
@@ -74,9 +76,11 @@ class RenameMethodsTests(SimpleTestCase):
             def new(self):
                 pass
 
-        class Deprecated(Renamed):
-            def old(self):
-                super().old()
+        msg = '`Deprecated.old` method should be renamed `new`.'
+        with self.assertWarnsMessage(DeprecationWarning, msg):
+            class Deprecated(Renamed):
+                def old(self):
+                    super().old()
 
         deprecated = Deprecated()
 
@@ -93,9 +97,11 @@ class RenameMethodsTests(SimpleTestCase):
         Ensure the correct warnings are raised when a class that renamed
         `old` subclass one that didn't.
         """
-        class Deprecated(metaclass=RenameManagerMethods):
-            def old(self):
-                pass
+        msg = '`Deprecated.old` method should be renamed `new`.'
+        with self.assertWarnsMessage(DeprecationWarning, msg):
+            class Deprecated(metaclass=RenameManagerMethods):
+                def old(self):
+                    pass
 
         class Renamed(Deprecated):
             def new(self):
@@ -130,8 +136,10 @@ class RenameMethodsTests(SimpleTestCase):
             def old(self):
                 super().old()
 
-        class Deprecated(DeprecatedMixin, RenamedMixin, Renamed):
-            pass
+        msg = '`DeprecatedMixin.old` method should be renamed `new`.'
+        with self.assertWarnsMessage(DeprecationWarning, msg):
+            class Deprecated(DeprecatedMixin, RenamedMixin, Renamed):
+                pass
 
         deprecated = Deprecated()
 
