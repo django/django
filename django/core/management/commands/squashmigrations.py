@@ -137,7 +137,7 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.MIGRATE_HEADING("Optimizing..."))
 
             optimizer = MigrationOptimizer()
-            new_operations = optimizer.optimize(operations, migration.app_label)
+            new_operations = optimizer.optimize(operations, app_label=migration.app_label)
 
             if self.verbosity > 0:
                 if len(new_operations) == len(operations):
