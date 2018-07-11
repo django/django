@@ -1,3 +1,5 @@
+from django.db.migrations.operations.fields import RemoveField
+
 class MigrationOptimizer:
     """
     Power the optimization process, where you provide a list of Operations
@@ -51,10 +53,12 @@ class MigrationOptimizer:
                 try:
                     model_name = getattr(operation, "model_name", None) or operation.name
                     state = from_state[app_label, model_name]
-
-                    # flatten unique/indexed/order_with_respect fields into a set
-                    unique = {k for i in state.options.values() for j in i for k in j}
-                    can_optimize = can_optimize and operation.name not in unique
+                    if isinstance(operation, RemoveField) and bool(state.options):
+                        # flatten unique/indexed/order_with_respect fields into a set
+                        unique = {k for i in state.options.values() for j in i for k in j}
+                        can_optimize = can_optimize and operation.name not in unique
+                    else:
+                        can_optimize = False
                 except (AttributeError, KeyError, TypeError):
                     pass
 

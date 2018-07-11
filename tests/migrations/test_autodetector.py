@@ -418,10 +418,6 @@ class AutodetectorTests(TestCase):
         "index_together": {("title", "newfield2")},
         "unique_together": {("title", "newfield2")},
     })
-    book_foo_together_5 = ModelState("otherapp", "Book", [
-        ("id", models.AutoField(primary_key=True)),
-        ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
-    ])
     attribution = ModelState("otherapp", "Attribution", [
         ("id", models.AutoField(primary_key=True)),
         ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
@@ -1494,24 +1490,10 @@ class AutodetectorTests(TestCase):
         )
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "otherapp", 1)
-        self.assertOperationTypes(changes, "otherapp", 0, ["RemoveField", "AlterUniqueTogether", "AlterIndexTogether"])
-        self.assertOperationAttributes(changes, "otherapp", 0, 0, model_name="book", name="newfield")
-        self.assertOperationAttributes(changes, "otherapp", 0, 1, name="book", unique_together={("author", "title")})
-        self.assertOperationAttributes(changes, "otherapp", 0, 2, name="book", index_together={("author", "title")})
-
-    def test_remove_field_that_was_indexed(self):
-        """
-        Removed fields will be removed after updating index/unique_together.
-        """
-        changes = self.get_changes(
-            [self.author_empty, self.book_foo_together], [self.author_empty, self.book_foo_together_5]
-        )
-        # Right number/type of migrations?
-        self.assertNumberMigrations(changes, "otherapp", 1)
         self.assertOperationTypes(changes, "otherapp", 0, ["AlterUniqueTogether", "AlterIndexTogether", "RemoveField"])
-        self.assertOperationAttributes(changes, "otherapp", 0, 0, name="book", unique_together=set())
-        self.assertOperationAttributes(changes, "otherapp", 0, 1, name="book", index_together=set())
-        self.assertOperationAttributes(changes, "otherapp", 0, 2, model_name="book", name="title")
+        self.assertOperationAttributes(changes, "otherapp", 0, 0, name="book", unique_together={("author", "title")})
+        self.assertOperationAttributes(changes, "otherapp", 0, 1, name="book", index_together={("author", "title")})
+        self.assertOperationAttributes(changes, "otherapp", 0, 2, model_name="book", name="newfield")
 
     def test_rename_field_and_foo_together(self):
         """
