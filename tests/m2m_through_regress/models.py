@@ -40,25 +40,6 @@ class Group(models.Model):
         return self.name
 
 
-# A set of models that use a non-abstract inherited model as the 'through' model.
-class A(models.Model):
-    a_text = models.CharField(max_length=20)
-
-
-class ThroughBase(models.Model):
-    a = models.ForeignKey(A, models.CASCADE)
-    b = models.ForeignKey('B', models.CASCADE)
-
-
-class Through(ThroughBase):
-    extra = models.CharField(max_length=20)
-
-
-class B(models.Model):
-    b_text = models.CharField(max_length=20)
-    a_list = models.ManyToManyField(A, through=Through)
-
-
 # Using to_field on the through model
 class Car(models.Model):
     make = models.CharField(max_length=20, unique=True, null=True)
