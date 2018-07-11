@@ -1,5 +1,6 @@
 from django.db.migrations.operations.fields import RemoveField
 
+
 class MigrationOptimizer:
     """
     Power the optimization process, where you provide a list of Operations
