@@ -18,7 +18,7 @@ from django.test.utils import captured_stdout
 
 @modify_settings(INSTALLED_APPS={'append': 'django.contrib.sites'})
 class SitesFrameworkTests(TestCase):
-    multi_db = True
+    databases = {'default', 'other'}
 
     @classmethod
     def setUpTestData(cls):
@@ -236,7 +236,7 @@ class JustOtherRouter:
 
 @modify_settings(INSTALLED_APPS={'append': 'django.contrib.sites'})
 class CreateDefaultSiteTests(TestCase):
-    multi_db = True
+    databases = {'default', 'other'}
 
     @classmethod
     def setUpTestData(cls):

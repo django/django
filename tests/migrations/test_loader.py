@@ -16,7 +16,7 @@ class RecorderTests(TestCase):
     """
     Tests recording migrations as applied or not.
     """
-    multi_db = True
+    databases = {'default', 'other'}
 
     def test_apply(self):
         """

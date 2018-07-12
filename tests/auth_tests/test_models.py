@@ -47,7 +47,7 @@ class LoadDataWithNaturalKeysTestCase(TestCase):
 
 
 class LoadDataWithNaturalKeysAndMultipleDatabasesTestCase(TestCase):
-    multi_db = True
+    databases = {'default', 'other'}
 
     def test_load_data_with_user_permissions(self):
         # Create test contenttypes for both databases

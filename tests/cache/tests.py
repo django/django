@@ -1085,7 +1085,7 @@ class DBCacheRouter:
     },
 )
 class CreateCacheTableForDBCacheTests(TestCase):
-    multi_db = True
+    databases = {'default', 'other'}
 
     @override_settings(DATABASE_ROUTERS=[DBCacheRouter()])
     def test_createcachetable_observes_database_router(self):

@@ -18,7 +18,7 @@ class MigrationTestBase(TransactionTestCase):
     """
 
     available_apps = ["migrations"]
-    multi_db = True
+    databases = {'default', 'other'}
 
     def tearDown(self):
         # Reset applied-migrations state.

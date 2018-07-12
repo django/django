@@ -7,8 +7,9 @@ from unittest import mock
 from django.conf import settings
 from django.contrib.staticfiles.finders import get_finder, get_finders
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import default_storage
-from django.db import connection, models, router
+from django.db import connection, connections, models, router
 from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
 from django.template.loader import render_to_string
@@ -1160,31 +1161,66 @@ class TestBadSetUpTestData(TestCase):
 class DisallowedDatabaseQueriesTests(SimpleTestCase):
     def test_disallowed_database_queries(self):
         expected_message = (
-            "Database queries aren't allowed in SimpleTestCase. "
-            "Either use TestCase or TransactionTestCase to ensure proper test isolation or "
-            "set DisallowedDatabaseQueriesTests.allow_database_queries to True to silence this failure."
+            "Database queries are not allowed in SimpleTestCase subclasses. "
+            "Either subclass TestCase or TransactionTestCase to ensure proper "
+            "test isolation or add 'default' to "
+            "test_utils.tests.DisallowedDatabaseQueriesTests.databases to "
+            "silence this failure."
         )
         with self.assertRaisesMessage(AssertionError, expected_message):
             Car.objects.first()
 
-
-class DisallowedDatabaseQueriesChunkedCursorsTests(SimpleTestCase):
-    def test_disallowed_database_queries(self):
+    def test_disallowed_database_chunked_cursor_queries(self):
         expected_message = (
-            "Database queries aren't allowed in SimpleTestCase. Either use "
-            "TestCase or TransactionTestCase to ensure proper test isolation or "
-            "set DisallowedDatabaseQueriesChunkedCursorsTests.allow_database_queries "
-            "to True to silence this failure."
+            "Database queries are not allowed in SimpleTestCase subclasses. "
+            "Either subclass TestCase or TransactionTestCase to ensure proper "
+            "test isolation or add 'default' to "
+            "test_utils.tests.DisallowedDatabaseQueriesTests.databases to "
+            "silence this failure."
         )
         with self.assertRaisesMessage(AssertionError, expected_message):
             next(Car.objects.iterator())
 
 
 class AllowedDatabaseQueriesTests(SimpleTestCase):
-    allow_database_queries = True
+    databases = {'default'}
 
     def test_allowed_database_queries(self):
         Car.objects.first()
+
+    def test_allowed_database_chunked_cursor_queries(self):
+        next(Car.objects.iterator(), None)
+
+
+class DatabaseAliasTests(SimpleTestCase):
+    def setUp(self):
+        self.addCleanup(setattr, self.__class__, 'databases', self.databases)
+
+    def test_no_close_match(self):
+        self.__class__.databases = {'void'}
+        message = (
+            "test_utils.tests.DatabaseAliasTests.databases refers to 'void' which is not defined "
+            "in settings.DATABASES."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, message):
+            self._validate_databases()
+
+    def test_close_match(self):
+        self.__class__.databases = {'defualt'}
+        message = (
+            "test_utils.tests.DatabaseAliasTests.databases refers to 'defualt' which is not defined "
+            "in settings.DATABASES. Did you mean 'default'?"
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, message):
+            self._validate_databases()
+
+    def test_match(self):
+        self.__class__.databases = {'default', 'other'}
+        self.assertEqual(self._validate_databases(), frozenset({'default', 'other'}))
+
+    def test_all(self):
+        self.__class__.databases = '__all__'
+        self.assertEqual(self._validate_databases(), frozenset(connections))
 
 
 @isolate_apps('test_utils', attr_name='class_apps')

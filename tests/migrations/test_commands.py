@@ -25,7 +25,7 @@ class MigrateTests(MigrationTestBase):
     """
     Tests running the migrate command.
     """
-    multi_db = True
+    databases = {'default', 'other'}
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_migrate(self):

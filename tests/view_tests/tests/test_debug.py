@@ -225,7 +225,7 @@ class DebugViewTests(SimpleTestCase):
 
 class DebugViewQueriesAllowedTests(SimpleTestCase):
     # May need a query to initialize MySQL connection
-    allow_database_queries = True
+    databases = {'default'}
 
     def test_handle_db_exception(self):
         """

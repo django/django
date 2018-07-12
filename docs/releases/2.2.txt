@@ -513,3 +513,12 @@ Miscellaneous
 * :meth:`.RemoteUserBackend.configure_user` is now passed ``request`` as the
   first positional argument, if it accepts it. Support for overrides that don't
   accept it will be removed in Django 3.1.
+
+* The :attr:`.SimpleTestCase.allow_database_queries`,
+  :attr:`.TransactionTestCase.multi_db`, and :attr:`.TestCase.multi_db`
+  attributes are deprecated in favor of :attr:`.SimpleTestCase.databases`,
+  :attr:`.TransactionTestCase.databases`, and :attr:`.TestCase.databases`.
+  These new attributes allow databases dependencies to be declared in order to
+  prevent unexpected queries against non-default databases to leak state
+  between tests. The previous behavior of ``allow_database_queries=True`` and
+  ``multi_db=True`` can be achieved by setting ``databases='__all__'``.

@@ -209,8 +209,7 @@ class LiveServerPort(LiveServerBase):
                 "Acquired duplicate server addresses for server threads: %s" % self.live_server_url
             )
         finally:
-            if hasattr(TestCase, 'server_thread'):
-                TestCase.server_thread.terminate()
+            TestCase.tearDownClass()
 
     def test_specified_port_bind(self):
         """LiveServerTestCase.port customizes the server's port."""
@@ -227,8 +226,7 @@ class LiveServerPort(LiveServerBase):
                 'Did not use specified port for LiveServerTestCase thread: %s' % TestCase.port
             )
         finally:
-            if hasattr(TestCase, 'server_thread'):
-                TestCase.server_thread.terminate()
+            TestCase.tearDownClass()
 
 
 class LiverServerThreadedTests(LiveServerBase):

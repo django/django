@@ -38,7 +38,7 @@ class MigrateWhenFooRouter:
 
 
 class MultiDBOperationTests(OperationTestBase):
-    multi_db = True
+    databases = {'default', 'other'}
 
     def _test_create_model(self, app_label, should_run):
         """

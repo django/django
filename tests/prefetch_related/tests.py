@@ -1155,7 +1155,7 @@ class NullableTest(TestCase):
 
 
 class MultiDbTests(TestCase):
-    multi_db = True
+    databases = {'default', 'other'}
 
     def test_using_is_honored_m2m(self):
         B = Book.objects.using('other')

@@ -32,6 +32,9 @@ details on these changes.
 * ``RemoteUserBackend.configure_user()`` will require ``request`` as the first
   positional argument.
 
+* Support for ``SimpleTestCase.allow_database_queries`` and
+  ``TransactionTestCase.multi_db`` will be removed.
+
 .. _deprecation-removed-in-3.0:
 
 3.0

@@ -241,8 +241,8 @@ class Ticket17477RegressionTests(AdminScriptTestCase):
 
 
 class SQLiteInMemoryTestDbs(TransactionTestCase):
-    multi_db = True
     available_apps = ['test_runner']
+    databases = {'default', 'other'}
 
     @unittest.skipUnless(all(db.connections[conn].vendor == 'sqlite' for conn in db.connections),
                          "This is an sqlite-specific issue")

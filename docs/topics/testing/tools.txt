@@ -722,14 +722,24 @@ A subclass of :class:`unittest.TestCase` that adds this functionality:
 If your tests make any database queries, use subclasses
 :class:`~django.test.TransactionTestCase` or :class:`~django.test.TestCase`.
 
-.. attribute:: SimpleTestCase.allow_database_queries
+.. attribute:: SimpleTestCase.databases
+
+    .. versionadded:: 2.2
 
     :class:`~SimpleTestCase` disallows database queries by default. This
     helps to avoid executing write queries which will affect other tests
     since each ``SimpleTestCase`` test isn't run in a transaction. If you
     aren't concerned about this problem, you can disable this behavior by
-    setting the ``allow_database_queries`` class attribute to ``True`` on
-    your test class.
+    setting the ``databases`` class attribute to ``'__all__'`` on your test
+    class.
+
+.. attribute:: SimpleTestCase.allow_database_queries
+
+    .. deprecated:: 2.2
+
+    This attribute is deprecated in favor of :attr:`databases`. The previous
+    behavior of ``allow_database_queries = True`` can be achieved by setting
+    ``databases = '__all__'``.
 
 .. warning::
 
@@ -1101,8 +1111,8 @@ you can be certain that the outcome of a test will not be affected by another
 test or by the order of test execution.
 
 By default, fixtures are only loaded into the ``default`` database. If you are
-using multiple databases and set :attr:`multi_db=True
-<TransactionTestCase.multi_db>`, fixtures will be loaded into all databases.
+using multiple databases and set :attr:`TransactionTestCase.databases`,
+fixtures will be loaded into all specified databases.
 
 URLconf configuration
 ---------------------
@@ -1119,7 +1129,9 @@ particular URL. Decorate your test class or test method with
 Multi-database support
 ----------------------
 
-.. attribute:: TransactionTestCase.multi_db
+.. attribute:: TransactionTestCase.databases
+
+.. versionadded:: 2.2
 
 Django sets up a test database corresponding to every database that is
 defined in the :setting:`DATABASES` definition in your settings
@@ -1133,24 +1145,67 @@ don't need to test multi-database activity.
 As an optimization, Django only flushes the ``default`` database at
 the start of each test run. If your setup contains multiple databases,
 and you have a test that requires every database to be clean, you can
-use the ``multi_db`` attribute on the test suite to request a full
-flush.
+use the ``databases`` attribute on the test suite to request extra databases
+to be flushed.
 
 For example::
 
-    class TestMyViews(TestCase):
-        multi_db = True
+    class TestMyViews(TransactionTestCase):
+        databases = {'default', 'other'}
 
         def test_index_page_view(self):
             call_some_test_code()
 
-This test case will flush *all* the test databases before running
-``test_index_page_view``.
+This test case will flush the ``default`` and ``other`` test databases before
+running ``test_index_page_view``. You can also use ``'__all__'`` to specify
+that all of the test databases must be flushed.
 
-The ``multi_db`` flag also affects into which databases the
-:attr:`TransactionTestCase.fixtures` are loaded. By default (when
-``multi_db=False``), fixtures are only loaded into the ``default`` database.
-If ``multi_db=True``, fixtures are loaded into all databases.
+The ``databases`` flag also controls which databases the
+:attr:`TransactionTestCase.fixtures` are loaded into. By default, fixtures are
+only loaded into the ``default`` database.
+
+Queries against databases not in ``databases`` will give assertion errors to
+prevent state leaking between tests.
+
+.. attribute:: TransactionTestCase.multi_db
+
+.. deprecated:: 2.2
+
+This attribute is deprecated in favor of :attr:`~TransactionTestCase.databases`.
+The previous behavior of ``multi_db = True`` can be achieved by setting
+``databases = '__all__'``.
+
+.. attribute:: TestCase.databases
+
+.. versionadded:: 2.2
+
+By default, only the ``default`` database will be wrapped in a transaction
+during a ``TestCase``'s execution and attempts to query other databases will
+result in assertion errors to prevent state leaking between tests.
+
+Use the ``databases`` class attribute on the test class to request transaction
+wrapping against non-``default`` databases.
+
+For example::
+
+    class OtherDBTests(TestCase):
+        databases = {'other'}
+
+        def test_other_db_query(self):
+            ...
+
+This test will only allow queries against the ``other`` database. Just like for
+:attr:`SimpleTestCase.databases` and :attr:`TransactionTestCase.databases`, the
+``'__all__'`` constant can be used to specify that the test should allow
+queries to all databases.
+
+.. attribute:: TestCase.multi_db
+
+.. deprecated:: 2.2
+
+This attribute is deprecated in favor of :attr:`~TestCase.databases`. The
+previous behavior of ``multi_db = True`` can be achieved by setting
+``databases = '__all__'``.
 
 .. _overriding-settings:
 

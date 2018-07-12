@@ -27,7 +27,7 @@ urlpatterns = [
 
 @override_settings(ROOT_URLCONF=__name__, DATABASE_ROUTERS=['%s.Router' % __name__])
 class MultiDatabaseTests(TestCase):
-    multi_db = True
+    databases = {'default', 'other'}
 
     @classmethod
     def setUpTestData(cls):

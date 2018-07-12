@@ -214,7 +214,7 @@ class TestRouter:
 
 @override_settings(DATABASE_ROUTERS=[TestRouter()])
 class ContentTypesMultidbTests(TestCase):
-    multi_db = True
+    databases = {'default', 'other'}
 
     def test_multidb(self):
         """
