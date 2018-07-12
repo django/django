@@ -44,6 +44,11 @@ class CacheNode(Node):
         cache_key = make_template_fragment_key(self.fragment_name, vary_on)
         value = fragment_cache.get(cache_key)
         if value is None:
+            fragment_var = context.get(self.fragment_name)
+            if callable(fragment_var):
+                extra = fragment_var(*vary_on)
+                if type(extra) is dict:
+                    context.update(extra)
             value = self.nodelist.render(context)
             fragment_cache.set(cache_key, value, expire_time)
         return value
