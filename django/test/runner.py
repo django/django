@@ -391,6 +391,9 @@ class ParallelTestSuite(unittest.TestSuite):
 
         return result
 
+    def __iter__(self):
+        return iter(self.subsuites)
+
 
 class DiscoverRunner:
     """A Django test runner that uses unittest2 test discovery."""
@@ -587,6 +590,27 @@ class DiscoverRunner:
     def suite_result(self, suite, result, **kwargs):
         return len(result.failures) + len(result.errors)
 
+    def _get_databases(self, suite):
+        databases = set()
+        for test in suite:
+            if isinstance(test, unittest.TestCase):
+                test_databases = getattr(test, 'databases', None)
+                if test_databases == '__all__':
+                    return set(connections)
+                if test_databases:
+                    databases.update(test_databases)
+            else:
+                databases.update(self._get_databases(test))
+        return databases
+
+    def get_databases(self, suite):
+        databases = self._get_databases(suite)
+        if self.verbosity >= 2:
+            unused_databases = [alias for alias in connections if alias not in databases]
+            if unused_databases:
+                print('Skipping setup of unused database(s): %s.' % ', '.join(sorted(unused_databases)))
+        return databases
+
     def run_tests(self, test_labels, extra_tests=None, **kwargs):
         """
         Run the unit tests for all the test labels in the provided list.
@@ -601,7 +625,8 @@ class DiscoverRunner:
         """
         self.setup_test_environment()
         suite = self.build_suite(test_labels, extra_tests)
-        old_config = self.setup_databases()
+        databases = self.get_databases(suite)
+        old_config = self.setup_databases(aliases=databases)
         run_failed = False
         try:
             self.run_checks()

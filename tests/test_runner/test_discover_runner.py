@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 from contextlib import contextmanager
 from unittest import TestSuite, TextTestRunner, defaultTestLoader
 
+from django.db import connections
 from django.test import SimpleTestCase
 from django.test.runner import DiscoverRunner
 from django.test.utils import captured_stdout
@@ -223,3 +224,47 @@ class DiscoverRunnerTests(SimpleTestCase):
         with captured_stdout() as stdout:
             runner.build_suite(['test_runner_apps.tagged.tests'])
             self.assertIn('Excluding test tag(s): bar, foo.\n', stdout.getvalue())
+
+
+class DiscoverRunnerGetDatabasesTests(SimpleTestCase):
+    runner = DiscoverRunner(verbosity=2)
+    skip_msg = 'Skipping setup of unused database(s): '
+
+    def get_databases(self, test_labels):
+        suite = self.runner.build_suite(test_labels)
+        with captured_stdout() as stdout:
+            databases = self.runner.get_databases(suite)
+        return databases, stdout.getvalue()
+
+    def test_mixed(self):
+        databases, output = self.get_databases(['test_runner_apps.databases.tests'])
+        self.assertEqual(databases, set(connections))
+        self.assertNotIn(self.skip_msg, output)
+
+    def test_all(self):
+        databases, output = self.get_databases(['test_runner_apps.databases.tests.AllDatabasesTests'])
+        self.assertEqual(databases, set(connections))
+        self.assertNotIn(self.skip_msg, output)
+
+    def test_default_and_other(self):
+        databases, output = self.get_databases([
+            'test_runner_apps.databases.tests.DefaultDatabaseTests',
+            'test_runner_apps.databases.tests.OtherDatabaseTests',
+        ])
+        self.assertEqual(databases, set(connections))
+        self.assertNotIn(self.skip_msg, output)
+
+    def test_default_only(self):
+        databases, output = self.get_databases(['test_runner_apps.databases.tests.DefaultDatabaseTests'])
+        self.assertEqual(databases, {'default'})
+        self.assertIn(self.skip_msg + 'other', output)
+
+    def test_other_only(self):
+        databases, output = self.get_databases(['test_runner_apps.databases.tests.OtherDatabaseTests'])
+        self.assertEqual(databases, {'other'})
+        self.assertIn(self.skip_msg + 'default', output)
+
+    def test_no_databases_required(self):
+        databases, output = self.get_databases(['test_runner_apps.databases.tests.NoDatabaseTests'])
+        self.assertEqual(databases, set())
+        self.assertIn(self.skip_msg + 'default, other', output)

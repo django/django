@@ -293,6 +293,9 @@ Tests
   for older versions of SQLite because they would require expensive table
   introspection there.
 
+* :class:`~django.test.runner.DiscoverRunner` now skips the setup of databases
+  not :ref:`referenced by tests<testing-multi-db>`.
+
 URLs
 ~~~~
 
