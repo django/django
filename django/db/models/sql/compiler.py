@@ -443,9 +443,10 @@ class SQLCompiler:
         refcounts_before = self.query.alias_refcount.copy()
         try:
             extra_select, order_by, group_by = self.pre_sql_setup()
-            for_update_part = None
             # Is a LIMIT/OFFSET clause needed?
             with_limit_offset = with_limits and (self.query.high_mark is not None or self.query.low_mark)
+            # Calcualte the for update part - it might alter the joins.
+            for_update_part = self.get_for_update_part(with_limit_offset)
             combinator = self.query.combinator
             features = self.connection.features
             if combinator:
@@ -454,8 +455,8 @@ class SQLCompiler:
                 result, params = self.get_combinator_sql(combinator, self.query.combinator_all)
             else:
                 distinct_fields, distinct_params = self.get_distinct()
-                # This must come after 'select', 'ordering', and 'distinct'
-                # (see docstring of get_from_clause() for details).
+                # This must come after 'select', 'ordering', 'for update' and
+                # 'distinct' (see docstring of get_from_clause() for details).
                 from_, f_params = self.get_from_clause()
                 where, w_params = self.compile(self.where) if self.where is not None else ("", [])
                 having, h_params = self.compile(self.having) if self.having is not None else ("", [])
@@ -484,32 +485,6 @@ class SQLCompiler:
                 result += [', '.join(out_cols), 'FROM', *from_]
                 params.extend(f_params)
 
-                if self.query.select_for_update and self.connection.features.has_select_for_update:
-                    if self.connection.get_autocommit():
-                        raise TransactionManagementError('select_for_update cannot be used outside of a transaction.')
-
-                    if with_limit_offset and not self.connection.features.supports_select_for_update_with_limit:
-                        raise NotSupportedError(
-                            'LIMIT/OFFSET is not supported with '
-                            'select_for_update on this database backend.'
-                        )
-                    nowait = self.query.select_for_update_nowait
-                    skip_locked = self.query.select_for_update_skip_locked
-                    of = self.query.select_for_update_of
-                    # If it's a NOWAIT/SKIP LOCKED/OF query but the backend
-                    # doesn't support it, raise NotSupportedError to prevent a
-                    # possible deadlock.
-                    if nowait and not self.connection.features.has_select_for_update_nowait:
-                        raise NotSupportedError('NOWAIT is not supported on this database backend.')
-                    elif skip_locked and not self.connection.features.has_select_for_update_skip_locked:
-                        raise NotSupportedError('SKIP LOCKED is not supported on this database backend.')
-                    elif of and not self.connection.features.has_select_for_update_of:
-                        raise NotSupportedError('FOR UPDATE OF is not supported on this database backend.')
-                    for_update_part = self.connection.ops.for_update_sql(
-                        nowait=nowait,
-                        skip_locked=skip_locked,
-                        of=self.get_select_for_update_of_arguments(),
-                    )
 
                 if for_update_part and self.connection.features.for_update_after_from:
                     result.append(for_update_part)
@@ -582,6 +557,36 @@ class SQLCompiler:
         finally:
             # Finally do cleanup - get rid of the joins we created above.
             self.query.reset_refcounts(refcounts_before)
+
+    def get_for_update_part(self, with_limit_offset):
+        if self.query.select_for_update and self.connection.features.has_select_for_update:
+            if self.connection.get_autocommit():
+                raise TransactionManagementError('select_for_update cannot be used outside of a transaction.')
+
+            if with_limit_offset and not self.connection.features.supports_select_for_update_with_limit:
+                raise NotSupportedError(
+                    'LIMIT/OFFSET is not supported with '
+                    'select_for_update on this database backend.'
+                )
+            nowait = self.query.select_for_update_nowait
+            skip_locked = self.query.select_for_update_skip_locked
+            of = self.query.select_for_update_of
+            # If it's a NOWAIT/SKIP LOCKED/OF query but the backend
+            # doesn't support it, raise NotSupportedError to prevent a
+            # possible deadlock.
+            if nowait and not self.connection.features.has_select_for_update_nowait:
+                raise NotSupportedError('NOWAIT is not supported on this database backend.')
+            elif skip_locked and not self.connection.features.has_select_for_update_skip_locked:
+                raise NotSupportedError('SKIP LOCKED is not supported on this database backend.')
+            elif of and not self.connection.features.has_select_for_update_of:
+                raise NotSupportedError('FOR UPDATE OF is not supported on this database backend.')
+            return self.connection.ops.for_update_sql(
+                nowait=nowait,
+                skip_locked=skip_locked,
+                of=self.get_select_for_update_of_arguments(),
+            )
+        else:
+            return None
 
     def get_default_columns(self, start_alias=None, opts=None, from_parent=None):
         """
@@ -907,58 +912,41 @@ class SQLCompiler:
         Return a quoted list of arguments for the SELECT FOR UPDATE OF part of
         the query.
         """
-        def _get_field_choices():
-            """Yield all allowed field paths in breadth-first search order."""
-            queue = collections.deque([(None, self.klass_info)])
-            while queue:
-                parent_path, klass_info = queue.popleft()
-                if parent_path is None:
-                    path = []
-                    yield 'self'
-                else:
-                    field = klass_info['field']
-                    if klass_info['reverse']:
-                        field = field.remote_field
-                    path = parent_path + [field.name]
-                    yield LOOKUP_SEP.join(path)
-                queue.extend(
-                    (path, klass_info)
-                    for klass_info in klass_info.get('related_klass_infos', [])
-                )
+        def _is_allowed_field(field, name):
+            # There is no technical reason from SQL perspective to prevent
+            # many_to_many and one_to_many, but the queries might produce
+            # the same object multiple times, and that seems a bit
+            # counterintuitive for the users.
+            return name == 'self' or (field.is_relation and (field.one_to_one or field.many_to_one))
+
         result = []
-        invalid_names = []
         for name in self.query.select_for_update_of:
-            parts = [] if name == 'self' else name.split(LOOKUP_SEP)
-            klass_info = self.klass_info
-            for part in parts:
-                for related_klass_info in klass_info.get('related_klass_infos', []):
-                    field = related_klass_info['field']
-                    if related_klass_info['reverse']:
-                        field = field.remote_field
-                    if field.name == part:
-                        klass_info = related_klass_info
-                        break
-                else:
-                    klass_info = None
-                    break
-            if klass_info is None:
-                invalid_names.append(name)
-                continue
-            select_index = klass_info['select_fields'][0]
-            col = self.select[select_index][0]
-            if self.connection.features.select_for_update_of_column:
-                result.append(self.compile(col)[0])
-            else:
-                result.append(self.quote_name_unless_alias(col.alias))
-        if invalid_names:
-            raise FieldError(
-                'Invalid field name(s) given in select_for_update(of=(...)): %s. '
-                'Only relational fields followed in the query are allowed. '
-                'Choices are: %s.' % (
-                    ', '.join(invalid_names),
-                    ', '.join(_get_field_choices()),
+            parts = ['pk'] if name == 'self' else name.split(LOOKUP_SEP)
+            try:
+                join_info = self.query.setup_joins(
+                    parts, self.query.get_meta(),
+                    self.query.get_initial_alias(),
+                    allow_transforms=False,
+                    allow_many=False
                 )
-            )
+            except FieldError:
+                # Reword the message.
+                raise FieldError(
+                    'Invalid field name given in select_for_update(of=(...)): %s. '
+                    'The relation does not exist.' % name
+                )
+            if not _is_allowed_field(join_info.final_field, name):
+                raise FieldError(
+                    'Invalid field name given in select_for_update(of=(...)): %s. '
+                    'The field is not a one to one or many to one relation. ' % name,
+                )
+            targets = join_info.targets
+            alias = join_info.joins[-1]
+            if self.connection.features.select_for_update_of_column:
+                for target in targets:
+                    result.append(self.compile(target.get_col(alias))[0])
+            else:
+                result.append(self.quote_name_unless_alias(alias))
         return result
 
     def deferred_to_columns(self):
