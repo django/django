@@ -105,7 +105,8 @@ Minor features
 :mod:`django.contrib.staticfiles`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Added path matching to the :option:`collectstatic --ignore` option so that
+  patterns like ``/vendor/*.js`` can be used.
 
 :mod:`django.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
