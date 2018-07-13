@@ -514,17 +514,68 @@ command line flags to generate natural keys.
     natural keys during serialization, but *not* be able to load those
     key values, just don't define the ``get_by_natural_key()`` method.
 
+.. _natural-keys-and-forward-references:
+
+Natural keys and forward references
+-----------------------------------
+
+.. versionadded:: 2.2
+
+Sometimes when you use :ref:`natural foreign keys
+<topics-serialization-natural-keys>` you'll need to deserialize data where
+an object has a foreign key referencing another object that hasn't yet been
+deserialized. This is called a "forward reference".
+
+For instance, suppose you have the following objects in your fixture::
+
+    ...
+    {
+        "model": "store.book",
+        "fields": {
+            "name": "Mostly Harmless",
+            "author": ["Douglas", "Adams"]
+        }
+    },
+    ...
+    {
+        "model": "store.person",
+        "fields": {
+            "first_name": "Douglas",
+            "last_name": "Adams"
+        }
+    },
+    ...
+
+In order to handle this situation, you need to pass
+``handle_forward_references=True`` to ``serializers.deserialize()``. This will
+set the ``deferred_fields`` attribute on the ``DeserializedObject`` instances.
+You'll need to keep track of ``DeserializedObject`` instances where this
+attribute isn't ``None`` and later call ``save_deferred_fields()`` on them.
+
+Typical usage looks like this::
+
+    objs_with_deferred_fields = []
+
+    for obj in serializers.deserialize('xml', data, handle_forward_references=True):
+        obj.save()
+        if obj.deferred_fields is not None:
+            objs_with_deferred_fields.append(obj)
+
+    for obj in objs_with_deferred_fields:
+        obj.save_deferred_fields()
+
+For this to work, the ``ForeignKey`` on the referencing model must have
+``null=True``.
+
 Dependencies during serialization
 ---------------------------------
 
-Since natural keys rely on database lookups to resolve references, it
-is important that the data exists before it is referenced. You can't make
-a "forward reference" with natural keys -- the data you're referencing
-must exist before you include a natural key reference to that data.
+It's often possible to avoid explicitly having to handle forward references by
+taking care with the ordering of objects within a fixture.
 
-To accommodate this limitation, calls to :djadmin:`dumpdata` that use
-the :option:`dumpdata --natural-foreign` option will serialize any model with a
-``natural_key()`` method before serializing standard primary key objects.
+To help with this, calls to :djadmin:`dumpdata` that use the :option:`dumpdata
+--natural-foreign` option will serialize any model with a ``natural_key()``
+method before serializing standard primary key objects.
 
 However, this may not always be enough. If your natural key refers to
 another object (by using a foreign key or natural key to another object

@@ -184,7 +184,10 @@ Requests and Responses
 Serialization
 ~~~~~~~~~~~~~
 
-* ...
+* You can now deserialize data using natural keys containing :ref:`forward
+  references <natural-keys-and-forward-references>` by passing
+  ``handle_forward_references=True`` to ``serializers.deserialize()``.
+  Additionally, :djadmin:`loaddata` handles forward references automatically.
 
 Signals
 ~~~~~~~
