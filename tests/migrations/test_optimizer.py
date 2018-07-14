@@ -594,8 +594,11 @@ class OptimizerTests(SimpleTestCase):
     def _test_create_alter_foo_field(self, alter):
         """
         CreateModel, AlterFooTogether/AlterOrderWithRespectTo followed by an
-        add/alter/rename field should optimize to CreateModel and the Alter*
+        add/alter/rename field should optimize to CreateModel with options.
         """
+        option_value = getattr(alter, alter.option_name)
+        options = {alter.option_name: option_value}
+
         # AddField
         self.assertOptimizesTo(
             [
@@ -611,13 +614,12 @@ class OptimizerTests(SimpleTestCase):
                     ("a", models.IntegerField()),
                     ("b", models.IntegerField()),
                     ("c", models.IntegerField()),
-                ]),
-                alter,
+                ], options=options),
             ],
         )
 
         # AlterField
-        self.assertDoesNotOptimize(
+        self.assertOptimizesTo(
             [
                 migrations.CreateModel("Foo", [
                     ("a", models.IntegerField()),
@@ -625,6 +627,12 @@ class OptimizerTests(SimpleTestCase):
                 ]),
                 alter,
                 migrations.AlterField("Foo", "b", models.CharField(max_length=255)),
+            ],
+            [
+                migrations.CreateModel("Foo", [
+                    ("a", models.IntegerField()),
+                    ("b", models.CharField(max_length=255)),
+                ], options=options),
             ],
         )
 
@@ -643,13 +651,20 @@ class OptimizerTests(SimpleTestCase):
                     ("a", models.IntegerField()),
                     ("b", models.IntegerField()),
                     ("c", models.CharField(max_length=255)),
-                ]),
-                alter,
+                ], options=options),
             ],
         )
 
         # RenameField
-        self.assertDoesNotOptimize(
+        if isinstance(option_value, str):
+            renamed_options = {alter.option_name: 'c'}
+        else:
+            renamed_options = {
+                alter.option_name: {
+                    tuple('c' if value == 'b' else value for value in item) for item in option_value
+                }
+            }
+        self.assertOptimizesTo(
             [
                 migrations.CreateModel("Foo", [
                     ("a", models.IntegerField()),
@@ -657,6 +672,12 @@ class OptimizerTests(SimpleTestCase):
                 ]),
                 alter,
                 migrations.RenameField("Foo", "b", "c"),
+            ],
+            [
+                migrations.CreateModel("Foo", [
+                    ("a", models.IntegerField()),
+                    ("c", models.IntegerField()),
+                ], options=renamed_options),
             ],
         )
 
@@ -673,10 +694,8 @@ class OptimizerTests(SimpleTestCase):
             [
                 migrations.CreateModel("Foo", [
                     ("a", models.IntegerField()),
-                    ("b", models.IntegerField()),
-                ]),
-                alter,
-                migrations.RenameField("Foo", "b", "c"),
+                    ("c", models.IntegerField()),
+                ], options=renamed_options),
             ],
         )
 
@@ -695,13 +714,20 @@ class OptimizerTests(SimpleTestCase):
                     ("a", models.IntegerField()),
                     ("b", models.IntegerField()),
                     ("d", models.IntegerField()),
-                ]),
-                alter,
+                ], options=options),
             ],
         )
 
         # RemoveField
-        self.assertDoesNotOptimize(
+        if isinstance(option_value, str):
+            removed_options = None
+        else:
+            removed_options = {
+                alter.option_name: {
+                    tuple(value for value in item if value != 'b') for item in option_value
+                }
+            }
+        self.assertOptimizesTo(
             [
                 migrations.CreateModel("Foo", [
                     ("a", models.IntegerField()),
@@ -710,9 +736,14 @@ class OptimizerTests(SimpleTestCase):
                 alter,
                 migrations.RemoveField("Foo", "b"),
             ],
+            [
+                migrations.CreateModel("Foo", [
+                    ("a", models.IntegerField()),
+                ], options=removed_options),
+            ]
         )
 
-        self.assertDoesNotOptimize(
+        self.assertOptimizesTo(
             [
                 migrations.CreateModel("Foo", [
                     ("a", models.IntegerField()),
@@ -721,6 +752,12 @@ class OptimizerTests(SimpleTestCase):
                 ]),
                 alter,
                 migrations.RemoveField("Foo", "c"),
+            ],
+            [
+                migrations.CreateModel("Foo", [
+                    ("a", models.IntegerField()),
+                    ("b", models.IntegerField()),
+                ], options=options),
             ],
         )
 

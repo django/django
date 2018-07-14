@@ -2075,8 +2075,10 @@ class AutodetectorTests(TestCase):
         changes = self.get_changes([], [self.book, self.author_with_book_order_wrt])
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
-        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "AlterOrderWithRespectTo"])
-        self.assertOperationAttributes(changes, 'testapp', 0, 1, name="author", order_with_respect_to="book")
+        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel"])
+        self.assertOperationAttributes(
+            changes, 'testapp', 0, 0, name="Author", options={'order_with_respect_to': 'book'}
+        )
         self.assertNotIn("_order", [name for name, field in changes['testapp'][0].operations[0].fields])
 
     def test_alter_model_managers(self):

@@ -142,6 +142,17 @@ class CreateModel(ModelOperation):
                     managers=self.managers,
                 ),
             ]
+        elif isinstance(operation, FieldRelatedOptionOperation) and self.name_lower == operation.name_lower:
+            option_value = getattr(operation, operation.option_name)
+            return [
+                CreateModel(
+                    self.name,
+                    fields=self.fields,
+                    options={**self.options, **{operation.option_name: option_value}},
+                    bases=self.bases,
+                    managers=self.managers,
+                ),
+            ]
         elif isinstance(operation, FieldOperation) and self.name_lower == operation.model_name_lower:
             if isinstance(operation, AddField):
                 return [
@@ -167,6 +178,18 @@ class CreateModel(ModelOperation):
                     ),
                 ]
             elif isinstance(operation, RemoveField):
+                options = self.options.copy()
+                for option_name in ('unique_together', 'index_together'):
+                    option = options.pop(option_name, None)
+                    if option:
+                        option = set(filter(bool, (
+                            tuple(f for f in fields if f != operation.name_lower) for fields in option
+                        )))
+                        if option:
+                            options[option_name] = option
+                order_with_respect_to = options.get('order_with_respect_to')
+                if order_with_respect_to == operation.name_lower:
+                    del options['order_with_respect_to']
                 return [
                     CreateModel(
                         self.name,
@@ -175,12 +198,23 @@ class CreateModel(ModelOperation):
                             for n, v in self.fields
                             if n.lower() != operation.name_lower
                         ],
-                        options=self.options,
+                        options=options,
                         bases=self.bases,
                         managers=self.managers,
                     ),
                 ]
             elif isinstance(operation, RenameField):
+                options = self.options.copy()
+                for option_name in ('unique_together', 'index_together'):
+                    option = options.get(option_name)
+                    if option:
+                        options[option_name] = {
+                            tuple(operation.new_name if f == operation.old_name else f for f in fields)
+                            for fields in option
+                        }
+                order_with_respect_to = options.get('order_with_respect_to')
+                if order_with_respect_to == operation.old_name:
+                    options['order_with_respect_to'] = operation.new_name
                 return [
                     CreateModel(
                         self.name,
@@ -188,7 +222,7 @@ class CreateModel(ModelOperation):
                             (operation.new_name if n == operation.old_name else n, v)
                             for n, v in self.fields
                         ],
-                        options=self.options,
+                        options=options,
                         bases=self.bases,
                         managers=self.managers,
                     ),
@@ -567,6 +601,8 @@ class AlterIndexTogether(FieldRelatedOptionOperation):
 
 class AlterOrderWithRespectTo(FieldRelatedOptionOperation):
     """Represent a change with the order_with_respect_to option."""
+
+    option_name = 'order_with_respect_to'
 
     def __init__(self, name, order_with_respect_to):
         self.order_with_respect_to = order_with_respect_to
