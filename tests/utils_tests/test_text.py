@@ -1,4 +1,5 @@
 import json
+import sys
 
 from django.test import SimpleTestCase
 from django.utils import text
@@ -179,6 +180,8 @@ class TestUtilsText(SimpleTestCase):
         )
         for value, output, is_unicode in items:
             self.assertEqual(text.slugify(value, allow_unicode=is_unicode), output)
+        # interning the result may be useful, e.g. when fed to Path.
+        self.assertEqual(sys.intern(text.slugify('a')), 'a')
 
     def test_unescape_entities(self):
         items = [
