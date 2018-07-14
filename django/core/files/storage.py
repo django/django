@@ -1,5 +1,4 @@
 import os
-from contextlib import suppress
 from datetime import datetime
 from urllib.parse import urljoin
 
@@ -169,6 +168,9 @@ class FileSystemStorage(Storage):
     """
     Standard filesystem storage
     """
+    # The combination of O_CREAT and O_EXCL makes os.open() raise OSError if
+    # the file already exists before it's opened.
+    OS_OPEN_FLAGS = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, 'O_BINARY', 0)
 
     def __init__(self, location=None, base_url=None, file_permissions_mode=None,
                  directory_permissions_mode=None):
@@ -224,10 +226,7 @@ class FileSystemStorage(Storage):
         # Create any intermediate directories that do not exist.
         directory = os.path.dirname(full_path)
         if not os.path.exists(directory):
-            # There's a race between os.path.exists() and os.makedirs().
-            # If os.makedirs() fails with FileNotFoundError, the directory
-            # was created concurrently.
-            with suppress(FileNotFoundError):
+            try:
                 if self.directory_permissions_mode is not None:
                     # os.makedirs applies the global umask, so we reset it,
                     # for consistency with file_permissions_mode behavior.
@@ -238,6 +237,11 @@ class FileSystemStorage(Storage):
                         os.umask(old_umask)
                 else:
                     os.makedirs(directory)
+            except FileNotFoundError:
+                # There's a race between os.path.exists() and os.makedirs().
+                # If os.makedirs() fails with FileNotFoundError, the directory
+                # was created concurrently.
+                pass
         if not os.path.isdir(directory):
             raise IOError("%s exists and is not a directory." % directory)
 
@@ -255,12 +259,8 @@ class FileSystemStorage(Storage):
 
                 # This is a normal uploadedfile that we can stream.
                 else:
-                    # This fun binary flag incantation makes os.open throw an
-                    # OSError if the file already exists before we open it.
-                    flags = (os.O_WRONLY | os.O_CREAT | os.O_EXCL |
-                             getattr(os, 'O_BINARY', 0))
                     # The current umask value is masked out by os.open!
-                    fd = os.open(full_path, flags, 0o666)
+                    fd = os.open(full_path, self.OS_OPEN_FLAGS, 0o666)
                     _file = None
                     try:
                         locks.lock(fd, locks.LOCK_EX)
@@ -293,13 +293,15 @@ class FileSystemStorage(Storage):
         assert name, "The name argument is not allowed to be empty."
         name = self.path(name)
         # If the file or directory exists, delete it from the filesystem.
-        # FileNotFoundError is raised if the file or directory was removed
-        # concurrently.
-        with suppress(FileNotFoundError):
+        try:
             if os.path.isdir(name):
                 os.rmdir(name)
             else:
                 os.remove(name)
+        except FileNotFoundError:
+            # FileNotFoundError is raised if the file or directory was removed
+            # concurrently.
+            pass
 
     def exists(self, name):
         return os.path.exists(self.path(name))

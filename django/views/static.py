@@ -3,10 +3,9 @@ Views and functions for serving static files. These are only to be used
 during development, and SHOULD NOT be used in a production setting.
 """
 import mimetypes
-import os
 import posixpath
 import re
-import stat
+from pathlib import Path
 
 from django.http import (
     FileResponse, Http404, HttpResponse, HttpResponseNotModified,
@@ -34,24 +33,22 @@ def serve(request, path, document_root=None, show_indexes=False):
     ``static/directory_index.html``.
     """
     path = posixpath.normpath(path).lstrip('/')
-    fullpath = safe_join(document_root, path)
-    if os.path.isdir(fullpath):
+    fullpath = Path(safe_join(document_root, path))
+    if fullpath.is_dir():
         if show_indexes:
             return directory_index(path, fullpath)
         raise Http404(_("Directory indexes are not allowed here."))
-    if not os.path.exists(fullpath):
+    if not fullpath.exists():
         raise Http404(_('"%(path)s" does not exist') % {'path': fullpath})
     # Respect the If-Modified-Since header.
-    statobj = os.stat(fullpath)
+    statobj = fullpath.stat()
     if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
                               statobj.st_mtime, statobj.st_size):
         return HttpResponseNotModified()
-    content_type, encoding = mimetypes.guess_type(fullpath)
+    content_type, encoding = mimetypes.guess_type(str(fullpath))
     content_type = content_type or 'application/octet-stream'
-    response = FileResponse(open(fullpath, 'rb'), content_type=content_type)
+    response = FileResponse(fullpath.open('rb'), content_type=content_type)
     response["Last-Modified"] = http_date(statobj.st_mtime)
-    if stat.S_ISREG(statobj.st_mode):
-        response["Content-Length"] = statobj.st_size
     if encoding:
         response["Content-Encoding"] = encoding
     return response
@@ -62,9 +59,9 @@ DEFAULT_DIRECTORY_INDEX_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-    <meta http-equiv="Content-Language" content="en-us" />
-    <meta name="robots" content="NONE,NOARCHIVE" />
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Language" content="en-us">
+    <meta name="robots" content="NONE,NOARCHIVE">
     <title>{% blocktrans %}Index of {{ directory }}{% endblocktrans %}</title>
   </head>
   <body>
@@ -95,11 +92,12 @@ def directory_index(path, fullpath):
     else:
         c = {}
     files = []
-    for f in os.listdir(fullpath):
-        if not f.startswith('.'):
-            if os.path.isdir(os.path.join(fullpath, f)):
-                f += '/'
-            files.append(f)
+    for f in fullpath.iterdir():
+        if not f.name.startswith('.'):
+            url = str(f.relative_to(fullpath))
+            if f.is_dir():
+                url += '/'
+            files.append(url)
     c.update({
         'directory': path + '/',
         'file_list': files,

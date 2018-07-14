@@ -342,7 +342,7 @@ template directory in the source code of Django itself
     If you have difficulty finding where the Django source files are located
     on your system, run the following command:
 
-    .. code-block:: console
+    .. console::
 
         $ python -c "import django; print(django.__path__)"
 

@@ -1,0 +1,9 @@
+{% extends "admin/date_hierarchy.html" %}
+{% load i18n %}
+
+{% block date-hierarchy-choices %}
+<select id="date-selector" class="override-date_hierarchy">{% for choice in choices %}
+  <option{% if choice.link %} value="{{ choice.link }}"{% endif %}>{{ choice.title }}</option>
+{% endfor %}</select>
+<button id="date-selected">{% trans "Go" %}</button>
+{% endblock %}

@@ -5,13 +5,13 @@ from unittest import mock
 from django import __version__
 from django.core.management import CommandError, call_command
 from django.test import SimpleTestCase
-from django.test.utils import captured_stdin, captured_stdout, patch_logger
+from django.test.utils import captured_stdin, captured_stdout
 
 
 class ShellCommandTestCase(SimpleTestCase):
 
     def test_command_option(self):
-        with patch_logger('test', 'info') as logger:
+        with self.assertLogs('test', 'INFO') as cm:
             call_command(
                 'shell',
                 command=(
@@ -19,8 +19,7 @@ class ShellCommandTestCase(SimpleTestCase):
                     'getLogger("test").info(django.__version__)'
                 ),
             )
-            self.assertEqual(len(logger), 1)
-            self.assertEqual(logger[0], __version__)
+        self.assertEqual(cm.records[0].getMessage(), __version__)
 
     @unittest.skipIf(sys.platform == 'win32', "Windows select() doesn't support file descriptors.")
     @mock.patch('django.core.management.commands.shell.select')

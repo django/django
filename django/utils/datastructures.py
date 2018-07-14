@@ -1,6 +1,5 @@
 import copy
 from collections import OrderedDict
-from contextlib import suppress
 
 
 class OrderedSet:
@@ -10,7 +9,7 @@ class OrderedSet:
     """
 
     def __init__(self, iterable=None):
-        self.dict = OrderedDict(((x, None) for x in iterable) if iterable else [])
+        self.dict = OrderedDict.fromkeys(iterable or ())
 
     def add(self, item):
         self.dict[item] = None
@@ -19,8 +18,10 @@ class OrderedSet:
         del self.dict[item]
 
     def discard(self, item):
-        with suppress(KeyError):
+        try:
             self.remove(item)
+        except KeyError:
+            pass
 
     def __iter__(self):
         return iter(self.dict)
@@ -99,9 +100,7 @@ class MultiValueDict(dict):
         return result
 
     def __getstate__(self):
-        obj_dict = self.__dict__.copy()
-        obj_dict['_data'] = {k: self._getlist(k) for k in self}
-        return obj_dict
+        return {**self.__dict__, '_data': {k: self._getlist(k) for k in self}}
 
     def __setstate__(self, obj_dict):
         data = obj_dict.pop('_data', {})
@@ -274,11 +273,9 @@ class DictWrapper(dict):
         present). If the prefix is present, pass the value through self.func
         before returning, otherwise return the raw value.
         """
-        if key.startswith(self.prefix):
-            use_func = True
+        use_func = key.startswith(self.prefix)
+        if use_func:
             key = key[len(self.prefix):]
-        else:
-            use_func = False
         value = super().__getitem__(key)
         if use_func:
             return self.func(value)

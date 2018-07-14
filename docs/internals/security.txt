@@ -93,6 +93,7 @@ triaging our announcement and upgrade Django as needed. Severity levels are:
 
 * Cross site scripting (XSS)
 * Cross site request forgery (CSRF)
+* Denial-of-service attacks
 * Broken authentication
 
 **Low**:
@@ -132,7 +133,7 @@ On the day of disclosure, we will take the following steps:
 4. Post a notice to the |django-announce| and oss-security@lists.openwall.com
    mailing lists that links to the blog post.
 
-.. _the Python Package Index: https://pypi.python.org/pypi
+.. _the Python Package Index: https://pypi.org/
 .. _the official Django development blog: https://www.djangoproject.com/weblog/
 
 If a reported issue is believed to be particularly time-sensitive --

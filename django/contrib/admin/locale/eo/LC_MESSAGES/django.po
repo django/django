@@ -2,7 +2,7 @@
 #
 # Translators:
 # Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2012-2013
-# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2013-2016
+# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2013-2017
 # Claude Paroz <claude@2xlibre.net>, 2016
 # Dinu Gherman <gherman@darwin.in-berlin.de>, 2011
 # kristjan <kristjan.schmidt@googlemail.com>, 2012
@@ -13,8 +13,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-03-20 12:56+0000\n"
-"Last-Translator: Nikolay Korotkiy <sikmir@gmail.com>\n"
+"PO-Revision-Date: 2017-12-09 14:27+0000\n"
+"Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
 "Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
 "eo/)\n"
 "MIME-Version: 1.0\n"
@@ -619,15 +619,16 @@ msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
-"Ni retpoŝte sendis al vi instrukciojn por agordi la pasvorton, se konto "
-"ekzistas, al la retpoŝto kiun vi sendis. Vi baldaŭ devus ĝin ricevi."
+"Ni retpoŝte sendis al vi instrukciojn por agordi la pasvorton, se la "
+"koncerna konto ekzistas, al la retpoŝta adreso kiun vi sendis. Vi baldaŭ "
+"devus ĝin ricevi."
 
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
-"Se vi ne ricevas retpoŝton, bonvolu certigi vin eniris la adreson kun kiu vi "
-"registris, kaj kontroli vian spaman dosierujon."
+"Se vi ne ricevas retpoŝton, bonvolu certigi ke vi metis la adreson per kiu "
+"vi registris, kaj kontroli vian spaman dosierujon."
 
 #, python-format
 msgid ""

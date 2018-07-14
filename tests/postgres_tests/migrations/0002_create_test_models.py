@@ -168,7 +168,7 @@ class Migration(migrations.Migration):
             name='AggregateTestModel',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('boolean_field', models.NullBooleanField()),
+                ('boolean_field', models.BooleanField(null=True)),
                 ('char_field', models.CharField(max_length=30, blank=True)),
                 ('integer_field', models.IntegerField(null=True)),
             ]
@@ -242,7 +242,7 @@ class Migration(migrations.Migration):
                 ('field_custom', JSONField(null=True, blank=True, encoder=DjangoJSONEncoder)),
             ],
             options={
-                'required_db_features': {'has_jsonb_datatype'},
+                'required_db_vendor': 'postgresql',
             },
             bases=(models.Model,),
         ),

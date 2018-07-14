@@ -1,13 +1,13 @@
 from django.db import models
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.state import ModelState
-from django.db.models.fields.related import RECURSIVE_RELATIONSHIP_CONSTANT
 from django.db.models.options import normalize_together
 from django.utils.functional import cached_property
 
 from .fields import (
     AddField, AlterField, FieldOperation, RemoveField, RenameField,
 )
+from .utils import ModelTuple, field_references_model
 
 
 def _check_for_duplicates(arg_name, objs):
@@ -31,9 +31,9 @@ class ModelOperation(Operation):
     def references_model(self, name, app_label=None):
         return name.lower() == self.name_lower
 
-    def reduce(self, operation, in_between, app_label=None):
+    def reduce(self, operation, app_label=None):
         return (
-            super().reduce(operation, in_between, app_label=app_label) or
+            super().reduce(operation, app_label=app_label) or
             not operation.references_model(self.name, app_label)
         )
 
@@ -105,33 +105,19 @@ class CreateModel(ModelOperation):
             return True
 
         # Check we didn't inherit from the model
-        models_to_check = [
-            base for base in self.bases
-            if base is not models.Model and isinstance(base, (models.base.ModelBase, str))
-        ]
+        model_tuple = ModelTuple(app_label, name_lower)
+        for base in self.bases:
+            if (base is not models.Model and isinstance(base, (models.base.ModelBase, str)) and
+                    ModelTuple.from_model(base) == model_tuple):
+                return True
+
         # Check we have no FKs/M2Ms with it
-        for fname, field in self.fields:
-            if field.remote_field:
-                models_to_check.append(field.remote_field.model)
-        # Now go over all the models and check against them
-        for model in models_to_check:
-            model_app_label, model_name = self.model_to_key(model)
-            if model_name.lower() == name_lower:
-                if app_label is None or not model_app_label or model_app_label == app_label:
-                    return True
+        for _name, field in self.fields:
+            if field_references_model(field, model_tuple):
+                return True
         return False
 
-    def model_to_key(self, model):
-        """
-        Take either a model class or an "app_label.ModelName" string
-        and return (app_label, object_name).
-        """
-        if isinstance(model, str):
-            return model.split(".", 1)
-        else:
-            return model._meta.app_label, model._meta.object_name
-
-    def reduce(self, operation, in_between, app_label=None):
+    def reduce(self, operation, app_label=None):
         if (isinstance(operation, DeleteModel) and
                 self.name_lower == operation.name_lower and
                 not self.options.get("proxy", False)):
@@ -147,31 +133,17 @@ class CreateModel(ModelOperation):
                 ),
             ]
         elif isinstance(operation, AlterModelOptions) and self.name_lower == operation.name_lower:
-            new_options = self.options.copy()
-            new_options.update(operation.options)
             return [
                 CreateModel(
                     self.name,
                     fields=self.fields,
-                    options=new_options,
+                    options={**self.options, **operation.options},
                     bases=self.bases,
                     managers=self.managers,
                 ),
             ]
         elif isinstance(operation, FieldOperation) and self.name_lower == operation.model_name_lower:
             if isinstance(operation, AddField):
-                # Don't allow optimizations of FKs through models they reference
-                if hasattr(operation.field, "remote_field") and operation.field.remote_field:
-                    for between in in_between:
-                        # Check that it doesn't point to the model
-                        app_label, object_name = self.model_to_key(operation.field.remote_field.model)
-                        if between.references_model(object_name, app_label):
-                            return False
-                        # Check that it's not through the model
-                        if getattr(operation.field.remote_field, "through", None):
-                            app_label, object_name = self.model_to_key(operation.field.remote_field.through)
-                            if between.references_model(object_name, app_label):
-                                return False
                 return [
                     CreateModel(
                         self.name,
@@ -221,7 +193,7 @@ class CreateModel(ModelOperation):
                         managers=self.managers,
                     ),
                 ]
-        return super().reduce(operation, in_between, app_label=app_label)
+        return super().reduce(operation, app_label=app_label)
 
 
 class DeleteModel(ModelOperation):
@@ -250,8 +222,13 @@ class DeleteModel(ModelOperation):
         if self.allow_migrate_model(schema_editor.connection.alias, model):
             schema_editor.create_model(model)
 
+    def references_model(self, name, app_label=None):
+        # The deleted model could be referencing the specified model through
+        # related fields.
+        return True
+
     def describe(self):
-        return "Delete model %s" % (self.name, )
+        return "Delete model %s" % self.name
 
 
 class RenameModel(ModelOperation):
@@ -281,21 +258,13 @@ class RenameModel(ModelOperation):
             kwargs
         )
 
-    def _get_model_tuple(self, remote_model, app_label, model_name):
-        if remote_model == RECURSIVE_RELATIONSHIP_CONSTANT:
-            return app_label, model_name.lower()
-        elif '.' in remote_model:
-            return tuple(remote_model.lower().split('.'))
-        else:
-            return app_label, remote_model.lower()
-
     def state_forwards(self, app_label, state):
         # Add a new model.
         renamed_model = state.models[app_label, self.old_name_lower].clone()
         renamed_model.name = self.new_name
         state.models[app_label, self.new_name_lower] = renamed_model
         # Repoint all fields pointing to the old model to the new one.
-        old_model_tuple = app_label, self.old_name_lower
+        old_model_tuple = ModelTuple(app_label, self.old_name_lower)
         new_remote_model = '%s.%s' % (app_label, self.new_name)
         to_reload = []
         for (model_app_label, model_name), model_state in state.models.items():
@@ -304,7 +273,7 @@ class RenameModel(ModelOperation):
                 changed_field = None
                 remote_field = field.remote_field
                 if remote_field:
-                    remote_model_tuple = self._get_model_tuple(
+                    remote_model_tuple = ModelTuple.from_model(
                         remote_field.model, model_app_label, model_name
                     )
                     if remote_model_tuple == old_model_tuple:
@@ -312,7 +281,7 @@ class RenameModel(ModelOperation):
                         changed_field.remote_field.model = new_remote_model
                     through_model = getattr(remote_field, 'through', None)
                     if through_model:
-                        through_model_tuple = self._get_model_tuple(
+                        through_model_tuple = ModelTuple.from_model(
                             through_model, model_app_label, model_name
                         )
                         if through_model_tuple == old_model_tuple:
@@ -399,7 +368,7 @@ class RenameModel(ModelOperation):
     def describe(self):
         return "Rename model %s to %s" % (self.old_name, self.new_name)
 
-    def reduce(self, operation, in_between, app_label=None):
+    def reduce(self, operation, app_label=None):
         if (isinstance(operation, RenameModel) and
                 self.new_name_lower == operation.old_name_lower):
             return [
@@ -411,7 +380,7 @@ class RenameModel(ModelOperation):
         # Skip `ModelOperation.reduce` as we want to run `references_model`
         # against self.new_name.
         return (
-            super(ModelOperation, self).reduce(operation, in_between, app_label=app_label) or
+            super(ModelOperation, self).reduce(operation, app_label=app_label) or
             not operation.references_model(self.new_name, app_label)
         )
 
@@ -465,26 +434,26 @@ class AlterModelTable(ModelOperation):
             self.table if self.table is not None else "(default)"
         )
 
-    def reduce(self, operation, in_between, app_label=None):
+    def reduce(self, operation, app_label=None):
         if isinstance(operation, (AlterModelTable, DeleteModel)) and self.name_lower == operation.name_lower:
             return [operation]
-        return super().reduce(operation, in_between, app_label=app_label)
+        return super().reduce(operation, app_label=app_label)
 
 
 class ModelOptionOperation(ModelOperation):
-    def reduce(self, operation, in_between, app_label=None):
+    def reduce(self, operation, app_label=None):
         if isinstance(operation, (self.__class__, DeleteModel)) and self.name_lower == operation.name_lower:
             return [operation]
-        return super().reduce(operation, in_between, app_label=app_label)
+        return super().reduce(operation, app_label=app_label)
 
 
 class FieldRelatedOptionOperation(ModelOptionOperation):
-    def reduce(self, operation, in_between, app_label=None):
+    def reduce(self, operation, app_label=None):
         if (isinstance(operation, FieldOperation) and
                 self.name_lower == operation.model_name_lower and
                 not self.references_field(operation.model_name, operation.name)):
             return [operation, self]
-        return super().reduce(operation, in_between, app_label=app_label)
+        return super().reduce(operation, app_label=app_label)
 
 
 class AlterUniqueTogether(FieldRelatedOptionOperation):
@@ -690,11 +659,10 @@ class AlterModelOptions(ModelOptionOperation):
 
     def state_forwards(self, app_label, state):
         model_state = state.models[app_label, self.name_lower]
-        model_state.options = dict(model_state.options)
-        model_state.options.update(self.options)
+        model_state.options = {**model_state.options, **self.options}
         for key in self.ALTER_OPTION_KEYS:
-            if key not in self.options and key in model_state.options:
-                del model_state.options[key]
+            if key not in self.options:
+                model_state.options.pop(key, False)
         state.reload_model(app_label, self.name_lower, delay=True)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
@@ -704,7 +672,7 @@ class AlterModelOptions(ModelOptionOperation):
         pass
 
     def describe(self):
-        return "Change Meta options on %s" % (self.name, )
+        return "Change Meta options on %s" % self.name
 
 
 class AlterModelManagers(ModelOptionOperation):
@@ -735,7 +703,7 @@ class AlterModelManagers(ModelOptionOperation):
         pass
 
     def describe(self):
-        return "Change managers on %s" % (self.name, )
+        return "Change managers on %s" % self.name
 
 
 class IndexOperation(Operation):
@@ -834,3 +802,72 @@ class RemoveIndex(IndexOperation):
 
     def describe(self):
         return 'Remove index %s from %s' % (self.name, self.model_name)
+
+
+class AddConstraint(IndexOperation):
+    option_name = 'constraints'
+
+    def __init__(self, model_name, constraint):
+        self.model_name = model_name
+        self.constraint = constraint
+
+    def state_forwards(self, app_label, state):
+        model_state = state.models[app_label, self.model_name_lower]
+        constraints = list(model_state.options[self.option_name])
+        constraints.append(self.constraint)
+        model_state.options[self.option_name] = constraints
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        model = to_state.apps.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model):
+            schema_editor.add_constraint(model, self.constraint)
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        model = to_state.apps.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model):
+            schema_editor.remove_constraint(model, self.constraint)
+
+    def deconstruct(self):
+        return self.__class__.__name__, [], {
+            'model_name': self.model_name,
+            'constraint': self.constraint,
+        }
+
+    def describe(self):
+        return 'Create constraint %s on model %s' % (self.constraint.name, self.model_name)
+
+
+class RemoveConstraint(IndexOperation):
+    option_name = 'constraints'
+
+    def __init__(self, model_name, name):
+        self.model_name = model_name
+        self.name = name
+
+    def state_forwards(self, app_label, state):
+        model_state = state.models[app_label, self.model_name_lower]
+        constraints = model_state.options[self.option_name]
+        model_state.options[self.option_name] = [c for c in constraints if c.name != self.name]
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        model = from_state.apps.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model):
+            from_model_state = from_state.models[app_label, self.model_name_lower]
+            constraint = from_model_state.get_constraint_by_name(self.name)
+            schema_editor.remove_constraint(model, constraint)
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        model = to_state.apps.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model):
+            to_model_state = to_state.models[app_label, self.model_name_lower]
+            constraint = to_model_state.get_constraint_by_name(self.name)
+            schema_editor.add_constraint(model, constraint)
+
+    def deconstruct(self):
+        return self.__class__.__name__, [], {
+            'model_name': self.model_name,
+            'name': self.name,
+        }
+
+    def describe(self):
+        return 'Remove constraint %s from model %s' % (self.name, self.model_name)

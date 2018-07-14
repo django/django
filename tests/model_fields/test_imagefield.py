@@ -64,8 +64,7 @@ class ImageFieldTestMixin(SerializeMixin):
         self.file2.close()
         shutil.rmtree(temp_storage_dir)
 
-    def check_dimensions(self, instance, width, height,
-                         field_name='mugshot'):
+    def check_dimensions(self, instance, width, height, field_name='mugshot'):
         """
         Asserts that the given width and height values match both the
         field's height and width attributes and the height and width fields
@@ -363,8 +362,7 @@ class TwoImageFieldTests(ImageFieldTestMixin, TestCase):
         self.check_dimensions(p, 8, 4, 'headshot')
 
     def test_create(self):
-        p = self.PersonModel.objects.create(mugshot=self.file1,
-                                            headshot=self.file2)
+        p = self.PersonModel.objects.create(mugshot=self.file1, headshot=self.file2)
         self.check_dimensions(p, 4, 8)
         self.check_dimensions(p, 8, 4, 'headshot')
 

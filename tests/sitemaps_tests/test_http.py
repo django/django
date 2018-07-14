@@ -16,6 +16,10 @@ from .models import TestModel
 
 
 class HTTPSitemapTests(SitemapTestsBase):
+    use_sitemap_err_msg = (
+        'To use sitemaps, either enable the sites framework or pass a '
+        'Site/RequestSite object in your view.'
+    )
 
     def test_simple_sitemap_index(self):
         "A simple sitemap index can be rendered"
@@ -207,7 +211,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         Sitemap.get_urls and no Site objects exist
         """
         Site.objects.all().delete()
-        with self.assertRaises(ImproperlyConfigured):
+        with self.assertRaisesMessage(ImproperlyConfigured, self.use_sitemap_err_msg):
             Sitemap().get_urls()
 
     @modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'})
@@ -217,7 +221,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         Sitemap.get_urls if Site objects exists, but the sites framework is not
         actually installed.
         """
-        with self.assertRaises(ImproperlyConfigured):
+        with self.assertRaisesMessage(ImproperlyConfigured, self.use_sitemap_err_msg):
             Sitemap().get_urls()
 
     def test_sitemap_item(self):

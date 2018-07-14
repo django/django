@@ -1,18 +1,19 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Daniel Ursache-Dogariu <contact@danniel.net>, 2011
+# Bogdan Mateescu, 2018
+# Daniel Ursache-Dogariu, 2011
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Răzvan Ionescu <ionescu77@gmail.com>, 2015
-# Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2016
+# Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 08:39+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2018-01-17 08:32+0000\n"
+"Last-Translator: Bogdan Mateescu\n"
 "Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
@@ -72,12 +73,11 @@ msgstr "Introduceți parola precedentă pentru confirmare."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Parolele nu sunt stocate în clar, deci nu există nici o metodă de a vedea "
-"care este parola unui utilizator, dar puteți schimba parola utilizând <a "
-"href=\"../password/\">acest formular</a>."
+"Parolele nu sunt stocate în forma lor brută, astfel încât nu există nici o "
+"modalitate de a vedea parola acestui utilizator, însă puteţi schimba parola "
+"folosind <a href=\"{}\">acest formular</a>."
 
 #, python-format
 msgid ""
@@ -121,19 +121,19 @@ msgid "hash"
 msgstr "hash"
 
 msgid "variety"
-msgstr ""
+msgstr "varietate"
 
 msgid "version"
-msgstr ""
+msgstr "versiune"
 
 msgid "memory cost"
-msgstr ""
+msgstr "memorie necesară"
 
 msgid "time cost"
-msgstr ""
+msgstr "timp necesar"
 
 msgid "parallelism"
-msgstr ""
+msgstr "paralelism"
 
 msgid "work factor"
 msgstr "factor de efort"
@@ -190,6 +190,8 @@ msgstr "nume utilizator"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
+"Obligatoriu. 150 de caractere sau mai puține. Numai litere, cifre și @/./+/-/"
+"_."
 
 msgid "A user with that username already exists."
 msgstr "Un utilizator cu acest nume de utilizator există deja."
@@ -283,11 +285,15 @@ msgid ""
 "Enter a valid username. This value may contain only English letters, "
 "numbers, and @/./+/-/_ characters."
 msgstr ""
+"Vă rugăm să folosiți un nume acceptat. Această valoare poate conține doar "
+"litere, cifre și caracterele @/./+/-/_."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
 msgstr ""
+"Vă rugăm să folosiți un nume acceptat. Această valoare poate conține doar "
+"litere, cifre și caracterele @/./+/-/_"
 
 msgid "Logged out"
 msgstr "Deautentificat"

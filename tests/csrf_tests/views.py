@@ -1,5 +1,6 @@
 from django.http import HttpResponse
-from django.template import RequestContext, Template
+from django.middleware.csrf import get_token
+from django.template import Context, RequestContext, Template
 from django.template.context_processors import csrf
 from django.views.decorators.csrf import ensure_csrf_cookie
 
@@ -7,7 +8,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 def post_form_view(request):
     """Return a POST form (without a token)."""
     return HttpResponse(content="""
-<html><body><h1>\u00a1Unicode!<form method="post"><input type="text" /></form></body></html>
+<html><body><h1>\u00a1Unicode!<form method="post"><input type="text"></form></body></html>
 """, mimetype='text/html')
 
 
@@ -28,3 +29,9 @@ def non_token_view_using_request_processor(request):
     context = RequestContext(request, processors=[csrf])
     template = Template('')
     return HttpResponse(template.render(context))
+
+
+def csrf_token_error_handler(request, **kwargs):
+    """This error handler accesses the CSRF token."""
+    template = Template(get_token(request))
+    return HttpResponse(template.render(Context()), status=599)

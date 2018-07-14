@@ -17,7 +17,7 @@ callable view object. For example, given the following ``url``::
 
     from news import views
 
-    url(r'^archive/$', views.archive, name='news-archive')
+    path('archive/', views.archive, name='news-archive')
 
 you can use any of the following to reverse the URL::
 
@@ -176,7 +176,7 @@ view would raise a ``Http404`` error before redirecting to it::
 
     from urllib.parse import urlparse
     from django.urls import resolve
-    from django.http import HttpResponseRedirect, Http404
+    from django.http import Http404, HttpResponseRedirect
 
     def myview(request):
         next = request.META.get('HTTP_REFERER', None) or '/'

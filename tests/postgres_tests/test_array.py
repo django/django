@@ -2,10 +2,9 @@ import decimal
 import json
 import unittest
 import uuid
-from contextlib import suppress
 
 from django import forms
-from django.core import exceptions, serializers, validators
+from django.core import checks, exceptions, serializers, validators
 from django.core.exceptions import FieldError
 from django.core.management import call_command
 from django.db import IntegrityError, connection, models
@@ -20,11 +19,13 @@ from .models import (
     PostgreSQLModel, Tag,
 )
 
-with suppress(ImportError):
+try:
     from django.contrib.postgres.fields import ArrayField
     from django.contrib.postgres.forms import (
         SimpleArrayField, SplitArrayField, SplitArrayWidget,
     )
+except ImportError:
+    pass
 
 
 class TestSaveLoad(PostgreSQLTestCase):
@@ -175,6 +176,15 @@ class TestQuerying(PostgreSQLTestCase):
             self.objs[:2]
         )
 
+    def test_in_subquery(self):
+        IntegerArrayModel.objects.create(field=[2, 3])
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(
+                field__in=IntegerArrayModel.objects.all().values_list('field', flat=True)
+            ),
+            self.objs[2:3]
+        )
+
     @unittest.expectedFailure
     def test_in_including_F_object(self):
         # This test asserts that Array objects passed to filters can be
@@ -297,6 +307,22 @@ class TestQuerying(PostgreSQLTestCase):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__0_2=[2, 3]),
             self.objs[2:3]
+        )
+
+    def test_order_by_slice(self):
+        more_objs = (
+            NullableIntegerArrayModel.objects.create(field=[1, 637]),
+            NullableIntegerArrayModel.objects.create(field=[2, 1]),
+            NullableIntegerArrayModel.objects.create(field=[3, -98123]),
+            NullableIntegerArrayModel.objects.create(field=[4, 2]),
+        )
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.order_by('field__1'),
+            [
+                more_objs[2], more_objs[1], more_objs[3], self.objs[2],
+                self.objs[3], more_objs[0], self.objs[4], self.objs[1],
+                self.objs[0],
+            ]
         )
 
     @unittest.expectedFailure
@@ -423,6 +449,38 @@ class TestChecks(PostgreSQLTestCase):
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0].id, 'postgres.E002')
 
+    def test_invalid_default(self):
+        class MyModel(PostgreSQLModel):
+            field = ArrayField(models.IntegerField(), default=[])
+
+        model = MyModel()
+        self.assertEqual(model.check(), [
+            checks.Warning(
+                msg=(
+                    "ArrayField default should be a callable instead of an "
+                    "instance so that it's not shared between all field "
+                    "instances."
+                ),
+                hint='Use a callable instead, e.g., use `list` instead of `[]`.',
+                obj=MyModel._meta.get_field('field'),
+                id='postgres.E003',
+            )
+        ])
+
+    def test_valid_default(self):
+        class MyModel(PostgreSQLModel):
+            field = ArrayField(models.IntegerField(), default=list)
+
+        model = MyModel()
+        self.assertEqual(model.check(), [])
+
+    def test_valid_default_none(self):
+        class MyModel(PostgreSQLModel):
+            field = ArrayField(models.IntegerField(), default=None)
+
+        model = MyModel()
+        self.assertEqual(model.check(), [])
+
     def test_nested_field_checks(self):
         """
         Nested ArrayFields are permitted.
@@ -542,7 +600,7 @@ class TestValidation(PostgreSQLTestCase):
         self.assertEqual(cm.exception.code, 'item_invalid')
         self.assertEqual(
             cm.exception.message % cm.exception.params,
-            'Item 1 in the array did not validate: This field cannot be null.'
+            'Item 2 in the array did not validate: This field cannot be null.'
         )
 
     def test_blank_true(self):
@@ -573,10 +631,10 @@ class TestValidation(PostgreSQLTestCase):
         exception = cm.exception.error_list[0]
         self.assertEqual(
             exception.message,
-            'Item 0 in the array did not validate: Ensure this value has at most 2 characters (it has 3).'
+            'Item 1 in the array did not validate: Ensure this value has at most 2 characters (it has 3).'
         )
         self.assertEqual(exception.code, 'item_invalid')
-        self.assertEqual(exception.params, {'nth': 0, 'value': 'abc', 'limit_value': 2, 'show_value': 3})
+        self.assertEqual(exception.params, {'nth': 1, 'value': 'abc', 'limit_value': 2, 'show_value': 3})
 
     def test_with_validators(self):
         field = ArrayField(models.IntegerField(validators=[validators.MinValueValidator(1)]))
@@ -587,10 +645,10 @@ class TestValidation(PostgreSQLTestCase):
         exception = cm.exception.error_list[0]
         self.assertEqual(
             exception.message,
-            'Item 0 in the array did not validate: Ensure this value is greater than or equal to 1.'
+            'Item 1 in the array did not validate: Ensure this value is greater than or equal to 1.'
         )
         self.assertEqual(exception.code, 'item_invalid')
-        self.assertEqual(exception.params, {'nth': 0, 'value': 0, 'limit_value': 1, 'show_value': 0})
+        self.assertEqual(exception.params, {'nth': 1, 'value': 0, 'limit_value': 1, 'show_value': 0})
 
 
 class TestSimpleFormField(PostgreSQLTestCase):
@@ -604,13 +662,13 @@ class TestSimpleFormField(PostgreSQLTestCase):
         field = SimpleArrayField(forms.IntegerField())
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean('a,b,9')
-        self.assertEqual(cm.exception.messages[0], 'Item 0 in the array did not validate: Enter a whole number.')
+        self.assertEqual(cm.exception.messages[0], 'Item 1 in the array did not validate: Enter a whole number.')
 
     def test_validate_fail(self):
         field = SimpleArrayField(forms.CharField(required=True))
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean('a,b,')
-        self.assertEqual(cm.exception.messages[0], 'Item 2 in the array did not validate: This field is required.')
+        self.assertEqual(cm.exception.messages[0], 'Item 3 in the array did not validate: This field is required.')
 
     def test_validate_fail_base_field_error_params(self):
         field = SimpleArrayField(forms.CharField(max_length=2))
@@ -621,23 +679,23 @@ class TestSimpleFormField(PostgreSQLTestCase):
         first_error = errors[0]
         self.assertEqual(
             first_error.message,
-            'Item 0 in the array did not validate: Ensure this value has at most 2 characters (it has 3).'
+            'Item 1 in the array did not validate: Ensure this value has at most 2 characters (it has 3).'
         )
         self.assertEqual(first_error.code, 'item_invalid')
-        self.assertEqual(first_error.params, {'nth': 0, 'value': 'abc', 'limit_value': 2, 'show_value': 3})
+        self.assertEqual(first_error.params, {'nth': 1, 'value': 'abc', 'limit_value': 2, 'show_value': 3})
         second_error = errors[1]
         self.assertEqual(
             second_error.message,
-            'Item 2 in the array did not validate: Ensure this value has at most 2 characters (it has 4).'
+            'Item 3 in the array did not validate: Ensure this value has at most 2 characters (it has 4).'
         )
         self.assertEqual(second_error.code, 'item_invalid')
-        self.assertEqual(second_error.params, {'nth': 2, 'value': 'defg', 'limit_value': 2, 'show_value': 4})
+        self.assertEqual(second_error.params, {'nth': 3, 'value': 'defg', 'limit_value': 2, 'show_value': 4})
 
     def test_validators_fail(self):
         field = SimpleArrayField(forms.RegexField('[a-e]{2}'))
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean('a,bc,de')
-        self.assertEqual(cm.exception.messages[0], 'Item 0 in the array did not validate: Enter a valid value.')
+        self.assertEqual(cm.exception.messages[0], 'Item 1 in the array did not validate: Enter a valid value.')
 
     def test_delimiter(self):
         field = SimpleArrayField(forms.CharField(), delimiter='|')
@@ -695,6 +753,21 @@ class TestSimpleFormField(PostgreSQLTestCase):
         vals = ['a', 'b', 'c']
         self.assertEqual(field.clean(vals), vals)
 
+    def test_has_changed(self):
+        field = SimpleArrayField(forms.IntegerField())
+        self.assertIs(field.has_changed([1, 2], [1, 2]), False)
+        self.assertIs(field.has_changed([1, 2], '1,2'), False)
+        self.assertIs(field.has_changed([1, 2], '1,2,3'), True)
+        self.assertIs(field.has_changed([1, 2], 'a,b'), True)
+
+    def test_has_changed_empty(self):
+        field = SimpleArrayField(forms.CharField())
+        self.assertIs(field.has_changed(None, None), False)
+        self.assertIs(field.has_changed(None, ''), False)
+        self.assertIs(field.has_changed(None, []), False)
+        self.assertIs(field.has_changed([], None), False)
+        self.assertIs(field.has_changed([], ''), False)
+
 
 class TestSplitFormField(PostgreSQLTestCase):
 
@@ -746,10 +819,10 @@ class TestSplitFormField(PostgreSQLTestCase):
         data = {'array_0': 'a', 'array_1': 'b', 'array_2': ''}
         form = SplitForm(data)
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors, {'array': ['Item 2 in the array did not validate: This field is required.']})
+        self.assertEqual(form.errors, {'array': ['Item 3 in the array did not validate: This field is required.']})
 
     def test_invalid_integer(self):
-        msg = 'Item 1 in the array did not validate: Ensure this value is less than or equal to 100.'
+        msg = 'Item 2 in the array did not validate: Ensure this value is less than or equal to 100.'
         with self.assertRaisesMessage(exceptions.ValidationError, msg):
             SplitArrayField(forms.IntegerField(max_value=100), size=2).clean([0, 101])
 
@@ -763,9 +836,9 @@ class TestSplitFormField(PostgreSQLTestCase):
             <tr>
                 <th><label for="id_array_0">Array:</label></th>
                 <td>
-                    <input id="id_array_0" name="array_0" type="text" required />
-                    <input id="id_array_1" name="array_1" type="text" required />
-                    <input id="id_array_2" name="array_2" type="text" required />
+                    <input id="id_array_0" name="array_0" type="text" required>
+                    <input id="id_array_1" name="array_1" type="text" required>
+                    <input id="id_array_2" name="array_2" type="text" required>
                 </td>
             </tr>
         ''')
@@ -775,8 +848,8 @@ class TestSplitFormField(PostgreSQLTestCase):
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean(['abc', 'c', 'defg'])
         self.assertEqual(cm.exception.messages, [
-            'Item 0 in the array did not validate: Ensure this value has at most 2 characters (it has 3).',
-            'Item 2 in the array did not validate: Ensure this value has at most 2 characters (it has 4).',
+            'Item 1 in the array did not validate: Ensure this value has at most 2 characters (it has 3).',
+            'Item 3 in the array did not validate: Ensure this value has at most 2 characters (it has 4).',
         ])
 
     def test_splitarraywidget_value_omitted_from_data(self):
@@ -834,8 +907,8 @@ class TestSplitFormWidget(PostgreSQLWidgetTestCase):
         self.check_html(
             SplitArrayWidget(forms.TextInput(), size=2), 'array', None,
             """
-            <input name="array_0" type="text" />
-            <input name="array_1" type="text" />
+            <input name="array_0" type="text">
+            <input name="array_1" type="text">
             """
         )
 
@@ -845,8 +918,8 @@ class TestSplitFormWidget(PostgreSQLWidgetTestCase):
             'array', ['val1', 'val2'], attrs={'id': 'foo'},
             html=(
                 """
-                <input id="foo_0" name="array_0" type="text" value="val1" />
-                <input id="foo_1" name="array_1" type="text" value="val2" />
+                <input id="foo_0" name="array_0" type="text" value="val1">
+                <input id="foo_1" name="array_1" type="text" value="val2">
                 """
             )
         )

@@ -61,22 +61,7 @@ Adds a few conveniences for perfectionists:
   indexer would treat them as separate URLs -- so it's best practice to
   normalize URLs.
 
-* Handles ETags based on the :setting:`USE_ETAGS` setting. If
-  :setting:`USE_ETAGS` is set to ``True``, Django will calculate an ETag
-  for each request by MD5-hashing the page content, and it'll take care of
-  sending ``Not Modified`` responses, if appropriate.
-
 * Sets the ``Content-Length`` header for non-streaming responses.
-
-.. versionchanged:: 1.11
-
-    Older versions didn't set the ``Content-Length`` header.
-
-.. deprecated:: 1.11
-
-    The :setting:`USE_ETAGS` setting is deprecated in favor of using
-    :class:`~django.middleware.http.ConditionalGetMiddleware` for ETag
-    processing.
 
 .. attribute:: CommonMiddleware.response_redirect_class
 
@@ -88,34 +73,6 @@ issued by the middleware.
 
 * Sends broken link notification emails to :setting:`MANAGERS` (see
   :doc:`/howto/error-reporting`).
-
-Exception middleware
---------------------
-
-.. module:: django.middleware.exception
-   :synopsis: Middleware to return responses for exceptions.
-
-.. class:: ExceptionMiddleware
-
-Catches exceptions raised during the request/response cycle and returns the
-appropriate response.
-
-* :class:`~django.http.Http404` is processed by
-  :data:`~django.conf.urls.handler404` (or a more friendly debug page if
-  :setting:`DEBUG=True <DEBUG>`).
-* :class:`~django.core.exceptions.PermissionDenied` is processed
-  by :data:`~django.conf.urls.handler403`.
-* ``MultiPartParserError`` is processed by :data:`~django.conf.urls.handler400`.
-* :class:`~django.core.exceptions.SuspiciousOperation` is processed by
-  :data:`~django.conf.urls.handler400`  (or a more friendly debug page if
-  :setting:`DEBUG=True <DEBUG>`).
-* Any other exception is processed by :data:`~django.conf.urls.handler500`
-  (or a more friendly debug page if :setting:`DEBUG=True <DEBUG>`).
-
-Django uses this middleware regardless of whether or not you include it in
-:setting:`MIDDLEWARE`, however, you may want to subclass if your own middleware
-needs to transform any of these exceptions into the appropriate responses.
-:class:`~django.middleware.locale.LocaleMiddleware` does this, for example.
 
 GZip middleware
 ---------------
@@ -172,11 +129,6 @@ header, the middleware adds one if needed. If the response has a ``ETag`` or
 ``Last-Modified`` header, and the request has ``If-None-Match`` or
 ``If-Modified-Since``, the response is replaced by an
 :class:`~django.http.HttpResponseNotModified`.
-
-.. versionchanged:: 1.11
-
-    In older versions, the middleware set the ``Content-Length`` and ``Date``
-    headers and didn't set the ``ETag`` header.
 
 Locale middleware
 -----------------
@@ -378,7 +330,7 @@ in the :setting:`SECURE_REDIRECT_EXEMPT` setting.
     Django can't seem to tell when a request actually is already secure, you
     may need to set the :setting:`SECURE_PROXY_SSL_HEADER` setting.
 
-.. _nginx: http://nginx.org
+.. _nginx: https://nginx.org
 
 Session middleware
 ------------------
@@ -472,14 +424,17 @@ Here are some hints about the ordering of various Django middleware classes:
 
    After ``UpdateCacheMiddleware``: Modifies ``Vary`` header.
 
-#. :class:`~django.middleware.http.ConditionalGetMiddleware`
-
-   Before ``CommonMiddleware``: uses its ``ETag`` header when
-   :setting:`USE_ETAGS` = ``True``.
-
 #. :class:`~django.contrib.sessions.middleware.SessionMiddleware`
 
    After ``UpdateCacheMiddleware``: Modifies ``Vary`` header.
+
+#. :class:`~django.middleware.http.ConditionalGetMiddleware`
+
+   Before any middleware that may change the response (it sets the ``ETag``
+   header).
+
+   After ``GZipMiddleware`` so it won't calculate an ``ETag`` header on gzipped
+   contents.
 
 #. :class:`~django.middleware.locale.LocaleMiddleware`
 
@@ -488,10 +443,9 @@ Here are some hints about the ordering of various Django middleware classes:
 
 #. :class:`~django.middleware.common.CommonMiddleware`
 
-   Before any middleware that may change the response (it calculates ``ETags``).
-
-   After ``GZipMiddleware`` so it won't calculate an ``ETag`` header on gzipped
-   contents.
+   Before any middleware that may change the response (it sets the
+   ``Content-Length`` header). A middleware that appears before
+   ``CommonMiddleware`` and changes the response must reset ``Content-Length``.
 
    Close to the top: it redirects when :setting:`APPEND_SLASH` or
    :setting:`PREPEND_WWW` are set to ``True``.

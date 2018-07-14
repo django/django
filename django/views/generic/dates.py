@@ -267,7 +267,7 @@ class DateMixin:
         if self.uses_datetime_field:
             value = datetime.datetime.combine(value, datetime.time.min)
             if settings.USE_TZ:
-                value = timezone.make_aware(value, timezone.get_current_timezone())
+                value = timezone.make_aware(value)
         return value
 
     def _make_single_date_lookup(self, date):
@@ -297,9 +297,11 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
 
     def get(self, request, *args, **kwargs):
         self.date_list, self.object_list, extra_context = self.get_dated_items()
-        context = self.get_context_data(object_list=self.object_list,
-                                        date_list=self.date_list)
-        context.update(extra_context)
+        context = self.get_context_data(
+            object_list=self.object_list,
+            date_list=self.date_list,
+            **extra_context
+        )
         return self.render_to_response(context)
 
     def get_dated_items(self):
@@ -331,7 +333,7 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
         if not allow_empty:
             # When pagination is enabled, it's better to do a cheap query
             # than to load the unpaginated queryset in memory.
-            is_empty = len(qs) == 0 if paginate_by is None else not qs.exists()
+            is_empty = not qs if paginate_by is None else not qs.exists()
             if is_empty:
                 raise Http404(_("No %(verbose_name_plural)s available") % {
                     'verbose_name_plural': qs.model._meta.verbose_name_plural,
@@ -610,7 +612,7 @@ def _date_from_string(year, year_format, month='', month_format='', day='', day_
     (only year is mandatory). Raise a 404 for an invalid date.
     """
     format = year_format + delim + month_format + delim + day_format
-    datestr = year + delim + month + delim + day
+    datestr = str(year) + delim + str(month) + delim + str(day)
     try:
         return datetime.datetime.strptime(datestr, format).date()
     except ValueError:

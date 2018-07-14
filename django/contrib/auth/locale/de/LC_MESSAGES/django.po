@@ -4,7 +4,7 @@
 # André Hagenbruch, 2011
 # Florian Apolloner <florian@apolloner.eu>, 2012
 # Jannis, 2013
-# Jannis Leidel <jannis@leidel.info>, 2013-2016
+# Jannis Leidel <jannis@leidel.info>, 2013-2017
 # Jannis, 2016
 # Jens Neuhaus <kontakt@jensneuhaus.de>, 2016
 # Markus Holtermann <inyoka@markusholtermann.eu>, 2013,2015
@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-12-01 14:16+0000\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-11-27 16:17+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -71,12 +71,11 @@ msgstr "Bitte das selbe Passwort zur Bestätigung erneut eingeben."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Die Passwörter werden nicht im Klartext gespeichert und können daher nicht "
-"angezeigt werden. Passwortänderungen sind aber über <a href=\"../password/"
-"\">dieses Formular</a> möglich."
+"dargestellt, sondern nur mit <a href=\"{}\">diesem Formular</a> geändert "
+"werden."
 
 #, python-format
 msgid ""

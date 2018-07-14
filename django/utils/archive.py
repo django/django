@@ -1,5 +1,5 @@
 """
-Based on "python-archive" -- http://pypi.python.org/pypi/python-archive/
+Based on "python-archive" -- https://pypi.org/project/python-archive/
 
 Copyright (c) 2010 Gary Wilson Jr. <gary.wilson@gmail.com> and contributors.
 

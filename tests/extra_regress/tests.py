@@ -433,4 +433,5 @@ class ExtraRegressTests(TestCase):
         self.assertSequenceEqual(qs.order_by('-second_extra'), [t2.pk, t1.pk])
         # Note: the extra ordering must appear in select clause, so we get two
         # non-distinct results here (this is on purpose, see #7070).
-        self.assertSequenceEqual(qs.order_by('-second_extra').values_list('first', flat=True), ['a', 'a'])
+        # Extra select doesn't appear in result values.
+        self.assertSequenceEqual(qs.order_by('-second_extra').values_list('first'), [('a',), ('a',)])

@@ -252,14 +252,13 @@ class ListMixin:
     def _set_slice(self, index, values):
         "Assign values to a slice of the object"
         try:
-            iter(values)
+            valueList = list(values)
         except TypeError:
             raise TypeError('can only assign an iterable to a slice')
 
-        self._check_allowed(values)
+        self._check_allowed(valueList)
 
         origLen = len(self)
-        valueList = list(values)
         start, stop, step = index.indices(origLen)
 
         # CAREFUL: index.step and step are not the same!

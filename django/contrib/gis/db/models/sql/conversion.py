@@ -10,8 +10,9 @@ from django.db import models
 
 class AreaField(models.FloatField):
     "Wrapper for Area values."
-    def __init__(self, area_att=None):
-        self.area_att = area_att
+    def __init__(self, geo_field):
+        super().__init__()
+        self.geo_field = geo_field
 
     def get_prep_value(self, value):
         if not isinstance(value, Area):
@@ -19,19 +20,21 @@ class AreaField(models.FloatField):
         return value
 
     def get_db_prep_value(self, value, connection, prepared=False):
-        if value is None or not self.area_att:
-            return value
-        return getattr(value, self.area_att)
+        if value is None:
+            return
+        area_att = connection.ops.get_area_att_for_field(self.geo_field)
+        return getattr(value, area_att) if area_att else value
 
     def from_db_value(self, value, expression, connection):
+        if value is None:
+            return
         # If the database returns a Decimal, convert it to a float as expected
         # by the Python geometric objects.
         if isinstance(value, Decimal):
             value = float(value)
         # If the units are known, convert value into area measure.
-        if value is not None and self.area_att:
-            value = Area(**{self.area_att: value})
-        return value
+        area_att = connection.ops.get_area_att_for_field(self.geo_field)
+        return Area(**{area_att: value}) if area_att else value
 
     def get_internal_type(self):
         return 'AreaField'
@@ -39,8 +42,9 @@ class AreaField(models.FloatField):
 
 class DistanceField(models.FloatField):
     "Wrapper for Distance values."
-    def __init__(self, distance_att=None):
-        self.distance_att = distance_att
+    def __init__(self, geo_field):
+        super().__init__()
+        self.geo_field = geo_field
 
     def get_prep_value(self, value):
         if isinstance(value, Distance):
@@ -50,14 +54,16 @@ class DistanceField(models.FloatField):
     def get_db_prep_value(self, value, connection, prepared=False):
         if not isinstance(value, Distance):
             return value
-        if not self.distance_att:
+        distance_att = connection.ops.get_distance_att_for_field(self.geo_field)
+        if not distance_att:
             raise ValueError('Distance measure is supplied, but units are unknown for result.')
-        return getattr(value, self.distance_att)
+        return getattr(value, distance_att)
 
     def from_db_value(self, value, expression, connection):
-        if value is None or not self.distance_att:
-            return value
-        return Distance(**{self.distance_att: value})
+        if value is None:
+            return
+        distance_att = connection.ops.get_distance_att_for_field(self.geo_field)
+        return Distance(**{distance_att: value}) if distance_att else value
 
     def get_internal_type(self):
         return 'DistanceField'

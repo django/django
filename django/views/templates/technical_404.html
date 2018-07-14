@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  <title>Page not found at {{ request.path_info|escape }}</title>
+  <title>Page not found at {{ request.path_info }}</title>
   <meta name="robots" content="NONE,NOARCHIVE">
   <style type="text/css">
     html * { padding:0; margin:0; }
     body * { padding:10px 20px; }
     body * * { padding:0; }
-    body { font:small sans-serif; background:#eee; }
+    body { font:small sans-serif; background:#eee; color:#000; }
     body>div { border-bottom:1px solid #ddd; }
     h1 { font-weight:normal; margin-bottom:.4em; }
     h1 span { font-size:60%; color:#666; font-weight:normal; }
@@ -32,7 +32,7 @@
       </tr>
       <tr>
         <th>Request URL:</th>
-        <td>{{ request.build_absolute_uri|escape }}</td>
+        <td>{{ request.build_absolute_uri }}</td>
       </tr>
       {% if raising_view_name %}
       <tr>
@@ -52,7 +52,7 @@
         {% for pattern in urlpatterns %}
           <li>
             {% for pat in pattern %}
-                {{ pat.regex.pattern }}
+                {{ pat.pattern }}
                 {% if forloop.last and pat.name %}[name='{{ pat.name }}']{% endif %}
             {% endfor %}
           </li>
@@ -60,7 +60,7 @@
       </ol>
       <p>
         {% if request_path %}
-        The current path, <code>{{ request_path|escape }}</code>,{% else %}
+        The current path, <code>{{ request_path }}</code>,{% else %}
         The empty path{% endif %} didn't match any of these.
       </p>
     {% else %}

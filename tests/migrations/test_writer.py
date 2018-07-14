@@ -5,7 +5,6 @@ import functools
 import math
 import os
 import re
-import sys
 import uuid
 from unittest import mock
 
@@ -23,12 +22,11 @@ from django.test import SimpleTestCase
 from django.utils import datetime_safe
 from django.utils.deconstruct import deconstructible
 from django.utils.functional import SimpleLazyObject
-from django.utils.timezone import FixedOffset, get_default_timezone, utc
+from django.utils.timezone import get_default_timezone, get_fixed_timezone, utc
 from django.utils.translation import gettext_lazy as _
+from django.utils.version import PY36
 
 from .models import FoodManager, FoodQuerySet
-
-PY36 = sys.version_info >= (3, 6)
 
 
 class Money(decimal.Decimal):
@@ -353,7 +351,7 @@ class WriterTests(SimpleTestCase):
         self.assertSerializedEqual(datetime.date.today)
         self.assertSerializedEqual(datetime.datetime.now().time())
         self.assertSerializedEqual(datetime.datetime(2014, 1, 1, 1, 1, tzinfo=get_default_timezone()))
-        self.assertSerializedEqual(datetime.datetime(2013, 12, 31, 22, 1, tzinfo=FixedOffset(180)))
+        self.assertSerializedEqual(datetime.datetime(2013, 12, 31, 22, 1, tzinfo=get_fixed_timezone(180)))
         self.assertSerializedResultEqual(
             datetime.datetime(2014, 1, 1, 1, 1),
             ("datetime.datetime(2014, 1, 1, 1, 1)", {'import datetime'})
@@ -518,6 +516,14 @@ class WriterTests(SimpleTestCase):
     def test_serialize_functools_partial(self):
         value = functools.partial(datetime.timedelta, 1, seconds=2)
         result = self.serialize_round_trip(value)
+        self.assertEqual(result.func, value.func)
+        self.assertEqual(result.args, value.args)
+        self.assertEqual(result.keywords, value.keywords)
+
+    def test_serialize_functools_partialmethod(self):
+        value = functools.partialmethod(datetime.timedelta, 1, seconds=2)
+        result = self.serialize_round_trip(value)
+        self.assertIsInstance(result, functools.partialmethod)
         self.assertEqual(result.func, value.func)
         self.assertEqual(result.args, value.args)
         self.assertEqual(result.keywords, value.keywords)

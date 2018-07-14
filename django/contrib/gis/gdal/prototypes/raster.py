@@ -51,10 +51,7 @@ set_ds_geotransform = void_output(std_call('GDALSetGeoTransform'), [c_void_p, PO
 
 get_ds_metadata = chararray_output(std_call('GDALGetMetadata'), [c_void_p, c_char_p], errcheck=False)
 set_ds_metadata = void_output(std_call('GDALSetMetadata'), [c_void_p, POINTER(c_char_p), c_char_p])
-if GDAL_VERSION >= (1, 11):
-    get_ds_metadata_domain_list = chararray_output(std_call('GDALGetMetadataDomainList'), [c_void_p], errcheck=False)
-else:
-    get_ds_metadata_domain_list = None
+get_ds_metadata_domain_list = chararray_output(std_call('GDALGetMetadataDomainList'), [c_void_p], errcheck=False)
 get_ds_metadata_item = const_string_output(std_call('GDALGetMetadataItem'), [c_void_p, c_char_p, c_char_p])
 set_ds_metadata_item = const_string_output(std_call('GDALSetMetadataItem'), [c_void_p, c_char_p, c_char_p, c_char_p])
 free_dsl = void_output(std_call('CSLDestroy'), [POINTER(c_char_p)], errcheck=False)
@@ -75,6 +72,7 @@ get_band_index = int_output(std_call('GDALGetBandNumber'), [c_void_p])
 get_band_description = const_string_output(std_call('GDALGetDescription'), [c_void_p])
 get_band_ds = voidptr_output(std_call('GDALGetBandDataset'), [c_void_p])
 get_band_datatype = int_output(std_call('GDALGetRasterDataType'), [c_void_p])
+get_band_color_interp = int_output(std_call('GDALGetRasterColorInterpretation'), [c_void_p])
 get_band_nodata_value = double_output(std_call('GDALGetRasterNoDataValue'), [c_void_p, POINTER(c_int)])
 set_band_nodata_value = void_output(std_call('GDALSetRasterNoDataValue'), [c_void_p, c_double])
 if GDAL_VERSION >= (2, 1):

@@ -127,8 +127,8 @@ You can use the :func:`redirect` function in a number of ways.
 
         def my_view(request):
             ...
-            object = MyModel.objects.get(...)
-            return redirect(object)
+            obj = MyModel.objects.get(...)
+            return redirect(obj)
 
 2. By passing the name of a view and optionally some positional or
    keyword arguments; the URL will be reverse resolved using the
@@ -156,8 +156,8 @@ will be returned::
 
     def my_view(request):
         ...
-        object = MyModel.objects.get(...)
-        return redirect(object, permanent=True)
+        obj = MyModel.objects.get(...)
+        return redirect(obj, permanent=True)
 
 ``get_object_or_404()``
 =======================
@@ -190,7 +190,7 @@ The following example gets the object with the primary key of 1 from
     from django.shortcuts import get_object_or_404
 
     def my_view(request):
-        my_object = get_object_or_404(MyModel, pk=1)
+        obj = get_object_or_404(MyModel, pk=1)
 
 This example is equivalent to::
 
@@ -198,7 +198,7 @@ This example is equivalent to::
 
     def my_view(request):
         try:
-            my_object = MyModel.objects.get(pk=1)
+            obj = MyModel.objects.get(pk=1)
         except MyModel.DoesNotExist:
             raise Http404("No MyModel matches the given query.")
 

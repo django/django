@@ -133,7 +133,7 @@ wherever you would have historically used::
 If you want to continue to use the base unittest library, you can --
 you just won't get any of the nice new unittest2 features.
 
-.. _unittest2: https://pypi.python.org/pypi/unittest2
+.. _unittest2: https://pypi.org/project/unittest2/
 
 Transaction context managers
 ----------------------------
@@ -583,8 +583,8 @@ domain):
   translations shipped with applications by using the :setting:`LOCALE_PATHS`
   setting is now possible for this domain too. These translations have higher
   precedence than the translations of Python packages passed to the
-  :ref:`javascript_catalog view <javascript_catalog-view>`.  Paths listed first
-  have higher precedence than the ones listed later.
+  ``javascript_catalog()`` view. Paths listed first have higher precedence than
+  the ones listed later.
 
 * Translations under the ``locale`` subdirectory of the *project directory*
   have never been taken in account for JavaScript translations and remain in
@@ -636,7 +636,7 @@ message as a nonexistent account.
 Password reset view now accepts ``from_email``
 ----------------------------------------------
 
-The :func:`django.contrib.auth.views.password_reset` view now accepts a
+The ``django.contrib.auth.views.password_reset()`` view now accepts a
 ``from_email`` parameter, which is passed to the ``password_reset_form``’s
 ``save()`` method as a keyword argument. If you are using this view with a
 custom password reset form, then you will need to ensure your form's ``save()``

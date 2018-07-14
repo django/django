@@ -76,7 +76,7 @@ Create an Article via the Reporter object::
 
 Create a new article, and add it to the article set::
 
-    >>> new_article2 = Article(headline="Paul's story", pub_date=date(2006, 1, 17))
+    >>> new_article2 = Article.objects.create(headline="Paul's story", pub_date=date(2006, 1, 17))
     >>> r.article_set.add(new_article2)
     >>> new_article2.reporter
     <Reporter: John Smith>
@@ -98,7 +98,7 @@ Adding an object of the wrong type raises TypeError::
     >>> r.article_set.add(r2)
     Traceback (most recent call last):
     ...
-    TypeError: 'Article' instance expected
+    TypeError: 'Article' instance expected, got <Reporter: Paul Jones>
 
     >>> r.article_set.all()
     <QuerySet [<Article: John's second story>, <Article: This is a test>]>

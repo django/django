@@ -679,8 +679,8 @@ Converting field data for serialization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To customize how the values are serialized by a serializer, you can override
-:meth:`~Field.value_to_string`. Using ``value_from_object()`` is the best way
-to get the field's value prior to serialization. For example, since our
+:meth:`~Field.value_to_string`. Using :meth:`~Field.value_from_object` is the
+best way to get the field's value prior to serialization. For example, since
 ``HandField`` uses strings for its data storage anyway, we can reuse some
 existing conversion code::
 

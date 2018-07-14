@@ -106,7 +106,7 @@ def inherited_create(pk, klass, data):
     #     automatically is easier than manually creating both.
     models.Model.save(instance)
     created = [instance]
-    for klass, field in instance._meta.parents.items():
+    for klass in instance._meta.parents:
         created.append(klass.objects.get(id=pk))
     return created
 
@@ -200,6 +200,7 @@ test_data = [
     (data_obj, 2, BinaryData, None),
     (data_obj, 5, BooleanData, True),
     (data_obj, 6, BooleanData, False),
+    (data_obj, 7, BooleanData, None),
     (data_obj, 10, CharData, "Test Char Data"),
     (data_obj, 11, CharData, ""),
     (data_obj, 12, CharData, "None"),
@@ -334,8 +335,6 @@ The end."""),
     (pk_obj, 682, IntegerPKData, 0),
     # (XX, ImagePKData
     (pk_obj, 695, GenericIPAddressPKData, "fe80:1424:2223:6cff:fe8a:2e8a:2151:abcd"),
-    # (pk_obj, 700, NullBooleanPKData, True),
-    # (pk_obj, 701, NullBooleanPKData, False),
     (pk_obj, 720, PositiveIntegerPKData, 123456789),
     (pk_obj, 730, PositiveSmallIntegerPKData, 12),
     (pk_obj, 740, SlugPKData, "this-is-a-slug"),
@@ -390,7 +389,7 @@ class SerializerDataTests(TestCase):
     pass
 
 
-def serializerTest(format, self):
+def serializerTest(self, format):
 
     # Create all the objects defined in the test data
     objects = []

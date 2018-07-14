@@ -3,9 +3,10 @@ This is the Django template system.
 
 How it works:
 
-The Lexer.tokenize() function converts a template string (i.e., a string containing
-markup with custom template tags) to tokens, which can be either plain text
-(TOKEN_TEXT), variables (TOKEN_VAR) or block statements (TOKEN_BLOCK).
+The Lexer.tokenize() method converts a template string (i.e., a string
+containing markup with custom template tags) to tokens, which can be either
+plain text (TokenType.TEXT), variables (TokenType.VAR), or block statements
+(TokenType.BLOCK).
 
 The Parser() class takes a list of tokens in its constructor, and its parse()
 method returns a compiled template -- which is, under the hood, a list of
@@ -51,7 +52,8 @@ times with multiple contexts)
 
 import logging
 import re
-from inspect import getcallargs, getfullargspec
+from enum import Enum
+from inspect import getcallargs, getfullargspec, unwrap
 
 from django.template.context import (  # NOQA: imported for backwards compatibility
     BaseContext, Context, ContextPopException, RequestContext,
@@ -66,17 +68,6 @@ from django.utils.timezone import template_localtime
 from django.utils.translation import gettext_lazy, pgettext_lazy
 
 from .exceptions import TemplateSyntaxError
-
-TOKEN_TEXT = 0
-TOKEN_VAR = 1
-TOKEN_BLOCK = 2
-TOKEN_COMMENT = 3
-TOKEN_MAPPING = {
-    TOKEN_TEXT: 'Text',
-    TOKEN_VAR: 'Var',
-    TOKEN_BLOCK: 'Block',
-    TOKEN_COMMENT: 'Comment',
-}
 
 # template syntax constants
 FILTER_SEPARATOR = '|'
@@ -106,6 +97,13 @@ tag_re = (re.compile('(%s.*?%s|%s.*?%s|%s.*?%s)' %
 logger = logging.getLogger('django.template')
 
 
+class TokenType(Enum):
+    TEXT = 0
+    VAR = 1
+    BLOCK = 2
+    COMMENT = 3
+
+
 class VariableDoesNotExist(Exception):
 
     def __init__(self, msg, params=()):
@@ -126,10 +124,8 @@ class Origin:
         return self.name
 
     def __eq__(self, other):
-        if not isinstance(other, Origin):
-            return False
-
         return (
+            isinstance(other, Origin) and
             self.name == other.name and
             self.loader == other.loader
         )
@@ -295,7 +291,7 @@ class Token:
         A token representing a string from the template.
 
         token_type
-            One of TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK, or TOKEN_COMMENT.
+            A TokenType, either .TEXT, .VAR, .BLOCK, or .COMMENT.
 
         contents
             The token source string.
@@ -314,13 +310,13 @@ class Token:
         self.position = position
 
     def __str__(self):
-        token_name = TOKEN_MAPPING[self.token_type]
+        token_name = self.token_type.name.capitalize()
         return ('<%s token: "%s...">' %
                 (token_name, self.contents[:20].replace('\n', '')))
 
     def split_contents(self):
         split = []
-        bits = iter(smart_split(self.contents))
+        bits = smart_split(self.contents)
         for bit in bits:
             # Handle translation-marked template pieces
             if bit.startswith(('_("', "_('")):
@@ -369,19 +365,18 @@ class Lexer:
                 self.verbatim = False
         if in_tag and not self.verbatim:
             if token_string.startswith(VARIABLE_TAG_START):
-                token = Token(TOKEN_VAR, token_string[2:-2].strip(), position, lineno)
+                return Token(TokenType.VAR, token_string[2:-2].strip(), position, lineno)
             elif token_string.startswith(BLOCK_TAG_START):
                 if block_content[:9] in ('verbatim', 'verbatim '):
                     self.verbatim = 'end%s' % block_content
-                token = Token(TOKEN_BLOCK, block_content, position, lineno)
+                return Token(TokenType.BLOCK, block_content, position, lineno)
             elif token_string.startswith(COMMENT_TAG_START):
                 content = ''
                 if token_string.find(TRANSLATOR_COMMENT_MARK):
                     content = token_string[2:-2].strip()
-                token = Token(TOKEN_COMMENT, content, position, lineno)
+                return Token(TokenType.COMMENT, content, position, lineno)
         else:
-            token = Token(TOKEN_TEXT, token_string, position, lineno)
-        return token
+            return Token(TokenType.TEXT, token_string, position, lineno)
 
 
 class DebugLexer(Lexer):
@@ -442,10 +437,10 @@ class Parser:
         nodelist = NodeList()
         while self.tokens:
             token = self.next_token()
-            # Use the raw values here for TOKEN_* for a tiny performance boost.
-            if token.token_type == 0:  # TOKEN_TEXT
+            # Use the raw values here for TokenType.* for a tiny performance boost.
+            if token.token_type.value == 0:  # TokenType.TEXT
                 self.extend_nodelist(nodelist, TextNode(token.contents), token)
-            elif token.token_type == 1:  # TOKEN_VAR
+            elif token.token_type.value == 1:  # TokenType.VAR
                 if not token.contents:
                     raise self.error(token, 'Empty variable tag on line %d' % token.lineno)
                 try:
@@ -454,7 +449,7 @@ class Parser:
                     raise self.error(token, e)
                 var_node = VariableNode(filter_expression)
                 self.extend_nodelist(nodelist, var_node, token)
-            elif token.token_type == 2:  # TOKEN_BLOCK
+            elif token.token_type.value == 2:  # TokenType.BLOCK
                 try:
                     command = token.contents.split()[0]
                 except IndexError:
@@ -491,7 +486,7 @@ class Parser:
     def skip_past(self, endtag):
         while self.tokens:
             token = self.next_token()
-            if token.token_type == TOKEN_BLOCK and token.contents == endtag:
+            if token.token_type == TokenType.BLOCK and token.contents == endtag:
                 return
         self.unclosed_block_tag([endtag])
 
@@ -712,7 +707,7 @@ class FilterExpression:
         # First argument, filter input, is implied.
         plen = len(provided) + 1
         # Check to see if a decorator is providing the real function.
-        func = getattr(func, '_decorated_function', func)
+        func = unwrap(func)
 
         args, _, _, defaults, _, _, _ = getfullargspec(func)
         alen = len(args)
@@ -764,17 +759,16 @@ class Variable:
             # Note that this could cause an OverflowError here that we're not
             # catching. Since this should only happen at compile time, that's
             # probably OK.
-            self.literal = float(var)
 
-            # So it's a float... is it an int? If the original value contained a
-            # dot or an "e" then it was a float, not an int.
-            if '.' not in var and 'e' not in var.lower():
-                self.literal = int(self.literal)
-
-            # "2." is invalid
-            if var.endswith('.'):
-                raise ValueError
-
+            # Try to interpret values containg a period or an 'e'/'E'
+            # (possibly scientific notation) as a float;  otherwise, try int.
+            if '.' in var or 'e' in var.lower():
+                self.literal = float(var)
+                # "2." is invalid
+                if var.endswith('.'):
+                    raise ValueError
+            else:
+                self.literal = int(var)
         except ValueError:
             # A ValueError means that the variable isn't a number.
             if var.startswith('_(') and var.endswith(')'):

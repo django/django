@@ -11,8 +11,6 @@ Simple mixins
 
     .. attribute:: extra_context
 
-        .. versionadded:: 2.0
-
         A dictionary to include in the context. This is a convenient way of
         specifying some simple context in
         :meth:`~django.views.generic.base.View.as_view`. Example usage::

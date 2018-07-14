@@ -56,11 +56,15 @@ Related objects reference
         manager perform the update by calling ``e.save()``.
 
         Using ``add()`` with a many-to-many relationship, however, will not
-        call any ``save()`` methods, but rather create the relationships
-        using :meth:`QuerySet.bulk_create()
+        call any ``save()`` methods (the ``bulk`` argument doesn't exist), but
+        rather create the relationships using :meth:`QuerySet.bulk_create()
         <django.db.models.query.QuerySet.bulk_create>`. If you need to execute
         some custom logic when a relationship is created, listen to the
-        :data:`~django.db.models.signals.m2m_changed` signal.
+        :data:`~django.db.models.signals.m2m_changed` signal, which will
+        trigger ``pre_add`` and ``post_add`` actions.
+
+        Using ``add()`` on a relation that already exists won't duplicate the
+        relation, but it will still trigger signals.
 
     .. method:: create(**kwargs)
 
@@ -92,7 +96,7 @@ Related objects reference
         parameter ``blog`` to ``create()``. Django figures out that the new
         ``Entry`` object's ``blog`` field should be set to ``b``.
 
-    .. method:: remove(*objs)
+    .. method:: remove(*objs, bulk=True)
 
         Removes the specified model objects from the related object set::
 
@@ -125,7 +129,10 @@ Related objects reference
         :data:`~django.db.models.signals.post_save` signals and comes at the
         expense of performance.
 
-    .. method:: clear()
+        For many-to-many relationships, the ``bulk`` keyword argument doesn't
+        exist.
+
+    .. method:: clear(bulk=True)
 
         Removes all objects from the related object set::
 
@@ -138,6 +145,9 @@ Related objects reference
         Just like ``remove()``, ``clear()`` is only available on
         :class:`~django.db.models.ForeignKey`\s where ``null=True`` and it also
         accepts the ``bulk`` keyword argument.
+
+        For many-to-many relationships, the ``bulk`` keyword argument doesn't
+        exist.
 
     .. method:: set(objs, bulk=True, clear=False)
 
@@ -152,7 +162,11 @@ Related objects reference
         If ``clear=True``, the ``clear()`` method is called instead and the
         whole set is added at once.
 
-        The ``bulk`` argument is passed on to :meth:`add`.
+        For :class:`~django.db.models.ForeignKey` objects, the ``bulk``
+        argument is passed on to :meth:`add` and :meth:`remove`.
+
+        For many-to-many relationships, the ``bulk`` keyword argument doesn't
+        exist.
 
         Note that since ``set()`` is a compound operation, it is subject to
         race conditions. For instance, new objects may be added to the database
@@ -173,7 +187,3 @@ Related objects reference
        If you use :meth:`~django.db.models.query.QuerySet.prefetch_related`,
        the ``add()``, ``remove()``, ``clear()``, and ``set()`` methods clear
        the prefetched cache.
-
-       .. versionchanged:: 1.11
-
-            The clearing of the prefetched cache described above was added.

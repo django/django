@@ -103,3 +103,11 @@ class ObjectReference(models.Model):
 
 class RawData(models.Model):
     raw_data = models.BinaryField()
+
+
+class Author(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+
+
+class Book(models.Model):
+    author = models.ForeignKey(Author, models.CASCADE, to_field='name')

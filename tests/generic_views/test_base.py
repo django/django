@@ -273,7 +273,11 @@ class TemplateViewTest(SimpleTestCase):
         """
         A template view must provide a template name.
         """
-        with self.assertRaises(ImproperlyConfigured):
+        msg = (
+            "TemplateResponseMixin requires either a definition of "
+            "'template_name' or an implementation of 'get_template_names()'"
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             self.client.get('/template/no_template/')
 
     @require_jinja2

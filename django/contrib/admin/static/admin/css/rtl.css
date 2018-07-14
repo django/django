@@ -35,7 +35,7 @@ th {
     margin-right: 1.5em;
 }
 
-.addlink, .changelink {
+.viewlink, .addlink, .changelink {
     padding-left: 0;
     padding-right: 16px;
     background-position: 100% 1px;
@@ -180,7 +180,7 @@ input[type=submit].default, .submit-row input.default {
     float: left;
 }
 
-fieldset .field-box {
+fieldset .fieldBox {
     float: right;
     margin-left: 20px;
     margin-right: 0;

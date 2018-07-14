@@ -8,7 +8,7 @@ class EmailFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
 
     def test_emailfield_1(self):
         f = EmailField()
-        self.assertWidgetRendersTo(f, '<input type="email" name="f" id="id_f" required />')
+        self.assertWidgetRendersTo(f, '<input type="email" name="f" id="id_f" required>')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean('')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
@@ -41,7 +41,7 @@ class EmailFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         f = EmailField(min_length=10, max_length=15)
         self.assertWidgetRendersTo(
             f,
-            '<input id="id_f" type="email" name="f" maxlength="15" minlength="10" required />',
+            '<input id="id_f" type="email" name="f" maxlength="15" minlength="10" required>',
         )
         with self.assertRaisesMessage(ValidationError, "'Ensure this value has at least 10 characters (it has 9).'"):
             f.clean('a@foo.com')

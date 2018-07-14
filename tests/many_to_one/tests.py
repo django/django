@@ -406,7 +406,8 @@ class ManyToOneTests(TestCase):
         self.assertEqual(a3.reporter.id, self.r2.id)
 
         # Get should respect explicit foreign keys as well.
-        with self.assertRaises(MultipleObjectsReturned):
+        msg = 'get() returned more than one Article -- it returned 2!'
+        with self.assertRaisesMessage(MultipleObjectsReturned, msg):
             Article.objects.get(reporter_id=self.r.id)
         self.assertEqual(
             repr(a3),
@@ -460,7 +461,7 @@ class ManyToOneTests(TestCase):
         self.assertIs(c.parent, p)
 
         # But if we kill the cache, we get a new object.
-        del c._parent_cache
+        del c._state.fields_cache['parent']
         self.assertIsNot(c.parent, p)
 
         # Assigning a new object results in that object getting cached immediately.
@@ -484,7 +485,11 @@ class ManyToOneTests(TestCase):
         setattr(c, "parent", None)
 
         # You also can't assign an object of the wrong type here
-        with self.assertRaises(ValueError):
+        msg = (
+            'Cannot assign "<First: First object (1)>": "Child.parent" must '
+            'be a "Parent" instance.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             setattr(c, "parent", First(id=1, second=1))
 
         # You can assign None to Child.parent during object creation.
@@ -550,7 +555,8 @@ class ManyToOneTests(TestCase):
 
         p = Parent.objects.create(name="Parent")
         c = Child.objects.create(name="Child", parent=p)
-        with self.assertRaises(ValueError):
+        msg = 'Cannot assign "%r": "Child.parent" must be a "Parent" instance.' % c
+        with self.assertRaisesMessage(ValueError, msg):
             Child.objects.create(name="Grandchild", parent=c)
 
     def test_fk_instantiation_outside_model(self):
@@ -564,12 +570,12 @@ class ManyToOneTests(TestCase):
         Third.objects.create(name='Third 1')
         Third.objects.create(name='Third 2')
         th = Third(name="testing")
-        # The object isn't saved an thus the relation field is null - we won't even
+        # The object isn't saved and thus the relation field is null - we won't even
         # execute a query in this case.
         with self.assertNumQueries(0):
             self.assertEqual(th.child_set.count(), 0)
         th.save()
-        # Now the model is saved, so we will need to execute an query.
+        # Now the model is saved, so we will need to execute a query.
         with self.assertNumQueries(1):
             self.assertEqual(th.child_set.count(), 0)
 
@@ -585,7 +591,7 @@ class ManyToOneTests(TestCase):
 
         self.assertEqual(public_student.school, public_school)
 
-        # Make sure the base manager is used so that an student can still access
+        # Make sure the base manager is used so that a student can still access
         # its related school even if the default manager doesn't normally
         # allow it.
         self.assertEqual(private_student.school, private_school)
@@ -650,3 +656,13 @@ class ManyToOneTests(TestCase):
         self.assertEqual(city.districts.count(), 2)
         city.districts.remove(d2)
         self.assertEqual(city.districts.count(), 1)
+
+    def test_cached_relation_invalidated_on_save(self):
+        """
+        Model.save() invalidates stale ForeignKey relations after a primary key
+        assignment.
+        """
+        self.assertEqual(self.a.reporter, self.r)  # caches a.reporter
+        self.a.reporter_id = self.r2.pk
+        self.a.save()
+        self.assertEqual(self.a.reporter, self.r2)

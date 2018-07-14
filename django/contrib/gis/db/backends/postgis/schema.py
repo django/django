@@ -17,9 +17,9 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
             return True
         return super()._field_should_be_indexed(model, field)
 
-    def _create_index_sql(self, model, fields, suffix="", sql=None):
+    def _create_index_sql(self, model, fields, **kwargs):
         if len(fields) != 1 or not hasattr(fields[0], 'geodetic'):
-            return super()._create_index_sql(model, fields, suffix=suffix, sql=sql)
+            return super()._create_index_sql(model, fields, **kwargs)
 
         field = fields[0]
         field_column = self.quote_name(field.column)

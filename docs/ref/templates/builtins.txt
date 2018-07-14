@@ -711,21 +711,6 @@ available to the included template::
 
     {% include "name_snippet.html" with greeting="Hi" only %}
 
-If the included template causes an exception while it's rendered (including
-if it's missing or has syntax errors), the behavior varies depending on the
-:class:`template engine's <django.template.Engine>` ``debug`` option (if not
-set, this option defaults to the value of :setting:`DEBUG`). When debug mode is
-turned on, an exception like :exc:`~django.template.TemplateDoesNotExist` or
-:exc:`~django.template.TemplateSyntaxError` will be raised. When debug mode
-is turned off, ``{% include %}`` logs a warning to the ``django.template``
-logger with the exception that happens while rendering the included template
-and returns an empty string.
-
-.. deprecated:: 1.11
-
-    Silencing exceptions raised while rendering the ``{% include %}`` template
-    tag is deprecated. In Django 2.1, the exception will be raised.
-
 .. note::
     The :ttag:`include` tag should be considered as an implementation of
     "render this subtemplate and include the HTML", not as "parse this
@@ -902,11 +887,6 @@ attribute and calling the result ``country_list``.
 * ``list`` -- a list of all items in this group (e.g., a list of all cities
   with country='India').
 
-.. versionchanged:: 1.11
-
-    The group object was changed from a dictionary to a
-    :py:func:`~collections.namedtuple`.
-
 Because ``{% regroup %}`` produces :py:func:`~collections.namedtuple` objects,
 you can also write the previous example as::
 
@@ -996,8 +976,6 @@ attribute, allowing  you to group on the display string rather than the
 
 ``resetcycle``
 --------------
-
-.. versionadded:: 1.11
 
 Resets a previous `cycle`_ so that it restarts from its first item at its next
 encounter. Without arguments, ``{% resetcycle %}`` will reset the last
@@ -1115,11 +1093,11 @@ hard-code URLs in your templates::
 
     {% url 'some-url-name' v1 v2 %}
 
-The first argument is a :func:`~django.conf.urls.url` ``name``. It can be a
-quoted literal or any other context variable. Additional arguments are optional
-and should be space-separated values that will be used as arguments in the URL.
-The example above shows passing positional arguments. Alternatively you may
-use keyword syntax::
+The first argument is a :ref:`URL pattern name <naming-url-patterns>`. It can
+be a quoted literal or any other context variable. Additional arguments are
+optional and should be space-separated values that will be used as arguments in
+the URL. The example above shows passing positional arguments. Alternatively
+you may use keyword syntax::
 
     {% url 'some-url-name' arg1=v1 arg2=v2 %}
 
@@ -1132,14 +1110,14 @@ takes a client ID (here, ``client()`` is a method inside the views file
 
 .. code-block:: python
 
-    ('^client/([0-9]+)/$', app_views.client, name='app-views-client')
+    path('client/<int:id>/', app_views.client, name='app-views-client')
 
 If this app's URLconf is included into the project's URLconf under a path
 such as this:
 
 .. code-block:: python
 
-    ('^clients/', include('project_name.app_name.urls'))
+    path('clients/', include('project_name.app_name.urls'))
 
 ...then, in a template, you can create a link to this view like this::
 
@@ -1179,8 +1157,8 @@ by the context as to the current application.
 
 .. warning::
 
-    Don't forget to put quotes around the :func:`~django.conf.urls.url`
-    ``name``, otherwise the value will be interpreted as a context variable!
+    Don't forget to put quotes around the URL pattern ``name``, otherwise the
+    value will be interpreted as a context variable!
 
 .. templatetag:: verbatim
 
@@ -1214,7 +1192,7 @@ value to a maximum value, and then applies that ratio to a constant.
 For example::
 
     <img src="bar.png" alt="Bar"
-         height="10" width="{% widthratio this_value max_value max_width %}" />
+         height="10" width="{% widthratio this_value max_value max_width %}">
 
 If ``this_value`` is 175, ``max_value`` is 200, and ``max_width`` is 100, the
 image in the above example will be 88 pixels wide
@@ -1363,31 +1341,42 @@ Available format strings:
 ================  ========================================  =====================
 Format character  Description                               Example output
 ================  ========================================  =====================
-a                 ``'a.m.'`` or ``'p.m.'`` (Note that       ``'a.m.'``
-                  this is slightly different than PHP's
-                  output, because this includes periods
-                  to match Associated Press style.)
-A                 ``'AM'`` or ``'PM'``.                     ``'AM'``
-b                 Month, textual, 3 letters, lowercase.     ``'jan'``
-B                 Not implemented.
-c                 ISO 8601 format. (Note: unlike others     ``2008-01-02T10:30:00.000123+02:00``,
-                  formatters, such as "Z", "O" or "r",      or ``2008-01-02T10:30:00.000123`` if the datetime is naive
-                  the "c" formatter will not add timezone
-                  offset if value is a naive datetime
-                  (see :class:`datetime.tzinfo`).
+**Day**
 d                 Day of the month, 2 digits with           ``'01'`` to ``'31'``
                   leading zeros.
+j                 Day of the month without leading          ``'1'`` to ``'31'``
+                  zeros.
 D                 Day of the week, textual, 3 letters.      ``'Fri'``
-e                 Timezone name. Could be in any format,
-                  or might return an empty string,          ``''``, ``'GMT'``, ``'-500'``, ``'US/Eastern'``, etc.
-                  depending on the datetime.
+l                 Day of the week, textual, long.           ``'Friday'``
+S                 English ordinal suffix for day of the     ``'st'``, ``'nd'``, ``'rd'`` or ``'th'``
+                  month, 2 characters.
+w                 Day of the week, digits without           ``'0'`` (Sunday) to ``'6'`` (Saturday)
+                  leading zeros.
+z                 Day of the year.                          ``0`` to ``365``
+**Week**
+W                 ISO-8601 week number of year, with        ``1``, ``53``
+                  weeks starting on Monday.
+**Month**
+m                 Month, 2 digits with leading zeros.       ``'01'`` to ``'12'``
+n                 Month without leading zeros.              ``'1'`` to ``'12'``
+                  style. Proprietary extension.
+M                 Month, textual, 3 letters.                ``'Jan'``
+b                 Month, textual, 3 letters, lowercase.     ``'jan'``
 E                 Month, locale specific alternative
                   representation usually used for long
                   date representation.                      ``'listopada'`` (for Polish locale, as opposed to ``'Listopad'``)
-f                 Time, in 12-hour hours and minutes,       ``'1'``, ``'1:30'``
-                  with minutes left off if they're zero.
-                  Proprietary extension.
 F                 Month, textual, long.                     ``'January'``
+N                 Month abbreviation in Associated Press    ``'Jan.'``, ``'Feb.'``, ``'March'``, ``'May'``
+t                 Number of days in the given month.        ``28`` to ``31``
+**Year**
+y                 Year, 2 digits.                           ``'99'``
+Y                 Year, 4 digits.                           ``'1999'``
+L                 Boolean for whether it's a leap year.     ``True`` or ``False``
+o                 ISO-8601 week-numbering year,             ``'1999'``
+                  corresponding to the ISO-8601 week
+                  number (W) which uses leap weeks. See Y
+                  for the more common year format.
+**Time**
 g                 Hour, 12-hour format without leading      ``'1'`` to ``'12'``
                   zeros.
 G                 Hour, 24-hour format without leading      ``'0'`` to ``'23'``
@@ -1395,47 +1384,42 @@ G                 Hour, 24-hour format without leading      ``'0'`` to ``'23'``
 h                 Hour, 12-hour format.                     ``'01'`` to ``'12'``
 H                 Hour, 24-hour format.                     ``'00'`` to ``'23'``
 i                 Minutes.                                  ``'00'`` to ``'59'``
-I                 Daylight Savings Time, whether it's       ``'1'`` or ``'0'``
-                  in effect or not.
-j                 Day of the month without leading          ``'1'`` to ``'31'``
-                  zeros.
-l                 Day of the week, textual, long.           ``'Friday'``
-L                 Boolean for whether it's a leap year.     ``True`` or ``False``
-m                 Month, 2 digits with leading zeros.       ``'01'`` to ``'12'``
-M                 Month, textual, 3 letters.                ``'Jan'``
-n                 Month without leading zeros.              ``'1'`` to ``'12'``
-N                 Month abbreviation in Associated Press    ``'Jan.'``, ``'Feb.'``, ``'March'``, ``'May'``
-                  style. Proprietary extension.
-o                 ISO-8601 week-numbering year,             ``'1999'``
-                  corresponding to the ISO-8601 week
-                  number (W) which uses leap weeks. See Y
-                  for the more common year format.
-O                 Difference to Greenwich time in hours.    ``'+0200'``
+s                 Seconds, 2 digits with leading zeros.     ``'00'`` to ``'59'``
+u                 Microseconds.                             ``000000`` to ``999999``
+a                 ``'a.m.'`` or ``'p.m.'`` (Note that       ``'a.m.'``
+                  this is slightly different than PHP's
+                  output, because this includes periods
+                  to match Associated Press style.)
+A                 ``'AM'`` or ``'PM'``.                     ``'AM'``
+f                 Time, in 12-hour hours and minutes,       ``'1'``, ``'1:30'``
+                  with minutes left off if they're zero.
+                  Proprietary extension.
 P                 Time, in 12-hour hours, minutes and       ``'1 a.m.'``, ``'1:30 p.m.'``, ``'midnight'``, ``'noon'``, ``'12:30 p.m.'``
                   'a.m.'/'p.m.', with minutes left off
                   if they're zero and the special-case
                   strings 'midnight' and 'noon' if
                   appropriate. Proprietary extension.
-r                 :rfc:`5322` formatted date.               ``'Thu, 21 Dec 2000 16:01:07 +0200'``
-s                 Seconds, 2 digits with leading zeros.     ``'00'`` to ``'59'``
-S                 English ordinal suffix for day of the     ``'st'``, ``'nd'``, ``'rd'`` or ``'th'``
-                  month, 2 characters.
-t                 Number of days in the given month.        ``28`` to ``31``
+**Timezone**
+e                 Timezone name. Could be in any format,
+                  or might return an empty string,          ``''``, ``'GMT'``, ``'-500'``, ``'US/Eastern'``, etc.
+                  depending on the datetime.
+I                 Daylight Savings Time, whether it's       ``'1'`` or ``'0'``
+                  in effect or not.
+O                 Difference to Greenwich time in hours.    ``'+0200'``
 T                 Time zone of this machine.                ``'EST'``, ``'MDT'``
-u                 Microseconds.                             ``000000`` to ``999999``
-U                 Seconds since the Unix Epoch
-                  (January 1 1970 00:00:00 UTC).
-w                 Day of the week, digits without           ``'0'`` (Sunday) to ``'6'`` (Saturday)
-                  leading zeros.
-W                 ISO-8601 week number of year, with        ``1``, ``53``
-                  weeks starting on Monday.
-y                 Year, 2 digits.                           ``'99'``
-Y                 Year, 4 digits.                           ``'1999'``
-z                 Day of the year.                          ``0`` to ``365``
 Z                 Time zone offset in seconds. The          ``-43200`` to ``43200``
                   offset for timezones west of UTC is
                   always negative, and for those east of
                   UTC is always positive.
+**Date/Time**
+c                 ISO 8601 format. (Note: unlike others     ``2008-01-02T10:30:00.000123+02:00``,
+                  formatters, such as "Z", "O" or "r",      or ``2008-01-02T10:30:00.000123`` if the datetime is naive
+                  the "c" formatter will not add timezone
+                  offset if value is a naive datetime
+                  (see :class:`datetime.tzinfo`).
+r                 :rfc:`5322` formatted date.               ``'Thu, 21 Dec 2000 16:01:07 +0200'``
+U                 Seconds since the Unix Epoch
+                  (January 1 1970 00:00:00 UTC).
 ================  ========================================  =====================
 
 For example::
@@ -1467,11 +1451,6 @@ used. Assuming the same settings as the previous example::
 
 outputs ``9 de Enero de 2008`` (the ``DATE_FORMAT`` format specifier for the
 ``es`` locale is ``r'j \d\e F \d\e Y'``.
-
-.. versionchanged:: 1.10
-
-    In older versions, the :setting:`DATE_FORMAT` setting (without
-    localization) is always used when a format string isn't given.
 
 You can combine ``date`` with the :tfilter:`time` filter to render a full
 representation of a ``datetime`` value. E.g.::
@@ -1645,8 +1624,8 @@ For example, you can apply ``escape`` to fields when :ttag:`autoescape` is off::
 ------------
 
 Escapes characters for use in JavaScript strings. This does *not* make the
-string safe for use in HTML, but does protect you from syntax errors when using
-templates to generate JavaScript/JSON.
+string safe for use in HTML or JavaScript template literals, but does protect
+you from syntax errors when using templates to generate JavaScript/JSON.
 
 For example::
 
@@ -1809,6 +1788,45 @@ For example::
 If ``value`` is the list ``['a', 'b', 'c']``, the output will be the string
 ``"a // b // c"``.
 
+.. templatefilter:: json_script
+
+``json_script``
+---------------
+
+.. versionadded:: 2.1
+
+Safely outputs a Python object as JSON, wrapped in a ``<script>`` tag, ready
+for use with JavaScript.
+
+**Argument:** HTML "id" of the ``<script>`` tag.
+
+For example::
+
+    {{ value|json_script:"hello-data" }}
+
+If ``value`` is the dictionary ``{'hello': 'world'}``, the output will be:
+
+.. code-block:: html
+
+    <script id="hello-data" type="application/json">{"hello": "world"}</script>
+
+The resulting data can be accessed in JavaScript like this:
+
+.. code-block:: javascript
+
+    var value = JSON.parse(document.getElementById('hello-data').textContent);
+
+XSS attacks are mitigated by escaping the characters "<", ">" and "&". For
+example if ``value`` is ``{'hello': 'world</script>&amp;'}``, the output is:
+
+.. code-block:: html
+
+    <script id="hello-data" type="application/json">{"hello": "world\\u003C/script\\u003E\\u0026amp;"}</script>
+
+This is compatible with a strict Content Security Policy that prohibits in-page
+script execution. It also maintains a clean separation between passive data and
+executable code.
+
 .. templatefilter:: last
 
 ``last``
@@ -1859,14 +1877,14 @@ If ``value`` is ``['a', 'b', 'c', 'd']`` or ``"abcd"``, the output will be
 --------------
 
 Replaces line breaks in plain text with appropriate HTML; a single
-newline becomes an HTML line break (``<br />``) and a new line
+newline becomes an HTML line break (``<br>``) and a new line
 followed by a blank line becomes a paragraph break (``</p>``).
 
 For example::
 
     {{ value|linebreaks }}
 
-If ``value`` is ``Joel\nis a slug``, the output will be ``<p>Joel<br />is a
+If ``value`` is ``Joel\nis a slug``, the output will be ``<p>Joel<br>is a
 slug</p>``.
 
 .. templatefilter:: linebreaksbr
@@ -1875,13 +1893,13 @@ slug</p>``.
 ----------------
 
 Converts all newlines in a piece of plain text to HTML line breaks
-(``<br />``).
+(``<br>``).
 
 For example::
 
     {{ value|linebreaksbr }}
 
-If ``value`` is ``Joel\nis a slug``, the output will be ``Joel<br />is a
+If ``value`` is ``Joel\nis a slug``, the output will be ``Joel<br>is a
 slug``.
 
 .. templatefilter:: linenumbers
@@ -2184,11 +2202,6 @@ used::
 is the same as::
 
     {{ value|time:"TIME_FORMAT" }}
-
-.. versionchanged:: 1.10
-
-    In older versions, the :setting:`TIME_FORMAT` setting (without
-    localization) is always used when a format string isn't given.
 
 .. templatefilter:: timesince
 
@@ -2563,20 +2576,20 @@ app is installed, the tag will serve files using ``url()`` method of the
 storage specified by :setting:`STATICFILES_STORAGE`. For example::
 
     {% load static %}
-    <img src="{% static "images/hi.jpg" %}" alt="Hi!" />
+    <img src="{% static "images/hi.jpg" %}" alt="Hi!">
 
 It is also able to consume standard context variables, e.g. assuming a
 ``user_stylesheet`` variable is passed to the template::
 
     {% load static %}
-    <link rel="stylesheet" href="{% static user_stylesheet %}" type="text/css" media="screen" />
+    <link rel="stylesheet" href="{% static user_stylesheet %}" type="text/css" media="screen">
 
 If you'd like to retrieve a static URL without displaying it, you can use a
 slightly different call::
 
     {% load static %}
     {% static "images/hi.jpg" as myphoto %}
-    <img src="{{ myphoto }}"></img>
+    <img src="{{ myphoto }}">
 
 .. admonition:: Using Jinja2 templates?
 
@@ -2593,7 +2606,7 @@ over exactly where and how :setting:`STATIC_URL` is injected into the template,
 you can use the :ttag:`get_static_prefix` template tag::
 
     {% load static %}
-    <img src="{% get_static_prefix %}images/hi.jpg" alt="Hi!" />
+    <img src="{% get_static_prefix %}images/hi.jpg" alt="Hi!">
 
 There's also a second form you can use to avoid extra processing if you need
 the value multiple times::
@@ -2601,8 +2614,8 @@ the value multiple times::
     {% load static %}
     {% get_static_prefix as STATIC_PREFIX %}
 
-    <img src="{{ STATIC_PREFIX }}images/hi.jpg" alt="Hi!" />
-    <img src="{{ STATIC_PREFIX }}images/hi2.jpg" alt="Hello!" />
+    <img src="{{ STATIC_PREFIX }}images/hi.jpg" alt="Hi!">
+    <img src="{{ STATIC_PREFIX }}images/hi2.jpg" alt="Hello!">
 
 .. templatetag:: get_media_prefix
 

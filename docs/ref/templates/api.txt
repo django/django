@@ -104,11 +104,6 @@ what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
 
       See :ref:`template-loaders` for details.
 
-      .. versionchanged:: 1.11
-
-          Enabling of the cached template loader when ``debug`` is ``False``
-          was added.
-
     * ``string_if_invalid`` is the output, as a string, that the template
       system should use for invalid (e.g. misspelled) variables.
 
@@ -153,12 +148,6 @@ what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
 
     It's required for preserving APIs that rely on a globally available,
     implicitly configured engine. Any other use is strongly discouraged.
-
-    .. versionchanged:: 2.0
-
-        In older versions, raises
-        :exc:`~django.core.exceptions.ImproperlyConfigured` if multiple
-        engines are configured rather than returning the first engine.
 
 .. method:: Engine.from_string(template_code)
 
@@ -701,14 +690,20 @@ the request's IP address (``request.META['REMOTE_ADDR']``) is in the
 ``django.template.context_processors.i18n``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If this processor is enabled, every ``RequestContext`` will contain these two
+.. function:: i18n
+
+If this processor is enabled, every ``RequestContext`` will contain these
 variables:
 
 * ``LANGUAGES`` -- The value of the :setting:`LANGUAGES` setting.
+* ``LANGUAGE_BIDI`` -- ``True`` if the current language is a right-to-left
+  language, e.g. Hebrew, Arabic. ``False`` if it's a left-to-right language,
+  e.g. English, French, German.
 * ``LANGUAGE_CODE`` -- ``request.LANGUAGE_CODE``, if it exists. Otherwise,
   the value of the :setting:`LANGUAGE_CODE` setting.
 
-See :doc:`/topics/i18n/index` for more.
+See :ref:`i18n template tags <i18n-template-tags>` for template tags that
+generate the same values.
 
 ``django.template.context_processors.media``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -855,11 +850,6 @@ loaders that come with Django:
             },
         }]
 
-    .. versionchanged:: 1.11
-
-        The ability to specify directories for a particular filesystem loader
-        was added.
-
 ``django.template.loaders.app_directories.Loader``
 
 .. class:: app_directories.Loader
@@ -918,8 +908,10 @@ loaders that come with Django:
     ``Template`` in memory. The cached ``Template`` instance is returned for
     subsequent requests to load the same template.
 
-    This loader is automatically enabled if :setting:`DEBUG` is ``False`` and
-    :setting:`OPTIONS['loaders'] <TEMPLATES-OPTIONS>` isn't specified.
+    This loader is automatically enabled if :setting:`OPTIONS['loaders']
+    <TEMPLATES-OPTIONS>` isn't specified and :setting:`OPTIONS['debug']
+    <TEMPLATES-OPTIONS>` is ``False`` (the latter option defaults to the value
+    of :setting:`DEBUG`).
 
     You can also enable template caching with some custom template loaders
     using settings like this::
@@ -946,11 +938,6 @@ loaders that come with Django:
         that the ``Node`` implementation for each tag is thread-safe. For more
         information, see :ref:`template tag thread safety considerations
         <template_tag_thread_safety>`.
-
-    .. versionchanged:: 1.11
-
-        The automatic enabling of the cached template loader when ``debug`` is
-        ``False`` was added.
 
 ``django.template.loaders.locmem.Loader``
 
@@ -1051,7 +1038,7 @@ Template origin
 Templates have an ``origin`` containing attributes depending on the source
 they are loaded from.
 
-.. class:: Origin
+.. class:: Origin(name, template_name=None, loader=None)
 
     .. attribute:: name
 
@@ -1069,3 +1056,14 @@ they are loaded from.
 
         If the template is instantiated directly rather than through a
         template loader, this is ``None``.
+
+    .. attribute:: loader
+
+        The template loader instance that constructed this ``Origin``.
+
+        If the template is instantiated directly rather than through a
+        template loader, this is ``None``.
+
+        :class:`django.template.loaders.cached.Loader` requires all of its
+        wrapped loaders to set this attribute, typically by instantiating
+        the ``Origin`` with ``loader=self``.

@@ -256,7 +256,7 @@ class GDALRasterTests(SimpleTestCase):
         if numpy:
             result = result.flatten().tolist()
         # All band data is equal to nodata value.
-        self.assertEqual(result, [23, ] * 4)
+        self.assertEqual(result, [23] * 4)
 
     def test_set_nodata_none_on_raster_creation(self):
         if GDAL_VERSION < (2, 1):
@@ -277,17 +277,9 @@ class GDALRasterTests(SimpleTestCase):
         self.assertEqual(result, [0] * 4)
 
     def test_raster_metadata_property(self):
-        # Check for required gdal version.
-        if GDAL_VERSION < (1, 11):
-            msg = 'GDAL ≥ 1.11 is required for using the metadata property.'
-            with self.assertRaisesMessage(ValueError, msg):
-                self.rs.metadata
-            return
-
-        self.assertEqual(
-            self.rs.metadata,
-            {'DEFAULT': {'AREA_OR_POINT': 'Area'}, 'IMAGE_STRUCTURE': {'INTERLEAVE': 'BAND'}},
-        )
+        data = self.rs.metadata
+        self.assertEqual(data['DEFAULT'], {'AREA_OR_POINT': 'Area'})
+        self.assertEqual(data['IMAGE_STRUCTURE'], {'INTERLEAVE': 'BAND'})
 
         # Create file-based raster from scratch
         source = GDALRaster({
@@ -299,7 +291,7 @@ class GDALRasterTests(SimpleTestCase):
         })
         # Set metadata on raster and on a band.
         metadata = {
-            'DEFAULT': {'OWNER': 'Django', 'VERSION': '1.0', 'AREA_OR_POINT': 'Point', },
+            'DEFAULT': {'OWNER': 'Django', 'VERSION': '1.0', 'AREA_OR_POINT': 'Point'},
         }
         source.metadata = metadata
         source.bands[0].metadata = metadata
@@ -307,13 +299,13 @@ class GDALRasterTests(SimpleTestCase):
         self.assertEqual(source.bands[0].metadata['DEFAULT'], metadata['DEFAULT'])
         # Update metadata on raster.
         metadata = {
-            'DEFAULT': {'VERSION': '2.0', },
+            'DEFAULT': {'VERSION': '2.0'},
         }
         source.metadata = metadata
         self.assertEqual(source.metadata['DEFAULT']['VERSION'], '2.0')
         # Remove metadata on raster.
         metadata = {
-            'DEFAULT': {'OWNER': None, },
+            'DEFAULT': {'OWNER': None},
         }
         source.metadata = metadata
         self.assertNotIn('OWNER', source.metadata['DEFAULT'])
@@ -379,37 +371,36 @@ class GDALRasterTests(SimpleTestCase):
         compressed = self.rs.warp({'papsz_options': {'compress': 'packbits'}, 'name': rstfile.name})
         # Check physically if compression worked.
         self.assertLess(os.path.getsize(compressed.name), os.path.getsize(self.rs.name))
-        if GDAL_VERSION > (1, 11):
-            # Create file-based raster with options from scratch.
-            compressed = GDALRaster({
-                'datatype': 1,
-                'driver': 'tif',
-                'name': rstfile.name,
-                'width': 40,
-                'height': 40,
-                'srid': 3086,
-                'origin': (500000, 400000),
-                'scale': (100, -100),
-                'skew': (0, 0),
-                'bands': [{
-                    'data': range(40 ^ 2),
-                    'nodata_value': 255,
-                }],
-                'papsz_options': {
-                    'compress': 'packbits',
-                    'pixeltype': 'signedbyte',
-                    'blockxsize': 23,
-                    'blockysize': 23,
-                }
-            })
-            # Check if options used on creation are stored in metadata.
-            # Reopening the raster ensures that all metadata has been written
-            # to the file.
-            compressed = GDALRaster(compressed.name)
-            self.assertEqual(compressed.metadata['IMAGE_STRUCTURE']['COMPRESSION'], 'PACKBITS',)
-            self.assertEqual(compressed.bands[0].metadata['IMAGE_STRUCTURE']['PIXELTYPE'], 'SIGNEDBYTE')
-            if GDAL_VERSION >= (2, 1):
-                self.assertIn('Block=40x23', compressed.info)
+        # Create file-based raster with options from scratch.
+        compressed = GDALRaster({
+            'datatype': 1,
+            'driver': 'tif',
+            'name': rstfile.name,
+            'width': 40,
+            'height': 40,
+            'srid': 3086,
+            'origin': (500000, 400000),
+            'scale': (100, -100),
+            'skew': (0, 0),
+            'bands': [{
+                'data': range(40 ^ 2),
+                'nodata_value': 255,
+            }],
+            'papsz_options': {
+                'compress': 'packbits',
+                'pixeltype': 'signedbyte',
+                'blockxsize': 23,
+                'blockysize': 23,
+            }
+        })
+        # Check if options used on creation are stored in metadata.
+        # Reopening the raster ensures that all metadata has been written
+        # to the file.
+        compressed = GDALRaster(compressed.name)
+        self.assertEqual(compressed.metadata['IMAGE_STRUCTURE']['COMPRESSION'], 'PACKBITS',)
+        self.assertEqual(compressed.bands[0].metadata['IMAGE_STRUCTURE']['PIXELTYPE'], 'SIGNEDBYTE')
+        if GDAL_VERSION >= (2, 1):
+            self.assertIn('Block=40x23', compressed.info)
 
     def test_raster_warp(self):
         # Create in memory raster
@@ -562,6 +553,8 @@ class GDALBandTests(SimpleTestCase):
         self.assertEqual(self.band.description, '')
         self.assertEqual(self.band.datatype(), 1)
         self.assertEqual(self.band.datatype(as_string=True), 'GDT_Byte')
+        self.assertEqual(self.band.color_interp(), 1)
+        self.assertEqual(self.band.color_interp(as_string=True), 'GCI_GrayIndex')
         self.assertEqual(self.band.nodata_value, 15)
         if numpy:
             data = self.band.data()

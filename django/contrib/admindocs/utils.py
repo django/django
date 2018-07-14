@@ -18,6 +18,12 @@ else:
     docutils_is_available = True
 
 
+def get_view_name(view_func):
+    mod_name = view_func.__module__
+    view_name = getattr(view_func, '__qualname__', view_func.__class__.__name__)
+    return mod_name + '.' + view_name
+
+
 def trim_docstring(docstring):
     """
     Uniformly trim leading/trailing whitespace from docstrings.
@@ -71,8 +77,7 @@ def parse_rst(text, default_reference_context, thing_being_parsed=None):
         'raw_enabled': False,
         'file_insertion_enabled': False,
     }
-    if thing_being_parsed:
-        thing_being_parsed = force_bytes("<%s>" % thing_being_parsed)
+    thing_being_parsed = thing_being_parsed and force_bytes('<%s>' % thing_being_parsed)
     # Wrap ``text`` in some reST that sets the default role to ``cmsreference``,
     # then restores it.
     source = """

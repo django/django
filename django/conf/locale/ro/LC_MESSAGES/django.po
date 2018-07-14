@@ -2,20 +2,21 @@
 #
 # Translators:
 # Abel Radac <abelradac@gmail.com>, 2017
+# Bogdan Mateescu, 2018
 # mihneasim <contact@mesimian.com>, 2011
-# Daniel Ursache-Dogariu <contact@danniel.net>, 2011
+# Daniel Ursache-Dogariu, 2011
 # Denis Darii <denis.darii@gmail.com>, 2011,2014
 # Ionel Cristian Mărieș <ionel.mc@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Răzvan Ionescu <ionescu77@gmail.com>, 2015
-# Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2016
+# Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-05-31 08:00+0000\n"
-"Last-Translator: Abel Radac <abelradac@gmail.com>\n"
+"POT-Creation-Date: 2017-12-01 21:10+0100\n"
+"PO-Revision-Date: 2018-01-17 09:13+0000\n"
+"Last-Translator: Bogdan Mateescu\n"
 "Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
@@ -68,7 +69,7 @@ msgid "German"
 msgstr "Germană"
 
 msgid "Lower Sorbian"
-msgstr ""
+msgstr "Soraba Inferioară"
 
 msgid "Greek"
 msgstr "Greacă"
@@ -140,7 +141,7 @@ msgid "Croatian"
 msgstr "Croată"
 
 msgid "Upper Sorbian"
-msgstr ""
+msgstr "Soraba Superioară"
 
 msgid "Hungarian"
 msgstr "Ungară"
@@ -165,6 +166,9 @@ msgstr "Japoneză"
 
 msgid "Georgian"
 msgstr "Georgiană"
+
+msgid "Kabyle"
+msgstr ""
 
 msgid "Kazakh"
 msgstr "Kazahă"
@@ -203,7 +207,7 @@ msgid "Burmese"
 msgstr "Burmeză"
 
 msgid "Norwegian Bokmål"
-msgstr ""
+msgstr "Norvegiana modernă"
 
 msgid "Nepali"
 msgstr "Nepaleză"
@@ -302,13 +306,13 @@ msgid "Syndication"
 msgstr "Sindicalizare"
 
 msgid "That page number is not an integer"
-msgstr ""
+msgstr "Numărul de pagină nu este întreg"
 
 msgid "That page number is less than 1"
-msgstr ""
+msgstr "Numărul de pagină este mai mic decât 1"
 
 msgid "That page contains no results"
-msgstr ""
+msgstr "Această pagină nu conține nici un rezultat"
 
 msgid "Enter a valid value."
 msgstr "Introduceți o valoare validă."
@@ -322,6 +326,7 @@ msgstr "Introduceți un întreg valid."
 msgid "Enter a valid email address."
 msgstr "Introduceți o adresă de email validă."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -426,6 +431,11 @@ msgstr[2] ""
 msgid ""
 "File extension '%(extension)s' is not allowed. Allowed extensions are: "
 "'%(allowed_extensions)s'."
+msgstr ""
+"Extensia '%(extension)s' nu este permisă. Extensiile permise sunt: "
+"'%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
 msgstr ""
 
 msgid "and"
@@ -629,11 +639,11 @@ msgstr "Relaţie unul-la-unul"
 
 #, python-format
 msgid "%(from)s-%(to)s relationship"
-msgstr ""
+msgstr "Relație %(from)s-%(to)s"
 
 #, python-format
 msgid "%(from)s-%(to)s relationships"
-msgstr ""
+msgstr "Relații %(from)s-%(to)s"
 
 msgid "Many-to-many relationship"
 msgstr "Relație multe-la-multe"
@@ -763,9 +773,8 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Corectaţi valorile duplicate de mai jos."
 
-msgid "The inline foreign key did not match the parent instance primary key."
+msgid "The inline value did not match the parent instance."
 msgstr ""
-"Foreign key-ul inline nu se potrivește cu cheia primară a istanței părinte."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
@@ -773,8 +782,8 @@ msgstr ""
 "disponibile."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" nu este o cheie primară validă."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "\"%(pk)s\" nu este o valoare validă."
 
 #, python-format
 msgid ""
@@ -1147,6 +1156,14 @@ msgstr ""
 "conexiunile HTTPS, sau pentru cererile 'same-origin'."
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1166,29 +1183,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "Mai multe informații sunt disponibile pentru DEBUG=True."
 
-msgid "Welcome to Django"
-msgstr "Bine ai venit la Django"
-
-msgid "It worked!"
-msgstr "A mers!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Felicitări pentru prima ta pagină Django."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Vedeți acest mesaj deoarece ați setat <code>DEBUG = True</code> în fișierul "
-"de setări Django și nu ați configurat nici un URL. La treabă!"
-
 msgid "No year specified"
 msgstr "Niciun an specificat"
+
+msgid "Date out of range"
+msgstr ""
 
 msgid "No month specified"
 msgstr "Nicio lună specificată"
@@ -1241,3 +1240,44 @@ msgstr "\"%(path)s\" nu există"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Index pentru %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr ""
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Vezi <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">notele de lansare</a> pentru Django "
+"%(version)s"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Instalarea a funcționat cu succes! Felicitări!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+
+msgid "Django Documentation"
+msgstr "Documentația Django"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr ""
+
+msgid "Tutorial: A Polling App"
+msgstr "Tutorial: O aplicație de votare"
+
+msgid "Get started with Django"
+msgstr ""
+
+msgid "Django Community"
+msgstr "Comunitatea Django"
+
+msgid "Connect, get help, or contribute"
+msgstr "Conectați-vă, obțineți ajutor sau contribuiți"

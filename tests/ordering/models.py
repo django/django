@@ -42,6 +42,12 @@ class OrderedByAuthorArticle(Article):
         ordering = ('author', 'second_author')
 
 
+class OrderedByFArticle(Article):
+    class Meta:
+        proxy = True
+        ordering = (models.F('author').asc(nulls_first=True), 'id')
+
+
 class Reference(models.Model):
     article = models.ForeignKey(OrderedByAuthorArticle, models.CASCADE)
 

@@ -197,8 +197,6 @@ is set, its column name).
 
 .. class:: AddIndex(model_name, index)
 
-.. versionadded:: 1.11
-
 Creates an index in the database table for the model with ``model_name``.
 ``index`` is an instance of the :class:`~django.db.models.Index` class.
 
@@ -207,9 +205,26 @@ Creates an index in the database table for the model with ``model_name``.
 
 .. class:: RemoveIndex(model_name, name)
 
-.. versionadded:: 1.11
-
 Removes the index named ``name`` from the model with ``model_name``.
+
+``AddConstraint``
+-----------------
+
+.. class:: AddConstraint(model_name, constraint)
+
+.. versionadded:: 2.2
+
+Creates a constraint in the database table for the model with ``model_name``.
+``constraint`` is an instance of :class:`~django.db.models.CheckConstraint`.
+
+``RemoveConstraint``
+--------------------
+
+.. class:: RemoveConstraint(model_name, name)
+
+.. versionadded:: 2.2
+
+Removes the constraint named ``name`` from the model with ``model_name``.
 
 Special Operations
 ==================
@@ -279,7 +294,7 @@ be removed (elided) when :ref:`squashing migrations <migration-squashing>`.
     want the operation not to do anything in the given direction. This is
     especially useful in making the operation reversible.
 
-.. _sqlparse: https://pypi.python.org/pypi/sqlparse
+.. _sqlparse: https://pypi.org/project/sqlparse/
 
 ``RunPython``
 -------------
@@ -476,10 +491,6 @@ Some things to note:
         # reloaded in case any are delayed.
         from_state.clear_delayed_apps_cache()
         ...
-
-  .. versionadded:: 1.11
-
-    This requirement and the ``clear_delayed_apps_cache()`` method is new.
 
 * ``to_state`` in the database_backwards method is the *older* state; that is,
   the one that will be the current state once the migration has finished reversing.

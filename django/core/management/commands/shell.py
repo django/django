@@ -2,7 +2,6 @@ import os
 import select
 import sys
 import traceback
-from contextlib import suppress
 
 from django.core.management import BaseCommand, CommandError
 from django.utils.datastructures import OrderedSet
@@ -20,15 +19,15 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--no-startup', action='store_true', dest='no_startup',
+            '--no-startup', action='store_true',
             help='When using plain Python, ignore the PYTHONSTARTUP environment variable and ~/.pythonrc.py script.',
         )
         parser.add_argument(
-            '-i', '--interface', choices=self.shells, dest='interface',
+            '-i', '--interface', choices=self.shells,
             help='Specify an interactive interpreter interface. Available options: "ipython", "bpython", and "python"',
         )
         parser.add_argument(
-            '-c', '--command', dest='command',
+            '-c', '--command',
             help='Instead of opening an interactive shell, run a command as Django and exit.',
         )
 
@@ -96,6 +95,8 @@ class Command(BaseCommand):
         available_shells = [options['interface']] if options['interface'] else self.shells
 
         for shell in available_shells:
-            with suppress(ImportError):
+            try:
                 return getattr(self, shell)(options)
+            except ImportError:
+                pass
         raise CommandError("Couldn't import {} interface.".format(shell))

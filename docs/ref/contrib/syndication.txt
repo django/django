@@ -77,12 +77,12 @@ a feed of the latest five news items::
 To connect a URL to this feed, put an instance of the Feed object in
 your :doc:`URLconf </topics/http/urls>`. For example::
 
-    from django.conf.urls import url
+    from django.urls import path
     from myproject.feeds import LatestEntriesFeed
 
     urlpatterns = [
         # ...
-        url(r'^latest/feed/$', LatestEntriesFeed()),
+        path('latest/feed/', LatestEntriesFeed()),
         # ...
     ]
 
@@ -217,7 +217,7 @@ The police beat feeds could be accessible via URLs like this:
 
 These can be matched with a :doc:`URLconf </topics/http/urls>` line such as::
 
-    url(r'^beats/(?P<beat_id>[0-9]+)/rss/$', BeatFeed()),
+    path('beats/<int:beat_id>/rss/', BeatFeed()),
 
 Like a view, the arguments in the URL are passed to the ``get_object()``
 method along with the request object.
@@ -366,13 +366,13 @@ Here's a full example::
 
 And the accompanying URLconf::
 
-    from django.conf.urls import url
-    from myproject.feeds import RssSiteNewsFeed, AtomSiteNewsFeed
+    from django.urls import path
+    from myproject.feeds import AtomSiteNewsFeed, RssSiteNewsFeed
 
     urlpatterns = [
         # ...
-        url(r'^sitenews/rss/$', RssSiteNewsFeed()),
-        url(r'^sitenews/atom/$', AtomSiteNewsFeed()),
+        path('sitenews/rss/', RssSiteNewsFeed()),
+        path('sitenews/atom/', AtomSiteNewsFeed()),
         # ...
     ]
 
@@ -942,7 +942,7 @@ They share this interface:
 
     All parameters should be strings, except ``categories``, which should be a
     sequence of strings. Beware that some control characters
-    are `not allowed <http://www.w3.org/International/questions/qa-controls>`_
+    are `not allowed <https://www.w3.org/International/questions/qa-controls>`_
     in XML documents. If your content has some of them, you might encounter a
     :exc:`ValueError` when producing the feed.
 
@@ -1029,7 +1029,7 @@ attributes. Thus, you can subclass the appropriate feed generator class
 .. _georss: http://georss.org/
 .. _itunes podcast format: https://www.apple.com/itunes/podcasts/specs.html
 
-``SyndicationFeed.root_attributes(self, )``
+``SyndicationFeed.root_attributes(self)``
     Return a ``dict`` of attributes to add to the root feed element
     (``feed``/``channel``).
 

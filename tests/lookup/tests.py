@@ -1,21 +1,24 @@
-import collections
+import collections.abc
 from datetime import datetime
 from math import ceil
 from operator import attrgetter
 
 from django.core.exceptions import FieldError
 from django.db import connection
+from django.db.models.functions import Substr
 from django.test import TestCase, skipUnlessDBFeature
 
-from .models import Article, Author, Game, Player, Season, Tag
+from .models import (
+    Article, Author, Game, IsNullWithNoneAsRHS, Player, Season, Tag,
+)
 
 
 class LookupTests(TestCase):
 
     def setUp(self):
         # Create a few Authors.
-        self.au1 = Author.objects.create(name='Author 1')
-        self.au2 = Author.objects.create(name='Author 2')
+        self.au1 = Author.objects.create(name='Author 1', alias='a1')
+        self.au2 = Author.objects.create(name='Author 2', alias='a2')
         # Create a few Articles.
         self.a1 = Article.objects.create(
             headline='Article 1',
@@ -99,7 +102,7 @@ class LookupTests(TestCase):
     def test_iterator(self):
         # Each QuerySet gets iterator(), which is a generator that "lazily"
         # returns results using database-level iteration.
-        self.assertIsInstance(Article.objects.iterator(), collections.Iterator)
+        self.assertIsInstance(Article.objects.iterator(), collections.abc.Iterator)
 
         self.assertQuerysetEqual(
             Article.objects.iterator(),
@@ -315,7 +318,11 @@ class LookupTests(TestCase):
         # However, an exception FieldDoesNotExist will be thrown if you specify
         # a nonexistent field name in values() (a field that is neither in the
         # model nor in extra(select)).
-        with self.assertRaises(FieldError):
+        msg = (
+            "Cannot resolve keyword 'id_plus_two' into field. Choices are: "
+            "author, author_id, headline, id, id_plus_one, pub_date, slug, tag"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.extra(select={'id_plus_one': 'id + 1'}).values('id', 'id_plus_two')
         # If you don't specify field names to values(), all are returned.
         self.assertSequenceEqual(
@@ -549,6 +556,10 @@ class LookupTests(TestCase):
         ):
             list(Article.objects.filter(id__in=Article.objects.using('other').all()))
 
+    def test_in_keeps_value_ordering(self):
+        query = Article.objects.filter(slug__in=['a%d' % i for i in range(1, 8)]).values('pk').query
+        self.assertIn(' IN (a1, a2, a3, a4, a5, a6, a7) ', str(query))
+
     def test_error_messages(self):
         # Programming errors are pointed out with nice error messages
         with self.assertRaisesMessage(
@@ -733,11 +744,16 @@ class LookupTests(TestCase):
         """
         A lookup query containing non-fields raises the proper exception.
         """
-        with self.assertRaises(FieldError):
+        msg = "Unsupported lookup 'blahblah' for CharField or join on the field not permitted."
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(headline__blahblah=99)
-        with self.assertRaises(FieldError):
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(headline__blahblah__exact=99)
-        with self.assertRaises(FieldError):
+        msg = (
+            "Cannot resolve keyword 'blahblah' into field. Choices are: "
+            "author, author_id, headline, id, pub_date, slug, tag"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(blahblah=99)
 
     def test_lookup_collision(self):
@@ -830,3 +846,66 @@ class LookupTests(TestCase):
              '<Article: Article 7>'],
             ordered=False
         )
+
+    def test_exact_none_transform(self):
+        """Transforms are used for __exact=None."""
+        Season.objects.create(year=1, nulled_text_field='not null')
+        self.assertFalse(Season.objects.filter(nulled_text_field__isnull=True))
+        self.assertTrue(Season.objects.filter(nulled_text_field__nulled__isnull=True))
+        self.assertTrue(Season.objects.filter(nulled_text_field__nulled__exact=None))
+        self.assertTrue(Season.objects.filter(nulled_text_field__nulled=None))
+
+    def test_exact_sliced_queryset_limit_one(self):
+        self.assertCountEqual(
+            Article.objects.filter(author=Author.objects.all()[:1]),
+            [self.a1, self.a2, self.a3, self.a4]
+        )
+
+    def test_exact_sliced_queryset_limit_one_offset(self):
+        self.assertCountEqual(
+            Article.objects.filter(author=Author.objects.all()[1:2]),
+            [self.a5, self.a6, self.a7]
+        )
+
+    def test_exact_sliced_queryset_not_limited_to_one(self):
+        msg = (
+            'The QuerySet value for an exact lookup must be limited to one '
+            'result using slicing.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            list(Article.objects.filter(author=Author.objects.all()[:2]))
+        with self.assertRaisesMessage(ValueError, msg):
+            list(Article.objects.filter(author=Author.objects.all()[1:]))
+
+    def test_custom_field_none_rhs(self):
+        """
+        __exact=value is transformed to __isnull=True if Field.get_prep_value()
+        converts value to None.
+        """
+        season = Season.objects.create(year=2012, nulled_text_field=None)
+        self.assertTrue(Season.objects.filter(pk=season.pk, nulled_text_field__isnull=True))
+        self.assertTrue(Season.objects.filter(pk=season.pk, nulled_text_field=''))
+
+    def test_pattern_lookups_with_substr(self):
+        a = Author.objects.create(name='John Smith', alias='Johx')
+        b = Author.objects.create(name='Rhonda Simpson', alias='sonx')
+        tests = (
+            ('startswith', [a]),
+            ('istartswith', [a]),
+            ('contains', [a, b]),
+            ('icontains', [a, b]),
+            ('endswith', [b]),
+            ('iendswith', [b]),
+        )
+        for lookup, result in tests:
+            with self.subTest(lookup=lookup):
+                authors = Author.objects.filter(**{'name__%s' % lookup: Substr('alias', 1, 3)})
+                self.assertCountEqual(authors, result)
+
+    def test_custom_lookup_none_rhs(self):
+        """Lookup.can_use_none_as_rhs=True allows None as a lookup value."""
+        season = Season.objects.create(year=2012, nulled_text_field=None)
+        query = Season.objects.get_queryset().query
+        field = query.model._meta.get_field('nulled_text_field')
+        self.assertIsInstance(query.build_lookup(['isnull_none_rhs'], field, None), IsNullWithNoneAsRHS)
+        self.assertTrue(Season.objects.filter(pk=season.pk, nulled_text_field__isnull_none_rhs=True))

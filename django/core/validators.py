@@ -1,7 +1,6 @@
 import ipaddress
-import os
 import re
-from contextlib import suppress
+from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
 from django.core.exceptions import ValidationError
@@ -55,7 +54,7 @@ class RegexValidator:
         Validate that the input contains (or does *not* contain, if
         inverse_match is True) a match for the regular expression.
         """
-        regex_matches = bool(self.regex.search(str(value)))
+        regex_matches = self.regex.search(str(value))
         invalid_input = regex_matches if self.inverse_match else not regex_matches
         if invalid_input:
             raise ValidationError(self.message, code=self.code)
@@ -215,9 +214,11 @@ class EmailValidator:
         literal_match = self.literal_regex.match(domain_part)
         if literal_match:
             ip_address = literal_match.group(1)
-            with suppress(ValidationError):
+            try:
                 validate_ipv46_address(ip_address)
                 return True
+            except ValidationError:
+                pass
         return False
 
     def __eq__(self, other):
@@ -390,6 +391,7 @@ class DecimalValidator:
     expected, otherwise raise ValidationError.
     """
     messages = {
+        'invalid': _('Enter a number.'),
         'max_digits': ngettext_lazy(
             'Ensure that there are no more than %(max)s digit in total.',
             'Ensure that there are no more than %(max)s digits in total.',
@@ -413,15 +415,23 @@ class DecimalValidator:
 
     def __call__(self, value):
         digit_tuple, exponent = value.as_tuple()[1:]
-        decimals = abs(exponent)
-        # digit_tuple doesn't include any leading zeros.
-        digits = len(digit_tuple)
-        if decimals > digits:
-            # We have leading zeros up to or past the decimal point. Count
-            # everything past the decimal point as a digit. We do not count
-            # 0 before the decimal point as a digit since that would mean
-            # we would not allow max_digits = decimal_places.
-            digits = decimals
+        if exponent in {'F', 'n', 'N'}:
+            raise ValidationError(self.messages['invalid'])
+        if exponent >= 0:
+            # A positive exponent adds that many trailing zeros.
+            digits = len(digit_tuple) + exponent
+            decimals = 0
+        else:
+            # If the absolute value of the negative exponent is larger than the
+            # number of digits, then it's the same as the number of digits,
+            # because it'll consume all of the digits in digit_tuple and then
+            # add abs(exponent) - len(digit_tuple) leading zeros after the
+            # decimal point.
+            if abs(exponent) > len(digit_tuple):
+                digits = decimals = abs(exponent)
+            else:
+                digits = len(digit_tuple)
+                decimals = abs(exponent)
         whole_digits = digits - decimals
 
         if self.max_digits is not None and digits > self.max_digits:
@@ -470,7 +480,7 @@ class FileExtensionValidator:
             self.code = code
 
     def __call__(self, value):
-        extension = os.path.splitext(value.name)[1][1:].lower()
+        extension = Path(value.name).suffix[1:].lower()
         if self.allowed_extensions is not None and extension not in self.allowed_extensions:
             raise ValidationError(
                 self.message,
@@ -500,6 +510,29 @@ def get_available_image_extensions():
         return [ext.lower()[1:] for ext in Image.EXTENSION]
 
 
-validate_image_file_extension = FileExtensionValidator(
-    allowed_extensions=get_available_image_extensions(),
-)
+def validate_image_file_extension(value):
+    return FileExtensionValidator(allowed_extensions=get_available_image_extensions())(value)
+
+
+@deconstructible
+class ProhibitNullCharactersValidator:
+    """Validate that the string doesn't contain the null character."""
+    message = _('Null characters are not allowed.')
+    code = 'null_characters_not_allowed'
+
+    def __init__(self, message=None, code=None):
+        if message is not None:
+            self.message = message
+        if code is not None:
+            self.code = code
+
+    def __call__(self, value):
+        if '\x00' in str(value):
+            raise ValidationError(self.message, code=self.code)
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, self.__class__) and
+            self.message == other.message and
+            self.code == other.code
+        )

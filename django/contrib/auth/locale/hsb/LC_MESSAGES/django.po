@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-06-12 16:34+0000\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-09-27 20:07+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Upper Sorbian (http://www.transifex.com/django/django/"
 "language/hsb/)\n"
@@ -67,12 +67,10 @@ msgstr "Zapodajće samsne hesło kaž do toho, za přepruwowanje."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Hrube hesła so njeskładuja, tohodla njeje móžnosć, hesło tutoho wužiwarja "
-"widźeć, ale móžeće hesło z pomocu <a href=\"../password/\">tutoho formulara</"
-"a> změnić."
+"Hrube hesła so njeskładuja, tohodla njeje móžno, hesło wužiwarja widźeć, ale "
+"móžeće hesło z pomocu <a href=\"{}\">tutoho formulara</a> změnić."
 
 #, python-format
 msgid ""

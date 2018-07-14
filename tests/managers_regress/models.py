@@ -119,7 +119,7 @@ class Child7(Parent):
 # RelatedManagers
 class RelatedModel(models.Model):
     test_gfk = GenericRelation('RelationModel', content_type_field='gfk_ctype', object_id_field='gfk_id')
-    exact = models.NullBooleanField()
+    exact = models.BooleanField(null=True)
 
     def __str__(self):
         return str(self.pk)

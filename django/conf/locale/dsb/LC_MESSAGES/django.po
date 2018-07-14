@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-02-08 20:42+0000\n"
+"POT-Creation-Date: 2017-12-01 21:10+0100\n"
+"PO-Revision-Date: 2017-12-09 18:46+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Lower Sorbian (http://www.transifex.com/django/django/"
 "language/dsb/)\n"
@@ -158,6 +158,9 @@ msgstr "Japańšćina"
 
 msgid "Georgian"
 msgstr "Georgišćina"
+
+msgid "Kabyle"
+msgstr "Kabylšćina"
 
 msgid "Kazakh"
 msgstr "Kazachšćina"
@@ -315,6 +318,7 @@ msgstr "Zapódajśo płaśiwu cełu licbu."
 msgid "Enter a valid email address."
 msgstr "Zapódajśo płaśiwu e-mailowu adresu."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -427,6 +431,9 @@ msgid ""
 msgstr ""
 "Datajowy sufiks ' %(extension)s' njejo dowólony. Dowólone sufikse su: ' "
 "%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
+msgstr "Znamuška nul njejsu dowólone."
 
 msgid "and"
 msgstr "a"
@@ -772,10 +779,8 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Pšosym korigěrujśo slědujuce dwójne gódnoty."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr ""
-"Nutśkowny cuzy kluc njejo primarnemu klucoju nadrědowaneje instance "
-"wótpowědował."
+msgid "The inline value did not match the parent instance."
+msgstr "Gódnota inline nadrědowanej instance njewótpowědujo."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
@@ -783,8 +788,8 @@ msgstr ""
 "wóleńskich móžnosćow."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" njejo płaśiwa gódnota za primarny kluc."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "\"%(pk)s\" njejo płaśiwa gódnota."
 
 #, python-format
 msgid ""
@@ -1164,6 +1169,19 @@ msgstr ""
 "HTTPS-zwiski abo za napšašowanja 'same-origin'."
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+"Jolic woznamjenje <meta name=\"referrer\" content=\"no-referrer\"> wužywaśo "
+"abo głowu 'Referrer-Policy: no-referrer' zapśimujośo, wótwónoźćo je. CSRF-"
+"šćit pomina se głowu 'Referer', aby striktnu kontrolu referera pśewjasć. "
+"Jolic se wó swóju priwatnosć staraśo, wužywajśo alternatiwy ako <a rel="
+"\"noreferrer\" ...> za wótkazy k sedłam tśeśich."
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1183,31 +1201,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "Dalšne informacije su k dispoziciji  z DEBUG=True."
 
-msgid "Welcome to Django"
-msgstr "Witajśo k Django"
-
-msgid "It worked!"
-msgstr "Jo funkcioněrowało!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Glukužycenje za waš prědny bok, kótaryž spěchujo se wót Django."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-"Wuwjeźćo ako pśiduce <code>python manage.py startapp [app_label]</code>, aby "
-"swójo prědne nałoženje startował."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Wiźiśo toś tu powěźeńku, dokulaž maśo <code>DEBUG = True</code> w swójej "
-"dataji nastajenjow Django a njejsćo URL konfigurěrował. Dajśo se na źěło!"
-
 msgid "No year specified"
 msgstr "Žedno lěto pódane"
+
+msgid "Date out of range"
+msgstr "Datum zwenka wobcerka"
 
 msgid "No month specified"
 msgstr "Žeden mjasec pódany"
@@ -1260,3 +1258,48 @@ msgstr "\"%(path)s\" njeeksistěrujo"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Indeks %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django? Web-framework za perfekcionisty z terminami."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"<a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" target="
+"\"_blank\" rel=\"noopener\">Wersijowe informacije</a> za Django %(version)s "
+"pokazaś"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Instalacija jo była wuspěšna! Gratulacija!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"Wiźiśo toś ten bok, dokulaž <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> jo w swójej dataji nastajenjow a njejsćo konfigurěrował "
+"URL."
+
+msgid "Django Documentation"
+msgstr "Dokumentacija Django"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr "Temy, reference a rozpokazanja"
+
+msgid "Tutorial: A Polling App"
+msgstr "Rozpokazanje: Napšašowańske nałoženje"
+
+msgid "Get started with Django"
+msgstr "Prědne kšace z Django"
+
+msgid "Django Community"
+msgstr "Zgromaźeństwo Django"
+
+msgid "Connect, get help, or contribute"
+msgstr "Zwězajśo, wobsarajśo se pomoc abo źěłajśo sobu"

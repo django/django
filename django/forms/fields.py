@@ -4,11 +4,10 @@ Field classes.
 
 import copy
 import datetime
-import itertools
+import math
 import os
 import re
 import uuid
-from contextlib import suppress
 from decimal import Decimal, DecimalException
 from io import BytesIO
 from urllib.parse import urlsplit, urlunsplit
@@ -21,7 +20,7 @@ from django.forms.boundfield import BoundField
 from django.forms.utils import from_current_timezone, to_current_timezone
 from django.forms.widgets import (
     FILE_INPUT_CONTRADICTION, CheckboxInput, ClearableFileInput, DateInput,
-    DateTimeInput, EmailInput, HiddenInput, MultipleHiddenInput,
+    DateTimeInput, EmailInput, FileInput, HiddenInput, MultipleHiddenInput,
     NullBooleanSelect, NumberInput, Select, SelectMultiple,
     SplitDateTimeWidget, SplitHiddenDateTimeWidget, TextInput, TimeInput,
     URLInput,
@@ -112,7 +111,7 @@ class Field:
         messages.update(error_messages or {})
         self.error_messages = messages
 
-        self.validators = list(itertools.chain(self.default_validators, validators))
+        self.validators = [*self.default_validators, *validators]
 
         super().__init__()
 
@@ -216,14 +215,16 @@ class CharField(Field):
             self.validators.append(validators.MinLengthValidator(int(min_length)))
         if max_length is not None:
             self.validators.append(validators.MaxLengthValidator(int(max_length)))
+        self.validators.append(validators.ProhibitNullCharactersValidator())
 
     def to_python(self, value):
         """Return a string."""
+        if value not in self.empty_values:
+            value = str(value)
+            if self.strip:
+                value = value.strip()
         if value in self.empty_values:
             return self.empty_value
-        value = str(value)
-        if self.strip:
-            value = value.strip()
         return value
 
     def widget_attrs(self, widget):
@@ -306,12 +307,10 @@ class FloatField(IntegerField):
 
     def validate(self, value):
         super().validate(value)
-
-        # Check for NaN (which is the only thing not equal to itself) and +/- infinity
-        if value != value or value in (Decimal('Inf'), Decimal('-Inf')):
+        if value in self.empty_values:
+            return
+        if not math.isfinite(value):
             raise ValidationError(self.error_messages['invalid'], code='invalid')
-
-        return value
 
     def widget_attrs(self, widget):
         attrs = super().widget_attrs(widget)
@@ -352,10 +351,7 @@ class DecimalField(IntegerField):
         super().validate(value)
         if value in self.empty_values:
             return
-        # Check for NaN, Inf and -Inf values. We can't compare directly for NaN,
-        # since it is never equal to itself. However, NaN is the only value that
-        # isn't equal to itself, so we can use this to identify NaN
-        if value != value or value == Decimal("Inf") or value == Decimal("-Inf"):
+        if not value.is_finite():
             raise ValidationError(self.error_messages['invalid'], code='invalid')
 
     def widget_attrs(self, widget):
@@ -364,7 +360,7 @@ class DecimalField(IntegerField):
             if self.decimal_places is not None:
                 # Use exponential notation for small values since they might
                 # be parsed as 0 otherwise. ref #20765
-                step = str(Decimal('1') / 10 ** self.decimal_places).lower()
+                step = str(Decimal(1).scaleb(-self.decimal_places)).lower()
             else:
                 step = 'any'
             attrs.setdefault('step', step)
@@ -472,6 +468,12 @@ class DateTimeField(BaseTemporalField):
 class DurationField(Field):
     default_error_messages = {
         'invalid': _('Enter a valid duration.'),
+        'overflow': _(
+            'The number of days must be between {min_days} and {max_days}.'.format(
+                min_days=datetime.timedelta.min.days,
+                max_days=datetime.timedelta.max.days,
+            )
+        )
     }
 
     def prepare_value(self, value):
@@ -484,7 +486,10 @@ class DurationField(Field):
             return None
         if isinstance(value, datetime.timedelta):
             return value
-        value = parse_duration(str(value))
+        try:
+            value = parse_duration(str(value))
+        except OverflowError:
+            raise ValidationError(self.error_messages['overflow'], code='overflow')
         if value is None:
             raise ValidationError(self.error_messages['invalid'], code='invalid')
         return value
@@ -586,11 +591,7 @@ class FileField(Field):
         return data
 
     def has_changed(self, initial, data):
-        if self.disabled:
-            return False
-        if data is None:
-            return False
-        return True
+        return not self.disabled and data is not None
 
 
 class ImageField(FileField):
@@ -644,6 +645,12 @@ class ImageField(FileField):
         if hasattr(f, 'seek') and callable(f.seek):
             f.seek(0)
         return f
+
+    def widget_attrs(self, widget):
+        attrs = super().widget_attrs(widget)
+        if isinstance(widget, FileInput) and 'accept' not in widget.attrs:
+            attrs.setdefault('accept', 'image/*')
+        return attrs
 
 
 class URLField(CharField):
@@ -969,6 +976,8 @@ class MultiValueField(Field):
         for f in fields:
             f.error_messages.setdefault('incomplete',
                                         self.error_messages['incomplete'])
+            if self.disabled:
+                f.disabled = True
             if self.require_all_fields:
                 # Set 'required' to False on the individual fields, because the
                 # required validation will be handled by MultiValueField, not
@@ -995,6 +1004,8 @@ class MultiValueField(Field):
         """
         clean_data = []
         errors = []
+        if self.disabled and not isinstance(value, list):
+            value = self.widget.decompress(value)
         if not value or isinstance(value, (list, tuple)):
             if not value or not [v for v in value if v not in self.empty_values]:
                 if self.required:
@@ -1083,19 +1094,19 @@ class FilePathField(ChoiceField):
         if recursive:
             for root, dirs, files in sorted(os.walk(self.path)):
                 if self.allow_files:
-                    for f in files:
+                    for f in sorted(files):
                         if self.match is None or self.match_re.search(f):
                             f = os.path.join(root, f)
                             self.choices.append((f, f.replace(path, "", 1)))
                 if self.allow_folders:
-                    for f in dirs:
+                    for f in sorted(dirs):
                         if f == '__pycache__':
                             continue
                         if self.match is None or self.match_re.search(f):
                             f = os.path.join(root, f)
                             self.choices.append((f, f.replace(path, "", 1)))
         else:
-            with suppress(OSError):
+            try:
                 for f in sorted(os.listdir(self.path)):
                     if f == '__pycache__':
                         continue
@@ -1104,6 +1115,8 @@ class FilePathField(ChoiceField):
                             (self.allow_folders and os.path.isdir(full_file))) and
                             (self.match is None or self.match_re.search(f))):
                         self.choices.append((full_file, f))
+            except OSError:
+                pass
 
         self.widget.choices = self.choices
 

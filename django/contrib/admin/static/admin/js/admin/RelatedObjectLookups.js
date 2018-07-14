@@ -58,7 +58,7 @@
 
     function updateRelatedObjectLinks(triggeringLink) {
         var $this = $(triggeringLink);
-        var siblings = $this.nextAll('.change-related, .delete-related');
+        var siblings = $this.nextAll('.view-related, .change-related, .delete-related');
         if (!siblings.length) {
             return;
         }
@@ -108,6 +108,12 @@
                 this.value = newId;
             }
         });
+        selects.next().find('.select2-selection__rendered').each(function() {
+            // The element can have a clear button as a child.
+            // Use the lastChild to modify only the displayed value.
+            this.lastChild.textContent = newRepr;
+            this.title = newRepr;
+        });
         win.close();
     }
 
@@ -140,7 +146,7 @@
     window.dismissAddAnotherPopup = dismissAddRelatedObjectPopup;
 
     $(document).ready(function() {
-        $("a[data-popup-opener]").click(function(event) {
+        $("a[data-popup-opener]").on('click', function(event) {
             event.preventDefault();
             opener.dismissRelatedLookupPopup(window, $(this).data("popup-opener"));
         });

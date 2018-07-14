@@ -43,7 +43,8 @@ class FilterSyntaxTests(SimpleTestCase):
         """
         Raise TemplateSyntaxError for a nonexistent filter
         """
-        with self.assertRaises(TemplateSyntaxError):
+        msg = "Invalid filter: 'does_not_exist'"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.get_template('filter-syntax05')
 
     @setup({'filter-syntax06': '{{ var|fil(ter) }}'})
@@ -52,7 +53,7 @@ class FilterSyntaxTests(SimpleTestCase):
         Raise TemplateSyntaxError when trying to access a filter containing
         an illegal character
         """
-        with self.assertRaises(TemplateSyntaxError):
+        with self.assertRaisesMessage(TemplateSyntaxError, "Invalid filter: 'fil'"):
             self.engine.get_template('filter-syntax06')
 
     @setup({'filter-syntax07': "{% nothing_to_see_here %}"})
@@ -60,7 +61,11 @@ class FilterSyntaxTests(SimpleTestCase):
         """
         Raise TemplateSyntaxError for invalid block tags
         """
-        with self.assertRaises(TemplateSyntaxError):
+        msg = (
+            "Invalid block tag on line 1: 'nothing_to_see_here'. Did you "
+            "forget to register or load this tag?"
+        )
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.get_template('filter-syntax07')
 
     @setup({'filter-syntax08': "{% %}"})

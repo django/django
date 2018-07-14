@@ -3,17 +3,23 @@ from django.contrib.admin import BooleanFieldListFilter, SimpleListFilter
 from django.contrib.admin.options import VERTICAL, ModelAdmin, TabularInline
 from django.contrib.admin.sites import AdminSite
 from django.core.checks import Error
+from django.db.models import F
+from django.db.models.functions import Upper
 from django.forms.models import BaseModelFormSet
 from django.test import SimpleTestCase
 
-from .models import Band, ValidationTestInlineModel, ValidationTestModel
+from .models import (
+    Band, Song, User, ValidationTestInlineModel, ValidationTestModel,
+)
 
 
 class CheckTestCase(SimpleTestCase):
 
-    def assertIsInvalid(self, model_admin, model, msg, id=None, hint=None, invalid_obj=None):
+    def assertIsInvalid(self, model_admin, model, msg, id=None, hint=None, invalid_obj=None, admin_site=None):
+        if admin_site is None:
+            admin_site = AdminSite()
         invalid_obj = invalid_obj or model_admin
-        admin_obj = model_admin(model, AdminSite())
+        admin_obj = model_admin(model, admin_site)
         self.assertEqual(admin_obj.check(), [Error(msg, hint=hint, obj=invalid_obj, id=id)])
 
     def assertIsInvalidRegexp(self, model_admin, model, msg, id=None, hint=None, invalid_obj=None):
@@ -30,8 +36,10 @@ class CheckTestCase(SimpleTestCase):
         self.assertEqual(error.id, id)
         self.assertRegex(error.msg, msg)
 
-    def assertIsValid(self, model_admin, model):
-        admin_obj = model_admin(model, AdminSite())
+    def assertIsValid(self, model_admin, model, admin_site=None):
+        if admin_site is None:
+            admin_site = AdminSite()
+        admin_obj = model_admin(model, admin_site)
         self.assertEqual(admin_obj.check(), [])
 
 
@@ -157,6 +165,19 @@ class FieldsetsCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin, ValidationTestModel,
             "There are duplicate field(s) in 'fieldsets[0][1]'.",
+            'admin.E012'
+        )
+
+    def test_duplicate_fields_in_fieldsets(self):
+        class TestModelAdmin(ModelAdmin):
+            fieldsets = [
+                (None, {'fields': ['name']}),
+                (None, {'fields': ['name']}),
+            ]
+
+        self.assertIsInvalid(
+            TestModelAdmin, ValidationTestModel,
+            "There are duplicate field(s) in 'fieldsets[1][1]'.",
             'admin.E012'
         )
 
@@ -598,7 +619,8 @@ class ListFilterTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin, ValidationTestModel,
             "The value of 'list_filter[0]' must inherit from 'ListFilter'.",
-            'admin.E113')
+            'admin.E113'
+        )
 
     def test_not_filter_again(self):
         class RandomClass:
@@ -619,7 +641,7 @@ class ListFilterTests(CheckTestCase):
                 return 'awesomeness'
 
             def get_choices(self, request):
-                return (('bit', 'A bit awesome'), ('very', 'Very awesome'), )
+                return (('bit', 'A bit awesome'), ('very', 'Very awesome'))
 
             def get_queryset(self, cl, qs):
                 return qs
@@ -649,7 +671,7 @@ class ListFilterTests(CheckTestCase):
                 return 'awesomeness'
 
             def get_choices(self, request):
-                return (('bit', 'A bit awesome'), ('very', 'Very awesome'), )
+                return (('bit', 'A bit awesome'), ('very', 'Very awesome'))
 
             def get_queryset(self, cl, qs):
                 return qs
@@ -809,6 +831,23 @@ class OrderingCheckTests(CheckTestCase):
 
         self.assertIsValid(TestModelAdmin, ValidationTestModel)
 
+    def test_invalid_expression(self):
+        class TestModelAdmin(ModelAdmin):
+            ordering = (F('nonexistent'), )
+
+        self.assertIsInvalid(
+            TestModelAdmin, ValidationTestModel,
+            "The value of 'ordering[0]' refers to 'nonexistent', which is not "
+            "an attribute of 'modeladmin.ValidationTestModel'.",
+            'admin.E033'
+        )
+
+    def test_valid_expression(self):
+        class TestModelAdmin(ModelAdmin):
+            ordering = (Upper('name'), Upper('band__name').desc())
+
+        self.assertIsValid(TestModelAdmin, ValidationTestModel)
+
 
 class ListSelectRelatedCheckTests(CheckTestCase):
 
@@ -902,7 +941,8 @@ class InlinesCheckTests(CheckTestCase):
         self.assertIsInvalidRegexp(
             TestModelAdmin, ValidationTestModel,
             r"'.*\.ValidationTestInline' must have a 'model' attribute\.",
-            'admin.E105')
+            'admin.E105'
+        )
 
     def test_invalid_model_type(self):
         class SomethingBad:
@@ -1152,4 +1192,120 @@ class ListDisplayEditableTests(CheckTestCase):
             "The value of 'name' cannot be in both 'list_editable' and "
             "'list_display_links'.",
             id='admin.E123',
+        )
+
+
+class AutocompleteFieldsTests(CheckTestCase):
+    def test_autocomplete_e036(self):
+        class Admin(ModelAdmin):
+            autocomplete_fields = 'name'
+
+        self.assertIsInvalid(
+            Admin, Band,
+            msg="The value of 'autocomplete_fields' must be a list or tuple.",
+            id='admin.E036',
+            invalid_obj=Admin,
+        )
+
+    def test_autocomplete_e037(self):
+        class Admin(ModelAdmin):
+            autocomplete_fields = ('nonexistent',)
+
+        self.assertIsInvalid(
+            Admin, ValidationTestModel,
+            msg=(
+                "The value of 'autocomplete_fields[0]' refers to 'nonexistent', "
+                "which is not an attribute of 'modeladmin.ValidationTestModel'."
+            ),
+            id='admin.E037',
+            invalid_obj=Admin,
+        )
+
+    def test_autocomplete_e38(self):
+        class Admin(ModelAdmin):
+            autocomplete_fields = ('name',)
+
+        self.assertIsInvalid(
+            Admin, ValidationTestModel,
+            msg=(
+                "The value of 'autocomplete_fields[0]' must be a foreign "
+                "key or a many-to-many field."
+            ),
+            id='admin.E038',
+            invalid_obj=Admin,
+        )
+
+    def test_autocomplete_e039(self):
+        class Admin(ModelAdmin):
+            autocomplete_fields = ('band',)
+
+        self.assertIsInvalid(
+            Admin, Song,
+            msg=(
+                'An admin for model "Band" has to be registered '
+                'to be referenced by Admin.autocomplete_fields.'
+            ),
+            id='admin.E039',
+            invalid_obj=Admin,
+        )
+
+    def test_autocomplete_e040(self):
+        class NoSearchFieldsAdmin(ModelAdmin):
+            pass
+
+        class AutocompleteAdmin(ModelAdmin):
+            autocomplete_fields = ('featuring',)
+
+        site = AdminSite()
+        site.register(Band, NoSearchFieldsAdmin)
+        self.assertIsInvalid(
+            AutocompleteAdmin, Song,
+            msg=(
+                'NoSearchFieldsAdmin must define "search_fields", because '
+                'it\'s referenced by AutocompleteAdmin.autocomplete_fields.'
+            ),
+            id='admin.E040',
+            invalid_obj=AutocompleteAdmin,
+            admin_site=site,
+        )
+
+    def test_autocomplete_is_valid(self):
+        class SearchFieldsAdmin(ModelAdmin):
+            search_fields = 'name'
+
+        class AutocompleteAdmin(ModelAdmin):
+            autocomplete_fields = ('featuring',)
+
+        site = AdminSite()
+        site.register(Band, SearchFieldsAdmin)
+        self.assertIsValid(AutocompleteAdmin, Song, admin_site=site)
+
+    def test_autocomplete_is_onetoone(self):
+        class UserAdmin(ModelAdmin):
+            search_fields = ('name',)
+
+        class Admin(ModelAdmin):
+            autocomplete_fields = ('best_friend',)
+
+        site = AdminSite()
+        site.register(User, UserAdmin)
+        self.assertIsValid(Admin, ValidationTestModel, admin_site=site)
+
+
+class ActionsCheckTests(CheckTestCase):
+
+    def test_custom_permissions_require_matching_has_method(self):
+        def custom_permission_action(modeladmin, request, queryset):
+            pass
+
+        custom_permission_action.allowed_permissions = ('custom',)
+
+        class BandAdmin(ModelAdmin):
+            actions = (custom_permission_action,)
+
+        self.assertIsInvalid(
+            BandAdmin, Band,
+            'BandAdmin must define a has_custom_permission() method for the '
+            'custom_permission_action action.',
+            id='admin.E129',
         )

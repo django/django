@@ -1,5 +1,4 @@
 import string
-from contextlib import suppress
 
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
@@ -108,11 +107,14 @@ def clear_site_cache(sender, **kwargs):
     """
     instance = kwargs['instance']
     using = kwargs['using']
-    with suppress(KeyError):
+    try:
         del SITE_CACHE[instance.pk]
-
-    with suppress(KeyError, Site.DoesNotExist):
+    except KeyError:
+        pass
+    try:
         del SITE_CACHE[Site.objects.using(using).get(pk=instance.pk).domain]
+    except (KeyError, Site.DoesNotExist):
+        pass
 
 
 pre_save.connect(clear_site_cache, sender=Site)

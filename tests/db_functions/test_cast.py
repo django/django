@@ -1,7 +1,14 @@
-from django.db import models
+import datetime
+import decimal
+import unittest
+
+from django.db import connection, models
+from django.db.models import Avg
 from django.db.models.expressions import Value
 from django.db.models.functions import Cast
-from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
+from django.test import (
+    TestCase, ignore_warnings, override_settings, skipUnlessDBFeature,
+)
 
 from .models import Author
 
@@ -42,6 +49,31 @@ class CastTests(TestCase):
                 numbers = Author.objects.annotate(cast_int=Cast('alias', field_class()))
                 self.assertEqual(numbers.get().cast_int, 1)
 
+    def test_cast_from_python_to_date(self):
+        today = datetime.date.today()
+        dates = Author.objects.annotate(cast_date=Cast(today, models.DateField()))
+        self.assertEqual(dates.get().cast_date, today)
+
+    def test_cast_from_python_to_datetime(self):
+        now = datetime.datetime.now()
+        dates = Author.objects.annotate(cast_datetime=Cast(now, models.DateTimeField()))
+        self.assertEqual(dates.get().cast_datetime, now)
+
     def test_cast_from_python(self):
-        numbers = Author.objects.annotate(cast_float=Cast(0, models.FloatField()))
-        self.assertEqual(numbers.get().cast_float, 0.0)
+        numbers = Author.objects.annotate(cast_float=Cast(decimal.Decimal(0.125), models.FloatField()))
+        cast_float = numbers.get().cast_float
+        self.assertIsInstance(cast_float, float)
+        self.assertEqual(cast_float, 0.125)
+
+    @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL test')
+    @override_settings(DEBUG=True)
+    def test_expression_wrapped_with_parentheses_on_postgresql(self):
+        """
+        The SQL for the Cast expression is wrapped with parentheses in case
+        it's a complex expression.
+        """
+        list(Author.objects.annotate(cast_float=Cast(Avg('age'), models.FloatField())))
+        self.assertIn('(AVG("db_functions_author"."age"))::double precision', connection.queries[-1]['sql'])
+
+    def test_cast_to_text_field(self):
+        self.assertEqual(Author.objects.values_list(Cast('age', models.TextField()), flat=True).get(), '1')

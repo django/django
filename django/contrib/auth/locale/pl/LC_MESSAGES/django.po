@@ -6,7 +6,7 @@
 # Janusz Harkot <jh@blueice.pl>, 2015
 # Karol <kfuks2@o2.pl>, 2012
 # m_aciek <maciej.olko@gmail.com>, 2014
-# m_aciek <maciej.olko@gmail.com>, 2016
+# m_aciek <maciej.olko@gmail.com>, 2016-2017
 # m_aciek <maciej.olko@gmail.com>, 2014-2015
 # muszalski <m.muszalski@gmail.com>, 2016
 # p <inactive+poczciwiec@transifex.com>, 2014
@@ -17,16 +17,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-11-11 22:31+0000\n"
-"Last-Translator: Tomasz Kajtoch <tomekkaj@tomekkaj.pl>\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-09-25 18:09+0000\n"
+"Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pl\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n"
-"%100<12 || n%100>=14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n"
+"%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n"
 "%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
 
 msgid "Personal info"
@@ -80,12 +80,11 @@ msgstr "Wprowadź to samo hasło ponownie, dla weryfikacji."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Czyste hasła nie są zapisywane, więc nie ma możliwości, aby zobaczyć hasło "
-"tego użytkownika, ale możesz je zmienić używając <a href=\"../password/"
-"\">tego formularza</a>."
+"Nie przechowujemy surowych haseł, więc nie da się zobaczyć hasła tego "
+"użytkownika. Możesz jednak zmienić to hasło używając <a href=\"{}\">tego "
+"formularza</a>."
 
 #, python-format
 msgid ""

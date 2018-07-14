@@ -2,13 +2,13 @@
 #
 # Translators:
 # Tomáš Ehrlich <tomas.ehrlich@gmail.com>, 2015
-# Vláďa Macek <macek@sandbox.cz>, 2015-2017
+# Vláďa Macek <macek@sandbox.cz>, 2015-2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-02-21 09:48+0000\n"
+"PO-Revision-Date: 2018-02-14 11:44+0000\n"
 "Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -18,11 +18,11 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
 msgid "PostgreSQL extensions"
-msgstr "PostgreSQL rozšíření"
+msgstr "Rozšíření pro PostgreSQL"
 
 #, python-format
 msgid "Item %(nth)s in the array did not validate: "
-msgstr "%(nth)s. položka pole je neplatná:"
+msgstr "Položka s indexem %(nth)s v seznamu je neplatná: "
 
 msgid "Nested arrays must have the same length."
 msgstr "Vnořená pole musejí mít stejnou délku."
@@ -54,7 +54,7 @@ msgid "Enter two valid values."
 msgstr "Zadejte dvě platné hodnoty."
 
 msgid "The start of the range must not exceed the end of the range."
-msgstr "Počáteční hodnota rozsahu nesmí být vyšší než koncová hodnota."
+msgstr "Počáteční hodnota rozsahu nemůže být vyšší než koncová hodnota."
 
 msgid "Enter two whole numbers."
 msgstr "Zadejte dvě celá čísla."
@@ -63,7 +63,7 @@ msgid "Enter two numbers."
 msgstr "Zadejte dvě čísla."
 
 msgid "Enter two valid date/times."
-msgstr "Zadejte dvě platné hodnoty data a času."
+msgstr "Zadejte dvě platné hodnoty data nebo času."
 
 msgid "Enter two valid dates."
 msgstr "Zadejte dvě platná data."

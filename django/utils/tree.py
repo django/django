@@ -64,11 +64,14 @@ class Node:
         return other in self.children
 
     def __eq__(self, other):
-        if self.__class__ != other.__class__:
-            return False
-        if (self.connector, self.negated) == (other.connector, other.negated):
-            return self.children == other.children
-        return False
+        return (
+            self.__class__ == other.__class__ and
+            (self.connector, self.negated) == (other.connector, other.negated) and
+            self.children == other.children
+        )
+
+    def __hash__(self):
+        return hash((self.__class__, self.connector, self.negated) + tuple(self.children))
 
     def add(self, data, conn_type, squash=True):
         """

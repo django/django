@@ -58,7 +58,8 @@ class CustomManagerTests(TestCase):
                 # Methods with queryset_only=False are copied even if they are private.
                 manager._optin_private_method()
                 # Methods with queryset_only=True aren't copied even if they are public.
-                with self.assertRaises(AttributeError):
+                msg = "%r object has no attribute 'optout_public_method'" % manager.__class__.__name__
+                with self.assertRaisesMessage(AttributeError, msg):
                     manager.optout_public_method()
 
     def test_manager_use_queryset_methods(self):
@@ -93,7 +94,8 @@ class CustomManagerTests(TestCase):
         querysets.
         """
         Person.custom_queryset_custom_manager.manager_only()
-        with self.assertRaises(AttributeError):
+        msg = "'CustomQuerySet' object has no attribute 'manager_only'"
+        with self.assertRaisesMessage(AttributeError, msg):
             Person.custom_queryset_custom_manager.all().manager_only()
 
     def test_queryset_and_manager(self):
@@ -116,7 +118,8 @@ class CustomManagerTests(TestCase):
         The default manager, "objects", doesn't exist, because a custom one
         was provided.
         """
-        with self.assertRaises(AttributeError):
+        msg = "type object 'Book' has no attribute 'objects'"
+        with self.assertRaisesMessage(AttributeError, msg):
             Book.objects
 
     def test_filtering(self):
@@ -603,6 +606,32 @@ class CustomManagersRegressTestCase(TestCase):
         # If the hidden object wasn't seen during the save process,
         # there would now be two objects in the database.
         self.assertEqual(RestrictedModel.plain_manager.count(), 1)
+
+    def test_refresh_from_db_when_default_manager_filters(self):
+        """
+        Model.refresh_from_db() works for instances hidden by the default
+        manager.
+        """
+        book = Book._base_manager.create(is_published=False)
+        Book._base_manager.filter(pk=book.pk).update(title='Hi')
+        book.refresh_from_db()
+        self.assertEqual(book.title, 'Hi')
+
+    def test_save_clears_annotations_from_base_manager(self):
+        """Model.save() clears annotations from the base manager."""
+        self.assertEqual(Book._meta.base_manager.name, 'annotated_objects')
+        book = Book.annotated_objects.create(title='Hunting')
+        Person.objects.create(
+            first_name='Bugs', last_name='Bunny', fun=True,
+            favorite_book=book, favorite_thing_id=1,
+        )
+        book = Book.annotated_objects.first()
+        self.assertEqual(book.favorite_avg, 1)  # Annotation from the manager.
+        book.title = 'New Hunting'
+        # save() fails if annotations that involve related fields aren't
+        # cleared before the update query.
+        book.save()
+        self.assertEqual(Book.annotated_objects.first().title, 'New Hunting')
 
     def test_delete_related_on_filtered_manager(self):
         """Deleting related objects should also not be distracted by a

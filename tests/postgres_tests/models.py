@@ -41,7 +41,7 @@ class PostgreSQLModel(models.Model):
 
 
 class IntegerArrayModel(PostgreSQLModel):
-    field = ArrayField(models.IntegerField(), default=[], blank=True)
+    field = ArrayField(models.IntegerField(), default=list, blank=True)
 
 
 class NullableIntegerArrayModel(PostgreSQLModel):
@@ -140,12 +140,9 @@ class RangeLookupsModel(PostgreSQLModel):
     date = models.DateField(blank=True, null=True)
 
 
-class JSONModel(models.Model):
+class JSONModel(PostgreSQLModel):
     field = JSONField(blank=True, null=True)
     field_custom = JSONField(blank=True, null=True, encoder=DjangoJSONEncoder)
-
-    class Meta:
-        required_db_features = ['has_jsonb_datatype']
 
 
 class ArrayFieldSubclass(ArrayField):
@@ -159,7 +156,7 @@ class AggregateTestModel(models.Model):
     """
     char_field = models.CharField(max_length=30, blank=True)
     integer_field = models.IntegerField(null=True)
-    boolean_field = models.NullBooleanField()
+    boolean_field = models.BooleanField(null=True)
 
 
 class StatTestModel(models.Model):

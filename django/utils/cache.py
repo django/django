@@ -17,25 +17,21 @@ An example: i18n middleware would need to distinguish caches by the
 "Accept-language" header.
 """
 import hashlib
-import logging
 import re
 import time
-import warnings
 
 from django.conf import settings
 from django.core.cache import caches
 from django.http import HttpResponse, HttpResponseNotModified
-from django.utils.deprecation import RemovedInDjango21Warning
-from django.utils.encoding import force_bytes, force_text, iri_to_uri
+from django.utils.encoding import force_bytes, iri_to_uri
 from django.utils.http import (
     http_date, parse_etags, parse_http_date_safe, quote_etag,
 )
+from django.utils.log import log_response
 from django.utils.timezone import get_current_timezone_name
 from django.utils.translation import get_language
 
 cc_delim_re = re.compile(r'\s*,\s*')
-
-logger = logging.getLogger('django.request')
 
 
 def patch_cache_control(response, **kwargs):
@@ -95,11 +91,10 @@ def get_max_age(response):
     if not response.has_header('Cache-Control'):
         return
     cc = dict(_to_tuple(el) for el in cc_delim_re.split(response['Cache-Control']))
-    if 'max-age' in cc:
-        try:
-            return int(cc['max-age'])
-        except (ValueError, TypeError):
-            pass
+    try:
+        return int(cc['max-age'])
+    except (ValueError, TypeError, KeyError):
+        pass
 
 
 def set_response_etag(response):
@@ -109,14 +104,13 @@ def set_response_etag(response):
 
 
 def _precondition_failed(request):
-    logger.warning(
+    response = HttpResponse(status=412)
+    log_response(
         'Precondition Failed: %s', request.path,
-        extra={
-            'status_code': 412,
-            'request': request,
-        },
+        response=response,
+        request=request,
     )
-    return HttpResponse(status=412)
+    return response
 
 
 def _not_modified(request, response=None):
@@ -145,15 +139,13 @@ def get_conditional_response(request, etag=None, last_modified=None, response=No
     # Get HTTP request headers.
     if_match_etags = parse_etags(request.META.get('HTTP_IF_MATCH', ''))
     if_unmodified_since = request.META.get('HTTP_IF_UNMODIFIED_SINCE')
-    if if_unmodified_since:
-        if_unmodified_since = parse_http_date_safe(if_unmodified_since)
+    if_unmodified_since = if_unmodified_since and parse_http_date_safe(if_unmodified_since)
     if_none_match_etags = parse_etags(request.META.get('HTTP_IF_NONE_MATCH', ''))
     if_modified_since = request.META.get('HTTP_IF_MODIFIED_SINCE')
-    if if_modified_since:
-        if_modified_since = parse_http_date_safe(if_modified_since)
+    if_modified_since = if_modified_since and parse_http_date_safe(if_modified_since)
 
     # Step 1 of section 6 of RFC 7232: Test the If-Match precondition.
-    if (if_match_etags and not _if_match_passes(etag, if_match_etags)):
+    if if_match_etags and not _if_match_passes(etag, if_match_etags):
         return _precondition_failed(request)
 
     # Step 2: Test the If-Unmodified-Since precondition.
@@ -162,7 +154,7 @@ def get_conditional_response(request, etag=None, last_modified=None, response=No
         return _precondition_failed(request)
 
     # Step 3: Test the If-None-Match precondition.
-    if (if_none_match_etags and not _if_none_match_passes(etag, if_none_match_etags)):
+    if if_none_match_etags and not _if_none_match_passes(etag, if_none_match_etags):
         if request.method in ('GET', 'HEAD'):
             return _not_modified(request, response)
         else:
@@ -248,18 +240,6 @@ def patch_response_headers(response, cache_timeout=None):
         cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
     if cache_timeout < 0:
         cache_timeout = 0  # Can't have max-age negative
-    if settings.USE_ETAGS and not response.has_header('ETag'):
-        warnings.warn(
-            "The USE_ETAGS setting is deprecated in favor of "
-            "ConditionalGetMiddleware which sets the ETag regardless of the "
-            "setting. patch_response_headers() won't do ETag processing in "
-            "Django 2.1.",
-            RemovedInDjango21Warning
-        )
-        if hasattr(response, 'render') and callable(response.render):
-            response.add_post_render_callback(set_response_etag)
-        else:
-            response = set_response_etag(response)
     if not response.has_header('Expires'):
         response['Expires'] = http_date(time.time() + cache_timeout)
     patch_cache_control(response, max_age=cache_timeout)
@@ -312,12 +292,7 @@ def _i18n_cache_key_suffix(request, cache_key):
         # which in turn can also fall back to settings.LANGUAGE_CODE
         cache_key += '.%s' % getattr(request, 'LANGUAGE_CODE', get_language())
     if settings.USE_TZ:
-        # The datetime module doesn't restrict the output of tzname().
-        # Windows is known to use non-standard, locale-dependent names.
-        # User-defined tzinfo classes may return absolutely anything.
-        # Hence this paranoid conversion to create a valid cache key.
-        tz_name = force_text(get_current_timezone_name(), errors='ignore')
-        cache_key += '.%s' % tz_name.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
+        cache_key += '.%s' % get_current_timezone_name()
     return cache_key
 
 
@@ -393,9 +368,8 @@ def learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cach
         headerlist = []
         for header in cc_delim_re.split(response['Vary']):
             header = header.upper().replace('-', '_')
-            if header == 'ACCEPT_LANGUAGE' and is_accept_language_redundant:
-                continue
-            headerlist.append('HTTP_' + header)
+            if header != 'ACCEPT_LANGUAGE' or not is_accept_language_redundant:
+                headerlist.append('HTTP_' + header)
         headerlist.sort()
         cache.set(cache_key, headerlist, cache_timeout)
         return _generate_cache_key(request, request.method, headerlist, key_prefix)

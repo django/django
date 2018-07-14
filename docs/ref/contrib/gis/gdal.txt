@@ -450,8 +450,6 @@ coordinate transformation::
 
     .. classmethod:: from_gml(gml_string)
 
-    .. versionadded:: 1.11
-
     Constructs an :class:`OGRGeometry` from the given GML string.
 
     .. classmethod:: from_bbox(bbox)
@@ -1162,21 +1160,6 @@ blue.
         >>> rst.name  # Stored in a random path in the vsimem filesystem.
         '/vsimem/da300bdb-129d-49a8-b336-e410a9428dad'
 
-    .. versionchanged:: 1.11
-
-        Added the ability to pass the ``size``, ``shape``, and ``offset``
-        parameters when creating :class:`GDALRaster` objects. The parameters
-        can be passed through the ``ds_input`` dictionary. This allows to
-        finely control initial pixel values. The functionality is similar to
-        the :meth:`GDALBand.data()<django.contrib.gis.gdal.GDALBand.data>`
-        method.
-
-    .. versionchanged:: 2.0
-
-       Added the ability to read and write rasters in GDAL's memory-based
-       virtual filesystem. ``GDALRaster`` objects can now be converted to and
-       from binary data in-memory.
-
     .. attribute:: name
 
         The name of the source which is equivalent to the input file path or the name
@@ -1417,16 +1400,12 @@ blue.
 
     .. attribute:: info
 
-        .. versionadded:: 2.0
-
         Returns a string with a summary of the raster. This is equivalent to
         the `gdalinfo`__ command line utility.
 
         __ http://www.gdal.org/gdalinfo.html
 
     .. attribute:: metadata
-
-        .. versionadded:: 2.0
 
         The metadata of this raster, represented as a nested dictionary. The
         first-level key is the metadata domain. The second-level contains the
@@ -1451,14 +1430,10 @@ blue.
 
     .. attribute:: vsi_buffer
 
-       .. versionadded:: 2.0
-
         A ``bytes`` representation of this raster. Returns ``None`` for rasters
         that are not stored in GDAL's virtual filesystem.
 
     .. attribute:: is_vsi_based
-
-       .. versionadded:: 2.0
 
         A boolean indicating if this raster is stored in GDAL's virtual
         filesystem.
@@ -1551,6 +1526,20 @@ blue.
         ``GDT_UInt32``, ``GDT_Int32``, ``GDT_Float32``, ``GDT_Float64``,
         ``GDT_CInt16``, ``GDT_CInt32``, ``GDT_CFloat32``, and ``GDT_CFloat64``.
 
+    .. method:: color_interp(as_string=False)
+
+        The color interpretation for the band, as an integer between 0and 16.
+        If ``as_string`` is ``True``, the data type is returned as a string
+        with the following possible values:
+        ``GCI_Undefined``, ``GCI_GrayIndex``, ``GCI_PaletteIndex``,
+        ``GCI_RedBand``, ``GCI_GreenBand``, ``GCI_BlueBand``, ``GCI_AlphaBand``,
+        ``GCI_HueBand``, ``GCI_SaturationBand``, ``GCI_LightnessBand``,
+        ``GCI_CyanBand``, ``GCI_MagentaBand``, ``GCI_YellowBand``,
+        ``GCI_BlackBand``, ``GCI_YCbCr_YBand``, ``GCI_YCbCr_CbBand``, and
+        ``GCI_YCbCr_CrBand``. ``GCI_YCbCr_CrBand`` also represents ``GCI_Max``
+        because both correspond to the integer 16, but only ``GCI_YCbCr_CrBand``
+        is returned as a string.
+
     .. method:: data(data=None, offset=None, size=None, shape=None)
 
         The accessor to the pixel values of the ``GDALBand``. Returns the complete
@@ -1612,8 +1601,6 @@ blue.
                    [3, 3, 3, 3]], dtype=uint8)
 
     .. attribute:: metadata
-
-        .. versionadded:: 2.0
 
         The metadata of this band. The functionality is identical to
         :attr:`GDALRaster.metadata`.
@@ -1715,8 +1702,6 @@ Key               Default  Usage
     data" value is set to ``None``.
 
 .. object:: papsz_options
-
-    .. versionadded:: 2.0
 
     A dictionary with raster creation options. The key-value pairs of the
     input dictionary are passed to the driver on creation of the raster.
@@ -1832,3 +1817,15 @@ Settings
 A string specifying the location of the GDAL library.  Typically,
 this setting is only used if the GDAL library is in a non-standard
 location (e.g., ``/home/john/lib/libgdal.so``).
+
+Exceptions
+==========
+
+.. exception:: GDALException
+
+    The base GDAL exception, indicating a GDAL-related error.
+
+.. exception:: SRSException
+
+    An exception raised when an error occurs when constructing or using a
+    spatial reference system object.

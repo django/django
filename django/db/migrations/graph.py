@@ -1,5 +1,4 @@
 import warnings
-from collections import deque
 from functools import total_ordering
 
 from django.db.migrations.state import ProjectState
@@ -56,9 +55,10 @@ class Node:
         # Use self.key instead of self to speed up the frequent hashing
         # when constructing an OrderedSet.
         if '_ancestors' not in self.__dict__:
-            ancestors = deque([self.key])
-            for parent in sorted(self.parents):
-                ancestors.extendleft(reversed(parent.ancestors()))
+            ancestors = []
+            for parent in sorted(self.parents, reverse=True):
+                ancestors += parent.ancestors()
+            ancestors.append(self.key)
             self.__dict__['_ancestors'] = list(OrderedSet(ancestors))
         return self.__dict__['_ancestors']
 
@@ -68,9 +68,10 @@ class Node:
         # Use self.key instead of self to speed up the frequent hashing
         # when constructing an OrderedSet.
         if '_descendants' not in self.__dict__:
-            descendants = deque([self.key])
-            for child in sorted(self.children):
-                descendants.extendleft(reversed(child.descendants()))
+            descendants = []
+            for child in sorted(self.children, reverse=True):
+                descendants += child.descendants()
+            descendants.append(self.key)
             self.__dict__['_descendants'] = list(OrderedSet(descendants))
         return self.__dict__['_descendants']
 
@@ -177,7 +178,7 @@ class MigrationGraph:
         except KeyError as err:
             raise NodeNotFoundError(
                 "Unable to find replacement node %r. It was either never added"
-                " to the migration graph, or has been removed." % (replacement, ),
+                " to the migration graph, or has been removed." % (replacement,),
                 replacement
             ) from err
         for replaced_key in replaced:
@@ -213,7 +214,7 @@ class MigrationGraph:
         except KeyError as err:
             raise NodeNotFoundError(
                 "Unable to remove replacement node %r. It was either never added"
-                " to the migration graph, or has been removed already." % (replacement, ),
+                " to the migration graph, or has been removed already." % (replacement,),
                 replacement
             ) from err
         replaced_nodes = set()
@@ -255,7 +256,7 @@ class MigrationGraph:
         follow if applying the migrations to a database.
         """
         if target not in self.nodes:
-            raise NodeNotFoundError("Node %r not a valid node" % (target, ), target)
+            raise NodeNotFoundError("Node %r not a valid node" % (target,), target)
         # Use parent.key instead of parent to speed up the frequent hashing in ensure_not_cyclic
         self.ensure_not_cyclic(target, lambda x: (parent.key for parent in self.node_map[x].parents))
         self.cached = True
@@ -274,7 +275,7 @@ class MigrationGraph:
         would follow if removing the migrations from a database.
         """
         if target not in self.nodes:
-            raise NodeNotFoundError("Node %r not a valid node" % (target, ), target)
+            raise NodeNotFoundError("Node %r not a valid node" % (target,), target)
         # Use child.key instead of child to speed up the frequent hashing in ensure_not_cyclic
         self.ensure_not_cyclic(target, lambda x: (child.key for child in self.node_map[x].children))
         self.cached = True
@@ -288,24 +289,13 @@ class MigrationGraph:
 
     def iterative_dfs(self, start, forwards=True):
         """Iterative depth-first search for finding dependencies."""
-        visited = deque()
-        visited.append(start)
-        if forwards:
-            stack = deque(sorted(start.parents))
-        else:
-            stack = deque(sorted(start.children))
+        visited = []
+        stack = [start]
         while stack:
-            node = stack.popleft()
-            visited.appendleft(node)
-            if forwards:
-                children = sorted(node.parents, reverse=True)
-            else:
-                children = sorted(node.children, reverse=True)
-            # reverse sorting is needed because prepending using deque.extendleft
-            # also effectively reverses values
-            stack.extendleft(children)
-
-        return list(OrderedSet(visited))
+            node = stack.pop()
+            visited.append(node)
+            stack += sorted(node.parents if forwards else node.children)
+        return list(OrderedSet(reversed(visited)))
 
     def root_nodes(self, app=None):
         """
@@ -314,7 +304,7 @@ class MigrationGraph:
         """
         roots = set()
         for node in self.nodes:
-            if not any(key[0] == node[0] for key in self.node_map[node].parents) and (not app or app == node[0]):
+            if all(key[0] != node[0] for key in self.node_map[node].parents) and (not app or app == node[0]):
                 roots.add(node)
         return sorted(roots)
 
@@ -328,7 +318,7 @@ class MigrationGraph:
         """
         leaves = set()
         for node in self.nodes:
-            if not any(key[0] == node[0] for key in self.node_map[node].children) and (not app or app == node[0]):
+            if all(key[0] != node[0] for key in self.node_map[node].children) and (not app or app == node[0]):
                 leaves.add(node)
         return sorted(leaves)
 
@@ -362,6 +352,14 @@ class MigrationGraph:
     def _nodes_and_edges(self):
         return len(self.nodes), sum(len(node.parents) for node in self.node_map.values())
 
+    def _generate_plan(self, nodes, at_end):
+        plan = []
+        for node in nodes:
+            for migration in self.forwards_plan(node):
+                if migration not in plan and (at_end or migration not in nodes):
+                    plan.append(migration)
+        return plan
+
     def make_state(self, nodes=None, at_end=True, real_apps=None):
         """
         Given a migration node or nodes, return a complete ProjectState for it.
@@ -370,17 +368,11 @@ class MigrationGraph:
         """
         if nodes is None:
             nodes = list(self.leaf_nodes())
-        if len(nodes) == 0:
+        if not nodes:
             return ProjectState()
         if not isinstance(nodes[0], tuple):
             nodes = [nodes]
-        plan = []
-        for node in nodes:
-            for migration in self.forwards_plan(node):
-                if migration not in plan:
-                    if not at_end and migration in nodes:
-                        continue
-                    plan.append(migration)
+        plan = self._generate_plan(nodes, at_end)
         project_state = ProjectState(real_apps=real_apps)
         for node in plan:
             project_state = self.nodes[node].mutate_state(project_state, preserve=False)

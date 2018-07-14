@@ -22,7 +22,7 @@ from django.core.cache.backends.base import (
 from django.utils.module_loading import import_string
 
 __all__ = [
-    'cache', 'DEFAULT_CACHE_ALIAS', 'InvalidCacheBackendError',
+    'cache', 'caches', 'DEFAULT_CACHE_ALIAS', 'InvalidCacheBackendError',
     'CacheKeyWarning', 'BaseCache',
 ]
 
@@ -44,8 +44,7 @@ def _create_cache(backend, **kwargs):
             location = kwargs.pop('LOCATION', '')
             params = kwargs
         else:
-            params = conf.copy()
-            params.update(kwargs)
+            params = {**conf, **kwargs}
             backend = params.pop('BACKEND')
             location = params.pop('LOCATION', '')
         backend_cls = import_string(backend)

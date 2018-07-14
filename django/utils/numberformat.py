@@ -23,7 +23,7 @@ def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep='',
     use_grouping = use_grouping and grouping != 0
     # Make the common case fast
     if isinstance(number, int) and not use_grouping and not decimal_pos:
-        return mark_safe(str(number))
+        return mark_safe(number)
     # sign
     sign = ''
     if isinstance(number, Decimal):
@@ -42,8 +42,7 @@ def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep='',
         int_part, dec_part = str_number, ''
     if decimal_pos is not None:
         dec_part = dec_part + ('0' * (decimal_pos - len(dec_part)))
-    if dec_part:
-        dec_part = decimal_sep + dec_part
+    dec_part = dec_part and decimal_sep + dec_part
     # grouping
     if use_grouping:
         try:

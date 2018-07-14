@@ -25,7 +25,7 @@ restricted subset of the test client API:
   :meth:`~Client.options()`, and :meth:`~Client.trace()`.
 
 * These methods accept all the same arguments *except* for
-  ``follows``. Since this is just a factory for producing
+  ``follow``. Since this is just a factory for producing
   requests, it's up to you to handle the response.
 
 * It does not support middleware. Session and authentication
@@ -38,7 +38,7 @@ Example
 The following is a simple unit test using the request factory::
 
     from django.contrib.auth.models import AnonymousUser, User
-    from django.test import TestCase, RequestFactory
+    from django.test import RequestFactory, TestCase
 
     from .views import MyView, my_view
 
@@ -116,11 +116,6 @@ multitenancy). For example, you could write a test for the domain
 Disabling :setting:`ALLOWED_HOSTS` checking (``ALLOWED_HOSTS = ['*']``) when
 running tests prevents the test client from raising a helpful error message if
 you follow a redirect to an external URL.
-
-.. versionchanged:: 1.11
-
-    Older versions didn't validate ``ALLOWED_HOSTS`` while testing so these
-    techniques weren't necessary.
 
 .. _topics-testing-advanced-multidb:
 
@@ -303,7 +298,7 @@ Advanced features of ``TransactionTestCase``
     recommended that you do not hard code primary key values in tests.
 
     Using ``reset_sequences = True`` will slow down the test, since the primary
-    key reset is an relatively expensive database operation.
+    key reset is a relatively expensive database operation.
 
 .. _testing-reusable-applications:
 
@@ -410,10 +405,6 @@ testing behavior. This behavior involves:
 
 #. Performing global post-test teardown.
 
-.. versionchanged:: 1.11
-
-    Running the system checks was added.
-
 If you define your own test runner class and point :setting:`TEST_RUNNER` at
 that class, Django will execute your test runner whenever you run
 ``./manage.py test``. In this way, it is possible to use any test framework
@@ -481,10 +472,6 @@ execute and tear down the test suite.
     Create or override an ``add_arguments(cls, parser)`` class method and add
     custom arguments by calling ``parser.add_argument()`` inside the method, so
     that the :djadmin:`test` command will be able to use those arguments.
-
-    .. versionadded:: 1.11
-
-        The ``debug_mode`` keyword argument was added.
 
 Attributes
 ~~~~~~~~~~
@@ -574,8 +561,6 @@ Methods
 
 .. method:: DiscoverRunner.run_checks()
 
-    .. versionadded:: 1.11
-
     Runs the :doc:`system checks </topics/checks>`.
 
 .. method:: DiscoverRunner.run_suite(suite, **kwargs)
@@ -585,8 +570,6 @@ Methods
     Returns the result produced by the running the test suite.
 
 .. method:: DiscoverRunner.get_test_runner_kwargs()
-
-    .. versionadded:: 1.11
 
     Returns the keyword arguments to instantiate the
     ``DiscoverRunner.test_runner`` with.
@@ -626,18 +609,12 @@ utility methods in the ``django.test.utils`` module.
     If ``debug`` isn't ``None``, the :setting:`DEBUG` setting is updated to its
     value.
 
-    .. versionchanged:: 1.11
-
-        The ``debug`` argument was added.
-
 .. function:: teardown_test_environment()
 
     Performs global post-test teardown, such as removing instrumentation from
     the template system and restoring normal email services.
 
 .. function:: setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, parallel=0, **kwargs)
-
-    .. versionadded:: 1.11
 
     Creates the test databases.
 
@@ -646,8 +623,6 @@ utility methods in the ``django.test.utils`` module.
     :func:`teardown_databases` function at the conclusion of testing.
 
 .. function:: teardown_databases(old_config, parallel=0, keepdb=False)
-
-    .. versionadded:: 1.11
 
     Destroys the test databases, restoring pre-test conditions.
 
@@ -740,5 +715,5 @@ listed here because of the ``source`` flag passed to the previous command.
 For more options like annotated HTML listings detailing missed lines, see the
 `coverage.py`_ docs.
 
-.. _coverage.py: http://coverage.readthedocs.io/
-.. _install coverage.py: https://pypi.python.org/pypi/coverage
+.. _coverage.py: https://coverage.readthedocs.io/
+.. _install coverage.py: https://pypi.org/project/coverage/

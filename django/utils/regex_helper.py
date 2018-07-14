@@ -5,10 +5,6 @@ Used internally by Django and not intended for external use.
 This is not, and is not intended to be, a complete reg-exp decompiler. It
 should be good enough for a large class of URLS, however.
 """
-import warnings
-
-from django.utils.deprecation import RemovedInDjango21Warning
-
 # Mapping of an escape character to a representative of that class. So, e.g.,
 # "\w" is replaced by "x" in a reverse URL. A value of None means to ignore
 # this sequence. Any missing key is mapped to itself.
@@ -121,12 +117,6 @@ def normalize(pattern):
                         # All of these are ignorable. Walk to the end of the
                         # group.
                         walk_to_end(ch, pattern_iter)
-                    elif ch in 'iLmsu#':
-                        warnings.warn(
-                            'Using (?%s) in url() patterns is deprecated.' % ch,
-                            RemovedInDjango21Warning
-                        )
-                        walk_to_end(ch, pattern_iter)
                     elif ch == ':':
                         # Non-capturing group
                         non_capturing_groups.append(len(result))
@@ -186,8 +176,7 @@ def normalize(pattern):
 
             if consume_next:
                 ch, escaped = next(pattern_iter)
-            else:
-                consume_next = True
+            consume_next = True
     except StopIteration:
         pass
     except NotImplementedError:

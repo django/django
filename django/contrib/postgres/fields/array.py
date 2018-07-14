@@ -10,17 +10,19 @@ from django.utils.inspect import func_supports_parameter
 from django.utils.translation import gettext_lazy as _
 
 from ..utils import prefix_validation_error
+from .mixins import CheckFieldDefaultMixin
 from .utils import AttributeSetter
 
 __all__ = ['ArrayField']
 
 
-class ArrayField(Field):
+class ArrayField(CheckFieldDefaultMixin, Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'item_invalid': _('Item %(nth)s in the array did not validate: '),
+        'item_invalid': _('Item %(nth)s in the array did not validate:'),
         'nested_array_mismatch': _('Nested arrays must have the same length.'),
     }
+    _default_hint = ('list', '[]')
 
     def __init__(self, base_field, size=None, **kwargs):
         self.base_field = base_field
@@ -83,7 +85,7 @@ class ArrayField(Field):
         return '%s[%s]' % (self.base_field.db_type(connection), size)
 
     def get_db_prep_value(self, value, connection, prepared=False):
-        if isinstance(value, list) or isinstance(value, tuple):
+        if isinstance(value, (list, tuple)):
             return [self.base_field.get_db_prep_value(i, connection, prepared=False) for i in value]
         return value
 
@@ -158,7 +160,7 @@ class ArrayField(Field):
                     error,
                     prefix=self.error_messages['item_invalid'],
                     code='item_invalid',
-                    params={'nth': index},
+                    params={'nth': index + 1},
                 )
         if isinstance(self.base_field, ArrayField):
             if len({len(i) for i in value}) > 1:
@@ -177,17 +179,16 @@ class ArrayField(Field):
                     error,
                     prefix=self.error_messages['item_invalid'],
                     code='item_invalid',
-                    params={'nth': index},
+                    params={'nth': index + 1},
                 )
 
     def formfield(self, **kwargs):
-        defaults = {
+        return super().formfield(**{
             'form_class': SimpleArrayField,
             'base_field': self.base_field.formfield(),
             'max_length': self.size,
-        }
-        defaults.update(kwargs)
-        return super().formfield(**defaults)
+            **kwargs,
+        })
 
 
 @ArrayField.register_lookup
@@ -240,6 +241,9 @@ class ArrayLenTransform(Transform):
 class ArrayInLookup(In):
     def get_prep_lookup(self):
         values = super().get_prep_lookup()
+        if hasattr(self.rhs, '_prepare'):
+            # Subqueries don't need further preparation.
+            return values
         # In.process_rhs() expects values to be hashable, so convert lists
         # to tuples.
         prepared_values = []

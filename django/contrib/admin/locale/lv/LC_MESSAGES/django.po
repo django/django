@@ -2,6 +2,7 @@
 #
 # Translators:
 # edgars <edgars.jekabsons@gmail.com>, 2011
+# Edgars Voroboks <nullisnot0@inbox.lv>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Māris Nartišs <maris.gis@gmail.com>, 2016
 # peterisb <pb@sungis.lv>, 2016
@@ -10,8 +11,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-20 08:14+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2017-11-18 07:25+0000\n"
+"Last-Translator: Edgars Voroboks <nullisnot0@inbox.lv>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -132,7 +133,7 @@ msgid "Deleted \"%(object)s.\""
 msgstr "Dzēsts \"%(object)s.\""
 
 msgid "LogEntry Object"
-msgstr ""
+msgstr "LogEntry Objekts"
 
 #, python-brace-format
 msgid "Added {name} \"{object}\"."
@@ -146,7 +147,7 @@ msgstr "un"
 
 #, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
-msgstr ""
+msgstr "Mainīti {fields} priekš {name} \"{object}\"."
 
 #, python-brace-format
 msgid "Changed {fields}."
@@ -197,7 +198,7 @@ msgstr ""
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may add another {name} "
 "below."
-msgstr ""
+msgstr "{name} \"{obj}\" vieksmīgi mainīts. Zemāk variet vēl pievienot {name}."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was changed successfully."
@@ -217,7 +218,7 @@ msgstr "%(name)s \"%(obj)s\" sekmīgi izdzēsts."
 
 #, python-format
 msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
-msgstr ""
+msgstr "%(name)s ar ID \"%(key)s\" neeksistē. Varbūt tas ir dzēsts?"
 
 #, python-format
 msgid "Add %s"
@@ -256,13 +257,15 @@ msgstr "Izmaiņu vēsture: %s"
 #. suitable to be an item in a list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
-msgstr ""
+msgstr "%(class_name)s %(instance)s"
 
 #, python-format
 msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
 msgstr ""
+"%(class_name)s %(instance)s dzēšanai ir nepieciešams izdzēst sekojošus "
+"aizsargātus saistītos objektus: %(related_objects)s"
 
 msgid "Django site admin"
 msgstr "Django administrācijas lapa"
@@ -302,6 +305,8 @@ msgid ""
 "There's been an error. It's been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
+"Notika kļūda. Lapas administratoriem ir nosūtīts e-pasts un kļūda tuvākajā "
+"laikā tiks novērsta. Paldies par pacietību."
 
 msgid "Run the selected action"
 msgstr "Izpildīt izvēlēto darbību"
@@ -394,6 +399,8 @@ msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
+"%(object_name)s '%(escaped_object)s' dzēšanai ir nepieciešams izdzēst "
+"sekojošus aizsargātus saistītos objektus:"
 
 #, python-format
 msgid ""
@@ -421,6 +428,8 @@ msgid ""
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
+"Izdzēšot izvēlēto %(objects_name)s, tiks dzēsti visi saistītie objekti, bet "
+"jums nav tiesību dzēst sekojošus objektu tipus:"
 
 #, python-format
 msgid ""
@@ -453,7 +462,7 @@ msgstr "Kopsavilkums"
 
 #, python-format
 msgid "Models in the %(name)s application"
-msgstr ""
+msgstr "Modeļi %(name)s lietotnē"
 
 msgid "Add"
 msgstr "Pievienot"
@@ -486,6 +495,8 @@ msgid ""
 "You are authenticated as %(username)s, but are not authorized to access this "
 "page. Would you like to login to a different account?"
 msgstr ""
+"Jūs esat autentificējies kā %(username)s, bet jums nav tiesību piekļūt šai "
+"lapai. Vai vēlaties pieteikties citā kontā?"
 
 msgid "Forgotten your password or username?"
 msgstr "Aizmirsi paroli vai lietotājvārdu?"
@@ -605,17 +616,24 @@ msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"Mēs nosūtījām jums e-pasta ziņojumu ar jūsu paroles iestatīšanas "
+"instrukciju, ja jums ir konts ar ievadīto e-pasta adresi. Jums tos tūlīt "
+"vajadzētu saņemt."
 
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
+"Ja nesaņemat e-pastu, lūdzu, pārliecinieties, vai esat ievadījis reģistrēto "
+"adresi un pārbaudiet savu mēstuļu mapi."
 
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
+"Jūs saņemat šo e-pasta ziņojumu, jo pieprasījāt atiestatīt lietotāja konta "
+"paroli vietnē %(site_name)s."
 
 msgid "Please go to the following page and choose a new password:"
 msgstr "Lūdzu apmeklējiet sekojošo lapu un ievadiet jaunu paroli:"

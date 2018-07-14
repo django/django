@@ -32,11 +32,12 @@ class NullQueriesTests(TestCase):
         self.assertSequenceEqual(Choice.objects.exclude(choice=None).order_by('id'), [c1, c2])
 
         # Valid query, but fails because foo isn't a keyword
-        with self.assertRaises(FieldError):
+        msg = "Cannot resolve keyword 'foo' into field. Choices are: choice, id, poll, poll_id"
+        with self.assertRaisesMessage(FieldError, msg):
             Choice.objects.filter(foo__exact=None)
 
         # Can't use None on anything other than __exact and __iexact
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, 'Cannot use None as a query value'):
             Choice.objects.filter(id__gt=None)
 
         # Related managers use __exact=None implicitly if the object hasn't been saved.

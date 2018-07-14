@@ -10,12 +10,13 @@ import string
 from urllib.parse import urlparse
 
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import DisallowedHost, ImproperlyConfigured
 from django.urls import get_callable
 from django.utils.cache import patch_vary_headers
 from django.utils.crypto import constant_time_compare, get_random_string
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import is_same_domain
+from django.utils.log import log_response
 
 logger = logging.getLogger('django.security.csrf')
 
@@ -146,14 +147,14 @@ class CsrfViewMiddleware(MiddlewareMixin):
         return None
 
     def _reject(self, request, reason):
-        logger.warning(
+        response = _get_failure_view()(request, reason=reason)
+        log_response(
             'Forbidden (%s): %s', reason, request.path,
-            extra={
-                'status_code': 403,
-                'request': request,
-            }
+            response=response,
+            request=request,
+            logger=logger,
         )
-        return _get_failure_view()(request, reason=reason)
+        return response
 
     def _get_token(self, request):
         if settings.CSRF_USE_SESSIONS:
@@ -190,18 +191,20 @@ class CsrfViewMiddleware(MiddlewareMixin):
                 path=settings.CSRF_COOKIE_PATH,
                 secure=settings.CSRF_COOKIE_SECURE,
                 httponly=settings.CSRF_COOKIE_HTTPONLY,
+                samesite=settings.CSRF_COOKIE_SAMESITE,
             )
             # Set the Vary header since content varies with the CSRF cookie.
             patch_vary_headers(response, ('Cookie',))
 
-    def process_view(self, request, callback, callback_args, callback_kwargs):
-        if getattr(request, 'csrf_processing_done', False):
-            return None
-
+    def process_request(self, request):
         csrf_token = self._get_token(request)
         if csrf_token is not None:
             # Use same token next time.
             request.META['CSRF_COOKIE'] = csrf_token
+
+    def process_view(self, request, callback, callback_args, callback_kwargs):
+        if getattr(request, 'csrf_processing_done', False):
+            return None
 
         # Wait until request.META["CSRF_COOKIE"] has been manipulated before
         # bailing out, so that get_token still works
@@ -261,19 +264,23 @@ class CsrfViewMiddleware(MiddlewareMixin):
                     if server_port not in ('443', '80'):
                         good_referer = '%s:%s' % (good_referer, server_port)
                 else:
-                    # request.get_host() includes the port.
-                    good_referer = request.get_host()
+                    try:
+                        # request.get_host() includes the port.
+                        good_referer = request.get_host()
+                    except DisallowedHost:
+                        pass
 
-                # Here we generate a list of all acceptable HTTP referers,
-                # including the current host since that has been validated
-                # upstream.
+                # Create a list of all acceptable HTTP referers, including the
+                # current host if it's permitted by ALLOWED_HOSTS.
                 good_hosts = list(settings.CSRF_TRUSTED_ORIGINS)
-                good_hosts.append(good_referer)
+                if good_referer is not None:
+                    good_hosts.append(good_referer)
 
                 if not any(is_same_domain(referer.netloc, host) for host in good_hosts):
                     reason = REASON_BAD_REFERER % referer.geturl()
                     return self._reject(request, reason)
 
+            csrf_token = request.META.get('CSRF_COOKIE')
             if csrf_token is None:
                 # No CSRF cookie. For POST requests, we insist on a CSRF cookie,
                 # and in this way we can avoid all CSRF attacks, including login

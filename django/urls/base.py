@@ -1,4 +1,3 @@
-from contextlib import suppress
 from threading import local
 from urllib.parse import urlsplit, urlunsplit
 
@@ -50,11 +49,12 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
 
         resolved_path = []
         ns_pattern = ''
+        ns_converters = {}
         while path:
             ns = path.pop()
             current_ns = current_path.pop() if current_path else None
             # Lookup the name to see if it could be an app identifier.
-            with suppress(KeyError):
+            try:
                 app_list = resolver.app_dict[ns]
                 # Yes! Path part matches an app in the current Resolver.
                 if current_ns and current_ns in app_list:
@@ -65,6 +65,8 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
                     # The name isn't shared by one of the instances (i.e.,
                     # the default) so pick the first instance as the default.
                     ns = app_list[0]
+            except KeyError:
+                pass
 
             if ns != current_ns:
                 current_path = None
@@ -73,6 +75,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
                 extra, resolver = resolver.namespace_dict[ns]
                 resolved_path.append(ns)
                 ns_pattern = ns_pattern + extra
+                ns_converters.update(resolver.pattern.converters)
             except KeyError as key:
                 if resolved_path:
                     raise NoReverseMatch(
@@ -82,7 +85,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
                 else:
                     raise NoReverseMatch("%s is not a registered namespace" % key)
         if ns_pattern:
-            resolver = get_ns_resolver(ns_pattern, resolver)
+            resolver = get_ns_resolver(ns_pattern, resolver, tuple(ns_converters.items()))
 
     return iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs))
 
@@ -118,8 +121,10 @@ def clear_script_prefix():
     """
     Unset the script prefix for the current thread.
     """
-    with suppress(AttributeError):
+    try:
         del _prefixes.value
+    except AttributeError:
+        pass
 
 
 def set_urlconf(urlconf_name):

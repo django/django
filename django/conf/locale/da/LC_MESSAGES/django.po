@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-20 22:58+0000\n"
+"POT-Creation-Date: 2017-12-01 21:10+0100\n"
+"PO-Revision-Date: 2017-12-02 11:14+0000\n"
 "Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
@@ -163,6 +163,9 @@ msgstr "japansk"
 
 msgid "Georgian"
 msgstr "georgisk"
+
+msgid "Kabyle"
+msgstr "kabylsk"
 
 msgid "Kazakh"
 msgstr "kasakhisk"
@@ -320,6 +323,7 @@ msgstr "Indtast et gyldigt heltal."
 msgid "Enter a valid email address."
 msgstr "Indtast en gyldig e-mail-adresse."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -408,6 +412,9 @@ msgid ""
 msgstr ""
 "Filendelse '%(extension)s' er ikke tilladt. Tilladte filendelser er: "
 "'%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
+msgstr "Null-tegn er ikke tilladte."
 
 msgid "and"
 msgstr "og"
@@ -738,9 +745,8 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Ret venligst de duplikerede data herunder."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr ""
-"Den indlejrede fremmednøgle passede ikke med forælderinstansens primærnøgle."
+msgid "The inline value did not match the parent instance."
+msgstr "Den indlejrede værdi passede ikke med forældreinstansen."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
@@ -748,8 +754,8 @@ msgstr ""
 "tilgængelige valgmuligheder."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" er ikke en gyldig værdi for en primærnøgle."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "\"%(pk)s\" er ikke en gyldig værdi."
 
 #, python-format
 msgid ""
@@ -1115,6 +1121,19 @@ msgstr ""
 "forbindelser, eller for 'same-origin'-forespørgsler."
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+"Hvis du bruger tagget <meta name=\"referrer\" content=\"no-referrer\"> eller "
+"inkluderer headeren 'Referrer-Policy: no-referrer', så fjern dem venligst. "
+"CSRF-beskyttelsen afhænger af at 'Referer'-headeren udfører stringent "
+"referer-kontrol. Hvis du er bekymret om privatliv, så brug alternativer så "
+"som <a rel=\"noreferrer\" ...> for links til tredjepartswebsider."
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1133,31 +1152,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "Mere information er tilgængeligt med DEBUG=True."
 
-msgid "Welcome to Django"
-msgstr "Velkommen til Django"
-
-msgid "It worked!"
-msgstr "Det virkede!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Tillykke med din første Django-drevne side."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-"Start derefter din første app ved at køre <code>python manage.py startapp "
-"[app_label]</code>."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Du ser denne besked fordi du har <code>DEBUG = True</code> i din Django "
-"indstillingsfil og du har ikke konfigureret nogen URLs endnu. Kom i sving!"
-
 msgid "No year specified"
 msgstr "Intet år specificeret"
+
+msgid "Date out of range"
+msgstr "Dato uden for rækkevidde"
 
 msgid "No month specified"
 msgstr "Ingen måned specificeret"
@@ -1209,3 +1208,46 @@ msgstr "\" %(path)s\" eksisterer ikke"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Indeks for %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django: Webframework'et for perfektionister med deadlines."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Vis <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">udgivelsesnoter</a> for Django %(version)s"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Installationen virkede! Tillykke!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"Du ser denne side fordi du har <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> i din settings-fil og ikke har opsat nogen URL'er."
+
+msgid "Django Documentation"
+msgstr "Django-dokumentation"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr "Emner, referencer &amp; how-to's"
+
+msgid "Tutorial: A Polling App"
+msgstr "Gennemgang: En afstemnings-app"
+
+msgid "Get started with Django"
+msgstr "Kom i gang med Django"
+
+msgid "Django Community"
+msgstr "Django-fællesskabet"
+
+msgid "Connect, get help, or contribute"
+msgstr "Forbind, få hjælp eller bidrag"

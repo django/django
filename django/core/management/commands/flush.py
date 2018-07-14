@@ -1,4 +1,3 @@
-from contextlib import suppress
 from importlib import import_module
 
 from django.apps import apps
@@ -21,7 +20,7 @@ class Command(BaseCommand):
             help='Tells Django to NOT prompt the user for input of any kind.',
         )
         parser.add_argument(
-            '--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
+            '--database', default=DEFAULT_DB_ALIAS,
             help='Nominates a database to flush. Defaults to the "default" database.',
         )
 
@@ -40,8 +39,10 @@ class Command(BaseCommand):
         # Import the 'management' module within each installed app, to register
         # dispatcher events.
         for app_config in apps.get_app_configs():
-            with suppress(ImportError):
+            try:
                 import_module('.management', app_config.name)
+            except ImportError:
+                pass
 
         sql_list = sql_flush(self.style, connection, only_django=True,
                              reset_sequences=reset_sequences,

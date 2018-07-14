@@ -1,5 +1,3 @@
-import warnings
-
 from django.db.migrations.exceptions import (
     CircularDependencyError, NodeNotFoundError,
 )
@@ -147,7 +145,7 @@ class GraphTests(SimpleTestCase):
         graph.add_dependency("app_b.0001", ("app_b", "0001"), ("app_a", "0003"))
         # Test whole graph
         with self.assertRaises(CircularDependencyError):
-            graph.forwards_plan(("app_a", "0003"), )
+            graph.forwards_plan(("app_a", "0003"))
 
     def test_circular_graph_2(self):
         graph = MigrationGraph()
@@ -193,22 +191,14 @@ class GraphTests(SimpleTestCase):
             expected.append(child)
         leaf = expected[-1]
 
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always', RuntimeWarning)
+        with self.assertWarnsMessage(RuntimeWarning, RECURSION_DEPTH_WARNING):
             forwards_plan = graph.forwards_plan(leaf)
 
-        self.assertEqual(len(w), 1)
-        self.assertTrue(issubclass(w[-1].category, RuntimeWarning))
-        self.assertEqual(str(w[-1].message), RECURSION_DEPTH_WARNING)
         self.assertEqual(expected, forwards_plan)
 
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always', RuntimeWarning)
+        with self.assertWarnsMessage(RuntimeWarning, RECURSION_DEPTH_WARNING):
             backwards_plan = graph.backwards_plan(root)
 
-        self.assertEqual(len(w), 1)
-        self.assertTrue(issubclass(w[-1].category, RuntimeWarning))
-        self.assertEqual(str(w[-1].message), RECURSION_DEPTH_WARNING)
         self.assertEqual(expected[::-1], backwards_plan)
 
     def test_plan_invalid_node(self):

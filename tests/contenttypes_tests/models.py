@@ -128,3 +128,11 @@ class ModelWithNullFKToSite(models.Model):
 
     def get_absolute_url(self):
         return '/title/%s/' % quote(self.title)
+
+
+class ModelWithM2MToSite(models.Model):
+    title = models.CharField(max_length=200)
+    sites = models.ManyToManyField(Site)
+
+    def get_absolute_url(self):
+        return '/title/%s/' % quote(self.title)

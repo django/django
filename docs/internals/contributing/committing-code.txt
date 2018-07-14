@@ -20,11 +20,9 @@ best pull requests possible. In practice however, committers - who will likely
 be more familiar with the commit guidelines - may decide to bring a commit up
 to standard themselves.
 
-.. note::
-
-    Before merging, but after reviewing, have Jenkins test the pull request by
-    commenting "buildbot, test this please" on the PR.
-    See our `Jenkins wiki page`_ for more details.
+You may want to have Jenkins test the pull request with one of the pull request
+builders that doesn't run automatically, such as Oracle or Selenium. See the
+`Jenkins wiki page`_ for instructions.
 
 .. _Jenkins wiki page: https://code.djangoproject.com/wiki/Jenkins
 
@@ -41,7 +39,7 @@ At this point, you can work on the code. Use ``git rebase -i`` and ``git
 commit --amend`` to make sure the commits have the expected level of quality.
 Once you're ready:
 
-.. code-block:: console
+.. console::
 
     $ # Pull in the latest changes from master.
     $ git checkout master
@@ -61,13 +59,9 @@ Once you're ready:
     $ # Delete the pull request branch.
     $ git branch -d pr/xxxx
 
-For changes on your own branches, force push to your fork after rebasing on
-master but before merging and pushing to upstream. This allows the commit
-hashes on master and your branch to match which automatically closes the pull
-request. Since you can't push to other contributors' branches, comment on the
-pull request "Merged in XXXXXXX" (replacing with the commit hash) after you
-merge it. Trac checks for this message format to indicate on the ticket page
-whether or not a pull request is merged.
+Force push to the branch after rebasing on master but before merging and
+pushing to upstream. This allows the commit hashes on master and the branch to
+match which automatically closes the pull request.
 
 If a pull request doesn't need to be merged as multiple commits, you can use
 GitHub's "Squash and merge" button on the website. Edit the commit message as
@@ -155,8 +149,7 @@ Django's Git repository:
   commit. This goes a *long way* in helping everyone follow your changes.
 
 * Separate bug fixes from feature changes. Bugfixes may need to be backported
-  to the stable branch, according to the :ref:`backwards-compatibility policy
-  <backwards-compatibility-policy>`.
+  to the stable branch, according to :ref:`supported-versions-policy`.
 
 * If your commit closes a ticket in the Django `ticket tracker`_, begin
   your commit message with the text "Fixed #xxxxx", where "xxxxx" is the
@@ -164,10 +157,6 @@ Django's Git repository:
   whizbang feature.". We've rigged Trac so that any commit message in that
   format will automatically close the referenced ticket and post a comment
   to it with the full commit message.
-
-  If your commit closes a ticket and is in a branch, use the branch name
-  first, then the "Fixed #xxxxx." For example:
-  "[1.4.x] Fixed #123 -- Added whizbang feature."
 
   For the curious, we're using a `Trac plugin`_ for this.
 
@@ -204,6 +193,14 @@ Django's Git repository:
   There's a `script on the wiki
   <https://code.djangoproject.com/wiki/CommitterTips#AutomatingBackports>`_
   to automate this.
+
+  If the commit fixes a regression, include this in the commit message:
+
+  .. code-block:: none
+
+    Regression in 6ecccad711b52f9273b1acb07a57d3f806e93928.
+
+  (use the commit hash where the regression was introduced).
 
 Reverting commits
 =================

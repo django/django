@@ -6,16 +6,16 @@
 # ilay <ilay@ilay.tw>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # tcc <tcchou@tcchou.org>, 2011
-# Tzu-ping Chung <uranusjr@gmail.com>, 2016
+# Tzu-ping Chung <uranusjr@gmail.com>, 2016-2017
 # Yeh-Yung <yyc1217@gmail.com>, 2013
 # Yeh-Yung <yyc1217@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-11-07 19:24+0000\n"
-"Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-12-03 05:47+0000\n"
+"Last-Translator: Tzu-ping Chung <uranusjr@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -73,11 +73,10 @@ msgstr "為檢查用，請輸入與前面相同的密碼。"
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"原始密碼並未儲存，因此無法存取此帳號的密碼，但你可以透過<a href=\"../"
-"password/\">這個表單</a>來變更密碼。"
+"原始密碼尚未儲存，因此無法存取此帳號的密碼，但你可以透過<a href=\"{}\">這個表"
+"單</a>來變更密碼。"
 
 #, python-format
 msgid ""
@@ -119,7 +118,7 @@ msgid "hash"
 msgstr "哈希碼"
 
 msgid "variety"
-msgstr ""
+msgstr "變種"
 
 msgid "version"
 msgstr "版本"

@@ -71,6 +71,21 @@ Django was originally developed at World Online, the Web department of a
 newspaper in Lawrence, Kansas, USA. Django's now run by an international
 `team of volunteers <https://www.djangoproject.com/foundation/teams/>`_.
 
+How is Django licensed?
+=======================
+
+Django is distributed under `the 3-clause BSD license
+<https://github.com/django/django/blob/master/LICENSE>`_. This is an open
+source license granting broad permissions to modify and redistribute Django.
+
+Why does Django include Python's license file?
+==============================================
+
+Django includes code from the Python standard library. Python is distributed
+under a permissive open source license. `A copy of the Python license
+<https://github.com/django/django/blob/master/LICENSE.python>`_ is
+included with Django for compliance with Python's terms.
+
 Which sites use Django?
 =======================
 
