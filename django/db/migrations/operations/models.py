@@ -491,22 +491,23 @@ class FieldRelatedOptionOperation(ModelOptionOperation):
         return super().reduce(operation, app_label=app_label)
 
 
-class AlterUniqueTogether(FieldRelatedOptionOperation):
-    """
-    Change the value of unique_together to the target one.
-    Input value of unique_together must be a set of tuples.
-    """
-    option_name = "unique_together"
+class AlterTogetherOptionOperation(FieldRelatedOptionOperation):
+    option_name = None
 
-    def __init__(self, name, unique_together):
-        unique_together = normalize_together(unique_together)
-        self.unique_together = {tuple(cons) for cons in unique_together}
+    def __init__(self, name, option_value):
+        if option_value:
+            option_value = set(normalize_together(option_value))
+        setattr(self, self.option_name, option_value)
         super().__init__(name)
+
+    @cached_property
+    def option_value(self):
+        return getattr(self, self.option_name)
 
     def deconstruct(self):
         kwargs = {
             'name': self.name,
-            'unique_together': self.unique_together,
+            self.option_name: self.option_value,
         }
         return (
             self.__class__.__qualname__,
@@ -516,14 +517,15 @@ class AlterUniqueTogether(FieldRelatedOptionOperation):
 
     def state_forwards(self, app_label, state):
         model_state = state.models[app_label, self.name_lower]
-        model_state.options[self.option_name] = self.unique_together
+        model_state.options[self.option_name] = self.option_value
         state.reload_model(app_label, self.name_lower, delay=True)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         new_model = to_state.apps.get_model(app_label, self.name)
         if self.allow_migrate_model(schema_editor.connection.alias, new_model):
             old_model = from_state.apps.get_model(app_label, self.name)
-            schema_editor.alter_unique_together(
+            alter_together = getattr(schema_editor, 'alter_%s' % self.option_name)
+            alter_together(
                 new_model,
                 getattr(old_model._meta, self.option_name, set()),
                 getattr(new_model._meta, self.option_name, set()),
@@ -536,16 +538,27 @@ class AlterUniqueTogether(FieldRelatedOptionOperation):
         return (
             self.references_model(model_name, app_label) and
             (
-                not self.unique_together or
-                any((name in together) for together in self.unique_together)
+                not self.option_value or
+                any((name in fields) for fields in self.option_value)
             )
         )
 
     def describe(self):
-        return "Alter %s for %s (%s constraint(s))" % (self.option_name, self.name, len(self.unique_together or ''))
+        return "Alter %s for %s (%s constraint(s))" % (self.option_name, self.name, len(self.option_value or ''))
 
 
-class AlterIndexTogether(FieldRelatedOptionOperation):
+class AlterUniqueTogether(AlterTogetherOptionOperation):
+    """
+    Change the value of unique_together to the target one.
+    Input value of unique_together must be a set of tuples.
+    """
+    option_name = 'unique_together'
+
+    def __init__(self, name, unique_together):
+        super().__init__(name, unique_together)
+
+
+class AlterIndexTogether(AlterTogetherOptionOperation):
     """
     Change the value of index_together to the target one.
     Input value of index_together must be a set of tuples.
@@ -553,50 +566,7 @@ class AlterIndexTogether(FieldRelatedOptionOperation):
     option_name = "index_together"
 
     def __init__(self, name, index_together):
-        index_together = normalize_together(index_together)
-        self.index_together = {tuple(cons) for cons in index_together}
-        super().__init__(name)
-
-    def deconstruct(self):
-        kwargs = {
-            'name': self.name,
-            'index_together': self.index_together,
-        }
-        return (
-            self.__class__.__qualname__,
-            [],
-            kwargs
-        )
-
-    def state_forwards(self, app_label, state):
-        model_state = state.models[app_label, self.name_lower]
-        model_state.options[self.option_name] = self.index_together
-        state.reload_model(app_label, self.name_lower, delay=True)
-
-    def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        new_model = to_state.apps.get_model(app_label, self.name)
-        if self.allow_migrate_model(schema_editor.connection.alias, new_model):
-            old_model = from_state.apps.get_model(app_label, self.name)
-            schema_editor.alter_index_together(
-                new_model,
-                getattr(old_model._meta, self.option_name, set()),
-                getattr(new_model._meta, self.option_name, set()),
-            )
-
-    def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        return self.database_forwards(app_label, schema_editor, from_state, to_state)
-
-    def references_field(self, model_name, name, app_label=None):
-        return (
-            self.references_model(model_name, app_label) and
-            (
-                not self.index_together or
-                any((name in together) for together in self.index_together)
-            )
-        )
-
-    def describe(self):
-        return "Alter %s for %s (%s constraint(s))" % (self.option_name, self.name, len(self.index_together or ''))
+        super().__init__(name, index_together)
 
 
 class AlterOrderWithRespectTo(FieldRelatedOptionOperation):
