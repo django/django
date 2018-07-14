@@ -449,10 +449,11 @@ class ModelOptionOperation(ModelOperation):
 
 class FieldRelatedOptionOperation(ModelOptionOperation):
     def reduce(self, operation, app_label=None):
-        if (isinstance(operation, FieldOperation) and
-                self.name_lower == operation.model_name_lower and
-                not self.references_field(operation.model_name, operation.name)):
-            return [operation, self]
+        if isinstance(operation, FieldOperation) and self.name_lower == operation.model_name_lower:
+            if isinstance(operation, RemoveField):
+                return False
+            if not self.references_field(operation.model_name, operation.name):
+                return [operation, self]
         return super().reduce(operation, app_label=app_label)
 
 

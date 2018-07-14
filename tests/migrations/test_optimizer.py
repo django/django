@@ -712,7 +712,7 @@ class OptimizerTests(SimpleTestCase):
             ],
         )
 
-        self.assertOptimizesTo(
+        self.assertDoesNotOptimize(
             [
                 migrations.CreateModel("Foo", [
                     ("a", models.IntegerField()),
@@ -721,13 +721,6 @@ class OptimizerTests(SimpleTestCase):
                 ]),
                 alter,
                 migrations.RemoveField("Foo", "c"),
-            ],
-            [
-                migrations.CreateModel("Foo", [
-                    ("a", models.IntegerField()),
-                    ("b", models.IntegerField()),
-                ]),
-                alter,
             ],
         )
 
