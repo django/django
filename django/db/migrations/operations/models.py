@@ -142,13 +142,22 @@ class CreateModel(ModelOperation):
                     managers=self.managers,
                 ),
             ]
-        elif isinstance(operation, FieldRelatedOptionOperation) and self.name_lower == operation.name_lower:
-            option_value = getattr(operation, operation.option_name)
+        elif isinstance(operation, AlterTogetherOptionOperation) and self.name_lower == operation.name_lower:
             return [
                 CreateModel(
                     self.name,
                     fields=self.fields,
-                    options={**self.options, **{operation.option_name: option_value}},
+                    options={**self.options, **{operation.option_name: operation.option_value}},
+                    bases=self.bases,
+                    managers=self.managers,
+                ),
+            ]
+        elif isinstance(operation, AlterOrderWithRespectTo) and self.name_lower == operation.name_lower:
+            return [
+                CreateModel(
+                    self.name,
+                    fields=self.fields,
+                    options={**self.options, 'order_with_respect_to': operation.order_with_respect_to},
                     bases=self.bases,
                     managers=self.managers,
                 ),
@@ -481,17 +490,7 @@ class ModelOptionOperation(ModelOperation):
         return super().reduce(operation, app_label=app_label)
 
 
-class FieldRelatedOptionOperation(ModelOptionOperation):
-    def reduce(self, operation, app_label=None):
-        if isinstance(operation, FieldOperation) and self.name_lower == operation.model_name_lower:
-            if isinstance(operation, RemoveField):
-                return False
-            if not self.references_field(operation.model_name, operation.name):
-                return [operation, self]
-        return super().reduce(operation, app_label=app_label)
-
-
-class AlterTogetherOptionOperation(FieldRelatedOptionOperation):
+class AlterTogetherOptionOperation(ModelOptionOperation):
     option_name = None
 
     def __init__(self, name, option_value):
@@ -569,7 +568,7 @@ class AlterIndexTogether(AlterTogetherOptionOperation):
         super().__init__(name, index_together)
 
 
-class AlterOrderWithRespectTo(FieldRelatedOptionOperation):
+class AlterOrderWithRespectTo(ModelOptionOperation):
     """Represent a change with the order_with_respect_to option."""
 
     option_name = 'order_with_respect_to'
