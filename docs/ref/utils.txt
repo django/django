@@ -843,6 +843,11 @@ appropriate entities.
 
     If ``value`` is ``"你好 World"``, the output will be ``"你好-world"``.
 
+    .. versionchanged:: 2.2
+
+        In previous versions, the result of ``slugify`` was automatically marked
+        as HTML safe, which is no longer the case.
+
 .. _time-zone-selection-functions:
 
 ``django.utils.timezone``

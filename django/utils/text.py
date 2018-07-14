@@ -7,7 +7,7 @@ from io import BytesIO
 from django.utils.functional import (
     SimpleLazyObject, keep_lazy, keep_lazy_text, lazy,
 )
-from django.utils.safestring import SafeText, mark_safe
+from django.utils.safestring import SafeText
 from django.utils.translation import gettext as _, gettext_lazy, pgettext
 
 
@@ -412,7 +412,7 @@ def slugify(value, allow_unicode=False):
     else:
         value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
     value = re.sub(r'[^\w\s-]', '', value).strip().lower()
-    return mark_safe(re.sub(r'[-\s]+', '-', value))
+    return re.sub(r'[-\s]+', '-', value)
 
 
 def camel_case_to_spaces(value):
