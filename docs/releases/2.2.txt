@@ -244,6 +244,8 @@ Miscellaneous
 * For consistency with WSGI servers, the test client now sets the
   ``Content-Length`` header to a string rather than an integer.
 
+* The result of :func:`django.utils.text.slugify` is no longer marked HTML safe.
+
 .. _deprecated-features-2.2:
 
 Features deprecated in 2.2

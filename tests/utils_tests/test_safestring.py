@@ -69,10 +69,6 @@ class SafeStringTest(SimpleTestCase):
         s += mark_safe('&b')
         self.assertRenderEqual('{{ s }}', 'a&b', s=s)
 
-        s = text.slugify(lazystr('a'))
-        s += mark_safe('&b')
-        self.assertRenderEqual('{{ s }}', 'a&b', s=s)
-
     def test_mark_safe_as_decorator(self):
         """
         mark_safe used as a decorator leaves the result of a function
