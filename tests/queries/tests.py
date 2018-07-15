@@ -2024,6 +2024,9 @@ class QuerysetOrderedTests(unittest.TestCase):
     def test_explicit_ordering(self):
         self.assertIs(Annotation.objects.all().order_by('id').ordered, True)
 
+    def test_empty_queryset(self):
+        self.assertIs(Annotation.objects.none().ordered, True)
+
     def test_order_by_extra(self):
         self.assertIs(Annotation.objects.all().extra(order_by=['id']).ordered, True)
 
