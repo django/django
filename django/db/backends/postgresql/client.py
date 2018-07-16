@@ -17,7 +17,7 @@ class DatabaseClient(BaseDatabaseClient):
     executable_name = 'psql'
 
     @classmethod
-    def runshell_db(cls, conn_params, parameters):
+    def runshell_db(cls, conn_params, parameters=[]):
         args = [cls.executable_name]
 
         host = conn_params.get('host', '')
