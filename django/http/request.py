@@ -164,7 +164,7 @@ class HttpRequest:
     def build_absolute_uri(self, location=None):
         """
         Build an absolute URI from the location and the variables available in
-        this request. If no ``location`` is specified, bulid the absolute URI
+        this request. If no ``location`` is specified, build the absolute URI
         using request.get_full_path(). If the location is absolute, convert it
         to an RFC 3987 compliant URI and return it. If location is relative or
         is scheme-relative (i.e., ``//example.com/``), urljoin() it to a base
