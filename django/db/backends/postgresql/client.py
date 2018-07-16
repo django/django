@@ -69,5 +69,5 @@ class DatabaseClient(BaseDatabaseClient):
                 if 'PGPASSFILE' in os.environ:  # unit tests need cleanup
                     del os.environ['PGPASSFILE']
 
-    def runshell(self, parameters):
+    def runshell(self, parameters=[]):
         DatabaseClient.runshell_db(self.connection.get_connection_params(), parameters)
