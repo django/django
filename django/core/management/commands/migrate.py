@@ -104,6 +104,7 @@ class Command(BaseCommand):
             )
 
         # If they supplied command line arguments, work out what they mean.
+        run_syncdb = options['run_syncdb']
         target_app_labels_only = True
         if options['app_label']:
             # Validate app_label.
@@ -112,7 +113,10 @@ class Command(BaseCommand):
                 apps.get_app_config(app_label)
             except LookupError as err:
                 raise CommandError(str(err))
-            if app_label not in executor.loader.migrated_apps:
+            if run_syncdb:
+                if app_label in executor.loader.migrated_apps:
+                    raise CommandError("Can't use run_syncdb with app '%s' as it has migrations." % app_label)
+            elif app_label not in executor.loader.migrated_apps:
                 raise CommandError("App '%s' does not have migrations." % app_label)
 
         if options['app_label'] and options['migration_name']:
@@ -152,15 +156,21 @@ class Command(BaseCommand):
                     self.stdout.write('    ' + message, style)
             return
 
+        # At this point, ignore run_syncdb if there aren't any apps to sync.
         run_syncdb = options['run_syncdb'] and executor.loader.unmigrated_apps
         # Print some useful info
         if self.verbosity >= 1:
             self.stdout.write(self.style.MIGRATE_HEADING("Operations to perform:"))
             if run_syncdb:
-                self.stdout.write(
-                    self.style.MIGRATE_LABEL("  Synchronize unmigrated apps: ") +
-                    (", ".join(sorted(executor.loader.unmigrated_apps)))
-                )
+                if options['app_label']:
+                    self.stdout.write(
+                        self.style.MIGRATE_LABEL("  Synchronize unmigrated app: %s" % app_label)
+                    )
+                else:
+                    self.stdout.write(
+                        self.style.MIGRATE_LABEL("  Synchronize unmigrated apps: ") +
+                        (", ".join(sorted(executor.loader.unmigrated_apps)))
+                    )
             if target_app_labels_only:
                 self.stdout.write(
                     self.style.MIGRATE_LABEL("  Apply all migrations: ") +
@@ -187,7 +197,10 @@ class Command(BaseCommand):
         if run_syncdb:
             if self.verbosity >= 1:
                 self.stdout.write(self.style.MIGRATE_HEADING("Synchronizing apps without migrations:"))
-            self.sync_apps(connection, executor.loader.unmigrated_apps)
+            if options['app_label']:
+                self.sync_apps(connection, [app_label])
+            else:
+                self.sync_apps(connection, executor.loader.unmigrated_apps)
 
         # Migrate!
         if self.verbosity >= 1:

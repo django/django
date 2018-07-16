@@ -663,6 +663,29 @@ class MigrateTests(MigrationTestBase):
         table_name = truncate_name('unmigrated_app_syncdb_classroom', connection.ops.max_name_length())
         self.assertIn('Creating table %s' % table_name, stdout)
 
+    @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations'})
+    def test_migrate_syncdb_app_with_migrations(self):
+        msg = "Can't use run_syncdb with app 'migrations' as it has migrations."
+        with self.assertRaisesMessage(CommandError, msg):
+            call_command('migrate', 'migrations', run_syncdb=True, verbosity=0)
+
+    @override_settings(INSTALLED_APPS=[
+        'migrations.migrations_test_apps.unmigrated_app_syncdb',
+        'migrations.migrations_test_apps.unmigrated_app_simple',
+    ])
+    def test_migrate_syncdb_app_label(self):
+        """
+        Running migrate --run-syncdb with an app_label only creates tables for
+        the specified app.
+        """
+        stdout = io.StringIO()
+        with mock.patch.object(BaseDatabaseSchemaEditor, 'execute') as execute:
+            call_command('migrate', 'unmigrated_app_syncdb', run_syncdb=True, stdout=stdout)
+            create_table_count = len([call for call in execute.mock_calls if 'CREATE TABLE' in str(call)])
+            self.assertEqual(create_table_count, 2)
+            self.assertGreater(len(execute.mock_calls), 2)
+            self.assertIn('Synchronize unmigrated app: unmigrated_app_syncdb', stdout.getvalue())
+
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
     def test_migrate_record_replaced(self):
         """
