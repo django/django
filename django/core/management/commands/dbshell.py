@@ -15,11 +15,13 @@ class Command(BaseCommand):
             '--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
             help='Nominates a database onto which to open a shell. Defaults to the "default" database.',
         )
+        parameters = parser.add_argument_group('parameters', prefix_chars='--')
+        parameters.add_argument('parameters', nargs='*')
 
     def handle(self, **options):
         connection = connections[options['database']]
         try:
-            connection.client.runshell()
+            connection.client.runshell(options['parameters'])
         except OSError:
             # Note that we're assuming OSError means that the client program
             # isn't installed. There's a possibility OSError would be raised
