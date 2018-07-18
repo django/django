@@ -771,12 +771,34 @@ class OtherModelTests(SimpleTestCase):
 
         self.assertEqual(Group.check(), [
             Error(
-                "The model has two many-to-many relations through "
+                "The model has two identical many-to-many relations through "
                 "the intermediate model 'invalid_models_tests.Membership'.",
                 obj=Group,
                 id='models.E003',
             )
         ])
+
+    def test_two_m2m_through_same_model_with_different_through_fields(self):
+        class Country(models.Model):
+            pass
+
+        class ShippingMethod(models.Model):
+            to_countries = models.ManyToManyField(
+                Country, through='ShippingMethodPrice',
+                through_fields=('method', 'to_country'),
+            )
+            from_countries = models.ManyToManyField(
+                Country, through='ShippingMethodPrice',
+                through_fields=('method', 'from_country'),
+                related_name='+',
+            )
+
+        class ShippingMethodPrice(models.Model):
+            method = models.ForeignKey(ShippingMethod, models.CASCADE)
+            to_country = models.ForeignKey(Country, models.CASCADE)
+            from_country = models.ForeignKey(Country, models.CASCADE)
+
+        self.assertEqual(ShippingMethod.check(), [])
 
     def test_missing_parent_link(self):
         msg = 'Add parent_link=True to invalid_models_tests.ParkingLot.parent.'

@@ -252,8 +252,8 @@ Models
 * **models.E001**: ``<swappable>`` is not of the form ``app_label.app_name``.
 * **models.E002**: ``<SETTING>`` references ``<model>``, which has not been
   installed, or is abstract.
-* **models.E003**: The model has two many-to-many relations through the
-  intermediate model ``<app_label>.<model>``.
+* **models.E003**: The model has two identical many-to-many relations through
+  the intermediate model ``<app_label>.<model>``.
 * **models.E004**: ``id`` can only be used as a field name if the field also
   sets ``primary_key=True``.
 * **models.E005**: The field ``<field name>`` from parent model ``<model>``

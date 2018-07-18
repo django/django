@@ -1301,12 +1301,13 @@ class Model(metaclass=ModelBase):
         fields = (f for f in fields if isinstance(f.remote_field.through, ModelBase))
 
         for f in fields:
-            signature = (f.remote_field.model, cls, f.remote_field.through)
+            signature = (f.remote_field.model, cls, f.remote_field.through, f.remote_field.through_fields)
             if signature in seen_intermediary_signatures:
                 errors.append(
                     checks.Error(
-                        "The model has two many-to-many relations through "
-                        "the intermediate model '%s'." % f.remote_field.through._meta.label,
+                        "The model has two identical many-to-many relations "
+                        "through the intermediate model '%s'." %
+                        f.remote_field.through._meta.label,
                         obj=cls,
                         id='models.E003',
                     )
