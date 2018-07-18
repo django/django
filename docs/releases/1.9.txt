@@ -755,7 +755,7 @@ followed by a call to ``add()``. This caused needlessly large data changes and
 prevented using the :data:`~django.db.models.signals.m2m_changed` signal to
 track individual changes in many-to-many relations.
 
-Direct assignment now relies on the the new
+Direct assignment now relies on the new
 :meth:`~django.db.models.fields.related.RelatedManager.set` method on related
 managers which by default only processes changes between the existing related
 set and the one that's newly assigned. The previous behavior can be restored by

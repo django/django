@@ -1447,7 +1447,7 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
                     pass
 
         (In this case, you'll also need to use an authentication backend that
-        allows inactive users, such as as
+        allows inactive users, such as
         :class:`~django.contrib.auth.backends.AllowAllUsersModelBackend`.)
 
         Or to allow only some active users to log in::

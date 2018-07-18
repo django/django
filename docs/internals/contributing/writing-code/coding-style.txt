@@ -48,7 +48,7 @@ Python style
   This makes better use of space and avoids having to realign strings if the
   length of the first line changes.
 
-* Use single quotes for strings, or a double quote if the the string contains a
+* Use single quotes for strings, or a double quote if the string contains a
   single quote. Don't waste time doing unrelated refactoring of existing code
   to conform to this style.
 

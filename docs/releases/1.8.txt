@@ -1086,7 +1086,7 @@ Miscellaneous
   If you wish to customize that error message, :ref:`override it on the form
   <modelforms-overriding-default-fields>` using the ``'unique'`` key in
   ``Meta.error_messages['username']`` or, if you have a custom form field for
-  ``'username'``, using the the ``'unique'`` key in its
+  ``'username'``, using the ``'unique'`` key in its
   :attr:`~django.forms.Field.error_messages` argument.
 
 * The block ``usertools`` in the ``base.html`` template of
