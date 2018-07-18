@@ -626,7 +626,7 @@ class SimpleTestCase(unittest.TestCase):
 
     def assertRaisesMessage(self, expected_exception, expected_message, *args, **kwargs):
         """
-        Assert that expected_message is found in the the message of a raised
+        Assert that expected_message is found in the message of a raised
         exception.
 
         Args:

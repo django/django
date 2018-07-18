@@ -52,7 +52,7 @@ class Node:
         return obj
 
     def __len__(self):
-        """Return the the number of children this node has."""
+        """Return the number of children this node has."""
         return len(self.children)
 
     def __bool__(self):

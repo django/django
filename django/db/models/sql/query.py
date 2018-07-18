@@ -1484,8 +1484,8 @@ class Query:
         joins = [alias]
         # The transform can't be applied yet, as joins must be trimmed later.
         # To avoid making every caller of this method look up transforms
-        # directly, compute transforms here and and create a partial that
-        # converts fields to the appropriate wrapped version.
+        # directly, compute transforms here and create a partial that converts
+        # fields to the appropriate wrapped version.
 
         def final_transformer(field, alias):
             return field.get_col(alias)
