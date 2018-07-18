@@ -12,15 +12,23 @@ from django.db.backends.base.base import BaseDatabaseWrapper
 from django.utils.functional import cached_property
 
 try:
-    import MySQLdb as Database
-except ImportError as err:
-    raise ImproperlyConfigured(
-        'Error loading MySQLdb module.\n'
-        'Did you install mysqlclient?'
-    ) from err
+    import pymysql as Database
+    Database.install_as_MySQLdb()
+except ImportError:
+    try:
+        import MySQLdb as Database
+    except ImportError as err:
+        raise ImproperlyConfigured(
+            'Error loading pymysql or MySQLdb module.\n'
+            'Did you install pymysql or mysqlclient?'
+        ) from err
 
-from MySQLdb.constants import CLIENT, FIELD_TYPE                # isort:skip
-from MySQLdb.converters import conversions                      # isort:skip
+try:
+    from pymysql.constants import CLIENT, FIELD_TYPE                # isort:skip
+    from pymysql.converters import conversions                      # isort:skip
+except ImportError:
+    from MySQLdb.constants import CLIENT, FIELD_TYPE                # isort:skip
+    from MySQLdb.converters import conversions                      # isort:skip
 
 # Some of these import MySQLdb, so import them after checking if it's installed.
 from .client import DatabaseClient                          # isort:skip
