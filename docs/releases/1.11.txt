@@ -180,8 +180,8 @@ Minor features
 
 * The OpenLayers-based form widgets now use ``OpenLayers.js`` from
   ``https://cdnjs.cloudflare.com`` which is more suitable for production use
-  than the the old ``http://openlayers.org`` source. They are also updated to
-  use OpenLayers 3.
+  than the old ``http://openlayers.org`` source. They are also updated to use
+  OpenLayers 3.
 
 * PostGIS migrations can now change field dimensions.
 
@@ -512,7 +512,7 @@ backends.
   default value is ``True`` and the ``DatabaseIntrospection.get_constraints()``
   method should include an ``'orders'`` key in each of the returned
   dictionaries with a list of ``'ASC'`` and/or ``'DESC'`` values corresponding
-  to the the ordering of each column in the index.
+  to the ordering of each column in the index.
 
 * :djadmin:`inspectdb` no longer calls ``DatabaseIntrospection.get_indexes()``
   which is deprecated. Custom database backends should ensure all types of
