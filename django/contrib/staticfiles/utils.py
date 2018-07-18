@@ -1,5 +1,6 @@
 import fnmatch
 import os
+import warnings
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -56,3 +57,5 @@ def check_settings(base_url=None):
             (settings.MEDIA_ROOT == settings.STATIC_ROOT)):
         raise ImproperlyConfigured("The MEDIA_ROOT and STATIC_ROOT "
                                    "settings must have different values")
+    if settings.MEDIA_URL and base_url and settings.MEDIA_URL.startswith(base_url):
+        warnings.warn("The contrib.staticfiles app will not serve media if MEDIA_URL is within STATIC_URL", UserWarning)

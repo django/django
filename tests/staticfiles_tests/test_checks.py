@@ -3,6 +3,7 @@ from unittest import mock
 from django.conf import settings
 from django.contrib.staticfiles.checks import check_finders
 from django.contrib.staticfiles.finders import BaseFinder
+from django.contrib.staticfiles.utils import check_settings
 from django.core.checks import Error
 from django.test import SimpleTestCase, override_settings
 
@@ -75,3 +76,8 @@ class FindersCheckTests(SimpleTestCase):
                 id='staticfiles.E002',
             )
         ])
+
+    @override_settings(MEDIA_URL='/static/media/')
+    def test_warn_media_url_in_static_url(self):
+        with self.assertWarnsMessage(UserWarning, "The contrib.staticfiles app will not serve media if MEDIA_URL is within STATIC_URL"):    
+            check_settings()
