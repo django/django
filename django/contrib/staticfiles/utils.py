@@ -52,6 +52,11 @@ def check_settings(base_url=None):
     if settings.MEDIA_URL == base_url:
         raise ImproperlyConfigured("The MEDIA_URL and STATIC_URL "
                                    "settings must have different values")
+    if (settings.DEBUG and settings.MEDIA_URL and settings.STATIC_URL and
+            settings.MEDIA_URL.startswith(settings.STATIC_URL)):
+        raise ImproperlyConfigured(
+            "runserver can't serve media if MEDIA_URL is within STATIC_URL."
+        )
     if ((settings.MEDIA_ROOT and settings.STATIC_ROOT) and
             (settings.MEDIA_ROOT == settings.STATIC_ROOT)):
         raise ImproperlyConfigured("The MEDIA_ROOT and STATIC_ROOT "
