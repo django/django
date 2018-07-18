@@ -743,9 +743,13 @@ class Model(metaclass=ModelBase):
                 update_fields=update_fields,
             )
         with transaction.atomic(using=using, savepoint=False):
+            parent_inserted = False
             if not raw:
-                self._save_parents(cls, using, update_fields)
-            updated = self._save_table(raw, cls, force_insert, force_update, using, update_fields)
+                parent_inserted = self._save_parents(cls, using, update_fields)
+            updated = self._save_table(
+                raw, cls, force_insert or parent_inserted,
+                force_update, using, update_fields,
+            )
         # Store the database on which the object was saved
         self._state.db = using
         # Once saved, this is no longer a to-be-added instance.
@@ -763,13 +767,19 @@ class Model(metaclass=ModelBase):
     def _save_parents(self, cls, using, update_fields):
         """Save all the parents of cls using values from self."""
         meta = cls._meta
+        inserted = False
         for parent, field in meta.parents.items():
             # Make sure the link fields are synced between parent and self.
             if (field and getattr(self, parent._meta.pk.attname) is None and
                     getattr(self, field.attname) is not None):
                 setattr(self, parent._meta.pk.attname, getattr(self, field.attname))
-            self._save_parents(cls=parent, using=using, update_fields=update_fields)
-            self._save_table(cls=parent, using=using, update_fields=update_fields)
+            parent_inserted = self._save_parents(cls=parent, using=using, update_fields=update_fields)
+            updated = self._save_table(
+                cls=parent, using=using, update_fields=update_fields,
+                force_insert=parent_inserted,
+            )
+            if not updated:
+                inserted = True
             # Set the parent's PK value to self.
             if field:
                 setattr(self, field.attname, self._get_pk_val(parent._meta))
@@ -780,6 +790,7 @@ class Model(metaclass=ModelBase):
                 # database if necessary.
                 if field.is_cached(self):
                     field.delete_cached_value(self)
+        return inserted
 
     def _save_table(self, raw=False, cls=None, force_insert=False,
                     force_update=False, using=None, update_fields=None):
