@@ -270,7 +270,7 @@ desire. For example::
     help_text="Please use the following format: <em>YYYY-MM-DD</em>."
 
 Alternatively you can use plain text and
-``django.utils.html.escape()`` to escape any HTML special characters. Ensure
+:func:`django.utils.html.escape` to escape any HTML special characters. Ensure
 that you escape any help text that may come from untrusted users to avoid a
 cross-site scripting attack.
 
