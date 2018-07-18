@@ -118,8 +118,8 @@ def call_command(command_name, *args, **options):
     }
     arg_options = {opt_mapping.get(key, key): value for key, value in options.items()}
     parse_args = [str(a) for a in args]
-    # Any required arguments which are passed in via **options must must be
-    # passed to parse_args().
+    # Any required arguments which are passed in via **options must be passed
+    # to parse_args().
     parse_args += [
         '{}={}'.format(min(opt.option_strings), arg_options[opt.dest])
         for opt in parser._actions if opt.required and opt.dest in options
