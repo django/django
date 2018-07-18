@@ -422,7 +422,7 @@ subclass::
         Note that this value is *not* HTML-escaped when it's displayed in
         the admin interface. This lets you include HTML if you so desire.
         Alternatively you can use plain text and
-        ``django.utils.html.escape()`` to escape any HTML special
+        :func:`django.utils.html.escape` to escape any HTML special
         characters.
 
 .. attribute:: ModelAdmin.filter_horizontal
