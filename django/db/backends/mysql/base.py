@@ -12,7 +12,8 @@ from django.db.backends.base.base import BaseDatabaseWrapper
 from django.utils.functional import cached_property
 
 try:
-    import MySQLdb as Database
+    import pymysql as Database
+    pymysql.install_as_MySQLdb()
 except ImportError as err:
     raise ImproperlyConfigured(
         'Error loading MySQLdb module.\n'
