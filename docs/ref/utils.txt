@@ -589,8 +589,7 @@ escaping HTML.
 .. function:: escape(text)
 
     Returns the given text with ampersands, quotes and angle brackets encoded
-    for use in HTML. The input is first passed through
-    :func:`~django.utils.encoding.force_text` and the output has
+    for use in HTML. The input is first coerced to a string and the output has
     :func:`~django.utils.safestring.mark_safe` applied.
 
 .. function:: conditional_escape(text)
