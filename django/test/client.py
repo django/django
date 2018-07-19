@@ -278,7 +278,7 @@ class RequestFactory:
         # See http://www.python.org/dev/peps/pep-3333/#environ-variables
         return {
             'HTTP_COOKIE': "; ".join(
-                f"{morsel.key}={morsel.coded_value}"
+                "{}={}".format(morsel.key, morsel.coded_value)
                 for morsel in self.cookies.values()
             ),
             'PATH_INFO': '/',
