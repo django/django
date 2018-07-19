@@ -1039,33 +1039,35 @@ class FormattingTests(SimpleTestCase):
         """
         Test the {% localize %} templatetag and the localize/unlocalize filters.
         """
-        context = Context({'float': 3.14, 'date': datetime.date(2016, 12, 31)})
+        context = Context({'int': 1455, 'float': 3.14, 'date': datetime.date(2016, 12, 31)})
         template1 = Template(
-            '{% load l10n %}{% localize %}{{ float }}/{{ date }}{% endlocalize %}; '
-            '{% localize on %}{{ float }}/{{ date }}{% endlocalize %}'
+            '{% load l10n %}{% localize %}{{ int }}/{{ float }}/{{ date }}{% endlocalize %}; '
+            '{% localize on %}{{ int }}/{{ float }}/{{ date }}{% endlocalize %}'
         )
         template2 = Template(
-            '{% load l10n %}{{ float }}/{{ date }}; '
-            '{% localize off %}{{ float }}/{{ date }};{% endlocalize %} '
-            '{{ float }}/{{ date }}'
+            '{% load l10n %}{{ int }}/{{ float }}/{{ date }}; '
+            '{% localize off %}{{ int }}/{{ float }}/{{ date }};{% endlocalize %} '
+            '{{ int }}/{{ float }}/{{ date }}'
         )
         template3 = Template(
-            '{% load l10n %}{{ float }}/{{ date }}; {{ float|unlocalize }}/{{ date|unlocalize }}'
+            '{% load l10n %}{{ int }}/{{ float }}/{{ date }}; '
+            '{{ int|unlocalize }}/{{ float|unlocalize }}/{{ date|unlocalize }}'
         )
         template4 = Template(
-            '{% load l10n %}{{ float }}/{{ date }}; {{ float|localize }}/{{ date|localize }}'
+            '{% load l10n %}{{ int }}/{{ float }}/{{ date }}; '
+            '{{ int|localize }}/{{ float|localize }}/{{ date|localize }}'
         )
-        expected_localized = '3,14/31. Dezember 2016'
-        expected_unlocalized = '3.14/Dez. 31, 2016'
+        expected_localized = '1.455/3,14/31. Dezember 2016'
+        expected_unlocalized = '1455/3.14/Dez. 31, 2016'
         output1 = '; '.join([expected_localized, expected_localized])
         output2 = '; '.join([expected_localized, expected_unlocalized, expected_localized])
         output3 = '; '.join([expected_localized, expected_unlocalized])
         output4 = '; '.join([expected_unlocalized, expected_localized])
         with translation.override('de', deactivate=True):
-            with self.settings(USE_L10N=False):
+            with self.settings(USE_L10N=False, USE_THOUSAND_SEPARATOR=True):
                 self.assertEqual(template1.render(context), output1)
                 self.assertEqual(template4.render(context), output4)
-            with self.settings(USE_L10N=True):
+            with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True):
                 self.assertEqual(template1.render(context), output1)
                 self.assertEqual(template2.render(context), output2)
                 self.assertEqual(template3.render(context), output3)
