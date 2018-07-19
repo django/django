@@ -277,7 +277,10 @@ class RequestFactory:
         # - REMOTE_ADDR: often useful, see #8551.
         # See http://www.python.org/dev/peps/pep-3333/#environ-variables
         return {
-            'HTTP_COOKIE': self.cookies.output(header='', sep='; '),
+            'HTTP_COOKIE': '; '.join(sorted(
+                '%s=%s' % (morsel.key, morsel.coded_value)
+                for morsel in self.cookies.values()
+            )),
             'PATH_INFO': '/',
             'REMOTE_ADDR': '127.0.0.1',
             'REQUEST_METHOD': 'GET',

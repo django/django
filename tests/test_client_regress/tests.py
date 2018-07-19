@@ -1423,3 +1423,9 @@ class RequestFactoryEnvironmentTests(SimpleTestCase):
         self.assertEqual(request.META.get('SERVER_PORT'), '80')
         self.assertEqual(request.META.get('SERVER_PROTOCOL'), 'HTTP/1.1')
         self.assertEqual(request.META.get('SCRIPT_NAME') + request.META.get('PATH_INFO'), '/path/')
+
+    def test_cookies(self):
+        factory = RequestFactory()
+        factory.cookies.load('A="B"; C="D"; Path=/; Version=1')
+        request = factory.get('/')
+        self.assertEqual(request.META['HTTP_COOKIE'], 'A="B"; C="D"')
