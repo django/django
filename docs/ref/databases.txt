@@ -710,6 +710,19 @@ can use the "pyformat" parameter style, where placeholders in the query
 are given as ``'%(name)s'`` and the parameters are passed as a dictionary
 rather than a list. SQLite does not support this.
 
+.. _sqlite-isolation:
+
+Isolation when using ``QuerySet.iterator()``
+--------------------------------------------
+
+There are special considerations described in `Isolation In SQLite`_ when
+modifying a table while iterating over it using :meth:`.QuerySet.iterator`. If
+a row is added, changed, or deleted within the loop, then that row may or may
+not appear, or may appear twice, in subsequent results fetched from the
+iterator. Your code must handle this.
+
+.. _`Isolation in SQLite`: https://sqlite.org/isolation.html
+
 .. _oracle-notes:
 
 Oracle notes
