@@ -93,7 +93,7 @@ class Command(BaseCommand):
                 for row in table_description:
                     comment_notes = []  # Holds Field notes, to be displayed in a Python comment.
                     extra_params = OrderedDict()  # Holds Field parameters such as 'db_column'.
-                    column_name = row[0]
+                    column_name = row.name
                     is_relation = column_name in relations
 
                     att_name, params, notes = self.normalize_col_name(
@@ -138,7 +138,7 @@ class Command(BaseCommand):
 
                     # Add 'null' and 'blank', if the 'null_ok' flag was present in the
                     # table description.
-                    if row[6]:  # If it's NULL...
+                    if row.null_ok:  # If it's NULL...
                         extra_params['blank'] = True
                         extra_params['null'] = True
 
@@ -229,7 +229,7 @@ class Command(BaseCommand):
         field_notes = []
 
         try:
-            field_type = connection.introspection.get_field_type(row[1], row)
+            field_type = connection.introspection.get_field_type(row.type_code, row)
         except KeyError:
             field_type = 'TextField'
             field_notes.append('This field type is a guess.')
@@ -241,19 +241,19 @@ class Command(BaseCommand):
             field_params.update(new_params)
 
         # Add max_length for all CharFields.
-        if field_type == 'CharField' and row[3]:
-            field_params['max_length'] = int(row[3])
+        if field_type == 'CharField' and row.internal_size:
+            field_params['max_length'] = int(row.internal_size)
 
         if field_type == 'DecimalField':
-            if row[4] is None or row[5] is None:
+            if row.precision is None or row.scale is None:
                 field_notes.append(
                     'max_digits and decimal_places have been guessed, as this '
                     'database handles decimal fields as float')
-                field_params['max_digits'] = row[4] if row[4] is not None else 10
-                field_params['decimal_places'] = row[5] if row[5] is not None else 5
+                field_params['max_digits'] = row.precision if row.precision is not None else 10
+                field_params['decimal_places'] = row.scale if row.scale is not None else 5
             else:
-                field_params['max_digits'] = row[4]
-                field_params['decimal_places'] = row[5]
+                field_params['max_digits'] = row.precision
+                field_params['decimal_places'] = row.scale
 
         return field_type, field_params, field_notes
 
