@@ -41,9 +41,6 @@ class Command(BaseCommand):
         def table2model(table_name):
             return re.sub(r'[^a-zA-Z0-9]', '', table_name.title())
 
-        def strip_prefix(s):
-            return s[1:] if s.startswith("u'") else s
-
         with connection.cursor() as cursor:
             yield "# This is an auto-generated Django model module."
             yield "# You'll have to do the following manually to clean this up:"
@@ -157,9 +154,7 @@ class Command(BaseCommand):
                     if extra_params:
                         if not field_desc.endswith('('):
                             field_desc += ', '
-                        field_desc += ', '.join(
-                            '%s=%s' % (k, strip_prefix(repr(v)))
-                            for k, v in extra_params.items())
+                        field_desc += ', '.join('%s=%r' % (k, v) for k, v in extra_params.items())
                     field_desc += ')'
                     if comment_notes:
                         field_desc += '  # ' + ' '.join(comment_notes)
