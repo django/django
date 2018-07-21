@@ -11,6 +11,7 @@ from django.db import (
     ConnectionHandler, DatabaseError, connection, connections, models,
 )
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
+from django.db.backends.utils import truncate_name
 from django.db.migrations.exceptions import InconsistentMigrationHistory
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import TestCase, override_settings
@@ -592,7 +593,8 @@ class MigrateTests(MigrationTestBase):
         stdout = stdout.getvalue()
         self.assertIn('Synchronize unmigrated apps: unmigrated_app_syncdb', stdout)
         self.assertIn('Creating tables...', stdout)
-        self.assertIn('Creating table unmigrated_app_syncdb_classroom', stdout)
+        table_name = truncate_name('unmigrated_app_syncdb_classroom', connection.ops.max_name_length())
+        self.assertIn('Creating table %s' % table_name, stdout)
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
     def test_migrate_record_replaced(self):
