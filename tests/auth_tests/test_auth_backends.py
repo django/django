@@ -6,7 +6,9 @@ from django.contrib.auth import (
 )
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import MD5PasswordHasher
-from django.contrib.auth.models import AnonymousUser, Group, Permission, User
+from django.contrib.auth.models import (
+    AnonymousUser, Group, Permission, User, _get_backends,
+)
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.http import HttpRequest
@@ -108,6 +110,7 @@ class BaseModelBackendTest:
         self.assertIs(user.has_perm('test'), False)
         self.assertIs(user.has_perms(['auth.test2', 'auth.test3']), False)
 
+    # default settings.OBJECT_PERMISSION_FALLBACK_TO_MODEL=False
     def test_has_no_object_perm(self):
         """Regressiontest for #12462"""
         user = self.UserModel._default_manager.get(pk=self.user.pk)
@@ -115,10 +118,26 @@ class BaseModelBackendTest:
         perm = Permission.objects.create(name='test', content_type=content_type, codename='test')
         user.user_permissions.add(perm)
 
-        self.assertIs(user.has_perm('auth.test', 'object'), False)
-        self.assertEqual(user.get_all_permissions('object'), set())
         self.assertIs(user.has_perm('auth.test'), True)
+        self.assertIs(user.has_perm('auth.test', 'object'), False)
+
         self.assertEqual(user.get_all_permissions(), {'auth.test'})
+        self.assertEqual(user.get_all_permissions('object'), set())
+
+    @override_settings(OBJECT_PERMISSION_FALLBACK_TO_MODEL=True)
+    def test_has_no_object_perm_with_fallback(self):
+        """Regressiontest for #20218"""
+        user = self.UserModel._default_manager.get(pk=self.user.pk)
+        content_type = ContentType.objects.get_for_model(Group)
+        perm = Permission.objects.create(name='test', content_type=content_type, codename='test')
+        user.user_permissions.add(perm)
+
+        # test with obj permissions fallback to model
+        self.assertIs(user.has_perm('auth.test'), True)
+        self.assertIs(user.has_perm('auth.test', 'object'), True)
+
+        self.assertEqual(user.get_all_permissions(), {'auth.test'})
+        self.assertEqual(user.get_all_permissions('object'), {'auth.test'})
 
     def test_anonymous_has_no_permissions(self):
         """
@@ -366,6 +385,30 @@ class SimpleRowlevelBackend:
             return ['group_perm']
         else:
             return ['none']
+
+
+@override_settings(
+    AUTHENTICATION_BACKENDS=[
+        'auth_tests.test_auth_backends.SimpleRowlevelBackend',
+        'auth_tests.test_auth_backends.NewModelBackend',
+        'auth_tests.test_auth_backends.PermissionDeniedBackend',
+    ],
+)
+class ChooseBackendTest(TestCase):
+
+    def test_choose_backend(self):
+        self.assertEqual(_get_backends('All').__len__(), 3)
+
+        self.assertEqual(_get_backends(('SimpleRowlevelBackend',)).__len__(), 1)
+        self.assertEqual(_get_backends(('simplerowlevelbackend',)).__len__(), 1)
+        self.assertEqual(_get_backends(('SimpleRowlevel',)).__len__(), 1)
+        self.assertEqual(_get_backends(('simplerowlevel',)).__len__(), 1)
+
+        self.assertEqual(_get_backends(
+            ('SimpleRowlevel', 'PermissionDenied',)).__len__(), 2)
+
+        self.assertEqual(_get_backends(
+            ('SimpleRowlevel', 'PermissionDenied', 'NewModelBackend')).__len__(), 3)
 
 
 @modify_settings(AUTHENTICATION_BACKENDS={

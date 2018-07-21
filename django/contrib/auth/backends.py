@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 
@@ -44,7 +45,8 @@ class ModelBackend:
         be either "group" or "user" to return permissions from
         `_get_group_permissions` or `_get_user_permissions` respectively.
         """
-        if not user_obj.is_active or user_obj.is_anonymous or obj is not None:
+        if not user_obj.is_active or user_obj.is_anonymous or obj is not None \
+                and settings.OBJECT_PERMISSION_FALLBACK_TO_MODEL is False:
             return set()
 
         perm_cache_name = '_%s_perm_cache' % from_name
@@ -72,8 +74,10 @@ class ModelBackend:
         return self._get_permissions(user_obj, obj, 'group')
 
     def get_all_permissions(self, user_obj, obj=None):
-        if not user_obj.is_active or user_obj.is_anonymous or obj is not None:
+        if not user_obj.is_active or user_obj.is_anonymous or obj is not None \
+                and settings.OBJECT_PERMISSION_FALLBACK_TO_MODEL is False:
             return set()
+
         if not hasattr(user_obj, '_perm_cache'):
             user_obj._perm_cache = {
                 *self.get_user_permissions(user_obj),
@@ -82,7 +86,8 @@ class ModelBackend:
         return user_obj._perm_cache
 
     def has_perm(self, user_obj, perm, obj=None):
-        return user_obj.is_active and perm in self.get_all_permissions(user_obj, obj)
+        return user_obj.is_active \
+            and perm in self.get_all_permissions(user_obj, obj)
 
     def has_module_perms(self, user_obj, app_label):
         """

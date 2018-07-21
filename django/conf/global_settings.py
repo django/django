@@ -498,6 +498,8 @@ AUTH_USER_MODEL = 'auth.User'
 
 AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend']
 
+OBJECT_PERMISSION_FALLBACK_TO_MODEL = False
+
 LOGIN_URL = '/accounts/login/'
 
 LOGIN_REDIRECT_URL = '/accounts/profile/'

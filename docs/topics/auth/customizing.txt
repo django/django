@@ -261,9 +261,12 @@ Handling object permissions
 Django's permission framework has a foundation for object permissions, though
 there is no implementation for it in the core. That means that checking for
 object permissions will always return ``False`` or an empty list (depending on
-the check performed). An authentication backend will receive the keyword
-parameters ``obj`` and ``user_obj`` for each object related authorization
-method and can return the object level permission as appropriate.
+the check performed). This behavior, however, can be changed by adding
+``OBJECT_PERMISSION_FALLBACK_TO_MODEL = True`` to the settings, in case of
+which, model level permissions will be returned instead. An authentication
+backend will receive the keyword parameters ``obj`` and ``user_obj`` for each
+object related authorization method and can return the object level permission
+as appropriate.
 
 .. _custom-permissions:
 

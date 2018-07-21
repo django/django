@@ -162,19 +162,28 @@ class UserManager(BaseUserManager):
 
 
 # A few helper functions for common logic between User and AnonymousUser.
-def _user_get_all_permissions(user, obj):
+def _user_get_all_permissions(user, obj, backends):
     permissions = set()
-    for backend in auth.get_backends():
+    for backend in _get_backends(backends):
         if hasattr(backend, "get_all_permissions"):
             permissions.update(backend.get_all_permissions(user, obj))
     return permissions
 
 
-def _user_has_perm(user, perm, obj):
+def _get_backends(backends):
+    if backends == "All":
+        return auth.get_backends()
+    backends = [be.lower().replace('backend', '') for be in backends]
+    return [be for be in auth.get_backends()
+            if be.__class__.__name__.lower().replace('backend', '') in backends]
+    # backend class name (possibly - 'backend') must be in the `backends` given
+
+
+def _user_has_perm(user, perm, obj, backends):
     """
     A backend can raise `PermissionDenied` to short-circuit permission checking.
     """
-    for backend in auth.get_backends():
+    for backend in _get_backends(backends):
         if not hasattr(backend, 'has_perm'):
             continue
         try:
@@ -185,11 +194,11 @@ def _user_has_perm(user, perm, obj):
     return False
 
 
-def _user_has_module_perms(user, app_label):
+def _user_has_module_perms(user, app_label, backends):
     """
     A backend can raise `PermissionDenied` to short-circuit permission checking.
     """
-    for backend in auth.get_backends():
+    for backend in _get_backends(backends):
         if not hasattr(backend, 'has_module_perms'):
             continue
         try:
@@ -236,22 +245,22 @@ class PermissionsMixin(models.Model):
     class Meta:
         abstract = True
 
-    def get_group_permissions(self, obj=None):
+    def get_group_permissions(self, obj=None, backends="All"):
         """
         Return a list of permission strings that this user has through their
         groups. Query all available auth backends. If an object is passed in,
         return only permissions matching this object.
         """
         permissions = set()
-        for backend in auth.get_backends():
+        for backend in _get_backends(backends):
             if hasattr(backend, "get_group_permissions"):
                 permissions.update(backend.get_group_permissions(self, obj))
         return permissions
 
-    def get_all_permissions(self, obj=None):
-        return _user_get_all_permissions(self, obj)
+    def get_all_permissions(self, obj=None, backends="All"):
+        return _user_get_all_permissions(self, obj, backends)
 
-    def has_perm(self, perm, obj=None):
+    def has_perm(self, perm, obj=None, backends="All"):
         """
         Return True if the user has the specified permission. Query all
         available auth backends, but return immediately if any backend returns
@@ -264,16 +273,16 @@ class PermissionsMixin(models.Model):
             return True
 
         # Otherwise we need to check the backends.
-        return _user_has_perm(self, perm, obj)
+        return _user_has_perm(self, perm, obj, backends)
 
-    def has_perms(self, perm_list, obj=None):
+    def has_perms(self, perm_list, obj=None, backends="All"):
         """
         Return True if the user has each of the specified permissions. If
         object is passed, check if the user has all required perms for it.
         """
-        return all(self.has_perm(perm, obj) for perm in perm_list)
+        return all(self.has_perm(perm, obj, backends) for perm in perm_list)
 
-    def has_module_perms(self, app_label):
+    def has_module_perms(self, app_label, backends="All"):
         """
         Return True if the user has any permissions in the given app label.
         Use simlar logic as has_perm(), above.
@@ -282,7 +291,7 @@ class PermissionsMixin(models.Model):
         if self.is_active and self.is_superuser:
             return True
 
-        return _user_has_module_perms(self, app_label)
+        return _user_has_module_perms(self, app_label, backends)
 
 
 class AbstractUser(AbstractBaseUser, PermissionsMixin):
@@ -403,20 +412,20 @@ class AnonymousUser:
     def user_permissions(self):
         return self._user_permissions
 
-    def get_group_permissions(self, obj=None):
+    def get_group_permissions(self, obj=None, backends="All"):
         return set()
 
-    def get_all_permissions(self, obj=None):
-        return _user_get_all_permissions(self, obj=obj)
+    def get_all_permissions(self, obj=None, backends="All"):
+        return _user_get_all_permissions(self, obj=obj, backends=backends)
 
-    def has_perm(self, perm, obj=None):
-        return _user_has_perm(self, perm, obj=obj)
+    def has_perm(self, perm, obj=None, backends="All"):
+        return _user_has_perm(self, perm, obj=obj, backends=backends)
 
-    def has_perms(self, perm_list, obj=None):
-        return all(self.has_perm(perm, obj) for perm in perm_list)
+    def has_perms(self, perm_list, obj=None, backends="All"):
+        return all(self.has_perm(perm, obj, backends=backends) for perm in perm_list)
 
-    def has_module_perms(self, module):
-        return _user_has_module_perms(self, module)
+    def has_module_perms(self, module, backends="All"):
+        return _user_has_module_perms(self, module, backends)
 
     @property
     def is_anonymous(self):
