@@ -40,7 +40,7 @@ custom_templates_dir = os.path.join(os.path.dirname(__file__), 'custom_templates
 SYSTEM_CHECK_MSG = 'System check identified no issues'
 
 
-class AdminScriptTestCase(unittest.TestCase):
+class AdminScriptTestCase(SimpleTestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -970,9 +970,9 @@ class ManageAlternateSettings(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertOutput(
             out,
-            "EXECUTE: noargs_command options=[('no_color', False), "
-            "('pythonpath', None), ('settings', 'alternate_settings'), "
-            "('traceback', False), ('verbosity', 1)]"
+            "EXECUTE: noargs_command options=[('force_color', False), "
+            "('no_color', False), ('pythonpath', None), ('settings', "
+            "'alternate_settings'), ('traceback', False), ('verbosity', 1)]"
         )
         self.assertNoOutput(err)
 
@@ -982,9 +982,9 @@ class ManageAlternateSettings(AdminScriptTestCase):
         out, err = self.run_manage(args, 'alternate_settings')
         self.assertOutput(
             out,
-            "EXECUTE: noargs_command options=[('no_color', False), "
-            "('pythonpath', None), ('settings', None), ('traceback', False), "
-            "('verbosity', 1)]"
+            "EXECUTE: noargs_command options=[('force_color', False), "
+            "('no_color', False), ('pythonpath', None), ('settings', None), "
+            "('traceback', False), ('verbosity', 1)]"
         )
         self.assertNoOutput(err)
 
@@ -994,9 +994,9 @@ class ManageAlternateSettings(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertOutput(
             out,
-            "EXECUTE: noargs_command options=[('no_color', True), "
-            "('pythonpath', None), ('settings', 'alternate_settings'), "
-            "('traceback', False), ('verbosity', 1)]"
+            "EXECUTE: noargs_command options=[('force_color', False), "
+            "('no_color', True), ('pythonpath', None), ('settings', "
+            "'alternate_settings'), ('traceback', False), ('verbosity', 1)]"
         )
         self.assertNoOutput(err)
 
@@ -1425,7 +1425,7 @@ class ManageTestserver(AdminScriptTestCase):
             'blah.json',
             stdout=out, settings=None, pythonpath=None, verbosity=1,
             traceback=False, addrport='', no_color=False, use_ipv6=False,
-            skip_checks=True, interactive=True,
+            skip_checks=True, interactive=True, force_color=False,
         )
 
     @mock.patch('django.db.connection.creation.create_test_db', return_value='test_db')
@@ -1436,6 +1436,7 @@ class ManageTestserver(AdminScriptTestCase):
         call_command('testserver', 'blah.json', stdout=out)
         mock_runserver_handle.assert_called_with(
             addrport='',
+            force_color=False,
             insecure_serving=False,
             no_color=False,
             pythonpath=None,
@@ -1578,6 +1579,34 @@ class CommandTypes(AdminScriptTestCase):
         self.assertEqual(out.getvalue(), 'Hello, world!\n')
         self.assertEqual(err.getvalue(), 'Hello, world!\n')
 
+    def test_force_color_execute(self):
+        out = StringIO()
+        err = StringIO()
+        with mock.patch.object(sys.stdout, 'isatty', lambda: False):
+            command = ColorCommand(stdout=out, stderr=err)
+            call_command(command, force_color=True)
+        self.assertEqual(out.getvalue(), '\x1b[31;1mHello, world!\n\x1b[0m')
+        self.assertEqual(err.getvalue(), '\x1b[31;1mHello, world!\n\x1b[0m')
+
+    def test_force_color_command_init(self):
+        out = StringIO()
+        err = StringIO()
+        with mock.patch.object(sys.stdout, 'isatty', lambda: False):
+            command = ColorCommand(stdout=out, stderr=err, force_color=True)
+            call_command(command)
+        self.assertEqual(out.getvalue(), '\x1b[31;1mHello, world!\n\x1b[0m')
+        self.assertEqual(err.getvalue(), '\x1b[31;1mHello, world!\n\x1b[0m')
+
+    def test_no_color_force_color_mutually_exclusive_execute(self):
+        msg = "The --no-color and --force-color options can't be used together."
+        with self.assertRaisesMessage(CommandError, msg):
+            call_command(BaseCommand(), no_color=True, force_color=True)
+
+    def test_no_color_force_color_mutually_exclusive_command_init(self):
+        msg = "'no_color' and 'force_color' can't be used together."
+        with self.assertRaisesMessage(CommandError, msg):
+            call_command(BaseCommand(no_color=True, force_color=True))
+
     def test_custom_stdout(self):
         class Command(BaseCommand):
             requires_system_checks = False
@@ -1655,9 +1684,10 @@ class CommandTypes(AdminScriptTestCase):
 
         expected_out = (
             "EXECUTE:BaseCommand labels=%s, "
-            "options=[('no_color', False), ('option_a', %s), ('option_b', %s), "
-            "('option_c', '3'), ('pythonpath', None), ('settings', None), "
-            "('traceback', False), ('verbosity', 1)]") % (labels, option_a, option_b)
+            "options=[('force_color', False), ('no_color', False), "
+            "('option_a', %s), ('option_b', %s), ('option_c', '3'), "
+            "('pythonpath', None), ('settings', None), ('traceback', False), "
+            "('verbosity', 1)]") % (labels, option_a, option_b)
         self.assertNoOutput(err)
         self.assertOutput(out, expected_out)
 
@@ -1731,9 +1761,9 @@ class CommandTypes(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertOutput(
             out,
-            "EXECUTE: noargs_command options=[('no_color', False), "
-            "('pythonpath', None), ('settings', None), ('traceback', False), "
-            "('verbosity', 1)]"
+            "EXECUTE: noargs_command options=[('force_color', False), "
+            "('no_color', False), ('pythonpath', None), ('settings', None), "
+            "('traceback', False), ('verbosity', 1)]"
         )
 
     def test_noargs_with_args(self):
@@ -1750,8 +1780,9 @@ class CommandTypes(AdminScriptTestCase):
         self.assertOutput(out, "EXECUTE:AppCommand name=django.contrib.auth, options=")
         self.assertOutput(
             out,
-            ", options=[('no_color', False), ('pythonpath', None), "
-            "('settings', None), ('traceback', False), ('verbosity', 1)]"
+            ", options=[('force_color', False), ('no_color', False), "
+            "('pythonpath', None), ('settings', None), ('traceback', False), "
+            "('verbosity', 1)]"
         )
 
     def test_app_command_no_apps(self):
@@ -1768,14 +1799,16 @@ class CommandTypes(AdminScriptTestCase):
         self.assertOutput(out, "EXECUTE:AppCommand name=django.contrib.auth, options=")
         self.assertOutput(
             out,
-            ", options=[('no_color', False), ('pythonpath', None), "
-            "('settings', None), ('traceback', False), ('verbosity', 1)]"
+            ", options=[('force_color', False), ('no_color', False), "
+            "('pythonpath', None), ('settings', None), ('traceback', False), "
+            "('verbosity', 1)]"
         )
         self.assertOutput(out, "EXECUTE:AppCommand name=django.contrib.contenttypes, options=")
         self.assertOutput(
             out,
-            ", options=[('no_color', False), ('pythonpath', None), "
-            "('settings', None), ('traceback', False), ('verbosity', 1)]"
+            ", options=[('force_color', False), ('no_color', False), "
+            "('pythonpath', None), ('settings', None), ('traceback', False), "
+            "('verbosity', 1)]"
         )
 
     def test_app_command_invalid_app_label(self):
@@ -1797,8 +1830,9 @@ class CommandTypes(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertOutput(
             out,
-            "EXECUTE:LabelCommand label=testlabel, options=[('no_color', False), "
-            "('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]"
+            "EXECUTE:LabelCommand label=testlabel, options=[('force_color', "
+            "False), ('no_color', False), ('pythonpath', None), ('settings', "
+            "None), ('traceback', False), ('verbosity', 1)]"
         )
 
     def test_label_command_no_label(self):
@@ -1814,13 +1848,15 @@ class CommandTypes(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertOutput(
             out,
-            "EXECUTE:LabelCommand label=testlabel, options=[('no_color', False), "
-            "('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]"
+            "EXECUTE:LabelCommand label=testlabel, options=[('force_color', "
+            "False), ('no_color', False), ('pythonpath', None), "
+            "('settings', None), ('traceback', False), ('verbosity', 1)]"
         )
         self.assertOutput(
             out,
-            "EXECUTE:LabelCommand label=anotherlabel, options=[('no_color', False), "
-            "('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]"
+            "EXECUTE:LabelCommand label=anotherlabel, options=[('force_color', "
+            "False), ('no_color', False), ('pythonpath', None), "
+            "('settings', None), ('traceback', False), ('verbosity', 1)]"
         )
 
 
@@ -1894,10 +1930,11 @@ class ArgumentOrder(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertOutput(
             out,
-            "EXECUTE:BaseCommand labels=('testlabel',), options=[('no_color', False), "
-            "('option_a', 'x'), ('option_b', %s), ('option_c', '3'), "
-            "('pythonpath', None), ('settings', 'alternate_settings'), "
-            "('traceback', False), ('verbosity', 1)]" % option_b
+            "EXECUTE:BaseCommand labels=('testlabel',), options=["
+            "('force_color', False), ('no_color', False), ('option_a', 'x'), "
+            "('option_b', %s), ('option_c', '3'), ('pythonpath', None), "
+            "('settings', 'alternate_settings'), ('traceback', False), "
+            "('verbosity', 1)]" % option_b
         )
 
 

@@ -95,7 +95,7 @@ class DjangoHelpFormatter(HelpFormatter):
     """
     show_last = {
         '--version', '--verbosity', '--traceback', '--settings', '--pythonpath',
-        '--no-color',
+        '--no-color', '--force_color',
     }
 
     def _reordered_actions(self, actions):
@@ -227,13 +227,15 @@ class BaseCommand:
     # Command-specific options not defined by the argument parser.
     stealth_options = ()
 
-    def __init__(self, stdout=None, stderr=None, no_color=False):
+    def __init__(self, stdout=None, stderr=None, no_color=False, force_color=False):
         self.stdout = OutputWrapper(stdout or sys.stdout)
         self.stderr = OutputWrapper(stderr or sys.stderr)
+        if no_color and force_color:
+            raise CommandError("'no_color' and 'force_color' can't be used together.")
         if no_color:
             self.style = no_style()
         else:
-            self.style = color_style()
+            self.style = color_style(force_color)
             self.stderr.style_func = self.style.ERROR
 
     def get_version(self):
@@ -279,6 +281,10 @@ class BaseCommand:
         parser.add_argument(
             '--no-color', action='store_true',
             help="Don't colorize the command output.",
+        )
+        parser.add_argument(
+            '--force-color', action='store_true',
+            help='Force colorization of the command output.',
         )
         self.add_arguments(parser)
         return parser
@@ -339,7 +345,11 @@ class BaseCommand:
         controlled by the ``requires_system_checks`` attribute, except if
         force-skipped).
         """
-        if options['no_color']:
+        if options['force_color'] and options['no_color']:
+            raise CommandError("The --no-color and --force-color options can't be used together.")
+        if options['force_color']:
+            self.style = color_style(force_color=True)
+        elif options['no_color']:
             self.style = no_style()
             self.stderr.style_func = None
         if options.get('stdout'):

@@ -1657,6 +1657,14 @@ Example usage::
 
     django-admin runserver --no-color
 
+.. django-admin-option:: --force-color
+
+.. versionadded:: 2.2
+
+Forces colorization of the command output if it would otherwise be disabled
+as discussed in :ref:`syntax-coloring`. For example, you may want to pipe
+colored output to another command.
+
 Extra niceties
 ==============
 
@@ -1668,7 +1676,7 @@ Syntax coloring
 The ``django-admin`` / ``manage.py`` commands will use pretty
 color-coded output if your terminal supports ANSI-colored output. It
 won't use the color codes if you're piping the command's output to
-another program.
+another program unless the :option:`--force-color` option is used.
 
 Under Windows, the native console doesn't support ANSI escape sequences so by
 default there is no color output. But you can install the `ANSICON`_

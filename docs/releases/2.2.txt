@@ -170,7 +170,8 @@ Internationalization
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :option:`--force-color` option forces colorization of the command
+  output.
 
 Migrations
 ~~~~~~~~~~
