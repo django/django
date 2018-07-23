@@ -211,7 +211,7 @@ class BaseDatabaseWrapper:
 
     def ensure_connection(self):
         """Guarantee that a connection to the database is established."""
-        if self.connection is None:
+        if (not self.is_usable()) or self.connection is None:
             with self.wrap_database_errors:
                 self.connect()
 
