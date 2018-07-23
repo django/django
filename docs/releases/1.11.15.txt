@@ -1,0 +1,7 @@
+============================
+Django 1.11.15 release notes
+============================
+
+*August 1, 2018*
+
+Django 1.11.15 fixes a security issue in 1.11.14.
