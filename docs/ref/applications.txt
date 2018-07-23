@@ -200,6 +200,13 @@ Configurable attributes
     required; for instance if the app package is a `namespace package`_ with
     multiple paths.
 
+.. attribute:: AppConfig.assets
+
+    .. versionadded:: 2.2
+
+    List of asset instances on which the application depends. They are usually
+    output in templates by the :ttag:`site_assets` template tag.
+
 Read-only attributes
 --------------------
 
@@ -368,6 +375,28 @@ Application registry
     example) until the app registry is fully populated. For this reason, it's
     best to leave ``require_ready`` to the default value of ``True`` whenever
     possible.
+
+Application assets
+==================
+
+.. versionadded:: 2.2
+
+The asset classes below are meant to be used to fill the
+:attr:`AppConfig.assets` list attribute.
+
+.. class:: CSS(path)
+
+    Represents a stylesheet file with a path relative to the static root, or an
+    absolute URL. Its string representation will look like::
+
+        <link href="/static/path/to/file.css" rel="stylesheet" type="text/css">
+
+.. class:: JS(path)
+
+    Represents a JavaScript file with a path relative to the static root, or an
+    absolute URL. Its string representation will look like::
+
+        <script src="/static/path/to/script.js"></script>
 
 .. _app-loading-process:
 

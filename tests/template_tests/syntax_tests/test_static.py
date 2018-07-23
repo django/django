@@ -69,3 +69,40 @@ class StaticTagTests(SimpleTestCase):
         msg = "'static' takes at least one argument (path to file)"
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('t')
+
+
+@override_settings(
+    INSTALLED_APPS=['template_tests.apps.MyAdmin', 'template_tests.apps.MyAuth'],
+    MEDIA_URL='/media/', STATIC_URL='/static/'
+)
+class SiteAssetsTagTests(SimpleTestCase):
+    libraries = {'static': 'django.templatetags.static'}
+
+    @setup({
+        'siteassets01a': '{% load static %}{% site_assets %}',
+        'siteassets01b': "{% load static %}{% site_assets 'myadmin, myauth' %}",
+        'siteassets01c': "{% load static %}{% site_assets 'myadmin  myauth' %}",
+    })
+    def test_site_assets(self):
+        expected_output = (
+            '<link href="/static/css/admin.css" rel="stylesheet" type="text/css">\n'
+            '<script src="https://code.jquery.com/jquery-3.1.1.js"></script>\n'
+            '<script src="/static/js/admin.js"></script>\n'
+            '<link href="/static/css/auth.css" rel="stylesheet" type="text/css">'
+        )
+        output = self.engine.render_to_string('siteassets01a')
+        self.assertEqual(output, expected_output)
+        output = self.engine.render_to_string('siteassets01b')
+        self.assertEqual(output, expected_output)
+        output = self.engine.render_to_string('siteassets01c')
+        self.assertEqual(output, expected_output)
+
+    @setup({'siteassets02': "{% load static %}{% site_assets '-myadmin' %}"})
+    def test_site_assets_exclude(self):
+        output = self.engine.render_to_string('siteassets02')
+        self.assertEqual(
+            output,
+            '<link href="/static/css/auth.css" rel="stylesheet" type="text/css">\n'
+            '<script src="https://code.jquery.com/jquery-3.1.1.js"></script>\n'
+            '<script src="/static/js/admin.js"></script>'
+        )

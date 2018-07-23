@@ -9,6 +9,7 @@ MODELS_MODULE_NAME = 'models'
 
 class AppConfig:
     """Class representing a Django application and its configuration."""
+    assets = None
 
     def __init__(self, app_name, app_module):
         # Full Python path to the application e.g. 'django.contrib.admin'.
