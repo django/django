@@ -245,6 +245,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         try:
             # Use a psycopg cursor directly, bypassing Django's utilities.
             self.connection.cursor().execute("SELECT 1")
+            self.connection.commit()
         except Database.Error:
             return False
         else:
