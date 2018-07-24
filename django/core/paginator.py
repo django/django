@@ -192,8 +192,8 @@ class Page(collections.abc.Sequence):
         a template for loop. This page num is in the middle of range.
         Can set show_count control the range length.
         """
-        bottom = self.number - show_count//2
-        top = self.number + show_count//2
+        bottom = self.number - show_count // 2
+        top = self.number + show_count // 2
         if self.paginator.num_pages <= show_count:
             return range(1, self.paginator.num_pages)
         if bottom <= 0:
