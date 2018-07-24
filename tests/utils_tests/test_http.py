@@ -248,3 +248,13 @@ class HttpDateProcessingTests(unittest.TestCase):
     def test_parsing_asctime(self):
         parsed = http.parse_http_date('Sun Nov  6 08:49:37 1994')
         self.assertEqual(datetime.utcfromtimestamp(parsed), datetime(1994, 11, 6, 8, 49, 37))
+
+
+class EscapeLeadingSlashesTests(unittest.TestCase):
+    def test(self):
+        tests = (
+            ('//example.com', '/%2Fexample.com'),
+            ('//', '/%2F'),
+        )
+        for url, expected in tests:
+            self.assertEqual(http.escape_leading_slashes(url), expected)
