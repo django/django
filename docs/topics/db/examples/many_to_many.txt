@@ -39,7 +39,7 @@ API facilities. Note that if you are using :ref:`an intermediate model
 manager's methods are disabled, so some of these examples won't work with such
 models.
 
-Create a couple of ``Publications``::
+Create a few ``Publications``::
 
     >>> p1 = Publication(title='The Python Journal')
     >>> p1.save()
@@ -68,7 +68,7 @@ Associate the ``Article`` with a ``Publication``::
 
     >>> a1.publications.add(p1)
 
-Create another ``Article``, and set it to appear in both ``Publications``::
+Create another ``Article``, and set it to appear in the ``Publications``::
 
     >>> a2 = Article(headline='NASA uses Python')
     >>> a2.save()
