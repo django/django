@@ -1,9 +1,11 @@
+import re
 from urllib.parse import quote, urljoin
 
 from django import template
 from django.apps import apps
 from django.utils.encoding import iri_to_uri
 from django.utils.html import conditional_escape
+from django.utils.safestring import mark_safe
 
 register = template.Library()
 
@@ -165,3 +167,34 @@ def static(path):
     asset.
     """
     return StaticNode.handle_simple(path)
+
+
+@register.simple_tag
+def site_assets(app_names=None):
+    """
+    Return a safe string containing site assets (defined in AppConfigs),
+    optionally limited by app names.
+    `app_names` is a space/comma separated list of app labels, optionally
+    preceded by '-' to exclude apps ('admin, auth' or '-gis admin').
+    If not specified, all apps are searched for assets.
+    """
+    asset_list = []
+    if app_names:
+        if app_names[0] == '-':
+            app_configs = [
+                conf for conf in apps.get_app_configs()
+                if conf.label not in re.split('[,\s]+', app_names[1:])
+            ]
+        else:
+            app_configs = [
+                conf for conf in apps.get_app_configs()
+                if conf.label in re.split('[,\s]+', app_names)
+            ]
+    else:
+        app_configs = apps.get_app_configs()
+    for app_config in app_configs:
+        if app_config.assets:
+            for asset in app_config.assets:
+                if asset not in asset_list:
+                    asset_list.append(asset)
+    return mark_safe('\n'.join(str(asset) for asset in asset_list))

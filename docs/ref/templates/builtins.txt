@@ -2596,6 +2596,50 @@ slightly different call::
     See :class:`~django.template.backends.jinja2.Jinja2` for information on
     using the ``static`` tag with Jinja2.
 
+.. templatetag:: site_assets
+
+``site_assets``
+~~~~~~~~~~~~~~~
+
+.. versionadded:: 2.2
+
+The ``site_assets`` template tag outputs all site assets defined in installed
+apps :attr:`django.apps.AppConfig.assets`.
+
+Considering this AppConfig definition::
+
+    from django.apps.assets import CSS, JS
+
+    class MyAppConfig(AppConfig):
+        assets = [
+            CSS('css/style.css'),
+            JS('js/script.js')
+        ]
+
+And this template snippet::
+
+    {% load static %}
+    <!DOCTYPE html>
+    <html><head>
+    {% site_assets %}
+    </head>...
+
+Assuming :setting:`STATIC_URL` is set to ``'/static/'``, the output will
+correspond to::
+
+    <!DOCTYPE html>
+    <html><head>
+    <link href="/static/css/style.css" rel="stylesheet" type="text/css">
+    <script src="/static/js/script.js"></script>
+    </head>...
+
+The tag accepts a string parameter containing app labels to limit the assets to
+those specific applications (space or comma separated). The string allows an
+initial ``-`` char to specify an excluding app list. For example,
+``{% site_assets 'admin auth' %}`` will only output assets from the ``admin``
+and ``auth`` app. ``{% site_assets '-admin' %}`` will output all assets except
+those from the ``admin`` application.
+
 .. templatetag:: get_static_prefix
 
 ``get_static_prefix``
