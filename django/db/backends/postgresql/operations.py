@@ -8,6 +8,10 @@ from django.db.backends.base.operations import BaseDatabaseOperations
 class DatabaseOperations(BaseDatabaseOperations):
     cast_char_field_without_max_length = 'varchar'
     explain_prefix = 'EXPLAIN'
+    cast_data_types = {
+        'AutoField': 'integer',
+        'BigAutoField': 'bigint',
+    }
 
     def unification_cast_sql(self, output_field):
         internal_type = output_field.get_internal_type()

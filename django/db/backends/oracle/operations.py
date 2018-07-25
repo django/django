@@ -52,6 +52,8 @@ END;
     # Oracle doesn't support string without precision; use the max string size.
     cast_char_field_without_max_length = 'NVARCHAR2(2000)'
     cast_data_types = {
+        'AutoField': 'NUMBER(11)',
+        'BigAutoField': 'NUMBER(19)',
         'TextField': cast_char_field_without_max_length,
     }
 
