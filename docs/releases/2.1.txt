@@ -391,6 +391,13 @@ Miscellaneous
 * Management commands no longer allow the abbreviated forms of the
   ``--settings`` and ``--pythonpath`` arguments.
 
+* The private ``django.db.models.sql.constants.QUERY_TERMS`` constant is
+  removed. The :meth:`~.RegisterLookupMixin.get_lookup`
+  and :meth:`~.RegisterLookupMixin.get_lookups` methods
+  of the :ref:`Lookup Registration API <lookup-registration-api>` may be
+  suitable alternatives. Compared to the ``QUERY_TERMS`` constant, they allow
+  your code to also account for any custom lookups that have been registered.
+
 .. _deprecated-features-2.1:
 
 Features deprecated in 2.1
