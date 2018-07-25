@@ -268,6 +268,44 @@ class GenericInlineAdminWithUniqueTogetherTest(TestDataMixin, TestCase):
         response = self.client.post(reverse('admin:generic_inline_admin_contact_delete', args=[c.pk]))
         self.assertContains(response, 'Are you sure you want to delete')
 
+    def test_change(self):
+        from .models import Contact
+        contact = Contact.objects.create(name='foo')
+        phone0 = PhoneNumber.objects.create(
+            content_object=contact, phone_number="000-000-000")
+        phone1 = PhoneNumber.objects.create(
+            content_object=contact, phone_number="111-111-111")
+
+        data = {
+            'name': 'foo',
+            'generic_inline_admin-phonenumber-content_type-object_id-TOTAL_FORMS': '2',
+            'generic_inline_admin-phonenumber-content_type-object_id-INITIAL_FORMS': '2',
+            'generic_inline_admin-phonenumber-content_type-object_id-MAX_NUM_FORMS': '0',
+
+            'generic_inline_admin-phonenumber-content_type-object_id-0-id': str(phone0.pk),
+            'generic_inline_admin-phonenumber-content_type-object_id-0-phone_number': '000-000-000',
+            'generic_inline_admin-phonenumber-content_type-object_id-0-contact': str(contact.pk),
+            'generic_inline_admin-phonenumber-content_type-object_id-0-category': '',
+
+            'generic_inline_admin-phonenumber-content_type-object_id-1-id': str(phone1.pk),
+            'generic_inline_admin-phonenumber-content_type-object_id-1-phone_number': '000-000-000',
+            'generic_inline_admin-phonenumber-content_type-object_id-1-contact': str(contact.pk),
+            'generic_inline_admin-phonenumber-content_type-object_id-1-category': '',
+        }
+
+        change_url = reverse(
+            'admin:generic_inline_admin_contact_change', args=[contact.pk])
+        response = self.client.post(change_url, data=data)
+
+        self.assertContains(
+            response,
+            '<ul class="errorlist nonfield"><li>'
+            'Phone number with this Content type, Object id and Phone number already exists.'
+            '</li></ul>',
+            1,
+            html=True
+        )
+
 
 @override_settings(ROOT_URLCONF='generic_inline_admin.urls')
 class NoInlineDeletionTest(SimpleTestCase):

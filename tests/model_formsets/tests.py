@@ -1527,8 +1527,7 @@ class ModelFormsetTest(TestCase):
             ['Please correct the duplicate data for price and quantity, which must be unique.']
         )
 
-        # Only the price field is specified, this should skip any unique checks since
-        # the unique_together is not fulfilled. This will fail with a KeyError if broken.
+        # Only the price field is specified, fails with unique together check.
         FormSet = modelformset_factory(Price, fields=("price",), extra=2)
         data = {
             'form-TOTAL_FORMS': '2',
@@ -1538,7 +1537,7 @@ class ModelFormsetTest(TestCase):
             'form-1-price': '24',
         }
         formset = FormSet(data)
-        self.assertTrue(formset.is_valid())
+        self.assertFalse(formset.is_valid())
 
         FormSet = inlineformset_factory(Author, Book, extra=0, fields="__all__")
         author = Author.objects.create(pk=1, name='Charles Baudelaire')
