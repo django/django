@@ -1514,6 +1514,11 @@ Calculates the value offset by ``offset``, and if no row exists there, returns
 ``default`` must have the same type as the ``expression``, however, this is
 only validated by the database and not in Python.
 
+.. admonition:: MariaDB and ``default``
+
+    MariaDB `doesn't support <https://jira.mariadb.org/browse/MDEV-12981>`_
+    the ``default`` parameter.
+
 ``LastValue``
 -------------
 
@@ -1532,6 +1537,11 @@ Calculates the leading value in a given :ref:`frame <window-frames>`. Both
 
 ``default`` must have the same type as the ``expression``, however, this is
 only validated by the database and not in Python.
+
+.. admonition:: MariaDB and ``default``
+
+    MariaDB `doesn't support <https://jira.mariadb.org/browse/MDEV-12981>`_
+    the ``default`` parameter.
 
 ``NthValue``
 ------------

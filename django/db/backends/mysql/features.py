@@ -109,3 +109,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             cursor.execute('SELECT @@LOWER_CASE_TABLE_NAMES')
             result = cursor.fetchone()
             return result and result[0] != 0
+
+    @cached_property
+    def supports_default_in_lead_lag(self):
+        # To be added in https://jira.mariadb.org/browse/MDEV-12981.
+        return not self.connection.mysql_is_mariadb

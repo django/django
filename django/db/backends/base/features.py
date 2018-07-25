@@ -258,6 +258,9 @@ class BaseDatabaseFeatures:
     # unknown kwargs are passed to QuerySet.explain()?
     validates_explain_options = True
 
+    # Does the backend support the default parameter in lead() and lag()?
+    supports_default_in_lead_lag = True
+
     def __init__(self, connection):
         self.connection = connection
 
