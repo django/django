@@ -19,7 +19,6 @@ from django.db.migrations.writer import (
     MigrationWriter, OperationWriter, SettingsReference,
 )
 from django.test import SimpleTestCase
-from django.utils import datetime_safe
 from django.utils.deconstruct import deconstructible
 from django.utils.functional import SimpleLazyObject
 from django.utils.timezone import get_default_timezone, get_fixed_timezone, utc
@@ -362,20 +361,6 @@ class WriterTests(SimpleTestCase):
                 "datetime.datetime(2012, 1, 1, 1, 1, tzinfo=utc)",
                 {'import datetime', 'from django.utils.timezone import utc'},
             )
-        )
-
-    def test_serialize_datetime_safe(self):
-        self.assertSerializedResultEqual(
-            datetime_safe.date(2014, 3, 31),
-            ("datetime.date(2014, 3, 31)", {'import datetime'})
-        )
-        self.assertSerializedResultEqual(
-            datetime_safe.time(10, 25),
-            ("datetime.time(10, 25)", {'import datetime'})
-        )
-        self.assertSerializedResultEqual(
-            datetime_safe.datetime(2014, 3, 31, 16, 4, 31),
-            ("datetime.datetime(2014, 3, 31, 16, 4, 31)", {'import datetime'})
         )
 
     def test_serialize_fields(self):

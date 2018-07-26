@@ -12,7 +12,6 @@ import uuid
 from django.db import models
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
-from django.utils import datetime_safe
 from django.utils.functional import LazyObject, Promise
 from django.utils.timezone import utc
 from django.utils.version import get_docs_version
@@ -46,25 +45,21 @@ class BaseSimpleSerializer(BaseSerializer):
         return repr(self.value), set()
 
 
-class DatetimeSerializer(BaseSerializer):
+class DateTimeSerializer(BaseSerializer):
+    """For datetime.*, except datetime.datetime."""
+    def serialize(self):
+        return repr(self.value), {'import datetime'}
+
+
+class DatetimeDatetimeSerializer(BaseSerializer):
+    """For datetime.datetime."""
     def serialize(self):
         if self.value.tzinfo is not None and self.value.tzinfo != utc:
             self.value = self.value.astimezone(utc)
-        value_repr = repr(self.value).replace("<UTC>", "utc")
-        if isinstance(self.value, datetime_safe.datetime):
-            value_repr = "datetime.%s" % value_repr
         imports = ["import datetime"]
         if self.value.tzinfo is not None:
             imports.append("from django.utils.timezone import utc")
-        return value_repr, set(imports)
-
-
-class DateSerializer(BaseSerializer):
-    def serialize(self):
-        value_repr = repr(self.value)
-        if isinstance(self.value, datetime_safe.date):
-            value_repr = "datetime.%s" % value_repr
-        return value_repr, {"import datetime"}
+        return repr(self.value).replace('<UTC>', 'utc'), set(imports)
 
 
 class DecimalSerializer(BaseSerializer):
@@ -246,19 +241,6 @@ class SettingsReferenceSerializer(BaseSerializer):
         return "settings.%s" % self.value.setting_name, {"from django.conf import settings"}
 
 
-class TimedeltaSerializer(BaseSerializer):
-    def serialize(self):
-        return repr(self.value), {"import datetime"}
-
-
-class TimeSerializer(BaseSerializer):
-    def serialize(self):
-        value_repr = repr(self.value)
-        if isinstance(self.value, datetime_safe.time):
-            value_repr = "datetime.%s" % value_repr
-        return value_repr, {"import datetime"}
-
-
 class TupleSerializer(BaseSequenceSerializer):
     def _format(self):
         # When len(value)==0, the empty tuple should be serialized as "()",
@@ -322,13 +304,9 @@ def serializer_factory(value):
     if isinstance(value, enum.Enum):
         return EnumSerializer(value)
     if isinstance(value, datetime.datetime):
-        return DatetimeSerializer(value)
-    if isinstance(value, datetime.date):
-        return DateSerializer(value)
-    if isinstance(value, datetime.time):
-        return TimeSerializer(value)
-    if isinstance(value, datetime.timedelta):
-        return TimedeltaSerializer(value)
+        return DatetimeDatetimeSerializer(value)
+    if isinstance(value, (datetime.date, datetime.timedelta, datetime.time)):
+        return DateTimeSerializer(value)
     if isinstance(value, SettingsReference):
         return SettingsReferenceSerializer(value)
     if isinstance(value, float):
