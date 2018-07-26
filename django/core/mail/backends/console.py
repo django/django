@@ -4,7 +4,10 @@ Email backend that writes messages to console instead of sending them.
 import sys
 import threading
 
+from django.conf import settings
 from django.core.mail.backends.base import BaseEmailBackend
+from django.core.mail.message import sanitize_address
+from django.utils.translation import gettext as _
 
 
 class EmailBackend(BaseEmailBackend):
@@ -13,12 +16,25 @@ class EmailBackend(BaseEmailBackend):
         self._lock = threading.RLock()
         super().__init__(*args, **kwargs)
 
+    def _output_if_exists(self, prefix, addresses, encoding):
+        if not addresses:
+            return
+
+        line = ', '.join([sanitize_address(addr, encoding) for addr in addresses])
+        self.stream.write('%s %s\n' % (prefix, line))
+
     def write_message(self, message):
+        encoding = message.encoding or settings.DEFAULT_CHARSET
+        self.stream.write(_('Recipients') + '\n')
+        self._output_if_exists('To:', message.to, encoding)
+        self._output_if_exists('Cc:', message.cc, encoding)
+        self._output_if_exists('Bcc:', message.bcc, encoding)
+
+        self.stream.write(_('MIME Text') + '\n')
         msg = message.message()
-        msg_data = msg.as_bytes()
         charset = msg.get_charset().get_output_charset() if msg.get_charset() else 'utf-8'
-        msg_data = msg_data.decode(charset)
-        self.stream.write('%s\n' % msg_data)
+        data = msg.as_bytes().decode(charset)
+        self.stream.write('%s\n' % data)
         self.stream.write('-' * 79)
         self.stream.write('\n')
 
