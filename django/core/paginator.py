@@ -185,3 +185,19 @@ class Page(collections.abc.Sequence):
         if self.number == self.paginator.num_pages:
             return self.paginator.count
         return self.number * self.paginator.per_page
+
+    def part_page_range(self, show_count=10):
+        """
+        Return a 1-based range of part pages for iterating through within
+        a template for loop. This page num is in the middle of range.
+        Can set show_count control the range length.
+        """
+        bottom = self.number - show_count // 2
+        top = self.number + show_count // 2
+        if self.paginator.num_pages <= show_count:
+            return range(1, self.paginator.num_pages)
+        if bottom <= 0:
+            return range(1, show_count + 1)
+        if top >= self.paginator.num_pages:
+            return range(self.paginator.num_pages - show_count + 1, self.paginator.num_pages + 1)
+        return range(bottom + 1, top + 1)
