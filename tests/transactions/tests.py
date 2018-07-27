@@ -365,10 +365,9 @@ class AtomicErrorsTests(TransactionTestCase):
             connection.close()
             with self.assertRaises(Error):
                 Reporter.objects.create(first_name="Cuthbert", last_name="Calculus")
-        # this transaction will success
-        with transaction.atomic():
-            Reporter.objects.create(first_name="Archibald1", last_name="Haddock1")
-            Reporter.objects.create(first_name="Cuthbert1", last_name="Calculus1")
+        # following lines will success
+        Reporter.objects.create(first_name="Archibald", last_name="Haddock")
+        Reporter.objects.create(first_name="Cuthbert", last_name="Calculus")
         self.assertEqual(Reporter.objects.count(), 2)
 
 

@@ -212,13 +212,14 @@ class BaseDatabaseWrapper:
     def ensure_connection(self):
         """Guarantee that a connection to the database is established."""
         if self.connection is None or (not self.is_usable()):
-            # when in atomic block or closed in a transaction
+            # when failed atomic blocks
             # raise TransactionManagementError to user
-            # and then rollback or retry
-            self.validate_no_broken_transaction()
+            # and then user could rollback or retry
+            self.validate_no_atomic_block()
             with self.wrap_database_errors:
                 self.close_if_unusable_or_obsolete()
                 self.connect()
+
 
     # ##### Backend-specific wrappers for PEP-249 connection methods #####
 
