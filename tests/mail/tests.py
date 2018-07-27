@@ -8,7 +8,9 @@ import socket
 import sys
 import tempfile
 import threading
-from email import message_from_binary_file, message_from_bytes
+from email import (
+    message_from_binary_file, message_from_bytes, message_from_string,
+)
 from email.header import Header
 from email.mime.text import MIMEText
 from email.utils import parseaddr
@@ -804,7 +806,7 @@ class BaseEmailBackendTests(HeadersCheckMixin):
         self.assertEqual(num_sent, 1)
         message = self.get_the_message()
         self.assertEqual(message["subject"], '=?utf-8?q?Ch=C3=A8re_maman?=')
-        self.assertEqual(message.get_payload(decode=True).decode(), 'Je t\'aime très fort')
+        self.assertEqual(message.get_payload(), 'Je t\'aime très fort')
 
     def test_send_long_lines(self):
         """
@@ -1086,9 +1088,9 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
     def get_mailbox_content(self):
         messages = []
         for filename in os.listdir(self.tmp_dir):
-            with open(os.path.join(self.tmp_dir, filename), 'rb') as fp:
-                session = fp.read().split(b'\n' + (b'-' * 79) + b'\n')
-            messages.extend(message_from_bytes(m) for m in session if m)
+            with open(os.path.join(self.tmp_dir, filename), 'r') as fp:
+                session = fp.read().split('\n' + ('-' * 79) + '\n')
+            messages.extend(message_from_string(m) for m in session if m)
         return messages
 
     def test_file_sessions(self):

@@ -13,12 +13,14 @@ class EmailBackend(BaseEmailBackend):
         self._lock = threading.RLock()
         super().__init__(*args, **kwargs)
 
-    def write_message(self, message):
-        msg = message.message()
-        msg_data = msg.as_bytes()
+    def _get_mime_text(self, msg):
+        """Use as_bytes() to mimic the SMTP backend."""
         charset = msg.get_charset().get_output_charset() if msg.get_charset() else 'utf-8'
-        msg_data = msg_data.decode(charset)
-        self.stream.write('%s\n' % msg_data)
+        return msg.as_bytes().decode(charset)
+
+    def write_message(self, message):
+        mime = self._get_mime_text(message.message())
+        self.stream.write('%s\n' % mime)
         self.stream.write('-' * 79)
         self.stream.write('\n')
 

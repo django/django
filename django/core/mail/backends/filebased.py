@@ -43,11 +43,6 @@ class EmailBackend(ConsoleEmailBackend):
         kwargs['stream'] = None
         super().__init__(*args, **kwargs)
 
-    def write_message(self, message):
-        self.stream.write(message.message().as_bytes() + b'\n')
-        self.stream.write(b'-' * 79)
-        self.stream.write(b'\n')
-
     def _get_filename(self):
         """Return a unique file name."""
         if self._fname is None:
@@ -58,7 +53,7 @@ class EmailBackend(ConsoleEmailBackend):
 
     def open(self):
         if self.stream is None:
-            self.stream = open(self._get_filename(), 'ab')
+            self.stream = open(self._get_filename(), 'a')
             return True
         return False
 
