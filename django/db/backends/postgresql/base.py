@@ -277,5 +277,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @cached_property
     def pg_version(self):
-        with self.temporary_connection():
-            return self.connection.server_version
+        # server_version is a psycopg connection attribute
+        # do not need a temp connection.
+        return self.connection.server_version
