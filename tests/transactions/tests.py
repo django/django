@@ -357,6 +357,20 @@ class AtomicErrorsTests(TransactionTestCase):
         # The connection is usable again .
         self.assertEqual(Reporter.objects.count(), 0)
 
+    @skipUnlessDBFeature('test_db_allows_multiple_connections')
+    def test_ensure_connection_after_client_close(self):
+        # this transaction will fail
+        with transaction.atomic():
+            Reporter.objects.create(first_name="Archibald", last_name="Haddock")
+            connection.close()
+            with self.assertRaises(Error):
+                Reporter.objects.create(first_name="Cuthbert", last_name="Calculus")
+        # this transaction will success
+        with transaction.atomic():
+            Reporter.objects.create(first_name="Archibald1", last_name="Haddock1")
+            Reporter.objects.create(first_name="Cuthbert1", last_name="Calculus1")
+        self.assertEqual(Reporter.objects.count(), 2)
+
 
 @skipUnless(connection.vendor == 'mysql', "MySQL-specific behaviors")
 class AtomicMySQLTests(TransactionTestCase):
