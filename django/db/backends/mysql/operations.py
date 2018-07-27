@@ -18,6 +18,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         'PositiveIntegerField': (0, 4294967295),
     }
     cast_data_types = {
+        'AutoField': 'signed integer',
+        'BigAutoField': 'signed integer',
         'CharField': 'char(%(max_length)s)',
         'TextField': 'char',
         'IntegerField': 'signed integer',

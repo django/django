@@ -89,14 +89,13 @@ This stuff starts about a week before the release; most of it can be done
 any time leading up to the actual release:
 
 #. If this is a security release, send out pre-notification **one week** before
-   the release. We maintain a list of who gets these pre-notification emails in
-   the private ``django-core`` repository. Send the mail to
-   ``security@djangoproject.com`` and BCC the pre-notification recipients.
-   This email should be signed by the key you'll use for the release and
-   should include `CVE IDs <https://cveform.mitre.org/>`_ (requested with
-   Vendor: djangoproject, Product: django) and patches for each issue being
-   fixed. Also, :ref:`notify django-announce <security-disclosure>` of the
-   upcoming security release.
+   the release. The template for that email and a list of the recipients are in
+   the private ``django-security`` GitHub wiki. BCC the pre-notification
+   recipients. Sign the email with the key you'll use for the release and
+   include `CVE IDs <https://cveform.mitre.org/>`_ (requested with Vendor:
+   djangoproject, Product: django) and patches for each issue being fixed.
+   Also, :ref:`notify django-announce <security-disclosure>` of the upcoming
+   security release.
 
 #. As the release approaches, watch Trac to make sure no release blockers
    are left for the upcoming release.

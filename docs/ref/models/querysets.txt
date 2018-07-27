@@ -2178,10 +2178,15 @@ don't support server-side cursors.
 Without server-side cursors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-MySQL and SQLite don't support streaming results, hence the Python database
-drivers load the entire result set into memory. The result set is then
-transformed into Python row objects by the database adapter using the
-``fetchmany()`` method defined in :pep:`249`.
+MySQL doesn't support streaming results, hence the Python database driver loads
+the entire result set into memory. The result set is then transformed into
+Python row objects by the database adapter using the ``fetchmany()`` method
+defined in :pep:`249`.
+
+SQLite can fetch results in batches using ``fetchmany()``, but since SQLite
+doesn't provide isolation between queries within a connection, be careful when
+writing to the table being iterated over. See :ref:`sqlite-isolation` for
+more information.
 
 The ``chunk_size`` parameter controls the size of batches Django retrieves from
 the database driver. Larger batches decrease the overhead of communicating with
@@ -2194,6 +2199,10 @@ psycopg mailing list <https://www.postgresql.org/message-id/4D2F2C71.8080805%40d
     is going to fetch less than 100KB of data, which seems a good compromise
     between the number of rows transferred and the data discarded if the loop
     is exited early.
+
+.. versionchanged:: 2.2
+
+    Support for result streaming on SQLite was added.
 
 ``latest()``
 ~~~~~~~~~~~~

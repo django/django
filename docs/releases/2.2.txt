@@ -126,7 +126,7 @@ CSRF
 Database backends
 ~~~~~~~~~~~~~~~~~
 
-* ...
+* Added result streaming for :meth:`.QuerySet.iterator` on SQLite.
 
 Email
 ~~~~~

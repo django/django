@@ -1089,11 +1089,12 @@ class SQLCompiler:
             self.col_count if self.has_extra_select else None,
             chunk_size,
         )
-        if not chunked_fetch and not self.connection.features.can_use_chunked_reads:
+        if not chunked_fetch or not self.connection.features.can_use_chunked_reads:
             try:
                 # If we are using non-chunked reads, we return the same data
                 # structure as normally, but ensure it is all read into memory
-                # before going any further. Use chunked_fetch if requested.
+                # before going any further. Use chunked_fetch if requested,
+                # unless the database doesn't support it.
                 return list(result)
             finally:
                 # done with the cursor
