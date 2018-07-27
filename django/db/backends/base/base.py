@@ -220,7 +220,6 @@ class BaseDatabaseWrapper:
                 self.close_if_unusable_or_obsolete()
                 self.connect()
 
-
     # ##### Backend-specific wrappers for PEP-249 connection methods #####
 
     def _prepare_cursor(self, cursor):
