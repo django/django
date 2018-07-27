@@ -245,6 +245,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         try:
             # Use a psycopg cursor directly, bypassing Django's utilities.
             self.connection.cursor().execute("SELECT 1")
+            # commit here, or this query will left connection in a unfinished transaction
             self.connection.commit()
         except Database.Error:
             return False
