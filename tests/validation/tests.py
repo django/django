@@ -68,6 +68,14 @@ class BaseModelValidationTests(ValidationTestCase):
         mtv = ModelToValidate(number=10, name='Some Name', slug='##invalid##')
         self.assertFailsValidation(mtv.full_clean, ['slug'])
 
+    def test_clean_XXX(self):
+        mtv = ModelToValidate(number=10, name='Some Name', slug='123456789123456789')
+        self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'slug', ['Slug too long'])
+
+        mtv = ModelToValidate(number=10, name='Some Name', slug='ok-slug')
+        mtv.full_clean()
+        self.assertEqual(mtv.slug, 'slug-override')
+
     def test_full_clean_does_not_mutate_exclude(self):
         mtv = ModelToValidate(f_with_custom_validator=42)
         exclude = ['number']

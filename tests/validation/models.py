@@ -32,6 +32,11 @@ class ModelToValidate(models.Model):
                                                         validators=(validate_answer_to_universe,))
     slug = models.SlugField(blank=True)
 
+    def clean_slug(self):
+        if len(self.slug) > 10:
+            raise ValidationError('Slug too long')
+        return 'slug-override'
+
     def clean(self):
         super().clean()
         if self.number == 11:
