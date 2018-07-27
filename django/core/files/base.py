@@ -117,6 +117,12 @@ class File(FileProxyMixin):
     def close(self):
         self.file.close()
 
+    def extension(self):
+        ext = self.name.split('.')[-1]
+        if ext == self.name:
+            return
+        return ext
+
 
 class ContentFile(File):
     """
