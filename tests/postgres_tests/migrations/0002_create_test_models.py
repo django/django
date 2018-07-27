@@ -60,6 +60,9 @@ class Migration(migrations.Migration):
                 ('uuids', ArrayField(models.UUIDField(), size=None)),
                 ('decimals', ArrayField(models.DecimalField(max_digits=5, decimal_places=2), size=None)),
                 ('tags', ArrayField(TagField(), blank=True, null=True, size=None)),
+                ('json', ArrayField(JSONField(default={}), default=[])),
+                ('int_ranges', ArrayField(IntegerRangeField(), null=True, blank=True)),
+                ('bigint_ranges', ArrayField(BigIntegerRangeField(), null=True, blank=True)),
             ],
             options={
                 'required_db_vendor': 'postgresql',
