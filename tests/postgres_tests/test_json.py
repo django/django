@@ -4,7 +4,9 @@ from decimal import Decimal
 
 from django.core import checks, exceptions, serializers
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db.models import Q
+from django.db.models import Q, Count
+from django.db.models import Sum, IntegerField
+from django.db.models.functions import Cast
 from django.forms import CharField, Form, widgets
 from django.test.utils import isolate_apps
 from django.utils.html import escape
@@ -15,6 +17,7 @@ from .models import JSONModel, PostgreSQLModel
 try:
     from django.contrib.postgres import forms
     from django.contrib.postgres.fields import JSONField
+    from django.contrib.postgres.fields.jsonb import KeyTextTransform, KeyTransform
 except ImportError:
     pass
 
@@ -298,6 +301,54 @@ class TestQuerying(PostgreSQLTestCase):
 
     def test_iregex(self):
         self.assertTrue(JSONModel.objects.filter(field__foo__iregex=r'^bAr$').exists())
+
+    def test_deep_aggregate(self):
+        JSONModel.objects.create(field={'l0': {'l1': {'l2.0': 'a', 'l2.1': 1}}})
+        JSONModel.objects.create(field={'l0': {'l1': {'l2.0': 'a', 'l2.1': 2}}})
+        JSONModel.objects.create(field={'l0': {'l1': {'l2.0': 'a', 'l2.1': 2}}})
+        JSONModel.objects.create(field={'l0': {'l1': {'l2.0': 'b', 'l2.1': 3}}})
+        JSONModel.objects.create(field={'l0': {'l1': {'l2.0': 'b', 'l2.1': 3}}})
+
+        query = JSONModel.objects.all()\
+            .values('field_custom')\
+            .annotate(
+                count=Count('field'),
+                key=KeyTextTransform('l2.0', KeyTransform('l1', KeyTransform('l0', 'field')))
+            )\
+            .values_list('count', 'key')\
+            .order_by('count')
+
+        self.assertSequenceEqual(query, [(2, 'b'), (3, 'a'), (11, None)])
+
+    def test_keytransform(self):
+
+        JSONModel.objects.create(field=[{'state': 3}, {'state': 7}, {'state': 9}])
+        JSONModel.objects.create(field=[{'state': 4}, {'state': 1}, {'state': 5}])
+        JSONModel.objects.create(field=[{'state': 2}, {'state': 6}, {'state': 8}])
+
+        self.assertSequenceEqual(
+            JSONModel.objects.annotate(history=KeyTransform('-1', 'field'))
+                .annotate(last_state=KeyTransform('state', 'history'))
+                .filter(last_state__isnull=False)
+                .values_list('last_state', flat=True),
+            [9, 5, 8]
+        )
+
+        self.assertEqual(
+            JSONModel.objects.annotate(history=KeyTransform('-1', 'field'))
+                .annotate(last_state=KeyTransform('state', 'history'))
+                .filter(last_state__gt=5).count(),
+            2
+        )
+
+        self.assertEqual(
+            JSONModel.objects.annotate(history=KeyTransform('-1', 'field'))
+                .annotate(last_state=KeyTextTransform('state', 'history'))
+                .filter(last_state__isnull=False)
+                .annotate(last_state_int=Cast('last_state', IntegerField()))
+                .aggregate(Sum('last_state_int')),
+            {'last_state_int__sum': 22}
+        )
 
 
 @isolate_apps('postgres_tests')

@@ -107,7 +107,8 @@ class KeyTransform(Transform):
             previous = previous.lhs
         lhs, params = compiler.compile(previous)
         if len(key_transforms) > 1:
-            return "(%s %s %%s)" % (lhs, self.nested_operator), [key_transforms] + params
+            key_transforms_str = "{%s}" % ",".join(key_transforms)
+            return "(%s %s %%s)" % (lhs, self.nested_operator), [key_transforms_str] + params
         try:
             int(self.key_name)
         except ValueError:
