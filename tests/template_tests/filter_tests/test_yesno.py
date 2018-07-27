@@ -1,6 +1,15 @@
 from django.template.defaultfilters import yesno
 from django.test import SimpleTestCase
 
+from ..utils import setup
+
+
+class YesNoTests(SimpleTestCase):
+    @setup({'t': '{{ var|yesno:"yup,nup,mup" }} {{ var|yesno }}'})
+    def test_true(self):
+        output = self.engine.render_to_string('t', {'var': True})
+        self.assertEqual(output, 'yup yes')
+
 
 class FunctionTests(SimpleTestCase):
 
