@@ -120,7 +120,7 @@ class File(FileProxyMixin):
 
 class ContentFile(File):
     """
-    A File-like object that take just raw content, rather than an actual file.
+    A File-like object that takes just raw content, rather than an actual file.
     """
     def __init__(self, content, name=None):
         stream_class = StringIO if isinstance(content, str) else BytesIO
