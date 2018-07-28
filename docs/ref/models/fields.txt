@@ -796,7 +796,7 @@ Opens or reopens the file associated with this instance in the specified
 ``mode``. Unlike the standard Python ``open()`` method, it doesn't return a
 file descriptor.
 
-Since the underlying file is opened implicitly when accessing it, it may be
+Since the underlying file is opened implicitly when accessing it, it is
 unnecessary to call this method except to reset the pointer to the underlying
 file or to change the ``mode``.
 
