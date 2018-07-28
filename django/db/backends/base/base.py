@@ -217,7 +217,6 @@ class BaseDatabaseWrapper:
             # and then user could rollback or retry
             self.validate_no_atomic_block()
             with self.wrap_database_errors:
-                self.close_if_unusable_or_obsolete()
                 self.connect()
 
     # ##### Backend-specific wrappers for PEP-249 connection methods #####
