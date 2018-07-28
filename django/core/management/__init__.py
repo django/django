@@ -3,7 +3,7 @@ import os
 import pkgutil
 import sys
 from collections import OrderedDict, defaultdict
-from contextlib import suppress
+from difflib import get_close_matches
 from importlib import import_module
 
 import django
@@ -15,7 +15,6 @@ from django.core.management.base import (
 )
 from django.core.management.color import color_style
 from django.utils import autoreload
-from django.utils.encoding import force_text
 
 
 def find_commands(management_dir):
@@ -79,8 +78,9 @@ def call_command(command_name, *args, **options):
 
     This is the primary API you should use for calling specific commands.
 
-    `name` may be a string or a command object. Using a string is preferred
-    unless the command object is required for further processing or testing.
+    `command_name` may be a string or a command object. Using a string is
+    preferred unless the command object is required for further processing or
+    testing.
 
     Some examples:
         call_command('migrate')
@@ -117,12 +117,19 @@ def call_command(command_name, *args, **options):
         for s_opt in parser._actions if s_opt.option_strings
     }
     arg_options = {opt_mapping.get(key, key): value for key, value in options.items()}
-    defaults = parser.parse_args(args=[force_text(a) for a in args])
+    parse_args = [str(a) for a in args]
+    # Any required arguments which are passed in via **options must be passed
+    # to parse_args().
+    parse_args += [
+        '{}={}'.format(min(opt.option_strings), arg_options[opt.dest])
+        for opt in parser._actions if opt.required and opt.dest in options
+    ]
+    defaults = parser.parse_args(args=parse_args)
     defaults = dict(defaults._get_kwargs(), **arg_options)
     # Raise an error if any unknown options were passed.
     stealth_options = set(command.base_stealth_options + command.stealth_options)
     dest_parameters = {action.dest for action in parser._actions}
-    valid_options = dest_parameters | stealth_options | set(opt_mapping)
+    valid_options = (dest_parameters | stealth_options).union(opt_mapping)
     unknown_options = set(options) - valid_options
     if unknown_options:
         raise TypeError(
@@ -148,6 +155,8 @@ class ManagementUtility:
     def __init__(self, argv=None):
         self.argv = argv or sys.argv[:]
         self.prog_name = os.path.basename(self.argv[0])
+        if self.prog_name == '__main__.py':
+            self.prog_name = 'python -m django'
         self.settings_exception = None
 
     def main_help_text(self, commands_only=False):
@@ -202,10 +211,11 @@ class ManagementUtility:
                 settings.INSTALLED_APPS
             else:
                 sys.stderr.write("No Django settings specified.\n")
-            sys.stderr.write(
-                "Unknown command: %r\nType '%s help' for usage.\n"
-                % (subcommand, self.prog_name)
-            )
+            possible_matches = get_close_matches(subcommand, commands)
+            sys.stderr.write('Unknown command: %r' % subcommand)
+            if possible_matches:
+                sys.stderr.write('. Did you mean %s?' % possible_matches[0])
+            sys.stderr.write("\nType '%s help' for usage.\n" % self.prog_name)
             sys.exit(1)
         if isinstance(app_name, BaseCommand):
             # If the command is already loaded, use it directly.
@@ -259,12 +269,14 @@ class ManagementUtility:
             subcommand_cls = self.fetch_command(cwords[0])
             # special case: add the names of installed apps to options
             if cwords[0] in ('dumpdata', 'sqlmigrate', 'sqlsequencereset', 'test'):
-                # Fail silently if DJANGO_SETTINGS_MODULE isn't set. The
-                # user will find out once they execute the command.
-                with suppress(ImportError):
+                try:
                     app_configs = apps.get_app_configs()
                     # Get the last part of the dotted path as the app name.
                     options.extend((app_config.label, 0) for app_config in app_configs)
+                except ImportError:
+                    # Fail silently if DJANGO_SETTINGS_MODULE isn't set. The
+                    # user will find out once they execute the command.
+                    pass
             parser = subcommand_cls.create_parser('', cwords[0])
             options.extend(
                 (min(s_opt.option_strings), s_opt.nargs != 0)
@@ -299,17 +311,21 @@ class ManagementUtility:
         # Preprocess options to extract --settings and --pythonpath.
         # These options could affect the commands that are available, so they
         # must be processed early.
-        parser = CommandParser(None, usage="%(prog)s subcommand [options] [args]", add_help=False)
+        parser = CommandParser(usage='%(prog)s subcommand [options] [args]', add_help=False, allow_abbrev=False)
         parser.add_argument('--settings')
         parser.add_argument('--pythonpath')
         parser.add_argument('args', nargs='*')  # catch-all
-        with suppress(CommandError):  # Ignore any option errors at this point.
+        try:
             options, args = parser.parse_known_args(self.argv[2:])
             handle_default_options(options)
+        except CommandError:
+            pass  # Ignore any option errors at this point.
 
         try:
             settings.INSTALLED_APPS
         except ImproperlyConfigured as exc:
+            self.settings_exception = exc
+        except ImportError as exc:
             self.settings_exception = exc
 
         if settings.configured:
@@ -345,7 +361,7 @@ class ManagementUtility:
         if subcommand == 'help':
             if '--commands' in args:
                 sys.stdout.write(self.main_help_text(commands_only=True) + '\n')
-            elif len(options.args) < 1:
+            elif not options.args:
                 sys.stdout.write(self.main_help_text() + '\n')
             else:
                 self.fetch_command(options.args[0]).print_help(self.prog_name, options.args[0])

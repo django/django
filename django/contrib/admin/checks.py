@@ -1,3 +1,4 @@
+import warnings
 from itertools import chain
 
 from django.apps import apps
@@ -9,10 +10,13 @@ from django.core import checks
 from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP
+from django.db.models.expressions import Combinable, F, OrderBy
 from django.forms.models import (
     BaseModelForm, BaseModelFormSet, _get_foreign_key,
 )
 from django.template.engine import Engine
+from django.utils.deprecation import RemovedInDjango30Warning
+from django.utils.inspect import get_func_args
 
 
 def check_admin_app(app_configs, **kwargs):
@@ -65,20 +69,76 @@ def check_dependencies(**kwargs):
 class BaseModelAdminChecks:
 
     def check(self, admin_obj, **kwargs):
-        errors = []
-        errors.extend(self._check_raw_id_fields(admin_obj))
-        errors.extend(self._check_fields(admin_obj))
-        errors.extend(self._check_fieldsets(admin_obj))
-        errors.extend(self._check_exclude(admin_obj))
-        errors.extend(self._check_form(admin_obj))
-        errors.extend(self._check_filter_vertical(admin_obj))
-        errors.extend(self._check_filter_horizontal(admin_obj))
-        errors.extend(self._check_radio_fields(admin_obj))
-        errors.extend(self._check_prepopulated_fields(admin_obj))
-        errors.extend(self._check_view_on_site_url(admin_obj))
-        errors.extend(self._check_ordering(admin_obj))
-        errors.extend(self._check_readonly_fields(admin_obj))
-        return errors
+        return [
+            *self._check_autocomplete_fields(admin_obj),
+            *self._check_raw_id_fields(admin_obj),
+            *self._check_fields(admin_obj),
+            *self._check_fieldsets(admin_obj),
+            *self._check_exclude(admin_obj),
+            *self._check_form(admin_obj),
+            *self._check_filter_vertical(admin_obj),
+            *self._check_filter_horizontal(admin_obj),
+            *self._check_radio_fields(admin_obj),
+            *self._check_prepopulated_fields(admin_obj),
+            *self._check_view_on_site_url(admin_obj),
+            *self._check_ordering(admin_obj),
+            *self._check_readonly_fields(admin_obj),
+        ]
+
+    def _check_autocomplete_fields(self, obj):
+        """
+        Check that `autocomplete_fields` is a list or tuple of model fields.
+        """
+        if not isinstance(obj.autocomplete_fields, (list, tuple)):
+            return must_be('a list or tuple', option='autocomplete_fields', obj=obj, id='admin.E036')
+        else:
+            return list(chain.from_iterable([
+                self._check_autocomplete_fields_item(obj, obj.model, field_name, 'autocomplete_fields[%d]' % index)
+                for index, field_name in enumerate(obj.autocomplete_fields)
+            ]))
+
+    def _check_autocomplete_fields_item(self, obj, model, field_name, label):
+        """
+        Check that an item in `autocomplete_fields` is a ForeignKey or a
+        ManyToManyField and that the item has a related ModelAdmin with
+        search_fields defined.
+        """
+        try:
+            field = model._meta.get_field(field_name)
+        except FieldDoesNotExist:
+            return refer_to_missing_field(field=field_name, option=label, model=model, obj=obj, id='admin.E037')
+        else:
+            if not field.many_to_many and not isinstance(field, models.ForeignKey):
+                return must_be(
+                    'a foreign key or a many-to-many field',
+                    option=label, obj=obj, id='admin.E038'
+                )
+            related_admin = obj.admin_site._registry.get(field.remote_field.model)
+            if related_admin is None:
+                return [
+                    checks.Error(
+                        'An admin for model "%s" has to be registered '
+                        'to be referenced by %s.autocomplete_fields.' % (
+                            field.remote_field.model.__name__,
+                            type(obj).__name__,
+                        ),
+                        obj=obj.__class__,
+                        id='admin.E039',
+                    )
+                ]
+            elif not related_admin.search_fields:
+                return [
+                    checks.Error(
+                        '%s must define "search_fields", because it\'s '
+                        'referenced by %s.autocomplete_fields.' % (
+                            related_admin.__class__.__name__,
+                            type(obj).__name__,
+                        ),
+                        obj=obj.__class__,
+                        id='admin.E040',
+                    )
+                ]
+            return []
 
     def _check_raw_id_fields(self, obj):
         """ Check that `raw_id_fields` only contains field names that are listed
@@ -150,12 +210,13 @@ class BaseModelAdminChecks:
         elif not isinstance(obj.fieldsets, (list, tuple)):
             return must_be('a list or tuple', option='fieldsets', obj=obj, id='admin.E007')
         else:
+            seen_fields = []
             return list(chain.from_iterable(
-                self._check_fieldsets_item(obj, obj.model, fieldset, 'fieldsets[%d]' % index)
+                self._check_fieldsets_item(obj, obj.model, fieldset, 'fieldsets[%d]' % index, seen_fields)
                 for index, fieldset in enumerate(obj.fieldsets)
             ))
 
-    def _check_fieldsets_item(self, obj, model, fieldset, label):
+    def _check_fieldsets_item(self, obj, model, fieldset, label, seen_fields):
         """ Check an item of `fieldsets`, i.e. check that this is a pair of a
         set name and a dictionary containing "fields" key. """
 
@@ -176,8 +237,8 @@ class BaseModelAdminChecks:
         elif not isinstance(fieldset[1]['fields'], (list, tuple)):
             return must_be('a list or tuple', option="%s[1]['fields']" % label, obj=obj, id='admin.E008')
 
-        fields = flatten(fieldset[1]['fields'])
-        if len(fields) != len(set(fields)):
+        seen_fields.extend(flatten(fieldset[1]['fields']))
+        if len(seen_fields) != len(set(seen_fields)):
             return [
                 checks.Error(
                     "There are duplicate field(s) in '%s[1]'." % label,
@@ -429,7 +490,13 @@ class BaseModelAdminChecks:
 
     def _check_ordering_item(self, obj, model, field_name, label):
         """ Check that `ordering` refers to existing fields. """
-
+        if isinstance(field_name, (Combinable, OrderBy)):
+            if not isinstance(field_name, OrderBy):
+                field_name = field_name.asc()
+            if isinstance(field_name.expression, F):
+                field_name = field_name.expression.name
+            else:
+                return []
         if field_name == '?' and len(obj.ordering) != 1:
             return [
                 checks.Error(
@@ -498,20 +565,22 @@ class BaseModelAdminChecks:
 class ModelAdminChecks(BaseModelAdminChecks):
 
     def check(self, admin_obj, **kwargs):
-        errors = super().check(admin_obj)
-        errors.extend(self._check_save_as(admin_obj))
-        errors.extend(self._check_save_on_top(admin_obj))
-        errors.extend(self._check_inlines(admin_obj))
-        errors.extend(self._check_list_display(admin_obj))
-        errors.extend(self._check_list_display_links(admin_obj))
-        errors.extend(self._check_list_filter(admin_obj))
-        errors.extend(self._check_list_select_related(admin_obj))
-        errors.extend(self._check_list_per_page(admin_obj))
-        errors.extend(self._check_list_max_show_all(admin_obj))
-        errors.extend(self._check_list_editable(admin_obj))
-        errors.extend(self._check_search_fields(admin_obj))
-        errors.extend(self._check_date_hierarchy(admin_obj))
-        return errors
+        return [
+            *super().check(admin_obj),
+            *self._check_save_as(admin_obj),
+            *self._check_save_on_top(admin_obj),
+            *self._check_inlines(admin_obj),
+            *self._check_list_display(admin_obj),
+            *self._check_list_display_links(admin_obj),
+            *self._check_list_filter(admin_obj),
+            *self._check_list_select_related(admin_obj),
+            *self._check_list_per_page(admin_obj),
+            *self._check_list_max_show_all(admin_obj),
+            *self._check_list_editable(admin_obj),
+            *self._check_search_fields(admin_obj),
+            *self._check_date_hierarchy(admin_obj),
+            *self._check_action_permission_methods(admin_obj),
+        ]
 
     def _check_save_as(self, obj):
         """ Check save_as is a boolean. """
@@ -587,54 +656,32 @@ class ModelAdminChecks(BaseModelAdminChecks):
         elif hasattr(obj, item):
             return []
         elif hasattr(model, item):
-            # getattr(model, item) could be an X_RelatedObjectsDescriptor
             try:
                 field = model._meta.get_field(item)
             except FieldDoesNotExist:
-                try:
-                    field = getattr(model, item)
-                except AttributeError:
-                    field = None
-
-            if field is None:
-                return [
-                    checks.Error(
-                        "The value of '%s' refers to '%s', which is not a "
-                        "callable, an attribute of '%s', or an attribute or method on '%s.%s'." % (
-                            label, item, obj.__class__.__name__, model._meta.app_label, model._meta.object_name
-                        ),
-                        obj=obj.__class__,
-                        id='admin.E108',
-                    )
-                ]
-            elif isinstance(field, models.ManyToManyField):
-                return [
-                    checks.Error(
-                        "The value of '%s' must not be a ManyToManyField." % label,
-                        obj=obj.__class__,
-                        id='admin.E109',
-                    )
-                ]
+                return []
             else:
+                if isinstance(field, models.ManyToManyField):
+                    return [
+                        checks.Error(
+                            "The value of '%s' must not be a ManyToManyField." % label,
+                            obj=obj.__class__,
+                            id='admin.E109',
+                        )
+                    ]
                 return []
         else:
-            try:
-                model._meta.get_field(item)
-            except FieldDoesNotExist:
-                return [
-                    # This is a deliberate repeat of E108; there's more than one path
-                    # required to test this condition.
-                    checks.Error(
-                        "The value of '%s' refers to '%s', which is not a callable, "
-                        "an attribute of '%s', or an attribute or method on '%s.%s'." % (
-                            label, item, obj.__class__.__name__, model._meta.app_label, model._meta.object_name
-                        ),
-                        obj=obj.__class__,
-                        id='admin.E108',
-                    )
-                ]
-            else:
-                return []
+            return [
+                checks.Error(
+                    "The value of '%s' refers to '%s', which is not a callable, "
+                    "an attribute of '%s', or an attribute or method on '%s.%s'." % (
+                        label, item, obj.__class__.__name__,
+                        model._meta.app_label, model._meta.object_name,
+                    ),
+                    obj=obj.__class__,
+                    id='admin.E108',
+                )
+            ]
 
     def _check_list_display_links(self, obj):
         """ Check that list_display_links is a unique subset of list_display.
@@ -845,19 +892,47 @@ class ModelAdminChecks(BaseModelAdminChecks):
                 else:
                     return []
 
+    def _check_action_permission_methods(self, obj):
+        """
+        Actions with an allowed_permission attribute require the ModelAdmin to
+        implement a has_<perm>_permission() method for each permission.
+        """
+        actions = obj._get_base_actions()
+        errors = []
+        for func, name, _ in actions:
+            if not hasattr(func, 'allowed_permissions'):
+                continue
+            for permission in func.allowed_permissions:
+                method_name = 'has_%s_permission' % permission
+                if not hasattr(obj, method_name):
+                    errors.append(
+                        checks.Error(
+                            '%s must define a %s() method for the %s action.' % (
+                                obj.__class__.__name__,
+                                method_name,
+                                func.__name__,
+                            ),
+                            obj=obj.__class__,
+                            id='admin.E129',
+                        )
+                    )
+        return errors
+
 
 class InlineModelAdminChecks(BaseModelAdminChecks):
 
     def check(self, inline_obj, **kwargs):
-        errors = super().check(inline_obj)
+        self._check_has_add_permission(inline_obj)
         parent_model = inline_obj.parent_model
-        errors.extend(self._check_relation(inline_obj, parent_model))
-        errors.extend(self._check_exclude_of_parent_model(inline_obj, parent_model))
-        errors.extend(self._check_extra(inline_obj))
-        errors.extend(self._check_max_num(inline_obj))
-        errors.extend(self._check_min_num(inline_obj))
-        errors.extend(self._check_formset(inline_obj))
-        return errors
+        return [
+            *super().check(inline_obj),
+            *self._check_relation(inline_obj, parent_model),
+            *self._check_exclude_of_parent_model(inline_obj, parent_model),
+            *self._check_extra(inline_obj),
+            *self._check_max_num(inline_obj),
+            *self._check_min_num(inline_obj),
+            *self._check_formset(inline_obj),
+        ]
 
     def _check_exclude_of_parent_model(self, obj, parent_model):
         # Do not perform more specific checks if the base checks result in an
@@ -931,6 +1006,20 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
             return must_inherit_from(parent='BaseModelFormSet', option='formset', obj=obj, id='admin.E206')
         else:
             return []
+
+    def _check_has_add_permission(self, obj):
+        cls = obj.__class__
+        try:
+            func = cls.has_add_permission
+        except AttributeError:
+            pass
+        else:
+            args = get_func_args(func)
+            if 'obj' not in args:
+                warnings.warn(
+                    "Update %s.has_add_permission() to accept a positional "
+                    "`obj` argument." % cls.__name__, RemovedInDjango30Warning
+                )
 
 
 def must_be(type, option, obj, id):

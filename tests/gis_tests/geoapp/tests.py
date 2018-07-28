@@ -8,7 +8,7 @@ from django.contrib.gis.geos import (
     MultiPoint, MultiPolygon, Point, Polygon, fromstr,
 )
 from django.core.management import call_command
-from django.db import connection
+from django.db import NotSupportedError, connection
 from django.test import TestCase, skipUnlessDBFeature
 
 from ..utils import (
@@ -171,14 +171,13 @@ class GeoModelTest(TestCase):
     def test_raw_sql_query(self):
         "Testing raw SQL query."
         cities1 = City.objects.all()
-        # Only PostGIS would support a 'select *' query because of its recognized
-        # HEXEWKB format for geometry fields
-        as_text = 'ST_AsText(%s)' if postgis else connection.ops.select
-        cities2 = City.objects.raw(
-            'select id, name, %s from geoapp_city' % as_text % 'point'
-        )
-        self.assertEqual(len(cities1), len(list(cities2)))
-        self.assertIsInstance(cities2[0].point, Point)
+        point_select = connection.ops.select % 'point'
+        cities2 = list(City.objects.raw(
+            'select id, name, %s as point from geoapp_city' % point_select
+        ))
+        self.assertEqual(len(cities1), len(cities2))
+        with self.assertNumQueries(0):  # Ensure point isn't deferred.
+            self.assertIsInstance(cities2[0].point, Point)
 
     def test_dumpdata_loaddata_cycle(self):
         """
@@ -301,10 +300,10 @@ class GeoLookupTest(TestCase):
         invalid_geom = fromstr('POLYGON((0 0, 0 1, 1 1, 1 0, 1 1, 1 0, 0 0))')
         State.objects.create(name='invalid', poly=invalid_geom)
         qs = State.objects.all()
-        if oracle or mysql:
+        if oracle or (mysql and connection.mysql_version < (8, 0, 0)):
             # Kansas has adjacent vertices with distance 6.99244813842e-12
             # which is smaller than the default Oracle tolerance.
-            # It's invalid on MySQL too.
+            # It's invalid on MySQL < 8 also.
             qs = qs.exclude(name='Kansas')
             self.assertEqual(State.objects.filter(name='Kansas', poly__isvalid=False).count(), 1)
         self.assertEqual(qs.filter(poly__isvalid=False).count(), 1)
@@ -386,6 +385,9 @@ class GeoLookupTest(TestCase):
         # Puerto Rico should be NULL (it's a commonwealth unincorporated territory)
         self.assertEqual(1, len(nullqs))
         self.assertEqual('Puerto Rico', nullqs[0].name)
+        # GeometryField=None is an alias for __isnull=True.
+        self.assertCountEqual(State.objects.filter(poly=None), nullqs)
+        self.assertCountEqual(State.objects.exclude(poly=None), validqs)
 
         # The valid states should be Colorado & Kansas
         self.assertEqual(2, len(validqs))
@@ -402,6 +404,29 @@ class GeoLookupTest(TestCase):
         nmi.save()
         State.objects.filter(name='Northern Mariana Islands').update(poly=None)
         self.assertIsNone(State.objects.get(name='Northern Mariana Islands').poly)
+
+    @skipUnlessDBFeature('supports_null_geometries', 'supports_crosses_lookup', 'supports_relate_lookup')
+    def test_null_geometries_excluded_in_lookups(self):
+        """NULL features are excluded in spatial lookup functions."""
+        null = State.objects.create(name='NULL', poly=None)
+        queries = [
+            ('equals', Point(1, 1)),
+            ('disjoint', Point(1, 1)),
+            ('touches', Point(1, 1)),
+            ('crosses', LineString((0, 0), (1, 1), (5, 5))),
+            ('within', Point(1, 1)),
+            ('overlaps', LineString((0, 0), (1, 1), (5, 5))),
+            ('contains', LineString((0, 0), (1, 1), (5, 5))),
+            ('intersects', LineString((0, 0), (1, 1), (5, 5))),
+            ('relate', (Point(1, 1), 'T*T***FF*')),
+            ('same_as', Point(1, 1)),
+            ('exact', Point(1, 1)),
+            ('coveredby', Point(1, 1)),
+            ('covers', Point(1, 1)),
+        ]
+        for lookup, geom in queries:
+            with self.subTest(lookup=lookup):
+                self.assertNotIn(null, State.objects.filter(**{'poly__%s' % lookup: geom}))
 
     @skipUnlessDBFeature("supports_relate_lookup")
     def test_relate_lookup(self):
@@ -448,6 +473,18 @@ class GeoLookupTest(TestCase):
             self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt2, intersects_mask)).name)
             self.assertEqual('Lawrence', City.objects.get(point__relate=(ks.poly, intersects_mask)).name)
 
+        # With a complex geometry expression
+        mask = 'anyinteract' if oracle else within_mask
+        self.assertFalse(City.objects.exclude(point__relate=(functions.Union('point', 'point'), mask)))
+
+    def test_gis_lookups_with_complex_expressions(self):
+        multiple_arg_lookups = {'dwithin', 'relate'}  # These lookups are tested elsewhere.
+        lookups = connection.ops.gis_operators.keys() - multiple_arg_lookups
+        self.assertTrue(lookups, 'No lookups found')
+        for lookup in lookups:
+            with self.subTest(lookup):
+                City.objects.filter(**{'point__' + lookup: functions.Union('point', 'point')}).exists()
+
 
 class GeoQuerySetTest(TestCase):
     # TODO: GeoQuerySet is removed, organize these test better.
@@ -483,7 +520,7 @@ class GeoQuerySetTest(TestCase):
         Testing the `MakeLine` aggregate.
         """
         if not connection.features.supports_make_line_aggr:
-            with self.assertRaises(NotImplementedError):
+            with self.assertRaises(NotSupportedError):
                 City.objects.all().aggregate(MakeLine('point'))
             return
 

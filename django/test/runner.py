@@ -6,7 +6,6 @@ import os
 import pickle
 import textwrap
 import unittest
-import warnings
 from importlib import import_module
 from io import StringIO
 
@@ -18,7 +17,6 @@ from django.test.utils import (
     teardown_databases as _teardown_databases, teardown_test_environment,
 )
 from django.utils.datastructures import OrderedSet
-from django.utils.deprecation import RemovedInDjango21Warning
 
 try:
     import tblib.pickling_support
@@ -290,7 +288,7 @@ def _init_worker(counter):
 
     for alias in connections:
         connection = connections[alias]
-        settings_dict = connection.creation.get_test_db_clone_settings(_worker_id)
+        settings_dict = connection.creation.get_test_db_clone_settings(str(_worker_id))
         # connection.settings_dict must be updated in place for changes to be
         # reflected in django.db.connections. If the following line assigned
         # connection.settings_dict = settings_dict, new threads would connect
@@ -352,13 +350,14 @@ class ParallelTestSuite(unittest.TestSuite):
         - make tracebacks picklable with tblib, if available
 
         Even with tblib, errors may still occur for dynamically created
-        exception classes such Model.DoesNotExist which cannot be unpickled.
+        exception classes which cannot be unpickled.
         """
         counter = multiprocessing.Value(ctypes.c_int, 0)
         pool = multiprocessing.Pool(
             processes=self.processes,
             initializer=self.init_worker.__func__,
-            initargs=[counter])
+            initargs=[counter],
+        )
         args = [
             (self.runner_class, index, subsuite, self.failfast)
             for index, subsuite in enumerate(self.subsuites)
@@ -423,31 +422,31 @@ class DiscoverRunner:
     @classmethod
     def add_arguments(cls, parser):
         parser.add_argument(
-            '-t', '--top-level-directory', action='store', dest='top_level', default=None,
+            '-t', '--top-level-directory', dest='top_level',
             help='Top level of project for unittest discovery.',
         )
         parser.add_argument(
-            '-p', '--pattern', action='store', dest='pattern', default="test*.py",
+            '-p', '--pattern', default="test*.py",
             help='The test matching pattern. Defaults to test*.py.',
         )
         parser.add_argument(
-            '-k', '--keepdb', action='store_true', dest='keepdb',
+            '-k', '--keepdb', action='store_true',
             help='Preserves the test DB between runs.'
         )
         parser.add_argument(
-            '-r', '--reverse', action='store_true', dest='reverse',
+            '-r', '--reverse', action='store_true',
             help='Reverses test cases order.',
         )
         parser.add_argument(
-            '--debug-mode', action='store_true', dest='debug_mode',
+            '--debug-mode', action='store_true',
             help='Sets settings.DEBUG to True.',
         )
         parser.add_argument(
-            '-d', '--debug-sql', action='store_true', dest='debug_sql',
+            '-d', '--debug-sql', action='store_true',
             help='Prints logged SQL queries on failure.',
         )
         parser.add_argument(
-            '--parallel', dest='parallel', nargs='?', default=1, type=int,
+            '--parallel', nargs='?', default=1, type=int,
             const=default_test_processes(), metavar='N',
             help='Run tests using up to N parallel processes.',
         )
@@ -524,6 +523,11 @@ class DiscoverRunner:
             suite.addTest(test)
 
         if self.tags or self.exclude_tags:
+            if self.verbosity >= 2:
+                if self.tags:
+                    print('Including test tag(s): %s.' % ', '.join(sorted(self.tags)))
+                if self.exclude_tags:
+                    print('Excluding test tag(s): %s.' % ', '.join(sorted(self.exclude_tags)))
             suite = filter_tests_by_tags(suite, self.tags, self.exclude_tags)
         suite = reorder_suite(suite, self.reorder_by, self.reverse)
 
@@ -533,8 +537,7 @@ class DiscoverRunner:
             # Since tests are distributed across processes on a per-TestCase
             # basis, there's no need for more processes than TestCases.
             parallel_units = len(parallel_suite.subsuites)
-            if self.parallel > parallel_units:
-                self.parallel = parallel_units
+            self.parallel = min(self.parallel, parallel_units)
 
             # If there's only one TestCase, parallelization isn't needed.
             if self.parallel > 1:
@@ -681,16 +684,6 @@ def partition_suite_by_case(suite):
             for item in test_group:
                 groups.extend(partition_suite_by_case(item))
     return groups
-
-
-def setup_databases(*args, **kwargs):
-    warnings.warn(
-        '`django.test.runner.setup_databases()` has moved to '
-        '`django.test.utils.setup_databases()`.',
-        RemovedInDjango21Warning,
-        stacklevel=2,
-    )
-    return _setup_databases(*args, **kwargs)
 
 
 def filter_tests_by_tags(suite, tags, exclude_tags):

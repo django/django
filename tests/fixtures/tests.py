@@ -17,7 +17,8 @@ from django.db import IntegrityError, connection
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from .models import (
-    Article, Category, PrimaryKeyUUIDModel, ProxySpy, Spy, Tag, Visa,
+    Article, Category, NaturalKeyThing, PrimaryKeyUUIDModel, ProxySpy, Spy,
+    Tag, Visa,
 )
 
 
@@ -51,8 +52,7 @@ class DumpDataAssertMixin:
                          natural_foreign_keys=False, natural_primary_keys=False,
                          use_base_manager=False, exclude_list=[], primary_keys=''):
         new_io = StringIO()
-        if filename:
-            filename = os.path.join(tempfile.gettempdir(), filename)
+        filename = filename and os.path.join(tempfile.gettempdir(), filename)
         management.call_command('dumpdata', *args, **{'format': format,
                                                       'stdout': new_io,
                                                       'stderr': new_io,
@@ -335,7 +335,8 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         self._dumpdata_assert(
             ['sites', 'fixtures'],
             '[{"pk": 1, "model": "sites.site", "fields": {"domain": "example.com", "name": "example.com"}}]',
-            exclude_list=['fixtures'])
+            exclude_list=['fixtures'],
+        )
 
         # Excluding fixtures.Article/Book should leave fixtures.Category
         self._dumpdata_assert(
@@ -495,16 +496,9 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         parent.
         """
         ProxySpy.objects.create(name='Paul')
-
-        with warnings.catch_warnings(record=True) as warning_list:
-            warnings.simplefilter('always')
+        msg = "fixtures.ProxySpy is a proxy model and won't be serialized."
+        with self.assertWarnsMessage(ProxyModelWarning, msg):
             self._dumpdata_assert(['fixtures.ProxySpy'], '[]')
-        warning = warning_list.pop()
-        self.assertEqual(warning.category, ProxyModelWarning)
-        self.assertEqual(
-            str(warning.message),
-            "fixtures.ProxySpy is a proxy model and won't be serialized."
-        )
 
     def test_dumpdata_proxy_with_concrete(self):
         """
@@ -570,6 +564,15 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         with self.assertRaises(IntegrityError) as cm:
             management.call_command('loaddata', 'invalid.json', verbosity=0)
             self.assertIn("Could not load fixtures.Article(pk=1):", cm.exception.args[0])
+
+    @unittest.skipUnless(connection.vendor == 'postgresql', 'psycopg2 prohibits null characters in data.')
+    def test_loaddata_null_characters_on_postgresql(self):
+        msg = (
+            'Could not load fixtures.Article(pk=2): '
+            'A string literal cannot contain NUL (0x00) characters.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            management.call_command('loaddata', 'null_character_in_field_value.json')
 
     def test_loaddata_app_option(self):
         with self.assertRaisesMessage(CommandError, "No fixture named 'db_fixture_1' found."):
@@ -778,3 +781,21 @@ class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
             '<Article: Time to reform copyright>',
             '<Article: Poker has no place on ESPN>',
         ])
+
+
+class ForwardReferenceTests(TestCase):
+    def test_forward_reference_fk(self):
+        management.call_command('loaddata', 'forward_reference_fk.json', verbosity=0)
+        self.assertEqual(NaturalKeyThing.objects.count(), 2)
+        t1, t2 = NaturalKeyThing.objects.all()
+        self.assertEqual(t1.other_thing, t2)
+        self.assertEqual(t2.other_thing, t1)
+
+    def test_forward_reference_m2m(self):
+        management.call_command('loaddata', 'forward_reference_m2m.json', verbosity=0)
+        self.assertEqual(NaturalKeyThing.objects.count(), 3)
+        t1 = NaturalKeyThing.objects.get_by_natural_key('t1')
+        self.assertQuerysetEqual(
+            t1.other_things.order_by('key'),
+            ['<NaturalKeyThing: t2>', '<NaturalKeyThing: t3>']
+        )

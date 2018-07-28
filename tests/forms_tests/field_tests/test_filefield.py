@@ -74,5 +74,9 @@ class FileFieldTest(SimpleTestCase):
         # with here)
         self.assertTrue(f.has_changed('resume.txt', {'filename': 'resume.txt', 'content': 'My resume'}))
 
+    def test_disabled_has_changed(self):
+        f = FileField(disabled=True)
+        self.assertIs(f.has_changed('x', 'y'), False)
+
     def test_file_picklable(self):
         self.assertIsInstance(pickle.loads(pickle.dumps(FileField())), FileField)

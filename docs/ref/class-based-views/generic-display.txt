@@ -38,8 +38,8 @@ many projects they are typically the most commonly used views.
 
     **Example myapp/views.py**::
 
-        from django.views.generic.detail import DetailView
         from django.utils import timezone
+        from django.views.generic.detail import DetailView
 
         from articles.models import Article
 
@@ -54,12 +54,12 @@ many projects they are typically the most commonly used views.
 
     **Example myapp/urls.py**::
 
-        from django.conf.urls import url
+        from django.urls import path
 
         from article.views import ArticleDetailView
 
         urlpatterns = [
-            url(r'^(?P<slug>[-\w]+)/$', ArticleDetailView.as_view(), name='article-detail'),
+            path('<slug:slug>/', ArticleDetailView.as_view(), name='article-detail'),
         ]
 
     **Example myapp/article_detail.html**:
@@ -107,14 +107,15 @@ many projects they are typically the most commonly used views.
 
     **Example views.py**::
 
-        from django.views.generic.list import ListView
         from django.utils import timezone
+        from django.views.generic.list import ListView
 
         from articles.models import Article
 
         class ArticleListView(ListView):
 
             model = Article
+            paginate_by = 100  # if pagination is desired
 
             def get_context_data(self, **kwargs):
                 context = super().get_context_data(**kwargs)
@@ -123,12 +124,12 @@ many projects they are typically the most commonly used views.
 
     **Example myapp/urls.py**::
 
-        from django.conf.urls import url
+        from django.urls import path
 
         from article.views import ArticleListView
 
         urlpatterns = [
-            url(r'^$', ArticleListView.as_view(), name='article-list'),
+            path('', ArticleListView.as_view(), name='article-list'),
         ]
 
     **Example myapp/article_list.html**:
@@ -143,6 +144,10 @@ many projects they are typically the most commonly used views.
             <li>No articles yet.</li>
         {% endfor %}
         </ul>
+
+    If you're using pagination, you can adapt the :ref:`example template from
+    the pagination docs <using-paginator-in-view>`. Change instances of
+    ``contacts`` in that example template to ``page_obj``.
 
 .. class:: django.views.generic.list.BaseListView
 

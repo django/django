@@ -2,12 +2,12 @@
 #
 # Translators:
 # Ankhbayar <ankhaa1002@gmail.com>, 2013
-# Bayarkhuu Bataa, 2014
+# Bayarkhuu Bataa, 2014,2017-2018
 # Jacara <baskhuujacara@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jargalan <jargalanch@gmail.com>, 2011
 # Tsolmon <mnts26@gmail.com>, 2011
-# Zorig <zorig_ezd@yahoo.com>, 2013-2014,2016
+# Zorig <zorig_ezd@yahoo.com>, 2013-2014,2016,2018
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2013-2016
 # Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011,2015,2017
 # Ганзориг БП <ganzo.bp@gmail.com>, 2011
@@ -15,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-04-13 07:03+0000\n"
-"Last-Translator: Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>\n"
+"POT-Creation-Date: 2017-12-01 21:10+0100\n"
+"PO-Revision-Date: 2018-02-21 00:40+0000\n"
+"Last-Translator: Zorig <zorig_ezd@yahoo.com>\n"
 "Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
 "mn/)\n"
 "MIME-Version: 1.0\n"
@@ -166,6 +166,9 @@ msgstr "Япон"
 
 msgid "Georgian"
 msgstr "Гүрж"
+
+msgid "Kabyle"
+msgstr ""
 
 msgid "Kazakh"
 msgstr "Казак"
@@ -323,6 +326,7 @@ msgstr "Бүхэл тоо оруулна уу"
 msgid "Enter a valid email address."
 msgstr "Зөв имэйл хаяг оруулна уу"
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -415,6 +419,9 @@ msgid ""
 msgstr ""
 "Файлын '%(extension)s' өргөтгөл зөвшөөрөгдөөгүй байна. Дараах өргөтгөлүүд "
 "зөвшөөрөгдсөн: '%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
+msgstr "Хоосон тэмдэгт зөвшөөрөгдөхгүй."
 
 msgid "and"
 msgstr "ба"
@@ -744,16 +751,15 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Доорх давхардсан утгуудыг засна уу."
 
-msgid "The inline foreign key did not match the parent instance primary key."
+msgid "The inline value did not match the parent instance."
 msgstr ""
-"Inline обектийн гадаад түлхүүр Эцэг обектийн түлхүүртэй таарахгүй байна. "
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Зөв сонголт хийнэ үү. Энэ утга сонголтонд алга."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" нь primary key талбарт тохирохгүй утга байна."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "\"%(pk)s\" зөв утга биш байна."
 
 #, python-format
 msgid ""
@@ -1117,6 +1123,14 @@ msgstr ""
 "HTTPS холболт эсвэл 'same-origin' хүсэлтэнд зориулж идэвхижүүлнэ үү."
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1135,31 +1149,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "DEBUG=True үед дэлгэрэнгүй мэдээлэл харах боломжтой."
 
-msgid "Welcome to Django"
-msgstr "Джанго-д тавтай морилоно уу"
-
-msgid "It worked!"
-msgstr "Өө ажилчихлаа!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Баяр хүргэе!. Таний эхний Django-оор хийсэн хуудас."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-"Одоо Та анхныхаа програмыг дараах командыг хийж ажиллуулна уу <code>python "
-"manage.py startapp [app_label]</code>."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Та Джангогийнхоо тохиргооны файлд <code>DEBUG = True</code> гэсэн ба ямарч  "
-"URLs тохируулаагүй учир энэ мэдэгдлийг уншиж байна. Ажиллаж байна!"
-
 msgid "No year specified"
 msgstr "Он тодорхойлоогүй байна"
+
+msgid "Date out of range"
+msgstr "Хугацааны хязгаар хэтэрсэн байна"
 
 msgid "No month specified"
 msgstr "Сар тодорхойлоогүй байна"
@@ -1213,3 +1207,41 @@ msgstr "\"%(path)s\" байхгүй байна."
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "%(directory)s ийн жагсаалт"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr ""
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Амжилттай суулгалаа! Баяр хүргэе!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+
+msgid "Django Documentation"
+msgstr "Джанго баримтжуулалт"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr ""
+
+msgid "Tutorial: A Polling App"
+msgstr ""
+
+msgid "Get started with Django"
+msgstr "Джанготой ажиллаж эхлэх"
+
+msgid "Django Community"
+msgstr ""
+
+msgid "Connect, get help, or contribute"
+msgstr "Холбогдох, тусламж авах эсвэл хувь нэмрээ оруулах"

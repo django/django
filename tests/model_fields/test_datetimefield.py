@@ -24,7 +24,6 @@ class DateTimeFieldTests(TestCase):
         self.assertEqual(f.to_python('01:02:03.000004'), datetime.time(1, 2, 3, 4))
         self.assertEqual(f.to_python('01:02:03.999999'), datetime.time(1, 2, 3, 999999))
 
-    @skipUnlessDBFeature('supports_microsecond_precision')
     def test_datetimes_save_completely(self):
         dat = datetime.date(2014, 3, 12)
         datetim = datetime.datetime(2014, 3, 12, 21, 22, 23, 240000)

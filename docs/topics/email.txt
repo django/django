@@ -57,9 +57,9 @@ are required.
 * ``recipient_list``: A list of strings, each an email address. Each
   member of ``recipient_list`` will see the other recipients in the "To:"
   field of the email message.
-* ``fail_silently``: A boolean. If it's ``False``, ``send_mail`` will raise
-  an :exc:`smtplib.SMTPException`. See the :mod:`smtplib` docs for a list of
-  possible exceptions, all of which are subclasses of
+* ``fail_silently``: A boolean. When it's ``False``, ``send_mail()`` will raise
+  an :exc:`smtplib.SMTPException` if an error occurs. See the :mod:`smtplib`
+  docs for a list of possible exceptions, all of which are subclasses of
   :exc:`~smtplib.SMTPException`.
 * ``auth_user``: The optional username to use to authenticate to the SMTP
   server. If this isn't provided, Django will use the value of the
@@ -192,7 +192,7 @@ Here's an example view that takes a ``subject``, ``message`` and ``from_email``
 from the request's POST data, sends that to admin@example.com and redirects to
 "/contact/thanks/" when it's done::
 
-    from django.core.mail import send_mail, BadHeaderError
+    from django.core.mail import BadHeaderError, send_mail
     from django.http import HttpResponse, HttpResponseRedirect
 
     def send_email(request):
@@ -272,7 +272,7 @@ All parameters are optional and can be set at any time prior to calling the
   new connection is created when ``send()`` is called.
 
 * ``attachments``: A list of attachments to put on the message. These can
-  be either ``email.MIMEBase.MIMEBase`` instances, or ``(filename,
+  be either :class:`~email.mime.base.MIMEBase` instances, or ``(filename,
   content, mimetype)`` triples.
 
 * ``headers``: A dictionary of extra headers to put on the message. The
@@ -310,7 +310,7 @@ The class has the following methods:
   recipients will not raise an exception.
 
 * ``message()`` constructs a ``django.core.mail.SafeMIMEText`` object (a
-  subclass of Python's ``email.MIMEText.MIMEText`` class) or a
+  subclass of Python's :class:`~email.mime.text.MIMEText` class) or a
   ``django.core.mail.SafeMIMEMultipart`` object holding the message to be
   sent. If you ever need to extend the
   :class:`~django.core.mail.EmailMessage` class, you'll probably want to
@@ -326,8 +326,8 @@ The class has the following methods:
 * ``attach()`` creates a new file attachment and adds it to the message.
   There are two ways to call ``attach()``:
 
-  * You can pass it a single argument that is an
-    ``email.MIMEBase.MIMEBase`` instance. This will be inserted directly
+  * You can pass it a single argument that is a
+    :class:`~email.mime.base.MIMEBase` instance. This will be inserted directly
     into the resulting message.
 
   * Alternatively, you can pass ``attach()`` three arguments:
@@ -366,11 +366,6 @@ The class has the following methods:
 
   For MIME types starting with ``text/``, binary data is handled as in
   ``attach()``.
-
-.. versionchanged:: 1.11
-
-    Added the fallback to MIME type ``application/octet-stream`` when binary
-    data for a ``text/*`` attachment cannot be decoded.
 
 Sending alternative content types
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

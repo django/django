@@ -5,9 +5,10 @@ from django.forms.models import modelform_factory
 from django.test import TestCase, skipIfDBFeature
 
 from .models import (
-    A, Address, B, Board, C, CharLink, Company, Contact, Content, D, Developer,
-    Guild, HasLinkThing, Link, Node, Note, OddRelation1, OddRelation2,
-    Organization, Person, Place, Related, Restaurant, Tag, Team, TextLink,
+    A, Address, B, Board, C, Cafe, CharLink, Company, Contact, Content, D,
+    Developer, Guild, HasLinkThing, Link, Node, Note, OddRelation1,
+    OddRelation2, Organization, Person, Place, Related, Restaurant, Tag, Team,
+    TextLink,
 )
 
 
@@ -47,6 +48,17 @@ class GenericRelationTests(TestCase):
         oddrel = OddRelation2.objects.create(name='tlink')
         TextLink.objects.create(content_object=oddrel)
         oddrel.delete()
+
+    def test_coerce_object_id_remote_field_cache_persistence(self):
+        restaurant = Restaurant.objects.create()
+        CharLink.objects.create(content_object=restaurant)
+        charlink = CharLink.objects.latest('pk')
+        self.assertIs(charlink.content_object, charlink.content_object)
+        # If the model (Cafe) uses more than one level of multi-table inheritance.
+        cafe = Cafe.objects.create()
+        CharLink.objects.create(content_object=cafe)
+        charlink = CharLink.objects.latest('pk')
+        self.assertIs(charlink.content_object, charlink.content_object)
 
     def test_q_object_or(self):
         """
@@ -246,3 +258,18 @@ class GenericRelationTests(TestCase):
     def test_ticket_22982(self):
         place = Place.objects.create(name='My Place')
         self.assertIn('GenericRelatedObjectManager', str(place.links))
+
+    def test_filter_on_related_proxy_model(self):
+        place = Place.objects.create()
+        Link.objects.create(content_object=place)
+        self.assertEqual(Place.objects.get(link_proxy__object_id=place.id), place)
+
+    def test_generic_reverse_relation_with_mti(self):
+        """
+        Filtering with a reverse generic relation, where the GenericRelation
+        comes from multi-table inheritance.
+        """
+        place = Place.objects.create(name='Test Place')
+        link = Link.objects.create(content_object=place)
+        result = Link.objects.filter(places=place)
+        self.assertCountEqual(result, [link])

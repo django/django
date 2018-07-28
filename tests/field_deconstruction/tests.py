@@ -28,6 +28,27 @@ class FieldDeconstructionTests(SimpleTestCase):
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(name, "author")
 
+    def test_db_tablespace(self):
+        field = models.Field()
+        _, _, args, kwargs = field.deconstruct()
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {})
+        # With a DEFAULT_DB_TABLESPACE.
+        with self.settings(DEFAULT_DB_TABLESPACE='foo'):
+            _, _, args, kwargs = field.deconstruct()
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {})
+        # With a db_tablespace.
+        field = models.Field(db_tablespace='foo')
+        _, _, args, kwargs = field.deconstruct()
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {'db_tablespace': 'foo'})
+        # With a db_tablespace equal to DEFAULT_DB_TABLESPACE.
+        with self.settings(DEFAULT_DB_TABLESPACE='foo'):
+            _, _, args, kwargs = field.deconstruct()
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {'db_tablespace': 'foo'})
+
     def test_auto_field(self):
         field = models.AutoField(primary_key=True)
         field.set_attributes_from_name("id")
@@ -493,3 +514,7 @@ class FieldDeconstructionTests(SimpleTestCase):
         self.assertEqual(path, "django.db.models.BinaryField")
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {})
+        field = models.BinaryField(editable=True)
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {'editable': True})

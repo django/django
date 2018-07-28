@@ -4,8 +4,6 @@ from django.db import connection
 from django.db.models import Index
 from django.db.utils import DatabaseError
 from django.test import TransactionTestCase, skipUnlessDBFeature
-from django.test.utils import ignore_warnings
-from django.utils.deprecation import RemovedInDjango21Warning
 
 from .models import Article, ArticleReporter, City, District, Reporter
 
@@ -46,9 +44,12 @@ class IntrospectionTests(TransactionTestCase):
                     self.fail("The test user has no CREATE VIEW privileges")
                 else:
                     raise
-
-        self.assertIn('introspection_article_view', connection.introspection.table_names(include_views=True))
-        self.assertNotIn('introspection_article_view', connection.introspection.table_names())
+        try:
+            self.assertIn('introspection_article_view', connection.introspection.table_names(include_views=True))
+            self.assertNotIn('introspection_article_view', connection.introspection.table_names())
+        finally:
+            with connection.cursor() as cursor:
+                cursor.execute('DROP VIEW introspection_article_view')
 
     def test_unmanaged_through_model(self):
         tables = connection.introspection.django_table_names()
@@ -61,8 +62,9 @@ class IntrospectionTests(TransactionTestCase):
 
     def test_sequence_list(self):
         sequences = connection.introspection.sequence_list()
-        expected = {'table': Reporter._meta.db_table, 'column': 'id'}
-        self.assertIn(expected, sequences, 'Reporter sequence not found in sequence_list()')
+        reporter_seqs = [seq for seq in sequences if seq['table'] == Reporter._meta.db_table]
+        self.assertEqual(len(reporter_seqs), 1, 'Reporter sequence not found in sequence_list()')
+        self.assertEqual(reporter_seqs[0]['column'], 'id')
 
     def test_get_table_description_names(self):
         with connection.cursor() as cursor:
@@ -90,7 +92,6 @@ class IntrospectionTests(TransactionTestCase):
             [30, 30, 254]
         )
 
-    @skipUnlessDBFeature('can_introspect_null')
     def test_get_table_description_nullable(self):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
@@ -149,7 +150,7 @@ class IntrospectionTests(TransactionTestCase):
         ]
         for statement in create_table_statements:
             with connection.cursor() as cursor:
-                cursor.fetchone = mock.Mock(return_value=[statement.format(Article._meta.db_table)])
+                cursor.fetchone = mock.Mock(return_value=[statement.format(Article._meta.db_table), 'table'])
                 relations = connection.introspection.get_relations(cursor, 'mocked_table')
             self.assertEqual(relations, {'art_id': ('id', Article._meta.db_table)})
 
@@ -169,28 +170,12 @@ class IntrospectionTests(TransactionTestCase):
         self.assertEqual(primary_key_column, 'id')
         self.assertEqual(pk_fk_column, 'city_id')
 
-    @ignore_warnings(category=RemovedInDjango21Warning)
-    def test_get_indexes(self):
-        with connection.cursor() as cursor:
-            indexes = connection.introspection.get_indexes(cursor, Article._meta.db_table)
-        self.assertEqual(indexes['reporter_id'], {'unique': False, 'primary_key': False})
-
-    @ignore_warnings(category=RemovedInDjango21Warning)
-    def test_get_indexes_multicol(self):
-        """
-        Multicolumn indexes are not included in the introspection results.
-        """
-        with connection.cursor() as cursor:
-            indexes = connection.introspection.get_indexes(cursor, Reporter._meta.db_table)
-        self.assertNotIn('first_name', indexes)
-        self.assertIn('id', indexes)
-
     def test_get_constraints_index_types(self):
         with connection.cursor() as cursor:
             constraints = connection.introspection.get_constraints(cursor, Article._meta.db_table)
         index = {}
         index2 = {}
-        for key, val in constraints.items():
+        for val in constraints.values():
             if val['columns'] == ['headline', 'pub_date']:
                 index = val
             if val['columns'] == ['headline', 'response_to_id', 'pub_date', 'reporter_id']:
@@ -212,7 +197,7 @@ class IntrospectionTests(TransactionTestCase):
             ['response_to_id'],
             ['headline', 'response_to_id', 'pub_date', 'reporter_id'],
         ]
-        for key, val in constraints.items():
+        for val in constraints.values():
             if val['index'] and not (val['primary_key'] or val['unique']):
                 self.assertIn(val['columns'], expected_columns)
                 self.assertEqual(val['orders'], ['ASC'] * len(val['columns']))

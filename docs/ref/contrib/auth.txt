@@ -34,12 +34,12 @@ Fields
 
         .. admonition:: Usernames and Unicode
 
-            Django originally accepted only ASCII letters in usernames.
-            Although it wasn't a deliberate choice, Unicode characters have
-            always been accepted when using Python 3. Django 1.10 officially
-            added Unicode support in usernames, keeping the ASCII-only behavior
-            on Python 2, with the option to customize the behavior using
-            :attr:`.User.username_validator`.
+            Django originally accepted only ASCII letters and numbers in
+            usernames. Although it wasn't a deliberate choice, Unicode
+            characters have always been accepted when using Python 3. Django
+            1.10 officially added Unicode support in usernames, keeping the
+            ASCII-only behavior on Python 2, with the option to customize the
+            behavior using :attr:`.User.username_validator`.
 
     .. attribute:: first_name
 
@@ -50,10 +50,6 @@ Fields
 
         Optional (:attr:`blank=True <django.db.models.Field.blank>`). 150
         characters or fewer.
-
-        .. versionchanged:: 2.0
-
-            The ``max_length`` increased from 30 to 150 characters.
 
     .. attribute:: email
 
@@ -213,6 +209,14 @@ Methods
         Returns ``False`` if
         :meth:`~django.contrib.auth.models.User.set_unusable_password()` has
         been called for this user.
+
+        .. versionchanged:: 2.1
+
+            In older versions, this also returns ``False`` if the password is
+            ``None`` or an empty string, or if the password uses a hasher
+            that's not in the :setting:`PASSWORD_HASHERS` setting. That
+            behavior is considered a bug as it prevents users with such
+            passwords from requesting a password reset.
 
     .. method:: get_group_permissions(obj=None)
 
@@ -395,12 +399,12 @@ Validators
 
 .. class:: validators.ASCIIUsernameValidator
 
-    A field validator allowing only ASCII letters, in addition to ``@``, ``.``,
-    ``+``, ``-``, and ``_``.
+    A field validator allowing only ASCII letters and numbers, in addition to
+    ``@``, ``.``, ``+``, ``-``, and ``_``.
 
 .. class:: validators.UnicodeUsernameValidator
 
-    A field validator allowing Unicode letters, in addition to ``@``, ``.``,
+    A field validator allowing Unicode characters, in addition to ``@``, ``.``,
     ``+``, ``-``, and ``_``. The default validator for ``User.username``.
 
 .. _topics-auth-signals:
@@ -460,10 +464,6 @@ can be used for notification when a user logs in or out.
         The :class:`~django.http.HttpRequest` object, if one was provided to
         :func:`~django.contrib.auth.authenticate`.
 
-    .. versionchanged:: 1.11
-
-        The ``request`` argument was added.
-
 .. _authentication-backends-reference:
 
 Authentication backends
@@ -516,10 +516,6 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         ``request`` is an :class:`~django.http.HttpRequest` and may be ``None``
         if it wasn't provided to :func:`~django.contrib.auth.authenticate`
         (which passes it on to the backend).
-
-        .. versionchanged:: 1.11
-
-            The ``request`` argument was added.
 
     .. method:: get_user_permissions(user_obj, obj=None)
 

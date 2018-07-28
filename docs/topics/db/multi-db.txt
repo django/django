@@ -7,6 +7,11 @@ multiple databases. Most of the rest of Django's documentation assumes
 you are interacting with a single database. If you want to interact
 with multiple databases, you'll need to take some additional steps.
 
+.. seealso::
+
+    See :ref:`testing-multi-db` for information about testing with multiple
+    databases.
+
 Defining your databases
 =======================
 
@@ -162,6 +167,9 @@ A database Router is a class that provides up to four methods:
     the router has no opinion. This is purely a validation operation,
     used by foreign key and many to many operations to determine if a
     relation should be allowed between two objects.
+
+    If no router has an opinion (i.e. all routers return ``None``), only
+    relations within the same database are allowed.
 
 .. method:: allow_migrate(db, app_label, model_name=None, **hints)
 
@@ -650,7 +658,7 @@ registered with any ``Admin`` instance::
 
 This example sets up two admin sites. On the first site, the
 ``Author`` and ``Publisher`` objects are exposed; ``Publisher``
-objects have an tabular inline showing books published by that
+objects have a tabular inline showing books published by that
 publisher. The second site exposes just publishers, without the
 inlines.
 
@@ -664,7 +672,8 @@ object that allows you to retrieve a specific connection using its
 alias::
 
     from django.db import connections
-    cursor = connections['my_db_alias'].cursor()
+    with connections['my_db_alias'].cursor() as cursor:
+        ...
 
 Limitations of multiple databases
 =================================

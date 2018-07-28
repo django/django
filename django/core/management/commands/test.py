@@ -10,10 +10,7 @@ class Command(BaseCommand):
 
     # DiscoverRunner runs the checks after databases are set up.
     requires_system_checks = False
-
-    def __init__(self):
-        self.test_runner = None
-        super().__init__()
+    test_runner = None
 
     def run_from_argv(self, argv):
         """
@@ -38,11 +35,11 @@ class Command(BaseCommand):
             help='Tells Django to NOT prompt the user for input of any kind.',
         )
         parser.add_argument(
-            '--failfast', action='store_true', dest='failfast',
+            '--failfast', action='store_true',
             help='Tells Django to stop running the test suite after first failed test.',
         )
         parser.add_argument(
-            '--testrunner', action='store', dest='testrunner',
+            '--testrunner',
             help='Tells Django to use specified test runner class instead of '
                  'the one specified by the TEST_RUNNER setting.',
         )
@@ -53,9 +50,6 @@ class Command(BaseCommand):
             test_runner_class.add_arguments(parser)
 
     def handle(self, *test_labels, **options):
-        from django.conf import settings
-        from django.test.utils import get_runner
-
         TestRunner = get_runner(settings, options['testrunner'])
 
         test_runner = TestRunner(**options)

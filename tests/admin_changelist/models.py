@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 
 
@@ -28,6 +30,7 @@ class Band(models.Model):
 
 class Musician(models.Model):
     name = models.CharField(max_length=30)
+    age = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -72,6 +75,7 @@ class Invitation(models.Model):
 
 
 class Swallow(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4)
     origin = models.CharField(max_length=255)
     load = models.FloatField()
     speed = models.FloatField()
@@ -111,3 +115,7 @@ class OrderedObject(models.Model):
 
 class CustomIdUser(models.Model):
     uuid = models.AutoField(primary_key=True)
+
+
+class CharPK(models.Model):
+    char_pk = models.CharField(max_length=100, primary_key=True)

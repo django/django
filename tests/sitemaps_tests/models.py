@@ -4,6 +4,7 @@ from django.urls import reverse
 
 class TestModel(models.Model):
     name = models.CharField(max_length=100)
+    lastmod = models.DateTimeField(null=True)
 
     def get_absolute_url(self):
         return '/testmodel/%s/' % self.id

@@ -12,7 +12,6 @@ from django.core.servers.basehttp import (
 )
 from django.utils import autoreload
 
-
 naiveip_re = re.compile(r"""^(?:
 (?P<addr>
     (?P<ipv4>\d{1,3}(?:\.\d{1,3}){3}) |         # IPv4 address
@@ -26,7 +25,7 @@ class Command(BaseCommand):
 
     # Validation is called explicitly each time the server is reloaded.
     requires_system_checks = False
-    leave_locale_alone = True
+    stealth_options = ('shutdown_message',)
 
     default_addr = '127.0.0.1'
     default_addr_ipv6 = '::1'
@@ -65,8 +64,6 @@ class Command(BaseCommand):
         return get_internal_wsgi_application()
 
     def handle(self, *args, **options):
-        from django.conf import settings
-
         if not settings.DEBUG and not settings.ALLOWED_HOSTS:
             raise CommandError('You must set settings.ALLOWED_HOSTS if DEBUG is False.')
 

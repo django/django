@@ -1,5 +1,7 @@
 from collections import OrderedDict
+from datetime import datetime, timedelta
 
+from django.conf import settings
 from django.contrib.admin import FieldListFilter
 from django.contrib.admin.exceptions import (
     DisallowedModelAdminLookup, DisallowedModelAdminToField,
@@ -15,8 +17,10 @@ from django.core.exceptions import (
 )
 from django.core.paginator import InvalidPage
 from django.db import models
+from django.db.models.expressions import Combinable, F, OrderBy
 from django.urls import reverse
 from django.utils.http import urlencode
+from django.utils.timezone import make_aware
 from django.utils.translation import gettext
 
 # Changelist settings
@@ -34,7 +38,7 @@ IGNORED_PARAMS = (
 class ChangeList:
     def __init__(self, request, model, list_display, list_display_links,
                  list_filter, date_hierarchy, search_fields, list_select_related,
-                 list_per_page, list_max_show_all, list_editable, model_admin):
+                 list_per_page, list_max_show_all, list_editable, model_admin, sortable_by):
         self.model = model
         self.opts = model._meta
         self.lookup_opts = self.opts
@@ -49,6 +53,7 @@ class ChangeList:
         self.list_max_show_all = list_max_show_all
         self.model_admin = model_admin
         self.preserved_filters = model_admin.get_preserved_filters(request)
+        self.sortable_by = sortable_by
 
         # Get search parameters from the query string.
         try:
@@ -76,8 +81,10 @@ class ChangeList:
         self.get_results(request)
         if self.is_popup:
             title = gettext('Select %s')
-        else:
+        elif self.model_admin.has_change_permission(request):
             title = gettext('Select %s to change')
+        else:
+            title = gettext('Select %s to view')
         self.title = title % self.opts.verbose_name
         self.pk_attname = self.lookup_opts.pk.attname
 
@@ -85,8 +92,7 @@ class ChangeList:
         """
         Return all params except IGNORED_PARAMS.
         """
-        if not params:
-            params = self.params
+        params = params or self.params
         lookup_params = params.copy()  # a dictionary of the query string
         # Remove all the parameters that are globally and systematically
         # ignored.
@@ -104,37 +110,66 @@ class ChangeList:
                 raise DisallowedModelAdminLookup("Filtering by %s not allowed" % key)
 
         filter_specs = []
-        if self.list_filter:
-            for list_filter in self.list_filter:
-                if callable(list_filter):
-                    # This is simply a custom list filter class.
-                    spec = list_filter(request, lookup_params, self.model, self.model_admin)
+        for list_filter in self.list_filter:
+            if callable(list_filter):
+                # This is simply a custom list filter class.
+                spec = list_filter(request, lookup_params, self.model, self.model_admin)
+            else:
+                field_path = None
+                if isinstance(list_filter, (tuple, list)):
+                    # This is a custom FieldListFilter class for a given field.
+                    field, field_list_filter_class = list_filter
                 else:
-                    field_path = None
-                    if isinstance(list_filter, (tuple, list)):
-                        # This is a custom FieldListFilter class for a given field.
-                        field, field_list_filter_class = list_filter
-                    else:
-                        # This is simply a field name, so use the default
-                        # FieldListFilter class that has been registered for
-                        # the type of the given field.
-                        field, field_list_filter_class = list_filter, FieldListFilter.create
-                    if not isinstance(field, models.Field):
-                        field_path = field
-                        field = get_fields_from_path(self.model, field_path)[-1]
+                    # This is simply a field name, so use the default
+                    # FieldListFilter class that has been registered for the
+                    # type of the given field.
+                    field, field_list_filter_class = list_filter, FieldListFilter.create
+                if not isinstance(field, models.Field):
+                    field_path = field
+                    field = get_fields_from_path(self.model, field_path)[-1]
 
-                    lookup_params_count = len(lookup_params)
-                    spec = field_list_filter_class(
-                        field, request, lookup_params,
-                        self.model, self.model_admin, field_path=field_path
+                lookup_params_count = len(lookup_params)
+                spec = field_list_filter_class(
+                    field, request, lookup_params,
+                    self.model, self.model_admin, field_path=field_path,
+                )
+                # field_list_filter_class removes any lookup_params it
+                # processes. If that happened, check if distinct() is needed to
+                # remove duplicate results.
+                if lookup_params_count > len(lookup_params):
+                    use_distinct = use_distinct or lookup_needs_distinct(self.lookup_opts, field_path)
+            if spec and spec.has_output():
+                filter_specs.append(spec)
+
+        if self.date_hierarchy:
+            # Create bounded lookup parameters so that the query is more
+            # efficient.
+            year = lookup_params.pop('%s__year' % self.date_hierarchy, None)
+            if year is not None:
+                month = lookup_params.pop('%s__month' % self.date_hierarchy, None)
+                day = lookup_params.pop('%s__day' % self.date_hierarchy, None)
+                try:
+                    from_date = datetime(
+                        int(year),
+                        int(month if month is not None else 1),
+                        int(day if day is not None else 1),
                     )
-                    # field_list_filter_class removes any lookup_params it
-                    # processes. If that happened, check if distinct() is
-                    # needed to remove duplicate results.
-                    if lookup_params_count > len(lookup_params):
-                        use_distinct = use_distinct or lookup_needs_distinct(self.lookup_opts, field_path)
-                if spec and spec.has_output():
-                    filter_specs.append(spec)
+                except ValueError as e:
+                    raise IncorrectLookupParameters(e) from e
+                if settings.USE_TZ:
+                    from_date = make_aware(from_date)
+                if day:
+                    to_date = from_date + timedelta(days=1)
+                elif month:
+                    # In this branch, from_date will always be the first of a
+                    # month, so advancing 32 days gives the next month.
+                    to_date = (from_date + timedelta(days=32)).replace(day=1)
+                else:
+                    to_date = from_date.replace(year=from_date.year + 1)
+                lookup_params.update({
+                    '%s__gte' % self.date_hierarchy: from_date,
+                    '%s__lt' % self.date_hierarchy: to_date,
+                })
 
         # At this point, all the parameters used by the various ListFilters
         # have been removed from lookup_params, which now only contains other
@@ -253,8 +288,11 @@ class ChangeList:
                     order_field = self.get_ordering_field(field_name)
                     if not order_field:
                         continue  # No 'admin_order_field', skip it
+                    if hasattr(order_field, 'as_sql'):
+                        # order_field is an expression.
+                        ordering.append(order_field.desc() if pfx == '-' else order_field.asc())
                     # reverse order if order_field has already "-" as prefix
-                    if order_field.startswith('-') and pfx == "-":
+                    elif order_field.startswith('-') and pfx == '-':
                         ordering.append(order_field[1:])
                     else:
                         ordering.append(pfx + order_field)
@@ -268,7 +306,7 @@ class ChangeList:
         # ordering fields so we can guarantee a deterministic order across all
         # database backends.
         pk_name = self.lookup_opts.pk.name
-        if not (set(ordering) & {'pk', '-pk', pk_name, '-' + pk_name}):
+        if {'pk', '-pk', pk_name, '-' + pk_name}.isdisjoint(ordering):
             # The two sets do not intersect, meaning the pk isn't present. So
             # we add it.
             ordering.append('-pk')
@@ -288,7 +326,15 @@ class ChangeList:
             # the right column numbers absolutely, because there might be more
             # than one column associated with that ordering, so we guess.
             for field in ordering:
-                if field.startswith('-'):
+                if isinstance(field, (Combinable, OrderBy)):
+                    if not isinstance(field, OrderBy):
+                        field = field.asc()
+                    if isinstance(field.expression, F):
+                        order_type = 'desc' if field.descending else 'asc'
+                        field = field.expression.name
+                    else:
+                        continue
+                elif field.startswith('-'):
                     field = field[1:]
                     order_type = 'desc'
                 else:
@@ -373,9 +419,8 @@ class ChangeList:
             else:
                 if isinstance(field.remote_field, models.ManyToOneRel):
                     # <FK>_id field names don't require a join.
-                    if field_name == field.get_attname():
-                        continue
-                    return True
+                    if field_name != field.get_attname():
+                        return True
         return False
 
     def url_for_result(self, result):

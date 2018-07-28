@@ -20,13 +20,15 @@ class ForceTests(TestCase):
         # Won't work because force_update and force_insert are mutually
         # exclusive
         c.value = 4
-        with self.assertRaises(ValueError):
+        msg = 'Cannot force both insert and updating in model saving.'
+        with self.assertRaisesMessage(ValueError, msg):
             c.save(force_insert=True, force_update=True)
 
         # Try to update something that doesn't have a primary key in the first
         # place.
         c1 = Counter(name="two", value=2)
-        with self.assertRaises(ValueError):
+        msg = 'Cannot force an update in save() with no primary key.'
+        with self.assertRaisesMessage(ValueError, msg):
             with transaction.atomic():
                 c1.save(force_update=True)
         c1.save(force_insert=True)
@@ -40,7 +42,8 @@ class ForceTests(TestCase):
         # Trying to update should still fail, even with manual primary keys, if
         # the data isn't in the database already.
         obj = WithCustomPK(name=1, value=1)
-        with self.assertRaises(DatabaseError):
+        msg = 'Forced update did not affect any rows.'
+        with self.assertRaisesMessage(DatabaseError, msg):
             with transaction.atomic():
                 obj.save(force_update=True)
 

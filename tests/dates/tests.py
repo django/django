@@ -56,6 +56,12 @@ class DatesTests(TestCase):
             ],
         )
         self.assertSequenceEqual(
+            Comment.objects.dates("article__pub_date", "week"), [
+                datetime.date(2005, 7, 25),
+                datetime.date(2010, 7, 26),
+            ],
+        )
+        self.assertSequenceEqual(
             Comment.objects.dates("article__pub_date", "day"), [
                 datetime.date(2005, 7, 28),
                 datetime.date(2010, 7, 28),
@@ -93,7 +99,8 @@ class DatesTests(TestCase):
         )
 
     def test_dates_fails_when_given_invalid_kind_argument(self):
-        with self.assertRaisesMessage(AssertionError, "'kind' must be one of 'year', 'month' or 'day'."):
+        msg = "'kind' must be one of 'year', 'month', 'week', or 'day'."
+        with self.assertRaisesMessage(AssertionError, msg):
             Article.objects.dates("pub_date", "bad_kind")
 
     def test_dates_fails_when_given_invalid_order_argument(self):

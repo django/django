@@ -128,7 +128,7 @@ be reported, and any test databases created by the run will not be destroyed.
 .. admonition:: Test with warnings enabled
 
     It's a good idea to run your tests with Python warnings enabled:
-    ``python -Wall manage.py test``. The ``-Wall`` flag tells Python to
+    ``python -Wa manage.py test``. The ``-Wa`` flag tells Python to
     display deprecation warnings. Django, like many other Python libraries,
     uses these warnings to flag when features are going away. It also might
     flag areas in your code that aren't strictly wrong but could benefit
@@ -177,7 +177,7 @@ control the particular collation used by the test database. See the
 :doc:`settings documentation </ref/settings>` for details of these
 and other advanced settings.
 
-If using an SQLite in-memory database with SQLite 3.7.13+, `shared cache
+If using an SQLite in-memory database with SQLite, `shared cache
 <https://www.sqlite.org/sharedcache.html>`_ is enabled, so you can write tests
 with ability to share the database between threads.
 
@@ -343,3 +343,10 @@ the :setting:`PASSWORD_HASHERS` setting to a faster hashing algorithm::
 
 Don't forget to also include in :setting:`PASSWORD_HASHERS` any hashing
 algorithm used in fixtures, if any.
+
+Preserving the test database
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :option:`test --keepdb` option preserves the test database between test
+runs. It skips the create and destroy actions which can greatly decrease the
+time to run tests.

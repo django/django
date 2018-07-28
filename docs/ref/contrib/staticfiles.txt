@@ -94,8 +94,13 @@ Some commonly used options are:
 
 .. django-admin-option:: --ignore PATTERN, -i PATTERN
 
-    Ignore files or directories matching this glob-style pattern. Use multiple
-    times to ignore more.
+    Ignore files, directories, or paths matching this glob-style pattern. Use
+    multiple times to ignore more. When specifying a path, always use forward
+    slashes, even on Windows.
+
+    .. versionchanged:: 2.2
+
+        Path matching was added.
 
 .. django-admin-option:: --dry-run, -n
 
@@ -199,7 +204,9 @@ the directories which were searched::
 
 Overrides the core :djadmin:`runserver` command if the ``staticfiles`` app
 is :setting:`installed<INSTALLED_APPS>` and adds automatic serving of static
-files and the following new options.
+files. File serving doesn't run through :setting:`MIDDLEWARE`.
+
+The command adds these options:
 
 .. django-admin-option:: --nostatic
 
@@ -220,8 +227,10 @@ setting is ``False``. By using this you acknowledge the fact that it's
 **grossly inefficient** and probably **insecure**. This is only intended for
 local development, should **never be used in production** and is only
 available if the :doc:`staticfiles </ref/contrib/staticfiles>` app is
-in your project's :setting:`INSTALLED_APPS` setting. :djadmin:`runserver`
+in your project's :setting:`INSTALLED_APPS` setting.
+
 ``--insecure`` doesn't work with
+:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` or
 :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`.
 
 Example usage::
@@ -303,12 +312,6 @@ passes might be needed. Increase the maximum number of passes by subclassing
 ``ManifestStaticFilesStorage`` and setting the ``max_post_process_passes``
 attribute. It defaults to 5.
 
-.. versionchanged:: 1.11
-
-    Previous versions didn't make multiple passes to ensure file hashes
-    converged, so often times file hashes weren't correct. The
-    ``max_post_process_passes`` attribute was added.
-
 To enable the ``ManifestStaticFilesStorage`` you have to make sure the
 following requirements are met:
 
@@ -331,11 +334,6 @@ If a file isn't found in the ``staticfiles.json`` manifest at runtime, a
 ``ManifestStaticFilesStorage`` and setting the ``manifest_strict`` attribute to
 ``False`` -- nonexistent paths will remain unchanged.
 
-.. versionchanged:: 1.11
-
-    The ``manifest_strict`` attribute was added. In older versions, the
-    behavior is the same as ``manifest_strict=False``.
-
 Due to the requirement of running :djadmin:`collectstatic`, this storage
 typically shouldn't be used when running tests as ``collectstatic`` isn't run
 as part of the normal test setup. During testing, ensure that the
@@ -351,9 +349,9 @@ mentioned above. Feel free to override this method to use your own
 hashing algorithm.
 
 .. _`far future Expires headers`: https://developer.yahoo.com/performance/rules.html#expires
-.. _`@import`: http://www.w3.org/TR/CSS2/cascade.html#at-import
-.. _`url()`: http://www.w3.org/TR/CSS2/syndata.html#uri
-.. _`Cascading Style Sheets`: http://www.w3.org/Style/CSS/
+.. _`@import`: https://www.w3.org/TR/CSS2/cascade.html#at-import
+.. _`url()`: https://www.w3.org/TR/CSS2/syndata.html#uri
+.. _`Cascading Style Sheets`: https://www.w3.org/Style/CSS/
 
 ``CachedStaticFilesStorage``
 ----------------------------
@@ -460,10 +458,11 @@ primary URL configuration::
 
    from django.conf import settings
    from django.contrib.staticfiles import views
+   from django.urls import re_path
 
    if settings.DEBUG:
        urlpatterns += [
-           url(r'^static/(?P<path>.*)$', views.serve),
+           re_path(r'^static/(?P<path>.*)$', views.serve),
        ]
 
 Note, the beginning of the pattern (``r'^static/'``) should be your

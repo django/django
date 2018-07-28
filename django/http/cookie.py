@@ -1,20 +1,10 @@
-import sys
 from http import cookies
 
-# Cookie pickling bug is fixed in Python 3.4.3+
-# http://bugs.python.org/issue22775
-if sys.version_info >= (3, 4, 3):
-    SimpleCookie = cookies.SimpleCookie
-else:
-    Morsel = cookies.Morsel
+# For backwards compatibility in Django 2.1.
+SimpleCookie = cookies.SimpleCookie
 
-    class SimpleCookie(cookies.SimpleCookie):
-        def __setitem__(self, key, value):
-            if isinstance(value, Morsel):
-                # allow assignment of constructed Morsels (e.g. for pickling)
-                dict.__setitem__(self, key, value)
-            else:
-                super().__setitem__(key, value)
+# Add support for the SameSite attribute (obsolete when PY37 is unsupported).
+cookies.Morsel._reserved.setdefault('samesite', 'SameSite')
 
 
 def parse_cookie(cookie):

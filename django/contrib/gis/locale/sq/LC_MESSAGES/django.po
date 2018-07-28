@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Besnik <besnik@programeshqip.org>, 2011
+# Besnik <besnik@programeshqip.org>, 2011,2015
 # Besnik <besnik@programeshqip.org>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-25 15:15+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-11-29 22:56+0000\n"
 "Last-Translator: Besnik <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
@@ -22,7 +22,7 @@ msgid "GIS"
 msgstr "GIS"
 
 msgid "The base GIS field."
-msgstr "Fusha GIS bazë"
+msgstr "Fusha GIS bazë."
 
 msgid ""
 "The base Geometry field -- maps to the OpenGIS Specification Geometry type."
@@ -57,7 +57,7 @@ msgid "Raster Field"
 msgstr ""
 
 msgid "No geometry value provided."
-msgstr "Nuk u dha vlerë gjeometrie."
+msgstr "S’u dha vlerë gjeometrie."
 
 msgid "Invalid geometry value."
 msgstr "Vlerë e pavlefshme gjeometrie."
@@ -73,20 +73,17 @@ msgstr ""
 "gjeometrie."
 
 msgid "Delete all Features"
-msgstr "Fshiji gjithë Veçoritë"
+msgstr "Fshiji krejt Veçoritë"
 
 msgid "WKT debugging window:"
 msgstr "Dritare diagnostikimi WKT:"
-
-msgid "Google Maps via GeoDjango"
-msgstr "Google Maps përmes GeoDjango"
 
 msgid "Debugging window (serialized value)"
 msgstr "Dritare diagnostikimi (vlerë e serializuar)"
 
 msgid "No feeds are registered."
-msgstr "Nuk ka prurje të regjistruara."
+msgstr "S’ka prurje të regjistruara."
 
 #, python-format
 msgid "Slug %r isn't registered."
-msgstr "Identifikuesi %r nuk është i regjistruar."
+msgstr "Identifikuesi %r s’është i regjistruar."

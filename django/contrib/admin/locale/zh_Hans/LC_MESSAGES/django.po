@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Brian Wang <singeeking@gmail.com>, 2018
 # Fulong Sun <sunfulong@neusoft.edu.cn>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
@@ -20,8 +21,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-03-14 10:21+0000\n"
-"Last-Translator: Liping Wang <lynn.config@gmail.com>\n"
+"PO-Revision-Date: 2018-02-03 06:40+0000\n"
+"Last-Translator: Brian Wang <singeeking@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -325,7 +326,7 @@ msgid ""
 msgstr "首先，输入一个用户名和密码。然后，你就可以编辑更多的用户选项。"
 
 msgid "Enter a username and password."
-msgstr "输入用户名和"
+msgstr "输入用户名和密码"
 
 msgid "Change password"
 msgstr "修改密码"
@@ -573,7 +574,7 @@ msgid "Password reset"
 msgstr "密码重设"
 
 msgid "Your password has been set.  You may go ahead and log in now."
-msgstr "你的口令己经设置。现在你可以继续进行登录。"
+msgstr "你的密码己经设置完成，现在你可以继续进行登录。"
 
 msgid "Password reset confirmation"
 msgstr "密码重设确认"

@@ -138,7 +138,7 @@ class BaseModelBackendTest:
         group.permissions.add(group_perm)
 
         self.assertEqual(backend.get_all_permissions(user), {'auth.test_user', 'auth.test_group'})
-        self.assertEqual(backend.get_user_permissions(user), {'auth.test_user', 'auth.test_group'})
+        self.assertEqual(backend.get_user_permissions(user), {'auth.test_user'})
         self.assertEqual(backend.get_group_permissions(user), {'auth.test_group'})
 
         with mock.patch.object(self.UserModel, 'is_anonymous', True):
@@ -164,7 +164,7 @@ class BaseModelBackendTest:
         group.permissions.add(group_perm)
 
         self.assertEqual(backend.get_all_permissions(user), {'auth.test_user', 'auth.test_group'})
-        self.assertEqual(backend.get_user_permissions(user), {'auth.test_user', 'auth.test_group'})
+        self.assertEqual(backend.get_user_permissions(user), {'auth.test_user'})
         self.assertEqual(backend.get_group_permissions(user), {'auth.test_group'})
 
         user.is_active = False
@@ -339,9 +339,7 @@ class SimpleRowlevelBackend:
         return False
 
     def has_module_perms(self, user, app_label):
-        if not user.is_anonymous and not user.is_active:
-            return False
-        return app_label == "app1"
+        return (user.is_anonymous or user.is_active) and app_label == 'app1'
 
     def get_all_permissions(self, user, obj=None):
         if not obj:
@@ -445,7 +443,11 @@ class NoBackendsTest(TestCase):
         self.user = User.objects.create_user('test', 'test@example.com', 'test')
 
     def test_raises_exception(self):
-        with self.assertRaises(ImproperlyConfigured):
+        msg = (
+            'No authentication backends have been defined. '
+            'Does AUTHENTICATION_BACKENDS contain anything?'
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             self.user.has_perm(('perm', TestObj()))
 
 
@@ -557,8 +559,8 @@ class ChangedBackendSettingsTest(TestCase):
         # Get a session for the test user
         self.assertTrue(self.client.login(
             username=self.TEST_USERNAME,
-            password=self.TEST_PASSWORD)
-        )
+            password=self.TEST_PASSWORD,
+        ))
         # Prepare a request object
         request = HttpRequest()
         request.session = self.client.session
@@ -626,7 +628,11 @@ class ImproperlyConfiguredUserModelTest(TestCase):
         request = HttpRequest()
         request.session = self.client.session
 
-        with self.assertRaises(ImproperlyConfigured):
+        msg = (
+            "AUTH_USER_MODEL refers to model 'thismodel.doesntexist' "
+            "that has not been installed"
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             get_user(request)
 
 
@@ -688,6 +694,15 @@ class SelectingBackendTests(TestCase):
         )
         with self.assertRaisesMessage(ValueError, expected_message):
             self.client._login(user)
+
+    def test_non_string_backend(self):
+        user = User.objects.create_user(self.username, 'email', self.password)
+        expected_message = (
+            'backend must be a dotted import path string (got '
+            '<class \'django.contrib.auth.backends.ModelBackend\'>).'
+        )
+        with self.assertRaisesMessage(TypeError, expected_message):
+            self.client._login(user, backend=ModelBackend)
 
     @override_settings(AUTHENTICATION_BACKENDS=[backend, other_backend])
     def test_backend_path_login_with_explicit_backends(self):

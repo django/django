@@ -7,15 +7,15 @@ import random
 import tempfile
 import time
 import zlib
-from contextlib import suppress
 
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
+from django.core.files import locks
 from django.core.files.move import file_move_safe
-from django.utils.encoding import force_bytes
 
 
 class FileBasedCache(BaseCache):
     cache_suffix = '.djcache'
+    pickle_protocol = pickle.HIGHEST_PROTOCOL
 
     def __init__(self, dir, params):
         super().__init__(params)
@@ -30,11 +30,18 @@ class FileBasedCache(BaseCache):
 
     def get(self, key, default=None, version=None):
         fname = self._key_to_file(key, version)
-        with suppress(FileNotFoundError):
+        try:
             with open(fname, 'rb') as f:
                 if not self._is_expired(f):
                     return pickle.loads(zlib.decompress(f.read()))
+        except FileNotFoundError:
+            pass
         return default
+
+    def _write_content(self, file, timeout, value):
+        expiry = self.get_backend_timeout(timeout)
+        file.write(pickle.dumps(expiry, self.pickle_protocol))
+        file.write(zlib.compress(pickle.dumps(value, self.pickle_protocol)))
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         self._createdir()  # Cache dir can be deleted at any time.
@@ -44,14 +51,29 @@ class FileBasedCache(BaseCache):
         renamed = False
         try:
             with open(fd, 'wb') as f:
-                expiry = self.get_backend_timeout(timeout)
-                f.write(pickle.dumps(expiry, pickle.HIGHEST_PROTOCOL))
-                f.write(zlib.compress(pickle.dumps(value, pickle.HIGHEST_PROTOCOL)))
+                self._write_content(f, timeout, value)
             file_move_safe(tmp_path, fname, allow_overwrite=True)
             renamed = True
         finally:
             if not renamed:
                 os.remove(tmp_path)
+
+    def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
+        try:
+            with open(self._key_to_file(key, version), 'r+b') as f:
+                try:
+                    locks.lock(f, locks.LOCK_EX)
+                    if self._is_expired(f):
+                        return False
+                    else:
+                        previous_value = pickle.loads(zlib.decompress(f.read()))
+                        f.seek(0)
+                        self._write_content(f, timeout, previous_value)
+                        return True
+                finally:
+                    locks.unlock(f)
+        except FileNotFoundError:
+            return False
 
     def delete(self, key, version=None):
         self._delete(self._key_to_file(key, version))
@@ -59,9 +81,11 @@ class FileBasedCache(BaseCache):
     def _delete(self, fname):
         if not fname.startswith(self._dir) or not os.path.exists(fname):
             return
-        with suppress(FileNotFoundError):
-            # The file may have been removed by another process.
+        try:
             os.remove(fname)
+        except FileNotFoundError:
+            # The file may have been removed by another process.
+            pass
 
     def has_key(self, key, version=None):
         fname = self._key_to_file(key, version)
@@ -90,8 +114,10 @@ class FileBasedCache(BaseCache):
 
     def _createdir(self):
         if not os.path.exists(self._dir):
-            with suppress(FileExistsError):
+            try:
                 os.makedirs(self._dir, 0o700)
+            except FileExistsError:
+                pass
 
     def _key_to_file(self, key, version=None):
         """
@@ -101,7 +127,7 @@ class FileBasedCache(BaseCache):
         key = self.make_key(key, version=version)
         self.validate_key(key)
         return os.path.join(self._dir, ''.join(
-            [hashlib.md5(force_bytes(key)).hexdigest(), self.cache_suffix]))
+            [hashlib.md5(key.encode()).hexdigest(), self.cache_suffix]))
 
     def clear(self):
         """
@@ -116,7 +142,10 @@ class FileBasedCache(BaseCache):
         """
         Take an open cache file `f` and delete it if it's expired.
         """
-        exp = pickle.load(f)
+        try:
+            exp = pickle.load(f)
+        except EOFError:
+            exp = 0  # An empty file is considered expired.
         if exp is not None and exp < time.time():
             f.close()  # On Windows a file has to be closed before deleting
             self._delete(f.name)

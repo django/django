@@ -1,19 +1,26 @@
 import datetime
+import decimal
 import uuid
-from contextlib import suppress
 
 from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db import utils
-from django.db.backends import utils as backend_utils
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.models import aggregates, fields
+from django.db.models.expressions import Col
 from django.utils import timezone
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
-from django.utils.duration import duration_string
+from django.utils.duration import duration_microseconds
 
 
 class DatabaseOperations(BaseDatabaseOperations):
+    cast_char_field_without_max_length = 'text'
+    cast_data_types = {
+        'DateField': 'TEXT',
+        'DateTimeField': 'TEXT',
+    }
+    explain_prefix = 'EXPLAIN QUERY PLAN'
+
     def bulk_batch_size(self, fields, objs):
         """
         SQLite has a compile-time default (SQLITE_LIMIT_VARIABLE_NUMBER) of
@@ -34,12 +41,15 @@ class DatabaseOperations(BaseDatabaseOperations):
         bad_aggregates = (aggregates.Sum, aggregates.Avg, aggregates.Variance, aggregates.StdDev)
         if isinstance(expression, bad_aggregates):
             for expr in expression.get_source_expressions():
-                # Not every subexpression has an output_field which is fine
-                # to ignore.
-                with suppress(FieldError):
+                try:
                     output_field = expr.output_field
+                except FieldError:
+                    # Not every subexpression has an output_field which is fine
+                    # to ignore.
+                    pass
+                else:
                     if isinstance(output_field, bad_fields):
-                        raise NotImplementedError(
+                        raise utils.NotSupportedError(
                             'You cannot use Sum, Avg, StdDev, and Variance '
                             'aggregations on date/time fields in sqlite3 '
                             'since date/time is saved as text.'
@@ -54,7 +64,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return "django_date_extract('%s', %s)" % (lookup_type.lower(), field_name)
 
     def date_interval_sql(self, timedelta):
-        return "'%s'" % duration_string(timedelta)
+        return str(duration_microseconds(timedelta))
 
     def format_for_duration_arithmetic(self, sql):
         """Do nothing since formatting is handled in the custom function."""
@@ -149,9 +159,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         return -1
 
     def sql_flush(self, style, tables, sequences, allow_cascade=False):
-        # NB: The generated SQL below is specific to SQLite
-        # Note: The DELETE FROM... SQL generated below works for SQLite databases
-        # because constraints don't exist
         sql = ['%s %s %s;' % (
             style.SQL_KEYWORD('DELETE'),
             style.SQL_KEYWORD('FROM'),
@@ -160,6 +167,12 @@ class DatabaseOperations(BaseDatabaseOperations):
         # Note: No requirement for reset of auto-incremented indices (cf. other
         # sql_flush() implementations). Just return SQL at this point
         return sql
+
+    def execute_sql_flush(self, using, sql_list):
+        # To prevent possible violation of foreign key constraints, deactivate
+        # constraints outside of the transaction created in super().
+        with self.connection.constraint_checks_disabled():
+            super().execute_sql_flush(using, sql_list)
 
     def adapt_datetimefield_value(self, value):
         if value is None:
@@ -202,14 +215,14 @@ class DatabaseOperations(BaseDatabaseOperations):
         elif internal_type == 'TimeField':
             converters.append(self.convert_timefield_value)
         elif internal_type == 'DecimalField':
-            converters.append(self.convert_decimalfield_value)
+            converters.append(self.get_decimalfield_converter(expression))
         elif internal_type == 'UUIDField':
             converters.append(self.convert_uuidfield_value)
         elif internal_type in ('NullBooleanField', 'BooleanField'):
             converters.append(self.convert_booleanfield_value)
         return converters
 
-    def convert_datetimefield_value(self, value, expression, connection, context):
+    def convert_datetimefield_value(self, value, expression, connection):
         if value is not None:
             if not isinstance(value, datetime.datetime):
                 value = parse_datetime(value)
@@ -217,30 +230,40 @@ class DatabaseOperations(BaseDatabaseOperations):
                 value = timezone.make_aware(value, self.connection.timezone)
         return value
 
-    def convert_datefield_value(self, value, expression, connection, context):
+    def convert_datefield_value(self, value, expression, connection):
         if value is not None:
             if not isinstance(value, datetime.date):
                 value = parse_date(value)
         return value
 
-    def convert_timefield_value(self, value, expression, connection, context):
+    def convert_timefield_value(self, value, expression, connection):
         if value is not None:
             if not isinstance(value, datetime.time):
                 value = parse_time(value)
         return value
 
-    def convert_decimalfield_value(self, value, expression, connection, context):
-        if value is not None:
-            value = expression.output_field.format_number(value)
-            value = backend_utils.typecast_decimal(value)
-        return value
+    def get_decimalfield_converter(self, expression):
+        # SQLite stores only 15 significant digits. Digits coming from
+        # float inaccuracy must be removed.
+        create_decimal = decimal.Context(prec=15).create_decimal_from_float
+        if isinstance(expression, Col):
+            quantize_value = decimal.Decimal(1).scaleb(-expression.output_field.decimal_places)
 
-    def convert_uuidfield_value(self, value, expression, connection, context):
+            def converter(value, expression, connection):
+                if value is not None:
+                    return create_decimal(value).quantize(quantize_value, context=expression.output_field.context)
+        else:
+            def converter(value, expression, connection):
+                if value is not None:
+                    return create_decimal(value)
+        return converter
+
+    def convert_uuidfield_value(self, value, expression, connection):
         if value is not None:
             value = uuid.UUID(value)
         return value
 
-    def convert_booleanfield_value(self, value, expression, connection, context):
+    def convert_booleanfield_value(self, value, expression, connection):
         return bool(value) if value in (1, 0) else value
 
     def bulk_insert_sql(self, fields, placeholder_rows):
@@ -250,10 +273,10 @@ class DatabaseOperations(BaseDatabaseOperations):
         )
 
     def combine_expression(self, connector, sub_expressions):
-        # SQLite doesn't have a power function, so we fake it with a
-        # user-defined function django_power that's registered in connect().
+        # SQLite doesn't have a ^ operator, so use the user-defined POWER
+        # function that's registered in connect().
         if connector == '^':
-            return 'django_power(%s)' % ','.join(sub_expressions)
+            return 'POWER(%s)' % ','.join(sub_expressions)
         return super().combine_expression(connector, sub_expressions)
 
     def combine_duration_expression(self, connector, sub_expressions):

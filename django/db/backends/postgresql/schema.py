@@ -1,6 +1,7 @@
 import psycopg2
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
+from django.db.backends.ddl_references import IndexColumns
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -12,13 +13,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_set_sequence_max = "SELECT setval('%(sequence)s', MAX(%(column)s)) FROM %(table)s"
 
     sql_create_index = "CREATE INDEX %(name)s ON %(table)s%(using)s (%(columns)s)%(extra)s"
-    sql_create_varchar_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s varchar_pattern_ops)%(extra)s"
-    sql_create_text_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s text_pattern_ops)%(extra)s"
     sql_delete_index = "DROP INDEX IF EXISTS %(name)s"
 
     # Setting the constraint to IMMEDIATE runs any deferred checks to allow
     # dropping it in the same transaction.
     sql_delete_fk = "SET CONSTRAINTS %(name)s IMMEDIATE; ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
+
+    sql_delete_procedure = 'DROP FUNCTION %(procedure)s(%(param_types)s)'
 
     def quote_value(self, value):
         return psycopg2.extensions.adapt(value)
@@ -47,9 +48,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             if '[' in db_type:
                 return None
             if db_type.startswith('varchar'):
-                return self._create_index_sql(model, [field], suffix='_like', sql=self.sql_create_varchar_index)
+                return self._create_index_sql(model, [field], suffix='_like', opclasses=['varchar_pattern_ops'])
             elif db_type.startswith('text'):
-                return self._create_index_sql(model, [field], suffix='_like', sql=self.sql_create_text_index)
+                return self._create_index_sql(model, [field], suffix='_like', opclasses=['text_pattern_ops'])
         return None
 
     def _alter_column_type_sql(self, model, old_field, new_field, new_type):
@@ -105,11 +106,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def _alter_field(self, model, old_field, new_field, old_type, new_type,
                      old_db_params, new_db_params, strict=False):
-        # Drop indexes on varchar/text columns that are changing to a different
-        # type.
+        # Drop indexes on varchar/text/citext columns that are changing to a
+        # different type.
         if (old_field.db_index or old_field.unique) and (
             (old_type.startswith('varchar') and not new_type.startswith('varchar')) or
-            (old_type.startswith('text') and not new_type.startswith('text'))
+            (old_type.startswith('text') and not new_type.startswith('text')) or
+            (old_type.startswith('citext') and not new_type.startswith('citext'))
         ):
             index_name = self._create_index_name(model._meta.db_table, [old_field.column], suffix='_like')
             self.execute(self._delete_constraint_sql(self.sql_delete_index, model, index_name))
@@ -129,3 +131,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         if old_field.unique and not (new_field.db_index or new_field.unique):
             index_to_remove = self._create_index_name(model._meta.db_table, [old_field.column], suffix='_like')
             self.execute(self._delete_constraint_sql(self.sql_delete_index, model, index_to_remove))
+
+    def _index_columns(self, table, columns, col_suffixes, opclasses):
+        if opclasses:
+            return IndexColumns(table, columns, self.quote_name, col_suffixes=col_suffixes, opclasses=opclasses)
+        return super()._index_columns(table, columns, col_suffixes, opclasses)

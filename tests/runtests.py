@@ -8,7 +8,6 @@ import subprocess
 import sys
 import tempfile
 import warnings
-from contextlib import suppress
 
 import django
 from django.apps import apps
@@ -19,13 +18,21 @@ from django.test.runner import default_test_processes
 from django.test.selenium import SeleniumTestCaseBase
 from django.test.utils import get_runner
 from django.utils.deprecation import (
-    RemovedInDjango21Warning, RemovedInDjango30Warning,
+    RemovedInDjango30Warning, RemovedInDjango31Warning,
 )
 from django.utils.log import DEFAULT_LOGGING
 
+try:
+    import MySQLdb
+except ImportError:
+    pass
+else:
+    # Ignore informational warnings from QuerySet.explain().
+    warnings.filterwarnings('ignore', r'\(1003, *', category=MySQLdb.Warning)
+
 # Make deprecation warnings errors to ensure no usage of deprecated features.
 warnings.simplefilter("error", RemovedInDjango30Warning)
-warnings.simplefilter("error", RemovedInDjango21Warning)
+warnings.simplefilter('error', RemovedInDjango31Warning)
 # Make runtime warning errors to ensure no usage of error prone patterns.
 warnings.simplefilter("error", RuntimeWarning)
 # Ignore known warnings in test dependencies.
@@ -48,8 +55,7 @@ atexit.register(shutil.rmtree, TMPDIR)
 SUBDIRS_TO_SKIP = [
     'data',
     'import_error_package',
-    'test_discovery_sample',
-    'test_discovery_sample2',
+    'test_runner_apps',
 ]
 
 ALWAYS_INSTALLED_APPS = [
@@ -90,12 +96,11 @@ def get_test_modules():
 
     for modpath, dirpath in discovery_paths:
         for f in os.listdir(dirpath):
-            if ('.' in f or
-                    os.path.basename(f) in SUBDIRS_TO_SKIP or
-                    os.path.isfile(f) or
-                    not os.path.exists(os.path.join(dirpath, f, '__init__.py'))):
-                continue
-            modules.append((modpath, f))
+            if ('.' not in f and
+                    os.path.basename(f) not in SUBDIRS_TO_SKIP and
+                    not os.path.isfile(f) and
+                    os.path.exists(os.path.join(dirpath, f, '__init__.py'))):
+                modules.append((modpath, f))
     return modules
 
 
@@ -194,13 +199,11 @@ def setup(verbosity, test_labels, parallel):
         # if the module (or an ancestor) was named on the command line, or
         # no modules were named (i.e., run all), import
         # this module and add it to INSTALLED_APPS.
-        if not test_labels:
-            module_found_in_labels = True
-        else:
-            module_found_in_labels = any(
-                # exact match or ancestor match
-                module_label == label or module_label.startswith(label + '.')
-                for label in test_labels_set)
+        module_found_in_labels = not test_labels or any(
+            # exact match or ancestor match
+            module_label == label or module_label.startswith(label + '.')
+            for label in test_labels_set
+        )
 
         if module_name in CONTRIB_TESTS_TO_APPS and module_found_in_labels:
             settings.INSTALLED_APPS.append(CONTRIB_TESTS_TO_APPS[module_name])
@@ -316,8 +319,10 @@ def bisect_tests(bisection_label, options, test_labels, parallel):
     # Make sure the bisection point isn't in the test list
     # Also remove tests that need to be run in specific combinations
     for label in [bisection_label, 'model_inheritance_same_model_name']:
-        with suppress(ValueError):
+        try:
             test_labels.remove(label)
+        except ValueError:
+            pass
 
     subprocess_args = get_subprocess_args(options)
 
@@ -365,8 +370,10 @@ def paired_tests(paired_test, options, test_labels, parallel):
     # Make sure the constant member of the pair isn't in the test list
     # Also remove tests that need to be run in specific combinations
     for label in [paired_test, 'model_inheritance_same_model_name']:
-        with suppress(ValueError):
+        try:
             test_labels.remove(label)
+        except ValueError:
+            pass
 
     subprocess_args = get_subprocess_args(options)
 
@@ -398,11 +405,11 @@ if __name__ == "__main__":
         help='Tells Django to NOT prompt the user for input of any kind.',
     )
     parser.add_argument(
-        '--failfast', action='store_true', dest='failfast',
+        '--failfast', action='store_true',
         help='Tells Django to stop running the test suite after first failed test.',
     )
     parser.add_argument(
-        '-k', '--keepdb', action='store_true', dest='keepdb',
+        '-k', '--keepdb', action='store_true',
         help='Tells Django to preserve the test database between runs.',
     )
     parser.add_argument(
@@ -426,15 +433,15 @@ if __name__ == "__main__":
              'test side effects not apparent with normal execution lineup.',
     )
     parser.add_argument(
-        '--selenium', dest='selenium', action=ActionSelenium, metavar='BROWSERS',
+        '--selenium', action=ActionSelenium, metavar='BROWSERS',
         help='A comma-separated list of browsers to run the Selenium tests against.',
     )
     parser.add_argument(
-        '--debug-sql', action='store_true', dest='debug_sql',
+        '--debug-sql', action='store_true',
         help='Turn on the SQL query logger within tests.',
     )
     parser.add_argument(
-        '--parallel', dest='parallel', nargs='?', default=0, type=int,
+        '--parallel', nargs='?', default=0, type=int,
         const=default_test_processes(), metavar='N',
         help='Run tests using up to N parallel processes.',
     )
@@ -455,8 +462,7 @@ if __name__ == "__main__":
     if options.settings:
         os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
     else:
-        if "DJANGO_SETTINGS_MODULE" not in os.environ:
-            os.environ['DJANGO_SETTINGS_MODULE'] = 'test_sqlite'
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'test_sqlite')
         options.settings = os.environ['DJANGO_SETTINGS_MODULE']
 
     if options.selenium:

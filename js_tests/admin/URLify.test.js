@@ -23,3 +23,8 @@ QUnit.test('merge adjacent whitespace', function(assert) {
 QUnit.test('trim trailing hyphens', function(assert) {
     assert.strictEqual(URLify('D silent always', 9, true), 'd-silent');
 });
+
+QUnit.test('do not remove English words if the string contains non-ASCII', function(assert) {
+    // If removing English words wasn't skipped, the last 'a' would be removed.
+    assert.strictEqual(URLify('Kaupa-miða', 255, true), 'kaupa-miða');
+});

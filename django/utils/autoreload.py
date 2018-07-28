@@ -34,7 +34,6 @@ import subprocess
 import sys
 import time
 import traceback
-from contextlib import suppress
 
 import _thread
 
@@ -44,8 +43,10 @@ from django.core.signals import request_finished
 
 # This import does nothing, but it's necessary to avoid some race conditions
 # in the threading module. See http://code.djangoproject.com/ticket/2330 .
-with suppress(ImportError):
+try:
     import threading  # NOQA
+except ImportError:
+    pass
 
 try:
     import termios
@@ -53,7 +54,7 @@ except ImportError:
     termios = None
 
 USE_INOTIFY = False
-with suppress(ImportError):
+try:
     # Test whether inotify is enabled and likely to work
     import pyinotify
 
@@ -61,6 +62,8 @@ with suppress(ImportError):
     if fd >= 0:
         USE_INOTIFY = True
         os.close(fd)
+except ImportError:
+    pass
 
 RUN_RELOADER = True
 
@@ -207,8 +210,10 @@ def code_changed():
             continue
         if mtime != _mtimes[filename]:
             _mtimes = {}
-            with suppress(ValueError):
+            try:
                 del _error_files[_error_files.index(filename)]
+            except ValueError:
+                pass
             return I18N_MODIFIED if filename.endswith('.mo') else FILE_MODIFIED
     return False
 
@@ -240,7 +245,7 @@ def check_errors(fn):
 def raise_last_exception():
     global _exception
     if _exception is not None:
-        raise _exception[0](_exception[1]).with_traceback(_exception[2])
+        raise _exception[1]
 
 
 def ensure_echo_on():
@@ -275,10 +280,16 @@ def reloader_thread():
 
 
 def restart_with_reloader():
+    import django.__main__
     while True:
-        args = [sys.executable] + ['-W%s' % o for o in sys.warnoptions] + sys.argv
-        new_environ = os.environ.copy()
-        new_environ["RUN_MAIN"] = 'true'
+        args = [sys.executable] + ['-W%s' % o for o in sys.warnoptions]
+        if sys.argv[0] == django.__main__.__file__:
+            # The server was started with `python -m django runserver`.
+            args += ['-m', 'django']
+            args += sys.argv[1:]
+        else:
+            args += sys.argv
+        new_environ = {**os.environ, 'RUN_MAIN': 'true'}
         exit_code = subprocess.call(args, env=new_environ)
         if exit_code != 3:
             return exit_code
@@ -287,24 +298,19 @@ def restart_with_reloader():
 def python_reloader(main_func, args, kwargs):
     if os.environ.get("RUN_MAIN") == "true":
         _thread.start_new_thread(main_func, args, kwargs)
-        with suppress(KeyboardInterrupt):
+        try:
             reloader_thread()
+        except KeyboardInterrupt:
+            pass
     else:
-        with suppress(KeyboardInterrupt):
+        try:
             exit_code = restart_with_reloader()
             if exit_code < 0:
                 os.kill(os.getpid(), -exit_code)
             else:
                 sys.exit(exit_code)
-
-
-def jython_reloader(main_func, args, kwargs):
-    from _systemrestart import SystemRestart
-    _thread.start_new_thread(main_func, args)
-    while True:
-        if code_changed():
-            raise SystemRestart
-        time.sleep(1)
+        except KeyboardInterrupt:
+            pass
 
 
 def main(main_func, args=None, kwargs=None):
@@ -312,10 +318,6 @@ def main(main_func, args=None, kwargs=None):
         args = ()
     if kwargs is None:
         kwargs = {}
-    if sys.platform.startswith('java'):
-        reloader = jython_reloader
-    else:
-        reloader = python_reloader
 
     wrapped_main_func = check_errors(main_func)
-    reloader(wrapped_main_func, args, kwargs)
+    python_reloader(wrapped_main_func, args, kwargs)

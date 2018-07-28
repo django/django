@@ -15,8 +15,17 @@ class PostgresConfig(AppConfig):
     def ready(self):
         # Connections may already exist before we are called.
         for conn in connections.all():
-            if conn.connection is not None:
-                register_type_handlers(conn)
+            if conn.vendor == 'postgresql':
+                conn.introspection.data_types_reverse.update({
+                    3802: 'django.contrib.postgres.fields.JSONField',
+                    3904: 'django.contrib.postgres.fields.IntegerRangeField',
+                    3906: 'django.contrib.postgres.fields.FloatRangeField',
+                    3910: 'django.contrib.postgres.fields.DateTimeRangeField',
+                    3912: 'django.contrib.postgres.fields.DateRangeField',
+                    3926: 'django.contrib.postgres.fields.BigIntegerRangeField',
+                })
+                if conn.connection is not None:
+                    register_type_handlers(conn)
         connection_created.connect(register_type_handlers)
         CharField.register_lookup(Unaccent)
         TextField.register_lookup(Unaccent)

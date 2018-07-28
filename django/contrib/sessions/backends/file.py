@@ -3,7 +3,6 @@ import logging
 import os
 import shutil
 import tempfile
-from contextlib import suppress
 
 from django.conf import settings
 from django.contrib.sessions.backends.base import (
@@ -28,10 +27,7 @@ class SessionStore(SessionBase):
         try:
             return cls._storage_path
         except AttributeError:
-            storage_path = getattr(settings, "SESSION_FILE_PATH", None)
-            if not storage_path:
-                storage_path = tempfile.gettempdir()
-
+            storage_path = getattr(settings, 'SESSION_FILE_PATH', None) or tempfile.gettempdir()
             # Make sure the storage path is valid.
             if not os.path.isdir(storage_path):
                 raise ImproperlyConfigured(
@@ -52,7 +48,7 @@ class SessionStore(SessionBase):
         # Make sure we're not vulnerable to directory traversal. Session keys
         # should always be md5s, so they should never contain directory
         # components.
-        if not set(session_key).issubset(set(VALID_KEY_CHARS)):
+        if not set(session_key).issubset(VALID_KEY_CHARS):
             raise InvalidSessionKey(
                 "Invalid characters in session key")
 
@@ -65,19 +61,16 @@ class SessionStore(SessionBase):
         modification = os.stat(self._key_to_file()).st_mtime
         if settings.USE_TZ:
             modification = datetime.datetime.utcfromtimestamp(modification)
-            modification = modification.replace(tzinfo=timezone.utc)
-        else:
-            modification = datetime.datetime.fromtimestamp(modification)
-        return modification
+            return modification.replace(tzinfo=timezone.utc)
+        return datetime.datetime.fromtimestamp(modification)
 
     def _expiry_date(self, session_data):
         """
         Return the expiry time of the file storing the session's content.
         """
-        expiry = session_data.get('_session_expiry')
-        if not expiry:
-            expiry = self._last_modification() + datetime.timedelta(seconds=settings.SESSION_COOKIE_AGE)
-        return expiry
+        return session_data.get('_session_expiry') or (
+            self._last_modification() + datetime.timedelta(seconds=settings.SESSION_COOKIE_AGE)
+        )
 
     def load(self):
         session_data = {}
@@ -156,7 +149,7 @@ class SessionStore(SessionBase):
         # See ticket #8616.
         dir, prefix = os.path.split(session_file_name)
 
-        with suppress(OSError, IOError, EOFError):
+        try:
             output_file_fd, output_file_name = tempfile.mkstemp(dir=dir, prefix=prefix + '_out_')
             renamed = False
             try:
@@ -173,6 +166,8 @@ class SessionStore(SessionBase):
             finally:
                 if not renamed:
                     os.unlink(output_file_name)
+        except (OSError, IOError, EOFError):
+            pass
 
     def exists(self, session_key):
         return os.path.exists(self._key_to_file(session_key))
@@ -182,8 +177,10 @@ class SessionStore(SessionBase):
             if self.session_key is None:
                 return
             session_key = self.session_key
-        with suppress(OSError):
+        try:
             os.unlink(self._key_to_file(session_key))
+        except OSError:
+            pass
 
     def clean(self):
         pass

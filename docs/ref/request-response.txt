@@ -124,7 +124,7 @@ All attributes should be considered read-only, unless stated otherwise.
 .. attribute:: HttpRequest.FILES
 
     A dictionary-like object containing all uploaded files. Each key in
-    ``FILES`` is the ``name`` from the ``<input type="file" name="" />``. Each
+    ``FILES`` is the ``name`` from the ``<input type="file" name="">``. Each
     value in ``FILES`` is an :class:`~django.core.files.uploadedfile.UploadedFile`.
 
     See :doc:`/topics/files` for more information.
@@ -284,6 +284,15 @@ Methods
 
     Example: ``"/music/bands/the_beatles/?print=true"``
 
+.. method:: HttpRequest.get_full_path_info()
+
+    .. versionadded:: 2.1
+
+    Like :meth:`get_full_path`, but uses :attr:`path_info` instead of
+    :attr:`path`.
+
+    Example: ``"/minfo/music/bands/the_beatles/?print=true"``
+
 .. method:: HttpRequest.build_absolute_uri(location)
 
     Returns the absolute URI form of ``location``. If no location is provided,
@@ -419,8 +428,6 @@ a subclass of dictionary. Exceptions are outlined here:
     :setting:`DEFAULT_CHARSET`.
 
 .. classmethod:: QueryDict.fromkeys(iterable, value='', mutable=False, encoding=None)
-
-    .. versionadded:: 1.11
 
     Creates a new ``QueryDict`` with keys from ``iterable`` and each value
     equal to ``value``. For example::
@@ -741,7 +748,7 @@ Methods
 
     Sets a header unless it has already been set.
 
-.. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False)
+.. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False, samesite=None)
 
     Sets a cookie. The parameters are the same as in the
     :class:`~http.cookies.Morsel` cookie object in the Python standard library.
@@ -754,10 +761,9 @@ Methods
       in UTC. If ``expires`` is a ``datetime`` object, the ``max_age``
       will be calculated.
     * Use ``domain`` if you want to set a cross-domain cookie. For example,
-      ``domain=".lawrence.com"`` will set a cookie that is readable by
-      the domains www.lawrence.com, blogs.lawrence.com and
-      calendars.lawrence.com. Otherwise, a cookie will only be readable by
-      the domain that set it.
+      ``domain="example.com"`` will set a cookie that is readable by the
+      domains www.example.com, blog.example.com, etc. Otherwise, a cookie will
+      only be readable by the domain that set it.
     * Use ``httponly=True`` if you want to prevent client-side
       JavaScript from having access to the cookie.
 
@@ -767,8 +773,17 @@ Methods
       when it is honored, it can be a useful way to mitigate the
       risk of a client-side script from accessing the protected cookie
       data.
+    * Use ``samesite='Strict'`` or ``samesite='Lax'`` to tell the browser not
+      to send this cookie when performing a cross-origin request. `SameSite`_
+      isn't supported by all browsers, so it's not a replacement for Django's
+      CSRF protection, but rather a defense in depth measure.
+
+    .. versionchanged:: 2.1
+
+        The ``samesite`` argument was added.
 
     .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
+    .. _SameSite: https://www.owasp.org/index.php/SameSite
 
     .. warning::
 
@@ -778,7 +793,7 @@ Methods
         to store a cookie of more than 4096 bytes, but many browsers will not
         set the cookie correctly.
 
-.. method:: HttpResponse.set_signed_cookie(key, value, salt='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=True)
+.. method:: HttpResponse.set_signed_cookie(key, value, salt='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False, samesite=None)
 
     Like :meth:`~HttpResponse.set_cookie()`, but
     :doc:`cryptographic signing </topics/signing>` the cookie before setting
@@ -952,7 +967,7 @@ Without passing ``safe=False``, a :exc:`TypeError` will be raised.
 .. warning::
 
     Before the `5th edition of ECMAScript
-    <http://www.ecma-international.org/ecma-262/5.1/index.html#sec-11.1.4>`_
+    <https://www.ecma-international.org/ecma-262/5.1/index.html#sec-11.1.4>`_
     it was possible to poison the JavaScript ``Array`` constructor. For this
     reason, Django does not allow passing non-dict objects to the
     :class:`~django.http.JsonResponse` constructor by default.  However, most
@@ -1006,7 +1021,7 @@ with the following notable differences:
 :class:`StreamingHttpResponse` should only be used in situations where it is
 absolutely required that the whole content isn't iterated before transferring
 the data to the client. Because the content can't be accessed, many
-middlewares can't function normally. For example the ``ETag`` and
+middleware can't function normally. For example the ``ETag`` and
 ``Content-Length`` headers can't be generated for streaming responses.
 
 Attributes
@@ -1039,15 +1054,45 @@ Attributes
 ``FileResponse`` objects
 ========================
 
-.. class:: FileResponse
+.. class:: FileResponse(open_file, as_attachment=False, filename='', **kwargs)
 
-:class:`FileResponse` is a subclass of :class:`StreamingHttpResponse` optimized
-for binary files. It uses `wsgi.file_wrapper`_ if provided by the wsgi server,
-otherwise it streams the file out in small chunks.
+    :class:`FileResponse` is a subclass of :class:`StreamingHttpResponse`
+    optimized for binary files. It uses `wsgi.file_wrapper`_ if provided by the
+    wsgi server, otherwise it streams the file out in small chunks.
+
+    If ``as_attachment=True``, the ``Content-Disposition`` header is set, which
+    asks the browser to offer the file to the user as a download.
+
+    If ``open_file`` doesn't have a name or if the name of ``open_file`` isn't
+    appropriate, provide a custom file name using the ``filename``  parameter.
+
+    The ``Content-Length``, ``Content-Type``, and ``Content-Disposition``
+    headers are automatically set when they can be guessed from contents of
+    ``open_file``.
+
+    .. versionadded:: 2.1
+
+        The ``as_attachment`` and ``filename`` keywords argument were added.
+        Also, ``FileResponse`` sets the ``Content`` headers if it can guess
+        them.
 
 .. _wsgi.file_wrapper: https://www.python.org/dev/peps/pep-3333/#optional-platform-specific-file-handling
 
-``FileResponse`` expects a file open in binary mode like so::
+``FileResponse`` accepts any file-like object with binary content, for example
+a file open in binary mode like so::
 
     >>> from django.http import FileResponse
     >>> response = FileResponse(open('myfile.png', 'rb'))
+
+The file will be closed automatically, so don't open it with a context manager.
+
+Methods
+-------
+
+.. method:: FileResponse.set_headers(open_file)
+
+    .. versionadded:: 2.1
+
+    This method is automatically called during the response initialization and
+    set various headers (``Content-Length``, ``Content-Type``, and
+    ``Content-Disposition``) depending on ``open_file``.

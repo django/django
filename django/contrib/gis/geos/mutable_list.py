@@ -236,11 +236,11 @@ class ListMixin:
     def _set_single_rebuild(self, index, value):
         self._set_slice(slice(index, index + 1, 1), [value])
 
-    def _checkindex(self, index, correct=True):
+    def _checkindex(self, index):
         length = len(self)
         if 0 <= index < length:
             return index
-        if correct and -length <= index < 0:
+        if -length <= index < 0:
             return index + length
         raise IndexError('invalid index: %s' % index)
 
@@ -252,14 +252,13 @@ class ListMixin:
     def _set_slice(self, index, values):
         "Assign values to a slice of the object"
         try:
-            iter(values)
+            valueList = list(values)
         except TypeError:
             raise TypeError('can only assign an iterable to a slice')
 
-        self._check_allowed(values)
+        self._check_allowed(valueList)
 
         origLen = len(self)
-        valueList = list(values)
         start, stop, step = index.indices(origLen)
 
         # CAREFUL: index.step and step are not the same!

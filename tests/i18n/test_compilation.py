@@ -35,9 +35,10 @@ class PoFileTests(MessageCompilationTests):
     MO_FILE = 'locale/%s/LC_MESSAGES/django.mo' % LOCALE
 
     def test_bom_rejection(self):
-        with self.assertRaises(CommandError) as cm:
-            call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
-        self.assertIn("file has a BOM (Byte Order Mark)", cm.exception.args[0])
+        stderr = StringIO()
+        with self.assertRaisesMessage(CommandError, 'compilemessages generated one or more errors.'):
+            call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO(), stderr=stderr)
+        self.assertIn('file has a BOM (Byte Order Mark)', stderr.getvalue())
         self.assertFalse(os.path.exists(self.MO_FILE))
 
     def test_no_write_access(self):
@@ -47,9 +48,9 @@ class PoFileTests(MessageCompilationTests):
         old_mode = os.stat(mo_file_en).st_mode
         os.chmod(mo_file_en, stat.S_IREAD)
         try:
-            call_command('compilemessages', locale=['en'], stderr=err_buffer, verbosity=0)
-            err = err_buffer.getvalue()
-            self.assertIn("not writable location", err)
+            with self.assertRaisesMessage(CommandError, 'compilemessages generated one or more errors.'):
+                call_command('compilemessages', locale=['en'], stderr=err_buffer, verbosity=0)
+            self.assertIn('not writable location', err_buffer.getvalue())
         finally:
             os.chmod(mo_file_en, old_mode)
 
@@ -137,7 +138,7 @@ class CompilationErrorHandling(MessageCompilationTests):
     def test_error_reported_by_msgfmt(self):
         # po file contains wrong po formatting.
         with self.assertRaises(CommandError):
-            call_command('compilemessages', locale=['ja'], verbosity=0)
+            call_command('compilemessages', locale=['ja'], verbosity=0, stderr=StringIO())
 
     def test_msgfmt_error_including_non_ascii(self):
         # po file contains invalid msgstr content (triggers non-ascii error content).
@@ -148,8 +149,10 @@ class CompilationErrorHandling(MessageCompilationTests):
             cmd = MakeMessagesCommand()
             if cmd.gettext_version < (0, 18, 3):
                 self.skipTest("python-brace-format is a recent gettext addition.")
-            with self.assertRaisesMessage(CommandError, "' cannot start a field name"):
-                call_command('compilemessages', locale=['ko'], verbosity=0)
+            stderr = StringIO()
+            with self.assertRaisesMessage(CommandError, 'compilemessages generated one or more errors'):
+                call_command('compilemessages', locale=['ko'], stdout=StringIO(), stderr=stderr)
+            self.assertIn("' cannot start a field name", stderr.getvalue())
 
 
 class ProjectAndAppTests(MessageCompilationTests):

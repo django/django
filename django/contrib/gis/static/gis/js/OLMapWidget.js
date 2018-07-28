@@ -102,7 +102,7 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
                 ol.extent.extend(extent, feature.getGeometry().getExtent());
             }, this);
             // Center/zoom the map
-            this.map.getView().fit(extent, this.map.getSize(), {maxZoom: this.options.default_zoom});
+            this.map.getView().fit(extent, {maxZoom: this.options.default_zoom});
         } else {
             this.map.getView().setCenter(this.defaultCenter());
         }

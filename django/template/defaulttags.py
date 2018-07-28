@@ -54,7 +54,7 @@ class CsrfTokenNode(Node):
             if csrf_token == 'NOTPROVIDED':
                 return format_html("")
             else:
-                return format_html("<input type='hidden' name='csrfmiddlewaretoken' value='{}' />", csrf_token)
+                return format_html('<input type="hidden" name="csrfmiddlewaretoken" value="{}">', csrf_token)
         else:
             # It's very probable that the token is missing because of
             # misconfiguration, so we raise a warning
@@ -118,15 +118,16 @@ class FirstOfNode(Node):
         self.asvar = asvar
 
     def render(self, context):
+        first = ''
         for var in self.vars:
-            value = var.resolve(context, True)
+            value = var.resolve(context, ignore_failures=True)
             if value:
                 first = render_value_in_context(value, context)
-                if self.asvar:
-                    context[self.asvar] = first
-                    return ''
-                return first
-        return ''
+                break
+        if self.asvar:
+            context[self.asvar] = first
+            return ''
+        return first
 
 
 class ForNode(Node):
@@ -143,13 +144,13 @@ class ForNode(Node):
 
     def __repr__(self):
         reversed_text = ' reversed' if self.is_reversed else ''
-        return "<For Node: for %s in %s, tail_len: %d%s>" % \
-            (', '.join(self.loopvars), self.sequence, len(self.nodelist_loop),
-             reversed_text)
-
-    def __iter__(self):
-        yield from self.nodelist_loop
-        yield from self.nodelist_empty
+        return '<%s: for %s in %s, tail_len: %d%s>' % (
+            self.__class__.__name__,
+            ', '.join(self.loopvars),
+            self.sequence,
+            len(self.nodelist_loop),
+            reversed_text,
+        )
 
     def render(self, context):
         if 'forloop' in context:
@@ -157,10 +158,7 @@ class ForNode(Node):
         else:
             parentloop = {}
         with context.push():
-            try:
-                values = self.sequence.resolve(context, True)
-            except VariableDoesNotExist:
-                values = []
+            values = self.sequence.resolve(context, ignore_failures=True)
             if values is None:
                 values = []
             if not hasattr(values, '__len__'):
@@ -228,20 +226,17 @@ class IfChangedNode(Node):
     def render(self, context):
         # Init state storage
         state_frame = self._get_context_stack_frame(context)
-        if self not in state_frame:
-            state_frame[self] = None
+        state_frame.setdefault(self)
 
         nodelist_true_output = None
-        try:
-            if self._varlist:
-                # Consider multiple parameters.  This automatically behaves
-                # like an OR evaluation of the multiple variables.
-                compare_to = [var.resolve(context, True) for var in self._varlist]
-            else:
-                # The "{% ifchanged %}" syntax (without any variables) compares the rendered output.
-                compare_to = nodelist_true_output = self.nodelist_true.render(context)
-        except VariableDoesNotExist:
-            compare_to = None
+        if self._varlist:
+            # Consider multiple parameters. This behaves like an OR evaluation
+            # of the multiple variables.
+            compare_to = [var.resolve(context, ignore_failures=True) for var in self._varlist]
+        else:
+            # The "{% ifchanged %}" syntax (without any variables) compares
+            # the rendered output.
+            compare_to = nodelist_true_output = self.nodelist_true.render(context)
 
         if compare_to != state_frame[self]:
             state_frame[self] = compare_to
@@ -276,8 +271,8 @@ class IfEqualNode(Node):
         return '<%s>' % self.__class__.__name__
 
     def render(self, context):
-        val1 = self.var1.resolve(context, True)
-        val2 = self.var2.resolve(context, True)
+        val1 = self.var1.resolve(context, ignore_failures=True)
+        val2 = self.var2.resolve(context, ignore_failures=True)
         if (self.negate and val1 != val2) or (not self.negate and val1 == val2):
             return self.nodelist_true.render(context)
         return self.nodelist_false.render(context)
@@ -297,7 +292,7 @@ class IfNode(Node):
 
     @property
     def nodelist(self):
-        return NodeList(node for _, nodelist in self.conditions_nodelists for node in nodelist)
+        return NodeList(self)
 
     def render(self, context):
         for condition, nodelist in self.conditions_nodelists:
@@ -346,10 +341,10 @@ class RegroupNode(Node):
         # This method is called for each object in self.target. See regroup()
         # for the reason why we temporarily put the object in the context.
         context[self.var_name] = obj
-        return self.expression.resolve(context, True)
+        return self.expression.resolve(context, ignore_failures=True)
 
     def render(self, context):
-        obj_list = self.target.resolve(context, True)
+        obj_list = self.target.resolve(context, ignore_failures=True)
         if obj_list is None:
             # target variable wasn't found in context; fail silently.
             context[self.var_name] = []
@@ -486,11 +481,11 @@ class WidthRatioNode(Node):
             value = float(value)
             max_value = float(max_value)
             ratio = (value / max_value) * max_width
-            result = str(int(round(ratio)))
+            result = str(round(ratio))
         except ZeroDivisionError:
-            return '0'
+            result = '0'
         except (ValueError, TypeError, OverflowError):
-            return ''
+            result = ''
 
         if self.asvar:
             context[self.asvar] = result
@@ -721,7 +716,7 @@ def firstof(parser, token):
     """
     bits = token.split_contents()[1:]
     asvar = None
-    if len(bits) < 1:
+    if not bits:
         raise TemplateSyntaxError("'firstof' statement requires at least one argument")
 
     if len(bits) >= 2 and bits[-2] == 'as':
@@ -1329,7 +1324,7 @@ def url(parser, token):
 
         {% url "url_name" name1=value1 name2=value2 %}
 
-    The first argument is a django.conf.urls.url() name. Other arguments are
+    The first argument is a URL pattern name. Other arguments are
     space-separated values that will be filled in place of positional and
     keyword arguments in the URL. Don't mix positional and keyword arguments.
     All arguments for the URL must be present.
@@ -1337,12 +1332,12 @@ def url(parser, token):
     For example, if you have a view ``app_name.views.client_details`` taking
     the client's id and the corresponding line in a URLconf looks like this::
 
-        url('^client/(\d+)/$', views.client_details, name='client-detail-view')
+        path('client/<int:id>/', views.client_details, name='client-detail-view')
 
     and this app's URLconf is included into the project's URLconf under some
     path::
 
-        url('^clients/', include('app_name.urls'))
+        path('clients/', include('app_name.urls'))
 
     then in a template you can create a link for a certain client like this::
 
@@ -1359,7 +1354,7 @@ def url(parser, token):
     """
     bits = token.split_contents()
     if len(bits) < 2:
-        raise TemplateSyntaxError("'%s' takes at least one argument, the name of a url()." % bits[0])
+        raise TemplateSyntaxError("'%s' takes at least one argument, a URL pattern name." % bits[0])
     viewname = parser.compile_filter(bits[1])
     args = []
     kwargs = {}
@@ -1369,16 +1364,15 @@ def url(parser, token):
         asvar = bits[-1]
         bits = bits[:-2]
 
-    if len(bits):
-        for bit in bits:
-            match = kwarg_re.match(bit)
-            if not match:
-                raise TemplateSyntaxError("Malformed arguments to url tag")
-            name, value = match.groups()
-            if name:
-                kwargs[name] = parser.compile_filter(value)
-            else:
-                args.append(parser.compile_filter(value))
+    for bit in bits:
+        match = kwarg_re.match(bit)
+        if not match:
+            raise TemplateSyntaxError("Malformed arguments to url tag")
+        name, value = match.groups()
+        if name:
+            kwargs[name] = parser.compile_filter(value)
+        else:
+            args.append(parser.compile_filter(value))
 
     return URLNode(viewname, args, kwargs, asvar)
 
@@ -1415,7 +1409,7 @@ def widthratio(parser, token):
     For example::
 
         <img src="bar.png" alt="Bar"
-             height="10" width="{% widthratio this_value max_value max_width %}" />
+             height="10" width="{% widthratio this_value max_value max_width %}">
 
     If ``this_value`` is 175, ``max_value`` is 200, and ``max_width`` is 100,
     the image in the above example will be 88 pixels wide

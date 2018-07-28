@@ -21,18 +21,13 @@ class DecimalFieldTests(TestCase):
         # Uses default rounding of ROUND_HALF_EVEN.
         self.assertEqual(f.to_python(2.0625), Decimal('2.062'))
         self.assertEqual(f.to_python(2.1875), Decimal('2.188'))
-        with self.assertRaises(ValidationError):
+        msg = "'abc' value must be a decimal number."
+        with self.assertRaisesMessage(ValidationError, msg):
             f.to_python('abc')
 
     def test_default(self):
         f = models.DecimalField(default=Decimal('0.00'))
         self.assertEqual(f.get_default(), Decimal('0.00'))
-
-    def test_format(self):
-        f = models.DecimalField(max_digits=5, decimal_places=1)
-        self.assertEqual(f._format(f.to_python(2)), '2.0')
-        self.assertEqual(f._format(f.to_python('2.6')), '2.6')
-        self.assertIsNone(f._format(None))
 
     def test_get_prep_value(self):
         f = models.DecimalField(max_digits=5, decimal_places=1)
@@ -86,3 +81,9 @@ class DecimalFieldTests(TestCase):
         expected_message = validators.DecimalValidator.messages['max_whole_digits'] % {'max': 2}
         with self.assertRaisesMessage(ValidationError, expected_message):
             field.clean(Decimal('999'), None)
+
+    def test_roundtrip_with_trailing_zeros(self):
+        """Trailing zeros in the fractional part aren't truncated."""
+        obj = Foo.objects.create(a='bar', d=Decimal('8.320'))
+        obj.refresh_from_db()
+        self.assertEqual(obj.d.compare_total(Decimal('8.320')), Decimal('0'))

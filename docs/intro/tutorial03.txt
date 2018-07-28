@@ -53,10 +53,10 @@ A URL pattern is simply the general form of a URL - for example:
 ``/newsarchive/<year>/<month>/``.
 
 To get from a URL to a view, Django uses what are known as 'URLconfs'. A
-URLconf maps URL patterns (described as regular expressions) to views.
+URLconf maps URL patterns to views.
 
 This tutorial provides basic instruction in the use of URLconfs, and you can
-refer to :mod:`django.urls` for more information.
+refer to :doc:`/topics/http/urls` for more information.
 
 Writing more views
 ==================
@@ -78,24 +78,24 @@ slightly different, because they take an argument:
         return HttpResponse("You're voting on question %s." % question_id)
 
 Wire these new views into the ``polls.urls`` module by adding the following
-:func:`~django.conf.urls.url` calls:
+:func:`~django.urls.path` calls:
 
 .. snippet::
     :filename: polls/urls.py
 
-    from django.conf.urls import url
+    from django.urls import path
 
     from . import views
 
     urlpatterns = [
         # ex: /polls/
-        url(r'^$', views.index, name='index'),
+        path('', views.index, name='index'),
         # ex: /polls/5/
-        url(r'^(?P<question_id>[0-9]+)/$', views.detail, name='detail'),
+        path('<int:question_id>/', views.detail, name='detail'),
         # ex: /polls/5/results/
-        url(r'^(?P<question_id>[0-9]+)/results/$', views.results, name='results'),
+        path('<int:question_id>/results/', views.results, name='results'),
         # ex: /polls/5/vote/
-        url(r'^(?P<question_id>[0-9]+)/vote/$', views.vote, name='vote'),
+        path('<int:question_id>/vote/', views.vote, name='vote'),
     ]
 
 Take a look in your browser, at "/polls/34/". It'll run the ``detail()``
@@ -106,26 +106,24 @@ placeholder results and voting pages.
 When somebody requests a page from your website -- say, "/polls/34/", Django
 will load the ``mysite.urls`` Python module because it's pointed to by the
 :setting:`ROOT_URLCONF` setting. It finds the variable named ``urlpatterns``
-and traverses the regular expressions in order. After finding the match at
-``'^polls/'``, it strips off the matching text (``"polls/"``) and sends the
-remaining text -- ``"34/"`` -- to the 'polls.urls' URLconf for further
-processing. There it matches ``r'^(?P<question_id>[0-9]+)/$'``, resulting in a
-call to the ``detail()`` view like so::
+and traverses the patterns in order. After finding the match at ``'polls/'``,
+it strips off the matching text (``"polls/"``) and sends the remaining text --
+``"34/"`` -- to the 'polls.urls' URLconf for further processing. There it
+matches ``'<int:question_id>/'``, resulting in a call to the ``detail()`` view
+like so::
 
-    detail(request=<HttpRequest object>, question_id='34')
+    detail(request=<HttpRequest object>, question_id=34)
 
-The ``question_id='34'`` part comes from ``(?P<question_id>[0-9]+)``. Using parentheses
-around a pattern "captures" the text matched by that pattern and sends it as an
-argument to the view function; ``?P<question_id>`` defines the name that will
-be used to identify the matched pattern; and ``[0-9]+`` is a regular expression to
-match a sequence of digits (i.e., a number).
+The ``question_id=34`` part comes from ``<int:question_id>``. Using angle
+brackets "captures" part of the URL and sends it as a keyword argument to the
+view function. The ``:question_id>`` part of the string defines the name that
+will be used to identify the matched pattern, and the ``<int:`` part is a
+converter that determines what patterns should match this part of the URL path.
 
-Because the URL patterns are regular expressions, there really is no limit on
-what you can do with them. And there's no need to add URL cruft such as
-``.html`` -- unless you want to, in which case you can do something like
-this::
+There's no need to add URL cruft such as ``.html`` -- unless you want to, in
+which case you can do something like this::
 
-    url(r'^polls/latest\.html$', views.index),
+    path('polls/latest.html', views.index),
 
 But, don't do that. It's silly.
 
@@ -388,7 +386,7 @@ template, the link was partially hardcoded like this:
 
 The problem with this hardcoded, tightly-coupled approach is that it becomes
 challenging to change URLs on projects with a lot of templates. However, since
-you defined the name argument in the :func:`~django.conf.urls.url` functions in
+you defined the name argument in the :func:`~django.urls.path` functions in
 the ``polls.urls`` module, you can remove a reliance on specific URL paths
 defined in your url configurations by using the ``{% url %}`` template tag:
 
@@ -402,7 +400,7 @@ defined below::
 
     ...
     # the 'name' value as called by the {% url %} template tag
-    url(r'^(?P<question_id>[0-9]+)/$', views.detail, name='detail'),
+    path('<int:question_id>/', views.detail, name='detail'),
     ...
 
 If you want to change the URL of the polls detail view to something else,
@@ -411,7 +409,7 @@ template (or templates) you would change it in ``polls/urls.py``::
 
     ...
     # added the word 'specifics'
-    url(r'^specifics/(?P<question_id>[0-9]+)/$', views.detail, name='detail'),
+    path('specifics/<int:question_id>/', views.detail, name='detail'),
     ...
 
 Namespacing URL names
@@ -430,16 +428,16 @@ file, go ahead and add an ``app_name`` to set the application namespace:
 .. snippet::
     :filename: polls/urls.py
 
-    from django.conf.urls import url
+    from django.urls import path
 
     from . import views
 
     app_name = 'polls'
     urlpatterns = [
-        url(r'^$', views.index, name='index'),
-        url(r'^(?P<question_id>[0-9]+)/$', views.detail, name='detail'),
-        url(r'^(?P<question_id>[0-9]+)/results/$', views.results, name='results'),
-        url(r'^(?P<question_id>[0-9]+)/vote/$', views.vote, name='vote'),
+        path('', views.index, name='index'),
+        path('<int:question_id>/', views.detail, name='detail'),
+        path('<int:question_id>/results/', views.results, name='results'),
+        path('<int:question_id>/vote/', views.vote, name='vote'),
     ]
 
 Now change your ``polls/index.html`` template from:

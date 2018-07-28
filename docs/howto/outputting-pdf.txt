@@ -14,7 +14,7 @@ For example, Django was used at kusports.com_ to generate customized,
 printer-friendly NCAA tournament brackets, as PDF files, for people
 participating in a March Madness contest.
 
-.. _ReportLab: http://www.reportlab.com/opensource/
+.. _ReportLab: https://www.reportlab.com/opensource/
 .. _kusports.com: http://www.kusports.com/
 
 Install ReportLab
@@ -24,7 +24,7 @@ The ReportLab library is `available on PyPI`_. A `user guide`_ (not
 coincidentally, a PDF file) is also available for download.
 You can install ReportLab with ``pip``:
 
-.. code-block:: console
+.. console::
 
     $ pip install reportlab
 
@@ -34,28 +34,28 @@ Test your installation by importing it in the Python interactive interpreter::
 
 If that command doesn't raise any errors, the installation worked.
 
-.. _available on PyPI: https://pypi.python.org/pypi/reportlab
-.. _user guide: http://www.reportlab.com/docs/reportlab-userguide.pdf
+.. _available on PyPI: https://pypi.org/project/reportlab/
+.. _user guide: https://www.reportlab.com/docs/reportlab-userguide.pdf
 
 Write your view
 ===============
 
 The key to generating PDFs dynamically with Django is that the ReportLab API
-acts on file-like objects, and Django's :class:`~django.http.HttpResponse`
-objects are file-like objects.
+acts on file-like objects, and Django's :class:`~django.http.FileResponse`
+objects accept file-like objects.
 
 Here's a "Hello World" example::
 
+    import io
+    from django.http import FileResponse
     from reportlab.pdfgen import canvas
-    from django.http import HttpResponse
 
     def some_view(request):
-        # Create the HttpResponse object with the appropriate PDF headers.
-        response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="somefilename.pdf"'
+        # Create a file-like buffer to receive PDF data.
+        buffer = io.BytesIO()
 
-        # Create the PDF object, using the response object as its "file."
-        p = canvas.Canvas(response)
+        # Create the PDF object, using the buffer as its "file."
+        p = canvas.Canvas(buffer)
 
         # Draw things on the PDF. Here's where the PDF generation happens.
         # See the ReportLab documentation for the full list of functionality.
@@ -64,37 +64,35 @@ Here's a "Hello World" example::
         # Close the PDF object cleanly, and we're done.
         p.showPage()
         p.save()
-        return response
+
+        # FileResponse sets the Content-Disposition header so that browsers
+        # present the option to save the file.
+        return FileResponse(buffer, as_attachment=True, filename='hello.pdf')
 
 The code and comments should be self-explanatory, but a few things deserve a
 mention:
 
-* The response gets a special MIME type, :mimetype:`application/pdf`. This
-  tells browsers that the document is a PDF file, rather than an HTML file.
-  If you leave this off, browsers will probably interpret the output as
-  HTML, which would result in ugly, scary gobbledygook in the browser
-  window.
+* The response will automatically set the MIME type :mimetype:`application/pdf`
+  based on the filename extension. This tells browsers that the document is a
+  PDF file, rather than an HTML file or a generic `application/octet-stream`
+  binary content.
 
-* The response gets an additional ``Content-Disposition`` header, which
-  contains the name of the PDF file. This filename is arbitrary: Call it
-  whatever you want. It'll be used by browsers in the "Save as..." dialog, etc.
+* When ``as_attachment=True`` is passed to ``FileResponse``, it sets the
+  appropriate ``Content-Disposition`` header and that tells Web browsers to
+  pop-up a dialog box prompting/confirming how to handle the document even if a
+  default is set on the machine. If the ``as_attachment`` parameter is omitted,
+  browsers will handle the PDF using whatever program/plugin they've been
+  configured to use for PDFs.
 
-* The ``Content-Disposition`` header starts with ``'attachment; '`` in this
-  example. This forces Web browsers to pop-up a dialog box
-  prompting/confirming how to handle the document even if a default is set
-  on the machine. If you leave off ``'attachment;'``, browsers will handle
-  the PDF using whatever program/plugin they've been configured to use for
-  PDFs. Here's what that code would look like::
+* You can provide an arbitrary ``filename`` parameter. It'll be used by browsers
+  in the "Save as..." dialog.
 
-      response['Content-Disposition'] = 'filename="somefilename.pdf"'
-
-* Hooking into the ReportLab API is easy: Just pass ``response`` as the
-  first argument to ``canvas.Canvas``. The ``Canvas`` class expects a
-  file-like object, and :class:`~django.http.HttpResponse` objects fit the
-  bill.
+* Hooking into the ReportLab API is easy: The same buffer passed as the first
+  argument to ``canvas.Canvas`` can be fed to the
+  :class:`~django.http.FileResponse` class.
 
 * Note that all subsequent PDF-generation methods are called on the PDF
-  object (in this case, ``p``) -- not on ``response``.
+  object (in this case, ``p``) -- not on ``buffer``.
 
 * Finally, it's important to call ``showPage()`` and ``save()`` on the PDF
   file.
@@ -104,42 +102,6 @@ mention:
     ReportLab is not thread-safe. Some of our users have reported odd issues
     with building PDF-generating Django views that are accessed by many people
     at the same time.
-
-Complex PDFs
-============
-
-If you're creating a complex PDF document with ReportLab, consider using the
-:mod:`io` library as a temporary holding place for your PDF file. This
-library provides a file-like object interface that is particularly efficient.
-Here's the above "Hello World" example rewritten to use :mod:`io`::
-
-    from io import BytesIO
-    from reportlab.pdfgen import canvas
-    from django.http import HttpResponse
-
-    def some_view(request):
-        # Create the HttpResponse object with the appropriate PDF headers.
-        response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="somefilename.pdf"'
-
-        buffer = BytesIO()
-
-        # Create the PDF object, using the BytesIO object as its "file."
-        p = canvas.Canvas(buffer)
-
-        # Draw things on the PDF. Here's where the PDF generation happens.
-        # See the ReportLab documentation for the full list of functionality.
-        p.drawString(100, 100, "Hello world.")
-
-        # Close the PDF object cleanly.
-        p.showPage()
-        p.save()
-
-        # Get the value of the BytesIO buffer and write it to the response.
-        pdf = buffer.getvalue()
-        buffer.close()
-        response.write(pdf)
-        return response
 
 Other formats
 =============

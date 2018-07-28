@@ -7,7 +7,6 @@ from django.contrib.auth.views import (
 )
 from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
-from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
 from .client import PasswordResetConfirmClient
@@ -48,7 +47,7 @@ class AuthTemplateTests(TestCase):
         client = PasswordResetConfirmClient()
         default_token_generator = PasswordResetTokenGenerator()
         token = default_token_generator.make_token(self.user)
-        uidb64 = urlsafe_base64_encode(force_bytes(self.user.pk)).decode()
+        uidb64 = urlsafe_base64_encode(str(self.user.pk).encode()).decode()
         url = reverse('password_reset_confirm', kwargs={'uidb64': uidb64, 'token': token})
         response = client.get(url)
         self.assertContains(response, '<title>Enter new password</title>')

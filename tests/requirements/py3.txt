@@ -7,7 +7,7 @@ numpy
 Pillow
 # pylibmc/libmemcached can't be built on Windows.
 pylibmc; sys.platform != 'win32'
-python3-memcached
+python-memcached >= 1.59
 pytz
 PyYAML
 selenium

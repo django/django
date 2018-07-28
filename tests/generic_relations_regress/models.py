@@ -19,9 +19,15 @@ class Link(models.Model):
         return "Link to %s id=%s" % (self.content_type, self.object_id)
 
 
+class LinkProxy(Link):
+    class Meta:
+        proxy = True
+
+
 class Place(models.Model):
     name = models.CharField(max_length=100)
-    links = GenericRelation(Link)
+    links = GenericRelation(Link, related_query_name='places')
+    link_proxy = GenericRelation(LinkProxy)
 
     def __str__(self):
         return "Place: %s" % self.name
@@ -30,6 +36,11 @@ class Place(models.Model):
 class Restaurant(Place):
     def __str__(self):
         return "Restaurant: %s" % self.name
+
+
+class Cafe(Restaurant):
+    def __str__(self):
+        return "Cafe: %s" % self.name
 
 
 class Address(models.Model):
@@ -158,7 +169,7 @@ class HasLinkThing(HasLinks):
 
 
 class A(models.Model):
-    flag = models.NullBooleanField()
+    flag = models.BooleanField(null=True)
     content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')

@@ -78,8 +78,8 @@ You'll need a few things before getting started:
 * If this is a security release, access to the pre-notification distribution
   list.
 
-If this is your first release, you'll need to coordinate with James and/or
-Jacob to get all these things lined up.
+If this is your first release, you'll need to coordinate with another releaser
+to get all these things lined up.
 
 Pre-release tasks
 =================
@@ -89,14 +89,13 @@ This stuff starts about a week before the release; most of it can be done
 any time leading up to the actual release:
 
 #. If this is a security release, send out pre-notification **one week** before
-   the release. We maintain a list of who gets these pre-notification emails in
-   the private ``django-core`` repository. Send the mail to
-   ``security@djangoproject.com`` and BCC the pre-notification recipients.
-   This email should be signed by the key you'll use for the release and
-   should include `CVE IDs <https://cveform.mitre.org/>`_ (requested with
-   Vendor: djangoproject, Product: django) and patches for each issue being
-   fixed. Also, :ref:`notify django-announce <security-disclosure>` of the
-   upcoming security release.
+   the release. The template for that email and a list of the recipients are in
+   the private ``django-security`` GitHub wiki. BCC the pre-notification
+   recipients. Sign the email with the key you'll use for the release and
+   include `CVE IDs <https://cveform.mitre.org/>`_ (requested with Vendor:
+   djangoproject, Product: django) and patches for each issue being fixed.
+   Also, :ref:`notify django-announce <security-disclosure>` of the upcoming
+   security release.
 
 #. As the release approaches, watch Trac to make sure no release blockers
    are left for the upcoming release.
@@ -164,14 +163,14 @@ OK, this is the fun part, where we actually push out a release!
         $ git pull
 
 #. If this is a security release, merge the appropriate patches from
-   ``django-private``. Rebase these patches as necessary to make each one a
+   ``django-security``. Rebase these patches as necessary to make each one a
    simple commit on the release branch rather than a merge commit. To ensure
    this, merge them with the ``--ff-only`` flag; for example::
 
         $ git checkout stable/1.5.x
         $ git merge --ff-only security/1.5.x
 
-   (This assumes ``security/1.5.x`` is a branch in the ``django-private`` repo
+   (This assumes ``security/1.5.x`` is a branch in the ``django-security`` repo
    containing the necessary security patches for the next release in the 1.5
    series.)
 
@@ -309,7 +308,7 @@ Now you're ready to actually put the release out there. To do this:
    This just tests that the tarballs are available (i.e. redirects are up) and
    that they install correctly, but it'll catch silly mistakes.
 
-   __ https://pypi.python.org/pypi/virtualenvwrapper
+   __ https://pypi.org/project/virtualenvwrapper/
 
 #. Ask a few people on IRC to verify the checksums by visiting the checksums
    file (e.g. https://www.djangoproject.com/m/pgp/Django-1.5b1.checksum.txt)

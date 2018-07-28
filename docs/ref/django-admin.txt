@@ -37,7 +37,7 @@ just as well.
 Usage
 =====
 
-.. code-block:: console
+.. console::
 
     $ django-admin <command> [options]
     $ manage.py <command> [options]
@@ -235,14 +235,10 @@ are prefixed by ``"###"``.
 
 .. django-admin-option:: --default MODULE
 
-.. versionadded:: 1.11
-
 The settings module to compare the current settings against. Leave empty to
 compare against Django's default settings.
 
 .. django-admin-option:: --output {hash,unified}
-
-.. versionadded:: 2.0
 
 Specifies the output format. Available values are ``hash`` and ``unified``.
 ``hash`` is the default mode that displays the output that's described above.
@@ -352,8 +348,11 @@ Specifies the database to flush. Defaults to ``default``.
 
 Introspects the database tables in the database pointed-to by the
 :setting:`NAME` setting and outputs a Django model module (a ``models.py``
-file) to standard output. You may choose what tables to inspect by passing
-their names as arguments.
+file) to standard output.
+
+You may choose what tables or views to inspect by passing their names as
+arguments. If no arguments are provided, models are created for views only if
+the :option:`--include-views` option is used.
 
 Use this if you have a legacy database with which you'd like to use Django.
 The script will inspect the database and create a model for each table within
@@ -366,7 +365,9 @@ output:
 * If ``inspectdb`` cannot map a column's type to a model field type, it'll
   use ``TextField`` and will insert the Python comment
   ``'This field type is a guess.'`` next to the field in the generated
-  model.
+  model. The recognized fields may depend on apps listed in
+  :setting:`INSTALLED_APPS`. For example, :mod:`django.contrib.postgres` adds
+  recognition for several PostgreSQL-specific field types.
 
 * If the database column name is a Python reserved word (such as
   ``'pass'``, ``'class'`` or ``'for'``), ``inspectdb`` will append
@@ -405,6 +406,12 @@ it because ``True`` is its default value).
 
 Specifies the database to introspect. Defaults to ``default``.
 
+.. django-admin-option:: --include-views
+
+.. versionadded:: 2.1
+
+If this option is provided, models are also created for database views.
+
 ``loaddata``
 ------------
 
@@ -428,15 +435,11 @@ Specifies a single app to look for fixtures in rather than looking in all apps.
 
 .. django-admin-option:: --format FORMAT
 
-.. versionadded:: 2.0
-
 Specifies the :ref:`serialization format <serialization-formats>` (e.g.,
 ``json`` or ``xml``) for fixtures :ref:`read from stdin
 <loading-fixtures-stdin>`.
 
 .. django-admin-option:: --exclude EXCLUDE, -e EXCLUDE
-
-.. versionadded:: 1.11
 
 Excludes loading the fixtures from the given applications and/or models (in the
 form of ``app_label`` or ``app_label.ModelName``). Use the option multiple
@@ -575,8 +578,6 @@ specify you want to load data into the ``master`` database.
 Loading fixtures from ``stdin``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 2.0
-
 You can use a dash as the fixture name to load input from ``sys.stdin``. For
 example::
 
@@ -688,8 +689,6 @@ understand each message's context.
 
 .. django-admin-option:: --add-location [{full,file,never}]
 
-.. versionadded:: 2.0
-
 Controls ``#: filename:line`` comment lines in language files. If the option
 is:
 
@@ -753,9 +752,6 @@ Enables fixing of migration conflicts.
 
 Allows naming the generated migration(s) instead of using a generated name.
 
-Makes ``makemigrations`` exit with error code 1 when no migrations are created
-(or would have been created, if combined with ``--dry-run``).
-
 .. django-admin-option:: --check
 
 Makes ``makemigrations`` exit with a non-zero status when model changes without
@@ -788,8 +784,8 @@ Specifies the database to migrate. Defaults to ``default``.
 
 .. django-admin-option:: --fake
 
-Tells Django to mark the migrations as having been applied or unapplied, but
-without actually running the SQL to change your database schema.
+Marks the migrations up to the target one (following the rules above) as
+applied, but without actually running the SQL to change your database schema.
 
 This is intended for advanced users to manipulate the
 current migration state directly if they're manually applying changes;
@@ -852,7 +848,7 @@ second). This offers better scaling to large projects, reduction in response
 time to code modification, more robust change detection, and battery usage
 reduction.
 
-.. _pyinotify: https://pypi.python.org/pypi/pyinotify/
+.. _pyinotify: https://pypi.org/project/pyinotify/
 
 When you start the server, and each time you change Python code while the
 server is running, the system check framework will check your entire Django
@@ -1017,10 +1013,6 @@ You can also pass code in on standard input to execute it. For example:
 On Windows, the REPL is output due to implementation limits of
 :func:`select.select` on that platform.
 
-.. versionchanged:: 1.11
-
-    In older versions, the REPL is also output on UNIX systems.
-
 ``showmigrations``
 ------------------
 
@@ -1047,10 +1039,6 @@ of 2 and above, all dependencies of a migration will also be shown.
 
 ``app_label``\s arguments limit the output, however, dependencies of provided
 apps may also be included.
-
-.. versionchanged:: 1.11
-
-    In older versions, ``showmigrations --plan`` ignores app labels.
 
 .. django-admin-option:: --database DATABASE
 
@@ -1132,6 +1120,11 @@ behavior, as optimization is meant to be safe.
 
 Suppresses all user prompts.
 
+.. django-admin-option:: --squashed-name SQUASHED_NAME
+
+Sets the name of the squashed migration. When omitted, the name is based on the
+first and last migration, with ``_squashed_`` in between.
+
 ``startapp``
 ------------
 
@@ -1195,6 +1188,7 @@ files is:
 - ``app_directory`` -- the full path of the newly created app
 - ``camel_case_app_name`` -- the app name in camel case format
 - ``docs_version`` -- the version of the documentation: ``'dev'`` or ``'1.x'``
+- ``django_version`` -- the version of Django, e.g.``'2.0.3'``
 
 .. _render_warning:
 
@@ -1207,7 +1201,7 @@ files is:
     to template rendering, it might result in an incorrect example.
 
     To work around this problem, you can use the :ttag:`templatetag`
-    templatetag to "escape" the various parts of the template syntax.
+    template tag to "escape" the various parts of the template syntax.
 
     In addition, to allow Python template files that contain Django template
     language syntax while also preventing packaging systems from trying to
@@ -1264,6 +1258,7 @@ The :class:`template context <django.template.Context>` used is:
 - ``project_directory`` -- the full path of the newly created project
 - ``secret_key`` -- a random key for the :setting:`SECRET_KEY` setting
 - ``docs_version`` -- the version of the documentation: ``'dev'`` or ``'1.x'``
+- ``django_version`` -- the version of Django, e.g.``'2.0.3'``
 
 Please also see the :ref:`rendering warning <render_warning>` as mentioned
 for :djadmin:`startapp`.
@@ -1315,8 +1310,6 @@ the side effects of tests that aren't properly isolated. :ref:`Grouping by test
 class <order-of-tests>` is preserved when using this option.
 
 .. django-admin-option:: --debug-mode
-
-.. versionadded:: 1.11
 
 Sets the :setting:`DEBUG` setting to ``True`` prior to running tests. This may
 help troubleshoot test failures.
@@ -1519,8 +1512,6 @@ instance.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. django-admin:: remove_stale_contenttypes
-
-.. versionadded:: 1.11
 
 This command is only available if Django's :doc:`contenttypes app
 </ref/contrib/contenttypes>` (:mod:`django.contrib.contenttypes`) is installed.
@@ -1771,7 +1762,7 @@ Bash completion
 ---------------
 
 If you use the Bash shell, consider installing the Django bash completion
-script, which lives in ``extras/django_bash_completion`` in the Django
+script, which lives in ``extras/django_bash_completion`` in the Django source
 distribution. It enables tab-completion of ``django-admin`` and
 ``manage.py`` commands, so you can, for instance...
 

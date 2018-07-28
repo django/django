@@ -170,10 +170,11 @@ ones:
         )
 
     The first element in each tuple is the value that will be stored in the
-    database. The second element will be displayed by the default form widget
-    or in a :class:`~django.forms.ModelChoiceField`. Given a model instance,
-    the display value for a choices field can be accessed using the
-    ``get_FOO_display()`` method. For example::
+    database. The second element is displayed by the field's form widget.
+
+    Given a model instance, the display value for a field with ``choices`` can
+    be accessed using the :meth:`~django.db.models.Model.get_FOO_display`
+    method. For example::
 
         from django.db import models
 
@@ -229,7 +230,7 @@ ones:
         >>> fruit.name = 'Pear'
         >>> fruit.save()
         >>> Fruit.objects.values_list('name', flat=True)
-        ['Apple', 'Pear']
+        <QuerySet ['Apple', 'Pear']>
 
 :attr:`~Field.unique`
     If ``True``, this field must be unique throughout the table.
@@ -896,9 +897,7 @@ information into a number of other models. You write your base class
 and put ``abstract=True`` in the :ref:`Meta <meta-options>`
 class. This model will then not be used to create any database
 table. Instead, when it is used as a base class for other models, its
-fields will be added to those of the child class. It is an error to
-have fields in the abstract base class with the same name as those in
-the child (and Django will raise an exception).
+fields will be added to those of the child class.
 
 An example::
 
@@ -918,6 +917,9 @@ The ``Student`` model will have three fields: ``name``, ``age`` and
 ``home_group``. The ``CommonInfo`` model cannot be used as a normal Django
 model, since it is an abstract base class. It does not generate a database
 table or have a manager, and cannot be instantiated or saved directly.
+
+Fields inherited from abstract base classes can be overridden with another
+field or value, or be removed with ``None``.
 
 For many uses, this type of model inheritance will be exactly what you want.
 It provides a way to factor out common information at the Python level, while
@@ -1346,15 +1348,20 @@ use an explicit :class:`~django.db.models.AutoField` in the base models::
     class BookReview(Book, Article):
         pass
 
-Or use a common ancestor to hold the :class:`~django.db.models.AutoField`::
+Or use a common ancestor to hold the :class:`~django.db.models.AutoField`. This
+requires using an explicit :class:`~django.db.models.OneToOneField` from each
+parent model to the common ancestor to avoid a clash between the fields that
+are automatically generated and inherited by the child::
 
     class Piece(models.Model):
         pass
 
     class Article(Piece):
+        article_piece = models.OneToOneField(Piece, on_delete=models.CASCADE, parent_link=True)
         ...
 
     class Book(Piece):
+        book_piece = models.OneToOneField(Piece, on_delete=models.CASCADE, parent_link=True)
         ...
 
     class BookReview(Book, Article):

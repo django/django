@@ -1,0 +1,23 @@
+[
+  {
+    "model": "fixtures.naturalkeything",
+    "fields": {
+      "key": "t1",
+      "other_things": [
+        ["t2"], ["t3"]
+      ]
+    }
+  },
+  {
+    "model": "fixtures.naturalkeything",
+    "fields": {
+      "key": "t2"
+    }
+  },
+  {
+    "model": "fixtures.naturalkeything",
+    "fields": {
+      "key": "t3"
+    }
+  }
+]

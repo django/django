@@ -5,6 +5,7 @@ This demonstrates features of the database API.
 """
 
 from django.db import models
+from django.db.models.lookups import IsNull
 
 
 class Alarm(models.Model):
@@ -17,15 +18,17 @@ class Alarm(models.Model):
 
 class Author(models.Model):
     name = models.CharField(max_length=100)
+    alias = models.CharField(max_length=50, null=True, blank=True)
 
     class Meta:
-        ordering = ('name', )
+        ordering = ('name',)
 
 
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateTimeField()
     author = models.ForeignKey(Author, models.SET_NULL, blank=True, null=True)
+    slug = models.SlugField(unique=True, blank=True, null=True)
 
     class Meta:
         ordering = ('-pub_date', 'headline')
@@ -39,12 +42,30 @@ class Tag(models.Model):
     name = models.CharField(max_length=100)
 
     class Meta:
-        ordering = ('name', )
+        ordering = ('name',)
+
+
+class NulledTextField(models.TextField):
+    def get_prep_value(self, value):
+        return None if value == '' else value
+
+
+@NulledTextField.register_lookup
+class NulledTransform(models.Transform):
+    lookup_name = 'nulled'
+    template = 'NULL'
+
+
+@NulledTextField.register_lookup
+class IsNullWithNoneAsRHS(IsNull):
+    lookup_name = 'isnull_none_rhs'
+    can_use_none_as_rhs = True
 
 
 class Season(models.Model):
     year = models.PositiveSmallIntegerField()
     gt = models.IntegerField(null=True, blank=True)
+    nulled_text_field = NulledTextField(null=True)
 
     def __str__(self):
         return str(self.year)

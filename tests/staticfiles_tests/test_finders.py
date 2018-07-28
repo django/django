@@ -105,5 +105,10 @@ class TestMiscFinder(SimpleTestCase):
 
     @override_settings(MEDIA_ROOT='')
     def test_location_empty(self):
-        with self.assertRaises(ImproperlyConfigured):
+        msg = (
+            "The storage backend of the staticfiles finder "
+            "<class 'django.contrib.staticfiles.finders.DefaultStorageFinder'> "
+            "doesn't have a valid location."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             finders.DefaultStorageFinder()

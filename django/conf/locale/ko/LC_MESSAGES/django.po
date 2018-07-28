@@ -2,22 +2,26 @@
 #
 # Translators:
 # BJ Jang <qgis.tr.kr@gmail.com>, 2014
+# 준구 강 <chr0m3.kr@gmail.com>, 2017
 # Jiyoon, Ha <cryptography@konkuk.ac.kr>, 2016
+# lqez <ez.amiryo@gmail.com>, 2017
+# hoseung2 <ghyutjik123@gmail.com>, 2017
 # Ian Y. Choi <ianyrchoi@gmail.com>, 2015
 # Jaehong Kim <mixe@korea.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Le Tartuffe <magno79@gmail.com>, 2014,2016
 # JuneHyeon Bae <devunt@gmail.com>, 2014
-# Chr0m3 <chr0m3.kr@gmail.com>, 2015
+# 준구 강 <chr0m3.kr@gmail.com>, 2015
+# Kagami Sascha Rosylight <saschanaz@outlook.com>, 2017
 # Subin Choi <os1742@gmail.com>, 2016
 # Taesik Yoon <xotlr43@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-20 09:03+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-12-01 21:10+0100\n"
+"PO-Revision-Date: 2017-12-11 14:17+0000\n"
+"Last-Translator: 준구 강 <chr0m3.kr@gmail.com>\n"
 "Language-Team: Korean (http://www.transifex.com/django/django/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -166,6 +170,9 @@ msgstr "일본어"
 msgid "Georgian"
 msgstr "조지아어"
 
+msgid "Kabyle"
+msgstr "커바일어"
+
 msgid "Kazakh"
 msgstr "카자흐어"
 
@@ -302,13 +309,13 @@ msgid "Syndication"
 msgstr "신디케이션"
 
 msgid "That page number is not an integer"
-msgstr ""
+msgstr "페이지 번호가 정수가 아닙니다."
 
 msgid "That page number is less than 1"
-msgstr ""
+msgstr "페이지 번호가 1보다 작습니다."
 
 msgid "That page contains no results"
-msgstr ""
+msgstr "해당 페이지에 결과가 없습니다."
 
 msgid "Enter a valid value."
 msgstr "올바른 값을 입력하세요."
@@ -322,6 +329,7 @@ msgstr "올바른 정수를 입력하세요."
 msgid "Enter a valid email address."
 msgstr "올바른 이메일 주소를 입력하세요."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "문자, 숫자, '_', '-'만 가능합니다."
@@ -403,6 +411,11 @@ msgid ""
 "File extension '%(extension)s' is not allowed. Allowed extensions are: "
 "'%(allowed_extensions)s'."
 msgstr ""
+"파일 확장자 '%(extension)s'는 허용되지 않습니다. 허용된 확장자 : "
+"'%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
+msgstr "null 문자는 사용할 수 없습니다. "
 
 msgid "and"
 msgstr "또한"
@@ -724,15 +737,15 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "아래의 중복된 값들을 고쳐주세요."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "부모 오브젝트의 primary key와 inline foreign key가 맞지 않습니다."
+msgid "The inline value did not match the parent instance."
+msgstr "Inline 값이 부모 인스턴스와 일치하지 않습니다."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "올바르게 선택해 주세요. 선택하신 것이 선택가능항목에 없습니다."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\"은/는 primary key로 적합하지 않습니다."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "\"%(pk)s\" 은/는 유효한 값이 아닙니다."
 
 #, python-format
 msgid ""
@@ -1090,6 +1103,19 @@ msgstr ""
 "나 HTTPS 연결, '동일-출처' 요청에 대해서는 이를 다시 활성화 시키십시오. "
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+"<meta name=\"referrer\" content=\"no-referrer\">태그나  'Referrer-Policy: no-"
+"referrer' 헤더를 포함하고 있다면, 제거해주시기 바랍니다. CSRF 방지를 위한 리"
+"퍼러 검사를 위해 'Referer' 헤더가 필요합니다. 개인 정보에 대해 우려가 있는 경"
+"우, 서드 파티 사이트에 대한 링크에 <a rel=\"noreferrer\" ...>와 같은 대안을 "
+"사용할 수 있습니다."
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1108,29 +1134,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "DEBUG=True 로 더 많은 정보를 확인할 수 있습니다."
 
-msgid "Welcome to Django"
-msgstr "Django에 오신 것을 환영합니다!"
-
-msgid "It worked!"
-msgstr "작동중!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "첫 번째 Django 페이지를 만든 것을 축하드립니다."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"이 메세지가 보이는 이유는 당신의 Django 설정 파일에 <code>DEBUG = True</code>"
-"가 있고, 아직 아무런 URL을 설정하지 않았기 때문입니다."
-
 msgid "No year specified"
 msgstr "년도가 없습니다."
+
+msgid "Date out of range"
+msgstr "유효 범위 밖의 날짜"
 
 msgid "No month specified"
 msgstr "월이 없습니다."
@@ -1182,3 +1190,46 @@ msgstr "\"%(path)s\" 가 존재하지 않습니다."
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Index of %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django: 마감에 쫓기는 완벽주의자를 위한 웹 프레임워크"
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Django %(version)s<a href=\"https://docs.djangoproject.com/en/%(version)s/"
+"releases/\" target=\"_blank\" rel=\"noopener\">릴리스 노트</a> 보기"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "성공적으로 설치되었습니다! 축하합니다!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"이 페이지는 어떤 URL도 지정되지 않았고, settings 파일에 <a href=\"https://"
+"docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank"
+"\" rel=\"noopener\">DEBUG=True</a>가 설정되어 있을 때 표시됩니다."
+
+msgid "Django Documentation"
+msgstr "Django 문서"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr "주제, 레퍼런스, &amp; 입문참조하다"
+
+msgid "Tutorial: A Polling App"
+msgstr "튜토리얼: 폴링 애플리케이션"
+
+msgid "Get started with Django"
+msgstr "Django와 함께 시작하기"
+
+msgid "Django Community"
+msgstr "Django 커뮤니티"
+
+msgid "Connect, get help, or contribute"
+msgstr "연결하고, 도움을 받거나 기여하기"

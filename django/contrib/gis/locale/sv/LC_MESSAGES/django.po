@@ -5,13 +5,14 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jonathan Lindén, 2015
 # Jonathan Lindén, 2014
+# Thomas Lundqvist <thomas@biljettshop.se>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 09:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-15 13:33+0000\n"
+"Last-Translator: Thomas Lundqvist <thomas@biljettshop.se>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -55,7 +56,7 @@ msgid "Extent Aggregate Field"
 msgstr "Fält för sammanlagd yta"
 
 msgid "Raster Field"
-msgstr ""
+msgstr "Rasterfält"
 
 msgid "No geometry value provided."
 msgstr "Inget geometriskt värde angivet."
@@ -76,9 +77,6 @@ msgstr "Ta bort alla attribut"
 
 msgid "WKT debugging window:"
 msgstr "WKT felsökningsfönster:"
-
-msgid "Google Maps via GeoDjango"
-msgstr "Google Maps genom GeoDjango"
 
 msgid "Debugging window (serialized value)"
 msgstr "Felsökningsfönster (serialiserat värde)"

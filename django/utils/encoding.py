@@ -99,10 +99,7 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
         return s
     if isinstance(s, memoryview):
         return bytes(s)
-    if isinstance(s, Promise) or not isinstance(s, str):
-        return str(s).encode(encoding, errors)
-    else:
-        return s.encode(encoding, errors)
+    return str(s).encode(encoding, errors)
 
 
 smart_str = smart_text
@@ -139,8 +136,8 @@ def iri_to_uri(iri):
     #     sub-delims  = "!" / "$" / "&" / "'" / "(" / ")"
     #                   / "*" / "+" / "," / ";" / "="
     #     unreserved  = ALPHA / DIGIT / "-" / "." / "_" / "~"
-    # Of the unreserved characters, urllib.quote already considers all but
-    # the ~ safe.
+    # Of the unreserved characters, urllib.parse.quote() already considers all
+    # but the ~ safe.
     # The % character is also added to the list of safe characters here, as the
     # end of section 3.1 of RFC 3987 specifically mentions that % must not be
     # converted.

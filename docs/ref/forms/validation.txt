@@ -229,8 +229,8 @@ defined on the :class:`~django.forms.Field` class itself with the
 Simple validators can be used to validate values inside the field, let's have
 a look at Django's ``SlugField``::
 
-    from django.forms import CharField
     from django.core import validators
+    from django.forms import CharField
 
     class SlugField(CharField):
         default_validators = [validators.validate_slug]

@@ -57,6 +57,11 @@ register lookups on itself. The two prominent examples are
         and checks if any has a registered lookup named ``lookup_name``, returning
         the first match.
 
+    .. method:: get_lookups()
+
+        Returns a dictionary of each lookup name registered in the class mapped
+        to the :class:`Lookup` class.
+
     .. method:: get_transform(transform_name)
 
         Returns a :class:`Transform` named ``transform_name``. The default

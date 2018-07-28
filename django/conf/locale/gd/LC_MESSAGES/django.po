@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-20 11:03+0000\n"
+"POT-Creation-Date: 2017-11-15 16:15+0100\n"
+"PO-Revision-Date: 2017-11-16 06:41+0000\n"
 "Last-Translator: GunChleoc\n"
 "Language-Team: Gaelic, Scottish (http://www.transifex.com/django/django/"
 "language/gd/)\n"
@@ -319,6 +319,7 @@ msgstr "Cuir a-steach àireamh slàin dhligheach."
 msgid "Enter a valid email address."
 msgstr "Cuir a-steach seòladh puist-d dligheach."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -447,6 +448,9 @@ msgid ""
 msgstr ""
 "Chan eil an leudachan faidhle \"%(extension)s\" ceadaichte. Seo na "
 "leudachain a tha ceadaichte: \"%(allowed_extensions)s\"."
+
+msgid "Null characters are not allowed."
+msgstr "Chan eil caractaran null ceadaichte."
 
 msgid "and"
 msgstr "agus"
@@ -796,17 +800,16 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Ceartaich na luachan dùblaichte gu h-ìosal."
 
-msgid "The inline foreign key did not match the parent instance primary key."
+msgid "The inline value did not match the parent instance."
 msgstr ""
-"Chan eil an iuchair chèin am broinn na loidhne a’ freagairt ri prìomh-"
-"iuchair an ionstans-pàraint."
+"Chan eil an luach am broinn na loidhne a’ freagairt ris an ionstans-pàraint."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Tagh rud dligheach. Chan eil an rud seo ’na roghainn dhut."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "Chan e luach dligheach a tha ann an “%(pk)s” airson prìomh-iuchair."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "Chan e luach dligheach a tha ann an “%(pk)s”."
 
 #, python-format
 msgid ""
@@ -1187,6 +1190,20 @@ msgstr ""
 "ceanglaichean HTTPS no airson iarrtasan “same-origin”."
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+"Ma tha thu a’ cleachdadh taga <meta name=\"referrer\" content=\"no-referrer"
+"\"> no a’ gabhail a-staigh bann-cinn “'Referrer-Policy: no-referrer” feuch "
+"an doir thu air falbh iad. Iarraidh an dìon CSRF bann-cinn “Referer” gus na "
+"referers a dhearbhadh gu teann. Ma tha thu iomagaineach a thaobh do "
+"prìobhaideachd, cleachd roghainnean eile mar <a rel=\"noreferrer\" ...> "
+"airson ceangal gu làraichean-lìn threas-phàrtaidhean."
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1207,32 +1224,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "Gheibh thu barrachd fiosrachaidh le DEBUG=True."
 
-msgid "Welcome to Django"
-msgstr "Fàilte gu Django"
-
-msgid "It worked!"
-msgstr "Dh’obraich e!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Meal do naidheachd gu bheil a’ chiad duilleag le cumhachd Django agad."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-"An uairsin, tòisich a' chiad aplacaid agad 's tu a' ruith <code>python "
-"manage.py startapp [app_label]</code>."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Chì thu an teachdaireachd seo air sgàth ’s gu bheil <code>DEBUG = True</"
-"code> ann am faidhle nan roghainnean Django agad agus cha do rèitich thu URL "
-"sam bith fhathast. Siuthad is rèitich fear!"
-
 msgid "No year specified"
 msgstr "Cha deach bliadhna a shònrachadh"
+
+msgid "Date out of range"
+msgstr "Tha ceann-là taobh thar na rainse"
 
 msgid "No month specified"
 msgstr "Cha deach mìos a shònrachadh"
@@ -1288,3 +1284,48 @@ msgstr "Chan eil “%(path)s” ann"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Clàr-amais dhe %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django: am frèam-obrach-lìn leis a choileanas foirfichean cinn-ama."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Seall na <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">nòtaichean sgaoilidh</a> airson Django "
+"%(version)s"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Chaidh a stàladh! Meal do naidheachd!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"Chì thu an duilleag seo on a tha <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> ann am faidhle nan roghainnean agad agus cha do rèitich "
+"thu URL sam bith fhathast."
+
+msgid "Django Documentation"
+msgstr "Docamaideadh Django"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr "Cuspairean, iomraidhean ⁊ treòirichean"
+
+msgid "Tutorial: A Polling App"
+msgstr "Oideachadh: Aplacaid cunntais-bheachd"
+
+msgid "Get started with Django"
+msgstr "Dèan toiseach-tòiseachaidh le Django"
+
+msgid "Django Community"
+msgstr "Coimhearsnachd Django"
+
+msgid "Connect, get help, or contribute"
+msgstr "Dèan ceangal, faigh taic no cuidich"

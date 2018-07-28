@@ -145,7 +145,7 @@ class BasicCustomPKTests(TestCase):
         # Or we can use the real attribute name for the primary key:
         self.assertEqual(e.employee_code, 123)
 
-        with self.assertRaises(AttributeError):
+        with self.assertRaisesMessage(AttributeError, "'Employee' object has no attribute 'id'"):
             e.id
 
     def test_in_bulk(self):

@@ -12,7 +12,6 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from contextlib import suppress
 from io import StringIO
 from unittest import mock
 
@@ -22,15 +21,22 @@ from django.conf import settings
 from django.core.management import (
     BaseCommand, CommandError, call_command, color,
 )
-from django.db import ConnectionHandler
+from django.core.management.commands.loaddata import Command as LoaddataCommand
+from django.core.management.commands.runserver import (
+    Command as RunserverCommand,
+)
+from django.core.management.commands.testserver import (
+    Command as TestserverCommand,
+)
+from django.db import ConnectionHandler, connection
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import (
     LiveServerTestCase, SimpleTestCase, TestCase, override_settings,
 )
+from django.utils.version import PY36
 
 custom_templates_dir = os.path.join(os.path.dirname(__file__), 'custom_templates')
 
-PY36 = sys.version_info >= (3, 6)
 SYSTEM_CHECK_MSG = 'System check identified no issues'
 
 
@@ -94,13 +100,8 @@ class AdminScriptTestCase(unittest.TestCase):
         else:
             os.remove(full_name)
 
-        # Also try to remove the compiled file; if it exists, it could
+        # Also remove a __pycache__ directory, if it exists; it could
         # mess up later tests that depend upon the .py file not existing
-        with suppress(OSError):
-            if sys.platform.startswith('java'):
-                # Jython produces module$py.class files
-                os.remove(re.sub(r'\.py$', '$py.class', full_name))
-        # Also remove a __pycache__ directory, if it exists
         cache_name = os.path.join(self.test_dir, '__pycache__')
         if os.path.isdir(cache_name):
             shutil.rmtree(cache_name)
@@ -130,11 +131,6 @@ class AdminScriptTestCase(unittest.TestCase):
 
         # Define a temporary environment for the subprocess
         test_environ = os.environ.copy()
-        if sys.platform.startswith('java'):
-            python_path_var_name = 'JYTHONPATH'
-        else:
-            python_path_var_name = 'PYTHONPATH'
-
         old_cwd = os.getcwd()
 
         # Set the test environment
@@ -144,7 +140,7 @@ class AdminScriptTestCase(unittest.TestCase):
             del test_environ['DJANGO_SETTINGS_MODULE']
         python_path = [base_dir, django_dir, tests_dir]
         python_path.extend(ext_backend_base_dirs)
-        test_environ[python_path_var_name] = os.pathsep.join(python_path)
+        test_environ['PYTHONPATH'] = os.pathsep.join(python_path)
         test_environ['PYTHONWARNINGS'] = ''
 
         # Move to the test directory and run
@@ -165,8 +161,10 @@ class AdminScriptTestCase(unittest.TestCase):
 
     def run_manage(self, args, settings_file=None):
         def safe_remove(path):
-            with suppress(OSError):
+            try:
                 os.remove(path)
+            except OSError:
+                pass
 
         conf_dir = os.path.dirname(conf.__file__)
         template_manage_py = os.path.join(conf_dir, 'project_template', 'manage.py-tpl')
@@ -232,6 +230,16 @@ class DjangoAdminNoSettings(AdminScriptTestCase):
         out, err = self.run_django_admin(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+
+    def test_commands_with_invalid_settings(self):
+        """"
+        Commands that don't require settings succeed if the settings file
+        doesn't exist.
+        """
+        args = ['startproject']
+        out, err = self.run_django_admin(args, settings_file='bad_settings')
+        self.assertNoOutput(out)
+        self.assertOutput(err, "You must provide a project name", regex=True)
 
 
 class DjangoAdminDefaultSettings(AdminScriptTestCase):
@@ -1256,13 +1264,11 @@ class ManageCheck(AdminScriptTestCase):
 
 class ManageRunserver(AdminScriptTestCase):
     def setUp(self):
-        from django.core.management.commands.runserver import Command
-
         def monkey_run(*args, **options):
             return
 
         self.output = StringIO()
-        self.cmd = Command(stdout=self.output)
+        self.cmd = RunserverCommand(stdout=self.output)
         self.cmd.run = monkey_run
 
     def assertServerSettings(self, addr, port, ipv6=False, raw_ipv6=False):
@@ -1346,9 +1352,8 @@ class ManageRunserver(AdminScriptTestCase):
 class ManageRunserverMigrationWarning(TestCase):
 
     def setUp(self):
-        from django.core.management.commands.runserver import Command
         self.stdout = StringIO()
-        self.runserver_command = Command(stdout=self.stdout)
+        self.runserver_command = RunserverCommand(stdout=self.stdout)
 
     @override_settings(INSTALLED_APPS=["admin_scripts.app_waiting_migration"])
     def test_migration_warning_one_app(self):
@@ -1390,7 +1395,6 @@ class ManageRunserverEmptyAllowedHosts(AdminScriptTestCase):
 
 
 class ManageTestserver(AdminScriptTestCase):
-    from django.core.management.commands.testserver import Command as TestserverCommand
 
     @mock.patch.object(TestserverCommand, 'handle', return_value='')
     def test_testserver_handle_params(self, mock_handle):
@@ -1401,6 +1405,31 @@ class ManageTestserver(AdminScriptTestCase):
             stdout=out, settings=None, pythonpath=None, verbosity=1,
             traceback=False, addrport='', no_color=False, use_ipv6=False,
             skip_checks=True, interactive=True,
+        )
+
+    @mock.patch('django.db.connection.creation.create_test_db', return_value='test_db')
+    @mock.patch.object(LoaddataCommand, 'handle', return_value='')
+    @mock.patch.object(RunserverCommand, 'handle', return_value='')
+    def test_params_to_runserver(self, mock_runserver_handle, mock_loaddata_handle, mock_create_test_db):
+        out = StringIO()
+        call_command('testserver', 'blah.json', stdout=out)
+        mock_runserver_handle.assert_called_with(
+            addrport='',
+            insecure_serving=False,
+            no_color=False,
+            pythonpath=None,
+            settings=None,
+            shutdown_message=(
+                "\nServer stopped.\nNote that the test database, 'test_db', "
+                "has not been deleted. You can explore it on your own."
+            ),
+            skip_checks=True,
+            traceback=False,
+            use_ipv6=False,
+            use_reloader=False,
+            use_static_handler=True,
+            use_threading=connection.features.test_db_allows_multiple_connections,
+            verbosity=1,
         )
 
 
@@ -1466,6 +1495,13 @@ class CommandTypes(AdminScriptTestCase):
         args = ['check', '--help']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
+        # Command-specific options like --tag appear before options common to
+        # all commands like --version.
+        tag_location = out.find('--tag')
+        version_location = out.find('--version')
+        self.assertNotEqual(tag_location, -1)
+        self.assertNotEqual(version_location, -1)
+        self.assertLess(tag_location, version_location)
         self.assertOutput(out, "Checks the entire Django project for potential problems.")
 
     def test_color_style(self):
@@ -2223,3 +2259,27 @@ class MainModule(AdminScriptTestCase):
         cmd_out, _ = self.run_django_admin(['--version'])
         mod_out, _ = self.run_test('-m', ['django', '--version'])
         self.assertEqual(mod_out, cmd_out)
+
+    def test_program_name_in_help(self):
+        out, err = self.run_test('-m', ['django', 'help'])
+        self.assertOutput(out, "Type 'python -m django help <subcommand>' for help on a specific subcommand.")
+
+
+class DjangoAdminSuggestions(AdminScriptTestCase):
+    def setUp(self):
+        self.write_settings('settings.py')
+
+    def tearDown(self):
+        self.remove_settings('settings.py')
+
+    def test_suggestions(self):
+        args = ['rnserver', '--settings=test_project.settings']
+        out, err = self.run_django_admin(args)
+        self.assertNoOutput(out)
+        self.assertOutput(err, "Unknown command: 'rnserver'. Did you mean runserver?")
+
+    def test_no_suggestions(self):
+        args = ['abcdef', '--settings=test_project.settings']
+        out, err = self.run_django_admin(args)
+        self.assertNoOutput(out)
+        self.assertNotInOutput(err, 'Did you mean')

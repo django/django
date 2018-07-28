@@ -19,26 +19,6 @@ class PostGISIntrospection(DatabaseIntrospection):
         'raster_overviews',
     ]
 
-    # Overridden from parent to include raster indices in retrieval.
-    # Raster indices have pg_index.indkey value 0 because they are an
-    # expression over the raster column through the ST_ConvexHull function.
-    # So the default query has to be adapted to include raster indices.
-    _get_indexes_query = """
-        SELECT DISTINCT attr.attname, idx.indkey, idx.indisunique, idx.indisprimary
-        FROM pg_catalog.pg_class c, pg_catalog.pg_class c2, pg_catalog.pg_index idx,
-            pg_catalog.pg_attribute attr, pg_catalog.pg_type t
-        WHERE
-            c.oid = idx.indrelid
-            AND idx.indexrelid = c2.oid
-            AND attr.attrelid = c.oid
-            AND t.oid = attr.atttypid
-            AND (
-                attr.attnum = idx.indkey[0] OR
-                (t.typname LIKE 'raster' AND idx.indkey = '0')
-            )
-            AND attr.attnum > 0
-            AND c.relname = %s"""
-
     def get_postgis_types(self):
         """
         Return a dictionary with keys that are the PostgreSQL object
@@ -59,15 +39,11 @@ class PostGISIntrospection(DatabaseIntrospection):
         # to query the PostgreSQL pg_type table corresponding to the
         # PostGIS custom data types.
         oid_sql = 'SELECT "oid" FROM "pg_type" WHERE "typname" = %s'
-        cursor = self.connection.cursor()
-        try:
+        with self.connection.cursor() as cursor:
             for field_type in field_types:
                 cursor.execute(oid_sql, (field_type[0],))
                 for result in cursor.fetchall():
                     postgis_types[result[0]] = field_type[1]
-        finally:
-            cursor.close()
-
         return postgis_types
 
     def get_field_type(self, data_type, description):
@@ -88,8 +64,7 @@ class PostGISIntrospection(DatabaseIntrospection):
         PointField or a PolygonField).  Thus, this routine queries the PostGIS
         metadata tables to determine the geometry type.
         """
-        cursor = self.connection.cursor()
-        try:
+        with self.connection.cursor() as cursor:
             try:
                 # First seeing if this geometry column is in the `geometry_columns`
                 cursor.execute('SELECT "coord_dimension", "srid", "type" '
@@ -122,7 +97,4 @@ class PostGISIntrospection(DatabaseIntrospection):
                 field_params['srid'] = srid
             if dim != 2:
                 field_params['dim'] = dim
-        finally:
-            cursor.close()
-
         return field_type, field_params

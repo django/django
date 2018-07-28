@@ -1,4 +1,3 @@
-from contextlib import suppress
 from functools import update_wrapper
 from weakref import WeakSet
 
@@ -10,6 +9,8 @@ from django.db.models.base import ModelBase
 from django.http import Http404, HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import NoReverseMatch, reverse
+from django.utils.functional import LazyObject
+from django.utils.module_loading import import_string
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _, gettext_lazy
 from django.views.decorators.cache import never_cache
@@ -95,9 +96,7 @@ class AdminSite:
 
         If a model is abstract, raise ImproperlyConfigured.
         """
-        if not admin_class:
-            admin_class = ModelAdmin
-
+        admin_class = admin_class or ModelAdmin
         if isinstance(model_or_iterable, ModelBase):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
@@ -169,7 +168,7 @@ class AdminSite:
         """
         Get all the enabled actions as an iterable of (name, func).
         """
-        return iter(self._actions.items())
+        return self._actions.items()
 
     @property
     def empty_value_display(self):
@@ -197,11 +196,11 @@ class AdminSite:
             class MyAdminSite(AdminSite):
 
                 def get_urls(self):
-                    from django.conf.urls import url
+                    from django.urls import path
 
                     urls = super().get_urls()
                     urls += [
-                        url(r'^my_view/$', self.admin_view(some_view))
+                        path('my_view/', self.admin_view(some_view))
                     ]
                     return urls
 
@@ -231,7 +230,7 @@ class AdminSite:
         return update_wrapper(inner, view)
 
     def get_urls(self):
-        from django.conf.urls import url, include
+        from django.urls import include, path, re_path
         # Since this module gets imported in the application's root package,
         # it cannot import models from other applications at the module level,
         # and django.contrib.contenttypes.views imports ContentType.
@@ -245,15 +244,21 @@ class AdminSite:
 
         # Admin-site-wide views.
         urlpatterns = [
-            url(r'^$', wrap(self.index), name='index'),
-            url(r'^login/$', self.login, name='login'),
-            url(r'^logout/$', wrap(self.logout), name='logout'),
-            url(r'^password_change/$', wrap(self.password_change, cacheable=True), name='password_change'),
-            url(r'^password_change/done/$', wrap(self.password_change_done, cacheable=True),
-                name='password_change_done'),
-            url(r'^jsi18n/$', wrap(self.i18n_javascript, cacheable=True), name='jsi18n'),
-            url(r'^r/(?P<content_type_id>\d+)/(?P<object_id>.+)/$', wrap(contenttype_views.shortcut),
-                name='view_on_site'),
+            path('', wrap(self.index), name='index'),
+            path('login/', self.login, name='login'),
+            path('logout/', wrap(self.logout), name='logout'),
+            path('password_change/', wrap(self.password_change, cacheable=True), name='password_change'),
+            path(
+                'password_change/done/',
+                wrap(self.password_change_done, cacheable=True),
+                name='password_change_done',
+            ),
+            path('jsi18n/', wrap(self.i18n_javascript, cacheable=True), name='jsi18n'),
+            path(
+                'r/<int:content_type_id>/<path:object_id>/',
+                wrap(contenttype_views.shortcut),
+                name='view_on_site',
+            ),
         ]
 
         # Add in each model's views, and create a list of valid URLS for the
@@ -261,7 +266,7 @@ class AdminSite:
         valid_app_labels = []
         for model, model_admin in self._registry.items():
             urlpatterns += [
-                url(r'^%s/%s/' % (model._meta.app_label, model._meta.model_name), include(model_admin.urls)),
+                path('%s/%s/' % (model._meta.app_label, model._meta.model_name), include(model_admin.urls)),
             ]
             if model._meta.app_label not in valid_app_labels:
                 valid_app_labels.append(model._meta.app_label)
@@ -271,7 +276,7 @@ class AdminSite:
         if valid_app_labels:
             regex = r'^(?P<app_label>' + '|'.join(valid_app_labels) + ')/$'
             urlpatterns += [
-                url(regex, wrap(self.app_index), name='app_list'),
+                re_path(regex, wrap(self.app_index), name='app_list'),
             ]
         return urlpatterns
 
@@ -307,7 +312,7 @@ class AdminSite:
         defaults = {
             'form_class': AdminPasswordChangeForm,
             'success_url': url,
-            'extra_context': dict(self.each_context(request), **(extra_context or {})),
+            'extra_context': {**self.each_context(request), **(extra_context or {})},
         }
         if self.password_change_template is not None:
             defaults['template_name'] = self.password_change_template
@@ -320,7 +325,7 @@ class AdminSite:
         """
         from django.contrib.auth.views import PasswordChangeDoneView
         defaults = {
-            'extra_context': dict(self.each_context(request), **(extra_context or {})),
+            'extra_context': {**self.each_context(request), **(extra_context or {})},
         }
         if self.password_change_done_template is not None:
             defaults['template_name'] = self.password_change_done_template
@@ -345,13 +350,13 @@ class AdminSite:
         """
         from django.contrib.auth.views import LogoutView
         defaults = {
-            'extra_context': dict(
-                self.each_context(request),
+            'extra_context': {
+                **self.each_context(request),
                 # Since the user isn't logged out at this point, the value of
                 # has_permission must be overridden.
-                has_permission=False,
+                'has_permission': False,
                 **(extra_context or {})
-            ),
+            },
         }
         if self.logout_template is not None:
             defaults['template_name'] = self.logout_template
@@ -373,12 +378,12 @@ class AdminSite:
         # it cannot import models from other applications at the module level,
         # and django.contrib.admin.forms eventually imports User.
         from django.contrib.admin.forms import AdminAuthenticationForm
-        context = dict(
-            self.each_context(request),
-            title=_('Log in'),
-            app_path=request.get_full_path(),
-            username=request.user.get_username(),
-        )
+        context = {
+            **self.each_context(request),
+            'title': _('Log in'),
+            'app_path': request.get_full_path(),
+            'username': request.user.get_username(),
+        }
         if (REDIRECT_FIELD_NAME not in request.GET and
                 REDIRECT_FIELD_NAME not in request.POST):
             context[REDIRECT_FIELD_NAME] = reverse('admin:index', current_app=self.name)
@@ -427,12 +432,17 @@ class AdminSite:
                 'object_name': model._meta.object_name,
                 'perms': perms,
             }
-            if perms.get('change'):
-                with suppress(NoReverseMatch):
+            if perms.get('change') or perms.get('view'):
+                model_dict['view_only'] = not perms.get('change')
+                try:
                     model_dict['admin_url'] = reverse('admin:%s_%s_changelist' % info, current_app=self.name)
+                except NoReverseMatch:
+                    pass
             if perms.get('add'):
-                with suppress(NoReverseMatch):
+                try:
                     model_dict['add_url'] = reverse('admin:%s_%s_add' % info, current_app=self.name)
+                except NoReverseMatch:
+                    pass
 
             if app_label in app_dict:
                 app_dict[app_label]['models'].append(model_dict)
@@ -477,12 +487,12 @@ class AdminSite:
         """
         app_list = self.get_app_list(request)
 
-        context = dict(
-            self.each_context(request),
-            title=self.index_title,
-            app_list=app_list,
-        )
-        context.update(extra_context or {})
+        context = {
+            **self.each_context(request),
+            'title': self.index_title,
+            'app_list': app_list,
+            **(extra_context or {}),
+        }
 
         request.current_app = self.name
 
@@ -495,13 +505,13 @@ class AdminSite:
         # Sort the models alphabetically within each app.
         app_dict['models'].sort(key=lambda x: x['name'])
         app_name = apps.get_app_config(app_label).verbose_name
-        context = dict(
-            self.each_context(request),
-            title=_('%(app)s administration') % {'app': app_name},
-            app_list=[app_dict],
-            app_label=app_label,
-        )
-        context.update(extra_context or {})
+        context = {
+            **self.each_context(request),
+            'title': _('%(app)s administration') % {'app': app_name},
+            'app_list': [app_dict],
+            'app_label': app_label,
+            **(extra_context or {}),
+        }
 
         request.current_app = self.name
 
@@ -511,6 +521,14 @@ class AdminSite:
         ], context)
 
 
+class DefaultAdminSite(LazyObject):
+    def _setup(self):
+        AdminSiteClass = import_string(apps.get_app_config('admin').default_site)
+        self._wrapped = AdminSiteClass()
+
+
 # This global object represents the default admin site, for the common case.
-# You can instantiate AdminSite in your own code to create a custom admin site.
-site = AdminSite()
+# You can provide your own AdminSite using the (Simple)AdminConfig.default_site
+# attribute. You can also instantiate AdminSite in your own code to create a
+# custom admin site.
+site = DefaultAdminSite()

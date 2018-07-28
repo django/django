@@ -2,6 +2,7 @@
 #
 # Translators:
 # Apostolis Bessas <mpessas+txc@transifex.com>, 2013
+# Claude Paroz <claude@2xlibre.net>, 2017
 # Dimitris Glezos <glezos@transifex.com>, 2011-2012
 # Giannis Meletakis <meletakis@gmail.com>, 2015
 # glogiotatidis <seadog@sealabs.net>, 2011
@@ -13,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-07-07 08:24+0000\n"
-"Last-Translator: Pãnoș <panos.laganakos@gmail.com>\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-09-24 14:24+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Greek (http://www.transifex.com/django/django/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -72,12 +73,8 @@ msgstr "Εισάγετε το ίδιο συνθηματικό όπως πρίν,
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Τα ακατέργαστα συνθηματικά δεν αποθηκεύονται, οπότε δεν υπάρχει τρόπος να "
-"δείτε το συνθηματικό αυτού του χρήστη, αλλά μπορείτε να το αλλάξετε "
-"χρησιμοποιόντας <a href=\"password/\">αυτή τη φόρμα</a>."
 
 #, python-format
 msgid ""

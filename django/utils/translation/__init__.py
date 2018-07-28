@@ -2,17 +2,15 @@
 Internationalization support.
 """
 import re
-import warnings
-from contextlib import ContextDecorator, suppress
+from contextlib import ContextDecorator
 
-from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.functional import lazy
 
 __all__ = [
     'activate', 'deactivate', 'override', 'deactivate_all',
     'get_language', 'get_language_from_request',
     'get_language_info', 'get_language_bidi',
-    'check_for_language', 'to_locale', 'templatize', 'string_concat',
+    'check_for_language', 'to_language', 'to_locale', 'templatize',
     'gettext', 'gettext_lazy', 'gettext_noop',
     'ugettext', 'ugettext_lazy', 'ugettext_noop',
     'ngettext', 'ngettext_lazy',
@@ -126,9 +124,11 @@ def lazy_number(func, resultclass, number=None, **kwargs):
                     number_value = rhs
                 kwargs['number'] = number_value
                 translated = func(**kwargs)
-                # String may not contain a placeholder for the number.
-                with suppress(TypeError):
+                try:
                     translated = translated % rhs
+                except TypeError:
+                    # String doesn't contain a placeholder for the number.
+                    pass
                 return translated
 
         proxy = lazy(lambda **kwargs: NumberAwareString(), NumberAwareString)(**kwargs)
@@ -193,8 +193,29 @@ def check_for_language(lang_code):
     return _trans.check_for_language(lang_code)
 
 
+def to_language(locale):
+    """Turn a locale name (en_US) into a language name (en-us)."""
+    p = locale.find('_')
+    if p >= 0:
+        return locale[:p].lower() + '-' + locale[p + 1:].lower()
+    else:
+        return locale.lower()
+
+
 def to_locale(language):
-    return _trans.to_locale(language)
+    """Turn a language name (en-us) into a locale name (en_US)."""
+    language = language.lower()
+    parts = language.split('-')
+    try:
+        country = parts[1]
+    except IndexError:
+        return language
+    # A language with > 2 characters after the dash only has its first
+    # character after the dash capitalized; e.g. sr-latn becomes sr_Latn.
+    # A language with 2 characters after the dash has both characters
+    # capitalized; e.g. en-us becomes en_US.
+    parts[1] = country.title() if len(country) > 2 else country.upper()
+    return parts[0] + '_' + '-'.join(parts[1:])
 
 
 def get_language_from_request(request, check_path=False):
@@ -205,6 +226,10 @@ def get_language_from_path(path):
     return _trans.get_language_from_path(path)
 
 
+def get_supported_language_variant(lang_code, *, strict=False):
+    return _trans.get_supported_language_variant(lang_code, strict)
+
+
 def templatize(src, **kwargs):
     from .template import templatize
     return templatize(src, **kwargs)
@@ -212,21 +237,6 @@ def templatize(src, **kwargs):
 
 def deactivate_all():
     return _trans.deactivate_all()
-
-
-def _string_concat(*strings):
-    """
-    Lazy variant of string concatenation, needed for translations that are
-    constructed from multiple parts.
-    """
-    warnings.warn(
-        'django.utils.translate.string_concat() is deprecated in '
-        'favor of django.utils.text.format_lazy().',
-        RemovedInDjango21Warning, stacklevel=2)
-    return ''.join(str(s) for s in strings)
-
-
-string_concat = lazy(_string_concat, str)
 
 
 def get_language_info(lang_code):

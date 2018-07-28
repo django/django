@@ -3,16 +3,17 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jensadne <jensadne@pvv.ntnu.no>, 2014
-# Jon <jon@funkbit.no>, 2015-2016
-# Jon <jon@funkbit.no>, 2013
+# Jon <jon@kolonial.no>, 2015-2016
+# Jon <jon@kolonial.no>, 2017
+# Jon <jon@kolonial.no>, 2013
 # Sigurd Gartmann <sigurdga-transifex@sigurdga.no>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-07-27 09:09+0000\n"
-"Last-Translator: Jon <jon@funkbit.no>\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-11-27 12:34+0000\n"
+"Last-Translator: Jon <jon@kolonial.no>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/django/django/"
 "language/nb/)\n"
 "MIME-Version: 1.0\n"
@@ -70,12 +71,10 @@ msgstr "Skriv inn det samme passordet som tidligere, for verifisering."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Selve passordet lagres ikke, så det finnes ingen måte å se denne brukerens "
-"passord på. Du kan endre passordet med <a href=\"../password/\">dette "
-"skjemaet</a>."
+"passord på. Du kan endre passordet med <a href=\"{}\">dette skjemaet</a>."
 
 #, python-format
 msgid ""

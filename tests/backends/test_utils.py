@@ -1,8 +1,14 @@
 """Tests for django.db.backends.utils"""
 from decimal import Decimal, Rounded
 
-from django.db.backends.utils import format_number, truncate_name
-from django.test import SimpleTestCase
+from django.db import connection
+from django.db.backends.utils import (
+    format_number, split_identifier, truncate_name,
+)
+from django.db.utils import NotSupportedError
+from django.test import (
+    SimpleTestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
+)
 
 
 class TestUtils(SimpleTestCase):
@@ -16,6 +22,12 @@ class TestUtils(SimpleTestCase):
         self.assertEqual(truncate_name('username"."some_table', 10), 'username"."some_table')
         self.assertEqual(truncate_name('username"."some_long_table', 10), 'username"."some_la38a')
         self.assertEqual(truncate_name('username"."some_long_table', 10, 3), 'username"."some_loa38')
+
+    def test_split_identifier(self):
+        self.assertEqual(split_identifier('some_table'), ('', 'some_table'))
+        self.assertEqual(split_identifier('"some_table"'), ('', 'some_table'))
+        self.assertEqual(split_identifier('namespace"."some_table'), ('namespace', 'some_table'))
+        self.assertEqual(split_identifier('"namespace"."some_table"'), ('namespace', 'some_table'))
 
     def test_format_number(self):
         def equal(value, max_d, places, result):
@@ -45,3 +57,36 @@ class TestUtils(SimpleTestCase):
             equal('0.1234567890', 5, None, '0.12346')
         with self.assertRaises(Rounded):
             equal('1234567890.1234', 5, None, '1234600000')
+
+
+class CursorWrapperTests(TransactionTestCase):
+    available_apps = []
+
+    def _test_procedure(self, procedure_sql, params, param_types, kparams=None):
+        with connection.cursor() as cursor:
+            cursor.execute(procedure_sql)
+        # Use a new cursor because in MySQL a procedure can't be used in the
+        # same cursor in which it was created.
+        with connection.cursor() as cursor:
+            cursor.callproc('test_procedure', params, kparams)
+        with connection.schema_editor() as editor:
+            editor.remove_procedure('test_procedure', param_types)
+
+    @skipUnlessDBFeature('create_test_procedure_without_params_sql')
+    def test_callproc_without_params(self):
+        self._test_procedure(connection.features.create_test_procedure_without_params_sql, [], [])
+
+    @skipUnlessDBFeature('create_test_procedure_with_int_param_sql')
+    def test_callproc_with_int_params(self):
+        self._test_procedure(connection.features.create_test_procedure_with_int_param_sql, [1], ['INTEGER'])
+
+    @skipUnlessDBFeature('create_test_procedure_with_int_param_sql', 'supports_callproc_kwargs')
+    def test_callproc_kparams(self):
+        self._test_procedure(connection.features.create_test_procedure_with_int_param_sql, [], ['INTEGER'], {'P_I': 1})
+
+    @skipIfDBFeature('supports_callproc_kwargs')
+    def test_unsupported_callproc_kparams_raises_error(self):
+        msg = 'Keyword parameters for callproc are not supported on this database backend.'
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            with connection.cursor() as cursor:
+                cursor.callproc('test_procedure', [], {'P_I': 1})

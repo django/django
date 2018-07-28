@@ -6,15 +6,15 @@
 # Jure Cuhalev <gandalf@owca.info>, 2012-2013
 # Marko Zabreznik <marko@zabreznik.net>, 2016
 # Primož Verdnik <primoz.verdnik@gmail.com>, 2017
-# zejn <zejn@kiberpipa.org>, 2013,2016
+# zejn <zejn@kiberpipa.org>, 2013,2016-2017
 # zejn <zejn@kiberpipa.org>, 2011-2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-03-02 08:26+0000\n"
-"Last-Translator: Primož Verdnik <primoz.verdnik@gmail.com>\n"
+"POT-Creation-Date: 2017-12-01 21:10+0100\n"
+"PO-Revision-Date: 2017-12-03 15:52+0000\n"
+"Last-Translator: zejn <zejn@kiberpipa.org>\n"
 "Language-Team: Slovenian (http://www.transifex.com/django/django/language/"
 "sl/)\n"
 "MIME-Version: 1.0\n"
@@ -164,6 +164,9 @@ msgstr "Japonščina"
 
 msgid "Georgian"
 msgstr "Gruzijščina"
+
+msgid "Kabyle"
+msgstr "Kabilski jezik"
 
 msgid "Kazakh"
 msgstr "Kazaščina"
@@ -321,6 +324,7 @@ msgstr "Vnesite veljavno celo število."
 msgid "Enter a valid email address."
 msgstr "Vnesite veljaven e-poštni naslov."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -436,6 +440,9 @@ msgid ""
 msgstr ""
 "Končnica datoteke '%(extension)s' ni dovoljena. Dovoljene končnice so: "
 "'%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
+msgstr "Znak null ni dovoljen."
 
 msgid "and"
 msgstr "in"
@@ -778,15 +785,15 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Prosimo odpravite podvojene vrednosti spodaj."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "Tuji ključ se ne ujema z glavnim ključem povezanega vnosa."
+msgid "The inline value did not match the parent instance."
+msgstr "Vrednost se ne ujema s povezanim vnosom."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Izberite veljavno možnost. Te možnosti ni med ponujenimi izbirami."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" ni veljavna vrednost za glavni ključ."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "\"%(pk)s\" ni veljavna vrednost."
 
 #, python-format
 msgid ""
@@ -1101,7 +1108,7 @@ msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] "%d mesec"
 msgstr[1] "%d meseca"
-msgstr[2] "%d meseci"
+msgstr[2] "%d mesece"
 msgstr[3] "%d mesecev"
 
 #, python-format
@@ -1109,7 +1116,7 @@ msgid "%d week"
 msgid_plural "%d weeks"
 msgstr[0] "%d teden"
 msgstr[1] "%d tedna"
-msgstr[2] "%d tedni"
+msgstr[2] "%d tedne"
 msgstr[3] "%d tednov"
 
 #, python-format
@@ -1117,7 +1124,7 @@ msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d dan"
 msgstr[1] "%d dneva"
-msgstr[2] "%d dnevi"
+msgstr[2] "%d dni"
 msgstr[3] "%d dni"
 
 #, python-format
@@ -1165,6 +1172,19 @@ msgstr ""
 "ali za povezave iz istega vira ('same-origin')."
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+"Če uporabljate <meta name=\"referrer\" content=\"no-referrer\"> ali "
+"vključujete 'Referrer-Policy: no-referrer' zaglavje, jih prosimo odstranite. "
+"CSRF zaščita zahteva zaglavje \"Referer\", da se izvaja preverjanje. Za "
+"zagotovitev zasebnosti za povezave na druge strani uporabite <a rel="
+"\"noreferrer\" ...>."
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1184,31 +1204,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "Več informacij je na voljo, če nastavite DEBUG=True."
 
-msgid "Welcome to Django"
-msgstr "Dobrodošli v Django"
-
-msgid "It worked!"
-msgstr "Deluje!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Dobrodošli na vaši prvi spletni strani, zgrajeni na Django platformi."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-"Nato ustvarite svojo prvo aplikacijo tako, da poženete <code>python manage."
-"py startapp [app_label]</code>."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"To sporočilo vidite, ker imate v vaših Django nastavitvah nastavljeno "
-"<code>DEBUG = True</code> in še niste nastavili nobenega URL-ja. Na delo!"
-
 msgid "No year specified"
 msgstr "Leto ni vnešeno"
+
+msgid "Date out of range"
+msgstr "Datum ni znotraj veljavnega obsega."
 
 msgid "No month specified"
 msgstr "Mesec ni vnešen"
@@ -1262,3 +1262,48 @@ msgstr "\"%(path)s\" ne obstaja."
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Vsebina mape %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django: spletno ogrodje za perfekcioniste s časovnimi roki."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Oglejte si <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/"
+"\" target=\"_blank\" rel=\"noopener\">obvestila ob izdaji</a> za Django "
+"%(version)s"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Namestitev se je uspešno izvedla! Čestitke!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"To stran vidite, ker imate nastavljeno <a href=\"https://docs.djangoproject."
+"com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> v vaši settings.py datoteki in ker nimate nastavljenih URL-"
+"jev."
+
+msgid "Django Documentation"
+msgstr "Django Dokumentacija"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr "Teme, referenca in vodiči"
+
+msgid "Tutorial: A Polling App"
+msgstr "Vodič: aplikacija anketa"
+
+msgid "Get started with Django"
+msgstr "Začnite z Djangom"
+
+msgid "Django Community"
+msgstr "Django Skupnost"
+
+msgid "Connect, get help, or contribute"
+msgstr "Spoznajte nove ljudi, poiščite pomoč in prispevajte "

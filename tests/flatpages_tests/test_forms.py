@@ -6,7 +6,7 @@ from django.test import TestCase, modify_settings, override_settings
 from django.utils import translation
 
 
-@modify_settings(INSTALLED_APPS={'append': ['django.contrib.flatpages', ]})
+@modify_settings(INSTALLED_APPS={'append': ['django.contrib.flatpages']})
 @override_settings(SITE_ID=1)
 class FlatpageAdminFormTests(TestCase):
 

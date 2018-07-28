@@ -22,7 +22,7 @@ attribute::
     from django.db import migrations
 
     def forwards(apps, schema_editor):
-        if not schema_editor.connection.alias == 'default':
+        if schema_editor.connection.alias != 'default':
             return
         # Your migration code goes here
 

@@ -105,7 +105,7 @@ template output the commas in a :ttag:`for` loop.
 Here's an example, which generates the same CSV file as above::
 
     from django.http import HttpResponse
-    from django.template import loader, Context
+    from django.template import Context, loader
 
     def some_view(request):
         # Create the HttpResponse object with the appropriate CSV header.

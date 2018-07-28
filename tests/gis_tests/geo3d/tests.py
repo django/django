@@ -8,6 +8,7 @@ from django.contrib.gis.db.models.functions import (
 from django.contrib.gis.geos import GEOSGeometry, LineString, Point, Polygon
 from django.test import TestCase, skipUnlessDBFeature
 
+from ..utils import FuncTestMixin
 from .models import (
     City3D, Interstate2D, Interstate3D, InterstateProj2D, InterstateProj3D,
     MultiPoint3D, Point2D, Point3D, Polygon2D, Polygon3D,
@@ -205,7 +206,7 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
 
 
 @skipUnlessDBFeature("supports_3d_functions")
-class Geo3DFunctionsTests(Geo3DLoadingHelper, TestCase):
+class Geo3DFunctionsTests(FuncTestMixin, Geo3DLoadingHelper, TestCase):
     def test_kml(self):
         """
         Test KML() function with Z values.

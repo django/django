@@ -1,5 +1,4 @@
 import json
-from contextlib import suppress
 
 from django.conf import settings
 from django.contrib.admin.utils import quote
@@ -13,6 +12,12 @@ from django.utils.translation import gettext, gettext_lazy as _
 ADDITION = 1
 CHANGE = 2
 DELETION = 3
+
+ACTION_FLAG_CHOICES = (
+    (ADDITION, _('Addition')),
+    (CHANGE, _('Change')),
+    (DELETION, _('Deletion')),
+)
 
 
 class LogEntryManager(models.Manager):
@@ -51,7 +56,7 @@ class LogEntry(models.Model):
     object_id = models.TextField(_('object id'), blank=True, null=True)
     # Translators: 'repr' means representation (https://docs.python.org/3/library/functions.html#repr)
     object_repr = models.CharField(_('object repr'), max_length=200)
-    action_flag = models.PositiveSmallIntegerField(_('action flag'))
+    action_flag = models.PositiveSmallIntegerField(_('action flag'), choices=ACTION_FLAG_CHOICES)
     # change_message is either a string or a JSON structure
     change_message = models.TextField(_('change message'), blank=True)
 
@@ -96,7 +101,7 @@ class LogEntry(models.Model):
         if self.change_message and self.change_message[0] == '[':
             try:
                 change_message = json.loads(self.change_message)
-            except ValueError:
+            except json.JSONDecodeError:
                 return self.change_message
             messages = []
             for sub_message in change_message:
@@ -138,6 +143,8 @@ class LogEntry(models.Model):
         """
         if self.content_type and self.object_id:
             url_name = 'admin:%s_%s_change' % (self.content_type.app_label, self.content_type.model)
-            with suppress(NoReverseMatch):
+            try:
                 return reverse(url_name, args=(quote(self.object_id),))
+            except NoReverseMatch:
+                pass
         return None

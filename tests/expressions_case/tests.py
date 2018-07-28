@@ -5,10 +5,10 @@ from operator import attrgetter, itemgetter
 from uuid import UUID
 
 from django.core.exceptions import FieldError
-from django.db import connection, models
+from django.db import models
 from django.db.models import F, Max, Min, Q, Sum, Value
 from django.db.models.expressions import Case, When
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 
 from .models import CaseTestModel, Client, FKCaseTestModel, O2OCaseTestModel
 
@@ -295,12 +295,6 @@ class CaseExpressionTests(TestCase):
             [(1, 3), (2, 2), (3, 4), (2, 2), (3, 4), (3, 4), (4, 4)],
             transform=attrgetter('integer', 'test')
         )
-
-    if connection.vendor == 'sqlite' and connection.Database.sqlite_version_info < (3, 7, 0):
-        # There is a bug in sqlite < 3.7.0, where placeholder order is lost.
-        # Thus, the above query returns  <condition_value> + <result_value>
-        # for each matching case instead of <result_value> + 1 (#24148).
-        test_combined_expression = unittest.expectedFailure(test_combined_expression)
 
     def test_in_subquery(self):
         self.assertQuerysetEqual(
@@ -826,6 +820,19 @@ class CaseExpressionTests(TestCase):
             transform=attrgetter('integer', 'null_boolean')
         )
 
+    def test_update_null_boolean_old(self):
+        CaseTestModel.objects.update(
+            null_boolean_old=Case(
+                When(integer=1, then=True),
+                When(integer=2, then=False),
+            ),
+        )
+        self.assertQuerysetEqual(
+            CaseTestModel.objects.all().order_by('pk'),
+            [(1, True), (2, False), (3, None), (2, False), (3, None), (3, None), (4, None)],
+            transform=attrgetter('integer', 'null_boolean_old')
+        )
+
     def test_update_positive_integer(self):
         CaseTestModel.objects.update(
             positive_integer=Case(
@@ -1255,6 +1262,15 @@ class CaseDocumentationExamples(TestCase):
         )
         self.assertEqual(
             Client.objects.aggregate(
+                regular=models.Count('pk', filter=Q(account_type=Client.REGULAR)),
+                gold=models.Count('pk', filter=Q(account_type=Client.GOLD)),
+                platinum=models.Count('pk', filter=Q(account_type=Client.PLATINUM)),
+            ),
+            {'regular': 2, 'gold': 1, 'platinum': 3}
+        )
+        # This was the example before the filter argument was added.
+        self.assertEqual(
+            Client.objects.aggregate(
                 regular=models.Sum(Case(
                     When(account_type=Client.REGULAR, then=1),
                     output_field=models.IntegerField(),
@@ -1284,3 +1300,40 @@ class CaseDocumentationExamples(TestCase):
             [('Jack Black', 'P')],
             transform=attrgetter('name', 'account_type')
         )
+
+    def test_hash(self):
+        expression_1 = Case(
+            When(account_type__in=[Client.REGULAR, Client.GOLD], then=1),
+            default=2,
+            output_field=models.IntegerField(),
+        )
+        expression_2 = Case(
+            When(account_type__in=(Client.REGULAR, Client.GOLD), then=1),
+            default=2,
+            output_field=models.IntegerField(),
+        )
+        expression_3 = Case(When(account_type__in=[Client.REGULAR, Client.GOLD], then=1), default=2)
+        expression_4 = Case(When(account_type__in=[Client.PLATINUM, Client.GOLD], then=2), default=1)
+        self.assertEqual(hash(expression_1), hash(expression_2))
+        self.assertNotEqual(hash(expression_2), hash(expression_3))
+        self.assertNotEqual(hash(expression_1), hash(expression_4))
+        self.assertNotEqual(hash(expression_3), hash(expression_4))
+
+
+class CaseWhenTests(SimpleTestCase):
+    def test_only_when_arguments(self):
+        msg = 'Positional arguments must all be When objects.'
+        with self.assertRaisesMessage(TypeError, msg):
+            Case(When(Q(pk__in=[])), object())
+
+    def test_invalid_when_constructor_args(self):
+        msg = '__init__() takes either a Q object or lookups as keyword arguments'
+        with self.assertRaisesMessage(TypeError, msg):
+            When(condition=object())
+        with self.assertRaisesMessage(TypeError, msg):
+            When()
+
+    def test_empty_q_object(self):
+        msg = "An empty Q() can't be used as a When() condition."
+        with self.assertRaisesMessage(ValueError, msg):
+            When(Q(), then=Value(True))

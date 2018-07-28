@@ -47,7 +47,7 @@ Then either:
 3. Add an entry in your URLconf. For example::
 
     urlpatterns = [
-        url(r'^pages/', include('django.contrib.flatpages.urls')),
+        path('pages/', include('django.contrib.flatpages.urls')),
     ]
 
 or:
@@ -74,7 +74,7 @@ There are several ways to include the flat pages in your URLconf. You can
 dedicate a particular path to flat pages::
 
     urlpatterns = [
-        url(r'^pages/', include('django.contrib.flatpages.urls')),
+        path('pages/', include('django.contrib.flatpages.urls')),
     ]
 
 You can also set it up as a "catchall" pattern. In this case, it is important
@@ -84,7 +84,7 @@ to place the pattern at the end of the other urlpatterns::
 
     # Your other patterns here
     urlpatterns += [
-        url(r'^(?P<url>.*/)$', views.flatpage),
+        path('<path:url>', views.flatpage),
     ]
 
 .. warning::
@@ -100,8 +100,8 @@ tag::
     from django.contrib.flatpages import views
 
     urlpatterns += [
-        url(r'^about-us/$', views.flatpage, {'url': '/about-us/'}, name='about'),
-        url(r'^license/$', views.flatpage, {'url': '/license/'}, name='license'),
+        path('about-us/', views.flatpage, {'url': '/about-us/'}, name='about'),
+        path('license/', views.flatpage, {'url': '/license/'}, name='license'),
     ]
 
 Using the middleware
@@ -147,7 +147,7 @@ can do all of the work.
 Note that the order of :setting:`MIDDLEWARE` matters. Generally, you can put
 :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware` at the
 end of the list. This means it will run first when processing the response, and
-ensures that any other response-processing middlewares see the real flatpage
+ensures that any other response-processing middleware see the real flatpage
 response rather than the 404.
 
 For more on middleware, read the :doc:`middleware docs
@@ -193,7 +193,7 @@ registering a custom ``ModelAdmin`` for ``FlatPage``::
         fieldsets = (
             (None, {'fields': ('url', 'title', 'content', 'sites')}),
             (_('Advanced options'), {
-                'classes': ('collapse', ),
+                'classes': ('collapse',),
                 'fields': (
                     'enable_comments',
                     'registration_required',
@@ -292,7 +292,7 @@ via the :ttag:`get_flatpages` tag:
 Displaying ``registration_required`` flatpages
 ----------------------------------------------
 
-By default, the :ttag:`get_flatpages` templatetag will only show
+By default, the :ttag:`get_flatpages` template tag will only show
 flatpages that are marked ``registration_required = False``. If you
 want to display registration-protected flatpages, you need to specify
 an authenticated user using a ``for`` clause.
@@ -345,15 +345,15 @@ Example
 
 Here's an example of a URLconf using :class:`FlatPageSitemap`::
 
-    from django.conf.urls import url
     from django.contrib.flatpages.sitemaps import FlatPageSitemap
     from django.contrib.sitemaps.views import sitemap
+    from django.urls import path
 
     urlpatterns = [
         # ...
 
         # the sitemap
-        url(r'^sitemap\.xml$', sitemap,
+        path('sitemap.xml', sitemap,
             {'sitemaps': {'flatpages': FlatPageSitemap}},
             name='django.contrib.sitemaps.views.sitemap'),
     ]

@@ -76,12 +76,19 @@ class TableColumns(Table):
 class Columns(TableColumns):
     """Hold a reference to one or many columns."""
 
-    def __init__(self, table, columns, quote_name):
+    def __init__(self, table, columns, quote_name, col_suffixes=()):
         self.quote_name = quote_name
+        self.col_suffixes = col_suffixes
         super().__init__(table, columns)
 
     def __str__(self):
-        return ', '.join(self.quote_name(column) for column in self.columns)
+        def col_str(column, idx):
+            try:
+                return self.quote_name(column) + self.col_suffixes[idx]
+            except IndexError:
+                return self.quote_name(column)
+
+        return ', '.join(col_str(column, idx) for idx, column in enumerate(self.columns))
 
 
 class IndexName(TableColumns):
@@ -94,6 +101,24 @@ class IndexName(TableColumns):
 
     def __str__(self):
         return self.create_index_name(self.table, self.columns, self.suffix)
+
+
+class IndexColumns(Columns):
+    def __init__(self, table, columns, quote_name, col_suffixes=(), opclasses=()):
+        self.opclasses = opclasses
+        super().__init__(table, columns, quote_name, col_suffixes)
+
+    def __str__(self):
+        def col_str(column, idx):
+            try:
+                col = self.quote_name(column) + self.col_suffixes[idx]
+            except IndexError:
+                col = self.quote_name(column)
+            # Index.__init__() guarantees that self.opclasses is the same
+            # length as self.columns.
+            return '{} {}'.format(col, self.opclasses[idx])
+
+        return ', '.join(col_str(column, idx) for idx, column in enumerate(self.columns))
 
 
 class ForeignKeyName(TableColumns):

@@ -128,20 +128,13 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
         # the WSGI environ. This prevents header-spoofing based on ambiguity
         # between underscores and dashes both normalized to underscores in WSGI
         # env vars. Nginx and Apache 2.4+ both do this as well.
-        for k, v in self.headers.items():
+        for k in self.headers:
             if '_' in k:
                 del self.headers[k]
 
         return super().get_environ()
 
     def handle(self):
-        """Handle multiple requests if necessary."""
-        self.close_connection = 1
-        self.handle_one_request()
-        while not self.close_connection:
-            self.handle_one_request()
-
-    def handle_one_request(self):
         """Copy of WSGIRequestHandler.handle() but with different ServerHandler"""
         self.raw_requestline = self.rfile.readline(65537)
         if len(self.raw_requestline) > 65536:

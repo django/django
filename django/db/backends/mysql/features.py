@@ -7,10 +7,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     update_can_self_select = False
     allows_group_by_pk = True
     related_fields_match_type = True
-    allow_sliced_subqueries = False
-    has_bulk_insert = True
+    # MySQL doesn't support sliced subqueries with IN/ALL/ANY/SOME.
+    allow_sliced_subqueries_with_in = False
     has_select_for_update = True
-    has_select_for_update_nowait = False
     supports_forward_references = False
     supports_regex_backreferencing = False
     supports_date_lookup_using_string = False
@@ -18,6 +17,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_introspect_binary_field = False
     can_introspect_small_integer_field = True
     can_introspect_positive_integer_field = True
+    introspected_boolean_field_type = 'IntegerField'
     supports_index_column_ordering = False
     supports_timezones = False
     requires_explicit_null_ordering_when_grouping = True
@@ -26,12 +26,31 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_release_savepoints = True
     atomic_transactions = False
     supports_column_check_constraints = False
+    supports_table_check_constraints = False
     can_clone_databases = True
     supports_temporal_subtraction = True
     supports_select_intersection = False
     supports_select_difference = False
     supports_slicing_ordering_in_compound = True
     supports_index_on_text_field = False
+    has_case_insensitive_like = False
+    create_test_procedure_without_params_sql = """
+        CREATE PROCEDURE test_procedure ()
+        BEGIN
+            DECLARE V_I INTEGER;
+            SET V_I = 1;
+        END;
+    """
+    create_test_procedure_with_int_param_sql = """
+        CREATE PROCEDURE test_procedure (P_I INTEGER)
+        BEGIN
+            DECLARE V_I INTEGER;
+            SET V_I = P_I;
+        END;
+    """
+    db_functions_convert_bytes_to_str = True
+    # Alias MySQL's TRADITIONAL to TEXT for consistency with other backends.
+    supported_explain_formats = {'JSON', 'TEXT', 'TRADITIONAL'}
 
     @cached_property
     def _mysql_storage_engine(self):
@@ -47,18 +66,11 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return self._mysql_storage_engine != 'MyISAM'
 
     @cached_property
-    def supports_microsecond_precision(self):
-        return self.connection.mysql_version >= (5, 6, 4)
-
-    @cached_property
     def has_zoneinfo_database(self):
         # Test if the time zone definitions are installed.
         with self.connection.cursor() as cursor:
             cursor.execute("SELECT 1 FROM mysql.time_zone LIMIT 1")
             return cursor.fetchone() is not None
-
-    def introspected_boolean_field_type(self, *args, **kwargs):
-        return 'IntegerField'
 
     @cached_property
     def is_sql_auto_is_null_enabled(self):
@@ -66,6 +78,23 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             cursor.execute('SELECT @@SQL_AUTO_IS_NULL')
             result = cursor.fetchone()
             return result and result[0] == 1
+
+    @cached_property
+    def supports_over_clause(self):
+        if self.connection.mysql_is_mariadb:
+            return self.connection.mysql_version >= (10, 2)
+        return self.connection.mysql_version >= (8, 0, 2)
+
+    @cached_property
+    def has_select_for_update_skip_locked(self):
+        return not self.connection.mysql_is_mariadb and self.connection.mysql_version >= (8, 0, 1)
+
+    has_select_for_update_nowait = has_select_for_update_skip_locked
+
+    @cached_property
+    def needs_explain_extended(self):
+        # EXTENDED is deprecated (and not required) in MySQL 5.7.
+        return not self.connection.mysql_is_mariadb and self.connection.mysql_version < (5, 7)
 
     @cached_property
     def supports_transactions(self):

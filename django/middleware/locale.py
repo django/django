@@ -57,6 +57,5 @@ class LocaleMiddleware(MiddlewareMixin):
 
         if not (i18n_patterns_used and language_from_path):
             patch_vary_headers(response, ('Accept-Language',))
-        if 'Content-Language' not in response:
-            response['Content-Language'] = language
+        response.setdefault('Content-Language', language)
         return response

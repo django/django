@@ -1,9 +1,11 @@
+import unittest
 from operator import attrgetter
 
 from django.core.exceptions import FieldError, ValidationError
 from django.db import connection, models
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import CaptureQueriesContext, isolate_apps
+from django.utils.version import PY36
 
 from .models import (
     Base, Chef, CommonInfo, GrandChild, GrandParent, ItalianRestaurant,
@@ -43,7 +45,7 @@ class ModelInheritanceTests(TestCase):
 
         # However, the CommonInfo class cannot be used as a normal model (it
         # doesn't exist as a model).
-        with self.assertRaises(AttributeError):
+        with self.assertRaisesMessage(AttributeError, "'CommonInfo' has no attribute 'objects'"):
             CommonInfo.objects.all()
 
     def test_reverse_relation_for_different_hierarchy_tree(self):
@@ -51,7 +53,12 @@ class ModelInheritanceTests(TestCase):
         # Restaurant object cannot access that reverse relation, since it's not
         # part of the Place-Supplier Hierarchy.
         self.assertQuerysetEqual(Place.objects.filter(supplier__name="foo"), [])
-        with self.assertRaises(FieldError):
+        msg = (
+            "Cannot resolve keyword 'supplier' into field. Choices are: "
+            "address, chef, chef_id, id, italianrestaurant, lot, name, "
+            "place_ptr, place_ptr_id, provider, rating, serves_hot_dogs, serves_pizza"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Restaurant.objects.filter(supplier__name="foo")
 
     def test_model_with_distinct_accessors(self):
@@ -65,7 +72,8 @@ class ModelInheritanceTests(TestCase):
 
         # The Post model doesn't have an attribute called
         # 'attached_%(class)s_set'.
-        with self.assertRaises(AttributeError):
+        msg = "'Post' object has no attribute 'attached_%(class)s_set'"
+        with self.assertRaisesMessage(AttributeError, msg):
             getattr(post, "attached_%(class)s_set")
 
     def test_model_with_distinct_related_query_name(self):
@@ -125,6 +133,24 @@ class ModelInheritanceTests(TestCase):
             if 'UPDATE' in sql:
                 self.assertEqual(expected_sql, sql)
 
+    def test_create_child_no_update(self):
+        """Creating a child with non-abstract parents only issues INSERTs."""
+        def a():
+            GrandChild.objects.create(
+                email='grand_parent@example.com',
+                first_name='grand',
+                last_name='parent',
+            )
+
+        def b():
+            GrandChild().save()
+        for i, test in enumerate([a, b]):
+            with self.subTest(i=i), self.assertNumQueries(4), CaptureQueriesContext(connection) as queries:
+                test()
+                for query in queries:
+                    sql = query['sql']
+                    self.assertIn('INSERT INTO', sql, sql)
+
     def test_eq(self):
         # Equality doesn't transfer in multitable inheritance.
         self.assertNotEqual(Place(id=1), Restaurant(id=1))
@@ -149,6 +175,23 @@ class ModelInheritanceTests(TestCase):
             pass
 
         self.assertIs(C._meta.parents[A], C._meta.get_field('a'))
+
+    @unittest.skipUnless(PY36, 'init_subclass is new in Python 3.6')
+    @isolate_apps('model_inheritance')
+    def test_init_subclass(self):
+        saved_kwargs = {}
+
+        class A:
+            def __init_subclass__(cls, **kwargs):
+                super().__init_subclass__()
+                saved_kwargs.update(kwargs)
+
+        kwargs = {'x': 1, 'y': 2, 'z': 3}
+
+        class B(A, models.Model, **kwargs):
+            pass
+
+        self.assertEqual(saved_kwargs, kwargs)
 
 
 class ModelInheritanceDataTests(TestCase):
@@ -343,6 +386,22 @@ class ModelInheritanceDataTests(TestCase):
         self.assertEqual(qs[1].italianrestaurant.name, 'Ristorante Miron')
         self.assertEqual(qs[1].italianrestaurant.rating, 4)
 
+    def test_parent_cache_reuse(self):
+        place = Place.objects.create()
+        GrandChild.objects.create(place=place)
+        grand_parent = GrandParent.objects.latest('pk')
+        with self.assertNumQueries(1):
+            self.assertEqual(grand_parent.place, place)
+        parent = grand_parent.parent
+        with self.assertNumQueries(0):
+            self.assertEqual(parent.place, place)
+        child = parent.child
+        with self.assertNumQueries(0):
+            self.assertEqual(child.place, place)
+        grandchild = child.grandchild
+        with self.assertNumQueries(0):
+            self.assertEqual(grandchild.place, place)
+
     def test_update_query_counts(self):
         """
         Update queries do not generate unnecessary queries (#18304).
@@ -420,8 +479,8 @@ class InheritanceSameModelNameTests(SimpleTestCase):
         ForeignReferent = Referent
 
         self.assertFalse(hasattr(Referenced, related_name))
-        self.assertTrue(Referenced.model_inheritance_referent_references.rel.model, LocalReferent)
-        self.assertTrue(Referenced.tests_referent_references.rel.model, ForeignReferent)
+        self.assertIs(Referenced.model_inheritance_referent_references.field.model, LocalReferent)
+        self.assertIs(Referenced.tests_referent_references.field.model, ForeignReferent)
 
 
 class InheritanceUniqueTests(TestCase):

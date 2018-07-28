@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-06-30 08:31+0000\n"
+"POT-Creation-Date: 2017-11-15 16:15+0100\n"
+"PO-Revision-Date: 2017-11-16 01:13+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Afrikaans (http://www.transifex.com/django/django/language/"
 "af/)\n"
@@ -294,6 +294,15 @@ msgstr ""
 msgid "Syndication"
 msgstr "Sindikasie"
 
+msgid "That page number is not an integer"
+msgstr ""
+
+msgid "That page number is less than 1"
+msgstr ""
+
+msgid "That page contains no results"
+msgstr ""
+
 msgid "Enter a valid value."
 msgstr "Sleutel 'n geldige waarde in."
 
@@ -306,6 +315,7 @@ msgstr "Sleutel 'n geldige heelgetal in."
 msgid "Enter a valid email address."
 msgstr "Sleutel 'n geldige e-pos adres in."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -393,6 +403,15 @@ msgstr[0] ""
 "Maak seker dat daar nie meer as %(max)s syfer voor die desimale punt is nie."
 msgstr[1] ""
 "Maak seker dat daar nie meer as %(max)s syfers voor die desimale punt is nie."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+
+msgid "Null characters are not allowed."
+msgstr ""
 
 msgid "and"
 msgstr "en"
@@ -723,9 +742,8 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Korrigeer die dubbele waardes hieronder."
 
-msgid "The inline foreign key did not match the parent instance primary key."
+msgid "The inline value did not match the parent instance."
 msgstr ""
-"Die inlyn vreemde sleutel stem nie ooreen met die ouer primêre sleutel."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
@@ -733,8 +751,8 @@ msgstr ""
 "nie."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" is nie 'n geldige waarde vir 'n primêre sleutel nie."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -744,14 +762,14 @@ msgstr ""
 "%(datetime)s kon nie in tydsone %(current_timezone)s vertolk word nie; dit "
 "mag dubbelsinnig wees, of nie bestaan nie."
 
+msgid "Clear"
+msgstr "Maak skoon"
+
 msgid "Currently"
 msgstr "Tans"
 
 msgid "Change"
 msgstr "Verander"
-
-msgid "Clear"
-msgstr "Maak skoon"
 
 msgid "Unknown"
 msgstr "Onbekend"
@@ -1093,6 +1111,14 @@ msgid ""
 msgstr ""
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1106,27 +1132,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "Meer inligting is beskikbaar met DEBUG=True."
 
-msgid "Welcome to Django"
-msgstr ""
-
-msgid "It worked!"
-msgstr ""
-
-msgid "Congratulations on your first Django-powered page."
-msgstr ""
-
-msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
-msgstr ""
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-
 msgid "No year specified"
 msgstr "Geen jaar gespesifiseer"
+
+msgid "Date out of range"
+msgstr ""
 
 msgid "No month specified"
 msgstr "Geen maand gespesifiseer"
@@ -1181,3 +1191,41 @@ msgstr "\"%(path)s\" bestaan nie"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Indeks van %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr ""
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+
+msgid "The install worked successfully! Congratulations!"
+msgstr ""
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+
+msgid "Django Documentation"
+msgstr ""
+
+msgid "Topics, references, &amp; how-to's"
+msgstr ""
+
+msgid "Tutorial: A Polling App"
+msgstr ""
+
+msgid "Get started with Django"
+msgstr ""
+
+msgid "Django Community"
+msgstr ""
+
+msgid "Connect, get help, or contribute"
+msgstr ""

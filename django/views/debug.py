@@ -2,25 +2,27 @@ import functools
 import re
 import sys
 import types
-from contextlib import suppress
 from pathlib import Path
 
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseNotFound
 from django.template import Context, Engine, TemplateDoesNotExist
-from django.template.defaultfilters import force_escape, pprint
+from django.template.defaultfilters import pprint
 from django.urls import Resolver404, resolve
 from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
-from django.utils.translation import gettext as _
+from django.utils.version import get_docs_version
 
 # Minimal Django templates engine to render the error templates
 # regardless of the project's TEMPLATES setting. Templates are
 # read directly from the filesystem so that the error handler
 # works even if the template loader is broken.
-DEBUG_ENGINE = Engine(debug=True)
+DEBUG_ENGINE = Engine(
+    debug=True,
+    libraries={'i18n': 'django.templatetags.i18n'},
+)
 
 HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|SIGNATURE', flags=re.IGNORECASE)
 
@@ -162,7 +164,7 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
                 cleansed = request.POST.copy()
                 if sensitive_post_parameters == '__ALL__':
                     # Cleanse all parameters.
-                    for k, v in cleansed.items():
+                    for k in cleansed:
                         cleansed[k] = CLEANSED_SUBSTITUTE
                     return cleansed
                 else:
@@ -211,7 +213,7 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
         if self.is_active(request) and sensitive_variables:
             if sensitive_variables == '__ALL__':
                 # Cleanse all variables
-                for name, value in tb_frame.f_locals.items():
+                for name in tb_frame.f_locals:
                     cleansed[name] = CLEANSED_SUBSTITUTE
             else:
                 # Cleanse specified variables
@@ -268,7 +270,7 @@ class ExceptionReporter:
                     # Trim large blobs of data
                     if len(v) > 4096:
                         v = '%s... <trimmed %d bytes string>' % (v[0:4096], len(v))
-                    frame_vars.append((k, force_escape(v)))
+                    frame_vars.append((k, v))
                 frame['vars'] = frame_vars
             frames[i] = frame
 
@@ -344,15 +346,19 @@ class ExceptionReporter:
         Return (pre_context_lineno, pre_context, context_line, post_context).
         """
         source = None
-        if loader is not None and hasattr(loader, "get_source"):
-            with suppress(ImportError):
+        if hasattr(loader, 'get_source'):
+            try:
                 source = loader.get_source(module_name)
+            except ImportError:
+                pass
             if source is not None:
                 source = source.splitlines()
         if source is None:
-            with suppress(OSError, IOError):
+            try:
                 with open(filename, 'rb') as fp:
                     source = fp.read().splitlines()
+            except (OSError, IOError):
+                pass
         if source is None:
             return None, [], None, []
 
@@ -415,22 +421,26 @@ class ExceptionReporter:
             pre_context_lineno, pre_context, context_line, post_context = self._get_lines_from_file(
                 filename, lineno, 7, loader, module_name,
             )
-            if pre_context_lineno is not None:
-                frames.append({
-                    'exc_cause': explicit_or_implicit_cause(exc_value),
-                    'exc_cause_explicit': getattr(exc_value, '__cause__', True),
-                    'tb': tb,
-                    'type': 'django' if module_name.startswith('django.') else 'user',
-                    'filename': filename,
-                    'function': function,
-                    'lineno': lineno + 1,
-                    'vars': self.filter.get_traceback_frame_variables(self.request, tb.tb_frame),
-                    'id': id(tb),
-                    'pre_context': pre_context,
-                    'context_line': context_line,
-                    'post_context': post_context,
-                    'pre_context_lineno': pre_context_lineno + 1,
-                })
+            if pre_context_lineno is None:
+                pre_context_lineno = lineno
+                pre_context = []
+                context_line = '<source code not available>'
+                post_context = []
+            frames.append({
+                'exc_cause': explicit_or_implicit_cause(exc_value),
+                'exc_cause_explicit': getattr(exc_value, '__cause__', True),
+                'tb': tb,
+                'type': 'django' if module_name.startswith('django.') else 'user',
+                'filename': filename,
+                'function': function,
+                'lineno': lineno + 1,
+                'vars': self.filter.get_traceback_frame_variables(self.request, tb.tb_frame),
+                'id': id(tb),
+                'pre_context': pre_context,
+                'context_line': context_line,
+                'post_context': post_context,
+                'pre_context_lineno': pre_context_lineno + 1,
+            })
 
             # If the traceback for current exception is consumed, try the
             # other exception.
@@ -504,16 +514,7 @@ def default_urlconf(request):
     with Path(CURRENT_DIR, 'templates', 'default_urlconf.html').open() as fh:
         t = DEBUG_ENGINE.from_string(fh.read())
     c = Context({
-        "title": _("Welcome to Django"),
-        "heading": _("It worked!"),
-        "subheading": _("Congratulations on your first Django-powered page."),
-        "instructions": _(
-            "Next, start your first app by running <code>python manage.py startapp [app_label]</code>."
-        ),
-        "explanation": _(
-            "You're seeing this message because you have <code>DEBUG = True</code> in your "
-            "Django settings file and you haven't configured any URLs. Get to work!"
-        ),
+        'version': get_docs_version(),
     })
 
     return HttpResponse(t.render(c), content_type='text/html')

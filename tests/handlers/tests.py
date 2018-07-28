@@ -1,5 +1,3 @@
-import unittest
-
 from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler, WSGIRequest, get_script_name
 from django.core.signals import request_finished, request_started
@@ -7,11 +5,6 @@ from django.db import close_old_connections, connection
 from django.test import (
     RequestFactory, SimpleTestCase, TransactionTestCase, override_settings,
 )
-
-try:
-    from http import HTTPStatus
-except ImportError:  # Python < 3.5
-    HTTPStatus = None
 
 
 class HandlerTests(SimpleTestCase):
@@ -24,7 +17,7 @@ class HandlerTests(SimpleTestCase):
 
     def test_middleware_initialized(self):
         handler = WSGIHandler()
-        self.assertIsNotNone(handler._request_middleware)
+        self.assertIsNotNone(handler._middleware_chain)
 
     def test_bad_path_info(self):
         """
@@ -182,7 +175,6 @@ class HandlerRequestTests(SimpleTestCase):
         environ = RequestFactory().get('/%E2%A8%87%87%A5%E2%A8%A0').environ
         self.assertIsInstance(environ['PATH_INFO'], str)
 
-    @unittest.skipIf(HTTPStatus is None, 'HTTPStatus only exists on Python 3.5+')
     def test_handle_accepts_httpstatus_enum_value(self):
         def start_response(status, headers):
             start_response.status = status

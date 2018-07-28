@@ -111,7 +111,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     }
     data_type_check_constraints = {
         'BooleanField': '%(qn_column)s IN (0,1)',
-        'NullBooleanField': '(%(qn_column)s IN (0,1)) OR (%(qn_column)s IS NULL)',
+        'NullBooleanField': '%(qn_column)s IN (0,1)',
         'PositiveIntegerField': '%(qn_column)s >= 0',
         'PositiveSmallIntegerField': '%(qn_column)s >= 0',
     }
@@ -136,15 +136,15 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'iendswith': "LIKE UPPER(TRANSLATE(%s USING NCHAR_CS)) ESCAPE TRANSLATE('\\' USING NCHAR_CS)",
     }
 
-    _likec_operators = _standard_operators.copy()
-    _likec_operators.update({
+    _likec_operators = {
+        **_standard_operators,
         'contains': "LIKEC %s ESCAPE '\\'",
         'icontains': "LIKEC UPPER(%s) ESCAPE '\\'",
         'startswith': "LIKEC %s ESCAPE '\\'",
         'endswith': "LIKEC %s ESCAPE '\\'",
         'istartswith': "LIKEC UPPER(%s) ESCAPE '\\'",
         'iendswith': "LIKEC UPPER(%s) ESCAPE '\\'",
-    })
+    }
 
     # The patterns below are used to generate SQL pattern lookup clauses when
     # the right-hand side of the lookup isn't a raw string (it might be an expression
@@ -185,18 +185,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         use_returning_into = self.settings_dict["OPTIONS"].get('use_returning_into', True)
         self.features.can_return_id_from_insert = use_returning_into
 
-    def _connect_string(self):
+    def _dsn(self):
         settings_dict = self.settings_dict
         if not settings_dict['HOST'].strip():
             settings_dict['HOST'] = 'localhost'
         if settings_dict['PORT']:
-            dsn = Database.makedsn(settings_dict['HOST'],
-                                   int(settings_dict['PORT']),
-                                   settings_dict['NAME'])
-        else:
-            dsn = settings_dict['NAME']
-        return "%s/%s@%s" % (settings_dict['USER'],
-                             settings_dict['PASSWORD'], dsn)
+            return Database.makedsn(settings_dict['HOST'], int(settings_dict['PORT']), settings_dict['NAME'])
+        return settings_dict['NAME']
+
+    def _connect_string(self):
+        return '%s/\\"%s\\"@%s' % (self.settings_dict['USER'], self.settings_dict['PASSWORD'], self._dsn())
 
     def get_connection_params(self):
         conn_params = self.settings_dict['OPTIONS'].copy()
@@ -205,7 +203,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return conn_params
 
     def get_new_connection(self, conn_params):
-        return Database.connect(self._connect_string(), **conn_params)
+        return Database.connect(
+            user=self.settings_dict['USER'],
+            password=self.settings_dict['PASSWORD'],
+            dsn=self._dsn(),
+            **conn_params,
+        )
 
     def init_connection_state(self):
         cursor = self.create_cursor()
@@ -350,6 +353,8 @@ class OracleParam:
         elif string_size > 4000:
             # Mark any string param greater than 4000 characters as a CLOB.
             self.input_size = Database.CLOB
+        elif isinstance(param, datetime.datetime):
+            self.input_size = Database.TIMESTAMP
         else:
             self.input_size = None
 
@@ -396,17 +401,48 @@ class FormatStylePlaceholderCursor:
         self.cursor.arraysize = 100
 
     @staticmethod
+    def _output_number_converter(value):
+        return decimal.Decimal(value) if '.' in value else int(value)
+
+    @staticmethod
+    def _get_decimal_converter(precision, scale):
+        if scale == 0:
+            return int
+        context = decimal.Context(prec=precision)
+        quantize_value = decimal.Decimal(1).scaleb(-scale)
+        return lambda v: decimal.Decimal(v).quantize(quantize_value, context=context)
+
+    @staticmethod
     def _output_type_handler(cursor, name, defaultType, length, precision, scale):
         """
-        Called for each db column fetched from cursors. Return numbers as
-        strings so that decimal values don't have rounding error.
+        Called for each db column fetched from cursors. Return numbers as the
+        appropriate Python type.
         """
         if defaultType == Database.NUMBER:
+            if scale == -127:
+                if precision == 0:
+                    # NUMBER column: decimal-precision floating point.
+                    # This will normally be an integer from a sequence,
+                    # but it could be a decimal value.
+                    outconverter = FormatStylePlaceholderCursor._output_number_converter
+                else:
+                    # FLOAT column: binary-precision floating point.
+                    # This comes from FloatField columns.
+                    outconverter = float
+            elif precision > 0:
+                # NUMBER(p,s) column: decimal-precision fixed point.
+                # This comes from IntegerField and DecimalField columns.
+                outconverter = FormatStylePlaceholderCursor._get_decimal_converter(precision, scale)
+            else:
+                # No type information. This normally comes from a
+                # mathematical expression in the SELECT list. Guess int
+                # or Decimal based on whether it has a decimal point.
+                outconverter = FormatStylePlaceholderCursor._output_number_converter
             return cursor.var(
                 Database.STRING,
                 size=255,
                 arraysize=cursor.arraysize,
-                outconverter=str,
+                outconverter=outconverter,
             )
 
     def _format_params(self, params):
@@ -423,7 +459,8 @@ class FormatStylePlaceholderCursor:
                 for k, value in params.items():
                     if value.input_size:
                         sizes[k] = value.input_size
-            self.setinputsizes(**sizes)
+            if sizes:
+                self.setinputsizes(**sizes)
         else:
             # It's not a list of dicts; it's a list of sequences
             sizes = [None] * len(params_list[0])
@@ -431,7 +468,8 @@ class FormatStylePlaceholderCursor:
                 for i, value in enumerate(params):
                     if value.input_size:
                         sizes[i] = value.input_size
-            self.setinputsizes(*sizes)
+            if sizes:
+                self.setinputsizes(*sizes)
 
     def _param_generator(self, params):
         # Try dict handling; if that fails, treat as sequence
@@ -449,12 +487,11 @@ class FormatStylePlaceholderCursor:
             query = query[:-1]
         if params is None:
             params = []
-            query = query
         elif hasattr(params, 'keys'):
             # Handle params as dict
             args = {k: ":%s" % k for k in params}
             query = query % args
-        elif unify_by_values and len(params) > 0:
+        elif unify_by_values and params:
             # Handle params as a dict with unified query parameters by their
             # values. It can be used only in single query execute() because
             # executemany() shares the formatted query with each of the params
@@ -490,20 +527,6 @@ class FormatStylePlaceholderCursor:
         self._guess_input_sizes(formatted)
         return self.cursor.executemany(query, [self._param_generator(p) for p in formatted])
 
-    def fetchone(self):
-        row = self.cursor.fetchone()
-        if row is None:
-            return row
-        return _rowfactory(row, self.cursor)
-
-    def fetchmany(self, size=None):
-        if size is None:
-            size = self.arraysize
-        return tuple(_rowfactory(r, self.cursor) for r in self.cursor.fetchmany(size))
-
-    def fetchall(self):
-        return tuple(_rowfactory(r, self.cursor) for r in self.cursor.fetchall())
-
     def close(self):
         try:
             self.cursor.close()
@@ -518,65 +541,7 @@ class FormatStylePlaceholderCursor:
         return VariableWrapper(self.cursor.arrayvar(*args))
 
     def __getattr__(self, attr):
-        if attr in self.__dict__:
-            return self.__dict__[attr]
-        else:
-            return getattr(self.cursor, attr)
+        return getattr(self.cursor, attr)
 
     def __iter__(self):
-        return CursorIterator(self.cursor)
-
-
-class CursorIterator:
-    """
-    Cursor iterator wrapper that invokes our custom row factory.
-    """
-
-    def __init__(self, cursor):
-        self.cursor = cursor
-        self.iter = iter(cursor)
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        return _rowfactory(next(self.iter), self.cursor)
-
-
-def _rowfactory(row, cursor):
-    # Cast numeric values as the appropriate Python type based upon the
-    # cursor description.
-    casted = []
-    for value, desc in zip(row, cursor.description):
-        if value is not None and desc[1] is Database.NUMBER:
-            precision = desc[4] or 0
-            scale = desc[5] or 0
-            if scale == -127:
-                if precision == 0:
-                    # NUMBER column: decimal-precision floating point
-                    # This will normally be an integer from a sequence,
-                    # but it could be a decimal value.
-                    if '.' in value:
-                        value = decimal.Decimal(value)
-                    else:
-                        value = int(value)
-                else:
-                    # FLOAT column: binary-precision floating point.
-                    # This comes from FloatField columns.
-                    value = float(value)
-            elif precision > 0:
-                # NUMBER(p,s) column: decimal-precision fixed point.
-                # This comes from IntField and DecimalField columns.
-                if scale == 0:
-                    value = int(value)
-                else:
-                    value = decimal.Decimal(value)
-            elif '.' in value:
-                # No type information. This normally comes from a
-                # mathematical expression in the SELECT list. Guess int
-                # or Decimal based on whether it has a decimal point.
-                value = decimal.Decimal(value)
-            else:
-                value = int(value)
-        casted.append(value)
-    return tuple(casted)
+        return iter(self.cursor)

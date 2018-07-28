@@ -13,7 +13,7 @@ from ..utils import prefix_validation_error
 
 class SimpleArrayField(forms.CharField):
     default_error_messages = {
-        'item_invalid': _('Item %(nth)s in the array did not validate: '),
+        'item_invalid': _('Item %(nth)s in the array did not validate:'),
     }
 
     def __init__(self, base_field, *, delimiter=',', max_length=None, min_length=None, **kwargs):
@@ -53,7 +53,7 @@ class SimpleArrayField(forms.CharField):
                     error,
                     prefix=self.error_messages['item_invalid'],
                     code='item_invalid',
-                    params={'nth': index},
+                    params={'nth': index + 1},
                 ))
         if errors:
             raise ValidationError(errors)
@@ -70,7 +70,7 @@ class SimpleArrayField(forms.CharField):
                     error,
                     prefix=self.error_messages['item_invalid'],
                     code='item_invalid',
-                    params={'nth': index},
+                    params={'nth': index + 1},
                 ))
         if errors:
             raise ValidationError(errors)
@@ -86,10 +86,20 @@ class SimpleArrayField(forms.CharField):
                     error,
                     prefix=self.error_messages['item_invalid'],
                     code='item_invalid',
-                    params={'nth': index},
+                    params={'nth': index + 1},
                 ))
         if errors:
             raise ValidationError(errors)
+
+    def has_changed(self, initial, data):
+        try:
+            value = self.to_python(data)
+        except ValidationError:
+            pass
+        else:
+            if initial in self.empty_values and value in self.empty_values:
+                return False
+        return super().has_changed(initial, data)
 
 
 class SplitArrayWidget(forms.Widget):
@@ -135,7 +145,7 @@ class SplitArrayWidget(forms.Widget):
             except IndexError:
                 widget_value = None
             if id_:
-                final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
+                final_attrs = {**final_attrs, 'id': '%s_%s' % (id_, i)}
             context['widget']['subwidgets'].append(
                 self.widget.get_context(name + '_%s' % i, widget_value, final_attrs)['widget']
             )
@@ -157,7 +167,7 @@ class SplitArrayWidget(forms.Widget):
 
 class SplitArrayField(forms.Field):
     default_error_messages = {
-        'item_invalid': _('Item %(nth)s in the array did not validate: '),
+        'item_invalid': _('Item %(nth)s in the array did not validate:'),
     }
 
     def __init__(self, base_field, size, *, remove_trailing_nulls=False, **kwargs):
@@ -183,7 +193,7 @@ class SplitArrayField(forms.Field):
                     error,
                     self.error_messages['item_invalid'],
                     code='item_invalid',
-                    params={'nth': index},
+                    params={'nth': index + 1},
                 ))
                 cleaned_data.append(None)
             else:

@@ -71,7 +71,7 @@ can be retrieved through this property::
 
     >>> w = CalendarWidget()
     >>> print(w.media)
-    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet">
     <script type="text/javascript" src="http://static.example.com/animations.js"></script>
     <script type="text/javascript" src="http://static.example.com/actions.js"></script>
 
@@ -114,9 +114,9 @@ requirements::
 
 If this last CSS definition were to be rendered, it would become the following HTML::
 
-    <link href="http://static.example.com/pretty.css" type="text/css" media="screen" rel="stylesheet" />
-    <link href="http://static.example.com/lo_res.css" type="text/css" media="tv,projector" rel="stylesheet" />
-    <link href="http://static.example.com/newspaper.css" type="text/css" media="print" rel="stylesheet" />
+    <link href="http://static.example.com/pretty.css" type="text/css" media="screen" rel="stylesheet">
+    <link href="http://static.example.com/lo_res.css" type="text/css" media="tv,projector" rel="stylesheet">
+    <link href="http://static.example.com/newspaper.css" type="text/css" media="print" rel="stylesheet">
 
 ``js``
 ------
@@ -145,8 +145,8 @@ example above::
 
     >>> w = FancyCalendarWidget()
     >>> print(w.media)
-    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
-    <link href="http://static.example.com/fancy.css" type="text/css" media="all" rel="stylesheet" />
+    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet">
+    <link href="http://static.example.com/fancy.css" type="text/css" media="all" rel="stylesheet">
     <script type="text/javascript" src="http://static.example.com/animations.js"></script>
     <script type="text/javascript" src="http://static.example.com/actions.js"></script>
     <script type="text/javascript" src="http://static.example.com/whizbang.js"></script>
@@ -165,7 +165,7 @@ an ``extend=False`` declaration to the ``Media`` declaration::
 
     >>> w = FancyCalendarWidget()
     >>> print(w.media)
-    <link href="http://static.example.com/fancy.css" type="text/css" media="all" rel="stylesheet" />
+    <link href="http://static.example.com/fancy.css" type="text/css" media="all" rel="stylesheet">
     <script type="text/javascript" src="http://static.example.com/whizbang.js"></script>
 
 If you require even more control over inheritance, define your assets using a
@@ -228,7 +228,7 @@ was ``None``::
 
     >>> w = CalendarWidget()
     >>> print(w.media)
-    <link href="/css/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <link href="/css/pretty.css" type="text/css" media="all" rel="stylesheet">
     <script type="text/javascript" src="http://uploads.example.com/animations.js"></script>
     <script type="text/javascript" src="http://othersite.com/actions.js"></script>
 
@@ -236,16 +236,16 @@ But if :setting:`STATIC_URL` is ``'http://static.example.com/'``::
 
     >>> w = CalendarWidget()
     >>> print(w.media)
-    <link href="/css/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <link href="/css/pretty.css" type="text/css" media="all" rel="stylesheet">
     <script type="text/javascript" src="http://static.example.com/animations.js"></script>
     <script type="text/javascript" src="http://othersite.com/actions.js"></script>
 
 Or if :mod:`~django.contrib.staticfiles` is configured using the
-`~django.contib.staticfiles.ManifestStaticFilesStorage`::
+:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`::
 
     >>> w = CalendarWidget()
     >>> print(w.media)
-    <link href="/css/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <link href="/css/pretty.css" type="text/css" media="all" rel="stylesheet">
     <script type="text/javascript" src="https://static.example.com/animations.27e20196a850.js"></script>
     <script type="text/javascript" src="http://othersite.com/actions.js"></script>
 
@@ -268,12 +268,12 @@ operator to filter out a medium of interest. For example::
 
     >>> w = CalendarWidget()
     >>> print(w.media)
-    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet">
     <script type="text/javascript" src="http://static.example.com/animations.js"></script>
     <script type="text/javascript" src="http://static.example.com/actions.js"></script>
 
     >>> print(w.media['css'])
-    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet">
 
 When you use the subscript operator, the value that is returned is a
 new ``Media`` object -- but one that only contains the media of interest.
@@ -300,10 +300,40 @@ specified by both::
     >>> w1 = CalendarWidget()
     >>> w2 = OtherWidget()
     >>> print(w1.media + w2.media)
-    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet">
     <script type="text/javascript" src="http://static.example.com/animations.js"></script>
     <script type="text/javascript" src="http://static.example.com/actions.js"></script>
     <script type="text/javascript" src="http://static.example.com/whizbang.js"></script>
+
+.. _form-media-asset-order:
+
+Order of assets
+---------------
+
+The order in which assets are inserted into the DOM is often important. For
+example, you may have a script that depends on jQuery. Therefore, combining
+``Media`` objects attempts to preserve the relative order in which assets are
+defined in each ``Media`` class.
+
+For example::
+
+    >>> from django import forms
+    >>> class CalendarWidget(forms.TextInput):
+    ...     class Media:
+    ...         js = ('jQuery.js', 'calendar.js', 'noConflict.js')
+    >>> class TimeWidget(forms.TextInput):
+    ...     class Media:
+    ...         js = ('jQuery.js', 'time.js', 'noConflict.js')
+    >>> w1 = CalendarWidget()
+    >>> w2 = TimeWidget()
+    >>> print(w1.media + w2.media)
+    <script type="text/javascript" src="http://static.example.com/jQuery.js"></script>
+    <script type="text/javascript" src="http://static.example.com/calendar.js"></script>
+    <script type="text/javascript" src="http://static.example.com/time.js"></script>
+    <script type="text/javascript" src="http://static.example.com/noConflict.js"></script>
+
+Combining ``Media`` objects with assets in a conflicting order results in a
+``MediaOrderConflictWarning``.
 
 ``Media`` on Forms
 ==================
@@ -326,7 +356,7 @@ are part of the form::
 
     >>> f = ContactForm()
     >>> f.media
-    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet">
     <script type="text/javascript" src="http://static.example.com/animations.js"></script>
     <script type="text/javascript" src="http://static.example.com/actions.js"></script>
     <script type="text/javascript" src="http://static.example.com/whizbang.js"></script>
@@ -346,8 +376,8 @@ form::
 
     >>> f = ContactForm()
     >>> f.media
-    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
-    <link href="http://static.example.com/layout.css" type="text/css" media="all" rel="stylesheet" />
+    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet">
+    <link href="http://static.example.com/layout.css" type="text/css" media="all" rel="stylesheet">
     <script type="text/javascript" src="http://static.example.com/animations.js"></script>
     <script type="text/javascript" src="http://static.example.com/actions.js"></script>
     <script type="text/javascript" src="http://static.example.com/whizbang.js"></script>

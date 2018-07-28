@@ -2,14 +2,13 @@ from datetime import datetime
 
 from django.conf import settings
 from django.db.models import (
-    DateField, DateTimeField, DurationField, IntegerField, TimeField,
-    Transform,
+    DateField, DateTimeField, DurationField, Field, Func, IntegerField,
+    TimeField, Transform, fields,
 )
 from django.db.models.lookups import (
     YearExact, YearGt, YearGte, YearLt, YearLte,
 )
 from django.utils import timezone
-from django.utils.functional import cached_property
 
 
 class TimezoneMixin:
@@ -31,6 +30,7 @@ class TimezoneMixin:
 
 class Extract(TimezoneMixin, Transform):
     lookup_name = None
+    output_field = IntegerField()
 
     def __init__(self, expression, lookup_name=None, tzinfo=None, **extra):
         if self.lookup_name is None:
@@ -74,10 +74,6 @@ class Extract(TimezoneMixin, Transform):
                 "Cannot extract time component '%s' from DateField '%s'. " % (copy.lookup_name, field.name)
             )
         return copy
-
-    @cached_property
-    def output_field(self):
-        return IntegerField()
 
 
 class ExtractYear(Extract):
@@ -147,8 +143,18 @@ ExtractYear.register_lookup(YearLt)
 ExtractYear.register_lookup(YearLte)
 
 
+class Now(Func):
+    template = 'CURRENT_TIMESTAMP'
+    output_field = fields.DateTimeField()
+
+    def as_postgresql(self, compiler, connection):
+        # PostgreSQL's CURRENT_TIMESTAMP means "the time at the start of the
+        # transaction". Use STATEMENT_TIMESTAMP to be cross-compatible with
+        # other databases.
+        return self.as_sql(compiler, connection, template='STATEMENT_TIMESTAMP()')
+
+
 class TruncBase(TimezoneMixin, Transform):
-    arity = 1
     kind = None
     tzinfo = None
 
@@ -184,21 +190,23 @@ class TruncBase(TimezoneMixin, Transform):
             raise ValueError('output_field must be either DateField, TimeField, or DateTimeField')
         # Passing dates or times to functions expecting datetimes is most
         # likely a mistake.
-        output_field = copy.output_field
-        explicit_output_field = field.__class__ != copy.output_field.__class__
+        class_output_field = self.__class__.output_field if isinstance(self.__class__.output_field, Field) else None
+        output_field = class_output_field or copy.output_field
+        has_explicit_output_field = class_output_field or field.__class__ is not copy.output_field.__class__
         if type(field) == DateField and (
                 isinstance(output_field, DateTimeField) or copy.kind in ('hour', 'minute', 'second', 'time')):
             raise ValueError("Cannot truncate DateField '%s' to %s. " % (
-                field.name, output_field.__class__.__name__ if explicit_output_field else 'DateTimeField'
+                field.name, output_field.__class__.__name__ if has_explicit_output_field else 'DateTimeField'
             ))
         elif isinstance(field, TimeField) and (
-                isinstance(output_field, DateTimeField) or copy.kind in ('year', 'quarter', 'month', 'day', 'date')):
+                isinstance(output_field, DateTimeField) or
+                copy.kind in ('year', 'quarter', 'month', 'week', 'day', 'date')):
             raise ValueError("Cannot truncate TimeField '%s' to %s. " % (
-                field.name, output_field.__class__.__name__ if explicit_output_field else 'DateTimeField'
+                field.name, output_field.__class__.__name__ if has_explicit_output_field else 'DateTimeField'
             ))
         return copy
 
-    def convert_value(self, value, expression, connection, context):
+    def convert_value(self, value, expression, connection):
         if isinstance(self.output_field, DateTimeField):
             if settings.USE_TZ:
                 if value is None:
@@ -235,6 +243,11 @@ class TruncMonth(TruncBase):
     kind = 'month'
 
 
+class TruncWeek(TruncBase):
+    """Truncate to midnight on the Monday of the week."""
+    kind = 'week'
+
+
 class TruncDay(TruncBase):
     kind = 'day'
 
@@ -242,10 +255,7 @@ class TruncDay(TruncBase):
 class TruncDate(TruncBase):
     kind = 'date'
     lookup_name = 'date'
-
-    @cached_property
-    def output_field(self):
-        return DateField()
+    output_field = DateField()
 
     def as_sql(self, compiler, connection):
         # Cast to date rather than truncate to date.
@@ -258,10 +268,7 @@ class TruncDate(TruncBase):
 class TruncTime(TruncBase):
     kind = 'time'
     lookup_name = 'time'
-
-    @cached_property
-    def output_field(self):
-        return TimeField()
+    output_field = TimeField()
 
     def as_sql(self, compiler, connection):
         # Cast to date rather than truncate to date.

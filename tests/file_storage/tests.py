@@ -566,6 +566,47 @@ class CustomStorageTests(FileStorageTests):
         self.storage.delete(second)
 
 
+class OverwritingStorage(FileSystemStorage):
+    """
+    Overwrite existing files instead of appending a suffix to generate an
+    unused name.
+    """
+    # Mask out O_EXCL so os.open() doesn't raise OSError if the file exists.
+    OS_OPEN_FLAGS = FileSystemStorage.OS_OPEN_FLAGS & ~os.O_EXCL
+
+    def get_available_name(self, name, max_length=None):
+        """Override the effort to find an used name."""
+        return name
+
+
+class OverwritingStorageTests(FileStorageTests):
+    storage_class = OverwritingStorage
+
+    def test_save_overwrite_behavior(self):
+        """Saving to same file name twice overwrites the first file."""
+        name = 'test.file'
+        self.assertFalse(self.storage.exists(name))
+        content_1 = b'content one'
+        content_2 = b'second content'
+        f_1 = ContentFile(content_1)
+        f_2 = ContentFile(content_2)
+        stored_name_1 = self.storage.save(name, f_1)
+        try:
+            self.assertEqual(stored_name_1, name)
+            self.assertTrue(self.storage.exists(name))
+            self.assertTrue(os.path.exists(os.path.join(self.temp_dir, name)))
+            with self.storage.open(name) as fp:
+                self.assertEqual(fp.read(), content_1)
+            stored_name_2 = self.storage.save(name, f_2)
+            self.assertEqual(stored_name_2, name)
+            self.assertTrue(self.storage.exists(name))
+            self.assertTrue(os.path.exists(os.path.join(self.temp_dir, name)))
+            with self.storage.open(name) as fp:
+                self.assertEqual(fp.read(), content_2)
+        finally:
+            self.storage.delete(name)
+
+
 class DiscardingFalseContentStorage(FileSystemStorage):
     def _save(self, name, content):
         if content:
@@ -943,9 +984,10 @@ class FileLikeObjectTestCase(LiveServerTestCase):
     def tearDown(self):
         shutil.rmtree(self.temp_dir)
 
-    def test_urllib2_urlopen(self):
+    def test_urllib_request_urlopen(self):
         """
-        Test the File storage API with a file like object coming from urllib2.urlopen()
+        Test the File storage API with a file-like object coming from
+        urllib.request.urlopen().
         """
         file_like_object = urlopen(self.live_server_url + '/')
         f = File(file_like_object)
