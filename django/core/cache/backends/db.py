@@ -96,6 +96,71 @@ class DatabaseCache(BaseDatabaseCache):
         value = connection.ops.process_clob(row[1])
         return pickle.loads(base64.b64decode(value.encode()))
 
+    def get_many(self, keys, version=None):
+        key_map = {self.make_key(key, version=version): key for key in keys}
+        db = router.db_for_read(self.cache_model_class)
+        connection = connections[db]
+        quote_name = connection.ops.quote_name
+        table = quote_name(self._table)
+
+        if not keys:
+            return dict()
+
+        with connection.cursor() as cursor:
+            format_string = '%s' + ', %s' * (len(key_map) - 1)
+            cursor.execute(
+                'SELECT %s, %s, %s FROM %s WHERE %s IN(%s)' % (
+                    quote_name('cache_key'),
+                    quote_name('value'),
+                    quote_name('expires'),
+                    table,
+                    quote_name('cache_key'),
+                    format_string,
+                ),
+                list(key_map)
+            )
+            rows = cursor.fetchall()
+
+        expired_keys = list()
+        return_dict = dict()
+        expression = models.Expression(output_field=models.DateTimeField())
+        converters = (connection.ops.get_db_converters(expression) + expression.get_db_converters(connection))
+        for row in rows:
+            key = row[0]
+            value = row[1]
+            expires = row[2]
+
+            for converter in converters:
+                if func_supports_parameter(converter, 'context'):  # RemovedInDjango30Warning
+                    expires = converter(expires, expression, connection, {})
+                else:
+                    expires = converter(expires, expression, connection)
+
+            if expires < timezone.now():
+                expired_keys.append(key)
+            else:
+                value = connection.ops.process_clob(value)
+                value = pickle.loads(base64.b64decode(value.encode()))
+                return_dict.update({
+                    key_map.get(key): value
+                })
+
+        if expired_keys:
+            db = router.db_for_write(self.cache_model_class)
+            connection = connections[db]
+            with connection.cursor() as cursor:
+                format_string = '%s' + ', %s' * (len(expired_keys) - 1)
+                cursor.execute(
+                    'DELETE FROM %s WHERE %s IN(%s)' % (
+                        table,
+                        quote_name('cache_key'),
+                        format_string
+                    ),
+                    expired_keys
+                )
+
+        return return_dict
+
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
