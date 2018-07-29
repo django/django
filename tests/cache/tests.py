@@ -1008,6 +1008,19 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         super().tearDown()
         self.drop_table()
 
+    def test_num_queries_of_get_many(self):
+        cache.set('a', 'a')
+        cache.set('b', 'b')
+        cache.set('expired_1', 'expired_1', 1)
+        cache.set('expired_2', 'expired_2', 1)
+
+        with self.assertNumQueries(1):
+            self.assertEqual(cache.get_many(['a', 'b']), {'a': 'a', 'b': 'b'})
+
+        time.sleep(2)
+        with self.assertNumQueries(2):
+            self.assertEqual(cache.get_many(['a', 'expired_1', 'expired_2']), {'a': 'a'})
+
     def create_table(self):
         management.call_command('createcachetable', verbosity=0)
 
