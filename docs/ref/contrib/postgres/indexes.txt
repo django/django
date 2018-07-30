@@ -26,6 +26,20 @@ available from the ``django.contrib.postgres.indexes`` module.
 
         The ``autosummarize`` parameter was added.
 
+``BTreeIndex``
+==============
+
+.. class:: BTreeIndex(fillfactor=None, **options)
+
+    .. versionadded:: 2.2
+
+    Creates a B-Tree index.
+
+    Provide an integer value from 10 to 100 to the fillfactor_ parameter to
+    tune how packed the index pages will be. PostgreSQL's default is 90.
+
+    .. _fillfactor: https://www.postgresql.org/docs/current/static/sql-createindex.html#SQL-CREATEINDEX-STORAGE-PARAMETERS
+
 ``GinIndex``
 ============
 

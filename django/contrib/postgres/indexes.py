@@ -1,7 +1,10 @@
 from django.db.models import Index
 from django.utils.functional import cached_property
 
-__all__ = ['BrinIndex', 'GinIndex', 'GistIndex', 'HashIndex', 'SpGistIndex']
+__all__ = [
+    'BrinIndex', 'BTreeIndex', 'GinIndex', 'GistIndex', 'HashIndex',
+    'SpGistIndex',
+]
 
 
 class PostgresIndex(Index):
@@ -52,6 +55,26 @@ class BrinIndex(PostgresIndex):
             with_params.append('autosummarize = %s' % ('on' if self.autosummarize else 'off'))
         if self.pages_per_range is not None:
             with_params.append('pages_per_range = %d' % self.pages_per_range)
+        return with_params
+
+
+class BTreeIndex(PostgresIndex):
+    suffix = 'btree'
+
+    def __init__(self, *, fillfactor=None, **kwargs):
+        self.fillfactor = fillfactor
+        super().__init__(**kwargs)
+
+    def deconstruct(self):
+        path, args, kwargs = super().deconstruct()
+        if self.fillfactor is not None:
+            kwargs['fillfactor'] = self.fillfactor
+        return path, args, kwargs
+
+    def get_with_params(self):
+        with_params = []
+        if self.fillfactor is not None:
+            with_params.append('fillfactor = %d' % self.fillfactor)
         return with_params
 
 
