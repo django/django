@@ -123,9 +123,6 @@ class OwnerProfile(models.Model):
 class Restaurant(Place):
     serves_pizza = models.BooleanField(default=False)
 
-    def __str__(self):
-        return self.name
-
 
 class Product(models.Model):
     slug = models.SlugField(unique=True)
@@ -223,7 +220,7 @@ class Post(models.Model):
     posted = models.DateField()
 
     def __str__(self):
-        return self.name
+        return self.title
 
 
 # Models for testing UUID primary keys
