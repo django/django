@@ -213,7 +213,7 @@ can be used for :doc:`deploying with WSGI app
 servers</howto/deployment/wsgi/index>`.
 
 The :djadmin:`built-in development server<runserver>` now supports using an
-externally-defined WSGI callable, which makes it possible to run runserver
+externally-defined WSGI callable, which makes it possible to run ``runserver``
 with the same WSGI configuration that is used for deployment. The new
 :setting:`WSGI_APPLICATION` setting lets you configure which WSGI callable
 :djadmin:`runserver` uses.

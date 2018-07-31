@@ -415,8 +415,8 @@ be removed.
 New test runner
 ---------------
 
-In order to maintain greater consistency with Python's unittest module, the new
-test runner (``django.test.runner.DiscoverRunner``) does not automatically
+In order to maintain greater consistency with Python's ``unittest`` module, the
+new test runner (``django.test.runner.DiscoverRunner``) does not automatically
 support some types of tests that were supported by the previous runner:
 
 * Tests in ``models.py`` and ``tests/__init__.py`` files will no longer be
@@ -430,7 +430,7 @@ Django bundles a modified version of the :mod:`doctest` module from the Python
 standard library (in ``django.test._doctest``) and includes some additional
 doctest utilities. These utilities are deprecated and will be removed in Django
 1.8; doctest suites should be updated to work with the standard library's
-doctest module (or converted to unittest-compatible tests).
+doctest module (or converted to ``unittest``-compatible tests).
 
 If you wish to delay updates to your test suite, you can set your
 :setting:`TEST_RUNNER` setting to ``django.test.simple.DjangoTestSuiteRunner``
