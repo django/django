@@ -154,8 +154,8 @@ that should be called if the HTTP client has sent a request that caused an error
 condition and a response with a status code of 400.
 
 By default, this is :func:`django.views.defaults.bad_request`. If you
-implement a custom view, be sure it returns an
-:class:`~django.http.HttpResponseBadRequest`.
+implement a custom view, be sure it accepts ``request`` and ``exception``
+arguments and returns an :class:`~django.http.HttpResponseBadRequest`.
 
 ``handler403``
 ==============
@@ -167,8 +167,8 @@ that should be called if the user doesn't have the permissions required to
 access a resource.
 
 By default, this is :func:`django.views.defaults.permission_denied`. If you
-implement a custom view, be sure it returns an
-:class:`~django.http.HttpResponseForbidden`.
+implement a custom view, be sure it accepts ``request`` and ``exception``
+arguments and returns an :class:`~django.http.HttpResponseForbidden`.
 
 ``handler404``
 ==============
@@ -179,8 +179,8 @@ A callable, or a string representing the full Python import path to the view
 that should be called if none of the URL patterns match.
 
 By default, this is :func:`django.views.defaults.page_not_found`. If you
-implement a custom view, be sure it returns an
-:class:`~django.http.HttpResponseNotFound`.
+implement a custom view, be sure it accepts ``request`` and ``exception``
+arguments and returns an :class:`~django.http.HttpResponseNotFound`.
 
 ``handler500``
 ==============
