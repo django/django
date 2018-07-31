@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016-2017
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-01 21:10+0100\n"
-"PO-Revision-Date: 2017-12-09 18:46+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-26 10:19+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Lower Sorbian (http://www.transifex.com/django/django/"
 "language/dsb/)\n"
@@ -398,6 +398,9 @@ msgstr[3] ""
 "Zawěććo, až toś ta gódnota ma maksimalnje %(limit_value)d znamuškow (ma "
 "%(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Zapódajśo licbu."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -481,6 +484,10 @@ msgstr "Big (8 bajtow) integer"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "Gódnota '%(value)s musy pak True pak False byś."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "Gódnota '%(value)s' musy pak True, False pak None byś."
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolean (pak True pak False)"
@@ -657,9 +664,6 @@ msgstr "Toś to pólo jo trěbne."
 msgid "Enter a whole number."
 msgstr "Zapódajśo cełu licbu."
 
-msgid "Enter a number."
-msgstr "Zapódajśo licbu."
-
 msgid "Enter a valid date."
 msgstr "Zapódajśo płaśiwy datum."
 
@@ -671,6 +675,10 @@ msgstr "Zapódajśo płaśiwy datum/cas."
 
 msgid "Enter a valid duration."
 msgstr "Zapódaśe płaśiwe traśe."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Licba dnjow musy mjazy  {min_days} a {max_days} byś."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""

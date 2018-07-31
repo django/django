@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-01 21:10+0100\n"
-"PO-Revision-Date: 2018-02-27 21:45+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-07-30 21:46+0000\n"
 "Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
 "Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
 "eo/)\n"
@@ -389,6 +389,9 @@ msgstr[1] ""
 "Certigu, ke tio valuto maksimume havas %(limit_value)d karakterojn (ĝi havas "
 "%(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Enigu nombron."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -466,6 +469,10 @@ msgstr "Granda (8 bitoka) entjero"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' valoro devas esti Vera aŭ Malvera"
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "“%(value)s” valoro devas esti Vera, Malvera aŭ Neniu."
 
 msgid "Boolean (Either True or False)"
 msgstr "Bulea (Vera aŭ Malvera)"
@@ -643,9 +650,6 @@ msgstr "Ĉi tiu kampo estas deviga."
 msgid "Enter a whole number."
 msgstr "Enigu plenan nombron."
 
-msgid "Enter a number."
-msgstr "Enigu nombron."
-
 msgid "Enter a valid date."
 msgstr "Enigu validan daton."
 
@@ -657,6 +661,10 @@ msgstr "Enigu validan daton/tempon."
 
 msgid "Enter a valid duration."
 msgstr "Enigu validan daŭron."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "La nombro da tagoj devas esti inter {min_days} kaj {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
@@ -754,7 +762,7 @@ msgid "Please correct the duplicate values below."
 msgstr "Bonvolu ĝustigi la duoblan valoron sube."
 
 msgid "The inline value did not match the parent instance."
-msgstr ""
+msgstr "La enteksta valoro ne egalas la patran aperon."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Elektu validan elekton. Ĉi tiu elekto ne estas el la eblaj elektoj."
@@ -1133,6 +1141,11 @@ msgid ""
 "If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
 "\" ...> for links to third-party sites."
 msgstr ""
+"Se vi uzas la <meta name=\"referrer\" content=\"no-referrer\">markon aŭ "
+"inkluzivante la 'Referrer-Policy: no-referrer' titolo, bonvolu forigi ilin. "
+"La CSRFa protekto postulas ke la 'Referer' titolo faru striktan "
+"referencantan kontroladon. Se vi estas koncernita pri privateco, uzu "
+"alternativojn kiel <a rel=\"noreferrer\" ...> por ligoj al aliaj retejoj."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1157,7 +1170,7 @@ msgid "No year specified"
 msgstr "Neniu jaro specifita"
 
 msgid "Date out of range"
-msgstr ""
+msgstr "Dato ne en la intervalo"
 
 msgid "No month specified"
 msgstr "Neniu monato specifita"
@@ -1213,16 +1226,18 @@ msgid "Index of %(directory)s"
 msgstr "Indekso de %(directory)s"
 
 msgid "Django: the Web framework for perfectionists with deadlines."
-msgstr ""
+msgstr "Dĵango: la retframo por perfektemuloj kun limdatoj"
 
 #, python-format
 msgid ""
 "View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
 "target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
 msgstr ""
+"Vidu <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">eldonajn notojn</a> por Dĵango %(version)s"
 
 msgid "The install worked successfully! Congratulations!"
-msgstr ""
+msgstr "La instalado sukcesis! Gratulojn!"
 
 #, python-format
 msgid ""
@@ -1231,21 +1246,24 @@ msgid ""
 "\">DEBUG=True</a> is in your settings file and you have not configured any "
 "URLs."
 msgstr ""
+"Vi vidas ĉi tiun paĝon ĉar <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener\">DEBUG = "
+"True</a> estas en via agorda dosiero kaj vi ne agordis ajnan URL."
 
 msgid "Django Documentation"
 msgstr "Djanga dokumentaro"
 
 msgid "Topics, references, &amp; how-to's"
-msgstr ""
+msgstr "Temoj, referencoj &amp; manlibroj"
 
 msgid "Tutorial: A Polling App"
-msgstr ""
+msgstr "Instruilo: apo pri enketoj"
 
 msgid "Get started with Django"
-msgstr ""
+msgstr "Komencu kun Dĵango"
 
 msgid "Django Community"
 msgstr "Djanga komunumo"
 
 msgid "Connect, get help, or contribute"
-msgstr ""
+msgstr "Konektiĝu, ricevu helpon aŭ kontribuu"

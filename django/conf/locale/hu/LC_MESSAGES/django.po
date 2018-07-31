@@ -1,7 +1,8 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# András Veres-Szentkirályi, 2016-2017
+# Akos Zsolt Hochrein <hoch.akos@gmail.com>, 2018
+# András Veres-Szentkirályi, 2016-2018
 # Attila Nagy <>, 2012
 # Dóra Szendrei <szendrgigi@gmail.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -12,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-24 13:36+0000\n"
-"Last-Translator: András Veres-Szentkirályi\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-26 09:24+0000\n"
+"Last-Translator: Akos Zsolt Hochrein <hoch.akos@gmail.com>\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
@@ -163,6 +164,9 @@ msgstr "Japán"
 
 msgid "Georgian"
 msgstr "Grúz"
+
+msgid "Kabyle"
+msgstr "Kabil"
 
 msgid "Kazakh"
 msgstr "Kazak"
@@ -388,6 +392,9 @@ msgstr[1] ""
 "Bizonyosodjon meg arról, hogy ez az érték legfeljebb %(limit_value)d "
 "karaktert tartalmaz (jelenlegi hossza: %(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Adj meg egy számot."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -472,6 +479,10 @@ msgstr "Nagy egész szám (8 bájtos)"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' érték csak igaz (True) vagy hamis (False) lehet."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "'%(value)s' értéknek True, False vagy None-nak kell lennie."
 
 msgid "Boolean (Either True or False)"
 msgstr "Logikai (True vagy False)"
@@ -650,9 +661,6 @@ msgstr "Ennek a mezőnek a megadása kötelező."
 msgid "Enter a whole number."
 msgstr "Adjon meg egy egész számot."
 
-msgid "Enter a number."
-msgstr "Adj meg egy számot."
-
 msgid "Enter a valid date."
 msgstr "Adjon meg egy érvényes dátumot."
 
@@ -664,6 +672,10 @@ msgstr "Adjon meg egy érvényes dátumot/időt."
 
 msgid "Enter a valid duration."
 msgstr "Adjon meg egy érvényes időtartamot."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "A napok számának {min_days} és {max_days} közé kell esnie."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Nem küldött el fájlt. Ellenőrizze a kódolás típusát az űrlapon."
