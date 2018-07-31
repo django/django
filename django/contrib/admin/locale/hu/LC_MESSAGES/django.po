@@ -2,7 +2,8 @@
 #
 # Translators:
 # Ádám Krizsány <krizsany1302@gmail.com>, 2015
-# András Veres-Szentkirályi, 2016
+# Akos Zsolt Hochrein <hoch.akos@gmail.com>, 2018
+# András Veres-Szentkirályi, 2016,2018
 # Jannis Leidel <jannis@leidel.info>, 2011
 # János R (Hangya), 2017
 # János R (Hangya), 2014
@@ -13,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: János R (Hangya)\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-07-31 07:37+0000\n"
+"Last-Translator: András Veres-Szentkirályi\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
@@ -91,6 +92,15 @@ msgid "Add another %(verbose_name)s"
 msgstr "Újabb %(verbose_name)s hozzáadása"
 
 msgid "Remove"
+msgstr "Törlés"
+
+msgid "Addition"
+msgstr "Hozzáadás"
+
+msgid "Change"
+msgstr "Módosítás"
+
+msgid "Deletion"
 msgstr "Törlés"
 
 msgid "action time"
@@ -172,9 +182,11 @@ msgstr ""
 "kiválasztásához."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr "\"{obj}\" {name} sikeresen létrehozva. Alább ismét szerkesztheti."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "\"{obj}\" {name} sikeresen létrehozva."
+
+msgid "You may edit it again below."
+msgstr "Alább ismét szerkesztheti."
 
 #, python-brace-format
 msgid ""
@@ -184,13 +196,14 @@ msgstr ""
 "\"{obj}\" {name} sikeresen létrehozva. Alább újabb {name} hozható létre."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "\"{obj}\" {name} sikeresen létrehozva."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr "\"{obj}\" {name} sikeresen módosítva. Alább ismét szerkesztheti."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr "\"{obj}\" {name} sikeresen létrehozva. Alább ismét szerkesztheti."
 
 #, python-brace-format
 msgid ""
@@ -229,6 +242,10 @@ msgstr "Új %s"
 #, python-format
 msgid "Change %s"
 msgstr "%s módosítása"
+
+#, python-format
+msgid "View %s"
+msgstr "%s megtekintése"
 
 msgid "Database error"
 msgstr "Adatbázishiba"
@@ -338,7 +355,7 @@ msgid "Change password"
 msgstr "Jelszó megváltoztatása"
 
 msgid "Please correct the error below."
-msgstr "Kérem, javítsa az alábbi hibákat."
+msgstr "Kérem javítsa a hibát alább."
 
 msgid "Please correct the errors below."
 msgstr "Kérem javítsa ki a lenti hibákat."
@@ -450,8 +467,8 @@ msgstr ""
 "Biztosan törölni akarja a kiválasztott %(objects_name)s objektumokat? Minden "
 "alábbi objektum, és a hozzájuk kapcsolódóak is törlésre kerülnek:"
 
-msgid "Change"
-msgstr "Módosítás"
+msgid "View"
+msgstr "Megtekintés"
 
 msgid "Delete?"
 msgstr "Törli?"
@@ -470,8 +487,8 @@ msgstr "%(name)s alkalmazásban elérhető modellek."
 msgid "Add"
 msgstr "Új"
 
-msgid "You don't have permission to edit anything."
-msgstr "Nincs joga szerkeszteni."
+msgid "You don't have permission to view or edit anything."
+msgstr "Nincs jogosultsága megkinteni vagy módosítani akármit."
 
 msgid "Recent actions"
 msgstr "Legutóbbi műveletek"
@@ -533,6 +550,10 @@ msgid "Change selected %(model)s"
 msgstr "Kiválasztott %(model)s szerkesztése"
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr "Kiválasztott %(model)s megtekintése"
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr "Újabb %(model)s hozzáadása"
 
@@ -561,6 +582,12 @@ msgstr "Mentés és másik hozzáadása"
 
 msgid "Save and continue editing"
 msgstr "Mentés és a szerkesztés folytatása"
+
+msgid "Save and view"
+msgstr "Mentés és megtekintés"
+
+msgid "Close"
+msgstr "Bezárás"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Köszönjük hogy egy kis időt eltöltött ma a honlapunkon."
@@ -671,6 +698,10 @@ msgstr "%s kiválasztása"
 #, python-format
 msgid "Select %s to change"
 msgstr "Válasszon ki egyet a módosításhoz (%s)"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Válasszon ki egyet a megtekintéshez (%s)"
 
 msgid "Date:"
 msgstr "Dátum:"

@@ -2,7 +2,8 @@
 #
 # Translators:
 # edgars <edgars.jekabsons@gmail.com>, 2011
-# Edgars Voroboks <nullisnot0@inbox.lv>, 2017
+# NullIsNot0 <nullisnot0@inbox.lv>, 2017
+# NullIsNot0 <nullisnot0@inbox.lv>, 2018
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Māris Nartišs <maris.gis@gmail.com>, 2016
 # peterisb <pb@sungis.lv>, 2016
@@ -10,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-11-18 07:25+0000\n"
-"Last-Translator: Edgars Voroboks <nullisnot0@inbox.lv>\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-06-03 12:04+0000\n"
+"Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -90,6 +91,15 @@ msgstr "Pievienot vēl %(verbose_name)s"
 
 msgid "Remove"
 msgstr "Dzēst"
+
+msgid "Addition"
+msgstr "Pievienošana"
+
+msgid "Change"
+msgstr "Izmainīt"
+
+msgid "Deletion"
+msgstr "Dzēšana"
 
 msgid "action time"
 msgstr "darbības laiks"
@@ -170,11 +180,11 @@ msgstr ""
 "izvēlētos vairāk par vienu."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-"{name} \"{obj}\" tika veiksmīgi pievienots. Zemāk var turpināt veikt "
-"izmaiņas."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" tika veiksmīgi pievienots."
+
+msgid "You may edit it again below."
+msgstr "Jūs varat to atkal labot zemāk. "
 
 #, python-brace-format
 msgid ""
@@ -185,14 +195,17 @@ msgstr ""
 "{name}."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} \"{obj}\" tika veiksmīgi pievienots."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 "{name} \"{obj}\" tika veiksmīgi mainīts. Zemāk var turpināt veikt izmaiņas."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+"{name} \"{obj}\" tika veiksmīgi pievienots. Zemāk var turpināt veikt "
+"izmaiņas."
 
 #, python-brace-format
 msgid ""
@@ -227,6 +240,10 @@ msgstr "Pievienot %s"
 #, python-format
 msgid "Change %s"
 msgstr "Labot %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Apskatīt %s"
 
 msgid "Database error"
 msgstr "Datubāzes kļūda"
@@ -338,7 +355,7 @@ msgid "Change password"
 msgstr "Paroles maiņa"
 
 msgid "Please correct the error below."
-msgstr "Lūdzu, izlabojiet kļūdas zemāk."
+msgstr "Lūdzu izlabojiet zemāk redzamo kļūdu."
 
 msgid "Please correct the errors below."
 msgstr "Lūdzu labo kļūdas zemāk."
@@ -447,8 +464,8 @@ msgstr ""
 "Vai esat pārliecināts, ka vēlaties dzēst izvēlētos %(objects_name)s "
 "objektus? Visi sekojošie objekti un tiem piesaistītie objekti tiks izdzēsti:"
 
-msgid "Change"
-msgstr "Izmainīt"
+msgid "View"
+msgstr "Apskatīt"
 
 msgid "Delete?"
 msgstr "Dzēst?"
@@ -467,8 +484,8 @@ msgstr "Modeļi %(name)s lietotnē"
 msgid "Add"
 msgstr "Pievienot"
 
-msgid "You don't have permission to edit anything."
-msgstr "Jums nav tiesības neko labot."
+msgid "You don't have permission to view or edit anything."
+msgstr "Jums nav tiesību neko apskatīt vai labot."
 
 msgid "Recent actions"
 msgstr "Nesenās darbības"
@@ -531,6 +548,10 @@ msgid "Change selected %(model)s"
 msgstr "Mainīt izvēlēto %(model)s"
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr "Apskatīt izvēlēto %(model)s"
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr "Pievienot citu %(model)s"
 
@@ -560,6 +581,12 @@ msgstr "Saglabāt un pievienot vēl vienu"
 
 msgid "Save and continue editing"
 msgstr "Saglabāt un turpināt labošanu"
+
+msgid "Save and view"
+msgstr "Saglabāt un apskatīt"
+
+msgid "Close"
+msgstr "Aizvērt"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Paldies par pavadīto laiku mājas lapā."
@@ -671,6 +698,10 @@ msgstr "Izvēlēties %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Izvēlēties %s, lai izmainītu"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Izvēlēties %s, lai apskatītu"
 
 msgid "Date:"
 msgstr "Datums:"
