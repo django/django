@@ -107,9 +107,12 @@ class DatabaseCache(BaseDatabaseCache):
             return dict()
 
         with connection.cursor() as cursor:
-            format_string = '%s' + ', %s' * (len(key_map) - 1)
+            if len(key_map) == 1:
+                format_string = '= %s'
+            else:
+                format_string = 'IN(%s' + ', %s' * (len(key_map) - 1) + ')'
             cursor.execute(
-                'SELECT %s, %s, %s FROM %s WHERE %s IN(%s)' % (
+                'SELECT %s, %s, %s FROM %s WHERE %s %s' % (
                     quote_name('cache_key'),
                     quote_name('value'),
                     quote_name('expires'),
@@ -149,9 +152,12 @@ class DatabaseCache(BaseDatabaseCache):
             db = router.db_for_write(self.cache_model_class)
             connection = connections[db]
             with connection.cursor() as cursor:
-                format_string = '%s' + ', %s' * (len(expired_keys) - 1)
+                if len(expired_keys) == 1:
+                    format_string = '= %s'
+                else:
+                    format_string = 'IN(%s' + ', %s' * (len(expired_keys) - 1) + ')'
                 cursor.execute(
-                    'DELETE FROM %s WHERE %s IN(%s)' % (
+                    'DELETE FROM %s WHERE %s %s' % (
                         table,
                         quote_name('cache_key'),
                         format_string
