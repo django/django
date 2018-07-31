@@ -2,13 +2,14 @@
 #
 # Translators:
 # Ali Ismayilov <ali@ismailov.info>, 2011
+# Emin Mastizada <emin@linux.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2018-04-27 17:21+0000\n"
+"Last-Translator: Emin Mastizada <emin@linux.com>\n"
 "Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
 "az/)\n"
 "MIME-Version: 1.0\n"
@@ -18,14 +19,15 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "GIS"
-msgstr ""
+msgstr "GIS"
 
 msgid "The base GIS field."
-msgstr ""
+msgstr "Təməl GIS sahəsi (field)."
 
 msgid ""
 "The base Geometry field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
+"Təməl Həndəsə sahəsi -- OpenGIS Specification Geometry növünə işarətlənir."
 
 msgid "Point"
 msgstr "Nöqtə"
@@ -49,10 +51,10 @@ msgid "Geometry collection"
 msgstr "Fiqurlar çoxluğu"
 
 msgid "Extent Aggregate Field"
-msgstr ""
+msgstr "Aqreqat Sahəsini Genişləndir"
 
 msgid "Raster Field"
-msgstr ""
+msgstr "Rastr Sahəsi"
 
 msgid "No geometry value provided."
 msgstr "Həndəsi qiyməti verilməyib."
@@ -70,17 +72,17 @@ msgstr ""
 "Fiquru vərəqənin fiqur sahəsinin SRID qiymətinə çevirərkən xəta baş verdi."
 
 msgid "Delete all Features"
-msgstr ""
+msgstr "Bütün Xüsusiyyətləri sil"
 
 msgid "WKT debugging window:"
-msgstr ""
+msgstr "WKT sazlama pəncərəsi:"
 
 msgid "Debugging window (serialized value)"
-msgstr ""
+msgstr "Sazlama pəncərəsi (seriallaşdırılmış dəyər)"
 
 msgid "No feeds are registered."
-msgstr ""
+msgstr "Qeyd edilmiş axın yoxdur."
 
 #, python-format
 msgid "Slug %r isn't registered."
-msgstr ""
+msgstr "%r slug-ı qeyd edilməyib."

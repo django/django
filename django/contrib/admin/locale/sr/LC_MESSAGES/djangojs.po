@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
 "PO-Revision-Date: 2018-01-30 10:24+0000\n"
 "Last-Translator: Branko Kokanovic <branko@kokanovic.org>\n"
 "Language-Team: Serbian (http://www.transifex.com/django/django/language/"
@@ -95,6 +95,21 @@ msgid ""
 "button."
 msgstr "Изабрали сте акцију али нисте изменили ни једно поље."
 
+msgid "Now"
+msgstr "Тренутно време"
+
+msgid "Midnight"
+msgstr "Поноћ"
+
+msgid "6 a.m."
+msgstr "18ч"
+
+msgid "Noon"
+msgstr "Подне"
+
+msgid "6 p.m."
+msgstr "18ч"
+
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
@@ -109,26 +124,11 @@ msgstr[0] "Обавештење: %s сат сте иза серверског в
 msgstr[1] "Обавештење: %s сата сте иза серверског времена."
 msgstr[2] "Обавештење: %s сати сте иза серверског времена."
 
-msgid "Now"
-msgstr "Тренутно време"
-
 msgid "Choose a Time"
 msgstr "Одаберите време"
 
 msgid "Choose a time"
 msgstr "Одабир времена"
-
-msgid "Midnight"
-msgstr "Поноћ"
-
-msgid "6 a.m."
-msgstr "18ч"
-
-msgid "Noon"
-msgstr "Подне"
-
-msgid "6 p.m."
-msgstr "18ч"
 
 msgid "Cancel"
 msgstr "Поништи"

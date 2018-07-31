@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
 "PO-Revision-Date: 2017-09-23 18:54+0000\n"
 "Last-Translator: Tomasz Kajtoch <tomekkaj@tomekkaj.pl>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
@@ -105,6 +105,21 @@ msgstr ""
 "Wybrano akcję, lecz nie dokonano żadnych zmian w polach. Prawdopodobnie "
 "szukasz przycisku „Wykonaj”, a nie „Zapisz”."
 
+msgid "Now"
+msgstr "Teraz"
+
+msgid "Midnight"
+msgstr "Północ"
+
+msgid "6 a.m."
+msgstr "6 rano"
+
+msgid "Noon"
+msgstr "Południe"
+
+msgid "6 p.m."
+msgstr "6 po południu"
+
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
@@ -137,26 +152,11 @@ msgstr[3] ""
 "Uwaga: Czas lokalny jest przesunięty o %s godzin do tyłu w stosunku do czasu "
 "serwera."
 
-msgid "Now"
-msgstr "Teraz"
-
 msgid "Choose a Time"
 msgstr "Wybierz Czas"
 
 msgid "Choose a time"
 msgstr "Wybierz czas"
-
-msgid "Midnight"
-msgstr "Północ"
-
-msgid "6 a.m."
-msgstr "6 rano"
-
-msgid "Noon"
-msgstr "Południe"
-
-msgid "6 p.m."
-msgstr "6 po południu"
 
 msgid "Cancel"
 msgstr "Anuluj"
