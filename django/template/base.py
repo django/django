@@ -152,7 +152,7 @@ class Template:
         self.name = name
         self.origin = origin
         self.engine = engine
-        self.source = template_string
+        self.source = str(template_string)  # May be lazy.
         self.nodelist = self.compile_nodelist()
 
     def __iter__(self):
