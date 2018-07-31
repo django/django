@@ -69,6 +69,7 @@ blogs
 boilerplatish
 Bokmål
 bolded
+Bonham
 bookmarklet
 bookmarklets
 boolean
@@ -107,6 +108,8 @@ clickjacking
 cms
 codebase
 codec
+codename
+codenamed
 coercible
 collectstatic
 commenters
@@ -119,6 +122,7 @@ config
 ContentType
 contenttypes
 contrib
+covariance
 coveredby
 createcachetable
 createdb
@@ -157,11 +161,14 @@ decrement
 decrementing
 deduplicates
 deepcopy
+deferrable
+deprecations
 deserialization
 deserialize
 deserialized
 deserializer
 deserializing
+deterministically
 Deutsch
 dev
 dict
@@ -302,6 +309,7 @@ ifchanged
 iframe
 inbox
 incrementing
+indexable
 indices
 ing
 ini
@@ -331,6 +339,7 @@ iso
 istartswith
 iterable
 iterables
+iteratively
 itunes
 iTunes
 ize
@@ -359,6 +368,7 @@ linebreaksbr
 linenumbers
 linestring
 linework
+linter
 Livni
 ljust
 loaddata
@@ -374,6 +384,7 @@ lookup
 lookups
 loopback
 lorem
+lossy
 lowercased
 lowercasing
 lt
@@ -424,6 +435,7 @@ multipolygon
 multitenancy
 multithreaded
 multithreading
+multivalued
 Mumbai
 myapp
 myproject
@@ -445,6 +457,7 @@ německy
 newforms
 nginx
 noding
+nonnegative
 nonspatial
 nullable
 OAuth
@@ -465,9 +478,13 @@ outbox
 Outdim
 outfile
 paginator
+parallelization
+parallelized
+parameterization
 parameterized
 params
 parens
+parsers
 Paweł
 pdf
 PEM
@@ -518,6 +535,7 @@ prepopulate
 prepopulated
 prepopulates
 preprocess
+preprocessed
 preprocesses
 preprocessing
 programmatically
@@ -543,6 +561,8 @@ QUnit
 quo
 quoteless
 Radziej
+raster
+rasters
 rc
 readded
 reallow
@@ -635,6 +655,7 @@ slugify
 SMTP
 solaris
 Solr
+sortable
 spaceless
 spam
 spammers
@@ -680,6 +701,7 @@ sublist
 submodule
 submodules
 subpath
+subprocesses
 subqueries
 subquery
 subselect
@@ -743,6 +765,8 @@ Tredinnick
 triager
 triagers
 triaging
+trigram
+trigrams
 truncatechars
 truncatewords
 tuple
@@ -754,6 +778,7 @@ ubuntu
 ul
 umask
 Unaccent
+unannotated
 unapplied
 unapply
 unapplying
@@ -781,6 +806,7 @@ unittest
 unittests
 unlocalize
 unlocalized
+unmaintained
 unmanaged
 unordered
 unparseable
@@ -800,6 +826,7 @@ unsquashed
 untar
 untrusted
 unvalidated
+uppercased
 url
 urlencode
 urlize
