@@ -441,12 +441,12 @@ is, earlier than or equal to - ``timezone.now``.
 Testing our new view
 --------------------
 
-Now you can satisfy yourself that this behaves as expected by firing up the
-runserver, loading the site in your browser, creating ``Questions`` with dates
-in the past and future, and checking that only those that have been published
-are listed.  You don't want to have to do that *every single time you make any
-change that might affect this* - so let's also create a test, based on our
-:djadmin:`shell` session above.
+Now you can satisfy yourself that this behaves as expected by firing up
+``runserver``, loading the site in your browser, creating ``Questions`` with
+dates in the past and future, and checking that only those that have been
+published are listed. You don't want to have to do that *every single time you
+make any change that might affect this* - so let's also create a test, based on
+our :djadmin:`shell` session above.
 
 Add the following to ``polls/tests.py``:
 

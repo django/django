@@ -180,7 +180,7 @@ The basic XML serialization format is quite simple::
         </object>
     </django-objects>
 
-The whole collection of objects that is either serialized or de-serialized is
+The whole collection of objects that is either serialized or deserialized is
 represented by a ``<django-objects>``-tag which contains multiple
 ``<object>``-elements. Each such object has two attributes: "pk" and "model",
 the latter being represented by the name of the app ("sessions") and the
@@ -198,11 +198,11 @@ Foreign keys and other relational fields are treated a little bit differently::
         <!-- ... -->
     </object>
 
-In this example we specify that the auth.Permission object with the PK 27 has
-a foreign key to the contenttypes.ContentType instance with the PK 9.
+In this example we specify that the ``auth.Permission`` object with the PK 27
+has a foreign key to the ``contenttypes.ContentType`` instance with the PK 9.
 
 ManyToMany-relations are exported for the model that binds them. For instance,
-the auth.User model has such a relation to the auth.Permission model::
+the ``auth.User`` model has such a relation to the ``auth.Permission`` model::
 
     <object pk="1" model="auth.user">
         <!-- ... -->

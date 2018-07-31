@@ -850,10 +850,9 @@ details on these changes.
   used instead.
 
 * The ``django.test.simple.DjangoTestRunner`` will be removed.
-  Instead use a unittest-native class.  The features of the
+  Instead use a ``unittest``-native class. The features of the
   ``django.test.simple.DjangoTestRunner`` (including fail-fast and
-  Ctrl-C test termination) can currently be provided by the unittest-native
-  :class:`~unittest.TextTestRunner`.
+  Ctrl-C test termination) can be provided by :class:`unittest.TextTestRunner`.
 
 * The undocumented function
   ``django.contrib.formtools.utils.security_hash`` will be removed,

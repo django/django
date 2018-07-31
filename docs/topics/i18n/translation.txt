@@ -663,7 +663,7 @@ You can use multiple expressions inside a single ``blocktrans`` tag::
 Other block tags (for example ``{% for %}`` or ``{% if %}``) are not allowed
 inside a ``blocktrans`` tag.
 
-If resolving one of the block arguments fails, blocktrans will fall back to
+If resolving one of the block arguments fails, ``blocktrans`` will fall back to
 the default language by deactivating the currently active language
 temporarily with the :func:`~django.utils.translation.deactivate_all`
 function.
@@ -1525,7 +1525,7 @@ multiple times::
 
     When :ref:`creating message files from JavaScript source code
     <creating-message-files-from-js-code>` you need to use the special
-    'djangojs' domain, **not** ``-e js``.
+    ``djangojs`` domain, **not** ``-e js``.
 
 .. admonition:: Using Jinja2 templates?
 
@@ -1876,7 +1876,7 @@ For example::
             translation.activate(cur_language)
         return text
 
-Calling this function with the value 'de' will give you ``"Willkommen"``,
+Calling this function with the value ``'de'`` will give you ``"Willkommen"``,
 regardless of :setting:`LANGUAGE_CODE` and language set by middleware.
 
 Functions of particular interest are
@@ -2023,8 +2023,8 @@ Notes:
       ]
 
   This example restricts languages that are available for automatic
-  selection to German and English (and any sublanguage, like de-ch or
-  en-us).
+  selection to German and English (and any sublanguage, like ``de-ch`` or
+  ``en-us``).
 
 * If you define a custom :setting:`LANGUAGES` setting, as explained in the
   previous bullet, you can mark the language names as translation strings
