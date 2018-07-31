@@ -2,7 +2,7 @@
 #
 # Translators:
 # charettes <charette.s@gmail.com>, 2012
-# Claude Paroz <claude@2xlibre.net>, 2013-2017
+# Claude Paroz <claude@2xlibre.net>, 2013-2018
 # Claude Paroz <claude@2xlibre.net>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jean-Baptiste Mora, 2014
@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 08:05+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 12:50+0000\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -162,6 +162,9 @@ msgstr "Japonais"
 
 msgid "Georgian"
 msgstr "Géorgien"
+
+msgid "Kabyle"
+msgstr "Kabyle"
 
 msgid "Kazakh"
 msgstr "Kazakh"
@@ -389,6 +392,9 @@ msgstr[1] ""
 "Assurez-vous que cette valeur comporte au plus %(limit_value)d caractères "
 "(actuellement %(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Saisissez un nombre."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -471,6 +477,11 @@ msgstr "Grand entier (8 octets)"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "La valeur « %(value)s » doit être soit True (vrai), soit False (faux)."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr ""
+"La valeur « %(value)s » doit être True (vrai), False (faux) ou None (aucun)."
 
 msgid "Boolean (Either True or False)"
 msgstr "Booléen (soit vrai ou faux)"
@@ -650,9 +661,6 @@ msgstr "Ce champ est obligatoire."
 msgid "Enter a whole number."
 msgstr "Saisissez un nombre entier."
 
-msgid "Enter a number."
-msgstr "Saisissez un nombre."
-
 msgid "Enter a valid date."
 msgstr "Saisissez une date valide."
 
@@ -664,6 +672,10 @@ msgstr "Saisissez une date et une heure valides."
 
 msgid "Enter a valid duration."
 msgstr "Saisissez une durée valide."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Le nombre de jours doit être entre {min_days} et {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""

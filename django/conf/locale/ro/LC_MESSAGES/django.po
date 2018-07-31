@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-01 21:10+0100\n"
-"PO-Revision-Date: 2018-01-17 09:13+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 05:42+0000\n"
 "Last-Translator: Bogdan Mateescu\n"
 "Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
@@ -168,7 +168,7 @@ msgid "Georgian"
 msgstr "Georgiană"
 
 msgid "Kabyle"
-msgstr ""
+msgstr "Kabyle"
 
 msgid "Kazakh"
 msgstr "Kazahă"
@@ -381,8 +381,8 @@ msgstr[1] ""
 "Asigurați-vă că această valoare are cel puțin %(limit_value)d caractere (are "
 "%(show_value)d)."
 msgstr[2] ""
-"Asigurați-vă că această valoare are cel puțin %(limit_value)d caractere (are "
-"%(show_value)d)."
+"Asigurați-vă că această valoare are cel puțin %(limit_value)d de caractere "
+"(are %(show_value)d)."
 
 #, python-format
 msgid ""
@@ -398,22 +398,25 @@ msgstr[1] ""
 "Asigurați-vă că această valoare are cel mult %(limit_value)d caractere (are "
 "%(show_value)d)."
 msgstr[2] ""
-"Asigurați-vă că această valoare are cel mult %(limit_value)d caractere (are "
-"%(show_value)d)."
+"Asigurați-vă că această valoare are cel mult %(limit_value)d de caractere "
+"(are %(show_value)d)."
+
+msgid "Enter a number."
+msgstr "Introduceţi un număr."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
 msgstr[0] "Asigurați-vă că nu este mai mult de %(max)s cifră în total."
 msgstr[1] "Asigurați-vă că nu sunt mai mult de %(max)s cifre în total."
-msgstr[2] "Asigurați-vă că nu sunt mai mult de %(max)s cifre în total."
+msgstr[2] "Asigurați-vă că nu sunt mai mult de %(max)s de cifre în total."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
 msgstr[0] "Asigurați-vă că nu este mai mult de %(max)s zecimală în total."
 msgstr[1] "Asigurați-vă că nu sunt mai mult de %(max)s zecimale în total."
-msgstr[2] "Asigurați-vă că nu sunt mai mult de %(max)s zecimale în total."
+msgstr[2] "Asigurați-vă că nu sunt mai mult de %(max)s de zecimale în total."
 
 #, python-format
 msgid ""
@@ -425,7 +428,8 @@ msgstr[0] ""
 msgstr[1] ""
 "Asigurați-vă că nu sunt mai mult de %(max)s cifre înainte de punctul zecimal."
 msgstr[2] ""
-"Asigurați-vă că nu sunt mai mult de %(max)s cifre înainte de punctul zecimal."
+"Asigurați-vă că nu sunt mai mult de %(max)s de cifre înainte de punctul "
+"zecimal."
 
 #, python-format
 msgid ""
@@ -436,7 +440,7 @@ msgstr ""
 "'%(allowed_extensions)s'."
 
 msgid "Null characters are not allowed."
-msgstr ""
+msgstr "Caracterele Null nu sunt permise."
 
 msgid "and"
 msgstr "și"
@@ -485,6 +489,10 @@ msgstr "Întreg mare (8 octeți)"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' trebuie să fie True sau False."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "'%(value)s' valoarea trebuie să fie True, False, sau None."
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolean (adevărat sau fals)"
@@ -660,9 +668,6 @@ msgstr "Acest câmp este obligatoriu."
 msgid "Enter a whole number."
 msgstr "Introduceţi un număr întreg."
 
-msgid "Enter a number."
-msgstr "Introduceţi un număr."
-
 msgid "Enter a valid date."
 msgstr "Introduceți o dată validă."
 
@@ -674,6 +679,10 @@ msgstr "Introduceți o dată/oră validă."
 
 msgid "Enter a valid duration."
 msgstr "Introduceți o durată validă."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Numărul de zile trebuie să fie cuprins între {min_days} și {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Nici un fișier nu a fost trimis. Verificați tipul fișierului."
@@ -689,13 +698,13 @@ msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr[0] ""
-"Verificați că numele fișierului are cel mult %(max)d caractere (are "
+"Asigurați-vă că numele fișierului are cel mult %(max)d caracter (are "
 "%(length)d)."
 msgstr[1] ""
-"Verificați că numele fișierului are cel mult %(max)d caractere (are "
+"Asigurați-vă că numele fișierului are cel mult %(max)d caractere (are "
 "%(length)d)."
 msgstr[2] ""
-"Verificați că numele fișierului are cel mult %(max)d caractere (are "
+"Asigurați-vă că numele fișierului are cel mult %(max)d de caractere (are "
 "%(length)d)."
 
 msgid "Please either submit a file or check the clear checkbox, not both."
@@ -739,14 +748,14 @@ msgid "Please submit %d or fewer forms."
 msgid_plural "Please submit %d or fewer forms."
 msgstr[0] "Trimiteți maxim %d formular."
 msgstr[1] "Trimiteți maxim %d formulare."
-msgstr[2] "Trimiteți maxim %d formulare."
+msgstr[2] "Trimiteți maxim %d de formulare."
 
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
 msgstr[0] "Trimiteți minim %d formular."
 msgstr[1] "Trimiteți minim %d formulare."
-msgstr[2] "Trimiteți minim %d formulare."
+msgstr[2] "Trimiteți minim %d de formulare."
 
 msgid "Order"
 msgstr "Ordine"
@@ -774,7 +783,7 @@ msgid "Please correct the duplicate values below."
 msgstr "Corectaţi valorile duplicate de mai jos."
 
 msgid "The inline value did not match the parent instance."
-msgstr ""
+msgstr "Valoarea în linie nu s-a potrivit cu instanța părinte."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
@@ -817,9 +826,9 @@ msgstr "da,nu,poate"
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
-msgstr[0] "%(size)d byte"
-msgstr[1] "%(size)d bytes"
-msgstr[2] "%(size)d bytes"
+msgstr[0] "%(size)d octet"
+msgstr[1] "%(size)d octeţi"
+msgstr[2] "%(size)d de octeţi"
 
 #, python-format
 msgid "%s KB"
@@ -1089,42 +1098,42 @@ msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] "%d an"
 msgstr[1] "%d ani"
-msgstr[2] "%d ani"
+msgstr[2] "%d de ani"
 
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] "%d lună"
 msgstr[1] "%d luni"
-msgstr[2] "%d luni"
+msgstr[2] "%d de luni"
 
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
 msgstr[0] "%d săptămână"
 msgstr[1] "%d săptămâni"
-msgstr[2] "%d săptămâni"
+msgstr[2] "%d de săptămâni"
 
 #, python-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d zi"
 msgstr[1] "%d zile"
-msgstr[2] "%d zile"
+msgstr[2] "%d de zile"
 
 #, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "%d oră"
 msgstr[1] "%d ore"
-msgstr[2] "%d ore"
+msgstr[2] "%d de ore"
 
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] "%d minută"
+msgstr[0] "%d minut"
 msgstr[1] "%d minute"
-msgstr[2] "%d minute"
+msgstr[2] "%d de minute"
 
 msgid "0 minutes"
 msgstr "0 minute"
@@ -1162,6 +1171,12 @@ msgid ""
 "If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
 "\" ...> for links to third-party sites."
 msgstr ""
+"Dacă utilizați eticheta <meta name=\"referrer\" content=\"no-referrer\"> sau "
+"includeți antetul 'Referrer-Policy: no-referrer', te rugăm sa îl elimini. "
+"Protecția CSRF necesită antetul 'Referer' pentru a face verificarea strictă "
+"a 'referer'. Dacă sunteți îngrijorat de confidențialitate, utilizați "
+"alternative ca <a rel=\"noreferrer\" ...> pentru linkuri către site-uri "
+"terțe."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1187,7 +1202,7 @@ msgid "No year specified"
 msgstr "Niciun an specificat"
 
 msgid "Date out of range"
-msgstr ""
+msgstr "Dată în afara intervalului"
 
 msgid "No month specified"
 msgstr "Nicio lună specificată"
@@ -1242,7 +1257,7 @@ msgid "Index of %(directory)s"
 msgstr "Index pentru %(directory)s"
 
 msgid "Django: the Web framework for perfectionists with deadlines."
-msgstr ""
+msgstr "Django: Framework-ul web pentru perfecționiști cu termene limită."
 
 #, python-format
 msgid ""
@@ -1263,18 +1278,21 @@ msgid ""
 "\">DEBUG=True</a> is in your settings file and you have not configured any "
 "URLs."
 msgstr ""
+"Vedeți această pagină deoarece <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> este în fișierul de setări și nu ați configurat niciun URL."
 
 msgid "Django Documentation"
 msgstr "Documentația Django"
 
 msgid "Topics, references, &amp; how-to's"
-msgstr ""
+msgstr "Subiecte, referinţe, &amp; cum să"
 
 msgid "Tutorial: A Polling App"
 msgstr "Tutorial: O aplicație de votare"
 
 msgid "Get started with Django"
-msgstr ""
+msgstr "Începeți cu Django"
 
 msgid "Django Community"
 msgstr "Comunitatea Django"
