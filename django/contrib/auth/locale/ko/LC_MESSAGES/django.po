@@ -8,10 +8,10 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Le Tartuffe <magno79@gmail.com>, 2014,2016
 # Jiyoon, Ha <cryptography@konkuk.ac.kr>, 2016
-# Chr0m3 <chr0m3.kr@gmail.com>, 2015
+# JunGu Kang <chr0m3.kr@gmail.com>, 2015
 # Kagami Sascha Rosylight <saschanaz@outlook.com>, 2017
 # minsung kang, 2015
-# seok woojing <woojing.seok@gmail.com>, 2016
+# Woo-Jing, Seok <woojing.seok@gmail.com>, 2016
 # seungho, kim <raccoonyy@gmail.com>, 2015
 msgid ""
 msgstr ""

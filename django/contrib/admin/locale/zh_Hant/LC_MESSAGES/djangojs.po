@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
 "PO-Revision-Date: 2017-09-19 16:41+0000\n"
 "Last-Translator: Tzu-ping Chung <uranusjr@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
@@ -96,24 +96,8 @@ msgid ""
 msgstr ""
 "你已選了一個動作, 但沒有任何改變。你可能動到 '去' 按鈕, 而不是 '儲存' 按鈕。"
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "備註：您的電腦時間比伺服器快 %s 小時。"
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "備註：您的電腦時間比伺服器慢 %s 小時。"
-
 msgid "Now"
 msgstr "現在"
-
-msgid "Choose a Time"
-msgstr "選擇一個時間"
-
-msgid "Choose a time"
-msgstr "選擇一個時間"
 
 msgid "Midnight"
 msgstr "午夜"
@@ -126,6 +110,22 @@ msgstr "中午"
 
 msgid "6 p.m."
 msgstr "下午 6 點"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "備註：您的電腦時間比伺服器快 %s 小時。"
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "備註：您的電腦時間比伺服器慢 %s 小時。"
+
+msgid "Choose a Time"
+msgstr "選擇一個時間"
+
+msgid "Choose a time"
+msgstr "選擇一個時間"
 
 msgid "Cancel"
 msgstr "取消"

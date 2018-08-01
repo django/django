@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:13+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 00:21+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Welsh (http://www.transifex.com/django/django/language/cy/)\n"
 "MIME-Version: 1.0\n"
@@ -158,6 +158,9 @@ msgstr "Siapanëeg"
 
 msgid "Georgian"
 msgstr "Georgeg"
+
+msgid "Kabyle"
+msgstr ""
 
 msgid "Kazakh"
 msgstr "Casacstanaidd"
@@ -392,6 +395,9 @@ msgstr[3] ""
 "Sicrhewch fod gan y gwerth hwn ddim mwy na %(limit_value)d nod (mae ganddo "
 "%(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Rhowch rif."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -472,6 +478,10 @@ msgstr "Cyfanrif mawr (8 beit)"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "Rhaid i werth '%(value)s' for unai'n True neu False."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr ""
 
 msgid "Boolean (Either True or False)"
 msgstr "Boleaidd (Unai True neu False)"
@@ -647,9 +657,6 @@ msgstr "Mae angen y maes hwn."
 msgid "Enter a whole number."
 msgstr "Rhowch cyfanrif."
 
-msgid "Enter a number."
-msgstr "Rhowch rif."
-
 msgid "Enter a valid date."
 msgstr "Rhif ddyddiad dilys."
 
@@ -660,6 +667,10 @@ msgid "Enter a valid date/time."
 msgstr "Rhowch ddyddiad/amser dilys."
 
 msgid "Enter a valid duration."
+msgstr ""
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
 msgstr ""
 
 msgid "No file was submitted. Check the encoding type on the form."

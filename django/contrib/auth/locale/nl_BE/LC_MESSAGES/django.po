@@ -1,0 +1,310 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# G3N1X <crypto.genix@gmail.com>, 2016
+# Bas Peschier <bas.peschier@gmail.com>, 2013
+# Erik Romijn <transifex@solidlinks.nl>, 2013
+# Harro van der Klauw <hvdklauw@gmail.com>, 2012
+# Ilja Maas <iljamaas@dreamsolution.nl>, 2015
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Sander Steffann <inactive+steffann@transifex.com>, 2015
+# Tino de Bruijn <tinodb@gmail.com>, 2011
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-09-24 14:24+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Dutch (Belgium) (http://www.transifex.com/django/django/"
+"language/nl_BE/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: nl_BE\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Personal info"
+msgstr "Persoonlijke informatie"
+
+msgid "Permissions"
+msgstr "Rechten"
+
+msgid "Important dates"
+msgstr "Belangrijke datums"
+
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "%(name)s object met primaire sleutel %(key)r bestaat niet."
+
+msgid "Password changed successfully."
+msgstr "Wachtwoord wijzigen is geslaagd."
+
+#, python-format
+msgid "Change password: %s"
+msgstr "Wijzig wachtwoord: %s"
+
+msgid "Authentication and Authorization"
+msgstr "Authenticatie en Autorisatie"
+
+msgid "password"
+msgstr "wachtwoord"
+
+msgid "last login"
+msgstr "laatste inlog"
+
+msgid "No password set."
+msgstr "Er is geen wachtwoord ingesteld."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Ongeldig wachtwoord formaat of onbekend hashing algoritme."
+
+msgid "The two password fields didn't match."
+msgstr "De twee ingevulde wachtwoorden zijn niet gelijk."
+
+msgid "Password"
+msgstr "Wachtwoord"
+
+msgid "Password confirmation"
+msgstr "Bevestiging wachtwoord"
+
+msgid "Enter the same password as before, for verification."
+msgstr "Vul  ter verificatie nogmaals het wachtwoord in."
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
+msgstr ""
+
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr ""
+"Voer een correcte %(username)s en wachtwoord in. Let op dat beide velden "
+"hoofdlettergevoelig zijn."
+
+msgid "This account is inactive."
+msgstr "Dit account is inactief."
+
+msgid "Email"
+msgstr "Email"
+
+msgid "New password"
+msgstr "Nieuw wachtwoord"
+
+msgid "New password confirmation"
+msgstr "Nieuw wachtwoord bevestigen"
+
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr ""
+"Uw oude wachtwoord is niet correct ingevoerd. Voert u het alstublieft "
+"opnieuw in."
+
+msgid "Old password"
+msgstr "Oud wachtwoord"
+
+msgid "Password (again)"
+msgstr "Wachtwoord (nogmaals)"
+
+msgid "algorithm"
+msgstr "algoritme"
+
+msgid "iterations"
+msgstr "iteraties"
+
+msgid "salt"
+msgstr "salt"
+
+msgid "hash"
+msgstr "hash"
+
+msgid "variety"
+msgstr "variëteit"
+
+msgid "version"
+msgstr "versie"
+
+msgid "memory cost"
+msgstr "geheugen gebruik"
+
+msgid "time cost"
+msgstr "doorlooptijd"
+
+msgid "parallelism"
+msgstr "parallellisme"
+
+msgid "work factor"
+msgstr "arbeidsfactor"
+
+msgid "checksum"
+msgstr "checksum"
+
+msgid "name"
+msgstr "naam"
+
+msgid "content type"
+msgstr "inhoudstype"
+
+msgid "codename"
+msgstr "codenaam"
+
+msgid "permission"
+msgstr "recht"
+
+msgid "permissions"
+msgstr "rechten"
+
+msgid "group"
+msgstr "groep"
+
+msgid "groups"
+msgstr "groepen"
+
+msgid "superuser status"
+msgstr "supergebruikerstatus"
+
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Bepaalt dat deze gebruiker alle rechten heeft, zonder deze expliciet toe te "
+"wijzen."
+
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of their groups."
+msgstr ""
+"De groep waar deze gebruiker toe behoort. Gebruikers krijgen alle permissies "
+"behorende bij hun groepen."
+
+msgid "user permissions"
+msgstr "gebruikersrechten"
+
+msgid "Specific permissions for this user."
+msgstr "Specifieke permissies voor deze gebruiker."
+
+msgid "username"
+msgstr "gebruikersnaam"
+
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Vereist. 150 tekens of minder. Alleen letters, cijfers en @/,/+/-/_ tekens "
+"zijn toegestaan."
+
+msgid "A user with that username already exists."
+msgstr "Een gebruiker met deze gebruikersnaam bestaat al."
+
+msgid "first name"
+msgstr "voornaam"
+
+msgid "last name"
+msgstr "achternaam"
+
+msgid "email address"
+msgstr "emailadres"
+
+msgid "staff status"
+msgstr "stafstatus"
+
+msgid "Designates whether the user can log into this admin site."
+msgstr "Bepaalt of de gebruiker kan inloggen op deze beheersite."
+
+msgid "active"
+msgstr "actief"
+
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Bepaalt of deze gebruiker als actief dient te worden behandeld. U kunt dit "
+"uitvinken in plaats van een gebruiker te verwijderen."
+
+msgid "date joined"
+msgstr "datum toegetreden"
+
+msgid "user"
+msgstr "gebruiker"
+
+msgid "users"
+msgstr "gebruikers"
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+"Dit wachtwoord is te kort. De minimum lengte is %(min_length)d karakters."
+msgstr[1] ""
+"Dit wachtwoord is te kort. De minimum lengte is %(min_length)d karakters."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "Uw wachtwoord moet minamaal %(min_length)d karakters lang zijn."
+msgstr[1] "Uw wachtwoord moet minamaal %(min_length)d karakters lang zijn."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "Het wachtwoord lijkt te veel op de %(verbose_name)s."
+
+msgid "Your password can't be too similar to your other personal information."
+msgstr ""
+"Uw wachtwoord mag niet te veel lijken op uw overige persoonlijke informatie."
+
+msgid "This password is too common."
+msgstr "Dit wachtwoord is te generiek."
+
+msgid "Your password can't be a commonly used password."
+msgstr "Uw wachtwoord mag geen veelgebruikt wachtwoord zijn."
+
+msgid "This password is entirely numeric."
+msgstr "Uw wachtwoord bevat alleen cijfers."
+
+msgid "Your password can't be entirely numeric."
+msgstr "Uw wachtwoord mag niet volledig uit cijfers bestaan."
+
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "Wachtwoord reset voor %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Geef een geldige gebruikersnaam op. Deze waarde mag alleen letters, cijfers "
+"en de tekens @/./+/-/_ bevatten."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Geef een geldige gebruikersnaam op. Deze waarde mag alleen letters, cijfers "
+"en de tekens @/./+/-/_ bevatten."
+
+msgid "Logged out"
+msgstr "Afmelden"
+
+msgid "Password reset"
+msgstr "Wachtwoord herstellen"
+
+msgid "Password reset sent"
+msgstr "Wachtwoord herstel verstuurd"
+
+msgid "Enter new password"
+msgstr "Voer nieuw wachtwoord in"
+
+msgid "Password reset unsuccessful"
+msgstr "Wachtwoord herstel mislukt"
+
+msgid "Password reset complete"
+msgstr "Wachtwoord herstellen voltooid"
+
+msgid "Password change"
+msgstr "Wachtwoordwijziging"
+
+msgid "Password change successful"
+msgstr "Wachtwoord wijzigen is geslaagd"

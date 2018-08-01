@@ -7,14 +7,15 @@
 # Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2015
 # Lucas Infante <maccinza@gmail.com>, 2015
 # Luiz Boaretto <lboaretto@gmail.com>, 2017
+# Marcelo Moro Brondani <mbrondani@inf.ufsm.br>, 2018
 # Rafael Ribeiro <pereiraribeirorafael@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 20:42+0000\n"
-"Last-Translator: andrewsmedina <andrewsmedina@gmail.com>\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-06-25 18:11+0000\n"
+"Last-Translator: Marcelo Moro Brondani <mbrondani@inf.ufsm.br>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -27,8 +28,8 @@ msgid "PostgreSQL extensions"
 msgstr "Extensões para PostgreSQL"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
-msgstr "O item %(nth)s no array não pode ser validado:"
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "O item %(nth)s na matriz não validou:"
 
 msgid "Nested arrays must have the same length."
 msgstr "Matrizes aninhadas devem ter o mesmo comprimento."

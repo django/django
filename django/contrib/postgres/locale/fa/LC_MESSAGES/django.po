@@ -2,39 +2,40 @@
 #
 # Translators:
 # Ali Nikneshan <ali@nikneshan.com>, 2015
+# MJafar Mashhadi <raindigital2007@gmail.com>, 2018
 # Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>, 2016
 # Pouya Abbassi, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 20:42+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-06-23 23:11+0000\n"
+"Last-Translator: MJafar Mashhadi <raindigital2007@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: fa\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 msgid "PostgreSQL extensions"
 msgstr "ملحقات Postgres"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
-msgstr "مورد %(nth)s ام در آرایه معتبر نیست: "
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "عضو %(nth)sم آرایه معتبر نیست:"
 
 msgid "Nested arrays must have the same length."
 msgstr "آرایه های تو در تو باید هم سایز باشند"
 
 msgid "Map of strings to strings/nulls"
-msgstr ""
+msgstr "نگاشتی از رشته به رشته/هیچمقدار"
 
 #, python-format
 msgid "The value of \"%(key)s\" is not a string or null."
-msgstr ""
+msgstr "مقدار \"%(key)s\" باید رشته یا هیچمقدار باشد."
 
 msgid "A JSON object"
 msgstr "یک شیء JSON"
@@ -80,6 +81,9 @@ msgid_plural ""
 msgstr[0] ""
 "لیست شامل %(show_value)d مورد است. ولی باید حداکثر شامل %(limit_value)d مورد "
 "باشد."
+msgstr[1] ""
+"لیست شامل %(show_value)d مورد است. ولی باید حداکثر شامل %(limit_value)d مورد "
+"باشد."
 
 #, python-format
 msgid ""
@@ -89,6 +93,8 @@ msgid_plural ""
 "List contains %(show_value)d items, it should contain no fewer than "
 "%(limit_value)d."
 msgstr[0] ""
+"لیست شامل %(show_value)d است، نباید کمتر از %(limit_value)d را شامل شود."
+msgstr[1] ""
 "لیست شامل %(show_value)d است، نباید کمتر از %(limit_value)d را شامل شود."
 
 #, python-format

@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: jon_atkinson <jon@jonatkinson.co.uk>\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-05-28 01:29+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: English (United Kingdom) (http://www.transifex.com/django/"
 "django/language/en_GB/)\n"
 "MIME-Version: 1.0\n"
@@ -84,6 +84,15 @@ msgstr "Add another %(verbose_name)s"
 
 msgid "Remove"
 msgstr "Remove"
+
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "Change"
+
+msgid "Deletion"
+msgstr ""
 
 msgid "action time"
 msgstr "action time"
@@ -162,8 +171,10 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -173,12 +184,13 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -216,6 +228,10 @@ msgstr "Add %s"
 #, python-format
 msgid "Change %s"
 msgstr "Change %s"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "Database error"
@@ -321,7 +337,7 @@ msgid "Change password"
 msgstr "Change password"
 
 msgid "Please correct the error below."
-msgstr "Please correct the errors below."
+msgstr ""
 
 msgid "Please correct the errors below."
 msgstr ""
@@ -432,8 +448,8 @@ msgstr ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 
-msgid "Change"
-msgstr "Change"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr "Delete?"
@@ -452,8 +468,8 @@ msgstr ""
 msgid "Add"
 msgstr "Add"
 
-msgid "You don't have permission to edit anything."
-msgstr "You don't have permission to edit anything."
+msgid "You don't have permission to view or edit anything."
+msgstr ""
 
 msgid "Recent actions"
 msgstr ""
@@ -515,6 +531,10 @@ msgid "Change selected %(model)s"
 msgstr ""
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr ""
 
@@ -543,6 +563,12 @@ msgstr "Save and add another"
 
 msgid "Save and continue editing"
 msgstr "Save and continue editing"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Thanks for spending some quality time with the Web site today."
@@ -645,6 +671,10 @@ msgstr "Select %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Select %s to change"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "Date:"

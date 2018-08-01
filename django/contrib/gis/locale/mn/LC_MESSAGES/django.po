@@ -3,7 +3,7 @@
 # Translators:
 # Jacara <baskhuujacara@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Zorig <zorig_ezd@yahoo.com>, 2014,2016
+# Zorig, 2014,2016
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011-2012,2015
 # Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011,2015
 msgid ""

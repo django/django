@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
 "PO-Revision-Date: 2017-09-23 18:54+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/django/django/language/"
@@ -100,6 +100,21 @@ msgstr ""
 "Bạn đã lựa chọn một hành động, và bạn đã không thực hiện bất kỳ thay đổi nào "
 "trên các trường. Có lẽ bạn đang tìm kiếm nút bấm Go thay vì nút bấm Save."
 
+msgid "Now"
+msgstr "Bây giờ"
+
+msgid "Midnight"
+msgstr "Nửa đêm"
+
+msgid "6 a.m."
+msgstr "6 giờ sáng"
+
+msgid "Noon"
+msgstr "Buổi trưa"
+
+msgid "6 p.m."
+msgstr ""
+
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
@@ -113,26 +128,11 @@ msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] ""
 "Lưu ý: Hiện tại bạn đang thấy thời gian sau %s giờ so với thời gian máy chủ."
 
-msgid "Now"
-msgstr "Bây giờ"
-
 msgid "Choose a Time"
 msgstr ""
 
 msgid "Choose a time"
 msgstr "Chọn giờ"
-
-msgid "Midnight"
-msgstr "Nửa đêm"
-
-msgid "6 a.m."
-msgstr "6 giờ sáng"
-
-msgid "Noon"
-msgstr "Buổi trưa"
-
-msgid "6 p.m."
-msgstr ""
 
 msgid "Cancel"
 msgstr "Hủy bỏ"

@@ -2,7 +2,7 @@
 #
 # Translators:
 # André Bouatchidzé <a@anbz.net>, 2013,2015
-# avsd05 <avsd05@gmail.com>, 2011
+# David A. <avsd05@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ka\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
 
 msgid "GIS"
 msgstr ""

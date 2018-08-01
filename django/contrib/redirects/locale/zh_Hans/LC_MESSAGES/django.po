@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Bestony <xiqingongzi@gmail.com>, 2018
+# Bai HuanCheng (Bestony) <xiqingongzi@gmail.com>, 2018
 # Jannis Leidel <jannis@leidel.info>, 2011
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
 # Ronald White <ouyanghongyu@gmail.com>, 2014
@@ -11,7 +11,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-09 17:42+0200\n"
 "PO-Revision-Date: 2018-01-14 07:31+0000\n"
-"Last-Translator: Bestony <xiqingongzi@gmail.com>\n"
+"Last-Translator: Bai HuanCheng (Bestony) <xiqingongzi@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"

@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:13+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 00:21+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Udmurt (http://www.transifex.com/django/django/language/"
 "udm/)\n"
@@ -156,6 +156,9 @@ msgstr "Япон"
 
 msgid "Georgian"
 msgstr "Грузин"
+
+msgid "Kabyle"
+msgstr ""
 
 msgid "Kazakh"
 msgstr "Казах"
@@ -366,6 +369,9 @@ msgid_plural ""
 "%(show_value)d)."
 msgstr[0] ""
 
+msgid "Enter a number."
+msgstr "Лыд гожтэ."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -436,6 +442,10 @@ msgstr "Бадӟым (8 байтъем) целой лыд"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
+msgstr ""
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
 msgstr ""
 
 msgid "Boolean (Either True or False)"
@@ -600,9 +610,6 @@ msgstr "Та клуэ."
 msgid "Enter a whole number."
 msgstr "Целой лыд гожтэ."
 
-msgid "Enter a number."
-msgstr "Лыд гожтэ."
-
 msgid "Enter a valid date."
 msgstr "Шонер дата гожтэ."
 
@@ -613,6 +620,10 @@ msgid "Enter a valid date/time."
 msgstr "Шонер дата но час-минут гожтэ."
 
 msgid "Enter a valid duration."
+msgstr ""
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
 msgstr ""
 
 msgid "No file was submitted. Check the encoding type on the form."

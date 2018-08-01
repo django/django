@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-05-28 01:29+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Urdu (http://www.transifex.com/django/django/language/ur/)\n"
 "MIME-Version: 1.0\n"
@@ -82,6 +82,15 @@ msgstr "دوسرا %(verbose_name)s درج کریں"
 
 msgid "Remove"
 msgstr "خارج کریں"
+
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "تدوین"
+
+msgid "Deletion"
+msgstr ""
 
 msgid "action time"
 msgstr "کاروائی کا وقت"
@@ -160,8 +169,10 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -171,12 +182,13 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -214,6 +226,10 @@ msgstr "%s کا اضافہ کریں"
 #, python-format
 msgid "Change %s"
 msgstr "%s تبدیل کریں"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "ڈیٹا بیس کی خرابی"
@@ -319,7 +335,7 @@ msgid "Change password"
 msgstr "لفظ اجازت تبدیل کریں"
 
 msgid "Please correct the error below."
-msgstr "براہ کرم نیچے غلطیاں درست کریں۔"
+msgstr ""
 
 msgid "Please correct the errors below."
 msgstr ""
@@ -429,8 +445,8 @@ msgstr ""
 "واقعی آپ منتخب شدہ %(objects_name)s مٹانا چاھتے ھیں؟ مندرجہ ذیل اور ان سے "
 "متعلقہ تمام اشیاء حذف ھو جائیں گی۔"
 
-msgid "Change"
-msgstr "تدوین"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr "مٹاؤں؟"
@@ -449,8 +465,8 @@ msgstr ""
 msgid "Add"
 msgstr "اضافہ"
 
-msgid "You don't have permission to edit anything."
-msgstr "آپ کو کوئی چیز مدوّن کرنے کا حق نھیں ھے۔"
+msgid "You don't have permission to view or edit anything."
+msgstr ""
 
 msgid "Recent actions"
 msgstr ""
@@ -512,6 +528,10 @@ msgid "Change selected %(model)s"
 msgstr ""
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr ""
 
@@ -540,6 +560,12 @@ msgstr "محفوظ کریں اور مزید اضافہ کریں"
 
 msgid "Save and continue editing"
 msgstr "محفوظ کریں اور تدوین جاری رکھیں"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "ویب سائٹ پر آج کچھ معیاری وقت خرچ کرنے کے لئے شکریہ۔"
@@ -644,6 +670,10 @@ msgstr "%s منتخب کریں"
 #, python-format
 msgid "Select %s to change"
 msgstr "تبدیل کرنے کے لئے %s منتخب کریں"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "تاریخ:"

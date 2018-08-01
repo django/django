@@ -2,13 +2,13 @@
 #
 # Translators:
 # Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2012-2013
-# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2013-2017
+# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2013-2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-12-09 14:19+0000\n"
+"PO-Revision-Date: 2018-04-29 10:04+0000\n"
 "Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
 "Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
 "eo/)\n"
@@ -78,7 +78,7 @@ msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
-"Bonvolu enigi korektan %(username)s-n kaj pasvorton. Notu, ke ambaŭ kampoj "
+"Bonvolu enigi korektan %(username)sn kaj pasvorton. Notu, ke ambaŭ kampoj "
 "povas esti usklecodistingaj."
 
 msgid "This account is inactive."

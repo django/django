@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Edgars Voroboks <nullisnot0@inbox.lv>, 2017
+# NullIsNot0 <nullisnot0@inbox.lv>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # peterisb <pb@sungis.lv>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
 "PO-Revision-Date: 2017-11-18 08:13+0000\n"
-"Last-Translator: Edgars Voroboks <nullisnot0@inbox.lv>\n"
+"Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -103,6 +103,21 @@ msgstr ""
 "Jūs esat izvēlējies veikt darbību un neesat izmainījis nevienu lauku. Jūs "
 "droši vien meklējat pogu 'Aiziet' nevis 'Saglabāt'."
 
+msgid "Now"
+msgstr "Tagad"
+
+msgid "Midnight"
+msgstr "Pusnakts"
+
+msgid "6 a.m."
+msgstr "06.00"
+
+msgid "Noon"
+msgstr "Pusdienas laiks"
+
+msgid "6 p.m."
+msgstr "6:00"
+
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
@@ -117,26 +132,11 @@ msgstr[0] "Piezīme: Tavs laiks ir %s stundas pēc servera laika."
 msgstr[1] "Piezīme: Tavs laiks ir %s stundu pēc servera laika."
 msgstr[2] "Piezīme: Tavs laiks ir %s stundas pēc servera laika."
 
-msgid "Now"
-msgstr "Tagad"
-
 msgid "Choose a Time"
 msgstr "Izvēlies laiku"
 
 msgid "Choose a time"
 msgstr "Izvēlieties laiku"
-
-msgid "Midnight"
-msgstr "Pusnakts"
-
-msgid "6 a.m."
-msgstr "06.00"
-
-msgid "Noon"
-msgstr "Pusdienas laiks"
-
-msgid "6 p.m."
-msgstr "6:00"
 
 msgid "Cancel"
 msgstr "Atcelt"

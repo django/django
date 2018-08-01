@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
-"Last-Translator: znotdead <zhirafchik@gmail.com>\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-05-28 01:29+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
@@ -88,6 +88,15 @@ msgstr "Дадаць яшчэ %(verbose_name)s"
 
 msgid "Remove"
 msgstr "Прыбраць"
+
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "Зьмяніць"
+
+msgid "Deletion"
+msgstr ""
 
 msgid "action time"
 msgstr "час дзеяньня"
@@ -168,9 +177,11 @@ msgstr ""
 "вылучыць больш за адзін."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr "Дадалі {name} \"{obj}\". Ніжэй яго можна зноўку правіць."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "Дадалі {name} \"{obj}\"."
+
+msgid "You may edit it again below."
+msgstr ""
 
 #, python-brace-format
 msgid ""
@@ -179,13 +190,14 @@ msgid ""
 msgstr "Дадалі {name} \"{obj}\". Ніжэй можна дадаць іншы {name}."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "Дадалі {name} \"{obj}\"."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr "Змянілі {name} \"{obj}\". Ніжэй яго можна зноўку правіць."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr "Дадалі {name} \"{obj}\". Ніжэй яго можна зноўку правіць."
 
 #, python-brace-format
 msgid ""
@@ -222,6 +234,10 @@ msgstr "Дадаць %s"
 #, python-format
 msgid "Change %s"
 msgstr "Зьмяніць %s"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "База зьвестак дала хібу"
@@ -336,7 +352,7 @@ msgid "Change password"
 msgstr "Зьмяніць пароль"
 
 msgid "Please correct the error below."
-msgstr "Выпраўце хібы, апісаныя ніжэй."
+msgstr ""
 
 msgid "Please correct the errors below."
 msgstr "Калі ласка, выпраўце памылкі, адзначаныя ніжэй."
@@ -445,8 +461,8 @@ msgstr ""
 "Ці выдаліць абранае (%(objects_name)s)? Усе наступныя аб’екты ды зьвязаныя "
 "зь імі складнікі выдаляцца:"
 
-msgid "Change"
-msgstr "Зьмяніць"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr "Ці выдаліць?"
@@ -465,8 +481,8 @@ msgstr "Мадэлі ў %(name)s праграме"
 msgid "Add"
 msgstr "Дадаць"
 
-msgid "You don't have permission to edit anything."
-msgstr "Вы ня маеце дазволу нешта зьмяняць."
+msgid "You don't have permission to view or edit anything."
+msgstr ""
 
 msgid "Recent actions"
 msgstr "Нядаўнія дзеянні"
@@ -529,6 +545,10 @@ msgid "Change selected %(model)s"
 msgstr "Змяніць абраныя %(model)s"
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr "Дадаць яшчэ %(model)s"
 
@@ -559,6 +579,12 @@ msgstr "Захаваць і дадаць іншы"
 
 msgid "Save and continue editing"
 msgstr "Захаваць і працягваць правіць"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Дзякуем за час, які вы сёньня правялі на гэтай пляцоўцы."
@@ -668,6 +694,10 @@ msgstr "Абраць %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Абярыце %s, каб зьмяніць"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "Дата:"

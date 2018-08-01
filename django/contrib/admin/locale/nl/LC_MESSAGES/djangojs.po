@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
 "PO-Revision-Date: 2017-09-23 18:54+0000\n"
 "Last-Translator: Evelijn Saaltink <evelijnsaaltink@gmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
@@ -106,26 +106,8 @@ msgstr ""
 "individuele velden. U zoekt waarschijnlijk naar de Gaan knop in plaats van "
 "de Opslaan knop."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Let op: U ligt %s uur voor ten opzichte van de server-tijd."
-msgstr[1] "Let op: U ligt %s uren voor ten opzichte van de server-tijd."
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Let op: U ligt %s uur achter ten opzichte van de server-tijd."
-msgstr[1] "Let op: U ligt %s uren achter ten opzichte van de server-tijd."
-
 msgid "Now"
 msgstr "Nu"
-
-msgid "Choose a Time"
-msgstr "Kies een tijdstip"
-
-msgid "Choose a time"
-msgstr "Kies een tijd"
 
 msgid "Midnight"
 msgstr "Middernacht"
@@ -138,6 +120,24 @@ msgstr "12 uur 's middags"
 
 msgid "6 p.m."
 msgstr "6 uur 's avonds"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Let op: U ligt %s uur voor ten opzichte van de server-tijd."
+msgstr[1] "Let op: U ligt %s uren voor ten opzichte van de server-tijd."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Let op: U ligt %s uur achter ten opzichte van de server-tijd."
+msgstr[1] "Let op: U ligt %s uren achter ten opzichte van de server-tijd."
+
+msgid "Choose a Time"
+msgstr "Kies een tijdstip"
+
+msgid "Choose a time"
+msgstr "Kies een tijd"
 
 msgid "Cancel"
 msgstr "Annuleren"

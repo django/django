@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
 "PO-Revision-Date: 2017-09-20 03:01+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Spanish (Colombia) (http://www.transifex.com/django/django/"
@@ -104,26 +104,8 @@ msgstr ""
 "individuales. Probablemente esté buscando el botón Ejecutar en lugar del "
 "botón Guardar."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Nota: Usted esta a %s horas por delante de la hora del servidor."
-msgstr[1] "Nota: Usted va %s horas por delante de la hora del servidor."
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Nota: Usted esta a %s hora de retraso de tiempo de servidor."
-msgstr[1] "Nota: Usted va %s horas por detrás de la hora del servidor."
-
 msgid "Now"
 msgstr "Ahora"
-
-msgid "Choose a Time"
-msgstr "Elija una hora"
-
-msgid "Choose a time"
-msgstr "Elija una hora"
 
 msgid "Midnight"
 msgstr "Medianoche"
@@ -136,6 +118,24 @@ msgstr "Mediodía"
 
 msgid "6 p.m."
 msgstr "6 p.m."
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Nota: Usted esta a %s horas por delante de la hora del servidor."
+msgstr[1] "Nota: Usted va %s horas por delante de la hora del servidor."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Nota: Usted esta a %s hora de retraso de tiempo de servidor."
+msgstr[1] "Nota: Usted va %s horas por detrás de la hora del servidor."
+
+msgid "Choose a Time"
+msgstr "Elija una hora"
+
+msgid "Choose a time"
+msgstr "Elija una hora"
 
 msgid "Cancel"
 msgstr "Cancelar"

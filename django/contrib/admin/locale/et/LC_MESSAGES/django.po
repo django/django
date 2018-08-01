@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-05-28 01:29+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
@@ -91,6 +91,15 @@ msgstr "Lisa veel üks %(verbose_name)s"
 msgid "Remove"
 msgstr "Eemalda"
 
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "Muuda"
+
+msgid "Deletion"
+msgstr ""
+
 msgid "action time"
 msgstr "toimingu aeg"
 
@@ -168,9 +177,11 @@ msgid ""
 msgstr "Et valida mitu, hoidke all \"Control\"-nuppu (Maci puhul \"Command\")."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr "{name} \"{obj}\" lisamine õnnestus. Allpool saate seda uuesti muuta."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" lisamine õnnestus."
+
+msgid "You may edit it again below."
+msgstr ""
 
 #, python-brace-format
 msgid ""
@@ -179,13 +190,14 @@ msgid ""
 msgstr "{name} \"{obj}\" lisamine õnnestus. Allpool saate lisada uue {name}."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} \"{obj}\" lisamine õnnestus."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr "{name} \"{obj}\" muutmine õnnestus. Allpool saate seda uuesti muuta."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr "{name} \"{obj}\" lisamine õnnestus. Allpool saate seda uuesti muuta."
 
 #, python-brace-format
 msgid ""
@@ -222,6 +234,10 @@ msgstr "Lisa %s"
 #, python-format
 msgid "Change %s"
 msgstr "Muuda %s"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "Andmebaasi viga"
@@ -331,7 +347,7 @@ msgid "Change password"
 msgstr "Muuda salasõna"
 
 msgid "Please correct the error below."
-msgstr "Palun parandage allolevad vead"
+msgstr ""
 
 msgid "Please correct the errors below."
 msgstr "Palun parandage allolevad vead."
@@ -442,8 +458,8 @@ msgstr ""
 "Kas oled kindel, et soovid kustutada valitud %(objects_name)s? Kõik "
 "järgnevad objektid ja seotud objektid kustutatakse:"
 
-msgid "Change"
-msgstr "Muuda"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr "Kustutan?"
@@ -462,8 +478,8 @@ msgstr "Rakenduse %(name)s moodulid"
 msgid "Add"
 msgstr "Lisa"
 
-msgid "You don't have permission to edit anything."
-msgstr "Teil ei ole õigust midagi muuta."
+msgid "You don't have permission to view or edit anything."
+msgstr ""
 
 msgid "Recent actions"
 msgstr "Hiljutised toimingud"
@@ -527,6 +543,10 @@ msgid "Change selected %(model)s"
 msgstr "Muuda valitud %(model)s"
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr "Lisa veel üks %(model)s"
 
@@ -555,6 +575,12 @@ msgstr "Salvesta ja lisa uus"
 
 msgid "Save and continue editing"
 msgstr "Salvesta ja jätka muutmist"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Tänan, et veetsite aega meie lehel."
@@ -666,6 +692,10 @@ msgstr "Vali %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Vali %s mida muuta"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "Kuupäev:"

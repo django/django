@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-01 21:10+0100\n"
-"PO-Revision-Date: 2017-12-02 06:40+0000\n"
-"Last-Translator: znotdead <zhirafchik@gmail.com>\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 00:21+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
@@ -399,6 +399,9 @@ msgstr[3] ""
 "Упэўніцеся, што гэтае значэнне мае не болей %(limit_value)d сімвалаў (зараз "
 "%(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Набярыце лік."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -483,6 +486,10 @@ msgstr "Вялікі (8 байтаў) цэлы"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "Значэньне '%(value)s' павінна быць True або False."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr ""
 
 msgid "Boolean (Either True or False)"
 msgstr "Ляґічнае («сапраўдна» або «не сапраўдна»)"
@@ -660,9 +667,6 @@ msgstr "Поле трэба запоўніць."
 msgid "Enter a whole number."
 msgstr "Набярыце ўвесь лік."
 
-msgid "Enter a number."
-msgstr "Набярыце лік."
-
 msgid "Enter a valid date."
 msgstr "Пазначце чынную дату."
 
@@ -674,6 +678,10 @@ msgstr "Пазначце чынныя час і дату."
 
 msgid "Enter a valid duration."
 msgstr "Увядзіце сапраўдны тэрмін."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr ""
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Файл не даслалі. Зірніце кадоўку блянку."

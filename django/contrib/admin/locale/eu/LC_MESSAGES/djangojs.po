@@ -4,12 +4,12 @@
 # Aitzol Naberan <anaberan@codesyntax.com>, 2011
 # Eneko Illarramendi <eneko@illarra.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
-# julen <julenx@gmail.com>, 2012-2013
+# julen, 2012-2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
 "PO-Revision-Date: 2017-09-23 18:54+0000\n"
 "Last-Translator: Eneko Illarramendi <eneko@illarra.com>\n"
 "Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
@@ -99,26 +99,8 @@ msgstr ""
 "Ekintza bat hautatu duzu, baina ez duzu inongo aldaketarik egin eremuetan. "
 "Litekeena da, Gorde botoia beharrean Aurrera botoiaren bila aritzea."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Oharra: zerbitzariaren denborarekiko ordu %s aurrerago zaude"
-msgstr[1] "Oharra: zerbitzariaren denborarekiko %s ordu aurrerago zaude"
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Oharra: zerbitzariaren denborarekiko ordu %s atzerago zaude. "
-msgstr[1] "Oharra: zerbitzariaren denborarekiko %s ordu atzerago zaude. "
-
 msgid "Now"
 msgstr "Orain"
-
-msgid "Choose a Time"
-msgstr "Aukeratu ordu bat"
-
-msgid "Choose a time"
-msgstr "Aukeratu ordu bat"
 
 msgid "Midnight"
 msgstr "Gauerdia"
@@ -131,6 +113,24 @@ msgstr "Eguerdia"
 
 msgid "6 p.m."
 msgstr "6 p.m."
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Oharra: zerbitzariaren denborarekiko ordu %s aurrerago zaude"
+msgstr[1] "Oharra: zerbitzariaren denborarekiko %s ordu aurrerago zaude"
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Oharra: zerbitzariaren denborarekiko ordu %s atzerago zaude. "
+msgstr[1] "Oharra: zerbitzariaren denborarekiko %s ordu atzerago zaude. "
+
+msgid "Choose a Time"
+msgstr "Aukeratu ordu bat"
+
+msgid "Choose a time"
+msgstr "Aukeratu ordu bat"
 
 msgid "Cancel"
 msgstr "Atzera"

@@ -6,15 +6,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-05-28 01:29+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Breton (http://www.transifex.com/django/django/language/br/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: br\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Plural-Forms: nplurals=5; plural=((n%10 == 1) && (n%100 != 11) && (n%100 !"
+"=71) && (n%100 !=91) ? 0 :(n%10 == 2) && (n%100 != 12) && (n%100 !=72) && (n"
+"%100 !=92) ? 1 :(n%10 ==3 || n%10==4 || n%10==9) && (n%100 < 10 || n% 100 > "
+"19) && (n%100 < 70 || n%100 > 79) && (n%100 < 90 || n%100 > 99) ? 2 :(n != 0 "
+"&& n % 1000000 == 0) ? 3 : 4);\n"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -82,6 +86,15 @@ msgstr ""
 
 msgid "Remove"
 msgstr "Lemel kuit"
+
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "Kemmañ"
+
+msgid "Deletion"
+msgstr ""
 
 msgid "action time"
 msgstr "eur an ober"
@@ -160,8 +173,10 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -171,12 +186,13 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -213,6 +229,10 @@ msgstr "Ouzhpennañ %s"
 msgid "Change %s"
 msgstr "Kemmañ %s"
 
+#, python-format
+msgid "View %s"
+msgstr ""
+
 msgid "Database error"
 msgstr "Fazi en diaz roadennoù"
 
@@ -221,12 +241,18 @@ msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #, python-format
 msgid "0 of %(cnt)s selected"
@@ -412,8 +438,8 @@ msgid ""
 "following objects and their related items will be deleted:"
 msgstr ""
 
-msgid "Change"
-msgstr "Kemmañ"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr "Diverkañ ?"
@@ -432,7 +458,7 @@ msgstr ""
 msgid "Add"
 msgstr "Ouzhpennañ"
 
-msgid "You don't have permission to edit anything."
+msgid "You don't have permission to view or edit anything."
 msgstr ""
 
 msgid "Recent actions"
@@ -490,6 +516,10 @@ msgid "Change selected %(model)s"
 msgstr ""
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr ""
 
@@ -505,6 +535,9 @@ msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #, python-format
 msgid "%(full_result_count)s total"
@@ -518,6 +551,12 @@ msgstr "Enrollañ hag ouzhpennañ unan all"
 
 msgid "Save and continue editing"
 msgstr "Enrollañ ha derc'hel da gemmañ"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr ""
@@ -613,6 +652,10 @@ msgstr "Diuzañ %s"
 
 #, python-format
 msgid "Select %s to change"
+msgstr ""
+
+#, python-format
+msgid "Select %s to view"
 msgstr ""
 
 msgid "Date:"

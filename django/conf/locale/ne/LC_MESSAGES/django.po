@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-01 21:10+0100\n"
-"PO-Revision-Date: 2018-02-10 13:00+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-07-21 02:37+0000\n"
 "Last-Translator: Sagar Chalise <chalisesagar@gmail.com>\n"
 "Language-Team: Nepali (http://www.transifex.com/django/django/language/ne/)\n"
 "MIME-Version: 1.0\n"
@@ -381,6 +381,9 @@ msgstr[1] ""
 "यो मान बढिमा पनि %(limit_value)d अक्षरहरु छ भन्ने निश्चित गर्नुहोस । (यसमा "
 "%(show_value)d छ ।)"
 
+msgid "Enter a number."
+msgstr "संख्या राख्नुहोस ।"
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -406,6 +409,7 @@ msgid ""
 "File extension '%(extension)s' is not allowed. Allowed extensions are: "
 "'%(allowed_extensions)s'."
 msgstr ""
+"'%(extension)s' फाइलको अनुमति छैन। अनुमति भएका फाइलहरू: '%(allowed_extensions)s'"
 
 msgid "Null characters are not allowed."
 msgstr "शून्य मान अनुमति छैन।"
@@ -456,6 +460,10 @@ msgstr "ठूलो (८ बाइटको) अंक"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "%(value)s' को मान True अथवा False हुनुपर्दछ ।."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr ""
 
 msgid "Boolean (Either True or False)"
 msgstr "बुलियन (True अथवा False)"
@@ -619,9 +627,6 @@ msgstr "यो फाँट अनिवार्य छ ।"
 msgid "Enter a whole number."
 msgstr "संख्या राख्नुहोस ।"
 
-msgid "Enter a number."
-msgstr "संख्या राख्नुहोस ।"
-
 msgid "Enter a valid date."
 msgstr "उपयुक्त मिति राख्नुहोस ।"
 
@@ -633,6 +638,10 @@ msgstr "उपयुक्त मिति/समय राख्नुहोस
 
 msgid "Enter a valid duration."
 msgstr "उपयुक्त अवधि राख्नुहोस ।"
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "दिन गन्ती {min_days} र {max_days} बीचमा हुनु पर्छ । "
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "कुनै फाईल पेश गरिएको छैन । फारममा ईनकोडिङको प्रकार जाँच गर्नुहोस । "
@@ -1192,10 +1201,10 @@ msgid "Django Documentation"
 msgstr "ज्याङ्गो दस्तावेज ।"
 
 msgid "Topics, references, &amp; how-to's"
-msgstr ""
+msgstr "शीर्षक,  सन्दर्भ तथा तरिकाहरू"
 
 msgid "Tutorial: A Polling App"
-msgstr ""
+msgstr "मतदान एप उदाहरण "
 
 msgid "Get started with Django"
 msgstr "ज्याङ्गो सुरु गर्नु होस ।"
@@ -1204,4 +1213,4 @@ msgid "Django Community"
 msgstr "ज्याङ्गो समुदाय"
 
 msgid "Connect, get help, or contribute"
-msgstr ""
+msgstr "सहयोग अथवा योगदान गरी जोडिनु होस"

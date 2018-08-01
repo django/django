@@ -5,7 +5,7 @@
 # Jaehong Kim <mixe@korea.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Le Tartuffe <magno79@gmail.com>, 2014
-# Chr0m3 <chr0m3.kr@gmail.com>, 2015
+# JunGu Kang <chr0m3.kr@gmail.com>, 2015
 # 이지현 <wlgus5781@gmail.com>, 2017
 # minsung kang, 2016
 msgid ""

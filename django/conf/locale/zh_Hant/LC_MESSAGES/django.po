@@ -15,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-01 21:10+0100\n"
-"PO-Revision-Date: 2017-12-03 05:47+0000\n"
-"Last-Translator: Tzu-ping Chung <uranusjr@gmail.com>\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 00:21+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -380,6 +380,9 @@ msgid_plural ""
 msgstr[0] ""
 "請確認這個值至多包含 %(limit_value)d 個字 (目前為 %(show_value)d 個字)。"
 
+msgid "Enter a number."
+msgstr "輸入一個數字"
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -452,6 +455,10 @@ msgstr "大整數 (8 位元組)"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' 必須為 True 或 False。"
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr ""
 
 msgid "Boolean (Either True or False)"
 msgstr "布林值 (True 或 False)"
@@ -617,9 +624,6 @@ msgstr "這個欄位是必須的。"
 msgid "Enter a whole number."
 msgstr "輸入整數"
 
-msgid "Enter a number."
-msgstr "輸入一個數字"
-
 msgid "Enter a valid date."
 msgstr "輸入有效的日期"
 
@@ -631,6 +635,10 @@ msgstr "輸入有效的日期/時間"
 
 msgid "Enter a valid duration."
 msgstr "輸入有效的時間長。"
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr ""
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "沒有檔案被送出。請檢查表單的編碼類型。"

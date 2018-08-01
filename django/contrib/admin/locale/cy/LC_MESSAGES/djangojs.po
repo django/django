@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
 "PO-Revision-Date: 2017-09-23 18:54+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Welsh (http://www.transifex.com/django/django/language/cy/)\n"
@@ -99,6 +99,21 @@ msgstr ""
 "Rydych wedi dewis gweithred ac nid ydych wedi newid unrhyw faes.  Rydych "
 "siwr o fod yn edrych am y botwm 'Ewch' yn lle'r botwm 'Cadw'."
 
+msgid "Now"
+msgstr "Nawr"
+
+msgid "Midnight"
+msgstr "Canol nos"
+
+msgid "6 a.m."
+msgstr "6 y.b."
+
+msgid "Noon"
+msgstr "Canol dydd"
+
+msgid "6 p.m."
+msgstr ""
+
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
@@ -115,26 +130,11 @@ msgstr[1] "Noder: Rydych %s awr tu ôl amser y gweinydd."
 msgstr[2] "Noder: Rydych %s awr tu ôl amser y gweinydd."
 msgstr[3] "Noder: Rydych %s awr tu ôl amser y gweinydd."
 
-msgid "Now"
-msgstr "Nawr"
-
 msgid "Choose a Time"
 msgstr ""
 
 msgid "Choose a time"
 msgstr "Dewiswch amser"
-
-msgid "Midnight"
-msgstr "Canol nos"
-
-msgid "6 a.m."
-msgstr "6 y.b."
-
-msgid "Noon"
-msgstr "Canol dydd"
-
-msgid "6 p.m."
-msgstr ""
 
 msgid "Cancel"
 msgstr "Diddymu"

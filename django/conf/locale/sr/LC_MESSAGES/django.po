@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-01 21:10+0100\n"
-"PO-Revision-Date: 2018-01-30 10:00+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 20:03+0000\n"
 "Last-Translator: Branko Kokanovic <branko@kokanovic.org>\n"
 "Language-Team: Serbian (http://www.transifex.com/django/django/language/"
 "sr/)\n"
@@ -392,6 +392,9 @@ msgstr[2] ""
 "Ово поље не сме да има више од %(limit_value)d карактера (тренутно има "
 "%(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Унесите број."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -473,6 +476,10 @@ msgstr "Велики (8 бајтова) цео број"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "Вредност '%(value)s' мора бити или True или False."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "'%(value)s' вредност мора бити или True, False, или None."
 
 msgid "Boolean (Either True or False)"
 msgstr "Булова вредност (True или False)"
@@ -650,9 +657,6 @@ msgstr "Ово поље се мора попунити."
 msgid "Enter a whole number."
 msgstr "Унесите цео број."
 
-msgid "Enter a number."
-msgstr "Унесите број."
-
 msgid "Enter a valid date."
 msgstr "Унесите исправан датум."
 
@@ -664,6 +668,10 @@ msgstr "Унесите исправан датум/време."
 
 msgid "Enter a valid duration."
 msgstr "Унесите исправан временски интервал."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Број дана мора бити између {min_days} и {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Фајл није пребачен. Проверите тип енкодирања на форми."
