@@ -3,8 +3,8 @@ Customizing authentication in Django
 ====================================
 
 The authentication that comes with Django is good enough for most common cases,
-but you may have needs not met by the out-of-the-box defaults. To customize
-authentication to your projects needs involves understanding what points of the
+but you may have needs not met by the out-of-the-box defaults. Customizing
+authentication in your projects requires understanding what points of the
 provided system are extensible or replaceable. This document provides details
 about how the auth system can be customized.
 
@@ -348,7 +348,7 @@ add it to a ``UserAdmin`` class which is registered with the
 
     # Define a new User admin
     class UserAdmin(BaseUserAdmin):
-        inlines = (EmployeeInline, )
+        inlines = (EmployeeInline,)
 
     # Re-register UserAdmin
     admin.site.unregister(User)
@@ -627,12 +627,6 @@ password resets. You must then provide some key implementation details:
         Optional. A short, informal identifier for the user such as their
         first name. If implemented, this replaces the username in the greeting
         to the user in the header of :mod:`django.contrib.admin`.
-
-    .. versionchanged:: 2.0
-
-        In older versions, subclasses are required to implement
-        ``get_short_name()`` and ``get_full_name()`` as ``AbstractBaseUser``
-        has implementations that raise ``NotImplementedError``.
 
     .. admonition:: Importing ``AbstractBaseUser``
 

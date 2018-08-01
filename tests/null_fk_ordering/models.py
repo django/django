@@ -18,10 +18,10 @@ class Article(models.Model):
     author = models.ForeignKey(Author, models.SET_NULL, null=True)
 
     def __str__(self):
-        return 'Article titled: %s' % (self.title, )
+        return 'Article titled: %s' % self.title
 
     class Meta:
-        ordering = ['author__name', ]
+        ordering = ['author__name']
 
 
 # These following 4 models represent a far more complex ordering case.

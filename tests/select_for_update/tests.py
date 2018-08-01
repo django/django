@@ -120,6 +120,28 @@ class SelectForUpdateTests(TransactionTestCase):
             expected = [value.upper() for value in expected]
         self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
 
+    @skipUnlessDBFeature('has_select_for_update_of')
+    def test_for_update_of_followed_by_values(self):
+        with transaction.atomic():
+            values = list(Person.objects.select_for_update(of=('self',)).values('pk'))
+        self.assertEqual(values, [{'pk': self.person.pk}])
+
+    @skipUnlessDBFeature('has_select_for_update_of')
+    def test_for_update_of_followed_by_values_list(self):
+        with transaction.atomic():
+            values = list(Person.objects.select_for_update(of=('self',)).values_list('pk'))
+        self.assertEqual(values, [(self.person.pk,)])
+
+    @skipUnlessDBFeature('has_select_for_update_of')
+    def test_for_update_of_self_when_self_is_not_selected(self):
+        """
+        select_for_update(of=['self']) when the only columns selected are from
+        related tables.
+        """
+        with transaction.atomic():
+            values = list(Person.objects.select_related('born').select_for_update(of=('self',)).values('born__name'))
+        self.assertEqual(values, [{'born__name': self.city1.name}])
+
     @skipUnlessDBFeature('has_select_for_update_nowait')
     def test_nowait_raises_error_on_block(self):
         """

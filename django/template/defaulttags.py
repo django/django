@@ -54,7 +54,7 @@ class CsrfTokenNode(Node):
             if csrf_token == 'NOTPROVIDED':
                 return format_html("")
             else:
-                return format_html("<input type='hidden' name='csrfmiddlewaretoken' value='{}' />", csrf_token)
+                return format_html('<input type="hidden" name="csrfmiddlewaretoken" value="{}">', csrf_token)
         else:
             # It's very probable that the token is missing because of
             # misconfiguration, so we raise a warning
@@ -118,15 +118,16 @@ class FirstOfNode(Node):
         self.asvar = asvar
 
     def render(self, context):
+        first = ''
         for var in self.vars:
             value = var.resolve(context, ignore_failures=True)
             if value:
                 first = render_value_in_context(value, context)
-                if self.asvar:
-                    context[self.asvar] = first
-                    return ''
-                return first
-        return ''
+                break
+        if self.asvar:
+            context[self.asvar] = first
+            return ''
+        return first
 
 
 class ForNode(Node):
@@ -225,8 +226,7 @@ class IfChangedNode(Node):
     def render(self, context):
         # Init state storage
         state_frame = self._get_context_stack_frame(context)
-        if self not in state_frame:
-            state_frame[self] = None
+        state_frame.setdefault(self)
 
         nodelist_true_output = None
         if self._varlist:
@@ -292,7 +292,7 @@ class IfNode(Node):
 
     @property
     def nodelist(self):
-        return NodeList(iter(self))
+        return NodeList(self)
 
     def render(self, context):
         for condition, nodelist in self.conditions_nodelists:
@@ -483,9 +483,9 @@ class WidthRatioNode(Node):
             ratio = (value / max_value) * max_width
             result = str(round(ratio))
         except ZeroDivisionError:
-            return '0'
+            result = '0'
         except (ValueError, TypeError, OverflowError):
-            return ''
+            result = ''
 
         if self.asvar:
             context[self.asvar] = result
@@ -716,7 +716,7 @@ def firstof(parser, token):
     """
     bits = token.split_contents()[1:]
     asvar = None
-    if len(bits) < 1:
+    if not bits:
         raise TemplateSyntaxError("'firstof' statement requires at least one argument")
 
     if len(bits) >= 2 and bits[-2] == 'as':
@@ -1364,16 +1364,15 @@ def url(parser, token):
         asvar = bits[-1]
         bits = bits[:-2]
 
-    if len(bits):
-        for bit in bits:
-            match = kwarg_re.match(bit)
-            if not match:
-                raise TemplateSyntaxError("Malformed arguments to url tag")
-            name, value = match.groups()
-            if name:
-                kwargs[name] = parser.compile_filter(value)
-            else:
-                args.append(parser.compile_filter(value))
+    for bit in bits:
+        match = kwarg_re.match(bit)
+        if not match:
+            raise TemplateSyntaxError("Malformed arguments to url tag")
+        name, value = match.groups()
+        if name:
+            kwargs[name] = parser.compile_filter(value)
+        else:
+            args.append(parser.compile_filter(value))
 
     return URLNode(viewname, args, kwargs, asvar)
 
@@ -1410,7 +1409,7 @@ def widthratio(parser, token):
     For example::
 
         <img src="bar.png" alt="Bar"
-             height="10" width="{% widthratio this_value max_value max_width %}" />
+             height="10" width="{% widthratio this_value max_value max_width %}">
 
     If ``this_value`` is 175, ``max_value`` is 200, and ``max_width`` is 100,
     the image in the above example will be 88 pixels wide

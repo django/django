@@ -182,13 +182,16 @@ def write_pot_file(potfile, msgs):
         found, header_read = False, False
         for line in pot_lines:
             if not found and not header_read:
-                found = True
-                line = line.replace('charset=CHARSET', 'charset=UTF-8')
+                if 'charset=CHARSET' in line:
+                    found = True
+                    line = line.replace('charset=CHARSET', 'charset=UTF-8')
             if not line and not found:
                 header_read = True
             lines.append(line)
     msgs = '\n'.join(lines)
-    with open(potfile, 'a', encoding='utf-8') as fp:
+    # Force newlines of POT files to '\n' to work around
+    # https://savannah.gnu.org/bugs/index.php?52395
+    with open(potfile, 'a', encoding='utf-8', newline='\n') as fp:
         fp.write(msgs)
 
 
@@ -205,7 +208,6 @@ class Command(BaseCommand):
     build_file_class = BuildFile
 
     requires_system_checks = False
-    leave_locale_alone = True
 
     msgmerge_options = ['-q', '--previous']
     msguniq_options = ['--to-code=utf-8']
@@ -214,20 +216,20 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--locale', '-l', default=[], dest='locale', action='append',
+            '--locale', '-l', default=[], action='append',
             help='Creates or updates the message files for the given locale(s) (e.g. pt_BR). '
                  'Can be used multiple times.',
         )
         parser.add_argument(
-            '--exclude', '-x', default=[], dest='exclude', action='append',
+            '--exclude', '-x', default=[], action='append',
             help='Locales to exclude. Default is none. Can be used multiple times.',
         )
         parser.add_argument(
-            '--domain', '-d', default='django', dest='domain',
+            '--domain', '-d', default='django',
             help='The domain of the message files (default: "django").',
         )
         parser.add_argument(
-            '--all', '-a', action='store_true', dest='all',
+            '--all', '-a', action='store_true',
             help='Updates the message files for all existing locales.',
         )
         parser.add_argument(
@@ -237,7 +239,7 @@ class Command(BaseCommand):
                  'commas, or use -e multiple times.',
         )
         parser.add_argument(
-            '--symlinks', '-s', action='store_true', dest='symlinks',
+            '--symlinks', '-s', action='store_true',
             help='Follows symlinks to directories when examining source code '
                  'and templates for translation strings.',
         )
@@ -252,15 +254,15 @@ class Command(BaseCommand):
             help="Don't ignore the common glob-style patterns 'CVS', '.*', '*~' and '*.pyc'.",
         )
         parser.add_argument(
-            '--no-wrap', action='store_true', dest='no_wrap',
+            '--no-wrap', action='store_true',
             help="Don't break long message lines into several lines.",
         )
         parser.add_argument(
-            '--no-location', action='store_true', dest='no_location',
+            '--no-location', action='store_true',
             help="Don't write '#: filename:line' lines.",
         )
         parser.add_argument(
-            '--add-location', dest='add_location',
+            '--add-location',
             choices=('full', 'file', 'never'), const='full', nargs='?',
             help=(
                 "Controls '#: filename:line' lines. If the option is 'full' "
@@ -271,11 +273,11 @@ class Command(BaseCommand):
             ),
         )
         parser.add_argument(
-            '--no-obsolete', action='store_true', dest='no_obsolete',
+            '--no-obsolete', action='store_true',
             help="Remove obsolete message strings.",
         )
         parser.add_argument(
-            '--keep-pot', action='store_true', dest='keep_pot',
+            '--keep-pot', action='store_true',
             help="Keep .pot file after making messages. Useful when debugging.",
         )
 
@@ -323,9 +325,9 @@ class Command(BaseCommand):
             raise CommandError("currently makemessages only supports domains "
                                "'django' and 'djangojs'")
         if self.domain == 'djangojs':
-            exts = extensions if extensions else ['js']
+            exts = extensions or ['js']
         else:
-            exts = extensions if extensions else ['html', 'txt', 'py']
+            exts = extensions or ['html', 'txt', 'py']
         self.extensions = handle_extensions(exts)
 
         if (locale is None and not exclude and not process_all) or self.domain is None:
@@ -500,10 +502,7 @@ class Command(BaseCommand):
                         if os.path.abspath(dirpath).startswith(os.path.dirname(path)):
                             locale_dir = path
                             break
-                    if not locale_dir:
-                        locale_dir = self.default_locale_path
-                    if not locale_dir:
-                        locale_dir = NO_LOCALE_DIR
+                    locale_dir = locale_dir or self.default_locale_path or NO_LOCALE_DIR
                     all_files.append(self.translatable_file_class(dirpath, filename, locale_dir))
         return sorted(all_files)
 

@@ -9,7 +9,8 @@ from django.db import models
 class Donut(models.Model):
     name = models.CharField(max_length=100)
     is_frosted = models.BooleanField(default=False)
-    has_sprinkles = models.NullBooleanField()
+    has_sprinkles = models.BooleanField(null=True)
+    has_sprinkles_old = models.NullBooleanField()
     baked_date = models.DateField(null=True)
     baked_time = models.TimeField(null=True)
     consumed_at = models.DateTimeField(null=True)

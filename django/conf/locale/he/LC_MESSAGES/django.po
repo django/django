@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-04-01 14:41+0000\n"
+"POT-Creation-Date: 2017-11-15 16:15+0100\n"
+"PO-Revision-Date: 2017-11-28 08:17+0000\n"
 "Last-Translator: Meir Kriheli <mkriheli@gmail.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/django/django/language/he/)\n"
 "MIME-Version: 1.0\n"
@@ -315,6 +315,7 @@ msgstr "יש להזין מספר שלם חוקי."
 msgid "Enter a valid email address."
 msgstr "נא להזין כתובת דוא\"ל חוקית"
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "יש להזין ערך המכיל אותיות, ספרות, קווים תחתונים ומקפים בלבד."
@@ -400,6 +401,9 @@ msgid ""
 msgstr ""
 "סיומת הקובץ '%(extension)s' אסורה. הסיומות המותרות הן: "
 "'%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
+msgstr "תווי NULL אינם מותרים. "
 
 msgid "and"
 msgstr "ו"
@@ -720,15 +724,15 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "נא לתקן את הערכים הכפולים למטה."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "המפתח הזר ה־inline לא התאים למפתח הראשי של האב."
+msgid "The inline value did not match the parent instance."
+msgstr "הערך הפנימי אינו תואם לאב."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "יש לבחור אפשרות חוקית; אפשרות זו אינה אחת מהזמינות."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" אינו ערך חוקי עבור מפתח ראשי."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "\"%(pk)s\" אינו ערך חוקי."
 
 #, python-format
 msgid ""
@@ -1092,6 +1096,18 @@ msgstr ""
 "אתר זה, לחיבורי HTTPS או לבקשות 'same-origin'."
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+"אם תג <meta name=\"referrer\" content=\"no-referrer\"> בשימוש או header‏ "
+"'Referrer-Policy: no-referrer', נא להסיר אותם. הגנת ה־CSRF דורשת את  ה־"
+"header‏ 'Referer' כדי לבצע בדיקה מפנה מדוקדקת. במקרה של דאגה לפרטיות, יש "
+"להשתמש בתחליפים כמו <a rel=\"noreferrer\" ...> עבור קישורים לאתרים צד ג'."
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1109,31 +1125,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "מידע נוסף זמין עם "
 
-msgid "Welcome to Django"
-msgstr "ברוכים הבאים אל Django"
-
-msgid "It worked!"
-msgstr "זה עבד!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "ברכות על העמוד מבוסס Django הראשון שלך."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-"בשלב הבא יש להתחיל את היישום הראשון שלך ע\"י הרצת <code>python manage.py "
-"startapp [app_label]</code>."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"הודעה זו מופיעה בגלל שיש לך <code>DEBUG = True</code> בקובץ הגדרות ה-Django "
-"שלך ולא הגדרת URLs. להפשיל שרוולים ולגשת למלאכה."
-
 msgid "No year specified"
 msgstr "לא צויינה שנה"
+
+msgid "Date out of range"
+msgstr "תאריך מחוץ לטווח"
 
 msgid "No month specified"
 msgstr "לא צויין חודש"
@@ -1185,3 +1181,46 @@ msgstr "\"%(path)s\" אינו קיים"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "אינדקס של %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django: תשתית הווב לפרפקציוניסטים עם תאריכי יעד."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"ראו <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">הערות השחרור</a> עבור Django %(version)s"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "ההתקנה עברה בהצלחה! מזל טוב!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"עמוד זה מופיע בעקבות המצאות <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> בקובץ ההגדרות שלך ולא הגדרת שום URLs."
+
+msgid "Django Documentation"
+msgstr "תיעוד Django"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr "נושאים, הפניות ומדריכים"
+
+msgid "Tutorial: A Polling App"
+msgstr "מדריך ללומד: יישום לסקרים."
+
+msgid "Get started with Django"
+msgstr "התחילו לעבוד עם Django"
+
+msgid "Django Community"
+msgstr "קהילת Django"
+
+msgid "Connect, get help, or contribute"
+msgstr "יצירת קשר, קבלת עזרה או השתתפות"

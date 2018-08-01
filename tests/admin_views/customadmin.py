@@ -46,9 +46,15 @@ class CustomPwdTemplateUserAdmin(UserAdmin):
     change_user_password_template = ['admin/auth/user/change_password.html']  # a list, to test fix for #18697
 
 
+class BookAdmin(admin.ModelAdmin):
+    def get_deleted_objects(self, objs, request):
+        return ['a deletable object'], {'books': 1}, set(), []
+
+
 site = Admin2(name="admin2")
 
 site.register(models.Article, base_admin.ArticleAdmin)
+site.register(models.Book, BookAdmin)
 site.register(models.Section, inlines=[base_admin.ArticleInline], search_fields=['name'])
 site.register(models.Thing, base_admin.ThingAdmin)
 site.register(models.Fabric, base_admin.FabricAdmin)

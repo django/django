@@ -100,9 +100,7 @@ class MultiValueDict(dict):
         return result
 
     def __getstate__(self):
-        obj_dict = self.__dict__.copy()
-        obj_dict['_data'] = {k: self._getlist(k) for k in self}
-        return obj_dict
+        return {**self.__dict__, '_data': {k: self._getlist(k) for k in self}}
 
     def __setstate__(self, obj_dict):
         data = obj_dict.pop('_data', {})
@@ -275,11 +273,9 @@ class DictWrapper(dict):
         present). If the prefix is present, pass the value through self.func
         before returning, otherwise return the raw value.
         """
-        if key.startswith(self.prefix):
-            use_func = True
+        use_func = key.startswith(self.prefix)
+        if use_func:
             key = key[len(self.prefix):]
-        else:
-            use_func = False
         value = super().__getitem__(key)
         if use_func:
             return self.func(value)

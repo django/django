@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-30 14:06+0000\n"
+"POT-Creation-Date: 2017-12-01 21:10+0100\n"
+"PO-Revision-Date: 2017-12-04 11:04+0000\n"
 "Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/django/django/language/"
 "lt/)\n"
@@ -166,6 +166,9 @@ msgstr "Japonų"
 
 msgid "Georgian"
 msgstr "Gruzinų"
+
+msgid "Kabyle"
+msgstr "Kabilų"
 
 msgid "Kazakh"
 msgstr "Kazachų"
@@ -323,6 +326,7 @@ msgstr "Įveskite tinkamą sveikąjį skaičių."
 msgid "Enter a valid email address."
 msgstr "Įveskite teisingą el. pašto adresą."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -428,6 +432,9 @@ msgid ""
 msgstr ""
 "Bylos tipas '%(extension)s' negalimas. Galimi tipai yra: "
 "'%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
+msgstr "Nuliniai simboliai neleidžiami."
 
 msgid "and"
 msgstr "ir"
@@ -765,15 +772,15 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Pataisykite žemiau esančias pasikartojančias reikšmes."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "Išorinis raktas neatitinka tėvinio objekto pirminio rakto."
+msgid "The inline value did not match the parent instance."
+msgstr "Reikšmė nesutapo su pirminiu objektu."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Pasirinkite tinkamą reikšmę. Parinkta reikšmė nėra galima."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" nėra pirminiam raktui tinkama reikšmė."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "\"%(pk)s\" nėra tinkama reikšmė."
 
 #, python-format
 msgid ""
@@ -1146,6 +1153,19 @@ msgstr ""
 "užklausoms."
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+"Jei naudojate <meta name=\"referrer\" content=\"no-referrer\"> žymeną "
+"pridedate 'Referrer-Policy: no-referrer' antraštę, prašome juo panaikinti. "
+"CSRF apsauga reikalauja 'Referer' antraštės vykdyti griežtą patikrinimą. Jei "
+"esate susirūpinę privatumu, naudokite tokias alternatyvas nuorodoms į "
+"išorinius tinklalapius kaip <a rel=\"noreferrer\" ...>."
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1164,31 +1184,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "Gauti daugiau informacijos galima su DEBUG=True nustatymu."
 
-msgid "Welcome to Django"
-msgstr "Sveiki, tai Django"
-
-msgid "It worked!"
-msgstr "Suveikė!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Sveikiname Jus su Jūsų pirmuoju Django tinklalapiu."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-"Toliau, pradėkite pirmą savo aplikaciją paleisdami <code>python manage.py "
-"startapp [app_label]</code>."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Jūs matote šią žinutę dėl to kad Django nustatymų faile įvesta <code>DEBUG = "
-"True</code> ir Jūs nenustatėte jokių URL'ų."
-
 msgid "No year specified"
 msgstr "Nenurodyti metai"
+
+msgid "Date out of range"
+msgstr "Data išeina iš ribų"
 
 msgid "No month specified"
 msgstr "Nenurodytas mėnuo"
@@ -1241,3 +1241,47 @@ msgstr "\"%(path)s\" neegzistuoja"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "%(directory)s indeksas"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django: Žiniatinklio karkasas perfekcionistams su terminais."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Žiūrėti Django %(version)s <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/releases/\" target=\"_blank\" rel=\"noopener\">išleidimo "
+"pastabas</a>"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Diegimas pavyko! Sveikiname!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"Jūs matote šią žinutę dėl to kad Django nustatymų faile įvesta <a href="
+"\"https://docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" target="
+"\"_blank\" rel=\"noopener\">DEBUG = True</a> ir Jūs nenustatėte jokių URL'ų."
+
+msgid "Django Documentation"
+msgstr "Django dokumentacija"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr "Temos, nuorodos ir &amp; kaip tai padaryti"
+
+msgid "Tutorial: A Polling App"
+msgstr "Pamoka: Apklausos aplikacija"
+
+msgid "Get started with Django"
+msgstr "Pradėti su Django"
+
+msgid "Django Community"
+msgstr "Django Bendrija"
+
+msgid "Connect, get help, or contribute"
+msgstr "Prisijunk, gauk pagalbą arba prisidėk"

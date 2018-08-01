@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-04-05 03:16+0000\n"
+"POT-Creation-Date: 2017-11-15 16:15+0100\n"
+"PO-Revision-Date: 2017-11-27 07:32+0000\n"
 "Last-Translator: Thordur Sigurdsson <thordur@ja.is>\n"
 "Language-Team: Icelandic (http://www.transifex.com/django/django/language/"
 "is/)\n"
@@ -319,6 +319,7 @@ msgstr "Sláðu inn gilda heiltölu."
 msgid "Enter a valid email address."
 msgstr "Sláðu inn gilt netfang."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -415,6 +416,9 @@ msgid ""
 msgstr ""
 "Skrár með endingunni '%(extension)s' eru ekki leyfðar. Leyfilegar endingar "
 "eru: '%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
+msgstr "Núlltákn eru ekki leyfileg."
 
 msgid "and"
 msgstr "og"
@@ -744,8 +748,8 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Vinsamlegast lagfærðu tvítöldu gögnin fyrir neðan."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "Ytri lykill virðist ekki passa við aðallykil eiganda."
+msgid "The inline value did not match the parent instance."
+msgstr "Innra gildið passar ekki við eiganda."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
@@ -753,8 +757,8 @@ msgstr ""
 "valmöguleikum."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "'%(pk)s' er ekki gilt sem lykill."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "„%(pk)s“ er ekki gilt gildi."
 
 #, python-format
 msgid ""
@@ -1120,6 +1124,14 @@ msgstr ""
 "eða ‚same-origin‘ fyrirspurnir."
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1140,31 +1152,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "Meiri upplýsingar fást með DEBUG=True."
 
-msgid "Welcome to Django"
-msgstr "Velkomin/n í Django"
-
-msgid "It worked!"
-msgstr "Það tókst!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Til hamingju með fyrstu Django síðuna þína."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-"Næst skaltu búa til fyrsta appið þitt með því að nota skipunina<code>python "
-"manage.py startapp [app_heiti]</code>."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Þú sérð þessi skilaboð vegna þess að þú hefur <code>DEBUG = True</code> í "
-"Django stillingunum þínum og hefur ekki sett upp neinar vefslóðir."
-
 msgid "No year specified"
 msgstr "Ekkert ár tilgreint"
+
+msgid "Date out of range"
+msgstr "Dagsetning utan tímabils"
 
 msgid "No month specified"
 msgstr "Enginn mánuður tilgreindur"
@@ -1216,3 +1208,41 @@ msgstr "\"%(path)s\" er ekki til"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Innihald %(directory)s "
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr ""
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+
+msgid "The install worked successfully! Congratulations!"
+msgstr ""
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+
+msgid "Django Documentation"
+msgstr ""
+
+msgid "Topics, references, &amp; how-to's"
+msgstr ""
+
+msgid "Tutorial: A Polling App"
+msgstr ""
+
+msgid "Get started with Django"
+msgstr ""
+
+msgid "Django Community"
+msgstr ""
+
+msgid "Connect, get help, or contribute"
+msgstr ""

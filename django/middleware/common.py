@@ -94,8 +94,6 @@ class CommonMiddleware(MiddlewareMixin):
 
     def process_response(self, request, response):
         """
-        Calculate the ETag, if needed.
-
         When the status code of the response is 404, it may redirect to a path
         with an appended slash if should_redirect_with_slash() returns True.
         """
@@ -132,7 +130,8 @@ class BrokenLinkEmailsMiddleware(MiddlewareMixin):
                     ),
                     "Referrer: %s\nRequested URL: %s\nUser agent: %s\n"
                     "IP address: %s\n" % (referer, path, ua, ip),
-                    fail_silently=True)
+                    fail_silently=True,
+                )
         return response
 
     def is_internal_request(self, domain, referer):

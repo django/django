@@ -22,7 +22,7 @@ class DateFieldTest(SimpleTestCase):
         # accept the input from the "as_hidden" rendering as well.
         self.assertHTMLEqual(
             a['mydate'].as_hidden(),
-            '<input type="hidden" name="mydate" value="2008-4-1" id="id_mydate" />',
+            '<input type="hidden" name="mydate" value="2008-4-1" id="id_mydate">',
         )
 
         b = GetDate({'mydate': '2008-4-1'})

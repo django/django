@@ -4,8 +4,9 @@ from unittest import mock
 
 import pytz
 
-from django.test import SimpleTestCase, override_settings
+from django.test import SimpleTestCase, ignore_warnings, override_settings
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango31Warning
 
 CET = pytz.timezone("Europe/Paris")
 EAT = timezone.get_fixed_timezone(180)      # Africa/Nairobi
@@ -97,7 +98,7 @@ class TimezoneTests(SimpleTestCase):
             self.assertEqual(timezone.get_current_timezone_name(), 'Asia/Bangkok')
 
     def test_override_fixed_offset(self):
-        with timezone.override(timezone.FixedOffset(0, 'tzname')):
+        with timezone.override(datetime.timezone(datetime.timedelta(), 'tzname')):
             self.assertEqual(timezone.get_current_timezone_name(), 'tzname')
 
     def test_activate_invalid_timezone(self):
@@ -190,13 +191,24 @@ class TimezoneTests(SimpleTestCase):
     def test_get_default_timezone(self):
         self.assertEqual(timezone.get_default_timezone_name(), 'America/Chicago')
 
+    def test_get_default_timezone_utc(self):
+        with override_settings(USE_TZ=True, TIME_ZONE='UTC'):
+            self.assertIs(timezone.get_default_timezone(), timezone.utc)
+
     def test_fixedoffset_timedelta(self):
         delta = datetime.timedelta(hours=1)
-        self.assertEqual(timezone.get_fixed_timezone(delta).utcoffset(''), delta)
+        self.assertEqual(timezone.get_fixed_timezone(delta).utcoffset(None), delta)
 
     def test_fixedoffset_negative_timedelta(self):
         delta = datetime.timedelta(hours=-2)
-        self.assertEqual(timezone.get_fixed_timezone(delta).utcoffset(''), delta)
+        self.assertEqual(timezone.get_fixed_timezone(delta).utcoffset(None), delta)
 
+    @ignore_warnings(category=RemovedInDjango31Warning)
     def test_fixedoffset_pickle(self):
         self.assertEqual(pickle.loads(pickle.dumps(timezone.FixedOffset(0, 'tzname'))).tzname(''), 'tzname')
+
+    def test_fixedoffset_deprecation(self):
+        msg = 'FixedOffset is deprecated in favor of datetime.timezone'
+        with self.assertWarnsMessage(RemovedInDjango31Warning, msg) as cm:
+            timezone.FixedOffset()
+        self.assertEqual(cm.filename, __file__)

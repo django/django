@@ -4,10 +4,12 @@ import unittest
 
 from django.db import connection
 from django.db.models import Avg, StdDev, Sum, Variance
+from django.db.models.fields import CharField
 from django.db.utils import NotSupportedError
 from django.test import TestCase, TransactionTestCase, override_settings
+from django.test.utils import isolate_apps
 
-from ..models import Item, Object, Square
+from ..models import Author, Item, Object, Square
 
 
 @unittest.skipUnless(connection.vendor == 'sqlite', 'SQLite tests')
@@ -58,6 +60,44 @@ class Tests(TestCase):
         self.assertEqual(creation._get_test_db_name(), creation.connection.settings_dict['TEST']['NAME'])
 
 
+@unittest.skipUnless(connection.vendor == 'sqlite', 'SQLite tests')
+@isolate_apps('backends')
+class SchemaTests(TransactionTestCase):
+
+    available_apps = ['backends']
+
+    def test_field_rename_inside_atomic_block(self):
+        """
+        NotImplementedError is raised when a model field rename is attempted
+        inside an atomic block.
+        """
+        new_field = CharField(max_length=255, unique=True)
+        new_field.set_attributes_from_name('renamed')
+        msg = (
+            "Renaming the 'backends_author'.'name' column while in a "
+            "transaction is not supported on SQLite because it would break "
+            "referential integrity. Try adding `atomic = False` to the "
+            "Migration class."
+        )
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            with connection.schema_editor(atomic=True) as editor:
+                editor.alter_field(Author, Author._meta.get_field('name'), new_field)
+
+    def test_table_rename_inside_atomic_block(self):
+        """
+        NotImplementedError is raised when a table rename is attempted inside
+        an atomic block.
+        """
+        msg = (
+            "Renaming the 'backends_author' table while in a transaction is "
+            "not supported on SQLite because it would break referential "
+            "integrity. Try adding `atomic = False` to the Migration class."
+        )
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            with connection.schema_editor(atomic=True) as editor:
+                editor.alter_db_table(Author, "backends_author", "renamed_table")
+
+
 @unittest.skipUnless(connection.vendor == 'sqlite', 'Test only for SQLite')
 @override_settings(DEBUG=True)
 class LastExecutedQueryTest(TestCase):
@@ -82,11 +122,11 @@ class LastExecutedQueryTest(TestCase):
         # If SQLITE_MAX_VARIABLE_NUMBER (default = 999) has been changed to be
         # greater than SQLITE_MAX_COLUMN (default = 2000), last_executed_query
         # can hit the SQLITE_MAX_COLUMN limit (#26063).
-        cursor = connection.cursor()
-        sql = "SELECT MAX(%s)" % ", ".join(["%s"] * 2001)
-        params = list(range(2001))
-        # This should not raise an exception.
-        cursor.db.ops.last_executed_query(cursor.cursor, sql, params)
+        with connection.cursor() as cursor:
+            sql = "SELECT MAX(%s)" % ", ".join(["%s"] * 2001)
+            params = list(range(2001))
+            # This should not raise an exception.
+            cursor.db.ops.last_executed_query(cursor.cursor, sql, params)
 
 
 @unittest.skipUnless(connection.vendor == 'sqlite', 'SQLite tests')
@@ -97,9 +137,9 @@ class EscapingChecks(TestCase):
     """
     def test_parameter_escaping(self):
         # '%s' escaping support for sqlite3 (#13648).
-        cursor = connection.cursor()
-        cursor.execute("select strftime('%s', date('now'))")
-        response = cursor.fetchall()[0][0]
+        with connection.cursor() as cursor:
+            cursor.execute("select strftime('%s', date('now'))")
+            response = cursor.fetchall()[0][0]
         # response should be an non-zero integer
         self.assertTrue(int(response))
 

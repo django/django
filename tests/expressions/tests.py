@@ -1,4 +1,5 @@
 import datetime
+import pickle
 import unittest
 import uuid
 from copy import deepcopy
@@ -38,10 +39,8 @@ class BasicExpressionsTests(TestCase):
             name="Foobar Ltd.", num_employees=3, num_chairs=4,
             ceo=Employee.objects.create(firstname="Frank", lastname="Meyer", salary=20)
         )
-        cls.gmbh = Company.objects.create(
-            name="Test GmbH", num_employees=32, num_chairs=1,
-            ceo=Employee.objects.create(firstname="Max", lastname="Mustermann", salary=30)
-        )
+        cls.max = Employee.objects.create(firstname='Max', lastname='Mustermann', salary=30)
+        cls.gmbh = Company.objects.create(name='Test GmbH', num_employees=32, num_chairs=1, ceo=cls.max)
 
     def setUp(self):
         self.company_query = Company.objects.values(
@@ -71,6 +70,15 @@ class BasicExpressionsTests(TestCase):
                 '<Company: Foobar Ltd.>',
                 '<Company: Test GmbH>',
             ],
+        )
+
+    @unittest.skipIf(connection.vendor == 'oracle', "Oracle doesn't support using boolean type in SELECT")
+    def test_filtering_on_annotate_that_uses_q(self):
+        self.assertEqual(
+            Company.objects.annotate(
+                num_employees_check=ExpressionWrapper(Q(num_employees__gt=3), output_field=models.BooleanField())
+            ).filter(num_employees_check=True).count(),
+            2,
         )
 
     def test_filter_inter_attribute(self):
@@ -366,7 +374,8 @@ class BasicExpressionsTests(TestCase):
         # other lookups could not reuse.
         qs = Employee.objects.filter(
             company_ceo_set__num_chairs=F('company_ceo_set__num_employees'),
-            company_ceo_set__num_chairs__gte=1)
+            company_ceo_set__num_chairs__gte=1,
+        )
         self.assertEqual(str(qs.query).count('JOIN'), 1)
 
     def test_ticket_18375_kwarg_ordering_2(self):
@@ -390,6 +399,14 @@ class BasicExpressionsTests(TestCase):
         )
         self.assertEqual(str(qs.query).count('JOIN'), 2)
 
+    def test_order_by_exists(self):
+        mary = Employee.objects.create(firstname='Mary', lastname='Mustermann', salary=20)
+        mustermanns_by_seniority = Employee.objects.filter(lastname='Mustermann').order_by(
+            # Order by whether the employee is the CEO of a company
+            Exists(Company.objects.filter(ceo=OuterRef('pk'))).desc()
+        )
+        self.assertSequenceEqual(mustermanns_by_seniority, [self.max, mary])
+
     def test_outerref(self):
         inner = Company.objects.filter(point_of_contact=OuterRef('pk'))
         msg = (
@@ -401,6 +418,10 @@ class BasicExpressionsTests(TestCase):
 
         outer = Employee.objects.annotate(is_point_of_contact=Exists(inner))
         self.assertIs(outer.exists(), True)
+
+    def test_exist_single_field_output_field(self):
+        queryset = Company.objects.values('pk')
+        self.assertIsInstance(Exists(queryset).output_field, models.BooleanField)
 
     def test_subquery(self):
         Company.objects.filter(name='Example Inc.').update(
@@ -515,6 +536,16 @@ class BasicExpressionsTests(TestCase):
         # This is a contrived example. It exercises the double OuterRef form.
         self.assertCountEqual(outer, [first, second, third])
 
+    def test_nested_subquery_outer_ref_with_autofield(self):
+        first = Time.objects.create(time='09:00')
+        second = Time.objects.create(time='17:00')
+        SimulationRun.objects.create(start=first, end=second, midpoint='12:00')
+        inner = SimulationRun.objects.filter(start=OuterRef(OuterRef('pk'))).values('start')
+        middle = Time.objects.annotate(other=Subquery(inner)).values('other')[:1]
+        outer = Time.objects.annotate(other=Subquery(middle, output_field=models.IntegerField()))
+        # This exercises the double OuterRef form with AutoField as pk.
+        self.assertCountEqual(outer, [first, second])
+
     def test_annotations_within_subquery(self):
         Company.objects.filter(num_employees__lt=50).update(ceo=Employee.objects.get(firstname='Frank'))
         inner = Company.objects.filter(
@@ -549,6 +580,16 @@ class BasicExpressionsTests(TestCase):
         inner = Result.objects.filter(result_time__gte=OuterRef('experiment__assigned'))
         outer = Result.objects.filter(pk__in=Subquery(inner.values('pk')))
         self.assertFalse(outer.exists())
+
+    def test_outerref_with_operator(self):
+        inner = Company.objects.filter(num_employees=OuterRef('ceo__salary') + 2)
+        outer = Company.objects.filter(pk__in=Subquery(inner.values('pk')))
+        self.assertEqual(outer.get().name, 'Test GmbH')
+
+    def test_pickle_expression(self):
+        expr = Value(1, output_field=models.IntegerField())
+        expr.convert_value  # populate cached property
+        self.assertEqual(pickle.loads(pickle.dumps(expr)), expr)
 
 
 class IterableLookupInnerExpressionsTests(TestCase):
@@ -759,17 +800,20 @@ class ExpressionsTests(TestCase):
         self.assertQuerysetEqual(
             Employee.objects.filter(firstname__contains=F('lastname')),
             ["<Employee: %Joh\\nny %Joh\\n>", "<Employee: Jean-Claude Claude>", "<Employee: Johnny John>"],
-            ordered=False)
+            ordered=False,
+        )
 
         self.assertQuerysetEqual(
             Employee.objects.filter(firstname__startswith=F('lastname')),
             ["<Employee: %Joh\\nny %Joh\\n>", "<Employee: Johnny John>"],
-            ordered=False)
+            ordered=False,
+        )
 
         self.assertQuerysetEqual(
             Employee.objects.filter(firstname__endswith=F('lastname')),
             ["<Employee: Jean-Claude Claude>"],
-            ordered=False)
+            ordered=False,
+        )
 
     def test_insensitive_patterns_escape(self):
         r"""
@@ -791,17 +835,20 @@ class ExpressionsTests(TestCase):
         self.assertQuerysetEqual(
             Employee.objects.filter(firstname__icontains=F('lastname')),
             ["<Employee: %Joh\\nny %joh\\n>", "<Employee: Jean-Claude claude>", "<Employee: Johnny john>"],
-            ordered=False)
+            ordered=False,
+        )
 
         self.assertQuerysetEqual(
             Employee.objects.filter(firstname__istartswith=F('lastname')),
             ["<Employee: %Joh\\nny %joh\\n>", "<Employee: Johnny john>"],
-            ordered=False)
+            ordered=False,
+        )
 
         self.assertQuerysetEqual(
             Employee.objects.filter(firstname__iendswith=F('lastname')),
             ["<Employee: Jean-Claude claude>"],
-            ordered=False)
+            ordered=False,
+        )
 
 
 class ExpressionsNumericTests(TestCase):
@@ -1241,6 +1288,16 @@ class FTimeDeltaTests(TestCase):
         ]
         self.assertEqual(over_estimate, ['e4'])
 
+    @skipUnlessDBFeature('supports_temporal_subtraction')
+    def test_datetime_subtraction_microseconds(self):
+        delta = datetime.timedelta(microseconds=8999999999999999)
+        Experiment.objects.update(end=F('start') + delta)
+        qs = Experiment.objects.annotate(
+            delta=ExpressionWrapper(F('end') - F('start'), output_field=models.DurationField())
+        )
+        for e in qs:
+            self.assertEqual(e.delta, delta)
+
     def test_duration_with_datetime(self):
         # Exclude e1 which has very high precision so we can test this on all
         # backends regardless of whether or not it supports
@@ -1249,6 +1306,15 @@ class FTimeDeltaTests(TestCase):
             completed__gt=self.stime + F('estimated_time'),
         ).order_by('name')
         self.assertQuerysetEqual(over_estimate, ['e3', 'e4', 'e5'], lambda e: e.name)
+
+    def test_duration_with_datetime_microseconds(self):
+        delta = datetime.timedelta(microseconds=8999999999999999)
+        qs = Experiment.objects.annotate(dt=ExpressionWrapper(
+            F('start') + delta,
+            output_field=models.DateTimeField(),
+        ))
+        for e in qs:
+            self.assertEqual(e.dt, e.start + delta)
 
     def test_date_minus_duration(self):
         more_than_4_days = Experiment.objects.filter(
@@ -1329,6 +1395,40 @@ class ValueTests(TestCase):
             ExpressionList()
 
 
+class FieldTransformTests(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.sday = sday = datetime.date(2010, 6, 25)
+        cls.stime = stime = datetime.datetime(2010, 6, 25, 12, 15, 30, 747000)
+        cls.ex1 = Experiment.objects.create(
+            name='Experiment 1',
+            assigned=sday,
+            completed=sday + datetime.timedelta(2),
+            estimated_time=datetime.timedelta(2),
+            start=stime,
+            end=stime + datetime.timedelta(2),
+        )
+
+    def test_month_aggregation(self):
+        self.assertEqual(
+            Experiment.objects.aggregate(month_count=Count('assigned__month')),
+            {'month_count': 1}
+        )
+
+    def test_transform_in_values(self):
+        self.assertQuerysetEqual(
+            Experiment.objects.values('assigned__month'),
+            ["{'assigned__month': 6}"]
+        )
+
+    def test_multiple_transforms_in_values(self):
+        self.assertQuerysetEqual(
+            Experiment.objects.values('end__date__month'),
+            ["{'end__date__month': 6}"]
+        )
+
+
 class ReprTests(TestCase):
 
     def test_expressions(self):
@@ -1396,6 +1496,10 @@ class ReprTests(TestCase):
 
 class CombinableTests(SimpleTestCase):
     bitwise_msg = 'Use .bitand() and .bitor() for bitwise logical operations.'
+
+    def test_negation(self):
+        c = Combinable()
+        self.assertEqual(-c, c * -1)
 
     def test_and(self):
         with self.assertRaisesMessage(NotImplementedError, self.bitwise_msg):

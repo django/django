@@ -33,7 +33,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         except Exception as e:
             if len(e.args) < 1 or e.args[0] != 1007:
                 # All errors except "database exists" (1007) cancel tests.
-                sys.stderr.write('Got an error creating the test database: %s\n' % e)
+                self.log('Got an error creating the test database: %s' % e)
                 sys.exit(2)
             else:
                 raise e
@@ -51,13 +51,13 @@ class DatabaseCreation(BaseDatabaseCreation):
             except Exception:
                 try:
                     if verbosity >= 1:
-                        print("Destroying old test database for alias %s..." % (
+                        self.log('Destroying old test database for alias %s...' % (
                             self._get_database_display_str(verbosity, target_database_name),
                         ))
                     cursor.execute('DROP DATABASE %(dbname)s' % test_db_params)
                     self._execute_create_test_db(cursor, test_db_params, keepdb)
                 except Exception as e:
-                    sys.stderr.write("Got an error recreating the test database: %s\n" % e)
+                    self.log('Got an error recreating the test database: %s' % e)
                     sys.exit(2)
 
         dump_cmd = DatabaseClient.settings_to_cmd_args(self.connection.settings_dict)

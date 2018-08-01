@@ -1,6 +1,8 @@
-============================================
-Django 2.0 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 2.0 release notes
+========================
+
+*December 2, 2017*
 
 Welcome to Django 2.0!
 
@@ -22,8 +24,8 @@ project.
 Python compatibility
 ====================
 
-Django 2.0 supports Python 3.4, 3.5, and 3.6. We **highly recommend** and only
-officially support the latest release of each series.
+Django 2.0 supports Python 3.4, 3.5, 3.6, and 3.7. We **highly recommend** and
+only officially support the latest release of each series.
 
 The Django 1.11.x series is the last to support Python 2.7.
 
@@ -96,7 +98,7 @@ Minor features
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The new :attr:`.ModelAdmin.autocomplete_fields` attribute and
-  :meth:`.ModelAdmin.get_autocomplete_fields` method allow using an
+  :meth:`.ModelAdmin.get_autocomplete_fields` method allow using a
   `Select2 <https://select2.org>`_ search widget for ``ForeignKey`` and
   ``ManyToManyField``.
 
@@ -347,7 +349,14 @@ bytestrings and unicode strings. Now that Python 2 support is dropped,
 bytestrings should only be encountered around input/output boundaries (handling
 of binary fields or HTTP streams, for example). You might have to update your
 code to limit bytestring usage to a minimum, as Django no longer accepts
-bytestrings in certain code paths.
+bytestrings in certain code paths. Python's :option:`-b` option may help detect
+that mistake in your code.
+
+For example, ``reverse()`` now uses ``str()`` instead of ``force_text()`` to
+coerce the ``args`` and ``kwargs`` it receives, prior to their placement in
+the URL. For bytestrings, this creates a string with an undesired ``b`` prefix
+as well as additional quotes (``str(b'foo')`` is ``"b'foo'"``). To adapt, call
+``decode()`` on the bytestring before passing it to ``reverse()``.
 
 Database backend API
 --------------------
@@ -528,6 +537,13 @@ rebuild tables using a script similar to this::
 This script hasn't received extensive testing and needs adaption for various
 cases such as multiple databases. Feel free to contribute improvements.
 
+In addition, because of a table alteration limitation of SQLite, it's prohibited
+to perform :class:`~django.db.migrations.operations.RenameModel` and
+:class:`~django.db.migrations.operations.RenameField` operations on models or
+fields referenced by other models in a transaction. In order to allow migrations
+containing these operations to be applied, you must set the
+``Migration.atomic`` attribute to ``False``.
+
 Miscellaneous
 -------------
 
@@ -692,7 +708,7 @@ to remove usage of these features.
 
 * The ``on_delete`` argument for ``ForeignKey`` and ``OneToOneField`` is now
   required in models and migrations. Consider squashing migrations so that you
-  have less of them to update.
+  have fewer of them to update.
 
 * ``django.db.models.fields.add_lazy_relation()`` is removed.
 

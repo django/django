@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Branko Kokanovic <branko@kokanovic.org>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2014-10-05 20:12+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Serbian (http://www.transifex.com/projects/p/django/language/"
+"PO-Revision-Date: 2018-02-28 18:40+0000\n"
+"Last-Translator: Branko Kokanovic <branko@kokanovic.org>\n"
+"Language-Team: Serbian (http://www.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -18,273 +19,273 @@ msgstr ""
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 msgid "Humanize"
-msgstr ""
+msgstr "Улепшавање"
 
 msgid "th"
-msgstr ""
+msgstr "."
 
 msgid "st"
-msgstr ""
+msgstr "."
 
 msgid "nd"
-msgstr ""
+msgstr "."
 
 msgid "rd"
-msgstr ""
+msgstr "."
 
 #, python-format
 msgid "%(value).1f million"
 msgid_plural "%(value).1f million"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value).1f милион"
+msgstr[1] "%(value).1f милиона"
+msgstr[2] "%(value).1f милиона"
 
 #, python-format
 msgid "%(value)s million"
 msgid_plural "%(value)s million"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value)s милион"
+msgstr[1] "%(value)s милиона"
+msgstr[2] "%(value)s милиона"
 
 #, python-format
 msgid "%(value).1f billion"
 msgid_plural "%(value).1f billion"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value).1f милијарда"
+msgstr[1] "%(value).1f милијарде "
+msgstr[2] "%(value).1f милијарди"
 
 #, python-format
 msgid "%(value)s billion"
 msgid_plural "%(value)s billion"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value)s милијарда"
+msgstr[1] "%(value)s милијарде"
+msgstr[2] "%(value)s милијарди"
 
 #, python-format
 msgid "%(value).1f trillion"
 msgid_plural "%(value).1f trillion"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value).1f билион"
+msgstr[1] "%(value).1f билиона"
+msgstr[2] "%(value).1f билиона"
 
 #, python-format
 msgid "%(value)s trillion"
 msgid_plural "%(value)s trillion"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value)s билион"
+msgstr[1] "%(value)s билиона"
+msgstr[2] "%(value)s билиона"
 
 #, python-format
 msgid "%(value).1f quadrillion"
 msgid_plural "%(value).1f quadrillion"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value).1f билијарда"
+msgstr[1] "%(value).1f билијарде"
+msgstr[2] "%(value).1f билијарди"
 
 #, python-format
 msgid "%(value)s quadrillion"
 msgid_plural "%(value)s quadrillion"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value)s билијарда"
+msgstr[1] "%(value)s билијарде"
+msgstr[2] "%(value)s билијарди"
 
 #, python-format
 msgid "%(value).1f quintillion"
 msgid_plural "%(value).1f quintillion"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value).1f трилион"
+msgstr[1] "%(value).1f трилиона"
+msgstr[2] "%(value).1f трилиона"
 
 #, python-format
 msgid "%(value)s quintillion"
 msgid_plural "%(value)s quintillion"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value)s трилион"
+msgstr[1] "%(value)s трилиона"
+msgstr[2] "%(value)s трилиона"
 
 #, python-format
 msgid "%(value).1f sextillion"
 msgid_plural "%(value).1f sextillion"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value).1f трилијарда"
+msgstr[1] "%(value).1f трилијарде"
+msgstr[2] "%(value).1f трилијарди"
 
 #, python-format
 msgid "%(value)s sextillion"
 msgid_plural "%(value)s sextillion"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value)s трилијарда"
+msgstr[1] "%(value)s трилијарде"
+msgstr[2] "%(value)s трилијарди"
 
 #, python-format
 msgid "%(value).1f septillion"
 msgid_plural "%(value).1f septillion"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value).1f квадрилион"
+msgstr[1] "%(value).1f квадрилиона"
+msgstr[2] "%(value).1f квадрилиона"
 
 #, python-format
 msgid "%(value)s septillion"
 msgid_plural "%(value)s septillion"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value)sквадрилион "
+msgstr[1] "%(value)sквадрилиона "
+msgstr[2] "%(value)sквадрилиона "
 
 #, python-format
 msgid "%(value).1f octillion"
 msgid_plural "%(value).1f octillion"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value).1f квадрилијарда"
+msgstr[1] "%(value).1f квадрилијадре"
+msgstr[2] "%(value).1f квадрилијарди"
 
 #, python-format
 msgid "%(value)s octillion"
 msgid_plural "%(value)s octillion"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value)sквадрилијарда "
+msgstr[1] "%(value)sквадрилијарде "
+msgstr[2] "%(value)sквадрилијарди "
 
 #, python-format
 msgid "%(value).1f nonillion"
 msgid_plural "%(value).1f nonillion"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value).1f квантилион"
+msgstr[1] "%(value).1fквантилиона "
+msgstr[2] "%(value).1f квантилиона"
 
 #, python-format
 msgid "%(value)s nonillion"
 msgid_plural "%(value)s nonillion"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value)sквантилион "
+msgstr[1] "%(value)sквантилиона "
+msgstr[2] "%(value)sквантилиона "
 
 #, python-format
 msgid "%(value).1f decillion"
 msgid_plural "%(value).1f decillion"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value).1f квантилијарда"
+msgstr[1] "%(value).1fквантилијарде "
+msgstr[2] "%(value).1fквантилијарди "
 
 #, python-format
 msgid "%(value)s decillion"
 msgid_plural "%(value)s decillion"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value)sквантилијарда "
+msgstr[1] "%(value)sквантилијарде "
+msgstr[2] "%(value)sквантилијарди "
 
 #, python-format
 msgid "%(value).1f googol"
 msgid_plural "%(value).1f googol"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value).1f гугол"
+msgstr[1] "%(value).1f гугола"
+msgstr[2] "%(value).1f гугола"
 
 #, python-format
 msgid "%(value)s googol"
 msgid_plural "%(value)s googol"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value)s гугол"
+msgstr[1] "%(value)s гугола"
+msgstr[2] "%(value)s гугола"
 
 msgid "one"
-msgstr ""
+msgstr "један"
 
 msgid "two"
-msgstr ""
+msgstr "два"
 
 msgid "three"
-msgstr ""
+msgstr "три"
 
 msgid "four"
-msgstr ""
+msgstr "четири"
 
 msgid "five"
-msgstr ""
+msgstr "пет"
 
 msgid "six"
-msgstr ""
+msgstr "шест"
 
 msgid "seven"
-msgstr ""
+msgstr "седам"
 
 msgid "eight"
-msgstr ""
+msgstr "осам"
 
 msgid "nine"
-msgstr ""
+msgstr "девет"
 
 msgid "today"
-msgstr ""
+msgstr "данас"
 
 msgid "tomorrow"
-msgstr ""
+msgstr "сутра"
 
 msgid "yesterday"
-msgstr ""
+msgstr "јуче"
 
 #, python-format
 msgctxt "naturaltime"
 msgid "%(delta)s ago"
-msgstr ""
+msgstr "пре %(delta)s"
 
 msgid "now"
-msgstr ""
+msgstr "сада"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "a second ago"
 msgid_plural "%(count)s seconds ago"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "пре %(count)s секунде"
+msgstr[1] "пре %(count)s секунде"
+msgstr[2] "пре %(count)s секунди"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "пре %(count)s минута"
+msgstr[1] "пре %(count)s минута"
+msgstr[2] "пре %(count)s минута"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "пре %(count)s сата"
+msgstr[1] "пре %(count)s сата"
+msgstr[2] "пре %(count)s сати"
 
 #, python-format
 msgctxt "naturaltime"
 msgid "%(delta)s from now"
-msgstr ""
+msgstr "%(delta)s од сада"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "a second from now"
 msgid_plural "%(count)s seconds from now"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(count)s секунда од сад"
+msgstr[1] "%(count)s секунде од сада"
+msgstr[2] "%(count)s секунди од сада"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "a minute from now"
 msgid_plural "%(count)s minutes from now"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(count)s минут од сад"
+msgstr[1] "%(count)s минута од сада"
+msgstr[2] "%(count)s минута од сада"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "an hour from now"
 msgid_plural "%(count)s hours from now"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(count)s сат од сад"
+msgstr[1] "%(count)s сата од сада"
+msgstr[2] "%(count)s сати од сада"

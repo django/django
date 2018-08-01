@@ -39,7 +39,7 @@
   True True
 """
 import sys
-from binascii import a2b_hex, b2a_hex
+from binascii import b2a_hex
 from ctypes import byref, c_char_p, c_double, c_ubyte, c_void_p, string_at
 
 from django.contrib.gis.gdal.base import GDALBase
@@ -67,7 +67,7 @@ class OGRGeometry(GDALBase):
 
         # If HEX, unpack input to a binary buffer.
         if str_instance and hex_regex.match(geom_input):
-            geom_input = memoryview(a2b_hex(geom_input.upper().encode()))
+            geom_input = memoryview(bytes.fromhex(geom_input))
             str_instance = False
 
         # Constructing the geometry,
@@ -142,12 +142,9 @@ class OGRGeometry(GDALBase):
     def _from_json(geom_input):
         ptr = capi.from_json(geom_input)
         if GDAL_VERSION < (2, 0):
-            has_srs = True
             try:
                 capi.get_geom_srs(ptr)
             except SRSException:
-                has_srs = False
-            if not has_srs:
                 srs = SpatialReference(4326)
                 capi.assign_srs(ptr, srs.ptr)
         return ptr

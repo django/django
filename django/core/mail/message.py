@@ -1,5 +1,4 @@
 import mimetypes
-import os
 from email import (
     charset as Charset, encoders as Encoders, generator, message_from_string,
 )
@@ -13,6 +12,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate, getaddresses, make_msgid, parseaddr
 from io import BytesIO, StringIO
+from pathlib import Path
 
 from django.conf import settings
 from django.core.mail.utils import DNS_NAME
@@ -231,7 +231,7 @@ class EmailMessage:
             self.reply_to = []
         self.from_email = from_email or settings.DEFAULT_FROM_EMAIL
         self.subject = subject
-        self.body = body
+        self.body = body or ''
         self.attachments = []
         if attachments:
             for attachment in attachments:
@@ -254,11 +254,9 @@ class EmailMessage:
         msg = self._create_message(msg)
         msg['Subject'] = self.subject
         msg['From'] = self.extra_headers.get('From', self.from_email)
-        msg['To'] = self.extra_headers.get('To', ', '.join(map(str, self.to)))
-        if self.cc:
-            msg['Cc'] = ', '.join(str(cc) for cc in self.cc)
-        if self.reply_to:
-            msg['Reply-To'] = self.extra_headers.get('Reply-To', ', '.join(str(r) for r in self.reply_to))
+        self._set_list_header_if_not_empty(msg, 'To', self.to)
+        self._set_list_header_if_not_empty(msg, 'Cc', self.cc)
+        self._set_list_header_if_not_empty(msg, 'Reply-To', self.reply_to)
 
         # Email header names are case-insensitive (RFC 2045), so we have to
         # accommodate that when doing comparisons.
@@ -273,9 +271,8 @@ class EmailMessage:
             # Use cached DNS_NAME for performance
             msg['Message-ID'] = make_msgid(domain=DNS_NAME)
         for name, value in self.extra_headers.items():
-            if name.lower() in ('from', 'to'):  # From and To are already handled
-                continue
-            msg[name] = value
+            if name.lower() != 'from':  # From is already handled
+                msg[name] = value
         return msg
 
     def recipients(self):
@@ -311,11 +308,7 @@ class EmailMessage:
             self.attachments.append(filename)
         else:
             assert content is not None
-
-            if not mimetype:
-                mimetype, _ = mimetypes.guess_type(filename)
-                if not mimetype:
-                    mimetype = DEFAULT_ATTACHMENT_MIME_TYPE
+            mimetype = mimetype or mimetypes.guess_type(filename)[0] or DEFAULT_ATTACHMENT_MIME_TYPE
             basetype, subtype = mimetype.split('/', 1)
 
             if basetype == 'text':
@@ -340,11 +333,10 @@ class EmailMessage:
         as UTF-8. If that fails, set the mimetype to
         DEFAULT_ATTACHMENT_MIME_TYPE and don't decode the content.
         """
-        filename = os.path.basename(path)
-
-        with open(path, 'rb') as file:
+        path = Path(path)
+        with path.open('rb') as file:
             content = file.read()
-            self.attach(filename, content, mimetype)
+            self.attach(path.name, content, mimetype)
 
     def _create_message(self, msg):
         return self._create_attachments(msg)
@@ -404,9 +396,20 @@ class EmailMessage:
                 filename.encode('ascii')
             except UnicodeEncodeError:
                 filename = ('utf-8', '', filename)
-            attachment.add_header('Content-Disposition', 'attachment',
-                                  filename=filename)
+            attachment.add_header('Content-Disposition', 'attachment', filename=filename)
         return attachment
+
+    def _set_list_header_if_not_empty(self, msg, header, values):
+        """
+        Set msg's header, either from self.extra_headers, if present, or from
+        the values argument.
+        """
+        if values:
+            try:
+                value = self.extra_headers[header]
+            except KeyError:
+                value = ', '.join(str(v) for v in values)
+            msg[header] = value
 
 
 class EmailMultiAlternatives(EmailMessage):

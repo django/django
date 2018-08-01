@@ -3,7 +3,6 @@ from django.db.utils import InterfaceError
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
-    empty_fetchmany_value = ()
     interprets_empty_strings_as_nulls = True
     uses_savepoints = True
     has_select_for_update = True

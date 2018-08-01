@@ -109,14 +109,6 @@ class FilterSyntaxTests(SimpleTestCase):
         output = self.engine.render_to_string('filter-syntax11', {"var": None, "var2": "happy"})
         self.assertEqual(output, 'happy')
 
-    @setup({'filter-syntax12': r'{{ var|yesno:"yup,nup,mup" }} {{ var|yesno }}'})
-    def test_filter_syntax12(self):
-        """
-        Default argument testing
-        """
-        output = self.engine.render_to_string('filter-syntax12', {"var": True})
-        self.assertEqual(output, 'yup yes')
-
     @setup({'filter-syntax13': r'1{{ var.method3 }}2'})
     def test_filter_syntax13(self):
         """

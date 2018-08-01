@@ -163,6 +163,10 @@ class UtilsTests(SimpleTestCase):
         # Regression test for #13071: NullBooleanField has special
         # handling.
         display_value = display_for_field(None, models.NullBooleanField(), self.empty_value)
+        expected = '<img src="%sadmin/img/icon-unknown.svg" alt="None">' % settings.STATIC_URL
+        self.assertHTMLEqual(display_value, expected)
+
+        display_value = display_for_field(None, models.BooleanField(null=True), self.empty_value)
         expected = '<img src="%sadmin/img/icon-unknown.svg" alt="None" />' % settings.STATIC_URL
         self.assertHTMLEqual(display_value, expected)
 
@@ -199,6 +203,19 @@ class UtilsTests(SimpleTestCase):
 
         display_value = display_for_value([1, 2, 'buckle', 'my', 'shoe'], self.empty_value)
         self.assertEqual(display_value, '1, 2, buckle, my, shoe')
+
+    @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
+    def test_list_display_for_value_boolean(self):
+        self.assertEqual(
+            display_for_value(True, '', boolean=True),
+            '<img src="/static/admin/img/icon-yes.svg" alt="True">'
+        )
+        self.assertEqual(
+            display_for_value(False, '', boolean=True),
+            '<img src="/static/admin/img/icon-no.svg" alt="False">'
+        )
+        self.assertEqual(display_for_value(True, ''), 'True')
+        self.assertEqual(display_for_value(False, ''), 'False')
 
     def test_label_for_field(self):
         """

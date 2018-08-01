@@ -16,9 +16,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             suffix += " ENCODING '{}'".format(encoding)
         if template:
             suffix += " TEMPLATE {}".format(self._quote_name(template))
-        if suffix:
-            suffix = "WITH" + suffix
-        return suffix
+        return suffix and "WITH" + suffix
 
     def sql_table_creation_suffix(self):
         test_settings = self.connection.settings_dict['TEST']
@@ -36,7 +34,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         except Exception as e:
             if getattr(e.__cause__, 'pgcode', '') != errorcodes.DUPLICATE_DATABASE:
                 # All errors except "database already exists" cancel tests.
-                sys.stderr.write('Got an error creating the test database: %s\n' % e)
+                self.log('Got an error creating the test database: %s' % e)
                 sys.exit(2)
             elif not keepdb:
                 # If the database should be kept, ignore "database already
@@ -60,11 +58,11 @@ class DatabaseCreation(BaseDatabaseCreation):
             except Exception as e:
                 try:
                     if verbosity >= 1:
-                        print("Destroying old test database for alias %s..." % (
+                        self.log('Destroying old test database for alias %s...' % (
                             self._get_database_display_str(verbosity, target_database_name),
                         ))
                     cursor.execute('DROP DATABASE %(dbname)s' % test_db_params)
                     self._execute_create_test_db(cursor, test_db_params, keepdb)
                 except Exception as e:
-                    sys.stderr.write("Got an error cloning the test database: %s\n" % e)
+                    self.log('Got an error cloning the test database: %s' % e)
                     sys.exit(2)

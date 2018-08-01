@@ -3,13 +3,14 @@
 # Translators:
 # Emin Mastizada <emin@linux.com>, 2016
 # Konul Allahverdiyeva <english.koni@gmail.com>, 2016
+# Zulfugar Ismayilzadeh <zulfuqar.ismayilzada@gmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-08-31 10:37+0000\n"
-"Last-Translator: Konul Allahverdiyeva <english.koni@gmail.com>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-19 16:41+0000\n"
+"Last-Translator: Zulfugar Ismayilzadeh <zulfuqar.ismayilzada@gmail.com>\n"
 "Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
 "az/)\n"
 "MIME-Version: 1.0\n"
@@ -217,8 +218,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" uğurla silindi."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "%(key)r əsas açarı ilə %(name)s mövcud deyil."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "\"%(key)s\" id nömrəli %(name)s mövcud deyil. Çox güman ki, silinib?"
 
 #, python-format
 msgid "Add %s"

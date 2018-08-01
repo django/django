@@ -14,7 +14,7 @@ from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.auth.models import User
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.db.models import CharField, DateField, DateTimeField
+from django.db.models import CharField, DateField, DateTimeField, UUIDField
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 from django.utils import translation
@@ -248,6 +248,12 @@ class AdminForeignKeyRawIdWidget(TestDataMixin, TestCase):
         lookup2 = widgets.url_params_from_lookup_dict({'myfield': my_callable()})
         self.assertEqual(lookup1, lookup2)
 
+    def test_label_and_url_for_value_invalid_uuid(self):
+        field = Bee._meta.get_field('honeycomb')
+        self.assertIsInstance(field.target_field, UUIDField)
+        widget = widgets.ForeignKeyRawIdWidget(field.remote_field, admin.site)
+        self.assertEqual(widget.label_and_url_for_value('invalid-uuid'), ('', ''))
+
 
 class FilteredSelectMultipleWidgetTest(SimpleTestCase):
     def test_render(self):
@@ -255,7 +261,7 @@ class FilteredSelectMultipleWidgetTest(SimpleTestCase):
         w = widgets.FilteredSelectMultiple('test\\', False)
         self.assertHTMLEqual(
             w.render('test', 'test'),
-            '<select multiple="multiple" name="test" class="selectfilter" '
+            '<select multiple name="test" class="selectfilter" '
             'data-field-name="test\\" data-is-stacked="0">\n</select>'
         )
 
@@ -264,7 +270,7 @@ class FilteredSelectMultipleWidgetTest(SimpleTestCase):
         w = widgets.FilteredSelectMultiple('test\\', True)
         self.assertHTMLEqual(
             w.render('test', 'test'),
-            '<select multiple="multiple" name="test" class="selectfilterstacked" '
+            '<select multiple name="test" class="selectfilterstacked" '
             'data-field-name="test\\" data-is-stacked="1">\n</select>'
         )
 
@@ -274,13 +280,13 @@ class AdminDateWidgetTest(SimpleTestCase):
         w = widgets.AdminDateWidget()
         self.assertHTMLEqual(
             w.render('test', datetime(2007, 12, 1, 9, 30)),
-            '<input value="2007-12-01" type="text" class="vDateField" name="test" size="10" />',
+            '<input value="2007-12-01" type="text" class="vDateField" name="test" size="10">',
         )
         # pass attrs to widget
         w = widgets.AdminDateWidget(attrs={'size': 20, 'class': 'myDateField'})
         self.assertHTMLEqual(
             w.render('test', datetime(2007, 12, 1, 9, 30)),
-            '<input value="2007-12-01" type="text" class="myDateField" name="test" size="20" />',
+            '<input value="2007-12-01" type="text" class="myDateField" name="test" size="20">',
         )
 
 
@@ -289,13 +295,13 @@ class AdminTimeWidgetTest(SimpleTestCase):
         w = widgets.AdminTimeWidget()
         self.assertHTMLEqual(
             w.render('test', datetime(2007, 12, 1, 9, 30)),
-            '<input value="09:30:00" type="text" class="vTimeField" name="test" size="8" />',
+            '<input value="09:30:00" type="text" class="vTimeField" name="test" size="8">',
         )
         # pass attrs to widget
         w = widgets.AdminTimeWidget(attrs={'size': 20, 'class': 'myTimeField'})
         self.assertHTMLEqual(
             w.render('test', datetime(2007, 12, 1, 9, 30)),
-            '<input value="09:30:00" type="text" class="myTimeField" name="test" size="20" />',
+            '<input value="09:30:00" type="text" class="myTimeField" name="test" size="20">',
         )
 
 
@@ -306,9 +312,9 @@ class AdminSplitDateTimeWidgetTest(SimpleTestCase):
             w.render('test', datetime(2007, 12, 1, 9, 30)),
             '<p class="datetime">'
             'Date: <input value="2007-12-01" type="text" class="vDateField" '
-            'name="test_0" size="10" /><br />'
+            'name="test_0" size="10"><br>'
             'Time: <input value="09:30:00" type="text" class="vTimeField" '
-            'name="test_1" size="8" /></p>'
+            'name="test_1" size="8"></p>'
         )
 
     def test_localization(self):
@@ -320,9 +326,9 @@ class AdminSplitDateTimeWidgetTest(SimpleTestCase):
                 w.render('test', datetime(2007, 12, 1, 9, 30)),
                 '<p class="datetime">'
                 'Datum: <input value="01.12.2007" type="text" '
-                'class="vDateField" name="test_0"size="10" /><br />'
+                'class="vDateField" name="test_0"size="10"><br>'
                 'Zeit: <input value="09:30:00" type="text" class="vTimeField" '
-                'name="test_1" size="8" /></p>'
+                'name="test_1" size="8"></p>'
             )
 
 
@@ -331,14 +337,14 @@ class AdminURLWidgetTest(SimpleTestCase):
         w = widgets.AdminURLFieldWidget()
         self.assertHTMLEqual(
             w.render('test', ''),
-            '<input class="vURLField" name="test" type="url" />'
+            '<input class="vURLField" name="test" type="url">'
         )
         self.assertHTMLEqual(
             w.render('test', 'http://example.com'),
             '<p class="url">Currently:<a href="http://example.com">'
-            'http://example.com</a><br />'
+            'http://example.com</a><br>'
             'Change:<input class="vURLField" name="test" type="url" '
-            'value="http://example.com" /></p>'
+            'value="http://example.com"></p>'
         )
 
     def test_render_idn(self):
@@ -346,9 +352,9 @@ class AdminURLWidgetTest(SimpleTestCase):
         self.assertHTMLEqual(
             w.render('test', 'http://example-äüö.com'),
             '<p class="url">Currently: <a href="http://xn--example--7za4pnc.com">'
-            'http://example-äüö.com</a><br />'
+            'http://example-äüö.com</a><br>'
             'Change:<input class="vURLField" name="test" type="url" '
-            'value="http://example-äüö.com" /></p>'
+            'value="http://example-äüö.com"></p>'
         )
 
     def test_render_quoting(self):
@@ -420,15 +426,15 @@ class AdminFileWidgetTests(TestDataMixin, TestCase):
             '<p class="file-upload">Currently: <a href="%(STORAGE_URL)salbums/'
             r'hybrid_theory.jpg">albums\hybrid_theory.jpg</a> '
             '<span class="clearable-file-input">'
-            '<input type="checkbox" name="test-clear" id="test-clear_id" /> '
-            '<label for="test-clear_id">Clear</label></span><br />'
-            'Change: <input type="file" name="test" /></p>' % {
+            '<input type="checkbox" name="test-clear" id="test-clear_id"> '
+            '<label for="test-clear_id">Clear</label></span><br>'
+            'Change: <input type="file" name="test"></p>' % {
                 'STORAGE_URL': default_storage.url(''),
             },
         )
         self.assertHTMLEqual(
             w.render('test', SimpleUploadedFile('test', b'content')),
-            '<input type="file" name="test" />',
+            '<input type="file" name="test">',
         )
 
     def test_render_required(self):
@@ -437,8 +443,8 @@ class AdminFileWidgetTests(TestDataMixin, TestCase):
         self.assertHTMLEqual(
             widget.render('test', self.album.cover_art),
             '<p class="file-upload">Currently: <a href="%(STORAGE_URL)salbums/'
-            r'hybrid_theory.jpg">albums\hybrid_theory.jpg</a><br />'
-            'Change: <input type="file" name="test" /></p>' % {
+            r'hybrid_theory.jpg">albums\hybrid_theory.jpg</a><br>'
+            'Change: <input type="file" name="test"></p>' % {
                 'STORAGE_URL': default_storage.url(''),
             },
         )
@@ -457,7 +463,7 @@ class AdminFileWidgetTests(TestDataMixin, TestCase):
         )
         self.assertNotContains(
             response,
-            '<input type="file" name="cover_art" id="id_cover_art" />',
+            '<input type="file" name="cover_art" id="id_cover_art">',
             html=True,
         )
         response = self.client.get(reverse('admin:admin_widgets_album_add'))
@@ -482,7 +488,7 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         self.assertHTMLEqual(
             w.render('test', band.pk, attrs={}),
             '<input type="text" name="test" value="%(bandpk)s" '
-            'class="vForeignKeyRawIdAdminField" />'
+            'class="vForeignKeyRawIdAdminField">'
             '<a href="/admin_widgets/band/?_to_field=id" class="related-lookup" '
             'id="lookup_id_test" title="Lookup"></a>&nbsp;<strong>'
             '<a href="/admin_widgets/band/%(bandpk)s/change/">Linkin Park</a>'
@@ -502,7 +508,7 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         self.assertHTMLEqual(
             w.render('test', core.parent_id, attrs={}),
             '<input type="text" name="test" value="86" '
-            'class="vForeignKeyRawIdAdminField" />'
+            'class="vForeignKeyRawIdAdminField">'
             '<a href="/admin_widgets/inventory/?_to_field=barcode" '
             'class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
             '&nbsp;<strong><a href="/admin_widgets/inventory/%(pk)s/change/">'
@@ -519,7 +525,7 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render('honeycomb_widget', big_honeycomb.pk, attrs={}),
-            '<input type="text" name="honeycomb_widget" value="%(hcombpk)s" />'
+            '<input type="text" name="honeycomb_widget" value="%(hcombpk)s">'
             '&nbsp;<strong>%(hcomb)s</strong>'
             % {'hcombpk': big_honeycomb.pk, 'hcomb': big_honeycomb}
         )
@@ -534,7 +540,7 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render('individual_widget', subject1.pk, attrs={}),
-            '<input type="text" name="individual_widget" value="%(subj1pk)s" />'
+            '<input type="text" name="individual_widget" value="%(subj1pk)s">'
             '&nbsp;<strong>%(subj1)s</strong>'
             % {'subj1pk': subject1.pk, 'subj1': subject1}
         )
@@ -552,7 +558,7 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         )
         self.assertHTMLEqual(
             w.render('test', child_of_hidden.parent_id, attrs={}),
-            '<input type="text" name="test" value="93" class="vForeignKeyRawIdAdminField" />'
+            '<input type="text" name="test" value="93" class="vForeignKeyRawIdAdminField">'
             '<a href="/admin_widgets/inventory/?_to_field=barcode" '
             'class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
             '&nbsp;<strong><a href="/admin_widgets/inventory/%(pk)s/change/">'
@@ -574,7 +580,7 @@ class ManyToManyRawIdWidgetTest(TestCase):
         w = widgets.ManyToManyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render('test', [m1.pk, m2.pk], attrs={}), (
-                '<input type="text" name="test" value="%(m1pk)s,%(m2pk)s" class="vManyToManyRawIdAdminField" />'
+                '<input type="text" name="test" value="%(m1pk)s,%(m2pk)s" class="vManyToManyRawIdAdminField">'
                 '<a href="/admin_widgets/member/" class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
             ) % {'m1pk': m1.pk, 'm2pk': m2.pk}
         )
@@ -599,12 +605,12 @@ class ManyToManyRawIdWidgetTest(TestCase):
         w = widgets.ManyToManyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render('company_widget1', [c1.pk, c2.pk], attrs={}),
-            '<input type="text" name="company_widget1" value="%(c1pk)s,%(c2pk)s" />' % {'c1pk': c1.pk, 'c2pk': c2.pk}
+            '<input type="text" name="company_widget1" value="%(c1pk)s,%(c2pk)s">' % {'c1pk': c1.pk, 'c2pk': c2.pk}
         )
 
         self.assertHTMLEqual(
             w.render('company_widget2', [c1.pk]),
-            '<input type="text" name="company_widget2" value="%(c1pk)s" />' % {'c1pk': c1.pk}
+            '<input type="text" name="company_widget2" value="%(c1pk)s">' % {'c1pk': c1.pk}
         )
 
 

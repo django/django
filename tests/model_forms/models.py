@@ -151,7 +151,7 @@ class CustomFF(models.Model):
 
 
 class FilePathModel(models.Model):
-    path = models.FilePathField(path=os.path.dirname(__file__), match=r".*\.py$", blank=True)
+    path = models.FilePathField(path=os.path.dirname(__file__), match='models.py', blank=True)
 
 
 try:

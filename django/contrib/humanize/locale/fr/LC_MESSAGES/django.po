@@ -10,8 +10,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2014-10-05 20:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2017-12-06 01:44+0800\n"
+"Last-Translator: Tzu-ping Chung <uranusjr@gmail.com>\n"
 "Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -22,17 +22,49 @@ msgstr ""
 msgid "Humanize"
 msgstr "Humanisation"
 
-msgid "th"
-msgstr "<sup>e</sup>"
+msgctxt "ordinal 11, 12, 13"
+msgid "{}th"
+msgstr "{}<sup>e</sup>"
 
-msgid "st"
-msgstr "<sup>er</sup>"
+msgctxt "ordinal 0"
+msgid "{}th"
+msgstr "{}<sup>e</sup>"
 
-msgid "nd"
-msgstr "<sup>e</sup>"
+msgctxt "ordinal 1"
+msgid "{}st"
+msgstr "{}<sup>er</sup>"
 
-msgid "rd"
-msgstr "<sup>e</sup>"
+msgctxt "ordinal 2"
+msgid "{}nd"
+msgstr "{}<sup>e</sup>"
+
+msgctxt "ordinal 3"
+msgid "{}rd"
+msgstr "{}<sup>e</sup>"
+
+msgctxt "ordinal 4"
+msgid "{}th"
+msgstr "{}<sup>e</sup>"
+
+msgctxt "ordinal 5"
+msgid "{}th"
+msgstr "{}<sup>e</sup>"
+
+msgctxt "ordinal 6"
+msgid "{}th"
+msgstr "{}<sup>e</sup>"
+
+msgctxt "ordinal 7"
+msgid "{}th"
+msgstr "{}<sup>e</sup>"
+
+msgctxt "ordinal 8"
+msgid "{}th"
+msgstr "{}<sup>e</sup>"
+
+msgctxt "ordinal 9"
+msgid "{}th"
+msgstr "{}<sup>e</sup>"
 
 #, python-format
 msgid "%(value).1f million"

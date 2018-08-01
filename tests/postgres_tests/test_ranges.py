@@ -100,7 +100,7 @@ class TestRangeContainsLookup(PostgreSQLTestCase):
             datetime.datetime(year=2016, month=2, day=2),
         ]
         cls.aware_timestamps = [
-            timezone.make_aware(timestamp, timezone.get_current_timezone())
+            timezone.make_aware(timestamp)
             for timestamp in cls.timestamps
         ]
         cls.dates = [
@@ -408,18 +408,24 @@ class TestValidators(PostgreSQLTestCase):
     def test_max(self):
         validator = RangeMaxValueValidator(5)
         validator(NumericRange(0, 5))
+        msg = 'Ensure that this range is completely less than or equal to 5.'
         with self.assertRaises(exceptions.ValidationError) as cm:
             validator(NumericRange(0, 10))
-        self.assertEqual(cm.exception.messages[0], 'Ensure that this range is completely less than or equal to 5.')
+        self.assertEqual(cm.exception.messages[0], msg)
         self.assertEqual(cm.exception.code, 'max_value')
+        with self.assertRaisesMessage(exceptions.ValidationError, msg):
+            validator(NumericRange(0, None))  # an unbound range
 
     def test_min(self):
         validator = RangeMinValueValidator(5)
         validator(NumericRange(10, 15))
+        msg = 'Ensure that this range is completely greater than or equal to 5.'
         with self.assertRaises(exceptions.ValidationError) as cm:
             validator(NumericRange(0, 10))
-        self.assertEqual(cm.exception.messages[0], 'Ensure that this range is completely greater than or equal to 5.')
+        self.assertEqual(cm.exception.messages[0], msg)
         self.assertEqual(cm.exception.code, 'min_value')
+        with self.assertRaisesMessage(exceptions.ValidationError, msg):
+            validator(NumericRange(None, 10))  # an unbound range
 
 
 class TestFormField(PostgreSQLTestCase):
@@ -462,10 +468,10 @@ class TestFormField(PostgreSQLTestCase):
                 <label for="id_field_0">Field:</label>
                 </th>
                 <td>
-                    <input id="id_field_0_0" name="field_0_0" type="text" />
-                    <input id="id_field_0_1" name="field_0_1" type="text" />
-                    <input id="id_field_1_0" name="field_1_0" type="text" />
-                    <input id="id_field_1_1" name="field_1_1" type="text" />
+                    <input id="id_field_0_0" name="field_0_0" type="text">
+                    <input id="id_field_0_1" name="field_0_1" type="text">
+                    <input id="id_field_1_0" name="field_1_0" type="text">
+                    <input id="id_field_1_1" name="field_1_1" type="text">
                 </td>
             </tr>
         ''')
@@ -493,8 +499,8 @@ class TestFormField(PostgreSQLTestCase):
         <tr>
             <th><label for="id_ints_0">Ints:</label></th>
             <td>
-                <input id="id_ints_0" name="ints_0" type="number" />
-                <input id="id_ints_1" name="ints_1" type="number" />
+                <input id="id_ints_0" name="ints_0" type="number">
+                <input id="id_ints_1" name="ints_1" type="number">
             </td>
         </tr>
         ''')
@@ -694,11 +700,11 @@ class TestWidget(PostgreSQLTestCase):
         f = pg_forms.ranges.DateTimeRangeField()
         self.assertHTMLEqual(
             f.widget.render('datetimerange', ''),
-            '<input type="text" name="datetimerange_0" /><input type="text" name="datetimerange_1" />'
+            '<input type="text" name="datetimerange_0"><input type="text" name="datetimerange_1">'
         )
         self.assertHTMLEqual(
             f.widget.render('datetimerange', None),
-            '<input type="text" name="datetimerange_0" /><input type="text" name="datetimerange_1" />'
+            '<input type="text" name="datetimerange_0"><input type="text" name="datetimerange_1">'
         )
         dt_range = DateTimeTZRange(
             datetime.datetime(2006, 1, 10, 7, 30),
@@ -706,6 +712,6 @@ class TestWidget(PostgreSQLTestCase):
         )
         self.assertHTMLEqual(
             f.widget.render('datetimerange', dt_range),
-            '<input type="text" name="datetimerange_0" value="2006-01-10 07:30:00" />'
-            '<input type="text" name="datetimerange_1" value="2006-02-12 09:50:00" />'
+            '<input type="text" name="datetimerange_0" value="2006-01-10 07:30:00">'
+            '<input type="text" name="datetimerange_1" value="2006-02-12 09:50:00">'
         )

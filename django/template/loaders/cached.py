@@ -7,7 +7,6 @@ import hashlib
 
 from django.template import TemplateDoesNotExist
 from django.template.backends.django import copy_exception
-from django.utils.encoding import force_bytes
 
 from .base import Loader as BaseLoader
 
@@ -88,7 +87,7 @@ class Loader(BaseLoader):
         return '-'.join(s for s in (str(template_name), skip_prefix, dirs_prefix) if s)
 
     def generate_hash(self, values):
-        return hashlib.sha1(force_bytes('|'.join(values))).hexdigest()
+        return hashlib.sha1('|'.join(values).encode()).hexdigest()
 
     def reset(self):
         "Empty the template cache."

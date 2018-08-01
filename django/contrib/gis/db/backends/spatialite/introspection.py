@@ -9,24 +9,23 @@ class GeoFlexibleFieldLookupDict(FlexibleFieldLookupDict):
     Sublcass that includes updates the `base_data_types_reverse` dict
     for geometry field types.
     """
-    base_data_types_reverse = FlexibleFieldLookupDict.base_data_types_reverse.copy()
-    base_data_types_reverse.update(
-        {'point': 'GeometryField',
-         'linestring': 'GeometryField',
-         'polygon': 'GeometryField',
-         'multipoint': 'GeometryField',
-         'multilinestring': 'GeometryField',
-         'multipolygon': 'GeometryField',
-         'geometrycollection': 'GeometryField',
-         })
+    base_data_types_reverse = {
+        **FlexibleFieldLookupDict.base_data_types_reverse,
+        'point': 'GeometryField',
+        'linestring': 'GeometryField',
+        'polygon': 'GeometryField',
+        'multipoint': 'GeometryField',
+        'multilinestring': 'GeometryField',
+        'multipolygon': 'GeometryField',
+        'geometrycollection': 'GeometryField',
+    }
 
 
 class SpatiaLiteIntrospection(DatabaseIntrospection):
     data_types_reverse = GeoFlexibleFieldLookupDict()
 
     def get_geometry_type(self, table_name, geo_col):
-        cursor = self.connection.cursor()
-        try:
+        with self.connection.cursor() as cursor:
             # Querying the `geometry_columns` table to get additional metadata.
             cursor.execute('SELECT coord_dimension, srid, geometry_type '
                            'FROM geometry_columns '
@@ -55,9 +54,6 @@ class SpatiaLiteIntrospection(DatabaseIntrospection):
                 field_params['srid'] = srid
             if (isinstance(dim, str) and 'Z' in dim) or dim == 3:
                 field_params['dim'] = 3
-        finally:
-            cursor.close()
-
         return field_type, field_params
 
     def get_constraints(self, cursor, table_name):

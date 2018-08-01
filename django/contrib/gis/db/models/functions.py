@@ -1,3 +1,4 @@
+import warnings
 from decimal import Decimal
 
 from django.contrib.gis.db.models.fields import BaseSpatialField, GeometryField
@@ -10,6 +11,7 @@ from django.db.models import (
 from django.db.models.expressions import Func, Value
 from django.db.models.functions import Cast
 from django.db.utils import NotSupportedError
+from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.functional import cached_property
 
 NUMERIC_TYPES = (int, float, Decimal)
@@ -274,8 +276,19 @@ class Envelope(GeomOutputGeoFunc):
     arity = 1
 
 
+class ForcePolygonCW(GeomOutputGeoFunc):
+    arity = 1
+
+
 class ForceRHR(GeomOutputGeoFunc):
     arity = 1
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            'ForceRHR is deprecated in favor of ForcePolygonCW.',
+            RemovedInDjango30Warning, stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
 
 
 class GeoHash(GeoFunc):
@@ -415,12 +428,10 @@ class SnapToGrid(SQLiteDecimalToFloatMixin, GeomOutputGeoFunc):
             )
         elif nargs == 4:
             # Reverse origin and size param ordering
-            expressions.extend(
-                [self._handle_param(arg, '', NUMERIC_TYPES) for arg in args[2:]]
-            )
-            expressions.extend(
-                [self._handle_param(arg, '', NUMERIC_TYPES) for arg in args[0:2]]
-            )
+            expressions += [
+                *(self._handle_param(arg, '', NUMERIC_TYPES) for arg in args[2:]),
+                *(self._handle_param(arg, '', NUMERIC_TYPES) for arg in args[0:2]),
+            ]
         else:
             raise ValueError('Must provide 1, 2, or 4 arguments to `SnapToGrid`.')
         super().__init__(*expressions, **extra)

@@ -9,19 +9,21 @@
 # Eugene MechanisM <eugene@mechanism.pro>, 2013
 # eXtractor <evg.kirov@gmail.com>, 2015
 # Igor Melnyk, 2014
+# Ivan Khomutov <iskhomutov@gmail.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # lilo.panic, 2016
 # Mikhail Zholobov <legal90@gmail.com>, 2013
+# Nikolay Korotkiy <sikmir@gmail.com>, 2018
 # Vasiliy Anikin <anikin.vasya@gmail.com>, 2017
-# Алексей Борискин <sun.void@gmail.com>, 2013-2016
+# Алексей Борискин <sun.void@gmail.com>, 2013-2017
 # Дмитрий Шатера <mr.bobsans@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-03-25 05:25+0000\n"
-"Last-Translator: Vasiliy Anikin <anikin.vasya@gmail.com>\n"
+"POT-Creation-Date: 2017-12-01 21:10+0100\n"
+"PO-Revision-Date: 2018-01-13 10:40+0000\n"
+"Last-Translator: Nikolay Korotkiy <sikmir@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -172,6 +174,9 @@ msgstr "Японский"
 
 msgid "Georgian"
 msgstr "Грузинский"
+
+msgid "Kabyle"
+msgstr "Кабильский"
 
 msgid "Kazakh"
 msgstr "Казахский"
@@ -329,6 +334,7 @@ msgstr "Введите правильное число."
 msgid "Enter a valid email address."
 msgstr "Введите правильный адрес электронной почты."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -440,6 +446,9 @@ msgid ""
 msgstr ""
 "Формат файлов '%(extension)s' не поддерживается. Поддерживаемые форматы "
 "файлов: '%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
+msgstr "Данные содержат запрещённый символ: ноль-байт"
 
 msgid "and"
 msgstr "и"
@@ -787,16 +796,16 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Пожалуйста, измените повторяющиеся значения ниже."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "Внешний ключ не совпадает с первичным ключом родителя."
+msgid "The inline value did not match the parent instance."
+msgstr "Значение во вложенной форме не совпадает со значением в базовой форме."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 "Выберите корректный вариант. Вашего варианта нет среди допустимых значений."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" не является верным значением для первичного ключа."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "\"%(pk)s\" не является верным значением."
 
 #, python-format
 msgid ""
@@ -1180,6 +1189,20 @@ msgstr ""
 "страницы."
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+"Если Вы используете HTML-тэг <meta name=\"referrer\" content=\"no-referrer"
+"\"> или добавили HTTP-заголовок 'Referrer-Policy: no-referrer', пожалуйста "
+"удалите их. CSRF защите необходим заголовок 'Referer' для строгой проверки "
+"адреса ссылающейся страницы. Если Вы беспокоитесь о приватности, используйте "
+"альтернативы, например <a rel=\"noreferrer\" ...>, для ссылок на сайты "
+"третьих лиц."
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1203,32 +1226,11 @@ msgstr ""
 "В отладочном режиме доступно больше информации.  Включить отладочный режим "
 "можно, установив значение переменной DEBUG=True."
 
-msgid "Welcome to Django"
-msgstr "Добро пожаловать в Django"
-
-msgid "It worked!"
-msgstr "Заработало!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Поздравляем вас с вашей первой страницей, работающей на Django."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-"Сейчас вы можете создать ваше первое приложение, запустив команду "
-"<code>python manage.py startapp [app_label]</code>."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Вы видите это сообщение, потому что в файле ваших настроек Django есть "
-"строчка <code>DEBUG = True</code> и вы не сконфигурировали ни одного URL. За "
-"работу!"
-
 msgid "No year specified"
 msgstr "Не указан год"
+
+msgid "Date out of range"
+msgstr "Дата выходит за пределы диапазона"
 
 msgid "No month specified"
 msgstr "Не указан месяц"
@@ -1286,3 +1288,48 @@ msgstr "\"%(path)s\" не существует"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Список файлов директории %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django: веб-фреймворк для перфекционистов с дедлайнами."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Посмотреть <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/"
+"\" target=\"_blank\" rel=\"noopener\">замечания к выпуску</a> для Django "
+"%(version)s"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Установка прошла успешно! Поздравляем!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"Вы видите данную страницу, потому что указали <a href=\"https://docs."
+"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel="
+"\"noopener\">DEBUG=True</a> в файле настроек и не настроили ни одного "
+"обработчика URL-адресов."
+
+msgid "Django Documentation"
+msgstr "Документация Django"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr "Разделы, справочник, &amp; примеры"
+
+msgid "Tutorial: A Polling App"
+msgstr "Руководство: Приложение для голосования"
+
+msgid "Get started with Django"
+msgstr "Начало работы с Django"
+
+msgid "Django Community"
+msgstr "Сообщество Django"
+
+msgid "Connect, get help, or contribute"
+msgstr "Присоединяйтесь, получайте помощь или помогайте в разработке"

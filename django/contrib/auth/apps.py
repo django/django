@@ -1,5 +1,6 @@
 from django.apps import AppConfig
 from django.core import checks
+from django.db.models.query_utils import DeferredAttribute
 from django.db.models.signals import post_migrate
 from django.utils.translation import gettext_lazy as _
 
@@ -18,7 +19,9 @@ class AuthConfig(AppConfig):
             create_permissions,
             dispatch_uid="django.contrib.auth.management.create_permissions"
         )
-        if hasattr(get_user_model(), 'last_login'):
+        last_login_field = getattr(get_user_model(), 'last_login', None)
+        # Register the handler only if UserModel.last_login is a field.
+        if isinstance(last_login_field, DeferredAttribute):
             from .models import update_last_login
             user_logged_in.connect(update_last_login, dispatch_uid='update_last_login')
         checks.register(check_user_model, checks.Tags.models)

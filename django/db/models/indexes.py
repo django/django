@@ -1,5 +1,6 @@
 import hashlib
 
+from django.db.backends.utils import split_identifier
 from django.utils.encoding import force_bytes
 
 __all__ = ['Index']
@@ -11,12 +12,18 @@ class Index:
     # cross-database compatibility with Oracle)
     max_name_length = 30
 
-    def __init__(self, *, fields=[], name=None, db_tablespace=None):
-        if not isinstance(fields, list):
-            raise ValueError('Index.fields must be a list.')
+    def __init__(self, *, fields=(), name=None, db_tablespace=None, opclasses=()):
+        if opclasses and not name:
+            raise ValueError('An index must be named to use opclasses.')
+        if not isinstance(fields, (list, tuple)):
+            raise ValueError('Index.fields must be a list or tuple.')
+        if not isinstance(opclasses, (list, tuple)):
+            raise ValueError('Index.opclasses must be a list or tuple.')
+        if opclasses and len(fields) != len(opclasses):
+            raise ValueError('Index.fields and Index.opclasses must have the same number of elements.')
         if not fields:
             raise ValueError('At least one field is required to define an index.')
-        self.fields = fields
+        self.fields = list(fields)
         # A list of 2-tuple with the field name and ordering ('' or 'DESC').
         self.fields_orders = [
             (field_name[1:], 'DESC') if field_name.startswith('-') else (field_name, '')
@@ -30,6 +37,7 @@ class Index:
             if errors:
                 raise ValueError(errors)
         self.db_tablespace = db_tablespace
+        self.opclasses = opclasses
 
     def check_name(self):
         errors = []
@@ -48,7 +56,7 @@ class Index:
         col_suffixes = [order[1] for order in self.fields_orders]
         return schema_editor._create_index_sql(
             model, fields, name=self.name, using=using, db_tablespace=self.db_tablespace,
-            col_suffixes=col_suffixes,
+            col_suffixes=col_suffixes, opclasses=self.opclasses,
         )
 
     def remove_sql(self, model, schema_editor):
@@ -64,12 +72,14 @@ class Index:
         kwargs = {'fields': self.fields, 'name': self.name}
         if self.db_tablespace is not None:
             kwargs['db_tablespace'] = self.db_tablespace
+        if self.opclasses:
+            kwargs['opclasses'] = self.opclasses
         return (path, (), kwargs)
 
     def clone(self):
         """Create a copy of this Index."""
-        path, args, kwargs = self.deconstruct()
-        return self.__class__(*args, **kwargs)
+        _, _, kwargs = self.deconstruct()
+        return self.__class__(**kwargs)
 
     @staticmethod
     def _hash_generator(*args):
@@ -90,7 +100,7 @@ class Index:
         (8 chars) and unique hash + suffix (10 chars). Each part is made to
         fit its size by truncating the excess length.
         """
-        table_name = model._meta.db_table
+        _, table_name = split_identifier(model._meta.db_table)
         column_names = [model._meta.get_field(field_name).column for field_name, order in self.fields_orders]
         column_names_with_order = [
             (('-%s' if order else '%s') % column_name)

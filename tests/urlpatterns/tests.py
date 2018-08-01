@@ -8,6 +8,15 @@ from django.urls import Resolver404, path, resolve, reverse
 from .converters import DynamicConverter
 from .views import empty_view
 
+included_kwargs = {'base': b'hello', 'value': b'world'}
+converter_test_data = (
+    # ('url', ('url_name', 'app_name', {kwargs})),
+    # aGVsbG8= is 'hello' encoded in base64.
+    ('/base64/aGVsbG8=/', ('base64', '', {'value': b'hello'})),
+    ('/base64/aGVsbG8=/subpatterns/d29ybGQ=/', ('subpattern-base64', '', included_kwargs)),
+    ('/base64/aGVsbG8=/namespaced/d29ybGQ=/', ('subpattern-base64', 'namespaced-base64', included_kwargs)),
+)
+
 
 @override_settings(ROOT_URLCONF='urlpatterns.path_urls')
 class SimplifiedURLTests(SimpleTestCase):
@@ -44,15 +53,22 @@ class SimplifiedURLTests(SimpleTestCase):
         self.assertEqual(url, '/articles/2015/4/12/')
 
     @override_settings(ROOT_URLCONF='urlpatterns.path_base64_urls')
-    def test_non_identical_converter_resolve(self):
-        match = resolve('/base64/aGVsbG8=/')  # base64 of 'hello'
-        self.assertEqual(match.url_name, 'base64')
-        self.assertEqual(match.kwargs, {'value': b'hello'})
+    def test_converter_resolve(self):
+        for url, (url_name, app_name, kwargs) in converter_test_data:
+            with self.subTest(url=url):
+                match = resolve(url)
+                self.assertEqual(match.url_name, url_name)
+                self.assertEqual(match.app_name, app_name)
+                self.assertEqual(match.kwargs, kwargs)
 
     @override_settings(ROOT_URLCONF='urlpatterns.path_base64_urls')
-    def test_non_identical_converter_reverse(self):
-        url = reverse('base64', kwargs={'value': b'hello'})
-        self.assertEqual(url, '/base64/aGVsbG8=/')
+    def test_converter_reverse(self):
+        for expected, (url_name, app_name, kwargs) in converter_test_data:
+            if app_name:
+                url_name = '%s:%s' % (app_name, url_name)
+            with self.subTest(url=url_name):
+                url = reverse(url_name, kwargs=kwargs)
+                self.assertEqual(url, expected)
 
     def test_path_inclusion_is_matchable(self):
         match = resolve('/included_urls/extra/something/')

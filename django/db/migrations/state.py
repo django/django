@@ -362,7 +362,8 @@ class ModelState:
         self.fields = fields
         self.options = options or {}
         self.options.setdefault('indexes', [])
-        self.bases = bases or (models.Model, )
+        self.options.setdefault('constraints', [])
+        self.bases = bases or (models.Model,)
         self.managers = managers or []
         # Sanity-check that fields is NOT a dict. It must be ordered.
         if isinstance(self.fields, dict):
@@ -445,6 +446,8 @@ class ModelState:
                         if not index.name:
                             index.set_name_with_model(model)
                     options['indexes'] = indexes
+                elif name == 'constraints':
+                    options['constraints'] = [con.clone() for con in model._meta.constraints]
                 else:
                     options[name] = model._meta.original_attrs[name]
         # If we're ignoring relationships, remove all field-listing model
@@ -553,8 +556,7 @@ class ModelState:
     def render(self, apps):
         """Create a Model object from our current state into the given apps."""
         # First, make a Meta object
-        meta_contents = {'app_label': self.app_label, "apps": apps}
-        meta_contents.update(self.options)
+        meta_contents = {'app_label': self.app_label, 'apps': apps, **self.options}
         meta = type("Meta", (), meta_contents)
         # Then, work out our bases
         try:
@@ -585,6 +587,12 @@ class ModelState:
             if index.name == name:
                 return index
         raise ValueError("No index named %s on model %s" % (name, self.name))
+
+    def get_constraint_by_name(self, name):
+        for constraint in self.options['constraints']:
+            if constraint.name == name:
+                return constraint
+        raise ValueError('No constraint named %s on model %s' % (name, self.name))
 
     def __repr__(self):
         return "<%s: '%s.%s'>" % (self.__class__.__name__, self.app_label, self.name)

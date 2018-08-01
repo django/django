@@ -4,7 +4,9 @@ from django.core.checks import Error, Warning as DjangoWarning
 from django.db import connection, models
 from django.test import SimpleTestCase, TestCase, skipIfDBFeature
 from django.test.utils import isolate_apps, override_settings
+from django.utils.functional import lazy
 from django.utils.timezone import now
+from django.utils.translation import gettext_lazy as _
 
 
 @isolate_apps('invalid_models_tests')
@@ -38,24 +40,6 @@ class AutoFieldTests(SimpleTestCase):
 
 
 @isolate_apps('invalid_models_tests')
-class BooleanFieldTests(SimpleTestCase):
-
-    def test_nullable_boolean_field(self):
-        class Model(models.Model):
-            field = models.BooleanField(null=True)
-
-        field = Model._meta.get_field('field')
-        self.assertEqual(field.check(), [
-            Error(
-                'BooleanFields do not accept null values.',
-                hint='Use a NullBooleanField instead.',
-                obj=field,
-                id='fields.E110',
-            ),
-        ])
-
-
-@isolate_apps('invalid_models_tests')
 class CharFieldTests(TestCase):
 
     def test_valid_field(self):
@@ -66,7 +50,8 @@ class CharFieldTests(TestCase):
                     ('1', 'item1'),
                     ('2', 'item2'),
                 ],
-                db_index=True)
+                db_index=True,
+            )
 
         field = Model._meta.get_field('field')
         self.assertEqual(field.check(), [])
@@ -149,6 +134,21 @@ class CharFieldTests(TestCase):
             ),
         ])
 
+    def test_non_iterable_choices_two_letters(self):
+        """Two letters isn't a valid choice pair."""
+        class Model(models.Model):
+            field = models.CharField(max_length=10, choices=['ab'])
+
+        field = Model._meta.get_field('field')
+        self.assertEqual(field.check(), [
+            Error(
+                "'choices' must be an iterable containing (actual value, "
+                "human readable name) tuples.",
+                obj=field,
+                id='fields.E005',
+            ),
+        ])
+
     def test_iterable_of_iterable_choices(self):
         class ThingItem:
             def __init__(self, value, display):
@@ -182,6 +182,79 @@ class CharFieldTests(TestCase):
                 id='fields.E005',
             ),
         ])
+
+    def test_choices_containing_lazy(self):
+        class Model(models.Model):
+            field = models.CharField(max_length=10, choices=[['1', _('1')], ['2', _('2')]])
+
+        self.assertEqual(Model._meta.get_field('field').check(), [])
+
+    def test_lazy_choices(self):
+        class Model(models.Model):
+            field = models.CharField(max_length=10, choices=lazy(lambda: [[1, '1'], [2, '2']], tuple)())
+
+        self.assertEqual(Model._meta.get_field('field').check(), [])
+
+    def test_choices_named_group(self):
+        class Model(models.Model):
+            field = models.CharField(
+                max_length=10, choices=[
+                    ['knights', [['L', 'Lancelot'], ['G', 'Galahad']]],
+                    ['wizards', [['T', 'Tim the Enchanter']]],
+                    ['R', 'Random character'],
+                ],
+            )
+
+        self.assertEqual(Model._meta.get_field('field').check(), [])
+
+    def test_choices_named_group_non_pairs(self):
+        class Model(models.Model):
+            field = models.CharField(
+                max_length=10,
+                choices=[['knights', [['L', 'Lancelot', 'Du Lac']]]],
+            )
+
+        field = Model._meta.get_field('field')
+        self.assertEqual(field.check(), [
+            Error(
+                "'choices' must be an iterable containing (actual value, "
+                "human readable name) tuples.",
+                obj=field,
+                id='fields.E005',
+            ),
+        ])
+
+    def test_choices_named_group_bad_structure(self):
+        class Model(models.Model):
+            field = models.CharField(
+                max_length=10, choices=[
+                    ['knights', [
+                        ['Noble', [['G', 'Galahad']]],
+                        ['Combative', [['L', 'Lancelot']]],
+                    ]],
+                ],
+            )
+
+        field = Model._meta.get_field('field')
+        self.assertEqual(field.check(), [
+            Error(
+                "'choices' must be an iterable containing (actual value, "
+                "human readable name) tuples.",
+                obj=field,
+                id='fields.E005',
+            ),
+        ])
+
+    def test_choices_named_group_lazy(self):
+        class Model(models.Model):
+            field = models.CharField(
+                max_length=10, choices=[
+                    [_('knights'), [['L', _('Lancelot')], ['G', _('Galahad')]]],
+                    ['R', _('Random character')],
+                ],
+            )
+
+        self.assertEqual(Model._meta.get_field('field').check(), [])
 
     def test_bad_db_index_value(self):
         class Model(models.Model):
@@ -524,7 +597,7 @@ class ImageFieldTests(SimpleTestCase):
         expected = [] if pillow_installed else [
             Error(
                 'Cannot use ImageField because Pillow is not installed.',
-                hint=('Get Pillow at https://pypi.python.org/pypi/Pillow '
+                hint=('Get Pillow at https://pypi.org/project/Pillow/ '
                       'or run command "pip install Pillow".'),
                 obj=field,
                 id='fields.E210',

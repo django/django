@@ -85,6 +85,10 @@ class UpdateCacheMiddleware(MiddlewareMixin):
         if not request.COOKIES and response.cookies and has_vary_header(response, 'Cookie'):
             return response
 
+        # Don't cache a response with 'Cache-Control: private'
+        if 'private' in response.get('Cache-Control', ()):
+            return response
+
         # Try to get the timeout from the "max-age" section of the "Cache-
         # Control" header before reverting to using the default cache_timeout
         # length.

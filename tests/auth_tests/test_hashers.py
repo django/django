@@ -9,7 +9,6 @@ from django.contrib.auth.hashers import (
 )
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
-from django.utils.encoding import force_bytes
 
 try:
     import crypt
@@ -53,7 +52,7 @@ class TestUtilsHashPass(SimpleTestCase):
 
     def test_pbkdf2(self):
         encoded = make_password('lètmein', 'seasalt', 'pbkdf2_sha256')
-        self.assertEqual(encoded, 'pbkdf2_sha256$100000$seasalt$BNZ6eyaNc8qFTJPjrAq99hSYb73EgAdytAtdBg2Sdcc=')
+        self.assertEqual(encoded, 'pbkdf2_sha256$150000$seasalt$71l36B3C2UesFoWz5oshQ1SSTtCLnDO5RMysCfljq5o=')
         self.assertTrue(is_password_usable(encoded))
         self.assertTrue(check_password('lètmein', encoded))
         self.assertFalse(check_password('lètmeinz', encoded))
@@ -173,6 +172,7 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertFalse(check_password(' ', blank_encoded))
 
     @skipUnless(bcrypt, "bcrypt not installed")
+    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.BCryptPasswordHasher'])
     def test_bcrypt(self):
         encoded = make_password('lètmein', hasher='bcrypt')
         self.assertTrue(is_password_usable(encoded))
@@ -188,6 +188,7 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertFalse(check_password(' ', blank_encoded))
 
     @skipUnless(bcrypt, "bcrypt not installed")
+    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.BCryptPasswordHasher'])
     def test_bcrypt_upgrade(self):
         hasher = get_hasher('bcrypt')
         self.assertEqual('bcrypt', hasher.algorithm)
@@ -220,6 +221,7 @@ class TestUtilsHashPass(SimpleTestCase):
             hasher.rounds = old_rounds
 
     @skipUnless(bcrypt, "bcrypt not installed")
+    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.BCryptPasswordHasher'])
     def test_bcrypt_harden_runtime(self):
         hasher = get_hasher('bcrypt')
         self.assertEqual('bcrypt', hasher.algorithm)
@@ -238,7 +240,7 @@ class TestUtilsHashPass(SimpleTestCase):
 
             # Get the original salt (includes the original workload factor)
             algorithm, data = encoded.split('$', 1)
-            expected_call = (('wrong_password', force_bytes(data[:29])),)
+            expected_call = (('wrong_password', data[:29].encode()),)
             self.assertEqual(hasher.encode.call_args_list, [expected_call] * 3)
 
     def test_unusable(self):
@@ -274,20 +276,22 @@ class TestUtilsHashPass(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, msg % 'lolcat'):
             identify_hasher('lolcat$salt$hash')
 
-    def test_bad_encoded(self):
-        self.assertFalse(is_password_usable('lètmein_badencoded'))
-        self.assertFalse(is_password_usable(''))
+    def test_is_password_usable(self):
+        passwords = ('lètmein_badencoded', '', None)
+        for password in passwords:
+            with self.subTest(password=password):
+                self.assertIs(is_password_usable(password), True)
 
     def test_low_level_pbkdf2(self):
         hasher = PBKDF2PasswordHasher()
         encoded = hasher.encode('lètmein', 'seasalt2')
-        self.assertEqual(encoded, 'pbkdf2_sha256$100000$seasalt2$Tl4GMr+Yt1zzO1sbKoUaDBdds5NkR3RxaDWuQsliFrI=')
+        self.assertEqual(encoded, 'pbkdf2_sha256$150000$seasalt2$5xGh/XsAm2L9fQXShAI1qf739n97YlTaaLY8/t6Ms7o=')
         self.assertTrue(hasher.verify('lètmein', encoded))
 
     def test_low_level_pbkdf2_sha1(self):
         hasher = PBKDF2SHA1PasswordHasher()
         encoded = hasher.encode('lètmein', 'seasalt2')
-        self.assertEqual(encoded, 'pbkdf2_sha1$100000$seasalt2$dK/dL+ySBZ5zoR0+Zk3SB/VsH0U=')
+        self.assertEqual(encoded, 'pbkdf2_sha1$150000$seasalt2$lIjyT2rG1gVh5rdCmuAEoHwQtQE=')
         self.assertTrue(hasher.verify('lètmein', encoded))
 
     @override_settings(

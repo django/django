@@ -14,9 +14,16 @@ class Cast(Func):
         extra_context['db_type'] = self.output_field.cast_db_type(connection)
         return super().as_sql(compiler, connection, **extra_context)
 
+    def as_mysql(self, compiler, connection):
+        # MySQL doesn't support explicit cast to float.
+        template = '(%(expressions)s + 0.0)' if self.output_field.get_internal_type() == 'FloatField' else None
+        return self.as_sql(compiler, connection, template=template)
+
     def as_postgresql(self, compiler, connection):
         # CAST would be valid too, but the :: shortcut syntax is more readable.
-        return self.as_sql(compiler, connection, template='%(expressions)s::%(db_type)s')
+        # 'expressions' is wrapped in parentheses in case it's a complex
+        # expression.
+        return self.as_sql(compiler, connection, template='(%(expressions)s)::%(db_type)s')
 
 
 class Coalesce(Func):

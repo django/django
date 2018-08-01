@@ -84,12 +84,9 @@ class BaseMemcachedCache(BaseCache):
         self._cache.delete(key)
 
     def get_many(self, keys, version=None):
-        new_keys = [self.make_key(x, version=version) for x in keys]
-        ret = self._cache.get_multi(new_keys)
-        if ret:
-            m = dict(zip(new_keys, keys))
-            return {m[k]: v for k, v in ret.items()}
-        return ret
+        key_map = {self.make_key(key, version=version): key for key in keys}
+        ret = self._cache.get_multi(key_map.keys())
+        return {key_map[k]: v for k, v in ret.items()}
 
     def close(self, **kwargs):
         # Many clients don't clean up connections properly.
@@ -162,6 +159,10 @@ class MemcachedCache(BaseMemcachedCache):
             self._client = self._lib.Client(self._servers, **client_kwargs)
         return self._client
 
+    def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
+        key = self.make_key(key, version=version)
+        return self._cache.touch(key, self.get_backend_timeout(timeout)) != 0
+
 
 class PyLibMCCache(BaseMemcachedCache):
     "An implementation of a cache binding using pylibmc"
@@ -172,6 +173,12 @@ class PyLibMCCache(BaseMemcachedCache):
     @cached_property
     def _cache(self):
         return self._lib.Client(self._servers, **self._options)
+
+    def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
+        key = self.make_key(key, version=version)
+        if timeout == 0:
+            return self._cache.delete(key)
+        return self._cache.touch(key, self.get_backend_timeout(timeout))
 
     def close(self, **kwargs):
         # libmemcached manages its own connections. Don't call disconnect_all()

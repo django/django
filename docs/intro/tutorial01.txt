@@ -16,19 +16,19 @@ We'll assume you have :doc:`Django installed </intro/install>` already. You can
 tell Django is installed and which version by running the following command
 in a shell prompt (indicated by the $ prefix):
 
-.. code-block:: console
+.. console::
 
     $ python -m django --version
 
 If Django is installed, you should see the version of your installation. If it
 isn't, you'll get an error telling "No module named django".
 
-This tutorial is written for Django |version| and Python 3.5 or later. If the
-Django version doesn't match, you can refer to the tutorial for your version
-of Django by using the version switcher at the bottom right corner of this
-page, or update Django to the newest version. If you are still using Python
-2.7, you will need to adjust the code samples slightly, as described in
-comments.
+This tutorial is written for Django |version|, which supports Python 3.5 and
+later. If the Django version doesn't match, you can refer to the tutorial for
+your version of Django by using the version switcher at the bottom right corner
+of this page, or update Django to the newest version. If you're using an older
+version of Python, check :ref:`faq-python-version-support` to find a compatible
+version of Django.
 
 See :doc:`How to install Django </topics/install>` for advice on how to remove
 older versions of Django and install a newer one.
@@ -52,7 +52,7 @@ application-specific settings.
 From the command line, ``cd`` into a directory where you'd like to store your
 code, then run the following command:
 
-.. code-block:: console
+.. console::
 
    $ django-admin startproject mysite
 
@@ -123,7 +123,7 @@ The development server
 Let's verify your Django project works. Change into the outer :file:`mysite` directory, if
 you haven't already, and run the following commands:
 
-.. code-block:: console
+.. console::
 
    $ python manage.py runserver
 
@@ -169,7 +169,7 @@ It worked!
     it as a command-line argument. For instance, this command starts the server
     on port 8080:
 
-    .. code-block:: console
+    .. console::
 
         $ python manage.py runserver 8080
 
@@ -178,7 +178,7 @@ It worked!
     running Vagrant or want to show off your work on other computers on the
     network), use:
 
-    .. code-block:: console
+    .. console::
 
         $ python manage.py runserver 0:8000
 
@@ -219,7 +219,7 @@ submodule of ``mysite``.
 To create your app, make sure you're in the same directory as :file:`manage.py`
 and type this command:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py startapp polls
 
@@ -289,8 +289,8 @@ The next step is to point the root URLconf at the ``polls.urls`` module. In
 .. snippet::
     :filename: mysite/urls.py
 
-    from django.urls import include, path
     from django.contrib import admin
+    from django.urls import include, path
 
     urlpatterns = [
         path('polls/', include('polls.urls')),
@@ -316,13 +316,18 @@ app will still work.
 You have now wired an ``index`` view into the URLconf. Lets verify it's
 working, run the following command:
 
-.. code-block:: console
+.. console::
 
    $ python manage.py runserver
 
 Go to http://localhost:8000/polls/ in your browser, and you should see the
 text "*Hello, world. You're at the polls index.*", which you defined in the
 ``index`` view.
+
+.. admonition:: Page not found?
+
+    If you get an error page here, check that you're going to
+    http://localhost:8000/polls/ and not http://localhost:8000/.
 
 The :func:`~django.urls.path` function is passed four arguments, two required:
 ``route`` and ``view``, and two optional: ``kwargs``, and ``name``.

@@ -52,3 +52,8 @@ if connection.vendor == 'postgresql':
         headline = models.CharField(max_length=100, db_index=True)
         body = models.TextField(db_index=True)
         slug = models.CharField(max_length=40, unique=True)
+
+
+class IndexedArticle2(models.Model):
+    headline = models.CharField(max_length=100)
+    body = models.TextField()

@@ -233,6 +233,45 @@ class I18nBlockTransTagTests(SimpleTestCase):
         output = self.engine.render_to_string('template')
         self.assertEqual(output, '%s')
 
+    @setup({'template': '{% load i18n %}{% blocktrans %}{% block b %} {% endblock %}{% endblocktrans %}'})
+    def test_with_block(self):
+        msg = "'blocktrans' doesn't allow other block tags (seen 'block b') inside it"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('template')
+
+    @setup({'template': '{% load i18n %}{% blocktrans %}{% for b in [1, 2, 3] %} {% endfor %}{% endblocktrans %}'})
+    def test_with_for(self):
+        msg = "'blocktrans' doesn't allow other block tags (seen 'for b in [1, 2, 3]') inside it"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('template')
+
+    @setup({'template': '{% load i18n %}{% blocktrans with foo=bar with %}{{ foo }}{% endblocktrans %}'})
+    def test_variable_twice(self):
+        with self.assertRaisesMessage(TemplateSyntaxError, "The 'with' option was specified more than once"):
+            self.engine.render_to_string('template', {'foo': 'bar'})
+
+    @setup({'template': '{% load i18n %}{% blocktrans with %}{% endblocktrans %}'})
+    def test_no_args_with(self):
+        msg = '"with" in \'blocktrans\' tag needs at least one keyword argument.'
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('template')
+
+    @setup({'template': '{% load i18n %}{% blocktrans count a %}{% endblocktrans %}'})
+    def test_count(self):
+        msg = '"count" in \'blocktrans\' tag expected exactly one keyword argument.'
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('template', {'a': [1, 2, 3]})
+
+    @setup({'template': (
+        '{% load i18n %}{% blocktrans count count=var|length %}'
+        'There is {{ count }} object. {% block a %} {% endblock %}'
+        '{% endblocktrans %}'
+    )})
+    def test_plural_bad_syntax(self):
+        msg = "'blocktrans' doesn't allow other block tags inside it"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('template', {'var': [1, 2, 3]})
+
 
 class TranslationBlockTransTagTests(SimpleTestCase):
 

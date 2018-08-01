@@ -168,6 +168,9 @@ class FileSystemStorage(Storage):
     """
     Standard filesystem storage
     """
+    # The combination of O_CREAT and O_EXCL makes os.open() raise OSError if
+    # the file already exists before it's opened.
+    OS_OPEN_FLAGS = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, 'O_BINARY', 0)
 
     def __init__(self, location=None, base_url=None, file_permissions_mode=None,
                  directory_permissions_mode=None):
@@ -256,12 +259,8 @@ class FileSystemStorage(Storage):
 
                 # This is a normal uploadedfile that we can stream.
                 else:
-                    # This fun binary flag incantation makes os.open throw an
-                    # OSError if the file already exists before we open it.
-                    flags = (os.O_WRONLY | os.O_CREAT | os.O_EXCL |
-                             getattr(os, 'O_BINARY', 0))
                     # The current umask value is masked out by os.open!
-                    fd = os.open(full_path, flags, 0o666)
+                    fd = os.open(full_path, self.OS_OPEN_FLAGS, 0o666)
                     _file = None
                     try:
                         locks.lock(fd, locks.LOCK_EX)

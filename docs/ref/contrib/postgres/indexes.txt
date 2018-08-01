@@ -43,16 +43,10 @@ available from the ``django.contrib.postgres.indexes`` module.
     .. _GIN Fast Update Technique: https://www.postgresql.org/docs/current/static/gin-implementation.html#GIN-FAST-UPDATE
     .. _gin_pending_list_limit: https://www.postgresql.org/docs/current/static/runtime-config-client.html#GUC-GIN-PENDING-LIST-LIMIT
 
-    .. versionchanged:: 2.0
-
-        The ``fastupdate`` and ``gin_pending_list_limit`` parameters were added.
-
 ``GistIndex``
 =============
 
 .. class:: GistIndex(buffering=None, fillfactor=None, **options)
-
-    .. versionadded:: 2.0
 
     Creates a `GiST index
     <https://www.postgresql.org/docs/current/static/gist.html>`_. These indexes

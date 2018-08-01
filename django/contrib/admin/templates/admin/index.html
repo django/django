@@ -1,7 +1,7 @@
 {% extends "admin/base_site.html" %}
 {% load i18n static %}
 
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />{% endblock %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}">{% endblock %}
 
 {% block coltype %}colMS{% endblock %}
 
@@ -34,7 +34,11 @@
             {% endif %}
 
             {% if model.admin_url %}
+                {% if model.view_only %}
+                <td><a href="{{ model.admin_url }}" class="viewlink">{% trans 'View' %}</a></td>
+                {% else %}
                 <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
+                {% endif %}
             {% else %}
                 <td>&nbsp;</td>
             {% endif %}
@@ -44,7 +48,7 @@
         </div>
     {% endfor %}
 {% else %}
-    <p>{% trans "You don't have permission to edit anything." %}</p>
+    <p>{% trans "You don't have permission to view or edit anything." %}</p>
 {% endif %}
 </div>
 {% endblock %}
@@ -67,7 +71,7 @@
                 {% else %}
                     <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>
                 {% endif %}
-                <br/>
+                <br>
                 {% if entry.content_type %}
                     <span class="mini quiet">{% filter capfirst %}{{ entry.content_type }}{% endfilter %}</span>
                 {% else %}

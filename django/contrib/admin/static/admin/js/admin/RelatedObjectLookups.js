@@ -58,7 +58,7 @@
 
     function updateRelatedObjectLinks(triggeringLink) {
         var $this = $(triggeringLink);
-        var siblings = $this.nextAll('.change-related, .delete-related');
+        var siblings = $this.nextAll('.view-related, .change-related, .delete-related');
         if (!siblings.length) {
             return;
         }
@@ -146,7 +146,7 @@
     window.dismissAddAnotherPopup = dismissAddRelatedObjectPopup;
 
     $(document).ready(function() {
-        $("a[data-popup-opener]").click(function(event) {
+        $("a[data-popup-opener]").on('click', function(event) {
             event.preventDefault();
             opener.dismissRelatedLookupPopup(window, $(this).data("popup-opener"));
         });

@@ -21,7 +21,7 @@ class EmailBackend(ConsoleEmailBackend):
         if not isinstance(self.file_path, str):
             raise ImproperlyConfigured('Path for saving emails is invalid: %r' % self.file_path)
         self.file_path = os.path.abspath(self.file_path)
-        # Make sure that self.file_path is an directory if it exists.
+        # Make sure that self.file_path is a directory if it exists.
         if os.path.exists(self.file_path) and not os.path.isdir(self.file_path):
             raise ImproperlyConfigured(
                 'Path for saving email messages exists, but is not a directory: %s' % self.file_path

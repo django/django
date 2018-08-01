@@ -1,4 +1,3 @@
-import logging
 import re
 
 from django.conf import settings
@@ -10,7 +9,6 @@ from django.middleware.csrf import (
     _compare_salted_tokens as equivalent_tokens, get_token,
 )
 from django.test import SimpleTestCase, override_settings
-from django.test.utils import patch_logger
 from django.views.decorators.csrf import csrf_exempt, requires_csrf_token
 
 from .views import (
@@ -64,7 +62,7 @@ class CsrfViewMiddlewareTestMixin:
 
     def _check_token_present(self, response, csrf_id=None):
         text = str(response.content, response.charset)
-        match = re.search("name='csrfmiddlewaretoken' value='(.*?)'", text)
+        match = re.search('name="csrfmiddlewaretoken" value="(.*?)"', text)
         csrf_token = csrf_id or self._csrf_id
         self.assertTrue(
             match and equivalent_tokens(csrf_token, match.group(1)),
@@ -98,24 +96,24 @@ class CsrfViewMiddlewareTestMixin:
         If no CSRF cookies is present, the middleware rejects the incoming
         request. This will stop login CSRF.
         """
-        with patch_logger('django.security.csrf', 'warning') as logger_calls:
-            req = self._get_POST_no_csrf_cookie_request()
-            self.mw.process_request(req)
+        req = self._get_POST_no_csrf_cookie_request()
+        self.mw.process_request(req)
+        with self.assertLogs('django.security.csrf', 'WARNING') as cm:
             req2 = self.mw.process_view(req, post_form_view, (), {})
-            self.assertEqual(403, req2.status_code)
-            self.assertEqual(logger_calls[0], 'Forbidden (%s): ' % REASON_NO_CSRF_COOKIE)
+        self.assertEqual(403, req2.status_code)
+        self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % REASON_NO_CSRF_COOKIE)
 
     def test_process_request_csrf_cookie_no_token(self):
         """
         If a CSRF cookie is present but no token, the middleware rejects
         the incoming request.
         """
-        with patch_logger('django.security.csrf', 'warning') as logger_calls:
-            req = self._get_POST_csrf_cookie_request()
-            self.mw.process_request(req)
+        req = self._get_POST_csrf_cookie_request()
+        self.mw.process_request(req)
+        with self.assertLogs('django.security.csrf', 'WARNING') as cm:
             req2 = self.mw.process_view(req, post_form_view, (), {})
-            self.assertEqual(403, req2.status_code)
-            self.assertEqual(logger_calls[0], 'Forbidden (%s): ' % REASON_BAD_TOKEN)
+        self.assertEqual(403, req2.status_code)
+        self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % REASON_BAD_TOKEN)
 
     def test_process_request_csrf_cookie_and_token(self):
         """
@@ -163,17 +161,17 @@ class CsrfViewMiddlewareTestMixin:
         """
         req = TestingHttpRequest()
         req.method = 'PUT'
-        with patch_logger('django.security.csrf', 'warning') as logger_calls:
+        with self.assertLogs('django.security.csrf', 'WARNING') as cm:
             req2 = self.mw.process_view(req, post_form_view, (), {})
-            self.assertEqual(403, req2.status_code)
-            self.assertEqual(logger_calls[0], 'Forbidden (%s): ' % REASON_NO_CSRF_COOKIE)
+        self.assertEqual(403, req2.status_code)
+        self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % REASON_NO_CSRF_COOKIE)
 
         req = TestingHttpRequest()
         req.method = 'DELETE'
-        with patch_logger('django.security.csrf', 'warning') as logger_calls:
+        with self.assertLogs('django.security.csrf', 'WARNING') as cm:
             req2 = self.mw.process_view(req, post_form_view, (), {})
-            self.assertEqual(403, req2.status_code)
-            self.assertEqual(logger_calls[0], 'Forbidden (%s): ' % REASON_NO_CSRF_COOKIE)
+        self.assertEqual(403, req2.status_code)
+        self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % REASON_NO_CSRF_COOKIE)
 
     def test_put_and_delete_allowed(self):
         """
@@ -293,6 +291,19 @@ class CsrfViewMiddlewareTestMixin:
             'match any trusted origins.',
             status_code=403,
         )
+
+    def test_https_malformed_host(self):
+        """
+        CsrfViewMiddleware generates a 403 response if it receives an HTTPS
+        request with a bad host.
+        """
+        req = self._get_GET_no_csrf_cookie_request()
+        req._is_secure_override = True
+        req.META['HTTP_HOST'] = '@malformed'
+        req.META['HTTP_REFERER'] = 'https://www.evil.org/somepage'
+        req.META['SERVER_PORT'] = '443'
+        response = self.mw.process_view(req, token_view, (), {})
+        self.assertEqual(response.status_code, 403)
 
     @override_settings(DEBUG=True)
     def test_https_malformed_referer(self):
@@ -423,22 +434,10 @@ class CsrfViewMiddlewareTestMixin:
         """
         ensure_csrf_cookie() doesn't log warnings (#19436).
         """
-        class TestHandler(logging.Handler):
-            def emit(self, record):
-                raise Exception("This shouldn't have happened!")
-
-        logger = logging.getLogger('django.request')
-        test_handler = TestHandler()
-        old_log_level = logger.level
-        try:
-            logger.addHandler(test_handler)
-            logger.setLevel(logging.WARNING)
-
-            req = self._get_GET_no_csrf_cookie_request()
-            ensure_csrf_cookie_view(req)
-        finally:
-            logger.removeHandler(test_handler)
-            logger.setLevel(old_log_level)
+        with self.assertRaisesMessage(AssertionError, 'no logs'):
+            with self.assertLogs('django.request', 'WARNING'):
+                req = self._get_GET_no_csrf_cookie_request()
+                ensure_csrf_cookie_view(req)
 
     def test_post_data_read_failure(self):
         """
@@ -485,11 +484,11 @@ class CsrfViewMiddlewareTestMixin:
         self.assertIsNone(resp)
 
         req = CsrfPostRequest(token, raise_error=True)
-        with patch_logger('django.security.csrf', 'warning') as logger_calls:
-            self.mw.process_request(req)
+        self.mw.process_request(req)
+        with self.assertLogs('django.security.csrf', 'WARNING') as cm:
             resp = self.mw.process_view(req, post_form_view, (), {})
-            self.assertEqual(resp.status_code, 403)
-            self.assertEqual(logger_calls[0], 'Forbidden (%s): ' % REASON_BAD_TOKEN)
+        self.assertEqual(resp.status_code, 403)
+        self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % REASON_BAD_TOKEN)
 
 
 class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
@@ -572,6 +571,14 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
             resp2 = self.mw.process_response(req, resp)
             max_age = resp2.cookies.get('csrfcookie').get('max-age')
             self.assertEqual(max_age, '')
+
+    def test_csrf_cookie_samesite(self):
+        req = self._get_GET_no_csrf_cookie_request()
+        with self.settings(CSRF_COOKIE_NAME='csrfcookie', CSRF_COOKIE_SAMESITE='Strict'):
+            self.mw.process_view(req, token_view, (), {})
+            resp = token_view(req)
+            resp2 = self.mw.process_response(req, resp)
+            self.assertEqual(resp2.cookies['csrfcookie']['samesite'], 'Strict')
 
     def test_process_view_token_too_long(self):
         """

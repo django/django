@@ -3,7 +3,6 @@ import os
 
 from django.core.files.uploadedfile import UploadedFile
 from django.http import HttpResponse, HttpResponseServerError, JsonResponse
-from django.utils.encoding import force_bytes, force_text
 
 from .models import FileModel
 from .tests import UNICODE_FILENAME, UPLOAD_TO
@@ -42,7 +41,7 @@ def file_upload_view_verify(request):
         if isinstance(value, UploadedFile):
             new_hash = hashlib.sha1(value.read()).hexdigest()
         else:
-            new_hash = hashlib.sha1(force_bytes(value)).hexdigest()
+            new_hash = hashlib.sha1(value.encode()).hexdigest()
         if new_hash != submitted_hash:
             return HttpResponseServerError()
 
@@ -151,7 +150,7 @@ def file_upload_content_type_extra(request):
     """
     params = {}
     for file_name, uploadedfile in request.FILES.items():
-        params[file_name] = {k: force_text(v) for k, v in uploadedfile.content_type_extra.items()}
+        params[file_name] = {k: v.decode() for k, v in uploadedfile.content_type_extra.items()}
     return JsonResponse(params)
 
 

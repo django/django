@@ -92,7 +92,6 @@ class IntrospectionTests(TransactionTestCase):
             [30, 30, 254]
         )
 
-    @skipUnlessDBFeature('can_introspect_null')
     def test_get_table_description_nullable(self):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
@@ -151,7 +150,7 @@ class IntrospectionTests(TransactionTestCase):
         ]
         for statement in create_table_statements:
             with connection.cursor() as cursor:
-                cursor.fetchone = mock.Mock(return_value=[statement.format(Article._meta.db_table)])
+                cursor.fetchone = mock.Mock(return_value=[statement.format(Article._meta.db_table), 'table'])
                 relations = connection.introspection.get_relations(cursor, 'mocked_table')
             self.assertEqual(relations, {'art_id': ('id', Article._meta.db_table)})
 
@@ -176,7 +175,7 @@ class IntrospectionTests(TransactionTestCase):
             constraints = connection.introspection.get_constraints(cursor, Article._meta.db_table)
         index = {}
         index2 = {}
-        for key, val in constraints.items():
+        for val in constraints.values():
             if val['columns'] == ['headline', 'pub_date']:
                 index = val
             if val['columns'] == ['headline', 'response_to_id', 'pub_date', 'reporter_id']:
@@ -198,7 +197,7 @@ class IntrospectionTests(TransactionTestCase):
             ['response_to_id'],
             ['headline', 'response_to_id', 'pub_date', 'reporter_id'],
         ]
-        for key, val in constraints.items():
+        for val in constraints.values():
             if val['index'] and not (val['primary_key'] or val['unique']):
                 self.assertIn(val['columns'], expected_columns)
                 self.assertEqual(val['orders'], ['ASC'] * len(val['columns']))

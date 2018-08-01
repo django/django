@@ -260,8 +260,8 @@ Django 1.5 also includes several smaller improvements worth noting:
   ``self.stderr.write('error')`` (see the note on
   :ref:`management commands output <management-commands-output>`).
 
-* The dumpdata management command outputs one row at a time, preventing
-  out-of-memory errors when dumping large datasets.
+* The :djadmin:`dumpdata` management command outputs one row at a time,
+  preventing out-of-memory errors when dumping large datasets.
 
 * In the localflavor for Canada, "pq" was added to the acceptable codes for
   Quebec. It's an old abbreviation.
@@ -602,7 +602,7 @@ Ordering of tests
 In order to make sure all ``TestCase`` code starts with a clean database,
 tests are now executed in the following order:
 
-* First, all unittests (including :class:`unittest.TestCase`,
+* First, all unit tests (including :class:`unittest.TestCase`,
   :class:`~django.test.SimpleTestCase`, :class:`~django.test.TestCase` and
   :class:`~django.test.TransactionTestCase`) are run with no particular ordering
   guaranteed nor enforced among them.

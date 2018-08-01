@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-21 16:32+0000\n"
+"POT-Creation-Date: 2017-12-01 21:10+0100\n"
+"PO-Revision-Date: 2017-12-03 05:47+0000\n"
 "Last-Translator: Tzu-ping Chung <uranusjr@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
 "language/zh_TW/)\n"
@@ -166,6 +166,9 @@ msgstr "日語"
 
 msgid "Georgian"
 msgstr "喬治亞語"
+
+msgid "Kabyle"
+msgstr "卡拜爾語"
 
 msgid "Kazakh"
 msgstr "哈薩克語"
@@ -323,6 +326,7 @@ msgstr "請輸入有效的整數。"
 msgid "Enter a valid email address."
 msgstr "請輸入有效的電子郵件地址。"
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "請輸入一個有效的「slug」，由字母、數字、底線與連字號組成。"
@@ -399,6 +403,9 @@ msgid ""
 "'%(allowed_extensions)s'."
 msgstr ""
 "副檔名「%(extension)s」不被允許。允許的副檔名包含：%(allowed_extensions)s。"
+
+msgid "Null characters are not allowed."
+msgstr "不允許空（null）字元。"
 
 msgid "and"
 msgstr "和"
@@ -706,15 +713,15 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "請修正下方重覆的數值"
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "內含的外鍵無法連接到對應的上層實體主鍵。"
+msgid "The inline value did not match the parent instance."
+msgstr "內含的外鍵無法連接到對應的上層實體。"
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "選擇有效的選項： 此選擇不在可用的選項中。"
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" 不是一個主鍵的有效資料。"
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "「%(pk)s」並非有效的值。"
 
 #, python-format
 msgid ""
@@ -1070,6 +1077,18 @@ msgstr ""
 "「same-origin」請求啟用它。"
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+"若你使用 <meta name=\"referrer\" content=\"no-referrer\"> 標籤，或在頭欄位包"
+"含「Referrer-Policy: no-referrer」，請將其移除。CSRF 保護需要使用「Referer」"
+"頭欄位進行嚴格參照檢查。若你擔心隱私問題，請在指向第三方網站的連結使用 <a "
+"rel=\"noreferrer\" ...> 語法。"
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1087,31 +1106,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "設定 DEBUG=True 以獲得更多資訊。"
 
-msgid "Welcome to Django"
-msgstr "歡迎使用 Django"
-
-msgid "It worked!"
-msgstr "設定成功！"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "觀迎來到你的第一個 Django 頁面。"
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-"馬上用 <code>python manage.py startapp [app_label]</code> 建立你的第一個 app "
-"吧。"
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"你看到這個訊息，是因為你在 Django 設定檔中包含 <code>DEBUG = True</code>，且"
-"尚未配置任何網址。開始工作吧！"
-
 msgid "No year specified"
 msgstr "不指定年份"
+
+msgid "Date out of range"
+msgstr "日期超過範圍"
 
 msgid "No month specified"
 msgstr "不指定月份"
@@ -1163,3 +1162,46 @@ msgstr "\"%(path)s\" 路徑不存在"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "%(directory)s 的索引"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django：為有時間壓力的完美主義者設計的網站框架。"
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"查看 <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">Django %(version)s 的發行筆記</a>"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "安裝成功！恭喜！"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"你看到這個訊息，是因為你在 Django 設定檔中包含 <a href=\"https://docs."
+"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel="
+"\"noopener\">DEBUG = True</a>，且尚未配置任何網址。開始工作吧！"
+
+msgid "Django Documentation"
+msgstr "Django 文件"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr "主題、參考、教學"
+
+msgid "Tutorial: A Polling App"
+msgstr "教學：投票應用"
+
+msgid "Get started with Django"
+msgstr "初學 Django"
+
+msgid "Django Community"
+msgstr "Django 社群"
+
+msgid "Connect, get help, or contribute"
+msgstr "聯繫、求助、貢獻"

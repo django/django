@@ -99,8 +99,8 @@ First we need to add :meth:`~django.db.models.Model.get_absolute_url()` to our
 .. snippet::
     :filename: models.py
 
-    from django.urls import reverse
     from django.db import models
+    from django.urls import reverse
 
     class Author(models.Model):
         name = models.CharField(max_length=200)
@@ -115,8 +115,8 @@ here; we don't have to write any logic ourselves:
 .. snippet::
     :filename: views.py
 
-    from django.views.generic.edit import CreateView, UpdateView, DeleteView
     from django.urls import reverse_lazy
+    from django.views.generic.edit import CreateView, DeleteView, UpdateView
     from myapp.models import Author
 
     class AuthorCreate(CreateView):
@@ -150,7 +150,7 @@ Finally, we hook these new views into the URLconf:
     :filename: urls.py
 
     from django.urls import path
-    from myapp.views import AuthorCreate, AuthorUpdate, AuthorDelete
+    from myapp.views import AuthorCreate, AuthorDelete, AuthorUpdate
 
     urlpatterns = [
         # ...

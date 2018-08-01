@@ -1,24 +1,19 @@
 """HTML utilities suitable for global use."""
 
+import json
 import re
 from html.parser import HTMLParser
 from urllib.parse import (
     parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit,
 )
 
-from django.utils.encoding import force_text
 from django.utils.functional import Promise, keep_lazy, keep_lazy_text
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
 from django.utils.safestring import SafeData, SafeText, mark_safe
 from django.utils.text import normalize_newlines
 
 # Configuration for urlize() function.
-TRAILING_PUNCTUATION_RE = re.compile(
-    '^'           # Beginning of word
-    '(.*?)'       # The URL in word
-    '([.,:;!]+)'  # Allowed non-wrapping, trailing punctuation
-    '$'           # End of word
-)
+TRAILING_PUNCTUATION_CHARS = '.,:;!'
 WRAPPING_PUNCTUATION = [('(', ')'), ('<', '>'), ('[', ']'), ('&lt;', '&gt;'), ('"', '"'), ('\'', '\'')]
 
 # List of possible strings used for bullets in bulleted lists.
@@ -28,7 +23,6 @@ unencoded_ampersands_re = re.compile(r'&(?!(\w+|#\d+);)')
 word_split_re = re.compile(r'''([\s<>"']+)''')
 simple_url_re = re.compile(r'^https?://\[?\w', re.IGNORECASE)
 simple_url_2_re = re.compile(r'^www\.|^(?!http)\w[^@]+\.(com|edu|gov|int|mil|net|org)($|/.*)$', re.IGNORECASE)
-simple_email_re = re.compile(r'^\S+@\S+\.\S+$')
 
 _html_escapes = {
     ord('&'): '&amp;',
@@ -75,6 +69,27 @@ _js_escapes.update((ord('%c' % z), '\\u%04X' % z) for z in range(32))
 def escapejs(value):
     """Hex encode characters for use in JavaScript strings."""
     return mark_safe(str(value).translate(_js_escapes))
+
+
+_json_script_escapes = {
+    ord('>'): '\\u003E',
+    ord('<'): '\\u003C',
+    ord('&'): '\\u0026',
+}
+
+
+def json_script(value, element_id):
+    """
+    Escape all the HTML/XML special characters with their unicode escapes, so
+    value is safe to be output anywhere except for inside a tag attribute. Wrap
+    the escaped JSON in a script tag.
+    """
+    from django.core.serializers.json import DjangoJSONEncoder
+    json_str = json.dumps(value, cls=DjangoJSONEncoder).translate(_json_script_escapes)
+    return format_html(
+        '<script id="{}" type="application/json">{}</script>',
+        element_id, mark_safe(json_str)
+    )
 
 
 def conditional_escape(text):
@@ -124,19 +139,19 @@ def format_html_join(sep, format_string, args_generator):
 
 @keep_lazy_text
 def linebreaks(value, autoescape=False):
-    """Convert newlines into <p> and <br />s."""
+    """Convert newlines into <p> and <br>s."""
     value = normalize_newlines(value)
     paras = re.split('\n{2,}', str(value))
     if autoescape:
-        paras = ['<p>%s</p>' % escape(p).replace('\n', '<br />') for p in paras]
+        paras = ['<p>%s</p>' % escape(p).replace('\n', '<br>') for p in paras]
     else:
-        paras = ['<p>%s</p>' % p.replace('\n', '<br />') for p in paras]
+        paras = ['<p>%s</p>' % p.replace('\n', '<br>') for p in paras]
     return '\n\n'.join(paras)
 
 
 class MLStripper(HTMLParser):
     def __init__(self):
-        HTMLParser.__init__(self, convert_charrefs=False)
+        super().__init__(convert_charrefs=False)
         self.reset()
         self.fed = []
 
@@ -168,7 +183,7 @@ def strip_tags(value):
     """Return the given HTML with all tags stripped."""
     # Note: in typical case this loop executes _strip_once once. Loop condition
     # is redundant, but helps to reduce number of executions of _strip_once.
-    value = force_text(value)
+    value = str(value)
     while '<' in value and '>' in value:
         new_value = _strip_once(value)
         if len(new_value) >= len(value):
@@ -181,7 +196,7 @@ def strip_tags(value):
 @keep_lazy_text
 def strip_spaces_between_tags(value):
     """Return the given HTML with spaces between tags removed."""
-    return re.sub(r'>\s+<', '><', force_text(value))
+    return re.sub(r'>\s+<', '><', str(value))
 
 
 def smart_urlquote(url):
@@ -191,8 +206,7 @@ def smart_urlquote(url):
         # Tilde is part of RFC3986 Unreserved Characters
         # http://tools.ietf.org/html/rfc3986#section-2.3
         # See also http://bugs.python.org/issue16285
-        segment = quote(segment, safe=RFC3986_SUBDELIMS + RFC3986_GENDELIMS + '~')
-        return force_text(segment)
+        return quote(segment, safe=RFC3986_SUBDELIMS + RFC3986_GENDELIMS + '~')
 
     # Handle IDN before quoting.
     try:
@@ -273,10 +287,10 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
             trimmed_something = False
 
             # Trim trailing punctuation.
-            match = TRAILING_PUNCTUATION_RE.match(middle)
-            if match:
-                middle = match.group(1)
-                trail = match.group(2) + trail
+            stripped = middle.rstrip(TRAILING_PUNCTUATION_CHARS)
+            if middle != stripped:
+                trail = middle[len(stripped):] + trail
+                middle = stripped
                 trimmed_something = True
 
             # Trim wrapping punctuation.
@@ -293,7 +307,22 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
                     trimmed_something = True
         return lead, middle, trail
 
-    words = word_split_re.split(force_text(text))
+    def is_email_simple(value):
+        """Return True if value looks like an email address."""
+        # An @ must be in the middle of the value.
+        if '@' not in value or value.startswith('@') or value.endswith('@'):
+            return False
+        try:
+            p1, p2 = value.split('@')
+        except ValueError:
+            # value contains more than one @.
+            return False
+        # Dot must be in p2 (e.g. example.com)
+        if '.' not in p2 or p2.startswith('.'):
+            return False
+        return True
+
+    words = word_split_re.split(str(text))
     for i, word in enumerate(words):
         if '.' in word or '@' in word or ':' in word:
             # lead: Current punctuation trimmed from the beginning of the word.
@@ -312,7 +341,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
             elif simple_url_2_re.match(middle):
                 middle, middle_unescaped, trail = unescape(middle, trail)
                 url = smart_urlquote('http://%s' % middle_unescaped)
-            elif ':' not in middle and simple_email_re.match(middle):
+            elif ':' not in middle and is_email_simple(middle):
                 local, domain = middle.rsplit('@', 1)
                 try:
                     domain = domain.encode('idna').decode('ascii')

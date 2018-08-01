@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-11-25 15:16+0000\n"
+"PO-Revision-Date: 2017-11-29 22:27+0000\n"
 "Last-Translator: Besnik <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
@@ -31,13 +31,12 @@ msgstr "lloje lënde"
 
 #, python-format
 msgid "Content type %(ct_id)s object has no associated model"
-msgstr "Objekti %(ct_id)s për lloj lënde nuk ka model të përshoqëruar"
+msgstr "Objekti për lloj lënde %(ct_id)s s’ka model të përshoqëruar"
 
 #, python-format
 msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
-msgstr ""
-"Objekti %(obj_id)s për lloj lënde %(ct_id)s nuk ka model të përshoqëruar"
+msgstr "Objekti %(obj_id)s për lloj lënde %(ct_id)s s’ekziston"
 
 #, python-format
 msgid "%(ct_name)s objects don't have a get_absolute_url() method"
-msgstr "Objektet %(ct_name)s nuk përmbajnë ndonjë metodë get_absolute_url()"
+msgstr "Objektet %(ct_name)s s’përmbajnë ndonjë metodë get_absolute_url()"

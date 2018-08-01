@@ -32,7 +32,8 @@ development:
 * :doc:`Report bugs <bugs-and-features>` in our `ticket tracker`_.
 
 * Join the |django-developers| mailing list and share your ideas for how
-  to improve Django. We're always open to suggestions.
+  to improve Django. We're always open to suggestions. You can also interact
+  on the `#django-dev IRC channel`_.
 
 * :doc:`Submit patches <writing-code/submitting-patches>` for new and/or
   fixed behavior. If you're looking for an easy way to start contributing
@@ -63,6 +64,7 @@ Browse the following sections to find out how:
 
 .. _posting guidelines: https://code.djangoproject.com/wiki/UsingTheMailingList
 .. _#django IRC channel: irc://irc.freenode.net/django
+.. _#django-dev IRC channel: irc://irc.freenode.net/django-dev
 .. _community page: https://www.djangoproject.com/community/
 .. _register it here: https://www.djangoproject.com/community/add/blogs/
 .. _ticket tracker: https://code.djangoproject.com/
