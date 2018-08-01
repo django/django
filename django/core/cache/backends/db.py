@@ -49,52 +49,7 @@ class DatabaseCache(BaseDatabaseCache):
     pickle_protocol = pickle.HIGHEST_PROTOCOL
 
     def get(self, key, default=None, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
-        db = router.db_for_read(self.cache_model_class)
-        connection = connections[db]
-        quote_name = connection.ops.quote_name
-        table = quote_name(self._table)
-
-        with connection.cursor() as cursor:
-            cursor.execute(
-                'SELECT %s, %s, %s FROM %s WHERE %s = %%s' % (
-                    quote_name('cache_key'),
-                    quote_name('value'),
-                    quote_name('expires'),
-                    table,
-                    quote_name('cache_key'),
-                ),
-                [key]
-            )
-            row = cursor.fetchone()
-        if row is None:
-            return default
-
-        expires = row[2]
-        expression = models.Expression(output_field=models.DateTimeField())
-        for converter in (connection.ops.get_db_converters(expression) +
-                          expression.get_db_converters(connection)):
-            if func_supports_parameter(converter, 'context'):  # RemovedInDjango30Warning
-                expires = converter(expires, expression, connection, {})
-            else:
-                expires = converter(expires, expression, connection)
-
-        if expires < timezone.now():
-            db = router.db_for_write(self.cache_model_class)
-            connection = connections[db]
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    'DELETE FROM %s WHERE %s = %%s' % (
-                        table,
-                        quote_name('cache_key'),
-                    ),
-                    [key]
-                )
-            return default
-
-        value = connection.ops.process_clob(row[1])
-        return pickle.loads(base64.b64decode(value.encode()))
+        return self.get_many([key], version).get(key, default)
 
     def get_many(self, keys, version=None):
         key_map = {self.make_key(key, version=version): key for key in keys}
