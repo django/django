@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-05-28 01:29+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Interlingua (http://www.transifex.com/django/django/language/"
 "ia/)\n"
@@ -83,6 +83,15 @@ msgstr "Adder un altere %(verbose_name)s"
 
 msgid "Remove"
 msgstr "Remover"
+
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "Cambiar"
+
+msgid "Deletion"
+msgstr ""
 
 msgid "action time"
 msgstr "hora de action"
@@ -161,8 +170,10 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -172,12 +183,13 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -215,6 +227,10 @@ msgstr "Adder %s"
 #, python-format
 msgid "Change %s"
 msgstr "Cambiar %s"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "Error in le base de datos"
@@ -320,7 +336,7 @@ msgid "Change password"
 msgstr "Cambiar contrasigno"
 
 msgid "Please correct the error below."
-msgstr "Per favor corrige le errores sequente."
+msgstr ""
 
 msgid "Please correct the errors below."
 msgstr ""
@@ -432,8 +448,8 @@ msgstr ""
 "Es tu secur de voler deler le %(objects_name)s seligite? Tote le sequente "
 "objectos e le objectos associate a illo essera delite:"
 
-msgid "Change"
-msgstr "Cambiar"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr "Deler?"
@@ -452,8 +468,8 @@ msgstr ""
 msgid "Add"
 msgstr "Adder"
 
-msgid "You don't have permission to edit anything."
-msgstr "Tu non ha le permission de modificar alcun cosa."
+msgid "You don't have permission to view or edit anything."
+msgstr ""
 
 msgid "Recent actions"
 msgstr ""
@@ -515,6 +531,10 @@ msgid "Change selected %(model)s"
 msgstr ""
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr ""
 
@@ -543,6 +563,12 @@ msgstr "Salveguardar e adder un altere"
 
 msgid "Save and continue editing"
 msgstr "Salveguardar e continuar le modification"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Gratias pro haber passate un tempore agradabile con iste sito web."
@@ -647,6 +673,10 @@ msgstr "Selige %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Selige %s a modificar"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "Data:"

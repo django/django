@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
 "PO-Revision-Date: 2017-09-23 18:54+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Galician (http://www.transifex.com/django/django/language/"
@@ -102,26 +102,8 @@ msgstr ""
 "individuais. Probabelmente estea buscando o botón Ir no canto do botón "
 "Gardar."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] ""
-msgstr[1] ""
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] ""
-msgstr[1] ""
-
 msgid "Now"
 msgstr "Agora"
-
-msgid "Choose a Time"
-msgstr ""
-
-msgid "Choose a time"
-msgstr "Escolla unha hora"
 
 msgid "Midnight"
 msgstr "Medianoite"
@@ -134,6 +116,24 @@ msgstr "Mediodía"
 
 msgid "6 p.m."
 msgstr ""
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] ""
+msgstr[1] ""
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Choose a Time"
+msgstr ""
+
+msgid "Choose a time"
+msgstr "Escolla unha hora"
 
 msgid "Cancel"
 msgstr "Cancelar"

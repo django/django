@@ -16,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Tonnes <tonnes.mb@gmail.com>\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-05-28 01:29+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -94,6 +94,15 @@ msgstr "Voeg nog een %(verbose_name)s toe"
 
 msgid "Remove"
 msgstr "Verwijderen"
+
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "Wijzigen"
+
+msgid "Deletion"
+msgstr ""
 
 msgid "action time"
 msgstr "actietijd"
@@ -174,11 +183,11 @@ msgstr ""
 "selecteren."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "De {name} \"{obj}\" is succesvol toegevoegd."
+
+msgid "You may edit it again below."
 msgstr ""
-"De {name} '{obj}' is met succes toegevoegd. U kunt deze hieronder nogmaals "
-"bewerken."
 
 #, python-brace-format
 msgid ""
@@ -189,14 +198,17 @@ msgstr ""
 "toevoegen."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "De {name} \"{obj}\" is succesvol toegevoegd."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 "De {name} '{obj}' is met succes gewijzigd. U kunt deze hieronder nogmaals "
+"bewerken."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+"De {name} '{obj}' is met succes toegevoegd. U kunt deze hieronder nogmaals "
 "bewerken."
 
 #, python-brace-format
@@ -236,6 +248,10 @@ msgstr "%s toevoegen"
 #, python-format
 msgid "Change %s"
 msgstr "%s wijzigen"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "Databasefout"
@@ -346,7 +362,7 @@ msgid "Change password"
 msgstr "Wachtwoord wijzigen"
 
 msgid "Please correct the error below."
-msgstr "Herstel de fouten hieronder."
+msgstr ""
 
 msgid "Please correct the errors below."
 msgstr "Herstel de fouten hieronder."
@@ -458,8 +474,8 @@ msgstr ""
 "Weet u zeker dat u de geselecteerde %(objects_name)s wilt verwijderen? Alle "
 "volgende objecten en hun aanverwante items zullen worden verwijderd:"
 
-msgid "Change"
-msgstr "Wijzigen"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr "Verwijderen?"
@@ -478,8 +494,8 @@ msgstr "Modellen in de %(name)s applicatie"
 msgid "Add"
 msgstr "Toevoegen"
 
-msgid "You don't have permission to edit anything."
-msgstr "U heeft geen rechten om iets te wijzigen."
+msgid "You don't have permission to view or edit anything."
+msgstr ""
 
 msgid "Recent actions"
 msgstr "Recente acties"
@@ -542,6 +558,10 @@ msgid "Change selected %(model)s"
 msgstr "Geselecteerde %(model)s wijzigen"
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr "Nog een %(model)s toevoegen"
 
@@ -570,6 +590,12 @@ msgstr "Opslaan en nieuwe toevoegen"
 
 msgid "Save and continue editing"
 msgstr "Opslaan en opnieuw bewerken"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Bedankt voor de aanwezigheid op de site vandaag."
@@ -681,6 +707,10 @@ msgstr "Selecteer %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Selecteer %s om te wijzigen"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "Datum:"

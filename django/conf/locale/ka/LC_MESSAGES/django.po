@@ -9,16 +9,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-01 21:10+0100\n"
-"PO-Revision-Date: 2018-02-07 12:13+0000\n"
-"Last-Translator: Tornike Beradze <beradze@europe.com>\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 00:21+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Georgian (http://www.transifex.com/django/django/language/"
 "ka/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ka\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
 
 msgid "Afrikaans"
 msgstr "აფრიკაანსი"
@@ -366,6 +366,9 @@ msgid_plural ""
 msgstr[0] ""
 "მნიშვნელობას უნდა ჰქონდეს სულ ცოტა %(limit_value)d სიმბოლო (მას აქვს "
 "%(show_value)d)."
+msgstr[1] ""
+"მნიშვნელობას უნდა ჰქონდეს სულ ცოტა %(limit_value)d სიმბოლო (მას აქვს "
+"%(show_value)d)."
 
 #, python-format
 msgid ""
@@ -377,16 +380,24 @@ msgid_plural ""
 msgstr[0] ""
 "მნიშვნელობას უნდა ჰქონდეს არაუმეტეს %(limit_value)d სიმბოლოსი (მას აქვს "
 "%(show_value)d)."
+msgstr[1] ""
+"მნიშვნელობას უნდა ჰქონდეს არაუმეტეს %(limit_value)d სიმბოლოსი (მას აქვს "
+"%(show_value)d)."
+
+msgid "Enter a number."
+msgstr "შეიყვანეთ რიცხვი."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
 msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
 msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -394,6 +405,7 @@ msgid ""
 msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -451,6 +463,10 @@ msgstr "დიდი მთელი (8-ბაიტიანი)"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "მნიშვნელობა '%(value)s' უნდა იყოს True ან False."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr ""
 
 msgid "Boolean (Either True or False)"
 msgstr "ლოგიკური (True ან False)"
@@ -624,9 +640,6 @@ msgstr "ეს ველი აუცილებელია."
 msgid "Enter a whole number."
 msgstr "შეიყვანეთ მთელი რიცხვი"
 
-msgid "Enter a number."
-msgstr "შეიყვანეთ რიცხვი."
-
 msgid "Enter a valid date."
 msgstr "შეიყვანეთ სწორი თარიღი."
 
@@ -638,6 +651,10 @@ msgstr "შეიყვანეთ სწორი თარიღი და �
 
 msgid "Enter a valid duration."
 msgstr "შეიყვანეთ სწორი დროის პერიოდი."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr ""
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
@@ -654,6 +671,7 @@ msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr[0] ""
+msgstr[1] ""
 
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr "ან გამოგზავნეთ ფაილი, ან მონიშნეთ \"წაშლის\" დროშა."
@@ -693,11 +711,13 @@ msgstr ""
 msgid "Please submit %d or fewer forms."
 msgid_plural "Please submit %d or fewer forms."
 msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
 msgstr[0] ""
+msgstr[1] ""
 
 msgid "Order"
 msgstr "დალაგება"
@@ -767,6 +787,7 @@ msgstr "კი,არა,შესაძლოა"
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d ბაიტი"
+msgstr[1] "%(size)d ბაიტი"
 
 #, python-format
 msgid "%s KB"
@@ -1035,31 +1056,37 @@ msgstr ", "
 msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] "%d წელი"
+msgstr[1] "%d წელი"
 
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] "%d თვე"
+msgstr[1] "%d თვე"
 
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
 msgstr[0] "%d კვირა"
+msgstr[1] "%d კვირა"
 
 #, python-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d დღე"
+msgstr[1] "%d დღე"
 
 #, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "%d საათი"
+msgstr[1] "%d საათი"
 
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d წუთი"
+msgstr[1] "%d წუთი"
 
 msgid "0 minutes"
 msgstr "0 წუთი"

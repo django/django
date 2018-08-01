@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-05-28 01:29+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Ossetic (http://www.transifex.com/django/django/language/"
 "os/)\n"
@@ -87,6 +87,15 @@ msgstr "Бафтауын ӕндӕр %(verbose_name)s"
 msgid "Remove"
 msgstr "Схафын"
 
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "Фӕивын"
+
+msgid "Deletion"
+msgstr ""
+
 msgid "action time"
 msgstr "мийы рӕстӕг"
 
@@ -164,8 +173,10 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -175,12 +186,13 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -217,6 +229,10 @@ msgstr "Бафтауын %s"
 #, python-format
 msgid "Change %s"
 msgstr "Фӕивын %s"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "Бӕрӕгдоны рӕдыд"
@@ -324,7 +340,7 @@ msgid "Change password"
 msgstr "Пароль фӕивын"
 
 msgid "Please correct the error below."
-msgstr "Дӕ хорзӕхӕй, бындӕр цы рӕдыдтытӕ ис, уыдон сраст кӕн."
+msgstr ""
 
 msgid "Please correct the errors below."
 msgstr ""
@@ -432,8 +448,8 @@ msgstr ""
 "Ӕцӕг дӕ фӕнды ӕвзӕрст %(objects_name)s схафын? ацы объекттӕ иууылдӕр, ӕмӕ "
 "семӕ баст иуӕгтӕ хафт ӕрцӕудзысты:"
 
-msgid "Change"
-msgstr "Фӕивын"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr "Хъӕуы схафын?"
@@ -452,8 +468,8 @@ msgstr "Моделтӕ %(name)s ӕфтуаны"
 msgid "Add"
 msgstr "Бафтауын"
 
-msgid "You don't have permission to edit anything."
-msgstr "Нӕй дын бар исты ивын."
+msgid "You don't have permission to view or edit anything."
+msgstr ""
 
 msgid "Recent actions"
 msgstr ""
@@ -512,6 +528,10 @@ msgid "Change selected %(model)s"
 msgstr ""
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr ""
 
@@ -540,6 +560,12 @@ msgstr "Нывӕрын ӕмӕ ног бафтауын"
 
 msgid "Save and continue editing"
 msgstr "Нывӕрын ӕмӕ дарддӕр ивын"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Бузныг дӕ рӕстӕг абон ацы веб сайтимӕ кӕй арвыстай."
@@ -648,6 +674,10 @@ msgstr "Равзарын %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Равзарын %s ивынӕн"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "Бон:"

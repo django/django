@@ -1,9 +1,9 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis, 2013
+# Jannis Vajen, 2013
 # Jannis Leidel <jannis@leidel.info>, 2013-2016
-# Jannis, 2016
+# Jannis Vajen, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2017-10-07 02:46+0000\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
+"PO-Revision-Date: 2018-01-08 09:56+0000\n"
 "Last-Translator: Sagar Chalise <chalisesagar@gmail.com>\n"
 "Language-Team: Nepali (http://www.transifex.com/django/django/language/ne/)\n"
 "MIME-Version: 1.0\n"
@@ -94,26 +94,8 @@ msgstr ""
 "तपाइले कार्य छाने पनि फाँटहरुमा फेरबदलहरु गर्नु भएको छैन । बचत गर्नु भन्दा पनि अघि बढ्नुहोस "
 "।"
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "सूचना: तपाईँ सर्भर समय भन्दा %s घण्टा अगाडि हुनुहुन्छ ।"
-msgstr[1] "सूचना: तपाईँ सर्भर समय भन्दा %s घण्टा अगाडि हुनुहुन्छ ।"
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "सूचना: तपाईँ सर्भर समय भन्दा %s घण्टा पछाडि हुनुहुन्छ ।"
-msgstr[1] "सूचना: तपाईँ सर्भर समय भन्दा %s घण्टा पछाडि हुनुहुन्छ ।"
-
 msgid "Now"
 msgstr "यतिखेर"
-
-msgid "Choose a Time"
-msgstr "समय छान्नु होस ।"
-
-msgid "Choose a time"
-msgstr "समय चयन गर्नुहोस"
 
 msgid "Midnight"
 msgstr "मध्यरात"
@@ -126,6 +108,24 @@ msgstr "मध्यान्ह"
 
 msgid "6 p.m."
 msgstr "बेलुकी ६ बजे"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "सूचना: तपाईँ सर्भर समय भन्दा %s घण्टा अगाडि हुनुहुन्छ ।"
+msgstr[1] "सूचना: तपाईँ सर्भर समय भन्दा %s घण्टा अगाडि हुनुहुन्छ ।"
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "सूचना: तपाईँ सर्भर समय भन्दा %s घण्टा पछाडि हुनुहुन्छ ।"
+msgstr[1] "सूचना: तपाईँ सर्भर समय भन्दा %s घण्टा पछाडि हुनुहुन्छ ।"
+
+msgid "Choose a Time"
+msgstr "समय छान्नु होस ।"
+
+msgid "Choose a time"
+msgstr "समय चयन गर्नुहोस"
 
 msgid "Cancel"
 msgstr "रद्द गर्नुहोस "

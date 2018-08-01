@@ -2,7 +2,7 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
-# BouRock, 2015-2017
+# BouRock, 2015-2018
 # BouRock, 2014-2015
 # Caner Başaran <basaran.caner@protonmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2012
@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-01 21:10+0100\n"
-"PO-Revision-Date: 2017-12-04 11:48+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 09:51+0000\n"
 "Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
@@ -394,6 +394,9 @@ msgstr[1] ""
 "Bu değerin en fazla %(limit_value)d karaktere sahip olduğuna emin olun (şu "
 "an %(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Bir sayı girin."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -474,6 +477,10 @@ msgstr "Büyük (8 bayt) tamsayı"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' değeri ya True ya da False olmak zorundadır."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "'%(value)s' değeri ya True, False ya da None olmak zorundadır."
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolean (Ya True ya da False)"
@@ -651,9 +658,6 @@ msgstr "Bu alan zorunludur."
 msgid "Enter a whole number."
 msgstr "Tam bir sayı girin."
 
-msgid "Enter a number."
-msgstr "Bir sayı girin."
-
 msgid "Enter a valid date."
 msgstr "Geçerli bir tarih girin."
 
@@ -665,6 +669,10 @@ msgstr "Geçerli bir tarih/saat girin."
 
 msgid "Enter a valid duration."
 msgstr "Geçerli bir süre girin."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Gün sayıları {min_days} ve {max_days} arasında olmak zorundadır."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Hiç dosya gönderilmedi. Formdaki kodlama türünü kontrol edin."

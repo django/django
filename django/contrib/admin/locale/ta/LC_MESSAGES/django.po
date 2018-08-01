@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-05-28 01:29+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Tamil (http://www.transifex.com/django/django/language/ta/)\n"
 "MIME-Version: 1.0\n"
@@ -82,6 +82,15 @@ msgstr ""
 
 msgid "Remove"
 msgstr "அழிக்க"
+
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "மாற்றுக"
+
+msgid "Deletion"
+msgstr ""
 
 msgid "action time"
 msgstr "செயல் நேரம்"
@@ -160,8 +169,10 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -171,12 +182,13 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -212,6 +224,10 @@ msgstr "%s யை சேர்க்க"
 #, python-format
 msgid "Change %s"
 msgstr "%s யை மாற்று"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "தகவல்சேமிப்பு  பிழை"
@@ -317,7 +333,7 @@ msgid "Change password"
 msgstr "கடவுச்சொல்லை மாற்று"
 
 msgid "Please correct the error below."
-msgstr "கீழே உள்ள தவறுகளைத் திருத்துக"
+msgstr ""
 
 msgid "Please correct the errors below."
 msgstr ""
@@ -418,8 +434,8 @@ msgid ""
 "following objects and their related items will be deleted:"
 msgstr ""
 
-msgid "Change"
-msgstr "மாற்றுக"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr ""
@@ -438,8 +454,8 @@ msgstr ""
 msgid "Add"
 msgstr "சேர்க்க"
 
-msgid "You don't have permission to edit anything."
-msgstr "உங்களுக்கு மாற்றுவதற்குரிய உரிமையில்லை"
+msgid "You don't have permission to view or edit anything."
+msgstr ""
 
 msgid "Recent actions"
 msgstr ""
@@ -500,6 +516,10 @@ msgid "Change selected %(model)s"
 msgstr ""
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr ""
 
@@ -528,6 +548,12 @@ msgstr "சேமித்து இன்னுமொன்றைச் சே�
 
 msgid "Save and continue editing"
 msgstr "சேமித்து மாற்றத்தை தொடருக"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "வலைத்தளத்தில் உங்களது பொன்னான நேரத்தை செலவழித்தமைக்கு மிகுந்த நன்றி"
@@ -626,6 +652,10 @@ msgstr "%s யை தேர்ந்தெடு"
 #, python-format
 msgid "Select %s to change"
 msgstr "%s யை மாற்ற தேர்ந்தெடு"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "தேதி:"

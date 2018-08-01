@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:13+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 00:21+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Swahili (http://www.transifex.com/django/django/language/"
 "sw/)\n"
@@ -158,6 +158,9 @@ msgstr "Kijapani"
 
 msgid "Georgian"
 msgstr "Kijiojia"
+
+msgid "Kabyle"
+msgstr ""
 
 msgid "Kazakh"
 msgstr "Kizakhi"
@@ -369,6 +372,9 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "Enter a number."
+msgstr "Ingiza namba"
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -443,6 +449,10 @@ msgstr "Inteja kubwa (baiti 8)"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "Thamani ya '%(value)s' ni lazma iwe Kweli au Si kweli"
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr ""
 
 msgid "Boolean (Either True or False)"
 msgstr "Buleani (Aidha Kweli au Si kweli)"
@@ -606,9 +616,6 @@ msgstr "Sehemu hii inahitajika"
 msgid "Enter a whole number."
 msgstr "Ingiza namba kamili"
 
-msgid "Enter a number."
-msgstr "Ingiza namba"
-
 msgid "Enter a valid date."
 msgstr "Ingiza tarehe halali"
 
@@ -619,6 +626,10 @@ msgid "Enter a valid date/time."
 msgstr "Ingiza tarehe/muda halali"
 
 msgid "Enter a valid duration."
+msgstr ""
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
 msgstr ""
 
 msgid "No file was submitted. Check the encoding type on the form."

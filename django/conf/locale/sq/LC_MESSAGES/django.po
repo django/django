@@ -2,14 +2,14 @@
 #
 # Translators:
 # Besnik <besnik@programeshqip.org>, 2011-2014
-# Besnik <besnik@programeshqip.org>, 2015-2017
+# Besnik <besnik@programeshqip.org>, 2015-2018
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-29 22:51+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 09:14+0000\n"
 "Last-Translator: Besnik <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
@@ -159,6 +159,9 @@ msgstr "Japoneze"
 
 msgid "Georgian"
 msgstr "Gjeorgjiane"
+
+msgid "Kabyle"
+msgstr "Kabilase"
 
 msgid "Kazakh"
 msgstr "Kazake"
@@ -382,6 +385,9 @@ msgstr[1] ""
 "Sigurohuni që kjo vlerë ka të shumtën %(limit_value)d shenja (ka "
 "%(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Jepni një numër."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -461,6 +467,10 @@ msgstr "Numër i plotë i madh (8 bajte)"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "Vlera '%(value)s' duhet të jetë True ose False."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "Vlera për '%(value)s' duhet të jetë ose True, ose False, ose None."
 
 msgid "Boolean (Either True or False)"
 msgstr "Buleane (Ose True, ose False)"
@@ -638,9 +648,6 @@ msgstr "Kjo fushë është e domosdoshme."
 msgid "Enter a whole number."
 msgstr "Jepni një numër të tërë."
 
-msgid "Enter a number."
-msgstr "Jepni një numër."
-
 msgid "Enter a valid date."
 msgstr "Jepni një datë të vlefshme."
 
@@ -652,6 +659,10 @@ msgstr "Jepni një datë/kohë të vlefshme."
 
 msgid "Enter a valid duration."
 msgstr "Jepni një kohëzgjatje të vlefshme."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Numri i ditëve duhet të jetë mes {min_days} dhe {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
@@ -1217,7 +1228,7 @@ msgid "Index of %(directory)s"
 msgstr "Tregues i %(directory)s"
 
 msgid "Django: the Web framework for perfectionists with deadlines."
-msgstr ""
+msgstr "Django: platforma Web për perfeksionistë me afate."
 
 #, python-format
 msgid ""

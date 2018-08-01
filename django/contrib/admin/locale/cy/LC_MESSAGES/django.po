@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-05-28 01:29+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Welsh (http://www.transifex.com/django/django/language/cy/)\n"
 "MIME-Version: 1.0\n"
@@ -88,6 +88,15 @@ msgstr "Ychwanegu %(verbose_name)s arall"
 msgid "Remove"
 msgstr "Gwaredu"
 
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "Newid"
+
+msgid "Deletion"
+msgstr ""
+
 msgid "action time"
 msgstr "amser y weithred"
 
@@ -165,8 +174,10 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -176,12 +187,13 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -218,6 +230,10 @@ msgstr "Ychwanegu %s"
 #, python-format
 msgid "Change %s"
 msgstr "Newid %s"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "Gwall cronfa ddata"
@@ -332,7 +348,7 @@ msgid "Change password"
 msgstr "Newid cyfrinair"
 
 msgid "Please correct the error below."
-msgstr "Cywirwch y gwall isod."
+msgstr ""
 
 msgid "Please correct the errors below."
 msgstr "Cywirwch y gwallau isod."
@@ -438,8 +454,8 @@ msgstr ""
 "Ydych yn sicr eich bod am ddileu'r %(objects_name)s a ddewiswyd?  Dilëir yr "
 "holl wrthrychau canlynol a'u heitemau perthnasol:"
 
-msgid "Change"
-msgstr "Newid"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr "Dileu?"
@@ -458,8 +474,8 @@ msgstr "Modelau yn y rhaglen %(name)s "
 msgid "Add"
 msgstr "Ychwanegu"
 
-msgid "You don't have permission to edit anything."
-msgstr "Does gennych ddim hawl i olygu unrhywbeth."
+msgid "You don't have permission to view or edit anything."
+msgstr ""
 
 msgid "Recent actions"
 msgstr ""
@@ -521,6 +537,10 @@ msgid "Change selected %(model)s"
 msgstr ""
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr ""
 
@@ -551,6 +571,12 @@ msgstr "Cadw ac ychwanegu un arall"
 
 msgid "Save and continue editing"
 msgstr "Cadw a pharhau i olygu"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Diolch am dreulio amser o ansawdd gyda'r safle we yma heddiw."
@@ -658,6 +684,10 @@ msgstr "Dewis %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Dewis %s i newid"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "Dyddiad:"

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-05-28 01:29+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Spanish (Mexico) (http://www.transifex.com/django/django/"
 "language/es_MX/)\n"
@@ -87,6 +87,15 @@ msgstr "Agregar otro/a %(verbose_name)s"
 
 msgid "Remove"
 msgstr "Eliminar"
+
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "Modificar"
+
+msgid "Deletion"
+msgstr ""
 
 msgid "action time"
 msgstr "hora de la acción"
@@ -167,8 +176,10 @@ msgstr ""
 "más de uno."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -178,12 +189,13 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -221,6 +233,10 @@ msgstr "Agregar %s"
 #, python-format
 msgid "Change %s"
 msgstr "Modificar %s"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "Error en la base de datos"
@@ -330,7 +346,7 @@ msgid "Change password"
 msgstr "Cambiar contraseña"
 
 msgid "Please correct the error below."
-msgstr "Por favor, corrija los siguientes errores."
+msgstr ""
 
 msgid "Please correct the errors below."
 msgstr "Por favor, corrija los siguientes errores."
@@ -443,8 +459,8 @@ msgstr ""
 "¿Está seguro que desea eliminar el seleccionado %(objects_name)s ? Todos los "
 "objetos siguientes y sus elementos asociados serán eliminados:"
 
-msgid "Change"
-msgstr "Modificar"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr "Eliminar?"
@@ -463,8 +479,8 @@ msgstr "Modelos en la aplicación %(name)s"
 msgid "Add"
 msgstr "Agregar"
 
-msgid "You don't have permission to edit anything."
-msgstr "No tiene permiso para editar nada"
+msgid "You don't have permission to view or edit anything."
+msgstr ""
 
 msgid "Recent actions"
 msgstr ""
@@ -526,6 +542,10 @@ msgid "Change selected %(model)s"
 msgstr ""
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr ""
 
@@ -554,6 +574,12 @@ msgstr "Guardar y agregar otro"
 
 msgid "Save and continue editing"
 msgstr "Guardar y continuar editando"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Gracias por el tiempo que ha dedicado al sitio web hoy."
@@ -666,6 +692,10 @@ msgstr "Seleccione %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Seleccione %s a modificar"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "Fecha:"

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:13+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 00:21+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Interlingua (http://www.transifex.com/django/django/language/"
 "ia/)\n"
@@ -157,6 +157,9 @@ msgstr "japonese"
 
 msgid "Georgian"
 msgstr "georgiano"
+
+msgid "Kabyle"
+msgstr ""
 
 msgid "Kazakh"
 msgstr "kazakh"
@@ -381,6 +384,9 @@ msgstr[1] ""
 "Assecura te que iste valor ha al plus %(limit_value)d characteres (illo ha "
 "%(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Specifica un numero."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -460,6 +466,10 @@ msgstr "Numero integre grande (8 bytes)"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "Le valor '%(value)s'' debe esser o True/Ver o False."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr ""
 
 msgid "Boolean (Either True or False)"
 msgstr "Booleano (ver o false)"
@@ -637,9 +647,6 @@ msgstr "Iste campo es obligatori."
 msgid "Enter a whole number."
 msgstr "Specifica un numero integre."
 
-msgid "Enter a number."
-msgstr "Specifica un numero."
-
 msgid "Enter a valid date."
 msgstr "Specifica un data valide."
 
@@ -651,6 +658,10 @@ msgstr "Specifica un data e hora valide."
 
 msgid "Enter a valid duration."
 msgstr "Specifica un duration valide."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr ""
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""

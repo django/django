@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 10:26+0000\n"
-"Last-Translator: Martin Pajuste <martinpajuste@gmail.com>\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 00:21+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -163,6 +163,9 @@ msgstr "jaapani"
 
 msgid "Georgian"
 msgstr "gruusia"
+
+msgid "Kabyle"
+msgstr ""
 
 msgid "Kazakh"
 msgstr "kasahhi"
@@ -385,6 +388,9 @@ msgstr[1] ""
 "Väärtuses võib olla kõige rohkem %(limit_value)d tähemärki (praegu on "
 "%(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Sisestage arv."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -465,6 +471,10 @@ msgstr "Suur (8 baiti) täisarv"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' väärtus peab olema kas Tõene või Väär."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr ""
 
 msgid "Boolean (Either True or False)"
 msgstr "Tõeväärtus (Kas tõene või väär)"
@@ -641,9 +651,6 @@ msgstr "See lahter on nõutav."
 msgid "Enter a whole number."
 msgstr "Sisestage täisarv."
 
-msgid "Enter a number."
-msgstr "Sisestage arv."
-
 msgid "Enter a valid date."
 msgstr "Sisestage korrektne kuupäev."
 
@@ -655,6 +662,10 @@ msgstr "Sisestage korrektne kuupäev ja kellaaeg."
 
 msgid "Enter a valid duration."
 msgstr "Sisestage korrektne kestus."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr ""
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Ühtegi faili ei saadetud. Kontrollige vormi kodeeringutüüpi."

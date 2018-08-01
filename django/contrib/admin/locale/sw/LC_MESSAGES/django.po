@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-05-28 01:29+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Swahili (http://www.transifex.com/django/django/language/"
 "sw/)\n"
@@ -87,6 +87,15 @@ msgstr "Ongeza %(verbose_name)s"
 msgid "Remove"
 msgstr "Ondoa"
 
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "Badilisha"
+
+msgid "Deletion"
+msgstr ""
+
 msgid "action time"
 msgstr "muda wa tendo"
 
@@ -164,10 +173,11 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} \"{obj}\" was added successfully."
 msgstr ""
-"Ingizo la {name} \"{obj}\" limefanyika kwa mafanikio. Unaweza kuhariri tena"
+
+msgid "You may edit it again below."
+msgstr ""
 
 #, python-brace-format
 msgid ""
@@ -176,13 +186,15 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
+"Ingizo la {name} \"{obj}\" limefanyika kwa mafanikio. Unaweza kuhariri tena"
 
 #, python-brace-format
 msgid ""
@@ -219,6 +231,10 @@ msgstr "Ongeza %s"
 #, python-format
 msgid "Change %s"
 msgstr "Badilisha %s"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "Hitilafu katika hifadhidata"
@@ -328,7 +344,7 @@ msgid "Change password"
 msgstr "Badilisha nywila"
 
 msgid "Please correct the error below."
-msgstr "Tafadhali sahihisha makosa yafuatayo "
+msgstr ""
 
 msgid "Please correct the errors below."
 msgstr "Tafadhali sahihisha makosa yafuatayo."
@@ -439,8 +455,8 @@ msgstr ""
 "Una uhakika kuwa unataka kufuta %(objects_name)s chaguliwa ? Vitu vyote kati "
 "ya vifuatavyo vinavyohusiana vitafutwa:"
 
-msgid "Change"
-msgstr "Badilisha"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr "Futa?"
@@ -459,8 +475,8 @@ msgstr "Models katika application %(name)s"
 msgid "Add"
 msgstr "Ongeza"
 
-msgid "You don't have permission to edit anything."
-msgstr "Huna ruhusa ya kuhariri chochote"
+msgid "You don't have permission to view or edit anything."
+msgstr ""
 
 msgid "Recent actions"
 msgstr "Matendo ya karibuni"
@@ -522,6 +538,10 @@ msgid "Change selected %(model)s"
 msgstr "Badili %(model)s husika"
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr "Ongeza %(model)s tena"
 
@@ -550,6 +570,12 @@ msgstr "Hifadhi na ongeza"
 
 msgid "Save and continue editing"
 msgstr "Hifadhi na endelea kuhariri"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Ahsante kwa kutumia muda wako katika Tovuti yetu leo. "
@@ -659,6 +685,10 @@ msgstr "Chagua %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Chaguo %s kwa mabadilisho"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "Tarehe"

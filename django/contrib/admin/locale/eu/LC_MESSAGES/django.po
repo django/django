@@ -4,16 +4,16 @@
 # Aitzol Naberan <anaberan@codesyntax.com>, 2013,2016
 # Eneko Illarramendi <eneko@illarra.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
-# julen <julenx@gmail.com>, 2012-2013
-# julen <julenx@gmail.com>, 2013
+# julen, 2012-2013
+# julen, 2013
 # Urtzi Odriozola <urtzi.odriozola@gmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-25 07:52+0000\n"
-"Last-Translator: Urtzi Odriozola <urtzi.odriozola@gmail.com>\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-05-28 01:29+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -89,6 +89,15 @@ msgstr "Gehitu beste %(verbose_name)s bat"
 
 msgid "Remove"
 msgstr "Kendu"
+
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "Aldatu"
+
+msgid "Deletion"
+msgstr ""
 
 msgid "action time"
 msgstr "Ekintza hordua"
@@ -169,10 +178,11 @@ msgstr ""
 "batean."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" ondo gehitu da."
+
+msgid "You may edit it again below."
 msgstr ""
-"{name} \"{obj}\" ondo gehitu da. Aldaketa gehiago egin ditzazkezu jarraian."
 
 #, python-brace-format
 msgid ""
@@ -182,14 +192,16 @@ msgstr ""
 "{name} \"{obj}\" ondo gehitu da. Beste {name} bat gehitu dezakezu jarraian."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} \"{obj}\" ondo gehitu da."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 "{name} \"{obj}\" ondo aldatu da. Aldaketa gehiago egin ditzazkezu jarraian."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+"{name} \"{obj}\" ondo gehitu da. Aldaketa gehiago egin ditzazkezu jarraian."
 
 #, python-brace-format
 msgid ""
@@ -228,6 +240,10 @@ msgstr "Gehitu %s"
 #, python-format
 msgid "Change %s"
 msgstr "Aldatu %s"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "Errorea datu-basean"
@@ -338,7 +354,7 @@ msgid "Change password"
 msgstr "Aldatu pasahitza"
 
 msgid "Please correct the error below."
-msgstr "Zuzendu azpiko erroreak."
+msgstr ""
 
 msgid "Please correct the errors below."
 msgstr "Mesedez zuzendu azpiko erroreak."
@@ -449,8 +465,8 @@ msgstr ""
 "Ziur zaude hautatutako %(objects_name)s ezabatu nahi duzula? Objektu guzti "
 "hauek eta erlazionatutako elementu guztiak ezabatuko dira:"
 
-msgid "Change"
-msgstr "Aldatu"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr "Ezabatu?"
@@ -469,8 +485,8 @@ msgstr "%(name)s aplikazioaren modeloak"
 msgid "Add"
 msgstr "Gehitu"
 
-msgid "You don't have permission to edit anything."
-msgstr "Ez daukazu ezer aldatzeko baimenik."
+msgid "You don't have permission to view or edit anything."
+msgstr ""
 
 msgid "Recent actions"
 msgstr "Azken ekintzak"
@@ -533,6 +549,10 @@ msgid "Change selected %(model)s"
 msgstr "Aldatu aukeratutako %(model)s"
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr "Gehitu beste %(model)s"
 
@@ -561,6 +581,12 @@ msgstr "Gorde eta gehitu beste bat"
 
 msgid "Save and continue editing"
 msgstr "Gorde eta jarraitu editatzen"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Eskerrik asko webguneari zure probetxuzko denbora eskaintzeagatik."
@@ -670,6 +696,10 @@ msgstr "Hautatu %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Hautatu %s aldatzeko"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "Data:"

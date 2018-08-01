@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Primož Verdnik <primoz.verdnik@gmail.com>\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-05-28 01:29+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Slovenian (http://www.transifex.com/django/django/language/"
 "sl/)\n"
 "MIME-Version: 1.0\n"
@@ -90,6 +90,15 @@ msgstr "Dodaj še en %(verbose_name)s"
 msgid "Remove"
 msgstr "Odstrani"
 
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "Spremeni"
+
+msgid "Deletion"
+msgstr ""
+
 msgid "action time"
 msgstr "čas dejanja"
 
@@ -167,10 +176,11 @@ msgid ""
 msgstr "Držite \"Control\" (ali \"Command\" na Mac-u) za izbiro več kot enega."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "Vnos {name} \"{obj}\" je bil uspešno dodan."
+
+msgid "You may edit it again below."
 msgstr ""
-"Vnos {name} \"{obj}\" je bil uspešno dodan. Lahko ga znova uredite spodaj."
 
 #, python-brace-format
 msgid ""
@@ -180,15 +190,17 @@ msgstr ""
 "Vnos {name} \"{obj}\" je bil uspešno dodan. Lahko dodate še en {name} spodaj."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "Vnos {name} \"{obj}\" je bil uspešno dodan."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 "Vnos {name} \"{obj}\" je bil uspešno spremenjen. Lahko ga znova uredite "
 "spodaj."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+"Vnos {name} \"{obj}\" je bil uspešno dodan. Lahko ga znova uredite spodaj."
 
 #, python-brace-format
 msgid ""
@@ -227,6 +239,10 @@ msgstr "Dodaj %s"
 #, python-format
 msgid "Change %s"
 msgstr "Spremeni %s"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "Napaka v podatkovni bazi"
@@ -340,7 +356,7 @@ msgid "Change password"
 msgstr "Spremeni geslo"
 
 msgid "Please correct the error below."
-msgstr "Prosimo, odpravite sledeče napake."
+msgstr ""
 
 msgid "Please correct the errors below."
 msgstr "Prosimo popravite spodnje napake."
@@ -450,8 +466,8 @@ msgstr ""
 "Ali res želite izbrisati izbrane %(objects_name)s? Vsi naslednji objekti in "
 "njihovi povezani vnosi bodo izbrisani:"
 
-msgid "Change"
-msgstr "Spremeni"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr "Izbrišem?"
@@ -470,8 +486,8 @@ msgstr "Model v %(name)s aplikaciji"
 msgid "Add"
 msgstr "Dodaj"
 
-msgid "You don't have permission to edit anything."
-msgstr "Nimate dovoljenja za urejanje česarkoli."
+msgid "You don't have permission to view or edit anything."
+msgstr ""
 
 msgid "Recent actions"
 msgstr "Nedavna dejanja"
@@ -535,6 +551,10 @@ msgid "Change selected %(model)s"
 msgstr "Spremeni izbran %(model)s"
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr "Dodaj še en %(model)s "
 
@@ -565,6 +585,12 @@ msgstr "Shrani in dodaj še eno"
 
 msgid "Save and continue editing"
 msgstr "Shrani in nadaljuj z urejanjem"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Hvala, ker ste si danes vzeli nekaj časa za to spletno stran."
@@ -673,6 +699,10 @@ msgstr "Izberite %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Izberite %s, ki ga želite spremeniti"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "Datum:"

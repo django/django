@@ -3,7 +3,7 @@
 # Translators:
 # Bayarbat.U <bayarbat@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Zorig <zorig_ezd@yahoo.com>, 2014
+# Zorig, 2014
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011,2013
 msgid ""
 msgstr ""

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
 "PO-Revision-Date: 2017-09-19 16:41+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Arabic (http://www.transifex.com/django/django/language/ar/)\n"
@@ -100,6 +100,21 @@ msgid ""
 "button."
 msgstr "اخترت إجراءً دون تغيير أي حقل. لعلك تريد زر التنفيذ بدلاً من زر الحفظ."
 
+msgid "Now"
+msgstr "الآن"
+
+msgid "Midnight"
+msgstr "منتصف الليل"
+
+msgid "6 a.m."
+msgstr "6 ص."
+
+msgid "Noon"
+msgstr "الظهر"
+
+msgid "6 p.m."
+msgstr "6 مساءً"
+
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
@@ -120,26 +135,11 @@ msgstr[3] "ملاحظة: أنت متأخر بـ %s ساعة من وقت الخا
 msgstr[4] "ملاحظة: أنت متأخر بـ %s ساعة من وقت الخادم."
 msgstr[5] "ملاحظة: أنت متأخر بـ %s ساعة من وقت الخادم."
 
-msgid "Now"
-msgstr "الآن"
-
 msgid "Choose a Time"
 msgstr "إختر وقت"
 
 msgid "Choose a time"
 msgstr "اختر وقتاً"
-
-msgid "Midnight"
-msgstr "منتصف الليل"
-
-msgid "6 a.m."
-msgstr "6 ص."
-
-msgid "Noon"
-msgstr "الظهر"
-
-msgid "6 p.m."
-msgstr "6 مساءً"
 
 msgid "Cancel"
 msgstr "ألغ"

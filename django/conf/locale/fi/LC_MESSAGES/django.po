@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Aarni Koskela, 2015,2017
+# Aarni Koskela, 2015,2017-2018
 # Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lasse Liehu <larso@gmx.com>, 2015
@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:13+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 00:21+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
@@ -161,6 +161,9 @@ msgstr "japani"
 
 msgid "Georgian"
 msgstr "georgia"
+
+msgid "Kabyle"
+msgstr "Kabyle"
 
 msgid "Kazakh"
 msgstr "kazakin kieli"
@@ -384,6 +387,9 @@ msgstr[1] ""
 "Varmista, että tämä arvo on enintään %(limit_value)d merkkiä pitkä (tällä "
 "hetkellä %(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Syötä luku."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -415,7 +421,7 @@ msgstr ""
 "\"%(allowed_extensions)s\"."
 
 msgid "Null characters are not allowed."
-msgstr ""
+msgstr "Tyhjiä merkkejä (null) ei sallita."
 
 msgid "and"
 msgstr "ja"
@@ -464,6 +470,10 @@ msgstr "Suuri (8-tavuinen) kokonaisluku"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "%(value)s-arvo pitää olla joko tosi tai epätosi."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr ""
 
 msgid "Boolean (Either True or False)"
 msgstr "Totuusarvo: joko tosi (True) tai epätosi (False)"
@@ -637,9 +647,6 @@ msgstr "Tämä kenttä vaaditaan."
 msgid "Enter a whole number."
 msgstr "Syötä kokonaisluku."
 
-msgid "Enter a number."
-msgstr "Syötä luku."
-
 msgid "Enter a valid date."
 msgstr "Syötä oikea päivämäärä."
 
@@ -651,6 +658,10 @@ msgstr "Syötä oikea pvm/kellonaika."
 
 msgid "Enter a valid duration."
 msgstr "Syötä oikea kesto."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr ""
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Tiedostoa ei lähetetty. Tarkista lomakkeen koodaus (encoding)."
@@ -750,7 +761,7 @@ msgstr "Valitse oikea vaihtoehto. Valintasi ei löydy vaihtoehtojen joukosta."
 
 #, python-format
 msgid "\"%(pk)s\" is not a valid value."
-msgstr ""
+msgstr "\"%(pk)s\" ei ole kelvollinen arvo."
 
 #, python-format
 msgid ""
@@ -1122,6 +1133,11 @@ msgid ""
 "If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
 "\" ...> for links to third-party sites."
 msgstr ""
+"Jos käytät <meta name=\"referrer\" content=\"no-referrer\">-tagia tai "
+"\"Referrer-Policy: no-referrer\" -otsaketta, ole hyvä ja poista ne. CSRF-"
+"suojaus vaatii Referer-otsakkeen tehdäkseen tarkan referer-tarkistuksen. Jos "
+"vaadit yksityisyyttä, käytä vaihtoehtoja kuten <a rel=\"noreferrer\" ..."
+">linkittääksesi kolmannen osapuolen sivuille."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1147,7 +1163,7 @@ msgid "No year specified"
 msgstr "Vuosi puuttuu"
 
 msgid "Date out of range"
-msgstr ""
+msgstr "Päivämäärä ei alueella"
 
 msgid "No month specified"
 msgstr "Kuukausi puuttuu"
@@ -1210,7 +1226,7 @@ msgid ""
 msgstr ""
 
 msgid "The install worked successfully! Congratulations!"
-msgstr ""
+msgstr "Asennus toimi! Onneksi olkoon!"
 
 #, python-format
 msgid ""
@@ -1219,21 +1235,24 @@ msgid ""
 "\">DEBUG=True</a> is in your settings file and you have not configured any "
 "URLs."
 msgstr ""
+"Näet tämän viestin, koska asetuksissasi on <a href=\"https://docs."
+"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel="
+"\"noopener\">DEBUG = True</a> etkä ole konfiguroinut yhtään URL-osoitetta."
 
 msgid "Django Documentation"
-msgstr ""
+msgstr "Django-dokumentaatio"
 
 msgid "Topics, references, &amp; how-to's"
-msgstr ""
+msgstr "Aiheet, viittaukset &amp; how-tot"
 
 msgid "Tutorial: A Polling App"
-msgstr ""
+msgstr "Tutoriaali: kyselyapplikaatio"
 
 msgid "Get started with Django"
-msgstr ""
+msgstr "Miten päästä alkuun Djangolla"
 
 msgid "Django Community"
-msgstr ""
+msgstr "Django-yhteisö"
 
 msgid "Connect, get help, or contribute"
 msgstr ""

@@ -6,9 +6,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-10-07 02:46+0000\n"
-"Last-Translator: Sagar Chalise <chalisesagar@gmail.com>\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-05-28 01:29+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Nepali (http://www.transifex.com/django/django/language/ne/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -84,6 +84,15 @@ msgstr "अर्को %(verbose_name)s थप्नुहोस ।"
 
 msgid "Remove"
 msgstr "हटाउनुहोस"
+
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "फेर्नुहोस"
+
+msgid "Deletion"
+msgstr ""
 
 msgid "action time"
 msgstr "कार्य समय"
@@ -162,8 +171,10 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -173,12 +184,13 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -214,6 +226,10 @@ msgstr "%s थप्नुहोस"
 #, python-format
 msgid "Change %s"
 msgstr "%s परिवर्तित ।"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "डाटाबेस त्रुटि"
@@ -321,7 +337,7 @@ msgid "Change password"
 msgstr "पासवर्ड फेर्नुहोस "
 
 msgid "Please correct the error below."
-msgstr "कृपया तलका त्रुटिहरु सच्याउनुहोस ।"
+msgstr ""
 
 msgid "Please correct the errors below."
 msgstr "कृपया तलका त्रुटी सुधार्नु होस ।"
@@ -418,8 +434,8 @@ msgid ""
 "following objects and their related items will be deleted:"
 msgstr "%(objects_name)s "
 
-msgid "Change"
-msgstr "फेर्नुहोस"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr "मेट्नुहुन्छ ?"
@@ -438,8 +454,8 @@ msgstr "%(name)s एप्लिकेसनमा भएको मोडेल�
 msgid "Add"
 msgstr "थप्नुहोस "
 
-msgid "You don't have permission to edit anything."
-msgstr "तपाइलाई केही पनि संपादन गर्ने अनुमति छैन ।"
+msgid "You don't have permission to view or edit anything."
+msgstr ""
 
 msgid "Recent actions"
 msgstr ""
@@ -498,6 +514,10 @@ msgid "Change selected %(model)s"
 msgstr ""
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr ""
 
@@ -526,6 +546,12 @@ msgstr "बचत गरेर अर्को थप्नुहोस"
 
 msgid "Save and continue editing"
 msgstr "बचत गरेर संशोधन जारी राख्नुहोस"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "वेब साइटमा समय बिताउनु भएकोमा धन्यवाद ।"
@@ -628,6 +654,10 @@ msgstr "%s छान्नुहोस"
 #, python-format
 msgid "Select %s to change"
 msgstr "%s परिवर्तन गर्न छान्नुहोस ।"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "मिति:"

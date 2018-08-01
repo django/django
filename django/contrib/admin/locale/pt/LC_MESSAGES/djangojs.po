@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
 "PO-Revision-Date: 2017-11-30 23:49+0000\n"
 "Last-Translator: Nuno Mariz <nmariz@gmail.com>\n"
 "Language-Team: Portuguese (http://www.transifex.com/django/django/language/"
@@ -99,6 +99,21 @@ msgstr ""
 "Selecionou uma ação mas ainda não guardou as mudanças dos campos "
 "individuais. Provavelmente quererá o botão Ir ao invés do botão Guardar."
 
+msgid "Now"
+msgstr "Agora"
+
+msgid "Midnight"
+msgstr "Meia-noite"
+
+msgid "6 a.m."
+msgstr "6 a.m."
+
+msgid "Noon"
+msgstr "Meio-dia"
+
+msgid "6 p.m."
+msgstr "6 p.m."
+
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
@@ -115,26 +130,11 @@ msgstr[0] ""
 msgstr[1] ""
 "Nota: O use fuso horário está %s horas atrasado em relação ao servidor."
 
-msgid "Now"
-msgstr "Agora"
-
 msgid "Choose a Time"
 msgstr "Escolha a Hora"
 
 msgid "Choose a time"
 msgstr "Escolha a hora"
-
-msgid "Midnight"
-msgstr "Meia-noite"
-
-msgid "6 a.m."
-msgstr "6 a.m."
-
-msgid "Noon"
-msgstr "Meio-dia"
-
-msgid "6 p.m."
-msgstr "6 p.m."
 
 msgid "Cancel"
 msgstr "Cancelar"

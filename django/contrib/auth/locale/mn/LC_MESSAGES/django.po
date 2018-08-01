@@ -6,7 +6,7 @@
 # dolugen <dolugen@gmail.com>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # miigaa ... <b.myagmardorj@gmail.com>, 2015
-# Zorig <zorig_ezd@yahoo.com>, 2013-2014,2017
+# Zorig, 2013-2014,2017
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2015
 # Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2015
 msgid ""

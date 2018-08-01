@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
 "PO-Revision-Date: 2017-09-23 19:47+0000\n"
 "Last-Translator: Nick Mavrakis <mavrakis.n@gmail.com>\n"
 "Language-Team: Greek (http://www.transifex.com/django/django/language/el/)\n"
@@ -104,26 +104,8 @@ msgstr ""
 "Έχετε επιλέξει μια ενέργεια, και δεν έχετε κάνει καμία αλλαγή στα εκάστοτε "
 "πεδία. Πιθανών θέλετε το κουμπί Go αντί του κουμπιού Αποθήκευσης."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Σημείωση: Είστε %s ώρα μπροστά από την ώρα του εξυπηρετητή."
-msgstr[1] "Σημείωση: Είστε %s ώρες μπροστά από την ώρα του εξυπηρετητή."
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Σημείωση: Είστε %s ώρα πίσω από την ώρα του εξυπηρετητή"
-msgstr[1] "Σημείωση: Είστε %s ώρες πίσω από την ώρα του εξυπηρετητή."
-
 msgid "Now"
 msgstr "Τώρα"
-
-msgid "Choose a Time"
-msgstr "Επιλέξτε Χρόνο"
-
-msgid "Choose a time"
-msgstr "Επιλέξτε χρόνο"
 
 msgid "Midnight"
 msgstr "Μεσάνυχτα"
@@ -136,6 +118,24 @@ msgstr "Μεσημέρι"
 
 msgid "6 p.m."
 msgstr "6 μ.μ."
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Σημείωση: Είστε %s ώρα μπροστά από την ώρα του εξυπηρετητή."
+msgstr[1] "Σημείωση: Είστε %s ώρες μπροστά από την ώρα του εξυπηρετητή."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Σημείωση: Είστε %s ώρα πίσω από την ώρα του εξυπηρετητή"
+msgstr[1] "Σημείωση: Είστε %s ώρες πίσω από την ώρα του εξυπηρετητή."
+
+msgid "Choose a Time"
+msgstr "Επιλέξτε Χρόνο"
+
+msgid "Choose a time"
+msgstr "Επιλέξτε χρόνο"
 
 msgid "Cancel"
 msgstr "Ακύρωση"

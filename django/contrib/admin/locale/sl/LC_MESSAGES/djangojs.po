@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
 "PO-Revision-Date: 2017-09-23 18:54+0000\n"
 "Last-Translator: Primož Verdnik <primoz.verdnik@gmail.com>\n"
 "Language-Team: Slovenian (http://www.transifex.com/django/django/language/"
@@ -102,6 +102,21 @@ msgstr ""
 "Izbrali ste dejanje, vendar niste naredili nobenih sprememb na posameznih "
 "poljih. Verjetno iščete gumb Pojdi namesto Shrani."
 
+msgid "Now"
+msgstr "Takoj"
+
+msgid "Midnight"
+msgstr "Polnoč"
+
+msgid "6 a.m."
+msgstr "Ob 6h"
+
+msgid "Noon"
+msgstr "Opoldne"
+
+msgid "6 p.m."
+msgstr "Ob 18h"
+
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
@@ -118,26 +133,11 @@ msgstr[1] "Opomba: glede na čas na strežniku ste %s uri zadaj."
 msgstr[2] "Opomba: glede na čas na strežniku ste %s ure zadaj."
 msgstr[3] "Opomba: glede na čas na strežniku ste %s ur zadaj."
 
-msgid "Now"
-msgstr "Takoj"
-
 msgid "Choose a Time"
 msgstr "Izberite čas"
 
 msgid "Choose a time"
 msgstr "Izbor časa"
-
-msgid "Midnight"
-msgstr "Polnoč"
-
-msgid "6 a.m."
-msgstr "Ob 6h"
-
-msgid "Noon"
-msgstr "Opoldne"
-
-msgid "6 p.m."
-msgstr "Ob 18h"
 
 msgid "Cancel"
 msgstr "Prekliči"

@@ -14,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-12-01 00:17+0000\n"
-"Last-Translator: Nuno Mariz <nmariz@gmail.com>\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 00:21+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Portuguese (http://www.transifex.com/django/django/language/"
 "pt/)\n"
 "MIME-Version: 1.0\n"
@@ -165,6 +165,9 @@ msgstr "Japonês"
 
 msgid "Georgian"
 msgstr "Georgiano"
+
+msgid "Kabyle"
+msgstr ""
 
 msgid "Kazakh"
 msgstr "Cazaque"
@@ -387,6 +390,9 @@ msgstr[1] ""
 "Garanta que este valor tenha no máximo %(limit_value)d caracteres (tem "
 "%(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Introduza um número."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -464,6 +470,10 @@ msgstr "Inteiro grande (8 byte)"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "O valor '%(value)s' deve ser True ou False."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr ""
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolean (Pode ser True ou False)"
@@ -641,9 +651,6 @@ msgstr "Este campo é obrigatório."
 msgid "Enter a whole number."
 msgstr "Introduza um número inteiro."
 
-msgid "Enter a number."
-msgstr "Introduza um número."
-
 msgid "Enter a valid date."
 msgstr "Introduza uma data válida."
 
@@ -655,6 +662,10 @@ msgstr "Introduza uma data/hora válida."
 
 msgid "Enter a valid duration."
 msgstr "Introduza uma duração válida."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr ""
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""

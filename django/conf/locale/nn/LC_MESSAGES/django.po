@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:13+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 00:21+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Norwegian Nynorsk (http://www.transifex.com/django/django/"
 "language/nn/)\n"
@@ -161,6 +161,9 @@ msgstr "Japansk"
 
 msgid "Georgian"
 msgstr "Georgisk"
+
+msgid "Kabyle"
+msgstr ""
 
 msgid "Kazakh"
 msgstr "Kasakhisk"
@@ -374,6 +377,9 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "Enter a number."
+msgstr "Oppgje eit tall."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -447,6 +453,10 @@ msgstr "Stort (8 bitar) heiltal"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
+msgstr ""
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
 msgstr ""
 
 msgid "Boolean (Either True or False)"
@@ -611,9 +621,6 @@ msgstr "Feltet er påkravd."
 msgid "Enter a whole number."
 msgstr "Oppgje eit heiltall."
 
-msgid "Enter a number."
-msgstr "Oppgje eit tall."
-
 msgid "Enter a valid date."
 msgstr "Oppgje ein gyldig dato."
 
@@ -624,6 +631,10 @@ msgid "Enter a valid date/time."
 msgstr "Oppgje gyldig dato og tidspunkt."
 
 msgid "Enter a valid duration."
+msgstr ""
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
 msgstr ""
 
 msgid "No file was submitted. Check the encoding type on the form."

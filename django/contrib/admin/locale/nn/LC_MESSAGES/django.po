@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-05-28 01:29+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Norwegian Nynorsk (http://www.transifex.com/django/django/"
 "language/nn/)\n"
@@ -87,6 +87,15 @@ msgstr "Legg til ny %(verbose_name)s."
 
 msgid "Remove"
 msgstr "Fjern"
+
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "Endre"
+
+msgid "Deletion"
+msgstr ""
 
 msgid "action time"
 msgstr "tid for handling"
@@ -165,8 +174,10 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -176,12 +187,13 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -219,6 +231,10 @@ msgstr "Opprett %s"
 #, python-format
 msgid "Change %s"
 msgstr "Rediger %s"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "Databasefeil"
@@ -326,7 +342,7 @@ msgid "Change password"
 msgstr "Endre passord"
 
 msgid "Please correct the error below."
-msgstr "Korriger feila under."
+msgstr ""
 
 msgid "Please correct the errors below."
 msgstr ""
@@ -435,8 +451,8 @@ msgstr ""
 "Er du sikker på at du vil slette dei valgte objekta %(objects_name)s? "
 "Følgjande objekt og deira relaterte objekt vil bli sletta:"
 
-msgid "Change"
-msgstr "Endre"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr "Slette?"
@@ -455,8 +471,8 @@ msgstr ""
 msgid "Add"
 msgstr "Opprett"
 
-msgid "You don't have permission to edit anything."
-msgstr "Du har ikkje løyve til å redigere noko."
+msgid "You don't have permission to view or edit anything."
+msgstr ""
 
 msgid "Recent actions"
 msgstr ""
@@ -517,6 +533,10 @@ msgid "Change selected %(model)s"
 msgstr ""
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr ""
 
@@ -545,6 +565,12 @@ msgstr "Lagre og opprett ny"
 
 msgid "Save and continue editing"
 msgstr "Lagre og hald fram å redigere"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Takk for at du brukte kvalitetstid på nettstaden i dag."
@@ -647,6 +673,10 @@ msgstr "Velg %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Velg %s du ønskar å redigere"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "Dato:"

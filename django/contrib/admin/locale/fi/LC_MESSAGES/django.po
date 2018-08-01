@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Aarni Koskela\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-05-28 01:29+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
@@ -88,6 +88,15 @@ msgstr "Lisää toinen %(verbose_name)s"
 
 msgid "Remove"
 msgstr "Poista"
+
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "Muokkaa"
+
+msgid "Deletion"
+msgstr ""
 
 msgid "action time"
 msgstr "tapahtumahetki"
@@ -168,9 +177,11 @@ msgstr ""
 "vaihtoehtoja."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr "{name} \"{obj}\" on lisätty. Voit muokata sitä uudelleen alla."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" on lisätty."
+
+msgid "You may edit it again below."
+msgstr ""
 
 #, python-brace-format
 msgid ""
@@ -179,13 +190,14 @@ msgid ""
 msgstr "{name} \"{obj}\" on lisätty. Voit lisätä toisen {name} alla."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} \"{obj}\" on lisätty."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr "{name} \"{obj}\" on muokattu. Voit muokata sitä edelleen alla."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr "{name} \"{obj}\" on lisätty. Voit muokata sitä uudelleen alla."
 
 #, python-brace-format
 msgid ""
@@ -222,6 +234,10 @@ msgstr "Lisää %s"
 #, python-format
 msgid "Change %s"
 msgstr "Muokkaa %s"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "Tietokantavirhe"
@@ -331,7 +347,7 @@ msgid "Change password"
 msgstr "Vaihda salasana"
 
 msgid "Please correct the error below."
-msgstr "Korjaa allaolevat virheet."
+msgstr ""
 
 msgid "Please correct the errors below."
 msgstr "Korjaa allaolevat virheet."
@@ -442,8 +458,8 @@ msgstr ""
 "Haluatki varmasti poistaa valitut %(objects_name)s? Samalla poistetaan "
 "kaikki alla mainitut ja niihin liittyvät kohteet:"
 
-msgid "Change"
-msgstr "Muokkaa"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr "Poista?"
@@ -462,8 +478,8 @@ msgstr "%(name)s -applikaation mallit"
 msgid "Add"
 msgstr "Lisää"
 
-msgid "You don't have permission to edit anything."
-msgstr "Sinulla ei ole oikeutta muokata mitään."
+msgid "You don't have permission to view or edit anything."
+msgstr ""
 
 msgid "Recent actions"
 msgstr "Viimeisimmät tapahtumat"
@@ -526,6 +542,10 @@ msgid "Change selected %(model)s"
 msgstr "Muuta valittuja %(model)s"
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr "Lisää toinen %(model)s"
 
@@ -554,6 +574,12 @@ msgstr "Tallenna ja lisää toinen"
 
 msgid "Save and continue editing"
 msgstr "Tallenna välillä ja jatka muokkaamista"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Kiitos sivuillamme viettämästäsi ajasta."
@@ -664,6 +690,10 @@ msgstr "Valitse %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Valitse muokattava %s"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "Pvm:"

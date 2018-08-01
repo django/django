@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-05-28 01:29+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Irish (http://www.transifex.com/django/django/language/ga/)\n"
 "MIME-Version: 1.0\n"
@@ -86,6 +86,15 @@ msgstr "Cuir eile %(verbose_name)s"
 
 msgid "Remove"
 msgstr "Tóg amach"
+
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "Athraigh"
+
+msgid "Deletion"
+msgstr ""
 
 msgid "action time"
 msgstr "am aicsean"
@@ -166,8 +175,10 @@ msgstr ""
 "amháin a roghnú."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -177,12 +188,13 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -220,6 +232,10 @@ msgstr "Cuir %s le"
 #, python-format
 msgid "Change %s"
 msgstr "Aithrigh %s"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "Botún bunachar sonraí"
@@ -336,7 +352,7 @@ msgid "Change password"
 msgstr "Athraigh focal faire"
 
 msgid "Please correct the error below."
-msgstr "Ceartaigh na botúin thíos le do thoil"
+msgstr ""
 
 msgid "Please correct the errors below."
 msgstr "Le do thoil cheartú earráidí thíos."
@@ -448,8 +464,8 @@ msgstr ""
 "An bhfuil tú cinnte gur mian leat a scriosadh %(objects_name)s roghnaithe? "
 "Beidh gach ceann de na nithe seo a leanas agus a n-ítimí gaolta scroiste:"
 
-msgid "Change"
-msgstr "Athraigh"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr "Cealaigh?"
@@ -468,8 +484,8 @@ msgstr "Samhlacha ins an %(name)s iarratais"
 msgid "Add"
 msgstr "Cuir le"
 
-msgid "You don't have permission to edit anything."
-msgstr "Níl cead agat aon rud a cuir in eagar."
+msgid "You don't have permission to view or edit anything."
+msgstr ""
 
 msgid "Recent actions"
 msgstr ""
@@ -531,6 +547,10 @@ msgid "Change selected %(model)s"
 msgstr "Athraigh roghnaithe %(model)s"
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr "Cuir le %(model)s"
 
@@ -562,6 +582,12 @@ msgstr "Sabháil agus cuir le ceann eile"
 
 msgid "Save and continue editing"
 msgstr "Sábhail agus lean ag cuir in eagar"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Go raibh maith agat le hadhaigh do cuairt ar an suíomh idirlínn inniú."
@@ -667,6 +693,10 @@ msgstr "Roghnaigh %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Roghnaigh %s a athrú"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "Dáta:"

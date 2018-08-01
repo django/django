@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-05-28 01:29+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Malayalam (http://www.transifex.com/django/django/language/"
 "ml/)\n"
@@ -90,6 +90,15 @@ msgstr "%(verbose_name)s ഒന്നു കൂടി ചേര്‍ക്ക�
 msgid "Remove"
 msgstr "നീക്കം ചെയ്യുക"
 
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "മാറ്റുക"
+
+msgid "Deletion"
+msgstr ""
+
 msgid "action time"
 msgstr "ആക്ഷന്‍ സമയം"
 
@@ -167,8 +176,10 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -178,12 +189,13 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -219,6 +231,10 @@ msgstr "%s ചേര്‍ക്കുക"
 #, python-format
 msgid "Change %s"
 msgstr "%s മാറ്റാം"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "ഡേറ്റാബേസ് തകരാറാണ്."
@@ -326,7 +342,7 @@ msgid "Change password"
 msgstr "പാസ് വേര്‍ഡ് മാറ്റുക."
 
 msgid "Please correct the error below."
-msgstr "ദയവായി താഴെയുള്ള തെറ്റുകള്‍ പരിഹരിക്കുക."
+msgstr ""
 
 msgid "Please correct the errors below."
 msgstr "ദയവായി താഴെയുള്ള തെറ്റുകള്‍ പരിഹരിക്കുക."
@@ -436,8 +452,8 @@ msgstr ""
 "തിരഞ്ഞെടുക്കപ്പെട്ട  %(objects_name)s നീക്കം ചെയ്യണമെന്നു ഉറപ്പാണോ ? തിരഞ്ഞെടുക്കപ്പെട്ടതും "
 "അതിനോട് ബന്ധപ്പെട്ടതും ആയ എല്ലാ താഴെപ്പറയുന്ന വസ്തുക്കളും നീക്കം ചെയ്യുന്നതാണ്:"
 
-msgid "Change"
-msgstr "മാറ്റുക"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr "ഡിലീറ്റ് ചെയ്യട്ടെ?"
@@ -456,8 +472,8 @@ msgstr "%(name)s മാതൃകയിലുള്ള"
 msgid "Add"
 msgstr "ചേര്‍ക്കുക"
 
-msgid "You don't have permission to edit anything."
-msgstr "ഒന്നിലും മാറ്റം വരുത്താനുള്ള അനുമതി ഇല്ല."
+msgid "You don't have permission to view or edit anything."
+msgstr ""
 
 msgid "Recent actions"
 msgstr ""
@@ -518,6 +534,10 @@ msgid "Change selected %(model)s"
 msgstr ""
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr ""
 
@@ -546,6 +566,12 @@ msgstr "സേവ് ചെയ്ത ശേഷം വേറെ ചേര്‍�
 
 msgid "Save and continue editing"
 msgstr "സേവ് ചെയ്ത ശേഷം മാറ്റം വരുത്താം"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "ഈ വെബ് സൈറ്റില്‍ കുറെ നല്ല സമയം ചെലവഴിച്ചതിനു നന്ദി."
@@ -654,6 +680,10 @@ msgstr "%s തെരഞ്ഞെടുക്കൂ"
 #, python-format
 msgid "Select %s to change"
 msgstr "മാറ്റാനുള്ള %s തെരഞ്ഞെടുക്കൂ"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "തീയതി:"

@@ -4,7 +4,7 @@
 # Bayarkhuu Bataa, 2014
 # Claude Paroz <claude@2xlibre.net>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Zorig <zorig_ezd@yahoo.com>, 2013-2014,2016-2017
+# Zorig, 2013-2014,2016-2017
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2014-2015
 # Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2015
 msgid ""
@@ -13,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-19 16:49+0100\n"
 "PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Zorig <zorig_ezd@yahoo.com>\n"
+"Last-Translator: Zorig\n"
 "Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
 "mn/)\n"
 "MIME-Version: 1.0\n"

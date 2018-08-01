@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-05-28 01:29+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Khmer (http://www.transifex.com/django/django/language/km/)\n"
 "MIME-Version: 1.0\n"
@@ -82,6 +82,15 @@ msgstr ""
 
 msgid "Remove"
 msgstr "លប់ចេញ"
+
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "ផ្លាស់ប្តូរ"
+
+msgid "Deletion"
+msgstr ""
 
 msgid "action time"
 msgstr "ពេលវេលាប្រតិបត្តិការ"
@@ -160,8 +169,10 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -171,12 +182,13 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -212,6 +224,10 @@ msgstr "បន្ថែម %s"
 #, python-format
 msgid "Change %s"
 msgstr "ផ្លាស់ប្តូរ %s"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "ទិន្នន័យមូលដ្ឋានមានបញ្ហា"
@@ -415,8 +431,8 @@ msgid ""
 "following objects and their related items will be deleted:"
 msgstr ""
 
-msgid "Change"
-msgstr "ផ្លាស់ប្តូរ"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr ""
@@ -435,8 +451,8 @@ msgstr ""
 msgid "Add"
 msgstr "បន្ថែម"
 
-msgid "You don't have permission to edit anything."
-msgstr "លោកអ្នកពុំមានសិទ្ធិ ផ្លាស់​ប្តូរ ទេ។"
+msgid "You don't have permission to view or edit anything."
+msgstr ""
 
 msgid "Recent actions"
 msgstr ""
@@ -496,6 +512,10 @@ msgid "Change selected %(model)s"
 msgstr ""
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr ""
 
@@ -523,6 +543,12 @@ msgstr "រក្សាទុក ហើយ បន្ថែម​ថ្មី"
 
 msgid "Save and continue editing"
 msgstr "រក្សាទុក ហើយ កែឯកសារដដែល"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "សូមថ្លែងអំណរគុណ ដែលបានចំណាយ ពេលវេលាដ៏មានតំលៃ របស់លោកអ្នកមកទស្សនាគេហទំព័ររបស់យើងខ្ញុំ"
@@ -619,6 +645,10 @@ msgstr "ជ្រើសរើស %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "ជ្រើសរើស %s ដើម្បីផ្លាស់ប្តូរ"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "កាលបរិច្ឆេទ"

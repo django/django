@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:13+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 00:21+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Arabic (http://www.transifex.com/django/django/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -161,6 +161,9 @@ msgstr "اليابانيّة"
 
 msgid "Georgian"
 msgstr "الجورجيّة"
+
+msgid "Kabyle"
+msgstr ""
 
 msgid "Kazakh"
 msgstr "الكازاخستانية"
@@ -404,6 +407,9 @@ msgstr[5] ""
 "تأكد أن هذه القيمة تحتوي على %(limit_value)d حرف أو رمز على الأكثر (هي تحتوي "
 "حالياً على %(show_value)d)."
 
+msgid "Enter a number."
+msgstr "أدخل رقماً."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -491,6 +497,10 @@ msgstr "عدد صحيح كبير (8 بايت)"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "قيمة '%(value)s' يجب أن تكون True أو False."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr ""
 
 msgid "Boolean (Either True or False)"
 msgstr "ثنائي (إما True أو False)"
@@ -665,9 +675,6 @@ msgstr "هذا الحقل مطلوب."
 msgid "Enter a whole number."
 msgstr "أدخل رقما صحيحا."
 
-msgid "Enter a number."
-msgstr "أدخل رقماً."
-
 msgid "Enter a valid date."
 msgstr "أدخل تاريخاً صحيحاً."
 
@@ -679,6 +686,10 @@ msgstr "أدخل تاريخاً/وقتاً صحيحاً."
 
 msgid "Enter a valid duration."
 msgstr "أدخل مدّة صحيحة"
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr ""
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "لم يتم ارسال ملف، الرجاء التأكد من نوع ترميز الاستمارة."

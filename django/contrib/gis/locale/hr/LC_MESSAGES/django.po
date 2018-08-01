@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# berislavlopac <berislav.lopac@gmail.com>, 2012
+# Berislav Lopac <berislav.lopac@gmail.com>, 2012
 # Davor Lučić <r.dav.lc@gmail.com>, 2012
 # Filip Cuk <filipcuk2@gmail.com>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011

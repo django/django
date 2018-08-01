@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# jamie lu <www.ljm969087551@qq.com>, 2017
+# jiamin lu <www.ljm969087551@qq.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
 # Lele Long <schemacs@gmail.com>, 2011,2015
@@ -17,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-09-24 13:46+0200\n"
 "PO-Revision-Date: 2017-12-28 06:11+0000\n"
-"Last-Translator: jamie lu <www.ljm969087551@qq.com>\n"
+"Last-Translator: jiamin lu <www.ljm969087551@qq.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"

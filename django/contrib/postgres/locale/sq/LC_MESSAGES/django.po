@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Besnik <besnik@programeshqip.org>, 2017
+# Besnik <besnik@programeshqip.org>, 2017-2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-11-29 22:58+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 09:27+0000\n"
 "Last-Translator: Besnik <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
@@ -21,14 +21,14 @@ msgid "PostgreSQL extensions"
 msgstr "Zgjerime PostgreSQL"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
-msgstr "Elementi %(nth)s te vargu s’u vleftësua dot: "
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "Objekti %(nth)s te vargu nuk u vleftësua:"
 
 msgid "Nested arrays must have the same length."
 msgstr "Vargjet brenda vargjesh duhet të kenë të njëjtën gjatësi."
 
 msgid "Map of strings to strings/nulls"
-msgstr ""
+msgstr "Hartë vargjesh te strings/nulls"
 
 #, python-format
 msgid "The value of \"%(key)s\" is not a string or null."

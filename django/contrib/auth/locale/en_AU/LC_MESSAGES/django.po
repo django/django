@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Tom Fifield <tom@openstack.org>, 2014
+# Tom Fifield <tom@tomfifield.net>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
