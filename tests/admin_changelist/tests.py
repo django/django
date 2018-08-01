@@ -347,7 +347,7 @@ class ChangeListTests(TestCase):
         """
         Regression test for #13902: When using a ManyToMany in list_filter,
         results shouldn't appear more than once. Model managed in the
-        admin inherits from the one that defins the relationship.
+        admin inherits from the one that defines the relationship.
         """
         lead = Musician.objects.create(name='John')
         four = Quartet.objects.create(name='The Beatles')

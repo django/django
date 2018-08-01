@@ -664,7 +664,7 @@ For example::
     # Primary keys compared
     MyModel(id=1) == MyModel(id=1)
     MyModel(id=1) != MyModel(id=2)
-    # Primay keys are None
+    # Primary keys are None
     MyModel(id=None) != MyModel(id=None)
     # Same instance
     instance = MyModel(id=None)

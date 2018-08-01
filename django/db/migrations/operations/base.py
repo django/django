@@ -103,7 +103,7 @@ class Operation:
 
     def allow_migrate_model(self, connection_alias, model):
         """
-        Return wether or not a model may be migrated.
+        Return whether or not a model may be migrated.
 
         This is a thin wrapper around router.allow_migrate_model() that
         preemptively rejects any proxy, swapped out, or unmanaged model.

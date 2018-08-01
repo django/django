@@ -760,7 +760,7 @@ class Variable:
             # catching. Since this should only happen at compile time, that's
             # probably OK.
 
-            # Try to interpret values containg a period or an 'e'/'E'
+            # Try to interpret values containing a period or an 'e'/'E'
             # (possibly scientific notation) as a float;  otherwise, try int.
             if '.' in var or 'e' in var.lower():
                 self.literal = float(var)

@@ -317,7 +317,7 @@ class SelectDateWidgetTest(WidgetTest):
     def test_selectdate_empty_label(self):
         w = SelectDateWidget(years=('2014',), empty_label='empty_label')
 
-        # Rendering the default state with empty_label setted as string.
+        # Rendering the default state with empty_label set as string.
         self.assertInHTML('<option selected value="">empty_label</option>', w.render('mydate', ''), count=3)
 
         w = SelectDateWidget(years=('2014',), empty_label=('empty_year', 'empty_month', 'empty_day'))
