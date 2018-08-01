@@ -501,7 +501,9 @@ class QuerySet:
             try:
                 obj = self.select_for_update().get(**lookup)
             except self.model.DoesNotExist:
-                obj, created = self._create_object_from_params(lookup, params)
+                # Lock the row so that a concurrent update is blocked until
+                # after update_or_create() has performed its save.
+                obj, created = self._create_object_from_params(lookup, params, lock=True)
                 if created:
                     return obj, created
             for k, v in defaults.items():
@@ -509,7 +511,7 @@ class QuerySet:
             obj.save(using=self.db)
         return obj, False
 
-    def _create_object_from_params(self, lookup, params):
+    def _create_object_from_params(self, lookup, params, lock=False):
         """
         Try to create an object using passed params. Used by get_or_create()
         and update_or_create().
@@ -521,7 +523,8 @@ class QuerySet:
             return obj, True
         except IntegrityError as e:
             try:
-                return self.get(**lookup), False
+                qs = self.select_for_update() if lock else self
+                return qs.get(**lookup), False
             except self.model.DoesNotExist:
                 pass
             raise e
