@@ -126,9 +126,9 @@ class UserAdmin(admin.ModelAdmin):
 
     @sensitive_post_parameters_m
     def user_change_password(self, request, id, form_url=''):
-        if not self.has_change_permission(request):
-            raise PermissionDenied
         user = self.get_object(request, unquote(id))
+        if not self.has_change_permission(request, user):
+            raise PermissionDenied
         if user is None:
             raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {
                 'name': self.model._meta.verbose_name,
