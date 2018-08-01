@@ -514,6 +514,64 @@ class UpdateOrCreateTransactionTests(TransactionTestCase):
         self.assertGreater(after_update - before_start, timedelta(seconds=0.5))
         self.assertEqual(updated_person.last_name, 'NotLennon')
 
+    @skipUnlessDBFeature('has_select_for_update')
+    @skipUnlessDBFeature('supports_transactions')
+    def test_creation_in_transaction(self):
+        """
+        Objects are selected and updated in a transaction to avoid race
+        conditions. This test checks the behavior of update_or_create() when
+        the object doesn't already exist, but another thread creates the
+        object before update_or_create() does and then attempts to update the
+        object, also before update_or_create(). It forces update_or_create() to
+        hold the lock in another thread for a relatively long time so that it
+        can update while it holds the lock. The updated field isn't a field in
+        'defaults', so update_or_create() shouldn't have an effect on it.
+        """
+        lock_status = {'lock_count': 0}
+
+        def birthday_sleep():
+            lock_status['lock_count'] += 1
+            time.sleep(0.5)
+            return date(1940, 10, 10)
+
+        def update_birthday_slowly():
+            try:
+                Person.objects.update_or_create(first_name='John', defaults={'birthday': birthday_sleep})
+            finally:
+                # Avoid leaking connection for Oracle
+                connection.close()
+
+        def lock_wait(expected_lock_count):
+            # timeout after ~0.5 seconds
+            for i in range(20):
+                time.sleep(0.025)
+                if lock_status['lock_count'] == expected_lock_count:
+                    return True
+            self.skipTest('Database took too long to lock the row')
+
+        # update_or_create in a separate thread.
+        t = Thread(target=update_birthday_slowly)
+        before_start = datetime.now()
+        t.start()
+        lock_wait(1)
+        # Create object *after* initial attempt by update_or_create to get obj
+        # but before creation attempt.
+        Person.objects.create(first_name='John', last_name='Lennon', birthday=date(1940, 10, 9))
+        lock_wait(2)
+        # At this point, the thread is pausing for 0.5 seconds, so now attempt
+        # to modify object before update_or_create() calls save(). This should
+        # be blocked until after the save().
+        Person.objects.filter(first_name='John').update(last_name='NotLennon')
+        after_update = datetime.now()
+        # Wait for thread to finish
+        t.join()
+        # Check call to update_or_create() succeeded and the subsequent
+        # (blocked) call to update().
+        updated_person = Person.objects.get(first_name='John')
+        self.assertEqual(updated_person.birthday, date(1940, 10, 10))  # set by update_or_create()
+        self.assertEqual(updated_person.last_name, 'NotLennon')        # set by update()
+        self.assertGreater(after_update - before_start, timedelta(seconds=1))
+
 
 class InvalidCreateArgumentsTests(SimpleTestCase):
     msg = "Invalid field name(s) for model Thing: 'nonexistent'."
