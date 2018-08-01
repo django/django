@@ -1,10 +1,10 @@
-==========================
-Django 2.1.1 release notes
-==========================
+============================
+Django 1.11.16 release notes
+============================
 
 *Expected September 1, 2018*
 
-Django 2.1.1 fixes several bugs in 2.1.
+Django 1.11.16 fixes a data loss bug in 1.11.15.
 
 Bugfixes
 ========
