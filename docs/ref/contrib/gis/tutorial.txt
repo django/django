@@ -742,7 +742,7 @@ Next, start up the Django development server:
 
 Finally, browse to ``http://localhost:8000/admin/``, and log in with the user
 you just created. Browse to any of the ``WorldBorder`` entries -- the borders
-may be edited by clicking on a polygon and dragging the vertexes to the desired
+may be edited by clicking on a polygon and dragging the vertices to the desired
 position.
 
 .. _OpenLayers: https://openlayers.org/

@@ -81,7 +81,7 @@ class SchemaIndexesNotPostgreSQLTests(TransactionTestCase):
             opclasses=['varchar_pattern_ops'],
         )
         with connection.schema_editor() as editor:
-            # This would error if opclasses weren't ingored.
+            # This would error if opclasses weren't ignored.
             editor.add_index(IndexedArticle2, index)
 
 

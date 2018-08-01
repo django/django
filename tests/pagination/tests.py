@@ -376,7 +376,7 @@ class ModelPaginationTests(TestCase):
 
     def test_paginating_unordered_object_list_raises_warning(self):
         """
-        Unordered object list warning with an object that has an orderd
+        Unordered object list warning with an object that has an ordered
         attribute but not a model attribute.
         """
         class ObjectList:
