@@ -658,7 +658,7 @@ msgstr "Masukan durasi waktu yang benar."
 
 #, python-brace-format
 msgid "The number of days must be between {min_days} and {max_days}."
-msgstr "Jumlah hari harus diantara min_days} dan {max_days}."
+msgstr "Jumlah hari harus diantara {min_days} dan {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Tidak ada berkas yang dikirimkan. Periksa tipe pengaksaraan formulir."
