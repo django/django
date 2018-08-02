@@ -49,52 +49,78 @@ class DatabaseCache(BaseDatabaseCache):
     pickle_protocol = pickle.HIGHEST_PROTOCOL
 
     def get(self, key, default=None, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        return self.get_many([key], version).get(key, default)
+
+    def get_many(self, keys, version=None):
+        key_map = {self.make_key(key, version=version): key for key in keys}
         db = router.db_for_read(self.cache_model_class)
         connection = connections[db]
         quote_name = connection.ops.quote_name
         table = quote_name(self._table)
 
+        if not keys:
+            return dict()
+
         with connection.cursor() as cursor:
+            if len(key_map) == 1:
+                format_string = '= %s'
+            else:
+                format_string = 'IN(%s' + ', %s' * (len(key_map) - 1) + ')'
             cursor.execute(
-                'SELECT %s, %s, %s FROM %s WHERE %s = %%s' % (
+                'SELECT %s, %s, %s FROM %s WHERE %s %s' % (
                     quote_name('cache_key'),
                     quote_name('value'),
                     quote_name('expires'),
                     table,
                     quote_name('cache_key'),
+                    format_string,
                 ),
-                [key]
+                list(key_map)
             )
-            row = cursor.fetchone()
-        if row is None:
-            return default
+            rows = cursor.fetchall()
 
-        expires = row[2]
+        expired_keys = list()
+        return_dict = dict()
         expression = models.Expression(output_field=models.DateTimeField())
-        for converter in (connection.ops.get_db_converters(expression) +
-                          expression.get_db_converters(connection)):
-            if func_supports_parameter(converter, 'context'):  # RemovedInDjango30Warning
-                expires = converter(expires, expression, connection, {})
-            else:
-                expires = converter(expires, expression, connection)
+        converters = (connection.ops.get_db_converters(expression) + expression.get_db_converters(connection))
+        for row in rows:
+            key = row[0]
+            value = row[1]
+            expires = row[2]
 
-        if expires < timezone.now():
+            for converter in converters:
+                if func_supports_parameter(converter, 'context'):  # RemovedInDjango30Warning
+                    expires = converter(expires, expression, connection, {})
+                else:
+                    expires = converter(expires, expression, connection)
+
+            if expires < timezone.now():
+                expired_keys.append(key)
+            else:
+                value = connection.ops.process_clob(value)
+                value = pickle.loads(base64.b64decode(value.encode()))
+                return_dict.update({
+                    key_map.get(key): value
+                })
+
+        if expired_keys:
             db = router.db_for_write(self.cache_model_class)
             connection = connections[db]
             with connection.cursor() as cursor:
+                if len(expired_keys) == 1:
+                    format_string = '= %s'
+                else:
+                    format_string = 'IN(%s' + ', %s' * (len(expired_keys) - 1) + ')'
                 cursor.execute(
-                    'DELETE FROM %s WHERE %s = %%s' % (
+                    'DELETE FROM %s WHERE %s %s' % (
                         table,
                         quote_name('cache_key'),
+                        format_string
                     ),
-                    [key]
+                    expired_keys
                 )
-            return default
 
-        value = connection.ops.process_clob(row[1])
-        return pickle.loads(base64.b64decode(value.encode()))
+        return return_dict
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
