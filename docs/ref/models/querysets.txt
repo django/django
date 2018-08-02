@@ -2085,7 +2085,7 @@ where the default is such that at most 999 variables per query are used.
 .. method:: count()
 
 Returns an integer representing the number of objects in the database matching
-the ``QuerySet``. The ``count()`` method never raises exceptions.
+the ``QuerySet``.
 
 Example::
 
