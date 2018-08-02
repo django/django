@@ -202,15 +202,29 @@ class DatabaseCache(BaseDatabaseCache):
                 return True
 
     def delete(self, key, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        self.delete_many([key], version)
+
+    def delete_many(self, keys, version=None):
+        key_map = {self.make_key(key, version): key for key in keys}
 
         db = router.db_for_write(self.cache_model_class)
         connection = connections[db]
+        quote_name = connection.ops.quote_name
         table = connection.ops.quote_name(self._table)
 
         with connection.cursor() as cursor:
-            cursor.execute("DELETE FROM %s WHERE cache_key = %%s" % table, [key])
+            if len(key_map) == 1:
+                format_string = '= %s'
+            else:
+                format_string = 'IN(%s' + ', %s' * (len(key_map) - 1) + ')'
+            cursor.execute(
+                'DELETE FROM %s WHERE %s %s' % (
+                    table,
+                    quote_name('cache_key'),
+                    format_string
+                ),
+                list(key_map)
+            )
 
     def has_key(self, key, version=None):
         key = self.make_key(key, version=version)
