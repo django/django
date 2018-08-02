@@ -49,8 +49,17 @@ class DatabaseCache(BaseDatabaseCache):
     pickle_protocol = pickle.HIGHEST_PROTOCOL
 
     def get(self, key, default=None, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        return self.get_many([key], version).get(key, default)
+
+    def get_many(self, keys, version=None):
+        if not keys:
+            return {}
+
+        key_map = {}
+        for key in keys:
+            self.validate_key(key)
+            key_map[self.make_key(key, version)] = key
+
         db = router.db_for_read(self.cache_model_class)
         connection = connections[db]
         quote_name = connection.ops.quote_name
@@ -58,43 +67,36 @@ class DatabaseCache(BaseDatabaseCache):
 
         with connection.cursor() as cursor:
             cursor.execute(
-                'SELECT %s, %s, %s FROM %s WHERE %s = %%s' % (
+                'SELECT %s, %s, %s FROM %s WHERE %s IN (%s)' % (
                     quote_name('cache_key'),
                     quote_name('value'),
                     quote_name('expires'),
                     table,
                     quote_name('cache_key'),
+                    ', '.join(['%s'] * len(key_map)),
                 ),
-                [key]
+                list(key_map),
             )
-            row = cursor.fetchone()
-        if row is None:
-            return default
+            rows = cursor.fetchall()
 
-        expires = row[2]
+        result = {}
+        expired_keys = []
         expression = models.Expression(output_field=models.DateTimeField())
-        for converter in (connection.ops.get_db_converters(expression) +
-                          expression.get_db_converters(connection)):
-            if func_supports_parameter(converter, 'context'):  # RemovedInDjango30Warning
-                expires = converter(expires, expression, connection, {})
+        converters = (connection.ops.get_db_converters(expression) + expression.get_db_converters(connection))
+        for key, value, expires in rows:
+            for converter in converters:
+                if func_supports_parameter(converter, 'context'):  # RemovedInDjango30Warning
+                    expires = converter(expires, expression, connection, {})
+                else:
+                    expires = converter(expires, expression, connection)
+            if expires < timezone.now():
+                expired_keys.append(key)
             else:
-                expires = converter(expires, expression, connection)
-
-        if expires < timezone.now():
-            db = router.db_for_write(self.cache_model_class)
-            connection = connections[db]
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    'DELETE FROM %s WHERE %s = %%s' % (
-                        table,
-                        quote_name('cache_key'),
-                    ),
-                    [key]
-                )
-            return default
-
-        value = connection.ops.process_clob(row[1])
-        return pickle.loads(base64.b64decode(value.encode()))
+                value = connection.ops.process_clob(value)
+                value = pickle.loads(base64.b64decode(value.encode()))
+                result[key_map.get(key)] = value
+        self._base_delete_many(expired_keys)
+        return result
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
@@ -202,15 +204,33 @@ class DatabaseCache(BaseDatabaseCache):
                 return True
 
     def delete(self, key, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        self.delete_many([key], version)
+
+    def delete_many(self, keys, version=None):
+        key_list = []
+        for key in keys:
+            self.validate_key(key)
+            key_list.append(self.make_key(key, version))
+        self._base_delete_many(key_list)
+
+    def _base_delete_many(self, keys):
+        if not keys:
+            return
 
         db = router.db_for_write(self.cache_model_class)
         connection = connections[db]
-        table = connection.ops.quote_name(self._table)
+        quote_name = connection.ops.quote_name
+        table = quote_name(self._table)
 
         with connection.cursor() as cursor:
-            cursor.execute("DELETE FROM %s WHERE cache_key = %%s" % table, [key])
+            cursor.execute(
+                'DELETE FROM %s WHERE %s IN (%s)' % (
+                    table,
+                    quote_name('cache_key'),
+                    ', '.join(['%s'] * len(keys)),
+                ),
+                keys,
+            )
 
     def has_key(self, key, version=None):
         key = self.make_key(key, version=version)
