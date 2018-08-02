@@ -108,6 +108,11 @@ class Command(BaseCommand):
                     if error_msg:
                         raise CommandError(error_msg)
 
+            user_data[self.UserModel.USERNAME_FIELD] = username
+            fake_user_data[self.UserModel.USERNAME_FIELD] = (
+                self.username_field.remote_field.model(username) if self.username_field.remote_field
+                else username
+            )
             # Prompt for required fields.
             for field_name in self.UserModel.REQUIRED_FIELDS:
                 if not options['interactive']:
@@ -134,28 +139,33 @@ class Command(BaseCommand):
                         # Wrap any foreign keys in fake model instances
                         if field.remote_field:
                             fake_user_data[field_name] = field.remote_field.model(input_value)
-                    # Prompt for a password.
-                    while password is None:
-                        password = getpass.getpass()
-                        password2 = getpass.getpass('Password (again): ')
-                        if password != password2:
-                            self.stderr.write("Error: Your passwords didn't match.")
-                            password = None
-                            # Don't validate passwords that don't match.
-                            continue
 
-                        if password.strip() == '':
-                            self.stderr.write("Error: Blank passwords aren't allowed.")
+            if options['interactive']:
+                # Prompt for a password.
+                while password is None:
+                    password = getpass.getpass()
+                    password2 = getpass.getpass('Password (again): ')
+                    if password != password2:
+                        self.stderr.write("Error: Your passwords didn't match.")
+                        password = None
+                        # Don't validate passwords that don't match.
+                        continue
+                    if password.strip() == '':
+                        self.stderr.write("Error: Blank passwords aren't allowed.")
+                        password = None
+                        # Don't validate blank passwords.
+                        continue
+                    try:
+                        validate_password(password2, self.UserModel(**fake_user_data))
+                    except exceptions.ValidationError as err:
+                        self.stderr.write('\n'.join(err.messages))
+                        response = input('Bypass password validation and create user anyway? [y/N]: ')
+                        if response.lower() != 'y':
                             password = None
-                            # Don't validate blank passwords.
-                            continue
-                        try:
-                            validate_password(password2, self.UserModel(**fake_user_data))
-                        except exceptions.ValidationError as err:
-                            self.stderr.write('\n'.join(err.messages))
-                            response = input('Bypass password validation and create user anyway? [y/N]: ')
-                            if response.lower() != 'y':
-                                password = None
+            user_data['password'] = password
+            self.UserModel._default_manager.db_manager(database).create_superuser(**user_data)
+            if options['verbosity'] >= 1:
+                self.stdout.write("Superuser created successfully.")
         except KeyboardInterrupt:
             self.stderr.write('\nOperation cancelled.')
             sys.exit(1)
@@ -167,13 +177,6 @@ class Command(BaseCommand):
                 'You can run `manage.py createsuperuser` in your project '
                 'to create one manually.'
             )
-
-        if username:
-            user_data[self.UserModel.USERNAME_FIELD] = username
-            user_data['password'] = password
-            self.UserModel._default_manager.db_manager(database).create_superuser(**user_data)
-            if options['verbosity'] >= 1:
-                self.stdout.write("Superuser created successfully.")
 
     def get_input_data(self, field, message, default=None):
         """

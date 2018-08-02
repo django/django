@@ -9,7 +9,7 @@ from django.db import models
 # that every user provide a date of birth. This lets us test
 # changes in username datatype, and non-text required fields.
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email, date_of_birth, password=None):
+    def create_user(self, email, date_of_birth, password=None, **fields):
         """
         Creates and saves a User with the given email and password.
         """
@@ -19,14 +19,15 @@ class CustomUserManager(BaseUserManager):
         user = self.model(
             email=self.normalize_email(email),
             date_of_birth=date_of_birth,
+            **fields
         )
 
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password, date_of_birth):
-        u = self.create_user(email, password=password, date_of_birth=date_of_birth)
+    def create_superuser(self, email, password, date_of_birth, **fields):
+        u = self.create_user(email, password=password, date_of_birth=date_of_birth, **fields)
         u.is_admin = True
         u.save(using=self._db)
         return u
@@ -37,11 +38,12 @@ class CustomUser(AbstractBaseUser):
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     date_of_birth = models.DateField()
+    first_name = models.CharField(max_length=50)
 
     custom_objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['date_of_birth']
+    REQUIRED_FIELDS = ['date_of_birth', 'first_name']
 
     def __str__(self):
         return self.email

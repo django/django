@@ -29,6 +29,8 @@ MOCK_INPUT_KEY_TO_PROMPTS = {
     # @mock_inputs dict key: [expected prompt messages],
     'bypass': ['Bypass password validation and create user anyway? [y/N]: '],
     'email': ['Email address: '],
+    'date_of_birth': ['Date of birth: '],
+    'first_name': ['First name: '],
     'username': ['Username: ', lambda: "Username (leave blank to use '%s'): " % get_default_username()],
 }
 
@@ -327,6 +329,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             interactive=False,
             email="joe@somewhere.org",
             date_of_birth="1976-04-01",
+            first_name='Joe',
             stdout=new_io,
         )
         command_output = new_io.getvalue().strip()
@@ -547,6 +550,85 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             self.assertEqual(
                 new_io.getvalue().strip(),
                 "This password is entirely numeric.\n"
+                "Superuser created successfully."
+            )
+
+        test(self)
+
+    @override_settings(AUTH_PASSWORD_VALIDATORS=[
+        {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    ])
+    def test_validate_password_against_username(self):
+        new_io = StringIO()
+        username = 'supremelycomplex'
+
+        def bad_then_good_password(index=[0]):
+            """Return username the first two times, then a valid password."""
+            index[0] += 1
+            if index[0] <= 2:
+                return username
+            return 'superduperunguessablepassword'
+
+        @mock_inputs({
+            'password': bad_then_good_password,
+            'username': username,
+            'email': '',
+            'bypass': 'n',
+        })
+        def test(self):
+            call_command(
+                'createsuperuser',
+                interactive=True,
+                stdin=MockTTY(),
+                stdout=new_io,
+                stderr=new_io,
+            )
+            self.assertEqual(
+                new_io.getvalue().strip(),
+                'The password is too similar to the username.\n'
+                'Superuser created successfully.'
+            )
+
+        test(self)
+
+    @override_settings(
+        AUTH_USER_MODEL='auth_tests.CustomUser',
+        AUTH_PASSWORD_VALIDATORS=[
+            {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+        ]
+    )
+    def test_validate_password_against_required_fields(self):
+        new_io = StringIO()
+        username = 'josephine'
+
+        # Returns the username the first two times it's called, then a valid
+        # password.
+        def bad_then_good_password(index=[0]):
+            """Return username the first two times, then a valid password."""
+            index[0] += 1
+            if index[0] <= 2:
+                return username
+            return 'superduperunguessablepassword'
+
+        @mock_inputs({
+            'password': bad_then_good_password,
+            'username': username,
+            'first_name': 'josephine',
+            'date_of_birth': '1970-01-01',
+            'email': 'joey@example.com',
+            'bypass': 'n',
+        })
+        def test(self):
+            call_command(
+                'createsuperuser',
+                interactive=True,
+                stdin=MockTTY(),
+                stdout=new_io,
+                stderr=new_io,
+            )
+            self.assertEqual(
+                new_io.getvalue().strip(),
+                "The password is too similar to the first name.\n"
                 "Superuser created successfully."
             )
 
