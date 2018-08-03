@@ -520,7 +520,7 @@ class QueryDict(MultiValueDict):
                 return urlencode({k: v})
         for k, list_ in self.lists():
             output.extend(
-                encode(k.encode(self.encoding), v.encode(self.encoding))
+                encode(k.encode(self.encoding), str(v).encode(self.encoding))
                 for v in list_
             )
         return '&'.join(output)
