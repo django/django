@@ -4,6 +4,7 @@ import time
 import traceback
 from datetime import date, datetime, timedelta
 from threading import Thread
+from unittest import skipIf
 
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, IntegrityError, connection
@@ -509,6 +510,7 @@ class UpdateOrCreateTransactionTests(TransactionTestCase):
         self.assertGreater(after_update - before_start, timedelta(seconds=0.5))
         self.assertEqual(updated_person.last_name, 'NotLennon')
 
+    @skipIf(connection.vendor == 'mysql', "MySQL's default isolation level is repeatable read.")
     @skipUnlessDBFeature('has_select_for_update')
     @skipUnlessDBFeature('supports_transactions')
     def test_creation_in_transaction(self):
