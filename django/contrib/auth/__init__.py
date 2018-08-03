@@ -187,6 +187,9 @@ def get_user(request):
         if backend_path in settings.AUTHENTICATION_BACKENDS:
             backend = load_backend(backend_path)
             user = backend.get_user(user_id)
+            if user:
+                # Annotate the user object with the path of the backend.
+                user.backend = backend_path
             # Verify the session
             if hasattr(user, 'get_session_auth_hash'):
                 session_hash = request.session.get(HASH_SESSION_KEY)
