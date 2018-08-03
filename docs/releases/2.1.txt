@@ -340,6 +340,8 @@ Miscellaneous
 * The minimum supported version of ``mysqlclient`` is increased from 1.3.3 to
   1.3.7.
 
+* Support for SQLite < 3.7.15 is removed.
+
 * The date format of ``Set-Cookie``'s ``Expires`` directive is changed to
   follow :rfc:`7231#section-7.1.1.1` instead of Netscape's cookie standard.
   Hyphens present in dates like ``Tue, 25-Dec-2018 22:26:13 GMT`` are removed.
