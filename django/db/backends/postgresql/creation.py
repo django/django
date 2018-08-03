@@ -3,6 +3,7 @@ import sys
 from psycopg2 import errorcodes
 
 from django.db.backends.base.creation import BaseDatabaseCreation
+from django.db.backends.utils import strip_quotes
 
 
 class DatabaseCreation(BaseDatabaseCreation):
@@ -28,8 +29,16 @@ class DatabaseCreation(BaseDatabaseCreation):
             template=test_settings.get('TEMPLATE'),
         )
 
+    def _database_exists(self, cursor, database_name):
+        cursor.execute('SELECT 1 FROM pg_catalog.pg_database WHERE datname = %s', [strip_quotes(database_name)])
+        return cursor.fetchone() is not None
+
     def _execute_create_test_db(self, cursor, parameters, keepdb=False):
         try:
+            if keepdb and self._database_exists(cursor, parameters['dbname']):
+                # If the database should be kept and it already exists, don't
+                # try to create a new one.
+                return
             super()._execute_create_test_db(cursor, parameters, keepdb)
         except Exception as e:
             if getattr(e.__cause__, 'pgcode', '') != errorcodes.DUPLICATE_DATABASE:

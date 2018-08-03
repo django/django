@@ -14,3 +14,7 @@ Bugfixes
 
 * Fixed a regression where ``QueryDict.urlencode()`` crashed if the dictionary
   contains a non-string value (:ticket:`29627`).
+
+* Fixed a regression in Django 2.0 where using ``manage.py test --keepdb``
+  fails on PostgreSQL if the database exists and the user doesn't have
+  permission to create databases (:ticket:`29613`).
