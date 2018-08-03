@@ -308,9 +308,9 @@ subclass::
 
     For more complex layout needs, see the :attr:`~ModelAdmin.fieldsets` option.
 
-    The ``fields`` option, unlike :attr:`~ModelAdmin.list_display`, may only
-    contain names of fields on the model or the form specified by
-    :attr:`~ModelAdmin.form`. It may contain callables only if they are listed
+    The ``fields`` option accepts the same types of values as
+    :attr:`~ModelAdmin.list_display`, except that callables aren't accepted.
+    Names of model and model admin methods will only be used if they're listed
     in :attr:`~ModelAdmin.readonly_fields`.
 
     To display multiple fields on the same line, wrap those fields in their own
@@ -550,15 +550,14 @@ subclass::
     If you don't set ``list_display``, the admin site will display a single
     column that displays the ``__str__()`` representation of each object.
 
-    You have four possible values that can be used in ``list_display``:
+    There are four types of values that can be used in ``list_display``:
 
-    * A field of the model. For example::
+    * The name of a model field. For example::
 
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('first_name', 'last_name')
 
-    * A callable that accepts one parameter for the model instance. For
-      example::
+    * A callable that accepts one argument, the model instance. For example::
 
           def upper_case_name(obj):
               return ("%s %s" % (obj.first_name, obj.last_name)).upper()
@@ -567,8 +566,8 @@ subclass::
           class PersonAdmin(admin.ModelAdmin):
               list_display = (upper_case_name,)
 
-    * A string representing an attribute on the ``ModelAdmin``. This
-      behaves same as the callable. For example::
+    * A string representing a ``ModelAdmin`` method that accepts one argument,
+      the model instance. For example::
 
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('upper_case_name',)
@@ -577,9 +576,8 @@ subclass::
                   return ("%s %s" % (obj.first_name, obj.last_name)).upper()
               upper_case_name.short_description = 'Name'
 
-    * A string representing an attribute on the model. This behaves almost
-      the same as the callable, but ``self`` in this context is the model
-      instance. Here's a full model example::
+    * A string representing a model attribute or method (without any required
+      arguments). For example::
 
           from django.contrib import admin
           from django.db import models
