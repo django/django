@@ -579,11 +579,16 @@ def create_reverse_many_to_one_manager(superclass, rel):
             queryset._known_related_objects = {self.field: {self.instance.pk: self.instance}}
             return queryset
 
-        def _remove_prefetched_objects(self):
+        def remove_prefetched_objects(self):
+            """Remove the cached objects from memory that was loaded by prefetch_related()"""
             try:
                 self.instance._prefetched_objects_cache.pop(self.field.remote_field.get_cache_name())
             except (AttributeError, KeyError):
                 pass  # nothing to clear from cache
+
+        def _remove_prefetched_objects(self):
+            """Deprecated in favor of remove_prefetched_objects"""
+            return self.remove_prefetched_objects()
 
         def get_queryset(self):
             try:
@@ -614,7 +619,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
             return queryset, rel_obj_attr, instance_attr, False, cache_name, False
 
         def add(self, *objs, bulk=True):
-            self._remove_prefetched_objects()
+            self.remove_prefetched_objects()
             objs = list(objs)
             db = router.db_for_write(self.model, instance=self.instance)
 
@@ -686,7 +691,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
             clear.alters_data = True
 
             def _clear(self, queryset, bulk):
-                self._remove_prefetched_objects()
+                self.remove_prefetched_objects()
                 db = router.db_for_write(self.model, instance=self.instance)
                 queryset = queryset.using(db)
                 if bulk:
@@ -860,11 +865,16 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 queryset = queryset.using(self._db)
             return queryset._next_is_sticky().filter(**self.core_filters)
 
-        def _remove_prefetched_objects(self):
+        def remove_prefetched_objects(self):
+            """Remove the cached objects from memory that was loaded by prefetch_related()"""
             try:
                 self.instance._prefetched_objects_cache.pop(self.prefetch_cache_name)
             except (AttributeError, KeyError):
                 pass  # nothing to clear from cache
+
+        def _remove_prefetched_objects(self):
+            """Deprecated in favor of remove_prefetched_objects"""
+            return self.remove_prefetched_objects()
 
         def get_queryset(self):
             try:
@@ -920,7 +930,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     "intermediary model. Use %s.%s's Manager instead." %
                     (opts.app_label, opts.object_name)
                 )
-            self._remove_prefetched_objects()
+            self.remove_prefetched_objects()
             db = router.db_for_write(self.through, instance=self.instance)
             with transaction.atomic(using=db, savepoint=False):
                 self._add_items(self.source_field_name, self.target_field_name, *objs)
@@ -938,7 +948,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     "an intermediary model. Use %s.%s's Manager instead." %
                     (opts.app_label, opts.object_name)
                 )
-            self._remove_prefetched_objects()
+            self.remove_prefetched_objects()
             self._remove_items(self.source_field_name, self.target_field_name, *objs)
         remove.alters_data = True
 
@@ -950,7 +960,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     instance=self.instance, reverse=self.reverse,
                     model=self.model, pk_set=None, using=db,
                 )
-                self._remove_prefetched_objects()
+                self.remove_prefetched_objects()
                 filters = self._build_remove_filters(super().get_queryset().using(db))
                 self.through._default_manager.using(db).filter(filters).delete()
 

@@ -1510,3 +1510,45 @@ class ReadPrefetchedObjectsCacheTests(TestCase):
         with self.assertNumQueries(4):
             # AuthorWithAge -> Author -> FavoriteAuthors, Book
             self.assertQuerysetEqual(authors, ['<AuthorWithAge: Rousseau>', '<AuthorWithAge: Voltaire>'])
+
+    def test_related_manager_remove_prefetched_objects(self):
+        """
+        Test RelatedManager.remove_prefetched_objects method
+        """
+        books = Book.objects.prefetch_related('first_time_authors')
+        book1 = books.get(title='Les confessions Volume I')
+        book2 = books.get(title='Candide')
+
+        # Update the related object - author1. So book1 has no first-time author now, but still has one in cache
+        author1 = book1.authors.first()
+        author1.first_book = book2
+        author1.save()
+
+        self.assertQuerysetEqual(
+            book1.first_time_authors.all(), ['<Author: Rousseau>'], msg="Expect the outdated cached data")
+
+        # Now clear the prefetched objects
+        book1.first_time_authors.remove_prefetched_objects()
+
+        self.assertQuerysetEqual(
+            book1.first_time_authors.all(), [], msg="Expect the fresh data from database")
+
+    def test_many_related_manager_remove_prefetched_objects(self):
+        """
+        Test ManyRelatedManager.remove_prefetched_objects method
+        """
+        books = Book.objects.prefetch_related('authors')
+        book1 = books.get(title='Les confessions Volume I')
+
+        # Update the related object - author1. So book1 has no author now, but still has one in cache
+        author1 = book1.authors.first()
+        author1.books.clear()
+
+        self.assertQuerysetEqual(
+            book1.authors.all(), ['<Author: Rousseau>'], msg="Expect the outdated cached data")
+
+        # Now clear the prefetched objects
+        book1.authors.remove_prefetched_objects()
+
+        self.assertQuerysetEqual(
+            book1.authors.all(), [], msg="Expect the fresh data from database")
