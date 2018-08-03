@@ -114,6 +114,13 @@ class QueryDictTests(SimpleTestCase):
         self.assertEqual(q.urlencode(), 'next=%2Ft%C3%ABst%26key%2F')
         self.assertEqual(q.urlencode(safe='/'), 'next=/t%C3%ABst%26key/')
 
+    def test_urlencode_int(self):
+        # Normally QueryDict doesn't contain non-string values but lazily
+        # written tests may make that mistake.
+        q = QueryDict(mutable=True)
+        q['a'] = 1
+        self.assertEqual(q.urlencode(), 'a=1')
+
     def test_mutable_copy(self):
         """A copy of a QueryDict is mutable."""
         q = QueryDict().copy()
