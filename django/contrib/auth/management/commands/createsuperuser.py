@@ -17,6 +17,9 @@ class NotRunningInTTYException(Exception):
     pass
 
 
+PASSWORD_FIELD = 'password'
+
+
 class Command(BaseCommand):
     help = 'Used to create a superuser.'
     requires_migrations_checks = True
@@ -60,11 +63,15 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         username = options[self.UserModel.USERNAME_FIELD]
         database = options['database']
-
-        # If not provided, create the user with an unusable password
-        password = None
         user_data = {}
         verbose_field_name = self.username_field.verbose_name
+        try:
+            self.UserModel._meta.get_field(PASSWORD_FIELD)
+        except exceptions.FieldDoesNotExist:
+            pass
+        else:
+            # If not provided, create the user with an unusable password.
+            user_data[PASSWORD_FIELD] = None
         try:
             if options['interactive']:
                 # Same as user_data but with foreign keys as fake model
@@ -109,18 +116,16 @@ class Command(BaseCommand):
                         if field.remote_field:
                             fake_user_data[field_name] = field.remote_field.model(input_value)
 
-                # Prompt for a password.
-                while password is None:
+                # Prompt for a password if the model has one.
+                while PASSWORD_FIELD in user_data and user_data[PASSWORD_FIELD] is None:
                     password = getpass.getpass()
                     password2 = getpass.getpass('Password (again): ')
                     if password != password2:
                         self.stderr.write("Error: Your passwords didn't match.")
-                        password = None
                         # Don't validate passwords that don't match.
                         continue
                     if password.strip() == '':
                         self.stderr.write("Error: Blank passwords aren't allowed.")
-                        password = None
                         # Don't validate blank passwords.
                         continue
                     try:
@@ -129,7 +134,8 @@ class Command(BaseCommand):
                         self.stderr.write('\n'.join(err.messages))
                         response = input('Bypass password validation and create user anyway? [y/N]: ')
                         if response.lower() != 'y':
-                            password = None
+                            continue
+                    user_data[PASSWORD_FIELD] = password
             else:
                 # Non-interactive mode.
                 if username is None:
@@ -147,7 +153,6 @@ class Command(BaseCommand):
                     else:
                         raise CommandError('You must use --%s with --noinput.' % field_name)
 
-            user_data['password'] = password
             self.UserModel._default_manager.db_manager(database).create_superuser(**user_data)
             if options['verbosity'] >= 1:
                 self.stdout.write("Superuser created successfully.")

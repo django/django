@@ -879,6 +879,40 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
         test(self)
 
+    @override_settings(AUTH_USER_MODEL='auth_tests.NoPasswordUser')
+    def test_usermodel_without_password(self):
+        new_io = StringIO()
+
+        def test(self):
+            call_command(
+                'createsuperuser',
+                interactive=False,
+                stdin=MockTTY(),
+                stdout=new_io,
+                stderr=new_io,
+                username='username',
+            )
+            self.assertEqual(new_io.getvalue().strip(), 'Superuser created successfully.')
+
+        test(self)
+
+    @override_settings(AUTH_USER_MODEL='auth_tests.NoPasswordUser')
+    def test_usermodel_without_password_interactive(self):
+        new_io = StringIO()
+
+        @mock_inputs({'username': 'username'})
+        def test(self):
+            call_command(
+                'createsuperuser',
+                interactive=True,
+                stdin=MockTTY(),
+                stdout=new_io,
+                stderr=new_io,
+            )
+            self.assertEqual(new_io.getvalue().strip(), 'Superuser created successfully.')
+
+        test(self)
+
 
 class MultiDBCreatesuperuserTestCase(TestCase):
     multi_db = True
