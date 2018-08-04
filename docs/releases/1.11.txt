@@ -777,6 +777,13 @@ Miscellaneous
   :data:`~django.core.validators.validate_image_file_extension` validator.
   See the note in :meth:`.Client.post`.
 
+* :class:`~django.db.models.FileField` now moves rather than copies the file
+  it receives. With the default file upload settings, files larger than
+  :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE` now have the same permissions as
+  temporary files (often ``0o600``) rather than the system's standard umask
+  (often ``0o6644``). Set the :setting:`FILE_UPLOAD_PERMISSIONS` if you need
+  the same permission regardless of file size.
+
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11
