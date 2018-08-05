@@ -1,7 +1,7 @@
 from django.contrib.auth.checks import (
     check_models_permissions, check_user_model,
 )
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import AbstractBaseUser, Group
 from django.core import checks
 from django.db import models
 from django.test import (
@@ -51,6 +51,28 @@ class UserModelChecksTests(SimpleTestCase):
                 "must not be included in 'REQUIRED_FIELDS'.",
                 obj=CustomUserBadRequiredFields,
                 id='auth.E002',
+            ),
+        ])
+
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserBadRequiredFields')
+    def test_m2m_not_in_required_fields(self):
+        """A M2M field should not appear in REQUIRED_FIELDS."""
+        class CustomUserBadRequiredFields(AbstractBaseUser):
+            username = models.CharField(max_length=30, unique=True)
+            date_of_birth = models.DateField()
+            groups = models.ManyToManyField(Group)
+
+            USERNAME_FIELD = 'username'
+            REQUIRED_FIELDS = ['date_of_birth', 'groups']
+
+        errors = checks.run_checks(self.apps.get_app_configs())
+        self.assertEqual(errors, [
+            checks.Error(
+                "The ManyToManyField named 'groups' "
+                "for a custom user model must not be included in 'REQUIRED_FIELDS' without "
+                "defining a custom manager class that would handle it.",
+                obj=CustomUserBadRequiredFields,
+                id='auth.W011',
             ),
         ])
 
