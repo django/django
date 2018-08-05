@@ -122,7 +122,7 @@ that allows you to keep a separate directory of installed packages for each of
 your projects so that they don't interfere with each other.
 
 It's a good idea to keep all your virtualenvs in one place, for example in
-``.virtualenvs/`` in your home directory. Create it if it doesn't exist yet:
+:file:`.virtualenvs/` in your home directory. Create it if it doesn't exist yet:
 
 .. console::
 
@@ -209,8 +209,8 @@ working on your own patch for a ticket!**
 __ https://github.com/django/django/commit/4df7e8483b2679fc1cba3410f08960bac6f51115
 __ https://github.com/django/django/commit/4ccfc4439a7add24f8db4ef3960d02ef8ae09887
 
-Navigate into Django's root directory (that's the one that contains ``django``,
-``docs``, ``tests``, ``AUTHORS``, etc.). You can then check out the older
+Navigate into Django's root directory (that's the one that contains :file:`django`,
+:file:`docs`, :file:`tests`, :file:`AUTHORS`, etc.). You can then check out the older
 revision of Django that we'll be using in the tutorial below:
 
 .. console::
@@ -229,7 +229,7 @@ before, it's a good idea to run it once beforehand just to get familiar with
 what its output is supposed to look like.
 
 Before running the test suite, install its dependencies by first ``cd``-ing
-into the Django ``tests/`` directory and then running:
+into the Django :file:`tests/` directory and then running:
 
 .. console::
 
@@ -346,8 +346,8 @@ Before we make those changes though, we're going to write a couple tests to
 verify that our modification functions correctly and continues to function
 correctly in the future.
 
-Navigate to Django's ``tests/forms_tests/tests/`` folder and open the
-``test_forms.py`` file. Add the following code on line 1674 right before the
+Navigate to Django's :file:`tests/forms_tests/tests/` folder and open the
+:file:`test_forms.py` file. Add the following code on line 1674 right before the
 ``test_forms_with_null_boolean`` function::
 
     def test_class_prefix(self):
@@ -386,7 +386,7 @@ Running your new test
 Remember that we haven't actually made any modifications to ``BaseForm`` yet,
 so our tests are going to fail. Let's run all the tests in the ``forms_tests``
 folder to make sure that's really what happens. From the command line, ``cd``
-into the Django ``tests/`` directory and run:
+into the Django :file:`tests/` directory and run:
 
 .. console::
 
@@ -405,7 +405,7 @@ Django.
 Writing the code for ticket #24788
 ----------------------------------
 
-Navigate to the ``django/django/forms/`` folder and open the ``forms.py`` file.
+Navigate to the :file:`django/django/forms/` folder and open the :file:`forms.py` file.
 Find the ``BaseForm`` class on line 72 and add the ``prefix`` class attribute
 right after the ``field_order`` attribute::
 
@@ -423,7 +423,7 @@ Verifying your test now passes
 Once you're done modifying Django, we need to make sure that the tests we wrote
 earlier pass, so we can see whether the code we wrote above is working
 correctly. To run the tests in the ``forms_tests`` folder, ``cd`` into the
-Django ``tests/`` directory and run:
+Django :file:`tests/` directory and run:
 
 .. console::
 
@@ -436,7 +436,7 @@ the following exception::
 
 We forgot to add the conditional statement in the ``__init__`` method. Go ahead
 and change ``self.prefix = prefix`` that is now on line 87 of
-``django/forms/forms.py``, adding a conditional statement::
+:file:`django/forms/forms.py`, adding a conditional statement::
 
     if prefix is not None:
         self.prefix = prefix
@@ -454,7 +454,7 @@ hasn't introduced any bugs into other areas of Django. While successfully
 passing the entire test suite doesn't guarantee your code is bug free, it does
 help identify many bugs and regressions that might otherwise go unnoticed.
 
-To run the entire Django test suite, ``cd`` into the Django ``tests/``
+To run the entire Django test suite, ``cd`` into the Django :file:`tests/`
 directory and run:
 
 .. console::
@@ -467,7 +467,7 @@ Writing Documentation
 =====================
 
 This is a new feature, so it should be documented. Add the following section on
-line 1068 (at the end of the file) of ``django/docs/ref/forms/api.txt``::
+line 1068 (at the end of the file) of :file:`django/docs/ref/forms/api.txt`::
 
     The prefix can also be specified on the form class::
 
@@ -481,7 +481,7 @@ line 1068 (at the end of the file) of ``django/docs/ref/forms/api.txt``::
 
 Since this new feature will be in an upcoming release it is also added to the
 release notes for Django 1.9, on line 164 under the "Forms" section in the file
-``docs/releases/1.9.txt``::
+:file:`docs/releases/1.9.txt`::
 
     * A form prefix can be specified inside a form class, not only when
       instantiating a form. See :ref:`form-prefix` for details.

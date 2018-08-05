@@ -64,7 +64,7 @@ created a URLconf for the polls application that includes this line:
     path('<int:question_id>/vote/', views.vote, name='vote'),
 
 We also created a dummy implementation of the ``vote()`` function. Let's
-create a real version. Add the following to ``polls/views.py``:
+create a real version. Add the following to :file:`polls/views.py`:
 
 .. snippet::
     :filename: polls/views.py
@@ -232,7 +232,7 @@ Read on for details.
 Amend URLconf
 -------------
 
-First, open the ``polls/urls.py`` URLconf and change it like so:
+First, open the :file:`polls/urls.py` URLconf and change it like so:
 
 .. snippet::
     :filename: polls/urls.py
@@ -257,7 +257,7 @@ Amend views
 
 Next, we're going to remove our old ``index``, ``detail``, and ``results``
 views and use Django's generic views instead. To do so, open the
-``polls/views.py`` file and change it like so:
+:file:`polls/views.py` file and change it like so:
 
 .. snippet::
     :filename: polls/views.py

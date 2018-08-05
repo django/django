@@ -56,7 +56,7 @@ code, then run the following command:
 
    $ django-admin startproject mysite
 
-This will create a ``mysite`` directory in your current directory. If it didn't
+This will create a :file:`mysite` directory in your current directory. If it didn't
 work, see :ref:`troubleshooting-django-admin`.
 
 .. note::
@@ -70,7 +70,7 @@ work, see :ref:`troubleshooting-django-admin`.
 
     If your background is in plain old PHP (with no use of modern frameworks),
     you're probably used to putting code under the Web server's document root
-    (in a place such as ``/var/www``). With Django, you don't do that. It's
+    (in a place such as :file:`/var/www`). With Django, you don't do that. It's
     not a good idea to put any of this Python code within your Web server's
     document root, because it risks the possibility that people may be able
     to view your code over the Web. That's not good for security.
@@ -240,7 +240,7 @@ This directory structure will house the poll application.
 Write your first view
 =====================
 
-Let's write the first view. Open the file ``polls/views.py``
+Let's write the first view. Open the file :file:`polls/views.py`
 and put the following Python code in it:
 
 .. snippet::
@@ -255,7 +255,7 @@ and put the following Python code in it:
 This is the simplest view possible in Django. To call the view, we need to map
 it to a URL - and for this we need a URLconf.
 
-To create a URLconf in the polls directory, create a file called ``urls.py``.
+To create a URLconf in the polls directory, create a file called :file:`urls.py`.
 Your app directory should now look like::
 
     polls/
@@ -269,7 +269,7 @@ Your app directory should now look like::
         urls.py
         views.py
 
-In the ``polls/urls.py`` file include the following code:
+In the :file:`polls/urls.py` file include the following code:
 
 .. snippet::
     :filename: polls/urls.py
@@ -283,7 +283,7 @@ In the ``polls/urls.py`` file include the following code:
     ]
 
 The next step is to point the root URLconf at the ``polls.urls`` module. In
-``mysite/urls.py``, add an import for ``django.urls.include`` and insert an
+:file:`mysite/urls.py`, add an import for ``django.urls.include`` and insert an
 :func:`~django.urls.include` in the ``urlpatterns`` list, so you have:
 
 .. snippet::
@@ -304,8 +304,8 @@ included URLconf for further processing.
 
 The idea behind :func:`~django.urls.include` is to make it easy to
 plug-and-play URLs. Since polls are in their own URLconf
-(``polls/urls.py``), they can be placed under "/polls/", or under
-"/fun_polls/", or under "/content/polls/", or any other path root, and the
+(:file:`polls/urls.py`), they can be placed under :file:`/polls/`, or under
+:file:`/fun_polls/`, or under :file:`/content/polls/`, or any other path root, and the
 app will still work.
 
 .. admonition:: When to use :func:`~django.urls.include()`
