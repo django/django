@@ -1,5 +1,7 @@
 import re
 
+import sqlparse
+
 from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo, TableInfo,
 )
@@ -242,21 +244,39 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             # table_name is a view.
             pass
         else:
-            fields_with_check_constraints = [
-                schema_row.strip().split(' ')[0][1:-1]
-                for schema_row in table_schema.split(',')
-                if schema_row.find('CHECK') >= 0
-            ]
-            for field_name in fields_with_check_constraints:
-                # An arbitrary made up name.
-                constraints['__check__%s' % field_name] = {
-                    'columns': [field_name],
-                    'primary_key': False,
-                    'unique': False,
-                    'foreign_key': False,
-                    'check': True,
-                    'index': False,
-                }
+            # Check constraint parsing is based of SQLite syntax diagram.
+            # https://www.sqlite.org/syntaxdiagrams.html#table-constraint
+            def next_ttype(ttype):
+                for token in tokens:
+                    if token.ttype == ttype:
+                        return token
+
+            statement = sqlparse.parse(table_schema)[0]
+            tokens = statement.flatten()
+            for token in tokens:
+                name = None
+                if token.match(sqlparse.tokens.Keyword, 'CONSTRAINT'):
+                    # Table constraint
+                    name_token = next_ttype(sqlparse.tokens.Literal.String.Symbol)
+                    name = name_token.value[1:-1]
+                    token = next_ttype(sqlparse.tokens.Keyword)
+                if token.match(sqlparse.tokens.Keyword, 'CHECK'):
+                    # Column check constraint
+                    if name is None:
+                        column_token = next_ttype(sqlparse.tokens.Literal.String.Symbol)
+                        column = column_token.value[1:-1]
+                        name = '__check__%s' % column
+                        columns = [column]
+                    else:
+                        columns = []
+                    constraints[name] = {
+                        'check': True,
+                        'columns': columns,
+                        'primary_key': False,
+                        'unique': False,
+                        'foreign_key': False,
+                        'index': False,
+                    }
         # Get the index info
         cursor.execute("PRAGMA index_list(%s)" % self.connection.ops.quote_name(table_name))
         for row in cursor.fetchall():

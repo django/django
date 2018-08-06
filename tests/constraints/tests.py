@@ -1,8 +1,13 @@
-from django.db import IntegrityError, models
+from django.db import IntegrityError, connection, models
 from django.db.models.constraints import BaseConstraint
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
 from .models import Product
+
+
+def get_constraints(table):
+    with connection.cursor() as cursor:
+        return connection.introspection.get_constraints(cursor, table)
 
 
 class BaseConstraintTests(SimpleTestCase):
@@ -37,3 +42,11 @@ class CheckConstraintTests(TestCase):
         Product.objects.create(name='Valid', price=10, discounted_price=5)
         with self.assertRaises(IntegrityError):
             Product.objects.create(name='Invalid', price=10, discounted_price=20)
+
+    @skipUnlessDBFeature('supports_table_check_constraints')
+    def test_name(self):
+        constraints = get_constraints(Product._meta.db_table)
+        expected_name = 'price_gt_discounted_price'
+        if connection.features.uppercases_column_names:
+            expected_name = expected_name.upper()
+        self.assertIn(expected_name, constraints)

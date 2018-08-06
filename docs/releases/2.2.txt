@@ -293,6 +293,13 @@ Database backend API
 * Third party database backends must implement support for partial indexes or
   set ``DatabaseFeatures.supports_partial_indexes`` to ``False``.
 
+* Several ``SchemaEditor`` attributes are changed:
+
+  * ``sql_create_check`` is replaced with ``sql_create_constraint``.
+  * ``sql_delete_check`` is replaced with ``sql_delete_constraint``.
+  * ``sql_create_fk`` is replaced with ``sql_foreign_key_constraint``,
+    ``sql_constraint``, and ``sql_create_constraint``.
+
 Admin actions are no longer collected from base ``ModelAdmin`` classes
 ----------------------------------------------------------------------
 

@@ -2145,29 +2145,29 @@ class SchemaTests(TransactionTestCase):
             self.assertNotIn(constraint_name, self.get_constraints(model._meta.db_table))
 
             constraint_name = "CamelCaseUniqConstraint"
-            editor.execute(
-                editor.sql_create_unique % {
-                    "table": editor.quote_name(table),
-                    "name": editor.quote_name(constraint_name),
-                    "columns": editor.quote_name(field.column),
-                }
-            )
+            editor.execute(editor._create_unique_sql(model, [field.column], constraint_name))
             if connection.features.uppercases_column_names:
                 constraint_name = constraint_name.upper()
             self.assertIn(constraint_name, self.get_constraints(model._meta.db_table))
             editor.alter_field(model, get_field(unique=True), field, strict=True)
             self.assertNotIn(constraint_name, self.get_constraints(model._meta.db_table))
 
-            if editor.sql_create_fk:
+            if editor.sql_foreign_key_constraint:
                 constraint_name = "CamelCaseFKConstraint"
+                fk_sql = editor.sql_foreign_key_constraint % {
+                    "column": editor.quote_name(column),
+                    "to_table": editor.quote_name(table),
+                    "to_column": editor.quote_name(model._meta.auto_field.column),
+                    "deferrable": connection.ops.deferrable_sql(),
+                }
+                constraint_sql = editor.sql_constraint % {
+                    "name": editor.quote_name(constraint_name),
+                    "constraint": fk_sql,
+                }
                 editor.execute(
-                    editor.sql_create_fk % {
+                    editor.sql_create_constraint % {
                         "table": editor.quote_name(table),
-                        "name": editor.quote_name(constraint_name),
-                        "column": editor.quote_name(column),
-                        "to_table": editor.quote_name(table),
-                        "to_column": editor.quote_name(model._meta.auto_field.column),
-                        "deferrable": connection.ops.deferrable_sql(),
+                        "constraint": constraint_sql,
                     }
                 )
                 if connection.features.uppercases_column_names:

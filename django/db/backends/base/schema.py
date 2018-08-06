@@ -61,25 +61,24 @@ class BaseDatabaseSchemaEditor:
     sql_rename_column = "ALTER TABLE %(table)s RENAME COLUMN %(old_column)s TO %(new_column)s"
     sql_update_with_default = "UPDATE %(table)s SET %(column)s = %(default)s WHERE %(column)s IS NULL"
 
-    sql_check = "CONSTRAINT %(name)s CHECK (%(check)s)"
-    sql_create_check = "ALTER TABLE %(table)s ADD %(check)s"
-    sql_delete_check = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
+    sql_foreign_key_constraint = "FOREIGN KEY (%(column)s) REFERENCES %(to_table)s (%(to_column)s)%(deferrable)s"
+    sql_unique_constraint = "UNIQUE (%(columns)s)"
+    sql_check_constraint = "CHECK (%(check)s)"
+    sql_create_constraint = "ALTER TABLE %(table)s ADD %(constraint)s"
+    sql_delete_constraint = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
+    sql_constraint = "CONSTRAINT %(name)s %(constraint)s"
 
-    sql_create_unique = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s UNIQUE (%(columns)s)"
-    sql_delete_unique = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
+    sql_create_unique = None
+    sql_delete_unique = sql_delete_constraint
 
-    sql_create_fk = (
-        "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s FOREIGN KEY (%(column)s) "
-        "REFERENCES %(to_table)s (%(to_column)s)%(deferrable)s"
-    )
     sql_create_inline_fk = None
-    sql_delete_fk = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
+    sql_delete_fk = sql_delete_constraint
 
     sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s%(condition)s"
     sql_delete_index = "DROP INDEX %(name)s"
 
     sql_create_pk = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s PRIMARY KEY (%(columns)s)"
-    sql_delete_pk = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
+    sql_delete_pk = sql_delete_constraint
 
     sql_delete_procedure = 'DROP PROCEDURE %(procedure)s'
 
@@ -254,7 +253,7 @@ class BaseDatabaseSchemaEditor:
             # Check constraints can go on the column SQL here
             db_params = field.db_parameters(connection=self.connection)
             if db_params['check']:
-                definition += " CHECK (%s)" % db_params['check']
+                definition += " " + self.sql_check_constraint % db_params
             # Autoincrement SQL (for backends with inline variant)
             col_type_suffix = field.db_type_suffix(connection=self.connection)
             if col_type_suffix:
@@ -287,7 +286,7 @@ class BaseDatabaseSchemaEditor:
         for fields in model._meta.unique_together:
             columns = [model._meta.get_field(field).column for field in fields]
             self.deferred_sql.append(self._create_unique_sql(model, columns))
-        constraints = [check.constraint_sql(model, self) for check in model._meta.constraints]
+        constraints = [check.full_constraint_sql(model, self) for check in model._meta.constraints]
         # Make the table
         sql = self.sql_create_table % {
             "table": self.quote_name(model._meta.db_table),
@@ -596,7 +595,7 @@ class BaseDatabaseSchemaEditor:
                     old_field.column,
                 ))
             for constraint_name in constraint_names:
-                self.execute(self._delete_constraint_sql(self.sql_delete_check, model, constraint_name))
+                self.execute(self._delete_constraint_sql(self.sql_delete_constraint, model, constraint_name))
         # Have they renamed the column?
         if old_field.column != new_field.column:
             self.execute(self._rename_field_sql(model._meta.db_table, old_field, new_field, new_type))
@@ -746,15 +745,16 @@ class BaseDatabaseSchemaEditor:
                     self.execute(self._create_fk_sql(rel.related_model, rel.field, "_fk"))
         # Does it have check constraints we need to add?
         if old_db_params['check'] != new_db_params['check'] and new_db_params['check']:
+            constraint = self.sql_constraint % {
+                'name': self.quote_name(
+                    self._create_index_name(model._meta.db_table, [new_field.column], suffix='_check'),
+                ),
+                'constraint': self.sql_check_constraint % new_db_params,
+            }
             self.execute(
-                self.sql_create_check % {
-                    "table": self.quote_name(model._meta.db_table),
-                    "check": self.sql_check % {
-                        'name': self.quote_name(
-                            self._create_index_name(model._meta.db_table, [new_field.column], suffix='_check'),
-                        ),
-                        'check': new_db_params['check'],
-                    },
+                self.sql_create_constraint % {
+                    'table': self.quote_name(model._meta.db_table),
+                    'constraint': constraint,
                 }
             )
         # Drop the default if we need to
@@ -983,35 +983,57 @@ class BaseDatabaseSchemaEditor:
             "type": new_type,
         }
 
-    def _create_fk_sql(self, model, field, suffix):
-        from_table = model._meta.db_table
-        from_column = field.column
-        _, to_table = split_identifier(field.target_field.model._meta.db_table)
-        to_column = field.target_field.column
+    def _create_constraint_sql(self, table, name, constraint):
+        constraint = Statement(self.sql_constraint, name=name, constraint=constraint)
+        return Statement(self.sql_create_constraint, table=table, constraint=constraint)
 
+    def _create_fk_sql(self, model, field, suffix):
         def create_fk_name(*args, **kwargs):
             return self.quote_name(self._create_index_name(*args, **kwargs))
 
-        return Statement(
-            self.sql_create_fk,
-            table=Table(from_table, self.quote_name),
-            name=ForeignKeyName(from_table, [from_column], to_table, [to_column], suffix, create_fk_name),
-            column=Columns(from_table, [from_column], self.quote_name),
-            to_table=Table(field.target_field.model._meta.db_table, self.quote_name),
-            to_column=Columns(field.target_field.model._meta.db_table, [to_column], self.quote_name),
-            deferrable=self.connection.ops.deferrable_sql(),
+        table = Table(model._meta.db_table, self.quote_name)
+        name = ForeignKeyName(
+            model._meta.db_table,
+            [field.column],
+            split_identifier(field.target_field.model._meta.db_table)[1],
+            [field.target_field.column],
+            suffix,
+            create_fk_name,
         )
+        column = Columns(model._meta.db_table, [field.column], self.quote_name)
+        to_table = Table(field.target_field.model._meta.db_table, self.quote_name)
+        to_column = Columns(field.target_field.model._meta.db_table, [field.target_field.column], self.quote_name)
+        deferrable = self.connection.ops.deferrable_sql()
+        constraint = Statement(
+            self.sql_foreign_key_constraint,
+            column=column,
+            to_table=to_table,
+            to_column=to_column,
+            deferrable=deferrable,
+        )
+        return self._create_constraint_sql(table, name, constraint)
 
-    def _create_unique_sql(self, model, columns):
+    def _create_unique_sql(self, model, columns, name=None):
         def create_unique_name(*args, **kwargs):
             return self.quote_name(self._create_index_name(*args, **kwargs))
-        table = model._meta.db_table
-        return Statement(
-            self.sql_create_unique,
-            table=Table(table, self.quote_name),
-            name=IndexName(table, columns, '_uniq', create_unique_name),
-            columns=Columns(table, columns, self.quote_name),
-        )
+
+        table = Table(model._meta.db_table, self.quote_name)
+        if name is None:
+            name = IndexName(model._meta.db_table, columns, '_uniq', create_unique_name)
+        else:
+            name = self.quote_name(name)
+        columns = Columns(table, columns, self.quote_name)
+        if self.sql_create_unique:
+            # Some databases use a different syntax for unique constraint
+            # creation.
+            return Statement(
+                self.sql_create_unique,
+                table=table,
+                name=name,
+                columns=columns,
+            )
+        constraint = Statement(self.sql_unique_constraint, columns=columns)
+        return self._create_constraint_sql(table, name, constraint)
 
     def _delete_constraint_sql(self, template, model, name):
         return template % {
