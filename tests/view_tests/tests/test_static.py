@@ -153,8 +153,9 @@ class StaticHelperTest(StaticTests):
             static('')
 
     def test_special_prefix(self):
-        """No URLs are served if prefix contains '://'."""
-        self.assertEqual(static('http://'), [])
+        """No URLs are served if prefix contains a netloc part."""
+        self.assertEqual(static('http://example.org'), [])
+        self.assertEqual(static('//example.org'), [])
 
 
 class StaticUtilsTests(unittest.TestCase):

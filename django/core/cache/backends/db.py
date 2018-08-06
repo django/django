@@ -46,6 +46,8 @@ class DatabaseCache(BaseDatabaseCache):
     # conversion and adaptation infrastructure is then used to avoid comparing
     # aware and naive datetimes accidentally.
 
+    pickle_protocol = pickle.HIGHEST_PROTOCOL
+
     def get(self, key, default=None, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
@@ -130,7 +132,7 @@ class DatabaseCache(BaseDatabaseCache):
             exp = exp.replace(microsecond=0)
             if num > self._max_entries:
                 self._cull(db, cursor, now)
-            pickled = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
+            pickled = pickle.dumps(value, self.pickle_protocol)
             # The DB column is expecting a string, so make sure the value is a
             # string, not bytes. Refs #19274.
             b64encoded = base64.b64encode(pickled).decode('latin1')

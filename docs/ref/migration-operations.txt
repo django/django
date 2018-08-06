@@ -207,6 +207,25 @@ Creates an index in the database table for the model with ``model_name``.
 
 Removes the index named ``name`` from the model with ``model_name``.
 
+``AddConstraint``
+-----------------
+
+.. class:: AddConstraint(model_name, constraint)
+
+.. versionadded:: 2.2
+
+Creates a constraint in the database table for the model with ``model_name``.
+``constraint`` is an instance of :class:`~django.db.models.CheckConstraint`.
+
+``RemoveConstraint``
+--------------------
+
+.. class:: RemoveConstraint(model_name, name)
+
+.. versionadded:: 2.2
+
+Removes the constraint named ``name`` from the model with ``model_name``.
+
 Special Operations
 ==================
 

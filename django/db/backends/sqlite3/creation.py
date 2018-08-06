@@ -25,7 +25,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         if not self.is_in_memory_db(test_database_name):
             # Erase the old test database
             if verbosity >= 1:
-                print("Destroying old test database for alias %s..." % (
+                self.log('Destroying old test database for alias %s...' % (
                     self._get_database_display_str(verbosity, test_database_name),
                 ))
             if os.access(test_database_name, os.F_OK):
@@ -38,10 +38,10 @@ class DatabaseCreation(BaseDatabaseCreation):
                     try:
                         os.remove(test_database_name)
                     except Exception as e:
-                        sys.stderr.write("Got an error deleting the old test database: %s\n" % e)
+                        self.log('Got an error deleting the old test database: %s' % e)
                         sys.exit(2)
                 else:
-                    print("Tests cancelled.")
+                    self.log('Tests cancelled.')
                     sys.exit(1)
         return test_database_name
 
@@ -64,18 +64,18 @@ class DatabaseCreation(BaseDatabaseCreation):
                 if keepdb:
                     return
                 if verbosity >= 1:
-                    print("Destroying old test database for alias %s..." % (
+                    self.log('Destroying old test database for alias %s...' % (
                         self._get_database_display_str(verbosity, target_database_name),
                     ))
                 try:
                     os.remove(target_database_name)
                 except Exception as e:
-                    sys.stderr.write("Got an error deleting the old test database: %s\n" % e)
+                    self.log('Got an error deleting the old test database: %s' % e)
                     sys.exit(2)
             try:
                 shutil.copy(source_database_name, target_database_name)
             except Exception as e:
-                sys.stderr.write("Got an error cloning the test database: %s\n" % e)
+                self.log('Got an error cloning the test database: %s' % e)
                 sys.exit(2)
 
     def _destroy_test_db(self, test_database_name, verbosity):

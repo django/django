@@ -4,7 +4,7 @@ from decimal import Decimal
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db.models import (
     BooleanField, CharField, Count, DateTimeField, ExpressionWrapper, F, Func,
-    IntegerField, NullBooleanField, Q, Sum, Value,
+    IntegerField, NullBooleanField, OuterRef, Q, Subquery, Sum, Value,
 )
 from django.db.models.expressions import RawSQL
 from django.db.models.functions import Length, Lower
@@ -569,3 +569,32 @@ class NonAggregateAnnotationTestCase(TestCase):
             Book.objects.annotate(is_book=True)
         with self.assertRaisesMessage(TypeError, msg % ', '.join([str(BooleanField()), 'True'])):
             Book.objects.annotate(BooleanField(), Value(False), is_book=True)
+
+    def test_chaining_annotation_filter_with_m2m(self):
+        qs = Author.objects.filter(
+            name='Adrian Holovaty',
+            friends__age=35,
+        ).annotate(
+            jacob_name=F('friends__name'),
+        ).filter(
+            friends__age=29,
+        ).annotate(
+            james_name=F('friends__name'),
+        ).values('jacob_name', 'james_name')
+        self.assertCountEqual(
+            qs,
+            [{'jacob_name': 'Jacob Kaplan-Moss', 'james_name': 'James Bennett'}],
+        )
+
+    @skipUnlessDBFeature('supports_subqueries_in_group_by')
+    def test_annotation_filter_with_subquery(self):
+        long_books_qs = Book.objects.filter(
+            publisher=OuterRef('pk'),
+            pages__gt=400,
+        ).values('publisher').annotate(count=Count('pk')).values('count')
+        publisher_books_qs = Publisher.objects.annotate(
+            total_books=Count('book'),
+        ).filter(
+            total_books=Subquery(long_books_qs, output_field=IntegerField()),
+        ).values('name')
+        self.assertCountEqual(publisher_books_qs, [{'name': 'Sams'}, {'name': 'Morgan Kaufmann'}])

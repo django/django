@@ -34,12 +34,12 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--locale', '-l', dest='locale', action='append', default=[],
+            '--locale', '-l', action='append', default=[],
             help='Locale(s) to process (e.g. de_AT). Default is to process all. '
                  'Can be used multiple times.',
         )
         parser.add_argument(
-            '--exclude', '-x', dest='exclude', action='append', default=[],
+            '--exclude', '-x', action='append', default=[],
             help='Locales to exclude. Default is none. Can be used multiple times.',
         )
         parser.add_argument(

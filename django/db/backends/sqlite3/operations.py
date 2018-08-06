@@ -273,10 +273,10 @@ class DatabaseOperations(BaseDatabaseOperations):
         )
 
     def combine_expression(self, connector, sub_expressions):
-        # SQLite doesn't have a power function, so we fake it with a
-        # user-defined function django_power that's registered in connect().
+        # SQLite doesn't have a ^ operator, so use the user-defined POWER
+        # function that's registered in connect().
         if connector == '^':
-            return 'django_power(%s)' % ','.join(sub_expressions)
+            return 'POWER(%s)' % ','.join(sub_expressions)
         return super().combine_expression(connector, sub_expressions)
 
     def combine_duration_expression(self, connector, sub_expressions):
@@ -297,3 +297,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         if internal_type == 'TimeField':
             return "django_time_diff(%s, %s)" % (lhs_sql, rhs_sql), lhs_params + rhs_params
         return "django_timestamp_diff(%s, %s)" % (lhs_sql, rhs_sql), lhs_params + rhs_params
+
+    def insert_statement(self, ignore_conflicts=False):
+        return 'INSERT OR IGNORE INTO' if ignore_conflicts else super().insert_statement(ignore_conflicts)

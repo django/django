@@ -627,9 +627,10 @@ or with a ``CircularDependencyError``, in which case you can manually resolve it
 To manually resolve a ``CircularDependencyError``, break out one of
 the ForeignKeys in the circular dependency loop into a separate
 migration, and move the dependency on the other app with it. If you're unsure,
-see how makemigrations deals with the problem when asked to create brand
-new migrations from your models. In a future release of Django, squashmigrations
-will be updated to attempt to resolve these errors itself.
+see how :djadmin:`makemigrations` deals with the problem when asked to create
+brand new migrations from your models. In a future release of Django,
+:djadmin:`squashmigrations` will be updated to attempt to resolve these errors
+itself.
 
 Once you've squashed your migration, you should then commit it alongside the
 migrations it replaces and distribute this change to all running instances

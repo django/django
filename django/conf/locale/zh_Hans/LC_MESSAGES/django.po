@@ -1,11 +1,12 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Bestony <xiqingongzi@gmail.com>, 2017-2018
+# Bai HuanCheng (Bestony) <xiqingongzi@gmail.com>, 2017-2018
 # Daniel Duan <DaNmarner@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
 # Lele Long <schemacs@gmail.com>, 2011,2015,2017
+# Le Yang <youngleocn@qq.com>, 2018
 # Liping Wang <lynn.config@gmail.com>, 2016-2017
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
 # Ronald White <ouyanghongyu@gmail.com>, 2014
@@ -24,9 +25,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-01 21:10+0100\n"
-"PO-Revision-Date: 2018-01-17 01:14+0000\n"
-"Last-Translator: Ziya Tang <tcztzy@gmail.com>\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-06-25 13:50+0000\n"
+"Last-Translator: Le Yang <youngleocn@qq.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -389,6 +390,9 @@ msgid_plural ""
 msgstr[0] ""
 "确保该变量包含不超过 %(limit_value)d 字符 (目前字符数 %(show_value)d)。"
 
+msgid "Enter a number."
+msgstr "输入一个数字。"
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -464,6 +468,10 @@ msgstr "大整数(8字节)"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "’%(value)s‘ 必须为 True 或者 False。"
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "'%(value)s' 值必须是 None, True 或 False 之一。"
 
 msgid "Boolean (Either True or False)"
 msgstr "布尔值（True或False）"
@@ -631,9 +639,6 @@ msgstr "这个字段是必填项。"
 msgid "Enter a whole number."
 msgstr "输入整数。"
 
-msgid "Enter a number."
-msgstr "输入一个数字。"
-
 msgid "Enter a valid date."
 msgstr "输入一个有效的日期。"
 
@@ -645,6 +650,10 @@ msgstr "输入一个有效的日期/时间。"
 
 msgid "Enter a valid duration."
 msgstr "请输入有效的时长。"
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr ""
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "未提交文件。请检查表单的编码类型。"

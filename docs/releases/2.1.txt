@@ -1,6 +1,8 @@
-============================================
-Django 2.1 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 2.1 release notes
+========================
+
+*August 1, 2018*
 
 Welcome to Django 2.1!
 
@@ -55,7 +57,7 @@ Minor features
 * The new :meth:`.ModelAdmin.delete_queryset` method allows customizing the
   deletion process of the "delete selected objects" action.
 
-* You can now :ref:`override the the default admin site
+* You can now :ref:`override the default admin site
   <overriding-default-admin-site>`.
 
 * The new :attr:`.ModelAdmin.sortable_by` attribute and
@@ -338,6 +340,8 @@ Miscellaneous
 * The minimum supported version of ``mysqlclient`` is increased from 1.3.3 to
   1.3.7.
 
+* Support for SQLite < 3.7.15 is removed.
+
 * The date format of ``Set-Cookie``'s ``Expires`` directive is changed to
   follow :rfc:`7231#section-7.1.1.1` instead of Netscape's cookie standard.
   Hyphens present in dates like ``Tue, 25-Dec-2018 22:26:13 GMT`` are removed.
@@ -390,6 +394,13 @@ Miscellaneous
 
 * Management commands no longer allow the abbreviated forms of the
   ``--settings`` and ``--pythonpath`` arguments.
+
+* The private ``django.db.models.sql.constants.QUERY_TERMS`` constant is
+  removed. The :meth:`~.RegisterLookupMixin.get_lookup`
+  and :meth:`~.RegisterLookupMixin.get_lookups` methods
+  of the :ref:`Lookup Registration API <lookup-registration-api>` may be
+  suitable alternatives. Compared to the ``QUERY_TERMS`` constant, they allow
+  your code to also account for any custom lookups that have been registered.
 
 .. _deprecated-features-2.1:
 

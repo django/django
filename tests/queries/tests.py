@@ -93,8 +93,8 @@ class Queries1Tests(TestCase):
         self.assertEqual(qs4.query.subq_aliases, {'T', 'U', 'V'})
         # It is possible to reuse U for the second subquery, no need to use W.
         self.assertNotIn('w0', str(qs4.query).lower())
-        # So, 'U0."id"' is referenced twice.
-        self.assertTrue(str(qs4.query).lower().count('u0'), 2)
+        # So, 'U0."id"' is referenced in SELECT and WHERE twice.
+        self.assertEqual(str(qs4.query).lower().count('u0.'), 4)
 
     def test_ticket1050(self):
         self.assertQuerysetEqual(
@@ -511,7 +511,7 @@ class Queries1Tests(TestCase):
 
         # This is also a good select_related() test because there are multiple
         # Note entries in the SQL. The two Note items should be different.
-        self.assertTrue(repr(qs[0].note), '<Note: n2>')
+        self.assertEqual(repr(qs[0].note), '<Note: n2>')
         self.assertEqual(repr(qs[0].creator.extra.note), '<Note: n1>')
 
     def test_ticket3037(self):
@@ -2023,6 +2023,9 @@ class QuerysetOrderedTests(unittest.TestCase):
 
     def test_explicit_ordering(self):
         self.assertIs(Annotation.objects.all().order_by('id').ordered, True)
+
+    def test_empty_queryset(self):
+        self.assertIs(Annotation.objects.none().ordered, True)
 
     def test_order_by_extra(self):
         self.assertIs(Annotation.objects.all().extra(order_by=['id']).ordered, True)

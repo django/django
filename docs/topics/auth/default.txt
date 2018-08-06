@@ -1447,7 +1447,7 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
                     pass
 
         (In this case, you'll also need to use an authentication backend that
-        allows inactive users, such as as
+        allows inactive users, such as
         :class:`~django.contrib.auth.backends.AllowAllUsersModelBackend`.)
 
         Or to allow only some active users to log in::
@@ -1508,12 +1508,9 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
     A :class:`~django.forms.ModelForm` for creating a new user.
 
-    It has three fields: one named after the
-    :attr:`~django.contrib.auth.models.CustomUser.USERNAME_FIELD` from the
-    user model, and ``password1`` and ``password2``.
-
-    It verifies that ``password1`` and ``password2`` match, validates the
-    password using
+    It has three fields: ``username`` (from the user model), ``password1``,
+    and ``password2``. It verifies that ``password1`` and ``password2`` match,
+    validates the password using
     :func:`~django.contrib.auth.password_validation.validate_password`, and
     sets the user's password using
     :meth:`~django.contrib.auth.models.User.set_password()`.

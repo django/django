@@ -13,13 +13,9 @@ from django.core.files import locks
 from django.core.files.move import file_move_safe
 
 
-def _write_content(f, expiry, value):
-    f.write(pickle.dumps(expiry, pickle.HIGHEST_PROTOCOL))
-    f.write(zlib.compress(pickle.dumps(value, pickle.HIGHEST_PROTOCOL)))
-
-
 class FileBasedCache(BaseCache):
     cache_suffix = '.djcache'
+    pickle_protocol = pickle.HIGHEST_PROTOCOL
 
     def __init__(self, dir, params):
         super().__init__(params)
@@ -42,6 +38,11 @@ class FileBasedCache(BaseCache):
             pass
         return default
 
+    def _write_content(self, file, timeout, value):
+        expiry = self.get_backend_timeout(timeout)
+        file.write(pickle.dumps(expiry, self.pickle_protocol))
+        file.write(zlib.compress(pickle.dumps(value, self.pickle_protocol)))
+
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         self._createdir()  # Cache dir can be deleted at any time.
         fname = self._key_to_file(key, version)
@@ -50,8 +51,7 @@ class FileBasedCache(BaseCache):
         renamed = False
         try:
             with open(fd, 'wb') as f:
-                expiry = self.get_backend_timeout(timeout)
-                _write_content(f, expiry, value)
+                self._write_content(f, timeout, value)
             file_move_safe(tmp_path, fname, allow_overwrite=True)
             renamed = True
         finally:
@@ -68,7 +68,7 @@ class FileBasedCache(BaseCache):
                     else:
                         previous_value = pickle.loads(zlib.decompress(f.read()))
                         f.seek(0)
-                        _write_content(f, self.get_backend_timeout(timeout), previous_value)
+                        self._write_content(f, timeout, previous_value)
                         return True
                 finally:
                     locks.unlock(f)

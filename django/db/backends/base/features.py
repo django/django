@@ -172,6 +172,7 @@ class BaseDatabaseFeatures:
 
     # Does it support CHECK constraints?
     supports_column_check_constraints = True
+    supports_table_check_constraints = True
 
     # Does the backend support 'pyformat' style ("... %(name)s ...", {'name': value})
     # parameter passing? Note this can be provided by the backend even if not
@@ -256,6 +257,13 @@ class BaseDatabaseFeatures:
     # Does DatabaseOperations.explain_query_prefix() raise ValueError if
     # unknown kwargs are passed to QuerySet.explain()?
     validates_explain_options = True
+
+    # Does the backend support the default parameter in lead() and lag()?
+    supports_default_in_lead_lag = True
+
+    # Does the backend support ignoring constraint or uniqueness errors during
+    # INSERT?
+    supports_ignore_conflicts = True
 
     def __init__(self, connection):
         self.connection = connection

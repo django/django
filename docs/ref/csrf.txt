@@ -551,4 +551,4 @@ Why might a user encounter a CSRF validation failure after logging in?
 For security reasons, CSRF tokens are rotated each time a user logs in. Any
 page with a form generated before a login will have an old, invalid CSRF token
 and need to be reloaded. This might happen if a user uses the back button after
-a login or if they log in in a different browser tab.
+a login or if they log in a different browser tab.

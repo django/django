@@ -277,7 +277,10 @@ class RequestFactory:
         # - REMOTE_ADDR: often useful, see #8551.
         # See http://www.python.org/dev/peps/pep-3333/#environ-variables
         return {
-            'HTTP_COOKIE': self.cookies.output(header='', sep='; '),
+            'HTTP_COOKIE': '; '.join(sorted(
+                '%s=%s' % (morsel.key, morsel.coded_value)
+                for morsel in self.cookies.values()
+            )),
             'PATH_INFO': '/',
             'REMOTE_ADDR': '127.0.0.1',
             'REQUEST_METHOD': 'GET',
@@ -310,7 +313,7 @@ class RequestFactory:
                 charset = match.group(1)
             else:
                 charset = settings.DEFAULT_CHARSET
-            return data.encode(charset)
+            return force_bytes(data, encoding=charset)
 
     def _encode_json(self, data, content_type):
         """
@@ -401,7 +404,7 @@ class RequestFactory:
         }
         if data:
             r.update({
-                'CONTENT_LENGTH': len(data),
+                'CONTENT_LENGTH': str(len(data)),
                 'CONTENT_TYPE': content_type,
                 'wsgi.input': FakePayload(data),
             })

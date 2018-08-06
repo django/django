@@ -51,16 +51,11 @@ class FilteredSelectMultiple(forms.SelectMultiple):
 
 
 class AdminDateWidget(forms.DateInput):
-    @property
-    def media(self):
-        extra = '' if settings.DEBUG else '.min'
+    class Media:
         js = [
-            'vendor/jquery/jquery%s.js' % extra,
-            'jquery.init.js',
-            'calendar.js',
-            'admin/DateTimeShortcuts.js',
+            'admin/js/calendar.js',
+            'admin/js/admin/DateTimeShortcuts.js',
         ]
-        return forms.Media(js=["admin/js/%s" % path for path in js])
 
     def __init__(self, attrs=None, format=None):
         attrs = {'class': 'vDateField', 'size': '10', **(attrs or {})}
@@ -68,16 +63,11 @@ class AdminDateWidget(forms.DateInput):
 
 
 class AdminTimeWidget(forms.TimeInput):
-    @property
-    def media(self):
-        extra = '' if settings.DEBUG else '.min'
+    class Media:
         js = [
-            'vendor/jquery/jquery%s.js' % extra,
-            'jquery.init.js',
-            'calendar.js',
-            'admin/DateTimeShortcuts.js',
+            'admin/js/calendar.js',
+            'admin/js/admin/DateTimeShortcuts.js',
         ]
-        return forms.Media(js=["admin/js/%s" % path for path in js])
 
     def __init__(self, attrs=None, format=None):
         attrs = {'class': 'vTimeField', 'size': '8', **(attrs or {})}

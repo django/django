@@ -1,10 +1,11 @@
+import datetime
 import importlib
 import os
 import sys
 
 from django.apps import apps
 from django.db.models.fields import NOT_PROVIDED
-from django.utils import datetime_safe, timezone
+from django.utils import timezone
 
 from .loader import MigrationLoader
 
@@ -135,7 +136,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                 sys.exit(1)
             else:
                 try:
-                    return eval(code, {}, {"datetime": datetime_safe, "timezone": timezone})
+                    return eval(code, {}, {'datetime': datetime, 'timezone': timezone})
                 except (SyntaxError, NameError) as e:
                     print("Invalid input: %s" % e)
 

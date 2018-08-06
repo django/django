@@ -112,5 +112,5 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
         self.assertNotEqual(sigint_handler, signal.SIG_IGN)
         with mock.patch('subprocess.check_call', new=_mock_subprocess_call):
             DatabaseClient.runshell_db({})
-        # dbshell restores the orignal handler.
+        # dbshell restores the original handler.
         self.assertEqual(sigint_handler, signal.getsignal(signal.SIGINT))

@@ -4,10 +4,7 @@ import unicodedata
 from gzip import GzipFile
 from io import BytesIO
 
-from django.utils.functional import (
-    SimpleLazyObject, keep_lazy, keep_lazy_text, lazy,
-)
-from django.utils.safestring import SafeText, mark_safe
+from django.utils.functional import SimpleLazyObject, keep_lazy_text, lazy
 from django.utils.translation import gettext as _, gettext_lazy, pgettext
 
 
@@ -399,7 +396,7 @@ def unescape_string_literal(s):
     return s[1:-1].replace(r'\%s' % quote, quote).replace(r'\\', '\\')
 
 
-@keep_lazy(str, SafeText)
+@keep_lazy_text
 def slugify(value, allow_unicode=False):
     """
     Convert to ASCII if 'allow_unicode' is False. Convert spaces to hyphens.
@@ -412,7 +409,7 @@ def slugify(value, allow_unicode=False):
     else:
         value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
     value = re.sub(r'[^\w\s-]', '', value).strip().lower()
-    return mark_safe(re.sub(r'[-\s]+', '-', value))
+    return re.sub(r'[-\s]+', '-', value)
 
 
 def camel_case_to_spaces(value):

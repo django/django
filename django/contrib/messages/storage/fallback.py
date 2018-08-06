@@ -6,7 +6,7 @@ from django.contrib.messages.storage.session import SessionStorage
 class FallbackStorage(BaseStorage):
     """
     Try to store all messages in the first backend. Store any unstored
-    messages in each subsequent backend backend.
+    messages in each subsequent backend.
     """
     storage_classes = (CookieStorage, SessionStorage)
 

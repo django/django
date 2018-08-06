@@ -67,6 +67,9 @@ class OtherTypesArrayModel(PostgreSQLModel):
     uuids = ArrayField(models.UUIDField())
     decimals = ArrayField(models.DecimalField(max_digits=5, decimal_places=2))
     tags = ArrayField(TagField(), blank=True, null=True)
+    json = ArrayField(JSONField(default=dict), default=list)
+    int_ranges = ArrayField(IntegerRangeField(), blank=True, null=True)
+    bigint_ranges = ArrayField(BigIntegerRangeField(), blank=True, null=True)
 
 
 class HStoreModel(PostgreSQLModel):

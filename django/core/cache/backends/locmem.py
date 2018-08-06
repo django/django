@@ -14,6 +14,8 @@ _locks = {}
 
 
 class LocMemCache(BaseCache):
+    pickle_protocol = pickle.HIGHEST_PROTOCOL
+
     def __init__(self, name, params):
         super().__init__(params)
         self._cache = _caches.setdefault(name, OrderedDict())
@@ -23,7 +25,7 @@ class LocMemCache(BaseCache):
     def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
-        pickled = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
+        pickled = pickle.dumps(value, self.pickle_protocol)
         with self._lock:
             if self._has_expired(key):
                 self._set(key, pickled, timeout)
@@ -51,7 +53,7 @@ class LocMemCache(BaseCache):
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
-        pickled = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
+        pickled = pickle.dumps(value, self.pickle_protocol)
         with self._lock:
             self._set(key, pickled, timeout)
 
@@ -73,7 +75,7 @@ class LocMemCache(BaseCache):
             pickled = self._cache[key]
             value = pickle.loads(pickled)
             new_value = value + delta
-            pickled = pickle.dumps(new_value, pickle.HIGHEST_PROTOCOL)
+            pickled = pickle.dumps(new_value, self.pickle_protocol)
             self._cache[key] = pickled
             self._cache.move_to_end(key, last=False)
         return new_value

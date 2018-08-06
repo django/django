@@ -152,7 +152,7 @@ class Template:
         self.name = name
         self.origin = origin
         self.engine = engine
-        self.source = template_string
+        self.source = str(template_string)  # May be lazy.
         self.nodelist = self.compile_nodelist()
 
     def __iter__(self):
@@ -760,7 +760,7 @@ class Variable:
             # catching. Since this should only happen at compile time, that's
             # probably OK.
 
-            # Try to interpret values containg a period or an 'e'/'E'
+            # Try to interpret values containing a period or an 'e'/'E'
             # (possibly scientific notation) as a float;  otherwise, try int.
             if '.' in var or 'e' in var.lower():
                 self.literal = float(var)

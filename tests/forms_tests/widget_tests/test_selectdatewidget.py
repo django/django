@@ -317,7 +317,7 @@ class SelectDateWidgetTest(WidgetTest):
     def test_selectdate_empty_label(self):
         w = SelectDateWidget(years=('2014',), empty_label='empty_label')
 
-        # Rendering the default state with empty_label setted as string.
+        # Rendering the default state with empty_label set as string.
         self.assertInHTML('<option selected value="">empty_label</option>', w.render('mydate', ''), count=3)
 
         w = SelectDateWidget(years=('2014',), empty_label=('empty_year', 'empty_month', 'empty_day'))
@@ -476,6 +476,12 @@ class SelectDateWidgetTest(WidgetTest):
         self.assertEqual(
             w.value_from_datadict({'date_year': '1899', 'date_month': '8', 'date_day': '13'}, {}, 'date'),
             '13-08-1899',
+        )
+        # And years before 1000 (demonstrating the need for datetime_safe).
+        w = SelectDateWidget(years=('0001',))
+        self.assertEqual(
+            w.value_from_datadict({'date_year': '0001', 'date_month': '8', 'date_day': '13'}, {}, 'date'),
+            '13-08-0001',
         )
 
     def test_format_value(self):

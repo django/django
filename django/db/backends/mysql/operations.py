@@ -1,3 +1,4 @@
+import decimal
 import uuid
 
 from django.conf import settings
@@ -17,6 +18,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         'PositiveIntegerField': (0, 4294967295),
     }
     cast_data_types = {
+        'AutoField': 'signed integer',
+        'BigAutoField': 'signed integer',
         'CharField': 'char(%(max_length)s)',
         'TextField': 'char',
         'IntegerField': 'signed integer',
@@ -260,10 +263,22 @@ class DatabaseOperations(BaseDatabaseOperations):
     def binary_placeholder_sql(self, value):
         return '_binary %s' if value is not None and not hasattr(value, 'as_sql') else '%s'
 
+    def convert_durationfield_value(self, value, expression, connection):
+        # DurationFields can return a Decimal in MariaDB.
+        if isinstance(value, decimal.Decimal):
+            value = float(value)
+        return super().convert_durationfield_value(value, expression, connection)
+
     def subtract_temporals(self, internal_type, lhs, rhs):
         lhs_sql, lhs_params = lhs
         rhs_sql, rhs_params = rhs
         if internal_type == 'TimeField':
+            if self.connection.mysql_is_mariadb:
+                # MariaDB includes the microsecond component in TIME_TO_SEC as
+                # a decimal. MySQL returns an integer without microseconds.
+                return '((TIME_TO_SEC(%(lhs)s) - TIME_TO_SEC(%(rhs)s)) * 1000000)' % {
+                    'lhs': lhs_sql, 'rhs': rhs_sql
+                }, lhs_params + rhs_params
             return (
                 "((TIME_TO_SEC(%(lhs)s) * 1000000 + MICROSECOND(%(lhs)s)) -"
                 " (TIME_TO_SEC(%(rhs)s) * 1000000 + MICROSECOND(%(rhs)s)))"
@@ -285,11 +300,14 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def regex_lookup(self, lookup_type):
         # REGEXP BINARY doesn't work correctly in MySQL 8+ and REGEXP_LIKE
-        # doesn't exist in MySQL 5.6.
-        if self.connection.mysql_version < (8, 0, 0):
+        # doesn't exist in MySQL 5.6 or in MariaDB.
+        if self.connection.mysql_version < (8, 0, 0) or self.connection.mysql_is_mariadb:
             if lookup_type == 'regex':
                 return '%s REGEXP BINARY %s'
             return '%s REGEXP %s'
 
         match_option = 'c' if lookup_type == 'regex' else 'i'
         return "REGEXP_LIKE(%%s, %%s, '%s')" % match_option
+
+    def insert_statement(self, ignore_conflicts=False):
+        return 'INSERT IGNORE INTO' if ignore_conflicts else super().insert_statement(ignore_conflicts)

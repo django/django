@@ -1337,7 +1337,7 @@ blue.
         disk.
 
         The only parameter that is set differently from the source raster is the
-        name. The default value of the the raster name is the name of the source
+        name. The default value of the raster name is the name of the source
         raster appended with ``'_copy' + source_driver_name``. For file-based
         rasters it is recommended to provide the file path of the target raster.
 

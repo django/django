@@ -21,7 +21,7 @@ options`_.
 ``Index`` options
 =================
 
-.. class:: Index(fields=(), name=None, db_tablespace=None)
+.. class:: Index(fields=(), name=None, db_tablespace=None, opclasses=())
 
     Creates an index (B-Tree) in the database.
 
@@ -72,3 +72,23 @@ in the same tablespace as the table.
 
     For a list of PostgreSQL-specific indexes, see
     :mod:`django.contrib.postgres.indexes`.
+
+``opclasses``
+-------------
+
+.. attribute:: Index.opclasses
+
+.. versionadded:: 2.2
+
+The names of the `PostgreSQL operator classes
+<https://www.postgresql.org/docs/current/static/indexes-opclass.html>`_ to use for
+this index. If you require a custom operator class, you must provide one for
+each field in the index.
+
+For example, ``GinIndex(name='json_index', fields=['jsonfield'],
+opclasses=['jsonb_path_ops'])`` creates a gin index on ``jsonfield`` using
+``jsonb_path_ops``.
+
+``opclasses`` are ignored for databases besides PostgreSQL.
+
+:attr:`Index.name` is required when using ``opclasses``.

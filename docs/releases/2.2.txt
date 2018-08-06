@@ -30,6 +30,13 @@ officially support the latest release of each series.
 What's new in Django 2.2
 ========================
 
+Check Constraints
+-----------------
+
+The new :class:`~django.db.models.CheckConstraint` class enables adding custom
+database constraints. Constraints are added to models using the
+:attr:`Meta.constraints <django.db.models.Options.constraints>` option.
+
 Minor features
 --------------
 
@@ -70,7 +77,20 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* Added phrase parameter to SearchVector to support phrase searching. 
+* The new ``ordering`` argument for
+  :class:`~django.contrib.postgres.aggregates.ArrayAgg` and
+  :class:`~django.contrib.postgres.aggregates.StringAgg` determines the
+  ordering of the aggregated elements.
+
+* The new :class:`~django.contrib.postgres.indexes.BTreeIndex`,
+  :class:`~django.contrib.postgres.indexes.HashIndex` and
+  :class:`~django.contrib.postgres.indexes.SpGistIndex` classes allow
+  creating ``B-Tree``, ``hash``, and ``SP-GiST`` indexes in the database.
+
+* :class:`~django.contrib.postgres.indexes.BrinIndex` now has the
+  ``autosummarize`` parameter.
+
+* Added ``phrase`` parameter to SearchVector to support phrase searching. 
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -95,7 +115,8 @@ Minor features
 :mod:`django.contrib.staticfiles`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Added path matching to the :option:`collectstatic --ignore` option so that
+  patterns like ``/vendor/*.js`` can be used.
 
 :mod:`django.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -115,7 +136,7 @@ CSRF
 Database backends
 ~~~~~~~~~~~~~~~~~
 
-* ...
+* Added result streaming for :meth:`.QuerySet.iterator` on SQLite.
 
 Email
 ~~~~~
@@ -156,12 +177,19 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* ...
+* The new :option:`migrate --plan` option prints the list of migration
+  operations that will be performed.
 
 Models
 ~~~~~~
 
-* ...
+* Added support for PostgreSQL operator classes (:attr:`.Index.opclasses`).
+
+* Added many :ref:`math database functions <math-functions>`.
+
+* Setting the new ``ignore_conflicts`` parameter of
+  :meth:`.QuerySet.bulk_create` to ``True`` tells the database to ignore
+  failure to insert rows that fail uniqueness constraints or other checks.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -171,7 +199,10 @@ Requests and Responses
 Serialization
 ~~~~~~~~~~~~~
 
-* ...
+* You can now deserialize data using natural keys containing :ref:`forward
+  references <natural-keys-and-forward-references>` by passing
+  ``handle_forward_references=True`` to ``serializers.deserialize()``.
+  Additionally, :djadmin:`loaddata` handles forward references automatically.
 
 Signals
 ~~~~~~~
@@ -208,7 +239,13 @@ Backwards incompatible changes in 2.2
 Database backend API
 --------------------
 
-* ...
+* Third-party database backends must implement support for table check
+  constraints or set ``DatabaseFeatures.supports_table_check_constraints`` to
+  ``False``.
+
+* Third party database backends must implement support for ignoring
+  constraints or uniqueness errors while inserting or set
+  ``DatabaseFeatures.supports_ignore_conflicts`` to ``False``.
 
 :mod:`django.contrib.gis`
 -------------------------
@@ -223,6 +260,12 @@ Miscellaneous
   have existing invalid data and run a migration that recreates a table, you'll
   see ``CHECK constraint failed``.
 
+* For consistency with WSGI servers, the test client now sets the
+  ``Content-Length`` header to a string rather than an integer.
+
+* The return value of :func:`django.utils.text.slugify` is no longer marked as
+  HTML safe.
+
 .. _deprecated-features-2.2:
 
 Features deprecated in 2.2
@@ -231,4 +274,5 @@ Features deprecated in 2.2
 Miscellaneous
 -------------
 
-* ...
+* ``django.utils.timezone.FixedOffset`` is deprecated in favor of
+  :class:`datetime.timezone`.

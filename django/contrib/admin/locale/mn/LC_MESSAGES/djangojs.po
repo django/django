@@ -2,16 +2,16 @@
 #
 # Translators:
 # Tsolmon <mnts26@gmail.com>, 2012
-# Zorig <zorig_ezd@yahoo.com>, 2014,2018
+# Zorig, 2014,2018
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011-2012,2015
 # Ганзориг БП <ganzo.bp@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
 "PO-Revision-Date: 2018-02-21 00:38+0000\n"
-"Last-Translator: Zorig <zorig_ezd@yahoo.com>\n"
+"Last-Translator: Zorig\n"
 "Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
 "mn/)\n"
 "MIME-Version: 1.0\n"
@@ -99,26 +99,8 @@ msgstr ""
 "Та 1 үйлдлийг сонгосон байна бас та ямарваа өөрчлөлт оруулсангүй. Та Save "
 "товчлуур биш Go товчлуурыг хайж байгаа бололтой."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Та серверийн цагаас %s цагийн түрүүнд явж байна"
-msgstr[1] "Та серверийн цагаас %s цагийн түрүүнд явж байна"
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Та серверийн цагаас %s цагаар хоцорч байна"
-msgstr[1] "Та серверийн цагаас %s цагаар хоцорч байна"
-
 msgid "Now"
 msgstr "Одоо"
-
-msgid "Choose a Time"
-msgstr "Цаг сонгох"
-
-msgid "Choose a time"
-msgstr "Цаг сонгох"
 
 msgid "Midnight"
 msgstr "Шөнө дунд"
@@ -131,6 +113,24 @@ msgstr "Үд дунд"
 
 msgid "6 p.m."
 msgstr "Оройн 6 цаг"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Та серверийн цагаас %s цагийн түрүүнд явж байна"
+msgstr[1] "Та серверийн цагаас %s цагийн түрүүнд явж байна"
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Та серверийн цагаас %s цагаар хоцорч байна"
+msgstr[1] "Та серверийн цагаас %s цагаар хоцорч байна"
+
+msgid "Choose a Time"
+msgstr "Цаг сонгох"
+
+msgid "Choose a time"
+msgstr "Цаг сонгох"
 
 msgid "Cancel"
 msgstr "Болих"

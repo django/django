@@ -300,10 +300,10 @@ class GeoLookupTest(TestCase):
         invalid_geom = fromstr('POLYGON((0 0, 0 1, 1 1, 1 0, 1 1, 1 0, 0 0))')
         State.objects.create(name='invalid', poly=invalid_geom)
         qs = State.objects.all()
-        if oracle or mysql:
+        if oracle or (mysql and connection.mysql_version < (8, 0, 0)):
             # Kansas has adjacent vertices with distance 6.99244813842e-12
             # which is smaller than the default Oracle tolerance.
-            # It's invalid on MySQL too.
+            # It's invalid on MySQL < 8 also.
             qs = qs.exclude(name='Kansas')
             self.assertEqual(State.objects.filter(name='Kansas', poly__isvalid=False).count(), 1)
         self.assertEqual(qs.filter(poly__isvalid=False).count(), 1)

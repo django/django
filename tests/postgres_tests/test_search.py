@@ -155,6 +155,12 @@ class MultipleFieldsTest(GrailTestData, PostgreSQLTestCase):
         ).filter(search='bedemir')
         self.assertEqual(set(searched), {self.bedemir0, self.bedemir1, self.crowd, self.witch, self.duck})
 
+    def test_search_with_non_text(self):
+        searched = Line.objects.annotate(
+            search=SearchVector('id'),
+        ).filter(search=str(self.crowd.id))
+        self.assertSequenceEqual(searched, [self.crowd])
+
     def test_config_query_explicit(self):
         searched = Line.objects.annotate(
             search=SearchVector('scene__setting', 'dialogue', config='french'),

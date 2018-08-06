@@ -5,10 +5,10 @@ from django.test import SimpleTestCase, ignore_warnings
 from django.utils.datastructures import MultiValueDict
 from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.http import (
-    base36_to_int, cookie_date, http_date, int_to_base36, is_safe_url,
-    is_same_domain, parse_etags, parse_http_date, quote_etag, urlencode,
-    urlquote, urlquote_plus, urlsafe_base64_decode, urlsafe_base64_encode,
-    urlunquote, urlunquote_plus,
+    base36_to_int, cookie_date, escape_leading_slashes, http_date,
+    int_to_base36, is_safe_url, is_same_domain, parse_etags, parse_http_date,
+    quote_etag, urlencode, urlquote, urlquote_plus, urlsafe_base64_decode,
+    urlsafe_base64_encode, urlunquote, urlunquote_plus,
 )
 
 
@@ -165,6 +165,10 @@ class IsSafeURLTests(unittest.TestCase):
         # Basic auth without host is not allowed.
         self.assertIs(is_safe_url(r'http://testserver\@example.com', allowed_hosts=None), False)
 
+    def test_allowed_hosts_str(self):
+        self.assertIs(is_safe_url('http://good.com/good', allowed_hosts='good.com'), True)
+        self.assertIs(is_safe_url('http://good.co/evil', allowed_hosts='good.com'), False)
+
     def test_secure_param_https_urls(self):
         secure_urls = (
             'https://example.com/p',
@@ -271,3 +275,14 @@ class HttpDateProcessingTests(unittest.TestCase):
     def test_parsing_asctime(self):
         parsed = parse_http_date('Sun Nov  6 08:49:37 1994')
         self.assertEqual(datetime.utcfromtimestamp(parsed), datetime(1994, 11, 6, 8, 49, 37))
+
+
+class EscapeLeadingSlashesTests(unittest.TestCase):
+    def test(self):
+        tests = (
+            ('//example.com', '/%2Fexample.com'),
+            ('//', '/%2F'),
+        )
+        for url, expected in tests:
+            with self.subTest(url=url):
+                self.assertEqual(escape_leading_slashes(url), expected)

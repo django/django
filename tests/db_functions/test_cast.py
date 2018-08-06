@@ -39,6 +39,8 @@ class CastTests(TestCase):
 
     def test_cast_to_integer(self):
         for field_class in (
+            models.AutoField,
+            models.BigAutoField,
             models.IntegerField,
             models.BigIntegerField,
             models.SmallIntegerField,

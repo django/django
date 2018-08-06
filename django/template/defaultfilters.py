@@ -222,8 +222,8 @@ def stringformat(value, arg):
     """
     Format the variable according to the arg, a string formatting specifier.
 
-    This specifier uses Python string formating syntax, with the exception that
-    the leading "%" is dropped.
+    This specifier uses Python string formatting syntax, with the exception
+    that the leading "%" is dropped.
 
     See https://docs.python.org/3/library/stdtypes.html#printf-style-string-formatting
     for documentation of Python string formatting.
@@ -448,7 +448,7 @@ def safeseq(value):
     individually, as safe, after converting them to strings. Return a list
     with the results.
     """
-    return [mark_safe(str(obj)) for obj in value]
+    return [mark_safe(obj) for obj in value]
 
 
 @register.filter(is_safe=True)

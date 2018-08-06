@@ -459,7 +459,8 @@ class FormatStylePlaceholderCursor:
                 for k, value in params.items():
                     if value.input_size:
                         sizes[k] = value.input_size
-            self.setinputsizes(**sizes)
+            if sizes:
+                self.setinputsizes(**sizes)
         else:
             # It's not a list of dicts; it's a list of sequences
             sizes = [None] * len(params_list[0])
@@ -467,7 +468,8 @@ class FormatStylePlaceholderCursor:
                 for i, value in enumerate(params):
                     if value.input_size:
                         sizes[i] = value.input_size
-            self.setinputsizes(*sizes)
+            if sizes:
+                self.setinputsizes(*sizes)
 
     def _param_generator(self, params):
         # Try dict handling; if that fails, treat as sequence
@@ -524,14 +526,6 @@ class FormatStylePlaceholderCursor:
         formatted = [firstparams] + [self._format_params(p) for p in params_iter]
         self._guess_input_sizes(formatted)
         return self.cursor.executemany(query, [self._param_generator(p) for p in formatted])
-
-    def fetchmany(self, size=None):
-        if size is None:
-            size = self.arraysize
-        return tuple(self.cursor.fetchmany(size))
-
-    def fetchall(self):
-        return tuple(self.cursor.fetchall())
 
     def close(self):
         try:

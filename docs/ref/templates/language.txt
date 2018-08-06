@@ -82,10 +82,10 @@ Variables
 Variables look like this: ``{{ variable }}``. When the template engine
 encounters a variable, it evaluates that variable and replaces it with the
 result. Variable names consist of any combination of alphanumeric characters
-and the underscore (``"_"``). The dot (``"."``) also appears in variable
-sections, although that has a special meaning, as indicated below.
-Importantly, *you cannot have spaces or punctuation characters in variable
-names.*
+and the underscore (``"_"``) but may not start with an underscore. The dot
+(``"."``) also appears in variable sections, although that has a special
+meaning, as indicated below. Importantly, *you cannot have spaces or
+punctuation characters in variable names.*
 
 Use a dot (``.``) to access attributes of a variable.
 
@@ -123,6 +123,9 @@ string) by default.
 Note that "bar" in a template expression like ``{{ foo.bar }}`` will be
 interpreted as a literal string and not using the value of the variable "bar",
 if one exists in the template context.
+
+Variable attributes that begin with an underscore may not be accessed as
+they're generally considered private.
 
 Filters
 =======

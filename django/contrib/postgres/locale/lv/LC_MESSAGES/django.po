@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Edgars Voroboks <nullisnot0@inbox.lv>, 2017
+# NullIsNot0 <nullisnot0@inbox.lv>, 2017
+# NullIsNot0 <nullisnot0@inbox.lv>, 2018
 # peterisb <pb@sungis.lv>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-11-17 21:10+0000\n"
-"Last-Translator: Edgars Voroboks <nullisnot0@inbox.lv>\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-23 16:49+0000\n"
+"Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -23,8 +24,8 @@ msgid "PostgreSQL extensions"
 msgstr "PostgreSQL paplašinājums"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
-msgstr "Masīva %(nth)s elements neizturēja pārbaudi: "
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "Masīva %(nth)s elements nav pareizs:"
 
 msgid "Nested arrays must have the same length."
 msgstr "Iekļauto masīvu garumam jābūt vienādam."

@@ -7,7 +7,9 @@ from admin_scripts.tests import AdminScriptTestCase
 from django.apps import apps
 from django.core import management
 from django.core.management import BaseCommand, CommandError, find_commands
-from django.core.management.utils import find_command, popen_wrapper
+from django.core.management.utils import (
+    find_command, get_random_secret_key, popen_wrapper,
+)
 from django.db import connection
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, extend_sys_path
@@ -260,3 +262,9 @@ class UtilsTests(SimpleTestCase):
         msg = 'Error executing a_42_command_that_doesnt_exist_42'
         with self.assertRaisesMessage(CommandError, msg):
             popen_wrapper(['a_42_command_that_doesnt_exist_42'])
+
+    def test_get_random_secret_key(self):
+        key = get_random_secret_key()
+        self.assertEqual(len(key), 50)
+        for char in key:
+            self.assertIn(char, 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)')

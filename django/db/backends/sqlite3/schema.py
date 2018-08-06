@@ -126,7 +126,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         else:
             super().alter_field(model, old_field, new_field, strict=strict)
 
-    def _remake_table(self, model, create_field=None, delete_field=None, alter_field=None):
+    def _remake_table(self, model, create_field=None, delete_field=None, alter_field=None,
+                      add_constraint=None, remove_constraint=None):
         """
         Shortcut to transform a model from old_model into new_model
 
@@ -222,6 +223,15 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 if delete_field.name not in index.fields
             ]
 
+        constraints = list(model._meta.constraints)
+        if add_constraint:
+            constraints.append(add_constraint)
+        if remove_constraint:
+            constraints = [
+                constraint for constraint in constraints
+                if remove_constraint.name != constraint.name
+            ]
+
         # Construct a new model for the new state
         meta_contents = {
             'app_label': model._meta.app_label,
@@ -229,6 +239,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             'unique_together': unique_together,
             'index_together': index_together,
             'indexes': indexes,
+            'constraints': constraints,
             'apps': apps,
         }
         meta = type("Meta", (), meta_contents)
@@ -362,3 +373,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         ))
         # Delete the old through table
         self.delete_model(old_field.remote_field.through)
+
+    def add_constraint(self, model, constraint):
+        self._remake_table(model, add_constraint=constraint)
+
+    def remove_constraint(self, model, constraint):
+        self._remake_table(model, remove_constraint=constraint)

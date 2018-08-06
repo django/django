@@ -16,25 +16,32 @@ from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from .models import Employee
 
 
+def fix_ordering_for_mariadb(qs, ordering):
+    if connection.vendor == 'mysql' and connection.mysql_is_mariadb:
+        # MariaDB requires repeating the ordering when using window functions
+        qs = qs.order_by(*ordering)
+    return qs
+
+
 @skipUnlessDBFeature('supports_over_clause')
 class WindowFunctionTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         Employee.objects.bulk_create([
-            Employee(name=e[0], salary=e[1], department=e[2], hire_date=e[3])
+            Employee(name=e[0], salary=e[1], department=e[2], hire_date=e[3], age=e[4])
             for e in [
-                ('Jones', 45000, 'Accounting', datetime.datetime(2005, 11, 1)),
-                ('Williams', 37000, 'Accounting', datetime.datetime(2009, 6, 1)),
-                ('Jenson', 45000, 'Accounting', datetime.datetime(2008, 4, 1)),
-                ('Adams', 50000, 'Accounting', datetime.datetime(2013, 7, 1)),
-                ('Smith', 55000, 'Sales', datetime.datetime(2007, 6, 1)),
-                ('Brown', 53000, 'Sales', datetime.datetime(2009, 9, 1)),
-                ('Johnson', 40000, 'Marketing', datetime.datetime(2012, 3, 1)),
-                ('Smith', 38000, 'Marketing', datetime.datetime(2009, 10, 1)),
-                ('Wilkinson', 60000, 'IT', datetime.datetime(2011, 3, 1)),
-                ('Moore', 34000, 'IT', datetime.datetime(2013, 8, 1)),
-                ('Miller', 100000, 'Management', datetime.datetime(2005, 6, 1)),
-                ('Johnson', 80000, 'Management', datetime.datetime(2005, 7, 1)),
+                ('Jones', 45000, 'Accounting', datetime.datetime(2005, 11, 1), 20),
+                ('Williams', 37000, 'Accounting', datetime.datetime(2009, 6, 1), 20),
+                ('Jenson', 45000, 'Accounting', datetime.datetime(2008, 4, 1), 20),
+                ('Adams', 50000, 'Accounting', datetime.datetime(2013, 7, 1), 50),
+                ('Smith', 55000, 'Sales', datetime.datetime(2007, 6, 1), 30),
+                ('Brown', 53000, 'Sales', datetime.datetime(2009, 9, 1), 30),
+                ('Johnson', 40000, 'Marketing', datetime.datetime(2012, 3, 1), 30),
+                ('Smith', 38000, 'Marketing', datetime.datetime(2009, 10, 1), 20),
+                ('Wilkinson', 60000, 'IT', datetime.datetime(2011, 3, 1), 40),
+                ('Moore', 34000, 'IT', datetime.datetime(2013, 8, 1), 40),
+                ('Miller', 100000, 'Management', datetime.datetime(2005, 6, 1), 40),
+                ('Johnson', 80000, 'Management', datetime.datetime(2005, 7, 1), 50),
             ]
         ])
 
@@ -187,6 +194,7 @@ class WindowFunctionTests(TestCase):
             partition_by=F('department'),
             order_by=[F('salary').asc(), F('name').asc()],
         )).order_by('department')
+        qs = fix_ordering_for_mariadb(qs, ('department', F('salary').asc(), F('name').asc()))
         self.assertQuerysetEqual(qs, [
             ('Williams', 37000, 'Accounting', None),
             ('Jenson', 45000, 'Accounting', 37000),
@@ -250,6 +258,7 @@ class WindowFunctionTests(TestCase):
             order_by=[F('hire_date').asc(), F('name').desc()],
             partition_by='department',
         )).values_list('name', 'salary', 'department', 'hire_date', 'lead')
+        qs = fix_ordering_for_mariadb(qs, ('department', F('hire_date').asc(), F('name').desc()))
         self.assertNotIn('GROUP BY', str(qs.query))
         self.assertSequenceEqual(qs, [
             ('Jones', 45000, 'Accounting', datetime.date(2005, 11, 1), 45000),
@@ -373,6 +382,8 @@ class WindowFunctionTests(TestCase):
             order_by=[F('hire_date').asc(), F('name').desc()],
             partition_by='department',
         )).order_by('department')
+        ('department', F('hire_date').asc(), F('name').desc())
+        qs = fix_ordering_for_mariadb(qs, ('department', F('hire_date').asc(), F('name').desc()))
         self.assertQuerysetEqual(qs, [
             ('Jones', 45000, 'Accounting', datetime.date(2005, 11, 1), 45000),
             ('Jenson', 45000, 'Accounting', datetime.date(2008, 4, 1), 37000),
@@ -415,6 +426,7 @@ class WindowFunctionTests(TestCase):
             ordered=False
         )
 
+    @skipUnlessDBFeature('supports_default_in_lead_lag')
     def test_lead_default(self):
         qs = Employee.objects.annotate(lead_default=Window(
             expression=Lead(expression='salary', offset=5, default=60000),
@@ -562,24 +574,24 @@ class WindowFunctionTests(TestCase):
         """A query with RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING."""
         qs = Employee.objects.annotate(sum=Window(
             expression=Sum('salary'),
-            partition_by='department',
-            order_by=[F('hire_date').asc(), F('name').asc()],
+            partition_by='age',
+            order_by=[F('age').asc()],
             frame=ValueRange(start=None, end=None),
         )).order_by('department', 'hire_date', 'name')
         self.assertIn('RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING', str(qs.query))
         self.assertQuerysetEqual(qs, [
-            ('Jones', 'Accounting', 45000, datetime.date(2005, 11, 1), 177000),
-            ('Jenson', 'Accounting', 45000, datetime.date(2008, 4, 1), 177000),
-            ('Williams', 'Accounting', 37000, datetime.date(2009, 6, 1), 177000),
-            ('Adams', 'Accounting', 50000, datetime.date(2013, 7, 1), 177000),
-            ('Wilkinson', 'IT', 60000, datetime.date(2011, 3, 1), 94000),
-            ('Moore', 'IT', 34000, datetime.date(2013, 8, 1), 94000),
-            ('Miller', 'Management', 100000, datetime.date(2005, 6, 1), 180000),
-            ('Johnson', 'Management', 80000, datetime.date(2005, 7, 1), 180000),
-            ('Smith', 'Marketing', 38000, datetime.date(2009, 10, 1), 78000),
-            ('Johnson', 'Marketing', 40000, datetime.date(2012, 3, 1), 78000),
-            ('Smith', 'Sales', 55000, datetime.date(2007, 6, 1), 108000),
-            ('Brown', 'Sales', 53000, datetime.date(2009, 9, 1), 108000),
+            ('Jones', 'Accounting', 45000, datetime.date(2005, 11, 1), 165000),
+            ('Jenson', 'Accounting', 45000, datetime.date(2008, 4, 1), 165000),
+            ('Williams', 'Accounting', 37000, datetime.date(2009, 6, 1), 165000),
+            ('Adams', 'Accounting', 50000, datetime.date(2013, 7, 1), 130000),
+            ('Wilkinson', 'IT', 60000, datetime.date(2011, 3, 1), 194000),
+            ('Moore', 'IT', 34000, datetime.date(2013, 8, 1), 194000),
+            ('Miller', 'Management', 100000, datetime.date(2005, 6, 1), 194000),
+            ('Johnson', 'Management', 80000, datetime.date(2005, 7, 1), 130000),
+            ('Smith', 'Marketing', 38000, datetime.date(2009, 10, 1), 165000),
+            ('Johnson', 'Marketing', 40000, datetime.date(2012, 3, 1), 148000),
+            ('Smith', 'Sales', 55000, datetime.date(2007, 6, 1), 148000),
+            ('Brown', 'Sales', 53000, datetime.date(2009, 9, 1), 148000)
         ], transform=lambda row: (row.name, row.department, row.salary, row.hire_date, row.sum))
 
     def test_row_range_rank(self):

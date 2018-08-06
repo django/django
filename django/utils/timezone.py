@@ -2,15 +2,16 @@
 Timezone-related classes and functions.
 """
 
-import datetime
 import functools
+import warnings
 from contextlib import ContextDecorator
-from datetime import timedelta, tzinfo
+from datetime import datetime, timedelta, timezone, tzinfo
 from threading import local
 
 import pytz
 
 from django.conf import settings
+from django.utils.deprecation import RemovedInDjango31Warning
 
 __all__ = [
     'utc', 'get_fixed_timezone',
@@ -37,6 +38,10 @@ class FixedOffset(tzinfo):
     """
 
     def __init__(self, offset=None, name=None):
+        warnings.warn(
+            'FixedOffset is deprecated in favor of datetime.timezone',
+            RemovedInDjango31Warning, stacklevel=2,
+        )
         if offset is not None:
             self.__offset = timedelta(minutes=offset)
         if name is not None:
@@ -53,8 +58,7 @@ class FixedOffset(tzinfo):
 
 
 # UTC time zone as a tzinfo instance.
-# (Use utc = datetime.timezone.utc here when PY35 isn't supported.)
-utc = datetime.timezone(ZERO, 'UTC')
+utc = pytz.utc
 
 
 def get_fixed_timezone(offset):
@@ -64,7 +68,7 @@ def get_fixed_timezone(offset):
     sign = '-' if offset < 0 else '+'
     hhmm = '%02d%02d' % divmod(abs(offset), 60)
     name = sign + hhmm
-    return FixedOffset(offset, name)
+    return timezone(timedelta(minutes=offset), name)
 
 
 # In order to avoid accessing settings at compile time,
@@ -174,7 +178,7 @@ def template_localtime(value, use_tz=None):
     This function is designed for use by the template engine.
     """
     should_convert = (
-        isinstance(value, datetime.datetime) and
+        isinstance(value, datetime) and
         (settings.USE_TZ if use_tz is None else use_tz) and
         not is_naive(value) and
         getattr(value, 'convert_to_local_time', True)
@@ -221,7 +225,11 @@ def now():
     """
     Return an aware or naive datetime.datetime, depending on settings.USE_TZ.
     """
-    return datetime.datetime.now(utc if settings.USE_TZ else None)
+    if settings.USE_TZ:
+        # timeit shows that datetime.now(tz=utc) is 24% slower
+        return datetime.utcnow().replace(tzinfo=utc)
+    else:
+        return datetime.now()
 
 
 # By design, these four functions don't perform any checks on their arguments.

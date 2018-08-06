@@ -1,4 +1,5 @@
 import unittest
+import warnings
 from datetime import datetime
 
 from django.core.paginator import (
@@ -368,9 +369,14 @@ class ModelPaginationTests(TestCase):
         # is appropriate).
         self.assertEqual(cm.filename, __file__)
 
+    def test_paginating_empty_queryset_does_not_warn(self):
+        with warnings.catch_warnings(record=True) as recorded:
+            Paginator(Article.objects.none(), 5)
+        self.assertEqual(len(recorded), 0)
+
     def test_paginating_unordered_object_list_raises_warning(self):
         """
-        Unordered object list warning with an object that has an orderd
+        Unordered object list warning with an object that has an ordered
         attribute but not a model attribute.
         """
         class ObjectList:

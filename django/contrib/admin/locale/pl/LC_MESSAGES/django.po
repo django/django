@@ -8,7 +8,7 @@
 # Karol <kfuks2@o2.pl>, 2012
 # konryd <inactive+konryd@transifex.com>, 2011
 # konryd <inactive+konryd@transifex.com>, 2011
-# m_aciek <maciej.olko@gmail.com>, 2016-2017
+# m_aciek <maciej.olko@gmail.com>, 2016-2018
 # m_aciek <maciej.olko@gmail.com>, 2015
 # Ola Sitarska <ola@sitarska.com>, 2013
 # Ola Sitarska <ola@sitarska.com>, 2013
@@ -18,8 +18,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-12-12 01:04+0000\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-05-28 08:42+0000\n"
 "Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -98,6 +98,15 @@ msgstr "Dodaj kolejne %(verbose_name)s"
 
 msgid "Remove"
 msgstr "Usuń"
+
+msgid "Addition"
+msgstr "Dodanie"
+
+msgid "Change"
+msgstr "Zmień"
+
+msgid "Deletion"
+msgstr "Usunięcie"
 
 msgid "action time"
 msgstr "czas akcji"
@@ -178,10 +187,11 @@ msgstr ""
 "więcej niż jeden wybór."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-"{name} „{obj}” został dodany pomyślnie. Można edytować go ponownie poniżej."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} „{obj}” został dodany pomyślnie."
+
+msgid "You may edit it again below."
+msgstr "Poniżej możesz ponownie edytować."
 
 #, python-brace-format
 msgid ""
@@ -191,15 +201,17 @@ msgstr ""
 "{name} „{obj}” został dodany pomyślnie. Można dodać kolejny {name} poniżej."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} „{obj}” został dodany pomyślnie."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 "{name} „{obj}” został pomyślnie zmieniony. Można edytować go ponownie "
 "poniżej."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+"{name} „{obj}” został dodany pomyślnie. Można edytować go ponownie poniżej."
 
 #, python-brace-format
 msgid ""
@@ -237,6 +249,10 @@ msgstr "Dodaj %s"
 #, python-format
 msgid "Change %s"
 msgstr "Zmień %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Obejrzyj %s"
 
 msgid "Database error"
 msgstr "Błąd bazy danych"
@@ -350,7 +366,7 @@ msgid "Change password"
 msgstr "Zmiana hasła"
 
 msgid "Please correct the error below."
-msgstr "Proszę, popraw poniższe błędy."
+msgstr "Prosimy poprawić poniższy błąd."
 
 msgid "Please correct the errors below."
 msgstr "Proszę, popraw poniższe błędy."
@@ -461,8 +477,8 @@ msgstr ""
 "Czy chcesz skasować zaznaczone %(objects_name)s? Następujące obiekty oraz "
 "obiekty od nich zależne zostaną skasowane:"
 
-msgid "Change"
-msgstr "Zmień"
+msgid "View"
+msgstr "Obejrzyj"
 
 msgid "Delete?"
 msgstr "Usunąć?"
@@ -481,8 +497,8 @@ msgstr "Modele w aplikacji %(name)s"
 msgid "Add"
 msgstr "Dodaj"
 
-msgid "You don't have permission to edit anything."
-msgstr "Nie masz uprawnień, by cokolwiek edytować."
+msgid "You don't have permission to view or edit anything."
+msgstr "Nie masz uprawnień do oglądania ani edycji niczego."
 
 msgid "Recent actions"
 msgstr "Ostatnie działania"
@@ -546,6 +562,10 @@ msgid "Change selected %(model)s"
 msgstr "Zmień wybrane %(model)s"
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr "Obejrzyj wybrane %(model)s"
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr "Dodaj kolejny %(model)s"
 
@@ -576,6 +596,12 @@ msgstr "Zapisz i dodaj nowy"
 
 msgid "Save and continue editing"
 msgstr "Zapisz i kontynuuj edycję"
+
+msgid "Save and view"
+msgstr "Zapisz i obejrzyj"
+
+msgid "Close"
+msgstr "Zamknij"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Dziękujemy za spędzenie cennego czasu na stronie."
@@ -690,6 +716,10 @@ msgstr "Zaznacz %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Zaznacz %s do zmiany"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Wybierz %s do obejrzenia"
 
 msgid "Date:"
 msgstr "Data:"

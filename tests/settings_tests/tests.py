@@ -441,3 +441,106 @@ class TestListSettings(unittest.TestCase):
             finally:
                 del sys.modules['fake_settings_module']
                 delattr(settings_module, setting)
+
+
+class SettingChangeEnterException(Exception):
+    pass
+
+
+class SettingChangeExitException(Exception):
+    pass
+
+
+class OverrideSettingsIsolationOnExceptionTests(SimpleTestCase):
+    """
+    The override_settings context manager restore settings if one of the
+    receivers of "setting_changed" signal fails. Check the three cases of
+    receiver failure detailed in receiver(). In each case, ALL receivers are
+    called when exiting the context manager.
+    """
+    def setUp(self):
+        signals.setting_changed.connect(self.receiver)
+        self.addCleanup(signals.setting_changed.disconnect, self.receiver)
+        # Create a spy that's connected to the `setting_changed` signal and
+        # executed AFTER `self.receiver`.
+        self.spy_receiver = mock.Mock()
+        signals.setting_changed.connect(self.spy_receiver)
+        self.addCleanup(signals.setting_changed.disconnect, self.spy_receiver)
+
+    def receiver(self, **kwargs):
+        """
+        A receiver that fails while certain settings are being changed.
+        - SETTING_BOTH raises an error while receiving the signal
+          on both entering and exiting the context manager.
+        - SETTING_ENTER raises an error only on enter.
+        - SETTING_EXIT raises an error only on exit.
+        """
+        setting = kwargs['setting']
+        enter = kwargs['enter']
+        if setting in ('SETTING_BOTH', 'SETTING_ENTER') and enter:
+            raise SettingChangeEnterException
+        if setting in ('SETTING_BOTH', 'SETTING_EXIT') and not enter:
+            raise SettingChangeExitException
+
+    def check_settings(self):
+        """Assert that settings for these tests aren't present."""
+        self.assertFalse(hasattr(settings, 'SETTING_BOTH'))
+        self.assertFalse(hasattr(settings, 'SETTING_ENTER'))
+        self.assertFalse(hasattr(settings, 'SETTING_EXIT'))
+        self.assertFalse(hasattr(settings, 'SETTING_PASS'))
+
+    def check_spy_receiver_exit_calls(self, call_count):
+        """
+        Assert that `self.spy_receiver` was called exactly `call_count` times
+        with the ``enter=False`` keyword argument.
+        """
+        kwargs_with_exit = [
+            kwargs for args, kwargs in self.spy_receiver.call_args_list
+            if ('enter', False) in kwargs.items()
+        ]
+        self.assertEqual(len(kwargs_with_exit), call_count)
+
+    def test_override_settings_both(self):
+        """Receiver fails on both enter and exit."""
+        with self.assertRaises(SettingChangeEnterException):
+            with override_settings(SETTING_PASS='BOTH', SETTING_BOTH='BOTH'):
+                pass
+
+        self.check_settings()
+        # Two settings were touched, so expect two calls of `spy_receiver`.
+        self.check_spy_receiver_exit_calls(call_count=2)
+
+    def test_override_settings_enter(self):
+        """Receiver fails on enter only."""
+        with self.assertRaises(SettingChangeEnterException):
+            with override_settings(SETTING_PASS='ENTER', SETTING_ENTER='ENTER'):
+                pass
+
+        self.check_settings()
+        # Two settings were touched, so expect two calls of `spy_receiver`.
+        self.check_spy_receiver_exit_calls(call_count=2)
+
+    def test_override_settings_exit(self):
+        """Receiver fails on exit only."""
+        with self.assertRaises(SettingChangeExitException):
+            with override_settings(SETTING_PASS='EXIT', SETTING_EXIT='EXIT'):
+                pass
+
+        self.check_settings()
+        # Two settings were touched, so expect two calls of `spy_receiver`.
+        self.check_spy_receiver_exit_calls(call_count=2)
+
+    def test_override_settings_reusable_on_enter(self):
+        """
+        Error is raised correctly when reusing the same override_settings
+        instance.
+        """
+        @override_settings(SETTING_ENTER='ENTER')
+        def decorated_function():
+            pass
+
+        with self.assertRaises(SettingChangeEnterException):
+            decorated_function()
+        signals.setting_changed.disconnect(self.receiver)
+        # This call shouldn't raise any errors.
+        decorated_function()

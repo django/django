@@ -54,3 +54,14 @@ class DTModel(models.Model):
 class DecimalModel(models.Model):
     n1 = models.DecimalField(decimal_places=2, max_digits=6)
     n2 = models.DecimalField(decimal_places=2, max_digits=6)
+
+
+class IntegerModel(models.Model):
+    big = models.BigIntegerField(null=True, blank=True)
+    normal = models.IntegerField(null=True, blank=True)
+    small = models.SmallIntegerField(null=True, blank=True)
+
+
+class FloatModel(models.Model):
+    f1 = models.FloatField(null=True, blank=True)
+    f2 = models.FloatField(null=True, blank=True)

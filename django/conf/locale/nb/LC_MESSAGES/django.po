@@ -7,7 +7,7 @@
 # jensadne <jensadne@pvv.ntnu.no>, 2014-2015
 # Jon <jon@kolonial.no>, 2015-2016
 # Jon <jon@kolonial.no>, 2014
-# Jon <jon@kolonial.no>, 2017
+# Jon <jon@kolonial.no>, 2017-2018
 # Jon <jon@kolonial.no>, 2013
 # Jon <jon@kolonial.no>, 2011
 # Sigurd Gartmann <sigurdga-transifex@sigurdga.no>, 2012
@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-27 12:38+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-07-30 11:29+0000\n"
 "Last-Translator: Jon <jon@kolonial.no>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/django/django/"
 "language/nb/)\n"
@@ -167,6 +167,9 @@ msgstr "Japansk"
 
 msgid "Georgian"
 msgstr "Georgisk"
+
+msgid "Kabyle"
+msgstr "Kabylsk"
 
 msgid "Kazakh"
 msgstr "Kasakhisk"
@@ -389,6 +392,9 @@ msgstr[1] ""
 "Sørg for at denne verdien har %(limit_value)d eller færre tegn (den har nå "
 "%(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Oppgi et tall."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -465,6 +471,10 @@ msgstr "Stort (8 byte) heltall"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "Verdien '%(value)s' må være enten True eller False."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "'%(value)s'-verdien må være enten True, False, eller None."
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolsk (True eller False)"
@@ -641,9 +651,6 @@ msgstr "Feltet er påkrevet."
 msgid "Enter a whole number."
 msgstr "Oppgi et heltall."
 
-msgid "Enter a number."
-msgstr "Oppgi et tall."
-
 msgid "Enter a valid date."
 msgstr "Oppgi en gyldig dato."
 
@@ -655,6 +662,10 @@ msgstr "Oppgi gyldig dato og tidspunkt."
 
 msgid "Enter a valid duration."
 msgstr "Oppgi en gyldig varighet."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Antall dager må være mellom {min_days} og {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Ingen fil ble sendt. Sjekk «encoding»-typen på skjemaet."

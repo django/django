@@ -505,8 +505,9 @@ class F(Combinable):
     def __repr__(self):
         return "{}({})".format(self.__class__.__name__, self.name)
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        return query.resolve_ref(self.name, allow_joins, reuse, summarize)
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None,
+                           summarize=False, for_save=False, simple_col=False):
+        return query.resolve_ref(self.name, allow_joins, reuse, summarize, simple_col)
 
     def asc(self, **kwargs):
         return OrderBy(self, **kwargs)
@@ -542,7 +543,8 @@ class ResolvedOuterRef(F):
 
 
 class OuterRef(F):
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None,
+                           summarize=False, for_save=False, simple_col=False):
         if isinstance(self.name, self.__class__):
             return self.name
         return ResolvedOuterRef(self.name)
@@ -744,6 +746,40 @@ class Col(Expression):
             return self.output_field.get_db_converters(connection)
         return (self.output_field.get_db_converters(connection) +
                 self.target.get_db_converters(connection))
+
+
+class SimpleCol(Expression):
+    """
+    Represents the SQL of a column name without the table name.
+
+    This variant of Col doesn't include the table name (or an alias) to
+    avoid a syntax error in check constraints.
+    """
+    contains_column_references = True
+
+    def __init__(self, target, output_field=None):
+        if output_field is None:
+            output_field = target
+        super().__init__(output_field=output_field)
+        self.target = target
+
+    def __repr__(self):
+        return '{}({})'.format(self.__class__.__name__, self.target)
+
+    def as_sql(self, compiler, connection):
+        qn = compiler.quote_name_unless_alias
+        return qn(self.target.column), []
+
+    def get_group_by_cols(self):
+        return [self]
+
+    def get_db_converters(self, connection):
+        if self.target == self.output_field:
+            return self.output_field.get_db_converters(connection)
+        return (
+            self.output_field.get_db_converters(connection) +
+            self.target.get_db_converters(connection)
+        )
 
 
 class Ref(Expression):

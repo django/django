@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-01 21:10+0100\n"
-"PO-Revision-Date: 2018-01-11 07:10+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-06-18 23:24+0000\n"
 "Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
@@ -384,6 +384,9 @@ msgstr[0] ""
 "Pastikan nilai ini mengandung paling banyak %(limit_value)d karakter "
 "(sekarang %(show_value)d karakter)."
 
+msgid "Enter a number."
+msgstr "Masukkan sebuah bilangan."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -460,6 +463,10 @@ msgstr "Bilangan asli raksasa (8 byte)"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "Nilai '%(value)s' haruslah bernilai Benar atau Salah."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "Nilai '%(value)s' harus True, False, atau None."
 
 msgid "Boolean (Either True or False)"
 msgstr "Nilai Boolean (Salah satu dari True atau False)"
@@ -637,9 +644,6 @@ msgstr "Bidang ini tidak boleh kosong."
 msgid "Enter a whole number."
 msgstr "Masukkan keseluruhan angka bilangan."
 
-msgid "Enter a number."
-msgstr "Masukkan sebuah bilangan."
-
 msgid "Enter a valid date."
 msgstr "Masukkan tanggal yang valid."
 
@@ -651,6 +655,10 @@ msgstr "Masukkan tanggal/waktu yang valid."
 
 msgid "Enter a valid duration."
 msgstr "Masukan durasi waktu yang benar."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Jumlah hari harus diantara {min_days} dan {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Tidak ada berkas yang dikirimkan. Periksa tipe pengaksaraan formulir."

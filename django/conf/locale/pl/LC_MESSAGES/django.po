@@ -14,7 +14,7 @@
 # konryd <inactive+konryd@transifex.com>, 2011
 # konryd <inactive+konryd@transifex.com>, 2011
 # Łukasz Rekucki (lqc) <lrekucki@gmail.com>, 2011
-# m_aciek <maciej.olko@gmail.com>, 2016-2017
+# m_aciek <maciej.olko@gmail.com>, 2016-2018
 # m_aciek <maciej.olko@gmail.com>, 2015
 # Michał Pasternak <michal.dtz@gmail.com>, 2013
 # p <inactive+poczciwiec@transifex.com>, 2012
@@ -30,8 +30,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-01 21:10+0100\n"
-"PO-Revision-Date: 2017-12-02 15:59+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 23:43+0000\n"
 "Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -420,6 +420,9 @@ msgstr[3] ""
 "Upewnij się, że ta wartość ma co najwyżej %(limit_value)d znaków (obecnie ma "
 "%(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Wpisz liczbę."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -510,6 +513,10 @@ msgstr "Duża liczba całkowita (8 bajtów)"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "wartość '%(value)s' musi być True lub False."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "Wartość „%(value)s” musi wynosić True, False lub None."
 
 msgid "Boolean (Either True or False)"
 msgstr "Wartość logiczna (True lub False – prawda lub fałsz)"
@@ -687,9 +694,6 @@ msgstr "To pole jest wymagane."
 msgid "Enter a whole number."
 msgstr "Wpisz liczbę całkowitą."
 
-msgid "Enter a number."
-msgstr "Wpisz liczbę."
-
 msgid "Enter a valid date."
 msgstr "Wpisz poprawną datę."
 
@@ -701,6 +705,10 @@ msgstr "Wpisz poprawną datę/godzinę."
 
 msgid "Enter a valid duration."
 msgstr "Wpisz poprawny czas trwania."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Liczba dni musi wynosić między {min_days} a {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Nie wysłano żadnego pliku. Sprawdź typ kodowania formularza."

@@ -61,6 +61,12 @@ class AutodetectorTests(TestCase):
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default='Ada Lovelace')),
     ])
+    author_name_check_constraint = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(max_length=200)),
+    ],
+        {'constraints': [models.CheckConstraint(models.Q(name__contains='Bob'), 'name_contains_bob')]},
+    )
     author_dates_of_birth_auto_now = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
         ("date_of_birth", models.DateField(auto_now=True)),
@@ -1144,10 +1150,9 @@ class AutodetectorTests(TestCase):
         changes = self.get_changes([], [self.author_with_publisher, self.publisher])
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
-        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "CreateModel", "AddField"])
-        self.assertOperationAttributes(changes, "testapp", 0, 0, name="Author")
-        self.assertOperationAttributes(changes, "testapp", 0, 1, name="Publisher")
-        self.assertOperationAttributes(changes, "testapp", 0, 2, name="publisher")
+        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "CreateModel"])
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="Publisher")
+        self.assertOperationAttributes(changes, "testapp", 0, 1, name="Author")
         self.assertMigrationDependencies(changes, 'testapp', 0, [])
 
     def test_circular_fk_dependency(self):
@@ -1159,8 +1164,8 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "CreateModel"])
-        self.assertOperationAttributes(changes, "testapp", 0, 0, name="Author")
-        self.assertOperationAttributes(changes, "testapp", 0, 1, name="Publisher")
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="Publisher")
+        self.assertOperationAttributes(changes, "testapp", 0, 1, name="Author")
         self.assertMigrationDependencies(changes, 'testapp', 0, [("otherapp", "auto_1")])
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'otherapp', 2)
@@ -1389,6 +1394,40 @@ class AutodetectorTests(TestCase):
         added_index = models.Index(fields=['title', 'author'], name='book_author_title_idx')
         self.assertOperationAttributes(changes, 'otherapp', 0, 1, model_name='book', index=added_index)
 
+    def test_create_model_with_check_constraint(self):
+        """Test creation of new model with constraints already defined."""
+        author = ModelState('otherapp', 'Author', [
+            ('id', models.AutoField(primary_key=True)),
+            ('name', models.CharField(max_length=200)),
+        ], {'constraints': [models.CheckConstraint(models.Q(name__contains='Bob'), 'name_contains_bob')]})
+        changes = self.get_changes([], [author])
+        added_constraint = models.CheckConstraint(models.Q(name__contains='Bob'), 'name_contains_bob')
+        # Right number of migrations?
+        self.assertEqual(len(changes['otherapp']), 1)
+        # Right number of actions?
+        migration = changes['otherapp'][0]
+        self.assertEqual(len(migration.operations), 2)
+        # Right actions order?
+        self.assertOperationTypes(changes, 'otherapp', 0, ['CreateModel', 'AddConstraint'])
+        self.assertOperationAttributes(changes, 'otherapp', 0, 0, name='Author')
+        self.assertOperationAttributes(changes, 'otherapp', 0, 1, model_name='author', constraint=added_constraint)
+
+    def test_add_constraints(self):
+        """Test change detection of new constraints."""
+        changes = self.get_changes([self.author_name], [self.author_name_check_constraint])
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ['AddConstraint'])
+        added_constraint = models.CheckConstraint(models.Q(name__contains='Bob'), 'name_contains_bob')
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, model_name='author', constraint=added_constraint)
+
+    def test_remove_constraints(self):
+        """Test change detection of removed constraints."""
+        changes = self.get_changes([self.author_name_check_constraint], [self.author_name])
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ['RemoveConstraint'])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, model_name='author', name='name_contains_bob')
+
     def test_add_foo_together(self):
         """Tests index/unique_together detection."""
         changes = self.get_changes([self.author_empty, self.book], [self.author_empty, self.book_foo_together])
@@ -1490,10 +1529,10 @@ class AutodetectorTests(TestCase):
         )
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "otherapp", 1)
-        self.assertOperationTypes(changes, "otherapp", 0, ["RemoveField", "AlterUniqueTogether", "AlterIndexTogether"])
-        self.assertOperationAttributes(changes, "otherapp", 0, 0, model_name="book", name="newfield")
-        self.assertOperationAttributes(changes, "otherapp", 0, 1, name="book", unique_together={("author", "title")})
-        self.assertOperationAttributes(changes, "otherapp", 0, 2, name="book", index_together={("author", "title")})
+        self.assertOperationTypes(changes, "otherapp", 0, ["AlterUniqueTogether", "AlterIndexTogether", "RemoveField"])
+        self.assertOperationAttributes(changes, "otherapp", 0, 0, name="book", unique_together={("author", "title")})
+        self.assertOperationAttributes(changes, "otherapp", 0, 1, name="book", index_together={("author", "title")})
+        self.assertOperationAttributes(changes, "otherapp", 0, 2, model_name="book", name="newfield")
 
     def test_rename_field_and_foo_together(self):
         """
@@ -1520,7 +1559,7 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, "testapp", 1)
         self.assertOperationTypes(changes, "testapp", 0, ["CreateModel"])
         self.assertOperationAttributes(
-            changes, "testapp", 0, 0, name="AuthorProxy", options={"proxy": True, "indexes": []}
+            changes, "testapp", 0, 0, name="AuthorProxy", options={"proxy": True, "indexes": [], "constraints": []}
         )
         # Now, we test turning a proxy model into a non-proxy model
         # It should delete the proxy then make the real one
@@ -1867,13 +1906,12 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "testapp", 1)
         self.assertOperationTypes(changes, "testapp", 0, [
-            "CreateModel", "CreateModel", "CreateModel", "AddField", "AddField"
+            'CreateModel', 'CreateModel', 'CreateModel', 'AddField',
         ])
-        self.assertOperationAttributes(changes, 'testapp', 0, 0, name="Author")
-        self.assertOperationAttributes(changes, 'testapp', 0, 1, name="Contract")
-        self.assertOperationAttributes(changes, 'testapp', 0, 2, name="Publisher")
-        self.assertOperationAttributes(changes, 'testapp', 0, 3, model_name='contract', name='publisher')
-        self.assertOperationAttributes(changes, 'testapp', 0, 4, model_name='author', name='publishers')
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name='Author')
+        self.assertOperationAttributes(changes, 'testapp', 0, 1, name='Publisher')
+        self.assertOperationAttributes(changes, 'testapp', 0, 2, name='Contract')
+        self.assertOperationAttributes(changes, 'testapp', 0, 3, model_name='author', name='publishers')
 
     def test_many_to_many_removed_before_through_model(self):
         """
@@ -1887,11 +1925,9 @@ class AutodetectorTests(TestCase):
         # Remove both the through model and ManyToMany
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "otherapp", 1)
-        self.assertOperationTypes(changes, "otherapp", 0, ["RemoveField", "RemoveField", "RemoveField", "DeleteModel"])
-        self.assertOperationAttributes(changes, 'otherapp', 0, 0, name="author", model_name='attribution')
-        self.assertOperationAttributes(changes, 'otherapp', 0, 1, name="book", model_name='attribution')
-        self.assertOperationAttributes(changes, 'otherapp', 0, 2, name="authors", model_name='book')
-        self.assertOperationAttributes(changes, 'otherapp', 0, 3, name='Attribution')
+        self.assertOperationTypes(changes, 'otherapp', 0, ['RemoveField', 'DeleteModel'])
+        self.assertOperationAttributes(changes, 'otherapp', 0, 0, name='authors', model_name='book')
+        self.assertOperationAttributes(changes, 'otherapp', 0, 1, name='Attribution')
 
     def test_many_to_many_removed_before_through_model_2(self):
         """
@@ -1906,14 +1942,10 @@ class AutodetectorTests(TestCase):
         # Remove both the through model and ManyToMany
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "otherapp", 1)
-        self.assertOperationTypes(changes, "otherapp", 0, [
-            "RemoveField", "RemoveField", "RemoveField", "DeleteModel", "DeleteModel"
-        ])
-        self.assertOperationAttributes(changes, 'otherapp', 0, 0, name="author", model_name='attribution')
-        self.assertOperationAttributes(changes, 'otherapp', 0, 1, name="book", model_name='attribution')
-        self.assertOperationAttributes(changes, 'otherapp', 0, 2, name="authors", model_name='book')
-        self.assertOperationAttributes(changes, 'otherapp', 0, 3, name='Attribution')
-        self.assertOperationAttributes(changes, 'otherapp', 0, 4, name='Book')
+        self.assertOperationTypes(changes, 'otherapp', 0, ['RemoveField', 'DeleteModel', 'DeleteModel'])
+        self.assertOperationAttributes(changes, 'otherapp', 0, 0, name='authors', model_name='book')
+        self.assertOperationAttributes(changes, 'otherapp', 0, 1, name='Attribution')
+        self.assertOperationAttributes(changes, 'otherapp', 0, 2, name='Book')
 
     def test_m2m_w_through_multistep_remove(self):
         """
@@ -1926,13 +1958,12 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "testapp", 1)
         self.assertOperationTypes(changes, "testapp", 0, [
-            "RemoveField", "RemoveField", "RemoveField", "DeleteModel", "DeleteModel"
+            "RemoveField", "RemoveField", "DeleteModel", "DeleteModel"
         ])
-        self.assertOperationAttributes(changes, "testapp", 0, 0, name="publishers", model_name='author')
-        self.assertOperationAttributes(changes, "testapp", 0, 1, name="author", model_name='contract')
-        self.assertOperationAttributes(changes, "testapp", 0, 2, name="publisher", model_name='contract')
-        self.assertOperationAttributes(changes, "testapp", 0, 3, name="Author")
-        self.assertOperationAttributes(changes, "testapp", 0, 4, name="Contract")
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="author", model_name='contract')
+        self.assertOperationAttributes(changes, "testapp", 0, 1, name="publisher", model_name='contract')
+        self.assertOperationAttributes(changes, "testapp", 0, 2, name="Author")
+        self.assertOperationAttributes(changes, "testapp", 0, 3, name="Contract")
 
     def test_concrete_field_changed_to_many_to_many(self):
         """
@@ -1969,11 +2000,10 @@ class AutodetectorTests(TestCase):
         changes = self.get_changes([self.author_with_publisher, self.publisher_with_author], [])
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "testapp", 1)
-        self.assertOperationTypes(changes, "testapp", 0, ["RemoveField", "RemoveField", "DeleteModel", "DeleteModel"])
-        self.assertOperationAttributes(changes, "testapp", 0, 0, name="publisher", model_name='author')
-        self.assertOperationAttributes(changes, "testapp", 0, 1, name="author", model_name='publisher')
-        self.assertOperationAttributes(changes, "testapp", 0, 2, name="Author")
-        self.assertOperationAttributes(changes, "testapp", 0, 3, name="Publisher")
+        self.assertOperationTypes(changes, "testapp", 0, ["RemoveField", "DeleteModel", "DeleteModel"])
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="author", model_name='publisher')
+        self.assertOperationAttributes(changes, "testapp", 0, 1, name="Author")
+        self.assertOperationAttributes(changes, "testapp", 0, 2, name="Publisher")
 
     def test_alter_model_options(self):
         """Changing a model's options should make a change."""
@@ -2045,8 +2075,10 @@ class AutodetectorTests(TestCase):
         changes = self.get_changes([], [self.book, self.author_with_book_order_wrt])
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
-        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "AlterOrderWithRespectTo"])
-        self.assertOperationAttributes(changes, 'testapp', 0, 1, name="author", order_with_respect_to="book")
+        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel"])
+        self.assertOperationAttributes(
+            changes, 'testapp', 0, 0, name="Author", options={'order_with_respect_to': 'book'}
+        )
         self.assertNotIn("_order", [name for name, field in changes['testapp'][0].operations[0].fields])
 
     def test_alter_model_managers(self):
@@ -2322,3 +2354,13 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["AddField", "AddField"])
         self.assertOperationAttributes(changes, 'testapp', 0, 0)
+
+    def test_mti_inheritance_model_removal(self):
+        Animal = ModelState('app', 'Animal', [
+            ("id", models.AutoField(primary_key=True)),
+        ])
+        Dog = ModelState('app', 'Dog', [], bases=('app.Animal',))
+        changes = self.get_changes([Animal, Dog], [Animal])
+        self.assertNumberMigrations(changes, 'app', 1)
+        self.assertOperationTypes(changes, 'app', 0, ['DeleteModel'])
+        self.assertOperationAttributes(changes, 'app', 0, 0, name='Dog')
