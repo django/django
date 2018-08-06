@@ -4,13 +4,13 @@ __all__ = ['CheckConstraint']
 
 
 class CheckConstraint:
-    def __init__(self, constraint, name):
-        self.constraint = constraint
+    def __init__(self, *, check, name):
+        self.check = check
         self.name = name
 
     def constraint_sql(self, model, schema_editor):
         query = Query(model)
-        where = query.build_where(self.constraint)
+        where = query.build_where(self.check)
         connection = schema_editor.connection
         compiler = connection.ops.compiler('SQLCompiler')(query, connection, 'default')
         sql, params = where.as_sql(compiler, connection)
@@ -35,19 +35,19 @@ class CheckConstraint:
         }
 
     def __repr__(self):
-        return "<%s: constraint='%s' name='%s'>" % (self.__class__.__name__, self.constraint, self.name)
+        return "<%s: check='%s' name=%r>" % (self.__class__.__name__, self.check, self.name)
 
     def __eq__(self, other):
         return (
             isinstance(other, CheckConstraint) and
             self.name == other.name and
-            self.constraint == other.constraint
+            self.check == other.check
         )
 
     def deconstruct(self):
         path = '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
         path = path.replace('django.db.models.constraints', 'django.db.models')
-        return (path, (), {'constraint': self.constraint, 'name': self.name})
+        return (path, (), {'check': self.check, 'name': self.name})
 
     def clone(self):
         _, args, kwargs = self.deconstruct()

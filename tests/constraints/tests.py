@@ -6,22 +6,22 @@ from .models import Product
 
 class CheckConstraintTests(TestCase):
     def test_repr(self):
-        constraint = models.Q(price__gt=models.F('discounted_price'))
+        check = models.Q(price__gt=models.F('discounted_price'))
         name = 'price_gt_discounted_price'
-        check = models.CheckConstraint(constraint, name)
+        constraint = models.CheckConstraint(check=check, name=name)
         self.assertEqual(
-            repr(check),
-            "<CheckConstraint: constraint='{}' name='{}'>".format(constraint, name),
+            repr(constraint),
+            "<CheckConstraint: check='{}' name='{}'>".format(check, name),
         )
 
     def test_deconstruction(self):
-        constraint = models.Q(price__gt=models.F('discounted_price'))
+        check = models.Q(price__gt=models.F('discounted_price'))
         name = 'price_gt_discounted_price'
-        check = models.CheckConstraint(constraint, name)
-        path, args, kwargs = check.deconstruct()
+        constraint = models.CheckConstraint(check=check, name=name)
+        path, args, kwargs = constraint.deconstruct()
         self.assertEqual(path, 'django.db.models.CheckConstraint')
         self.assertEqual(args, ())
-        self.assertEqual(kwargs, {'constraint': constraint, 'name': name})
+        self.assertEqual(kwargs, {'check': check, 'name': name})
 
     @skipUnlessDBFeature('supports_table_check_constraints')
     def test_database_constraint(self):
