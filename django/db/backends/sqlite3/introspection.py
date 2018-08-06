@@ -1,5 +1,6 @@
 import re
 
+from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo, TableInfo,
 )
@@ -242,21 +243,62 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             # table_name is a view.
             pass
         else:
-            fields_with_check_constraints = [
-                schema_row.strip().split(' ')[0][1:-1]
-                for schema_row in table_schema.split(',')
-                if schema_row.find('CHECK') >= 0
-            ]
-            for field_name in fields_with_check_constraints:
-                # An arbitrary made up name.
-                constraints['__check__%s' % field_name] = {
-                    'columns': [field_name],
-                    'primary_key': False,
-                    'unique': False,
-                    'foreign_key': False,
-                    'check': True,
-                    'index': False,
-                }
+            try:
+                import sqlparse
+            except ImportError:
+                raise ImproperlyConfigured(
+                    "The sqlparse package is required to introspect constraints on sqlite.",
+                )
+
+            Token = sqlparse.tokens
+
+            _constraint = False
+            _check = False
+            _unique = False
+            _name = None
+            _columns = []
+
+            def update_constraints():
+                if _constraint or _check:
+                    constraints[_name] = {
+                        'columns': _columns,
+                        'primary_key': False,
+                        'unique': _unique,
+                        'foreign_key': False,
+                        'check': _check,
+                        'index': False,
+                    }
+
+            statement = sqlparse.parse(table_schema)[0]
+            for token in statement.flatten():
+                if token.match(Token.Keyword, 'CONSTRAINT'):
+                    _constraint = True
+                elif token.match(Token.Keyword, 'CHECK'):
+                    _check = True
+                elif token.match(Token.Keyword, 'UNIQUE'):
+                    _unique = True
+                elif token.match(Token.Punctuation, ','):
+                    update_constraints()
+                    _constraint = False
+                    _check = False
+                    _unique = False
+                    _name = None
+                    _columns = []
+                if _constraint:  # Table constraint
+                    if token.ttype == Token.Literal.String.Symbol:
+                        if _name is None:
+                            _name = token.value[1:-1]
+                        else:
+                            _columns.append(token.value[1:-1])
+                elif _check:  # Column check constraint
+                    if token.ttype == Token.Literal.String.Symbol:
+                        field_name = token.value[1:-1]
+                        _columns.append(field_name)
+                        _name = '__check__%s' % field_name
+            # If this is the last part, there isn't a terminating comma
+            # so update here also.
+            update_constraints()
+
         # Get the index info
         cursor.execute("PRAGMA index_list(%s)" % self.connection.ops.quote_name(table_name))
         for row in cursor.fetchall():

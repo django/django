@@ -288,6 +288,13 @@ Database backend API
 
 * ``DatabaseFeatures.uses_savepoints`` now defaults to ``True``.
 
+* Changed several ``SchemaEditor`` attributes:
+
+  * Replaced ``sql_create_check`` with ``sql_create_constraint``.
+  * Replaced ``sql_delete_check`` with ``sql_delete_constraint``.
+  * Replaced ``sql_create_fk`` with ``sql_foreign_key_constraint``,
+    ``sql_constraint` and ``sql_create_constraint``.
+
 :mod:`django.contrib.gis`
 -------------------------
 

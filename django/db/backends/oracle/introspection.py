@@ -186,6 +186,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             GROUP BY user_constraints.constraint_name, user_constraints.constraint_type
         """, [table_name])
         for constraint, columns, pk, unique, check in cursor.fetchall():
+            constraint = self.identifier_converter(constraint)
             constraints[constraint] = {
                 'columns': columns.split(','),
                 'primary_key': pk,
@@ -213,6 +214,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             GROUP BY cons.constraint_name, rcols.table_name, rcols.column_name
         """, [table_name])
         for constraint, columns, other_table, other_column in cursor.fetchall():
+            constraint = self.identifier_converter(constraint)
             constraints[constraint] = {
                 'primary_key': False,
                 'unique': False,
@@ -240,6 +242,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             GROUP BY ind.index_name, ind.index_type
         """, [table_name])
         for constraint, type_, columns, orders in cursor.fetchall():
+            constraint = self.identifier_converter(constraint)
             constraints[constraint] = {
                 'primary_key': False,
                 'unique': False,

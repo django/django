@@ -40,6 +40,14 @@ class BaseDatabaseIntrospection:
         """
         return self.table_name_converter(name)
 
+    def identifier_converter(self, name):
+        """
+        Apply a conversion to the identifier for the purposes of comparison.
+
+        Use table_name_converter() by default.
+        """
+        return self.table_name_converter(name)
+
     def table_names(self, cursor=None, include_views=False):
         """
         Return a list of names of all tables that exist in the database.
