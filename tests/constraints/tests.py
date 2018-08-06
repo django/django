@@ -1,7 +1,16 @@
 from django.db import IntegrityError, models
-from django.test import TestCase, skipUnlessDBFeature
+from django.db.models.constraints import BaseConstraint
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
 from .models import Product
+
+
+class BaseConstraintTests(SimpleTestCase):
+    def test_constraint_sql(self):
+        c = BaseConstraint('name')
+        msg = 'This method must be implemented by a subclass.'
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            c.constraint_sql(None, None)
 
 
 class CheckConstraintTests(TestCase):
