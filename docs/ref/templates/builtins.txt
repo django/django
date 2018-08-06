@@ -1359,7 +1359,6 @@ W                 ISO-8601 week number of year, with        ``1``, ``53``
 **Month**
 m                 Month, 2 digits with leading zeros.       ``'01'`` to ``'12'``
 n                 Month without leading zeros.              ``'1'`` to ``'12'``
-                  style. Proprietary extension.
 M                 Month, textual, 3 letters.                ``'Jan'``
 b                 Month, textual, 3 letters, lowercase.     ``'jan'``
 E                 Month, locale specific alternative
@@ -1367,6 +1366,7 @@ E                 Month, locale specific alternative
                   date representation.                      ``'listopada'`` (for Polish locale, as opposed to ``'Listopad'``)
 F                 Month, textual, long.                     ``'January'``
 N                 Month abbreviation in Associated Press    ``'Jan.'``, ``'Feb.'``, ``'March'``, ``'May'``
+                  style. Proprietary extension.
 t                 Number of days in the given month.        ``28`` to ``31``
 **Year**
 y                 Year, 2 digits.                           ``'99'``
