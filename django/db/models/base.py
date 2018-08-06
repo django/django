@@ -16,7 +16,7 @@ from django.db import (
     connections, router, transaction,
 )
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.constraints import CheckConstraint
+from django.db.models.constraints import CheckConstraint, UniqueConstraint
 from django.db.models.deletion import CASCADE, Collector
 from django.db.models.fields.related import (
     ForeignObjectRel, OneToOneField, lazy_related_operation, resolve_relation,
@@ -982,15 +982,24 @@ class Model(metaclass=ModelBase):
         unique_checks = []
 
         unique_togethers = [(self.__class__, self._meta.unique_together)]
+        constraints = [(self.__class__, self._meta.constraints)]
         for parent_class in self._meta.get_parent_list():
             if parent_class._meta.unique_together:
                 unique_togethers.append((parent_class, parent_class._meta.unique_together))
+            if parent_class._meta.constraints:
+                constraints.append((parent_class, parent_class._meta.constraints))
 
         for model_class, unique_together in unique_togethers:
             for check in unique_together:
                 if not any(name in exclude for name in check):
                     # Add the check if the field isn't excluded.
                     unique_checks.append((model_class, tuple(check)))
+
+        for model_class, model_constraints in constraints:
+            for constraint in model_constraints:
+                if (isinstance(constraint, UniqueConstraint) and
+                        not any(name in exclude for name in constraint.fields)):
+                    unique_checks.append((model_class, constraint.fields))
 
         # These are checks for the unique_for_<date/year/month>.
         date_checks = []

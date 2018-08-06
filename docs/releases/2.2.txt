@@ -33,7 +33,8 @@ What's new in Django 2.2
 Constraints
 -----------
 
-The new :class:`~django.db.models.CheckConstraint` class enables adding custom
+The new :class:`~django.db.models.CheckConstraint` and
+:class:`~django.db.models.UniqueConstraint` classes enable adding custom
 database constraints. Constraints are added to models using the
 :attr:`Meta.constraints <django.db.models.Options.constraints>` option.
 

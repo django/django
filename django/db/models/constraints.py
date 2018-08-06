@@ -1,6 +1,6 @@
 from django.db.models.sql.query import Query
 
-__all__ = ['CheckConstraint']
+__all__ = ['CheckConstraint', 'UniqueConstraint']
 
 
 class BaseConstraint:
@@ -67,4 +67,40 @@ class CheckConstraint(BaseConstraint):
     def deconstruct(self):
         path, args, kwargs = super().deconstruct()
         kwargs['check'] = self.check
+        return path, args, kwargs
+
+
+class UniqueConstraint(BaseConstraint):
+    def __init__(self, *, fields, name):
+        if not fields:
+            raise ValueError('At least one field is required to define a unique constraint.')
+        self.fields = tuple(fields)
+        super().__init__(name)
+
+    def constraint_sql(self, model, schema_editor):
+        columns = (
+            model._meta.get_field(field_name).column
+            for field_name in self.fields
+        )
+        return schema_editor.sql_unique_constraint % {
+            'columns': ', '.join(map(schema_editor.quote_name, columns)),
+        }
+
+    def create_sql(self, model, schema_editor):
+        columns = [model._meta.get_field(field_name).column for field_name in self.fields]
+        return schema_editor._create_unique_sql(model, columns, self.name)
+
+    def __repr__(self):
+        return '<%s: fields=%r name=%r>' % (self.__class__.__name__, self.fields, self.name)
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, UniqueConstraint) and
+            self.name == other.name and
+            self.fields == other.fields
+        )
+
+    def deconstruct(self):
+        path, args, kwargs = super().deconstruct()
+        kwargs['fields'] = self.fields
         return path, args, kwargs

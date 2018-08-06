@@ -3,8 +3,8 @@ from django.db import models
 
 class Product(models.Model):
     name = models.CharField(max_length=255)
-    price = models.IntegerField()
-    discounted_price = models.IntegerField()
+    price = models.IntegerField(null=True)
+    discounted_price = models.IntegerField(null=True)
 
     class Meta:
         constraints = [
@@ -12,4 +12,5 @@ class Product(models.Model):
                 check=models.Q(price__gt=models.F('discounted_price')),
                 name='price_gt_discounted_price',
             ),
+            models.UniqueConstraint(fields=['name'], name='unique_name'),
         ]

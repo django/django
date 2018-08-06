@@ -260,6 +260,15 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     name_token = next_ttype(sqlparse.tokens.Literal.String.Symbol)
                     name = name_token.value[1:-1]
                     token = next_ttype(sqlparse.tokens.Keyword)
+                if token.match(sqlparse.tokens.Keyword, 'UNIQUE'):
+                    constraints[name] = {
+                        'unique': True,
+                        'columns': [],
+                        'primary_key': False,
+                        'foreign_key': False,
+                        'check': False,
+                        'index': False,
+                    }
                 if token.match(sqlparse.tokens.Keyword, 'CHECK'):
                     # Column check constraint
                     if name is None:
