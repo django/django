@@ -560,13 +560,6 @@ password resets. You must then provide some key implementation details:
                 ...
                 USERNAME_FIELD = 'identifier'
 
-        :attr:`USERNAME_FIELD` now supports
-        :class:`~django.db.models.ForeignKey`\s. Since there is no way to pass
-        model instances during the :djadmin:`createsuperuser` prompt, expect the
-        user to enter the value of :attr:`~django.db.models.ForeignKey.to_field`
-        value (the :attr:`~django.db.models.Field.primary_key` by default) of an
-        existing instance.
-
     .. attribute:: EMAIL_FIELD
 
         A string describing the name of the email field on the ``User`` model.
@@ -599,13 +592,6 @@ password resets. You must then provide some key implementation details:
             ``REQUIRED_FIELDS`` must contain all required fields on your user
             model, but should *not* contain the ``USERNAME_FIELD`` or
             ``password`` as these fields will always be prompted for.
-
-        :attr:`REQUIRED_FIELDS` now supports
-        :class:`~django.db.models.ForeignKey`\s. Since there is no way to pass
-        model instances during the :djadmin:`createsuperuser` prompt, expect the
-        user to enter the value of :attr:`~django.db.models.ForeignKey.to_field`
-        value (the :attr:`~django.db.models.Field.primary_key` by default) of an
-        existing instance.
 
     .. attribute:: is_active
 
@@ -729,6 +715,9 @@ The following attributes and methods are available on any subclass of
         :meth:`.BaseUserManager.normalize_email`. If you override this method,
         be sure to call ``super()`` to retain the normalization.
 
+Writing a manager for a custom user model
+-----------------------------------------
+
 You should also define a custom manager for your user model. If your user model
 defines ``username``, ``email``, ``is_staff``, ``is_active``, ``is_superuser``,
 ``last_login``, and ``date_joined`` fields the same as Django's default user,
@@ -763,6 +752,11 @@ providing two additional methods:
 
         Unlike ``create_user()``, ``create_superuser()`` *must* require the
         caller to provide a password.
+
+For a :class:`~.ForeignKey` in :attr:`.USERNAME_FIELD` or
+:attr:`.REQUIRED_FIELDS`, these methods receive the value of the
+:attr:`~.ForeignKey.to_field` (the :attr:`~django.db.models.Field.primary_key`
+by default) of an existing instance.
 
 :class:`~django.contrib.auth.models.BaseUserManager` provides the following
 utility methods:
