@@ -36,13 +36,13 @@ class BaseConstraint:
 
 
 class CheckConstraint(BaseConstraint):
-    def __init__(self, constraint, name):
-        self.constraint = constraint
+    def __init__(self, *, check, name):
+        self.check = check
         super().__init__(name)
 
     def constraint_sql(self, model, schema_editor):
         query = Query(model)
-        where = query.build_where(self.constraint)
+        where = query.build_where(self.check)
         connection = schema_editor.connection
         compiler = connection.ops.compiler('SQLCompiler')(query, connection, 'default')
         sql, params = where.as_sql(compiler, connection)
@@ -50,16 +50,16 @@ class CheckConstraint(BaseConstraint):
         return schema_editor.sql_check_constraint % {'check': sql % params}
 
     def __repr__(self):
-        return "<%s: constraint='%s' name='%s'>" % (self.__class__.__name__, self.constraint, self.name)
+        return "<%s: check='%s' name=%r>" % (self.__class__.__name__, self.check, self.name)
 
     def __eq__(self, other):
         return (
             isinstance(other, CheckConstraint) and
             self.name == other.name and
-            self.constraint == other.constraint
+            self.check == other.check
         )
 
     def deconstruct(self):
         path, args, kwargs = super().deconstruct()
-        kwargs['constraint'] = self.constraint
+        kwargs['check'] = self.check
         return path, args, kwargs

@@ -23,20 +23,20 @@ explains the API references of :class:`CheckConstraint`.
 ``CheckConstraint`` options
 ===========================
 
-.. class:: CheckConstraint(constraint, name)
+.. class:: CheckConstraint(*, check, name)
 
     Creates a check constraint in the database.
 
-``constraint``
---------------
+``check``
+---------
 
-.. attribute:: CheckConstraint.constraint
+.. attribute:: CheckConstraint.check
 
-A :class:`Q` object that specifies the condition you want the constraint to
+A :class:`Q` object that specifies the check you want the constraint to
 enforce.
 
-For example ``CheckConstraint(Q(age__gte=18), 'age_gte_18')`` ensures the age
-field is never less than 18.
+For example ``CheckConstraint(check=Q(age__gte=18), name='age_gte_18')``
+ensures the age field is never less than 18.
 
 ``name``
 --------
