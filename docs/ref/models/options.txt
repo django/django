@@ -459,8 +459,8 @@ Django quotes column and table names behind the scenes.
 
     .. versionadded:: 2.2
 
-    A list of :doc:`constraints </ref/models/check-constraints>` that you want
-    to define on the model::
+    A list of :doc:`constraints </ref/models/constraints>` that you want to
+    define on the model::
 
         from django.db import models
 

@@ -1,6 +1,6 @@
-===========================
-Check constraints reference
-===========================
+=====================
+Constraints reference
+=====================
 
 .. module:: django.db.models.constraints
 
@@ -8,20 +8,19 @@ Check constraints reference
 
 .. versionadded:: 2.2
 
-The ``CheckConstraint`` class creates database check constraints. They are
-added in the model :attr:`Meta.constraints
-<django.db.models.Options.constraints>` option. This document
-explains the API references of :class:`CheckConstraint`.
+The classes defined in this module create database constraints. They are added
+in the model :attr:`Meta.constraints <django.db.models.Options.constraints>`
+option.
 
 .. admonition:: Referencing built-in constraints
 
     Constraints are defined in ``django.db.models.constraints``, but for
     convenience they're imported into :mod:`django.db.models`. The standard
     convention is to use ``from django.db import models`` and refer to the
-    constraints as ``models.CheckConstraint``.
+    constraints as ``models.<Foo>Constraint``.
 
-``CheckConstraint`` options
-===========================
+``CheckConstraint``
+===================
 
 .. class:: CheckConstraint(*, check, name)
 

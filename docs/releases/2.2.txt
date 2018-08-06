@@ -30,8 +30,8 @@ officially support the latest release of each series.
 What's new in Django 2.2
 ========================
 
-Check Constraints
------------------
+Constraints
+-----------
 
 The new :class:`~django.db.models.CheckConstraint` class enables adding custom
 database constraints. Constraints are added to models using the
