@@ -15,21 +15,21 @@ class CheckConstraint:
         compiler = connection.ops.compiler('SQLCompiler')(query, connection, 'default')
         sql, params = where.as_sql(compiler, connection)
         params = tuple(schema_editor.quote_value(p) for p in params)
-        return schema_editor.sql_check % {
-            'name': schema_editor.quote_name(self.name),
+        return schema_editor.sql_check_constraint % {
             'check': sql % params,
         }
 
     def create_sql(self, model, schema_editor):
         sql = self.constraint_sql(model, schema_editor)
-        return schema_editor.sql_create_check % {
+        return schema_editor.sql_create_constraint % {
             'table': schema_editor.quote_name(model._meta.db_table),
-            'check': sql,
+            'name': schema_editor.quote_name(self.name),
+            'constraint': sql,
         }
 
     def remove_sql(self, model, schema_editor):
         quote_name = schema_editor.quote_name
-        return schema_editor.sql_delete_check % {
+        return schema_editor.sql_delete_constraint % {
             'table': quote_name(model._meta.db_table),
             'name': quote_name(self.name),
         }
