@@ -3,7 +3,9 @@ from datetime import datetime, timedelta
 import pytz
 
 from django.conf import settings
-from django.db.models import DateField, DateTimeField, IntegerField, TimeField
+from django.db.models import (
+    DateField, DateTimeField, IntegerField, Max, OuterRef, Subquery, TimeField,
+)
 from django.db.models.functions import (
     Extract, ExtractDay, ExtractHour, ExtractMinute, ExtractMonth,
     ExtractQuarter, ExtractSecond, ExtractWeek, ExtractWeekDay, ExtractYear,
@@ -15,7 +17,7 @@ from django.test import (
 )
 from django.utils import timezone
 
-from .models import DTModel
+from .models import Author, DTModel, Fan
 
 
 def truncate_to(value, kind, tzinfo=None):
@@ -853,6 +855,36 @@ class DateFunctionTests(TestCase):
 
         with self.assertRaisesMessage(ValueError, "Cannot truncate DateField 'start_date' to DateTimeField"):
             list(DTModel.objects.annotate(truncated=TruncSecond('start_date', output_field=DateField())))
+
+    def test_trunc_subquery_with_parameters(self):
+        author_1 = Author.objects.create(name='J. R. R. Tolkien')
+        author_2 = Author.objects.create(name='G. R. R. Martin')
+        fan_since_1 = datetime(2016, 2, 3, 15, 0, 0)
+        fan_since_2 = datetime(2015, 2, 3, 15, 0, 0)
+        fan_since_3 = datetime(2017, 2, 3, 15, 0, 0)
+        if settings.USE_TZ:
+            fan_since_1 = timezone.make_aware(fan_since_1, is_dst=False)
+            fan_since_2 = timezone.make_aware(fan_since_2, is_dst=False)
+            fan_since_3 = timezone.make_aware(fan_since_3, is_dst=False)
+        Fan.objects.create(author=author_1, name='Tom', fan_since=fan_since_1)
+        Fan.objects.create(author=author_1, name='Emma', fan_since=fan_since_2)
+        Fan.objects.create(author=author_2, name='Isabella', fan_since=fan_since_3)
+
+        inner = Fan.objects.filter(
+            author=OuterRef('pk'),
+            name__in=('Emma', 'Isabella', 'Tom')
+        ).values('author').annotate(newest_fan=Max('fan_since')).values('newest_fan')
+        outer = Author.objects.annotate(
+            newest_fan_year=TruncYear(Subquery(inner, output_field=DateTimeField()))
+        )
+        tz = pytz.UTC if settings.USE_TZ else None
+        self.assertSequenceEqual(
+            outer.order_by('name').values('name', 'newest_fan_year'),
+            [
+                {'name': 'G. R. R. Martin', 'newest_fan_year': datetime(2017, 1, 1, 0, 0, tzinfo=tz)},
+                {'name': 'J. R. R. Tolkien', 'newest_fan_year': datetime(2016, 1, 1, 0, 0, tzinfo=tz)},
+            ]
+        )
 
 
 @override_settings(USE_TZ=True, TIME_ZONE='UTC')
