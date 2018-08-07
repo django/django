@@ -1050,6 +1050,13 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         )
         self.assertEqual(out.getvalue(), "Cache table 'test cache table' created.\n")
 
+    def test_num_queries_of_delete_many(self):
+        cache.set('a', 'a')
+        cache.set('b', 'b')
+        cache.set('c', 'c')
+        with self.assertNumQueries(1):
+            cache.delete_many(['a', 'b', 'c'])
+
 
 @override_settings(USE_TZ=True)
 class DBCacheWithTimeZoneTests(DBCacheTests):
