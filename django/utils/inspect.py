@@ -52,11 +52,11 @@ def func_accepts_var_args(func):
 
 def method_has_no_args(meth):
     """Return True if a method only accepts 'self'."""
-    args = [
+    count = len([
         p for p in inspect.signature(meth).parameters.values()
         if p.kind == p.POSITIONAL_OR_KEYWORD
-    ]
-    return len(args) == 1
+    ])
+    return count == 0 if inspect.ismethod(meth) else count == 1
 
 
 def func_supports_parameter(func, parameter):
