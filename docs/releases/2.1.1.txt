@@ -21,3 +21,6 @@ Bugfixes
 
 * Fixed a regression in Django 2.0 where combining ``Q`` objects with ``__in``
   lookups and lists crashed (:ticket:`29643`).
+
+* Fixed translation failure of ``DurationField``'s "overflow" error message
+  (:ticket:`29623`).
