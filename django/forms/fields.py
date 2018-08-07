@@ -468,12 +468,7 @@ class DateTimeField(BaseTemporalField):
 class DurationField(Field):
     default_error_messages = {
         'invalid': _('Enter a valid duration.'),
-        'overflow': _(
-            'The number of days must be between {min_days} and {max_days}.'.format(
-                min_days=datetime.timedelta.min.days,
-                max_days=datetime.timedelta.max.days,
-            )
-        )
+        'overflow': _('The number of days must be between {min_days} and {max_days}.')
     }
 
     def prepare_value(self, value):
@@ -489,7 +484,10 @@ class DurationField(Field):
         try:
             value = parse_duration(str(value))
         except OverflowError:
-            raise ValidationError(self.error_messages['overflow'], code='overflow')
+            raise ValidationError(self.error_messages['overflow'].format(
+                min_days=datetime.timedelta.min.days,
+                max_days=datetime.timedelta.max.days,
+            ), code='overflow')
         if value is None:
             raise ValidationError(self.error_messages['invalid'], code='invalid')
         return value
