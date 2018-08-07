@@ -18,3 +18,6 @@ Bugfixes
 * Fixed a regression in Django 2.0 where using ``manage.py test --keepdb``
   fails on PostgreSQL if the database exists and the user doesn't have
   permission to create databases (:ticket:`29613`).
+
+* Fixed a regression in Django 2.0 where combining ``Q`` objects with ``__in``
+  lookups and lists crashed (:ticket:`29643`).
