@@ -499,6 +499,53 @@ class GenericRelationsTests(TestCase):
         tag = TaggedItem(content_object=spinach)
         self.assertEqual(tag.content_object, spinach)
 
+    def test_create_after_prefetch(self):
+        platypus = Animal.objects.prefetch_related('tags').get(pk=self.platypus.pk)
+        self.assertSequenceEqual(platypus.tags.all(), [])
+        weird_tag = platypus.tags.create(tag='weird')
+        self.assertSequenceEqual(platypus.tags.all(), [weird_tag])
+
+    def test_add_after_prefetch(self):
+        platypus = Animal.objects.prefetch_related('tags').get(pk=self.platypus.pk)
+        self.assertSequenceEqual(platypus.tags.all(), [])
+        weird_tag = TaggedItem.objects.create(tag='weird', content_object=platypus)
+        platypus.tags.add(weird_tag)
+        self.assertSequenceEqual(platypus.tags.all(), [weird_tag])
+
+    def test_remove_after_prefetch(self):
+        weird_tag = self.platypus.tags.create(tag='weird')
+        platypus = Animal.objects.prefetch_related('tags').get(pk=self.platypus.pk)
+        self.assertSequenceEqual(platypus.tags.all(), [weird_tag])
+        platypus.tags.remove(weird_tag)
+        self.assertSequenceEqual(platypus.tags.all(), [])
+
+    def test_clear_after_prefetch(self):
+        weird_tag = self.platypus.tags.create(tag='weird')
+        platypus = Animal.objects.prefetch_related('tags').get(pk=self.platypus.pk)
+        self.assertSequenceEqual(platypus.tags.all(), [weird_tag])
+        platypus.tags.clear()
+        self.assertSequenceEqual(platypus.tags.all(), [])
+
+    def test_set_after_prefetch(self):
+        platypus = Animal.objects.prefetch_related('tags').get(pk=self.platypus.pk)
+        self.assertSequenceEqual(platypus.tags.all(), [])
+        furry_tag = TaggedItem.objects.create(tag='furry', content_object=platypus)
+        platypus.tags.set([furry_tag])
+        self.assertSequenceEqual(platypus.tags.all(), [furry_tag])
+        weird_tag = TaggedItem.objects.create(tag='weird', content_object=platypus)
+        platypus.tags.set([weird_tag])
+        self.assertSequenceEqual(platypus.tags.all(), [weird_tag])
+
+    def test_add_then_remove_after_prefetch(self):
+        furry_tag = self.platypus.tags.create(tag='furry')
+        platypus = Animal.objects.prefetch_related('tags').get(pk=self.platypus.pk)
+        self.assertSequenceEqual(platypus.tags.all(), [furry_tag])
+        weird_tag = self.platypus.tags.create(tag='weird')
+        platypus.tags.add(weird_tag)
+        self.assertSequenceEqual(platypus.tags.all(), [furry_tag, weird_tag])
+        platypus.tags.remove(weird_tag)
+        self.assertSequenceEqual(platypus.tags.all(), [furry_tag])
+
 
 class ProxyRelatedModelTest(TestCase):
     def test_default_behavior(self):

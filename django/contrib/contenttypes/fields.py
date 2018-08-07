@@ -545,6 +545,12 @@ def create_generic_related_manager(superclass, rel):
             db = self._db or router.db_for_read(self.model, instance=self.instance)
             return queryset.using(db).filter(**self.core_filters)
 
+        def _remove_prefetched_objects(self):
+            try:
+                self.instance._prefetched_objects_cache.pop(self.prefetch_cache_name)
+            except (AttributeError, KeyError):
+                pass  # nothing to clear from cache
+
         def get_queryset(self):
             try:
                 return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
@@ -577,6 +583,7 @@ def create_generic_related_manager(superclass, rel):
             )
 
         def add(self, *objs, bulk=True):
+            self._remove_prefetched_objects()
             db = router.db_for_write(self.model, instance=self.instance)
 
             def check_and_update_obj(obj):
@@ -620,6 +627,7 @@ def create_generic_related_manager(superclass, rel):
         clear.alters_data = True
 
         def _clear(self, queryset, bulk):
+            self._remove_prefetched_objects()
             db = router.db_for_write(self.model, instance=self.instance)
             queryset = queryset.using(db)
             if bulk:
@@ -656,6 +664,7 @@ def create_generic_related_manager(superclass, rel):
         set.alters_data = True
 
         def create(self, **kwargs):
+            self._remove_prefetched_objects()
             kwargs[self.content_type_field_name] = self.content_type
             kwargs[self.object_id_field_name] = self.pk_val
             db = router.db_for_write(self.model, instance=self.instance)
