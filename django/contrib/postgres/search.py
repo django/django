@@ -158,11 +158,18 @@ class SearchQuery(SearchQueryCombinable, Value):
     def __invert__(self):
         return type(self)(self.value, config=self.config, invert=not self.invert)
 
+    def __str__(self):
+        result = super().__str__()
+        return ('~%s' % result) if self.invert else result
+
 
 class CombinedSearchQuery(SearchQueryCombinable, CombinedExpression):
     def __init__(self, lhs, connector, rhs, config, output_field=None):
         self.config = config
         super().__init__(lhs, connector, rhs, output_field)
+
+    def __str__(self):
+        return '(%s)' % super().__str__()
 
 
 class SearchRank(Func):
