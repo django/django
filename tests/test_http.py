@@ -160,8 +160,22 @@ class RequestTests(unittest.TestCase):
         self.assertEqual(request.read(3), b"one")
         self.assertEqual(request.read(), b"twothree")
 
+    def test_script_name(self):
+
+        request = AsgiRequest(
+            {
+                "http_version": "1.1",
+                "method": "GET",
+                "path": "/test/",
+                "root_path": "/path/to/"
+            },
+            b"",
+        )
+
+        self.assertEqual(request.path, "/path/to/test/")
 
 ### Handler tests
+
 
 class MockHandler(AsgiHandler):
     """

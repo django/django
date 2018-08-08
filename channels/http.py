@@ -35,14 +35,19 @@ class AsgiRequest(http.HttpRequest):
         self._post_parse_error = False
         self._read_started = False
         self.resolver_match = None
-        # Path info
-        self.path = self.scope["path"]
         self.script_name = self.scope.get("root_path", "")
-        if self.script_name and self.path.startswith(self.script_name):
+        if self.script_name and scope["path"].startswith(self.script_name):
             # TODO: Better is-prefix checking, slash handling?
-            self.path_info = self.path[len(self.script_name):]
+            self.path_info = scope["path"][len(self.script_name):]
         else:
-            self.path_info = self.path
+            self.path_info = scope["path"]
+
+        # django path is different from asgi scope path args, it should combine with script name
+        if self.script_name:
+            self.path = "%s/%s" % (self.script_name.rstrip("/"), self.path_info.replace("/", "", 1))
+        else:
+            self.path = scope["path"]
+
         # HTTP basics
         self.method = self.scope["method"].upper()
         # fix https://github.com/django/channels/issues/622
