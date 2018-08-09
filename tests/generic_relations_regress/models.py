@@ -158,7 +158,7 @@ class SpecialGenericRelation(GenericRelation):
 
 
 class HasLinks(models.Model):
-    links = SpecialGenericRelation(Link)
+    links = SpecialGenericRelation(Link, related_query_name='targets')
 
     class Meta:
         abstract = True
