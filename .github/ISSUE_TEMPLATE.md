@@ -1,15 +1,14 @@
-Please submit **questions** about usage to django-users@googlegroups.com (https://groups.google.com/forum/#!forum/django-users) and about development to django-developers@googlegroups.com (https://groups.google.com/forum/#!forum/django-developers).
+Issues are for **concrete, actionable bugs and feature requests** only - if you're just asking for debugging help or technical support we have to direct you elsewhere. If you just have questions or support requests please use:
 
-If you're submitting a feature request, please try to include:
+- Stack Overflow
+- The Django Users mailing list django-users@googlegroups.com (https://groups.google.com/forum/#!forum/django-users)
 
-- Detailed description of the overall behaviour
-- Reasoning why it should be in Channels rather than a third-party app
-- Examples of usage, if possible (it's easier to discuss concrete code examples)
+We have to limit this because of limited volunteer time to respond to issues!
 
-If you're submitting a bug report, please include:
+Please also try and include, if you can:
 
 - Your OS and runtime environment, and browser if applicable
-- The versions of Channels, Daphne, Django, Twisted, and your ASGI backend (channels_redis normally)
+- A `pip freeze` output showing your package versions
 - What you expected to happen vs. what actually happened
 - How you're running Channels (runserver? daphne/runworker? Nginx/Apache in front?)
 - Console logs and full tracebacks of any errors
