@@ -73,4 +73,5 @@ Reference
    channel_layer_spec
    community
    contributing
+   support
    releases/index
