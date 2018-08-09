@@ -588,9 +588,8 @@ class TestInlinePermissions(TestCase):
         self.author_book_auto_m2m_intermediate_id = author_book_auto_m2m_intermediate.pk
 
         holder = Holder2.objects.create(dummy=13)
-        inner2 = Inner2.objects.create(dummy=42, holder=holder)
+        self.inner2 = Inner2.objects.create(dummy=42, holder=holder)
         self.holder_change_url = reverse('admin:admin_inlines_holder2_change', args=(holder.id,))
-        self.inner2_id = inner2.id
 
         self.client.force_login(self.user)
 
@@ -684,7 +683,7 @@ class TestInlinePermissions(TestCase):
         )
         self.assertNotContains(
             response,
-            '<input type="hidden" id="id_inner2_set-0-id" value="%i" name="inner2_set-0-id">' % self.inner2_id,
+            '<input type="hidden" id="id_inner2_set-0-id" value="%i" name="inner2_set-0-id">' % self.inner2.id,
             html=True
         )
 
@@ -693,7 +692,7 @@ class TestInlinePermissions(TestCase):
         self.user.user_permissions.add(permission)
         response = self.client.get(self.holder_change_url)
         # Change permission on inner2s, so we can change existing but not add new
-        self.assertContains(response, '<h2>Inner2s</h2>')
+        self.assertContains(response, '<h2>Inner2s</h2>', count=2)
         # Just the one form for existing instances
         self.assertContains(
             response, '<input type="hidden" id="id_inner2_set-TOTAL_FORMS" value="1" name="inner2_set-TOTAL_FORMS">',
@@ -701,7 +700,7 @@ class TestInlinePermissions(TestCase):
         )
         self.assertContains(
             response,
-            '<input type="hidden" id="id_inner2_set-0-id" value="%i" name="inner2_set-0-id">' % self.inner2_id,
+            '<input type="hidden" id="id_inner2_set-0-id" value="%i" name="inner2_set-0-id">' % self.inner2.id,
             html=True
         )
         # max-num 0 means we can't add new ones
@@ -709,6 +708,14 @@ class TestInlinePermissions(TestCase):
             response,
             '<input type="hidden" id="id_inner2_set-MAX_NUM_FORMS" value="0" name="inner2_set-MAX_NUM_FORMS">',
             html=True
+        )
+        # TabularInline
+        self.assertContains(response, '<th class="required">Dummy</th>', html=True)
+        self.assertContains(
+            response,
+            '<input type="number" name="inner2_set-2-0-dummy" value="%s" '
+            'class="vIntegerField" id="id_inner2_set-2-0-dummy">' % self.inner2.dummy,
+            html=True,
         )
 
     def test_inline_change_fk_add_change_perm(self):
@@ -726,7 +733,7 @@ class TestInlinePermissions(TestCase):
         )
         self.assertContains(
             response,
-            '<input type="hidden" id="id_inner2_set-0-id" value="%i" name="inner2_set-0-id">' % self.inner2_id,
+            '<input type="hidden" id="id_inner2_set-0-id" value="%i" name="inner2_set-0-id">' % self.inner2.id,
             html=True
         )
 
@@ -746,7 +753,7 @@ class TestInlinePermissions(TestCase):
         )
         self.assertContains(
             response,
-            '<input type="hidden" id="id_inner2_set-0-id" value="%i" name="inner2_set-0-id">' % self.inner2_id,
+            '<input type="hidden" id="id_inner2_set-0-id" value="%i" name="inner2_set-0-id">' % self.inner2.id,
             html=True
         )
         self.assertContains(response, 'id="id_inner2_set-0-DELETE"')
@@ -760,7 +767,7 @@ class TestInlinePermissions(TestCase):
         self.user.user_permissions.add(permission)
         response = self.client.get(self.holder_change_url)
         # All perms on inner2s, so we can add/change/delete
-        self.assertContains(response, '<h2>Inner2s</h2>')
+        self.assertContains(response, '<h2>Inner2s</h2>', count=2)
         # One form for existing instance only, three for new
         self.assertContains(
             response,
@@ -769,10 +776,18 @@ class TestInlinePermissions(TestCase):
         )
         self.assertContains(
             response,
-            '<input type="hidden" id="id_inner2_set-0-id" value="%i" name="inner2_set-0-id">' % self.inner2_id,
+            '<input type="hidden" id="id_inner2_set-0-id" value="%i" name="inner2_set-0-id">' % self.inner2.id,
             html=True
         )
         self.assertContains(response, 'id="id_inner2_set-0-DELETE"')
+        # TabularInline
+        self.assertContains(response, '<th class="required">Dummy</th>', html=True)
+        self.assertContains(
+            response,
+            '<input type="number" name="inner2_set-2-0-dummy" value="%s" '
+            'class="vIntegerField" id="id_inner2_set-2-0-dummy">' % self.inner2.dummy,
+            html=True,
+        )
 
 
 @override_settings(ROOT_URLCONF='admin_inlines.urls')

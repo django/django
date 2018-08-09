@@ -24,3 +24,7 @@ Bugfixes
 
 * Fixed translation failure of ``DurationField``'s "overflow" error message
   (:ticket:`29623`).
+
+* Fixed a regression where the admin change form crashed if the user doesn't
+  have the 'add' permission to a model that uses ``TabularInline``
+  (:ticket:`29637`).
