@@ -21,8 +21,31 @@ Apologies if this comes off as harsh, but please understand that open source mai
 of time, and if we answered all the issues and support requests there would be no time left to actually work on the code
 itself!
 
-How to help
------------
+Making bugs reproducable
+------------------------
+
+If you're struggling with an issue that only happens in a production environment and can't get it to reproduce locally
+so either you can fix it or someone can help you, take a step-by-step approach to eliminating the differences between the
+environments.
+
+First off, try changing your production environment to see if that helps - for example, if you have Nginx/Apache/etc.
+between browsers and Channels, try going direct to the Python server and see if that fixes things. Turn SSL off if you
+have it on. Try from different browsers and internet connections. WebSockets are notoriously hard to debug already,
+and so you should expect some level of akwardness from any project involving them.
+
+Next, check package versions between your local and remote environments. You'd be surprised how easy it is to forget
+to upgrade something!
+
+Once you've made sure it's none of that, try changing your project. Make a fresh Django project (or use one of the
+Channels example projects) and make sure it doesn't have the bug, then work on adding code to it from your project
+until the bug appears. Alternately, take your project and remove pieces back down to the basic Django level until
+it works.
+
+Network programming is also just difficult in general; you should expect some level of reconnects and dropped connections
+as a matter of course. Make sure that what you're seeing isn't just normal for a production application.
+
+How to help the Channels project
+--------------------------------
 
 If you'd like to help us with support, the first thing to do is to provide support in the communities mentioned at the
 top (Stack Overflow and the mailing list).
@@ -33,3 +56,24 @@ and closing those that aren't and redirecting them to this page politely and exp
 
 Some sample response templates are below.
 
+General support request
+~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+    Sorry, but we can't help out with general support requests here - the issue tracker is for reproduceable bugs and
+    concrete feature requests only! Please see our support documentation (http://channels.readthedocs.io/en/latest/support.html)
+    for more information about where you can get general help.
+    
+Non-specific bug/"It doesn't work!"
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+    I'm afraid we can't address issues without either direct steps to reproduce, or that only happen in a production
+    environment, as they may not be problems in the project itself. Our support documentation
+    (http://channels.readthedocs.io/en/latest/support.html) has details about how to take this sort of problem, diagnose it,
+    and either fix it yourself, get help from the community, or make it into an actionable issue that we can handle.
+    
+    Sorry we have to direct you away like this, but we get a lot of support requests every week. If you can reduce the problem
+    to a clear set of steps to reproduce or an example project that fails in a fresh environment, please re-open the ticket
+    with that information.
