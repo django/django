@@ -69,6 +69,7 @@ Non-specific bug/"It doesn't work!"
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
+
     I'm afraid we can't address issues without either direct steps to reproduce, or that only happen in a production
     environment, as they may not be problems in the project itself. Our support documentation
     (http://channels.readthedocs.io/en/latest/support.html) has details about how to take this sort of problem, diagnose it,
@@ -77,3 +78,12 @@ Non-specific bug/"It doesn't work!"
     Sorry we have to direct you away like this, but we get a lot of support requests every week. If you can reduce the problem
     to a clear set of steps to reproduce or an example project that fails in a fresh environment, please re-open the ticket
     with that information.
+    
+Problem in application code
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+    It looks like a problem in your application code rather than in Channels itself, so I'm going to close the ticket.
+    If you can trace it down to a problem in Channels itself (with exact steps to reproduce on a fresh or small example
+    project - see http://channels.readthedocs.io/en/latest/support.html) please re-open the ticket! Thanks.
