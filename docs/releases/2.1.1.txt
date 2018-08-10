@@ -32,3 +32,7 @@ Bugfixes
 * Fixed a regression where a ``related_query_name`` reverse accessor wasn't set
   up when a ``GenericRelation`` is declared on an abstract base model
   (:ticket:`29653`).
+
+* Fixed a regression where a POST request to an admin change view by a user
+  without change permission would redirect to the admin index instead of
+  receiving a 403 response (:ticket:`29660`).
