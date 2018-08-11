@@ -116,8 +116,6 @@ relationships <lookups-that-span-relationships>`::
     <QuerySet [<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]>
     >>> Article.objects.filter(publications=1)
     <QuerySet [<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]>
-    >>> Article.objects.filter(publications=p1)
-    <QuerySet [<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]>
 
     >>> Article.objects.filter(publications__title__startswith="Science")
     <QuerySet [<Article: NASA uses Python>, <Article: NASA uses Python>]>
