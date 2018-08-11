@@ -671,7 +671,7 @@ class SQLCompiler:
             already_seen = already_seen or set()
             join_tuple = tuple(getattr(self.query.alias_map[j], 'join_cols', None) for j in joins)
             if join_tuple in already_seen:
-                raise FieldError('Infinite loop caused by ordering.')
+                raise FieldError("Infinite loop caused by ordering (\"%s\" on %s)." % (join_tuple, field))
             already_seen.add(join_tuple)
 
             results = []
@@ -1171,9 +1171,9 @@ class SQLInsertCompiler(SQLCompiler):
                     'can only be used to update, not to insert.' % (value, field)
                 )
             if value.contains_aggregate:
-                raise FieldError("Aggregate functions are not allowed in this query")
+                raise FieldError("Aggregate functions are not allowed in this query (\"%s\" on %s)." % (value, field))
             if value.contains_over_clause:
-                raise FieldError('Window expressions are not allowed in this query.')
+                raise FieldError("Window expressions are not allowed in this query (\"%s\" on %s)." % (value, field))
         else:
             value = field.get_db_prep_save(value, connection=self.connection)
         return value
@@ -1326,9 +1326,13 @@ class SQLUpdateCompiler(SQLCompiler):
             if hasattr(val, 'resolve_expression'):
                 val = val.resolve_expression(self.query, allow_joins=False, for_save=True)
                 if val.contains_aggregate:
-                    raise FieldError("Aggregate functions are not allowed in this query")
+                    raise FieldError(
+                        "Aggregate functions are not allowed in this query (\"%s\" on %s)." % (val, field)
+                    )
                 if val.contains_over_clause:
-                    raise FieldError('Window expressions are not allowed in this query.')
+                    raise FieldError(
+                        "Window expressions are not allowed in this query (\"%s\" on %s)." % (val, field)
+                    )
             elif hasattr(val, 'prepare_database_save'):
                 if field.remote_field:
                     val = field.get_db_prep_save(

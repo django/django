@@ -2599,9 +2599,15 @@ class ConditionalTests(TestCase):
     def test_infinite_loop(self):
         # If you're not careful, it's possible to introduce infinite loops via
         # default ordering on foreign keys in a cycle. We detect that.
-        with self.assertRaisesMessage(FieldError, 'Infinite loop caused by ordering.'):
+        with self.assertRaisesMessage(
+            FieldError,
+            "Infinite loop caused by ordering (\"((('y_id', 'id'),), (('x_id', 'id'),))\" on queries.LoopY.x)"
+        ):
             list(LoopX.objects.all())  # Force queryset evaluation with list()
-        with self.assertRaisesMessage(FieldError, 'Infinite loop caused by ordering.'):
+        with self.assertRaisesMessage(
+            FieldError,
+            "Infinite loop caused by ordering (\"((('z_id', 'id'),), (('z_id', 'id'),))\" on queries.LoopZ.z)"
+        ):
             list(LoopZ.objects.all())  # Force queryset evaluation with list()
 
         # Note that this doesn't cause an infinite loop, since the default
