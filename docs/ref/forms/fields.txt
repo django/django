@@ -367,8 +367,9 @@ For each field, we describe the default widget used if you don't specify
     * Default widget: :class:`TextInput`
     * Empty value: Whatever you've given as :attr:`empty_value`.
     * Normalizes to: A string.
-    * Validates ``max_length`` or ``min_length``, if they are provided.
-      Otherwise, all inputs are valid.
+    * Uses :class:`~django.core.validators.MaxLengthValidator` and
+      :class:`~django.core.validators.MinLengthValidator` if ``max_length`` and
+      ``min_length`` are provided. Otherwise, all inputs are valid.
     * Error message keys: ``required``, ``max_length``, ``min_length``
 
     Has three optional arguments for validation:
@@ -528,8 +529,10 @@ For each field, we describe the default widget used if you don't specify
       ``False``, else :class:`TextInput`.
     * Empty value: ``None``
     * Normalizes to: A Python ``decimal``.
-    * Validates that the given value is a decimal. Leading and trailing
-      whitespace is ignored.
+    * Validates that the given value is a decimal. Uses
+      :class:`~django.core.validators.MaxValueValidator` and
+      :class:`~django.core.validators.MinValueValidator` if  ``max_value`` and
+      ``min_value`` are provided. Leading and trailing whitespace is ignored.
     * Error message keys: ``required``, ``invalid``, ``max_value``,
       ``min_value``, ``max_digits``, ``max_decimal_places``,
       ``max_whole_digits``
@@ -581,8 +584,9 @@ For each field, we describe the default widget used if you don't specify
     * Default widget: :class:`EmailInput`
     * Empty value: ``''`` (an empty string)
     * Normalizes to: A string.
-    * Validates that the given value is a valid email address, using a
-      moderately complex regular expression.
+    * Uses :class:`~django.core.validators.EmailValidator` to validate that
+      the given value is a valid email address, using a moderately complex
+      regular expression.
     * Error message keys: ``required``, ``invalid``
 
     Has two optional arguments for validation, ``max_length`` and ``min_length``.
@@ -669,8 +673,11 @@ For each field, we describe the default widget used if you don't specify
       ``False``, else :class:`TextInput`.
     * Empty value: ``None``
     * Normalizes to: A Python float.
-    * Validates that the given value is a float. Leading and trailing
-      whitespace is allowed, as in Python's ``float()`` function.
+    * Validates that the given value is a float. Uses
+      :class:`~django.core.validators.MaxValueValidator` and
+      :class:`~django.core.validators.MinValueValidator` if ``max_value`` and
+      ``min_value`` are provided. Leading and trailing whitespace is allowed,
+      as in Python's ``float()`` function.
     * Error message keys: ``required``, ``invalid``, ``max_value``,
       ``min_value``
 
@@ -686,8 +693,9 @@ For each field, we describe the default widget used if you don't specify
     * Empty value: ``None``
     * Normalizes to: An ``UploadedFile`` object that wraps the file content
       and file name into a single object.
-    * Validates that file data has been bound to the form, and that the
-      file is of an image format understood by Pillow.
+    * Validates that file data has been bound to the form. Also uses
+      :class:`~django.core.validators.FileExtensionValidator` to validate that
+      the file extension is supported by Pillow.
     * Error message keys: ``required``, ``invalid``, ``missing``, ``empty``,
       ``invalid_image``
 
@@ -718,8 +726,11 @@ For each field, we describe the default widget used if you don't specify
       ``False``, else :class:`TextInput`.
     * Empty value: ``None``
     * Normalizes to: A Python integer.
-    * Validates that the given value is an integer. Leading and trailing
-      whitespace is allowed, as in Python's ``int()`` function.
+    * Validates that the given value is an integer. Uses
+      :class:`~django.core.validators.MaxValueValidator` and
+      :class:`~django.core.validators.MinValueValidator` if ``max_value`` and
+      ``min_value`` are provided. Leading and trailing whitespace is allowed,
+      as in Python's ``int()`` function.
     * Error message keys: ``required``, ``invalid``, ``max_value``,
       ``min_value``
 
@@ -824,8 +835,8 @@ For each field, we describe the default widget used if you don't specify
     * Default widget: :class:`TextInput`
     * Empty value: ``''`` (an empty string)
     * Normalizes to: A string.
-    * Validates that the given value matches against a certain regular
-      expression.
+    * Uses :class:`~django.core.validators.RegexValidator` to validate that
+      the given value matches a certain regular expression.
     * Error message keys: ``required``, ``invalid``
 
     Takes one required argument:
@@ -851,8 +862,9 @@ For each field, we describe the default widget used if you don't specify
    * Default widget: :class:`TextInput`
    * Empty value: ``''`` (an empty string)
    * Normalizes to: A string.
-   * Validates that the given value contains only letters, numbers,
-     underscores, and hyphens.
+   * Uses :class:`~django.core.validators.validate_slug` or
+     :class:`~django.core.validators.validate_unicode_slug` to validate that
+     the given value contains only letters, numbers, underscores, and hyphens.
    * Error messages: ``required``, ``invalid``
 
    This field is intended for use in representing a model
@@ -897,7 +909,8 @@ For each field, we describe the default widget used if you don't specify
     * Default widget: :class:`URLInput`
     * Empty value: ``''`` (an empty string)
     * Normalizes to: A string.
-    * Validates that the given value is a valid URL.
+    * Uses :class:`~django.core.validators.URLValidator` to validate that the
+      given value is a valid URL.
     * Error message keys: ``required``, ``invalid``
 
     Takes the following optional arguments:
