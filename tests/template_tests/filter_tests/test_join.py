@@ -56,20 +56,20 @@ class FunctionTests(SimpleTestCase):
 
     def test_autoescape(self):
         self.assertEqual(
-            join(['<a>', '<img>', '</a>'], '<br>'),
-            '&lt;a&gt;&lt;br&gt;&lt;img&gt;&lt;br&gt;&lt;/a&gt;',
+            join(['<a>', '<img/>', '</a>'], '<br/>'),
+            '&lt;a&gt;&lt;br/&gt;&lt;img/&gt;&lt;br/&gt;&lt;/a&gt;',
         )
 
     def test_autoescape_off(self):
         self.assertEqual(
-            join(['<a>', '<img>', '</a>'], '<br>', autoescape=False),
-            '<a>&lt;br&gt;<img>&lt;br&gt;</a>',
+            join(['<a>', '<img/>', '</a>'], '<br/>', autoescape=False),
+            '<a>&lt;br/&gt;<img/>&lt;br/&gt;</a>',
         )
 
     def test_noniterable_arg(self):
         obj = object()
-        self.assertEqual(join(obj, '<br>'), obj)
+        self.assertEqual(join(obj, '<br/>'), obj)
 
     def test_noniterable_arg_autoescape_off(self):
         obj = object()
-        self.assertEqual(join(obj, '<br>', autoescape=False), obj)
+        self.assertEqual(join(obj, '<br/>', autoescape=False), obj)

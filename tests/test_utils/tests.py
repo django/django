@@ -527,7 +527,7 @@ class HTMLEqualTests(SimpleTestCase):
         self.assertHTMLEqual('<p> </p>', '<p></p>')
         self.assertHTMLEqual('<p/>', '<p></p>')
         self.assertHTMLEqual('<p />', '<p></p>')
-        self.assertHTMLEqual('<input checked>', '<input checked="checked">')
+        self.assertHTMLEqual('<input checked />', '<input checked="checked" />')
         self.assertHTMLEqual('<p>Hello', '<p> Hello')
         self.assertHTMLEqual('<p>Hello</p>World', '<p>Hello</p> World')
 
@@ -587,9 +587,9 @@ class HTMLEqualTests(SimpleTestCase):
             """<!DOCTYPE html>
         <html>
         <head>
-            <link rel="stylesheet">
+            <link rel="stylesheet" />
             <title>Document</title>
-            <meta attribute="value">
+            <meta attribute="value" />
         </head>
         <body>
             <p>
@@ -599,9 +599,9 @@ class HTMLEqualTests(SimpleTestCase):
         </html>""", """
         <html>
         <head>
-            <link rel="stylesheet">
+            <link rel="stylesheet" />
             <title>Document</title>
-            <meta attribute="value">
+            <meta attribute="value" />
         </head>
         <body>
             <p> This is a valid paragraph
@@ -659,7 +659,7 @@ class HTMLEqualTests(SimpleTestCase):
         dom2 = parse_html('<p>foo</p><p>foo</p>')
         self.assertEqual(dom2.count(dom1), 2)
 
-        dom2 = parse_html('<div><p>foo<input type=""></p><p>foo</p></div>')
+        dom2 = parse_html('<div><p>foo<input type="" /></p><p>foo</p></div>')
         self.assertEqual(dom2.count(dom1), 1)
 
         dom2 = parse_html('<div><div><p>foo</p></div></div>')
@@ -696,10 +696,10 @@ class HTMLEqualTests(SimpleTestCase):
             <input type="text" name="Hello" />
         </form></body>''')
 
-        self.assertNotContains(response, "<input name='Hello' type='text'>")
+        self.assertNotContains(response, "<input name='Hello' type='text' />")
         self.assertContains(response, '<form method="get">')
 
-        self.assertContains(response, "<input name='Hello' type='text'>", html=True)
+        self.assertContains(response, "<input name='Hello' type='text' />", html=True)
         self.assertNotContains(response, '<form method="get">', html=True)
 
         invalid_response = HttpResponse('''<body <bad>>''')

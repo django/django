@@ -74,7 +74,7 @@ class Media:
         media = sorted(self._css)
         return chain.from_iterable([
             format_html(
-                '<link href="{}" type="text/css" media="{}" rel="stylesheet">',
+                '<link href="{}" type="text/css" media="{}" rel="stylesheet" />',
                 self.absolute_path(path), medium
             ) for path in self._css[medium]
         ] for medium in media)
@@ -324,7 +324,7 @@ class HiddenInput(Input):
 
 class MultipleHiddenInput(HiddenInput):
     """
-    Handle <input type="hidden"> for fields that have a list
+    Handle <input type="hidden" /> for fields that have a list
     of values.
     """
     template_name = 'django/forms/widgets/multiple_hidden.html'
@@ -864,7 +864,7 @@ class MultiWidget(Widget):
 
 class SplitDateTimeWidget(MultiWidget):
     """
-    A widget that splits datetime input into two <input type="text"> boxes.
+    A widget that splits datetime input into two <input type="text" /> boxes.
     """
     supports_microseconds = False
     template_name = 'django/forms/widgets/splitdatetime.html'
@@ -891,7 +891,7 @@ class SplitDateTimeWidget(MultiWidget):
 
 class SplitHiddenDateTimeWidget(SplitDateTimeWidget):
     """
-    A widget that splits datetime input into two <input type="hidden"> inputs.
+    A widget that splits datetime input into two <input type="hidden" /> inputs.
     """
     template_name = 'django/forms/widgets/splithiddendatetime.html'
 

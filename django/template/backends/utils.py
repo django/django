@@ -6,7 +6,7 @@ from django.utils.safestring import SafeText
 
 def csrf_input(request):
     return format_html(
-        '<input type="hidden" name="csrfmiddlewaretoken" value="{}">',
+        '<input type="hidden" name="csrfmiddlewaretoken" value="{}" />',
         get_token(request))
 
 
