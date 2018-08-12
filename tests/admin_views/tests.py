@@ -1760,7 +1760,6 @@ class AdminViewPermissionsTest(TestCase):
         self.client.get(reverse('admin:logout'))
 
         # view user should be able to view the article but not change any of them
-        # (the POST can be sent, but no modification occurs)
         self.client.force_login(self.viewuser)
         response = self.client.get(article_changelist_url)
         self.assertEqual(response.status_code, 200)
@@ -1770,7 +1769,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(response.context['title'], 'View article')
         self.assertContains(response, '<a href="/test_admin/admin/admin_views/article/" class="closelink">Close</a>')
         post = self.client.post(article_change_url, change_dict)
-        self.assertEqual(post.status_code, 302)
+        self.assertEqual(post.status_code, 403)
         self.assertEqual(Article.objects.get(pk=self.a1.pk).content, '<p>Middle content</p>')
         self.client.get(reverse('admin:logout'))
 
@@ -1824,10 +1823,12 @@ class AdminViewPermissionsTest(TestCase):
             response = self.client.post(change_url_2, {'name': 'changed'})
             self.assertEqual(RowLevelChangePermissionModel.objects.get(id=2).name, 'changed')
             self.assertRedirects(response, self.index_url)
+            # Allowed to view objects with an id divisible by 3.
             response = self.client.get(change_url_3)
             self.assertEqual(response.status_code, 200)
+            # Not allowed to change objects with an odd id.
             response = self.client.post(change_url_3, {'name': 'changed'})
-            self.assertRedirects(response, self.index_url)
+            self.assertEqual(response.status_code, 403)
             self.assertEqual(RowLevelChangePermissionModel.objects.get(id=3).name, 'odd id mult 3')
             response = self.client.get(change_url_6)
             self.assertEqual(response.status_code, 200)
@@ -3864,7 +3865,7 @@ class AdminInlineTests(TestCase):
             username='permissionuser', password='secret',
             email='vuser@example.com', is_staff=True,
         )
-        permissionuser.user_permissions.add(get_perm(Collector, get_permission_codename('view', Collector._meta)))
+        permissionuser.user_permissions.add(get_perm(Collector, get_permission_codename('change', Collector._meta)))
         permissionuser.user_permissions.add(get_perm(Widget, get_permission_codename('view', Widget._meta)))
         self.client.force_login(permissionuser)
         # Without add permission, a new inline can't be added.

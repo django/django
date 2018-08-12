@@ -1556,7 +1556,10 @@ class ModelAdmin(BaseModelAdmin):
         else:
             obj = self.get_object(request, unquote(object_id), to_field)
 
-            if not self.has_view_permission(request, obj) and not self.has_change_permission(request, obj):
+            if request.method == 'POST':
+                if not self.has_change_permission(request, obj):
+                    raise PermissionDenied
+            elif not self.has_view_permission(request, obj) and not self.has_change_permission(request, obj):
                 raise PermissionDenied
 
             if obj is None:
