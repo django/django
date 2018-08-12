@@ -1324,7 +1324,7 @@ class ModelAdmin(BaseModelAdmin):
 
     def _response_post_save(self, request, obj):
         opts = self.model._meta
-        if self.has_change_permission(request, None):
+        if self.has_view_or_change_permission(request):
             post_url = reverse('admin:%s_%s_changelist' %
                                (opts.app_label, opts.model_name),
                                current_app=self.admin_site.name)

@@ -35,3 +35,6 @@ Bugfixes
 
 * Fixed the test client's JSON serialization of a request data dictionary for
   structured content type suffixes (:ticket:`29662`).
+
+* Made the admin change view redirect to the changelist view after a POST if
+  the user has the 'view' permission (:ticket:`29663`).
