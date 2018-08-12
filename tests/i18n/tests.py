@@ -475,7 +475,7 @@ class FormattingTests(SimpleTestCase):
                 '<option value="9">setembre</option>'
                 '<option value="10">octubre</option>'
                 '<option value="11">novembre</option>'
-                '<option value="12" selected>desembre</option>'
+                '<option value="12" selected="selected">desembre</option>'
                 '</select>'
                 '<select name="mydate_day" id="id_mydate_day">'
                 '<option value="">---</option>'
@@ -509,11 +509,11 @@ class FormattingTests(SimpleTestCase):
                 '<option value="28">28</option>'
                 '<option value="29">29</option>'
                 '<option value="30">30</option>'
-                '<option value="31" selected>31</option>'
+                '<option value="31" selected="selected">31</option>'
                 '</select>'
                 '<select name="mydate_year" id="id_mydate_year">'
                 '<option value="">---</option>'
-                '<option value="2009" selected>2009</option>'
+                '<option value="2009" selected="selected">2009</option>'
                 '<option value="2010">2010</option>'
                 '<option value="2011">2011</option>'
                 '<option value="2012">2012</option>'
@@ -673,7 +673,7 @@ class FormattingTests(SimpleTestCase):
                 '<option value="28">28</option>'
                 '<option value="29">29</option>'
                 '<option value="30">30</option>'
-                '<option value="31" selected>31</option>'
+                '<option value="31" selected="selected">31</option>'
                 '</select>'
                 '<select name="mydate_month" id="id_mydate_month">'
                 '<option value="">---</option>'
@@ -688,11 +688,11 @@ class FormattingTests(SimpleTestCase):
                 '<option value="9">setembre</option>'
                 '<option value="10">octubre</option>'
                 '<option value="11">novembre</option>'
-                '<option value="12" selected>desembre</option>'
+                '<option value="12" selected="selected">desembre</option>'
                 '</select>'
                 '<select name="mydate_year" id="id_mydate_year">'
                 '<option value="">---</option>'
-                '<option value="2009" selected>2009</option>'
+                '<option value="2009" selected="selected">2009</option>'
                 '<option value="2010">2010</option>'
                 '<option value="2011">2011</option>'
                 '<option value="2012">2012</option>'
@@ -741,7 +741,7 @@ class FormattingTests(SimpleTestCase):
                 '<option value="28">28</option>'
                 '<option value="29">29</option>'
                 '<option value="30">30</option>'
-                '<option value="31" selected>31</option>'
+                '<option value="31" selected="selected">31</option>'
                 '</select>'
                 '<select name="mydate_month" id="id_mydate_month">'
                 '<option value="">---</option>'
@@ -756,11 +756,11 @@ class FormattingTests(SimpleTestCase):
                 '<option value="9">\u0421\u0435\u043d\u0442\u044f\u0431\u0440\u044c</option>'
                 '<option value="10">\u041e\u043a\u0442\u044f\u0431\u0440\u044c</option>'
                 '<option value="11">\u041d\u043e\u044f\u0431\u0440\u044c</option>'
-                '<option value="12" selected>\u0414\u0435\u043a\u0430\u0431\u0440\u044c</option>'
+                '<option value="12" selected="selected">\u0414\u0435\u043a\u0430\u0431\u0440\u044c</option>'
                 '</select>'
                 '<select name="mydate_year" id="id_mydate_year">'
                 '<option value="">---</option>'
-                '<option value="2009" selected>2009</option>'
+                '<option value="2009" selected="selected">2009</option>'
                 '<option value="2010">2010</option>'
                 '<option value="2011">2011</option>'
                 '<option value="2012">2012</option>'
@@ -851,7 +851,7 @@ class FormattingTests(SimpleTestCase):
                 '<option value="9">September</option>'
                 '<option value="10">October</option>'
                 '<option value="11">November</option>'
-                '<option value="12" selected>December</option>'
+                '<option value="12" selected="selected">December</option>'
                 '</select>'
                 '<select name="mydate_day" id="id_mydate_day">'
                 '<option value="">---</option>'
@@ -885,11 +885,11 @@ class FormattingTests(SimpleTestCase):
                 '<option value="28">28</option>'
                 '<option value="29">29</option>'
                 '<option value="30">30</option>'
-                '<option value="31" selected>31</option>'
+                '<option value="31" selected="selected">31</option>'
                 '</select>'
                 '<select name="mydate_year" id="id_mydate_year">'
                 '<option value="">---</option>'
-                '<option value="2009" selected>2009</option>'
+                '<option value="2009" selected="selected">2009</option>'
                 '<option value="2010">2010</option>'
                 '<option value="2011">2011</option>'
                 '<option value="2012">2012</option>'
@@ -929,13 +929,13 @@ class FormattingTests(SimpleTestCase):
             self.assertHTMLEqual(
                 form6.as_ul(),
                 '<li><label for="id_name">Name:</label>'
-                '<input id="id_name" type="text" name="name" value="acme" maxlength="50" required /></li>'
+                '<input id="id_name" type="text" name="name" value="acme" maxlength="50" required="required"  /></li>'
                 '<li><label for="id_date_added">Date added:</label>'
-                '<input type="text" name="date_added" value="31.12.2009 06:00:00" id="id_date_added" required /></li>'
+                '<input type="text" name="date_added" value="31.12.2009 06:00:00" id="id_date_added" required="required"  /></li>'
                 '<li><label for="id_cents_paid">Cents paid:</label>'
-                '<input type="text" name="cents_paid" value="59,47" id="id_cents_paid" required /></li>'
+                '<input type="text" name="cents_paid" value="59,47" id="id_cents_paid" required="required"  /></li>'
                 '<li><label for="id_products_delivered">Products delivered:</label>'
-                '<input type="text" name="products_delivered" value="12000" id="id_products_delivered" required />'
+                '<input type="text" name="products_delivered" value="12000" id="id_products_delivered" required="required"  />'
                 '</li>'
             )
             self.assertEqual(localize_input(datetime.datetime(2009, 12, 31, 6, 0, 0)), '31.12.2009 06:00:00')
@@ -944,7 +944,7 @@ class FormattingTests(SimpleTestCase):
                 # Checking for the localized "products_delivered" field
                 self.assertInHTML(
                     '<input type="text" name="products_delivered" '
-                    'value="12.000" id="id_products_delivered" required />',
+                    'value="12.000" id="id_products_delivered" required="required"  />',
                     form6.as_ul()
                 )
 
@@ -1095,13 +1095,13 @@ class FormattingTests(SimpleTestCase):
 
             self.assertHTMLEqual(
                 template.render(context),
-                '<input id="id_date_added" name="date_added" type="text" value="31.12.2009 06:00:00" required />;'
-                '<input id="id_cents_paid" name="cents_paid" type="text" value="59,47" required />'
+                '<input id="id_date_added" name="date_added" type="text" value="31.12.2009 06:00:00" required="required"  />;'
+                '<input id="id_cents_paid" name="cents_paid" type="text" value="59,47" required="required"  />'
             )
             self.assertHTMLEqual(
                 template_as_text.render(context),
-                '<input id="id_date_added" name="date_added" type="text" value="31.12.2009 06:00:00" required />;'
-                ' <input id="id_cents_paid" name="cents_paid" type="text" value="59,47" required />'
+                '<input id="id_date_added" name="date_added" type="text" value="31.12.2009 06:00:00" required="required"  />;'
+                ' <input id="id_cents_paid" name="cents_paid" type="text" value="59,47" required="required"  />'
             )
             self.assertHTMLEqual(
                 template_as_hidden.render(context),

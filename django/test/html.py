@@ -59,7 +59,7 @@ class Element:
         if self.attributes != element.attributes:
             # attributes without a value is same as attribute with value that
             # equals the attributes name:
-            # <input checked> == <input checked="checked">
+            # <input checked> == <input checked="checked" />
             for i in range(len(self.attributes)):
                 attr, value = self.attributes[i]
                 other_attr, other_value = element.attributes[i]

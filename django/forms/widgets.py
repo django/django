@@ -682,7 +682,7 @@ class Select(ChoiceWidget):
         invalid HTML.
         """
         use_required_attribute = super().use_required_attribute(initial)
-        # 'required' is always okay for <select multiple>.
+        # 'required' is always okay for <select multiple="multiple">.
         if self.allow_multiple_selected:
             return use_required_attribute
 
@@ -731,7 +731,7 @@ class SelectMultiple(Select):
         return getter(name)
 
     def value_omitted_from_data(self, data, files, name):
-        # An unselected <select multiple> doesn't appear in POST data, so it's
+        # An unselected <select multiple="multiple"> doesn't appear in POST data, so it's
         # never known if the value is actually omitted.
         return False
 

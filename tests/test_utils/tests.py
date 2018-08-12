@@ -463,7 +463,7 @@ class HTMLEqualTests(SimpleTestCase):
         self.assertEqual(element.children[0].children[0], 'Hello')
 
         parse_html('<p>')
-        parse_html('<p attr>')
+        parse_html('<p attr="attr">')
         dom = parse_html('<p>foo')
         self.assertEqual(len(dom.children), 1)
         self.assertEqual(dom.name, 'p')
@@ -527,7 +527,7 @@ class HTMLEqualTests(SimpleTestCase):
         self.assertHTMLEqual('<p> </p>', '<p></p>')
         self.assertHTMLEqual('<p/>', '<p></p>')
         self.assertHTMLEqual('<p />', '<p></p>')
-        self.assertHTMLEqual('<input checked />', '<input checked="checked" />')
+        self.assertHTMLEqual('<input checked="checked" />', '<input checked="checked" />')
         self.assertHTMLEqual('<p>Hello', '<p> Hello')
         self.assertHTMLEqual('<p>Hello</p>World', '<p>Hello</p> World')
 

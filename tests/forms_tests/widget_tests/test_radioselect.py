@@ -14,7 +14,7 @@ class RadioSelectTest(WidgetTest):
         self.check_html(self.widget(choices=choices), 'beatle', 'J', html=(
             """<ul>
             <li><label><input type="radio" name="beatle" value="" /> ------</label></li>
-            <li><label><input checked type="radio" name="beatle" value="J" /> John</label></li>
+            <li><label><input checked="checked" type="radio" name="beatle" value="J" /> John</label></li>
             <li><label><input type="radio" name="beatle" value="P" /> Paul</label></li>
             <li><label><input type="radio" name="beatle" value="G" /> George</label></li>
             <li><label><input type="radio" name="beatle" value="R" /> Ringo</label></li>
@@ -42,7 +42,7 @@ class RadioSelectTest(WidgetTest):
         <li><label for="media_2_0"><input id="media_2_0" name="nestchoice" type="radio" value="vhs" /> VHS</label></li>
         <li>
         <label for="media_2_1">
-        <input checked id="media_2_1" name="nestchoice" type="radio" value="dvd" /> DVD
+        <input checked="checked" id="media_2_1" name="nestchoice" type="radio" value="dvd" /> DVD
         </label>
         </li>
         </ul></li>
@@ -62,7 +62,7 @@ class RadioSelectTest(WidgetTest):
         html = """
         <ul id="foo">
         <li>
-        <label for="foo_0"><input checked type="radio" id="foo_0" value="J" name="beatle" /> John</label>
+        <label for="foo_0"><input checked="checked" type="radio" id="foo_0" value="J" name="beatle" /> John</label>
         </li>
         <li><label for="foo_1"><input type="radio" id="foo_1" value="P" name="beatle" /> Paul</label></li>
         <li><label for="foo_2"><input type="radio" id="foo_2" value="G" name="beatle" /> George</label></li>
@@ -79,7 +79,7 @@ class RadioSelectTest(WidgetTest):
         html = """
         <ul id="bar">
         <li>
-        <label for="bar_0"><input checked type="radio" id="bar_0" value="J" name="beatle" /> John</label>
+        <label for="bar_0"><input checked="checked" type="radio" id="bar_0" value="J" name="beatle" /> John</label>
         </li>
         <li><label for="bar_1"><input type="radio" id="bar_1" value="P" name="beatle" /> Paul</label></li>
         <li><label for="bar_2"><input type="radio" id="bar_2" value="G" name="beatle" /> George</label></li>
@@ -95,7 +95,7 @@ class RadioSelectTest(WidgetTest):
         """
         html = """
         <ul class="bar">
-        <li><label><input checked type="radio" class="bar" value="J" name="beatle" /> John</label></li>
+        <li><label><input checked="checked" type="radio" class="bar" value="J" name="beatle" /> John</label></li>
         <li><label><input type="radio" class="bar" value="P" name="beatle" /> Paul</label></li>
         <li><label><input type="radio" class="bar" value="G" name="beatle" /> George</label></li>
         <li><label><input type="radio" class="bar" value="R" name="beatle" /> Ringo</label></li>
@@ -137,7 +137,7 @@ class RadioSelectTest(WidgetTest):
         self.check_html(MultiWidget([self.widget(choices=choices)]), 'beatle', ['J'], html=(
             """<ul>
             <li><label><input type="radio" name="beatle_0" value="" /> ------</label></li>
-            <li><label><input checked type="radio" name="beatle_0" value="J" /> John</label></li>
+            <li><label><input checked="checked" type="radio" name="beatle_0" value="J" /> John</label></li>
             <li><label><input type="radio" name="beatle_0" value="P" /> Paul</label></li>
             <li><label><input type="radio" name="beatle_0" value="G" /> George</label></li>
             <li><label><input type="radio" name="beatle_0" value="R" /> Ringo</label></li>
