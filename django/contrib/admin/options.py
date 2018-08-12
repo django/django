@@ -1322,11 +1322,7 @@ class ModelAdmin(BaseModelAdmin):
             self.message_user(request, msg, messages.SUCCESS)
             return self.response_post_save_change(request, obj)
 
-    def response_post_save_add(self, request, obj):
-        """
-        Figure out where to redirect after the 'Save' button has been pressed
-        when adding a new object.
-        """
+    def _response_post_save(self, request, obj):
         opts = self.model._meta
         if self.has_change_permission(request, None):
             post_url = reverse('admin:%s_%s_changelist' %
@@ -1338,24 +1334,20 @@ class ModelAdmin(BaseModelAdmin):
             post_url = reverse('admin:index',
                                current_app=self.admin_site.name)
         return HttpResponseRedirect(post_url)
+
+    def response_post_save_add(self, request, obj):
+        """
+        Figure out where to redirect after the 'Save' button has been pressed
+        when adding a new object.
+        """
+        return self._response_post_save(request, obj)
 
     def response_post_save_change(self, request, obj):
         """
         Figure out where to redirect after the 'Save' button has been pressed
         when editing an existing object.
         """
-        opts = self.model._meta
-
-        if self.has_change_permission(request, None):
-            post_url = reverse('admin:%s_%s_changelist' %
-                               (opts.app_label, opts.model_name),
-                               current_app=self.admin_site.name)
-            preserved_filters = self.get_preserved_filters(request)
-            post_url = add_preserved_filters({'preserved_filters': preserved_filters, 'opts': opts}, post_url)
-        else:
-            post_url = reverse('admin:index',
-                               current_app=self.admin_site.name)
-        return HttpResponseRedirect(post_url)
+        return self._response_post_save(request, obj)
 
     def response_action(self, request, queryset):
         """
