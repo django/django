@@ -121,7 +121,13 @@ class BaseHandler:
         if response is None:
             wrapped_callback = self.make_view_atomic(callback)
             try:
-                response = wrapped_callback(request, *callback_args, **callback_kwargs)
+                response = wrapped_callback(
+                    request, *callback_args, **callback_kwargs)
+            except TypeError:
+                raise TypeError(
+                    "Check if as_view() method called properly"
+                    " in your urls.py "
+                )
             except Exception as e:
                 response = self.process_exception_by_middleware(e, request)
 
