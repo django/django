@@ -45,8 +45,8 @@ class OriginValidator:
 
         Returns ``True`` if validation function was successful, ``False`` otherwise.
         """
-        # None is not allowed
-        if parsed_origin is None:
+        # None is not allowed unless all hosts are allowed
+        if parsed_origin is None and "*" not in self.allowed_origins:
             return False
         return self.validate_origin(parsed_origin)
 
@@ -85,9 +85,12 @@ class OriginValidator:
         ``http://exapmple.com``). After the domain there must be a port,
         but it can be omitted.
 
-        Note. This function assumes that the given origin has a schema, domain and port,
-        or only domain. Port is optional.
+        Note. This function assumes that the given origin is either None, a
+        schema-domain-port string, or just a domain string
         """
+        if parsed_origin is None:
+            return False
+
         # Get ResultParse object
         parsed_pattern = urlparse(pattern.lower(), scheme=None)
         if parsed_pattern.scheme is None:

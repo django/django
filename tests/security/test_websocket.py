@@ -48,3 +48,17 @@ async def test_origin_validator():
     connected, _ = await communicator.connect()
     assert not connected
     await communicator.disconnect()
+    # Make our test application, with all hosts allowed
+    application = OriginValidator(AsyncWebsocketConsumer, ["*"])
+    # Test a connection without any headers
+    communicator = WebsocketCommunicator(application, "/", headers=[])
+    connected, _ = await communicator.connect()
+    assert connected
+    await communicator.disconnect()
+    # Make our test application, with no hosts allowed
+    application = OriginValidator(AsyncWebsocketConsumer, [])
+    # Test a connection without any headers
+    communicator = WebsocketCommunicator(application, "/", headers=[])
+    connected, _ = await communicator.connect()
+    assert not connected
+    await communicator.disconnect()
