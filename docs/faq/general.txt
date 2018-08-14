@@ -64,6 +64,11 @@ The framework cleanly separates components such as its database layer and
 application layer. And it ships with a simple-yet-powerful
 :doc:`cache framework </topics/cache>`.
 
+For more information, please take a look at `Scaling Django`_ from `djangobook`_
+
+.. _Scaling Django: https://djangobook.com/scaling-django/
+.. _djangobook: https://djangobook.com/
+
 Who's behind this?
 ==================
 
