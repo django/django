@@ -219,6 +219,9 @@ Tests
   URL, ignoring the ordering of the query string.
   :meth:`~.SimpleTestCase.assertRedirects` uses the new assertion.
 
+* Client now supports structured syntax JSON content types
+  .. versionchanged:: 2.2
+
 URLs
 ~~~~
 
