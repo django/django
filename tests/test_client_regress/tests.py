@@ -1204,29 +1204,20 @@ class RequestMethodStringDataTests(SimpleTestCase):
         response = self.client.get('/json_response/')
         self.assertEqual(response.json(), {'key': 'value'})
 
-    def test_json_vendor(self):
+    def test_json_structured_syntax(self):
+        # Found here: https://www.iana.org/assignments/media-types/media-types.xhtml
         valid_types = (
             'application/vnd.api+json',
             'application/vnd.api.foo+json',
             'application/json; charset=utf-8',
+            'application/activity+json',
+            'application/alto-costmap+json',
         )
         for content_type in valid_types:
             response = self.client.get('/json_response/', {'content_type': content_type})
             self.assertEqual(response['Content-Type'], content_type)
             self.assertEqual(response.json(), {'key': 'value'})
     
-    def test_json_structured_syntax(self):
-        # Found at: https://www.iana.org/assignments/media-types/media-types.xhtml
-        example_types = (
-            'application/activity+json',
-            'application/alto-costmap+json',
-            'application/calendar+json',
-            'application/problem+json',
-        )
-        for content_type in example_types:
-            response = self.client.get('/json_response/', {'content_type:': content_type})
-            self.assertEqual(response['Content-Type'], content_type)
-            self.assertEqual(response.json(), {'key': 'value'})
 
     def test_json_multiple_access(self):
         response = self.client.get('/json_response/')
