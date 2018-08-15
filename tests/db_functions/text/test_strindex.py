@@ -3,7 +3,7 @@ from django.db.models.functions import StrIndex
 from django.test import TestCase
 from django.utils import timezone
 
-from .models import Article, Author
+from ..models import Article, Author
 
 
 class StrIndexTests(TestCase):

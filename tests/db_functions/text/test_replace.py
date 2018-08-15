@@ -2,7 +2,7 @@ from django.db.models import F, Value
 from django.db.models.functions import Concat, Replace
 from django.test import TestCase
 
-from .models import Author
+from ..models import Author
 
 
 class ReplaceTests(TestCase):

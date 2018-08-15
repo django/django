@@ -2,7 +2,7 @@ from django.db.models import IntegerField
 from django.db.models.functions import Chr, Left, Ord
 from django.test import TestCase
 
-from .models import Author
+from ..models import Author
 
 
 class ChrTests(TestCase):

@@ -2,7 +2,7 @@ from django.db.models import CharField
 from django.db.models.functions import LTrim, RTrim, Trim
 from django.test import TestCase
 
-from .models import Author
+from ..models import Author
 
 
 class TrimTests(TestCase):

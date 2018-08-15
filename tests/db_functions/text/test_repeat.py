@@ -2,7 +2,7 @@ from django.db.models import CharField, Value
 from django.db.models.functions import Length, Repeat
 from django.test import TestCase
 
-from .models import Author
+from ..models import Author
 
 
 class RepeatTests(TestCase):
