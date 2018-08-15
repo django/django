@@ -19,6 +19,10 @@ def fix_os_paths(x):
         return x
 
 
+def _build_path():
+    return os.path.join(PATH, 'filepathfield_test_dir') + '/'
+
+
 class FilePathFieldTest(SimpleTestCase):
     expected_choices = [
         ('/filepathfield_test_dir/__init__.py', '__init__.py'),
@@ -33,7 +37,7 @@ class FilePathFieldTest(SimpleTestCase):
         ('/filepathfield_test_dir/h/__init__.py', '__init__.py'),
         ('/filepathfield_test_dir/j/__init__.py', '__init__.py'),
     ]
-    path = os.path.join(PATH, 'filepathfield_test_dir') + '/'
+    path = _build_path()
 
     def assertChoices(self, field, expected_choices):
         self.assertEqual(fix_os_paths(field.choices), expected_choices)
@@ -43,6 +47,13 @@ class FilePathFieldTest(SimpleTestCase):
 
     def test_no_options(self):
         f = FilePathField(path=self.path)
+        expected = [
+            ('/filepathfield_test_dir/README', 'README'),
+        ] + self.expected_choices[:4]
+        self.assertChoices(f, expected)
+
+    def test_callable_path(self):
+        f = FilePathField(path=_build_path)
         expected = [
             ('/filepathfield_test_dir/README', 'README'),
         ] + self.expected_choices[:4]
