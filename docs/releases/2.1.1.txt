@@ -32,3 +32,6 @@ Bugfixes
 * Fixed a regression where a ``related_query_name`` reverse accessor wasn't set
   up when a ``GenericRelation`` is declared on an abstract base model
   (:ticket:`29653`).
+
+* Fixed the test client's JSON serialization of a request data dictionary for
+  structured content type suffixes (:ticket:`29662`).
