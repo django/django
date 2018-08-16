@@ -92,12 +92,7 @@ class DummyCacheTests(SimpleTestCase):
 
     def test_get_many(self):
         "get_many returns nothing for the dummy cache backend"
-        cache.set_many({
-            'a': 'a',
-            'b': 'b',
-            'c': 'c',
-            'd': 'd',
-        })
+        cache.set_many({'a': 'a', 'b': 'b', 'c': 'c', 'd': 'd'})
         self.assertEqual(cache.get_many(['a', 'c', 'd']), {})
         self.assertEqual(cache.get_many(['a', 'b', 'e']), {})
 
@@ -107,10 +102,7 @@ class DummyCacheTests(SimpleTestCase):
 
     def test_delete(self):
         "Cache deletion is transparently ignored on the dummy cache backend"
-        cache.set_many({
-            'key1': 'spam',
-            'key2': 'eggs',
-        })
+        cache.set_many({'key1': 'spam', 'key2': 'eggs'})
         self.assertIsNone(cache.get("key1"))
         cache.delete("key1")
         self.assertIsNone(cache.get("key1"))
@@ -310,22 +302,14 @@ class BaseCacheTests:
 
     def test_get_many(self):
         # Multiple cache keys can be returned using get_many
-        cache.set_many({
-            'a': 'a',
-            'b': 'b',
-            'c': 'c',
-            'd': 'd',
-        })
+        cache.set_many({'a': 'a', 'b': 'b', 'c': 'c', 'd': 'd'})
         self.assertEqual(cache.get_many(['a', 'c', 'd']), {'a': 'a', 'c': 'c', 'd': 'd'})
         self.assertEqual(cache.get_many(['a', 'b', 'e']), {'a': 'a', 'b': 'b'})
         self.assertEqual(cache.get_many(iter(['a', 'b', 'e'])), {'a': 'a', 'b': 'b'})
 
     def test_delete(self):
         # Cache keys can be deleted
-        cache.set_many({
-            'key1': 'spam',
-            'key2': 'eggs',
-        })
+        cache.set_many({'key1': 'spam', 'key2': 'eggs'})
         self.assertEqual(cache.get("key1"), "spam")
         cache.delete("key1")
         self.assertIsNone(cache.get("key1"))
@@ -529,11 +513,7 @@ class BaseCacheTests:
 
     def test_delete_many(self):
         # Multiple keys can be deleted using delete_many
-        cache.set_many({
-            'key1': 'spam',
-            'key2': 'eggs',
-            'key3': 'ham',
-        })
+        cache.set_many({'key1': 'spam', 'key2': 'eggs', 'key3': 'ham'})
         cache.delete_many(["key1", "key2"])
         self.assertIsNone(cache.get("key1"))
         self.assertIsNone(cache.get("key2"))
@@ -541,10 +521,7 @@ class BaseCacheTests:
 
     def test_clear(self):
         # The cache can be emptied using clear
-        cache.set_many({
-            'key1': 'spam',
-            'key2': 'eggs',
-        })
+        cache.set_many({'key1': 'spam', 'key2': 'eggs'})
         cache.clear()
         self.assertIsNone(cache.get("key1"))
         self.assertIsNone(cache.get("key2"))
