@@ -3,6 +3,7 @@ SQLite3 backend for the sqlite3 module in the standard library.
 """
 import datetime
 import decimal
+import functools
 import math
 import operator
 import re
@@ -32,6 +33,16 @@ def decoder(conv_func):
     Convert bytestrings from Python's sqlite3 interface to a regular string.
     """
     return lambda s: conv_func(s.decode())
+
+
+def none_guard(func):
+    """
+    Returns None if any of the arguments are None
+    """
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        return None if None in args else func(*args, **kwargs)
+    return wrapper
 
 
 Database.register_converter("bool", b'1'.__eq__)
@@ -190,7 +201,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function('LOG', 2, lambda x, y: math.log(y, x))
         conn.create_function('MOD', 2, math.fmod)
         conn.create_function('PI', 0, lambda: math.pi)
-        conn.create_function('POWER', 2, operator.pow)
+        conn.create_function('POWER', 2, none_guard(operator.pow))
         conn.create_function('RADIANS', 1, math.radians)
         conn.create_function('SIN', 1, math.sin)
         conn.create_function('SQRT', 1, math.sqrt)
@@ -468,6 +479,7 @@ def _sqlite_format_dtdelta(conn, lhs, rhs):
     return str(out)
 
 
+@none_guard
 def _sqlite_time_diff(lhs, rhs):
     left = backend_utils.typecast_time(lhs)
     right = backend_utils.typecast_time(rhs)
@@ -483,6 +495,7 @@ def _sqlite_time_diff(lhs, rhs):
     )
 
 
+@none_guard
 def _sqlite_timestamp_diff(lhs, rhs):
     left = backend_utils.typecast_timestamp(lhs)
     right = backend_utils.typecast_timestamp(rhs)
@@ -493,11 +506,13 @@ def _sqlite_regexp(re_pattern, re_string):
     return bool(re.search(re_pattern, str(re_string))) if re_string is not None else False
 
 
+@none_guard
 def _sqlite_lpad(text, length, fill_text):
     if len(text) >= length:
         return text[:length]
     return (fill_text * length)[:length - len(text)] + text
 
 
+@none_guard
 def _sqlite_rpad(text, length, fill_text):
     return (text + fill_text * length)[:length]
