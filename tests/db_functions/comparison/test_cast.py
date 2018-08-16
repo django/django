@@ -10,7 +10,7 @@ from django.test import (
     TestCase, ignore_warnings, override_settings, skipUnlessDBFeature,
 )
 
-from .models import Author
+from ..models import Author
 
 
 class CastTests(TestCase):
