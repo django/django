@@ -5,7 +5,7 @@ from django.apps import apps as installed_apps
 from django.utils.crypto import get_random_string
 from django.utils.encoding import DEFAULT_LOCALE_ENCODING
 
-from .base import CommandError
+from .base import CommandError, CommandParser
 
 
 def popen_wrapper(args, stdout_encoding='utf-8'):
@@ -106,3 +106,19 @@ def parse_apps_and_model_labels(labels):
             apps.add(app_config)
 
     return models, apps
+
+
+def get_command_line_option(argv, option):
+    """
+    Return the value of a command line option (which should include leading
+    dashes, e.g. '--testrunnner') from an argument list. Return None if the
+    option wasn't passed or if the argument list couldn't be parsed.
+    """
+    parser = CommandParser(add_help=False, allow_abbrev=False)
+    parser.add_argument(option, dest='value')
+    try:
+        options, _ = parser.parse_known_args(argv[2:])
+    except CommandError:
+        return None
+    else:
+        return options.value

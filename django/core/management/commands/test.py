@@ -2,6 +2,7 @@ import sys
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.core.management.utils import get_command_line_option
 from django.test.utils import get_runner
 
 
@@ -18,11 +19,7 @@ class Command(BaseCommand):
         option. This allows a test runner to define additional command line
         arguments.
         """
-        option = '--testrunner='
-        for arg in argv[2:]:
-            if arg.startswith(option):
-                self.test_runner = arg[len(option):]
-                break
+        self.test_runner = get_command_line_option(argv, '--testrunner')
         super().run_from_argv(argv)
 
     def add_arguments(self, parser):
