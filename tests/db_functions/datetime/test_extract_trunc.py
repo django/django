@@ -17,7 +17,7 @@ from django.test import (
 )
 from django.utils import timezone
 
-from .models import Author, DTModel, Fan
+from ..models import Author, DTModel, Fan
 
 
 def truncate_to(value, kind, tzinfo=None):

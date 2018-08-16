@@ -1,15 +1,8 @@
-from datetime import datetime, timedelta
-
 from django.db.models import CharField, Value as V
-from django.db.models.functions import Coalesce, Length, Now, Upper
+from django.db.models.functions import Coalesce, Length, Upper
 from django.test import TestCase
-from django.utils import timezone
 
-from .models import Article, Author
-
-lorem_ipsum = """
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-    tempor incididunt ut labore et dolore magna aliqua."""
+from .models import Author
 
 
 class FunctionTests(TestCase):
@@ -34,43 +27,6 @@ class FunctionTests(TestCase):
                 'Rhonda Simpson',
             ],
             lambda a: a.name
-        )
-
-    def test_now(self):
-        ar1 = Article.objects.create(
-            title='How to Django',
-            text=lorem_ipsum,
-            written=timezone.now(),
-        )
-        ar2 = Article.objects.create(
-            title='How to Time Travel',
-            text=lorem_ipsum,
-            written=timezone.now(),
-        )
-
-        num_updated = Article.objects.filter(id=ar1.id, published=None).update(published=Now())
-        self.assertEqual(num_updated, 1)
-
-        num_updated = Article.objects.filter(id=ar1.id, published=None).update(published=Now())
-        self.assertEqual(num_updated, 0)
-
-        ar1.refresh_from_db()
-        self.assertIsInstance(ar1.published, datetime)
-
-        ar2.published = Now() + timedelta(days=2)
-        ar2.save()
-        ar2.refresh_from_db()
-        self.assertIsInstance(ar2.published, datetime)
-
-        self.assertQuerysetEqual(
-            Article.objects.filter(published__lte=Now()),
-            ['How to Django'],
-            lambda a: a.title
-        )
-        self.assertQuerysetEqual(
-            Article.objects.filter(published__gt=Now()),
-            ['How to Time Travel'],
-            lambda a: a.title
         )
 
     def test_func_transform_bilateral(self):
