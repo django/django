@@ -518,6 +518,9 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             request.user.has_perm('%s.%s' % (opts.app_label, codename_change))
         )
 
+    def has_view_or_change_permission(self, request, obj=None):
+        return self.has_view_permission(request, obj) or self.has_change_permission(request, obj)
+
     def has_module_permission(self, request):
         """
         Return True if the given request has any permission in the given
@@ -588,9 +591,8 @@ class ModelAdmin(BaseModelAdmin):
             else:
                 inline_has_add_permission = inline.has_add_permission(request)
             if request:
-                if not (inline.has_view_permission(request, obj) or
+                if not (inline.has_view_or_change_permission(request, obj) or
                         inline_has_add_permission or
-                        inline.has_change_permission(request, obj) or
                         inline.has_delete_permission(request, obj)):
                     continue
                 if not inline_has_add_permission:
@@ -1556,7 +1558,7 @@ class ModelAdmin(BaseModelAdmin):
         else:
             obj = self.get_object(request, unquote(object_id), to_field)
 
-            if not self.has_view_permission(request, obj) and not self.has_change_permission(request, obj):
+            if not self.has_view_or_change_permission(request, obj):
                 raise PermissionDenied
 
             if obj is None:
@@ -1678,7 +1680,7 @@ class ModelAdmin(BaseModelAdmin):
         from django.contrib.admin.views.main import ERROR_FLAG
         opts = self.model._meta
         app_label = opts.app_label
-        if not self.has_view_permission(request) and not self.has_change_permission(request):
+        if not self.has_view_or_change_permission(request):
             raise PermissionDenied
 
         try:
@@ -1904,7 +1906,7 @@ class ModelAdmin(BaseModelAdmin):
         if obj is None:
             return self._get_obj_does_not_exist_redirect(request, model._meta, object_id)
 
-        if not self.has_view_permission(request, obj) and not self.has_change_permission(request, obj):
+        if not self.has_view_or_change_permission(request, obj):
             raise PermissionDenied
 
         # Then get the history for this object.
@@ -2111,7 +2113,7 @@ class InlineModelAdmin(BaseModelAdmin):
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
-        if not self.has_change_permission(request) and not self.has_view_permission(request):
+        if not self.has_view_or_change_permission(request):
             queryset = queryset.none()
         return queryset
 
