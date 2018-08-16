@@ -56,22 +56,22 @@ class TestUtilsText(SimpleTestCase):
     def test_truncate_chars(self):
         truncator = text.Truncator('The quick brown fox jumped over the lazy dog.')
         self.assertEqual('The quick brown fox jumped over the lazy dog.', truncator.chars(100)),
-        self.assertEqual('The quick brown fox ...', truncator.chars(23)),
+        self.assertEqual('The quick brown fox…', truncator.chars(20)),
         self.assertEqual('The quick brown fo.....', truncator.chars(23, '.....')),
 
         nfc = text.Truncator('o\xfco\xfco\xfco\xfc')
         nfd = text.Truncator('ou\u0308ou\u0308ou\u0308ou\u0308')
         self.assertEqual('oüoüoüoü', nfc.chars(8))
         self.assertEqual('oüoüoüoü', nfd.chars(8))
-        self.assertEqual('oü...', nfc.chars(5))
-        self.assertEqual('oü...', nfd.chars(5))
+        self.assertEqual('oü…', nfc.chars(3))
+        self.assertEqual('oü…', nfd.chars(3))
 
         # Ensure the final length is calculated correctly when there are
         # combining characters with no precomposed form, and that combining
         # characters are not split up.
         truncator = text.Truncator('-B\u030AB\u030A----8')
-        self.assertEqual('-B\u030A...', truncator.chars(5))
-        self.assertEqual('-B\u030AB\u030A-...', truncator.chars(7))
+        self.assertEqual('-B\u030A…', truncator.chars(3))
+        self.assertEqual('-B\u030AB\u030A-…', truncator.chars(5))
         self.assertEqual('-B\u030AB\u030A----8', truncator.chars(8))
 
         # Ensure the length of the end text is correctly calculated when it
@@ -82,18 +82,18 @@ class TestUtilsText(SimpleTestCase):
 
         # Make a best effort to shorten to the desired length, but requesting
         # a length shorter than the ellipsis shouldn't break
-        self.assertEqual('...', text.Truncator('asdf').chars(1))
+        self.assertEqual('…', text.Truncator('asdf').chars(1))
         # lazy strings are handled correctly
-        self.assertEqual(text.Truncator(lazystr('The quick brown fox')).chars(12), 'The quick...')
+        self.assertEqual(text.Truncator(lazystr('The quick brown fox')).chars(10), 'The quick…')
 
     def test_truncate_words(self):
         truncator = text.Truncator('The quick brown fox jumped over the lazy dog.')
         self.assertEqual('The quick brown fox jumped over the lazy dog.', truncator.words(10))
-        self.assertEqual('The quick brown fox...', truncator.words(4))
+        self.assertEqual('The quick brown fox…', truncator.words(4))
         self.assertEqual('The quick brown fox[snip]', truncator.words(4, '[snip]'))
         # lazy strings are handled correctly
         truncator = text.Truncator(lazystr('The quick brown fox jumped over the lazy dog.'))
-        self.assertEqual('The quick brown fox...', truncator.words(4))
+        self.assertEqual('The quick brown fox…', truncator.words(4))
 
     def test_truncate_html_words(self):
         truncator = text.Truncator(
@@ -104,7 +104,7 @@ class TestUtilsText(SimpleTestCase):
             truncator.words(10, html=True)
         )
         self.assertEqual(
-            '<p id="par"><strong><em>The quick brown fox...</em></strong></p>',
+            '<p id="par"><strong><em>The quick brown fox…</em></strong></p>',
             truncator.words(4, html=True)
         )
         self.assertEqual(
