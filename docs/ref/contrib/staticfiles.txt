@@ -254,9 +254,13 @@ as the base URL.
 
 .. method:: storage.StaticFilesStorage.post_process(paths, **options)
 
-This method is called by the :djadmin:`collectstatic` management command
-after each run and gets passed the local storages and paths of found
-files as a dictionary, as well as the command line options.
+If this method is defined on a storage, it's called by the
+:djadmin:`collectstatic` management command after each run and gets passed the
+local storages and paths of found files as a dictionary, as well as the command
+line options. It yields tuples of three values:
+``original_path, processed_path, processed``. The path values are strings and
+``processed`` is a boolean indicating whether or not the value was
+post-processed, or an exception if post-processing failed.
 
 The :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
 uses this behind the scenes to replace the paths with their hashed
