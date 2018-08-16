@@ -539,7 +539,7 @@ msgstr "Wšykne pokazaś"
 msgid "Save"
 msgstr "Składowaś"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr "Wuskokujuce wokno se zacynja..."
 
 #, python-format

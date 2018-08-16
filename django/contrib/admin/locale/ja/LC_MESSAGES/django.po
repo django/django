@@ -533,7 +533,7 @@ msgstr "全件表示"
 msgid "Save"
 msgstr "保存"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr "ポップアップを閉じています..."
 
 #, python-format

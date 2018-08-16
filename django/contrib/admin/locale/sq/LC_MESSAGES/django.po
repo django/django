@@ -539,7 +539,7 @@ msgstr "Shfaqi krejt"
 msgid "Save"
 msgstr "Ruaje"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr "Flluska po mbyllet…"
 
 #, python-format

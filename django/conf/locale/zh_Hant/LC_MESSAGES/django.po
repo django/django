@@ -1010,8 +1010,8 @@ msgstr "這是無效的 IPv6 位址。"
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s…"
-msgstr "%(truncated_text)s…"
+msgid "%(truncated_text)s..."
+msgstr "%(truncated_text)s..."
 
 msgid "or"
 msgstr "或"

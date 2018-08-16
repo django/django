@@ -482,7 +482,7 @@ msgstr "Sken akk"
 msgid "Save"
 msgstr "Sekles"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr ""
 
 #, python-format

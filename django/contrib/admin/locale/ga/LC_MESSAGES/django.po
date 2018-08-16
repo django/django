@@ -523,7 +523,7 @@ msgstr "Taispéan gach rud"
 msgid "Save"
 msgstr "Sábháil"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr ""
 
 #, python-format

@@ -547,7 +547,7 @@ msgstr "Arată totul"
 msgid "Save"
 msgstr "Salvează"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr "Fereastra se închide..."
 
 #, python-format

@@ -490,7 +490,7 @@ msgstr "सबै देखाउनुहोस"
 msgid "Save"
 msgstr "बचत गर्नुहोस"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr ""
 
 #, python-format

@@ -492,7 +492,7 @@ msgstr "எல்லாவற்றையும் காட்டு"
 msgid "Save"
 msgstr "சேமிக்க"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr ""
 
 #, python-format

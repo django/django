@@ -532,7 +532,7 @@ msgstr "Показати всі"
 msgid "Save"
 msgstr "Зберегти"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr "Закриття спливаючого вікна..."
 
 #, python-format

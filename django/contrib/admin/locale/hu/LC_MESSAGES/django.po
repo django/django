@@ -542,7 +542,7 @@ msgstr "Mutassa mindet"
 msgid "Save"
 msgstr "Mentés"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr "A popup bezáródik..."
 
 #, python-format

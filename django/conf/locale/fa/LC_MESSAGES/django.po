@@ -1052,8 +1052,8 @@ msgstr "این مقدار آدرس IPv6 معتبری نیست."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s…"
-msgstr "%(truncated_text)s…"
+msgid "%(truncated_text)s..."
+msgstr "%(truncated_text)s..."
 
 msgid "or"
 msgstr "یا"

@@ -530,7 +530,7 @@ msgstr "显示全部"
 msgid "Save"
 msgstr "保存"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr "弹窗关闭中。。。"
 
 #, python-format

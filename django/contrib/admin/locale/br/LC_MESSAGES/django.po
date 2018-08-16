@@ -482,7 +482,7 @@ msgstr "Diskouez pep tra"
 msgid "Save"
 msgstr "Enrollañ"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr ""
 
 #, python-format

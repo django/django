@@ -545,7 +545,7 @@ msgstr "نمایش همه"
 msgid "Save"
 msgstr "ذخیره"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr "در حال بستن پنجره..."
 
 #, python-format

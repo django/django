@@ -522,7 +522,7 @@ msgstr "أظهر الكل"
 msgid "Save"
 msgstr "احفظ"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr "جاري الإغلاق..."
 
 #, python-format

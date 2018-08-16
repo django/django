@@ -544,7 +544,7 @@ msgstr "Rodyti visus"
 msgid "Save"
 msgstr "Išsaugoti"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr "Langas užsidaro..."
 
 #, python-format

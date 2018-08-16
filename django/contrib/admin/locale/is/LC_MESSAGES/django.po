@@ -534,7 +534,7 @@ msgstr "Sýna allt"
 msgid "Save"
 msgstr "Vista"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr "Sprettigluggi lokast..."
 
 #, python-format

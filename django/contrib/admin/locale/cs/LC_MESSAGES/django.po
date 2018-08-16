@@ -549,7 +549,7 @@ msgstr "Zobrazit vše"
 msgid "Save"
 msgstr "Uložit"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr "Vyskakovací okno se zavírá..."
 
 #, python-format

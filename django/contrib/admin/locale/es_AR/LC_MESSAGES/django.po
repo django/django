@@ -543,7 +543,7 @@ msgstr "Mostrar todos/as"
 msgid "Save"
 msgstr "Guardar"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr "Cerrando ventana emergente..."
 
 #, python-format

@@ -504,7 +504,7 @@ msgstr "Иууылдӕр равдисын"
 msgid "Save"
 msgstr "Нывӕрын"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr ""
 
 #, python-format

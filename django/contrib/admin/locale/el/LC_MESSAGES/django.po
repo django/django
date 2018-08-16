@@ -538,7 +538,7 @@ msgstr "Εμφάνιση όλων"
 msgid "Save"
 msgstr "Αποθήκευση"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr "Κλείσιμο popup..."
 
 #, python-format

@@ -510,7 +510,7 @@ msgstr "Барлығын көрсету"
 msgid "Save"
 msgstr "Сақтау"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr ""
 
 #, python-format

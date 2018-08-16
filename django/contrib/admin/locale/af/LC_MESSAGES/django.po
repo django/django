@@ -498,7 +498,7 @@ msgstr "Wys alle"
 msgid "Save"
 msgstr "Stoor"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr ""
 
 #, python-format

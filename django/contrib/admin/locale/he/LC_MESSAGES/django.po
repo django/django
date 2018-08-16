@@ -509,7 +509,7 @@ msgstr "הצג הכל"
 msgid "Save"
 msgstr "שמירה"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr "חלון צץ נסגר..."
 
 #, python-format

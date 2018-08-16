@@ -542,7 +542,7 @@ msgstr "Tampilkan semua"
 msgid "Save"
 msgstr "Simpan"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr "Menutup jendela sembulan..."
 
 #, python-format

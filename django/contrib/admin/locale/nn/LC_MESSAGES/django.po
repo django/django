@@ -509,7 +509,7 @@ msgstr "Vis alle"
 msgid "Save"
 msgstr "Lagre"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr ""
 
 #, python-format

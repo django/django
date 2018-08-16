@@ -686,7 +686,7 @@ msgid "Save"
 msgstr ""
 
 #: contrib/admin/templates/admin/popup_response.html:3
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr ""
 
 #: contrib/admin/templates/admin/related_widget_wrapper.html:11

@@ -527,7 +527,7 @@ msgstr "Visa alla"
 msgid "Save"
 msgstr "Spara"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr "Popup stänger..."
 
 #, python-format

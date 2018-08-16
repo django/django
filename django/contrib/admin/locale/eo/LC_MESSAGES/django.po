@@ -543,7 +543,7 @@ msgstr "Montri ĉion"
 msgid "Save"
 msgstr "Konservi"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr "Ŝprucfenestro fermante…"
 
 #, python-format

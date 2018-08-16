@@ -504,7 +504,7 @@ msgstr "顯示全部"
 msgid "Save"
 msgstr "儲存"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr "關閉彈出視窗中⋯⋯"
 
 #, python-format

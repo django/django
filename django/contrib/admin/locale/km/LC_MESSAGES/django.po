@@ -488,7 +488,7 @@ msgstr "បង្ហាញទាំងអស់"
 msgid "Save"
 msgstr "រក្សាទុក"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr ""
 
 #, python-format

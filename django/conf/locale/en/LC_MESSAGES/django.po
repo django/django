@@ -1292,7 +1292,7 @@ msgstr ""
 #: utils/text.py:70
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s…"
+msgid "%(truncated_text)s..."
 msgstr ""
 
 #: utils/text.py:237

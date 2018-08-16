@@ -530,7 +530,7 @@ msgstr "Zobraziť všetky"
 msgid "Save"
 msgstr "Uložiť"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr "Vyskakovacie okno sa zatvára..."
 
 #, python-format

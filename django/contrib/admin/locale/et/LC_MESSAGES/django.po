@@ -519,7 +519,7 @@ msgstr "Näita kõiki"
 msgid "Save"
 msgstr "Salvesta"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr "Hüpikaken sulgub..."
 
 #, python-format

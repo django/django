@@ -487,7 +487,7 @@ msgstr "అన్నీ చూపించు"
 msgid "Save"
 msgstr "భద్రపరుచు"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr ""
 
 #, python-format

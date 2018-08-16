@@ -510,7 +510,7 @@ msgstr "എല്ലാം കാണട്ടെ"
 msgid "Save"
 msgstr "സേവ് ചെയ്യണം"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr ""
 
 #, python-format

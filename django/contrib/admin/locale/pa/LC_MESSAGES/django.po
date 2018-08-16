@@ -500,7 +500,7 @@ msgstr "ਸਭ ਵੇਖੋ"
 msgid "Save"
 msgstr "ਸੰਭਾਲੋ"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr ""
 
 #, python-format

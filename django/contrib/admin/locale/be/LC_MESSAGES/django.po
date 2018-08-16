@@ -521,7 +521,7 @@ msgstr "Паказаць усё"
 msgid "Save"
 msgstr "Захаваць"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr "Усплывальнае акно зачыняецца..."
 
 #, python-format

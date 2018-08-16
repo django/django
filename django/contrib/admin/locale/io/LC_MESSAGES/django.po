@@ -508,7 +508,7 @@ msgstr "Montrar omni"
 msgid "Save"
 msgstr "Salvar"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr ""
 
 #, python-format

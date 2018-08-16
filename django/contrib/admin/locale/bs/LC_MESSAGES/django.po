@@ -501,7 +501,7 @@ msgstr "Prikaži sve"
 msgid "Save"
 msgstr "Sačuvaj"
 
-msgid "Popup closing…"
+msgid "Popup closing..."
 msgstr ""
 
 #, python-format
