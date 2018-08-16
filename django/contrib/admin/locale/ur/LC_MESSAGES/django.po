@@ -504,7 +504,7 @@ msgstr "تمام دکھائیں"
 msgid "Save"
 msgstr "محفوظ کریں"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr ""
 
 #, python-format

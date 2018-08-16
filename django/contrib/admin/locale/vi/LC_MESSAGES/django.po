@@ -516,7 +516,7 @@ msgstr "Hiện tất cả"
 msgid "Save"
 msgstr "Lưu lại"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Đang đóng cửa sổ popup ..."
 
 #, python-format

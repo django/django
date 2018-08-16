@@ -531,7 +531,7 @@ msgstr "Zeige alle"
 msgid "Save"
 msgstr "Sichern"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Popup wird geschlossen..."
 
 #, python-format

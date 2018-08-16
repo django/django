@@ -554,7 +554,7 @@ msgstr "Pokaż wszystko"
 msgid "Save"
 msgstr "Zapisz"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Zamykanie okna..."
 
 #, python-format

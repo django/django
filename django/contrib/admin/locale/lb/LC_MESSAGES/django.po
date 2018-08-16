@@ -483,7 +483,7 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr ""
 
 #, python-format

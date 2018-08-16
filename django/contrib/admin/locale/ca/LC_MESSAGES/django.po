@@ -527,7 +527,7 @@ msgstr "Mostrar tots"
 msgid "Save"
 msgstr "Desar"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Tancant el contingut emergent..."
 
 #, python-format

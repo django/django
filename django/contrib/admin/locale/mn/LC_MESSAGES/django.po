@@ -539,7 +539,7 @@ msgstr "Бүгдийг харуулах"
 msgid "Save"
 msgstr "Хадгалах"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Цонх хаагдлаа"
 
 #, python-format

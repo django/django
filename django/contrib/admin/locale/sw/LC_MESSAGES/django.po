@@ -514,7 +514,7 @@ msgstr "Onesha yotee"
 msgid "Save"
 msgstr "Hifadhi"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Udukizi unafunga"
 
 #, python-format

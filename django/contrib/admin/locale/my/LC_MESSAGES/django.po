@@ -481,7 +481,7 @@ msgstr ""
 msgid "Save"
 msgstr "သိမ်းဆည်း"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr ""
 
 #, python-format

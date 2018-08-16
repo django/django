@@ -540,7 +540,7 @@ msgstr "Rādīt visu"
 msgid "Save"
 msgstr "Saglabāt"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Logs aizveras..."
 
 #, python-format

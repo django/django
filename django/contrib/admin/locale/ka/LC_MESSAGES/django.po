@@ -510,7 +510,7 @@ msgstr "ვაჩვენოთ ყველა"
 msgid "Save"
 msgstr "შევინახოთ"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr ""
 
 #, python-format

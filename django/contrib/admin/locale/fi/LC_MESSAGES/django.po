@@ -518,7 +518,7 @@ msgstr "Näytä kaikki"
 msgid "Save"
 msgstr "Tallenna ja poistu"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Ponnahdusikkuna sulkeutuu..."
 
 #, python-format

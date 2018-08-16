@@ -525,7 +525,7 @@ msgstr "Erakutsi dena"
 msgid "Save"
 msgstr "Gorde"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Popupa ixten..."
 
 #, python-format

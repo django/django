@@ -543,7 +543,7 @@ msgstr "모두 표시"
 msgid "Save"
 msgstr "저장"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "팝업 닫는 중..."
 
 #, python-format

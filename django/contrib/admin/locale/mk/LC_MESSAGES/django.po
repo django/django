@@ -527,7 +527,7 @@ msgstr "Прикажи ги сите"
 msgid "Save"
 msgstr "Сними"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Попапот се затвара..."
 
 #, python-format

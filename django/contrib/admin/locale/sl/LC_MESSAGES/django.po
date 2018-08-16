@@ -527,7 +527,7 @@ msgstr "Prikaži vse"
 msgid "Save"
 msgstr "Shrani"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Zapiram pojavno okno ..."
 
 #, python-format

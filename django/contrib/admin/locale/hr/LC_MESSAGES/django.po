@@ -523,7 +523,7 @@ msgstr "Prikaži sve"
 msgid "Save"
 msgstr "Spremi"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Zatvaranje popup-a..."
 
 #, python-format

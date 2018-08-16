@@ -503,7 +503,7 @@ msgstr "Бөтенесен күрсәтергә"
 msgid "Save"
 msgstr "Сакларга"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr ""
 
 #, python-format

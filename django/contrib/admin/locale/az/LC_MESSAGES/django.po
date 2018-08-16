@@ -526,7 +526,7 @@ msgstr "Hamısını göstər"
 msgid "Save"
 msgstr "Yadda saxla"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Qəfl pəncərə qapatılır..."
 
 #, python-format

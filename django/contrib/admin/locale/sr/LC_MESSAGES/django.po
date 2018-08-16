@@ -540,7 +540,7 @@ msgstr "Прикажи све"
 msgid "Save"
 msgstr "Сачувај"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Искачући прозор се затвара..."
 
 #, python-format

@@ -551,7 +551,7 @@ msgstr "Показать все"
 msgid "Save"
 msgstr "Сохранить"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Всплывающее окно закрывается..."
 
 #, python-format

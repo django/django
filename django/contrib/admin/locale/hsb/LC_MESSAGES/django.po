@@ -535,7 +535,7 @@ msgstr "Wšě pokazać"
 msgid "Save"
 msgstr "Składować"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Wuskakowace wokno so začinja..."
 
 #, python-format

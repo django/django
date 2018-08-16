@@ -549,7 +549,7 @@ msgstr "Tout afficher"
 msgid "Save"
 msgstr "Enregistrer"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Fenêtre en cours de fermeture…"
 
 #, python-format

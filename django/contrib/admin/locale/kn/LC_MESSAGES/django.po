@@ -489,7 +489,7 @@ msgstr "ಎಲ್ಲವನ್ನೂ ತೋರಿಸು"
 msgid "Save"
 msgstr "ಉಳಿಸಿ"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr ""
 
 #, python-format

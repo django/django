@@ -493,7 +493,7 @@ msgstr "সব দেখান"
 msgid "Save"
 msgstr "সংরক্ষণ করুন"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr ""
 
 #, python-format

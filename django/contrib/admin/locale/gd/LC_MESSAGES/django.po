@@ -555,7 +555,7 @@ msgstr "Seall na h-uile"
 msgid "Save"
 msgstr "Sàbhail"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Tha a’ phriob-uinneag ’ga dùnadh…"
 
 #, python-format

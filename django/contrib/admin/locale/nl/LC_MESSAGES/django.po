@@ -534,7 +534,7 @@ msgstr "Alles tonen"
 msgid "Save"
 msgstr "Opslaan"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Pop-up wordt gesloten..."
 
 #, python-format

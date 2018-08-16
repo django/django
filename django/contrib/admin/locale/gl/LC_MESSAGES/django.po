@@ -518,7 +518,7 @@ msgstr "Amosar todo"
 msgid "Save"
 msgstr "Gardar"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr ""
 
 #, python-format

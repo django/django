@@ -526,7 +526,7 @@ msgstr "Покажи всички"
 msgid "Save"
 msgstr "Запис"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Затваряне на изкачащ прозорец..."
 
 #, python-format

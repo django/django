@@ -507,7 +507,7 @@ msgstr "Monstrar toto"
 msgid "Save"
 msgstr "Salveguardar"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr ""
 
 #, python-format
