@@ -226,8 +226,8 @@ class AdminActionsTest(TestCase):
     def test_actions_ordering(self):
         """Actions are ordered as expected."""
         response = self.client.get(reverse('admin:admin_views_externalsubscriber_changelist'))
-        self.assertContains(response, '''<label>Action: <select name="action" required>
-<option value="" selected>---------</option>
+        self.assertContains(response, '''<label>Action: <select name="action" required="required">
+<option value="" selected="selected">---------</option>
 <option value="delete_selected">Delete selected external
 subscribers</option>
 <option value="redirect_to">Redirect to (Awesome action)</option>

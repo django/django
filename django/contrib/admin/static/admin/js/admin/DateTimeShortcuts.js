@@ -1,7 +1,7 @@
 /*global Calendar, findPosX, findPosY, getStyle, get_format, gettext, gettext_noop, interpolate, ngettext, quickElement*/
 // Inserts shortcut buttons after all of the following:
-//     <input type="text" class="vDateField">
-//     <input type="text" class="vTimeField">
+//     <input type="text" class="vDateField" />
+//     <input type="text" class="vTimeField" />
 (function() {
     'use strict';
     var DateTimeShortcuts = {

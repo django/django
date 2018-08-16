@@ -205,7 +205,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
 class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
     """
     A Widget for displaying ManyToMany ids in the "raw_id" interface rather than
-    in a <select multiple> box.
+    in a <select multiple="multiple"> box.
     """
     template_name = 'admin/widgets/many_to_many_raw_id.html'
 

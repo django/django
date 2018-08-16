@@ -18,7 +18,7 @@ class SelectTest(WidgetTest):
     def test_render(self):
         self.check_html(self.widget(choices=self.beatles), 'beatle', 'J', html=(
             """<select name="beatle">
-            <option value="J" selected>John</option>
+            <option value="J" selected="selected">John</option>
             <option value="P">Paul</option>
             <option value="G">George</option>
             <option value="R">Ringo</option>
@@ -60,7 +60,7 @@ class SelectTest(WidgetTest):
 
         self.check_html(self.widget(choices=choices), 'choices', '0', html=(
             """<select name="choices">
-            <option value="0" selected>0</option>
+            <option value="0" selected="selected">0</option>
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
@@ -79,7 +79,7 @@ class SelectTest(WidgetTest):
         self.check_html(widget, 'num', 2, html=(
             """<select name="num" class="super" id="super">
               <option value="1">1</option>
-              <option value="2" selected>2</option>
+              <option value="2" selected="selected">2</option>
               <option value="3">3</option>
             </select>"""
         ))
@@ -94,7 +94,7 @@ class SelectTest(WidgetTest):
             html=(
                 """<select name="num">
                 <option value="1">1</option>
-                <option value="2" selected>2</option>
+                <option value="2" selected="selected">2</option>
                 <option value="3">3</option>
                 </select>"""
             ),
@@ -105,7 +105,7 @@ class SelectTest(WidgetTest):
             html=(
                 """<select name="num">
                 <option value="1">1</option>
-                <option value="2" selected>2</option>
+                <option value="2" selected="selected">2</option>
                 <option value="3">3</option>
                 </select>"""
             ),
@@ -116,7 +116,7 @@ class SelectTest(WidgetTest):
             html=(
                 """<select name="num">
                 <option value="1">1</option>
-                <option value="2" selected>2</option>
+                <option value="2" selected="selected">2</option>
                 <option value="3">3</option>
                 </select>"""
             ),
@@ -127,7 +127,7 @@ class SelectTest(WidgetTest):
         self.check_html(widget, 'num', 2, html=(
             """<select name="num">
             <option value="1">1</option>
-            <option value="2" selected>2</option>
+            <option value="2" selected="selected">2</option>
             <option value="3">3</option>
             </select>"""
         ))
@@ -146,7 +146,7 @@ class SelectTest(WidgetTest):
             """<select name="num">
             <option value="0">0</option>
             <option value="1">1</option>
-            <option value="2" selected>2</option>
+            <option value="2" selected="selected">2</option>
             <option value="3">3</option>
             <option value="4">4</option>
             </select>"""
@@ -156,7 +156,7 @@ class SelectTest(WidgetTest):
             <option value="0">0</option>
             <option value="1">1</option>
             <option value="2">2</option>
-            <option value="3" selected>3</option>
+            <option value="3" selected="selected">3</option>
             <option value="4">4</option>
             </select>"""
         ))
@@ -176,7 +176,7 @@ class SelectTest(WidgetTest):
             'email', 'ŠĐĆŽćžšđ',
             html=(
                 """<select name="email">
-                <option value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" selected>
+                <option value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" selected="selected">
                     \u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111
                 </option>
                 <option value="\u0107\u017e\u0161\u0111">abc\u0107\u017e\u0161\u0111</option>
@@ -201,7 +201,7 @@ class SelectTest(WidgetTest):
     def test_choices_select_outer(self):
         self.check_html(self.nested_widget, 'nestchoice', 'outer1', html=(
             """<select name="nestchoice">
-            <option value="outer1" selected>Outer 1</option>
+            <option value="outer1" selected="selected">Outer 1</option>
             <optgroup label="Group &quot;1&quot;">
             <option value="inner1">Inner 1</option>
             <option value="inner2">Inner 2</option>
@@ -214,7 +214,7 @@ class SelectTest(WidgetTest):
             """<select name="nestchoice">
             <option value="outer1">Outer 1</option>
             <optgroup label="Group &quot;1&quot;">
-            <option value="inner1" selected>Inner 1</option>
+            <option value="inner1" selected="selected">Inner 1</option>
             <option value="inner2">Inner 2</option>
             </optgroup>
             </select>"""

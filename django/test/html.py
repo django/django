@@ -59,7 +59,7 @@ class Element:
         if self.attributes != element.attributes:
             # attributes without a value is same as attribute with value that
             # equals the attributes name:
-            # <input checked> == <input checked="checked">
+            # <input checked> == <input checked="checked" />
             for i in range(len(self.attributes)):
                 attr, value = self.attributes[i]
                 other_attr, other_value = element.attributes[i]
@@ -118,7 +118,7 @@ class Element:
             output += ''.join(str(c) for c in self.children)
             output += '\n</%s>' % self.name
         else:
-            output += '>'
+            output += ' />'
         return output
 
     def __repr__(self):

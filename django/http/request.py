@@ -374,7 +374,7 @@ class QueryDict(MultiValueDict):
 
     A QueryDict can be used to represent GET or POST data. It subclasses
     MultiValueDict since keys in such data can be repeated, for instance
-    in the data from a form with a <select multiple> field.
+    in the data from a form with a <select multiple="multiple"> field.
 
     By default QueryDicts are immutable, though the copy() method
     will always return a mutable copy.

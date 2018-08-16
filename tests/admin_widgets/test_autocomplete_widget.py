@@ -86,15 +86,15 @@ class AutocompleteMixinTests(TestCase):
         # With 'band', a ForeignKey.
         form = AlbumForm(initial={'band': beatles.pk})
         output = form.as_table()
-        selected_option = '<option value="%s" selected>The Beatles</option>' % beatles.pk
+        selected_option = '<option value="%s" selected="selected">The Beatles</option>' % beatles.pk
         option = '<option value="%s">The Who</option>' % who.pk
         self.assertIn(selected_option, output)
         self.assertNotIn(option, output)
         # With 'featuring', a ManyToManyField.
         form = AlbumForm(initial={'featuring': [beatles.pk, who.pk]})
         output = form.as_table()
-        selected_option = '<option value="%s" selected>The Beatles</option>' % beatles.pk
-        option = '<option value="%s" selected>The Who</option>' % who.pk
+        selected_option = '<option value="%s" selected="selected">The Beatles</option>' % beatles.pk
+        option = '<option value="%s" selected="selected">The Who</option>' % who.pk
         self.assertIn(selected_option, output)
         self.assertIn(option, output)
 

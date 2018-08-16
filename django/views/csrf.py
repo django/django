@@ -16,8 +16,8 @@ CSRF_FAILURE_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  <meta name="robots" content="NONE,NOARCHIVE">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <meta name="robots" content="NONE,NOARCHIVE" />
   <title>403 Forbidden</title>
   <style type="text/css">
     html * { padding:0; margin:0; }
@@ -122,7 +122,7 @@ def csrf_failure(request, reason="", template_name=CSRF_FAILURE_TEMPLATE_NAME):
             "connections, or for 'same-origin' requests."),
         'no_referer3': _(
             "If you are using the <meta name=\"referrer\" "
-            "content=\"no-referrer\"> tag or including the 'Referrer-Policy: "
+            "content=\"no-referrer\" /> tag or including the 'Referrer-Policy: "
             "no-referrer' header, please remove them. The CSRF protection "
             "requires the 'Referer' header to do strict referer checking. If "
             "you're concerned about privacy, use alternatives like "
