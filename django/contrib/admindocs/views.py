@@ -17,8 +17,8 @@ from django.template.engine import Engine
 from django.urls import get_mod_func, get_resolver, get_urlconf, reverse
 from django.utils.decorators import method_decorator
 from django.utils.inspect import (
-    func_accepts_kwargs, func_accepts_var_args, func_has_no_args,
-    get_func_full_args,
+    func_accepts_kwargs, func_accepts_var_args, get_func_full_args,
+    method_has_no_args,
 )
 from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
@@ -275,7 +275,7 @@ class ModelDetailView(BaseAdminDocsView):
                         'data_type': get_return_data_type(func_name),
                         'verbose': verbose or ''
                     })
-                elif func_has_no_args(func) and not func_accepts_kwargs(func) and not func_accepts_var_args(func):
+                elif method_has_no_args(func) and not func_accepts_kwargs(func) and not func_accepts_var_args(func):
                     fields.append({
                         'name': func_name,
                         'data_type': get_return_data_type(func_name),

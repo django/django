@@ -280,7 +280,8 @@ class ModelBase(type):
                         )
                 else:
                     field = copy.deepcopy(field)
-                    field.mti_inherited = True
+                    if not base._meta.abstract:
+                        field.mti_inherited = True
                     new_class.add_to_class(field.name, field)
 
         # Copy indexes so that index names are unique when models extend an

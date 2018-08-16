@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
 "PO-Revision-Date: 2017-10-21 13:28+0000\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
@@ -101,26 +101,8 @@ msgstr ""
 "sur des champs. Vous cherchez probablement le bouton Envoyer et non le "
 "bouton Enregistrer."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Note : l'heure du serveur précède votre heure de %s heure."
-msgstr[1] "Note : l'heure du serveur précède votre heure de %s heures."
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Note : votre heure précède l'heure du serveur de %s heure."
-msgstr[1] "Note : votre heure précède l'heure du serveur de %s heures."
-
 msgid "Now"
 msgstr "Maintenant"
-
-msgid "Choose a Time"
-msgstr "Choisir une heure"
-
-msgid "Choose a time"
-msgstr "Choisir une heure"
 
 msgid "Midnight"
 msgstr "Minuit"
@@ -133,6 +115,24 @@ msgstr "Midi"
 
 msgid "6 p.m."
 msgstr "18:00"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Note : l'heure du serveur précède votre heure de %s heure."
+msgstr[1] "Note : l'heure du serveur précède votre heure de %s heures."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Note : votre heure précède l'heure du serveur de %s heure."
+msgstr[1] "Note : votre heure précède l'heure du serveur de %s heures."
+
+msgid "Choose a Time"
+msgstr "Choisir une heure"
+
+msgid "Choose a time"
+msgstr "Choisir une heure"
 
 msgid "Cancel"
 msgstr "Annuler"

@@ -6,7 +6,7 @@
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Dimmus <dmitri.chudinov@gmail.com>, 2011
 # eigrad <andrew@ei-grad.ru>, 2012
-# Eugene MechanisM <eugene@mechanism.pro>, 2013
+# Eugene <eugene.mechanism@gmail.com>, 2013
 # eXtractor <evg.kirov@gmail.com>, 2015
 # Igor Melnyk, 2014
 # Ivan Khomutov <iskhomutov@gmail.com>, 2017
@@ -14,16 +14,16 @@
 # lilo.panic, 2016
 # Mikhail Zholobov <legal90@gmail.com>, 2013
 # Nikolay Korotkiy <sikmir@gmail.com>, 2018
-# Vasiliy Anikin <anikin.vasya@gmail.com>, 2017
+# Вася Аникин <anikin.vasya@gmail.com>, 2017
 # Алексей Борискин <sun.void@gmail.com>, 2013-2017
-# Дмитрий Шатера <mr.bobsans@gmail.com>, 2016
+# Дмитрий Шатера <mr.bobsans@gmail.com>, 2016,2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-01 21:10+0100\n"
-"PO-Revision-Date: 2018-01-13 10:40+0000\n"
-"Last-Translator: Nikolay Korotkiy <sikmir@gmail.com>\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-07-23 14:39+0000\n"
+"Last-Translator: SeryiMysh <vital@dorokhin.kz>\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -413,6 +413,9 @@ msgstr[3] ""
 "Убедитесь, что это значение содержит не более %(limit_value)d символов "
 "(сейчас %(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Введите число."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -498,6 +501,10 @@ msgstr "Длинное целое (8 байт)"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "Значение '%(value)s' должно быть True или False."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "Значение '%(value)s' должно быть True, False или None."
 
 msgid "Boolean (Either True or False)"
 msgstr "Логическое (True или False)"
@@ -677,9 +684,6 @@ msgstr "Обязательное поле."
 msgid "Enter a whole number."
 msgstr "Введите целое число."
 
-msgid "Enter a number."
-msgstr "Введите число."
-
 msgid "Enter a valid date."
 msgstr "Введите правильную дату."
 
@@ -691,6 +695,10 @@ msgstr "Введите правильную дату и время."
 
 msgid "Enter a valid duration."
 msgstr "Введите правильную продолжительность."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Количество дней должно быть в диапазоне от {min_days} до {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Ни одного файла не было отправлено. Проверьте тип кодировки формы."

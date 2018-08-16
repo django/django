@@ -164,8 +164,6 @@ class TruncBase(TimezoneMixin, Transform):
 
     def as_sql(self, compiler, connection):
         inner_sql, inner_params = compiler.compile(self.lhs)
-        # Escape any params because trunc_sql will format the string.
-        inner_sql = inner_sql.replace('%s', '%%s')
         if isinstance(self.output_field, DateTimeField):
             tzname = self.get_tzname()
             sql = connection.ops.datetime_trunc_sql(self.kind, inner_sql, tzname)

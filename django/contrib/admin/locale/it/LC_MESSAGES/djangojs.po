@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
 "PO-Revision-Date: 2017-09-23 18:54+0000\n"
 "Last-Translator: palmux <palmux@gmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
@@ -104,26 +104,8 @@ msgstr ""
 "Hai selezionato un'azione, e non hai ancora apportato alcuna modifica a "
 "campi singoli. Probabilmente stai cercando il pulsante Go, invece di Save."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Nota: Sei %s ora in anticipo rispetto al server."
-msgstr[1] "Nota: Sei %s ore in anticipo rispetto al server."
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Nota: Sei %s ora in ritardo rispetto al server."
-msgstr[1] "Nota: Sei %s ore in ritardo rispetto al server."
-
 msgid "Now"
 msgstr "Adesso"
-
-msgid "Choose a Time"
-msgstr "Scegli un orario"
-
-msgid "Choose a time"
-msgstr "Scegli un orario"
 
 msgid "Midnight"
 msgstr "Mezzanotte"
@@ -136,6 +118,24 @@ msgstr "Mezzogiorno"
 
 msgid "6 p.m."
 msgstr "6 del pomeriggio"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Nota: Sei %s ora in anticipo rispetto al server."
+msgstr[1] "Nota: Sei %s ore in anticipo rispetto al server."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Nota: Sei %s ora in ritardo rispetto al server."
+msgstr[1] "Nota: Sei %s ore in ritardo rispetto al server."
+
+msgid "Choose a Time"
+msgstr "Scegli un orario"
+
+msgid "Choose a time"
+msgstr "Scegli un orario"
 
 msgid "Cancel"
 msgstr "Annulla"

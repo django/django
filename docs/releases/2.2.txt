@@ -82,6 +82,14 @@ Minor features
   :class:`~django.contrib.postgres.aggregates.StringAgg` determines the
   ordering of the aggregated elements.
 
+* The new :class:`~django.contrib.postgres.indexes.BTreeIndex`,
+  :class:`~django.contrib.postgres.indexes.HashIndex` and
+  :class:`~django.contrib.postgres.indexes.SpGistIndex` classes allow
+  creating ``B-Tree``, ``hash``, and ``SP-GiST`` indexes in the database.
+
+* :class:`~django.contrib.postgres.indexes.BrinIndex` now has the
+  ``autosummarize`` parameter.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -167,7 +175,8 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* ...
+* The new :option:`migrate --plan` option prints the list of migration
+  operations that will be performed.
 
 Models
 ~~~~~~
@@ -175,6 +184,10 @@ Models
 * Added support for PostgreSQL operator classes (:attr:`.Index.opclasses`).
 
 * Added many :ref:`math database functions <math-functions>`.
+
+* Setting the new ``ignore_conflicts`` parameter of
+  :meth:`.QuerySet.bulk_create` to ``True`` tells the database to ignore
+  failure to insert rows that fail uniqueness constraints or other checks.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -227,6 +240,10 @@ Database backend API
 * Third-party database backends must implement support for table check
   constraints or set ``DatabaseFeatures.supports_table_check_constraints`` to
   ``False``.
+
+* Third party database backends must implement support for ignoring
+  constraints or uniqueness errors while inserting or set
+  ``DatabaseFeatures.supports_ignore_conflicts`` to ``False``.
 
 :mod:`django.contrib.gis`
 -------------------------

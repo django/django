@@ -863,7 +863,7 @@ March 6, 2018 - :cve:`2018-7536`
 
 Denial-of-service possibility in ``urlize`` and ``urlizetrunc`` template
 filters. `Full description
-<https://www.djangoproject.com/weblog/2018/mar/06/security-releases/>`_
+<https://www.djangoproject.com/weblog/2018/mar/06/security-releases/>`__
 
 Versions affected
 ~~~~~~~~~~~~~~~~~
@@ -877,7 +877,7 @@ March 6, 2018 - :cve:`2018-7537`
 
 Denial-of-service possibility in ``truncatechars_html`` and
 ``truncatewords_html`` template filters. `Full description
-<https://www.djangoproject.com/weblog/2018/mar/06/security-releases/>`_
+<https://www.djangoproject.com/weblog/2018/mar/06/security-releases/>`__
 
 Versions affected
 ~~~~~~~~~~~~~~~~~
@@ -885,3 +885,16 @@ Versions affected
 * Django 2.0 `(patch) <https://github.com/django/django/commit/94c5da1d17a6b0d378866c66b605102c19f7988c>`__
 * Django 1.11 `(patch) <https://github.com/django/django/commit/a91436360b79a6ff995c3e5018bcc666dfaf1539>`__
 * Django 1.8  `(patch) <https://github.com/django/django/commit/d17974a287a6ea2e361daff88fcc004cbd6835fa>`__
+
+August 1, 2018 - :cve:`2018-14574`
+----------------------------------
+
+Open redirect possibility in ``CommonMiddleware``. `Full description
+<https://www.djangoproject.com/weblog/2018/aug/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 2.1 `(patch) <https://github.com/django/django/commit/c4e5ff7fdb5fce447675e90291fd33fddd052b3c>`__
+* Django 2.0 `(patch) <https://github.com/django/django/commit/6fffc3c6d420e44f4029d5643f38d00a39b08525>`__
+* Django 1.11 `(patch) <https://github.com/django/django/commit/d6eaee092709aad477a9894598496c6deec532ff>`__

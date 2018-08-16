@@ -17,7 +17,7 @@ from django.core.checks.urls import check_resolver
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.datastructures import MultiValueDict
 from django.utils.functional import cached_property
-from django.utils.http import RFC3986_SUBDELIMS
+from django.utils.http import RFC3986_SUBDELIMS, escape_leading_slashes
 from django.utils.regex_helper import normalize
 from django.utils.translation import get_language
 
@@ -592,9 +592,7 @@ class URLResolver:
                     # safe characters from `pchar` definition of RFC 3986
                     url = quote(candidate_pat % text_candidate_subs, safe=RFC3986_SUBDELIMS + '/~:@')
                     # Don't allow construction of scheme relative urls.
-                    if url.startswith('//'):
-                        url = '/%%2F%s' % url[2:]
-                    return url
+                    return escape_leading_slashes(url)
         # lookup_view can be URL name or callable, but callables are not
         # friendly in error messages.
         m = getattr(lookup_view, '__module__', None)

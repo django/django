@@ -627,6 +627,8 @@ appropriate typecasting.
 SQLite notes
 ============
 
+Django supports SQLite 3.7.15 and later.
+
 SQLite_ provides an excellent development alternative for applications that
 are predominantly read-only or require a smaller installation footprint. As
 with all database servers, though, there are some differences that are

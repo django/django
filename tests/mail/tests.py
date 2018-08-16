@@ -1144,7 +1144,7 @@ class ConsoleBackendTests(BaseEmailBackendTests, SimpleTestCase):
 
     def get_mailbox_content(self):
         messages = self.stream.getvalue().split('\n' + ('-' * 79) + '\n')
-        return [message_from_bytes(str(m).encode()) for m in messages if m]
+        return [message_from_bytes(m.encode()) for m in messages if m]
 
     def test_console_stream_kwarg(self):
         """
@@ -1153,7 +1153,7 @@ class ConsoleBackendTests(BaseEmailBackendTests, SimpleTestCase):
         s = StringIO()
         connection = mail.get_connection('django.core.mail.backends.console.EmailBackend', stream=s)
         send_mail('Subject', 'Content', 'from@example.com', ['to@example.com'], connection=connection)
-        message = str(s.getvalue().split('\n' + ('-' * 79) + '\n')[0]).encode()
+        message = s.getvalue().split('\n' + ('-' * 79) + '\n')[0].encode()
         self.assertMessageHasHeaders(message, {
             ('MIME-Version', '1.0'),
             ('Content-Type', 'text/plain; charset="utf-8"'),

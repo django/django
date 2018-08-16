@@ -9,7 +9,7 @@ from django.contrib.postgres.search import (
     SearchQuery, SearchRank, SearchVector,
 )
 from django.db.models import F
-from django.test import modify_settings
+from django.test import SimpleTestCase, modify_settings
 
 from . import PostgreSQLTestCase
 from .models import Character, Line, Scene
@@ -292,3 +292,29 @@ class TestRankingAndWeights(GrailTestData, PostgreSQLTestCase):
             rank=SearchRank(SearchVector('dialogue'), SearchQuery('brave sir robin')),
         ).filter(rank__gt=0.3)
         self.assertSequenceEqual(searched, [self.verse0])
+
+
+class SearchQueryTests(SimpleTestCase):
+    def test_str(self):
+        tests = (
+            (~SearchQuery('a'), '~SearchQuery(a)'),
+            (
+                (SearchQuery('a') | SearchQuery('b')) & (SearchQuery('c') | SearchQuery('d')),
+                '((SearchQuery(a) || SearchQuery(b)) && (SearchQuery(c) || SearchQuery(d)))',
+            ),
+            (
+                SearchQuery('a') & (SearchQuery('b') | SearchQuery('c')),
+                '(SearchQuery(a) && (SearchQuery(b) || SearchQuery(c)))',
+            ),
+            (
+                (SearchQuery('a') | SearchQuery('b')) & SearchQuery('c'),
+                '((SearchQuery(a) || SearchQuery(b)) && SearchQuery(c))'
+            ),
+            (
+                SearchQuery('a') & (SearchQuery('b') & (SearchQuery('c') | SearchQuery('d'))),
+                '(SearchQuery(a) && (SearchQuery(b) && (SearchQuery(c) || SearchQuery(d))))',
+            ),
+        )
+        for query, expected_str in tests:
+            with self.subTest(query=query):
+                self.assertEqual(str(query), expected_str)

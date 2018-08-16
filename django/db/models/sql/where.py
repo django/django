@@ -142,7 +142,7 @@ class WhereNode(tree.Node):
     def clone(self):
         """
         Create a clone of the tree. Must only be called on root nodes (nodes
-        with empty subtree_parents). Childs must be either (Contraint, lookup,
+        with empty subtree_parents). Childs must be either (Constraint, lookup,
         value) tuples, or objects supporting .clone().
         """
         clone = self.__class__._new_instance(

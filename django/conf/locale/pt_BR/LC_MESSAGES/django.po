@@ -18,17 +18,19 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lucas Infante <maccinza@gmail.com>, 2015
 # Luiz Boaretto <lboaretto@gmail.com>, 2017
+# Marcelo Moro Brondani <mbrondani@inf.ufsm.br>, 2018
 # Sandro <sandrossv@hotmail.com>, 2011
 # Sergio Garcia <sergio@ginx.com.br>, 2015
 # Tânia Andrea <taniaa.moreira@gmail.com>, 2017
 # Wiliam Souza <wiliamsouza83@gmail.com>, 2015
+# Xico Petry <xico.petry@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-22 16:27+0000\n"
-"Last-Translator: Camilo B. Moreira <camilo.moreira@fatec.sp.gov.br>\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-07-19 17:55+0000\n"
+"Last-Translator: Xico Petry <xico.petry@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -177,6 +179,9 @@ msgstr "Japonês"
 
 msgid "Georgian"
 msgstr "Georgiano"
+
+msgid "Kabyle"
+msgstr "Cabila"
 
 msgid "Kazakh"
 msgstr "Cazaque"
@@ -400,6 +405,9 @@ msgstr[1] ""
 "Certifique-se de que o valor tenha no máximo %(limit_value)d caracteres (ele "
 "possui %(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Informe um número."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -480,6 +488,10 @@ msgstr "Inteiro grande (8 byte)"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' valor deve ser True ou False."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "O valor '%(value)s' deve ser True, False ou Nenhum."
 
 msgid "Boolean (Either True or False)"
 msgstr "Booleano (Verdadeiro ou Falso)"
@@ -657,9 +669,6 @@ msgstr "Este campo é obrigatório."
 msgid "Enter a whole number."
 msgstr "Informe um número inteiro."
 
-msgid "Enter a number."
-msgstr "Informe um número."
-
 msgid "Enter a valid date."
 msgstr "Informe uma data válida."
 
@@ -671,6 +680,10 @@ msgstr "Informe uma data/hora válida."
 
 msgid "Enter a valid duration."
 msgstr "Insira uma duração válida."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "O número de dias deve ser entre {min_days} e {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Nenhum arquivo enviado. Verifique o tipo de codificação do formulário."
@@ -1144,6 +1157,11 @@ msgid ""
 "If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
 "\" ...> for links to third-party sites."
 msgstr ""
+"Se você estiver usando a tag <meta name=\"referrer\" content=\"no-referrer"
+"\"> ou incluindo o cabeçalho \"Referrer-Policy: no-referrer\", remova-os. A "
+"proteção contra CSRF requer que o cabeçalho 'Referer' faça uma verificação "
+"rigorosa do referenciador. Se você estiver preocupado com a privacidade, use "
+"alternativas  <a rel=\"noreferrer\" ...> para links para sites de terceiros."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "

@@ -74,6 +74,10 @@ class InnerInline2(admin.StackedInline):
         js = ('my_awesome_inline_scripts.js',)
 
 
+class InnerInline2Tabular(admin.TabularInline):
+    model = Inner2
+
+
 class CustomNumberWidget(forms.NumberInput):
     class Media:
         js = ('custom_number.js',)
@@ -236,7 +240,7 @@ site.register(TitleCollection, inlines=[TitleInline])
 # only ModelAdmin media
 site.register(Holder, HolderAdmin, inlines=[InnerInline])
 # ModelAdmin and Inline media
-site.register(Holder2, HolderAdmin, inlines=[InnerInline2])
+site.register(Holder2, HolderAdmin, inlines=[InnerInline2, InnerInline2Tabular])
 # only Inline media
 site.register(Holder3, inlines=[InnerInline3])
 

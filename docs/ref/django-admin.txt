@@ -804,6 +804,13 @@ option does not, however, check for matching database schema beyond matching
 table names and so is only safe to use if you are confident that your existing
 schema matches what is recorded in your initial migration.
 
+.. django-admin-option:: --plan
+
+.. versionadded:: 2.2
+
+Shows the migration operations that will be performed for the given ``migrate``
+command.
+
 .. django-admin-option:: --run-syncdb
 
 Allows creating tables for apps without migrations. While this isn't

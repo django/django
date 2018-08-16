@@ -7,6 +7,7 @@ from django.core.mail import mail_managers
 from django.http import HttpResponsePermanentRedirect
 from django.urls import is_valid_path
 from django.utils.deprecation import MiddlewareMixin
+from django.utils.http import escape_leading_slashes
 
 
 class CommonMiddleware(MiddlewareMixin):
@@ -79,6 +80,8 @@ class CommonMiddleware(MiddlewareMixin):
         POST, PUT, or PATCH.
         """
         new_path = request.get_full_path(force_append_slash=True)
+        # Prevent construction of scheme relative urls.
+        new_path = escape_leading_slashes(new_path)
         if settings.DEBUG and request.method in ('POST', 'PUT', 'PATCH'):
             raise RuntimeError(
                 "You called this URL via %(method)s, but the URL doesn't end "

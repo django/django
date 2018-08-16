@@ -46,6 +46,7 @@ class ChangeList:
         self.list_display = list_display
         self.list_display_links = list_display_links
         self.list_filter = list_filter
+        self.has_filters = None
         self.date_hierarchy = date_hierarchy
         self.search_fields = search_fields
         self.list_select_related = list_select_related

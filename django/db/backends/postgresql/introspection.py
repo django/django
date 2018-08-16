@@ -200,6 +200,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """, [table_name])
         for index, columns, unique, primary, orders, type_, definition, options in cursor.fetchall():
             if index not in constraints:
+                basic_index = type_ == 'btree' and not index.endswith('_btree') and options is None
                 constraints[index] = {
                     "columns": columns if columns != [None] else [],
                     "orders": orders if orders != [None] else [],
@@ -208,7 +209,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     "foreign_key": None,
                     "check": False,
                     "index": True,
-                    "type": Index.suffix if type_ == 'btree' else type_,
+                    "type": Index.suffix if basic_index else type_,
                     "definition": definition,
                     "options": options,
                 }

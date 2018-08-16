@@ -261,6 +261,10 @@ class BaseDatabaseFeatures:
     # Does the backend support the default parameter in lead() and lag()?
     supports_default_in_lead_lag = True
 
+    # Does the backend support ignoring constraint or uniqueness errors during
+    # INSERT?
+    supports_ignore_conflicts = True
+
     def __init__(self, connection):
         self.connection = connection
 

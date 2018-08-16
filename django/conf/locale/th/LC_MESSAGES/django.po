@@ -3,7 +3,7 @@
 # Translators:
 # Abhabongse Janthong, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Kowit Charoenratchatabhan <kowit.s.c@gmail.com>, 2014
+# Kowit Charoenratchatabhan <kowit.s.c@gmail.com>, 2014,2018
 # Naowal Siripatana <naowalzaza@gmail.com>, 2017
 # sipp11 <sipp11@mycapsules.com>, 2014
 # Suteepat Damrongyingsupab <tianissimo@hotmail.com>, 2011-2012
@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:13+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 00:21+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Thai (http://www.transifex.com/django/django/language/th/)\n"
 "MIME-Version: 1.0\n"
@@ -164,6 +164,9 @@ msgstr "ญี่ปุ่น"
 msgid "Georgian"
 msgstr "จอร์เจีย"
 
+msgid "Kabyle"
+msgstr ""
+
 msgid "Kazakh"
 msgstr "คาซัค"
 
@@ -288,7 +291,7 @@ msgid "Traditional Chinese"
 msgstr "จีนตัวเต็ม"
 
 msgid "Messages"
-msgstr ""
+msgstr "ข้อความ"
 
 msgid "Site Maps"
 msgstr ""
@@ -300,10 +303,10 @@ msgid "Syndication"
 msgstr ""
 
 msgid "That page number is not an integer"
-msgstr ""
+msgstr "หมายเลขหน้าดังกล่าวไม่ใช่จำนวนเต็ม"
 
 msgid "That page number is less than 1"
-msgstr ""
+msgstr "หมายเลขหน้าดังกล่าวมีค่าน้อยกว่า 1"
 
 msgid "That page contains no results"
 msgstr ""
@@ -372,6 +375,9 @@ msgid_plural ""
 "%(show_value)d)."
 msgstr[0] ""
 
+msgid "Enter a number."
+msgstr "กรอกหมายเลข"
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -435,13 +441,17 @@ msgstr "จำนวนเต็ม"
 
 #, python-format
 msgid "'%(value)s' value must be an integer."
-msgstr ""
+msgstr "ค่าของ %(value)s ต้องเป็น integer"
 
 msgid "Big (8 byte) integer"
 msgstr "จำนวนเต็ม (8 byte)"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
+msgstr "ค่าของ %(value)s ต้องเป็น True หรือ False อย่างใดอย่างหนึ่ง"
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
 msgstr ""
 
 msgid "Boolean (Either True or False)"
@@ -498,7 +508,7 @@ msgid ""
 msgstr ""
 
 msgid "Duration"
-msgstr ""
+msgstr "ช่วงเวลา"
 
 msgid "Email address"
 msgstr "อีเมล"
@@ -607,9 +617,6 @@ msgstr "ฟิลด์นี้จำเป็น"
 msgid "Enter a whole number."
 msgstr "กรอกหมายเลข"
 
-msgid "Enter a number."
-msgstr "กรอกหมายเลข"
-
 msgid "Enter a valid date."
 msgstr "กรุณาใส่วัน"
 
@@ -620,6 +627,10 @@ msgid "Enter a valid date/time."
 msgstr "กรุณาใส่วันเวลา"
 
 msgid "Enter a valid duration."
+msgstr "ใส่ระยะเวลาที่ถูกต้อง"
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
 msgstr ""
 
 msgid "No file was submitted. Check the encoding type on the form."
@@ -656,7 +667,7 @@ msgid "Enter a complete value."
 msgstr ""
 
 msgid "Enter a valid UUID."
-msgstr ""
+msgstr "ใส่ UUID ที่ถูกต้อง"
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
@@ -1045,7 +1056,7 @@ msgid "0 minutes"
 msgstr "0 นาที"
 
 msgid "Forbidden"
-msgstr ""
+msgstr "หวงห้าม"
 
 msgid "CSRF verification failed. Request aborted."
 msgstr ""
@@ -1172,10 +1183,10 @@ msgid "Tutorial: A Polling App"
 msgstr ""
 
 msgid "Get started with Django"
-msgstr ""
+msgstr "เริ่มต้นกับ Django"
 
 msgid "Django Community"
-msgstr ""
+msgstr "ชุมชน Django"
 
 msgid "Connect, get help, or contribute"
 msgstr ""

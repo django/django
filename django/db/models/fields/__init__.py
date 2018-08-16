@@ -998,8 +998,7 @@ class BooleanField(Field):
         if self.null and value in self.empty_values:
             return None
         if value in (True, False):
-            # if value is 1 or 0 than it's equal to True or False, but we want
-            # to return a true bool for semantic reasons.
+            # 1/0 are equal to True/False. bool() converts former to latter.
             return bool(value)
         if value in ('t', 'True', '1'):
             return True
