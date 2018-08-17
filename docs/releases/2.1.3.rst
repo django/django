@@ -1,0 +1,23 @@
+2.1.3 Release Notes
+===================
+
+Channels 2.1.3 is another bugfix release in the 2.1 series.
+
+
+Bugfixes & Small Changes
+------------------------
+
+* An ALLOWED_ORIGINS value of "*" will now also allow requests without a Host
+  header at all (especially important for tests)
+
+* The request.path value is now correct in cases when a server has SCRIPT_NAME
+  set.
+
+* Errors that happen inside channel listeners inside a runworker or Worker
+  class are now raised rather than suppressed.
+
+
+Backwards Incompatible Changes
+------------------------------
+
+None.
