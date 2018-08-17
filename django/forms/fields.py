@@ -1187,7 +1187,7 @@ class UUIDField(CharField):
 
     def prepare_value(self, value):
         if isinstance(value, uuid.UUID):
-            return value.hex
+            return str(value)
         return value
 
     def to_python(self, value):
