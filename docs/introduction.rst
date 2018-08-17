@@ -34,7 +34,7 @@ a single idea of what a channels "application" is, and even the simplest of
     ASGI is the name for the asynchronous server specification that Channels
     is built on. Like WSGI, it is designed to let you choose between different
     servers and frameworks rather than being locked into Channels and our server
-    Daphne.
+    Daphne. You can learn more at http://asgi.readthedocs.io
 
 Channels gives you the tools to write these basic *consumers* - individual
 pieces that might handle chat messaging, or notifications - and tie them
@@ -56,7 +56,7 @@ direct, asynchronous interface for complex tasks.
 Scopes and Events
 ------------------
 
-Channels splits up incoming connections into two components: a *scope*,
+Channels and ASGI split up incoming connections into two components: a *scope*,
 and a series of *events*.
 
 The *scope* is a set of details about a single incoming connection - such as

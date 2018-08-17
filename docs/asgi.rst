@@ -1,7 +1,8 @@
 ASGI
 ====
 
-ASGI, or the Asynchronous Server Gateway Interface, is the specification which
+`ASGI <http://asgi.readthedocs.io>`_, or the
+Asynchronous Server Gateway Interface, is the specification which
 Channels and Daphne are built upon, designed to untie Channels apps from a
 specific application server and provide a common way to write application
 and middleware code.
@@ -9,8 +10,7 @@ and middleware code.
 It's a spiritual successor to WSGI, designed not only run in an asychronous
 fashion via ``asyncio``, but also supporting multiple protocols.
 
-The full ASGI spec can be found at
-https://github.com/django/asgiref/blob/master/specs/asgi.rst
+The full ASGI spec can be found at http://asgi.readthedocs.io
 
 
 Summary

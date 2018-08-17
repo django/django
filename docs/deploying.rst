@@ -142,7 +142,8 @@ You can see more about Daphne and its options
 Alternative Web Servers
 -----------------------
 
-There are also alternative ASGI servers that you can use for serving Channels.
+There are also alternative `ASGI <http://asgi.readthedocs.io>`_ servers
+that you can use for serving Channels.
 
 To some degree ASGI web servers should be interchangable, they should all have
 the same basic functionality in terms of serving HTTP and WebSocket requests.
@@ -154,7 +155,7 @@ and socket support, and approaches to process management.
 Uvicorn
 -------
 
-`Uvicorn <https://www.uvicorn.org/>` is an ASGI & WSGI server, with a fast
+`Uvicorn <https://www.uvicorn.org/>`_ is an ASGI & WSGI server, with a fast
 uvloop + httptools implementation.
 
 It supports HTTP/1 and websockets.
@@ -162,7 +163,7 @@ It supports HTTP/1 and websockets.
 Hypercorn
 ---------
 
-`Hypercorn <https://pgjones.gitlab.io/hypercorn/index.html>` is an ASGI
+`Hypercorn <https://pgjones.gitlab.io/hypercorn/index.html>`_ is an ASGI
 server based on the sans-io hyper, h11, h2, and wsproto libraries.
 
 It supports HTTP/1, HTTP/2, and websockets.
