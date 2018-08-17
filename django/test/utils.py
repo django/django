@@ -347,7 +347,11 @@ class TestContextDecorator:
                 context = self.enable()
                 if self.attr_name:
                     setattr(inner_self, self.attr_name, context)
-                decorated_setUp(inner_self)
+                try:
+                    decorated_setUp(inner_self)
+                except Exception:
+                    self.disable()
+                    raise
 
             def tearDown(inner_self):
                 decorated_tearDown(inner_self)

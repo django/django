@@ -19,8 +19,8 @@ from django.test import (
 )
 from django.test.html import HTMLParseError, parse_html
 from django.test.utils import (
-    CaptureQueriesContext, isolate_apps, override_settings,
-    setup_test_environment,
+    CaptureQueriesContext, TestContextDecorator, isolate_apps,
+    override_settings, setup_test_environment,
 )
 from django.urls import NoReverseMatch, reverse
 
@@ -1221,3 +1221,28 @@ class IsolatedAppsTests(SimpleTestCase):
         self.assertEqual(MethodDecoration._meta.apps, method_apps)
         self.assertEqual(ContextManager._meta.apps, context_apps)
         self.assertEqual(NestedContextManager._meta.apps, nested_context_apps)
+
+
+class DoNothingDecorator(TestContextDecorator):
+    def enable(self):
+        pass
+
+    def disable(self):
+        pass
+
+
+class TestContextDecoratorTests(SimpleTestCase):
+
+    @mock.patch.object(DoNothingDecorator, 'disable')
+    def test_exception_in_setup(self, mock_disable):
+        """An exception is setUp() is reraised after disable() is called."""
+        class ExceptionInSetUp(unittest.TestCase):
+            def setUp(self):
+                raise NotImplementedError('reraised')
+
+        decorator = DoNothingDecorator()
+        decorated_test_class = decorator.__call__(ExceptionInSetUp)()
+        self.assertFalse(mock_disable.called)
+        with self.assertRaisesMessage(NotImplementedError, 'reraised'):
+            decorated_test_class.setUp()
+        self.assertTrue(mock_disable.called)
