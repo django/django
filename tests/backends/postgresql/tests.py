@@ -48,9 +48,10 @@ class Tests(TestCase):
         max_name_length = connection.ops.max_name_length()
         settings['NAME'] = 'a' + (max_name_length * 'a')
         msg = (
-            'Database names longer than %d characters are not supported by '
-            'PostgreSQL. Supply a shorter NAME in settings.DATABASES.'
-        ) % max_name_length
+            "The database name '%s' (%d characters) is longer than "
+            "PostgreSQL's limit of %s characters. Supply a shorter NAME in "
+            "settings.DATABASES."
+        ) % (settings['NAME'], max_name_length + 1, max_name_length)
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             DatabaseWrapper(settings).get_connection_params()
 
