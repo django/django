@@ -138,3 +138,31 @@ You can also specify the port and IP that Daphne binds to::
 
 You can see more about Daphne and its options
 `on GitHub <https://github.com/django/daphne>`_.
+
+Alternative Web Servers
+-----------------------
+
+There are also alternative ASGI servers that you can use for serving Channels.
+
+To some degree ASGI web servers should be interchangable, they should all have
+the same basic functionality in terms of serving HTTP and WebSocket requests.
+
+Aspects where servers may differ are in their configuration and defaults,
+performance characteristics, support for resource limiting, differing protocol
+and socket support, and approaches to process management.
+
+Uvicorn
+-------
+
+`Uvicorn <https://www.uvicorn.org/>` is an ASGI & WSGI server, with a fast
+uvloop + httptools implementation.
+
+It supports HTTP/1 and websockets.
+
+Hypercorn
+---------
+
+`Hypercorn <https://pgjones.gitlab.io/hypercorn/index.html>` is an ASGI
+server based on the sans-io hyper, h11, h2, and wsproto libraries.
+
+It supports HTTP/1, HTTP/2, and websockets.
