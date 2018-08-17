@@ -3,6 +3,7 @@ import itertools
 import os
 import re
 from importlib import import_module
+from unittest import mock
 from urllib.parse import quote
 
 from django.apps import apps
@@ -1202,6 +1203,13 @@ class ChangelistTests(AuthViewsTestCase):
     def test_password_change_bad_url(self):
         response = self.client.get(reverse('auth_test_admin:auth_user_password_change', args=('foobar',)))
         self.assertEqual(response.status_code, 404)
+
+    @mock.patch('django.contrib.auth.admin.UserAdmin.has_change_permission')
+    def test_user_change_password_passes_user_to_has_change_permission(self, has_change_permission):
+        url = reverse('auth_test_admin:auth_user_password_change', args=(self.admin.pk,))
+        self.client.post(url, {'password1': 'password1', 'password2': 'password1'})
+        (_request, user), _kwargs = has_change_permission.call_args
+        self.assertEqual(user.pk, self.admin.pk)
 
 
 @override_settings(
