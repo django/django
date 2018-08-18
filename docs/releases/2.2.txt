@@ -224,6 +224,10 @@ Tests
   URL, ignoring the ordering of the query string.
   :meth:`~.SimpleTestCase.assertRedirects` uses the new assertion.
 
+* The test :class:`~.django.test.Client` now supports automatic JSON
+  serialization of list and tuple ``data`` when
+  ``content_type='application/json'``.
+
 URLs
 ~~~~
 

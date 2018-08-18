@@ -95,14 +95,21 @@ class ClientTest(TestCase):
     def test_json_serialization(self):
         """The test client serializes JSON data."""
         methods = ('post', 'put', 'patch', 'delete')
+        tests = (
+            ({'value': 37}, {'value': 37}),
+            ([37, True], [37, True]),
+            ((37, False), [37, False]),
+        )
         for method in methods:
             with self.subTest(method=method):
-                client_method = getattr(self.client, method)
-                method_name = method.upper()
-                response = client_method('/json_view/', {'value': 37}, content_type='application/json')
-                self.assertEqual(response.status_code, 200)
-                self.assertEqual(response.context['data'], 37)
-                self.assertContains(response, 'Viewing %s page.' % method_name)
+                for data, expected in tests:
+                    with self.subTest(data):
+                        client_method = getattr(self.client, method)
+                        method_name = method.upper()
+                        response = client_method('/json_view/', data, content_type='application/json')
+                        self.assertEqual(response.status_code, 200)
+                        self.assertEqual(response.context['data'], expected)
+                        self.assertContains(response, 'Viewing %s page.' % method_name)
 
     def test_json_encoder_argument(self):
         """The test Client accepts a json_encoder."""

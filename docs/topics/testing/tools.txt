@@ -213,10 +213,11 @@ Use the ``django.test.Client`` class to make requests.
 
             name=fred&passwd=secret
 
-        If you provide ``content_type`` as :mimetype:`application/json`, a
-        ``data`` dictionary is serialized using :func:`json.dumps` with
-        :class:`~django.core.serializers.json.DjangoJSONEncoder`. You can
-        change the encoder by providing a ``json_encoder`` argument to
+        If you provide ``content_type`` as :mimetype:`application/json`, the
+        ``data`` is serialized using :func:`json.dumps` if it's a dict, list,
+        or tuple. Serialization is performed with
+        :class:`~django.core.serializers.json.DjangoJSONEncoder` by default,
+        and can be overridden by providing a ``json_encoder`` argument to
         :class:`Client`. This serialization also happens for :meth:`put`,
         :meth:`patch`, and :meth:`delete` requests.
 
@@ -225,6 +226,11 @@ Use the ``django.test.Client`` class to make requests.
             The JSON serialization described above was added. In older versions,
             you can call :func:`json.dumps` on ``data`` before passing it to
             ``post()`` to achieve the same thing.
+
+        .. versionchanged:: 2.2
+
+            The JSON serialization was extended to support lists and tuples. In
+            older versions, only dicts are serialized.
 
         If you provide any other ``content_type`` (e.g. :mimetype:`text/xml`
         for an XML payload), the contents of ``data`` are sent as-is in the
