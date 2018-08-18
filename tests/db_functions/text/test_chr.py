@@ -1,6 +1,7 @@
 from django.db.models import IntegerField
 from django.db.models.functions import Chr, Left, Ord
 from django.test import TestCase
+from django.test.utils import register_lookup
 
 from ..models import Author
 
@@ -23,10 +24,7 @@ class ChrTests(TestCase):
         self.assertCountEqual(authors.exclude(first_initial=Chr(ord('É'))), [self.john, self.rhonda])
 
     def test_transform(self):
-        try:
-            IntegerField.register_lookup(Chr)
+        with register_lookup(IntegerField, Chr):
             authors = Author.objects.annotate(name_code_point=Ord('name'))
             self.assertCountEqual(authors.filter(name_code_point__chr=Chr(ord('J'))), [self.john])
             self.assertCountEqual(authors.exclude(name_code_point__chr=Chr(ord('J'))), [self.elena, self.rhonda])
-        finally:
-            IntegerField._unregister_lookup(Chr)

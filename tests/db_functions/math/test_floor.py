@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.db.models import DecimalField
 from django.db.models.functions import Floor
 from django.test import TestCase
+from django.test.utils import register_lookup
 
 from ..models import DecimalModel, FloatModel, IntegerModel
 
@@ -41,11 +42,8 @@ class FloorTests(TestCase):
         self.assertEqual(obj.big_floor, math.floor(obj.big))
 
     def test_transform(self):
-        try:
-            DecimalField.register_lookup(Floor)
+        with register_lookup(DecimalField, Floor):
             DecimalModel.objects.create(n1=Decimal('5.4'), n2=Decimal('0'))
             DecimalModel.objects.create(n1=Decimal('3.4'), n2=Decimal('0'))
             objs = DecimalModel.objects.filter(n1__floor__gt=4)
             self.assertQuerysetEqual(objs, [Decimal('5.4')], lambda a: a.n1)
-        finally:
-            DecimalField._unregister_lookup(Floor)

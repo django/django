@@ -1,6 +1,7 @@
 from django.db.models import CharField
 from django.db.models.functions import Length
 from django.test import TestCase
+from django.test.utils import register_lookup
 
 from ..models import Author
 
@@ -35,8 +36,7 @@ class LengthTests(TestCase):
         )
 
     def test_transform(self):
-        try:
-            CharField.register_lookup(Length)
+        with register_lookup(CharField, Length):
             Author.objects.create(name='John Smith', alias='smithj')
             Author.objects.create(name='Rhonda')
             authors = Author.objects.filter(name__length__gt=7)
@@ -44,5 +44,3 @@ class LengthTests(TestCase):
                 authors.order_by('name'), ['John Smith'],
                 lambda a: a.name
             )
-        finally:
-            CharField._unregister_lookup(Length)

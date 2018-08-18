@@ -1,6 +1,7 @@
 from django.db.models import CharField
 from django.db.models.functions import LTrim, RTrim, Trim
 from django.test import TestCase
+from django.test.utils import register_lookup
 
 from ..models import Author
 
@@ -32,9 +33,6 @@ class TrimTests(TestCase):
         )
         for transform, trimmed_name in tests:
             with self.subTest(transform=transform):
-                try:
-                    CharField.register_lookup(transform)
+                with register_lookup(CharField, transform):
                     authors = Author.objects.filter(**{'name__%s' % transform.lookup_name: trimmed_name})
                     self.assertQuerysetEqual(authors, [' John  '], lambda a: a.name)
-                finally:
-                    CharField._unregister_lookup(transform)

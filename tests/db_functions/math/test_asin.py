@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.db.models import DecimalField
 from django.db.models.functions import ASin
 from django.test import TestCase
+from django.test.utils import register_lookup
 
 from ..models import DecimalModel, FloatModel, IntegerModel
 
@@ -41,11 +42,8 @@ class ASinTests(TestCase):
         self.assertAlmostEqual(obj.big_asin, math.asin(obj.big))
 
     def test_transform(self):
-        try:
-            DecimalField.register_lookup(ASin)
+        with register_lookup(DecimalField, ASin):
             DecimalModel.objects.create(n1=Decimal('0.1'), n2=Decimal('0'))
             DecimalModel.objects.create(n1=Decimal('1.0'), n2=Decimal('0'))
             objs = DecimalModel.objects.filter(n1__asin__gt=1)
             self.assertQuerysetEqual(objs, [Decimal('1.0')], lambda a: a.n1)
-        finally:
-            DecimalField._unregister_lookup(ASin)

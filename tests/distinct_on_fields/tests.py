@@ -1,6 +1,7 @@
 from django.db.models import CharField, Max
 from django.db.models.functions import Lower
 from django.test import TestCase, skipUnlessDBFeature
+from django.test.utils import register_lookup
 
 from .models import Celebrity, Fan, Staff, StaffTag, Tag
 
@@ -100,14 +101,11 @@ class DistinctOnTests(TestCase):
         new_name = self.t1.name.upper()
         self.assertNotEqual(self.t1.name, new_name)
         Tag.objects.create(name=new_name)
-        CharField.register_lookup(Lower)
-        try:
+        with register_lookup(CharField, Lower):
             self.assertCountEqual(
                 Tag.objects.order_by().distinct('name__lower'),
                 [self.t1, self.t2, self.t3, self.t4, self.t5],
             )
-        finally:
-            CharField._unregister_lookup(Lower)
 
     def test_distinct_not_implemented_checks(self):
         # distinct + annotate not allowed

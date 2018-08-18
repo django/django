@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.db.models import DecimalField
 from django.db.models.functions import Tan
 from django.test import TestCase
+from django.test.utils import register_lookup
 
 from ..models import DecimalModel, FloatModel, IntegerModel
 
@@ -41,11 +42,8 @@ class TanTests(TestCase):
         self.assertAlmostEqual(obj.big_tan, math.tan(obj.big))
 
     def test_transform(self):
-        try:
-            DecimalField.register_lookup(Tan)
+        with register_lookup(DecimalField, Tan):
             DecimalModel.objects.create(n1=Decimal('0.0'), n2=Decimal('0'))
             DecimalModel.objects.create(n1=Decimal('12.0'), n2=Decimal('0'))
             objs = DecimalModel.objects.filter(n1__tan__lt=0)
             self.assertQuerysetEqual(objs, [Decimal('12.0')], lambda a: a.n1)
-        finally:
-            DecimalField._unregister_lookup(Tan)

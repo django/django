@@ -1,6 +1,7 @@
 from django.db.models import CharField
 from django.db.models.functions import Upper
 from django.test import TestCase
+from django.test.utils import register_lookup
 
 from ..models import Author
 
@@ -28,8 +29,7 @@ class UpperTests(TestCase):
         )
 
     def test_transform(self):
-        try:
-            CharField.register_lookup(Upper)
+        with register_lookup(CharField, Upper):
             Author.objects.create(name='John Smith', alias='smithj')
             Author.objects.create(name='Rhonda')
             authors = Author.objects.filter(name__upper__exact='JOHN SMITH')
@@ -39,5 +39,3 @@ class UpperTests(TestCase):
                 ],
                 lambda a: a.name
             )
-        finally:
-            CharField._unregister_lookup(Upper)
