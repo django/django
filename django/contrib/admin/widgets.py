@@ -351,6 +351,11 @@ class AdminBigIntegerFieldWidget(AdminIntegerFieldWidget):
     class_name = 'vBigIntegerField'
 
 
+class AdminUUIDInputWidget(forms.TextInput):
+    def __init__(self, attrs=None):
+        super().__init__(attrs={'class': 'vUUIDField', **(attrs or {})})
+
+
 # Mapping of lower case language codes [returned by Django's get_language()]
 # to language codes supported by select2.
 # See django/contrib/admin/static/admin/js/vendor/select2/i18n/*
