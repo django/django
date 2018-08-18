@@ -11,8 +11,9 @@ Profile first
 =============
 
 As general programming practice, this goes without saying. Find out :ref:`what
-queries you are doing and what they are costing you
-<faq-see-raw-sql-queries>`. You may also want to use an external project like
+queries you are doing and what they are costing you <faq-see-raw-sql-queries>`.
+Use :meth:`.QuerySet.explain` to understand how specific ``QuerySet``\s are
+executed by your database. You may also want to use an external project like
 django-debug-toolbar_, or a tool that monitors your database directly.
 
 Remember that you may be optimizing for speed or memory or both, depending on
@@ -113,6 +114,14 @@ Use ``iterator()``
 When you have a lot of objects, the caching behavior of the ``QuerySet`` can
 cause a large amount of memory to be used. In this case,
 :meth:`~django.db.models.query.QuerySet.iterator()` may help.
+
+Use ``explain()``
+-----------------
+
+:meth:`.QuerySet.explain` gives you detailed information about how the database
+executes a query, including indexes and joins that are used. These details may
+help you find queries that could be rewritten more efficiently, or identify
+indexes that could be added to improve performance.
 
 Do database work in the database rather than in Python
 ======================================================
