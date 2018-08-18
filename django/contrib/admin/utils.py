@@ -319,7 +319,7 @@ def _get_non_gfk_field(opts, name):
     return field
 
 
-def label_for_field(name, model, model_admin=None, return_attr=False):
+def label_for_field(name, model, model_admin=None, return_attr=False, form=None):
     """
     Return a sensible label for a field name. The name can be a callable,
     property (but not created with @property decorator), or the name of an
@@ -346,10 +346,14 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
                 attr = getattr(model_admin, name)
             elif hasattr(model, name):
                 attr = getattr(model, name)
+            elif form and name in form.fields:
+                attr = form.fields[name]
             else:
                 message = "Unable to lookup '%s' on %s" % (name, model._meta.object_name)
                 if model_admin:
                     message += " or %s" % (model_admin.__class__.__name__,)
+                if form:
+                    message += " or %s" % form.__class__.__name__
                 raise AttributeError(message)
 
             if hasattr(attr, "short_description"):

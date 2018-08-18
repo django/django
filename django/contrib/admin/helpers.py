@@ -162,7 +162,7 @@ class AdminReadonlyField:
         if form._meta.labels and class_name in form._meta.labels:
             label = form._meta.labels[class_name]
         else:
-            label = label_for_field(field, form._meta.model, model_admin)
+            label = label_for_field(field, form._meta.model, model_admin, form=form)
 
         if form._meta.help_texts and class_name in form._meta.help_texts:
             help_text = form._meta.help_texts[class_name]

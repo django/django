@@ -1768,6 +1768,7 @@ class AdminViewPermissionsTest(TestCase):
         response = self.client.get(article_change_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['title'], 'View article')
+        self.assertContains(response, '<label>Extra form field:</label>')
         self.assertContains(response, '<a href="/test_admin/admin/admin_views/article/" class="closelink">Close</a>')
         post = self.client.post(article_change_url, change_dict)
         self.assertEqual(post.status_code, 302)
