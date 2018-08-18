@@ -735,3 +735,27 @@ class ModelRefreshTests(TestCase):
         article.save()
         featured.refresh_from_db()
         self.assertEqual(featured.article.headline, 'Parrot programs in Python 2.0')
+
+    def test_prefetched_cache_cleared(self):
+        a = Article.objects.create(pub_date=datetime(2005, 7, 28))
+        s = SelfRef.objects.create(article=a)
+        # refresh_from_db() without fields=[...]
+        a1_prefetched = Article.objects.prefetch_related('selfref_set').first()
+        self.assertCountEqual(a1_prefetched.selfref_set.all(), [s])
+        s.article = None
+        s.save()
+        # Relation is cleared and prefetch cache is stale.
+        self.assertCountEqual(a1_prefetched.selfref_set.all(), [s])
+        a1_prefetched.refresh_from_db()
+        # Cache was cleared and new results are available.
+        self.assertCountEqual(a1_prefetched.selfref_set.all(), [])
+        # refresh_from_db() with fields=[...]
+        a2_prefetched = Article.objects.prefetch_related('selfref_set').first()
+        self.assertCountEqual(a2_prefetched.selfref_set.all(), [])
+        s.article = a
+        s.save()
+        # Relation is added and prefetch cache is stale.
+        self.assertCountEqual(a2_prefetched.selfref_set.all(), [])
+        a2_prefetched.refresh_from_db(fields=['selfref_set'])
+        # Cache was cleared and new results are available.
+        self.assertCountEqual(a2_prefetched.selfref_set.all(), [s])
