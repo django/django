@@ -189,6 +189,9 @@ Models
   :meth:`.QuerySet.bulk_create` to ``True`` tells the database to ignore
   failure to insert rows that fail uniqueness constraints or other checks.
 
+* :class:`~django.db.models.FilePathField` ``path`` parameter now accepts a
+  callable.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
