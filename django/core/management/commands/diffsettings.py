@@ -41,8 +41,11 @@ class Command(BaseCommand):
     def handle(self, **options):
         from django.conf import settings, Settings, global_settings
 
-        # Because settings are imported lazily, we need to explicitly load them.
-        settings._setup()
+        # Because settings are imported lazily, we need to explicitly load them,
+        # only if the user hasn't configured settings manually i.e. using
+        # settings.configure()
+        if not settings.configured:
+            settings._setup()
 
         user_settings = module_to_dict(settings._wrapped)
         default = options['default']
