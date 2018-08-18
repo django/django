@@ -524,14 +524,10 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         Creation should fail if the password fails validation.
         """
         new_io = StringIO()
+        entered_passwords = ['1234567890', '1234567890', 'password', 'password']
 
-        # Returns '1234567890' the first two times it is called, then
-        # 'password' subsequently.
-        def bad_then_good_password(index=[0]):
-            index[0] += 1
-            if index[0] <= 2:
-                return '1234567890'
-            return 'password'
+        def bad_then_good_password():
+            return entered_passwords.pop(0)
 
         @mock_inputs({
             'password': bad_then_good_password,
@@ -561,13 +557,10 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
     def test_validate_password_against_username(self):
         new_io = StringIO()
         username = 'supremelycomplex'
+        entered_passwords = [username, username, 'superduperunguessablepassword', 'superduperunguessablepassword']
 
-        def bad_then_good_password(index=[0]):
-            """Return username the first two times, then a valid password."""
-            index[0] += 1
-            if index[0] <= 2:
-                return username
-            return 'superduperunguessablepassword'
+        def bad_then_good_password():
+            return entered_passwords.pop(0)
 
         @mock_inputs({
             'password': bad_then_good_password,
@@ -599,21 +592,16 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
     )
     def test_validate_password_against_required_fields(self):
         new_io = StringIO()
-        username = 'josephine'
+        first_name = 'josephine'
+        entered_passwords = [first_name, first_name, 'superduperunguessablepassword', 'superduperunguessablepassword']
 
-        # Returns the username the first two times it's called, then a valid
-        # password.
-        def bad_then_good_password(index=[0]):
-            """Return username the first two times, then a valid password."""
-            index[0] += 1
-            if index[0] <= 2:
-                return username
-            return 'superduperunguessablepassword'
+        def bad_then_good_password():
+            return entered_passwords.pop(0)
 
         @mock_inputs({
             'password': bad_then_good_password,
-            'username': username,
-            'first_name': 'josephine',
+            'username': 'whatever',
+            'first_name': first_name,
             'date_of_birth': '1970-01-01',
             'email': 'joey@example.com',
             'bypass': 'n',
