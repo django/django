@@ -119,3 +119,13 @@ class CustomIdUser(models.Model):
 
 class CharPK(models.Model):
     char_pk = models.CharField(max_length=100, primary_key=True)
+
+
+class SoftDeletableManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=False)
+
+
+class SoftDeletableObject(models.Model):
+    deleted = models.BooleanField(default=False)
+    objects = SoftDeletableManager()

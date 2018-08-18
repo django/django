@@ -856,3 +856,60 @@ class SystemChecksTestCase(SimpleTestCase):
             self.assertEqual(errors, [])
         finally:
             Book._meta.apps.ready = True
+
+    def test_check_manager_name_must_be_string(self):
+        class MyModelAdmin(admin.ModelAdmin):
+            manager_name = None
+
+        errors = MyModelAdmin(Album, AdminSite()).check()
+        self.assertEqual(
+            errors,
+            [
+                checks.Error(
+                    "The value of 'manager_name' must be a string.",
+                    obj=MyModelAdmin,
+                    id='admin.E130',
+                ),
+            ],
+        )
+
+    def test_check_manager_name_must_be_an_attribute(self):
+        class MyModelAdmin(admin.ModelAdmin):
+            manager_name = 'missing'
+
+        errors = MyModelAdmin(Album, AdminSite()).check()
+        self.assertEqual(
+            errors,
+            [
+                checks.Error(
+                    "The value of 'manager_name' refers to 'missing', which is "
+                    "not an attribute of 'admin_checks.Album'.",
+                    obj=MyModelAdmin,
+                    id='admin.E131',
+                ),
+            ],
+        )
+
+    def test_check_manager_name_must_reference_a_manager(self):
+        class MyModelAdmin(admin.ModelAdmin):
+            manager_name = 'title'
+
+        errors = MyModelAdmin(Album, AdminSite()).check()
+        self.assertEqual(
+            errors,
+            [
+                checks.Error(
+                    "The value of 'manager_name' must be an attribute of "
+                    "'admin_checks.Album' that inherits from 'Manager'.",
+                    obj=MyModelAdmin,
+                    id='admin.E132',
+                ),
+            ],
+        )
+
+    def test_check_manager_name_valid(self):
+        class MyModelAdmin(admin.ModelAdmin):
+            manager_name = '_base_manager'
+
+        errors = MyModelAdmin(Album, AdminSite()).check()
+        self.assertEqual(errors, [])

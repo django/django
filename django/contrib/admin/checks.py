@@ -101,6 +101,7 @@ class BaseModelAdminChecks:
 
     def check(self, admin_obj, **kwargs):
         return [
+            *self._check_manager_name(admin_obj),
             *self._check_autocomplete_fields(admin_obj),
             *self._check_raw_id_fields(admin_obj),
             *self._check_fields(admin_obj),
@@ -115,6 +116,34 @@ class BaseModelAdminChecks:
             *self._check_ordering(admin_obj),
             *self._check_readonly_fields(admin_obj),
         ]
+
+    def _check_manager_name(self, obj):
+        try:
+            manager = getattr(obj.model, obj.manager_name)
+        except TypeError:
+            return must_be('a string', option='manager_name', obj=obj, id='admin.E130')
+        except AttributeError:
+            return refer_to_missing_field(
+                field=obj.manager_name,
+                option='manager_name',
+                obj=obj,
+                id='admin.E131',
+            )
+        else:
+            if not isinstance(manager, models.Manager):
+                return [
+                    checks.Error(
+                        "The value of 'manager_name' must be an attribute "
+                        "of '%s.%s' that inherits from 'Manager'." % (
+                            obj.model._meta.app_label,
+                            obj.model._meta.object_name,
+                        ),
+                        obj=obj.__class__,
+                        id='admin.E132',
+                    ),
+                ]
+            else:
+                return []
 
     def _check_autocomplete_fields(self, obj):
         """

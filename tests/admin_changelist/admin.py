@@ -147,3 +147,7 @@ class EmptyValueChildAdmin(admin.ModelAdmin):
     def age_display(self, obj):
         return obj.age
     age_display.empty_value_display = '&dagger;'
+
+
+class SoftDeletableObjectAdmin(admin.ModelAdmin):
+    manager_name = '_base_manager'

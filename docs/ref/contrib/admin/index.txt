@@ -258,6 +258,12 @@ subclass::
 
             view_birth_date.empty_value_display = '???'
 
+.. attribute:: ModelAdmin.manager_name
+
+     Default, ``'_default_manager'``. Set this to the name of the model's
+     manager to be used by :meth:`.ModelAdmin.get_queryset()` if the default
+     manager is not appropriate for your needs.
+
 .. attribute:: ModelAdmin.exclude
 
     This attribute, if given, should be a list of field names to exclude from

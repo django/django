@@ -26,13 +26,14 @@ from .admin import (
     DynamicListDisplayLinksChildAdmin, DynamicListFilterChildAdmin,
     DynamicSearchFieldsChildAdmin, EmptyValueChildAdmin, EventAdmin,
     FilteredChildAdmin, GroupAdmin, InvitationAdmin,
-    NoListDisplayLinksParentAdmin, ParentAdmin, QuartetAdmin, SwallowAdmin,
-    site as custom_site,
+    NoListDisplayLinksParentAdmin, ParentAdmin, QuartetAdmin,
+    SoftDeletableObjectAdmin, SwallowAdmin, site as custom_site,
 )
 from .models import (
     Band, CharPK, Child, ChordsBand, ChordsMusician, Concert, CustomIdUser,
     Event, Genre, Group, Invitation, Membership, Musician, OrderedObject,
-    Parent, Quartet, Swallow, SwallowOneToOne, UnorderedObject,
+    Parent, Quartet, SoftDeletableObject, Swallow, SwallowOneToOne,
+    UnorderedObject,
 )
 
 
@@ -1010,6 +1011,15 @@ class ChangeListTests(TestCase):
         self.assertIn('<ul class="object-tools">', response.rendered_content)
         # The "Add" button inside the object-tools shouldn't appear.
         self.assertNotIn('Add ', response.rendered_content)
+
+    def test_manager_name(self):
+        obj = SoftDeletableObject.objects.create()
+        deleted_obj = SoftDeletableObject.objects.create(deleted=True)
+        self.assertSequenceEqual(SoftDeletableObject._default_manager.get_queryset(), [obj])
+        superuser = self._create_superuser('superuser')
+        ma = SoftDeletableObjectAdmin(SoftDeletableObject, custom_site)
+        request = self._mocked_authenticated_request('/event/', superuser)
+        self.assertCountEqual(ma.get_queryset(request), [obj, deleted_obj])
 
 
 class GetAdminLogTests(TestCase):
