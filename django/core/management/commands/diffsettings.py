@@ -42,7 +42,8 @@ class Command(BaseCommand):
         from django.conf import settings, Settings, global_settings
 
         # Because settings are imported lazily, we need to explicitly load them.
-        settings._setup()
+        if not settings.configured:
+            settings._setup()
 
         user_settings = module_to_dict(settings._wrapped)
         default = options['default']

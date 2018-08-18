@@ -159,16 +159,18 @@ class AdminScriptTestCase(unittest.TestCase):
         script_dir = os.path.abspath(os.path.join(os.path.dirname(django.__file__), 'bin'))
         return self.run_test(os.path.join(script_dir, 'django-admin.py'), args, settings_file)
 
-    def run_manage(self, args, settings_file=None):
+    def run_manage(self, args, settings_file=None, configured_settings=False):
         def safe_remove(path):
             try:
                 os.remove(path)
             except OSError:
                 pass
 
-        conf_dir = os.path.dirname(conf.__file__)
-        template_manage_py = os.path.join(conf_dir, 'project_template', 'manage.py-tpl')
-
+        template_manage_py = (
+            os.path.join(os.path.dirname(__file__), 'configured_settings_manage.py')
+            if configured_settings else
+            os.path.join(os.path.dirname(conf.__file__), 'project_template', 'manage.py-tpl')
+        )
         test_manage_py = os.path.join(self.test_dir, 'manage.py')
         shutil.copyfile(template_manage_py, test_manage_py)
 
@@ -2181,6 +2183,11 @@ class DiffSettings(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "FOO = 'bar'  ###")
+
+    def test_settings_configured(self):
+        out, err = self.run_manage(['diffsettings'], configured_settings=True)
+        self.assertNoOutput(err)
+        self.assertOutput(out, 'DEBUG = True')
 
     def test_all(self):
         """The all option also shows settings with the default value."""
