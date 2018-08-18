@@ -3,7 +3,7 @@ import re
 import types
 from datetime import datetime, timedelta
 from decimal import Decimal
-from unittest import TestCase, skipUnless
+from unittest import TestCase
 
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
@@ -306,43 +306,21 @@ with open(create_path('invalid_urls.txt'), encoding='utf8') as f:
         TEST_DATA.append((URLValidator(), url.strip(), ValidationError))
 
 
-def create_simple_test_method(validator, expected, value, num):
-    if expected is not None and issubclass(expected, Exception):
-        test_mask = 'test_%s_raises_error_%d'
+class TestValidators(SimpleTestCase):
 
-        def test_func(self):
-            # assertRaises not used, so as to be able to produce an error message
-            # containing the tested value
-            try:
-                validator(value)
-            except expected:
-                pass
-            else:
-                self.fail("%s not raised when validating '%s'" % (
-                    expected.__name__, value))
-    else:
-        test_mask = 'test_%s_%d'
+    def test_validators(self):
+        for validator, value, expected in TEST_DATA:
+            name = validator.__name__ if isinstance(validator, types.FunctionType) else validator.__class__.__name__
+            exception_expected = expected is not None and issubclass(expected, Exception)
+            with self.subTest(name, value=value):
+                if validator is validate_image_file_extension and not PILLOW_IS_INSTALLED:
+                    self.skipTest('Pillow is required to test validate_image_file_extension.')
+                if exception_expected:
+                    with self.assertRaises(expected):
+                        validator(value)
+                else:
+                    self.assertEqual(expected, validator(value))
 
-        def test_func(self):
-            try:
-                self.assertEqual(expected, validator(value))
-            except ValidationError as e:
-                self.fail("Validation of '%s' failed. Error message was: %s" % (
-                    value, str(e)))
-    if isinstance(validator, types.FunctionType):
-        val_name = validator.__name__
-    else:
-        val_name = validator.__class__.__name__
-    test_name = test_mask % (val_name, num)
-    if validator is validate_image_file_extension:
-        SKIP_MSG = "Pillow is required to test validate_image_file_extension"
-        test_func = skipUnless(PILLOW_IS_INSTALLED, SKIP_MSG)(test_func)
-    return test_name, test_func
-
-# Dynamically assemble a test class with the contents of TEST_DATA
-
-
-class TestSimpleValidators(SimpleTestCase):
     def test_single_message(self):
         v = ValidationError('Not Valid')
         self.assertEqual(str(v), "['Not Valid']")
@@ -367,13 +345,6 @@ class TestSimpleValidators(SimpleTestCase):
         v = MaxLengthValidator(16, message='"%(value)s" has more than %(limit_value)d characters.')
         with self.assertRaisesMessage(ValidationError, '"djangoproject.com" has more than 16 characters.'):
             v('djangoproject.com')
-
-
-test_counter = 0
-for validator, value, expected in TEST_DATA:
-    name, method = create_simple_test_method(validator, expected, value, test_counter)
-    setattr(TestSimpleValidators, name, method)
-    test_counter += 1
 
 
 class TestValidatorEquality(TestCase):
