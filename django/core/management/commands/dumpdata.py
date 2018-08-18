@@ -4,7 +4,7 @@ from collections import OrderedDict
 from django.apps import apps
 from django.core import serializers
 from django.core.management.base import BaseCommand, CommandError
-from django.core.management.utils import parse_apps_and_model_labels
+from django.core.management.utils import parse_apps_and_model_labels, get_command_line_option
 from django.db import DEFAULT_DB_ALIAS, router
 
 
@@ -12,11 +12,23 @@ class ProxyModelWarning(Warning):
     pass
 
 
+DEFAULT_FORMAT = 'json'
+
+
 class Command(BaseCommand):
     help = (
         "Output the contents of the database as a fixture of the given format "
         "(using each model's default manager unless --all is specified)."
     )
+    format = DEFAULT_FORMAT
+
+    def run_from_argv(self, argv):
+        """
+        Pre-parse the command line to extract the value of the --format option. This allows a format to define
+        additional command line arguments.
+        """
+        self.format = get_command_line_option(argv, '--format', default=DEFAULT_FORMAT)
+        super().run_from_argv(argv)
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -24,7 +36,7 @@ class Command(BaseCommand):
             help='Restricts dumped data to the specified app_label or app_label.ModelName.',
         )
         parser.add_argument(
-            '--format', default='json',
+            '--format', default=DEFAULT_FORMAT,
             help='Specifies the output serialization format for fixtures.',
         )
         parser.add_argument(
@@ -64,6 +76,21 @@ class Command(BaseCommand):
             '-o', '--output',
             help='Specifies file to which the output is written.'
         )
+
+        # Allow the format to add commandline arguments, which are shown in a distinct section in --help output
+        serializer_class = serializers.get_serializer(self.format)
+        title = 'options specific to the "{}" format'.format(self.format)
+        group = parser.add_argument_group(title)
+        if hasattr(serializer_class, 'add_arguments'):
+            serializer_class.add_arguments(group)
+
+        # Show this section even when empty (by adding a description), in order to let the user see that other formats
+        # might have additional options.
+        if not group._group_actions:
+            group.description = "This format has no additional options."
+
+        # Store the options added, so we can only pass these options to the serializer later
+        self.serializer_option_keys = {opt.dest for opt in group._group_actions}
 
     def handle(self, *app_labels, **options):
         format = options['format']
@@ -177,13 +204,14 @@ class Command(BaseCommand):
                 progress_output = self.stdout
                 object_count = sum(get_objects(count_only=True))
             stream = open(output, 'w') if output else None
+            serialize_options = {k: v for k, v in options.items() if k in self.serializer_option_keys}
             try:
                 serializers.serialize(
                     format, get_objects(), indent=indent,
                     use_natural_foreign_keys=use_natural_foreign_keys,
                     use_natural_primary_keys=use_natural_primary_keys,
                     stream=stream or self.stdout, progress_output=progress_output,
-                    object_count=object_count,
+                    object_count=object_count, **serialize_options,
                 )
             finally:
                 if stream:

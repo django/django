@@ -108,17 +108,17 @@ def parse_apps_and_model_labels(labels):
     return models, apps
 
 
-def get_command_line_option(argv, option):
+def get_command_line_option(argv, option, default=None):
     """
     Return the value of a command line option (which should include leading
     dashes, e.g. '--testrunnner') from an argument list. Return None if the
     option wasn't passed or if the argument list couldn't be parsed.
     """
     parser = CommandParser(add_help=False, allow_abbrev=False)
-    parser.add_argument(option, dest='value')
+    parser.add_argument(option, dest='value', default=default)
     try:
         options, _ = parser.parse_known_args(argv[2:])
     except CommandError:
-        return None
+        return default
     else:
         return options.value
