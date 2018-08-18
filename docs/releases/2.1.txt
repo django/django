@@ -86,6 +86,12 @@ Minor features
 
 * Admin actions may now :ref:`specify permissions <admin-action-permissions>`
   to limit their availability to certain users.
+* ``Not Empty`` option added to admin's related and all values filters.
+
+:mod:`django.contrib.admindocs`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
 
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

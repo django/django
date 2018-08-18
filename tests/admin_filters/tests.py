@@ -481,6 +481,17 @@ class ListFiltersTests(TestCase):
         self.assertIs(choices[-1]['selected'], True)
         self.assertEqual(choices[-1]['query_string'], '?year__isnull=True')
 
+        request = self.request_factory.get('/', {'year__isnull': 'False'})
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+
+        # Make sure the one befor the last choice is `Not Empty` and is selected
+        filterspec = changelist.get_filters(request)[0][0]
+        self.assertEqual(filterspec.title, 'year')
+        choices = list(filterspec.choices(changelist))
+        self.assertIs(choices[-2]['selected'], True)
+        self.assertEqual(choices[-2]['query_string'], '?year__isnull=False')
+
         request = self.request_factory.get('/', {'year': '2002'})
         request.user = self.alfred
         changelist = modeladmin.get_changelist_instance(request)
@@ -535,6 +546,17 @@ class ListFiltersTests(TestCase):
         choices = list(filterspec.choices(changelist))
         self.assertIs(choices[-1]['selected'], True)
         self.assertEqual(choices[-1]['query_string'], '?author__isnull=True')
+
+        request = self.request_factory.get('/', {'author__isnull': 'False'})
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+
+        # Make sure the one befor the last choice is `Not Empty` and is selected
+        filterspec = changelist.get_filters(request)[0][1]
+        self.assertEqual(filterspec.title, 'Verbose Author')
+        choices = list(filterspec.choices(changelist))
+        self.assertIs(choices[-2]['selected'], True)
+        self.assertEqual(choices[-2]['query_string'], '?author__isnull=False')
 
         request = self.request_factory.get('/', {'author__id__exact': self.alfred.pk})
         request.user = self.alfred

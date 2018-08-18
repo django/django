@@ -174,6 +174,7 @@ class RelatedFieldListFilter(FieldListFilter):
             self.lookup_title = other_model._meta.verbose_name
         self.title = self.lookup_title
         self.empty_value_display = model_admin.get_empty_value_display()
+        self.not_empty_value_display = model_admin.get_not_empty_value_display()
 
     @property
     def include_empty_choice(self):
@@ -209,6 +210,13 @@ class RelatedFieldListFilter(FieldListFilter):
                 'display': val,
             }
         if self.include_empty_choice:
+            yield {
+                'selected': self.lookup_val_isnull == 'False',
+                'query_string': changelist.get_query_string({
+                    self.lookup_kwarg_isnull: 'False',
+                }, [self.lookup_kwarg]),
+                'display': self.not_empty_value_display,
+            }
             yield {
                 'selected': bool(self.lookup_val_isnull),
                 'query_string': changelist.get_query_string({self.lookup_kwarg_isnull: 'True'}, [self.lookup_kwarg]),
@@ -372,6 +380,7 @@ class AllValuesFieldListFilter(FieldListFilter):
         self.lookup_val = params.get(self.lookup_kwarg)
         self.lookup_val_isnull = params.get(self.lookup_kwarg_isnull)
         self.empty_value_display = model_admin.get_empty_value_display()
+        self.not_empty_value_display = model_admin.get_not_empty_value_display()
         parent_model, reverse_path = reverse_field_path(model, field_path)
         # Obey parent ModelAdmin queryset when deciding which options to show
         if model == parent_model:
@@ -402,6 +411,13 @@ class AllValuesFieldListFilter(FieldListFilter):
                 'display': val,
             }
         if include_none:
+            yield {
+                'selected': self.lookup_val_isnull == 'False',
+                'query_string': changelist.get_query_string({
+                    self.lookup_kwarg_isnull: 'False',
+                }, [self.lookup_kwarg]),
+                'display': self.not_empty_value_display,
+            }
             yield {
                 'selected': bool(self.lookup_val_isnull),
                 'query_string': changelist.get_query_string({self.lookup_kwarg_isnull: 'True'}, [self.lookup_kwarg]),

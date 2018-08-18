@@ -26,8 +26,8 @@ from .admin import (
     DynamicListDisplayLinksChildAdmin, DynamicListFilterChildAdmin,
     DynamicSearchFieldsChildAdmin, EmptyValueChildAdmin, EventAdmin,
     FilteredChildAdmin, GroupAdmin, InvitationAdmin,
-    NoListDisplayLinksParentAdmin, ParentAdmin, QuartetAdmin, SwallowAdmin,
-    site as custom_site,
+    NoListDisplayLinksParentAdmin, NotEmptyValueChildAdmin, ParentAdmin,
+    QuartetAdmin, SwallowAdmin, site as custom_site,
 )
 from .models import (
     Band, CharPK, Child, ChordsBand, ChordsMusician, Concert, CustomIdUser,
@@ -164,6 +164,24 @@ class ChangeListTests(TestCase):
         row_html = build_tbody_html(new_child.id, link, '<td class="field-parent nowrap">???</td>')
         self.assertNotEqual(table_output.find(row_html), -1, 'Failed to find expected row element: %s' % table_output)
 
+    def test_set_not_empty_value_display_on_admin_site(self):
+        """
+        Not Empty value display can be set on AdminSite.
+        """
+        Child.objects.create(name='name', parent=None)
+        request = self.factory.get('/child/')
+        request.user = self.superuser
+        # Set a new not empty display value on AdminSite.
+        admin.site.not_empty_value_display = '???'
+        m = ChildAdmin(Child, admin.site)
+        cl = m.get_changelist_instance(request)
+        t = '{% load admin_list %}{% spaceless %}{% for spec in cl.filter_specs %}'\
+            '{% admin_list_filter cl spec %}{% endfor %}{% endspaceless %}'
+        template = Template(t)
+        context = Context({'cl': cl, 'opts': Child._meta})
+        table_output = template.render(context)
+        self.assertNotEqual(table_output.find('<a href="?age__isnull=False" title="???">???</a>'), -1)
+
     def test_result_list_set_empty_value_display_in_model_admin(self):
         """
         Empty value display can be set in ModelAdmin or individual fields.
@@ -185,6 +203,22 @@ class ChangeListTests(TestCase):
             '<td class="field-age">-empty-</td>'
         )
         self.assertNotEqual(table_output.find(row_html), -1, 'Failed to find expected row element: %s' % table_output)
+
+    def test_set_not_empty_value_display_in_model_admin(self):
+        """
+        Not Empty value display can be set in ModelAdmin or individual fields.
+        """
+        Child.objects.create(name='name', parent=None)
+        request = self.factory.get('/child/')
+        request.user = self.superuser
+        m = NotEmptyValueChildAdmin(Child, admin.site)
+        cl = m.get_changelist_instance(request)
+        t = '{% load admin_list %}{% spaceless %}{% for spec in cl.filter_specs %}'\
+            '{% admin_list_filter cl spec %}{% endfor %}{% endspaceless %}'
+        template = Template(t)
+        context = Context({'cl': cl, 'opts': Child._meta})
+        table_output = template.render(context)
+        self.assertNotEqual(table_output.find('<a href="?age__isnull=False" title="-not-empty-">-not-empty-</a>'), -1)
 
     def test_result_list_html(self):
         """

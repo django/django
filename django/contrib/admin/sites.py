@@ -50,6 +50,7 @@ class AdminSite:
     site_url = '/'
 
     _empty_value_display = '-'
+    _not_empty_value_display = gettext_lazy('Not Empty')
 
     login_form = None
     index_template = None
@@ -177,6 +178,14 @@ class AdminSite:
     @empty_value_display.setter
     def empty_value_display(self, empty_value_display):
         self._empty_value_display = empty_value_display
+
+    @property
+    def not_empty_value_display(self):
+        return self._not_empty_value_display
+
+    @not_empty_value_display.setter
+    def not_empty_value_display(self, not_empty_value_display):
+        self._not_empty_value_display = not_empty_value_display
 
     def has_permission(self, request):
         """
