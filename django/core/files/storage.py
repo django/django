@@ -309,11 +309,11 @@ class FileSystemStorage(Storage):
     def listdir(self, path):
         path = self.path(path)
         directories, files = [], []
-        for entry in os.listdir(path):
-            if os.path.isdir(os.path.join(path, entry)):
-                directories.append(entry)
+        for entry in os.scandir(path):
+            if entry.is_dir():
+                directories.append(entry.name)
             else:
-                files.append(entry)
+                files.append(entry.name)
         return directories, files
 
     def path(self, name):
