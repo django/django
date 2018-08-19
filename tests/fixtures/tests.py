@@ -48,20 +48,11 @@ class SubclassTestCaseFixtureLoadingTests(TestCaseFixtureLoadingTests):
 
 class DumpDataAssertMixin:
 
-    def _dumpdata_assert(self, args, output, format='json', filename=None,
-                         natural_foreign_keys=False, natural_primary_keys=False,
-                         use_base_manager=False, exclude_list=[], primary_keys=''):
+    def _dumpdata_assert(self, args, output, format='json', filename=None, **kwargs):
         new_io = StringIO()
         filename = filename and os.path.join(tempfile.gettempdir(), filename)
-        management.call_command('dumpdata', *args, **{'format': format,
-                                                      'stdout': new_io,
-                                                      'stderr': new_io,
-                                                      'output': filename,
-                                                      'use_natural_foreign_keys': natural_foreign_keys,
-                                                      'use_natural_primary_keys': natural_primary_keys,
-                                                      'use_base_manager': use_base_manager,
-                                                      'exclude': exclude_list,
-                                                      'primary_keys': primary_keys})
+        management.call_command('dumpdata', *args, format=format, stdout=new_io,
+                                stderr=new_io, output=filename, **kwargs)
         if filename:
             with open(filename, "r") as f:
                 command_output = f.read()
@@ -235,7 +226,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             ['fixtures.book'],
             '[{"pk": 1, "model": "fixtures.book", "fields": {"name": "Music for all ages", "authors": [["Artist '
             'formerly known as \\"Prince\\""], ["Django Reinhardt"]]}}]',
-            natural_foreign_keys=True
+            use_natural_foreign_keys=True
         )
 
         # You can also omit the primary keys for models that we can get later with natural keys.
@@ -244,7 +235,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '[{"fields": {"name": "Django Reinhardt"}, "model": "fixtures.person"}, {"fields": {"name": "Stephane '
             'Grappelli"}, "model": "fixtures.person"}, {"fields": {"name": "Artist formerly known as '
             '\\"Prince\\""}, "model": "fixtures.person"}]',
-            natural_primary_keys=True
+            use_natural_primary_keys=True
         )
 
         # Dump the current contents of the database as a JSON fixture
@@ -272,7 +263,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             ' ["Artist formerly known as \\"Prince\\""], "permissions": [["change_user", "auth", "user"]]}}, '
             '{"pk": 1, "model": "fixtures.book", "fields": {"name": "Music for all ages", "authors": [["Artist '
             'formerly known as \\"Prince\\""], ["Django Reinhardt"]]}}]',
-            natural_foreign_keys=True
+            use_natural_foreign_keys=True
         )
 
         # Dump the current contents of the database as an XML fixture
@@ -323,7 +314,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             'to="fixtures.person" name="authors" rel="ManyToManyRel"><object><natural>Artist formerly known as '
             '"Prince"</natural></object><object><natural>Django Reinhardt</natural></object></field></object>'
             '</django-objects>',
-            format='xml', natural_foreign_keys=True
+            format='xml', use_natural_foreign_keys=True
         )
 
     def test_dumpdata_with_excludes(self):
@@ -335,7 +326,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         self._dumpdata_assert(
             ['sites', 'fixtures'],
             '[{"pk": 1, "model": "sites.site", "fields": {"domain": "example.com", "name": "example.com"}}]',
-            exclude_list=['fixtures'],
+            exclude=['fixtures'],
         )
 
         # Excluding fixtures.Article/Book should leave fixtures.Category
@@ -344,7 +335,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '[{"pk": 1, "model": "sites.site", "fields": {"domain": "example.com", "name": "example.com"}}, '
             '{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": '
             '"News Stories"}}]',
-            exclude_list=['fixtures.Article', 'fixtures.Book']
+            exclude=['fixtures.Article', 'fixtures.Book']
         )
 
         # Excluding fixtures and fixtures.Article/Book should be a no-op
@@ -353,7 +344,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '[{"pk": 1, "model": "sites.site", "fields": {"domain": "example.com", "name": "example.com"}}, '
             '{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": '
             '"News Stories"}}]',
-            exclude_list=['fixtures.Article', 'fixtures.Book']
+            exclude=['fixtures.Article', 'fixtures.Book']
         )
 
         # Excluding sites and fixtures.Article/Book should only leave fixtures.Category
@@ -361,16 +352,16 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             ['sites', 'fixtures'],
             '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": '
             '"News Stories"}}]',
-            exclude_list=['fixtures.Article', 'fixtures.Book', 'sites']
+            exclude=['fixtures.Article', 'fixtures.Book', 'sites']
         )
 
         # Excluding a bogus app should throw an error
         with self.assertRaisesMessage(management.CommandError, "No installed app with label 'foo_app'."):
-            self._dumpdata_assert(['fixtures', 'sites'], '', exclude_list=['foo_app'])
+            self._dumpdata_assert(['fixtures', 'sites'], '', exclude=['foo_app'])
 
         # Excluding a bogus model should throw an error
         with self.assertRaisesMessage(management.CommandError, "Unknown model: fixtures.FooModel"):
-            self._dumpdata_assert(['fixtures', 'sites'], '', exclude_list=['fixtures.FooModel'])
+            self._dumpdata_assert(['fixtures', 'sites'], '', exclude=['fixtures.FooModel'])
 
     @unittest.skipIf(sys.platform.startswith('win'), "Windows doesn't support '?' in filenames.")
     def test_load_fixture_with_special_characters(self):
@@ -633,7 +624,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '"law", "tagged_id": 3}}, {"pk": 1, "model": "fixtures.person", "fields": {"name": "Django '
             'Reinhardt"}}, {"pk": 2, "model": "fixtures.person", "fields": {"name": "Stephane Grappelli"}}, '
             '{"pk": 3, "model": "fixtures.person", "fields": {"name": "Prince"}}]',
-            natural_foreign_keys=True
+            use_natural_foreign_keys=True
         )
 
         # Dump the current contents of the database as an XML fixture
@@ -656,7 +647,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '</field></object><object pk="2" model="fixtures.person"><field type="CharField" name="name">Stephane '
             'Grappelli</field></object><object pk="3" model="fixtures.person"><field type="CharField" name="name">'
             'Prince</field></object></django-objects>',
-            format='xml', natural_foreign_keys=True
+            format='xml', use_natural_foreign_keys=True
         )
 
     def test_loading_with_exclude_app(self):
