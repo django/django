@@ -40,11 +40,17 @@ class Command(BaseCommand):
             help='Tells Django to use specified test runner class instead of '
                  'the one specified by the TEST_RUNNER setting.',
         )
-
+        # Allow the test runner to add commandline arguments, which are shown in a distinct section in --help output
         test_runner_class = get_runner(settings, self.test_runner)
-
+        title = 'options specific to the "{}" testrunner'.format(self.test_runner)
+        group = parser.add_argument_group(title)
         if hasattr(test_runner_class, 'add_arguments'):
-            test_runner_class.add_arguments(parser)
+            test_runner_class.add_arguments(group)
+
+        # Show this section even when empty (by adding a description), in order to let the user see that other test
+        # runners might have additional options.
+        if not group._group_actions:
+            group.description = "This test runner has no additional options."
 
     def handle(self, *test_labels, **options):
         TestRunner = get_runner(settings, options['testrunner'])
