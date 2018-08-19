@@ -39,7 +39,12 @@ class MyAdmin(admin.ModelAdmin):
 
 @override_settings(
     SILENCED_SYSTEM_CHECKS=['fields.W342'],  # ForeignKey(unique=True)
-    INSTALLED_APPS=['django.contrib.auth', 'django.contrib.contenttypes', 'admin_checks']
+    INSTALLED_APPS=[
+        'django.contrib.admin',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'admin_checks',
+    ],
 )
 class SystemChecksTestCase(SimpleTestCase):
 
@@ -69,11 +74,6 @@ class SystemChecksTestCase(SimpleTestCase):
         self.assertEqual(admin.checks.check_dependencies(), [])
 
     @override_settings(
-        INSTALLED_APPS=[
-            'django.contrib.admin',
-            'django.contrib.auth',
-            'django.contrib.contenttypes',
-        ],
         TEMPLATES=[{
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
             'DIRS': [],
