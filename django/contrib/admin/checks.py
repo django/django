@@ -14,7 +14,8 @@ from django.db.models.expressions import Combinable, F, OrderBy
 from django.forms.models import (
     BaseModelForm, BaseModelFormSet, _get_foreign_key,
 )
-from django.template.engine import Engine
+from django.template import engines
+from django.template.backends.django import DjangoTemplates
 from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.inspect import get_func_args
 
@@ -31,38 +32,68 @@ def check_dependencies(**kwargs):
     """
     Check that the admin's dependencies are correctly installed.
     """
+    if not apps.is_installed('django.contrib.admin'):
+        return []
     errors = []
-    # contrib.contenttypes must be installed.
-    if not apps.is_installed('django.contrib.contenttypes'):
-        missing_app = checks.Error(
-            "'django.contrib.contenttypes' must be in INSTALLED_APPS in order "
-            "to use the admin application.",
-            id="admin.E401",
-        )
-        errors.append(missing_app)
-    # The auth context processor must be installed if using the default
-    # authentication backend.
-    try:
-        default_template_engine = Engine.get_default()
-    except Exception:
-        # Skip this non-critical check:
-        # 1. if the user has a non-trivial TEMPLATES setting and Django
-        #    can't find a default template engine
-        # 2. if anything goes wrong while loading template engines, in
-        #    order to avoid raising an exception from a confusing location
-        # Catching ImproperlyConfigured suffices for 1. but 2. requires
-        # catching all exceptions.
-        pass
+    app_dependencies = (
+        ('django.contrib.contenttypes', 401),
+        ('django.contrib.auth', 405),
+        ('django.contrib.messages', 406),
+        ('django.contrib.sessions', 407),
+    )
+    for app_name, error_code in app_dependencies:
+        if not apps.is_installed(app_name):
+            errors.append(checks.Error(
+                "'%s' must be in INSTALLED_APPS in order to use the admin "
+                "application." % app_name,
+                id='admin.E%d' % error_code,
+            ))
+    for engine in engines.all():
+        if isinstance(engine, DjangoTemplates):
+            django_templates_instance = engine.engine
+            break
+    else:
+        django_templates_instance = None
+    if not django_templates_instance:
+        errors.append(checks.Error(
+            "A 'django.template.backends.django.DjangoTemplates' instance "
+            "must be configured in TEMPLATES in order to use the admin "
+            "application.",
+            id='admin.E403',
+        ))
     else:
         if ('django.contrib.auth.context_processors.auth'
-                not in default_template_engine.context_processors and
-                'django.contrib.auth.backends.ModelBackend' in settings.AUTHENTICATION_BACKENDS):
-            missing_template = checks.Error(
-                "'django.contrib.auth.context_processors.auth' must be in "
-                "TEMPLATES in order to use the admin application.",
-                id="admin.E402"
-            )
-            errors.append(missing_template)
+                not in django_templates_instance.context_processors and
+                'django.contrib.auth.backends.ModelBackend'
+                in settings.AUTHENTICATION_BACKENDS):
+            errors.append(checks.Error(
+                "'django.contrib.auth.context_processors.auth' must be "
+                "enabled in DjangoTemplates (TEMPLATES) if using the default "
+                "auth backend in order to use the admin application.",
+                id='admin.E402',
+            ))
+        if ('django.contrib.messages.context_processors.messages'
+                not in django_templates_instance.context_processors):
+            errors.append(checks.Error(
+                "'django.contrib.messages.context_processors.messages' must "
+                "be enabled in DjangoTemplates (TEMPLATES) in order to use "
+                "the admin application.",
+                id='admin.E404',
+            ))
+    if ('django.contrib.auth.middleware.AuthenticationMiddleware'
+            not in settings.MIDDLEWARE):
+        errors.append(checks.Error(
+            "'django.contrib.auth.middleware.AuthenticationMiddleware' must "
+            "be in MIDDLEWARE in order to use the admin application.",
+            id='admin.E408',
+        ))
+    if ('django.contrib.messages.middleware.MessageMiddleware'
+            not in settings.MIDDLEWARE):
+        errors.append(checks.Error(
+            "'django.contrib.messages.middleware.MessageMiddleware' must "
+            "be in MIDDLEWARE in order to use the admin application.",
+            id='admin.E409',
+        ))
     return errors
 
 

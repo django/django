@@ -1172,9 +1172,28 @@ class ManageCheck(AdminScriptTestCase):
                 'django.contrib.admin.apps.SimpleAdminConfig',
                 'django.contrib.auth',
                 'django.contrib.contenttypes',
+                'django.contrib.messages',
+                'django.contrib.sessions',
             ],
             sdict={
-                'DEBUG': True
+                'DEBUG': True,
+                'MIDDLEWARE': [
+                    'django.contrib.messages.middleware.MessageMiddleware',
+                    'django.contrib.auth.middleware.AuthenticationMiddleware',
+                ],
+                'TEMPLATES': [
+                    {
+                        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                        'DIRS': [],
+                        'APP_DIRS': True,
+                        'OPTIONS': {
+                            'context_processors': [
+                                'django.contrib.auth.context_processors.auth',
+                                'django.contrib.messages.context_processors.messages',
+                            ],
+                        },
+                    },
+                ],
             }
         )
         args = ['check']
