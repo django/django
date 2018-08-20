@@ -1237,7 +1237,7 @@ class Window(Expression):
     def set_source_expressions(self, exprs):
         self.source_expression, self.partition_by, self.order_by, self.frame = exprs
 
-    def as_sql(self, compiler, connection, function=None, template=None):
+    def as_sql(self, compiler, connection, template=None):
         connection.ops.check_expression_support(self)
         expr_sql, params = compiler.compile(self.source_expression)
         window_sql, window_params = [], []
