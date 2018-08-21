@@ -245,7 +245,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     leading punctuation (opening parens) and it'll still do the right thing.
 
     If trim_url_limit is not None, truncate the URLs in the link text longer
-    than this limit to trim_url_limit-3 characters and append an ellipsis.
+    than this limit to trim_url_limit - 1 characters and append an ellipsis.
 
     If nofollow is True, give the links a rel="nofollow" attribute.
 
@@ -256,7 +256,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     def trim_url(x, limit=trim_url_limit):
         if limit is None or len(x) <= limit:
             return x
-        return '%s...' % x[:max(0, limit - 3)]
+        return '%s…' % x[:max(0, limit - 1)]
 
     def unescape(text, trail):
         """

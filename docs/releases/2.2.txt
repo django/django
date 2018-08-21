@@ -273,6 +273,12 @@ Miscellaneous
 * The return value of :func:`django.utils.text.slugify` is no longer marked as
   HTML safe.
 
+* The default truncation character used by the :tfilter:`urlizetrunc`,
+  :tfilter:`truncatechars`, :tfilter:`truncatechars_html`,
+  :tfilter:`truncatewords`, and :tfilter:`truncatewords_html` template filters
+  is now the real ellipsis character (``…``) instead of 3 dots. You may have to
+  adapt some test output comparisons.
+
 .. _deprecated-features-2.2:
 
 Features deprecated in 2.2

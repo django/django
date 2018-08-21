@@ -64,7 +64,7 @@ class Truncator(SimpleLazyObject):
         if truncate is None:
             truncate = pgettext(
                 'String to return when truncating text',
-                '%(truncated_text)s...')
+                '%(truncated_text)s…')
         if '%(truncated_text)s' in truncate:
             return truncate % {'truncated_text': text}
         # The truncation text didn't contain the %(truncated_text)s string
@@ -81,8 +81,7 @@ class Truncator(SimpleLazyObject):
         of characters.
 
         `truncate` specifies what should be used to notify that the string has
-        been truncated, defaulting to a translatable string of an ellipsis
-        (...).
+        been truncated, defaulting to a translatable string of an ellipsis.
         """
         self._setup()
         length = int(num)
@@ -123,7 +122,7 @@ class Truncator(SimpleLazyObject):
         """
         Truncate a string after a certain number of words. `truncate` specifies
         what should be used to notify that the string has been truncated,
-        defaulting to ellipsis (...).
+        defaulting to ellipsis.
         """
         self._setup()
         length = int(num)

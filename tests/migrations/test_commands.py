@@ -346,7 +346,7 @@ class MigrateTests(MigrationTestBase):
         self.assertEqual(
             'Planned operations:\n'
             'migrations.0004_fourth\n'
-            '    Raw SQL operation -> SELECT * FROM migrations_author W...\n',
+            '    Raw SQL operation -> SELECT * FROM migrations_author WHE…\n',
             out.getvalue()
         )
         # Migrate to the fourth migration.

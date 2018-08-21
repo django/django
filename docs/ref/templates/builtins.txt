@@ -2265,15 +2265,15 @@ If ``value`` is ``"my FIRST post"``, the output will be ``"My First Post"``.
 -----------------
 
 Truncates a string if it is longer than the specified number of characters.
-Truncated strings will end with a translatable ellipsis sequence ("...").
+Truncated strings will end with a translatable ellipsis character ("…").
 
 **Argument:** Number of characters to truncate to
 
 For example::
 
-    {{ value|truncatechars:9 }}
+    {{ value|truncatechars:7 }}
 
-If ``value`` is ``"Joel is a slug"``, the output will be ``"Joel i..."``.
+If ``value`` is ``"Joel is a slug"``, the output will be ``"Joel i…"``.
 
 .. templatefilter:: truncatechars_html
 
@@ -2286,10 +2286,10 @@ are closed immediately after the truncation.
 
 For example::
 
-    {{ value|truncatechars_html:9 }}
+    {{ value|truncatechars_html:7 }}
 
 If ``value`` is ``"<p>Joel is a slug</p>"``, the output will be
-``"<p>Joel i...</p>"``.
+``"<p>Joel i…</p>"``.
 
 Newlines in the HTML content will be preserved.
 
@@ -2306,7 +2306,7 @@ For example::
 
     {{ value|truncatewords:2 }}
 
-If ``value`` is ``"Joel is a slug"``, the output will be ``"Joel is ..."``.
+If ``value`` is ``"Joel is a slug"``, the output will be ``"Joel is …"``.
 
 Newlines within the string will be removed.
 
@@ -2327,7 +2327,7 @@ For example::
     {{ value|truncatewords_html:2 }}
 
 If ``value`` is ``"<p>Joel is a slug</p>"``, the output will be
-``"<p>Joel is ...</p>"``.
+``"<p>Joel is …</p>"``.
 
 Newlines in the HTML content will be preserved.
 
@@ -2454,7 +2454,7 @@ For example::
 
 If ``value`` is ``"Check out www.djangoproject.com"``, the output would be
 ``'Check out <a href="http://www.djangoproject.com"
-rel="nofollow">www.djangopr...</a>'``.
+rel="nofollow">www.djangoproj…</a>'``.
 
 As with urlize_, this filter should only be applied to plain text.
 

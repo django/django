@@ -280,7 +280,7 @@ def truncatewords(value, arg):
         length = int(arg)
     except ValueError:  # Invalid literal for int().
         return value  # Fail silently.
-    return Truncator(value).words(length, truncate=' ...')
+    return Truncator(value).words(length, truncate=' …')
 
 
 @register.filter(is_safe=True)
@@ -294,7 +294,7 @@ def truncatewords_html(value, arg):
         length = int(arg)
     except ValueError:  # invalid literal for int()
         return value  # Fail silently.
-    return Truncator(value).words(length, html=True, truncate=' ...')
+    return Truncator(value).words(length, html=True, truncate=' …')
 
 
 @register.filter(is_safe=False)

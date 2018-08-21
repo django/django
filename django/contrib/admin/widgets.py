@@ -193,7 +193,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         except NoReverseMatch:
             url = ''  # Admin not registered for target model.
 
-        return Truncator(obj).words(14, truncate='...'), url
+        return Truncator(obj).words(14), url
 
 
 class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
