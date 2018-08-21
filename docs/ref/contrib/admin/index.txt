@@ -25,41 +25,39 @@ Overview
 The admin is enabled in the default project template used by
 :djadmin:`startproject`.
 
-For reference, here are the requirements:
+If you're not using the default project template, here are the requirements:
 
-1. Add ``'django.contrib.admin'`` to your :setting:`INSTALLED_APPS` setting.
+#. Add ``'django.contrib.admin'`` and its dependencies -
+   :mod:`django.contrib.auth`, :mod:`django.contrib.contenttypes`,
+   :mod:`django.contrib.messages`, and :mod:`django.contrib.sessions` - to your
+   :setting:`INSTALLED_APPS` setting.
 
-2. The admin has four dependencies - :mod:`django.contrib.auth`,
-   :mod:`django.contrib.contenttypes`,
-   :mod:`django.contrib.messages` and
-   :mod:`django.contrib.sessions`.  If these applications are not
-   in your :setting:`INSTALLED_APPS` list, add them.
+#. Configure a :class:`~django.template.backends.django.DjangoTemplates`
+   backend in your :setting:`TEMPLATES` setting with
+   ``django.contrib.auth.context_processors.auth`` and
+   ``django.contrib.messages.context_processors.messages`` in
+   the ``'context_processors'`` option of :setting:`OPTIONS
+   <TEMPLATES-OPTIONS>`.
 
-3. Add ``django.contrib.auth.context_processors.auth`` and
-   ``django.contrib.messages.context_processors.messages`` to
-   the ``'context_processors'`` option of the ``DjangoTemplates`` backend
-   defined in your :setting:`TEMPLATES` as well as
+#. If you've customized the :setting:`MIDDLEWARE` setting,
    :class:`django.contrib.auth.middleware.AuthenticationMiddleware` and
-   :class:`django.contrib.messages.middleware.MessageMiddleware` to
-   :setting:`MIDDLEWARE`. These are all active by default, so you only need to
-   do this if you've manually tweaked the settings.
+   :class:`django.contrib.messages.middleware.MessageMiddleware` must be
+   included.
 
-4. Determine which of your application's models should be editable in the
-   admin interface.
+5. :ref:`Hook the admin's URLs into your URLconf
+   <hooking-adminsite-to-urlconf>`.
 
-5. For each of those models, optionally create a ``ModelAdmin`` class that
-   encapsulates the customized admin functionality and options for that
-   particular model.
+After you've taken these steps, you'll be able to use the admin site by
+visiting the URL you hooked it into (``/admin/``, by default).
 
-6. Instantiate an ``AdminSite`` and tell it about each of your models and
-   ``ModelAdmin`` classes.
+If you need to create a user to login with, use the :djadmin:`createsuperuser`
+command. By default, logging in to the admin requires that the user has the
+:attr:`~.User.is_superuser` or :attr:`~.User.is_staff` attribute set to
+``True``.
 
-7. Hook the ``AdminSite`` instance into your URLconf.
-
-After you've taken these steps, you'll be able to use your Django admin site
-by visiting the URL you hooked it into (``/admin/``, by default). If you need
-to create a user to login with, you can use the :djadmin:`createsuperuser`
-command.
+Finally, determine which of your application's models should be editable in the
+admin interface. For each of those models, register them with the admin as
+described in :class:`ModelAdmin`.
 
 Other topics
 ------------
@@ -2897,6 +2895,8 @@ Templates can override or extend base admin templates as described in
     Raises :class:`~django.core.exceptions.ImproperlyConfigured` if a model is
     abstract. and ``django.contrib.admin.sites.AlreadyRegistered`` if a model
     is already registered.
+
+.. _hooking-adminsite-to-urlconf:
 
 Hooking ``AdminSite`` instances into your URLconf
 -------------------------------------------------
