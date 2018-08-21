@@ -260,7 +260,7 @@ class Field(RegisterLookupMixin):
         for choices_group in self.choices:
             try:
                 group_name, group_choices = choices_group
-            except ValueError:
+            except (TypeError, ValueError):
                 # Containing non-pairs
                 break
             try:
