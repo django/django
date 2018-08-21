@@ -1,6 +1,7 @@
 from django.db.models import CharField
 from django.db.models.functions import Lower
 from django.test import TestCase
+from django.test.utils import register_lookup
 
 from ..models import Author
 
@@ -29,8 +30,7 @@ class LowerTests(TestCase):
             Author.objects.update(name=Lower('name', 'name'))
 
     def test_transform(self):
-        try:
-            CharField.register_lookup(Lower)
+        with register_lookup(CharField, Lower):
             Author.objects.create(name='John Smith', alias='smithj')
             Author.objects.create(name='Rhonda')
             authors = Author.objects.filter(name__lower__exact='john smith')
@@ -38,5 +38,3 @@ class LowerTests(TestCase):
                 authors.order_by('name'), ['John Smith'],
                 lambda a: a.name
             )
-        finally:
-            CharField._unregister_lookup(Lower)

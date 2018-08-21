@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.db.models import DecimalField
 from django.db.models.functions import ACos
 from django.test import TestCase
+from django.test.utils import register_lookup
 
 from ..models import DecimalModel, FloatModel, IntegerModel
 
@@ -41,11 +42,8 @@ class ACosTests(TestCase):
         self.assertAlmostEqual(obj.big_acos, math.acos(obj.big))
 
     def test_transform(self):
-        try:
-            DecimalField.register_lookup(ACos)
+        with register_lookup(DecimalField, ACos):
             DecimalModel.objects.create(n1=Decimal('0.5'), n2=Decimal('0'))
             DecimalModel.objects.create(n1=Decimal('-0.9'), n2=Decimal('0'))
             objs = DecimalModel.objects.filter(n1__acos__lt=2)
             self.assertQuerysetEqual(objs, [Decimal('0.5')], lambda a: a.n1)
-        finally:
-            DecimalField._unregister_lookup(ACos)

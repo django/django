@@ -1,8 +1,13 @@
 from django.db.models import CharField, Value as V
 from django.db.models.functions import Coalesce, Length, Upper
 from django.test import TestCase
+from django.test.utils import register_lookup
 
 from .models import Author
+
+
+class UpperBilateral(Upper):
+    bilateral = True
 
 
 class FunctionTests(TestCase):
@@ -30,11 +35,7 @@ class FunctionTests(TestCase):
         )
 
     def test_func_transform_bilateral(self):
-        class UpperBilateral(Upper):
-            bilateral = True
-
-        try:
-            CharField.register_lookup(UpperBilateral)
+        with register_lookup(CharField, UpperBilateral):
             Author.objects.create(name='John Smith', alias='smithj')
             Author.objects.create(name='Rhonda')
             authors = Author.objects.filter(name__upper__exact='john smith')
@@ -44,15 +45,9 @@ class FunctionTests(TestCase):
                 ],
                 lambda a: a.name
             )
-        finally:
-            CharField._unregister_lookup(UpperBilateral)
 
     def test_func_transform_bilateral_multivalue(self):
-        class UpperBilateral(Upper):
-            bilateral = True
-
-        try:
-            CharField.register_lookup(UpperBilateral)
+        with register_lookup(CharField, UpperBilateral):
             Author.objects.create(name='John Smith', alias='smithj')
             Author.objects.create(name='Rhonda')
             authors = Author.objects.filter(name__upper__in=['john smith', 'rhonda'])
@@ -63,8 +58,6 @@ class FunctionTests(TestCase):
                 ],
                 lambda a: a.name
             )
-        finally:
-            CharField._unregister_lookup(UpperBilateral)
 
     def test_function_as_filter(self):
         Author.objects.create(name='John Smith', alias='SMITHJ')

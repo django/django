@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.db.models import DecimalField
 from django.db.models.functions import Radians
 from django.test import TestCase
+from django.test.utils import register_lookup
 
 from ..models import DecimalModel, FloatModel, IntegerModel
 
@@ -41,11 +42,8 @@ class RadiansTests(TestCase):
         self.assertAlmostEqual(obj.big_radians, math.radians(obj.big))
 
     def test_transform(self):
-        try:
-            DecimalField.register_lookup(Radians)
+        with register_lookup(DecimalField, Radians):
             DecimalModel.objects.create(n1=Decimal('2.0'), n2=Decimal('0'))
             DecimalModel.objects.create(n1=Decimal('-1.0'), n2=Decimal('0'))
             objs = DecimalModel.objects.filter(n1__radians__gt=0)
             self.assertQuerysetEqual(objs, [Decimal('2.0')], lambda a: a.n1)
-        finally:
-            DecimalField._unregister_lookup(Radians)

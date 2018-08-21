@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.db.models import DecimalField
 from django.db.models.functions import Degrees
 from django.test import TestCase
+from django.test.utils import register_lookup
 
 from ..models import DecimalModel, FloatModel, IntegerModel
 
@@ -41,11 +42,8 @@ class DegreesTests(TestCase):
         self.assertAlmostEqual(obj.big_degrees, math.degrees(obj.big))
 
     def test_transform(self):
-        try:
-            DecimalField.register_lookup(Degrees)
+        with register_lookup(DecimalField, Degrees):
             DecimalModel.objects.create(n1=Decimal('5.4'), n2=Decimal('0'))
             DecimalModel.objects.create(n1=Decimal('-30'), n2=Decimal('0'))
             objs = DecimalModel.objects.filter(n1__degrees__gt=0)
             self.assertQuerysetEqual(objs, [Decimal('5.4')], lambda a: a.n1)
-        finally:
-            DecimalField._unregister_lookup(Degrees)

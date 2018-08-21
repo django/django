@@ -16,7 +16,7 @@ from django.db.models.lookups import Contains, Exact
 from django.template import Context, Template, TemplateSyntaxError
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
-from django.test.utils import CaptureQueriesContext
+from django.test.utils import CaptureQueriesContext, register_lookup
 from django.urls import reverse
 from django.utils import formats
 
@@ -480,8 +480,7 @@ class ChangeListTests(TestCase):
 
         m = ConcertAdmin(Concert, custom_site)
         m.search_fields = ['group__name__cc']
-        Field.register_lookup(Contains, 'cc')
-        try:
+        with register_lookup(Field, Contains, lookup_name='cc'):
             request = self.factory.get('/', data={SEARCH_VAR: 'Hype'})
             request.user = self.superuser
             cl = m.get_changelist_instance(request)
@@ -491,8 +490,6 @@ class ChangeListTests(TestCase):
             request.user = self.superuser
             cl = m.get_changelist_instance(request)
             self.assertCountEqual(cl.queryset, [])
-        finally:
-            Field._unregister_lookup(Contains, 'cc')
 
     def test_spanning_relations_with_custom_lookup_in_search_fields(self):
         hype = Group.objects.create(name='The Hype')
@@ -501,8 +498,7 @@ class ChangeListTests(TestCase):
         Membership.objects.create(music=vox, group=hype)
         # Register a custom lookup on IntegerField to ensure that field
         # traversing logic in ModelAdmin.get_search_results() works.
-        IntegerField.register_lookup(Exact, 'exactly')
-        try:
+        with register_lookup(IntegerField, Exact, lookup_name='exactly'):
             m = ConcertAdmin(Concert, custom_site)
             m.search_fields = ['group__members__age__exactly']
 
@@ -515,8 +511,6 @@ class ChangeListTests(TestCase):
             request.user = self.superuser
             cl = m.get_changelist_instance(request)
             self.assertCountEqual(cl.queryset, [])
-        finally:
-            IntegerField._unregister_lookup(Exact, 'exactly')
 
     def test_custom_lookup_with_pk_shortcut(self):
         self.assertEqual(CharPK._meta.pk.name, 'char_pk')  # Not equal to 'pk'.

@@ -9,6 +9,7 @@ from django.db.models.lookups import Exact, GreaterThan, IsNull, LessThan
 from django.db.models.sql.query import Query
 from django.db.models.sql.where import OR
 from django.test import TestCase
+from django.test.utils import register_lookup
 
 from .models import Author, Item, ObjectC, Ranking
 
@@ -49,11 +50,8 @@ class TestQuery(TestCase):
 
     def test_transform(self):
         query = Query(Author)
-        CharField.register_lookup(Lower, 'lower')
-        try:
+        with register_lookup(CharField, Lower):
             where = query.build_where(~Q(name__lower='foo'))
-        finally:
-            CharField._unregister_lookup(Lower, 'lower')
         lookup = where.children[0]
         self.assertIsInstance(lookup, Exact)
         self.assertIsInstance(lookup.lhs, Lower)
