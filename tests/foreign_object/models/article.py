@@ -87,7 +87,6 @@ class ArticleTranslation(models.Model):
 
     class Meta:
         unique_together = ('article', 'lang')
-        ordering = ('active_translation__title',)
 
 
 class ArticleTag(models.Model):
