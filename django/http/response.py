@@ -216,7 +216,7 @@ class HttpResponseBase:
         secure = key.startswith(('__Secure-', '__Host-'))
         self.set_cookie(
             key, max_age=0, path=path, domain=domain, secure=secure,
-            expires='Thu, 01 Jan 1970 00:00:00 GMT',
+            expires='Thu, 01-Jan-1970 00:00:00 GMT',
         )
 
     # Common methods used by subclasses
