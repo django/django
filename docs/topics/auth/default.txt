@@ -989,10 +989,6 @@ implementation details see :ref:`using-the-views`.
         <https://robinlinus.github.io/socialmedia-leak/>`_" information
         leakage, host all images and your favicon on a separate domain.
 
-        Enabling ``redirect_authenticated_user`` can also result in a redirect
-        loop when using the :func:`.permission_required` decorator
-        unless the ``raise_exception`` parameter is used.
-
     * ``success_url_allowed_hosts``: A :class:`set` of hosts, in addition to
       :meth:`request.get_host() <django.http.HttpRequest.get_host>`, that are
       safe for redirecting after login. Defaults to an empty :class:`set`.
