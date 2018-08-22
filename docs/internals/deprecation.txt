@@ -17,6 +17,8 @@ details on these changes.
 
 * ``django.utils.timezone.FixedOffset`` will be removed.
 
+* ``django.core.paginator.QuerySetPaginator`` will be removed.
+
 .. _deprecation-removed-in-3.0:
 
 3.0

@@ -293,3 +293,6 @@ Miscellaneous
 
 * ``django.utils.timezone.FixedOffset`` is deprecated in favor of
   :class:`datetime.timezone`.
+
+* The undocumented ``QuerySetPaginator`` alias of
+  ``django.core.paginator.Paginator`` is deprecated.
