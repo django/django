@@ -269,7 +269,7 @@ class ExceptionReporter:
                     v = pprint(v)
                     # Trim large blobs of data
                     if len(v) > 4096:
-                        v = '%s... <trimmed %d bytes string>' % (v[0:4096], len(v))
+                        v = '%s… <trimmed %d bytes string>' % (v[0:4096], len(v))
                     frame_vars.append((k, v))
                 frame['vars'] = frame_vars
             frames[i] = frame

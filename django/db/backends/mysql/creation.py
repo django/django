@@ -51,7 +51,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             except Exception:
                 try:
                     if verbosity >= 1:
-                        self.log('Destroying old test database for alias %s...' % (
+                        self.log('Destroying old test database for alias %s…' % (
                             self._get_database_display_str(verbosity, target_database_name),
                         ))
                     cursor.execute('DROP DATABASE %(dbname)s' % test_db_params)

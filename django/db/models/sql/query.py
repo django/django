@@ -614,7 +614,7 @@ class Query:
             # really make sense (or return consistent value sets). Not worth
             # the extra complexity when you can write a real query instead.
             if self._extra and rhs._extra:
-                raise ValueError("When merging querysets using 'or', you cannot have extra(select=...) on both sides.")
+                raise ValueError("When merging querysets using 'or', you cannot have extra(select=…) on both sides.")
         self.extra.update(rhs.extra)
         extra_select_mask = set()
         if self.extra_select_mask is not None:
