@@ -101,14 +101,14 @@ For example, immediately after *Django 1.5 alpha 1* was tagged, the branch
 ``stable/1.5.x`` was created and all further work on preparing the code for the
 final 1.5 release was done there.
 
-These branches also provide limited bugfix support for the most recent released
-version of Django and security support for the two most recently-released
-versions of Django.
+These branches also provide bugfix and security support as described in
+:ref:`supported-versions-policy`.
 
 For example, after the release of Django 1.5, the branch ``stable/1.5.x``
 receives only fixes for security and critical stability bugs, which are
 eventually released as Django 1.5.1 and so on, ``stable/1.4.x`` receives only
-security fixes, and ``stable/1.3.x`` no longer receives any updates.
+security and data loss fixes, and ``stable/1.3.x`` no longer receives any
+updates.
 
 .. admonition:: Historical information
 
@@ -117,13 +117,13 @@ security fixes, and ``stable/1.3.x`` no longer receives any updates.
 
     Previously, these branches weren't created until right after the releases
     and the stabilization work occurred on the main repository branch. Thus,
-    no new features development work for the next release of Django could be
+    no new feature development work for the next release of Django could be
     committed until the final release happened.
 
     For example, shortly after the release of Django 1.3 the branch
     ``stable/1.3.x`` was created. Official support for that release has expired,
     and so it no longer receives direct maintenance from the Django project.
-    However, that and all other similarly named branches continue to exist and
+    However, that and all other similarly named branches continue to exist, and
     interested community members have occasionally used them to provide
     unofficial support for old Django releases.
 
@@ -142,7 +142,7 @@ Feature-development branches
 
 Feature-development branches tend by their nature to be temporary. Some
 produce successful features which are merged back into Django's master to
-become part of an official release, but others do not; in either case there
+become part of an official release, but others do not; in either case, there
 comes a time when the branch is no longer being actively worked on by any
 developer. At this point the branch is considered closed.
 
@@ -192,9 +192,9 @@ part of Django itself, and so are no longer separately maintained:
   Unicode-based strings in most places within Django and Django
   applications. This became part of Django as of the 1.0 release.
 
-When Django moved from SVN to Git, the information about branch merges wasn't
-preserved in the source code repository. This means that the ``master`` branch
-of Django doesn't contain merge commits for the above branches.
+When Django moved from Subversion to Git, the information about branch merges
+wasn't preserved in the source code repository. This means that the ``master``
+branch of Django doesn't contain merge commits for the above branches.
 
 However, this information is `available as a grafts file`_. You can restore it
 by putting the following lines in ``.git/info/grafts`` in your local clone::
@@ -237,7 +237,7 @@ were never finished:
 All of the above-mentioned branches now reside in ``attic``.
 
 Finally, the repository contains ``soc2009/xxx`` and ``soc2010/xxx`` feature
-branches, used for Google Summer of Code projects.
+branches, used for the 2009 and 2010 Google Summer of Code projects.
 
 Tags
 ====

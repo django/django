@@ -1,10 +1,10 @@
 "Thread-safe in-memory cache backend."
 import pickle
 import time
-from contextlib import contextmanager
+from collections import OrderedDict
+from threading import Lock
 
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
-from django.utils.synch import RWLock
 
 # Global in-memory store of cache data. Keyed by name, to provide
 # multiple named local memory caches.
@@ -13,109 +13,99 @@ _expire_info = {}
 _locks = {}
 
 
-@contextmanager
-def dummy():
-    """A context manager that does nothing special."""
-    yield
-
-
 class LocMemCache(BaseCache):
+    pickle_protocol = pickle.HIGHEST_PROTOCOL
+
     def __init__(self, name, params):
-        BaseCache.__init__(self, params)
-        self._cache = _caches.setdefault(name, {})
+        super().__init__(params)
+        self._cache = _caches.setdefault(name, OrderedDict())
         self._expire_info = _expire_info.setdefault(name, {})
-        self._lock = _locks.setdefault(name, RWLock())
+        self._lock = _locks.setdefault(name, Lock())
 
     def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
-        pickled = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
-        with self._lock.writer():
+        pickled = pickle.dumps(value, self.pickle_protocol)
+        with self._lock:
             if self._has_expired(key):
                 self._set(key, pickled, timeout)
                 return True
             return False
 
-    def get(self, key, default=None, version=None, acquire_lock=True):
+    def get(self, key, default=None, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
-        pickled = None
-        with (self._lock.reader() if acquire_lock else dummy()):
-            if not self._has_expired(key):
-                pickled = self._cache[key]
-        if pickled is not None:
-            try:
-                return pickle.loads(pickled)
-            except pickle.PickleError:
+        with self._lock:
+            if self._has_expired(key):
+                self._delete(key)
                 return default
-
-        with (self._lock.writer() if acquire_lock else dummy()):
-            try:
-                del self._cache[key]
-                del self._expire_info[key]
-            except KeyError:
-                pass
-            return default
+            pickled = self._cache[key]
+            self._cache.move_to_end(key, last=False)
+        return pickle.loads(pickled)
 
     def _set(self, key, value, timeout=DEFAULT_TIMEOUT):
         if len(self._cache) >= self._max_entries:
             self._cull()
         self._cache[key] = value
+        self._cache.move_to_end(key, last=False)
         self._expire_info[key] = self.get_backend_timeout(timeout)
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
-        pickled = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
-        with self._lock.writer():
+        pickled = pickle.dumps(value, self.pickle_protocol)
+        with self._lock:
             self._set(key, pickled, timeout)
 
+    def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
+        key = self.make_key(key, version=version)
+        with self._lock:
+            if self._has_expired(key):
+                return False
+            self._expire_info[key] = self.get_backend_timeout(timeout)
+            return True
+
     def incr(self, key, delta=1, version=None):
-        with self._lock.writer():
-            value = self.get(key, version=version, acquire_lock=False)
-            if value is None:
+        key = self.make_key(key, version=version)
+        self.validate_key(key)
+        with self._lock:
+            if self._has_expired(key):
+                self._delete(key)
                 raise ValueError("Key '%s' not found" % key)
+            pickled = self._cache[key]
+            value = pickle.loads(pickled)
             new_value = value + delta
-            key = self.make_key(key, version=version)
-            pickled = pickle.dumps(new_value, pickle.HIGHEST_PROTOCOL)
+            pickled = pickle.dumps(new_value, self.pickle_protocol)
             self._cache[key] = pickled
+            self._cache.move_to_end(key, last=False)
         return new_value
 
     def has_key(self, key, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
-        with self._lock.reader():
-            if not self._has_expired(key):
-                return True
-
-        with self._lock.writer():
-            try:
-                del self._cache[key]
-                del self._expire_info[key]
-            except KeyError:
-                pass
-            return False
+        with self._lock:
+            if self._has_expired(key):
+                self._delete(key)
+                return False
+            return True
 
     def _has_expired(self, key):
         exp = self._expire_info.get(key, -1)
-        if exp is None or exp > time.time():
-            return False
-        return True
+        return exp is not None and exp <= time.time()
 
     def _cull(self):
         if self._cull_frequency == 0:
-            self.clear()
+            self._cache.clear()
+            self._expire_info.clear()
         else:
-            doomed = [k for (i, k) in enumerate(self._cache) if i % self._cull_frequency == 0]
-            for k in doomed:
-                self._delete(k)
+            count = len(self._cache) // self._cull_frequency
+            for i in range(count):
+                key, _ = self._cache.popitem()
+                del self._expire_info[key]
 
     def _delete(self, key):
         try:
             del self._cache[key]
-        except KeyError:
-            pass
-        try:
             del self._expire_info[key]
         except KeyError:
             pass
@@ -123,9 +113,10 @@ class LocMemCache(BaseCache):
     def delete(self, key, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
-        with self._lock.writer():
+        with self._lock:
             self._delete(key)
 
     def clear(self):
-        self._cache.clear()
-        self._expire_info.clear()
+        with self._lock:
+            self._cache.clear()
+            self._expire_info.clear()

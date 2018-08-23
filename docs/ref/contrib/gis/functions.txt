@@ -20,25 +20,27 @@ get a ``NotImplementedError`` exception.
 
 Function's summary:
 
-==================  ========================   ======================  ===================  ==================  =====================
-Measurement         Relationships              Operations              Editors              Output format       Miscellaneous
-==================  ========================   ======================  ===================  ==================  =====================
-:class:`Area`       :class:`Azimuth`           :class:`Difference`     :class:`ForceRHR`    :class:`AsGeoJSON`  :class:`IsValid`
-:class:`Distance`   :class:`BoundingCircle`    :class:`Intersection`   :class:`MakeValid`   :class:`AsGML`      :class:`MemSize`
-:class:`Length`     :class:`Centroid`          :class:`SymDifference`  :class:`Reverse`     :class:`AsKML`      :class:`NumGeometries`
-:class:`Perimeter`  :class:`Envelope`          :class:`Union`          :class:`Scale`       :class:`AsSVG`      :class:`NumPoints`
-..                  :class:`LineLocatePoint`                           :class:`SnapToGrid`  :class:`GeoHash`
-..                  :class:`PointOnSurface`                            :class:`Transform`
+==================  ========================   ======================  =======================  ==================  =====================
+Measurement         Relationships              Operations              Editors                  Output format       Miscellaneous
+==================  ========================   ======================  =======================  ==================  =====================
+:class:`Area`       :class:`Azimuth`           :class:`Difference`     :class:`ForcePolygonCW`  :class:`AsGeoJSON`  :class:`IsValid`
+:class:`Distance`   :class:`BoundingCircle`    :class:`Intersection`   :class:`ForceRHR`        :class:`AsGML`      :class:`MemSize`
+:class:`Length`     :class:`Centroid`          :class:`SymDifference`  :class:`MakeValid`       :class:`AsKML`      :class:`NumGeometries`
+:class:`Perimeter`  :class:`Envelope`          :class:`Union`          :class:`Reverse`         :class:`AsSVG`      :class:`NumPoints`
+..                  :class:`LineLocatePoint`                           :class:`Scale`           :class:`GeoHash`
+..                  :class:`PointOnSurface`                            :class:`SnapToGrid`
+..                                                                     :class:`Transform`
 ..                                                                     :class:`Translate`
-==================  ========================   ======================  ===================  ==================  =====================
+==================  ========================   ======================  =======================  ==================  =====================
 
 ``Area``
 ========
 
 .. class:: Area(expression, **extra)
 
-*Availability*: MySQL, Oracle,
-`PostGIS <https://postgis.net/docs/ST_Area.html>`__, SpatiaLite
+*Availability*: `MySQL
+<https://dev.mysql.com/doc/refman/en/gis-polygon-property-functions.html#function_area>`__,
+Oracle, `PostGIS <https://postgis.net/docs/ST_Area.html>`__, SpatiaLite
 
 Accepts a single geographic field or expression and returns the area of the
 field as an :class:`~django.contrib.gis.measure.Area` measure.
@@ -51,8 +53,9 @@ geographic SRSes.
 
 .. class:: AsGeoJSON(expression, bbox=False, crs=False, precision=8, **extra)
 
-*Availability*: MySQL (≥ 5.7.5), `PostGIS
-<https://postgis.net/docs/ST_AsGeoJSON.html>`__, SpatiaLite
+*Availability*: `MySQL
+<https://dev.mysql.com/doc/refman/en/spatial-geojson-functions.html#function_st-asgeojson>`__ (≥ 5.7.5),
+`PostGIS <https://postgis.net/docs/ST_AsGeoJSON.html>`__, SpatiaLite
 
 Accepts a single geographic field or expression and returns a `GeoJSON
 <http://geojson.org/>`_ representation of the geometry. Note that the result is
@@ -78,10 +81,6 @@ Keyword Argument       Description
                        digits for the coordinates in the GeoJSON
                        representation -- the default value is 8.
 =====================  =====================================================
-
-.. versionchanged:: 2.0
-
-    MySQL support was added.
 
 ``AsGML``
 =========
@@ -162,14 +161,12 @@ Keyword Argument       Description
                        representation -- the default value is 8.
 =====================  =====================================================
 
-__ http://www.w3.org/Graphics/SVG/
+__ https://www.w3.org/Graphics/SVG/
 
 ``Azimuth``
 ===========
 
 .. class:: Azimuth(point_a, point_b, **extra)
-
-.. versionadded:: 2.0
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_Azimuth.html>`__,
 SpatiaLite (LWGEOM)
@@ -197,8 +194,9 @@ The ``num_seg`` parameter is used only on PostGIS.
 
 .. class:: Centroid(expression, **extra)
 
-*Availability*: MySQL, `PostGIS <https://postgis.net/docs/ST_Centroid.html>`__,
-Oracle, SpatiaLite
+*Availability*: `MySQL
+<https://dev.mysql.com/doc/refman/en/gis-polygon-property-functions.html#function_st-centroid>`__,
+`PostGIS <https://postgis.net/docs/ST_Centroid.html>`__, Oracle, SpatiaLite
 
 Accepts a single geographic field or expression and returns the ``centroid``
 value of the geometry.
@@ -208,8 +206,9 @@ value of the geometry.
 
 .. class:: Difference(expr1, expr2, **extra)
 
-*Availability*: MySQL, `PostGIS
-<https://postgis.net/docs/ST_Difference.html>`__, Oracle, SpatiaLite
+*Availability*: `MySQL
+<https://dev.mysql.com/doc/refman/en/spatial-operator-functions.html#function_st-difference>`__,
+`PostGIS <https://postgis.net/docs/ST_Difference.html>`__, Oracle, SpatiaLite
 
 Accepts two geographic fields or expressions and returns the geometric
 difference, that is the part of geometry A that does not intersect with
@@ -220,8 +219,9 @@ geometry B.
 
 .. class:: Distance(expr1, expr2, spheroid=None, **extra)
 
-*Availability*: MySQL, `PostGIS <https://postgis.net/docs/ST_Distance.html>`__,
-Oracle, SpatiaLite
+*Availability*: `MySQL
+<https://dev.mysql.com/doc/refman/en/spatial-relation-functions-object-shapes.html#function_st-distance>`__,
+`PostGIS <https://postgis.net/docs/ST_Distance.html>`__, Oracle, SpatiaLite
 
 Accepts two geographic fields or expressions and returns the distance between
 them, as a :class:`~django.contrib.gis.measure.Distance` object. On MySQL, a raw
@@ -265,16 +265,42 @@ queryset is calculated::
 
 .. class:: Envelope(expression, **extra)
 
-*Availability*: MySQL, `PostGIS <https://postgis.net/docs/ST_Envelope.html>`__,
-SpatiaLite
+*Availability*: `MySQL
+<https://dev.mysql.com/doc/refman/en/gis-general-property-functions.html#function_st-envelope>`__,
+`Oracle
+<https://docs.oracle.com/database/121/SPATL/sdo_geom-sdo_mbr.htm#GUID-646638D0-2C5F-490A-AF63-DE9B7A4C97C1__CHDJCEIH>`__,
+`PostGIS <https://postgis.net/docs/ST_Envelope.html>`__, SpatiaLite
 
 Accepts a single geographic field or expression and returns the geometry
 representing the bounding box of the geometry.
+
+.. versionchanged:: 2.2
+
+    Oracle support was added.
+
+``ForcePolygonCW``
+==================
+
+.. class:: ForcePolygonCW(expression, **extra)
+
+.. versionadded:: 2.1
+
+*Availability*: `PostGIS <https://postgis.net/docs/ST_ForcePolygonCW.html>`__,
+SpatiaLite
+
+Accepts a single geographic field or expression and returns a modified version
+of the polygon/multipolygon in which all exterior rings are oriented clockwise
+and all interior rings are oriented counterclockwise. Non-polygonal geometries
+are returned unchanged.
 
 ``ForceRHR``
 ============
 
 .. class:: ForceRHR(expression, **extra)
+
+.. deprecated:: 2.1
+
+    Use :class:`ForcePolygonCW` instead.
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_ForceRHR.html>`__
 
@@ -287,18 +313,15 @@ right-hand rule.
 
 .. class:: GeoHash(expression, precision=None, **extra)
 
-*Availability*: MySQL (≥ 5.7.5), `PostGIS
-<https://postgis.net/docs/ST_GeoHash.html>`__, SpatiaLite (LWGEOM)
+*Availability*: `MySQL
+<https://dev.mysql.com/doc/refman/en/spatial-geohash-functions.html#function_st-geohash>`__ (≥ 5.7.5),
+`PostGIS <https://postgis.net/docs/ST_GeoHash.html>`__, SpatiaLite (LWGEOM)
 
 Accepts a single geographic field or expression and returns a `GeoHash`__
 representation of the geometry.
 
 The ``precision`` keyword argument controls the number of characters in the
 result.
-
-.. versionchanged:: 2.0
-
-    MySQL support was added.
 
 __ https://en.wikipedia.org/wiki/Geohash
 
@@ -307,8 +330,9 @@ __ https://en.wikipedia.org/wiki/Geohash
 
 .. class:: Intersection(expr1, expr2, **extra)
 
-*Availability*: MySQL, `PostGIS
-<https://postgis.net/docs/ST_Intersection.html>`__, Oracle, SpatiaLite
+*Availability*: `MySQL
+<https://dev.mysql.com/doc/refman/en/spatial-operator-functions.html#function_st-intersection>`__,
+`PostGIS <https://postgis.net/docs/ST_Intersection.html>`__, Oracle, SpatiaLite
 
 Accepts two geographic fields or expressions and returns the geometric
 intersection between them.
@@ -318,23 +342,21 @@ intersection between them.
 
 .. class:: IsValid(expr)
 
-*Availability*: MySQL (≥ 5.7.5), `PostGIS
-<https://postgis.net/docs/ST_IsValid.html>`__, Oracle, SpatiaLite (LWGEOM)
+*Availability*: `MySQL
+<https://dev.mysql.com/doc/refman/en/spatial-convenience-functions.html#function_st-isvalid>`__ (≥ 5.7.5),
+`PostGIS <https://postgis.net/docs/ST_IsValid.html>`__, Oracle, SpatiaLite (LWGEOM)
 
 Accepts a geographic field or expression and tests if the value is well formed.
 Returns ``True`` if its value is a valid geometry and ``False`` otherwise.
-
-.. versionchanged:: 2.0
-
-    MySQL support was added.
 
 ``Length``
 ==========
 
 .. class:: Length(expression, spheroid=True, **extra)
 
-*Availability*: MySQL, Oracle, `PostGIS
-<https://postgis.net/docs/ST_Length.html>`__, SpatiaLite
+*Availability*: `MySQL
+<https://dev.mysql.com/doc/refman/en/gis-linestring-property-functions.html#function_st-length>`__,
+Oracle, `PostGIS <https://postgis.net/docs/ST_Length.html>`__, SpatiaLite
 
 Accepts a single geographic linestring or multilinestring field or expression
 and returns its length as a :class:`~django.contrib.gis.measure.Distance`
@@ -351,8 +373,6 @@ MySQL doesn't support length calculations on geographic SRSes.
 ===================
 
 .. class:: LineLocatePoint(linestring, point, **extra)
-
-.. versionadded:: 2.0
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_LineLocatePoint.html>`__,
 SpatiaLite
@@ -388,8 +408,10 @@ Accepts a single geographic field or expression and returns the memory size
 
 .. class:: NumGeometries(expression, **extra)
 
-*Availability*: MySQL, `PostGIS
-<https://postgis.net/docs/ST_NumGeometries.html>`__, Oracle, SpatiaLite
+*Availability*: `MySQL
+<https://dev.mysql.com/doc/refman/en/gis-geometrycollection-property-functions.html#function_st-numgeometries>`__,
+`PostGIS <https://postgis.net/docs/ST_NumGeometries.html>`__, Oracle,
+SpatiaLite
 
 Accepts a single geographic field or expression and returns the number of
 geometries if the geometry field is a collection (e.g., a ``GEOMETRYCOLLECTION``
@@ -402,8 +424,9 @@ On MySQL, returns ``None`` for single geometries.
 
 .. class:: NumPoints(expression, **extra)
 
-*Availability*: MySQL, `PostGIS <https://postgis.net/docs/ST_NPoints.html>`__,
-Oracle, SpatiaLite
+*Availability*: `MySQL
+<https://dev.mysql.com/doc/refman/en/gis-linestring-property-functions.html#function_st-numpoints>`__,
+`PostGIS <https://postgis.net/docs/ST_NPoints.html>`__, Oracle, SpatiaLite
 
 Accepts a single geographic field or expression and returns the number of points
 in a geometry.
@@ -480,8 +503,10 @@ Number of Arguments  Description
 
 .. class:: SymDifference(expr1, expr2, **extra)
 
-*Availability*: MySQL, `PostGIS
-<https://postgis.net/docs/ST_SymDifference.html>`__, Oracle, SpatiaLite
+*Availability*: `MySQL
+<https://dev.mysql.com/doc/refman/en/spatial-operator-functions.html#function_st-symdifference>`__,
+`PostGIS <https://postgis.net/docs/ST_SymDifference.html>`__, Oracle,
+SpatiaLite
 
 Accepts two geographic fields or expressions and returns the geometric
 symmetric difference (union without the intersection) between the given
@@ -522,8 +547,9 @@ parameters.
 
 .. class:: Union(expr1, expr2, **extra)
 
-*Availability*: MySQL, `PostGIS <https://postgis.net/docs/ST_Union.html>`__,
-Oracle, SpatiaLite
+*Availability*: `MySQL
+<https://dev.mysql.com/doc/refman/en/spatial-operator-functions.html#function_st-union>`__,
+`PostGIS <https://postgis.net/docs/ST_Union.html>`__, Oracle, SpatiaLite
 
 Accepts two geographic fields or expressions and returns the union of both
 geometries.

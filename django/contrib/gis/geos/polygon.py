@@ -37,7 +37,7 @@ class Polygon(GEOSGeometry):
 
         # If initialized as Polygon(shell, (LinearRing, LinearRing)) [for backward-compatibility]
         if n_holes == 1 and isinstance(init_holes[0], (tuple, list)):
-            if len(init_holes[0]) == 0:
+            if not init_holes[0]:
                 init_holes = ()
                 n_holes = 0
             elif isinstance(init_holes[0][0], LinearRing):

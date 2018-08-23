@@ -60,6 +60,9 @@ class Migration(migrations.Migration):
                 ('uuids', ArrayField(models.UUIDField(), size=None)),
                 ('decimals', ArrayField(models.DecimalField(max_digits=5, decimal_places=2), size=None)),
                 ('tags', ArrayField(TagField(), blank=True, null=True, size=None)),
+                ('json', ArrayField(JSONField(default={}), default=[])),
+                ('int_ranges', ArrayField(IntegerRangeField(), null=True, blank=True)),
+                ('bigint_ranges', ArrayField(BigIntegerRangeField(), null=True, blank=True)),
             ],
             options={
                 'required_db_vendor': 'postgresql',
@@ -168,7 +171,7 @@ class Migration(migrations.Migration):
             name='AggregateTestModel',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('boolean_field', models.NullBooleanField()),
+                ('boolean_field', models.BooleanField(null=True)),
                 ('char_field', models.CharField(max_length=30, blank=True)),
                 ('integer_field', models.IntegerField(null=True)),
             ]

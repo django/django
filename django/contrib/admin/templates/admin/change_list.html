@@ -3,9 +3,9 @@
 
 {% block extrastyle %}
   {{ block.super }}
-  <link rel="stylesheet" type="text/css" href="{% static "admin/css/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "admin/css/changelists.css" %}">
   {% if cl.formset %}
-    <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}" />
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}">
   {% endif %}
   {% if cl.formset or action_form %}
     <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
@@ -42,18 +42,11 @@
     {% block object-tools %}
         <ul class="object-tools">
           {% block object-tools-items %}
-            {% if has_add_permission %}
-            <li>
-              {% url cl.opts|admin_urlname:'add' as add_url %}
-              <a href="{% add_preserved_filters add_url is_popup to_field %}" class="addlink">
-                {% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}
-              </a>
-            </li>
-            {% endif %}
+            {% change_list_object_tools %}
           {% endblock %}
         </ul>
     {% endblock %}
-    {% if cl.formset.errors %}
+    {% if cl.formset and cl.formset.errors %}
         <p class="errornote">
         {% if cl.formset.total_error_count == 1 %}{% trans "Please correct the error below." %}{% else %}{% trans "Please correct the errors below." %}{% endif %}
         </p>
@@ -61,7 +54,7 @@
     {% endif %}
     <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
       {% block search %}{% search_form cl %}{% endblock %}
-      {% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
+      {% block date_hierarchy %}{% if cl.date_hierarchy %}{% date_hierarchy cl %}{% endif %}{% endblock %}
 
       {% block filters %}
         {% if cl.has_filters %}
@@ -72,7 +65,7 @@
         {% endif %}
       {% endblock %}
 
-      <form id="changelist-form" method="post"{% if cl.formset.is_multipart %} enctype="multipart/form-data"{% endif %} novalidate>{% csrf_token %}
+      <form id="changelist-form" method="post"{% if cl.formset and cl.formset.is_multipart %} enctype="multipart/form-data"{% endif %} novalidate>{% csrf_token %}
       {% if cl.formset %}
         <div>{{ cl.formset.management_form }}</div>
       {% endif %}

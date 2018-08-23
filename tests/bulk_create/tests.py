@@ -1,6 +1,6 @@
 from operator import attrgetter
 
-from django.db import connection
+from django.db import IntegrityError, NotSupportedError, connection
 from django.db.models import FileField, Value
 from django.db.models.functions import Lower
 from django.test import (
@@ -121,11 +121,9 @@ class BulkCreateTests(TestCase):
         self.assertEqual(Restaurant.objects.count(), 2)
 
     def test_large_batch(self):
-        with override_settings(DEBUG=True):
-            connection.queries_log.clear()
-            TwoFields.objects.bulk_create([
-                TwoFields(f1=i, f2=i + 1) for i in range(0, 1001)
-            ])
+        TwoFields.objects.bulk_create([
+            TwoFields(f1=i, f2=i + 1) for i in range(0, 1001)
+        ])
         self.assertEqual(TwoFields.objects.count(), 1001)
         self.assertEqual(
             TwoFields.objects.filter(f1__gte=450, f1__lte=550).count(),
@@ -154,11 +152,10 @@ class BulkCreateTests(TestCase):
         Test inserting a large batch with objects having primary key set
         mixed together with objects without PK set.
         """
-        with override_settings(DEBUG=True):
-            connection.queries_log.clear()
-            TwoFields.objects.bulk_create([
-                TwoFields(id=i if i % 2 == 0 else None, f1=i, f2=i + 1)
-                for i in range(100000, 101000)])
+        TwoFields.objects.bulk_create([
+            TwoFields(id=i if i % 2 == 0 else None, f1=i, f2=i + 1)
+            for i in range(100000, 101000)
+        ])
         self.assertEqual(TwoFields.objects.count(), 1000)
         # We can't assume much about the ID's created, except that the above
         # created IDs must exist.
@@ -255,3 +252,46 @@ class BulkCreateTests(TestCase):
         # Objects save via bulk_create() and save() should have equal state.
         self.assertEqual(country_nl._state.adding, country_be._state.adding)
         self.assertEqual(country_nl._state.db, country_be._state.db)
+
+    def test_set_state_with_pk_specified(self):
+        state_ca = State(two_letter_code='CA')
+        state_ny = State(two_letter_code='NY')
+        State.objects.bulk_create([state_ca])
+        state_ny.save()
+        # Objects save via bulk_create() and save() should have equal state.
+        self.assertEqual(state_ca._state.adding, state_ny._state.adding)
+        self.assertEqual(state_ca._state.db, state_ny._state.db)
+
+    @skipIfDBFeature('supports_ignore_conflicts')
+    def test_ignore_conflicts_value_error(self):
+        message = 'This database backend does not support ignoring conflicts.'
+        with self.assertRaisesMessage(NotSupportedError, message):
+            TwoFields.objects.bulk_create(self.data, ignore_conflicts=True)
+
+    @skipUnlessDBFeature('supports_ignore_conflicts')
+    def test_ignore_conflicts_ignore(self):
+        data = [
+            TwoFields(f1=1, f2=1),
+            TwoFields(f1=2, f2=2),
+            TwoFields(f1=3, f2=3),
+        ]
+        TwoFields.objects.bulk_create(data)
+        self.assertEqual(TwoFields.objects.count(), 3)
+        # With ignore_conflicts=True, conflicts are ignored.
+        conflicting_objects = [
+            TwoFields(f1=2, f2=2),
+            TwoFields(f1=3, f2=3),
+        ]
+        TwoFields.objects.bulk_create([conflicting_objects[0]], ignore_conflicts=True)
+        TwoFields.objects.bulk_create(conflicting_objects, ignore_conflicts=True)
+        self.assertEqual(TwoFields.objects.count(), 3)
+        self.assertIsNone(conflicting_objects[0].pk)
+        self.assertIsNone(conflicting_objects[1].pk)
+        # New objects are created and conflicts are ignored.
+        new_object = TwoFields(f1=4, f2=4)
+        TwoFields.objects.bulk_create(conflicting_objects + [new_object], ignore_conflicts=True)
+        self.assertEqual(TwoFields.objects.count(), 4)
+        self.assertIsNone(new_object.pk)
+        # Without ignore_conflicts=True, there's a problem.
+        with self.assertRaises(IntegrityError):
+            TwoFields.objects.bulk_create(conflicting_objects)

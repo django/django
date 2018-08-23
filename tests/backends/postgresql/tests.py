@@ -1,8 +1,8 @@
 import unittest
-import warnings
 from unittest import mock
 
-from django.db import DatabaseError, connection
+from django.core.exceptions import ImproperlyConfigured
+from django.db import DatabaseError, connection, connections
 from django.test import TestCase
 
 
@@ -23,16 +23,37 @@ class Tests(TestCase):
         self.assertIsNone(nodb_conn.settings_dict['NAME'])
 
         # Now assume the 'postgres' db isn't available
-        with warnings.catch_warnings(record=True) as w:
+        msg = (
+            "Normally Django will use a connection to the 'postgres' database "
+            "to avoid running initialization queries against the production "
+            "database when it's not needed (for example, when running tests). "
+            "Django was unable to create a connection to the 'postgres' "
+            "database and will use the first PostgreSQL database instead."
+        )
+        with self.assertWarnsMessage(RuntimeWarning, msg):
             with mock.patch('django.db.backends.base.base.BaseDatabaseWrapper.connect',
                             side_effect=mocked_connect, autospec=True):
-                warnings.simplefilter('always', RuntimeWarning)
-                nodb_conn = connection._nodb_connection
+                with mock.patch.object(
+                    connection,
+                    'settings_dict',
+                    {**connection.settings_dict, 'NAME': 'postgres'},
+                ):
+                    nodb_conn = connection._nodb_connection
         self.assertIsNotNone(nodb_conn.settings_dict['NAME'])
-        self.assertEqual(nodb_conn.settings_dict['NAME'], connection.settings_dict['NAME'])
-        # Check a RuntimeWarning has been emitted
-        self.assertEqual(len(w), 1)
-        self.assertEqual(w[0].message.__class__, RuntimeWarning)
+        self.assertEqual(nodb_conn.settings_dict['NAME'], connections['other'].settings_dict['NAME'])
+
+    def test_database_name_too_long(self):
+        from django.db.backends.postgresql.base import DatabaseWrapper
+        settings = connection.settings_dict.copy()
+        max_name_length = connection.ops.max_name_length()
+        settings['NAME'] = 'a' + (max_name_length * 'a')
+        msg = (
+            "The database name '%s' (%d characters) is longer than "
+            "PostgreSQL's limit of %s characters. Supply a shorter NAME in "
+            "settings.DATABASES."
+        ) % (settings['NAME'], max_name_length + 1, max_name_length)
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            DatabaseWrapper(settings).get_connection_params()
 
     def test_connect_and_rollback(self):
         """
@@ -44,10 +65,10 @@ class Tests(TestCase):
             # Ensure the database default time zone is different than
             # the time zone in new_connection.settings_dict. We can
             # get the default time zone by reset & show.
-            cursor = new_connection.cursor()
-            cursor.execute("RESET TIMEZONE")
-            cursor.execute("SHOW TIMEZONE")
-            db_default_tz = cursor.fetchone()[0]
+            with new_connection.cursor() as cursor:
+                cursor.execute("RESET TIMEZONE")
+                cursor.execute("SHOW TIMEZONE")
+                db_default_tz = cursor.fetchone()[0]
             new_tz = 'Europe/Paris' if db_default_tz == 'UTC' else 'UTC'
             new_connection.close()
 
@@ -59,12 +80,12 @@ class Tests(TestCase):
             # time zone, run a query and rollback.
             with self.settings(TIME_ZONE=new_tz):
                 new_connection.set_autocommit(False)
-                cursor = new_connection.cursor()
                 new_connection.rollback()
 
                 # Now let's see if the rollback rolled back the SET TIME ZONE.
-                cursor.execute("SHOW TIMEZONE")
-                tz = cursor.fetchone()[0]
+                with new_connection.cursor() as cursor:
+                    cursor.execute("SHOW TIMEZONE")
+                    tz = cursor.fetchone()[0]
                 self.assertEqual(new_tz, tz)
 
         finally:
@@ -138,6 +159,10 @@ class Tests(TestCase):
         for lookup in lookups:
             with self.subTest(lookup=lookup):
                 self.assertIn('::text', do.lookup_cast(lookup))
+        for lookup in lookups:
+            for field_type in ('CICharField', 'CIEmailField', 'CITextField'):
+                with self.subTest(lookup=lookup, field_type=field_type):
+                    self.assertIn('::citext', do.lookup_cast(lookup, internal_type=field_type))
 
     def test_correct_extraction_psycopg2_version(self):
         from django.db.backends.postgresql.base import psycopg2_version

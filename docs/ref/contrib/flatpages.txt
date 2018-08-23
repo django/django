@@ -193,7 +193,7 @@ registering a custom ``ModelAdmin`` for ``FlatPage``::
         fieldsets = (
             (None, {'fields': ('url', 'title', 'content', 'sites')}),
             (_('Advanced options'), {
-                'classes': ('collapse', ),
+                'classes': ('collapse',),
                 'fields': (
                     'enable_comments',
                     'registration_required',
@@ -292,7 +292,7 @@ via the :ttag:`get_flatpages` tag:
 Displaying ``registration_required`` flatpages
 ----------------------------------------------
 
-By default, the :ttag:`get_flatpages` templatetag will only show
+By default, the :ttag:`get_flatpages` template tag will only show
 flatpages that are marked ``registration_required = False``. If you
 want to display registration-protected flatpages, you need to specify
 an authenticated user using a ``for`` clause.

@@ -81,11 +81,7 @@ class DistanceTest(TestCase):
         # Now performing the `dwithin` queries on a geodetic coordinate system.
         for dist in au_dists:
             with self.subTest(dist=dist):
-                if isinstance(dist, D) and not oracle:
-                    type_error = True
-                else:
-                    type_error = False
-
+                type_error = isinstance(dist, D) and not oracle
                 if isinstance(dist, tuple):
                     if oracle or spatialite:
                         # Result in meters

@@ -109,7 +109,7 @@ Making requests
 
 Use the ``django.test.Client`` class to make requests.
 
-.. class:: Client(enforce_csrf_checks=False, **defaults)
+.. class:: Client(enforce_csrf_checks=False, json_encoder=DjangoJSONEncoder, **defaults)
 
     It requires no arguments at time of construction. However, you can use
     keywords arguments to specify some default headers. For example, this will
@@ -124,6 +124,13 @@ Use the ``django.test.Client`` class to make requests.
 
     The ``enforce_csrf_checks`` argument can be used to test CSRF
     protection (see above).
+
+    The ``json_encoder`` argument allows setting a custom JSON encoder for
+    the JSON serialization that's described in :meth:`post`.
+
+    .. versionchanged:: 2.1
+
+        The ``json_encoder`` argument was added.
 
     Once you have a ``Client`` instance, you can call any of the following
     methods:
@@ -161,7 +168,7 @@ Use the ``django.test.Client`` class to make requests.
             HTTP request from the browser to the server should be passed
             as ``HTTP_HOST``.
 
-            .. _CGI: http://www.w3.org/CGI/
+            .. _CGI: https://www.w3.org/CGI/
 
         If you already have the GET arguments in URL-encoded form, you can
         use that encoding instead of using the data argument. For example,
@@ -206,9 +213,23 @@ Use the ``django.test.Client`` class to make requests.
 
             name=fred&passwd=secret
 
-        If you provide ``content_type`` (e.g. :mimetype:`text/xml` for an XML
-        payload), the contents of ``data`` will be sent as-is in the POST
-        request, using ``content_type`` in the HTTP ``Content-Type`` header.
+        If you provide ``content_type`` as :mimetype:`application/json`, a
+        ``data`` dictionary is serialized using :func:`json.dumps` with
+        :class:`~django.core.serializers.json.DjangoJSONEncoder`. You can
+        change the encoder by providing a ``json_encoder`` argument to
+        :class:`Client`. This serialization also happens for :meth:`put`,
+        :meth:`patch`, and :meth:`delete` requests.
+
+        .. versionchanged:: 2.1
+
+            The JSON serialization described above was added. In older versions,
+            you can call :func:`json.dumps` on ``data`` before passing it to
+            ``post()`` to achieve the same thing.
+
+        If you provide any other ``content_type`` (e.g. :mimetype:`text/xml`
+        for an XML payload), the contents of ``data`` are sent as-is in the
+        POST request, using ``content_type`` in the HTTP ``Content-Type``
+        header.
 
         If you don't provide a value for ``content_type``, the values in
         ``data`` will be transmitted with a content type of
@@ -671,12 +692,15 @@ A subclass of :class:`unittest.TestCase` that adds this functionality:
 
   * Checking that a callable :meth:`raises a certain exception
     <SimpleTestCase.assertRaisesMessage>`.
+  * Checking that a callable :meth:`triggers a certain warning
+    <SimpleTestCase.assertWarnsMessage>`.
   * Testing form field :meth:`rendering and error treatment
     <SimpleTestCase.assertFieldOutput>`.
   * Testing :meth:`HTML responses for the presence/lack of a given fragment
     <SimpleTestCase.assertContains>`.
   * Verifying that a template :meth:`has/hasn't been used to generate a given
     response content <SimpleTestCase.assertTemplateUsed>`.
+  * Verifying that two :meth:`URLs <SimpleTestCase.assertURLEqual>` are equal.
   * Verifying a HTTP :meth:`redirect <SimpleTestCase.assertRedirects>` is
     performed by the app.
   * Robustly testing two :meth:`HTML fragments <SimpleTestCase.assertHTMLEqual>`
@@ -857,7 +881,7 @@ To demonstrate how to use ``LiveServerTestCase``, let's write a simple Selenium
 test. First of all, you need to install the `selenium package`_ into your
 Python path:
 
-.. code-block:: console
+.. console::
 
     $ pip install selenium
 
@@ -900,7 +924,7 @@ The code for this test may look as follows::
 
 Finally, you may run the test as follows:
 
-.. code-block:: console
+.. console::
 
     $ ./manage.py test myapp.tests.MySeleniumTests.test_login
 
@@ -911,7 +935,7 @@ example above is just a tiny fraction of what the Selenium client can do; check
 out the `full reference`_ for more details.
 
 .. _Selenium: http://seleniumhq.org/
-.. _selenium package: https://pypi.python.org/pypi/selenium
+.. _selenium package: https://pypi.org/project/selenium/
 .. _full reference: https://selenium-python.readthedocs.io/api.html
 .. _Firefox: https://www.mozilla.com/firefox/
 
@@ -1000,7 +1024,7 @@ If you want to use a different ``Client`` class (for example, a subclass
 with customized behavior), use the :attr:`~SimpleTestCase.client_class` class
 attribute::
 
-    from django.test import TestCase, Client
+    from django.test import Client, TestCase
 
     class MyTestClient(Client):
         # Specialized methods for your environment
@@ -1049,7 +1073,7 @@ subclass::
             # Test definitions as before.
             call_setup_methods()
 
-        def testFluffyAnimals(self):
+        def test_fluffy_animals(self):
             # A test that uses the fixtures.
             call_some_test_code()
 
@@ -1084,7 +1108,7 @@ tests can't rely upon the fact that your views will be available at a
 particular URL. Decorate your test class or test method with
 ``@override_settings(ROOT_URLCONF=...)`` for URLconf configuration.
 
-.. _emptying-test-outbox:
+.. _testing-multi-db:
 
 Multi-database support
 ----------------------
@@ -1300,6 +1324,8 @@ LOCALE_PATHS, LANGUAGE_CODE      Default translation and loaded translations
 MEDIA_ROOT, DEFAULT_FILE_STORAGE Default file storage
 ================================ ========================
 
+.. _emptying-test-outbox:
+
 Emptying the test outbox
 ------------------------
 
@@ -1340,6 +1366,15 @@ your test suite.
 
         with self.assertRaisesMessage(ValueError, 'invalid literal for int()'):
             int('a')
+
+.. method:: SimpleTestCase.assertWarnsMessage(expected_warning, expected_message, callable, *args, **kwargs)
+            SimpleTestCase.assertWarnsMessage(expected_warning, expected_message)
+
+    .. versionadded:: 2.1
+
+    Analogous to :meth:`SimpleTestCase.assertRaisesMessage` but for
+    :meth:`~unittest.TestCase.assertWarnsRegex` instead of
+    :meth:`~unittest.TestCase.assertRaisesRegex`.
 
 .. method:: SimpleTestCase.assertFieldOutput(fieldclass, valid, invalid, field_args=None, field_kwargs=None, empty_value='')
 
@@ -1445,6 +1480,15 @@ your test suite.
     You can use this as a context manager in the same way as
     :meth:`~SimpleTestCase.assertTemplateUsed`.
 
+.. method:: SimpleTestCase.assertURLEqual(url1, url2, msg_prefix='')
+
+    .. versionadded:: 2.2
+
+    Asserts that two URLs are the same, ignoring the order of query string
+    parameters except for parameters with the same name. For example,
+    ``/path/?x=1&y=2`` is equal to ``/path/?y=2&x=1``, but
+    ``/path/?a=1&a=2`` isn't equal to ``/path/?a=2&a=1``.
+
 .. method:: SimpleTestCase.assertRedirects(response, expected_url, status_code=302, target_status_code=200, msg_prefix='', fetch_redirect_response=True)
 
     Asserts that the response returned a ``status_code`` redirect status,
@@ -1485,7 +1529,7 @@ your test suite.
         self.assertHTMLEqual(
             '<p>Hello <b>world!</p>',
             '''<p>
-                Hello   <b>world! <b/>
+                Hello   <b>world! </b>
             </p>'''
         )
         self.assertHTMLEqual(
@@ -1619,21 +1663,40 @@ You can also tag a test case::
     class SampleTestCase(TestCase):
         ...
 
+Subclasses inherit tags from superclasses, and methods inherit tags from their
+class. Given::
+
+    @tag('foo')
+    class SampleTestCaseChild(SampleTestCase):
+
+        @tag('bar')
+        def test(self):
+            ...
+
+``SampleTestCaseChild.test`` will be labeled with ``'slow'``, ``'core'``,
+``'bar'``, and ``'foo'``.
+
+.. versionchanged:: 2.1
+
+   In older versions, tagged tests don't inherit tags from classes, and
+   tagged subclasses don't inherit tags from superclasses. For example,
+   ``SampleTestCaseChild.test`` is labeled only with ``'bar'``.
+
 Then you can choose which tests to run. For example, to run only fast tests:
 
-.. code-block:: console
+.. console::
 
     $ ./manage.py test --tag=fast
 
 Or to run fast tests and the core one (even though it's slow):
 
-.. code-block:: console
+.. console::
 
     $ ./manage.py test --tag=fast --tag=core
 
 You can also exclude tests by tag. To run core tests if they are not slow:
 
-.. code-block:: console
+.. console::
 
     $ ./manage.py test --tag=core --exclude-tag=slow
 

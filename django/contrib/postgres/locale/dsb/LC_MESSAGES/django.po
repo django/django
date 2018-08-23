@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016-2017
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-02-08 20:54+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-26 10:31+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Lower Sorbian (http://www.transifex.com/django/django/"
 "language/dsb/)\n"
@@ -22,8 +22,8 @@ msgid "PostgreSQL extensions"
 msgstr "Rozšyrjenja PostgreSQL"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
-msgstr "Element %(nth)s w pólnej wariabli njejo se wobkšuśił:"
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "Zapisk %(nth)sw pólnej wariabli njejo se wobkšuśił:"
 
 msgid "Nested arrays must have the same length."
 msgstr "Zakašćikowane pólne wariable muse tu samsku dłujkosć měś."

@@ -65,7 +65,7 @@ class ModelInstanceCreationTests(TestCase):
         self.assertEqual(a.headline, 'Fourth article')
 
     def test_cannot_create_instance_with_invalid_kwargs(self):
-        with self.assertRaisesMessage(TypeError, "'foo' is an invalid keyword argument for this function"):
+        with self.assertRaisesMessage(TypeError, "Article() got an unexpected keyword argument 'foo'"):
             Article(
                 id=None,
                 headline='Some headline',
@@ -555,6 +555,7 @@ class ManagerTest(SimpleTestCase):
         'only',
         'using',
         'exists',
+        'explain',
         '_insert',
         '_update',
         'raw',
@@ -722,3 +723,39 @@ class ModelRefreshTests(TestCase):
         FeaturedArticle.objects.create(article_id=article.pk)
         article.refresh_from_db()
         self.assertTrue(hasattr(article, 'featured'))
+
+    def test_refresh_clears_one_to_one_field(self):
+        article = Article.objects.create(
+            headline='Parrot programs in Python',
+            pub_date=datetime(2005, 7, 28),
+        )
+        featured = FeaturedArticle.objects.create(article_id=article.pk)
+        self.assertEqual(featured.article.headline, 'Parrot programs in Python')
+        article.headline = 'Parrot programs in Python 2.0'
+        article.save()
+        featured.refresh_from_db()
+        self.assertEqual(featured.article.headline, 'Parrot programs in Python 2.0')
+
+    def test_prefetched_cache_cleared(self):
+        a = Article.objects.create(pub_date=datetime(2005, 7, 28))
+        s = SelfRef.objects.create(article=a)
+        # refresh_from_db() without fields=[...]
+        a1_prefetched = Article.objects.prefetch_related('selfref_set').first()
+        self.assertCountEqual(a1_prefetched.selfref_set.all(), [s])
+        s.article = None
+        s.save()
+        # Relation is cleared and prefetch cache is stale.
+        self.assertCountEqual(a1_prefetched.selfref_set.all(), [s])
+        a1_prefetched.refresh_from_db()
+        # Cache was cleared and new results are available.
+        self.assertCountEqual(a1_prefetched.selfref_set.all(), [])
+        # refresh_from_db() with fields=[...]
+        a2_prefetched = Article.objects.prefetch_related('selfref_set').first()
+        self.assertCountEqual(a2_prefetched.selfref_set.all(), [])
+        s.article = a
+        s.save()
+        # Relation is added and prefetch cache is stale.
+        self.assertCountEqual(a2_prefetched.selfref_set.all(), [])
+        a2_prefetched.refresh_from_db(fields=['selfref_set'])
+        # Cache was cleared and new results are available.
+        self.assertCountEqual(a2_prefetched.selfref_set.all(), [s])

@@ -7,23 +7,26 @@
 # dudanogueira <dudanogueira@gmail.com>, 2012
 # Elyézer Rezende <elyezermr@gmail.com>, 2013
 # Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2015
-# Francisco Petry Rauber <xico.petry@gmail.com>, 2016
+# Xico Petry <xico.petry@gmail.com>, 2016
 # Gladson <gladsonbrito@gmail.com>, 2013
 # Guilherme Ferreira <guilherme@uft.edu.br>, 2017
 # semente, 2012-2013
 # Jannis Leidel <jannis@leidel.info>, 2011
+# João Paulo Andrade <joaopaulo.a.p@gmail.com>, 2018
 # Lucas Infante <maccinza@gmail.com>, 2015
 # Luiz Boaretto <lboaretto@gmail.com>, 2017
+# Marcelo Moro Brondani <mbrondani@inf.ufsm.br>, 2018
 # Marco Rougeth <marco@rougeth.com>, 2015
+# Otávio Reis Perkles <otaviocha@gmail.com>, 2018
 # Raysa Dutra, 2016
 # Sergio Garcia <sergio@ginx.com.br>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-04-19 17:11+0000\n"
-"Last-Translator: Guilherme Ferreira <guilherme@uft.edu.br>\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-06-25 18:02+0000\n"
+"Last-Translator: Marcelo Moro Brondani <mbrondani@inf.ufsm.br>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -100,6 +103,15 @@ msgstr "Adicionar outro(a) %(verbose_name)s"
 
 msgid "Remove"
 msgstr "Remover"
+
+msgid "Addition"
+msgstr "Adição"
+
+msgid "Change"
+msgstr "Modificar"
+
+msgid "Deletion"
+msgstr "Eliminação"
 
 msgid "action time"
 msgstr "hora da ação"
@@ -180,11 +192,11 @@ msgstr ""
 "mais de uma opção."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-"O {name} \"{obj}\" foi adicionado com sucesso. Você pode editar ele "
-"novamente abaixo."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "O {name} \"{obj}\" foi adicionado com sucesso."
+
+msgid "You may edit it again below."
+msgstr "Você pode editá-lo novamente abaixo."
 
 #, python-brace-format
 msgid ""
@@ -195,14 +207,17 @@ msgstr ""
 "{name} abaixo."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "O {name} \"{obj}\" foi adicionado com sucesso."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 "O {name} \"{obj}\" foi alterado com sucesso. Você pode modificar ele "
+"novamente abaixo."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+"O {name} \"{obj}\" foi adicionado com sucesso. Você pode editar ele "
 "novamente abaixo."
 
 #, python-brace-format
@@ -242,6 +257,10 @@ msgstr "Adicionar %s"
 #, python-format
 msgid "Change %s"
 msgstr "Modificar %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Visualizar %s"
 
 msgid "Database error"
 msgstr "Erro no banco de dados"
@@ -351,7 +370,7 @@ msgid "Change password"
 msgstr "Alterar senha"
 
 msgid "Please correct the error below."
-msgstr "Por favor, corrija o erro abaixo."
+msgstr "Por favor corrija o erro abaixo "
 
 msgid "Please correct the errors below."
 msgstr "Por favor, corrija os erros abaixo."
@@ -462,8 +481,8 @@ msgstr ""
 "Tem certeza de que deseja apagar o %(objects_name)s selecionado? Todos os "
 "seguintes objetos e seus itens relacionados serão removidos:"
 
-msgid "Change"
-msgstr "Modificar"
+msgid "View"
+msgstr "Visualizar"
 
 msgid "Delete?"
 msgstr "Apagar?"
@@ -482,8 +501,8 @@ msgstr "Modelos na aplicação %(name)s"
 msgid "Add"
 msgstr "Adicionar"
 
-msgid "You don't have permission to edit anything."
-msgstr "Você não tem permissão para edição."
+msgid "You don't have permission to view or edit anything."
+msgstr "Você não tem permissão para ver ou editar nada."
 
 msgid "Recent actions"
 msgstr "Ações recentes"
@@ -547,6 +566,10 @@ msgid "Change selected %(model)s"
 msgstr "Alterar %(model)s selecionado"
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr "Visualizar %(model)s selecionados"
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr "Adicionar outro %(model)s"
 
@@ -575,6 +598,12 @@ msgstr "Salvar e adicionar outro(a)"
 
 msgid "Save and continue editing"
 msgstr "Salvar e continuar editando"
+
+msgid "Save and view"
+msgstr "Salvar e visualizar"
+
+msgid "Close"
+msgstr "Fechar"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Obrigado por visitar nosso Web site hoje."
@@ -686,6 +715,10 @@ msgstr "Selecione %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Selecione %s para modificar"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Selecione %s para visualizar"
 
 msgid "Date:"
 msgstr "Data:"

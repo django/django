@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Aarni Koskela, 2015,2017
+# Aarni Koskela, 2015,2017-2018
 # Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Klaus Dahlén <klaus.dahlen@gmail.com>, 2012
@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2017-02-06 21:20+0000\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2018-03-04 12:14+0000\n"
 "Last-Translator: Aarni Koskela\n"
 "Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
@@ -69,12 +69,11 @@ msgstr "Syötä sama salasana tarkistuksen vuoksi toistamiseen."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Salasanoja ei tallenneta selkokielisinä, joten tämän käyttäjän salasanaa on "
-"mahdoton nähdä, mutta voit vaihtaa salasanan käyttämällä <a href=\"../"
-"password/\">tätä lomaketta</a>."
+"mahdoton nähdä, mutta voit vaihtaa salasanan käyttämällä <a href=\"{}\">tätä "
+"lomaketta</a>."
 
 #, python-format
 msgid ""

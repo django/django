@@ -5,7 +5,7 @@ from django.core.exceptions import FieldDoesNotExist
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
 
-from .models import MinimalUser
+from .models import MinimalUser, UserWithDisabledLastLoginField
 
 
 @override_settings(ROOT_URLCONF='auth_tests.urls')
@@ -98,6 +98,12 @@ class SignalTestCase(TestCase):
             with self.assertRaises(FieldDoesNotExist):
                 MinimalUser._meta.get_field('last_login')
             with self.settings(AUTH_USER_MODEL='auth_tests.MinimalUser'):
+                apps.get_app_config('auth').ready()
+            self.assertEqual(signals.user_logged_in.receivers, [])
+
+            # last_login is a property whose value is None.
+            self.assertIsNone(UserWithDisabledLastLoginField().last_login)
+            with self.settings(AUTH_USER_MODEL='auth_tests.UserWithDisabledLastLoginField'):
                 apps.get_app_config('auth').ready()
             self.assertEqual(signals.user_logged_in.receivers, [])
 

@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Fery Setiawan <gembelweb@gmail.com>, 2016
+# Fery Setiawan <gembelweb@gmail.com>, 2016,2018
 # Jannis Leidel <jannis@leidel.info>, 2011
 # rodin <romihardiyanto@gmail.com>, 2011-2012
 # rodin <romihardiyanto@gmail.com>, 2014
@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2016-08-23 04:44+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-06-18 23:30+0000\n"
 "Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
@@ -24,17 +24,60 @@ msgstr ""
 msgid "Humanize"
 msgstr "Menjadikan manusia"
 
-msgid "th"
-msgstr "th"
+#. Translators: Ordinal format for 11 (11th), 12 (12th), and 13 (13th).
+msgctxt "ordinal 11, 12, 13"
+msgid "{}th"
+msgstr "{}"
 
-msgid "st"
-msgstr "st"
+#. Translators: Ordinal format when value ends with 0, e.g. 80th.
+msgctxt "ordinal 0"
+msgid "{}th"
+msgstr "{}"
 
-msgid "nd"
-msgstr "nd"
+#. Translators: Ordinal format when value ends with 1, e.g. 81st, except 11.
+msgctxt "ordinal 1"
+msgid "{}st"
+msgstr "{}"
 
-msgid "rd"
-msgstr "rd"
+#. Translators: Ordinal format when value ends with 2, e.g. 82nd, except 12.
+msgctxt "ordinal 2"
+msgid "{}nd"
+msgstr "{}"
+
+#. Translators: Ordinal format when value ends with 3, e.g. 83th, except 13.
+msgctxt "ordinal 3"
+msgid "{}rd"
+msgstr "{}"
+
+#. Translators: Ordinal format when value ends with 4, e.g. 84th.
+msgctxt "ordinal 4"
+msgid "{}th"
+msgstr "{}"
+
+#. Translators: Ordinal format when value ends with 5, e.g. 85th.
+msgctxt "ordinal 5"
+msgid "{}th"
+msgstr "{}"
+
+#. Translators: Ordinal format when value ends with 6, e.g. 86th.
+msgctxt "ordinal 6"
+msgid "{}th"
+msgstr "{}"
+
+#. Translators: Ordinal format when value ends with 7, e.g. 87th.
+msgctxt "ordinal 7"
+msgid "{}th"
+msgstr "{}"
+
+#. Translators: Ordinal format when value ends with 8, e.g. 88th.
+msgctxt "ordinal 8"
+msgid "{}th"
+msgstr "{}"
+
+#. Translators: Ordinal format when value ends with 9, e.g. 89th.
+msgctxt "ordinal 9"
+msgid "{}th"
+msgstr "{}"
 
 #, python-format
 msgid "%(value).1f million"
@@ -182,10 +225,49 @@ msgstr "besok"
 msgid "yesterday"
 msgstr "kemarin"
 
+#. Translators: delta will contain a string like '2 months' or '1 month, 2
+#. weeks'
 #, python-format
-msgctxt "naturaltime"
 msgid "%(delta)s ago"
-msgstr "%(delta)s yang lalu"
+msgstr "%(delta)s lampau"
+
+#. Translators: 'naturaltime-past' strings will be included in
+#. '%(delta)s ago'
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] "%d tahun"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d month"
+msgid_plural "%d months"
+msgstr[0] "%d bulan"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d week"
+msgid_plural "%d weeks"
+msgstr[0] "%d minggu"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d hari"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d jam"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d menit"
 
 msgid "now"
 msgstr "sekarang"
@@ -211,10 +293,49 @@ msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
 msgstr[0] "%(count)s jam yang lalu"
 
+#. Translators: delta will contain a string like '2 months' or '1 month, 2
+#. weeks'
 #, python-format
-msgctxt "naturaltime"
 msgid "%(delta)s from now"
 msgstr "%(delta)s dari sekarang"
+
+#. Translators: 'naturaltime-future' strings will be included in
+#. '%(delta)s from now'
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] "%d tahun"
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d month"
+msgid_plural "%d months"
+msgstr[0] "%d bulan"
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d week"
+msgid_plural "%d weeks"
+msgstr[0] "%d minggu"
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d hari"
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d jam"
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d menit"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.

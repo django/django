@@ -85,11 +85,9 @@ class HashedFilesMixin:
         # `name` is the base name to construct the new hashed filename from.
         parsed_name = urlsplit(unquote(name))
         clean_name = parsed_name.path.strip()
-        if filename:
-            filename = urlsplit(unquote(filename)).path.strip()
-        filename = filename or clean_name
-        opened = False
-        if content is None:
+        filename = (filename and urlsplit(unquote(filename)).path.strip()) or clean_name
+        opened = content is None
+        if opened:
             if not self.exists(filename):
                 raise ValueError("The file '%s' could not be found with %r." % (filename, self))
             try:
@@ -97,7 +95,6 @@ class HashedFilesMixin:
             except IOError:
                 # Handle directory paths and fragments
                 return name
-            opened = True
         try:
             file_hash = self.file_hash(clean_name, content)
         finally:

@@ -88,7 +88,6 @@ class WSGIRequest(HttpRequest):
                 pass
             else:
                 self.encoding = self.content_params['charset']
-        self._post_parse_error = False
         try:
             content_length = int(environ.get('CONTENT_LENGTH'))
         except (ValueError, TypeError):
@@ -176,9 +175,7 @@ def get_script_name(environ):
     # rewrites. Unfortunately not every Web server (lighttpd!) passes this
     # information through all the time, so FORCE_SCRIPT_NAME, above, is still
     # needed.
-    script_url = get_bytes_from_wsgi(environ, 'SCRIPT_URL', '')
-    if not script_url:
-        script_url = get_bytes_from_wsgi(environ, 'REDIRECT_URL', '')
+    script_url = get_bytes_from_wsgi(environ, 'SCRIPT_URL', '') or get_bytes_from_wsgi(environ, 'REDIRECT_URL', '')
 
     if script_url:
         if b'//' in script_url:

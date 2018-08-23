@@ -1,6 +1,5 @@
 from django.db.models import Field, FloatField
 from django.db.models.expressions import CombinedExpression, Func, Value
-from django.db.models.functions import Coalesce
 from django.db.models.lookups import Lookup
 
 
@@ -46,15 +45,13 @@ class SearchVectorCombinable:
 
 class SearchVector(SearchVectorCombinable, Func):
     function = 'to_tsvector'
-    arg_joiner = " || ' ' || "
+    arg_joiner = ", ' ',"
+    template = '%(function)s(concat(%(expressions)s))'
     output_field = SearchVectorField()
     config = None
 
     def __init__(self, *expressions, **extra):
         super().__init__(*expressions, **extra)
-        self.source_expressions = [
-            Coalesce(expression, Value('')) for expression in self.source_expressions
-        ]
         self.config = self.extra.get('config', self.config)
         weight = self.extra.get('weight')
         if weight is not None and not hasattr(weight, 'resolve_expression'):
@@ -75,7 +72,7 @@ class SearchVector(SearchVectorCombinable, Func):
         if template is None:
             if self.config:
                 config_sql, config_params = compiler.compile(self.config)
-                template = "%(function)s({}::regconfig, %(expressions)s)".format(config_sql.replace('%', '%%'))
+                template = "%(function)s({}::regconfig, concat(%(expressions)s))".format(config_sql.replace('%', '%%'))
             else:
                 template = self.template
         sql, params = super().as_sql(compiler, connection, function=function, template=template)
@@ -161,11 +158,18 @@ class SearchQuery(SearchQueryCombinable, Value):
     def __invert__(self):
         return type(self)(self.value, config=self.config, invert=not self.invert)
 
+    def __str__(self):
+        result = super().__str__()
+        return ('~%s' % result) if self.invert else result
+
 
 class CombinedSearchQuery(SearchQueryCombinable, CombinedExpression):
     def __init__(self, lhs, connector, rhs, config, output_field=None):
         self.config = config
         super().__init__(lhs, connector, rhs, output_field)
+
+    def __str__(self):
+        return '(%s)' % super().__str__()
 
 
 class SearchRank(Func):

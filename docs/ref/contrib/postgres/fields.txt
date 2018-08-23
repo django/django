@@ -53,8 +53,8 @@ may be a good choice for the :ref:`range fields <range-fields>` and
         It is possible to nest array fields - you can specify an instance of
         ``ArrayField`` as the ``base_field``. For example::
 
-            from django.db import models
             from django.contrib.postgres.fields import ArrayField
+            from django.db import models
 
             class ChessBoard(models.Model):
                 board = ArrayField(
@@ -109,8 +109,8 @@ Querying ``ArrayField``
 There are a number of custom lookups and transforms for :class:`ArrayField`.
 We will use the following example model::
 
-    from django.db import models
     from django.contrib.postgres.fields import ArrayField
+    from django.db import models
 
     class Post(models.Model):
         name = models.CharField(max_length=200)
@@ -544,7 +544,7 @@ name::
     ...         }],
     ...     },
     ... })
-    >>> Dog.objects.create(name='Meg', data={'breed': 'collie'})
+    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': None})
 
     >>> Dog.objects.filter(data__breed='collie')
     <QuerySet [<Dog: Meg>]>
@@ -565,6 +565,23 @@ the :lookup:`jsonfield.contains` lookup instead.
 
 If only one key or index is used, the SQL operator ``->`` is used. If multiple
 operators are used then the ``#>`` operator is used.
+
+To query for ``null`` in JSON data, use ``None`` as a value::
+
+    >>> Dog.objects.filter(data__owner=None)
+    <QuerySet [<Dog: Meg>]>
+
+To query for missing keys, use the ``isnull`` lookup::
+
+    >>> Dog.objects.create(name='Shep', data={'breed': 'collie'})
+    >>> Dog.objects.filter(data__owner__isnull=True)
+    <QuerySet [<Dog: Shep>]>
+
+.. versionchanged:: 2.1
+
+    In older versions, using ``None`` as a  lookup value matches objects that
+    don't have the key rather than objects that have the key with a ``None``
+    value.
 
 .. warning::
 

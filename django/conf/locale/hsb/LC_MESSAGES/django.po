@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016-2017
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-02-08 20:28+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-26 11:17+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Upper Sorbian (http://www.transifex.com/django/django/"
 "language/hsb/)\n"
@@ -158,6 +158,9 @@ msgstr "Japanšćina"
 
 msgid "Georgian"
 msgstr "Georgišćina"
+
+msgid "Kabyle"
+msgstr "Kabylšćina"
 
 msgid "Kazakh"
 msgstr "Kazachšćina"
@@ -315,6 +318,7 @@ msgstr "Zapodajće płaćiwu cyłu ličbu."
 msgid "Enter a valid email address."
 msgstr "Zapodajće płaćiwu e-mejlowu adresu."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -392,6 +396,9 @@ msgstr[3] ""
 "Zawěsćće, zo tuta hódnota ma maksimalnje %(limit_value)d znamješkow (ima "
 "%(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Zapodajće ličbu."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -425,6 +432,9 @@ msgid ""
 msgstr ""
 "Datajowy sufiks ' %(extension)s' dowoleny njeje. Dowolene sufiksy su: ' "
 "%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
+msgstr "Prózdne znamješka dowolene njejsu."
 
 msgid "and"
 msgstr "a"
@@ -472,6 +482,10 @@ msgstr "Big (8 byte) integer"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "Hódnota '%(value)s' dyrbi pak True pak False być."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "Hódnota '%(value)s' dyrbi pak True, False pak None być."
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolean (pak True pak False)"
@@ -648,9 +662,6 @@ msgstr "Tute polo je trěbne."
 msgid "Enter a whole number."
 msgstr "Zapodajće cyłu ličbu."
 
-msgid "Enter a number."
-msgstr "Zapodajće ličbu."
-
 msgid "Enter a valid date."
 msgstr "Zapodajće płaćiwy datum."
 
@@ -662,6 +673,10 @@ msgstr "Zapodajće płaćiwy datum/čas."
 
 msgid "Enter a valid duration."
 msgstr "Zapodajće płaćiwe traće."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Ličba dnjow dyrbi mjez {min_days} a {max_days} być."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Žana dataja je so pósłała. Přepruwujće kodowanski typ we formularje."
@@ -767,9 +782,8 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Prošu porjedźće slědowace dwójne hódnoty."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr ""
-"Nutřkowny cuzy kluč primarnemu klučej nadrjadowaneje instancy njewotpowěduje."
+msgid "The inline value did not match the parent instance."
+msgstr "Hódnota inline nadrjadowanej instancy njewotpowěduje."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
@@ -777,8 +791,8 @@ msgstr ""
 "dispoziciji stejacych wolenskich móžnosćow njeje."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" płaćiwa hódnota za primarny kluč njeje."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "\"%(pk)s\" płaćiwa hódnota njeje."
 
 #, python-format
 msgid ""
@@ -807,7 +821,7 @@ msgid "No"
 msgstr "Ně"
 
 msgid "yes,no,maybe"
-msgstr "ha,ně,snano"
+msgstr "haj,ně,snano"
 
 #, python-format
 msgid "%(size)d byte"
@@ -1158,6 +1172,19 @@ msgstr ""
 "za naprašowanja 'sameorigin'."
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+"Jeli značku <meta name=\"referrer\" content=\"no-referrer\"> wužiwaće abo "
+"hłowu 'Referrer-Policy: no-referrer' zapřijimaće, wotstrońće je prošu. CSRF-"
+"škit trjeba hłowu 'Referer' , zo by striktnu kontrolu referer přewjedźe. "
+"Jeli so wo priwatnosć staraće, wužiwajće alternatiwy kaž  <a rel=\"noreferrer"
+"\" ...> za wotkazy k sydłam třećich."
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1176,31 +1203,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "Z DEBUG=True su dalše informacije k dispoziciji."
 
-msgid "Welcome to Django"
-msgstr "Witajće k Django"
-
-msgid "It worked!"
-msgstr "Je so fungowało!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Zbožopřeće k wašej prěnjej stronje spěchowanej přez Django."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-"Wuwjedźće jako přichodne <code>python manage.py startapp [app_label]</code>, "
-"zo byšće swoje prěnje nałoženje startował."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Widźiće tutu zdźělenku, dokelž maće <code>DEBUG = True</code> w swojej "
-"dataji nastajenjow Django a njejsće URL skonfigurował. Dajće do dźěła!"
-
 msgid "No year specified"
 msgstr "Žane lěto podate"
+
+msgid "Date out of range"
+msgstr "Datum zwonka wobłuka"
 
 msgid "No month specified"
 msgstr "Žadyn měsac podaty"
@@ -1253,3 +1260,47 @@ msgstr "\"%(path)s\" njeeksistuje"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Indeks %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django: Web framework za perfekcionistow z terminami."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Čitajće <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">wersijowe informacije</a> za Django "
+"%(version)s"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Instalacija bě wuspěšna! Zbožopřeće!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"Widźiće tutu stronu, dokelž <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> je we wašej dataji nastajenjow a njejsće URL skonfigurował."
+
+msgid "Django Documentation"
+msgstr "Dokumentacija Django"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr "Temy, referency a nawody"
+
+msgid "Tutorial: A Polling App"
+msgstr "Nawod: Naprašowanske nałoženje"
+
+msgid "Get started with Django"
+msgstr "Prěnje kroki z Django"
+
+msgid "Django Community"
+msgstr "Zhromadźenstwo Django"
+
+msgid "Connect, get help, or contribute"
+msgstr "Zwjazać, pomoc wobstarać abo přinošować"

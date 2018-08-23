@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.core.exceptions import MiddlewareNotUsed
 from django.test import RequestFactory, SimpleTestCase, override_settings
-from django.test.utils import patch_logger
 
 from . import middleware as mw
 
@@ -138,26 +137,24 @@ class MiddlewareNotUsedTests(SimpleTestCase):
 
     @override_settings(MIDDLEWARE=['middleware_exceptions.tests.MyMiddleware'])
     def test_log(self):
-        with patch_logger('django.request', 'debug') as calls:
+        with self.assertLogs('django.request', 'DEBUG') as cm:
             self.client.get('/middleware_exceptions/view/')
-        self.assertEqual(len(calls), 1)
         self.assertEqual(
-            calls[0],
+            cm.records[0].getMessage(),
             "MiddlewareNotUsed: 'middleware_exceptions.tests.MyMiddleware'"
         )
 
     @override_settings(MIDDLEWARE=['middleware_exceptions.tests.MyMiddlewareWithExceptionMessage'])
     def test_log_custom_message(self):
-        with patch_logger('django.request', 'debug') as calls:
+        with self.assertLogs('django.request', 'DEBUG') as cm:
             self.client.get('/middleware_exceptions/view/')
-        self.assertEqual(len(calls), 1)
         self.assertEqual(
-            calls[0],
+            cm.records[0].getMessage(),
             "MiddlewareNotUsed('middleware_exceptions.tests.MyMiddlewareWithExceptionMessage'): spam eggs"
         )
 
     @override_settings(DEBUG=False)
     def test_do_not_log_when_debug_is_false(self):
-        with patch_logger('django.request', 'debug') as calls:
-            self.client.get('/middleware_exceptions/view/')
-        self.assertEqual(len(calls), 0)
+        with self.assertRaisesMessage(AssertionError, 'no logs'):
+            with self.assertLogs('django.request', 'DEBUG'):
+                self.client.get('/middleware_exceptions/view/')

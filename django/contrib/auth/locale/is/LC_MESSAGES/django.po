@@ -4,13 +4,13 @@
 # Hafsteinn Einarsson <haffi67@gmail.com>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Logi Ragnarsson <logi@belgingur.is>, 2012
-# Thordur Sigurdsson <thordur@ja.is>, 2016
+# Thordur Sigurdsson <thordur@ja.is>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-10-08 00:36+0000\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-10-03 17:25+0000\n"
 "Last-Translator: Thordur Sigurdsson <thordur@ja.is>\n"
 "Language-Team: Icelandic (http://www.transifex.com/django/django/language/"
 "is/)\n"
@@ -69,12 +69,11 @@ msgstr "Settu inn sama lykilorð og áður til staðfestingar."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Lykilorð eru aðeins geymd dulkóðuð, svo ekki er hægt að sjá lykilorð þessa "
-"notanda, en þú getur breytt lykilorðinu með <a href=\"../password/\">þessu "
-"eyðublaði</a> ."
+"notanda, en þú getur breytt lykilorðinu með <a href=\"{}\">þessu eyðublaði</"
+"a>."
 
 #, python-format
 msgid ""

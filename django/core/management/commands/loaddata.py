@@ -39,11 +39,11 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('args', metavar='fixture', nargs='+', help='Fixture labels.')
         parser.add_argument(
-            '--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
+            '--database', default=DEFAULT_DB_ALIAS,
             help='Nominates a specific database to load fixtures into. Defaults to the "default" database.',
         )
         parser.add_argument(
-            '--app', action='store', dest='app_label', default=None,
+            '--app', dest='app_label',
             help='Only look for fixtures in the specified app.',
         )
         parser.add_argument(
@@ -52,11 +52,11 @@ class Command(BaseCommand):
                  'currently exist on the model.',
         )
         parser.add_argument(
-            '-e', '--exclude', dest='exclude', action='append', default=[],
+            '-e', '--exclude', action='append', default=[],
             help='An app_label or app_label.ModelName to exclude. Can be used multiple times.',
         )
         parser.add_argument(
-            '--format', action='store', dest='format', default=None,
+            '--format',
             help='Format of serialized data when reading from stdin.',
         )
 
@@ -109,8 +109,11 @@ class Command(BaseCommand):
             return
 
         with connection.constraint_checks_disabled():
+            self.objs_with_deferred_fields = []
             for fixture_label in fixture_labels:
                 self.load_label(fixture_label)
+            for obj in self.objs_with_deferred_fields:
+                obj.save_deferred_fields(using=self.using)
 
         # Since we disabled constraint checks, we must manually check for
         # any invalid keys that might have been added
@@ -163,6 +166,7 @@ class Command(BaseCommand):
 
                 objects = serializers.deserialize(
                     ser_fmt, fixture, using=self.using, ignorenonexistent=self.ignore,
+                    handle_forward_references=True,
                 )
 
                 for obj in objects:
@@ -180,7 +184,8 @@ class Command(BaseCommand):
                                     '\rProcessed %i object(s).' % loaded_objects_in_fixture,
                                     ending=''
                                 )
-                        except (DatabaseError, IntegrityError) as e:
+                        # psycopg2 raises ValueError if data contains NUL chars.
+                        except (DatabaseError, IntegrityError, ValueError) as e:
                             e.args = ("Could not load %(app_label)s.%(object_name)s(pk=%(pk)s): %(error_msg)s" % {
                                 'app_label': obj.object._meta.app_label,
                                 'object_name': obj.object._meta.object_name,
@@ -188,6 +193,8 @@ class Command(BaseCommand):
                                 'error_msg': e,
                             },)
                             raise
+                    if obj.deferred_fields:
+                        self.objs_with_deferred_fields.append(obj)
                 if objects and show_progress:
                     self.stdout.write('')  # add a newline after progress indicator
                 self.loaded_object_count += loaded_objects_in_fixture
@@ -219,7 +226,7 @@ class Command(BaseCommand):
         ser_fmts = serializers.get_public_serializer_formats() if ser_fmt is None else [ser_fmt]
 
         if self.verbosity >= 2:
-            self.stdout.write("Loading '%s' fixtures..." % fixture_name)
+            self.stdout.write("Loading '%s' fixtures…" % fixture_name)
 
         if os.path.isabs(fixture_name):
             fixture_dirs = [os.path.dirname(fixture_name)]
@@ -240,7 +247,7 @@ class Command(BaseCommand):
         fixture_files = []
         for fixture_dir in fixture_dirs:
             if self.verbosity >= 2:
-                self.stdout.write("Checking %s for fixtures..." % humanize(fixture_dir))
+                self.stdout.write("Checking %s for fixtures…" % humanize(fixture_dir))
             fixture_files_in_dir = []
             path = os.path.join(fixture_dir, fixture_name)
             for candidate in glob.iglob(glob.escape(path) + '*'):
@@ -332,7 +339,7 @@ class Command(BaseCommand):
 class SingleZipReader(zipfile.ZipFile):
 
     def __init__(self, *args, **kwargs):
-        zipfile.ZipFile.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
         if len(self.namelist()) != 1:
             raise ValueError("Zip-compressed fixtures must contain one file.")
 

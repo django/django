@@ -133,6 +133,24 @@ class ModelInheritanceTests(TestCase):
             if 'UPDATE' in sql:
                 self.assertEqual(expected_sql, sql)
 
+    def test_create_child_no_update(self):
+        """Creating a child with non-abstract parents only issues INSERTs."""
+        def a():
+            GrandChild.objects.create(
+                email='grand_parent@example.com',
+                first_name='grand',
+                last_name='parent',
+            )
+
+        def b():
+            GrandChild().save()
+        for i, test in enumerate([a, b]):
+            with self.subTest(i=i), self.assertNumQueries(4), CaptureQueriesContext(connection) as queries:
+                test()
+                for query in queries:
+                    sql = query['sql']
+                    self.assertIn('INSERT INTO', sql, sql)
+
     def test_eq(self):
         # Equality doesn't transfer in multitable inheritance.
         self.assertNotEqual(Place(id=1), Restaurant(id=1))
@@ -368,6 +386,22 @@ class ModelInheritanceDataTests(TestCase):
         self.assertEqual(qs[1].italianrestaurant.name, 'Ristorante Miron')
         self.assertEqual(qs[1].italianrestaurant.rating, 4)
 
+    def test_parent_cache_reuse(self):
+        place = Place.objects.create()
+        GrandChild.objects.create(place=place)
+        grand_parent = GrandParent.objects.latest('pk')
+        with self.assertNumQueries(1):
+            self.assertEqual(grand_parent.place, place)
+        parent = grand_parent.parent
+        with self.assertNumQueries(0):
+            self.assertEqual(parent.place, place)
+        child = parent.child
+        with self.assertNumQueries(0):
+            self.assertEqual(child.place, place)
+        grandchild = child.grandchild
+        with self.assertNumQueries(0):
+            self.assertEqual(grandchild.place, place)
+
     def test_update_query_counts(self):
         """
         Update queries do not generate unnecessary queries (#18304).
@@ -445,8 +479,8 @@ class InheritanceSameModelNameTests(SimpleTestCase):
         ForeignReferent = Referent
 
         self.assertFalse(hasattr(Referenced, related_name))
-        self.assertTrue(Referenced.model_inheritance_referent_references.rel.model, LocalReferent)
-        self.assertTrue(Referenced.tests_referent_references.rel.model, ForeignReferent)
+        self.assertIs(Referenced.model_inheritance_referent_references.field.model, LocalReferent)
+        self.assertIs(Referenced.tests_referent_references.field.model, ForeignReferent)
 
 
 class InheritanceUniqueTests(TestCase):

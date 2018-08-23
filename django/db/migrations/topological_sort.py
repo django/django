@@ -10,7 +10,7 @@ def topological_sort_as_sets(dependency_graph):
     """
     todo = dependency_graph.copy()
     while todo:
-        current = {node for node, deps in todo.items() if len(deps) == 0}
+        current = {node for node, deps in todo.items() if not deps}
 
         if not current:
             raise ValueError('Cyclic dependency in graph: {}'.format(

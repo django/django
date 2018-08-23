@@ -22,9 +22,9 @@ LANGUAGE_QUERY_PARAMETER = 'language'
 
 def set_language(request):
     """
-    Redirect to a given URL while setting the chosen language in the session or
-    cookie. The URL and the language code need to be specified in the request
-    parameters.
+    Redirect to a given URL while setting the chosen language in the session
+    (if enabled) and in a cookie. The URL and the language code need to be
+    specified in the request parameters.
 
     Since this view changes how the user will see the rest of the site, it must
     only be accessed as a POST request. If called as a GET request, it will
@@ -35,8 +35,7 @@ def set_language(request):
     if ((next or not request.is_ajax()) and
             not is_safe_url(url=next, allowed_hosts={request.get_host()}, require_https=request.is_secure())):
         next = request.META.get('HTTP_REFERER')
-        if next:
-            next = unquote(next)  # HTTP_REFERER may be encoded.
+        next = next and unquote(next)  # HTTP_REFERER may be encoded.
         if not is_safe_url(url=next, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
             next = '/'
     response = HttpResponseRedirect(next) if next else HttpResponse(status=204)
@@ -49,13 +48,12 @@ def set_language(request):
                     response = HttpResponseRedirect(next_trans)
             if hasattr(request, 'session'):
                 request.session[LANGUAGE_SESSION_KEY] = lang_code
-            else:
-                response.set_cookie(
-                    settings.LANGUAGE_COOKIE_NAME, lang_code,
-                    max_age=settings.LANGUAGE_COOKIE_AGE,
-                    path=settings.LANGUAGE_COOKIE_PATH,
-                    domain=settings.LANGUAGE_COOKIE_DOMAIN,
-                )
+            response.set_cookie(
+                settings.LANGUAGE_COOKIE_NAME, lang_code,
+                max_age=settings.LANGUAGE_COOKIE_AGE,
+                path=settings.LANGUAGE_COOKIE_PATH,
+                domain=settings.LANGUAGE_COOKIE_DOMAIN,
+            )
     return response
 
 
@@ -177,31 +175,6 @@ js_catalog_template = r"""
 """
 
 
-def render_javascript_catalog(catalog=None, plural=None):
-    template = Engine().from_string(js_catalog_template)
-
-    def indent(s):
-        return s.replace('\n', '\n  ')
-
-    context = Context({
-        'catalog_str': indent(json.dumps(
-            catalog, sort_keys=True, indent=2)) if catalog else None,
-        'formats_str': indent(json.dumps(
-            get_formats(), sort_keys=True, indent=2)),
-        'plural': plural,
-    })
-
-    return HttpResponse(template.render(context), 'text/javascript')
-
-
-def null_javascript_catalog(request, domain=None, packages=None):
-    """
-    Return "identity" versions of the JavaScript i18n functions -- i.e.,
-    versions that don't actually do anything.
-    """
-    return render_javascript_catalog()
-
-
 class JavaScriptCatalog(View):
     """
     Return the selected language catalog as a JavaScript library.
@@ -311,7 +284,7 @@ class JavaScriptCatalog(View):
         ) if context['catalog'] else None
         context['formats_str'] = indent(json.dumps(context['formats'], sort_keys=True, indent=2))
 
-        return HttpResponse(template.render(Context(context)), 'text/javascript')
+        return HttpResponse(template.render(Context(context)), 'text/javascript; charset="utf-8"')
 
 
 class JSONCatalog(JavaScriptCatalog):

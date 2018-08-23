@@ -4,14 +4,15 @@
 # gudbergur <gudbergur@gmail.com>, 2012
 # Hafsteinn Einarsson <haffi67@gmail.com>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Matt R, 2018
 # Thordur Sigurdsson <thordur@ja.is>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2017-04-05 03:24+0000\n"
-"Last-Translator: Thordur Sigurdsson <thordur@ja.is>\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
+"PO-Revision-Date: 2018-05-18 14:09+0000\n"
+"Last-Translator: Matt R\n"
 "Language-Team: Icelandic (http://www.transifex.com/django/django/language/"
 "is/)\n"
 "MIME-Version: 1.0\n"
@@ -99,26 +100,8 @@ msgstr ""
 "Þú hefur valið aðgerð en hefur ekki gert breytingar á reitum. Þú ert líklega "
 "að leita að 'Fara' hnappnum frekar en 'Vista' hnappnum."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Athugaðu að þú ert %s klukkustund á undan tíma vefþjóns."
-msgstr[1] "Athugaðu að þú ert %s klukkustundum á undan tíma vefþjóns."
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Athugaðu að þú ert %s klukkustund á eftir tíma vefþjóns."
-msgstr[1] "Athugaðu að þú ert %s klukkustundum á eftir tíma vefþjóns."
-
 msgid "Now"
 msgstr "Núna"
-
-msgid "Choose a Time"
-msgstr "Veldu tíma"
-
-msgid "Choose a time"
-msgstr "Veldu tíma"
 
 msgid "Midnight"
 msgstr "Miðnætti"
@@ -131,6 +114,24 @@ msgstr "Hádegi"
 
 msgid "6 p.m."
 msgstr "6 e.h."
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Athugaðu að þú ert %s klukkustund á undan tíma vefþjóns."
+msgstr[1] "Athugaðu að þú ert %s klukkustundum á undan tíma vefþjóns."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Athugaðu að þú ert %s klukkustund á eftir tíma vefþjóns."
+msgstr[1] "Athugaðu að þú ert %s klukkustundum á eftir tíma vefþjóns."
+
+msgid "Choose a Time"
+msgstr "Veldu tíma"
+
+msgid "Choose a time"
+msgstr "Veldu tíma"
 
 msgid "Cancel"
 msgstr "Hætta við"
@@ -148,40 +149,40 @@ msgid "Tomorrow"
 msgstr "Á morgun"
 
 msgid "January"
-msgstr "Janúar"
+msgstr "janúar"
 
 msgid "February"
-msgstr "Febrúar"
+msgstr "febrúar"
 
 msgid "March"
-msgstr "Mars"
+msgstr "mars"
 
 msgid "April"
-msgstr "Apríl"
+msgstr "apríl"
 
 msgid "May"
-msgstr "Maí"
+msgstr "maí"
 
 msgid "June"
-msgstr "Júní"
+msgstr "júní"
 
 msgid "July"
-msgstr "Júlí"
+msgstr "júlí"
 
 msgid "August"
-msgstr "Ágúst"
+msgstr "ágúst"
 
 msgid "September"
-msgstr "September"
+msgstr "september"
 
 msgid "October"
-msgstr "Október"
+msgstr "október"
 
 msgid "November"
-msgstr "Nóvember"
+msgstr "nóvember"
 
 msgid "December"
-msgstr "Desember"
+msgstr "desember"
 
 msgctxt "one letter Sunday"
 msgid "S"

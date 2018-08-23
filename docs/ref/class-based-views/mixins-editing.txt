@@ -232,6 +232,11 @@ The following mixins are used to construct Django's editing views:
         could use ``success_url="/parent/{parent_id}/"`` to redirect to a URL
         composed out of the ``parent_id`` field on a model.
 
+    .. method:: delete(request, *args, **kwargs)
+
+        Retrieves the target object and calls its ``delete()`` method, then
+        redirects to the success URL.
+
     .. method:: get_success_url()
 
         Returns the url to redirect to when the nominated object has been

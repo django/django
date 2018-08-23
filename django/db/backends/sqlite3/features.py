@@ -4,17 +4,15 @@ from django.utils.functional import cached_property
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
-    # SQLite cannot handle us only partially reading from a cursor's result set
-    # and then writing the same rows to the database in another cursor. This
-    # setting ensures we always read result sets fully into memory all in one
-    # go.
-    can_use_chunked_reads = False
+    # SQLite can read from a cursor since SQLite 3.6.5, subject to the caveat
+    # that statements within a connection aren't isolated from each other. See
+    # https://sqlite.org/isolation.html.
+    can_use_chunked_reads = True
     test_db_allows_multiple_connections = False
     supports_unspecified_pk = True
     supports_timezones = False
     max_query_params = 999
     supports_mixed_date_datetime_comparisons = False
-    supports_column_check_constraints = False
     autocommits_when_autocommit_is_off = True
     can_introspect_decimal_field = False
     can_introspect_positive_integer_field = True
@@ -22,6 +20,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_transactions = True
     atomic_transactions = False
     can_rollback_ddl = True
+    supports_atomic_references_rename = False
     supports_paramstyle_pyformat = False
     supports_sequence_reset = False
     can_clone_databases = True

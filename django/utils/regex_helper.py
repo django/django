@@ -176,8 +176,7 @@ def normalize(pattern):
 
             if consume_next:
                 ch, escaped = next(pattern_iter)
-            else:
-                consume_next = True
+            consume_next = True
     except StopIteration:
         pass
     except NotImplementedError:

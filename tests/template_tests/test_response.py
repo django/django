@@ -249,8 +249,7 @@ class TemplateResponseTest(SimpleTestCase):
         self.assertEqual(response.content, b'no')
 
     def test_kwargs(self):
-        response = self._response(content_type='application/json',
-                                  status=504)
+        response = self._response(content_type='application/json', status=504)
         self.assertEqual(response['content-type'], 'application/json')
         self.assertEqual(response.status_code, 504)
 

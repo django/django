@@ -277,7 +277,7 @@ For example, we can ask for all publishers, annotated with their respective
 total book stock counters (note how we use ``'book'`` to specify the
 ``Publisher`` -> ``Book`` reverse foreign key hop)::
 
-    >>> from django.db.models import Count, Min, Sum, Avg
+    >>> from django.db.models import Avg, Count, Min, Sum
     >>> Publisher.objects.annotate(Count('book'))
 
 (Every ``Publisher`` in the resulting ``QuerySet`` will have an extra attribute
@@ -324,7 +324,7 @@ constraining the objects for which an annotation is calculated. For example,
 you can generate an annotated list of all books that have a title starting
 with "Django" using the query::
 
-    >>> from django.db.models import Count, Avg
+    >>> from django.db.models import Avg, Count
     >>> Book.objects.filter(name__startswith="Django").annotate(num_authors=Count('authors'))
 
 When used with an ``aggregate()`` clause, a filter has the effect of
@@ -367,10 +367,6 @@ Each ``Author`` in the result set will have the ``num_books`` and
     aggregation. It's more efficient to use ``QuerySet.filter()`` to exclude
     rows. The aggregation ``filter`` argument is only useful when using two or
     more aggregations over the same relations with different conditionals.
-
-.. versionchanged:: 2.0
-
-    The ``filter`` argument was added to aggregates.
 
 Order of ``annotate()`` and ``filter()`` clauses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -578,6 +574,6 @@ For example, if you wanted to calculate the average number of authors per
 book you first annotate the set of books with the author count, then
 aggregate that author count, referencing the annotation field::
 
-    >>> from django.db.models import Count, Avg
+    >>> from django.db.models import Avg, Count
     >>> Book.objects.annotate(num_authors=Count('authors')).aggregate(Avg('num_authors'))
     {'num_authors__avg': 1.66}

@@ -167,6 +167,8 @@ class BaseSpatialField(Field):
 
     def get_prep_value(self, value):
         obj = super().get_prep_value(value)
+        if obj is None:
+            return None
         # When the input is not a geometry or raster, attempt to construct one
         # from the given string input.
         if isinstance(obj, GEOSGeometry):
@@ -250,11 +252,12 @@ class GeometryField(BaseSpatialField):
         setattr(cls, self.attname, SpatialProxy(self.geom_class or GEOSGeometry, self, load_func=GEOSGeometry))
 
     def formfield(self, **kwargs):
-        defaults = {'form_class': self.form_class,
-                    'geom_type': self.geom_type,
-                    'srid': self.srid,
-                    }
-        defaults.update(kwargs)
+        defaults = {
+            'form_class': self.form_class,
+            'geom_type': self.geom_type,
+            'srid': self.srid,
+            **kwargs,
+        }
         if self.dim > 2 and not getattr(defaults['form_class'].widget, 'supports_3d', False):
             defaults.setdefault('widget', forms.Textarea)
         return super().formfield(**defaults)
@@ -366,7 +369,7 @@ class RasterField(BaseSpatialField):
             band_index = int(name)
             return type(
                 'SpecificRasterBandTransform',
-                (RasterBandTransform, ),
+                (RasterBandTransform,),
                 {'band_index': band_index}
             )
         except ValueError:

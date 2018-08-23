@@ -86,7 +86,8 @@ class Reader(models.Model):
 
 
 class BookReview(models.Model):
-    book = models.ForeignKey(BookWithYear, models.CASCADE)
+    # Intentionally does not have a related name.
+    book = models.ForeignKey(BookWithYear, models.CASCADE, null=True)
     notes = models.TextField(null=True, blank=True)
 
 

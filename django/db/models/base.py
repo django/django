@@ -16,6 +16,7 @@ from django.db import (
     connections, router, transaction,
 )
 from django.db.models.constants import LOOKUP_SEP
+from django.db.models.constraints import CheckConstraint
 from django.db.models.deletion import CASCADE, Collector
 from django.db.models.fields.related import (
     ForeignObjectRel, OneToOneField, lazy_related_operation, resolve_relation,
@@ -78,10 +79,7 @@ class ModelBase(type):
         new_class = super_new(cls, name, bases, new_attrs, **kwargs)
         attr_meta = attrs.pop('Meta', None)
         abstract = getattr(attr_meta, 'abstract', False)
-        if not attr_meta:
-            meta = getattr(new_class, 'Meta', None)
-        else:
-            meta = attr_meta
+        meta = attr_meta or getattr(new_class, 'Meta', None)
         base_meta = getattr(new_class, '_meta', None)
 
         app_label = None
@@ -281,7 +279,10 @@ class ModelBase(type):
                             )
                         )
                 else:
-                    new_class.add_to_class(field.name, copy.deepcopy(field))
+                    field = copy.deepcopy(field)
+                    if not base._meta.abstract:
+                        field.mti_inherited = True
+                    new_class.add_to_class(field.name, field)
 
         # Copy indexes so that index names are unique when models extend an
         # abstract model.
@@ -482,7 +483,7 @@ class Model(metaclass=ModelBase):
                 except (AttributeError, FieldDoesNotExist):
                     pass
             for kwarg in kwargs:
-                raise TypeError("'%s' is an invalid keyword argument for this function" % kwarg)
+                raise TypeError("%s() got an unexpected keyword argument '%s'" % (cls.__name__, kwarg))
         super().__init__()
         post_init.send(sender=cls, instance=self)
 
@@ -549,8 +550,7 @@ class Model(metaclass=ModelBase):
         self.__dict__.update(state)
 
     def _get_pk_val(self, meta=None):
-        if not meta:
-            meta = self._meta
+        meta = meta or self._meta
         return getattr(self, meta.pk.attname)
 
     def _set_pk_val(self, value):
@@ -582,16 +582,23 @@ class Model(metaclass=ModelBase):
         When accessing deferred fields of an instance, the deferred loading
         of the field will call this method.
         """
-        if fields is not None:
-            if len(fields) == 0:
+        if fields is None:
+            self._prefetched_objects_cache = {}
+        else:
+            prefetched_objects_cache = getattr(self, '_prefetched_objects_cache', ())
+            for field in fields:
+                if field in prefetched_objects_cache:
+                    del prefetched_objects_cache[field]
+                    fields.remove(field)
+            if not fields:
                 return
             if any(LOOKUP_SEP in f for f in fields):
                 raise ValueError(
                     'Found "%s" in fields argument. Relations and transforms '
                     'are not allowed in fields.' % LOOKUP_SEP)
 
-        db = using if using is not None else self._state.db
-        db_instance_qs = self.__class__._default_manager.using(db).filter(pk=self.pk)
+        hints = {'instance': self}
+        db_instance_qs = self.__class__._base_manager.db_manager(using, hints=hints).filter(pk=self.pk)
 
         # Use provided fields, if not set then reload all non-deferred fields.
         deferred_fields = self.get_deferred_fields()
@@ -610,13 +617,9 @@ class Model(metaclass=ModelBase):
                 # This field wasn't refreshed - skip ahead.
                 continue
             setattr(self, field.attname, getattr(db_instance, field.attname))
-            # Throw away stale foreign key references.
+            # Clear cached foreign keys.
             if field.is_relation and field.is_cached(self):
-                rel_instance = field.get_cached_value(self)
-                local_val = getattr(db_instance, field.attname)
-                related_val = None if rel_instance is None else getattr(rel_instance, field.target_field.attname)
-                if local_val != related_val or (local_val is None and related_val is None):
-                    field.delete_cached_value(self)
+                field.delete_cached_value(self)
 
         # Clear cached relations.
         for field in self._meta.related_objects:
@@ -688,7 +691,7 @@ class Model(metaclass=ModelBase):
             # If update_fields is empty, skip the save. We do also check for
             # no-op saves later on for inheritance cases. This bailout is
             # still needed for skipping signal sending.
-            if len(update_fields) == 0:
+            if not update_fields:
                 return
 
             update_fields = frozenset(update_fields)
@@ -736,7 +739,7 @@ class Model(metaclass=ModelBase):
         """
         using = using or router.db_for_write(self.__class__, instance=self)
         assert not (force_insert and (force_update or update_fields))
-        assert update_fields is None or len(update_fields) > 0
+        assert update_fields is None or update_fields
         cls = origin = self.__class__
         # Skip proxies, but keep the origin as the proxy model.
         if cls._meta.proxy:
@@ -748,9 +751,13 @@ class Model(metaclass=ModelBase):
                 update_fields=update_fields,
             )
         with transaction.atomic(using=using, savepoint=False):
+            parent_inserted = False
             if not raw:
-                self._save_parents(cls, using, update_fields)
-            updated = self._save_table(raw, cls, force_insert, force_update, using, update_fields)
+                parent_inserted = self._save_parents(cls, using, update_fields)
+            updated = self._save_table(
+                raw, cls, force_insert or parent_inserted,
+                force_update, using, update_fields,
+            )
         # Store the database on which the object was saved
         self._state.db = using
         # Once saved, this is no longer a to-be-added instance.
@@ -768,13 +775,19 @@ class Model(metaclass=ModelBase):
     def _save_parents(self, cls, using, update_fields):
         """Save all the parents of cls using values from self."""
         meta = cls._meta
+        inserted = False
         for parent, field in meta.parents.items():
             # Make sure the link fields are synced between parent and self.
             if (field and getattr(self, parent._meta.pk.attname) is None and
                     getattr(self, field.attname) is not None):
                 setattr(self, parent._meta.pk.attname, getattr(self, field.attname))
-            self._save_parents(cls=parent, using=using, update_fields=update_fields)
-            self._save_table(cls=parent, using=using, update_fields=update_fields)
+            parent_inserted = self._save_parents(cls=parent, using=using, update_fields=update_fields)
+            updated = self._save_table(
+                cls=parent, using=using, update_fields=update_fields,
+                force_insert=parent_inserted,
+            )
+            if not updated:
+                inserted = True
             # Set the parent's PK value to self.
             if field:
                 setattr(self, field.attname, self._get_pk_val(parent._meta))
@@ -785,6 +798,7 @@ class Model(metaclass=ModelBase):
                 # database if necessary.
                 if field.is_cached(self):
                     field.delete_cached_value(self)
+        return inserted
 
     def _save_table(self, raw=False, cls=None, force_insert=False,
                     force_update=False, using=None, update_fields=None):
@@ -852,7 +866,8 @@ class Model(metaclass=ModelBase):
             # exists.
             return update_fields is not None or filtered.exists()
         if self._meta.select_on_save and not forced_update:
-            if filtered.exists():
+            return (
+                filtered.exists() and
                 # It may happen that the object is deleted from the DB right after
                 # this check, causing the subsequent UPDATE to return zero matching
                 # rows. The same result can occur in some rare cases when the
@@ -860,9 +875,8 @@ class Model(metaclass=ModelBase):
                 # successfully (a row is matched and updated). In order to
                 # distinguish these two cases, the object's existence in the
                 # database is again checked for if the UPDATE query returns 0.
-                return filtered._update(values) > 0 or filtered.exists()
-            else:
-                return False
+                (filtered._update(values) > 0 or filtered.exists())
+            )
         return filtered._update(values) > 0
 
     def _do_insert(self, manager, using, fields, update_pk, raw):
@@ -970,11 +984,8 @@ class Model(metaclass=ModelBase):
 
         for model_class, unique_together in unique_togethers:
             for check in unique_together:
-                for name in check:
-                    # If this is an excluded field, don't add this check.
-                    if name in exclude:
-                        break
-                else:
+                if not any(name in exclude for name in check):
+                    # Add the check if the field isn't excluded.
                     unique_checks.append((model_class, tuple(check)))
 
         # These are checks for the unique_for_<date/year/month>.
@@ -1186,27 +1197,32 @@ class Model(metaclass=ModelBase):
 
     @classmethod
     def check(cls, **kwargs):
-        errors = []
-        errors.extend(cls._check_swappable())
-        errors.extend(cls._check_model())
-        errors.extend(cls._check_managers(**kwargs))
+        errors = [*cls._check_swappable(), *cls._check_model(), *cls._check_managers(**kwargs)]
         if not cls._meta.swapped:
-            errors.extend(cls._check_fields(**kwargs))
-            errors.extend(cls._check_m2m_through_same_relationship())
-            errors.extend(cls._check_long_column_names())
+            errors += [
+                *cls._check_fields(**kwargs),
+                *cls._check_m2m_through_same_relationship(),
+                *cls._check_long_column_names(),
+            ]
             clash_errors = (
-                cls._check_id_field() +
-                cls._check_field_name_clashes() +
-                cls._check_model_name_db_lookup_clashes()
+                *cls._check_id_field(),
+                *cls._check_field_name_clashes(),
+                *cls._check_model_name_db_lookup_clashes(),
+                *cls._check_property_name_related_field_accessor_clashes(),
+                *cls._check_single_primary_key(),
             )
             errors.extend(clash_errors)
             # If there are field name clashes, hide consequent column name
             # clashes.
             if not clash_errors:
                 errors.extend(cls._check_column_name_clashes())
-            errors.extend(cls._check_index_together())
-            errors.extend(cls._check_unique_together())
-            errors.extend(cls._check_ordering())
+            errors += [
+                *cls._check_index_together(),
+                *cls._check_unique_together(),
+                *cls._check_indexes(),
+                *cls._check_ordering(),
+                *cls._check_constraints(),
+            ]
 
         return errors
 
@@ -1285,12 +1301,13 @@ class Model(metaclass=ModelBase):
         fields = (f for f in fields if isinstance(f.remote_field.through, ModelBase))
 
         for f in fields:
-            signature = (f.remote_field.model, cls, f.remote_field.through)
+            signature = (f.remote_field.model, cls, f.remote_field.through, f.remote_field.through_fields)
             if signature in seen_intermediary_signatures:
                 errors.append(
                     checks.Error(
-                        "The model has two many-to-many relations through "
-                        "the intermediate model '%s'." % f.remote_field.through._meta.label,
+                        "The model has two identical many-to-many relations "
+                        "through the intermediate model '%s'." %
+                        f.remote_field.through._meta.label,
                         obj=cls,
                         id='models.E003',
                     )
@@ -1423,6 +1440,40 @@ class Model(metaclass=ModelBase):
         return errors
 
     @classmethod
+    def _check_property_name_related_field_accessor_clashes(cls):
+        errors = []
+        property_names = cls._meta._property_names
+        related_field_accessors = (
+            f.get_attname() for f in cls._meta._get_fields(reverse=False)
+            if f.is_relation and f.related_model is not None
+        )
+        for accessor in related_field_accessors:
+            if accessor in property_names:
+                errors.append(
+                    checks.Error(
+                        "The property '%s' clashes with a related field "
+                        "accessor." % accessor,
+                        obj=cls,
+                        id='models.E025',
+                    )
+                )
+        return errors
+
+    @classmethod
+    def _check_single_primary_key(cls):
+        errors = []
+        if sum(1 for f in cls._meta.local_fields if f.primary_key) > 1:
+            errors.append(
+                checks.Error(
+                    "The model cannot have more than one field with "
+                    "'primary_key=True'.",
+                    obj=cls,
+                    id='models.E026',
+                )
+            )
+        return errors
+
+    @classmethod
     def _check_index_together(cls):
         """Check the value of "index_together" option."""
         if not isinstance(cls._meta.index_together, (tuple, list)):
@@ -1475,6 +1526,12 @@ class Model(metaclass=ModelBase):
             for fields in cls._meta.unique_together:
                 errors.extend(cls._check_local_fields(fields, "unique_together"))
             return errors
+
+    @classmethod
+    def _check_indexes(cls):
+        """Check the fields of indexes."""
+        fields = [field for index in cls._meta.indexes for field, _ in index.fields_orders]
+        return cls._check_local_fields(fields, 'indexes')
 
     @classmethod
     def _check_local_fields(cls, fields, option):
@@ -1662,6 +1719,29 @@ class Model(metaclass=ModelBase):
                         )
                     )
 
+        return errors
+
+    @classmethod
+    def _check_constraints(cls):
+        errors = []
+        for db in settings.DATABASES:
+            if not router.allow_migrate_model(db, cls):
+                continue
+            connection = connections[db]
+            if connection.features.supports_table_check_constraints:
+                continue
+            if any(isinstance(constraint, CheckConstraint) for constraint in cls._meta.constraints):
+                errors.append(
+                    checks.Warning(
+                        '%s does not support check constraints.' % connection.display_name,
+                        hint=(
+                            "A constraint won't be created. Silence this "
+                            "warning if you don't care about it."
+                        ),
+                        obj=cls,
+                        id='models.W027',
+                    )
+                )
         return errors
 
 

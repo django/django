@@ -12,8 +12,6 @@ All of these functions are available from the
 
 .. class:: RandomUUID()
 
-.. versionadded:: 2.0
-
 Returns a version 4 UUID.
 
 The `pgcrypto extension`_ must be installed. You can use the

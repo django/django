@@ -80,6 +80,11 @@ class ExtractYear(Extract):
     lookup_name = 'year'
 
 
+class ExtractIsoYear(Extract):
+    """Return the ISO-8601 week-numbering year."""
+    lookup_name = 'iso_year'
+
+
 class ExtractMonth(Extract):
     lookup_name = 'month'
 
@@ -126,6 +131,7 @@ DateField.register_lookup(ExtractMonth)
 DateField.register_lookup(ExtractDay)
 DateField.register_lookup(ExtractWeekDay)
 DateField.register_lookup(ExtractWeek)
+DateField.register_lookup(ExtractIsoYear)
 DateField.register_lookup(ExtractQuarter)
 
 TimeField.register_lookup(ExtractHour)
@@ -141,6 +147,12 @@ ExtractYear.register_lookup(YearGt)
 ExtractYear.register_lookup(YearGte)
 ExtractYear.register_lookup(YearLt)
 ExtractYear.register_lookup(YearLte)
+
+ExtractIsoYear.register_lookup(YearExact)
+ExtractIsoYear.register_lookup(YearGt)
+ExtractIsoYear.register_lookup(YearGte)
+ExtractIsoYear.register_lookup(YearLt)
+ExtractIsoYear.register_lookup(YearLte)
 
 
 class Now(Func):
@@ -164,8 +176,6 @@ class TruncBase(TimezoneMixin, Transform):
 
     def as_sql(self, compiler, connection):
         inner_sql, inner_params = compiler.compile(self.lhs)
-        # Escape any params because trunc_sql will format the string.
-        inner_sql = inner_sql.replace('%s', '%%s')
         if isinstance(self.output_field, DateTimeField):
             tzname = self.get_tzname()
             sql = connection.ops.datetime_trunc_sql(self.kind, inner_sql, tzname)
@@ -199,7 +209,8 @@ class TruncBase(TimezoneMixin, Transform):
                 field.name, output_field.__class__.__name__ if has_explicit_output_field else 'DateTimeField'
             ))
         elif isinstance(field, TimeField) and (
-                isinstance(output_field, DateTimeField) or copy.kind in ('year', 'quarter', 'month', 'day', 'date')):
+                isinstance(output_field, DateTimeField) or
+                copy.kind in ('year', 'quarter', 'month', 'week', 'day', 'date')):
             raise ValueError("Cannot truncate TimeField '%s' to %s. " % (
                 field.name, output_field.__class__.__name__ if has_explicit_output_field else 'DateTimeField'
             ))
@@ -240,6 +251,11 @@ class TruncQuarter(TruncBase):
 
 class TruncMonth(TruncBase):
     kind = 'month'
+
+
+class TruncWeek(TruncBase):
+    """Truncate to midnight on the Monday of the week."""
+    kind = 'week'
 
 
 class TruncDay(TruncBase):

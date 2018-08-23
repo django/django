@@ -1,5 +1,5 @@
 import functools
-import os
+from pathlib import Path
 
 from django.conf import settings
 from django.template.backends.django import DjangoTemplates
@@ -13,7 +13,7 @@ except ImportError:
     def Jinja2(params):
         raise ImportError("jinja2 isn't installed")
 
-ROOT = os.path.dirname(__file__)
+ROOT = Path(__file__).parent
 
 
 @functools.lru_cache()
@@ -39,7 +39,7 @@ class EngineMixin:
     def engine(self):
         return self.backend({
             'APP_DIRS': True,
-            'DIRS': [os.path.join(ROOT, self.backend.app_dirname)],
+            'DIRS': [str(ROOT / self.backend.app_dirname)],
             'NAME': 'djangoforms',
             'OPTIONS': {},
         })

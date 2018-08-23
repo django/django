@@ -53,8 +53,27 @@
         });
     });
 })(jQuery);
+{%- if include_console_assets -%}
+(function($) {
+    $(document).ready(function() {
+        $(".c-tab-unix").on("click", function() {
+            $("section.c-content-unix").show();
+            $("section.c-content-win").hide();
+            $(".c-tab-unix").prop("checked", true);
+        });
+        $(".c-tab-win").on("click", function() {
+            $("section.c-content-win").show();
+            $("section.c-content-unix").hide();
+            $(".c-tab-win").prop("checked", true);
+        });
+    });
+})(jQuery);
+{%- endif -%}
 </script>
 {% endif %}
+{%- if include_console_assets -%}
+<link rel="stylesheet" href="{{ pathto('_static/console-tabs.css', 1) }}" type="text/css" />
+{%- endif -%}
 {% endblock %}
 
 {% block document %}

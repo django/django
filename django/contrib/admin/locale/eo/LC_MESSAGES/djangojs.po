@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-09-28 11:14+0000\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
+"PO-Revision-Date: 2017-09-19 16:41+0000\n"
 "Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
 "Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
 "eo/)\n"
@@ -101,26 +101,8 @@ msgstr ""
 "Vi elektas agon, kaj vi ne faris ajnajn ŝanĝojn ĉe unuopaj kampoj. Vi  "
 "verŝajne serĉas la Iru-butonon prefere ol la Ŝirmu-butono."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Noto: Vi estas %s horo antaŭ la servila horo."
-msgstr[1] "Noto: Vi estas %s horoj antaŭ la servila horo."
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Noto: Vi estas %s horo post la servila horo."
-msgstr[1] "Noto: Vi estas %s horoj post la servila horo."
-
 msgid "Now"
 msgstr "Nun"
-
-msgid "Choose a Time"
-msgstr "Elektu horon"
-
-msgid "Choose a time"
-msgstr "Elektu tempon"
 
 msgid "Midnight"
 msgstr "Noktomezo"
@@ -133,6 +115,24 @@ msgstr "Tagmezo"
 
 msgid "6 p.m."
 msgstr "6 ptm"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Noto: Vi estas %s horo antaŭ la servila horo."
+msgstr[1] "Noto: Vi estas %s horoj antaŭ la servila horo."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Noto: Vi estas %s horo post la servila horo."
+msgstr[1] "Noto: Vi estas %s horoj post la servila horo."
+
+msgid "Choose a Time"
+msgstr "Elektu horon"
+
+msgid "Choose a time"
+msgstr "Elektu tempon"
 
 msgid "Cancel"
 msgstr "Malmendu"

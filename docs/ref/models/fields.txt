@@ -61,9 +61,6 @@ set ``blank=True`` if you wish to permit empty values in forms, as the
     When using the Oracle database backend, the value ``NULL`` will be stored to
     denote the empty string regardless of this attribute.
 
-If you want to accept :attr:`~Field.null` values with :class:`BooleanField`,
-use :class:`NullBooleanField` instead.
-
 ``blank``
 ---------
 
@@ -85,8 +82,9 @@ If a field has ``blank=False``, the field will be required.
 
 An iterable (e.g., a list or tuple) consisting itself of iterables of exactly
 two items (e.g. ``[(A, B), (A, B) ...]``) to use as choices for this field. If
-this is given, the default form widget will be a select box with these choices
-instead of the standard text field.
+choices are given, they're enforced by :ref:`model validation
+<validating-objects>` and the default form widget will be a select box with
+these choices instead of the standard text field.
 
 The first element in each tuple is the actual value to be set on the model,
 and the second element is the human-readable name. For example::
@@ -272,7 +270,7 @@ desire. For example::
     help_text="Please use the following format: <em>YYYY-MM-DD</em>."
 
 Alternatively you can use plain text and
-``django.utils.html.escape()`` to escape any HTML special characters. Ensure
+:func:`django.utils.html.escape` to escape any HTML special characters. Ensure
 that you escape any help text that may come from untrusted users to avoid a
 cross-site scripting attack.
 
@@ -416,12 +414,26 @@ guaranteed to fit numbers from ``-9223372036854775808`` to
 ``BinaryField``
 ---------------
 
-.. class:: BinaryField(**options)
+.. class:: BinaryField(max_length=None, **options)
 
 A field to store raw binary data. It only supports ``bytes`` assignment. Be
 aware that this field has limited functionality. For example, it is not possible
-to filter a queryset on a ``BinaryField`` value. It is also not possible to
-include a ``BinaryField`` in a :class:`~django.forms.ModelForm`.
+to filter a queryset on a ``BinaryField`` value.
+
+By default, ``BinaryField`` sets :attr:`~Field.editable` to ``False``, in which
+case it can't be included in a :class:`~django.forms.ModelForm`.
+
+.. versionchanged:: 2.1
+
+    Older versions don't allow setting ``editable`` to ``True``.
+
+``BinaryField`` has one extra optional argument:
+
+.. attribute:: BinaryField.max_length
+
+    The maximum length (in characters) of the field. The maximum length is
+    enforced in Django's validation using
+    :class:`~django.core.validators.MaxLengthValidator`.
 
 .. admonition:: Abusing ``BinaryField``
 
@@ -436,14 +448,17 @@ include a ``BinaryField`` in a :class:`~django.forms.ModelForm`.
 
 A true/false field.
 
-The default form widget for this field is a
-:class:`~django.forms.CheckboxInput`.
-
-If you need to accept :attr:`~Field.null` values then use
-:class:`NullBooleanField` instead.
+The default form widget for this field is :class:`~django.forms.CheckboxInput`,
+or :class:`~django.forms.NullBooleanSelect` if :attr:`null=True <Field.null>`.
 
 The default value of ``BooleanField`` is ``None`` when :attr:`Field.default`
 isn't defined.
+
+.. versionchanged:: 2.1
+
+    In older versions, this field doesn't permit ``null=True``, so you have to
+    use :class:`NullBooleanField` instead. Using the latter is now discouraged
+    as it's likely to be deprecated in a future version of Django.
 
 ``CharField``
 -------------
@@ -461,7 +476,8 @@ The default form widget for this field is a :class:`~django.forms.TextInput`.
 .. attribute:: CharField.max_length
 
     The maximum length (in characters) of the field. The max_length is enforced
-    at the database level and in Django's validation.
+    at the database level and in Django's validation using
+    :class:`~django.core.validators.MaxLengthValidator`.
 
 .. note::
 
@@ -544,7 +560,10 @@ The default form widget for this field is a single
 .. class:: DecimalField(max_digits=None, decimal_places=None, **options)
 
 A fixed-precision decimal number, represented in Python by a
-:class:`~decimal.Decimal` instance. Has two **required** arguments:
+:class:`~decimal.Decimal` instance. It validates the input using
+:class:`~django.core.validators.DecimalValidator`.
+
+Has two **required** arguments:
 
 .. attribute:: DecimalField.max_digits
 
@@ -596,8 +615,8 @@ SECOND(6)``. Otherwise a ``bigint`` of microseconds is used.
 
 .. class:: EmailField(max_length=254, **options)
 
-A :class:`CharField` that checks that the value is a valid email address. It
-uses :class:`~django.core.validators.EmailValidator` to validate the input.
+A :class:`CharField` that checks that the value is a valid email address using
+:class:`~django.core.validators.EmailValidator`.
 
 ``FileField``
 -------------
@@ -962,9 +981,15 @@ The default form widget for this field is a
 .. class:: IntegerField(**options)
 
 An integer. Values from ``-2147483648`` to ``2147483647`` are safe in all
-databases supported by Django. The default form widget for this field is a
-:class:`~django.forms.NumberInput` when :attr:`~django.forms.Field.localize`
-is ``False`` or :class:`~django.forms.TextInput` otherwise.
+databases supported by Django.
+
+It uses :class:`~django.core.validators.MinValueValidator` and
+:class:`~django.core.validators.MaxValueValidator` to validate the input based
+on the values that the default database supports.
+
+The default form widget for this field is a :class:`~django.forms.NumberInput`
+when :attr:`~django.forms.Field.localize` is ``False`` or
+:class:`~django.forms.TextInput` otherwise.
 
 ``GenericIPAddressField``
 -------------------------
@@ -1002,9 +1027,8 @@ values are stored as null.
 
 .. class:: NullBooleanField(**options)
 
-Like a :class:`BooleanField`, but allows ``NULL`` as one of the options. Use
-this instead of a :class:`BooleanField` with ``null=True``. The default form
-widget for this field is a :class:`~django.forms.NullBooleanSelect`.
+Like :class:`BooleanField` with ``null=True``. Use that instead of this field
+as it's likely to be deprecated in a future version of Django.
 
 ``PositiveIntegerField``
 ------------------------
@@ -1043,6 +1067,9 @@ Implies setting :attr:`Field.db_index` to ``True``.
 It is often useful to automatically prepopulate a SlugField based on the value
 of some other value.  You can do this automatically in the admin using
 :attr:`~django.contrib.admin.ModelAdmin.prepopulated_fields`.
+
+It uses :class:`~django.core.validators.validate_slug` or
+:class:`~django.core.validators.validate_unicode_slug` for validation.
 
 .. attribute:: SlugField.allow_unicode
 
@@ -1087,7 +1114,8 @@ The admin adds some JavaScript shortcuts.
 
 .. class:: URLField(max_length=200, **options)
 
-A :class:`CharField` for a URL.
+A :class:`CharField` for a URL, validated by
+:class:`~django.core.validators.URLValidator`.
 
 The default form widget for this field is a :class:`~django.forms.TextInput`.
 
@@ -1251,6 +1279,11 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
     Cascade deletes. Django emulates the behavior of the SQL constraint ON
     DELETE CASCADE and also deletes the object containing the ForeignKey.
+
+    :meth:`.Model.delete` isn't called on related models, but the
+    :data:`~django.db.models.signals.pre_delete` and
+    :data:`~django.db.models.signals.post_delete` signals are sent for all
+    deleted objects.
 
 * .. attribute:: PROTECT
 
@@ -1846,6 +1879,12 @@ Field API reference
 
     Besides saving to the database, the field also needs to know how to
     serialize its value:
+
+    .. method:: value_from_object(obj)
+
+        Returns the field's value for the given model instance.
+
+        This method is often used by :meth:`value_to_string`.
 
     .. method:: value_to_string(obj)
 

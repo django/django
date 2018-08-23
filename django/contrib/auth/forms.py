@@ -138,10 +138,12 @@ class UserChangeForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['password'].help_text = self.fields['password'].help_text.format('../password/')
-        f = self.fields.get('user_permissions')
-        if f is not None:
-            f.queryset = f.queryset.select_related('content_type')
+        password = self.fields.get('password')
+        if password:
+            password.help_text = password.help_text.format('../password/')
+        user_permissions = self.fields.get('user_permissions')
+        if user_permissions:
+            user_permissions.queryset = user_permissions.queryset.select_related('content_type')
 
     def clean_password(self):
         # Regardless of what the user provides, return the initial value.
@@ -192,15 +194,6 @@ class AuthenticationForm(forms.Form):
         if username is not None and password:
             self.user_cache = authenticate(self.request, username=username, password=password)
             if self.user_cache is None:
-                # An authentication backend may reject inactive users. Check
-                # if the user exists and is inactive, and raise the 'inactive'
-                # error if so.
-                try:
-                    self.user_cache = UserModel._default_manager.get_by_natural_key(username)
-                except UserModel.DoesNotExist:
-                    pass
-                else:
-                    self.confirm_login_allowed(self.user_cache)
                 raise self.get_invalid_login_error()
             else:
                 self.confirm_login_allowed(self.user_cache)
@@ -223,11 +216,6 @@ class AuthenticationForm(forms.Form):
                 self.error_messages['inactive'],
                 code='inactive',
             )
-
-    def get_user_id(self):
-        if self.user_cache:
-            return self.user_cache.id
-        return None
 
     def get_user(self):
         return self.user_cache
@@ -299,9 +287,8 @@ class PasswordResetForm(forms.Form):
                 'user': user,
                 'token': token_generator.make_token(user),
                 'protocol': 'https' if use_https else 'http',
+                **(extra_email_context or {}),
             }
-            if extra_email_context is not None:
-                context.update(extra_email_context)
             self.send_mail(
                 subject_template_name, email_template_name, context, from_email,
                 email, html_email_template_name=html_email_template_name,
@@ -357,9 +344,10 @@ class PasswordChangeForm(SetPasswordForm):
     A form that lets a user change their password by entering their old
     password.
     """
-    error_messages = dict(SetPasswordForm.error_messages, **{
+    error_messages = {
+        **SetPasswordForm.error_messages,
         'password_incorrect': _("Your old password was entered incorrectly. Please enter it again."),
-    })
+    }
     old_password = forms.CharField(
         label=_("Old password"),
         strip=False,

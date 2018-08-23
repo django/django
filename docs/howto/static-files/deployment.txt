@@ -38,30 +38,7 @@ serving your site, the process may look something like:
   :ref:`how to do this with Apache and mod_wsgi <serving-files>`.
 
 You'll probably want to automate this process, especially if you've got
-multiple web servers. There's any number of ways to do this automation, but
-one option that many Django developers enjoy is `Fabric
-<http://fabfile.org/>`_.
-
-Below, and in the following sections, we'll show off a few example fabfiles
-(i.e. Fabric scripts) that automate these file deployment options. The syntax
-of a fabfile is fairly straightforward but won't be covered here; consult
-`Fabric's documentation <http://docs.fabfile.org/>`_, for a complete
-explanation of the syntax.
-
-So, a fabfile to deploy static files to a couple of web servers might look
-something like::
-
-    from fabric.api import *
-
-    # Hosts to deploy onto
-    env.hosts = ['www1.example.com', 'www2.example.com']
-
-    # Where your project code lives on the server
-    env.project_root = '/home/www/myproject'
-
-    def deploy_static():
-        with cd(env.project_root):
-            run('./manage.py collectstatic -v0 --noinput')
+multiple web servers.
 
 Serving static files from a dedicated server
 --------------------------------------------
@@ -88,26 +65,6 @@ the deployment strategy to look something like:
   directory that's being served. `rsync <https://rsync.samba.org/>`_ is a
   common choice for this step since it only needs to transfer the bits of
   static files that have changed.
-
-Here's how this might look in a fabfile::
-
-    from fabric.api import *
-    from fabric.contrib import project
-
-    # Where the static files get collected locally. Your STATIC_ROOT setting.
-    env.local_static_root = '/path/to/static'
-
-    # Where the static files should go remotely
-    env.remote_static_root = '/home/www/static.example.com'
-
-    @roles('static')
-    def deploy_static():
-        local('./manage.py collectstatic')
-        project.rsync_project(
-            remote_dir=env.remote_static_root,
-            local_dir=env.local_static_root,
-            delete=True,
-        )
 
 .. _staticfiles-from-cdn:
 

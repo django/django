@@ -149,12 +149,6 @@ what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
     It's required for preserving APIs that rely on a globally available,
     implicitly configured engine. Any other use is strongly discouraged.
 
-    .. versionchanged:: 2.0
-
-        In older versions, raises
-        :exc:`~django.core.exceptions.ImproperlyConfigured` if multiple
-        engines are configured rather than returning the first engine.
-
 .. method:: Engine.from_string(template_code)
 
     Compiles the given template code and returns a :class:`Template` object.
@@ -377,10 +371,10 @@ replaced with the name of the invalid variable.
     While ``string_if_invalid`` can be a useful debugging tool, it is a bad
     idea to turn it on as a 'development default'.
 
-    Many templates, including those in the Admin site, rely upon the silence
-    of the template system when a nonexistent variable is encountered. If you
-    assign a value other than ``''`` to ``string_if_invalid``, you will
-    experience rendering problems with these templates and sites.
+    Many templates, including some of Django's, rely upon the silence of the
+    template system when a nonexistent variable is encountered. If you assign a
+    value other than ``''`` to ``string_if_invalid``, you will experience
+    rendering problems with these templates and sites.
 
     Generally, ``string_if_invalid`` should only be enabled in order to debug
     a specific template problem, then cleared once debugging is complete.
@@ -696,14 +690,20 @@ the request's IP address (``request.META['REMOTE_ADDR']``) is in the
 ``django.template.context_processors.i18n``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If this processor is enabled, every ``RequestContext`` will contain these two
+.. function:: i18n
+
+If this processor is enabled, every ``RequestContext`` will contain these
 variables:
 
 * ``LANGUAGES`` -- The value of the :setting:`LANGUAGES` setting.
+* ``LANGUAGE_BIDI`` -- ``True`` if the current language is a right-to-left
+  language, e.g. Hebrew, Arabic. ``False`` if it's a left-to-right language,
+  e.g. English, French, German.
 * ``LANGUAGE_CODE`` -- ``request.LANGUAGE_CODE``, if it exists. Otherwise,
   the value of the :setting:`LANGUAGE_CODE` setting.
 
-See :doc:`/topics/i18n/index` for more.
+See :ref:`i18n template tags <i18n-template-tags>` for template tags that
+generate the same values.
 
 ``django.template.context_processors.media``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -908,8 +908,10 @@ loaders that come with Django:
     ``Template`` in memory. The cached ``Template`` instance is returned for
     subsequent requests to load the same template.
 
-    This loader is automatically enabled if :setting:`DEBUG` is ``False`` and
-    :setting:`OPTIONS['loaders'] <TEMPLATES-OPTIONS>` isn't specified.
+    This loader is automatically enabled if :setting:`OPTIONS['loaders']
+    <TEMPLATES-OPTIONS>` isn't specified and :setting:`OPTIONS['debug']
+    <TEMPLATES-OPTIONS>` is ``False`` (the latter option defaults to the value
+    of :setting:`DEBUG`).
 
     You can also enable template caching with some custom template loaders
     using settings like this::
@@ -1036,7 +1038,7 @@ Template origin
 Templates have an ``origin`` containing attributes depending on the source
 they are loaded from.
 
-.. class:: Origin
+.. class:: Origin(name, template_name=None, loader=None)
 
     .. attribute:: name
 
@@ -1054,3 +1056,14 @@ they are loaded from.
 
         If the template is instantiated directly rather than through a
         template loader, this is ``None``.
+
+    .. attribute:: loader
+
+        The template loader instance that constructed this ``Origin``.
+
+        If the template is instantiated directly rather than through a
+        template loader, this is ``None``.
+
+        :class:`django.template.loaders.cached.Loader` requires all of its
+        wrapped loaders to set this attribute, typically by instantiating
+        the ``Origin`` with ``loader=self``.

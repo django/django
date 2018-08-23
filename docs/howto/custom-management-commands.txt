@@ -18,9 +18,7 @@ directory whose name doesn't begin with an underscore. For example::
         __init__.py
         models.py
         management/
-            __init__.py
             commands/
-                __init__.py
                 _private.py
                 closepoll.py
         tests.py
@@ -105,7 +103,6 @@ options can be added in the :meth:`~BaseCommand.add_arguments` method like this:
             parser.add_argument(
                 '--delete',
                 action='store_true',
-                dest='delete',
                 help='Delete poll instead of closing it',
             )
 
@@ -128,52 +125,30 @@ such as :option:`--verbosity` and :option:`--traceback`.
 Management commands and locales
 ===============================
 
-By default, the :meth:`BaseCommand.execute` method deactivates translations
-because some commands shipped with Django perform several tasks (for example,
-user-facing content rendering and database population) that require a
-project-neutral string language.
+By default, management commands are executed with the current active locale.
 
-If, for some reason, your custom management command needs to use a fixed locale,
-you should manually activate and deactivate it in your
-:meth:`~BaseCommand.handle` method using the functions provided by the I18N
-support code::
+If, for some reason, your custom management command must run without an active
+locale (for example, to prevent translated content from being inserted into
+the database), deactivate translations using the ``@no_translations``
+decorator on your :meth:`~BaseCommand.handle` method::
 
-    from django.core.management.base import BaseCommand, CommandError
-    from django.utils import translation
+    from django.core.management.base import BaseCommand, no_translations
 
     class Command(BaseCommand):
         ...
 
+        @no_translations
         def handle(self, *args, **options):
-
-            # Activate a fixed locale, e.g. Russian
-            translation.activate('ru')
-
-            # Or you can activate the LANGUAGE_CODE # chosen in the settings:
-            from django.conf import settings
-            translation.activate(settings.LANGUAGE_CODE)
-
-            # Your command logic here
             ...
 
-            translation.deactivate()
+Since translation deactivation requires access to configured settings, the
+decorator can't be used for commands that work without configured settings.
 
-Another need might be that your command simply should use the locale set in
-settings and Django should be kept from deactivating it. You can achieve
-it by using the :data:`BaseCommand.leave_locale_alone` option.
+.. versionchanged:: 2.1
 
-When working on the scenarios described above though, take into account that
-system management commands typically have to be very careful about running in
-non-uniform locales, so you might need to:
-
-* Make sure the :setting:`USE_I18N` setting is always ``True`` when running
-  the command (this is a good example of the potential problems stemming
-  from a dynamic runtime environment that Django commands avoid offhand by
-  deactivating translations).
-
-* Review the code of your command and the code it calls for behavioral
-  differences when locales are changed and evaluate its impact on
-  predictable behavior of your command.
+    The ``@no_translations`` decorator is new. In older versions, translations
+    are deactivated before running a command unless the command's
+    ``leave_locale_alone`` attribute (now removed) is set to ``True``.
 
 Testing
 =======
@@ -249,21 +224,6 @@ All attributes can be set in your derived class and can be used in
     A boolean; if ``True``, the entire Django project will be checked for
     potential problems prior to executing the command. Default value is ``True``.
 
-.. attribute:: BaseCommand.leave_locale_alone
-
-    A boolean indicating whether the locale set in settings should be preserved
-    during the execution of the command instead of being forcibly set to 'en-us'.
-
-    Default value is ``False``.
-
-    Make sure you know what you are doing if you decide to change the value of
-    this option in your custom command if it creates database content that
-    is locale-sensitive and such content shouldn't contain any translations
-    (like it happens e.g. with :mod:`django.contrib.auth` permissions) as
-    making the locale differ from the de facto default 'en-us' might cause
-    unintended effects. See the `Management commands and locales`_ section
-    above for further details.
-
 .. attribute:: BaseCommand.style
 
     An instance attribute that helps create colored output when writing to
@@ -293,6 +253,19 @@ the :meth:`~BaseCommand.handle` method must be implemented.
             def __init__(self, *args, **kwargs):
                 super().__init__(*args, **kwargs)
                 # ...
+
+.. method:: BaseCommand.create_parser(prog_name, subcommand, **kwargs)
+
+    Returns a ``CommandParser`` instance, which is an
+    :class:`~argparse.ArgumentParser` subclass with a few customizations for
+    Django.
+
+    You can customize the instance by overriding this method and calling
+    ``super()`` with ``kwargs`` of :class:`~argparse.ArgumentParser` parameters.
+
+    .. versionchanged:: 2.2
+
+        ``kwargs`` was added.
 
 .. method:: BaseCommand.add_arguments(parser)
 

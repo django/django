@@ -48,7 +48,8 @@ class SecurityMiddlewareTest(SimpleTestCase):
         """
         self.assertEqual(
             self.process_response(secure=True)["strict-transport-security"],
-            "max-age=3600")
+            'max-age=3600',
+        )
 
     @override_settings(SECURE_HSTS_SECONDS=3600)
     def test_sts_already_present(self):

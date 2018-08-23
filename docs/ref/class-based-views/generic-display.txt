@@ -38,8 +38,8 @@ many projects they are typically the most commonly used views.
 
     **Example myapp/views.py**::
 
-        from django.views.generic.detail import DetailView
         from django.utils import timezone
+        from django.views.generic.detail import DetailView
 
         from articles.models import Article
 
@@ -107,14 +107,15 @@ many projects they are typically the most commonly used views.
 
     **Example views.py**::
 
-        from django.views.generic.list import ListView
         from django.utils import timezone
+        from django.views.generic.list import ListView
 
         from articles.models import Article
 
         class ArticleListView(ListView):
 
             model = Article
+            paginate_by = 100  # if pagination is desired
 
             def get_context_data(self, **kwargs):
                 context = super().get_context_data(**kwargs)
@@ -143,6 +144,10 @@ many projects they are typically the most commonly used views.
             <li>No articles yet.</li>
         {% endfor %}
         </ul>
+
+    If you're using pagination, you can adapt the :ref:`example template from
+    the pagination docs <using-paginator-in-view>`. Change instances of
+    ``contacts`` in that example template to ``page_obj``.
 
 .. class:: django.views.generic.list.BaseListView
 

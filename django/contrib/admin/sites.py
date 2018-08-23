@@ -9,6 +9,8 @@ from django.db.models.base import ModelBase
 from django.http import Http404, HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import NoReverseMatch, reverse
+from django.utils.functional import LazyObject
+from django.utils.module_loading import import_string
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _, gettext_lazy
 from django.views.decorators.cache import never_cache
@@ -94,9 +96,7 @@ class AdminSite:
 
         If a model is abstract, raise ImproperlyConfigured.
         """
-        if not admin_class:
-            admin_class = ModelAdmin
-
+        admin_class = admin_class or ModelAdmin
         if isinstance(model_or_iterable, ModelBase):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
@@ -300,6 +300,7 @@ class AdminSite:
             'site_url': site_url,
             'has_permission': self.has_permission(request),
             'available_apps': self.get_app_list(request),
+            'is_popup': False,
         }
 
     def password_change(self, request, extra_context=None):
@@ -312,7 +313,7 @@ class AdminSite:
         defaults = {
             'form_class': AdminPasswordChangeForm,
             'success_url': url,
-            'extra_context': dict(self.each_context(request), **(extra_context or {})),
+            'extra_context': {**self.each_context(request), **(extra_context or {})},
         }
         if self.password_change_template is not None:
             defaults['template_name'] = self.password_change_template
@@ -325,7 +326,7 @@ class AdminSite:
         """
         from django.contrib.auth.views import PasswordChangeDoneView
         defaults = {
-            'extra_context': dict(self.each_context(request), **(extra_context or {})),
+            'extra_context': {**self.each_context(request), **(extra_context or {})},
         }
         if self.password_change_done_template is not None:
             defaults['template_name'] = self.password_change_done_template
@@ -350,13 +351,13 @@ class AdminSite:
         """
         from django.contrib.auth.views import LogoutView
         defaults = {
-            'extra_context': dict(
-                self.each_context(request),
+            'extra_context': {
+                **self.each_context(request),
                 # Since the user isn't logged out at this point, the value of
                 # has_permission must be overridden.
-                has_permission=False,
+                'has_permission': False,
                 **(extra_context or {})
-            ),
+            },
         }
         if self.logout_template is not None:
             defaults['template_name'] = self.logout_template
@@ -378,12 +379,12 @@ class AdminSite:
         # it cannot import models from other applications at the module level,
         # and django.contrib.admin.forms eventually imports User.
         from django.contrib.admin.forms import AdminAuthenticationForm
-        context = dict(
-            self.each_context(request),
-            title=_('Log in'),
-            app_path=request.get_full_path(),
-            username=request.user.get_username(),
-        )
+        context = {
+            **self.each_context(request),
+            'title': _('Log in'),
+            'app_path': request.get_full_path(),
+            'username': request.user.get_username(),
+        }
         if (REDIRECT_FIELD_NAME not in request.GET and
                 REDIRECT_FIELD_NAME not in request.POST):
             context[REDIRECT_FIELD_NAME] = reverse('admin:index', current_app=self.name)
@@ -431,8 +432,11 @@ class AdminSite:
                 'name': capfirst(model._meta.verbose_name_plural),
                 'object_name': model._meta.object_name,
                 'perms': perms,
+                'admin_url': None,
+                'add_url': None,
             }
-            if perms.get('change'):
+            if perms.get('change') or perms.get('view'):
+                model_dict['view_only'] = not perms.get('change')
                 try:
                     model_dict['admin_url'] = reverse('admin:%s_%s_changelist' % info, current_app=self.name)
                 except NoReverseMatch:
@@ -486,12 +490,12 @@ class AdminSite:
         """
         app_list = self.get_app_list(request)
 
-        context = dict(
-            self.each_context(request),
-            title=self.index_title,
-            app_list=app_list,
-        )
-        context.update(extra_context or {})
+        context = {
+            **self.each_context(request),
+            'title': self.index_title,
+            'app_list': app_list,
+            **(extra_context or {}),
+        }
 
         request.current_app = self.name
 
@@ -504,13 +508,13 @@ class AdminSite:
         # Sort the models alphabetically within each app.
         app_dict['models'].sort(key=lambda x: x['name'])
         app_name = apps.get_app_config(app_label).verbose_name
-        context = dict(
-            self.each_context(request),
-            title=_('%(app)s administration') % {'app': app_name},
-            app_list=[app_dict],
-            app_label=app_label,
-        )
-        context.update(extra_context or {})
+        context = {
+            **self.each_context(request),
+            'title': _('%(app)s administration') % {'app': app_name},
+            'app_list': [app_dict],
+            'app_label': app_label,
+            **(extra_context or {}),
+        }
 
         request.current_app = self.name
 
@@ -520,6 +524,14 @@ class AdminSite:
         ], context)
 
 
+class DefaultAdminSite(LazyObject):
+    def _setup(self):
+        AdminSiteClass = import_string(apps.get_app_config('admin').default_site)
+        self._wrapped = AdminSiteClass()
+
+
 # This global object represents the default admin site, for the common case.
-# You can instantiate AdminSite in your own code to create a custom admin site.
-site = AdminSite()
+# You can provide your own AdminSite using the (Simple)AdminConfig.default_site
+# attribute. You can also instantiate AdminSite in your own code to create a
+# custom admin site.
+site = DefaultAdminSite()

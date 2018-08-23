@@ -1,20 +1,20 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Bouke Haarsma <bouke@webatoom.nl>, 2013
+# Bouke Haarsma <bouke@haarsma.eu>, 2013
 # Evelijn Saaltink <evelijnsaaltink@gmail.com>, 2016
 # Harro van der Klauw <hvdklauw@gmail.com>, 2012
 # Ilja Maas <iljamaas@dreamsolution.nl>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeffrey Gelens <jeffrey@noppo.pro>, 2011-2012
-# Sander Steffann <sander@steffann.nl>, 2015
+# Sander Steffann <inactive+steffann@transifex.com>, 2015
 # wunki <petar@wunki.org>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-10-12 17:32+0000\n"
+"PO-Revision-Date: 2017-09-23 18:54+0000\n"
 "Last-Translator: Evelijn Saaltink <evelijnsaaltink@gmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"

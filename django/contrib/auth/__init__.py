@@ -119,6 +119,9 @@ def login(request, user, backend=None):
                 'therefore must provide the `backend` argument or set the '
                 '`backend` attribute on the user.'
             )
+    else:
+        if not isinstance(backend, str):
+            raise TypeError('backend must be a dotted import path string (got %r).' % backend)
 
     request.session[SESSION_KEY] = user._meta.pk.value_to_string(user)
     request.session[BACKEND_SESSION_KEY] = backend
@@ -137,7 +140,7 @@ def logout(request):
     # Dispatch the signal before the user is logged out so the receivers have a
     # chance to find out *who* logged out.
     user = getattr(request, 'user', None)
-    if hasattr(user, 'is_authenticated') and not user.is_authenticated:
+    if not getattr(user, 'is_authenticated', True):
         user = None
     user_logged_out.send(sender=user.__class__, request=request, user=user)
 

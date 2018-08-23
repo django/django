@@ -1,11 +1,9 @@
-import binascii
 import copy
 import datetime
 import re
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.utils import DatabaseError
-from django.utils.encoding import force_text
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -25,7 +23,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         elif isinstance(value, str):
             return "'%s'" % value.replace("\'", "\'\'")
         elif isinstance(value, (bytes, bytearray, memoryview)):
-            return "'%s'" % force_text(binascii.hexlify(value))
+            return "'%s'" % value.hex()
         elif isinstance(value, bool):
             return "1" if value else "0"
         else:
@@ -145,6 +143,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         if db_type is not None and db_type.lower() in self.connection._limited_data_types:
             return False
         return create_index
+
+    def _unique_should_be_added(self, old_field, new_field):
+        return (
+            super()._unique_should_be_added(old_field, new_field) and
+            not self._field_became_primary_key(old_field, new_field)
+        )
 
     def _is_identity_column(self, table_name, column_name):
         with self.connection.cursor() as cursor:

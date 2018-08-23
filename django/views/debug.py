@@ -164,7 +164,7 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
                 cleansed = request.POST.copy()
                 if sensitive_post_parameters == '__ALL__':
                     # Cleanse all parameters.
-                    for k, v in cleansed.items():
+                    for k in cleansed:
                         cleansed[k] = CLEANSED_SUBSTITUTE
                     return cleansed
                 else:
@@ -213,7 +213,7 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
         if self.is_active(request) and sensitive_variables:
             if sensitive_variables == '__ALL__':
                 # Cleanse all variables
-                for name, value in tb_frame.f_locals.items():
+                for name in tb_frame.f_locals:
                     cleansed[name] = CLEANSED_SUBSTITUTE
             else:
                 # Cleanse specified variables
@@ -269,7 +269,7 @@ class ExceptionReporter:
                     v = pprint(v)
                     # Trim large blobs of data
                     if len(v) > 4096:
-                        v = '%s... <trimmed %d bytes string>' % (v[0:4096], len(v))
+                        v = '%s… <trimmed %d bytes string>' % (v[0:4096], len(v))
                     frame_vars.append((k, v))
                 frame['vars'] = frame_vars
             frames[i] = frame
@@ -346,7 +346,7 @@ class ExceptionReporter:
         Return (pre_context_lineno, pre_context, context_line, post_context).
         """
         source = None
-        if loader is not None and hasattr(loader, "get_source"):
+        if hasattr(loader, 'get_source'):
             try:
                 source = loader.get_source(module_name)
             except ImportError:

@@ -27,10 +27,7 @@ class SessionStore(SessionBase):
         try:
             return cls._storage_path
         except AttributeError:
-            storage_path = getattr(settings, "SESSION_FILE_PATH", None)
-            if not storage_path:
-                storage_path = tempfile.gettempdir()
-
+            storage_path = getattr(settings, 'SESSION_FILE_PATH', None) or tempfile.gettempdir()
             # Make sure the storage path is valid.
             if not os.path.isdir(storage_path):
                 raise ImproperlyConfigured(
@@ -64,10 +61,8 @@ class SessionStore(SessionBase):
         modification = os.stat(self._key_to_file()).st_mtime
         if settings.USE_TZ:
             modification = datetime.datetime.utcfromtimestamp(modification)
-            modification = modification.replace(tzinfo=timezone.utc)
-        else:
-            modification = datetime.datetime.fromtimestamp(modification)
-        return modification
+            return modification.replace(tzinfo=timezone.utc)
+        return datetime.datetime.fromtimestamp(modification)
 
     def _expiry_date(self, session_data):
         """

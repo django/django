@@ -24,15 +24,14 @@
     };
 
     $(function() {
-        $('.admin-autocomplete').djangoAdminSelect2();
+        // Initialize all autocomplete widgets except the one in the template
+        // form used when a new formset is added.
+        $('.admin-autocomplete').not('[name*=__prefix__]').djangoAdminSelect2();
     });
 
     $(document).on('formset:added', (function() {
         return function(event, $newFormset) {
-            var $widget = $newFormset.find('.admin-autocomplete');
-            // Exclude already initialized Select2 inputs.
-            $widget = $widget.not('.select2-hidden-accessible');
-            return init($widget);
+            return $newFormset.find('.admin-autocomplete').djangoAdminSelect2();
         };
     })(this));
 }(django.jQuery));

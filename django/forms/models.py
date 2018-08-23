@@ -278,7 +278,8 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
 class BaseModelForm(BaseForm):
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=None,
-                 empty_permitted=False, instance=None, use_required_attribute=None):
+                 empty_permitted=False, instance=None, use_required_attribute=None,
+                 renderer=None):
         opts = self._meta
         if opts.model is None:
             raise ValueError('ModelForm has no model class specified.')
@@ -299,6 +300,7 @@ class BaseModelForm(BaseForm):
         super().__init__(
             data, files, auto_id, prefix, object_data, error_class,
             label_suffix, empty_permitted, use_required_attribute=use_required_attribute,
+            renderer=renderer,
         )
         for formfield in self.fields.values():
             apply_limit_choices_to_to_formfield(formfield)
@@ -564,13 +566,11 @@ class BaseModelFormSet(BaseFormSet):
                  queryset=None, *, initial=None, **kwargs):
         self.queryset = queryset
         self.initial_extra = initial
-        defaults = {'data': data, 'files': files, 'auto_id': auto_id, 'prefix': prefix}
-        defaults.update(kwargs)
-        super().__init__(**defaults)
+        super().__init__(**{'data': data, 'files': files, 'auto_id': auto_id, 'prefix': prefix, **kwargs})
 
     def initial_form_count(self):
         """Return the number of forms that are required in this FormSet."""
-        if not (self.data or self.files):
+        if not self.is_bound:
             return len(self.get_queryset())
         return super().initial_form_count()
 
@@ -589,9 +589,8 @@ class BaseModelFormSet(BaseFormSet):
         return field.to_python
 
     def _construct_form(self, i, **kwargs):
-        pk_required = False
-        if i < self.initial_form_count():
-            pk_required = True
+        pk_required = i < self.initial_form_count()
+        if pk_required:
             if self.is_bound:
                 pk_key = '%s-%s' % (self.add_prefix(i), self.model._meta.pk.name)
                 try:
@@ -697,8 +696,12 @@ class BaseModelFormSet(BaseFormSet):
                     for field in unique_check if field in form.cleaned_data
                 )
                 # Reduce Model instances to their primary key values
-                row_data = tuple(d._get_pk_val() if hasattr(d, '_get_pk_val') else d
-                                 for d in row_data)
+                row_data = tuple(
+                    d._get_pk_val() if hasattr(d, '_get_pk_val')
+                    # Prevent "unhashable type: list" errors later on.
+                    else tuple(d) if isinstance(d, list)
+                    else d for d in row_data
+                )
                 if row_data and None not in row_data:
                     # if we've already seen it then we have a uniqueness failure
                     if row_data in seen_data:
@@ -941,17 +944,7 @@ class BaseInlineFormSet(BaseModelFormSet):
         # form (it may have been saved after the formset was originally
         # instantiated).
         setattr(form.instance, self.fk.name, self.instance)
-        # Use commit=False so we can assign the parent key afterwards, then
-        # save the object.
-        obj = form.save(commit=False)
-        pk_value = getattr(self.instance, self.fk.remote_field.field_name)
-        setattr(obj, self.fk.get_attname(), getattr(pk_value, 'pk', pk_value))
-        if commit:
-            obj.save()
-        # form.save_m2m() can be called via the formset later on if commit=False
-        if commit and hasattr(form, 'save_m2m'):
-            form.save_m2m()
-        return obj
+        return super().save_new(form, commit=commit)
 
     def add_fields(self, form, index):
         super().add_fields(form, index)
@@ -1006,7 +999,7 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
                 raise ValueError(
                     "fk_name '%s' is not a ForeignKey to '%s'." % (fk_name, parent_model._meta.label)
                 )
-        elif len(fks_to_parent) == 0:
+        elif not fks_to_parent:
             raise ValueError(
                 "'%s' has no field named '%s'." % (model._meta.label, fk_name)
             )
@@ -1021,7 +1014,7 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
         ]
         if len(fks_to_parent) == 1:
             fk = fks_to_parent[0]
-        elif len(fks_to_parent) == 0:
+        elif not fks_to_parent:
             if can_fail:
                 return
             raise ValueError(
@@ -1133,7 +1126,7 @@ class ModelChoiceIterator:
     def __iter__(self):
         if self.field.empty_label is not None:
             yield ("", self.field.empty_label)
-        queryset = self.queryset.all()
+        queryset = self.queryset
         # Can't use iterator() when queryset uses prefetch_related()
         if not queryset._prefetch_related_lookups:
             queryset = queryset.iterator()
@@ -1141,7 +1134,13 @@ class ModelChoiceIterator:
             yield self.choice(obj)
 
     def __len__(self):
-        return len(self.queryset) + (1 if self.field.empty_label is not None else 0)
+        # count() adds a query but uses less memory since the QuerySet results
+        # won't be cached. In most cases, the choices will only be iterated on,
+        # and __len__() won't be called.
+        return self.queryset.count() + (1 if self.field.empty_label is not None else 0)
+
+    def __bool__(self):
+        return self.field.empty_label is not None or self.queryset.exists()
 
     def choice(self, obj):
         return (self.field.prepare_value(obj), self.field.label_from_instance(obj))
@@ -1197,7 +1196,7 @@ class ModelChoiceField(ChoiceField):
         return self._queryset
 
     def _set_queryset(self, queryset):
-        self._queryset = queryset
+        self._queryset = None if queryset is None else queryset.all()
         self.widget.choices = self.choices
 
     queryset = property(_get_queryset, _set_queryset)
@@ -1351,8 +1350,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
 
 
 def modelform_defines_fields(form_class):
-    return (form_class is not None and (
-            hasattr(form_class, '_meta') and
-            (form_class._meta.fields is not None or
-             form_class._meta.exclude is not None)
-            ))
+    return hasattr(form_class, '_meta') and (
+        form_class._meta.fields is not None or
+        form_class._meta.exclude is not None
+    )

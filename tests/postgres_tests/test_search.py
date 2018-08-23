@@ -9,7 +9,7 @@ from django.contrib.postgres.search import (
     SearchQuery, SearchRank, SearchVector,
 )
 from django.db.models import F
-from django.test import modify_settings
+from django.test import SimpleTestCase, modify_settings
 
 from . import PostgreSQLTestCase
 from .models import Character, Line, Scene
@@ -155,6 +155,12 @@ class MultipleFieldsTest(GrailTestData, PostgreSQLTestCase):
         ).filter(search='bedemir')
         self.assertEqual(set(searched), {self.bedemir0, self.bedemir1, self.crowd, self.witch, self.duck})
 
+    def test_search_with_non_text(self):
+        searched = Line.objects.annotate(
+            search=SearchVector('id'),
+        ).filter(search=str(self.crowd.id))
+        self.assertSequenceEqual(searched, [self.crowd])
+
     def test_config_query_explicit(self):
         searched = Line.objects.annotate(
             search=SearchVector('scene__setting', 'dialogue', config='french'),
@@ -286,3 +292,29 @@ class TestRankingAndWeights(GrailTestData, PostgreSQLTestCase):
             rank=SearchRank(SearchVector('dialogue'), SearchQuery('brave sir robin')),
         ).filter(rank__gt=0.3)
         self.assertSequenceEqual(searched, [self.verse0])
+
+
+class SearchQueryTests(SimpleTestCase):
+    def test_str(self):
+        tests = (
+            (~SearchQuery('a'), '~SearchQuery(a)'),
+            (
+                (SearchQuery('a') | SearchQuery('b')) & (SearchQuery('c') | SearchQuery('d')),
+                '((SearchQuery(a) || SearchQuery(b)) && (SearchQuery(c) || SearchQuery(d)))',
+            ),
+            (
+                SearchQuery('a') & (SearchQuery('b') | SearchQuery('c')),
+                '(SearchQuery(a) && (SearchQuery(b) || SearchQuery(c)))',
+            ),
+            (
+                (SearchQuery('a') | SearchQuery('b')) & SearchQuery('c'),
+                '((SearchQuery(a) || SearchQuery(b)) && SearchQuery(c))'
+            ),
+            (
+                SearchQuery('a') & (SearchQuery('b') & (SearchQuery('c') | SearchQuery('d'))),
+                '(SearchQuery(a) && (SearchQuery(b) && (SearchQuery(c) || SearchQuery(d))))',
+            ),
+        )
+        for query, expected_str in tests:
+            with self.subTest(query=query):
+                self.assertEqual(str(query), expected_str)

@@ -1,0 +1,123 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Branko Kokanovic <branko@kokanovic.org>, 2018
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-07-04 19:55+0000\n"
+"Last-Translator: Branko Kokanovic <branko@kokanovic.org>\n"
+"Language-Team: Serbian (http://www.transifex.com/django/django/language/"
+"sr/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sr\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+msgid "PostgreSQL extensions"
+msgstr "PostgreSQL екстензије"
+
+#, python-format
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "Ставка %(nth)s у низу није валидирана:"
+
+msgid "Nested arrays must have the same length."
+msgstr "Угњеждени низови морају да буду исте дужине."
+
+msgid "Map of strings to strings/nulls"
+msgstr "Мапа знаковних ниски на знаковне ниске/null-ове"
+
+#, python-format
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "Вредност кључа \"%(key)s\" није знаковна ниска или null."
+
+msgid "A JSON object"
+msgstr "JSON објекат"
+
+msgid "Value must be valid JSON."
+msgstr "Вредност мора бити исправни JSON."
+
+msgid "Could not load JSON data."
+msgstr "Не могу да учитам JSON податке."
+
+msgid "Input must be a JSON dictionary."
+msgstr "Улазна вредност мора бити JSON dict."
+
+#, python-format
+msgid "'%(value)s' value must be valid JSON."
+msgstr "'%(value)s' вредност мора бити исправни JSON."
+
+msgid "Enter two valid values."
+msgstr "Унесите две исправне вредности."
+
+msgid "The start of the range must not exceed the end of the range."
+msgstr "Почетак опсега не може бити преко краја опсега."
+
+msgid "Enter two whole numbers."
+msgstr "Унесите два цела броја."
+
+msgid "Enter two numbers."
+msgstr "Унесите два броја."
+
+msgid "Enter two valid date/times."
+msgstr "Унесите два исправна датума/времена."
+
+msgid "Enter two valid dates."
+msgstr "Унесите два исправна датума."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no more than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no more than "
+"%(limit_value)d."
+msgstr[0] ""
+"Листа садржи %(show_value)dставку, не би требало да садржи више од "
+"%(limit_value)d."
+msgstr[1] ""
+"Листа садржи %(show_value)d ставке, не би требало да садржи више од "
+"%(limit_value)d."
+msgstr[2] ""
+"Листа садржи %(show_value)d ставки, не би требало да садржи више од "
+"%(limit_value)d."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no fewer than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no fewer than "
+"%(limit_value)d."
+msgstr[0] ""
+"Листа садржи %(show_value)d ставку, не би требало да садржи мање од "
+"%(limit_value)d."
+msgstr[1] ""
+"Листа садржи %(show_value)d ставке, не би требало да садржи мање од "
+"%(limit_value)d."
+msgstr[2] ""
+"Листа садржи %(show_value)d ставки, не би требало да садржи мање од "
+"%(limit_value)d."
+
+#, python-format
+msgid "Some keys were missing: %(keys)s"
+msgstr "Неки кључеви недостају: %(keys)s"
+
+#, python-format
+msgid "Some unknown keys were provided: %(keys)s"
+msgstr "Дати су неки непознати кључеви: %(keys)s"
+
+#, python-format
+msgid ""
+"Ensure that this range is completely less than or equal to %(limit_value)s."
+msgstr "Овај опсег мора бити укупно мањи или једнак %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure that this range is completely greater than or equal to "
+"%(limit_value)s."
+msgstr "Овај опсег мора бити укупно већи или једнак %(limit_value)s."

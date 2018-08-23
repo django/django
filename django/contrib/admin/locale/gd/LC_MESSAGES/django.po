@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-20 11:01+0000\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-05-29 09:32+0000\n"
 "Last-Translator: GunChleoc\n"
 "Language-Team: Gaelic, Scottish (http://www.transifex.com/django/django/"
 "language/gd/)\n"
@@ -90,6 +90,15 @@ msgstr "Cuir %(verbose_name)s eile ris"
 msgid "Remove"
 msgstr "Thoir air falbh"
 
+msgid "Addition"
+msgstr "Cur ris"
+
+msgid "Change"
+msgstr "Atharraich"
+
+msgid "Deletion"
+msgstr "Sguabadh às"
+
 msgid "action time"
 msgstr "àm a’ ghnìomha"
 
@@ -167,11 +176,11 @@ msgid ""
 msgstr "Cum sìos “Control” no “Command” air Mac gus iomadh nì a thaghadh."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-"Chaidh {name} “{obj}” a chur ris gu soirbheachail. ’S urrainn dhut a "
-"dheasachadh a-rithist gu h-ìosal."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "Chaidh {name} “{obj}” a chur ris gu soirbheachail."
+
+msgid "You may edit it again below."
+msgstr "’S urrainn dhut a dheasachadh a-rithist gu h-ìosal."
 
 #, python-brace-format
 msgid ""
@@ -182,14 +191,17 @@ msgstr ""
 "eile a chur ris gu h-ìosal."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "Chaidh {name} “{obj}” a chur ris gu soirbheachail."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 "Chaidh {name} “{obj}” atharrachadh gu soirbheachail. ’S urrainn dhut a "
+"dheasachadh a-rithist gu h-ìosal."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+"Chaidh {name} “{obj}” a chur ris gu soirbheachail. ’S urrainn dhut a "
 "dheasachadh a-rithist gu h-ìosal."
 
 #, python-brace-format
@@ -231,6 +243,10 @@ msgstr "Cuir %s ris"
 #, python-format
 msgid "Change %s"
 msgstr "Atharraich %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Seall %s"
 
 msgid "Database error"
 msgstr "Mearachd an stòir-dhàta"
@@ -461,8 +477,8 @@ msgstr ""
 "sguabadh às? Thèid a h-uile oibseact seo ’s na nithean dàimheach aca a "
 "sguabadh às:"
 
-msgid "Change"
-msgstr "Atharraich"
+msgid "View"
+msgstr "Seall"
 
 msgid "Delete?"
 msgstr "A bheil thu airson a sguabadh às?"
@@ -481,8 +497,8 @@ msgstr "Modailean ann an aplacaid %(name)s"
 msgid "Add"
 msgstr "Cuir ris"
 
-msgid "You don't have permission to edit anything."
-msgstr "Chan eil cead agad gus dad a dheasachadh."
+msgid "You don't have permission to view or edit anything."
+msgstr "Chan eil cead agad gus dad a shealltainn no a dheasachadh."
 
 msgid "Recent actions"
 msgstr "Gnìomhan o chionn goirid"
@@ -547,6 +563,10 @@ msgid "Change selected %(model)s"
 msgstr "Atharraich a’ %(model)s a thagh thu"
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr "Seall %(model)s a thagh thu"
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr "Cuir %(model)s eile ris"
 
@@ -577,6 +597,12 @@ msgstr "Sàbhail is cuir fear eile ris"
 
 msgid "Save and continue editing"
 msgstr "Sàbhail is deasaich a-rithist"
+
+msgid "Save and view"
+msgstr "Sàbhail is seall"
+
+msgid "Close"
+msgstr "Dùin"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr ""
@@ -696,6 +722,10 @@ msgstr "Tagh %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Tagh %s gus atharrachadh"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Tagh %s gus a shealltainn"
 
 msgid "Date:"
 msgstr "Ceann-là:"

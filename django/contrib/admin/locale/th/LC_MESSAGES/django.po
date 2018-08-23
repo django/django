@@ -2,15 +2,15 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Kowit Charoenratchatabhan <kowit.s.c@gmail.com>, 2013-2014
+# Kowit Charoenratchatabhan <kowit.s.c@gmail.com>, 2013-2014,2017-2018
 # piti118 <piti118@gmail.com>, 2012
 # Suteepat Damrongyingsupab <tianissimo@hotmail.com>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:09+0000\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-05-28 01:29+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Thai (http://www.transifex.com/django/django/language/th/)\n"
 "MIME-Version: 1.0\n"
@@ -86,11 +86,20 @@ msgstr "เพิ่ม %(verbose_name)s อีก"
 msgid "Remove"
 msgstr "ถอดออก"
 
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "เปลี่ยนแปลง"
+
+msgid "Deletion"
+msgstr ""
+
 msgid "action time"
 msgstr "เวลาลงมือ"
 
 msgid "user"
-msgstr ""
+msgstr "ผู้ใช้"
 
 msgid "content type"
 msgstr ""
@@ -135,7 +144,7 @@ msgid "Added {name} \"{object}\"."
 msgstr ""
 
 msgid "Added."
-msgstr ""
+msgstr "เพิ่มแล้ว"
 
 msgid "and"
 msgstr "และ"
@@ -146,7 +155,7 @@ msgstr ""
 
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr ""
+msgstr "เปลี่ยน {fields}."
 
 #, python-brace-format
 msgid "Deleted {name} \"{object}\"."
@@ -163,8 +172,10 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -174,12 +185,13 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -207,8 +219,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "ลบ %(name)s \"%(obj)s\" เรียบร้อยแล้ว"
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "Primary key %(key)r ของอ็อบเจ็กต์ %(name)s ไม่มีอยู่"
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr ""
 
 #, python-format
 msgid "Add %s"
@@ -217,6 +229,10 @@ msgstr "เพิ่ม %s"
 #, python-format
 msgid "Change %s"
 msgstr "เปลี่ยน %s"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "เกิดความผิดพลาดที่ฐานข้อมูล"
@@ -322,7 +338,7 @@ msgid "Change password"
 msgstr "เปลี่ยนรหัสผ่าน"
 
 msgid "Please correct the error below."
-msgstr "โปรดแก้ไขข้อผิดพลาดด้านล่าง"
+msgstr ""
 
 msgid "Please correct the errors below."
 msgstr "กรุณาแก้ไขข้อผิดพลาดด้านล่าง"
@@ -428,8 +444,8 @@ msgstr ""
 "คุณแน่ใจหรือว่า ต้องการลบ %(objects_name)s ที่ถูกเลือก? เนื่องจากอ็อบเจ็กต์ "
 "และรายการที่เกี่ยวข้องทั้งหมดต่อไปนี้จะถูกลบด้วย"
 
-msgid "Change"
-msgstr "เปลี่ยนแปลง"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr "ลบ?"
@@ -448,8 +464,8 @@ msgstr "โมเดลในแอป %(name)s"
 msgid "Add"
 msgstr "เพิ่ม"
 
-msgid "You don't have permission to edit anything."
-msgstr "คุณไม่สิทธิ์ในการเปลี่ยนแปลงข้อมูลใดๆ ได้"
+msgid "You don't have permission to view or edit anything."
+msgstr ""
 
 msgid "Recent actions"
 msgstr ""
@@ -508,6 +524,10 @@ msgid "Change selected %(model)s"
 msgstr ""
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr ""
 
@@ -535,6 +555,12 @@ msgstr "บันทึกและเพิ่ม"
 
 msgid "Save and continue editing"
 msgstr "บันทึกและกลับมาแก้ไข"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "ขอบคุณที่สละเวลาอันมีค่าให้กับเว็บไซต์ของเราในวันนี้"
@@ -587,7 +613,7 @@ msgstr ""
 msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
-msgstr ""
+msgstr "เราได้ส่งอีเมลวิธีการตั้งรหัสผ่าน ไปที่อีเมลที่คุณให้ไว้เรียบร้อยแล้ว และคุณจะได้รับเร็วๆ นี้"
 
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
@@ -637,6 +663,10 @@ msgstr "เลือก %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "เลือก %s เพื่อเปลี่ยนแปลง"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "วันที่ :"

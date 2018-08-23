@@ -2,7 +2,6 @@
 Decorators for views based on HTTP headers.
 """
 
-import logging
 from calendar import timegm
 from functools import wraps
 
@@ -11,10 +10,9 @@ from django.middleware.http import ConditionalGetMiddleware
 from django.utils.cache import get_conditional_response
 from django.utils.decorators import decorator_from_middleware
 from django.utils.http import http_date, quote_etag
+from django.utils.log import log_response
 
 conditional_page = decorator_from_middleware(ConditionalGetMiddleware)
-
-logger = logging.getLogger('django.request')
 
 
 def require_http_methods(request_method_list):
@@ -32,11 +30,13 @@ def require_http_methods(request_method_list):
         @wraps(func)
         def inner(request, *args, **kwargs):
             if request.method not in request_method_list:
-                logger.warning(
+                response = HttpResponseNotAllowed(request_method_list)
+                log_response(
                     'Method Not Allowed (%s): %s', request.method, request.path,
-                    extra={'status_code': 405, 'request': request}
+                    response=response,
+                    request=request,
                 )
-                return HttpResponseNotAllowed(request_method_list)
+                return response
             return func(request, *args, **kwargs)
         return inner
     return decorator

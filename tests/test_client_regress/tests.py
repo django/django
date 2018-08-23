@@ -631,7 +631,7 @@ class AssertFormErrorTests(SimpleTestCase):
         except AssertionError as e:
             self.assertIn(
                 "The form 'form' in context 0 does not contain the non-field "
-                "error 'Some error.' (actual errors: )",
+                "error 'Some error.' (actual errors: none)",
                 str(e)
             )
         try:
@@ -639,7 +639,7 @@ class AssertFormErrorTests(SimpleTestCase):
         except AssertionError as e:
             self.assertIn(
                 "abc: The form 'form' in context 0 does not contain the "
-                "non-field error 'Some error.' (actual errors: )",
+                "non-field error 'Some error.' (actual errors: none)",
                 str(e)
             )
 
@@ -1196,15 +1196,21 @@ class RequestMethodStringDataTests(SimpleTestCase):
         response = self.client.head('/body/', data='', content_type='application/json')
         self.assertEqual(response.content, b'')
 
+    def test_json_bytes(self):
+        response = self.client.post('/body/', data=b"{'value': 37}", content_type='application/json')
+        self.assertEqual(response.content, b"{'value': 37}")
+
     def test_json(self):
         response = self.client.get('/json_response/')
         self.assertEqual(response.json(), {'key': 'value'})
 
-    def test_json_vendor(self):
+    def test_json_structured_suffixes(self):
         valid_types = (
             'application/vnd.api+json',
             'application/vnd.api.foo+json',
             'application/json; charset=utf-8',
+            'application/activity+json',
+            'application/activity+json; charset=utf-8',
         )
         for content_type in valid_types:
             response = self.client.get('/json_response/', {'content_type': content_type})
@@ -1419,3 +1425,9 @@ class RequestFactoryEnvironmentTests(SimpleTestCase):
         self.assertEqual(request.META.get('SERVER_PORT'), '80')
         self.assertEqual(request.META.get('SERVER_PROTOCOL'), 'HTTP/1.1')
         self.assertEqual(request.META.get('SCRIPT_NAME') + request.META.get('PATH_INFO'), '/path/')
+
+    def test_cookies(self):
+        factory = RequestFactory()
+        factory.cookies.load('A="B"; C="D"; Path=/; Version=1')
+        request = factory.get('/')
+        self.assertEqual(request.META['HTTP_COOKIE'], 'A="B"; C="D"')

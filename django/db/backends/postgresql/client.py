@@ -60,7 +60,7 @@ class DatabaseClient(BaseDatabaseClient):
             signal.signal(signal.SIGINT, signal.SIG_IGN)
             subprocess.check_call(args)
         finally:
-            # Restore the orignal SIGINT handler.
+            # Restore the original SIGINT handler.
             signal.signal(signal.SIGINT, sigint_handler)
             if temp_pgpass:
                 temp_pgpass.close()

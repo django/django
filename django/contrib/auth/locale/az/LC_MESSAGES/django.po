@@ -2,13 +2,14 @@
 #
 # Translators:
 # Ali Ismayilov <ali@ismailov.info>, 2011
+# Emin Mastizada <emin@linux.com>, 2018
 # Emin Mastizada <emin@linux.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-08-05 00:28+0000\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2018-04-27 13:17+0000\n"
 "Last-Translator: Emin Mastizada <emin@linux.com>\n"
 "Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
 "az/)\n"
@@ -67,15 +68,19 @@ msgstr "Təsdiqləmək üçün əvvəlki ilə eyni parolu daxil edin."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
+"Düz parollar saxlanmadığı üçün bu istifadəçinin parolunu görmək mümkün "
+"deyil, amma <a href=\"{}\">bu formadan</a> istifadə edərək parolunu dəyişə "
+"bilərsiz."
 
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
+"Lütfən düzgün %(username)s və parol daxil edin. Nəzərə alın ki, hər ikisi "
+"böyük-kiçik hərflərə həssasdırlar."
 
 msgid "This account is inactive."
 msgstr "Bu hesab qeyri-aktivdir."
@@ -165,18 +170,20 @@ msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of their groups."
 msgstr ""
+"Bu istifadəçinin aid olduğu qruplar. İstifadə bu qruplardan hər birinə "
+"verilən bütün icazələri alacaq."
 
 msgid "user permissions"
 msgstr "səlahiyyətləri"
 
 msgid "Specific permissions for this user."
-msgstr ""
+msgstr "Bu istifadəçiyə aid xüsusi icazələr."
 
 msgid "username"
 msgstr "istifadəçi adı"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
+msgstr "Tələb edilir. Ən az 150 simvol. Ancaq hərf, rəqəm və @/./+/-/_."
 
 msgid "A user with that username already exists."
 msgstr "Bu istifadəçi adı altında başqa istifadəçi var."
@@ -258,11 +265,15 @@ msgid ""
 "Enter a valid username. This value may contain only English letters, "
 "numbers, and @/./+/-/_ characters."
 msgstr ""
+"Düzgün istifadəçi adı daxil edin. Bu dəyən ancaq İngiliscə hərflərdən, rəqəm "
+"və @/./+/-/_ işarətlərindən ibarət ola bilər."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
 msgstr ""
+"Düzgün istifadəçi adı daxil edin. Bu dəyən ancaq hərf, rəqəm və @/./+/-/_ "
+"işarətlərindən ibarət ola bilər."
 
 msgid "Logged out"
 msgstr "Çıxdınız"

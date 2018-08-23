@@ -103,6 +103,24 @@ class IndexName(TableColumns):
         return self.create_index_name(self.table, self.columns, self.suffix)
 
 
+class IndexColumns(Columns):
+    def __init__(self, table, columns, quote_name, col_suffixes=(), opclasses=()):
+        self.opclasses = opclasses
+        super().__init__(table, columns, quote_name, col_suffixes)
+
+    def __str__(self):
+        def col_str(column, idx):
+            try:
+                col = self.quote_name(column) + self.col_suffixes[idx]
+            except IndexError:
+                col = self.quote_name(column)
+            # Index.__init__() guarantees that self.opclasses is the same
+            # length as self.columns.
+            return '{} {}'.format(col, self.opclasses[idx])
+
+        return ', '.join(col_str(column, idx) for idx, column in enumerate(self.columns))
+
+
 class ForeignKeyName(TableColumns):
     """Hold a reference to a foreign key name."""
 

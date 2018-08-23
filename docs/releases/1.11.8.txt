@@ -2,7 +2,7 @@
 Django 1.11.8 release notes
 ===========================
 
-*Expected December 1, 2017*
+*December 2, 2017*
 
 Django 1.11.8 fixes several bugs in 1.11.7.
 
@@ -18,3 +18,19 @@ Bugfixes
 
 * Fixed incorrect index name truncation when using a namespaced ``db_table``
   (:ticket:`28792`).
+
+* Made ``QuerySet.iterator()`` use server-side cursors on PostgreSQL after
+  ``values()`` and ``values_list()`` (:ticket:`28817`).
+
+* Fixed crash on SQLite and MySQL when ordering by a filtered subquery that
+  uses ``nulls_first`` or ``nulls_last`` (:ticket:`28848`).
+
+* Made query lookups for ``CICharField``, ``CIEmailField``, and ``CITextField``
+  use a ``citext`` cast (:ticket:`28702`).
+
+* Fixed a regression in caching of a ``GenericForeignKey`` when the referenced
+  model instance uses multi-table inheritance (:ticket:`28856`).
+
+* Fixed "Cannot change column 'x': used in a foreign key constraint" crash on
+  MySQL with a sequence of ``AlterField`` and/or ``RenameField`` operations in
+  a migration (:ticket:`28305`).

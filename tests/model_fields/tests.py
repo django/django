@@ -3,6 +3,7 @@ import pickle
 from django import forms
 from django.db import models
 from django.test import SimpleTestCase, TestCase
+from django.utils.functional import lazy
 
 from .models import (
     Foo, RenamedField, VerboseNameField, Whiz, WhizIter, WhizIterEmpty,
@@ -130,3 +131,29 @@ class ChoicesTests(SimpleTestCase):
         self.assertEqual(WhizIterEmpty(c="b").c, "b")      # Invalid value
         self.assertIsNone(WhizIterEmpty(c=None).c)         # Blank value
         self.assertEqual(WhizIterEmpty(c='').c, '')        # Empty value
+
+
+class GetChoicesTests(SimpleTestCase):
+
+    def test_blank_in_choices(self):
+        choices = [('', '<><>'), ('a', 'A')]
+        f = models.CharField(choices=choices)
+        self.assertEqual(f.get_choices(include_blank=True), choices)
+
+    def test_blank_in_grouped_choices(self):
+        choices = [
+            ('f', 'Foo'),
+            ('b', 'Bar'),
+            ('Group', (
+                ('', 'No Preference'),
+                ('fg', 'Foo'),
+                ('bg', 'Bar'),
+            )),
+        ]
+        f = models.CharField(choices=choices)
+        self.assertEqual(f.get_choices(include_blank=True), choices)
+
+    def test_lazy_strings_not_evaluated(self):
+        lazy_func = lazy(lambda x: 0 / 0, int)  # raises ZeroDivisionError if evaluated.
+        f = models.CharField(choices=[(lazy_func('group'), (('a', 'A'), ('b', 'B')))])
+        self.assertEqual(f.get_choices(include_blank=True)[0], ('', '---------'))

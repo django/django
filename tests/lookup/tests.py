@@ -1,21 +1,24 @@
-import collections
+import collections.abc
 from datetime import datetime
 from math import ceil
 from operator import attrgetter
 
 from django.core.exceptions import FieldError
 from django.db import connection
+from django.db.models.functions import Substr
 from django.test import TestCase, skipUnlessDBFeature
 
-from .models import Article, Author, Game, Player, Season, Tag
+from .models import (
+    Article, Author, Game, IsNullWithNoneAsRHS, Player, Season, Tag,
+)
 
 
 class LookupTests(TestCase):
 
     def setUp(self):
         # Create a few Authors.
-        self.au1 = Author.objects.create(name='Author 1')
-        self.au2 = Author.objects.create(name='Author 2')
+        self.au1 = Author.objects.create(name='Author 1', alias='a1')
+        self.au2 = Author.objects.create(name='Author 2', alias='a2')
         # Create a few Articles.
         self.a1 = Article.objects.create(
             headline='Article 1',
@@ -99,7 +102,7 @@ class LookupTests(TestCase):
     def test_iterator(self):
         # Each QuerySet gets iterator(), which is a generator that "lazily"
         # returns results using database-level iteration.
-        self.assertIsInstance(Article.objects.iterator(), collections.Iterator)
+        self.assertIsInstance(Article.objects.iterator(), collections.abc.Iterator)
 
         self.assertQuerysetEqual(
             Article.objects.iterator(),
@@ -553,6 +556,10 @@ class LookupTests(TestCase):
         ):
             list(Article.objects.filter(id__in=Article.objects.using('other').all()))
 
+    def test_in_keeps_value_ordering(self):
+        query = Article.objects.filter(slug__in=['a%d' % i for i in range(1, 8)]).values('pk').query
+        self.assertIn(' IN (a1, a2, a3, a4, a5, a6, a7) ', str(query))
+
     def test_error_messages(self):
         # Programming errors are pointed out with nice error messages
         with self.assertRaisesMessage(
@@ -878,3 +885,27 @@ class LookupTests(TestCase):
         season = Season.objects.create(year=2012, nulled_text_field=None)
         self.assertTrue(Season.objects.filter(pk=season.pk, nulled_text_field__isnull=True))
         self.assertTrue(Season.objects.filter(pk=season.pk, nulled_text_field=''))
+
+    def test_pattern_lookups_with_substr(self):
+        a = Author.objects.create(name='John Smith', alias='Johx')
+        b = Author.objects.create(name='Rhonda Simpson', alias='sonx')
+        tests = (
+            ('startswith', [a]),
+            ('istartswith', [a]),
+            ('contains', [a, b]),
+            ('icontains', [a, b]),
+            ('endswith', [b]),
+            ('iendswith', [b]),
+        )
+        for lookup, result in tests:
+            with self.subTest(lookup=lookup):
+                authors = Author.objects.filter(**{'name__%s' % lookup: Substr('alias', 1, 3)})
+                self.assertCountEqual(authors, result)
+
+    def test_custom_lookup_none_rhs(self):
+        """Lookup.can_use_none_as_rhs=True allows None as a lookup value."""
+        season = Season.objects.create(year=2012, nulled_text_field=None)
+        query = Season.objects.get_queryset().query
+        field = query.model._meta.get_field('nulled_text_field')
+        self.assertIsInstance(query.build_lookup(['isnull_none_rhs'], field, None), IsNullWithNoneAsRHS)
+        self.assertTrue(Season.objects.filter(pk=season.pk, nulled_text_field__isnull_none_rhs=True))

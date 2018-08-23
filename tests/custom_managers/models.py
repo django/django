@@ -25,6 +25,13 @@ class PublishedBookManager(models.Manager):
         return super().get_queryset().filter(is_published=True)
 
 
+class AnnotatedBookManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().annotate(
+            favorite_avg=models.Avg('favorite_books__favorite_thing_id')
+        )
+
+
 class CustomQuerySet(models.QuerySet):
     def filter(self, *args, **kwargs):
         queryset = super().filter(fun=True)
@@ -131,7 +138,6 @@ class Book(models.Model):
     title = models.CharField(max_length=50)
     author = models.CharField(max_length=30)
     is_published = models.BooleanField(default=False)
-    published_objects = PublishedBookManager()
     authors = models.ManyToManyField(Person, related_name='books')
     fun_authors = models.ManyToManyField(FunPerson, related_name='books')
     favorite_things = GenericRelation(
@@ -144,6 +150,12 @@ class Book(models.Model):
         content_type_field='favorite_thing_type',
         object_id_field='favorite_thing_id',
     )
+
+    published_objects = PublishedBookManager()
+    annotated_objects = AnnotatedBookManager()
+
+    class Meta:
+        base_manager_name = 'annotated_objects'
 
     def __str__(self):
         return self.title

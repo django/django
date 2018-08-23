@@ -101,7 +101,8 @@ class Post(models.Model):
 
 
 class NullBooleanModel(models.Model):
-    nbfield = models.NullBooleanField()
+    nbfield = models.BooleanField(null=True, blank=True)
+    nbfield_old = models.NullBooleanField()
 
 
 class BooleanModel(models.Model):

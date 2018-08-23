@@ -1,0 +1,291 @@
+============================================
+Django 2.2 release notes - UNDER DEVELOPMENT
+============================================
+
+*Expected April 2019*
+
+Welcome to Django 2.2!
+
+These release notes cover the :ref:`new features <whats-new-2.2>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-2.2>` you'll
+want to be aware of when upgrading from Django 2.1 or earlier. We've
+:ref:`begun the deprecation process for some features
+<deprecated-features-2.2>`.
+
+See the :doc:`/howto/upgrade-version` guide if you're updating an existing
+project.
+
+Django 2.2 is designated as a :term:`long-term support release`. It will
+receive security updates for at least three years after its release. Support
+for the previous LTS, Django 1.11, will end in April 2020.
+
+Python compatibility
+====================
+
+Django 2.2 supports Python 3.5, 3.6, and 3.7. We **highly recommend** and only
+officially support the latest release of each series.
+
+.. _whats-new-2.2:
+
+What's new in Django 2.2
+========================
+
+Check Constraints
+-----------------
+
+The new :class:`~django.db.models.CheckConstraint` class enables adding custom
+database constraints. Constraints are added to models using the
+:attr:`Meta.constraints <django.db.models.Options.constraints>` option.
+
+Minor features
+--------------
+
+:mod:`django.contrib.admin`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.admindocs`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.auth`
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.contenttypes`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Added Oracle support for the
+  :class:`~django.contrib.gis.db.models.functions.Envelope` function.
+
+* Added SpatiaLite support for the :lookup:`coveredby` and :lookup:`covers`
+  lookups.
+
+:mod:`django.contrib.messages`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.postgres`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new ``ordering`` argument for
+  :class:`~django.contrib.postgres.aggregates.ArrayAgg` and
+  :class:`~django.contrib.postgres.aggregates.StringAgg` determines the
+  ordering of the aggregated elements.
+
+* The new :class:`~django.contrib.postgres.indexes.BTreeIndex`,
+  :class:`~django.contrib.postgres.indexes.HashIndex` and
+  :class:`~django.contrib.postgres.indexes.SpGistIndex` classes allow
+  creating ``B-Tree``, ``hash``, and ``SP-GiST`` indexes in the database.
+
+* :class:`~django.contrib.postgres.indexes.BrinIndex` now has the
+  ``autosummarize`` parameter.
+
+:mod:`django.contrib.redirects`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sessions`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sitemaps`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sites`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.staticfiles`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Added path matching to the :option:`collectstatic --ignore` option so that
+  patterns like ``/vendor/*.js`` can be used.
+
+:mod:`django.contrib.syndication`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Cache
+~~~~~
+
+* ...
+
+CSRF
+~~~~
+
+* ...
+
+Database backends
+~~~~~~~~~~~~~~~~~
+
+* Added result streaming for :meth:`.QuerySet.iterator` on SQLite.
+
+Email
+~~~~~
+
+* ...
+
+File Storage
+~~~~~~~~~~~~
+
+* ...
+
+File Uploads
+~~~~~~~~~~~~
+
+* ...
+
+
+Forms
+~~~~~
+
+* ...
+
+Generic Views
+~~~~~~~~~~~~~
+
+* ...
+
+Internationalization
+~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Management Commands
+~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Migrations
+~~~~~~~~~~
+
+* The new :option:`migrate --plan` option prints the list of migration
+  operations that will be performed.
+
+Models
+~~~~~~
+
+* Added support for PostgreSQL operator classes (:attr:`.Index.opclasses`).
+
+* Added many :ref:`math database functions <math-functions>`.
+
+* Setting the new ``ignore_conflicts`` parameter of
+  :meth:`.QuerySet.bulk_create` to ``True`` tells the database to ignore
+  failure to insert rows that fail uniqueness constraints or other checks.
+
+* The new :class:`~django.db.models.functions.ExtractIsoYear` function extracts
+  ISO-8601 week-numbering years from :class:`~django.db.models.DateField` and
+  :class:`~django.db.models.DateTimeField`, and the new :lookup:`iso_year`
+  lookup allows querying by an ISO-8601 week-numbering year.
+
+Requests and Responses
+~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Serialization
+~~~~~~~~~~~~~
+
+* You can now deserialize data using natural keys containing :ref:`forward
+  references <natural-keys-and-forward-references>` by passing
+  ``handle_forward_references=True`` to ``serializers.deserialize()``.
+  Additionally, :djadmin:`loaddata` handles forward references automatically.
+
+Signals
+~~~~~~~
+
+* ...
+
+Templates
+~~~~~~~~~
+
+* ...
+
+Tests
+~~~~~
+
+* The new :meth:`.SimpleTestCase.assertURLEqual` assertion checks for a given
+  URL, ignoring the ordering of the query string.
+  :meth:`~.SimpleTestCase.assertRedirects` uses the new assertion.
+
+URLs
+~~~~
+
+* ...
+
+Validators
+~~~~~~~~~~
+
+* ...
+
+.. _backwards-incompatible-2.2:
+
+Backwards incompatible changes in 2.2
+=====================================
+
+Database backend API
+--------------------
+
+* Third-party database backends must implement support for table check
+  constraints or set ``DatabaseFeatures.supports_table_check_constraints`` to
+  ``False``.
+
+* Third party database backends must implement support for ignoring
+  constraints or uniqueness errors while inserting or set
+  ``DatabaseFeatures.supports_ignore_conflicts`` to ``False``.
+
+:mod:`django.contrib.gis`
+-------------------------
+
+* Support for GDAL 1.9 and 1.10 is dropped.
+
+* To improve readability, the ``UUIDField`` form field now displays values with
+  dashes, e.g. ``550e8400-e29b-41d4-a716-446655440000`` instead of
+  ``550e8400e29b41d4a716446655440000``.
+
+Miscellaneous
+-------------
+
+* On SQLite, ``PositiveIntegerField`` and ``PositiveSmallIntegerField`` now
+  include a check constraint to prevent negative values in the database. If you
+  have existing invalid data and run a migration that recreates a table, you'll
+  see ``CHECK constraint failed``.
+
+* For consistency with WSGI servers, the test client now sets the
+  ``Content-Length`` header to a string rather than an integer.
+
+* The return value of :func:`django.utils.text.slugify` is no longer marked as
+  HTML safe.
+
+* The default truncation character used by the :tfilter:`urlizetrunc`,
+  :tfilter:`truncatechars`, :tfilter:`truncatechars_html`,
+  :tfilter:`truncatewords`, and :tfilter:`truncatewords_html` template filters
+  is now the real ellipsis character (``…``) instead of 3 dots. You may have to
+  adapt some test output comparisons.
+
+.. _deprecated-features-2.2:
+
+Features deprecated in 2.2
+==========================
+
+Miscellaneous
+-------------
+
+* ``django.utils.timezone.FixedOffset`` is deprecated in favor of
+  :class:`datetime.timezone`.

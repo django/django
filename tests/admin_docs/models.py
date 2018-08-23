@@ -52,6 +52,10 @@ class Person(models.Model):
     def dummy_function(self, baz, rox, *some_args, **some_kwargs):
         return some_kwargs
 
+    @property
+    def a_property(self):
+        return 'a_property'
+
     def suffix_company_name(self, suffix='ltd'):
         return self.company.name + suffix
 

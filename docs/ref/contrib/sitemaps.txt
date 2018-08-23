@@ -273,10 +273,6 @@ The sitemap framework provides a convenience class for a common case:
     and :attr:`~Sitemap.protocol` keyword arguments allow specifying these
     attributes for all URLs.
 
-    .. versionadded:: 2.0
-
-        The ``protocol`` keyword argument was added.
-
 Example
 -------
 

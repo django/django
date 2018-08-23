@@ -401,8 +401,8 @@ Template tags
 :ttag:`spaceless` tag
 ~~~~~~~~~~~~~~~~~~~~~
 
-The spaceless template tag now removes *all* spaces between HTML tags, instead
-of preserving a single space.
+The ``spaceless`` template tag now removes *all* spaces between HTML tags,
+instead of preserving a single space.
 
 Local flavors
 -------------

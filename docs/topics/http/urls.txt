@@ -12,7 +12,7 @@ There's no ``.php`` or ``.cgi`` required, and certainly none of that
 See `Cool URIs don't change`_, by World Wide Web creator Tim Berners-Lee, for
 excellent arguments on why URLs should be clean and usable.
 
-.. _Cool URIs don't change: http://www.w3.org/Provider/Style/URI
+.. _Cool URIs don't change: https://www.w3.org/Provider/Style/URI
 
 Overview
 ========
@@ -127,9 +127,10 @@ The following path converters are available by default:
   plus the hyphen and underscore characters. For example,
   ``building-your-1st-django-site``.
 
-* ``uuid`` - Matches a formatted UUID. For example,
-  ``075194d3-6885-417e-a8a8-6c931e272f00``. Returns a :class:`~uuid.UUID`
-  instance.
+* ``uuid`` - Matches a formatted UUID. To prevent multiple URLs from mapping to
+  the same page, dashes must be included and letters must be lowercase. For
+  example, ``075194d3-6885-417e-a8a8-6c931e272f00``. Returns a
+  :class:`~uuid.UUID` instance.
 
 * ``path`` - Matches any non-empty string, including the path separator,
   ``'/'``. This allows you to match against a complete URL path rather than
@@ -167,7 +168,7 @@ For example::
 Register custom converter classes in your URLconf using
 :func:`~django.urls.register_converter`::
 
-    from django.urls import register_converter, path
+    from django.urls import path, register_converter
 
     from . import converters, views
 
@@ -198,9 +199,9 @@ Here's the example URLconf from earlier, rewritten using regular expressions::
 
     urlpatterns = [
         path('articles/2003/', views.special_case_2003),
-        re_path('articles/(?P<year>[0-9]{4})/', views.year_archive),
-        re_path('articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/', views.month_archive),
-        re_path('articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/(?P<slug>[\w-_]+)/', views.article_detail),
+        re_path(r'^articles/(?P<year>[0-9]{4})/$', views.year_archive),
+        re_path(r'^articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/$', views.month_archive),
+        re_path(r'^articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/(?P<slug>[\w-]+)/$', views.article_detail),
     ]
 
 This accomplishes roughly the same thing as the previous example, except:
@@ -242,8 +243,8 @@ following URL patterns which optionally take a page argument::
     from django.urls import re_path
 
     urlpatterns = [
-        re_path(r'blog/(page-(\d+)/)?$', blog_articles),                  # bad
-        re_path(r'comments/(?:page-(?P<page_number>\d+)/)?$', comments),  # good
+        re_path(r'^blog/(page-(\d+)/)?$', blog_articles),                  # bad
+        re_path(r'^comments/(?:page-(?P<page_number>\d+)/)?$', comments),  # good
     ]
 
 Both patterns use nested arguments and will resolve: for example,
@@ -613,8 +614,8 @@ You can obtain these in template code by using:
 
 Or in Python code::
 
-    from django.urls import reverse
     from django.http import HttpResponseRedirect
+    from django.urls import reverse
 
     def redirect_to_year(request):
         # ...
@@ -735,7 +736,7 @@ the fully qualified name into parts and then tries the following lookup:
    setting the current application on the :attr:`request.current_app
    <django.http.HttpRequest.current_app>` attribute.
 
-3. If there is no current application. Django looks for a default
+3. If there is no current application, Django looks for a default
    application instance. The default application instance is the instance
    that has an :term:`instance namespace` matching the :term:`application
    namespace` (in this example, an instance of ``polls`` called ``'polls'``).

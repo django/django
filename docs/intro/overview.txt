@@ -51,7 +51,7 @@ Install it
 Next, run the Django command-line utility to create the database tables
 automatically:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py migrate
 
@@ -69,7 +69,7 @@ necessary:
 .. code-block:: python
 
     # Import the models we created from our "news" app
-    >>> from news.models import Reporter, Article
+    >>> from news.models import Article, Reporter
 
     # No reporters are in the system yet.
     >>> Reporter.objects.all()
@@ -307,7 +307,7 @@ Here's what the "base.html" template, including the use of :doc:`static files
         <title>{% block title %}{% endblock %}</title>
     </head>
     <body>
-        <img src="{% static "images/sitelogo.png" %}" alt="Logo" />
+        <img src="{% static "images/sitelogo.png" %}" alt="Logo">
         {% block content %}{% endblock %}
     </body>
     </html>

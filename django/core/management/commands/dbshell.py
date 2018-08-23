@@ -12,7 +12,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
+            '--database', default=DEFAULT_DB_ALIAS,
             help='Nominates a database onto which to open a shell. Defaults to the "default" database.',
         )
 

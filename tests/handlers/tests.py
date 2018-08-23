@@ -17,7 +17,7 @@ class HandlerTests(SimpleTestCase):
 
     def test_middleware_initialized(self):
         handler = WSGIHandler()
-        self.assertIsNotNone(handler._request_middleware)
+        self.assertIsNotNone(handler._middleware_chain)
 
     def test_bad_path_info(self):
         """

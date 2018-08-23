@@ -1,11 +1,11 @@
 import json
 
-from django.core import exceptions, serializers
+from django.core import checks, exceptions, serializers
 from django.forms import Form
-from django.test.utils import modify_settings
+from django.test.utils import isolate_apps, modify_settings
 
 from . import PostgreSQLTestCase
-from .models import HStoreModel
+from .models import HStoreModel, PostgreSQLModel
 
 try:
     from django.contrib.postgres import forms
@@ -148,6 +148,18 @@ class TestQuerying(HStoreTestCase):
             self.objs[:2]
         )
 
+    def test_order_by_field(self):
+        more_objs = (
+            HStoreModel.objects.create(field={'g': '637'}),
+            HStoreModel.objects.create(field={'g': '002'}),
+            HStoreModel.objects.create(field={'g': '042'}),
+            HStoreModel.objects.create(field={'g': '981'}),
+        )
+        self.assertSequenceEqual(
+            HStoreModel.objects.filter(field__has_key='g').order_by('field__g'),
+            [more_objs[1], more_objs[2], more_objs[0], more_objs[3]]
+        )
+
     def test_keys_contains(self):
         self.assertSequenceEqual(
             HStoreModel.objects.filter(field__keys__contains=['a']),
@@ -176,6 +188,34 @@ class TestQuerying(HStoreTestCase):
             HStoreModel.objects.filter(id__in=HStoreModel.objects.filter(field__a='b')),
             self.objs[:2]
         )
+
+
+@isolate_apps('postgres_tests')
+class TestChecks(PostgreSQLTestCase):
+
+    def test_invalid_default(self):
+        class MyModel(PostgreSQLModel):
+            field = HStoreField(default={})
+
+        model = MyModel()
+        self.assertEqual(model.check(), [
+            checks.Warning(
+                msg=(
+                    "HStoreField default should be a callable instead of an "
+                    "instance so that it's not shared between all field "
+                    "instances."
+                ),
+                hint='Use a callable instead, e.g., use `dict` instead of `{}`.',
+                obj=MyModel._meta.get_field('field'),
+                id='postgres.E003',
+            )
+        ])
+
+    def test_valid_default(self):
+        class MyModel(PostgreSQLModel):
+            field = HStoreField(default=dict)
+
+        self.assertEqual(MyModel().check(), [])
 
 
 class TestSerialization(HStoreTestCase):

@@ -5,6 +5,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, MiddlewareNotUsed
 from django.db import connections, transaction
 from django.urls import get_resolver, set_urlconf
+from django.utils.log import log_response
 from django.utils.module_loading import import_string
 
 from .exception import convert_exception_to_response, get_exception_response
@@ -13,10 +14,8 @@ logger = logging.getLogger('django.request')
 
 
 class BaseHandler:
-    _request_middleware = None
     _view_middleware = None
     _template_response_middleware = None
-    _response_middleware = None
     _exception_middleware = None
     _middleware_chain = None
 
@@ -26,10 +25,8 @@ class BaseHandler:
 
         Must be called after the environment is fixed (see __call__ in subclasses).
         """
-        self._request_middleware = []
         self._view_middleware = []
         self._template_response_middleware = []
-        self._response_middleware = []
         self._exception_middleware = []
 
         handler = convert_exception_to_response(self._get_response)
@@ -87,10 +84,11 @@ class BaseHandler:
         if not getattr(response, 'is_rendered', True) and callable(getattr(response, 'render', None)):
             response = response.render()
 
-        if response.status_code == 404:
-            logger.warning(
-                'Not Found: %s', request.path,
-                extra={'status_code': 404, 'request': request},
+        if response.status_code >= 400:
+            log_response(
+                '%s: %s', response.reason_phrase, request.path,
+                response=response,
+                request=request,
             )
 
         return response

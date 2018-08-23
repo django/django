@@ -32,8 +32,7 @@ def add_srs_entry(srs, auth_name='EPSG', auth_srid=None, ref_sys_name=None,
       of `django.db.DEFAULT_DB_ALIAS` (at the time of this writing, its value
       is 'default').
     """
-    if not database:
-        database = DEFAULT_DB_ALIAS
+    database = database or DEFAULT_DB_ALIAS
     connection = connections[database]
 
     if not hasattr(connection.ops, 'spatial_version'):
