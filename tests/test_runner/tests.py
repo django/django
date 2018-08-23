@@ -150,8 +150,11 @@ class ManageCommandTests(unittest.TestCase):
             call_command('test', 'sites', testrunner='test_runner.NonexistentRunner')
 
 
-class CustomTestRunnerOptionsTests(AdminScriptTestCase):
-
+class CustomTestRunnerOptionsSettingsTests(AdminScriptTestCase):
+    """
+    Custom runners can add command line arguments. The runner is specified
+    through a settings file.
+    """
     def setUp(self):
         settings = {
             'TEST_RUNNER': '\'test_runner.runner.CustomOptionsTestRunner\'',
@@ -185,6 +188,34 @@ class CustomTestRunnerOptionsTests(AdminScriptTestCase):
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, 'bar:foo:31337')
+
+
+class CustomTestRunnerOptionsCmdlineTests(AdminScriptTestCase):
+    """
+    Custom runners can add command line arguments when the runner is specified
+    using --testrunner.
+    """
+    def setUp(self):
+        self.write_settings('settings.py')
+
+    def tearDown(self):
+        self.remove_settings('settings.py')
+
+    def test_testrunner_equals(self):
+        args = [
+            'test', '--testrunner=test_runner.runner.CustomOptionsTestRunner',
+            '--option_a=bar', '--option_b=foo', '--option_c=31337'
+        ]
+        out, err = self.run_django_admin(args, 'test_project.settings')
+        self.assertNoOutput(err)
+        self.assertOutput(out, 'bar:foo:31337')
+
+    def test_no_testrunner(self):
+        args = ['test', '--testrunner']
+        out, err = self.run_django_admin(args, 'test_project.settings')
+        self.assertIn('usage', err)
+        self.assertNotIn('Traceback', err)
+        self.assertNoOutput(out)
 
 
 class Ticket17477RegressionTests(AdminScriptTestCase):
