@@ -356,7 +356,8 @@ class BaseForm:
                 else:
                     self._errors[field] = self.error_class()
             self._errors[field].extend(error_list)
-            if field in self.cleaned_data:
+            # Cleaning only neccesary if cleaned_data exists
+            if self.cleaned_data is not None and field in self.cleaned_data:
                 del self.cleaned_data[field]
 
     def has_error(self, field, code=None):
