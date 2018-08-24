@@ -25,6 +25,14 @@ script:
 
 jobs:
   include:
+    - python: "3.7"
+      env: DJANGO="Django>=2.0,<2.1"
+      dist: xenial
+      sudo: required
+    - python: "3.7"
+      env: DJANGO="Django>=2.1,<2.2"
+      dist: xenial
+      sudo: required
     #- stage: test_js
     #  script: cd js_client && npm install --progress=false && npm test && cd ..
     - stage: release
