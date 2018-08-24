@@ -8,6 +8,7 @@ from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.views.main import ALL_VAR, SEARCH_VAR
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.core.paginator import DOT
 from django.db import connection
 from django.db.models import F
 from django.db.models.fields import Field, IntegerField
@@ -978,28 +979,29 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         per_page = cl.list_per_page = 10
 
-        for page_num, objects_count, expected_page_range in [
+        for number, objects_count, expected_page_range in [
             (1, per_page, []),
             (1, per_page * 2, list(range(1, 3))),
             (6, per_page * 11, list(range(1, 12))),
-            (6, per_page * 12, [1, 2, 3, 4, 5, 6, 7, 8, 9, '.', 11, 12]),
-            (7, per_page * 12, [1, 2, '.', 4, 5, 6, 7, 8, 9, 10, 11, 12]),
-            (7, per_page * 13, [1, 2, '.', 4, 5, 6, 7, 8, 9, 10, '.', 12, 13]),
+            (6, per_page * 12, [1, 2, 3, 4, 5, 6, 7, 8, 9, DOT, 11, 12]),
+            (7, per_page * 12, [1, 2, DOT, 4, 5, 6, 7, 8, 9, 10, 11, 12]),
+            (7, per_page * 13, [1, 2, DOT, 4, 5, 6, 7, 8, 9, 10, DOT, 12, 13]),
         ]:
             # assuming we have exactly `objects_count` objects
-            Group.objects.all().delete()
-            for i in range(objects_count):
-                Group.objects.create(name='test band')
+            with self.subTest(number=number, objects_count=objects_count, expected_page_range=objects_count):
+                Group.objects.all().delete()
+                for i in range(objects_count):
+                    Group.objects.create(name='test band')
 
-            # setting page number and calculating page range
-            cl.page_num = page_num
-            cl.get_results(request)
-            real_page_range = pagination(cl)['page_range']
-            self.assertListEqual(
-                expected_page_range,
-                list(real_page_range),
-                (page_num, objects_count)
-            )
+                # setting page number and calculating page range
+                cl.page_num = number
+                cl.get_results(request)
+                real_page_range = pagination(cl)['page_range']
+                self.assertListEqual(
+                    expected_page_range,
+                    list(real_page_range),
+                    (number, objects_count)
+                )
 
     def test_object_tools_displayed_no_add_permission(self):
         """

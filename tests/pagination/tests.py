@@ -1,4 +1,3 @@
-import unittest
 import warnings
 from datetime import datetime
 
@@ -309,10 +308,9 @@ class PaginationTests(BasePaginationTests):
         self.assertEqual(cm.filename, __file__)
 
 
-class EllipsisPaginationTests(unittest.TestCase):
+class EllipsisPaginationTests(BasePaginationTests):
 
     def test_ellipsis_pagination(self):
-        items = range(5000)
         tests = (
             (1, [1, 2, 3, 4, DOT, 49, 50]),
             (2, [1, 2, 3, 4, 5, DOT, 49, 50]),
@@ -323,11 +321,11 @@ class EllipsisPaginationTests(unittest.TestCase):
             (46, [1, 2, DOT, 43, 44, 45, 46, 47, 48, 49, 50]),
             (49, [1, 2, DOT, 46, 47, 48, 49, 50])
         )
-        for page_num, page_range in tests:
-            params = (items, 100)
-            paginator = EllipsisPaginator(*params)
-            ellipsis_page_range = paginator.get_ellipsed_page_range(page_num)
-            self.assertEqual(ellipsis_page_range, page_range)
+        for number, page_range in tests:
+            with self.subTest(number=number):
+                paginator = EllipsisPaginator(range(5000), 100)
+                ellipsis_page_range = paginator.get_ellipsized_page_range(number)
+                self.assertEqual(ellipsis_page_range, page_range)
 
 
 class ModelPaginationTests(TestCase):

@@ -46,12 +46,7 @@ def pagination(cl):
     Generate the series of links to the pages in a paginated list.
     """
     pagination_required = (not cl.show_all or not cl.can_show_all) and cl.multi_page
-    page_num = cl.page_num
-    if not pagination_required:
-        page_range = []
-    else:
-        page_range = cl.paginator.get_ellipsed_page_range(page_num)
-
+    page_range = cl.paginator.get_ellipsized_page_range(cl.page_num) if pagination_required else []
     need_show_all_link = cl.can_show_all and not cl.show_all and cl.multi_page
     return {
         'cl': cl,
