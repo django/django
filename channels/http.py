@@ -273,7 +273,7 @@ class AsgiHandler(base.BaseHandler):
             response_headers.append(
                 (
                     b"Set-Cookie",
-                    c.output(header="").encode("ascii"),
+                    c.output(header="").encode("ascii").strip(),
                 )
             )
         # Make initial response message
