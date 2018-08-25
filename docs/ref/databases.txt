@@ -929,6 +929,6 @@ the support channels provided by each 3rd party project.
 
 .. _SAP SQL Anywhere: https://github.com/sqlanywhere/sqlany-django
 .. _IBM DB2: https://pypi.org/project/ibm_db/
-.. _Microsoft SQL Server: https://django-mssql.readthedocs.io/en/latest/
+.. _Microsoft SQL Server: https://pypi.org/project/django-pyodbc-azure/
 .. _Firebird: https://github.com/maxirobaina/django-firebird
 .. _ODBC: https://github.com/lionheart/django-pyodbc/
