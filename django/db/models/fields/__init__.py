@@ -142,6 +142,8 @@ class Field(RegisterLookupMixin):
         self.verbose_name = verbose_name  # May be set by set_attributes_from_name
         self._verbose_name = verbose_name  # Store original for deconstruction
         self.primary_key = primary_key
+        # The returning attribute should not be overridden. As of now only
+        # PostgreSQL supports to return multiple fields on a single model.
         self.returning = returning or (primary_key and default is NOT_PROVIDED)
         self.max_length, self._unique = max_length, unique
         self.blank, self.null = blank, null

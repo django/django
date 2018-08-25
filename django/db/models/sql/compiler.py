@@ -1307,6 +1307,10 @@ class SQLInsertCompiler(SQLCompiler):
                 return self.connection.ops.fetch_returned_insert_columns(cursor)
             if self.query.get_meta().pk.get_internal_type() in ['AutoField', 'BigAutoField']:
                 # The PK could be a custom field. Only AutoFields are supported in MySQL and SQLite.
+                # For databases which do not support the returning clause we need to ask the database for the id as
+                # fall back strategy. Generally last_insert_id is only supported for serial or auto increment columns,
+                # hence we guard it for auto field.
+                # TODO: Add marker to fields that their value can be returned by last_insert_id instead of a type check.
                 return self.connection.ops.last_insert_id(
                     cursor, self.query.get_meta().db_table, self.query.get_meta().pk
                 )
