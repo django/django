@@ -84,6 +84,26 @@ class SimplifiedURLTests(SimpleTestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             path('foo/<nonexistent:var>/', empty_view)
 
+    def test_prefix_spaces_in_name(self):
+        match = resolve('/prefix/1')
+        self.assertEqual(match.url_name, 'spaces-prefix-name')
+        self.assertEqual(match.args, ())
+        self.assertEqual(match.kwargs, {'num': 1})
+
+    def test_reverse_prefix_spaces(self):
+        url = reverse('spaces-prefix-name', kwargs={'num': 1})
+        self.assertEqual(url, '/prefix/1')
+
+    def test_postfix_spaces_in_name(self):
+        match = resolve('/postfix/1')
+        self.assertEqual(match.url_name, 'spaces-postfix-name')
+        self.assertEqual(match.args, ())
+        self.assertEqual(match.kwargs, {'num': 1})
+
+    def test_reverse_postfix_spaces(self):
+        url = reverse('spaces-postfix-name', kwargs={'num': 1})
+        self.assertEqual(url, '/postfix/1')
+
 
 @override_settings(ROOT_URLCONF='urlpatterns.converter_urls')
 class ConverterTests(SimpleTestCase):
