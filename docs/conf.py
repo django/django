@@ -42,11 +42,15 @@ needs_sphinx = '1.3'  # Actually 1.3.4, but micro versions aren't supported here
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
     "djangodocs",
+    'sphinx.ext.extlinks',
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
-    "ticket_role",
-    "cve_role",
 ]
+
+extlinks = {
+    'cve': ('https://nvd.nist.gov/view/vuln/detail?vulnId=%s', 'CVE-'),
+    'ticket': ('https://code.djangoproject.com/ticket/%s', '#'),
+}
 
 # Spelling check needs an additional module that is not installed by default.
 # Add it only if spelling check is requested so docs can be generated without it.
@@ -371,7 +375,3 @@ epub_cover = ('', 'epub-cover.html')
 
 # If false, no index is generated.
 # epub_use_index = True
-
-# -- custom extension options --------------------------------------------------
-cve_url = 'https://nvd.nist.gov/view/vuln/detail?vulnId=%s'
-ticket_url = 'https://code.djangoproject.com/ticket/%s'
