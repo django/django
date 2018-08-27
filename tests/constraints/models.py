@@ -59,6 +59,28 @@ class UniqueConstraintConditionProduct(models.Model):
         ]
 
 
+class UniqueConstraintDeferrable(models.Model):
+    name = models.CharField(max_length=255)
+    shelf = models.CharField(max_length=31)
+
+    class Meta:
+        required_db_features = {
+            'supports_deferrable_unique_constraints',
+        }
+        constraints = [
+            models.UniqueConstraint(
+                fields=['name'],
+                name='name_init_deferred_uniq',
+                deferrable=models.Deferrable.DEFERRED,
+            ),
+            models.UniqueConstraint(
+                fields=['shelf'],
+                name='sheld_init_immediate_uniq',
+                deferrable=models.Deferrable.IMMEDIATE,
+            ),
+        ]
+
+
 class AbstractModel(models.Model):
     age = models.IntegerField()
 

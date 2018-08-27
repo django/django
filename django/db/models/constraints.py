@@ -1,7 +1,9 @@
+from enum import Enum
+
 from django.db.models.query_utils import Q
 from django.db.models.sql.query import Query
 
-__all__ = ['CheckConstraint', 'UniqueConstraint']
+__all__ = ['CheckConstraint', 'Deferrable', 'UniqueConstraint']
 
 
 class BaseConstraint:
@@ -69,14 +71,28 @@ class CheckConstraint(BaseConstraint):
         return path, args, kwargs
 
 
+class Deferrable(Enum):
+    DEFERRED = 'deferred'
+    IMMEDIATE = 'immediate'
+
+
 class UniqueConstraint(BaseConstraint):
-    def __init__(self, *, fields, name, condition=None):
+    def __init__(self, *, fields, name, condition=None, deferrable=None):
         if not fields:
             raise ValueError('At least one field is required to define a unique constraint.')
         if not isinstance(condition, (type(None), Q)):
             raise ValueError('UniqueConstraint.condition must be a Q instance.')
+        if condition and deferrable:
+            raise ValueError(
+                'UniqueConstraint with conditions cannot be deferred.'
+            )
+        if not isinstance(deferrable, (type(None), Deferrable)):
+            raise ValueError(
+                'UniqueConstraint.deferrable must be a Deferrable instance.'
+            )
         self.fields = tuple(fields)
         self.condition = condition
+        self.deferrable = deferrable
         super().__init__(name)
 
     def _get_condition_sql(self, model, schema_editor):
@@ -91,21 +107,30 @@ class UniqueConstraint(BaseConstraint):
     def constraint_sql(self, model, schema_editor):
         fields = [model._meta.get_field(field_name).column for field_name in self.fields]
         condition = self._get_condition_sql(model, schema_editor)
-        return schema_editor._unique_sql(model, fields, self.name, condition=condition)
+        return schema_editor._unique_sql(
+            model, fields, self.name, condition=condition,
+            deferrable=self.deferrable,
+        )
 
     def create_sql(self, model, schema_editor):
         fields = [model._meta.get_field(field_name).column for field_name in self.fields]
         condition = self._get_condition_sql(model, schema_editor)
-        return schema_editor._create_unique_sql(model, fields, self.name, condition=condition)
+        return schema_editor._create_unique_sql(
+            model, fields, self.name, condition=condition,
+            deferrable=self.deferrable,
+        )
 
     def remove_sql(self, model, schema_editor):
         condition = self._get_condition_sql(model, schema_editor)
-        return schema_editor._delete_unique_sql(model, self.name, condition=condition)
+        return schema_editor._delete_unique_sql(
+            model, self.name, condition=condition, deferrable=self.deferrable,
+        )
 
     def __repr__(self):
-        return '<%s: fields=%r name=%r%s>' % (
+        return '<%s: fields=%r name=%r%s%s>' % (
             self.__class__.__name__, self.fields, self.name,
             '' if self.condition is None else ' condition=%s' % self.condition,
+            '' if self.deferrable is None else ' deferrable=%s' % self.deferrable,
         )
 
     def __eq__(self, other):
@@ -113,7 +138,8 @@ class UniqueConstraint(BaseConstraint):
             return (
                 self.name == other.name and
                 self.fields == other.fields and
-                self.condition == other.condition
+                self.condition == other.condition and
+                self.deferrable == other.deferrable
             )
         return super().__eq__(other)
 
@@ -122,4 +148,6 @@ class UniqueConstraint(BaseConstraint):
         kwargs['fields'] = self.fields
         if self.condition:
             kwargs['condition'] = self.condition
+        if self.deferrable:
+            kwargs['deferrable'] = self.deferrable
         return path, args, kwargs

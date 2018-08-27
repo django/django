@@ -381,6 +381,9 @@ Models
   <sqlite3.Connection.create_function>` on Python 3.8+. This allows using them
   in check constraints and partial indexes.
 
+* The new :attr:`.UniqueConstraint.deferrable` attribute allows creating
+  deferrable unique constraints.
+
 Pagination
 ~~~~~~~~~~
 

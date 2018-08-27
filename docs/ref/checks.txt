@@ -354,6 +354,8 @@ Models
 * **models.W036**: ``<database>`` does not support unique constraints with
   conditions.
 * **models.W037**: ``<database>`` does not support indexes with conditions.
+* **models.W038**: ``<database>`` does not support deferrable unique
+  constraints.
 
 Security
 --------

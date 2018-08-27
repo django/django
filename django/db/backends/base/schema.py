@@ -5,7 +5,7 @@ from django.db.backends.ddl_references import (
     Columns, ForeignKeyName, IndexName, Statement, Table,
 )
 from django.db.backends.utils import names_digest, split_identifier
-from django.db.models import Index
+from django.db.models import Deferrable, Index
 from django.db.transaction import TransactionManagementError, atomic
 from django.utils import timezone
 
@@ -65,7 +65,7 @@ class BaseDatabaseSchemaEditor:
     sql_rename_column = "ALTER TABLE %(table)s RENAME COLUMN %(old_column)s TO %(new_column)s"
     sql_update_with_default = "UPDATE %(table)s SET %(column)s = %(default)s WHERE %(column)s IS NULL"
 
-    sql_unique_constraint = "UNIQUE (%(columns)s)"
+    sql_unique_constraint = "UNIQUE (%(columns)s)%(deferrable)s"
     sql_check_constraint = "CHECK (%(check)s)"
     sql_delete_constraint = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
     sql_constraint = "CONSTRAINT %(name)s %(constraint)s"
@@ -73,7 +73,7 @@ class BaseDatabaseSchemaEditor:
     sql_create_check = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s CHECK (%(check)s)"
     sql_delete_check = sql_delete_constraint
 
-    sql_create_unique = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s UNIQUE (%(columns)s)"
+    sql_create_unique = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s UNIQUE (%(columns)s)%(deferrable)s"
     sql_delete_unique = sql_delete_constraint
 
     sql_create_fk = (
@@ -1075,7 +1075,20 @@ class BaseDatabaseSchemaEditor:
     def _delete_fk_sql(self, model, name):
         return self._delete_constraint_sql(self.sql_delete_fk, model, name)
 
-    def _unique_sql(self, model, fields, name, condition=None):
+    def _deferrable_constraint_sql(self, deferrable):
+        if deferrable is None:
+            return ''
+        if deferrable == Deferrable.DEFERRED:
+            return ' DEFERRABLE INITIALLY DEFERRED'
+        if deferrable == Deferrable.IMMEDIATE:
+            return ' DEFERRABLE INITIALLY IMMEDIATE'
+
+    def _unique_sql(self, model, fields, name, condition=None, deferrable=None):
+        if (
+            deferrable and
+            not self.connection.features.supports_deferrable_unique_constraints
+        ):
+            return None
         if condition:
             # Databases support conditional unique constraints via a unique
             # index.
@@ -1085,13 +1098,20 @@ class BaseDatabaseSchemaEditor:
             return None
         constraint = self.sql_unique_constraint % {
             'columns': ', '.join(map(self.quote_name, fields)),
+            'deferrable': self._deferrable_constraint_sql(deferrable),
         }
         return self.sql_constraint % {
             'name': self.quote_name(name),
             'constraint': constraint,
         }
 
-    def _create_unique_sql(self, model, columns, name=None, condition=None):
+    def _create_unique_sql(self, model, columns, name=None, condition=None, deferrable=None):
+        if (
+            deferrable and
+            not self.connection.features.supports_deferrable_unique_constraints
+        ):
+            return None
+
         def create_unique_name(*args, **kwargs):
             return self.quote_name(self._create_index_name(*args, **kwargs))
 
@@ -1113,9 +1133,15 @@ class BaseDatabaseSchemaEditor:
             name=name,
             columns=columns,
             condition=self._index_condition_sql(condition),
+            deferrable=self._deferrable_constraint_sql(deferrable),
         )
 
-    def _delete_unique_sql(self, model, name, condition=None):
+    def _delete_unique_sql(self, model, name, condition=None, deferrable=None):
+        if (
+            deferrable and
+            not self.connection.features.supports_deferrable_unique_constraints
+        ):
+            return None
         if condition:
             return (
                 self._delete_constraint_sql(self.sql_delete_index, model, name)

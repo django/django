@@ -76,7 +76,7 @@ The name of the constraint.
 ``UniqueConstraint``
 ====================
 
-.. class:: UniqueConstraint(*, fields, name, condition=None)
+.. class:: UniqueConstraint(*, fields, name, condition=None, deferrable=None)
 
     Creates a unique constraint in the database.
 
@@ -119,3 +119,35 @@ ensures that each user only has one draft.
 
 These conditions have the same database restrictions as
 :attr:`Index.condition`.
+
+``deferrable``
+--------------
+
+.. attribute:: UniqueConstraint.deferrable
+
+.. versionadded:: 3.1
+
+Set this parameter to create a deferrable unique constraint. Accepted values
+are ``Deferrable.DEFERRED`` or ``Deferrable.IMMEDIATE``. For example::
+
+    from django.db.models import Deferrable, UniqueConstraint
+
+    UniqueConstraint(
+        name='unique_order',
+        fields=['order'],
+        deferrable=Deferrable.DEFERRED,
+    )
+
+By default constraints are not deferred. A deferred constraint will not be
+enforced until the end of the transaction. An immediate constraint will be
+enforced immediately after every command.
+
+.. admonition:: MySQL, MariaDB, and SQLite.
+
+    Deferrable unique constraints are ignored on MySQL, MariaDB, and SQLite as
+    neither supports them.
+
+.. warning::
+
+    Deferred unique constraints may lead to a `performance penalty
+    <https://www.postgresql.org/docs/current/sql-createtable.html#id-1.9.3.85.9.4>`_.

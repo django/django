@@ -17,6 +17,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_native_duration_field = True
     can_defer_constraint_checks = True
     supports_partially_nullable_unique_constraints = False
+    supports_deferrable_unique_constraints = True
     truncates_names = True
     supports_tablespaces = True
     supports_sequence_reset = False
