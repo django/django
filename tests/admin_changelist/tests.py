@@ -491,6 +491,20 @@ class ChangeListTests(TestCase):
             cl = m.get_changelist_instance(request)
             self.assertCountEqual(cl.queryset, [])
 
+    def test_exact_integer_lookup_in_search_fields(self):
+        child = Child.objects.create(name='Hansel', age=11)
+
+        model_admin = ChildAdmin(Child, custom_site)
+        request = self.factory.get('/', data={SEARCH_VAR: '11'})
+        request.user = self.superuser
+        cl = model_admin.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [child])
+
+        request = self.factory.get('/', data={SEARCH_VAR: 'invalid'})
+        request.user = self.superuser
+        cl = model_admin.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [])
+
     def test_spanning_relations_with_custom_lookup_in_search_fields(self):
         hype = Group.objects.create(name='The Hype')
         concert = Concert.objects.create(name='Woodstock', group=hype)

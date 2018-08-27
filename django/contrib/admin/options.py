@@ -1027,9 +1027,20 @@ class ModelAdmin(BaseModelAdmin):
             orm_lookups = [construct_search(str(search_field))
                            for search_field in search_fields]
             for bit in search_term.split():
-                or_queries = [models.Q(**{orm_lookup: bit})
-                              for orm_lookup in orm_lookups]
-                queryset = queryset.filter(reduce(operator.or_, or_queries))
+                or_queries = []
+                for orm_lookup in orm_lookups:
+                    try:
+                        query = models.Q(**{orm_lookup: bit})
+                        queryset.filter(query)
+                        or_queries.append(query)
+                    except ValueError:
+                        # This piece of the search term failed for this lookup, skip.
+                        pass
+
+                if or_queries:
+                    queryset = queryset.filter(reduce(operator.or_, or_queries))
+                else:
+                    queryset = queryset.none()
             use_distinct |= any(lookup_needs_distinct(self.opts, search_spec) for search_spec in orm_lookups)
 
         return queryset, use_distinct
