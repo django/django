@@ -547,6 +547,16 @@ class Model(metaclass=ModelBase):
 
         self.__dict__.update(state)
 
+    def __getattr__(self, name)
+        try:
+            return object.__getattribute__(self, item)
+        except AttributeError:
+            ProfileField = self._meta.ProfileField
+            if ProfileField:
+                return getattr(object.__getattribute__(self, ProfileField), item)
+            else:
+                raise
+
     def _get_pk_val(self, meta=None):
         meta = meta or self._meta
         return getattr(self, meta.pk.attname)
