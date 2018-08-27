@@ -457,10 +457,7 @@ with the following code::
     )
 
     def run(verbose=True):
-        lm = LayerMapping(
-            WorldBorder, world_shp, world_mapping,
-            transform=False, encoding='iso-8859-1',
-        )
+        lm = LayerMapping(WorldBorder, world_shp, world_mapping, transform=False)
         lm.save(strict=True, verbose=verbose)
 
 A few notes about what's going on:
