@@ -41,11 +41,9 @@ class AsyncHttpConsumer(AsyncConsumer):
         elif isinstance(headers, dict):
             headers = list(headers.items())
 
-        await self.send({
-            "type": "http.response.start",
-            "status": status,
-            "headers": headers,
-        })
+        await self.send(
+            {"type": "http.response.start", "status": status, "headers": headers}
+        )
 
     async def send_body(self, body, *, more_body=False):
         """
@@ -56,11 +54,9 @@ class AsyncHttpConsumer(AsyncConsumer):
         the channel will be ignored.
         """
         assert isinstance(body, bytes), "Body is not bytes"
-        await self.send({
-            "type": "http.response.body",
-            "body": body,
-            "more_body": more_body,
-        })
+        await self.send(
+            {"type": "http.response.body", "body": body, "more_body": more_body}
+        )
 
     async def send_response(self, status, body, **kwargs):
         """

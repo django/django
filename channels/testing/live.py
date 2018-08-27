@@ -37,12 +37,11 @@ class ChannelsLiveServerTestCase(TransactionTestCase):
         super(ChannelsLiveServerTestCase, self)._pre_setup()
 
         self._live_server_modified_settings = modify_settings(
-            ALLOWED_HOSTS={"append": self.host},
+            ALLOWED_HOSTS={"append": self.host}
         )
         self._live_server_modified_settings.enable()
         self._server_process = self.ProtocolServerProcess(
-            self.host,
-            get_default_application(),
+            self.host, get_default_application()
         )
         self._server_process.start()
         self._server_process.ready.wait()

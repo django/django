@@ -15,14 +15,13 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         super(Command, self).add_arguments(parser)
         parser.add_argument(
-            "--layer", action="store", dest="layer", default=DEFAULT_CHANNEL_LAYER,
+            "--layer",
+            action="store",
+            dest="layer",
+            default=DEFAULT_CHANNEL_LAYER,
             help="Channel layer alias to use, if not the default.",
         )
-        parser.add_argument(
-            "channels",
-            nargs="+",
-            help="Channels to listen on."
-        )
+        parser.add_argument("channels", nargs="+", help="Channels to listen on.")
 
     def handle(self, *args, **options):
         # Get the backend to use

@@ -1,6 +1,12 @@
 from django.conf import settings
 from django.contrib.auth import (
-    BACKEND_SESSION_KEY, HASH_SESSION_KEY, SESSION_KEY, _get_backends, get_user_model, load_backend, user_logged_in,
+    BACKEND_SESSION_KEY,
+    HASH_SESSION_KEY,
+    SESSION_KEY,
+    _get_backends,
+    get_user_model,
+    load_backend,
+    user_logged_in,
     user_logged_out,
 )
 from django.contrib.auth.models import AnonymousUser
@@ -20,7 +26,9 @@ def get_user(scope):
     If no user is retrieved, return an instance of `AnonymousUser`.
     """
     if "session" not in scope:
-        raise ValueError("Cannot find session in scope. You should wrap your consumer in SessionMiddleware.")
+        raise ValueError(
+            "Cannot find session in scope. You should wrap your consumer in SessionMiddleware."
+        )
     session = scope["session"]
     user = None
     try:
@@ -36,8 +44,7 @@ def get_user(scope):
             if hasattr(user, "get_session_auth_hash"):
                 session_hash = session.get(HASH_SESSION_KEY)
                 session_hash_verified = session_hash and constant_time_compare(
-                    session_hash,
-                    user.get_session_auth_hash()
+                    session_hash, user.get_session_auth_hash()
                 )
                 if not session_hash_verified:
                     session.flush()
@@ -53,19 +60,26 @@ def login(scope, user, backend=None):
     Note that data set during the anonymous session is retained when the user logs in.
     """
     if "session" not in scope:
-        raise ValueError("Cannot find session in scope. You should wrap your consumer in SessionMiddleware.")
+        raise ValueError(
+            "Cannot find session in scope. You should wrap your consumer in SessionMiddleware."
+        )
     session = scope["session"]
     session_auth_hash = ""
     if user is None:
         user = scope.get("user", None)
     if user is None:
-        raise ValueError("User must be passed as an argument or must be present in the scope.")
+        raise ValueError(
+            "User must be passed as an argument or must be present in the scope."
+        )
     if hasattr(user, "get_session_auth_hash"):
         session_auth_hash = user.get_session_auth_hash()
     if SESSION_KEY in session:
         if _get_user_session_key(session) != user.pk or (
-                session_auth_hash and not
-                constant_time_compare(session.get(HASH_SESSION_KEY, ""), session_auth_hash)):
+            session_auth_hash
+            and not constant_time_compare(
+                session.get(HASH_SESSION_KEY, ""), session_auth_hash
+            )
+        ):
             # To avoid reusing another user's session, create a new, empty
             # session if the existing session corresponds to a different
             # authenticated user.
@@ -132,7 +146,9 @@ class AuthMiddleware(BaseMiddleware):
     def populate_scope(self, scope):
         # Make sure we have a session
         if "session" not in scope:
-            raise ValueError("AuthMiddleware cannot find session in scope. SessionMiddleware must be above it.")
+            raise ValueError(
+                "AuthMiddleware cannot find session in scope. SessionMiddleware must be above it."
+            )
         # Add it to the scope if it's not there already
         if "user" not in scope:
             # We can't make this a LazyObject because there's no way to await attribute access,
@@ -144,4 +160,6 @@ class AuthMiddleware(BaseMiddleware):
 
 
 # Handy shortcut for applying all three layers at once
-AuthMiddlewareStack = lambda inner: CookieMiddleware(SessionMiddleware(AuthMiddleware(inner)))
+AuthMiddlewareStack = lambda inner: CookieMiddleware(
+    SessionMiddleware(AuthMiddleware(inner))
+)

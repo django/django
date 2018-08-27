@@ -26,11 +26,7 @@ async def test_send_receive(channel_layer):
     Makes sure we can send a message to a normal channel then receive it.
     """
     await channel_layer.send(
-        "test-channel-1",
-        {
-            "type": "test.message",
-            "text": "Ahoy-hoy!",
-        },
+        "test-channel-1", {"type": "test.message", "text": "Ahoy-hoy!"}
     )
     message = await channel_layer.receive("test-channel-1")
     assert message["type"] == "test.message"
@@ -56,11 +52,7 @@ async def test_process_local_send_receive(channel_layer):
     """
     channel_name = await channel_layer.new_channel()
     await channel_layer.send(
-        channel_name,
-        {
-            "type": "test.message",
-            "text": "Local only please",
-        },
+        channel_name, {"type": "test.message", "text": "Local only please"}
     )
     message = await channel_layer.receive(channel_name)
     assert message["type"] == "test.message"

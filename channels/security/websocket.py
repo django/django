@@ -19,7 +19,9 @@ class OriginValidator:
     def __call__(self, scope):
         # Make sure the scope is of type websocket
         if scope["type"] != "websocket":
-            raise ValueError("You cannot use OriginValidator on a non-WebSocket connection")
+            raise ValueError(
+                "You cannot use OriginValidator on a non-WebSocket connection"
+            )
         # Extract the Origin header
         parsed_origin = None
         for header_name, header_value in scope.get("headers", []):
@@ -101,8 +103,11 @@ class OriginValidator:
         # Get pattern.port or default ports for pattern or None
         pattern_port = self.get_origin_port(parsed_pattern)
         # Compares hostname, scheme, ports of pattern and origin
-        if parsed_pattern.scheme == parsed_origin.scheme and origin_port == pattern_port \
-                and is_same_domain(parsed_origin.hostname, parsed_pattern.hostname):
+        if (
+            parsed_pattern.scheme == parsed_origin.scheme
+            and origin_port == pattern_port
+            and is_same_domain(parsed_origin.hostname, parsed_pattern.hostname)
+        ):
             return True
         return False
 

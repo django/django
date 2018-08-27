@@ -32,9 +32,7 @@ class WebsocketCommunicator(ApplicationCommunicator):
         On an accepted connection, returns (True, <chosen-subprotocol>)
         On a rejected connection, returns (False, <close-code>)
         """
-        await self.send_input({
-            "type": "websocket.connect",
-        })
+        await self.send_input({"type": "websocket.connect"})
         response = await self.receive_output(timeout)
         if response["type"] == "websocket.close":
             return (False, response.get("code", 1000))
@@ -46,20 +44,18 @@ class WebsocketCommunicator(ApplicationCommunicator):
         Sends a WebSocket frame to the application.
         """
         # Make sure we have exactly one of the arguments
-        assert bool(text_data) != bool(bytes_data), "You must supply exactly one of text_data or bytes_data"
+        assert bool(text_data) != bool(
+            bytes_data
+        ), "You must supply exactly one of text_data or bytes_data"
         # Send the right kind of event
         if text_data:
             assert isinstance(text_data, str), "The text_data argument must be a str"
-            await self.send_input({
-                "type": "websocket.receive",
-                "text": text_data,
-            })
+            await self.send_input({"type": "websocket.receive", "text": text_data})
         else:
-            assert isinstance(bytes_data, bytes), "The bytes_data argument must be bytes"
-            await self.send_input({
-                "type": "websocket.receive",
-                "bytes": bytes_data,
-            })
+            assert isinstance(
+                bytes_data, bytes
+            ), "The bytes_data argument must be bytes"
+            await self.send_input({"type": "websocket.receive", "bytes": bytes_data})
 
     async def send_json_to(self, data):
         """
@@ -77,13 +73,17 @@ class WebsocketCommunicator(ApplicationCommunicator):
         # Make sure this is a send message
         assert response["type"] == "websocket.send"
         # Make sure there's exactly one key in the response
-        assert ("text" in response) != ("bytes" in response), "The response needs exactly one of 'text' or 'bytes'"
+        assert ("text" in response) != (
+            "bytes" in response
+        ), "The response needs exactly one of 'text' or 'bytes'"
         # Pull out the right key and typecheck it for our users
         if "text" in response:
             assert isinstance(response["text"], str), "Text frame payload is not str"
             return response["text"]
         else:
-            assert isinstance(response["bytes"], bytes), "Binary frame payload is not bytes"
+            assert isinstance(
+                response["bytes"], bytes
+            ), "Binary frame payload is not bytes"
             return response["bytes"]
 
     async def receive_json_from(self, timeout=1):
@@ -98,8 +98,5 @@ class WebsocketCommunicator(ApplicationCommunicator):
         """
         Closes the socket
         """
-        await self.send_input({
-            "type": "websocket.disconnect",
-            "code": code,
-        })
+        await self.send_input({"type": "websocket.disconnect", "code": code})
         await self.wait(timeout)

@@ -58,7 +58,10 @@ class ChannelLayerManager:
     def _make_backend(self, name, config):
         # Check for old format config
         if "ROUTING" in self.configs[name]:
-            raise InvalidChannelLayerError("ROUTING key found for %s - this is no longer needed in Channels 2." % name)
+            raise InvalidChannelLayerError(
+                "ROUTING key found for %s - this is no longer needed in Channels 2."
+                % name
+            )
         # Load the backend class
         try:
             backend_class = import_string(self.configs[name]["BACKEND"])
@@ -66,7 +69,8 @@ class ChannelLayerManager:
             raise InvalidChannelLayerError("No BACKEND specified for %s" % name)
         except ImportError:
             raise InvalidChannelLayerError(
-                "Cannot import BACKEND %r specified for %s" % (self.configs[name]["BACKEND"], name)
+                "Cannot import BACKEND %r specified for %s"
+                % (self.configs[name]["BACKEND"], name)
             )
         # Initialise and pass config
         return backend_class(**config)
@@ -138,8 +142,8 @@ class BaseChannelLayer:
     channel_name_regex = re.compile(r"^[a-zA-Z\d\-_.]+(\![\d\w\-_.]*)?$")
     group_name_regex = re.compile(r"^[a-zA-Z\d\-_.]+$")
     invalid_name_error = (
-        "{} name must be a valid unicode string containing only ASCII " +
-        "alphanumerics, hyphens, underscores, or periods."
+        "{} name must be a valid unicode string containing only ASCII "
+        + "alphanumerics, hyphens, underscores, or periods."
     )
 
     def valid_channel_name(self, name, receive=False):
@@ -147,11 +151,13 @@ class BaseChannelLayer:
             if bool(self.channel_name_regex.match(name)):
                 # Check cases for special channels
                 if "!" in name and not name.endswith("!") and receive:
-                    raise TypeError("Specific channel names in receive() must end at the !")
+                    raise TypeError(
+                        "Specific channel names in receive() must end at the !"
+                    )
                 return True
         raise TypeError(
-            "Channel name must be a valid unicode string containing only ASCII " +
-            "alphanumerics, hyphens, or periods, not '{}'.".format(name)
+            "Channel name must be a valid unicode string containing only ASCII "
+            + "alphanumerics, hyphens, or periods, not '{}'.".format(name)
         )
 
     def valid_group_name(self, name):
@@ -159,8 +165,8 @@ class BaseChannelLayer:
             if bool(self.group_name_regex.match(name)):
                 return True
         raise TypeError(
-            "Group name must be a valid unicode string containing only ASCII " +
-            "alphanumerics, hyphens, or periods."
+            "Group name must be a valid unicode string containing only ASCII "
+            + "alphanumerics, hyphens, or periods."
         )
 
     def valid_channel_names(self, names, receive=False):
@@ -168,7 +174,9 @@ class BaseChannelLayer:
         _names_type = isinstance(names, list)
         assert _non_empty_list and _names_type, "names must be a non-empty list"
 
-        assert all(self.valid_channel_name(channel, receive=receive) for channel in names)
+        assert all(
+            self.valid_channel_name(channel, receive=receive) for channel in names
+        )
         return True
 
     def non_local_name(self, name):
@@ -178,7 +186,7 @@ class BaseChannelLayer:
         and including the !; if it is anything else, this means the full name.
         """
         if "!" in name:
-            return name[:name.find("!") + 1]
+            return name[: name.find("!") + 1]
         else:
             return name
 
@@ -187,10 +195,23 @@ class InMemoryChannelLayer(BaseChannelLayer):
     """
     In-memory channel layer implementation
     """
+
     local_poll_interval = 0.01
 
-    def __init__(self, expiry=60, group_expiry=86400, capacity=100, channel_capacity=None, **kwargs):
-        super().__init__(expiry=expiry, capacity=capacity, channel_capacity=channel_capacity, **kwargs)
+    def __init__(
+        self,
+        expiry=60,
+        group_expiry=86400,
+        capacity=100,
+        channel_capacity=None,
+        **kwargs
+    ):
+        super().__init__(
+            expiry=expiry,
+            capacity=capacity,
+            channel_capacity=channel_capacity,
+            **kwargs
+        )
         self.channels = {}
         self.groups = {}
         self.group_expiry = group_expiry
@@ -215,10 +236,7 @@ class InMemoryChannelLayer(BaseChannelLayer):
             raise ChannelFull(channel)
 
         # Add message
-        await queue.put((
-            time.time() + self.expiry,
-            deepcopy(message),
-        ))
+        await queue.put((time.time() + self.expiry, deepcopy(message)))
 
     async def receive(self, channel):
         """
@@ -276,7 +294,10 @@ class InMemoryChannelLayer(BaseChannelLayer):
         for group in self.groups:
             for channel in list(self.groups.get(group, set())):
                 # If join time is older than group_expiry end the group membership
-                if self.groups[group][channel] and int(self.groups[group][channel]) < timeout:
+                if (
+                    self.groups[group][channel]
+                    and int(self.groups[group][channel]) < timeout
+                ):
                     # Delete from group
                     del self.groups[group][channel]
 

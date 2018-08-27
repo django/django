@@ -21,13 +21,29 @@ class Command(RunserverCommand):
 
     def add_arguments(self, parser):
         super().add_arguments(parser)
-        parser.add_argument("--noasgi", action="store_false", dest="use_asgi", default=True,
-            help="Run the old WSGI-based runserver rather than the ASGI-based one")
-        parser.add_argument("--http_timeout", action="store", dest="http_timeout", type=int, default=None,
-            help="Specify the daphne http_timeout interval in seconds (default: no timeout)")
-        parser.add_argument("--websocket_handshake_timeout", action="store", dest="websocket_handshake_timeout",
-            type=int, default=5,
-            help="Specify the daphne websocket_handshake_timeout interval in seconds (default: 5)")
+        parser.add_argument(
+            "--noasgi",
+            action="store_false",
+            dest="use_asgi",
+            default=True,
+            help="Run the old WSGI-based runserver rather than the ASGI-based one",
+        )
+        parser.add_argument(
+            "--http_timeout",
+            action="store",
+            dest="http_timeout",
+            type=int,
+            default=None,
+            help="Specify the daphne http_timeout interval in seconds (default: no timeout)",
+        )
+        parser.add_argument(
+            "--websocket_handshake_timeout",
+            action="store",
+            dest="websocket_handshake_timeout",
+            type=int,
+            default=5,
+            help="Specify the daphne websocket_handshake_timeout interval in seconds (default: 5)",
+        )
 
     def handle(self, *args, **options):
         self.verbosity = options.get("verbosity", 1)
@@ -36,7 +52,9 @@ class Command(RunserverCommand):
         self.websocket_handshake_timeout = options.get("websocket_handshake_timeout", 5)
         # Check Channels is installed right
         if not hasattr(settings, "ASGI_APPLICATION"):
-            raise CommandError("You have not set ASGI_APPLICATION, which is needed to run the server.")
+            raise CommandError(
+                "You have not set ASGI_APPLICATION, which is needed to run the server."
+            )
         # Dispatch upward
         super().handle(*args, **options)
 
@@ -54,20 +72,23 @@ class Command(RunserverCommand):
         quit_command = "CTRL-BREAK" if sys.platform == "win32" else "CONTROL-C"
         now = datetime.datetime.now().strftime("%B %d, %Y - %X")
         self.stdout.write(now)
-        self.stdout.write((
-            "Django version %(version)s, using settings %(settings)r\n"
-            "Starting ASGI/Channels version %(channels_version)s development server"
-            " at %(protocol)s://%(addr)s:%(port)s/\n"
-            "Quit the server with %(quit_command)s.\n"
-        ) % {
-            "version": self.get_version(),
-            "channels_version": __version__,
-            "settings": settings.SETTINGS_MODULE,
-            "protocol": self.protocol,
-            "addr": "[%s]" % self.addr if self._raw_ipv6 else self.addr,
-            "port": self.port,
-            "quit_command": quit_command,
-        })
+        self.stdout.write(
+            (
+                "Django version %(version)s, using settings %(settings)r\n"
+                "Starting ASGI/Channels version %(channels_version)s development server"
+                " at %(protocol)s://%(addr)s:%(port)s/\n"
+                "Quit the server with %(quit_command)s.\n"
+            )
+            % {
+                "version": self.get_version(),
+                "channels_version": __version__,
+                "settings": settings.SETTINGS_MODULE,
+                "protocol": self.protocol,
+                "addr": "[%s]" % self.addr if self._raw_ipv6 else self.addr,
+                "port": self.port,
+                "quit_command": quit_command,
+            }
+        )
 
         # Launch server in 'main' thread. Signals are disabled as it's still
         # actually a subthread under the autoreloader.
@@ -114,7 +135,10 @@ class Command(RunserverCommand):
         msg = "[%s] " % datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
         # HTTP requests
         if protocol == "http" and action == "complete":
-            msg += "HTTP %(method)s %(path)s %(status)s [%(time_taken).2f, %(client)s]\n" % details
+            msg += (
+                "HTTP %(method)s %(path)s %(status)s [%(time_taken).2f, %(client)s]\n"
+                % details
+            )
             # Utilize terminal colors, if available
             if 200 <= details["status"] < 300:
                 # Put 2XX first, since it should be the common case

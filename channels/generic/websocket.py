@@ -3,7 +3,12 @@ import json
 from asgiref.sync import async_to_sync
 
 from ..consumer import AsyncConsumer, SyncConsumer
-from ..exceptions import AcceptConnection, DenyConnection, InvalidChannelLayerError, StopConsumer
+from ..exceptions import (
+    AcceptConnection,
+    DenyConnection,
+    InvalidChannelLayerError,
+    StopConsumer,
+)
 
 
 class WebsocketConsumer(SyncConsumer):
@@ -27,7 +32,9 @@ class WebsocketConsumer(SyncConsumer):
             for group in self.groups:
                 async_to_sync(self.channel_layer.group_add)(group, self.channel_name)
         except AttributeError:
-            raise InvalidChannelLayerError("BACKEND is unconfigured or doesn't support groups")
+            raise InvalidChannelLayerError(
+                "BACKEND is unconfigured or doesn't support groups"
+            )
         try:
             self.connect()
         except AcceptConnection:
@@ -65,13 +72,9 @@ class WebsocketConsumer(SyncConsumer):
         Sends a reply back down the WebSocket
         """
         if text_data is not None:
-            super().send(
-                {"type": "websocket.send", "text": text_data},
-            )
+            super().send({"type": "websocket.send", "text": text_data})
         elif bytes_data is not None:
-            super().send(
-                {"type": "websocket.send", "bytes": bytes_data},
-            )
+            super().send({"type": "websocket.send", "bytes": bytes_data})
         else:
             raise ValueError("You must pass one of bytes_data or text_data")
         if close:
@@ -82,13 +85,9 @@ class WebsocketConsumer(SyncConsumer):
         Closes the WebSocket from the server end
         """
         if code is not None and code is not True:
-            super().send(
-                {"type": "websocket.close", "code": code}
-            )
+            super().send({"type": "websocket.close", "code": code})
         else:
-            super().send(
-                {"type": "websocket.close"}
-            )
+            super().send({"type": "websocket.close"})
 
     def websocket_disconnect(self, message):
         """
@@ -97,9 +96,13 @@ class WebsocketConsumer(SyncConsumer):
         """
         try:
             for group in self.groups:
-                async_to_sync(self.channel_layer.group_discard)(group, self.channel_name)
+                async_to_sync(self.channel_layer.group_discard)(
+                    group, self.channel_name
+                )
         except AttributeError:
-            raise InvalidChannelLayerError("BACKEND is unconfigured or doesn't support groups")
+            raise InvalidChannelLayerError(
+                "BACKEND is unconfigured or doesn't support groups"
+            )
         self.disconnect(message["code"])
         raise StopConsumer()
 
@@ -133,10 +136,7 @@ class JsonWebsocketConsumer(WebsocketConsumer):
         """
         Encode the given content as JSON and send it to the client.
         """
-        super().send(
-            text_data=self.encode_json(content),
-            close=close,
-        )
+        super().send(text_data=self.encode_json(content), close=close)
 
     @classmethod
     def decode_json(cls, text_data):
@@ -168,7 +168,9 @@ class AsyncWebsocketConsumer(AsyncConsumer):
             for group in self.groups:
                 await self.channel_layer.group_add(group, self.channel_name)
         except AttributeError:
-            raise InvalidChannelLayerError("BACKEND is unconfigured or doesn't support groups")
+            raise InvalidChannelLayerError(
+                "BACKEND is unconfigured or doesn't support groups"
+            )
         try:
             await self.connect()
         except AcceptConnection:
@@ -206,13 +208,9 @@ class AsyncWebsocketConsumer(AsyncConsumer):
         Sends a reply back down the WebSocket
         """
         if text_data is not None:
-            await super().send(
-                {"type": "websocket.send", "text": text_data},
-            )
+            await super().send({"type": "websocket.send", "text": text_data})
         elif bytes_data is not None:
-            await super().send(
-                {"type": "websocket.send", "bytes": bytes_data},
-            )
+            await super().send({"type": "websocket.send", "bytes": bytes_data})
         else:
             raise ValueError("You must pass one of bytes_data or text_data")
         if close:
@@ -223,13 +221,9 @@ class AsyncWebsocketConsumer(AsyncConsumer):
         Closes the WebSocket from the server end
         """
         if code is not None and code is not True:
-            await super().send(
-                {"type": "websocket.close", "code": code}
-            )
+            await super().send({"type": "websocket.close", "code": code})
         else:
-            await super().send(
-                {"type": "websocket.close"}
-            )
+            await super().send({"type": "websocket.close"})
 
     async def websocket_disconnect(self, message):
         """
@@ -240,7 +234,9 @@ class AsyncWebsocketConsumer(AsyncConsumer):
             for group in self.groups:
                 await self.channel_layer.group_discard(group, self.channel_name)
         except AttributeError:
-            raise InvalidChannelLayerError("BACKEND is unconfigured or doesn't support groups")
+            raise InvalidChannelLayerError(
+                "BACKEND is unconfigured or doesn't support groups"
+            )
         await self.disconnect(message["code"])
         raise StopConsumer()
 
@@ -274,10 +270,7 @@ class AsyncJsonWebsocketConsumer(AsyncWebsocketConsumer):
         """
         Encode the given content as JSON and send it to the client.
         """
-        await super().send(
-            text_data=await self.encode_json(content),
-            close=close,
-        )
+        await super().send(text_data=await self.encode_json(content), close=close)
 
     @classmethod
     async def decode_json(cls, text_data):

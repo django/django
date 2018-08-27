@@ -28,8 +28,8 @@ class CookieMiddleware:
         # Check this actually has headers. They're a required scope key for HTTP and WS.
         if "headers" not in scope:
             raise ValueError(
-                "CookieMiddleware was passed a scope that did not have a headers key " +
-                "(make sure it is only passed HTTP or WebSocket connections)"
+                "CookieMiddleware was passed a scope that did not have a headers key "
+                + "(make sure it is only passed HTTP or WebSocket connections)"
             )
         # Go through headers to find the cookie one
         for name, value in scope.get("headers", []):
@@ -99,7 +99,7 @@ class CookieMiddleware:
         # Write out the cookies to the response
         for c in cookies.values():
             message.setdefault("headers", []).append(
-                (b"Set-Cookie", bytes(c.output(header=""), encoding="utf-8")),
+                (b"Set-Cookie", bytes(c.output(header=""), encoding="utf-8"))
             )
 
     @classmethod
@@ -155,7 +155,9 @@ class SessionMiddlewareInstance:
         else:
             # Make sure there are cookies in the scope
             if "cookies" not in self.scope:
-                raise ValueError("No cookies in scope - SessionMiddleware needs to run inside of CookieMiddleware.")
+                raise ValueError(
+                    "No cookies in scope - SessionMiddleware needs to run inside of CookieMiddleware."
+                )
             # Parse the headers in the scope into cookies
             self.scope["session"] = LazyObject()
             self.activated = True
@@ -169,7 +171,9 @@ class SessionMiddlewareInstance:
         """
         # Resolve the session now we can do it in a blocking way
         session_key = self.scope["cookies"].get(self.middleware.cookie_name)
-        self.scope["session"]._wrapped = await database_sync_to_async(self.middleware.session_store)(session_key)
+        self.scope["session"]._wrapped = await database_sync_to_async(
+            self.middleware.session_store
+        )(session_key)
         # Override send
         self.real_send = send
         return await self.inner(receive, self.send)
@@ -185,9 +189,11 @@ class SessionMiddlewareInstance:
             # If this is a message type that we want to save on, and there's
             # changed data, save it. We also save if it's empty as we might
             # not be able to send a cookie-delete along with this message.
-            if message["type"] in self.middleware.save_message_types and \
-               message.get("status", 200) != 500 and \
-               (modified or settings.SESSION_SAVE_EVERY_REQUEST):
+            if (
+                message["type"] in self.middleware.save_message_types
+                and message.get("status", 200) != 500
+                and (modified or settings.SESSION_SAVE_EVERY_REQUEST)
+            ):
                 self.save_session()
                 # If this is a message type that can transport cookies back to the
                 # client, then do so.

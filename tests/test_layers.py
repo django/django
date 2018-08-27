@@ -9,12 +9,9 @@ from channels.layers import InMemoryChannelLayer, channel_layers, get_channel_la
 
 
 class TestChannelLayerManager(unittest.TestCase):
-
-    @override_settings(CHANNEL_LAYERS={
-        "default": {
-            "BACKEND": "channels.layers.InMemoryChannelLayer",
-        },
-    })
+    @override_settings(
+        CHANNEL_LAYERS={"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
+    )
     def test_config_error(self):
         """
         If channel layer doesn't specify TEST_CONFIG, `make_test_backend`
@@ -24,14 +21,14 @@ class TestChannelLayerManager(unittest.TestCase):
         with self.assertRaises(InvalidChannelLayerError):
             channel_layers.make_test_backend(DEFAULT_CHANNEL_LAYER)
 
-    @override_settings(CHANNEL_LAYERS={
-        "default": {
-            "BACKEND": "channels.layers.InMemoryChannelLayer",
-            "TEST_CONFIG": {
-                "expiry": 100500,
-            },
-        },
-    })
+    @override_settings(
+        CHANNEL_LAYERS={
+            "default": {
+                "BACKEND": "channels.layers.InMemoryChannelLayer",
+                "TEST_CONFIG": {"expiry": 100500},
+            }
+        }
+    )
     def test_config_instance(self):
         """
         If channel layer provides TEST_CONFIG, `make_test_backend` should
@@ -46,11 +43,11 @@ class TestChannelLayerManager(unittest.TestCase):
         The channel layers cache is reset when the CHANNEL_LAYERS setting
         changes.
         """
-        with override_settings(CHANNEL_LAYERS={
-            "default": {
-                "BACKEND": "channels.layers.InMemoryChannelLayer",
-            },
-        }):
+        with override_settings(
+            CHANNEL_LAYERS={
+                "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}
+            }
+        ):
             self.assertEqual(channel_layers.backends, {})
             get_channel_layer()
             self.assertNotEqual(channel_layers.backends, {})
@@ -58,6 +55,7 @@ class TestChannelLayerManager(unittest.TestCase):
 
 
 ### In-memory layer tests
+
 
 @pytest.mark.asyncio
 async def test_send_receive():

@@ -33,10 +33,7 @@ class HttpCommunicator(ApplicationCommunicator):
         # If we've not sent the request yet, do so
         if not self.sent_request:
             self.sent_request = True
-            await self.send_input({
-                "type": "http.request",
-                "body": self.body,
-            })
+            await self.send_input({"type": "http.request", "body": self.body})
         # Get the response start
         response_start = await self.receive_output(timeout)
         assert response_start["type"] == "http.response.start"

@@ -18,15 +18,8 @@ class SimpleHttpApp(AsyncConsumer):
     async def http_request(self, event):
         assert self.scope["path"] == "/test/"
         assert self.scope["method"] == "GET"
-        await self.send({
-            "type": "http.response.start",
-            "status": 200,
-            "headers": [],
-        })
-        await self.send({
-            "type": "http.response.body",
-            "body": b"test response",
-        })
+        await self.send({"type": "http.response.start", "status": 200, "headers": []})
+        await self.send({"type": "http.response.body", "body": b"test response"})
 
 
 @pytest.mark.asyncio
@@ -69,9 +62,7 @@ class KwargsWebSocketApp(WebsocketConsumer):
 
     def connect(self):
         self.accept()
-        self.send(
-            text_data=self.scope["url_route"]["kwargs"]["message"],
-        )
+        self.send(text_data=self.scope["url_route"]["kwargs"]["message"])
 
 
 @pytest.mark.asyncio
@@ -106,9 +97,7 @@ async def test_websocket_application():
     Tests that the WebSocket communicator class works with the
     URLRoute application.
     """
-    application = URLRouter([
-        url(r"^testws/(?P<message>\w+)/$", KwargsWebSocketApp),
-    ])
+    application = URLRouter([url(r"^testws/(?P<message>\w+)/$", KwargsWebSocketApp)])
     communicator = WebsocketCommunicator(application, "/testws/test/")
     connected, subprotocol = await communicator.connect()
     # Test connection
@@ -141,6 +130,7 @@ class ConnectionScopeValidator(WebsocketConsumer):
     """
     Tests ASGI specification for the connection scope.
     """
+
     def connect(self):
         assert self.scope["type"] == "websocket"
         # check if path is a unicode string

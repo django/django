@@ -9,7 +9,8 @@ def setup_logger(name, verbosity=1):
     """
 
     formatter = logging.Formatter(
-        fmt="%(asctime)s - %(levelname)s - %(module)s - %(message)s")
+        fmt="%(asctime)s - %(levelname)s - %(module)s - %(message)s"
+    )
 
     handler.setFormatter(formatter)
 
@@ -24,8 +25,7 @@ def setup_logger(name, verbosity=1):
     for module in ["daphne.ws_protocol", "daphne.http_protocol", "daphne.server"]:
         daphne_logger = logging.getLogger(module)
         daphne_logger.addHandler(handler)
-        daphne_logger.setLevel(
-            logging.DEBUG if verbosity > 1 else logging.INFO)
+        daphne_logger.setLevel(logging.DEBUG if verbosity > 1 else logging.INFO)
 
     logger.propagate = False
     return logger

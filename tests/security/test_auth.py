@@ -4,7 +4,12 @@ from unittest import mock
 import pytest
 from django.conf import settings
 from django.contrib.auth import (
-    BACKEND_SESSION_KEY, HASH_SESSION_KEY, SESSION_KEY, get_user_model, user_logged_in, user_logged_out,
+    BACKEND_SESSION_KEY,
+    HASH_SESSION_KEY,
+    SESSION_KEY,
+    get_user_model,
+    user_logged_in,
+    user_logged_out,
 )
 from django.contrib.auth.models import AnonymousUser
 
@@ -31,6 +36,7 @@ class CatchSignal:
         await ... # the django action the creates the signal
          assert handler.called
     """
+
     def __init__(self, signal):
         self.handler = mock.Mock()
         self.signal = signal
@@ -81,7 +87,9 @@ async def assert_is_logged_in(scope, user):
     assert BACKEND_SESSION_KEY in session
     assert HASH_SESSION_KEY in session
 
-    assert isinstance(await get_user(scope), await database_sync_to_async(get_user_model)())
+    assert isinstance(
+        await get_user(scope), await database_sync_to_async(get_user_model)()
+    )
     assert await get_user(scope) == user
 
 
@@ -93,9 +101,9 @@ async def test_login_no_session_in_scope():
     """
 
     with pytest.raises(
-            ValueError,
-            match="Cannot find session in scope. You should wrap your consumer in SessionMiddleware."
-            ):
+        ValueError,
+        match="Cannot find session in scope. You should wrap your consumer in SessionMiddleware.",
+    ):
         await login(scope={}, user=None)
 
 
@@ -105,11 +113,12 @@ async def test_login_no_user_in_scope(session):
     """
     Test the login method to ensure it raises a `ValueError` if no user is passed and is no user in the scope.
     """
-    scope = {
-        "session": session
-    }
+    scope = {"session": session}
 
-    with pytest.raises(ValueError, match="User must be passed as an argument or must be present in the scope."):
+    with pytest.raises(
+        ValueError,
+        match="User must be passed as an argument or must be present in the scope.",
+    ):
         await login(scope, user=None)
 
 
@@ -120,9 +129,7 @@ async def test_login_user_as_argument(session, user_bob):
     Test that one can login to a scope that has a session by passing the scope and user as arguments to the login
      function.
     """
-    scope = {
-        "session": session
-    }
+    scope = {"session": session}
 
     assert isinstance(await get_user(scope), AnonymousUser)
     # not logged in
@@ -143,10 +150,7 @@ async def test_login_user_on_scope(session, user_bob):
     Test that in the absence of a user being passed to the `login` function the function will use the user set on the
      scope.
     """
-    scope = {
-        "session": session,
-        "user": user_bob
-    }
+    scope = {"session": session, "user": user_bob}
 
     # check that we are not logged in on the session
     assert isinstance(await get_user(scope), AnonymousUser)
@@ -165,9 +169,7 @@ async def test_login_change_user(session, user_bob, user_bill):
     """
     Test logging in a second user into a scope were another user is already logged in.
     """
-    scope = {
-        "session": session,
-    }
+    scope = {"session": session}
 
     # check that we are not logged in on the session
     assert isinstance(await get_user(scope), AnonymousUser)
@@ -198,9 +200,7 @@ async def test_logout(session, user_bob):
     """
     Test that one can logout a user from a logged in session.
     """
-    scope = {
-        "session": session,
-    }
+    scope = {"session": session}
 
     # check that we are not logged in on the session
     assert isinstance(await get_user(scope), AnonymousUser)
@@ -233,9 +233,7 @@ async def test_logout_not_logged_in(session):
     """
     Test that the `logout` function does nothing in the case were there is no user logged in.
     """
-    scope = {
-        "session": session,
-    }
+    scope = {"session": session}
 
     # check that we are not logged in on the session
     assert isinstance(await get_user(scope), AnonymousUser)

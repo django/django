@@ -2,7 +2,10 @@ import pytest
 from django.test import override_settings
 
 from channels.generic.websocket import (
-    AsyncJsonWebsocketConsumer, AsyncWebsocketConsumer, JsonWebsocketConsumer, WebsocketConsumer,
+    AsyncJsonWebsocketConsumer,
+    AsyncWebsocketConsumer,
+    JsonWebsocketConsumer,
+    WebsocketConsumer,
 )
 from channels.layers import get_channel_layer
 from channels.testing import WebsocketCommunicator
@@ -52,13 +55,16 @@ async def test_websocket_consumer_subprotocol():
     """
     Tests that WebsocketConsumer correctly handles subprotocols.
     """
+
     class TestConsumer(WebsocketConsumer):
         def connect(self):
             assert self.scope["subprotocols"] == ["subprotocol1", "subprotocol2"]
             self.accept("subprotocol2")
 
     # Test a normal connection with subprotocols
-    communicator = WebsocketCommunicator(TestConsumer, "/testws/", subprotocols=["subprotocol1", "subprotocol2"])
+    communicator = WebsocketCommunicator(
+        TestConsumer, "/testws/", subprotocols=["subprotocol1", "subprotocol2"]
+    )
     connected, subprotocol = await communicator.connect()
     assert connected
     assert subprotocol == "subprotocol2"
@@ -79,9 +85,7 @@ async def test_websocket_consumer_groups():
             self.send(text_data=text_data, bytes_data=bytes_data)
 
     channel_layers_setting = {
-        "default": {
-            "BACKEND": "channels.layers.InMemoryChannelLayer",
-        },
+        "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}
     }
     with override_settings(CHANNEL_LAYERS=channel_layers_setting):
         communicator = WebsocketCommunicator(TestConsumer, "/testws/")
@@ -143,13 +147,16 @@ async def test_async_websocket_consumer_subprotocol():
     """
     Tests that AsyncWebsocketConsumer correctly handles subprotocols.
     """
+
     class TestConsumer(AsyncWebsocketConsumer):
         async def connect(self):
             assert self.scope["subprotocols"] == ["subprotocol1", "subprotocol2"]
             await self.accept("subprotocol2")
 
     # Test a normal connection with subprotocols
-    communicator = WebsocketCommunicator(TestConsumer, "/testws/", subprotocols=["subprotocol1", "subprotocol2"])
+    communicator = WebsocketCommunicator(
+        TestConsumer, "/testws/", subprotocols=["subprotocol1", "subprotocol2"]
+    )
     connected, subprotocol = await communicator.connect()
     assert connected
     assert subprotocol == "subprotocol2"
@@ -170,9 +177,7 @@ async def test_async_websocket_consumer_groups():
             await self.send(text_data=text_data, bytes_data=bytes_data)
 
     channel_layers_setting = {
-        "default": {
-            "BACKEND": "channels.layers.InMemoryChannelLayer",
-        },
+        "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}
     }
     with override_settings(CHANNEL_LAYERS=channel_layers_setting):
         communicator = WebsocketCommunicator(TestConsumer, "/testws/")

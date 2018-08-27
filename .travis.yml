@@ -12,16 +12,18 @@ env:
   - DJANGO="Django>=2.1,<2.2"
 
 install:
-  - nvm install 7
-  - pip install -U pip wheel setuptools flake8 isort unify
+  - pip install -U pip wheel setuptools
   - pip install $DJANGO -e .[tests]
   - pip freeze
 
 script:
   - pytest
-  - flake8
-  - isort --check-only --diff --recursive channels tests
-  - unify --check-only --recursive --quote \" channels tests
+
+stages:
+  - lint
+  - test
+  - name: release
+    if: branch = master
 
 jobs:
   include:
@@ -33,8 +35,14 @@ jobs:
       env: DJANGO="Django>=2.1,<2.2"
       dist: xenial
       sudo: required
-    #- stage: test_js
-    #  script: cd js_client && npm install --progress=false && npm test && cd ..
+
+    - stage: lint
+      install: pip install -U -e .[tests] black pyflakes isort
+      script:
+        - pyflakes channels tests
+        - black --check channels tests
+        - isort --check-only --diff --recursive channels tests
+
     - stage: release
       script: skip
       deploy:

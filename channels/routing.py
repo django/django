@@ -36,7 +36,9 @@ def get_default_application():
     try:
         value = getattr(module, name)
     except AttributeError:
-        raise ImproperlyConfigured("Cannot find %r in ASGI_APPLICATION module %s" % (name, path))
+        raise ImproperlyConfigured(
+            "Cannot find %r in ASGI_APPLICATION module %s" % (name, path)
+        )
     return value
 
 
@@ -55,7 +57,9 @@ class ProtocolTypeRouter:
         if scope["type"] in self.application_mapping:
             return self.application_mapping[scope["type"]](scope)
         else:
-            raise ValueError("No application configured for scope type %r" % scope["type"])
+            raise ValueError(
+                "No application configured for scope type %r" % scope["type"]
+            )
 
 
 def route_pattern_match(route, path):
@@ -81,7 +85,7 @@ def route_pattern_match(route, path):
         args = () if kwargs else match.groups()
         if kwargs is not None:
             kwargs.update(route.default_args)
-        return path[match.end():], args, kwargs
+        return path[match.end() :], args, kwargs
     return None
 
 
@@ -131,15 +135,17 @@ class URLRouter:
                     new_path, args, kwargs = match
                     # Add args or kwargs into the scope
                     outer = scope.get("url_route", {})
-                    return route.callback(dict(
-                        scope,
-                        path_remaining=new_path,
-                        url_route={
-                            "args": outer.get("args", ()) + args,
-                            "kwargs": {**outer.get("kwargs", {}), **kwargs},
-                        },
-                    ))
-            except Resolver404 as e:
+                    return route.callback(
+                        dict(
+                            scope,
+                            path_remaining=new_path,
+                            url_route={
+                                "args": outer.get("args", ()) + args,
+                                "kwargs": {**outer.get("kwargs", {}), **kwargs},
+                            },
+                        )
+                    )
+            except Resolver404:
                 pass
         else:
             if "path_remaining" in scope:
@@ -160,10 +166,12 @@ class ChannelNameRouter:
     def __call__(self, scope):
         if "channel" not in scope:
             raise ValueError(
-                "ChannelNameRouter got a scope without a 'channel' key. " +
-                "Did you make sure it's only being used for 'channel' type messages?"
+                "ChannelNameRouter got a scope without a 'channel' key. "
+                + "Did you make sure it's only being used for 'channel' type messages?"
             )
         if scope["channel"] in self.application_mapping:
             return self.application_mapping[scope["channel"]](scope)
         else:
-            raise ValueError("No application configured for channel name %r" % scope["channel"])
+            raise ValueError(
+                "No application configured for channel name %r" % scope["channel"]
+            )

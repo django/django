@@ -15,7 +15,9 @@ def name_that_thing(thing):
         return name_that_thing(thing.im_class) + "." + thing.im_func.func_name
     # Other named thing
     if hasattr(thing, "__name__"):
-        if hasattr(thing, "__class__") and not isinstance(thing, (types.FunctionType, types.MethodType)):
+        if hasattr(thing, "__class__") and not isinstance(
+            thing, (types.FunctionType, types.MethodType)
+        ):
             if thing.__class__ is not type and not issubclass(thing.__class__, type):
                 return name_that_thing(thing.__class__)
         if hasattr(thing, "__self__"):

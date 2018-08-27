@@ -17,12 +17,8 @@ async def test_async_http_consumer():
             data = json.loads(body.decode("utf-8"))
             await self.send_response(
                 200,
-                json.dumps({
-                    "value": data["value"],
-                }).encode("utf-8"),
-                headers={
-                    "Content-Type": "application/json",
-                },
+                json.dumps({"value": data["value"]}).encode("utf-8"),
+                headers={"Content-Type": "application/json"},
             )
 
     # Open a connection

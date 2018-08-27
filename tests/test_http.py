@@ -24,12 +24,7 @@ class RequestTests(unittest.TestCase):
         with all optional fields omitted.
         """
         request = AsgiRequest(
-            {
-                "http_version": "1.1",
-                "method": "GET",
-                "path": "/test/",
-            },
-            b"",
+            {"http_version": "1.1", "method": "GET", "path": "/test/"}, b""
         )
         self.assertEqual(request.path, "/test/")
         self.assertEqual(request.method, "GET")
@@ -100,7 +95,9 @@ class RequestTests(unittest.TestCase):
         self.assertEqual(request.method, "POST")
         self.assertEqual(request.body, b"djangoponies=are+awesome")
         self.assertEqual(request.META["HTTP_HOST"], "example.com")
-        self.assertEqual(request.META["CONTENT_TYPE"], "application/x-www-form-urlencoded")
+        self.assertEqual(
+            request.META["CONTENT_TYPE"], "application/x-www-form-urlencoded"
+        )
         self.assertEqual(request.GET["django"], "great")
         self.assertEqual(request.POST["djangoponies"], "are awesome")
         with self.assertRaises(KeyError):
@@ -113,13 +110,13 @@ class RequestTests(unittest.TestCase):
         Tests POSTing files using multipart form data.
         """
         body = (
-            b"--BOUNDARY\r\n" +
-            b'Content-Disposition: form-data; name="title"\r\n\r\n' +
-            b"My First Book\r\n" +
-            b"--BOUNDARY\r\n" +
-            b'Content-Disposition: form-data; name="pdf"; filename="book.pdf"\r\n\r\n' +
-            b"FAKEPDFBYTESGOHERE" +
-            b"--BOUNDARY--"
+            b"--BOUNDARY\r\n"
+            + b'Content-Disposition: form-data; name="title"\r\n\r\n'
+            + b"My First Book\r\n"
+            + b"--BOUNDARY\r\n"
+            + b'Content-Disposition: form-data; name="pdf"; filename="book.pdf"\r\n\r\n'
+            + b"FAKEPDFBYTESGOHERE"
+            + b"--BOUNDARY--"
         )
         request = AsgiRequest(
             {
@@ -149,10 +146,7 @@ class RequestTests(unittest.TestCase):
                 "http_version": "1.1",
                 "method": "PUT",
                 "path": "/",
-                "headers": {
-                    "host": b"example.com",
-                    "content-length": b"11",
-                },
+                "headers": {"host": b"example.com", "content-length": b"11"},
             },
             b"onetwothree",
         )
@@ -167,12 +161,13 @@ class RequestTests(unittest.TestCase):
                 "http_version": "1.1",
                 "method": "GET",
                 "path": "/test/",
-                "root_path": "/path/to/"
+                "root_path": "/path/to/",
             },
             b"",
         )
 
         self.assertEqual(request.path, "/path/to/test/")
+
 
 ### Handler tests
 
@@ -194,16 +189,9 @@ async def test_handler_basic():
     """
     Tests very basic request handling, no body.
     """
-    scope = {
-        "type": "http",
-        "http_version": "1.1",
-        "method": "GET",
-        "path": "/test/",
-    }
+    scope = {"type": "http", "http_version": "1.1", "method": "GET", "path": "/test/"}
     handler = ApplicationCommunicator(MockHandler, scope)
-    await handler.send_input({
-        "type": "http.request",
-    })
+    await handler.send_input({"type": "http.request"})
     await handler.receive_output(1)  # response start
     await handler.receive_output(1)  # response body
     MockHandler.request_class.assert_called_with(scope, b"")
@@ -214,17 +202,11 @@ async def test_handler_body_single():
     """
     Tests request handling with a single-part body
     """
-    scope = {
-        "type": "http",
-        "http_version": "1.1",
-        "method": "GET",
-        "path": "/test/",
-    }
+    scope = {"type": "http", "http_version": "1.1", "method": "GET", "path": "/test/"}
     handler = ApplicationCommunicator(MockHandler, scope)
-    await handler.send_input({
-        "type": "http.request",
-        "body": b"chunk one \x01 chunk two",
-    })
+    await handler.send_input(
+        {"type": "http.request", "body": b"chunk one \x01 chunk two"}
+    )
     await handler.receive_output(1)  # response start
     await handler.receive_output(1)  # response body
     MockHandler.request_class.assert_called_with(scope, b"chunk one \x01 chunk two")
@@ -235,27 +217,15 @@ async def test_handler_body_multiple():
     """
     Tests request handling with a multi-part body
     """
-    scope = {
-        "type": "http",
-        "http_version": "1.1",
-        "method": "GET",
-        "path": "/test/",
-    }
+    scope = {"type": "http", "http_version": "1.1", "method": "GET", "path": "/test/"}
     handler = ApplicationCommunicator(MockHandler, scope)
-    await handler.send_input({
-        "type": "http.request",
-        "body": b"chunk one",
-        "more_body": True,
-    })
-    await handler.send_input({
-        "type": "http.request",
-        "body": b" \x01 ",
-        "more_body": True,
-    })
-    await handler.send_input({
-        "type": "http.request",
-        "body": b"chunk two",
-    })
+    await handler.send_input(
+        {"type": "http.request", "body": b"chunk one", "more_body": True}
+    )
+    await handler.send_input(
+        {"type": "http.request", "body": b" \x01 ", "more_body": True}
+    )
+    await handler.send_input({"type": "http.request", "body": b"chunk two"})
     await handler.receive_output(1)  # response start
     await handler.receive_output(1)  # response body
     MockHandler.request_class.assert_called_with(scope, b"chunk one \x01 chunk two")
@@ -266,22 +236,12 @@ async def test_handler_body_ignore_extra():
     """
     Tests request handling ignores anything after more_body: False
     """
-    scope = {
-        "type": "http",
-        "http_version": "1.1",
-        "method": "GET",
-        "path": "/test/",
-    }
+    scope = {"type": "http", "http_version": "1.1", "method": "GET", "path": "/test/"}
     handler = ApplicationCommunicator(MockHandler, scope)
-    await handler.send_input({
-        "type": "http.request",
-        "body": b"chunk one",
-        "more_body": False,
-    })
-    await handler.send_input({
-        "type": "http.request",
-        "body": b" \x01 ",
-    })
+    await handler.send_input(
+        {"type": "http.request", "body": b"chunk one", "more_body": False}
+    )
+    await handler.send_input({"type": "http.request", "body": b" \x01 "})
     await handler.receive_output(1)  # response start
     await handler.receive_output(1)  # response body
     MockHandler.request_class.assert_called_with(scope, b"chunk one")
@@ -290,7 +250,6 @@ async def test_handler_body_ignore_extra():
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
 async def test_sessions():
-
     class SimpleHttpApp(AsyncConsumer):
         """
         Barebones HTTP ASGI app for testing.
@@ -300,17 +259,14 @@ async def test_sessions():
             self.scope["session"].save()
             assert self.scope["path"] == "/test/"
             assert self.scope["method"] == "GET"
-            await self.send({
-                "type": "http.response.start",
-                "status": 200,
-                "headers": [],
-            })
-            await self.send({
-                "type": "http.response.body",
-                "body": b"test response",
-            })
+            await self.send(
+                {"type": "http.response.start", "status": 200, "headers": []}
+            )
+            await self.send({"type": "http.response.body", "body": b"test response"})
 
-    communicator = HttpCommunicator(SessionMiddlewareStack(SimpleHttpApp), "GET", "/test/")
+    communicator = HttpCommunicator(
+        SessionMiddlewareStack(SimpleHttpApp), "GET", "/test/"
+    )
     response = await communicator.get_response()
     headers = response.get("headers", [])
 
@@ -320,12 +276,12 @@ async def test_sessions():
     assert name == b"Set-Cookie"
     value = value.decode("utf-8")
 
-    assert re.compile(r'sessionid=').search(value) is not None
+    assert re.compile(r"sessionid=").search(value) is not None
 
-    assert re.compile(r'expires=').search(value) is not None
+    assert re.compile(r"expires=").search(value) is not None
 
-    assert re.compile(r'HttpOnly').search(value) is not None
+    assert re.compile(r"HttpOnly").search(value) is not None
 
-    assert re.compile(r'Max-Age').search(value) is not None
+    assert re.compile(r"Max-Age").search(value) is not None
 
-    assert re.compile(r'Path').search(value) is not None
+    assert re.compile(r"Path").search(value) is not None

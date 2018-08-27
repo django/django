@@ -42,7 +42,9 @@ class AsyncConsumer:
         self.channel_layer = get_channel_layer()
         if self.channel_layer is not None:
             self.channel_name = await self.channel_layer.new_channel()
-            self.channel_receive = functools.partial(self.channel_layer.receive, self.channel_name)
+            self.channel_receive = functools.partial(
+                self.channel_layer.receive, self.channel_name
+            )
         # Store send function
         if self._sync:
             self.base_send = async_to_sync(send)
@@ -51,7 +53,9 @@ class AsyncConsumer:
         # Pass messages in from channel layer or client to dispatch method
         try:
             if self.channel_layer is not None:
-                await await_many_dispatch([receive, self.channel_receive], self.dispatch)
+                await await_many_dispatch(
+                    [receive, self.channel_receive], self.dispatch
+                )
             else:
                 await await_many_dispatch([receive], self.dispatch)
         except StopConsumer:

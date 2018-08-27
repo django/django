@@ -3,7 +3,9 @@ from django.apps import AppConfig
 # We import this here to ensure the reactor is installed very early on
 # in case other packages accidentally import twisted.internet.reactor
 # (e.g. raven does this).
-import daphne.server  # noqa
+import daphne.server
+
+del daphne.server
 
 
 class ChannelsConfig(AppConfig):
@@ -14,4 +16,5 @@ class ChannelsConfig(AppConfig):
     def ready(self):
         # Do django monkeypatches
         from .hacks import monkeypatch_django
+
         monkeypatch_django()

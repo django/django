@@ -50,7 +50,7 @@ class StaticFilesHandler(AsgiHandler):
         """
         Returns the relative path to the media file on disk for the given URL.
         """
-        relative_url = url[len(self.scope["static_base_url"][2]):]
+        relative_url = url[len(self.scope["static_base_url"][2]) :]
         return url2pathname(relative_url)
 
     def serve(self, request):
@@ -69,4 +69,5 @@ class StaticFilesHandler(AsgiHandler):
         except Http404 as e:
             if settings.DEBUG:
                 from django.views import debug
+
                 return debug.technical_404_response(request, e)
