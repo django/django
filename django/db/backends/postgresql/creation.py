@@ -35,11 +35,16 @@ class DatabaseCreation(BaseDatabaseCreation):
 
     def _execute_create_test_db(self, cursor, parameters, keepdb=False):
         try:
-            if keepdb and self._database_exists(cursor, parameters['dbname']):
+            exists = self._database_exists(cursor, parameters['dbname'])
+            if keepdb and exists:
                 # If the database should be kept and it already exists, don't
                 # try to create a new one.
                 return
-            super()._execute_create_test_db(cursor, parameters, keepdb)
+            if exists:
+                # In some cases, the user we connect is may not be permitted to create DBs.
+                cursor.execute('DROP OWNED BY CURRENT_USER;')
+            else:
+                super()._execute_create_test_db(cursor, parameters, keepdb)
         except Exception as e:
             if getattr(e.__cause__, 'pgcode', '') != errorcodes.DUPLICATE_DATABASE:
                 # All errors except "database already exists" cancel tests.
