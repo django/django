@@ -29,7 +29,7 @@ class SimpleTemplateResponse(HttpResponse):
         to minimize code duplication.
         It's called self._request because self.request gets overwritten by
         django.test.client.Client. Unlike template_name and context_data,
-        _request should not be considered part of the public API. 
+        _request should not be considered part of the public API.
         """
         self._request = None
         """
