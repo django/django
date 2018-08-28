@@ -377,6 +377,12 @@ Miscellaneous
 * The admin CSS class ``field-box`` is renamed to ``fieldBox`` to prevent
   conflicts with the class given to model fields named "box".
 
+* Since the admin's ``actions.html``, ``change_list_results.html``,
+  ``date_hierarchy.html``, ``pagination.html``, ``prepopulated_fields_js.html``,
+  ``search_form.html``, and ``submit_line.html`` templates can now be
+  overridden per app or per model, you may need to rename existing templates
+  with those names that were written for a different purpose.
+
 * ``QuerySet.raw()`` now caches its results like regular querysets. Use
   ``iterator()`` if you don't want caching.
 
