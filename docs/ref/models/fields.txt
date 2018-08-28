@@ -626,7 +626,7 @@ A :class:`CharField` that checks that the value is a valid email address using
 A file-upload field.
 
 .. note::
-    The ``primary_key`` argument isn't supported and will raise a an error if
+    The ``primary_key`` argument isn't supported and will raise an error if
     used.
 
 Has two optional arguments:
