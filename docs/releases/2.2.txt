@@ -136,6 +136,13 @@ Database backends
 
 * Added result streaming for :meth:`.QuerySet.iterator` on SQLite.
 
+* Postgres backend will now check if the test DB exists before trying to create
+  it. If it does exist, a `DROP OWNED BY CURRENT_USER;` statement will be
+  issued to clear the DB before starting tests.
+
+  This resolves the problem where the user used to connect to the DB does not
+  have permission to create a db.
+
 Email
 ~~~~~
 
