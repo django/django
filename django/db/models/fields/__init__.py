@@ -25,7 +25,6 @@ from django.utils.dateparse import (
     parse_date, parse_datetime, parse_duration, parse_time,
 )
 from django.utils.duration import duration_microseconds, duration_string
-from django.utils.encoding import force_bytes, smart_text
 from django.utils.functional import Promise, cached_property
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils.itercompat import is_iterable
@@ -828,7 +827,7 @@ class Field(RegisterLookupMixin):
             else 'pk'
         )
         return (blank_choice if include_blank else []) + [
-            (choice_func(x), smart_text(x))
+            (choice_func(x), str(x))
             for x in rel_model._default_manager.complex_filter(limit_choices_to)
         ]
 
@@ -2280,12 +2279,12 @@ class BinaryField(Field):
 
     def value_to_string(self, obj):
         """Binary data is serialized as base64"""
-        return b64encode(force_bytes(self.value_from_object(obj))).decode('ascii')
+        return b64encode(self.value_from_object(obj)).decode('ascii')
 
     def to_python(self, value):
         # If it's a string, it should be base64-encoded data
         if isinstance(value, str):
-            return memoryview(b64decode(force_bytes(value)))
+            return memoryview(b64decode(value.encode('ascii')))
         return value
 
 
