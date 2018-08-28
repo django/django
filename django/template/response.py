@@ -12,41 +12,57 @@ class SimpleTemplateResponse(HttpResponse):
 
     def __init__(self, template, context=None, content_type=None, status=None,
                  charset=None, using=None):
-        # It would seem obvious to call these next two members 'template' and
-        # 'context', but those names are reserved as part of the test Client
-        # API. To avoid the name collision, we use different names.
+        
+        """
+        It would seem obvious to call these next two members 'template' and
+        'context', but those names are reserved as part of the test Client
+        API. To avoid the name collision, we use different names.
+        """
+        
         self.template_name = template
         self.context_data = context
 
         self.using = using
 
         self._post_render_callbacks = []
-
-        # _request stores the current request object in subclasses that know
-        # about requests, like TemplateResponse. It's defined in the base class
-        # to minimize code duplication.
-        # It's called self._request because self.request gets overwritten by
-        # django.test.client.Client. Unlike template_name and context_data,
-        # _request should not be considered part of the public API.
+        
+        """
+        _request stores the current request object in subclasses that know
+        about requests, like TemplateResponse. It's defined in the base class
+        to minimize code duplication.
+        It's called self._request because self.request gets overwritten by
+        django.test.client.Client. Unlike template_name and context_data,
+        _request should not be considered part of the public API.
+        
+        """
+        
         self._request = None
-
-        # content argument doesn't make sense here because it will be replaced
-        # with rendered template so we always pass empty string in order to
-        # prevent errors and provide shorter signature.
+        
+        """
+        content argument doesn't make sense here because it will be replaced
+        with rendered template so we always pass empty string in order to
+        prevent errors and provide shorter signature.
+        """
+        
         super().__init__('', content_type, status, charset=charset)
-
-        # _is_rendered tracks whether the template and context has been baked
-        # into a final response.
-        # Super __init__ doesn't know any better than to set self.content to
-        # the empty string we just gave it, which wrongly sets _is_rendered
-        # True, so we initialize it to False after the call to super __init__.
+        
+        """
+        _is_rendered tracks whether the template and context has been baked
+        into a final response.
+        Super __init__ doesn't know any better than to set self.content to
+        the empty string we just gave it, which wrongly sets _is_rendered
+        True, so we initialize it to False after the call to super __init__.
+        """
+        
         self._is_rendered = False
 
     def __getstate__(self):
+        
         """
         Raise an exception if trying to pickle an unrendered response. Pickle
         only rendered data, not the data used to construct the response.
         """
+        
         obj_dict = self.__dict__.copy()
         if not self._is_rendered:
             raise ContentNotRenderedError('The response content must be '
@@ -58,7 +74,11 @@ class SimpleTemplateResponse(HttpResponse):
         return obj_dict
 
     def resolve_template(self, template):
-        """Accept a template object, path-to-template, or list of paths."""
+        
+        """
+        Accept a template object, path-to-template, or list of paths.
+        """
+        
         if isinstance(template, (list, tuple)):
             return select_template(template, using=self.using)
         elif isinstance(template, str):
@@ -71,36 +91,42 @@ class SimpleTemplateResponse(HttpResponse):
 
     @property
     def rendered_content(self):
-        """Return the freshly rendered content for the template and context
+        
+        """
+        Return the freshly rendered content for the template and context
         described by the TemplateResponse.
 
         This *does not* set the final content of the response. To set the
         response content, you must either call render(), or set the
         content explicitly using the value of this property.
         """
+        
         template = self.resolve_template(self.template_name)
         context = self.resolve_context(self.context_data)
         content = template.render(context, self._request)
         return content
 
     def add_post_render_callback(self, callback):
-        """Add a new post-rendering callback.
-
+        
+        """
+        Add a new post-rendering callback.
         If the response has already been rendered,
         invoke the callback immediately.
         """
+        
         if self._is_rendered:
             callback(self)
         else:
             self._post_render_callbacks.append(callback)
 
     def render(self):
-        """Render (thereby finalizing) the content of the response.
 
+        """
+        Render (thereby finalizing) the content of the response.
         If the content has already been rendered, this is a no-op.
-
         Return the baked response instance.
         """
+        
         retval = self
         if not self._is_rendered:
             self.content = self.rendered_content
