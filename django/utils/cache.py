@@ -23,7 +23,7 @@ import time
 from django.conf import settings
 from django.core.cache import caches
 from django.http import HttpResponse, HttpResponseNotModified
-from django.utils.encoding import force_bytes, iri_to_uri
+from django.utils.encoding import iri_to_uri
 from django.utils.http import (
     http_date, parse_etags, parse_http_date_safe, quote_etag,
 )
@@ -302,8 +302,8 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
     for header in headerlist:
         value = request.META.get(header)
         if value is not None:
-            ctx.update(force_bytes(value))
-    url = hashlib.md5(force_bytes(iri_to_uri(request.build_absolute_uri())))
+            ctx.update(value.encode())
+    url = hashlib.md5(iri_to_uri(request.build_absolute_uri()).encode('ascii'))
     cache_key = 'views.decorators.cache.cache_page.%s.%s.%s.%s' % (
         key_prefix, method, url.hexdigest(), ctx.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)
@@ -311,7 +311,7 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
 
 def _generate_cache_header_key(key_prefix, request):
     """Return a cache key for the header cache."""
-    url = hashlib.md5(force_bytes(iri_to_uri(request.build_absolute_uri())))
+    url = hashlib.md5(iri_to_uri(request.build_absolute_uri()).encode('ascii'))
     cache_key = 'views.decorators.cache.cache_header.%s.%s' % (
         key_prefix, url.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)
