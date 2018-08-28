@@ -18,7 +18,7 @@ from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
 from django.test.utils import CaptureQueriesContext, register_lookup
 from django.urls import reverse
-from django.utils import formats
+from django.utils import formats, timezone
 
 from .admin import (
     BandAdmin, ChildAdmin, ChordsBandAdmin, ConcertAdmin,
@@ -499,6 +499,21 @@ class ChangeListTests(TestCase):
         request.user = self.superuser
         cl = model_admin.get_changelist_instance(request)
         self.assertCountEqual(cl.queryset, [child])
+
+        request = self.factory.get('/', data={SEARCH_VAR: 'invalid'})
+        request.user = self.superuser
+        cl = model_admin.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [])
+
+    def test_exact_date_lookup_in_search_fields(self):
+        date = timezone.now().date()
+        event = Event.objects.create(date=date)
+
+        model_admin = EventAdmin(Event, custom_site)
+        request = self.factory.get('/', data={SEARCH_VAR: date.isoformat()})
+        request.user = self.superuser
+        cl = model_admin.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [event])
 
         request = self.factory.get('/', data={SEARCH_VAR: 'invalid'})
         request.user = self.superuser

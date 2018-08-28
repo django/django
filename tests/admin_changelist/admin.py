@@ -18,6 +18,7 @@ class CustomPaginator(Paginator):
 class EventAdmin(admin.ModelAdmin):
     date_hierarchy = 'date'
     list_display = ['event_date_func']
+    search_fields = ['date__exact']
 
     def event_date_func(self, event):
         return event.date

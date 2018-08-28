@@ -1029,13 +1029,13 @@ class ModelAdmin(BaseModelAdmin):
             for bit in search_term.split():
                 or_queries = []
                 for orm_lookup in orm_lookups:
+                    query = models.Q(**{orm_lookup: bit})
                     try:
-                        query = models.Q(**{orm_lookup: bit})
                         queryset.filter(query)
-                        or_queries.append(query)
-                    except ValueError:
+                    except (ValidationError, ValueError):
                         # This piece of the search term failed for this lookup, skip.
-                        pass
+                        continue
+                    or_queries.append(query)
 
                 if or_queries:
                     queryset = queryset.filter(reduce(operator.or_, or_queries))
