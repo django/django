@@ -173,7 +173,7 @@ The following mixins are used to construct Django's editing views:
         redirects to
         :meth:`~django.views.generic.edit.FormMixin.get_success_url`.
 
-    .. method:: form_invalid()
+    .. method:: form_invalid(form)
 
         Renders a response, providing the invalid form as context.
 
