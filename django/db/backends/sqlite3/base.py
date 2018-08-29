@@ -161,7 +161,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def get_new_connection(self, conn_params):
         conn = Database.connect(**conn_params)
-        conn.create_function("django_date_extract", 2, _sqlite_date_extract)
+        conn.create_function("django_date_extract", 2, _sqlite_datetime_extract)
         conn.create_function("django_date_trunc", 2, _sqlite_date_trunc)
         conn.create_function("django_datetime_cast_date", 2, _sqlite_datetime_cast_date)
         conn.create_function("django_datetime_cast_time", 2, _sqlite_datetime_cast_time)
@@ -337,22 +337,6 @@ def _sqlite_datetime_parse(dt, tzname=None):
     return dt
 
 
-def _sqlite_date_extract(lookup_type, dt):
-    dt = _sqlite_datetime_parse(dt)
-    if dt is None:
-        return None
-    if lookup_type == 'week_day':
-        return (dt.isoweekday() % 7) + 1
-    elif lookup_type == 'week':
-        return dt.isocalendar()[1]
-    elif lookup_type == 'quarter':
-        return math.ceil(dt.month / 3)
-    elif lookup_type == 'iso_year':
-        return dt.isocalendar()[0]
-    else:
-        return getattr(dt, lookup_type)
-
-
 def _sqlite_date_trunc(lookup_type, dt):
     dt = _sqlite_datetime_parse(dt)
     if dt is None:
@@ -398,7 +382,7 @@ def _sqlite_datetime_cast_time(dt, tzname):
     return dt.time().isoformat()
 
 
-def _sqlite_datetime_extract(lookup_type, dt, tzname):
+def _sqlite_datetime_extract(lookup_type, dt, tzname=None):
     dt = _sqlite_datetime_parse(dt, tzname)
     if dt is None:
         return None
