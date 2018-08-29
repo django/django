@@ -325,12 +325,21 @@ class SQLiteCursorWrapper(Database.Cursor):
         return FORMAT_QMARK_REGEX.sub('?', query).replace('%%', '%')
 
 
-def _sqlite_date_extract(lookup_type, dt):
+def _sqlite_datetime_parse(dt, tzname=None):
     if dt is None:
         return None
     try:
         dt = backend_utils.typecast_timestamp(dt)
-    except (ValueError, TypeError):
+    except (TypeError, ValueError):
+        return None
+    if tzname is not None:
+        dt = timezone.localtime(dt, pytz.timezone(tzname))
+    return dt
+
+
+def _sqlite_date_extract(lookup_type, dt):
+    dt = _sqlite_datetime_parse(dt)
+    if dt is None:
         return None
     if lookup_type == 'week_day':
         return (dt.isoweekday() % 7) + 1
@@ -345,9 +354,8 @@ def _sqlite_date_extract(lookup_type, dt):
 
 
 def _sqlite_date_trunc(lookup_type, dt):
-    try:
-        dt = backend_utils.typecast_timestamp(dt)
-    except (ValueError, TypeError):
+    dt = _sqlite_datetime_parse(dt)
+    if dt is None:
         return None
     if lookup_type == 'year':
         return "%i-01-01" % dt.year
@@ -374,18 +382,6 @@ def _sqlite_time_trunc(lookup_type, dt):
         return "%02i:%02i:00" % (dt.hour, dt.minute)
     elif lookup_type == 'second':
         return "%02i:%02i:%02i" % (dt.hour, dt.minute, dt.second)
-
-
-def _sqlite_datetime_parse(dt, tzname):
-    if dt is None:
-        return None
-    try:
-        dt = backend_utils.typecast_timestamp(dt)
-    except (ValueError, TypeError):
-        return None
-    if tzname is not None:
-        dt = timezone.localtime(dt, pytz.timezone(tzname))
-    return dt
 
 
 def _sqlite_datetime_cast_date(dt, tzname):
