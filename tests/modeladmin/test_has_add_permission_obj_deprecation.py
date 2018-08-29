@@ -1,4 +1,8 @@
+from datetime import date
+
 from django.contrib.admin.options import ModelAdmin, TabularInline
+from django.contrib.admin.sites import AdminSite
+from django.test import TestCase
 from django.utils.deprecation import RemovedInDjango30Warning
 
 from .models import Band, Song
@@ -56,3 +60,38 @@ class HasAddPermissionObjTests(CheckTestCase):
         )
         with self.assertWarnsMessage(RemovedInDjango30Warning, msg):
             self.assertIsValid(BandAdmin, Band)
+
+
+class MockRequest:
+    method = 'POST'
+    FILES = {}
+    POST = {}
+
+
+class SongInline(TabularInline):
+    model = Song
+
+    def has_add_permission(self, request):
+        return True
+
+
+class BandAdmin(ModelAdmin):
+    inlines = [SongInline]
+
+
+class ModelAdminTests(TestCase):
+
+    def setUp(self):
+        self.band = Band.objects.create(name='The Doors', bio='', sign_date=date(1965, 1, 1))
+        self.song = Song.objects.create(name='test', band=self.band)
+        self.site = AdminSite()
+        self.request = MockRequest()
+        self.request.user = self.MockAddUser()
+        self.ma = BandAdmin(Band, self.site)
+
+    class MockAddUser:
+        def has_perm(self, perm):
+            return perm == 'modeladmin.add_band'
+
+    def test_get_inline_instances(self):
+        self.assertEqual(len(self.ma.get_inline_instances(self.request)), 1)
