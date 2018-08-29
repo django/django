@@ -12,12 +12,31 @@
 # database backends as possible.  You may want to create a separate settings
 # file for each of the backends you test against.
 
-DATABASES = {
+"""DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
     },
     'other': {
         'ENGINE': 'django.db.backends.sqlite3',
+    }
+} """
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'django_unit_test',
+        'USER': 'luke',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    },
+    'other': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'django_unit_test_other',
+        'USER': 'luke',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
