@@ -1113,7 +1113,7 @@ class FilePathField(ChoiceField):
                         (self.allow_folders and f.is_dir())) and
                         (self.match is None or self.match_re.search(f.name))):
                     choices.append((f.path, f.name))
-                choices.sort(key=operator.itemgetter(1))
+            choices.sort(key=operator.itemgetter(1))
             self.choices.extend(choices)
 
         self.widget.choices = self.choices
