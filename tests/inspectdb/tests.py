@@ -1,13 +1,13 @@
+
 import os
 import re
 from io import StringIO
 from unittest import mock, skipUnless
 
 from django.core.management import call_command
-from django.db import connection,connections
+from django.db import connection, connections
 from django.db.backends.base.introspection import TableInfo
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
-
 
 from .models import PeopleMoreData
 
