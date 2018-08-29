@@ -46,3 +46,6 @@ Bugfixes
   ``values_list()`` after combining querysets with ``extra()`` with
   ``union()``, ``difference()``, or ``intersection()`` crashed due to
   mismatching columns (:ticket:`29694`).
+
+* Fixed crash if ``InlineModelAdmin.has_add_permission()`` doesn't accept the
+  ``obj`` argument (:ticket:`29723`).

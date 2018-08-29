@@ -95,3 +95,10 @@ class ModelAdminTests(TestCase):
 
     def test_get_inline_instances(self):
         self.assertEqual(len(self.ma.get_inline_instances(self.request)), 1)
+
+    def test_get_inline_formsets(self):
+        formsets, inline_instances = self.ma._create_formsets(self.request, self.band, change=True)
+        self.assertEqual(len(self.ma.get_inline_formsets(self.request, formsets, inline_instances)), 1)
+
+    def test_get_formsets_with_inlines(self):
+        self.assertEqual(len(list(self.ma. get_formsets_with_inlines(self.request, self.band))), 1)
