@@ -251,12 +251,10 @@ class InspectDBTestCase(TestCase):
             with connection.cursor() as c:
                 c.execute('DROP INDEX Findex')
 
-
     @skipUnless(connection.vendor == 'postgresql', 'PostgreSQL foreign data wrapper test')
     def test_foreign_data_wrapper(self):
         cwd = os.getcwd()
 
-        #CreateExtension("file_fdw")
         with connections["default"].cursor() as c:
             c.execute("CREATE EXTENSION file_fdw")
             c.execute("CREATE SERVER pglog FOREIGN DATA WRAPPER file_fdw")
@@ -271,7 +269,7 @@ class InspectDBTestCase(TestCase):
 
             print(create_foreign_table)
 
-            res = c.execute(create_foreign_table)
+            c.execute(create_foreign_table)
 
             create__table = """CREATE  TABLE iris_dummy (
                 petal_length real,
@@ -279,21 +277,19 @@ class InspectDBTestCase(TestCase):
                 sepal_length real,
                 sepal_width real,
                 class int
-                ) """ 
+                ) """
             c.execute(create__table)
-
         print(connection.settings_dict['NAME'])
         try:
             out = StringIO()
             call_command('inspectdb', stdout=out)
             output = out.getvalue()
             print(output)
-            #self.assertIn("Iris", output)
+            # self.assertIn("Iris", output)
         finally:
             with connection.cursor() as c:
-                c.execute("DROP FOREIGN TABLE iris");
+                c.execute("DROP FOREIGN TABLE iris")
                 pass
-            
 
     @skipUnless(connection.vendor == 'sqlite',
                 "Only patched sqlite's DatabaseIntrospection.data_types_reverse for this test")
