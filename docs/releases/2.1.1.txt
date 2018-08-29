@@ -41,3 +41,8 @@ Bugfixes
 
 * Fixed admin change view crash for view-only users if the form has an extra
   form field (:ticket:`29682`).
+
+* Fixed a regression in Django 2.0.5 where ``QuerySet.values()`` or
+  ``values_list()`` after combining querysets with ``extra()`` with
+  ``union()``, ``difference()``, or ``intersection()`` crashed due to
+  mismatching columns (:ticket:`29694`).

@@ -130,6 +130,13 @@ class QuerySetSetOperationTests(TestCase):
         ).values_list('num', 'count')
         self.assertCountEqual(qs1.union(qs2), [(1, 0), (2, 1)])
 
+    def test_union_with_extra_and_values_list(self):
+        qs1 = Number.objects.filter(num=1).extra(
+            select={'count': 0},
+        ).values_list('num', 'count')
+        qs2 = Number.objects.filter(num=2).extra(select={'count': 1})
+        self.assertCountEqual(qs1.union(qs2), [(1, 0), (2, 1)])
+
     def test_union_with_values_list_on_annotated_and_unannotated(self):
         ReservedName.objects.create(name='rn1', order=1)
         qs1 = Number.objects.annotate(
