@@ -23,7 +23,7 @@ stages:
   - lint
   - test
   - name: release
-    if: branch = master
+    if: tag IS present
 
 jobs:
   include:
