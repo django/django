@@ -166,8 +166,8 @@ whose name begins with ``test``.
 
 Put the following in the ``tests.py`` file in the ``polls`` application:
 
-.. snippet::
-    :filename: polls/tests.py
+.. code-block:: python
+    :caption: polls/tests.py
 
     import datetime
 
@@ -248,8 +248,8 @@ return ``False`` if its ``pub_date`` is in the future. Amend the method in
 ``models.py``, so that it will only return ``True`` if the date is also in the
 past:
 
-.. snippet::
-    :filename: polls/models.py
+.. code-block:: python
+    :caption: polls/models.py
 
     def was_published_recently(self):
         now = timezone.now()
@@ -284,8 +284,8 @@ introduced another.
 Add two more test methods to the same class, to test the behavior of the method
 more comprehensively:
 
-.. snippet::
-    :filename: polls/tests.py
+.. code-block:: python
+    :caption: polls/tests.py
 
     def test_was_published_recently_with_old_question(self):
         """
@@ -400,8 +400,8 @@ The list of polls shows polls that aren't published yet (i.e. those that have a
 In :doc:`Tutorial 4 </intro/tutorial04>` we introduced a class-based view,
 based on :class:`~django.views.generic.list.ListView`:
 
-.. snippet::
-    :filename: polls/views.py
+.. code-block:: python
+    :caption: polls/views.py
 
     class IndexView(generic.ListView):
         template_name = 'polls/index.html'
@@ -415,15 +415,15 @@ We need to amend the ``get_queryset()`` method and change it so that it also
 checks the date by comparing it with ``timezone.now()``. First we need to add
 an import:
 
-.. snippet::
-    :filename: polls/views.py
+.. code-block:: python
+    :caption: polls/views.py
 
     from django.utils import timezone
 
 and then we must amend the ``get_queryset`` method like so:
 
-.. snippet::
-    :filename: polls/views.py
+.. code-block:: python
+    :caption: polls/views.py
 
     def get_queryset(self):
         """
@@ -450,16 +450,16 @@ our :djadmin:`shell` session above.
 
 Add the following to ``polls/tests.py``:
 
-.. snippet::
-    :filename: polls/tests.py
+.. code-block:: python
+    :caption: polls/tests.py
 
     from django.urls import reverse
 
 and we'll create a shortcut function to create questions as well as a new test
 class:
 
-.. snippet::
-    :filename: polls/tests.py
+.. code-block:: python
+    :caption: polls/tests.py
 
     def create_question(question_text, days):
         """
@@ -559,8 +559,8 @@ What we have works well; however, even though future questions don't appear in
 the *index*, users can still reach them if they know or guess the right URL. So
 we need to add a similar  constraint to ``DetailView``:
 
-.. snippet::
-    :filename: polls/views.py
+.. code-block:: python
+    :caption: polls/views.py
 
     class DetailView(generic.DetailView):
         ...
@@ -574,8 +574,8 @@ And of course, we will add some tests, to check that a ``Question`` whose
 ``pub_date`` is in the past can be displayed, and that one with a ``pub_date``
 in the future is not:
 
-.. snippet::
-    :filename: polls/tests.py
+.. code-block:: python
+    :caption: polls/tests.py
 
     class QuestionDetailViewTests(TestCase):
         def test_future_question(self):

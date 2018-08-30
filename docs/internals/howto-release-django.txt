@@ -62,8 +62,8 @@ You'll need a few things before getting started:
 
 * Access to Django's record on PyPI. Create a file with your credentials:
 
-  .. snippet::
-    :filename: ~/.pypirc
+  .. code-block:: ini
+    :caption: ~/.pypirc
 
     [pypi]
     username:YourUsername

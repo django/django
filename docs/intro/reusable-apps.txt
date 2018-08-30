@@ -141,8 +141,8 @@ this. For a small app like polls, this process isn't too difficult.
 
 3. Create a file ``django-polls/README.rst`` with the following contents:
 
-   .. snippet::
-       :filename: django-polls/README.rst
+   .. code-block:: rst
+       :caption: django-polls/README.rst
 
        =====
        Polls
@@ -188,8 +188,8 @@ this. For a small app like polls, this process isn't too difficult.
    explanation. Create a file ``django-polls/setup.py`` with the following
    contents:
 
-   .. snippet::
-       :filename: django-polls/setup.py
+   .. code-block:: python
+       :caption: django-polls/setup.py
 
        import os
        from setuptools import find_packages, setup
@@ -233,8 +233,8 @@ this. For a small app like polls, this process isn't too difficult.
    file, create a file ``django-polls/MANIFEST.in`` with the following
    contents:
 
-   .. snippet::
-       :filename: django-polls/MANIFEST.in
+   .. code-block:: text
+       :caption: django-polls/MANIFEST.in
 
        include LICENSE
        include README.rst

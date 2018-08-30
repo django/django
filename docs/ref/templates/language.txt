@@ -559,8 +559,8 @@ The auto-escaping tag passes its effect onto templates that extend the
 current one as well as templates included via the :ttag:`include` tag,
 just like all block tags. For example:
 
-.. snippet::
-    :filename: base.html
+.. code-block:: html+django
+    :caption: base.html
 
     {% autoescape off %}
     <h1>{% block title %}{% endblock %}</h1>
@@ -568,8 +568,8 @@ just like all block tags. For example:
     {% endblock %}
     {% endautoescape %}
 
-.. snippet::
-    :filename: child.html
+.. code-block:: html+django
+    :caption: child.html
 
     {% extends "base.html" %}
     {% block title %}This &amp; that{% endblock %}
@@ -649,15 +649,15 @@ of all comments related to the current task with::
 And of course you can easily access methods you've explicitly defined on your
 own models:
 
-.. snippet::
-    :filename: models.py
+.. code-block:: python
+    :caption: models.py
 
     class Task(models.Model):
         def foo(self):
             return "bar"
 
-.. snippet::
-    :filename: template.html
+.. code-block:: html+django
+    :caption: template.html
 
     {{ task.foo }}
 

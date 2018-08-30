@@ -1264,8 +1264,8 @@ attribute (as below). If the ``app_name`` is set in this new way, the
 ``namespace`` argument is no longer required. It will default to the value of
 ``app_name``. For example, the URL patterns in the tutorial are changed from:
 
-.. snippet::
-    :filename: mysite/urls.py
+.. code-block:: python
+    :caption: mysite/urls.py
 
     urlpatterns = [
         url(r'^polls/', include('polls.urls', namespace="polls")),
@@ -1274,16 +1274,16 @@ attribute (as below). If the ``app_name`` is set in this new way, the
 
 to:
 
-.. snippet::
-    :filename: mysite/urls.py
+.. code-block:: python
+    :caption: mysite/urls.py
 
     urlpatterns = [
         url(r'^polls/', include('polls.urls')),  # 'namespace="polls"' removed
         ...
     ]
 
-.. snippet::
-    :filename: polls/urls.py
+.. code-block:: python
+    :caption: polls/urls.py
 
     app_name = 'polls'  # added
     urlpatterns = [...]
@@ -1292,8 +1292,8 @@ This change also means that the old way of including an ``AdminSite`` instance
 is deprecated. Instead, pass ``admin.site.urls`` directly to
 :func:`~django.conf.urls.url()`:
 
-.. snippet::
-    :filename: urls.py
+.. code-block:: python
+    :caption: urls.py
 
     from django.conf.urls import url
     from django.contrib import admin
