@@ -90,6 +90,8 @@ Minor features
 * :class:`~django.contrib.postgres.indexes.BrinIndex` now has the
   ``autosummarize`` parameter.
 
+* Added ``phrase`` parameter to SearchVector to support phrase searching. 
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
