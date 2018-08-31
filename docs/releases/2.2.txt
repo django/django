@@ -259,12 +259,12 @@ Database backend API
 
 * Support for GDAL 1.9 and 1.10 is dropped.
 
+Miscellaneous
+-------------
+
 * To improve readability, the ``UUIDField`` form field now displays values with
   dashes, e.g. ``550e8400-e29b-41d4-a716-446655440000`` instead of
   ``550e8400e29b41d4a716446655440000``.
-
-Miscellaneous
--------------
 
 * On SQLite, ``PositiveIntegerField`` and ``PositiveSmallIntegerField`` now
   include a check constraint to prevent negative values in the database. If you
