@@ -28,7 +28,6 @@ from django.db.models.signals import (
     class_prepared, post_init, post_save, pre_init, pre_save,
 )
 from django.db.models.utils import make_model_tuple
-from django.utils.encoding import force_text
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext_lazy as _
 from django.utils.version import get_version
@@ -902,7 +901,7 @@ class Model(metaclass=ModelBase):
 
     def _get_FIELD_display(self, field):
         value = getattr(self, field.attname)
-        return force_text(dict(field.flatchoices).get(value, value), strings_only=True)
+        return dict(field.flatchoices).get(value, value)
 
     def _get_next_or_previous_by_FIELD(self, field, is_next, **kwargs):
         if not self.pk:
