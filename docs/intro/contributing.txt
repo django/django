@@ -187,36 +187,6 @@ The installed version of Django is now pointing at your local copy. You will
 immediately see any changes you make to it, which is of great help when writing
 your first patch.
 
-Rolling back to a previous revision of Django
-=============================================
-
-For this tutorial, we'll be using ticket :ticket:`24788` as a case study, so
-we'll rewind Django's version history in git to before that ticket's patch was
-applied. This will allow us to go through all of the steps involved in writing
-that patch from scratch, including running Django's test suite.
-
-**Keep in mind that while we'll be using an older revision of Django for this
-tutorial, you should always use the current version of the master branch when
-working on your own patch for a ticket!**
-
-.. note::
-
-    The patch for this ticket was written by Paweł Marczewski, and it was
-    applied to Django as `commit 4df7e8483b2679fc1cba3410f08960bac6f51115`__.
-    Consequently, we'll be using the revision of Django just prior to that,
-    `commit 4ccfc4439a7add24f8db4ef3960d02ef8ae09887`__.
-
-__ https://github.com/django/django/commit/4df7e8483b2679fc1cba3410f08960bac6f51115
-__ https://github.com/django/django/commit/4ccfc4439a7add24f8db4ef3960d02ef8ae09887
-
-Navigate into Django's root directory (that's the one that contains ``django``,
-``docs``, ``tests``, ``AUTHORS``, etc.). You can then check out the older
-revision of Django that we'll be using in the tutorial below:
-
-.. console::
-
-    $ git checkout 4ccfc4439a7add24f8db4ef3960d02ef8ae09887
-
 Running Django's test suite for the first time
 ==============================================
 
@@ -247,9 +217,8 @@ some other flavor of Unix, run:
 
     $ ./runtests.py
 
-Now sit back and relax. Django's entire test suite has over 9,600 different
-tests, so it can take anywhere from 5 to 15 minutes to run, depending on the
-speed of your computer.
+Now sit back and relax. Django's entire test suite has thousands of tests, and
+it takes at least a few minutes run, depending on the speed of your computer.
 
 While Django's test suite is running, you'll see a stream of characters
 representing the status of each test as it's run. ``E`` indicates that an error
@@ -289,6 +258,36 @@ __ https://djangoci.com
     is sufficient, however, it's possible (and sometimes necessary) to
     :ref:`run the tests using a different database
     <running-unit-tests-settings>`.
+
+Rolling back to a previous revision of Django
+=============================================
+
+For this tutorial, we'll be using ticket :ticket:`24788` as a case study, so
+we'll rewind Django's version history in git to before that ticket's patch was
+applied. This will allow us to go through all of the steps involved in writing
+that patch from scratch, including running Django's test suite.
+
+**Keep in mind that while we'll be using an older revision of Django for this
+tutorial, you should always use the current version of the master branch when
+working on your own patch for a ticket!**
+
+.. note::
+
+    The patch for this ticket was written by Paweł Marczewski, and it was
+    applied to Django as `commit 4df7e8483b2679fc1cba3410f08960bac6f51115`__.
+    Consequently, we'll be using the revision of Django just prior to that,
+    `commit 4ccfc4439a7add24f8db4ef3960d02ef8ae09887`__.
+
+__ https://github.com/django/django/commit/4df7e8483b2679fc1cba3410f08960bac6f51115
+__ https://github.com/django/django/commit/4ccfc4439a7add24f8db4ef3960d02ef8ae09887
+
+Navigate into Django's root directory (that's the one that contains ``django``,
+``docs``, ``tests``, ``AUTHORS``, etc.). You can then check out the older
+revision of Django that we'll be using in the tutorial below:
+
+.. console::
+
+    $ git checkout 4ccfc4439a7add24f8db4ef3960d02ef8ae09887
 
 Creating a branch for your patch
 ================================
@@ -461,7 +460,9 @@ directory and run:
 
     $ ./runtests.py
 
-As long as you don't see any failures, you're good to go.
+Remember that for this tutorial you're working from an older version of Django.
+You may see a few unrelated failures that have since been fixed in Django's
+master branch.
 
 Writing Documentation
 =====================
