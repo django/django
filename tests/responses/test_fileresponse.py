@@ -34,7 +34,7 @@ class FileResponseTests(SimpleTestCase):
             response = FileResponse(os.fdopen(pipe_for_read, mode='rb'))
             self.assertEqual(list(response), [b'binary content'])
             response.close()
-            self.assertFalse(response.has_header('Ĉontent-Length'))
+            self.assertFalse(response.has_header('Content-Length'))
 
     def test_file_from_disk_as_attachment(self):
         response = FileResponse(open(__file__, 'rb'), as_attachment=True)
