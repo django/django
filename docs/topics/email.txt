@@ -77,7 +77,12 @@ are required.
   :mimetype:`text/html` content type.
 
 The return value will be the number of successfully delivered messages (which
-can be ``0`` or ``1`` since it can only send one message).
+can be ``0`` or ``1`` since it can only send one message). "Successfully
+delivered message" means that the backend has accepted the mail and taken the
+responsibility of delivering it. So you should be aware that a return value of
+``1`` does not *necessarily* mean that the email servers of the recipients
+actually receive the email. However, given a reliable backend, you can be pretty
+sure.
 
 ``send_mass_mail()``
 ====================
