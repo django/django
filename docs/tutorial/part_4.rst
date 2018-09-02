@@ -142,6 +142,22 @@ suites for end-to-end tests (``StaticLiveServerTestCase`` or ``LiveServerTestCas
 that URLs inside the Channels routing configuration like ``/ws/room/ROOM_NAME/``
 will work inside the suite.
 
+We are using ``sqlite3``, which for testing, is run as an in-memory database, and therefore, the tests will not run correctly.
+We need to tell our project that the ``sqlite3`` database need not to be in memory for run the tests. Edit the
+``mysite/settings.py`` file and add the ``TEST`` argument to the **DATABASES** setting::
+
+    # mysite/settings.py
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+            'TEST': {
+                'NAME': os.path.join(BASE_DIR, 'db_test.sqlite3')
+            }
+        }
+    }
+
+
 To run the tests, run the following command::
 
     $ python3 manage.py test chat.tests
