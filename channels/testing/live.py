@@ -4,6 +4,7 @@ from django.test.testcases import TransactionTestCase
 from django.test.utils import modify_settings
 
 from channels.routing import get_default_application
+from channels.staticfiles import StaticFilesWrapper
 from daphne.testing import DaphneProcess
 
 
@@ -17,6 +18,7 @@ class ChannelsLiveServerTestCase(TransactionTestCase):
 
     host = "localhost"
     ProtocolServerProcess = DaphneProcess
+    static_wrapper = StaticFilesWrapper
     serve_static = True
 
     @property
@@ -40,9 +42,13 @@ class ChannelsLiveServerTestCase(TransactionTestCase):
             ALLOWED_HOSTS={"append": self.host}
         )
         self._live_server_modified_settings.enable()
-        self._server_process = self.ProtocolServerProcess(
-            self.host, get_default_application()
-        )
+
+        if self.serve_static:
+            application = self.static_wrapper(get_default_application())
+        else:
+            application = get_default_application()
+
+        self._server_process = self.ProtocolServerProcess(self.host, application)
         self._server_process.start()
         self._server_process.ready.wait()
         self._port = self._server_process.port.value
