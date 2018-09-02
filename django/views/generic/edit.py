@@ -3,7 +3,7 @@ from django.forms import models as model_forms
 from django.http import HttpResponseRedirect
 from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 from django.views.generic.detail import (
-    BaseDetailView, SingleObjectMixin, SingleObjectTemplateResponseMixin,
+    SingleObjectMixin, SingleObjectTemplateResponseMixin,
 )
 
 

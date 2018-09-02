@@ -162,12 +162,11 @@ Generic Views
 
 * MRO of :class:`~django.views.generic.edit.DeleteView` is changed in order to clarify the inheritance hierarchy.
 
-* :class:`~django.views.generic.detail.BaseDetailView` is not used in MRO of DeleteView, instead
-  :class:`~django.views.generic.detail.SingleObjectMixin` is used.
+* ``BaseDetailView`` is not used in MRO of DeleteView, instead :class:`~django.views.generic.detail.SingleObjectMixin` is used.
 
 * :class:`~django.views.generic.edit.DeletionMixin` inherits from :class:`~django.views.generic.detail.SingleObjectMixin`.
 
-* :class:`~django.views.generic.edit.BaseDeleteView` provides get(), post() and delete() methods
+* ``BaseDeleteView`` provides get(), post() and delete() methods
 
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
