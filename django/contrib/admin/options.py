@@ -101,6 +101,7 @@ csrf_protect_m = method_decorator(csrf_protect)
 class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
     """Functionality common to both ModelAdmin and InlineAdmin."""
 
+    manager_name = '_default_manager'
     autocomplete_fields = ()
     raw_id_fields = ()
     fields = None
@@ -351,7 +352,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         Return a QuerySet of all model instances that can be edited by the
         admin site. This is used by changelist_view.
         """
-        qs = self.model._default_manager.get_queryset()
+        qs = getattr(self.model, self.manager_name).get_queryset()
         # TODO: this should be handled by some parameter to the ChangeList.
         ordering = self.get_ordering(request)
         if ordering:

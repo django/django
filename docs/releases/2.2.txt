@@ -43,7 +43,8 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :attr:`.ModelAdmin.manager_name` attribute allows customizing the
+  model's manager used by :meth:`.ModelAdmin.get_queryset()`.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
