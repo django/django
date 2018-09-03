@@ -18,7 +18,7 @@ from django.utils.encoding import DEFAULT_LOCALE_ENCODING
 from django.utils.functional import cached_property
 from django.utils.jslex import prepare_js_for_gettext
 from django.utils.text import get_text_list
-from django.utils.translation import templatize
+from django.utils.translation import templatize, to_locale
 
 plural_forms_re = re.compile(r'^(?P<value>"Plural-Forms.+?\\n")\s*$', re.MULTILINE | re.DOTALL)
 STATUS_OK = 0
@@ -166,6 +166,15 @@ def normalize_eols(raw_contents):
     if lines_list and lines_list[-1]:
         lines_list.append('')
     return '\n'.join(lines_list)
+
+
+def normalize_locale(locale_str):
+    """
+    Normalize locale string to use a single locale format.
+    Eg. (zh-cn, zh_cn, zh_CN, ZH-CN) all map to zh_CN
+    """
+    language = locale_str.lower().replace('_', '-')
+    return to_locale(language)
 
 
 def write_pot_file(potfile, msgs):
@@ -367,6 +376,9 @@ class Command(BaseCommand):
             lang_code for lang_code in map(os.path.basename, locale_dirs)
             if looks_like_locale.match(lang_code)
         ]
+
+        # Normalize user input locale(s)
+        locale = [normalize_locale(l) for l in locale]
 
         # Account for excluded locales
         if process_all:
