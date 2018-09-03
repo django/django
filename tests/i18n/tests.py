@@ -1649,6 +1649,7 @@ class CountrySpecificLanguageTests(SimpleTestCase):
         self.assertTrue(check_for_language('en'))
         self.assertTrue(check_for_language('en-us'))
         self.assertTrue(check_for_language('en-US'))
+        self.assertFalse(check_for_language('en_US'))
         self.assertTrue(check_for_language('be'))
         self.assertTrue(check_for_language('be@latin'))
         self.assertTrue(check_for_language('sr-RS@latin'))
