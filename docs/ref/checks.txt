@@ -85,8 +85,8 @@ Django's system checks are organized using the following tags:
 * ``signals``: Checks on signal declarations and handler registrations.
 * ``staticfiles``: Checks :mod:`django.contrib.staticfiles` configuration.
 * ``templates``: Checks template related configuration.
+* ``translation``: Checks translation related configuration.
 * ``urls``: Checks URL configuration.
-* ``translation``: Checks language formats used for translation.
 
 Some checks may be registered with multiple tags.
 
@@ -427,6 +427,14 @@ configured:
   :setting:`OPTIONS <TEMPLATES-OPTIONS>` must be a string but got: ``{value}``
   (``{type}``).
 
+Translation
+-----------
+
+The following checks are performed on your translation configuration:
+
+* **translation.E001**: You have provided an invalid value for the
+  :setting:`LANGUAGE_CODE` setting.
+
 URLs
 ----
 
@@ -449,18 +457,6 @@ The following checks are performed on your URL configuration:
   able to reverse all URLs in this namespace.
 * **urls.E006**: The :setting:`MEDIA_URL`/ :setting:`STATIC_URL` setting must
   end with a slash.
-
-Translation
------------
-
-The following checks are performed on your translation configuration:
-
-* **translation.E001**: LANGUAGE_CODE in settings.py is ``<language_code>``.
-   It should be in the form ll or ll-cc where ll is the language and cc is the
-   country. Examples include: ``it``, ``de-at``, ``es``, ``pt-br``. The full
-   set of language codes specifications is outlined by
-   https://en.wikipedia.org/wiki/IETF_language_tag#Syntax_of_language_tags
-
 
 ``contrib`` app checks
 ======================
