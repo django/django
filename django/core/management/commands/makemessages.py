@@ -273,6 +273,10 @@ class Command(BaseCommand):
             ),
         )
         parser.add_argument(
+            '--sort-output', action='store_true', dest='sort_output',
+            help="Sort message strings by msgid",
+        )
+        parser.add_argument(
             '--no-obsolete', action='store_true',
             help="Remove obsolete message strings.",
         )
@@ -317,6 +321,11 @@ class Command(BaseCommand):
             self.msguniq_options = self.msguniq_options[:] + [arg_add_location]
             self.msgattrib_options = self.msgattrib_options[:] + [arg_add_location]
             self.xgettext_options = self.xgettext_options[:] + [arg_add_location]
+        if options['sort_output']:
+            self.msgmerge_options = self.msgmerge_options[:] + ['--sort-output']
+            self.msguniq_options = self.msguniq_options[:] + ['--sort-output']
+            self.msgattrib_options = self.msgattrib_options[:] + ['--sort-output']
+            self.xgettext_options = self.xgettext_options[:] + ['--sort-output']
 
         self.no_obsolete = options['no_obsolete']
         self.keep_pot = options['keep_pot']

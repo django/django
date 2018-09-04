@@ -637,6 +637,41 @@ class LocationCommentsTests(ExtractorTests):
             management.call_command('makemessages', locale=[LOCALE], verbosity=0, add_location='full')
 
 
+class SortOutputTests(ExtractorTests):
+    @staticmethod
+    def _get_msg_ids(po_file):
+        def unescape(escaped_msg_id):
+            return (escaped_msg_id.replace('\\n', '\n').replace('\\t', '\t').
+                    replace('\\r', '\r').replace('\\\\', '\\').replace('\\"', '"'))
+
+        msg_ids = []
+        with open(po_file, 'r') as fp:
+            po_contents = fp.read()
+            current_msgid = None
+            for line in po_contents.splitlines():
+                if line.startswith('msgid "'):
+                    current_msgid = unescape(line[7:-1])
+                elif current_msgid is not None:
+                    if line.startswith('"'):
+                        current_msgid += unescape(line[1:-1])
+                    else:
+                        msg_ids.append(current_msgid)
+                        current_msgid = None
+        return msg_ids
+
+    def test_sort_output_enabled(self):
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0, sort_output=True)
+        self.assertTrue(os.path.exists(self.PO_FILE))
+        msg_ids = self._get_msg_ids(self.PO_FILE)
+        self.assertEqual(sorted(msg_ids), msg_ids)
+
+    def test_sort_output_disabled(self):
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0, sort_output=False)
+        self.assertTrue(os.path.exists(self.PO_FILE))
+        msg_ids = self._get_msg_ids(self.PO_FILE)
+        self.assertNotEqual(sorted(msg_ids), msg_ids)
+
+
 class KeepPotFileExtractorTests(ExtractorTests):
 
     POT_FILE = 'locale/django.pot'
