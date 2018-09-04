@@ -256,6 +256,32 @@ class AsgiHandler(base.BaseHandler):
                 content_type="text/plain",
             )
 
+    def load_middleware(self):
+        """
+        Loads the Django middleware chain and caches it on the class.
+        """
+        # Because we create an AsgiHandler on every HTTP request
+        # we need to preserve the Django middleware chain once we load it.
+        if (
+            hasattr(self.__class__, "_middleware_chain")
+            and self.__class__._middleware_chain
+        ):
+            self._middleware_chain = self.__class__._middleware_chain
+            self._view_middleware = self.__class__._view_middleware
+            self._template_response_middleware = (
+                self.__class__._template_response_middleware
+            )
+            self._exception_middleware = self.__class__._exception_middleware
+
+        else:
+            super(AsgiHandler, self).load_middleware()
+            self.__class__._middleware_chain = self._middleware_chain
+            self.__class__._view_middleware = self._view_middleware
+            self.__class__._template_response_middleware = (
+                self._template_response_middleware
+            )
+            self.__class__._exception_middleware = self._exception_middleware
+
     @classmethod
     def encode_response(cls, response):
         """

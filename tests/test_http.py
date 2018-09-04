@@ -1,6 +1,6 @@
 import re
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 from django.http import HttpResponse
@@ -285,3 +285,28 @@ async def test_sessions():
     assert re.compile(r"Max-Age").search(value) is not None
 
     assert re.compile(r"Path").search(value) is not None
+
+
+class MiddlewareTests(unittest.TestCase):
+    def test_middleware_caching(self):
+        """
+        Tests that middleware is only loaded once
+        and is successfully cached on the AsgiHandler class.
+        """
+
+        scope = {
+            "type": "http",
+            "http_version": "1.1",
+            "method": "GET",
+            "path": "/test/",
+        }
+
+        AsgiHandler(scope)  # First Handler
+
+        self.assertTrue(AsgiHandler._middleware_chain is not None)
+
+        with patch(
+            "django.core.handlers.base.BaseHandler.load_middleware"
+        ) as super_function:
+            AsgiHandler(scope)  # Second Handler
+            self.assertFalse(super_function.called)
