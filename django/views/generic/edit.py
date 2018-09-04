@@ -3,7 +3,7 @@ from django.forms import models as model_forms
 from django.http import HttpResponseRedirect
 from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 from django.views.generic.detail import (
-    BaseDetailView, SingleObjectMixin, SingleObjectTemplateResponseMixin,
+    SingleObjectMixin, SingleObjectTemplateResponseMixin,
 )
 
 
@@ -199,9 +199,31 @@ class UpdateView(SingleObjectTemplateResponseMixin, BaseUpdateView):
     template_name_suffix = '_form'
 
 
-class DeletionMixin:
+class DeletionMixin(SingleObjectMixin):
     """Provide the ability to delete objects."""
     success_url = None
+
+    def get_success_url(self):
+        if self.success_url:
+            return self.success_url.format(**self.object.__dict__)
+        else:
+            raise ImproperlyConfigured(
+                "No URL to redirect to. Provide a success_url.")
+
+
+class BaseDeleteView(DeletionMixin, View):
+    """
+    Base view for deleting an object.
+
+    Using this base class requires subclassing to provide a response mixin.
+    """
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
+
+    def post(self, request, *args, **kwargs):
+        return self.delete(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
         """
@@ -212,25 +234,6 @@ class DeletionMixin:
         success_url = self.get_success_url()
         self.object.delete()
         return HttpResponseRedirect(success_url)
-
-    # Add support for browsers which only accept GET and POST for now.
-    def post(self, request, *args, **kwargs):
-        return self.delete(request, *args, **kwargs)
-
-    def get_success_url(self):
-        if self.success_url:
-            return self.success_url.format(**self.object.__dict__)
-        else:
-            raise ImproperlyConfigured(
-                "No URL to redirect to. Provide a success_url.")
-
-
-class BaseDeleteView(DeletionMixin, BaseDetailView):
-    """
-    Base view for deleting an object.
-
-    Using this base class requires subclassing to provide a response mixin.
-    """
 
 
 class DeleteView(SingleObjectTemplateResponseMixin, BaseDeleteView):
