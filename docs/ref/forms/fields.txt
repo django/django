@@ -882,7 +882,7 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: TimeField(**kwargs)
 
-    * Default widget: :class:`TextInput`
+    * Default widget: :class:`TimeInput`
     * Empty value: ``None``
     * Normalizes to: A Python ``datetime.time`` object.
     * Validates that the given value is either a ``datetime.time`` or string
