@@ -591,6 +591,10 @@ class BasicExpressionsTests(TestCase):
         expr.convert_value  # populate cached property
         self.assertEqual(pickle.loads(pickle.dumps(expr)), expr)
 
+    def test_incorrect_field_in_F_expression(self):
+        with self.assertRaisesMessage(FieldError, "Cannot resolve keyword 'nope' into field."):
+            list(Employee.objects.filter(firstname=F('nope')))
+
 
 class IterableLookupInnerExpressionsTests(TestCase):
     @classmethod
@@ -921,10 +925,6 @@ class ExpressionsNumericTests(TestCase):
 
         self.assertEqual(Number.objects.get(pk=n.pk).integer, 10)
         self.assertEqual(Number.objects.get(pk=n.pk).float, Approximate(256.900, places=3))
-
-    def test_incorrect_field_expression(self):
-        with self.assertRaisesMessage(FieldError, "Cannot resolve keyword 'nope' into field."):
-            list(Employee.objects.filter(firstname=F('nope')))
 
 
 class ExpressionOperatorTests(TestCase):
