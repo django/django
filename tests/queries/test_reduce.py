@@ -11,7 +11,13 @@ queries = (
     Classroom.objects.annotate(a=Lower('name')),
     Student.objects.annotate(a=Count('classroom__school__classroom')),
     Student.objects.annotate(a=Count('classroom', filter=Q(pk=1))),
-    Classroom.objects.select_related('school')
+    Classroom.objects.select_related('school'),
+)
+
+excluded_queries = (
+    Student.objects.distinct('school'),
+    Student.objects.all()[:3],
+    Student.objects.filter(pk=1)
 )
 
 
@@ -27,16 +33,23 @@ class TestSimplifyCount(TestCase):
         cls.classroom.students.add(cls.student1, cls.student2)
 
     def test_simple_count_optimization(self):
-        for query in queries:
+        for qs in queries:
             with self.subTest():
+                self.assertTrue(qs.query.can_optimize_count)
                 with CaptureQueriesContext(connection) as captured_queries:
-                    self.assertEqual(query.model.objects.count(), query.count())
+                    self.assertEqual(qs.model.objects.count(), qs.count())
                 self.assertEqual(captured_queries[0]['sql'], captured_queries[1]['sql'])
                 self.assertNotIn('JOIN', captured_queries[1]['sql'])
 
     def test_filter_removes_optimization(self):
-        for query in queries:
+        for qs in queries:
             with self.subTest():
+                self.assertTrue(qs.query.can_optimize_count)
                 with CaptureQueriesContext(connection) as captured_queries:
-                    self.assertEqual(query.model.objects.count(), query.filter(pk__isnull=False).count())
+                    self.assertEqual(qs.model.objects.count(), qs.filter(pk__isnull=False).count())
                 self.assertNotEqual(captured_queries[0]['sql'], captured_queries[1]['sql'])
+
+    def test_excluded_queries(self):
+        for qs in excluded_queries:
+            with self.subTest():
+                self.assertFalse(qs.query.can_optimize_count)
