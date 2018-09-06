@@ -1568,10 +1568,13 @@ class Query:
         else:
             field_list = name.split(LOOKUP_SEP)
             join_info = self.setup_joins(field_list, self.get_meta(), self.get_initial_alias(), can_reuse=reuse)
-            targets, _, join_list = self.trim_joins(join_info.targets, join_info.joins, join_info.path)
+            targets, final_alias, join_list = self.trim_joins(join_info.targets, join_info.joins, join_info.path)
             if len(targets) > 1:
                 raise FieldError("Referencing multicolumn fields with F() objects "
                                  "isn't supported")
+            # Verify that the last lookup in name is a field or a transform:
+            # transform_function() raises FieldError if not.
+            join_info.transform_function(targets[0], final_alias)
             if reuse is not None:
                 reuse.update(join_list)
             col = targets[0].get_col(join_list[-1], join_info.targets[0])
