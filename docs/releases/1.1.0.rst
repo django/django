@@ -11,7 +11,7 @@ Major Changes
 
 * Channels now includes a JavaScript wrapper that wraps reconnection and
   multiplexing for you on the client side. For more on how to use it, see the
-  :doc:`/javascript` documentation.
+  javascript documentation.
 
 * Test classes have been moved from ``channels.tests`` to ``channels.test``
   to better match Django. Old imports from ``channels.tests`` will continue to

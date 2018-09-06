@@ -61,7 +61,6 @@ Topics
    topics/worker
    deploying
    one-to-two
-   javascript
 
 
 Reference
