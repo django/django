@@ -188,7 +188,7 @@ class RegexPattern(CheckURLMixin):
 
 
 _PATH_PARAMETER_COMPONENT_RE = re.compile(
-    r'<(?:(?P<converter>[^>:]+):)?(?P<parameter>\w+)>'
+    r'<(?:(?P<converter>[^>:]+):)?(\s+)?(?P<parameter>\w+)(\s+)?>'
 )
 
 

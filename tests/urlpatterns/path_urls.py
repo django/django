@@ -12,4 +12,6 @@ urlpatterns = [
     path('users/<id>/', views.empty_view, name='user-with-id'),
     path('included_urls/', include('urlpatterns_reverse.included_urls')),
     path('<lang>/<path:url>/', views.empty_view, name='lang-and-path'),
+    path('prefix/<int: num>', views.empty_view, name='spaces-prefix-name'),
+    path('postfix/<int:num >', views.empty_view, name='spaces-postfix-name')
 ]
