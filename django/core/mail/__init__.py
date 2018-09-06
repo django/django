@@ -57,7 +57,7 @@ def send_mail(subject, message, from_email, recipient_list,
     if html_message:
         mail.attach_alternative(html_message, 'text/html')
 
-    return mail.send()
+    return mail.send(fail_silently=fail_silently)
 
 
 def send_mass_mail(datatuple, fail_silently=False, auth_user=None,
