@@ -74,3 +74,17 @@ async def test_origin_validator():
     connected, _ = await communicator.connect()
     assert not connected
     await communicator.disconnect()
+    # Test bug with subdomain and empty origin header
+    application = OriginValidator(AsyncWebsocketConsumer, [".allowed-domain.com"])
+    communicator = WebsocketCommunicator(application, "/", headers=[(b"origin", b"")])
+    connected, _ = await communicator.connect()
+    assert not connected
+    await communicator.disconnect()
+    # Test bug with subdomain and invalid origin header
+    application = OriginValidator(AsyncWebsocketConsumer, [".allowed-domain.com"])
+    communicator = WebsocketCommunicator(
+        application, "/", headers=[(b"origin", b"something-invalid")]
+    )
+    connected, _ = await communicator.connect()
+    assert not connected
+    await communicator.disconnect()

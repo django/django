@@ -95,6 +95,8 @@ class OriginValidator:
 
         # Get ResultParse object
         parsed_pattern = urlparse(pattern.lower(), scheme=None)
+        if parsed_origin.hostname is None:
+            return False
         if parsed_pattern.scheme is None:
             pattern_hostname = urlparse("//" + pattern).hostname or pattern
             return is_same_domain(parsed_origin.hostname, pattern_hostname)
