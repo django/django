@@ -9,4 +9,5 @@ Django 2.1.2 fixes several bugs in 2.1.1
 Bugfixes
 ========
 
-* ...
+* Fixed a regression where nonexistent joins in ``F()`` no longer raised
+  ``FieldError`` (:ticket:`29727`).
