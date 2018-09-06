@@ -877,8 +877,10 @@ As with regular formsets, it's possible to :ref:`specify initial data
 parameter when instantiating the model formset class returned by
 :func:`~django.forms.models.modelformset_factory`. However, with model
 formsets, the initial values only apply to extra forms, those that aren't
-attached to an existing model instance. If the extra forms with initial data
-aren't changed by the user, they won't be validated or saved.
+attached to an existing model instance. If the length of ``initial`` exceeds
+the number of extra forms, the excess initial data is ignored. If the extra
+forms with initial data aren't changed by the user, they won't be validated or
+saved.
 
 .. _saving-objects-in-the-formset:
 
