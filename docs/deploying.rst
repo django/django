@@ -167,3 +167,91 @@ Hypercorn
 server based on the sans-io hyper, h11, h2, and wsproto libraries.
 
 It supports HTTP/1, HTTP/2, and websockets.
+
+How to use Channels 2 with Nginx and Supervisor on Ubuntu
+-----------------------------------------------------
+
+Prerequisites:
+
+    * A Django Site to be deployed.
+    * A non-root user account with sudo pivileges set up on a Ubuntu Server.
+
+Install Nginx and Supervisor::
+
+    $ sudo apt install nginx
+    $ sudo apt install supervisor
+
+if you installed from default respository:
+
+    * Ubuntu < 16.04, the default init daemon service is Upstart.
+    * Ubuntu >= 16.04, the default init daemon service is systemd.
+
+Supervisor configuration::
+
+Create the supervisor configuration file, the contents of the configuration file are as follows::
+
+    [fcgi-program:asgi]
+    # TCP socket used by Nginx backend upstream
+    socket=tcp://localhost:8000
+
+    # where is "my-site" project files located?
+    # its your project running directory
+    directory=/my/app/path
+
+    # parameter %(process_num) for command's value is required,
+    # every new thread will create a sock file
+    command=daphne -u /run/daphne/daphne%(process_num)d.sock --fd 0 --access-log - --proxy-headers mysite.asgi:application
+
+    # number of processes to startup, maybe the count of your cpus
+    numprocs=4
+
+    # parameter %(process_num) for process_name's value is required,
+    # each process will give different process name of supervisord
+    process_name=asgi%(process_num)d
+
+    autostart=true
+    autorestart=true
+
+    # where is asgi log file located?
+    stdout_logfile=/your/log/asgi.log
+
+    redirect_stderr=true
+
+Reread and update your supervisord::
+
+    $ sudo supervisorctl reread
+    $ sudo supervisorctl update
+
+Nginx configuration:
+
+Setup your nginx upstream conf file for your project::
+
+    upstream channels-backend {
+        server localhost:8000;
+    }
+    ...
+    server {
+        ...
+        location / {
+            try_files $uri @proxy_to_app;
+        }
+        ...
+        localtion @proxy_to_app {
+            proxy_pass http://channels-backend;
+
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+
+            proxy_redirect off;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Host $server_name;
+        }
+        ...
+    }
+
+Reload your nginx service::
+
+    $ sudo service nginx reload
