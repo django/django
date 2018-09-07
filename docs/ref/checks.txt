@@ -457,6 +457,8 @@ The following checks are performed on your URL configuration:
   able to reverse all URLs in this namespace.
 * **urls.E006**: The :setting:`MEDIA_URL`/ :setting:`STATIC_URL` setting must
   end with a slash.
+* **urls.E007**: The custom ``handlerXXX`` view ``'path.to.view'`` does not
+  take the correct number of arguments (…).
 
 ``contrib`` app checks
 ======================
