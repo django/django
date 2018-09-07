@@ -152,78 +152,63 @@ Aspects where servers may differ are in their configuration and defaults,
 performance characteristics, support for resource limiting, differing protocol
 and socket support, and approaches to process management.
 
-Uvicorn
--------
+You can see more alternative servers, such as Uvicorn, in the
+`ASGI implementations documentation <https://asgi.readthedocs.io/en/latest/implementations.html#servers>`_.
 
-`Uvicorn <https://www.uvicorn.org/>`_ is an ASGI & WSGI server, with a fast
-uvloop + httptools implementation.
 
-It supports HTTP/1 and websockets.
+Example Setups
+--------------
 
-Hypercorn
----------
+These are examples of possible setups - they are not guaranteed to work out of
+the box, and should be taken more as a guide than a direct tutorial.
 
-`Hypercorn <https://pgjones.gitlab.io/hypercorn/index.html>`_ is an ASGI
-server based on the sans-io hyper, h11, h2, and wsproto libraries.
 
-It supports HTTP/1, HTTP/2, and websockets.
+Nginx/Supervisor (Ubuntu)
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-How to use Channels 2 with Nginx and Supervisor on Ubuntu
------------------------------------------------------
+This example sets up a Django site on an Ubuntu server, using Nginx as the
+main webserver and supervisord to run and manage Daphne. 
 
-Prerequisites:
+First, install Nginx and Supervisor::
 
-    * A Django Site to be deployed.
-    * A non-root user account with sudo pivileges set up on a Ubuntu Server.
+    $ sudo apt install nginx supervisor
 
-Install Nginx and Supervisor::
-
-    $ sudo apt install nginx
-    $ sudo apt install supervisor
-
-if you installed from default respository:
-
-    * Ubuntu < 16.04, the default init daemon service is Upstart.
-    * Ubuntu >= 16.04, the default init daemon service is systemd.
-
-Supervisor configuration::
-
-Create the supervisor configuration file, the contents of the configuration file are as follows::
+Now, you will need to create the supervisor configuration file (often located in
+``/etc/supervisor/conf.d/`` - here, we're making Supervisor listen on the TCP
+port and then handing that socket off to the child processes so they can all
+share the same bound port::
 
     [fcgi-program:asgi]
     # TCP socket used by Nginx backend upstream
     socket=tcp://localhost:8000
 
-    # where is "my-site" project files located?
-    # its your project running directory
+    # Directory where your site's project files are located
     directory=/my/app/path
 
-    # parameter %(process_num) for command's value is required,
-    # every new thread will create a sock file
+    # Each process needs to have a separate socket file, so we use process_num
+    # Make sure to update "mysite.asgi" to match your project name
     command=daphne -u /run/daphne/daphne%(process_num)d.sock --fd 0 --access-log - --proxy-headers mysite.asgi:application
 
-    # number of processes to startup, maybe the count of your cpus
+    # Number of processes to startup, roughly the number of CPUs you have
     numprocs=4
 
-    # parameter %(process_num) for process_name's value is required,
-    # each process will give different process name of supervisord
+    # Give each process a unique name so they can be told apart
     process_name=asgi%(process_num)d
 
+    # Automatically start and recover processes
     autostart=true
     autorestart=true
 
-    # where is asgi log file located?
+    # Choose where you want your log to go
     stdout_logfile=/your/log/asgi.log
-
     redirect_stderr=true
 
-Reread and update your supervisord::
+Have supervisor reread and update its jobs::
 
     $ sudo supervisorctl reread
     $ sudo supervisorctl update
 
-Nginx configuration:
-
+Next, Nginx has to be told to proxy traffic to the running Daphne instances.
 Setup your nginx upstream conf file for your project::
 
     upstream channels-backend {
@@ -252,6 +237,6 @@ Setup your nginx upstream conf file for your project::
         ...
     }
 
-Reload your nginx service::
+Reload nginx to apply the changes::
 
     $ sudo service nginx reload
