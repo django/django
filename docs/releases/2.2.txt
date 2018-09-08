@@ -170,7 +170,8 @@ Internationalization
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :option:`makemessages --sort-output` option sort messages
+  in PO files.
 
 Migrations
 ~~~~~~~~~~

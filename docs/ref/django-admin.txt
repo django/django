@@ -699,6 +699,13 @@ is:
 
 Requires ``gettext`` 0.19 or newer.
 
+.. django-admin-option:: --sort-output
+
+.. versionadded:: 2.2
+
+Sort messages in language files. This can make diff of language files
+more manageable, at the cost of losing some of the messages' context.
+
 .. django-admin-option:: --keep-pot
 
 Prevents deleting the temporary ``.pot`` files generated before creating the
