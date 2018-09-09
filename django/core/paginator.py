@@ -149,7 +149,7 @@ class EllipsisPaginator(Paginator):
     """
     def __init__(self, *args, **kwargs):
         self.on_each_side = int(kwargs.pop('on_each_side', 3))
-        self.on_ends =  int(kwargs.pop('on_ends', 2))
+        self.on_ends = int(kwargs.pop('on_ends', 2))
         super().__init__(*args, **kwargs)
 
     def get_ellipsized_page_range(self, number=1):
