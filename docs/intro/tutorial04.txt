@@ -160,7 +160,7 @@ This is almost exactly the same as the ``detail()`` view from :doc:`Tutorial 3
 </intro/tutorial03>`. The only difference is the template name. We'll fix this
 redundancy later.
 
-Now, create a ``polls/results.html`` template:
+Now, create a ``polls/templates/polls/results.html`` template:
 
 .. snippet:: html+django
     :filename: polls/templates/polls/results.html
