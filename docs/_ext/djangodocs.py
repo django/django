@@ -12,9 +12,11 @@ from sphinx import addnodes
 from sphinx.builders.html import StandaloneHTMLBuilder
 from sphinx.directives import CodeBlock
 from sphinx.domains.std import Cmdoption
+from sphinx.util import logging
 from sphinx.util.console import bold
 from sphinx.writers.html import HTMLTranslator
 
+logger = logging.getLogger(__name__)
 # RE for option descriptions without a '--' prefix
 simple_option_desc_re = re.compile(
     r'([-_a-zA-Z0-9]+)(\s*.*?)(?=,\s+(?:/|-|--)|$)')
@@ -41,7 +43,7 @@ def setup(app):
         rolename="lookup",
         indextemplate="pair: %s; field lookup type",
     )
-    app.add_description_unit(
+    app.add_object_type(
         directivename="django-admin",
         rolename="djadmin",
         indextemplate="pair: %s; django-admin command",
@@ -179,7 +181,7 @@ class DjangoStandaloneHTMLBuilder(StandaloneHTMLBuilder):
 
     def finish(self):
         super().finish()
-        self.info(bold("writing templatebuiltins.js..."))
+        logger.info(bold("writing templatebuiltins.js..."))
         xrefs = self.env.domaindata["std"]["objects"]
         templatebuiltins = {
             "ttags": [
