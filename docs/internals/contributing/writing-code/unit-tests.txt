@@ -446,8 +446,8 @@ Since this pattern involves a lot of boilerplate, Django provides the
     :func:`~django.test.utils.isolate_apps` instances are correctly
     installed, you should pass the set of targeted ``app_label`` as arguments:
 
-    .. snippet::
-        :filename: tests/app_label/tests.py
+    .. code-block:: python
+        :caption: tests/app_label/tests.py
 
         from django.db import models
         from django.test import SimpleTestCase

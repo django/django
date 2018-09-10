@@ -12,8 +12,8 @@ Write a simple form
 Let's update our poll detail template ("polls/detail.html") from the last
 tutorial, so that the template contains an HTML ``<form>`` element:
 
-.. snippet:: html+django
-    :filename: polls/templates/polls/detail.html
+.. code-block:: html+django
+    :caption: polls/templates/polls/detail.html
 
     <h1>{{ question.question_text }}</h1>
 
@@ -58,16 +58,16 @@ Now, let's create a Django view that handles the submitted data and does
 something with it. Remember, in :doc:`Tutorial 3 </intro/tutorial03>`, we
 created a URLconf for the polls application that includes this line:
 
-.. snippet::
-    :filename: polls/urls.py
+.. code-block:: python
+    :caption: polls/urls.py
 
     path('<int:question_id>/vote/', views.vote, name='vote'),
 
 We also created a dummy implementation of the ``vote()`` function. Let's
 create a real version. Add the following to ``polls/views.py``:
 
-.. snippet::
-    :filename: polls/views.py
+.. code-block:: python
+    :caption: polls/views.py
 
     from django.http import HttpResponse, HttpResponseRedirect
     from django.shortcuts import get_object_or_404, render
@@ -146,8 +146,8 @@ response documentation </ref/request-response>`.
 After somebody votes in a question, the ``vote()`` view redirects to the results
 page for the question. Let's write that view:
 
-.. snippet::
-    :filename: polls/views.py
+.. code-block:: python
+    :caption: polls/views.py
 
     from django.shortcuts import get_object_or_404, render
 
@@ -162,8 +162,8 @@ redundancy later.
 
 Now, create a ``polls/results.html`` template:
 
-.. snippet:: html+django
-    :filename: polls/templates/polls/results.html
+.. code-block:: html+django
+    :caption: polls/templates/polls/results.html
 
     <h1>{{ question.question_text }}</h1>
 
@@ -234,8 +234,8 @@ Amend URLconf
 
 First, open the ``polls/urls.py`` URLconf and change it like so:
 
-.. snippet::
-    :filename: polls/urls.py
+.. code-block:: python
+    :caption: polls/urls.py
 
     from django.urls import path
 
@@ -259,8 +259,8 @@ Next, we're going to remove our old ``index``, ``detail``, and ``results``
 views and use Django's generic views instead. To do so, open the
 ``polls/views.py`` file and change it like so:
 
-.. snippet::
-    :filename: polls/views.py
+.. code-block:: python
+    :caption: polls/views.py
 
     from django.http import HttpResponseRedirect
     from django.shortcuts import get_object_or_404, render

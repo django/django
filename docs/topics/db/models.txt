@@ -1429,8 +1429,8 @@ store your models. You must import the models in the ``__init__.py`` file.
 For example, if you had ``organic.py`` and ``synthetic.py`` in the ``models``
 directory:
 
-.. snippet::
-    :filename: myapp/models/__init__.py
+.. code-block:: python
+    :caption: myapp/models/__init__.py
 
     from .organic import Person
     from .synthetic import Robot

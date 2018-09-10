@@ -314,8 +314,8 @@ The ``Func`` API is as follows:
         ``arg_joiner``, and any other ``**extra_context`` parameters to
         customize the SQL as needed. For example:
 
-        .. snippet::
-            :filename: django/db/models/functions.py
+        .. code-block:: python
+            :caption: django/db/models/functions.py
 
             class ConcatPair(Func):
                 ...

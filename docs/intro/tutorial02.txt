@@ -135,8 +135,8 @@ with a ``Question``.
 These concepts are represented by simple Python classes. Edit the
 :file:`polls/models.py` file so it looks like this:
 
-.. snippet::
-    :filename: polls/models.py
+.. code-block:: python
+    :caption: polls/models.py
 
     from django.db import models
 
@@ -211,8 +211,8 @@ is ``'polls.apps.PollsConfig'``. Edit the :file:`mysite/settings.py` file and
 add that dotted path to the :setting:`INSTALLED_APPS` setting. It'll look like
 this:
 
-.. snippet::
-    :filename: mysite/settings.py
+.. code-block:: python
+    :caption: mysite/settings.py
 
     INSTALLED_APPS = [
         'polls.apps.PollsConfig',
@@ -423,8 +423,8 @@ representation of this object. Let's fix that by editing the ``Question`` model
 :meth:`~django.db.models.Model.__str__` method to both ``Question`` and
 ``Choice``:
 
-.. snippet::
-    :filename: polls/models.py
+.. code-block:: python
+    :caption: polls/models.py
 
     from django.db import models
 
@@ -446,8 +446,8 @@ automatically-generated admin.
 Note these are normal Python methods. Let's add a custom method, just for
 demonstration:
 
-.. snippet::
-    :filename: polls/models.py
+.. code-block:: python
+    :caption: polls/models.py
 
     import datetime
 
@@ -644,8 +644,8 @@ Just one thing to do: we need to tell the admin that ``Question``
 objects have an admin interface. To do this, open the :file:`polls/admin.py`
 file, and edit it to look like this:
 
-.. snippet::
-    :filename: polls/admin.py
+.. code-block:: python
+    :caption: polls/admin.py
 
     from django.contrib import admin
 

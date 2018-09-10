@@ -25,8 +25,8 @@ The :doc:`data-model syntax </topics/db/models>` offers many rich ways of
 representing your models -- so far, it's been solving many years' worth of
 database-schema problems. Here's a quick example:
 
-.. snippet::
-    :filename: mysite/news/models.py
+.. code-block:: python
+    :caption: mysite/news/models.py
 
     from django.db import models
 
@@ -145,8 +145,8 @@ production ready :doc:`administrative interface </ref/contrib/admin/index>` --
 a website that lets authenticated users add, change and delete objects. It's
 as easy as registering your model in the admin site:
 
-.. snippet::
-    :filename: mysite/news/models.py
+.. code-block:: python
+    :caption: mysite/news/models.py
 
     from django.db import models
 
@@ -156,8 +156,8 @@ as easy as registering your model in the admin site:
         content = models.TextField()
         reporter = models.ForeignKey(Reporter, on_delete=models.CASCADE)
 
-.. snippet::
-    :filename: mysite/news/admin.py
+.. code-block:: python
+    :caption: mysite/news/admin.py
 
     from django.contrib import admin
 
@@ -188,8 +188,8 @@ to decouple URLs from Python code.
 Here's what a URLconf might look like for the ``Reporter``/``Article``
 example above:
 
-.. snippet::
-    :filename: mysite/news/urls.py
+.. code-block:: python
+    :caption: mysite/news/urls.py
 
     from django.urls import path
 
@@ -228,8 +228,8 @@ Generally, a view retrieves data according to the parameters, loads a template
 and renders the template with the retrieved data. Here's an example view for
 ``year_archive`` from above:
 
-.. snippet::
-    :filename: mysite/news/views.py
+.. code-block:: python
+    :caption: mysite/news/views.py
 
     from django.shortcuts import render
 
@@ -257,8 +257,8 @@ in the first directory, it checks the second, and so on.
 Let's say the ``news/year_archive.html`` template was found. Here's what that
 might look like:
 
-.. snippet:: html+django
-    :filename: mysite/news/templates/news/year_archive.html
+.. code-block:: html+django
+    :caption: mysite/news/templates/news/year_archive.html
 
     {% extends "base.html" %}
 
@@ -298,8 +298,8 @@ in templates: each template has to define only what's unique to that template.
 Here's what the "base.html" template, including the use of :doc:`static files
 </howto/static-files/index>`, might look like:
 
-.. snippet:: html+django
-    :filename: mysite/templates/base.html
+.. code-block:: html+django
+    :caption: mysite/templates/base.html
 
     {% load static %}
     <html>

@@ -325,8 +325,8 @@ following structure::
 
 Let's take a look inside a couple of those files:
 
-.. snippet::
-    :filename: runtests.py
+.. code-block:: python
+    :caption: runtests.py
 
     #!/usr/bin/env python
     import os
@@ -353,8 +353,8 @@ necessary to use the Django test runner. You may want to add
 command-line options for controlling verbosity, passing in specific test
 labels to run, etc.
 
-.. snippet::
-    :filename: tests/test_settings.py
+.. code-block:: python
+    :caption: tests/test_settings.py
 
     SECRET_KEY = 'fake-key'
     INSTALLED_APPS = [
