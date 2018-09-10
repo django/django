@@ -429,8 +429,8 @@ configuration process for :ref:`Django's default logging
 <default-logging-configuration>`. Here's an example that disables Django's
 logging configuration and then manually configures logging:
 
-.. snippet::
-    :filename: settings.py
+.. code-block:: python
+    :caption: settings.py
 
     LOGGING_CONFIG = None
 
