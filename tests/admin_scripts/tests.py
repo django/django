@@ -1459,6 +1459,13 @@ class ManageTestserver(AdminScriptTestCase):
 # user-space commands are correctly handled - in particular, arguments to
 # the commands are correctly parsed and processed.
 ##########################################################################
+class ColorCommand(BaseCommand):
+    requires_system_checks = False
+
+    def handle(self, *args, **options):
+        self.stdout.write('Hello, world!', self.style.ERROR)
+        self.stderr.write('Hello, world!', self.style.ERROR)
+
 
 class CommandTypes(AdminScriptTestCase):
     "Tests for the various types of base command types that can be defined."
@@ -1542,16 +1549,9 @@ class CommandTypes(AdminScriptTestCase):
         self.assertNotEqual(style.ERROR('Hello, world!'), 'Hello, world!')
 
     def test_command_color(self):
-        class Command(BaseCommand):
-            requires_system_checks = False
-
-            def handle(self, *args, **options):
-                self.stdout.write('Hello, world!', self.style.ERROR)
-                self.stderr.write('Hello, world!', self.style.ERROR)
-
         out = StringIO()
         err = StringIO()
-        command = Command(stdout=out, stderr=err)
+        command = ColorCommand(stdout=out, stderr=err)
         call_command(command)
         if color.supports_color():
             self.assertIn('Hello, world!\n', out.getvalue())
@@ -1564,23 +1564,16 @@ class CommandTypes(AdminScriptTestCase):
 
     def test_command_no_color(self):
         "--no-color prevent colorization of the output"
-        class Command(BaseCommand):
-            requires_system_checks = False
-
-            def handle(self, *args, **options):
-                self.stdout.write('Hello, world!', self.style.ERROR)
-                self.stderr.write('Hello, world!', self.style.ERROR)
-
         out = StringIO()
         err = StringIO()
-        command = Command(stdout=out, stderr=err, no_color=True)
+        command = ColorCommand(stdout=out, stderr=err, no_color=True)
         call_command(command)
         self.assertEqual(out.getvalue(), 'Hello, world!\n')
         self.assertEqual(err.getvalue(), 'Hello, world!\n')
 
         out = StringIO()
         err = StringIO()
-        command = Command(stdout=out, stderr=err)
+        command = ColorCommand(stdout=out, stderr=err)
         call_command(command, no_color=True)
         self.assertEqual(out.getvalue(), 'Hello, world!\n')
         self.assertEqual(err.getvalue(), 'Hello, world!\n')
