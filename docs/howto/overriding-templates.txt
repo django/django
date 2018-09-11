@@ -12,6 +12,11 @@ the default Django template loader will try to load the template from the
 project-level directory first. In other words, :setting:`DIRS <TEMPLATES-DIRS>`
 is searched before :setting:`APP_DIRS <TEMPLATES-APP_DIRS>`.
 
+.. seealso::
+
+   Read :ref:`overriding-built-in-widget-templates` if you're looking to
+   do that.
+
 Overriding from the project's templates directory
 =================================================
 
