@@ -95,7 +95,7 @@ class DjangoHelpFormatter(HelpFormatter):
     """
     show_last = {
         '--version', '--verbosity', '--traceback', '--settings', '--pythonpath',
-        '--no-color', '--force_color',
+        '--no-color', '--force-color',
     }
 
     def _reordered_actions(self, actions):
