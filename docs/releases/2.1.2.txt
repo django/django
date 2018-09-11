@@ -11,3 +11,6 @@ Bugfixes
 
 * Fixed a regression where nonexistent joins in ``F()`` no longer raised
   ``FieldError`` (:ticket:`29727`).
+
+* Fixed a regression where files starting with a tilde or underscore weren't
+  ignored by the migrations loader (:ticket:`29749`).
