@@ -183,6 +183,10 @@ Management Commands
 * :option:`inspectdb --include-views` now creates models for materialized views
   on PostgreSQL.
 
+* The new :option:`inspectdb --include-partitions` option allows creating
+  models for partition tables on PostgreSQL. In older versions, models are
+  created child tables instead the parent.
+
 * :djadmin:`inspectdb` now introspects :class:`~django.db.models.DurationField`
   for Oracle and PostgreSQL.
 

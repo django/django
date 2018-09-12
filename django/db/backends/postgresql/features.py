@@ -73,3 +73,4 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_gin_pending_list_limit = property(operator.attrgetter('is_postgresql_9_5'))
     supports_ignore_conflicts = property(operator.attrgetter('is_postgresql_9_5'))
     has_phraseto_tsquery = property(operator.attrgetter('is_postgresql_9_6'))
+    supports_table_partitions = property(operator.attrgetter('is_postgresql_10'))

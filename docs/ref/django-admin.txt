@@ -352,7 +352,8 @@ file) to standard output.
 
 You may choose what tables or views to inspect by passing their names as
 arguments. If no arguments are provided, models are created for views only if
-the :option:`--include-views` option is used.
+the :option:`--include-views` option is used. Models for partition tables are
+created on PostgreSQL if the :option:`--include-partitions` option is used.
 
 Use this if you have a legacy database with which you'd like to use Django.
 The script will inspect the database and create a model for each table within
@@ -404,6 +405,8 @@ PostgreSQL
 * Models are created for foreign tables.
 * Models are created for materialized views if
   :option:`--include-views` is used.
+* Models are created for partition tables if
+  :option:`--include-partitions` is used.
 
 .. versionchanged:: 2.2
 
@@ -412,6 +415,14 @@ PostgreSQL
 .. django-admin-option:: --database DATABASE
 
 Specifies the database to introspect. Defaults to ``default``.
+
+.. django-admin-option:: --include-partitions
+
+.. versionadded:: 2.2
+
+If this option is provided, models are also created for partitions.
+
+Only support for PostgreSQL is implemented.
 
 .. django-admin-option:: --include-views
 
