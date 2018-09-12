@@ -110,7 +110,7 @@ class IntrospectionTests(TransactionTestCase):
     def test_bigautofield(self):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, City._meta.db_table)
-        self.assertIn('BigAutoField', [datatype(r[1], r) for r in desc])
+        self.assertIn(connection.features.introspected_big_auto_field_type, [datatype(r[1], r) for r in desc])
 
     # Regression test for #9991 - 'real' types in postgres
     @skipUnlessDBFeature('has_real_datatype')

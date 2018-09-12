@@ -16,10 +16,12 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     max_query_params = 999
     supports_mixed_date_datetime_comparisons = False
     autocommits_when_autocommit_is_off = sys.version_info < (3, 6)
+    can_introspect_autofield = True
     can_introspect_decimal_field = False
     can_introspect_duration_field = False
     can_introspect_positive_integer_field = True
     can_introspect_small_integer_field = True
+    introspected_big_auto_field_type = 'AutoField'
     supports_transactions = True
     atomic_transactions = False
     can_rollback_ddl = True

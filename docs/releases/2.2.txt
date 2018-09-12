@@ -192,7 +192,8 @@ Management Commands
   created child tables instead the parent.
 
 * :djadmin:`inspectdb` now introspects :class:`~django.db.models.DurationField`
-  for Oracle and PostgreSQL.
+  for Oracle and PostgreSQL, and :class:`~django.db.models.AutoField` for
+  SQLite.
 
 * On Oracle, :djadmin:`dbshell` is wrapped with ``rlwrap``, if available.
   ``rlwrap`` provides a command history and editing of keyboard input.

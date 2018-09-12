@@ -1,11 +1,14 @@
 import re
+from collections import namedtuple
 
 import sqlparse
 
 from django.db.backends.base.introspection import (
-    BaseDatabaseIntrospection, FieldInfo, TableInfo,
+    BaseDatabaseIntrospection, FieldInfo as BaseFieldInfo, TableInfo,
 )
 from django.db.models.indexes import Index
+
+FieldInfo = namedtuple('FieldInfo', BaseFieldInfo._fields + ('pk',))
 
 field_size_re = re.compile(r'^\s*(?:var)?char\s*\(\s*(\d+)\s*\)\s*$')
 
@@ -57,6 +60,14 @@ class FlexibleFieldLookupDict:
 class DatabaseIntrospection(BaseDatabaseIntrospection):
     data_types_reverse = FlexibleFieldLookupDict()
 
+    def get_field_type(self, data_type, description):
+        field_type = super().get_field_type(data_type, description)
+        if description.pk and field_type in {'BigIntegerField', 'IntegerField'}:
+            # No support for BigAutoField as SQLite treats all integer primary
+            # keys as signed 64-bit integers.
+            return 'AutoField'
+        return field_type
+
     def get_table_list(self, cursor):
         """Return a list of table and view names in the current database."""
         # Skip the sqlite_sequence system table used for autoincrement key
@@ -82,6 +93,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 None,
                 info['null_ok'],
                 info['default'],
+                info['pk'] == 1,
             ) for info in self._table_info(cursor, table_name)
         ]
 
