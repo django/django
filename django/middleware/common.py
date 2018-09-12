@@ -28,6 +28,9 @@ class CommonMiddleware(MiddlewareMixin):
           This behavior can be customized by subclassing CommonMiddleware and
           overriding the response_redirect_class attribute.
     """
+    def __init__(self, get_response=None):
+        self.allowed_hosts_exempt = [re.compile(r) for r in settings.ALLOWED_HOSTS_EXEMPT]
+        self.get_response = get_response
 
     response_redirect_class = HttpResponsePermanentRedirect
 
@@ -43,8 +46,12 @@ class CommonMiddleware(MiddlewareMixin):
                 if user_agent_regex.search(request.META['HTTP_USER_AGENT']):
                     raise PermissionDenied('Forbidden user agent')
 
+        # Check for rejected Hosts
+        skip_host_validation = any(pattern.search(request.path.lstrip('/'))
+                                   for pattern in self.allowed_hosts_exempt)
+        host = request.get_host(skip_host_validation)
+
         # Check for a redirect based on settings.PREPEND_WWW
-        host = request.get_host()
         must_prepend = settings.PREPEND_WWW and host and not host.startswith('www.')
         redirect_url = ('%s://www.%s' % (request.scheme, host)) if must_prepend else ''
 
