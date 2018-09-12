@@ -13,7 +13,7 @@ from django.template import Library
 from django.template.loader import get_template
 from django.templatetags.static import static
 from django.urls import NoReverseMatch
-from django.utils import formats
+from django.utils import formats, timezone
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
@@ -364,14 +364,23 @@ def date_hierarchy(cl):
         year_lookup = cl.params.get(year_field)
         month_lookup = cl.params.get(month_field)
         day_lookup = cl.params.get(day_field)
+        lookup_method = 'dates'
 
         def link(filters):
             return cl.get_query_string(filters, [field_generic])
 
+        date_range = cl.queryset.aggregate(first=models.Min(field_name),
+                                           last=models.Max(field_name))
+        try:
+            # Localize to current timezone if items in date_range are timezone aware datetimes
+            date_range = {k: timezone.localtime(v) for k, v in date_range.items()}
+            lookup_method = 'datetimes'
+        except (ValueError, AttributeError):
+            # localtime doesn't do dates (ValueError) or naive datetimes (AttributeError)
+            pass
+
         if not (year_lookup or month_lookup or day_lookup):
             # select appropriate start level
-            date_range = cl.queryset.aggregate(first=models.Min(field_name),
-                                               last=models.Max(field_name))
             if date_range['first'] and date_range['last']:
                 if date_range['first'].year == date_range['last'].year:
                     year_lookup = date_range['first'].year
@@ -389,7 +398,7 @@ def date_hierarchy(cl):
                 'choices': [{'title': capfirst(formats.date_format(day, 'MONTH_DAY_FORMAT'))}]
             }
         elif year_lookup and month_lookup:
-            days = getattr(cl.queryset, 'dates')(field_name, 'day')
+            days = getattr(cl.queryset, lookup_method)(field_name, 'day')
             return {
                 'show': True,
                 'back': {
@@ -402,7 +411,7 @@ def date_hierarchy(cl):
                 } for day in days]
             }
         elif year_lookup:
-            months = getattr(cl.queryset, 'dates')(field_name, 'month')
+            months = getattr(cl.queryset, lookup_method)(field_name, 'month')
             return {
                 'show': True,
                 'back': {
@@ -415,7 +424,7 @@ def date_hierarchy(cl):
                 } for month in months]
             }
         else:
-            years = getattr(cl.queryset, 'dates')(field_name, 'year')
+            years = getattr(cl.queryset, lookup_method)(field_name, 'year')
             return {
                 'show': True,
                 'back': None,
