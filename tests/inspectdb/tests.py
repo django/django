@@ -1,9 +1,11 @@
+
+import os
 import re
 from io import StringIO
 from unittest import mock, skipUnless
 
 from django.core.management import call_command
-from django.db import connection
+from django.db import connection, connections
 from django.db.backends.base.introspection import TableInfo
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
@@ -248,6 +250,46 @@ class InspectDBTestCase(TestCase):
         finally:
             with connection.cursor() as c:
                 c.execute('DROP INDEX Findex')
+
+    @skipUnless(connection.vendor == 'postgresql', 'PostgreSQL foreign data wrapper test')
+    def test_foreign_data_wrapper(self):
+        cwd = os.getcwd()
+
+        with connections["default"].cursor() as c:
+            c.execute("CREATE EXTENSION file_fdw")
+            c.execute("CREATE SERVER pglog FOREIGN DATA WRAPPER file_fdw")
+            create_foreign_table = """CREATE FOREIGN TABLE iris (
+                petal_length real,
+                petal_width real,
+                sepal_length real,
+                sepal_width real,
+                class int
+                ) SERVER pglog
+                OPTIONS (filename '%s/inspectdb/iris.csv' ,format 'csv') """ % (cwd, )
+
+            print(create_foreign_table)
+
+            c.execute(create_foreign_table)
+
+            create__table = """CREATE  TABLE iris_dummy (
+                petal_length real,
+                petal_width real,
+                sepal_length real,
+                sepal_width real,
+                class int
+                ) """
+            c.execute(create__table)
+        print(connection.settings_dict['NAME'])
+        try:
+            out = StringIO()
+            call_command('inspectdb', stdout=out)
+            output = out.getvalue()
+            print(output)
+            # self.assertIn("Iris", output)
+        finally:
+            with connection.cursor() as c:
+                c.execute("DROP FOREIGN TABLE iris")
+                pass
 
     @skipUnless(connection.vendor == 'sqlite',
                 "Only patched sqlite's DatabaseIntrospection.data_types_reverse for this test")
