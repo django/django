@@ -116,7 +116,7 @@ Changing the search configuration
 
 You can specify the ``config`` attribute to a :class:`SearchVector` and
 :class:`SearchQuery` to use a different search configuration. This allows using
-a different language parsers and dictionaries as defined by the database::
+different language parsers and dictionaries as defined by the database::
 
     >>> from django.contrib.postgres.search import SearchQuery, SearchVector
     >>> Entry.objects.annotate(
