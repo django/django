@@ -46,10 +46,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
             WHERE c.relkind IN ('r', 'v')
                 AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
-                AND pg_catalog.pg_table_is_visible(c.oid)""")
-        return [TableInfo(row[0], {'r': 't', 'v': 'v'}.get(row[1]))
-                for row in cursor.fetchall()
-                if row[0] not in self.ignored_tables]
+                AND pg_catalog.pg_table_is_visible(c.oid)
+        """)
+        mapping = {'r': 't', 'v': 'v'}
+        return [
+            TableInfo(row[0], mapping[row[1]])
+            for row in cursor.fetchall() if row[0] not in self.ignored_tables
+        ]
 
     def get_table_description(self, cursor, table_name):
         """
@@ -70,12 +73,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         ]
 
     def get_sequences(self, cursor, table_name, table_fields=()):
-        sequences = []
         cursor.execute("""
             SELECT s.relname as sequence_name, col.attname
             FROM pg_class s
                 JOIN pg_namespace sn ON sn.oid = s.relnamespace
-                JOIN pg_depend d ON d.refobjid = s.oid AND d.refclassid='pg_class'::regclass
+                JOIN pg_depend d ON d.refobjid = s.oid AND d.refclassid = 'pg_class'::regclass
                 JOIN pg_attrdef ad ON ad.oid = d.objid AND d.classid = 'pg_attrdef'::regclass
                 JOIN pg_attribute col ON col.attrelid = ad.adrelid AND col.attnum = ad.adnum
                 JOIN pg_class tbl ON tbl.oid = ad.adrelid
@@ -85,9 +87,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
               AND n.nspname = 'public'
               AND tbl.relname = %s
         """, [table_name])
-        for row in cursor.fetchall():
-            sequences.append({'name': row[0], 'table': table_name, 'column': row[1]})
-        return sequences
+        return [
+            {'name': row[0], 'table': table_name, 'column': row[1]}
+            for row in cursor.fetchall()
+        ]
 
     def get_relations(self, cursor, table_name):
         """
@@ -101,15 +104,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             LEFT JOIN pg_class c2 ON con.confrelid = c2.oid
             LEFT JOIN pg_attribute a1 ON c1.oid = a1.attrelid AND a1.attnum = con.conkey[1]
             LEFT JOIN pg_attribute a2 ON c2.oid = a2.attrelid AND a2.attnum = con.confkey[1]
-            WHERE c1.relname = %s
-                AND con.contype = 'f'""", [table_name])
-        relations = {}
-        for row in cursor.fetchall():
-            relations[row[1]] = (row[2], row[0])
-        return relations
+            WHERE c1.relname = %s AND con.contype = 'f'
+        """, [table_name])
+        return {row[1]: (row[2], row[0]) for row in cursor.fetchall()}
 
     def get_key_columns(self, cursor, table_name):
-        key_columns = []
         cursor.execute("""
             SELECT kcu.column_name, ccu.table_name AS referenced_table, ccu.column_name AS referenced_column
             FROM information_schema.constraint_column_usage ccu
@@ -121,9 +120,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 ON ccu.constraint_catalog = tc.constraint_catalog
                     AND ccu.constraint_schema = tc.constraint_schema
                     AND ccu.constraint_name = tc.constraint_name
-            WHERE kcu.table_name = %s AND tc.constraint_type = 'FOREIGN KEY'""", [table_name])
-        key_columns.extend(cursor.fetchall())
-        return key_columns
+            WHERE kcu.table_name = %s AND tc.constraint_type = 'FOREIGN KEY'
+        """, [table_name])
+        return cursor.fetchall()
 
     def get_constraints(self, cursor, table_name):
         """
