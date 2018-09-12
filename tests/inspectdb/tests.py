@@ -311,6 +311,30 @@ class InspectDBTransactionalTests(TransactionTestCase):
                 cursor.execute('DROP VIEW inspectdb_people_view')
 
     @skipUnless(connection.vendor == 'postgresql', 'PostgreSQL specific SQL')
+    def test_include_materialized_views(self):
+        """inspectdb --include-views creates models for database materialized views."""
+        with connection.cursor() as cursor:
+            cursor.execute(
+                'CREATE MATERIALIZED VIEW inspectdb_people_materialized_view AS '
+                'SELECT id, name FROM inspectdb_people'
+            )
+        out = StringIO()
+        view_model = 'class InspectdbPeopleMaterializedView(models.Model):'
+        view_managed = 'managed = False  # Created from a view.'
+        try:
+            call_command('inspectdb', table_name_filter=inspectdb_tables_only, stdout=out)
+            no_views_output = out.getvalue()
+            self.assertNotIn(view_model, no_views_output)
+            self.assertNotIn(view_managed, no_views_output)
+            call_command('inspectdb', table_name_filter=inspectdb_tables_only, include_views=True, stdout=out)
+            with_views_output = out.getvalue()
+            self.assertIn(view_model, with_views_output)
+            self.assertIn(view_managed, with_views_output)
+        finally:
+            with connection.cursor() as cursor:
+                cursor.execute('DROP MATERIALIZED VIEW IF EXISTS inspectdb_people_materialized_view')
+
+    @skipUnless(connection.vendor == 'postgresql', 'PostgreSQL specific SQL')
     def test_foreign_data_wrapper(self):
         with connection.cursor() as cursor:
             cursor.execute('CREATE EXTENSION IF NOT EXISTS file_fdw')

@@ -44,11 +44,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             SELECT c.relname, c.relkind
             FROM pg_catalog.pg_class c
             LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
-            WHERE c.relkind IN ('f', 'r', 'v')
+            WHERE c.relkind IN ('f', 'm', 'r', 'v')
                 AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
                 AND pg_catalog.pg_table_is_visible(c.oid)
         """)
-        mapping = {'f': 't', 'r': 't', 'v': 'v'}
+        mapping = {'f': 't', 'm': 'v', 'r': 't', 'v': 'v'}
         return [
             TableInfo(row[0], mapping[row[1]])
             for row in cursor.fetchall() if row[0] not in self.ignored_tables
@@ -59,18 +59,27 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         Return a description of the table with the DB-API cursor.description
         interface.
         """
-        # As cursor.description does not return reliably the nullable property,
-        # we have to query the information_schema (#7783)
+        # Query the pg_catalog tables as cursor.description does not reliably
+        # return the nullable property and information_schema.columns does not
+        # contain details of materialized views.
         cursor.execute("""
-            SELECT column_name, is_nullable, column_default
-            FROM information_schema.columns
-            WHERE table_name = %s""", [table_name])
+            SELECT
+                a.attname AS column_name,
+                NOT (a.attnotnull OR (t.typtype = 'd' AND t.typnotnull)) AS is_nullable,
+                pg_get_expr(ad.adbin, ad.adrelid) AS column_default
+            FROM pg_attribute a
+            LEFT JOIN pg_attrdef ad ON a.attrelid = ad.adrelid AND a.attnum = ad.adnum
+            JOIN pg_type t ON a.atttypid = t.oid
+            JOIN pg_class c ON a.attrelid = c.oid
+            JOIN pg_namespace n ON c.relnamespace = n.oid
+            WHERE c.relkind IN ('f', 'm', 'r', 'v')
+                AND c.relname = %s
+                AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
+                AND pg_catalog.pg_table_is_visible(c.oid)
+        """, [table_name])
         field_map = {line[0]: line[1:] for line in cursor.fetchall()}
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
-        return [
-            FieldInfo(*line[0:6], field_map[line.name][0] == 'YES', field_map[line.name][1])
-            for line in cursor.description
-        ]
+        return [FieldInfo(*line[0:6], *field_map[line.name]) for line in cursor.description]
 
     def get_sequences(self, cursor, table_name, table_fields=()):
         cursor.execute("""

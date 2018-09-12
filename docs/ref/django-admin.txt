@@ -402,10 +402,12 @@ PostgreSQL
 ^^^^^^^^^^
 
 * Models are created for foreign tables.
+* Models are created for materialized views if
+  :option:`--include-views` is used.
 
 .. versionchanged:: 2.2
 
-    Support for foreign tables was added.
+    Support for foreign tables and materialized views was added.
 
 .. django-admin-option:: --database DATABASE
 
