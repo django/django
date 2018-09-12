@@ -177,6 +177,8 @@ Management Commands
 * The new :option:`--force-color` option forces colorization of the command
   output.
 
+* :djadmin:`inspectdb` now creates models for foreign tables on PostgreSQL.
+
 Migrations
 ~~~~~~~~~~
 

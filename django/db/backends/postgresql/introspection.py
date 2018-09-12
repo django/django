@@ -44,11 +44,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             SELECT c.relname, c.relkind
             FROM pg_catalog.pg_class c
             LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
-            WHERE c.relkind IN ('r', 'v')
+            WHERE c.relkind IN ('f', 'r', 'v')
                 AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
                 AND pg_catalog.pg_table_is_visible(c.oid)
         """)
-        mapping = {'r': 't', 'v': 'v'}
+        mapping = {'f': 't', 'r': 't', 'v': 'v'}
         return [
             TableInfo(row[0], mapping[row[1]])
             for row in cursor.fetchall() if row[0] not in self.ignored_tables

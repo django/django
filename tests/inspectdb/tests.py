@@ -309,3 +309,32 @@ class InspectDBTransactionalTests(TransactionTestCase):
         finally:
             with connection.cursor() as cursor:
                 cursor.execute('DROP VIEW inspectdb_people_view')
+
+    @skipUnless(connection.vendor == 'postgresql', 'PostgreSQL specific SQL')
+    def test_foreign_data_wrapper(self):
+        with connection.cursor() as cursor:
+            cursor.execute('CREATE EXTENSION IF NOT EXISTS file_fdw')
+            cursor.execute('CREATE SERVER inspectdb_server FOREIGN DATA WRAPPER file_fdw')
+            cursor.execute('''\
+                CREATE FOREIGN TABLE inspectdb_iris_foreign_table (
+                    petal_length real,
+                    petal_width real,
+                    sepal_length real,
+                    sepal_width real
+                ) SERVER inspectdb_server OPTIONS (
+                    filename '/dev/null'
+                )
+            ''')
+        out = StringIO()
+        foreign_table_model = 'class InspectdbIrisForeignTable(models.Model):'
+        foreign_table_managed = 'managed = False'
+        try:
+            call_command('inspectdb', stdout=out)
+            output = out.getvalue()
+            self.assertIn(foreign_table_model, output)
+            self.assertIn(foreign_table_managed, output)
+        finally:
+            with connection.cursor() as cursor:
+                cursor.execute('DROP FOREIGN TABLE IF EXISTS inspectdb_iris_foreign_table')
+                cursor.execute('DROP SERVER IF EXISTS inspectdb_server')
+                cursor.execute('DROP EXTENSION IF EXISTS file_fdw')

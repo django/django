@@ -395,6 +395,18 @@ table's lifecycle, you'll need to change the
 :attr:`~django.db.models.Options.managed` option to ``True`` (or simply remove
 it because ``True`` is its default value).
 
+Database-specific notes
+~~~~~~~~~~~~~~~~~~~~~~~
+
+PostgreSQL
+^^^^^^^^^^
+
+* Models are created for foreign tables.
+
+.. versionchanged:: 2.2
+
+    Support for foreign tables was added.
+
 .. django-admin-option:: --database DATABASE
 
 Specifies the database to introspect. Defaults to ``default``.
