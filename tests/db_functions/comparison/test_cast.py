@@ -52,9 +52,20 @@ class CastTests(TestCase):
                 self.assertEqual(numbers.get().cast_int, 1)
 
     def test_case_from_db_datetime_to_date(self):
-        fan = Fan.objects.create()
-        fans = Fan.objects.filter(pk=fan.pk).annotate(fan_from_day=Cast("fan_since", models.DateField())).values()
-        self.assertTrue(isinstance(fans[0]['fan_from_day'], datetime.date))
+        author = Author.objects.create(name='John Smith', age=45)
+        Fan.objects.create(name='Margaret', age=50, author=author)
+        fans = Fan.objects.annotate(fan_for_day=Cast("fan_since", models.DateField()))
+        self.assertTrue(isinstance(fans.get().fan_for_day, datetime.date))
+
+    def test_case_from_db_datetime_to_date_group_by(self):
+        # Create a fan
+        author = Author.objects.create(name='John Smith', age=45)
+        Fan.objects.create(name='Margaret', age=50, author=author)
+        fans = Fan.objects.values("author").annotate(
+            fan_for_day=Cast("fan_since", models.DateField()),
+            fans=models.Count("*")).values()
+        self.assertTrue(isinstance(fans[0]['fan_for_day'], datetime.date))
+        self.assertEqual(fans[0]['fans'], 1)
 
     def test_cast_from_python_to_date(self):
         today = datetime.date.today()
