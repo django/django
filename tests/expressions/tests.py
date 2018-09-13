@@ -65,11 +65,8 @@ class BasicExpressionsTests(TestCase):
             foo=RawSQL('%s', ['value']),
         ).filter(foo='value').order_by('name')
         self.assertQuerysetEqual(
-            companies, [
-                '<Company: Example Inc.>',
-                '<Company: Foobar Ltd.>',
-                '<Company: Test GmbH>',
-            ],
+            companies,
+            ['<Company: Example Inc.>', '<Company: Foobar Ltd.>', '<Company: Test GmbH>'],
         )
 
     @unittest.skipIf(connection.vendor == 'oracle', "Oracle doesn't support using boolean type in SELECT")
@@ -150,9 +147,7 @@ class BasicExpressionsTests(TestCase):
 
     def test_order_of_operations(self):
         # Law of order of operations is followed
-        self. company_query.update(
-            num_chairs=F('num_employees') + 2 * F('num_employees')
-        )
+        self.company_query.update(num_chairs=F('num_employees') + 2 * F('num_employees'))
         self.assertSequenceEqual(
             self.company_query, [
                 {
@@ -175,9 +170,7 @@ class BasicExpressionsTests(TestCase):
 
     def test_parenthesis_priority(self):
         # Law of order of operations can be overridden by parentheses
-        self.company_query.update(
-            num_chairs=((F('num_employees') + 2) * F('num_employees'))
-        )
+        self.company_query.update(num_chairs=(F('num_employees') + 2) * F('num_employees'))
         self.assertSequenceEqual(
             self.company_query, [
                 {
@@ -200,16 +193,10 @@ class BasicExpressionsTests(TestCase):
 
     def test_update_with_fk(self):
         # ForeignKey can become updated with the value of another ForeignKey.
-        self.assertEqual(
-            Company.objects.update(point_of_contact=F('ceo')),
-            3
-        )
+        self.assertEqual(Company.objects.update(point_of_contact=F('ceo')), 3)
         self.assertQuerysetEqual(
-            Company.objects.all(), [
-                "Joe Smith",
-                "Frank Meyer",
-                "Max Mustermann",
-            ],
+            Company.objects.all(),
+            ['Joe Smith', 'Frank Meyer', 'Max Mustermann'],
             lambda c: str(c.point_of_contact),
             ordered=False
         )
@@ -219,10 +206,8 @@ class BasicExpressionsTests(TestCase):
         Number.objects.create(integer=2)
         Number.objects.filter(float__isnull=False).update(float=Value(None))
         self.assertQuerysetEqual(
-            Number.objects.all(), [
-                None,
-                None,
-            ],
+            Number.objects.all(),
+            [None, None],
             lambda n: n.float,
             ordered=False
         )
@@ -230,15 +215,13 @@ class BasicExpressionsTests(TestCase):
     def test_filter_with_join(self):
         # F Expressions can also span joins
         Company.objects.update(point_of_contact=F('ceo'))
-        c = Company.objects.all()[0]
+        c = Company.objects.first()
         c.point_of_contact = Employee.objects.create(firstname="Guido", lastname="van Rossum")
         c.save()
 
         self.assertQuerysetEqual(
-            Company.objects.filter(ceo__firstname=F("point_of_contact__firstname")), [
-                "Foobar Ltd.",
-                "Test GmbH",
-            ],
+            Company.objects.filter(ceo__firstname=F('point_of_contact__firstname')),
+            ['Foobar Ltd.', 'Test GmbH'],
             lambda c: c.name,
             ordered=False
         )
@@ -262,28 +245,20 @@ class BasicExpressionsTests(TestCase):
 
     def test_object_update(self):
         # F expressions can be used to update attributes on single objects
-        test_gmbh = Company.objects.get(name="Test GmbH")
-        self.assertEqual(test_gmbh.num_employees, 32)
-        test_gmbh.num_employees = F("num_employees") + 4
-        test_gmbh.save()
-        test_gmbh = Company.objects.get(pk=test_gmbh.pk)
-        self.assertEqual(test_gmbh.num_employees, 36)
+        self.gmbh.num_employees = F('num_employees') + 4
+        self.gmbh.save()
+        self.gmbh.refresh_from_db()
+        self.assertEqual(self.gmbh.num_employees, 36)
 
     def test_new_object_save(self):
         # We should be able to use Funcs when inserting new data
-        test_co = Company(
-            name=Lower(Value("UPPER")), num_employees=32, num_chairs=1,
-            ceo=Employee.objects.create(firstname="Just", lastname="Doit", salary=30),
-        )
+        test_co = Company(name=Lower(Value('UPPER')), num_employees=32, num_chairs=1, ceo=self.max)
         test_co.save()
         test_co.refresh_from_db()
         self.assertEqual(test_co.name, "upper")
 
     def test_new_object_create(self):
-        test_co = Company.objects.create(
-            name=Lower(Value("UPPER")), num_employees=32, num_chairs=1,
-            ceo=Employee.objects.create(firstname="Just", lastname="Doit", salary=30),
-        )
+        test_co = Company.objects.create(name=Lower(Value('UPPER')), num_employees=32, num_chairs=1, ceo=self.max)
         test_co.refresh_from_db()
         self.assertEqual(test_co.name, "upper")
 
@@ -298,29 +273,23 @@ class BasicExpressionsTests(TestCase):
     def test_object_update_fk(self):
         # F expressions cannot be used to update attributes which are foreign
         # keys, or attributes which involve joins.
-        test_gmbh = Company.objects.get(name="Test GmbH")
-
         def test():
-            test_gmbh.point_of_contact = F("ceo")
+            self.gmbh.point_of_contact = F('ceo')
         msg = 'F(ceo)": "Company.point_of_contact" must be a "Employee" instance.'
         with self.assertRaisesMessage(ValueError, msg):
             test()
 
-        test_gmbh.point_of_contact = test_gmbh.ceo
-        test_gmbh.save()
-        test_gmbh.name = F("ceo__last_name")
+        self.gmbh.point_of_contact = self.gmbh.ceo
+        self.gmbh.save()
+        self.gmbh.name = F('ceo__last_name')
         msg = 'Joined field references are not permitted in this query'
         with self.assertRaisesMessage(FieldError, msg):
-            test_gmbh.save()
+            self.gmbh.save()
 
     def test_object_update_unsaved_objects(self):
         # F expressions cannot be used to update attributes on objects which do
         # not yet exist in the database
-        test_gmbh = Company.objects.get(name="Test GmbH")
-        acme = Company(
-            name="The Acme Widget Co.", num_employees=12, num_chairs=5,
-            ceo=test_gmbh.ceo
-        )
+        acme = Company(name='The Acme Widget Co.', num_employees=12, num_chairs=5, ceo=self.max)
         acme.num_employees = F("num_employees") + 16
         msg = (
             'Failed to insert expression "Col(expressions_company, '
@@ -363,8 +332,7 @@ class BasicExpressionsTests(TestCase):
         # Reverse multijoin F() references and the lookup target the same join.
         # Pre #18375 the F() join was generated first and the lookup couldn't
         # reuse that join.
-        qs = Employee.objects.filter(
-            company_ceo_set__num_chairs=F('company_ceo_set__num_employees'))
+        qs = Employee.objects.filter(company_ceo_set__num_chairs=F('company_ceo_set__num_employees'))
         self.assertEqual(str(qs.query).count('JOIN'), 1)
 
     def test_ticket_18375_kwarg_ordering(self):
@@ -426,7 +394,7 @@ class BasicExpressionsTests(TestCase):
     def test_subquery(self):
         Company.objects.filter(name='Example Inc.').update(
             point_of_contact=Employee.objects.get(firstname='Joe', lastname='Smith'),
-            ceo=Employee.objects.get(firstname='Max', lastname='Mustermann'),
+            ceo=self.max,
         )
         Employee.objects.create(firstname='Bob', lastname='Brown', salary=40)
         qs = Employee.objects.annotate(
@@ -810,13 +778,11 @@ class ExpressionsTests(TestCase):
             ["<Employee: %Joh\\nny %Joh\\n>", "<Employee: Jean-Claude Claude>", "<Employee: Johnny John>"],
             ordered=False,
         )
-
         self.assertQuerysetEqual(
             Employee.objects.filter(firstname__startswith=F('lastname')),
             ["<Employee: %Joh\\nny %Joh\\n>", "<Employee: Johnny John>"],
             ordered=False,
         )
-
         self.assertQuerysetEqual(
             Employee.objects.filter(firstname__endswith=F('lastname')),
             ["<Employee: Jean-Claude Claude>"],
@@ -845,13 +811,11 @@ class ExpressionsTests(TestCase):
             ["<Employee: %Joh\\nny %joh\\n>", "<Employee: Jean-Claude claude>", "<Employee: Johnny john>"],
             ordered=False,
         )
-
         self.assertQuerysetEqual(
             Employee.objects.filter(firstname__istartswith=F('lastname')),
             ["<Employee: %Joh\\nny %joh\\n>", "<Employee: Johnny john>"],
             ordered=False,
         )
-
         self.assertQuerysetEqual(
             Employee.objects.filter(firstname__iendswith=F('lastname')),
             ["<Employee: Jean-Claude claude>"],
@@ -874,11 +838,7 @@ class ExpressionsNumericTests(TestCase):
         """
         self.assertQuerysetEqual(
             Number.objects.all(),
-            [
-                '<Number: -1, -1.000>',
-                '<Number: 42, 42.000>',
-                '<Number: 1337, 1337.000>'
-            ],
+            ['<Number: -1, -1.000>', '<Number: 42, 42.000>', '<Number: 1337, 1337.000>'],
             ordered=False
         )
 
@@ -886,18 +846,10 @@ class ExpressionsNumericTests(TestCase):
         """
         We can increment a value of all objects in a query set.
         """
-        self.assertEqual(
-            Number.objects.filter(integer__gt=0)
-                  .update(integer=F('integer') + 1),
-            2)
-
+        self.assertEqual(Number.objects.filter(integer__gt=0).update(integer=F('integer') + 1), 2)
         self.assertQuerysetEqual(
             Number.objects.all(),
-            [
-                '<Number: -1, -1.000>',
-                '<Number: 43, 42.000>',
-                '<Number: 1338, 1337.000>'
-            ],
+            ['<Number: -1, -1.000>', '<Number: 43, 42.000>', '<Number: 1338, 1337.000>'],
             ordered=False
         )
 
@@ -906,16 +858,10 @@ class ExpressionsNumericTests(TestCase):
         We can filter for objects, where a value is not equals the value
         of an other field.
         """
-        self.assertEqual(
-            Number.objects.filter(integer__gt=0)
-                  .update(integer=F('integer') + 1),
-            2)
+        self.assertEqual(Number.objects.filter(integer__gt=0).update(integer=F('integer') + 1), 2)
         self.assertQuerysetEqual(
             Number.objects.exclude(float=F('integer')),
-            [
-                '<Number: 43, 42.000>',
-                '<Number: 1338, 1337.000>'
-            ],
+            ['<Number: 43, 42.000>', '<Number: 1338, 1337.000>'],
             ordered=False
         )
 
@@ -1155,8 +1101,7 @@ class FTimeDeltaTests(TestCase):
         # Intentionally no assert
 
     def test_delta_add(self):
-        for i in range(len(self.deltas)):
-            delta = self.deltas[i]
+        for i, delta in enumerate(self.deltas):
             test_set = [e.name for e in Experiment.objects.filter(end__lt=F('start') + delta)]
             self.assertEqual(test_set, self.expnames[:i])
 
@@ -1167,8 +1112,7 @@ class FTimeDeltaTests(TestCase):
             self.assertEqual(test_set, self.expnames[:i + 1])
 
     def test_delta_subtract(self):
-        for i in range(len(self.deltas)):
-            delta = self.deltas[i]
+        for i, delta in enumerate(self.deltas):
             test_set = [e.name for e in Experiment.objects.filter(start__gt=F('end') - delta)]
             self.assertEqual(test_set, self.expnames[:i])
 
@@ -1176,8 +1120,7 @@ class FTimeDeltaTests(TestCase):
             self.assertEqual(test_set, self.expnames[:i + 1])
 
     def test_exclude(self):
-        for i in range(len(self.deltas)):
-            delta = self.deltas[i]
+        for i, delta in enumerate(self.deltas):
             test_set = [e.name for e in Experiment.objects.exclude(end__lt=F('start') + delta)]
             self.assertEqual(test_set, self.expnames[i:])
 
@@ -1185,8 +1128,7 @@ class FTimeDeltaTests(TestCase):
             self.assertEqual(test_set, self.expnames[i + 1:])
 
     def test_date_comparison(self):
-        for i in range(len(self.days_long)):
-            days = self.days_long[i]
+        for i, days in enumerate(self.days_long):
             test_set = [e.name for e in Experiment.objects.filter(completed__lt=F('assigned') + days)]
             self.assertEqual(test_set, self.expnames[:i])
 
@@ -1195,8 +1137,7 @@ class FTimeDeltaTests(TestCase):
 
     @skipUnlessDBFeature("supports_mixed_date_datetime_comparisons")
     def test_mixed_comparisons1(self):
-        for i in range(len(self.delays)):
-            delay = self.delays[i]
+        for i, delay in enumerate(self.delays):
             test_set = [e.name for e in Experiment.objects.filter(assigned__gt=F('start') - delay)]
             self.assertEqual(test_set, self.expnames[:i])
 
@@ -1204,9 +1145,8 @@ class FTimeDeltaTests(TestCase):
             self.assertEqual(test_set, self.expnames[:i + 1])
 
     def test_mixed_comparisons2(self):
-        delays = [datetime.timedelta(delay.days) for delay in self.delays]
-        for i in range(len(delays)):
-            delay = delays[i]
+        for i, delay in enumerate(self.delays):
+            delay = datetime.timedelta(delay.days)
             test_set = [e.name for e in Experiment.objects.filter(start__lt=F('assigned') + delay)]
             self.assertEqual(test_set, self.expnames[:i])
 
@@ -1216,8 +1156,7 @@ class FTimeDeltaTests(TestCase):
             self.assertEqual(test_set, self.expnames[:i + 1])
 
     def test_delta_update(self):
-        for i in range(len(self.deltas)):
-            delta = self.deltas[i]
+        for delta in self.deltas:
             exps = Experiment.objects.all()
             expected_durations = [e.duration() for e in exps]
             expected_starts = [e.start + delta for e in exps]
@@ -1416,10 +1355,8 @@ class ValueTests(TestCase):
 
     def test_equal(self):
         value = Value('name')
-        same_value = Value('name')
-        other_value = Value('username')
-        self.assertEqual(value, same_value)
-        self.assertNotEqual(value, other_value)
+        self.assertEqual(value, Value('name'))
+        self.assertNotEqual(value, Value('username'))
 
     def test_hash(self):
         d = {Value('name'): 'Bob'}
