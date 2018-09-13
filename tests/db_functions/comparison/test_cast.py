@@ -10,7 +10,7 @@ from django.test import (
     TestCase, ignore_warnings, override_settings, skipUnlessDBFeature,
 )
 
-from ..models import Author
+from ..models import Author, Fan
 
 
 class CastTests(TestCase):
@@ -50,6 +50,11 @@ class CastTests(TestCase):
             with self.subTest(field_class=field_class):
                 numbers = Author.objects.annotate(cast_int=Cast('alias', field_class()))
                 self.assertEqual(numbers.get().cast_int, 1)
+
+    def test_case_from_db_datetime_to_date(self):
+        fan = Fan.objects.create()
+        fans = Fan.objects.filter(pk=fan.pk).annotate(fan_from_day=Cast("fan_since", models.DateField())).values()
+        self.assertTrue(isinstance(fans[0]['fan_from_day'], datetime.date))
 
     def test_cast_from_python_to_date(self):
         today = datetime.date.today()
