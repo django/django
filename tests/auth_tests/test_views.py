@@ -14,11 +14,12 @@ from django.contrib.auth import (
 from django.contrib.auth.forms import (
     AuthenticationForm, PasswordChangeForm, SetPasswordForm,
 )
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Permission, User
 from django.contrib.auth.views import (
     INTERNAL_RESET_SESSION_TOKEN, LoginView, logout_then_login,
     redirect_to_login,
 )
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.sites.requests import RequestSite
 from django.core import mail
@@ -1115,6 +1116,11 @@ class LogoutTest(AuthViewsTestCase):
         self.assertRedirects(response, '/logout/', fetch_redirect_response=False)
 
 
+def get_perm(Model, perm):
+    ct = ContentType.objects.get_for_model(Model)
+    return Permission.objects.get(content_type=ct, codename=perm)
+
+
 # Redirect in test_user_change_password will fail if session auth hash
 # isn't updated after password change (#21649)
 @override_settings(ROOT_URLCONF='auth_tests.urls_admin')
@@ -1220,6 +1226,25 @@ class ChangelistTests(AuthViewsTestCase):
     def test_password_change_bad_url(self):
         response = self.client.get(reverse('auth_test_admin:auth_user_password_change', args=('foobar',)))
         self.assertEqual(response.status_code, 404)
+
+    def test_view_user_password_is_readonly(self):
+        u = User.objects.get(username='testclient')
+        u.is_superuser = False
+        u.save()
+        u.user_permissions.add(get_perm(User, 'view_user'))
+        response = self.client.get(reverse('auth_test_admin:auth_user_change', args=(u.pk,)),)
+        algo, salt, hash_string = (u.password.split('$'))
+        self.assertContains(response, '<div class="readonly">testclient</div>')
+        # ReadOnlyPasswordHashWidget is used to render the field.
+        self.assertContains(
+            response,
+            '<strong>algorithm</strong>: %s\n\n'
+            '<strong>salt</strong>: %s**********\n\n'
+            '<strong>hash</strong>: %s**************************\n\n' % (
+                algo, salt[:2], hash_string[:6],
+            ),
+            html=True,
+        )
 
 
 @override_settings(

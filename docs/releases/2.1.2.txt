@@ -4,8 +4,17 @@ Django 2.1.2 release notes
 
 *Expected October 1, 2018*
 
-Django 2.1.2 fixes several bugs in 2.1.1. Also, the latest string translations
-from Transifex are incorporated.
+Django 2.1.2 fixes a security issue and several bugs in 2.1.1. Also, the latest
+string translations from Transifex are incorporated.
+
+CVE-2018-16984: Password hash disclosure to "view only" admin users
+===================================================================
+
+If an admin user has the change permission to the user model, only part of the
+password hash is displayed in the change form. Admin users with the view (but
+not change) permission to the user model were displayed the entire hash. While
+it's typically infeasible to reverse a strong password hash, if your site uses
+weaker password hashing algorithms such as MD5 or SHA1, it could be a problem.
 
 Bugfixes
 ========

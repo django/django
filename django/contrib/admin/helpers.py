@@ -202,6 +202,12 @@ class AdminReadonlyField:
         except (AttributeError, ValueError, ObjectDoesNotExist):
             result_repr = self.empty_value_display
         else:
+            if field in self.form.fields:
+                widget = self.form[field].field.widget
+                # This isn't elegant but suffices for contrib.auth's
+                # ReadOnlyPasswordHashWidget.
+                if getattr(widget, 'read_only', False):
+                    return widget.render(field, value)
             if f is None:
                 if getattr(attr, 'boolean', False):
                     result_repr = _boolean_icon(value)

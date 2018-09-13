@@ -22,6 +22,7 @@ UserModel = get_user_model()
 
 class ReadOnlyPasswordHashWidget(forms.Widget):
     template_name = 'auth/widgets/read_only_password_hash.html'
+    read_only = True
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
