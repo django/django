@@ -1309,3 +1309,30 @@ class ActionsCheckTests(CheckTestCase):
             'custom_permission_action action.',
             id='admin.E129',
         )
+
+    def test_actions_not_unique(self):
+        def action(modeladmin, request, queryset):
+            pass
+
+        class BandAdmin(ModelAdmin):
+            actions = (action, action)
+
+        self.assertIsInvalid(
+            BandAdmin, Band,
+            "__name__ attributes of actions defined in "
+            "<class 'modeladmin.test_checks.ActionsCheckTests."
+            "test_actions_not_unique.<locals>.BandAdmin'> must be unique.",
+            id='admin.E130',
+        )
+
+    def test_actions_unique(self):
+        def action1(modeladmin, request, queryset):
+            pass
+
+        def action2(modeladmin, request, queryset):
+            pass
+
+        class BandAdmin(ModelAdmin):
+            actions = (action1, action2)
+
+        self.assertIsValid(BandAdmin, Band)
