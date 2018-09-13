@@ -1,4 +1,6 @@
 from django.db.backends.utils import names_digest, split_identifier
+from django.db.models.query_utils import Q
+from django.db.models.sql import Query
 
 __all__ = ['Index']
 
@@ -9,9 +11,13 @@ class Index:
     # cross-database compatibility with Oracle)
     max_name_length = 30
 
-    def __init__(self, *, fields=(), name=None, db_tablespace=None, opclasses=()):
+    def __init__(self, *, fields=(), name=None, db_tablespace=None, opclasses=(), condition=None):
         if opclasses and not name:
             raise ValueError('An index must be named to use opclasses.')
+        if not isinstance(condition, (type(None), Q)):
+            raise ValueError('Index.condition must be a Q instance.')
+        if condition and not name:
+            raise ValueError('An index must be named to use condition.')
         if not isinstance(fields, (list, tuple)):
             raise ValueError('Index.fields must be a list or tuple.')
         if not isinstance(opclasses, (list, tuple)):
@@ -35,6 +41,7 @@ class Index:
                 raise ValueError(errors)
         self.db_tablespace = db_tablespace
         self.opclasses = opclasses
+        self.condition = condition
 
     def check_name(self):
         errors = []
@@ -48,12 +55,25 @@ class Index:
             self.name = 'D%s' % self.name[1:]
         return errors
 
+    def _get_condition_sql(self, model, schema_editor):
+        if self.condition is None:
+            return ''
+        query = Query(model=model)
+        query.add_q(self.condition)
+        compiler = query.get_compiler(connection=schema_editor.connection)
+        # Only the WhereNode is of interest for the partial index.
+        sql, params = query.where.as_sql(compiler=compiler, connection=schema_editor.connection)
+        # BaseDatabaseSchemaEditor does the same map on the params, but since
+        # it's handled outside of that class, the work is done here.
+        return ' WHERE ' + (sql % tuple(map(schema_editor.quote_value, params)))
+
     def create_sql(self, model, schema_editor, using=''):
         fields = [model._meta.get_field(field_name) for field_name, _ in self.fields_orders]
         col_suffixes = [order[1] for order in self.fields_orders]
+        condition = self._get_condition_sql(model, schema_editor)
         return schema_editor._create_index_sql(
             model, fields, name=self.name, using=using, db_tablespace=self.db_tablespace,
-            col_suffixes=col_suffixes, opclasses=self.opclasses,
+            col_suffixes=col_suffixes, opclasses=self.opclasses, condition=condition,
         )
 
     def remove_sql(self, model, schema_editor):
@@ -71,6 +91,8 @@ class Index:
             kwargs['db_tablespace'] = self.db_tablespace
         if self.opclasses:
             kwargs['opclasses'] = self.opclasses
+        if self.condition:
+            kwargs['condition'] = self.condition
         return (path, (), kwargs)
 
     def clone(self):
@@ -107,7 +129,10 @@ class Index:
         self.check_name()
 
     def __repr__(self):
-        return "<%s: fields='%s'>" % (self.__class__.__name__, ', '.join(self.fields))
+        return "<%s: fields='%s'%s>" % (
+            self.__class__.__name__, ', '.join(self.fields),
+            '' if self.condition is None else ', condition=%s' % self.condition,
+        )
 
     def __eq__(self, other):
         return (self.__class__ == other.__class__) and (self.deconstruct() == other.deconstruct())

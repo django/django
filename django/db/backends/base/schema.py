@@ -75,7 +75,7 @@ class BaseDatabaseSchemaEditor:
     sql_create_inline_fk = None
     sql_delete_fk = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
 
-    sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s"
+    sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s%(condition)s"
     sql_delete_index = "DROP INDEX %(name)s"
 
     sql_create_pk = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s PRIMARY KEY (%(columns)s)"
@@ -326,7 +326,7 @@ class BaseDatabaseSchemaEditor:
 
     def add_index(self, model, index):
         """Add an index on a model."""
-        self.execute(index.create_sql(model, self))
+        self.execute(index.create_sql(model, self), params=None)
 
     def remove_index(self, model, index):
         """Remove an index from a model."""
@@ -905,7 +905,8 @@ class BaseDatabaseSchemaEditor:
         return ''
 
     def _create_index_sql(self, model, fields, *, name=None, suffix='', using='',
-                          db_tablespace=None, col_suffixes=(), sql=None, opclasses=()):
+                          db_tablespace=None, col_suffixes=(), sql=None, opclasses=(),
+                          condition=''):
         """
         Return the SQL statement to create the index for one or several fields.
         `sql` can be specified if the syntax differs from the standard (GIS
@@ -929,6 +930,7 @@ class BaseDatabaseSchemaEditor:
             using=using,
             columns=self._index_columns(table, columns, col_suffixes, opclasses),
             extra=tablespace_sql,
+            condition=condition,
         )
 
     def _index_columns(self, table, columns, col_suffixes, opclasses):

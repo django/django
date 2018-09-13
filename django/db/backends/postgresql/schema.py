@@ -12,7 +12,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_delete_sequence = "DROP SEQUENCE IF EXISTS %(sequence)s CASCADE"
     sql_set_sequence_max = "SELECT setval('%(sequence)s', MAX(%(column)s)) FROM %(table)s"
 
-    sql_create_index = "CREATE INDEX %(name)s ON %(table)s%(using)s (%(columns)s)%(extra)s"
+    sql_create_index = "CREATE INDEX %(name)s ON %(table)s%(using)s (%(columns)s)%(extra)s%(condition)s"
     sql_delete_index = "DROP INDEX IF EXISTS %(name)s"
 
     # Setting the constraint to IMMEDIATE runs any deferred checks to allow

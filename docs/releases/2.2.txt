@@ -201,6 +201,8 @@ Models
 
 * Added support for PostgreSQL operator classes (:attr:`.Index.opclasses`).
 
+* Added support for partial indexes (:attr:`.Index.condition`).
+
 * Added many :ref:`math database functions <math-functions>`.
 
 * Setting the new ``ignore_conflicts`` parameter of
@@ -287,6 +289,9 @@ Database backend API
   to ``False``.
 
 * ``DatabaseFeatures.uses_savepoints`` now defaults to ``True``.
+
+* Third party database backends must implement support for partial indexes or
+  set ``DatabaseFeatures.supports_partial_indexes`` to ``False``.
 
 :mod:`django.contrib.gis`
 -------------------------

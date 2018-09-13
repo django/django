@@ -38,6 +38,7 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
             "using": "USING %s" % self.geom_index_type,
             "columns": field_column,
             "extra": '',
+            "condition": '',
         }
 
     def _alter_column_type_sql(self, table, old_field, new_field, new_type):

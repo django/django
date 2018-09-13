@@ -16,6 +16,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_alter_column_no_default = "MODIFY %(column)s DEFAULT NULL"
     sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"
     sql_delete_table = "DROP TABLE %(table)s CASCADE CONSTRAINTS"
+    sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s"
 
     def quote_value(self, value):
         if isinstance(value, (datetime.date, datetime.time, datetime.datetime)):

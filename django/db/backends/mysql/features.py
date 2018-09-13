@@ -51,6 +51,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     db_functions_convert_bytes_to_str = True
     # Alias MySQL's TRADITIONAL to TEXT for consistency with other backends.
     supported_explain_formats = {'JSON', 'TEXT', 'TRADITIONAL'}
+    # Neither MySQL nor MariaDB support partial indexes.
+    supports_partial_indexes = False
 
     @cached_property
     def _mysql_storage_engine(self):

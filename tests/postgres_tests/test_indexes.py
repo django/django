@@ -4,8 +4,12 @@ from django.contrib.postgres.indexes import (
     BrinIndex, BTreeIndex, GinIndex, GistIndex, HashIndex, SpGistIndex,
 )
 from django.db import connection
+from django.db.models import CharField
+from django.db.models.functions import Length
+from django.db.models.query_utils import Q
 from django.db.utils import NotSupportedError
 from django.test import skipUnlessDBFeature
+from django.test.utils import register_lookup
 
 from . import PostgreSQLTestCase
 from .models import CharFieldModel, IntegerArrayModel
@@ -171,6 +175,36 @@ class SchemaTests(PostgreSQLTestCase):
         with connection.schema_editor() as editor:
             editor.remove_index(IntegerArrayModel, index)
         self.assertNotIn(index_name, self.get_constraints(IntegerArrayModel._meta.db_table))
+
+    def test_partial_gin_index(self):
+        with register_lookup(CharField, Length):
+            index_name = 'char_field_gin_partial_idx'
+            index = GinIndex(fields=['field'], name=index_name, condition=Q(field__length=40))
+            with connection.schema_editor() as editor:
+                editor.add_index(CharFieldModel, index)
+            constraints = self.get_constraints(CharFieldModel._meta.db_table)
+            self.assertEqual(constraints[index_name]['type'], 'gin')
+            with connection.schema_editor() as editor:
+                editor.remove_index(CharFieldModel, index)
+            self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))
+
+    def test_partial_gin_index_with_tablespace(self):
+        with register_lookup(CharField, Length):
+            index_name = 'char_field_gin_partial_idx'
+            index = GinIndex(
+                fields=['field'],
+                name=index_name,
+                condition=Q(field__length=40),
+                db_tablespace='pg_default',
+            )
+            with connection.schema_editor() as editor:
+                editor.add_index(CharFieldModel, index)
+                self.assertIn('TABLESPACE "pg_default" ', str(index.create_sql(CharFieldModel, editor)))
+            constraints = self.get_constraints(CharFieldModel._meta.db_table)
+            self.assertEqual(constraints[index_name]['type'], 'gin')
+            with connection.schema_editor() as editor:
+                editor.remove_index(CharFieldModel, index)
+            self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))
 
     @skipUnlessDBFeature('has_gin_pending_list_limit')
     def test_gin_parameters(self):

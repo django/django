@@ -34,6 +34,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_cast_with_precision = False
     time_cast_precision = 3
     can_release_savepoints = True
+    supports_partial_indexes = Database.version_info >= (3, 8, 0)
     # Is "ALTER TABLE ... RENAME COLUMN" supported?
     can_alter_table_rename_column = Database.sqlite_version_info >= (3, 25, 0)
 

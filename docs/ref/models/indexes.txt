@@ -21,7 +21,7 @@ options`_.
 ``Index`` options
 =================
 
-.. class:: Index(fields=(), name=None, db_tablespace=None, opclasses=())
+.. class:: Index(fields=(), name=None, db_tablespace=None, opclasses=(), condition=None)
 
     Creates an index (B-Tree) in the database.
 
@@ -92,3 +92,44 @@ opclasses=['jsonb_path_ops'])`` creates a gin index on ``jsonfield`` using
 ``opclasses`` are ignored for databases besides PostgreSQL.
 
 :attr:`Index.name` is required when using ``opclasses``.
+
+``condition``
+-------------
+
+.. attribute:: Index.condition
+
+.. versionadded:: 2.2
+
+If the table is very large and your queries mostly target a subset of rows,
+it may be useful to restrict an index to that subset. Specify a condition as a
+:class:`~django.db.models.Q`. For example, ``condition=Q(pages__gt=400)``
+indexes records with more than 400 pages.
+
+:attr:`Index.name` is required when using ``condition``.
+
+.. admonition:: Restrictions on PostgreSQL
+
+    PostgreSQL requires functions referenced in the condition to be be marked as
+    IMMUTABLE. Django doesn't validate this but PostgreSQL will error. This
+    means that functions such as :ref:`date-functions` and
+    :class:`~django.db.models.functions.Concat` aren't accepted. If you store
+    dates in :class:`~django.db.models.DateTimeField`, comparison to
+    :class:`~datetime.datetime` objects may require the ``tzinfo`` argument
+    to be provided because otherwise the comparison could result in a mutable
+    function due to the casting Django does for :ref:`lookups <field-lookups>`.
+
+.. admonition:: Restrictions on SQLite
+
+    SQLite `imposes restrictions <https://www.sqlite.org/partialindex.html>`_
+    on how a partial index can be constructed.
+
+.. admonition:: Oracle
+
+    Oracle does not support partial indexes. Instead, partial indexes can be
+    emulated using functional indexes. Use a :doc:`migration
+    </topics/migrations>` to add the index using :class:`.RunSQL`.
+
+.. admonition:: MySQL and MariaDB
+
+    The ``condition`` argument is ignored with MySQL and MariaDB as neither
+    supports conditional indexes.

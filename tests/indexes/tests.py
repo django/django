@@ -1,10 +1,15 @@
+import datetime
 from unittest import skipIf, skipUnless
 
 from django.db import connection
 from django.db.models import Index
 from django.db.models.deletion import CASCADE
 from django.db.models.fields.related import ForeignKey
-from django.test import TestCase, TransactionTestCase
+from django.db.models.query_utils import Q
+from django.test import (
+    TestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
+)
+from django.utils import timezone
 
 from .models import (
     Article, ArticleTranslation, IndexedArticle2, IndexTogetherSingleList,
@@ -85,6 +90,28 @@ class SchemaIndexesNotPostgreSQLTests(TransactionTestCase):
             editor.add_index(IndexedArticle2, index)
 
 
+# The `condition` parameter is ignored by databases that don't support partial
+# indexes.
+@skipIfDBFeature('supports_partial_indexes')
+class PartialIndexConditionIgnoredTests(TransactionTestCase):
+    available_apps = ['indexes']
+
+    def test_condition_ignored(self):
+        index = Index(
+            name='test_condition_ignored',
+            fields=['published'],
+            condition=Q(published=True),
+        )
+        with connection.schema_editor() as editor:
+            # This would error if condition weren't ignored.
+            editor.add_index(Article, index)
+
+        self.assertNotIn(
+            'WHERE %s.%s' % (editor.quote_name(Article._meta.db_table), 'published'),
+            str(index.create_sql(Article, editor))
+        )
+
+
 @skipUnless(connection.vendor == 'postgresql', 'PostgreSQL tests')
 class SchemaIndexesPostgreSQLTests(TransactionTestCase):
     available_apps = ['indexes']
@@ -139,6 +166,35 @@ class SchemaIndexesPostgreSQLTests(TransactionTestCase):
             )
             self.assertCountEqual(cursor.fetchall(), expected_ops_classes)
 
+    def test_ops_class_partial(self):
+        index = Index(
+            name='test_ops_class_partial',
+            fields=['body'],
+            opclasses=['text_pattern_ops'],
+            condition=Q(headline__contains='China'),
+        )
+        with connection.schema_editor() as editor:
+            editor.add_index(IndexedArticle2, index)
+        with editor.connection.cursor() as cursor:
+            cursor.execute(self.get_opclass_query % 'test_ops_class_partial')
+            self.assertCountEqual(cursor.fetchall(), [('text_pattern_ops', 'test_ops_class_partial')])
+
+    def test_ops_class_partial_tablespace(self):
+        indexname = 'test_ops_class_tblspace'
+        index = Index(
+            name=indexname,
+            fields=['body'],
+            opclasses=['text_pattern_ops'],
+            condition=Q(headline__contains='China'),
+            db_tablespace='pg_default',
+        )
+        with connection.schema_editor() as editor:
+            editor.add_index(IndexedArticle2, index)
+            self.assertIn('TABLESPACE "pg_default" ', str(index.create_sql(IndexedArticle2, editor)))
+        with editor.connection.cursor() as cursor:
+            cursor.execute(self.get_opclass_query % indexname)
+            self.assertCountEqual(cursor.fetchall(), [('text_pattern_ops', indexname)])
+
 
 @skipUnless(connection.vendor == 'mysql', 'MySQL tests')
 class SchemaIndexesMySQLTests(TransactionTestCase):
@@ -178,3 +234,108 @@ class SchemaIndexesMySQLTests(TransactionTestCase):
             if field_created:
                 with connection.schema_editor() as editor:
                     editor.remove_field(ArticleTranslation, new_field)
+
+
+@skipUnlessDBFeature('supports_partial_indexes')
+class PartialIndexTests(TestCase):
+    # Schema editor is used to create the index to test that it works.
+
+    def test_partial_index(self):
+        with connection.schema_editor() as editor:
+            index = Index(
+                name='recent_article_idx',
+                fields=['pub_date'],
+                condition=Q(
+                    pub_date__gt=datetime.datetime(
+                        year=2015, month=1, day=1,
+                        # PostgreSQL would otherwise complain about the lookup
+                        # being converted to a mutable function (by removing
+                        # the timezone in the cast) which is forbidden.
+                        tzinfo=timezone.get_current_timezone(),
+                    ),
+                )
+            )
+            self.assertIn(
+                'WHERE %s.%s' % (editor.quote_name(Article._meta.db_table), editor.quote_name("pub_date")),
+                str(index.create_sql(Article, schema_editor=editor))
+            )
+            editor.add_index(index=index, model=Article)
+            self.assertIn(index.name, connection.introspection.get_constraints(
+                cursor=connection.cursor(), table_name=Article._meta.db_table,
+            ))
+
+    def test_integer_restriction_partial(self):
+        with connection.schema_editor() as editor:
+            index = Index(
+                name='recent_article_idx',
+                fields=['id'],
+                condition=Q(pk__gt=1),
+            )
+            self.assertIn(
+                'WHERE %s.%s' % (editor.quote_name(Article._meta.db_table), editor.quote_name('id')),
+                str(index.create_sql(Article, schema_editor=editor))
+            )
+            editor.add_index(index=index, model=Article)
+            self.assertIn(index.name, connection.introspection.get_constraints(
+                cursor=connection.cursor(), table_name=Article._meta.db_table,
+            ))
+
+    def test_boolean_restriction_partial(self):
+        with connection.schema_editor() as editor:
+            index = Index(
+                name='published_index',
+                fields=['published'],
+                condition=Q(published=True),
+            )
+            self.assertIn(
+                'WHERE %s.%s' % (editor.quote_name(Article._meta.db_table), editor.quote_name('published')),
+                str(index.create_sql(Article, schema_editor=editor))
+            )
+            editor.add_index(index=index, model=Article)
+            self.assertIn(index.name, connection.introspection.get_constraints(
+                cursor=connection.cursor(), table_name=Article._meta.db_table,
+            ))
+
+    def test_multiple_conditions(self):
+        with connection.schema_editor() as editor:
+            index = Index(
+                name='recent_article_idx',
+                fields=['pub_date', 'headline'],
+                condition=(
+                    Q(pub_date__gt=datetime.datetime(
+                        year=2015,
+                        month=1,
+                        day=1,
+                        tzinfo=timezone.get_current_timezone(),
+                    )) & Q(headline__contains='China')
+                ),
+            )
+            sql = str(index.create_sql(Article, schema_editor=editor))
+            where = sql.find('WHERE')
+            self.assertIn(
+                'WHERE (%s.%s' % (editor.quote_name(Article._meta.db_table), editor.quote_name("pub_date")),
+                sql
+            )
+            # Because each backend has different syntax for the operators,
+            # check ONLY the occurrence of headline in the SQL.
+            self.assertGreater(sql.rfind('headline'), where)
+            editor.add_index(index=index, model=Article)
+            self.assertIn(index.name, connection.introspection.get_constraints(
+                cursor=connection.cursor(), table_name=Article._meta.db_table,
+            ))
+
+    def test_is_null_condition(self):
+        with connection.schema_editor() as editor:
+            index = Index(
+                name='recent_article_idx',
+                fields=['pub_date'],
+                condition=Q(pub_date__isnull=False),
+            )
+            self.assertIn(
+                'WHERE %s.%s IS NOT NULL' % (editor.quote_name(Article._meta.db_table), editor.quote_name("pub_date")),
+                str(index.create_sql(Article, schema_editor=editor))
+            )
+            editor.add_index(index=index, model=Article)
+            self.assertIn(index.name, connection.introspection.get_constraints(
+                cursor=connection.cursor(), table_name=Article._meta.db_table,
+            ))

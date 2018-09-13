@@ -27,6 +27,7 @@ class ArticleTranslation(models.Model):
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateTimeField()
+    published = models.BooleanField(default=False)
 
     # Add virtual relation to the ArticleTranslation model.
     translation = CurrentTranslation(ArticleTranslation, models.CASCADE, ['id'], ['article'])

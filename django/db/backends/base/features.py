@@ -276,6 +276,9 @@ class BaseDatabaseFeatures:
     # in UPDATE statements to ensure the expression has the correct type?
     requires_casted_case_in_updates = False
 
+    # Does the backend support partial indexes (CREATE INDEX ... WHERE ...)?
+    supports_partial_indexes = True
+
     def __init__(self, connection):
         self.connection = connection
 
