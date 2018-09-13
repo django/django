@@ -1,9 +1,10 @@
 from datetime import datetime
 from operator import attrgetter
 
-from django.db.models import DateTimeField, F, Max, OuterRef, Subquery
+from django.db.models import Count, DateTimeField, F, Max, OuterRef, Subquery
 from django.db.models.functions import Upper
 from django.test import TestCase
+from django.utils.deprecation import RemovedInDjango31Warning
 
 from .models import Article, Author, OrderedByFArticle, Reference
 
@@ -403,3 +404,11 @@ class OrderingTests(TestCase):
             articles, ['Article 1', 'Article 4', 'Article 3', 'Article 2'],
             attrgetter('headline')
         )
+
+    def test_deprecated_values_annotate(self):
+        msg = (
+            "Article QuerySet won't use Meta.ordering in Django 3.1. Add "
+            ".order_by('-pub_date', 'headline') to retain the current query."
+        )
+        with self.assertRaisesMessage(RemovedInDjango31Warning, msg):
+            list(Article.objects.values('author').annotate(Count('headline')))

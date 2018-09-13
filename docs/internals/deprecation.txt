@@ -19,6 +19,8 @@ details on these changes.
 
 * ``django.core.paginator.QuerySetPaginator`` will be removed.
 
+* A model's ``Meta.ordering`` will no longer affect ``GROUP BY`` queries.
+
 .. _deprecation-removed-in-3.0:
 
 3.0
