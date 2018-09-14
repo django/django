@@ -16,10 +16,10 @@ the :ref:`internal release deprecation policy <internal-release-deprecation-poli
 .. module:: django.utils.cache
    :synopsis: Helper functions for controlling caching.
 
-This module contains helper functions for controlling caching. It does so by
-managing the ``Vary`` header of responses. It includes functions to patch the
-header of response objects directly and decorators that change functions to do
-that header-patching themselves.
+This module contains helper functions for controlling HTTP caching. It does so
+by managing the ``Vary`` header of responses. It includes functions to patch
+the header of response objects directly and decorators that change functions to
+do that header-patching themselves.
 
 For information on the ``Vary`` header, see :rfc:`7231#section-7.1.4`.
 
@@ -99,10 +99,13 @@ need to distinguish caches by the ``Accept-language`` header.
 ==========================
 
 .. module:: django.utils.dateparse
-   :synopsis: Functions to parse datetime objects.
+   :synopsis: Functions to parse strings to datetime objects.
 
 The functions defined in this module share the following properties:
 
+- They accept strings in ISO 8601 date/time formats (or some close
+  alternatives) and return objects from the corresponding classes in Python's
+  :mod:`datetime` module.
 - They raise :exc:`ValueError` if their input is well formatted but isn't a
   valid date or time.
 - They return ``None`` if it isn't well formatted at all.
@@ -199,8 +202,8 @@ The functions defined in this module share the following properties:
 
 .. function:: smart_text(s, encoding='utf-8', strings_only=False, errors='strict')
 
-    Returns a ``str`` object representing ``s``. Treats bytestrings using the
-    ``encoding`` codec.
+    Returns a ``str`` object representing arbitrary object ``s``. Treats
+    bytestrings using the ``encoding`` codec.
 
     If ``strings_only`` is ``True``, don't convert (some) non-string-like
     objects.
@@ -222,8 +225,8 @@ The functions defined in this module share the following properties:
 
 .. function:: smart_bytes(s, encoding='utf-8', strings_only=False, errors='strict')
 
-    Returns a bytestring version of ``s``, encoded as specified in
-    ``encoding``.
+    Returns a bytestring version of arbitrary object ``s``, encoded as
+    specified in ``encoding``.
 
     If ``strings_only`` is ``True``, don't convert (some) non-string-like
     objects.
@@ -468,7 +471,7 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
                 ...
 
     Note that as the method is now a property, in Python code it will need to
-    be invoked appropriately::
+    be accessed appropriately::
 
         # in the view:
         if person.friends:
@@ -822,25 +825,27 @@ appropriate entities.
     is translated to "persona", the regular expression will match
     ``persona/(?P<pk>\d+)/$``, e.g. ``persona/5/``.
 
-.. function:: slugify(allow_unicode=False)
+.. function:: slugify(value, allow_unicode=False)
 
-    Converts to ASCII if ``allow_unicode`` is ``False`` (default). Converts spaces to
-    hyphens. Removes characters that aren't alphanumerics, underscores, or
-    hyphens. Converts to lowercase. Also strips leading and trailing whitespace.
+    Converts a string to a URL slug by:
+
+    #. Converting to ASCII if ``allow_unicode`` is ``False`` (the default).
+    #. Removing characters that aren't alphanumerics, underscores, hyphens, or
+       whitespace.
+    #. Removing leading and trailing whitespace.
+    #. Converting to lowercase.
+    #. Replacing any whitespace or repeated dashes with single dashes.
 
     For example::
 
-        slugify(value)
+        >>> slugify(' Joel is a slug ')
+        'joel-is-a-slug'
 
-    If ``value`` is ``"Joel is a slug"``, the output will be
-    ``"joel-is-a-slug"``.
+    If you want to allow Unicode characters, pass ``allow_unicode=True``. For
+    example::
 
-    You can set the ``allow_unicode`` parameter to ``True``, if you want to
-    allow Unicode characters::
-
-        slugify(value, allow_unicode=True)
-
-    If ``value`` is ``"你好 World"``, the output will be ``"你好-world"``.
+        >>> slugify('你好 World', allow_unicode=True)
+        '你好-world'
 
 .. _time-zone-selection-functions:
 
