@@ -652,6 +652,7 @@ class AlterModelOptions(ModelOptionOperation):
     ALTER_OPTION_KEYS = [
         "base_manager_name",
         "default_manager_name",
+        "default_related_name",
         "get_latest_by",
         "managed",
         "ordering",

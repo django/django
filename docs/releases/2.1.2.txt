@@ -14,3 +14,6 @@ Bugfixes
 
 * Fixed a regression where files starting with a tilde or underscore weren't
   ignored by the migrations loader (:ticket:`29749`).
+
+* Made migrations detect changes to ``Meta.default_related_name``
+  (:ticket:`29755`).
