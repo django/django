@@ -442,7 +442,7 @@ Usage example::
 ``Trunc``
 ---------
 
-.. class:: Trunc(expression, kind, output_field=None, tzinfo=None, **extra)
+.. class:: Trunc(expression, kind, output_field=None, tzinfo=None, is_dst=None, **extra)
 
 Truncates a date up to a significant component.
 
@@ -459,6 +459,14 @@ depending on ``output_field``, with fields up to ``kind`` set to their minimum
 value. If ``output_field`` is omitted, it will default to the ``output_field``
 of ``expression``. A ``tzinfo`` subclass, usually provided by ``pytz``, can be
 passed to truncate a value in a specific timezone.
+
+The ``is_dst`` parameter indicates whether or not ``pytz`` should interpret
+nonexistent and ambiguous datetimes in daylight saving time. By default (when
+``is_dst=None``), ``pytz`` raises an exception for such datetimes.
+
+.. versionadded:: 3.0
+
+    The ``is_dst`` parameter was added.
 
 Given the datetime ``2015-06-15 14:30:50.000321+00:00``, the built-in ``kind``\s
 return:
@@ -525,21 +533,21 @@ Usage example::
 ``DateField`` truncation
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. class:: TruncYear(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncYear(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'year'
 
-.. class:: TruncMonth(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncMonth(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'month'
 
-.. class:: TruncWeek(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncWeek(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     Truncates to midnight on the Monday of the week.
 
     .. attribute:: kind = 'week'
 
-.. class:: TruncQuarter(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncQuarter(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'quarter'
 
@@ -603,19 +611,19 @@ truncate function. It's also registered as a transform on  ``DateTimeField`` as
 truncate function. It's also registered as a transform on ``DateTimeField`` as
 ``__time``.
 
-.. class:: TruncDay(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncDay(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'day'
 
-.. class:: TruncHour(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncHour(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'hour'
 
-.. class:: TruncMinute(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncMinute(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'minute'
 
-.. class:: TruncSecond(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncSecond(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'second'
 
@@ -653,15 +661,15 @@ Usage example::
 ``TimeField`` truncation
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. class:: TruncHour(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncHour(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'hour'
 
-.. class:: TruncMinute(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncMinute(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'minute'
 
-.. class:: TruncSecond(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncSecond(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'second'
 
