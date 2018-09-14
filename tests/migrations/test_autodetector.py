@@ -2104,6 +2104,25 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, 'thirdapp', 0, 0, name="CustomUser")
         self.assertOperationAttributes(changes, 'thirdapp', 0, 1, name="Aardvark")
 
+    def test_default_related_name_option(self):
+        model_state = ModelState('app', 'model', [
+            ('id', models.AutoField(primary_key=True)),
+        ], options={'default_related_name': 'related_name'})
+        changes = self.get_changes([], [model_state])
+        self.assertNumberMigrations(changes, 'app', 1)
+        self.assertOperationTypes(changes, 'app', 0, ['CreateModel'])
+        self.assertOperationAttributes(
+            changes, 'app', 0, 0, name='model',
+            options={'default_related_name': 'related_name'},
+        )
+        altered_model_state = ModelState('app', 'Model', [
+            ('id', models.AutoField(primary_key=True)),
+        ])
+        changes = self.get_changes([model_state], [altered_model_state])
+        self.assertNumberMigrations(changes, 'app', 1)
+        self.assertOperationTypes(changes, 'app', 0, ['AlterModelOptions'])
+        self.assertOperationAttributes(changes, 'app', 0, 0, name='model', options={})
+
     @override_settings(AUTH_USER_MODEL="thirdapp.CustomUser")
     def test_swappable_first_setting(self):
         """Swappable models get their CreateModel first."""
