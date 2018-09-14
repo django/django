@@ -28,6 +28,7 @@ class FeedDoesNotExist(ObjectDoesNotExist):
 
 class Feed:
     feed_type = feedgenerator.DefaultFeed
+    language = settings.LANGUAGE_CODE
     title_template = None
     description_template = None
 
@@ -134,7 +135,7 @@ class Feed:
             subtitle=self._get_dynamic_attr('subtitle', obj),
             link=link,
             description=self._get_dynamic_attr('description', obj),
-            language=settings.LANGUAGE_CODE,
+            language=self.language,
             feed_url=add_domain(
                 current_site.domain,
                 self._get_dynamic_attr('feed_url', obj) or request.path,
