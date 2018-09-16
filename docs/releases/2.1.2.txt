@@ -17,3 +17,5 @@ Bugfixes
 
 * Made migrations detect changes to ``Meta.default_related_name``
   (:ticket:`29755`).
+
+* Added compatibility for ``cx_Oracle`` 7 (:ticket:`29759`).
