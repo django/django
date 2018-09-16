@@ -11,8 +11,9 @@ from django.db.models.aggregates import (
     Avg, Count, Max, Min, StdDev, Sum, Variance,
 )
 from django.db.models.expressions import (
-    Case, Col, Combinable, Exists, ExpressionList, ExpressionWrapper, F, Func,
-    OrderBy, OuterRef, Random, RawSQL, Ref, Subquery, Value, When,
+    Case, Col, Combinable, Exists, Expression, ExpressionList,
+    ExpressionWrapper, F, Func, OrderBy, OuterRef, Random, RawSQL, Ref,
+    Subquery, Value, When,
 )
 from django.db.models.functions import (
     Coalesce, Concat, Length, Lower, Substr, Upper,
@@ -819,6 +820,31 @@ class ExpressionsTests(TestCase):
             Employee.objects.filter(firstname__iendswith=F('lastname')),
             ["<Employee: Jean-Claude claude>"],
             ordered=False,
+        )
+
+
+class SimpleExpressionTests(SimpleTestCase):
+
+    def test_equal(self):
+        self.assertEqual(Expression(), Expression())
+        self.assertEqual(
+            Expression(models.IntegerField()),
+            Expression(output_field=models.IntegerField())
+        )
+        self.assertNotEqual(
+            Expression(models.IntegerField()),
+            Expression(models.CharField())
+        )
+
+    def test_hash(self):
+        self.assertEqual(hash(Expression()), hash(Expression()))
+        self.assertEqual(
+            hash(Expression(models.IntegerField())),
+            hash(Expression(output_field=models.IntegerField()))
+        )
+        self.assertNotEqual(
+            hash(Expression(models.IntegerField())),
+            hash(Expression(models.CharField())),
         )
 
 
