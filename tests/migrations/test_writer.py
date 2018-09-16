@@ -648,7 +648,6 @@ class WriterTests(SimpleTestCase):
         string = MigrationWriter.serialize(models.CharField(default=DeconstructibleInstances))[0]
         self.assertEqual(string, "models.CharField(default=migrations.test_writer.DeconstructibleInstances)")
 
-
     def test_force_construct_class_arguments(self):
         """
         Unserializable values can be migrated anymore

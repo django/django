@@ -280,8 +280,8 @@ class UnserializablesSerializer(BaseSerializer):
         new_value = deconstructible_klass()
         if len(init_values) > 2:
             new_value = deconstructible_klass(*[v for v in init_values[2].values()])
-
         return DeconstructableSerializer(new_value).serialize()
+
 
 def serializer_factory(value):
     from django.db.migrations.writer import SettingsReference
