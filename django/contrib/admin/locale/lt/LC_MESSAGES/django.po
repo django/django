@@ -12,8 +12,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-05-28 01:29+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2018-09-14 12:28+0000\n"
+"Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/django/django/language/"
 "lt/)\n"
 "MIME-Version: 1.0\n"
@@ -244,7 +244,7 @@ msgstr "Pakeisti %s"
 
 #, python-format
 msgid "View %s"
-msgstr ""
+msgstr "Peržiūrėti %s"
 
 msgid "Database error"
 msgstr "Duomenų bazės klaida"
@@ -706,7 +706,7 @@ msgstr "Pasirinkite %s kurį norite keisti"
 
 #, python-format
 msgid "Select %s to view"
-msgstr ""
+msgstr "Pasirinkti %s peržiūrai"
 
 msgid "Date:"
 msgstr "Data:"

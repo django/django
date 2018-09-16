@@ -210,6 +210,8 @@ class ConsoleNode(nodes.literal_block):
     Custom node to override the visit/depart event handlers at registration
     time. Wrap a literal_block object and defer to it.
     """
+    tagname = 'ConsoleNode'
+
     def __init__(self, litblk_obj):
         self.wrapped = litblk_obj
 
@@ -320,6 +322,8 @@ class ConsoleDirective(CodeBlock):
                 return 'runtests.py ' + args_to_win(line[15:])
             if line.startswith('$ ./'):
                 return args_to_win(line[4:])
+            if line.startswith('$ python3'):
+                return 'py ' + args_to_win(line[9:])
             if line.startswith('$ python'):
                 return 'py ' + args_to_win(line[8:])
             if line.startswith('$ '):

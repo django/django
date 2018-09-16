@@ -346,7 +346,7 @@ class RequestsTests(SimpleTestCase):
         Multipart POST requests with Content-Length >= 0 are valid and need to be handled.
         """
         # According to:
-        # http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.13
+        # https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.13
         # Every request.POST with Content-Length >= 0 is a valid request,
         # this test ensures that we handle Content-Length == 0.
         payload = FakePayload("\r\n".join([

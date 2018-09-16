@@ -1003,7 +1003,7 @@ class ConstraintsTests(SimpleTestCase):
             age = models.IntegerField()
 
             class Meta:
-                constraints = [models.CheckConstraint(models.Q(age__gte=18), 'is_adult')]
+                constraints = [models.CheckConstraint(check=models.Q(age__gte=18), name='is_adult')]
 
         errors = Model.check()
         warn = Warning(

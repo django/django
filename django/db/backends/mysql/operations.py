@@ -1,11 +1,9 @@
-import decimal
 import uuid
 
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.utils import timezone
 from django.utils.duration import duration_microseconds
-from django.utils.encoding import force_text
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -21,6 +19,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         'AutoField': 'signed integer',
         'BigAutoField': 'signed integer',
         'CharField': 'char(%(max_length)s)',
+        'DecimalField': 'decimal(%(max_digits)s, %(decimal_places)s)',
         'TextField': 'char',
         'IntegerField': 'signed integer',
         'BigIntegerField': 'signed integer',
@@ -32,7 +31,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     explain_prefix = 'EXPLAIN'
 
     def date_extract_sql(self, lookup_type, field_name):
-        # http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
+        # https://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
         if lookup_type == 'week_day':
             # DAYOFWEEK() returns an integer, 1-7, Sunday=1.
             # Note: WEEKDAY() returns 0-6, Monday=0.
@@ -142,7 +141,10 @@ class DatabaseOperations(BaseDatabaseOperations):
         # With MySQLdb, cursor objects have an (undocumented) "_last_executed"
         # attribute where the exact query sent to the database is saved.
         # See MySQLdb/cursors.py in the source distribution.
-        return force_text(getattr(cursor, '_last_executed', None), errors='replace')
+        query = getattr(cursor, '_last_executed', None)
+        if query is not None:
+            query = query.decode(errors='replace')
+        return query
 
     def no_limit_value(self):
         # 2**64 - 1, as recommended by the MySQL documentation
@@ -233,9 +235,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     def get_db_converters(self, expression):
         converters = super().get_db_converters(expression)
         internal_type = expression.output_field.get_internal_type()
-        if internal_type == 'TextField':
-            converters.append(self.convert_textfield_value)
-        elif internal_type in ['BooleanField', 'NullBooleanField']:
+        if internal_type in ['BooleanField', 'NullBooleanField']:
             converters.append(self.convert_booleanfield_value)
         elif internal_type == 'DateTimeField':
             if settings.USE_TZ:
@@ -243,11 +243,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         elif internal_type == 'UUIDField':
             converters.append(self.convert_uuidfield_value)
         return converters
-
-    def convert_textfield_value(self, value, expression, connection):
-        if value is not None:
-            value = force_text(value)
-        return value
 
     def convert_booleanfield_value(self, value, expression, connection):
         if value in (0, 1):
@@ -267,12 +262,6 @@ class DatabaseOperations(BaseDatabaseOperations):
     def binary_placeholder_sql(self, value):
         return '_binary %s' if value is not None and not hasattr(value, 'as_sql') else '%s'
 
-    def convert_durationfield_value(self, value, expression, connection):
-        # DurationFields can return a Decimal in MariaDB.
-        if isinstance(value, decimal.Decimal):
-            value = float(value)
-        return super().convert_durationfield_value(value, expression, connection)
-
     def subtract_temporals(self, internal_type, lhs, rhs):
         lhs_sql, lhs_params = lhs
         rhs_sql, rhs_params = rhs
@@ -280,7 +269,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             if self.connection.mysql_is_mariadb:
                 # MariaDB includes the microsecond component in TIME_TO_SEC as
                 # a decimal. MySQL returns an integer without microseconds.
-                return '((TIME_TO_SEC(%(lhs)s) - TIME_TO_SEC(%(rhs)s)) * 1000000)' % {
+                return 'CAST((TIME_TO_SEC(%(lhs)s) - TIME_TO_SEC(%(rhs)s)) * 1000000 AS SIGNED)' % {
                     'lhs': lhs_sql, 'rhs': rhs_sql
                 }, lhs_params + rhs_params
             return (

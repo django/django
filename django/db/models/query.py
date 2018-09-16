@@ -18,9 +18,9 @@ from django.db import (
 from django.db.models import DateField, DateTimeField, sql
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
-from django.db.models.expressions import F
+from django.db.models.expressions import Case, Expression, F, Value, When
 from django.db.models.fields import AutoField
-from django.db.models.functions import Trunc
+from django.db.models.functions import Cast, Trunc
 from django.db.models.query_utils import FilteredRelation, InvalidQuery, Q
 from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE
 from django.db.utils import NotSupportedError
@@ -96,13 +96,12 @@ class ValuesIterable(BaseIterable):
         query = queryset.query
         compiler = query.get_compiler(queryset.db)
 
-        field_names = list(query.values_select)
-        extra_names = list(query.extra_select)
-        annotation_names = list(query.annotation_select)
-
         # extra(select=...) cols are always at the start of the row.
-        names = extra_names + field_names + annotation_names
-
+        names = [
+            *query.extra_select,
+            *query.values_select,
+            *query.annotation_select,
+        ]
         indexes = range(len(names))
         for row in compiler.results_iter(chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size):
             yield {names[i]: row[i] for i in indexes}
@@ -120,14 +119,13 @@ class ValuesListIterable(BaseIterable):
         compiler = query.get_compiler(queryset.db)
 
         if queryset._fields:
-            field_names = list(query.values_select)
-            extra_names = list(query.extra_select)
-            annotation_names = list(query.annotation_select)
-
             # extra(select=...) cols are always at the start of the row.
-            names = extra_names + field_names + annotation_names
-
-            fields = list(queryset._fields) + [f for f in annotation_names if f not in queryset._fields]
+            names = [
+                *query.extra_select,
+                *query.values_select,
+                *query.annotation_select,
+            ]
+            fields = [*queryset._fields, *(f for f in query.annotation_select if f not in queryset._fields)]
             if fields != names:
                 # Reorder according to fields.
                 index_map = {name: idx for idx, name in enumerate(names)}
@@ -352,7 +350,7 @@ class QuerySet:
         """
         if self.query.distinct_fields:
             raise NotImplementedError("aggregate() + distinct(fields) not implemented.")
-        self._validate_values_are_expressions(args + tuple(kwargs.values()), method_name='aggregate')
+        self._validate_values_are_expressions((*args, *kwargs.values()), method_name='aggregate')
         for arg in args:
             # The default_alias property raises TypeError if default_alias
             # can't be set automatically or AttributeError if it isn't an
@@ -472,6 +470,50 @@ class QuerySet:
                     obj_without_pk._state.db = self.db
 
         return objs
+
+    def bulk_update(self, objs, fields, batch_size=None):
+        """
+        Update the given fields in each of the given objects in the database.
+        """
+        if batch_size is not None and batch_size < 0:
+            raise ValueError('Batch size must be a positive integer.')
+        if not fields:
+            raise ValueError('Field names must be given to bulk_update().')
+        objs = tuple(objs)
+        if not all(obj.pk for obj in objs):
+            raise ValueError('All bulk_update() objects must have a primary key set.')
+        fields = [self.model._meta.get_field(name) for name in fields]
+        if any(not f.concrete or f.many_to_many for f in fields):
+            raise ValueError('bulk_update() can only be used with concrete fields.')
+        if any(f.primary_key for f in fields):
+            raise ValueError('bulk_update() cannot be used with primary key fields.')
+        if not objs:
+            return
+        # PK is used twice in the resulting update query, once in the filter
+        # and once in the WHEN. Each field will also have one CAST.
+        max_batch_size = connections[self.db].ops.bulk_batch_size(['pk', 'pk'] + fields, objs)
+        batch_size = min(batch_size, max_batch_size) if batch_size else max_batch_size
+        requires_casting = connections[self.db].features.requires_casted_case_in_updates
+        batches = (objs[i:i + batch_size] for i in range(0, len(objs), batch_size))
+        updates = []
+        for batch_objs in batches:
+            update_kwargs = {}
+            for field in fields:
+                when_statements = []
+                for obj in batch_objs:
+                    attr = getattr(obj, field.attname)
+                    if not isinstance(attr, Expression):
+                        attr = Value(attr, output_field=field)
+                    when_statements.append(When(pk=obj.pk, then=attr))
+                case_statement = Case(*when_statements, output_field=field)
+                if requires_casting:
+                    case_statement = Cast(case_statement, output_field=field)
+                update_kwargs[field.attname] = case_statement
+            updates.append(([obj.pk for obj in batch_objs], update_kwargs))
+        with transaction.atomic(using=self.db, savepoint=False):
+            for pks, update_kwargs in updates:
+                self.filter(pk__in=pks).update(**update_kwargs)
+    bulk_update.alters_data = True
 
     def get_or_create(self, defaults=None, **kwargs):
         """
@@ -685,7 +727,7 @@ class QuerySet:
         query.add_update_values(kwargs)
         # Clear any annotations so that they won't be present in subqueries.
         query._annotations = None
-        with transaction.atomic(using=self.db, savepoint=False):
+        with transaction.mark_for_rollback_on_error(using=self.db):
             rows = query.get_compiler(self.db).execute_sql(CURSOR)
         self._result_cache = None
         return rows

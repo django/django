@@ -1836,15 +1836,15 @@ class Queries6Tests(TestCase):
     @classmethod
     def setUpTestData(cls):
         generic = NamedCategory.objects.create(name="Generic")
-        t1 = Tag.objects.create(name='t1', category=generic)
-        Tag.objects.create(name='t2', parent=t1, category=generic)
-        t3 = Tag.objects.create(name='t3', parent=t1)
-        t4 = Tag.objects.create(name='t4', parent=t3)
-        Tag.objects.create(name='t5', parent=t3)
+        cls.t1 = Tag.objects.create(name='t1', category=generic)
+        cls.t2 = Tag.objects.create(name='t2', parent=cls.t1, category=generic)
+        cls.t3 = Tag.objects.create(name='t3', parent=cls.t1)
+        cls.t4 = Tag.objects.create(name='t4', parent=cls.t3)
+        cls.t5 = Tag.objects.create(name='t5', parent=cls.t3)
         n1 = Note.objects.create(note='n1', misc='foo', id=1)
-        ann1 = Annotation.objects.create(name='a1', tag=t1)
+        ann1 = Annotation.objects.create(name='a1', tag=cls.t1)
         ann1.notes.add(n1)
-        Annotation.objects.create(name='a2', tag=t4)
+        Annotation.objects.create(name='a2', tag=cls.t4)
 
     def test_parallel_iterators(self):
         # Parallel iterators work.
@@ -1922,6 +1922,24 @@ class Queries6Tests(TestCase):
 
     def test_distinct_ordered_sliced_subquery_aggregation(self):
         self.assertEqual(Tag.objects.distinct().order_by('category__name')[:3].count(), 3)
+
+    def test_multiple_columns_with_the_same_name_slice(self):
+        self.assertEqual(
+            list(Tag.objects.order_by('name').values_list('name', 'category__name')[:2]),
+            [('t1', 'Generic'), ('t2', 'Generic')],
+        )
+        self.assertSequenceEqual(
+            Tag.objects.order_by('name').select_related('category')[:2],
+            [self.t1, self.t2],
+        )
+        self.assertEqual(
+            list(Tag.objects.order_by('-name').values_list('name', 'parent__name')[:2]),
+            [('t5', 't3'), ('t4', 't3')],
+        )
+        self.assertSequenceEqual(
+            Tag.objects.order_by('-name').select_related('parent')[:2],
+            [self.t5, self.t4],
+        )
 
 
 class RawQueriesTests(TestCase):

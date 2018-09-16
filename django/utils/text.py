@@ -280,25 +280,12 @@ def compress_string(s):
     return zbuf.getvalue()
 
 
-class StreamingBuffer:
-    def __init__(self):
-        self.vals = []
-
-    def write(self, val):
-        self.vals.append(val)
-
+class StreamingBuffer(BytesIO):
     def read(self):
-        if not self.vals:
-            return b''
-        ret = b''.join(self.vals)
-        self.vals = []
+        ret = self.getvalue()
+        self.seek(0)
+        self.truncate()
         return ret
-
-    def flush(self):
-        return
-
-    def close(self):
-        return
 
 
 # Like compress_string, but for iterators of strings.
@@ -413,7 +400,7 @@ def slugify(value, allow_unicode=False):
 
 def camel_case_to_spaces(value):
     """
-    Split CamelCase and convert to lower case. Strip surrounding whitespace.
+    Split CamelCase and convert to lowercase. Strip surrounding whitespace.
     """
     return re_camel_case.sub(r' \1', value).strip().lower()
 

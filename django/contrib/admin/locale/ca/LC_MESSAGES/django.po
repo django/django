@@ -4,15 +4,16 @@
 # Antoni Aloy <aaloy@apsl.net>, 2014-2015,2017
 # Carles Barrobés <carles@barrobes.com>, 2011-2012,2014
 # duub qnnp, 2015
+# GerardoGa <ggarciamaristany@gmail.com>, 2018
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Roger Pons <rogerpons@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Antoni Aloy <aaloy@apsl.net>\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-09-22 07:45+0000\n"
+"Last-Translator: GerardoGa <ggarciamaristany@gmail.com>\n"
 "Language-Team: Catalan (http://www.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
@@ -89,6 +90,15 @@ msgstr "Afegir un/a altre/a %(verbose_name)s."
 
 msgid "Remove"
 msgstr "Eliminar"
+
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "Modificar"
+
+msgid "Deletion"
+msgstr ""
 
 msgid "action time"
 msgstr "moment de l'acció"
@@ -167,11 +177,11 @@ msgid ""
 msgstr "Premi \"Control\" o \"Command\" a un Mac per seleccionar-ne més d'un."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "El {name} \"{obj}\" fou afegit amb èxit."
+
+msgid "You may edit it again below."
 msgstr ""
-"El  {name} \"{obj}\" s'ha afegit amb èxit. Pots editar-lo altra vegada a "
-"sota."
 
 #, python-brace-format
 msgid ""
@@ -182,14 +192,17 @@ msgstr ""
 "sota."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "El {name} \"{obj}\" fou afegit amb èxit."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 "El {name} \"{obj}\" fou canviat amb èxit. Pots editar-ho un altra vegada a "
+"sota."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+"El  {name} \"{obj}\" s'ha afegit amb èxit. Pots editar-lo altra vegada a "
 "sota."
 
 #, python-brace-format
@@ -229,6 +242,10 @@ msgstr "Afegir %s"
 #, python-format
 msgid "Change %s"
 msgstr "Modificar %s"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "Error de base de dades"
@@ -339,7 +356,7 @@ msgid "Change password"
 msgstr "Canviar contrasenya"
 
 msgid "Please correct the error below."
-msgstr "Si us plau, corregiu els errors mostrats a sota."
+msgstr "Si us plau, corregeix l'error de sota"
 
 msgid "Please correct the errors below."
 msgstr "Si us plau, corregiu els errors mostrats a sota."
@@ -450,8 +467,8 @@ msgstr ""
 "N'esteu segur de voler esborrar els %(objects_name)s seleccionats? "
 "S'esborraran tots els objects següents i els seus elements relacionats:"
 
-msgid "Change"
-msgstr "Modificar"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr "Eliminar?"
@@ -470,8 +487,8 @@ msgstr "Models en l'aplicació %(name)s"
 msgid "Add"
 msgstr "Afegir"
 
-msgid "You don't have permission to edit anything."
-msgstr "No teniu permís per editar res."
+msgid "You don't have permission to view or edit anything."
+msgstr ""
 
 msgid "Recent actions"
 msgstr "Accions recents"
@@ -535,6 +552,10 @@ msgid "Change selected %(model)s"
 msgstr "Canviea el %(model)s seleccionat"
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr "Afegeix un altre %(model)s"
 
@@ -563,6 +584,12 @@ msgstr "Desar i afegir-ne un de nou"
 
 msgid "Save and continue editing"
 msgstr "Desar i continuar editant"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Gràcies per passar una estona de qualitat al web durant el dia d'avui."
@@ -675,6 +702,10 @@ msgstr "Seleccioneu %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Seleccioneu %s per modificar"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "Data:"

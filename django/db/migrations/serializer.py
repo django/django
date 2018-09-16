@@ -4,8 +4,10 @@ import datetime
 import decimal
 import enum
 import functools
+import inspect
 import math
 import re
+import sys
 import types
 import uuid
 
@@ -252,6 +254,7 @@ class TypeSerializer(BaseSerializer):
     def serialize(self):
         special_cases = [
             (models.Model, "models.Model", []),
+            (type(None), 'type(None)', []),
         ]
         for case, string, imports in special_cases:
             if case is self.value:
@@ -267,6 +270,40 @@ class TypeSerializer(BaseSerializer):
 class UUIDSerializer(BaseSerializer):
     def serialize(self):
         return "uuid.%s" % repr(self.value), {"import uuid"}
+
+
+class ClassSerializer(BaseSerializer):
+    def serialize(self):
+        _module = self.value.__module__
+        module_first_part, module_second_part = _module.split('.')
+        _class = self.value.__class__
+        _path = ""
+        if module_second_part.startswith('_'):
+            related_modules = [
+                m for m in sys.modules
+                if module_first_part in m and
+                m != _module and len(m.split('.')) > 1 and not
+                m.split('.')[1].startswith('_')
+            ]
+            for related_module in related_modules:
+                klass_members = dict(
+                    inspect.getmembers(
+                        sys.modules[related_module],
+                        lambda m: inspect.isclass(m))).keys()
+                if _class.__name__ not in klass_members:
+                    continue
+                _path = related_module + "." + _class.__name__
+                break
+        from django.utils.deconstruct import deconstructible
+        deconstructible_klass = deconstructible(_class, path=_path)
+        try:
+            init_values = self.value.__reduce__()
+            new_value = deconstructible_klass()
+            if len(init_values) > 2:
+                new_value = deconstructible_klass(init_values[2])
+            return DeconstructableSerializer(new_value).serialize()
+        except TypeError:
+            pass  # not suitable for deconstructible
 
 
 def serializer_factory(value):
@@ -325,6 +362,13 @@ def serializer_factory(value):
         return RegexSerializer(value)
     if isinstance(value, uuid.UUID):
         return UUIDSerializer(value)
+
+    # Last try to serialize
+    if hasattr(value, "__module__") and hasattr(value, "__class__"):
+        class_serializer = ClassSerializer(value)
+        if class_serializer.serialize():
+            return class_serializer
+
     raise ValueError(
         "Cannot serialize: %r\nThere are some values Django cannot serialize into "
         "migration files.\nFor more, see https://docs.djangoproject.com/en/%s/"

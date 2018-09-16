@@ -257,32 +257,19 @@ non-ASCII characters would have been removed in quoting in the first line.)
 
 .. _above: `URI and IRI handling`_
 
-The database API
-================
-
-You can pass either strings or UTF-8 bytestrings as arguments to
-``filter()`` methods and the like in the database API. The following two
-querysets are identical::
-
-    qs = People.objects.filter(name__contains='Å')
-    qs = People.objects.filter(name__contains=b'\xc3\x85') # UTF-8 encoding of Å
-
 Templates
 =========
 
-You can use either strings or UTF-8 bytestrings when creating templates
-manually::
+Use strings when creating templates manually::
 
     from django.template import Template
-    t1 = Template(b'This is a bytestring template.')
     t2 = Template('This is a string template.')
 
-But the common case is to read templates from the filesystem, and this creates
-a slight complication: not all filesystems store their data encoded as UTF-8.
-If your template files are not stored with a UTF-8 encoding, set the :setting:`FILE_CHARSET`
-setting to the encoding of the files on disk. When Django reads in a template
-file, it will convert the data from this encoding to Unicode. (:setting:`FILE_CHARSET`
-is set to ``'utf-8'`` by default.)
+But the common case is to read templates from the filesystem. If your template
+files are not stored with a UTF-8 encoding, adjust the :setting:`TEMPLATES`
+setting. The built-in :py:mod:`~django.template.backends.django` backend
+provides the ``'file_charset'`` option to change the encoding used to read
+files from disk.
 
 The :setting:`DEFAULT_CHARSET` setting controls the encoding of rendered templates.
 This is set to UTF-8 by default.

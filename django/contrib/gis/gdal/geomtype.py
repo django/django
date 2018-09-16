@@ -26,7 +26,7 @@ class OGRGeomType:
               6 + wkb25bit: 'MultiPolygon25D',
               7 + wkb25bit: 'GeometryCollection25D',
               }
-    # Reverse type dictionary, keyed by lower-case of the name.
+    # Reverse type dictionary, keyed by lowercase of the name.
     _str_types = {v.lower(): k for k, v in _types.items()}
 
     def __init__(self, type_input):

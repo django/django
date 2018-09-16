@@ -356,8 +356,8 @@ class AdminUUIDInputWidget(forms.TextInput):
         super().__init__(attrs={'class': 'vUUIDField', **(attrs or {})})
 
 
-# Mapping of lower case language codes [returned by Django's get_language()]
-# to language codes supported by select2.
+# Mapping of lowercase language codes [returned by Django's get_language()] to
+# language codes supported by select2.
 # See django/contrib/admin/static/admin/js/vendor/select2/i18n/*
 SELECT2_TRANSLATIONS = {x.lower(): x for x in [
     'ar', 'az', 'bg', 'ca', 'cs', 'da', 'de', 'el', 'en', 'es', 'et',

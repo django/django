@@ -344,7 +344,7 @@ class Command(BaseCommand):
             action = 'IRREVERSIBLE'
             is_error = True
         else:
-            action = action.replace('\n', '')
+            action = str(action).replace('\n', '')
             is_error = False
         if action:
             action = ' -> ' + action

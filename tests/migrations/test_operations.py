@@ -110,7 +110,7 @@ class OperationTestBase(MigrationTestBase):
         if check_constraint:
             operations.append(migrations.AddConstraint(
                 "Pony",
-                models.CheckConstraint(models.Q(pink__gt=2), name="pony_test_constraint")
+                models.CheckConstraint(check=models.Q(pink__gt=2), name="pony_test_constraint")
             ))
         if second_model:
             operations.append(migrations.CreateModel(
@@ -471,7 +471,7 @@ class OperationTests(OperationTestBase):
     @skipUnlessDBFeature('supports_table_check_constraints')
     def test_create_model_with_constraint(self):
         where = models.Q(pink__gt=2)
-        check_constraint = models.CheckConstraint(where, name='test_constraint_pony_pink_gt_2')
+        check_constraint = models.CheckConstraint(check=where, name='test_constraint_pony_pink_gt_2')
         operation = migrations.CreateModel(
             "Pony",
             [
@@ -1782,7 +1782,7 @@ class OperationTests(OperationTestBase):
         project_state = self.set_up_test_model('test_addconstraint')
 
         where = models.Q(pink__gt=2)
-        check_constraint = models.CheckConstraint(where, name='test_constraint_pony_pink_gt_2')
+        check_constraint = models.CheckConstraint(check=where, name='test_constraint_pony_pink_gt_2')
         operation = migrations.AddConstraint('Pony', check_constraint)
         self.assertEqual(operation.describe(), 'Create constraint test_constraint_pony_pink_gt_2 on model Pony')
 

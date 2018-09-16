@@ -3,6 +3,7 @@ import importlib
 import io
 import os
 import sys
+import unittest
 from unittest import mock
 
 from django.apps import apps
@@ -16,9 +17,14 @@ from django.db.migrations.exceptions import InconsistentMigrationHistory
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import TestCase, override_settings
 
-from .models import UnicodeModel, UnserializableModel
+from .models import ClassSerializableModel, UnicodeModel, UnserializableModel
 from .routers import TestRouter
 from .test_base import MigrationTestBase
+
+try:
+    import sqlparse
+except ImportError:
+    sqlparse = None
 
 
 class MigrateTests(MigrationTestBase):
@@ -311,10 +317,10 @@ class MigrateTests(MigrationTestBase):
             '    Raw Python operation -> Grow salamander tail.\n'
             'migrations.0002_second\n'
             '    Create model Book\n'
-            '    Raw SQL operation -> SELECT * FROM migrations_book\n'
+            "    Raw SQL operation -> ['SELECT * FROM migrations_book']\n"
             'migrations.0003_third\n'
             '    Create model Author\n'
-            '    Raw SQL operation -> SELECT * FROM migrations_author\n',
+            "    Raw SQL operation -> ['SELECT * FROM migrations_author']\n",
             out.getvalue()
         )
         # Migrate to the third migration.
@@ -334,10 +340,10 @@ class MigrateTests(MigrationTestBase):
             'Planned operations:\n'
             'migrations.0003_third\n'
             '    Undo Create model Author\n'
-            '    Raw SQL operation -> SELECT * FROM migrations_book\n'
+            "    Raw SQL operation -> ['SELECT * FROM migrations_book']\n"
             'migrations.0002_second\n'
             '    Undo Create model Book\n'
-            '    Raw SQL operation -> SELECT * FROM migrations_salamander\n',
+            "    Raw SQL operation -> ['SELECT * FROM migrations_salamand…\n",
             out.getvalue()
         )
         out = io.StringIO()
@@ -349,21 +355,35 @@ class MigrateTests(MigrationTestBase):
             '    Raw SQL operation -> SELECT * FROM migrations_author WHE…\n',
             out.getvalue()
         )
-        # Migrate to the fourth migration.
-        call_command('migrate', 'migrations', '0004', verbosity=0)
-        out = io.StringIO()
         # Show the plan when an operation is irreversible.
-        call_command('migrate', 'migrations', '0003', plan=True, stdout=out, no_color=True)
-        self.assertEqual(
-            'Planned operations:\n'
-            'migrations.0004_fourth\n'
-            '    Raw SQL operation -> IRREVERSIBLE\n',
-            out.getvalue()
-        )
-        # Cleanup by unmigrating everything: fake the irreversible, then
-        # migrate all to zero.
-        call_command('migrate', 'migrations', '0003', fake=True, verbosity=0)
+        # Migration 0004's RunSQL uses a SQL string instead of a list, so
+        # sqlparse may be required for splitting.
+        if sqlparse or not connection.features.requires_sqlparse_for_splitting:
+            # Migrate to the fourth migration.
+            call_command('migrate', 'migrations', '0004', verbosity=0)
+            out = io.StringIO()
+            call_command('migrate', 'migrations', '0003', plan=True, stdout=out, no_color=True)
+            self.assertEqual(
+                'Planned operations:\n'
+                'migrations.0004_fourth\n'
+                '    Raw SQL operation -> IRREVERSIBLE\n',
+                out.getvalue()
+            )
+            # Cleanup by unmigrating everything: fake the irreversible, then
+            # migrate all to zero.
+            call_command('migrate', 'migrations', '0003', fake=True, verbosity=0)
         call_command('migrate', 'migrations', 'zero', verbosity=0)
+
+    @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations_empty'})
+    def test_showmigrations_no_migrations(self):
+        out = io.StringIO()
+        call_command('showmigrations', stdout=out, no_color=True)
+        self.assertEqual('migrations\n (no migrations)\n', out.getvalue().lower())
+
+    @override_settings(INSTALLED_APPS=['migrations.migrations_test_apps.unmigrated_app'])
+    def test_showmigrations_unmigrated_app(self):
+        with self.assertRaisesMessage(CommandError, 'No migrations present for: unmigrated_app'):
+            call_command('showmigrations', 'unmigrated_app')
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_empty"})
     def test_showmigrations_plan_no_migrations(self):
@@ -1405,6 +1425,22 @@ class MakeMigrationsTests(MigrationTestBase):
             prompt_output = prompt_stdout.getvalue()
             self.assertIn("You can accept the default 'timezone.now' by pressing 'Enter'", prompt_output)
             self.assertIn("Add field creation_date to entry", output)
+
+    @unittest.skipUnless(connection.vendor == 'postgresql', "Test only for PostgreSQL")
+    def test_makemigrations_for_class_serializable_model(self):
+        """
+        Python internal built-in modules rename in particular
+        """
+        self.assertTableNotExists('migrations_unicodemodel')
+        apps.register_model('migrations', ClassSerializableModel)
+        with self.temporary_migration_module() as migration_dir:
+            call_command("makemigrations", "migrations", verbosity=0)
+            # Check for existing 0001_initial.py file in migration folder
+            initial_file = os.path.join(migration_dir, "0001_initial.py")
+            self.assertTrue(os.path.exists(initial_file))
+            with open(initial_file, 'r', encoding='utf-8') as fp:
+                content = fp.read()
+                self.assertIn('psycopg2.extras.DateTimeTZRange', content)
 
 
 class SquashMigrationsTests(MigrationTestBase):

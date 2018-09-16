@@ -10,13 +10,13 @@ class Driver(GDALBase):
     """
     Wrap a GDAL/OGR Data Source Driver.
     For more information, see the C API source code:
-    http://www.gdal.org/gdal_8h.html - http://www.gdal.org/ogr__api_8h.html
+    https://www.gdal.org/gdal_8h.html - https://www.gdal.org/ogr__api_8h.html
     """
 
     # Case-insensitive aliases for some GDAL/OGR Drivers.
     # For a complete list of original driver names see
-    # http://www.gdal.org/ogr_formats.html (vector)
-    # http://www.gdal.org/formats_list.html (raster)
+    # https://www.gdal.org/ogr_formats.html (vector)
+    # https://www.gdal.org/formats_list.html (raster)
     _alias = {
         # vector
         'esri': 'ESRI Shapefile',

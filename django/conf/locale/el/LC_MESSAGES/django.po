@@ -5,7 +5,7 @@
 # Dimitris Glezos <glezos@transifex.com>, 2011,2013,2017
 # Giannis Meletakis <meletakis@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Nick Mavrakis <mavrakis.n@gmail.com>, 2017
+# Nick Mavrakis <mavrakis.n@gmail.com>, 2017-2018
 # Nikolas Demiridis <nikolas@demiridis.gr>, 2014
 # Nick Mavrakis <mavrakis.n@gmail.com>, 2016
 # Pãnoș <panos.laganakos@gmail.com>, 2014
@@ -17,9 +17,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-25 01:42+0000\n"
-"Last-Translator: Dimitris Glezos <glezos@transifex.com>\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-09-22 10:11+0000\n"
+"Last-Translator: Nick Mavrakis <mavrakis.n@gmail.com>\n"
 "Language-Team: Greek (http://www.transifex.com/django/django/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -167,6 +167,9 @@ msgstr "Γιαπωνέζικα"
 
 msgid "Georgian"
 msgstr "Γεωργιανά"
+
+msgid "Kabyle"
+msgstr "Kabyle"
 
 msgid "Kazakh"
 msgstr "Καζακστά"
@@ -392,6 +395,9 @@ msgstr[1] ""
 "Βεβαιωθείτε πως η τιμή έχει το πολύ %(limit_value)d χαρακτήρες (έχει "
 "%(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Εισάγετε έναν αριθμό."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -474,6 +480,10 @@ msgstr "Μεγάλος ακέραιος - big integer (8 bytes)"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "Η τιμή '%(value)s' πρέπει να είναι είτε True ή False."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "Η τιμή '%(value)s' πρέπει να είναι True, False, ή None."
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolean (Είτε Αληθές ή Ψευδές)"
@@ -652,9 +662,6 @@ msgstr "Αυτό το πεδίο είναι απαραίτητο."
 msgid "Enter a whole number."
 msgstr "Εισάγετε έναν ακέραιο αριθμό."
 
-msgid "Enter a number."
-msgstr "Εισάγετε έναν αριθμό."
-
 msgid "Enter a valid date."
 msgstr "Εισάγετε μια έγκυρη ημερομηνία."
 
@@ -666,6 +673,10 @@ msgstr "Εισάγετε μια έγκυρη ημερομηνία/ώρα."
 
 msgid "Enter a valid duration."
 msgstr "Εισάγετε μια έγκυρη διάρκεια."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Ο αριθμός των ημερών πρέπει να είναι μεταξύ {min_days} και {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
@@ -767,7 +778,7 @@ msgid "Please correct the duplicate values below."
 msgstr "Έχετε ξαναεισάγει την ίδια τιμη. Βεβαιωθείτε ότι είναι μοναδική."
 
 msgid "The inline value did not match the parent instance."
-msgstr ""
+msgstr "Η τιμή δεν είναι ίση με την αντίστοιχη τιμή του γονικού object."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
@@ -1148,6 +1159,12 @@ msgid ""
 "If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
 "\" ...> for links to third-party sites."
 msgstr ""
+"Αν χρησιμοποιείτε την ετικέτα <meta name=\"referrer\" content=\"no-referrer"
+"\"> ή συμπεριλαμβάνετε την κεφαλίδα (header) 'Referrer-Policy: no-referrer', "
+"παρακαλούμε αφαιρέστε τα. Η προστασία CSRF απαιτεί την κεφαλίδα 'Referer' να "
+"κάνει αυστηρό έλεγχο στον referer. Αν κύριο μέλημα σας είναι η ιδιωτικότητα, "
+"σκεφτείτε να χρησιμοποιήσετε εναλλακτικές μεθόδους όπως <a rel=\"noreferrer"
+"\" ...> για συνδέσμους από άλλες ιστοσελίδες."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1252,12 +1269,16 @@ msgid ""
 "\">DEBUG=True</a> is in your settings file and you have not configured any "
 "URLs."
 msgstr ""
+"Βλέπετε αυτό το μήνυμα επειδή έχετε <a href=\"https://docs.djangoproject.com/"
+"en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> στο αρχείο settings και δεν έχετε ρυθμίσει κανένα URL στο "
+"αρχείο urls.py. Στρωθείτε στην δουλειά!"
 
 msgid "Django Documentation"
 msgstr "Εγχειρίδιο Django"
 
 msgid "Topics, references, &amp; how-to's"
-msgstr ""
+msgstr "Θέματα, αναφορές &amp; \"πως να...\""
 
 msgid "Tutorial: A Polling App"
 msgstr "Εγχειρίδιο: Ένα App Ψηφοφορίας"

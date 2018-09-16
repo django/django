@@ -55,10 +55,8 @@ class Q(tree.Node):
     default = AND
     conditional = True
 
-    def __init__(self, *args, **kwargs):
-        connector = kwargs.pop('_connector', None)
-        negated = kwargs.pop('_negated', False)
-        super().__init__(children=list(args) + sorted(kwargs.items()), connector=connector, negated=negated)
+    def __init__(self, *args, _connector=None, _negated=False, **kwargs):
+        super().__init__(children=[*args, *sorted(kwargs.items())], connector=_connector, negated=_negated)
 
     def _combine(self, other, conn):
         if not isinstance(other, Q):

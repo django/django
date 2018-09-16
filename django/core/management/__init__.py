@@ -257,7 +257,7 @@ class ManagementUtility:
         except IndexError:
             curr = ''
 
-        subcommands = list(get_commands()) + ['help']
+        subcommands = [*get_commands(), 'help']
         options = [('--help', False)]
 
         # subcommand

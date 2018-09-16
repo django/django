@@ -13,7 +13,9 @@
 # Sean Lee <iseansay@gmail.com>, 2013
 # Sean Lee <iseansay@gmail.com>, 2013
 # slene <vslene@gmail.com>, 2011
+# Wentao Han <wentao.han@gmail.com>, 2018
 # xuyi wang <xuyi.wg@gmail.com>, 2018
+# yf zhan <daxian12345@gmail.com>, 2018
 # Ziang Song <songziang@gmail.com>, 2012
 # Kevin Sze <leiarix@gmail.com>, 2012
 # 雨翌 <yumendy@163.com>, 2016
@@ -23,8 +25,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-07-16 13:10+0000\n"
-"Last-Translator: xuyi wang <xuyi.wg@gmail.com>\n"
+"PO-Revision-Date: 2018-09-28 07:44+0000\n"
+"Last-Translator: Wentao Han <wentao.han@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -101,13 +103,13 @@ msgid "Remove"
 msgstr "删除"
 
 msgid "Addition"
-msgstr ""
+msgstr "添加"
 
 msgid "Change"
 msgstr "修改"
 
 msgid "Deletion"
-msgstr ""
+msgstr "删除"
 
 msgid "action time"
 msgstr "动作时间"
@@ -155,7 +157,7 @@ msgstr "LogEntry对象"
 
 #, python-brace-format
 msgid "Added {name} \"{object}\"."
-msgstr "以添加{name}\"{object}\"。"
+msgstr "已添加{name}\"{object}\"。"
 
 msgid "Added."
 msgstr "已添加。"
@@ -244,7 +246,7 @@ msgstr "修改 %s"
 
 #, python-format
 msgid "View %s"
-msgstr ""
+msgstr "查看 %s"
 
 msgid "Database error"
 msgstr "数据库错误"
@@ -457,7 +459,7 @@ msgstr ""
 "被删除："
 
 msgid "View"
-msgstr ""
+msgstr "查看"
 
 msgid "Delete?"
 msgstr "删除？"
@@ -571,10 +573,10 @@ msgid "Save and continue editing"
 msgstr "保存并继续编辑"
 
 msgid "Save and view"
-msgstr ""
+msgstr "保存并查看"
 
 msgid "Close"
-msgstr ""
+msgstr "关闭"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "感谢您今天在本站花费了一些宝贵时间。"

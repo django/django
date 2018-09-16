@@ -14,8 +14,6 @@ def _simple_domain_name_validator(value):
     Validate that the given value contains no whitespaces to prevent common
     typos.
     """
-    if not value:
-        return
     checks = ((s in value) for s in string.whitespace)
     if any(checks):
         raise ValidationError(

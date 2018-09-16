@@ -173,11 +173,20 @@ Management Commands
 * The new :option:`--force-color` option forces colorization of the command
   output.
 
+* :djadmin:`inspectdb` now creates models for foreign tables on PostgreSQL.
+
+* :option:`inspectdb --include-views` now creates models for materialized views
+  on PostgreSQL.
+
 Migrations
 ~~~~~~~~~~
 
 * The new :option:`migrate --plan` option prints the list of migration
   operations that will be performed.
+
+* Added class serializer ``ClassSerializer``
+
+* ``NoneType`` can now be serialized in migrations.
 
 Models
 ~~~~~~
@@ -194,6 +203,14 @@ Models
   ISO-8601 week-numbering years from :class:`~django.db.models.DateField` and
   :class:`~django.db.models.DateTimeField`, and the new :lookup:`iso_year`
   lookup allows querying by an ISO-8601 week-numbering year.
+
+* The new :meth:`.QuerySet.bulk_update` method allows efficiently updating
+  specific fields on multiple model instances.
+
+* Django no longer always starts a transaction when a single query is being
+  performed, such as ``Model.save()``, ``QuerySet.update()``, and
+  ``Model.delete()``. This improves the performance of autocommit by reducing
+  the number of database round trips.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -284,6 +301,14 @@ Miscellaneous
   is now the real ellipsis character (``…``) instead of 3 dots. You may have to
   adapt some test output comparisons.
 
+* Support for bytestring paths in the template filesystem loader is removed.
+
+* :func:`django.utils.http.urlsafe_base64_encode` now returns a string instead
+  of a bytestring, and :func:`django.utils.http.urlsafe_base64_decode` may no
+  longer be passed a bytestring.
+
+* Support for ``cx_Oracle`` < 6.0 is removed.
+
 .. _deprecated-features-2.2:
 
 Features deprecated in 2.2
@@ -306,3 +331,10 @@ Miscellaneous
 
 * The undocumented ``QuerySetPaginator`` alias of
   ``django.core.paginator.Paginator`` is deprecated.
+
+* The ``FloatRangeField`` model and form fields in ``django.contrib.postgres``
+  are deprecated in favor of a new name, ``DecimalRangeField``, to match the
+  underlying ``numrange`` data type used in the database.
+
+* The ``FILE_CHARSET`` setting is deprecated. Starting with Django 3.1, files
+  read from disk must be UTF-8 encoded.

@@ -180,7 +180,7 @@ Minor features
 
 * The OpenLayers-based form widgets now use ``OpenLayers.js`` from
   ``https://cdnjs.cloudflare.com`` which is more suitable for production use
-  than the old ``http://openlayers.org`` source. They are also updated to use
+  than the old ``https://openlayers.org/`` source. They are also updated to use
   OpenLayers 3.
 
 * PostGIS migrations can now change field dimensions.

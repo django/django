@@ -469,7 +469,7 @@ Django quotes column and table names behind the scenes.
 
             class Meta:
                 constraints = [
-                    models.CheckConstraint(models.Q(age__gte=18), 'age_gte_18'),
+                    models.CheckConstraint(check=models.Q(age__gte=18), name='age_gte_18'),
                 ]
 
 ``verbose_name``

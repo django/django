@@ -304,6 +304,8 @@ class LazyObject:
     # care about this (especially in equality tests)
     __class__ = property(new_method_proxy(operator.attrgetter("__class__")))
     __eq__ = new_method_proxy(operator.eq)
+    __lt__ = new_method_proxy(operator.lt)
+    __gt__ = new_method_proxy(operator.gt)
     __ne__ = new_method_proxy(operator.ne)
     __hash__ = new_method_proxy(hash)
 

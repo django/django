@@ -15,5 +15,5 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(primary_key=True)),
             ],
         ),
-        migrations.RunSQL('SELECT * FROM migrations_author', 'SELECT * FROM migrations_book')
+        migrations.RunSQL(['SELECT * FROM migrations_author'], ['SELECT * FROM migrations_book'])
     ]

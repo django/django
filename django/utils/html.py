@@ -14,7 +14,7 @@ from django.utils.text import normalize_newlines
 
 # Configuration for urlize() function.
 TRAILING_PUNCTUATION_CHARS = '.,:;!'
-WRAPPING_PUNCTUATION = [('(', ')'), ('<', '>'), ('[', ']'), ('&lt;', '&gt;'), ('"', '"'), ('\'', '\'')]
+WRAPPING_PUNCTUATION = [('(', ')'), ('[', ']')]
 
 # List of possible strings used for bullets in bulleted lists.
 DOTS = ['&middot;', '*', '\u2022', '&#149;', '&bull;', '&#8226;']
@@ -133,8 +133,9 @@ def format_html_join(sep, format_string, args_generator):
                                                   for u in users))
     """
     return mark_safe(conditional_escape(sep).join(
-        format_html(format_string, *tuple(args))
-        for args in args_generator))
+        format_html(format_string, *args)
+        for args in args_generator
+    ))
 
 
 @keep_lazy_text
@@ -204,8 +205,8 @@ def smart_urlquote(url):
     def unquote_quote(segment):
         segment = unquote(segment)
         # Tilde is part of RFC3986 Unreserved Characters
-        # http://tools.ietf.org/html/rfc3986#section-2.3
-        # See also http://bugs.python.org/issue16285
+        # https://tools.ietf.org/html/rfc3986#section-2.3
+        # See also https://bugs.python.org/issue16285
         return quote(segment, safe=RFC3986_SUBDELIMS + RFC3986_GENDELIMS + '~')
 
     # Handle IDN before quoting.
@@ -258,23 +259,14 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
             return x
         return '%s…' % x[:max(0, limit - 1)]
 
-    def unescape(text, trail):
+    def unescape(text):
         """
         If input URL is HTML-escaped, unescape it so that it can be safely fed
         to smart_urlquote. For example:
         http://example.com?x=1&amp;y=&lt;2&gt; => http://example.com?x=1&y=<2>
         """
-        unescaped = (text + trail).replace(
-            '&amp;', '&').replace('&lt;', '<').replace(
+        return text.replace('&amp;', '&').replace('&lt;', '<').replace(
             '&gt;', '>').replace('&quot;', '"').replace('&#39;', "'")
-        if trail and unescaped.endswith(trail):
-            # Remove trail for unescaped if it was not consumed by unescape
-            unescaped = unescaped[:-len(trail)]
-        elif trail == ';':
-            # Trail was consumed by unescape (as end-of-entity marker), move it to text
-            text += trail
-            trail = ''
-        return text, unescaped, trail
 
     def trim_punctuation(lead, middle, trail):
         """
@@ -285,14 +277,6 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
         trimmed_something = True
         while trimmed_something:
             trimmed_something = False
-
-            # Trim trailing punctuation.
-            stripped = middle.rstrip(TRAILING_PUNCTUATION_CHARS)
-            if middle != stripped:
-                trail = middle[len(stripped):] + trail
-                middle = stripped
-                trimmed_something = True
-
             # Trim wrapping punctuation.
             for opening, closing in WRAPPING_PUNCTUATION:
                 if middle.startswith(opening):
@@ -305,6 +289,15 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
                     middle = middle[:-len(closing)]
                     trail = closing + trail
                     trimmed_something = True
+            # Trim trailing punctuation (after trimming wrapping punctuation,
+            # as encoded entities contain ';'). Unescape entites to avoid
+            # breaking them by removing ';'.
+            middle_unescaped = unescape(middle)
+            stripped = middle_unescaped.rstrip(TRAILING_PUNCTUATION_CHARS)
+            if middle_unescaped != stripped:
+                trail = middle[len(stripped):] + trail
+                middle = middle[:len(stripped) - len(middle_unescaped)]
+                trimmed_something = True
         return lead, middle, trail
 
     def is_email_simple(value):
@@ -336,11 +329,9 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
             url = None
             nofollow_attr = ' rel="nofollow"' if nofollow else ''
             if simple_url_re.match(middle):
-                middle, middle_unescaped, trail = unescape(middle, trail)
-                url = smart_urlquote(middle_unescaped)
+                url = smart_urlquote(unescape(middle))
             elif simple_url_2_re.match(middle):
-                middle, middle_unescaped, trail = unescape(middle, trail)
-                url = smart_urlquote('http://%s' % middle_unescaped)
+                url = smart_urlquote('http://%s' % unescape(middle))
             elif ':' not in middle and is_email_simple(middle):
                 local, domain = middle.rsplit('@', 1)
                 try:

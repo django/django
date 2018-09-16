@@ -75,7 +75,7 @@ class SessionStore(SessionBase):
     def load(self):
         session_data = {}
         try:
-            with open(self._key_to_file(), "rb") as session_file:
+            with open(self._key_to_file(), "r", encoding="ascii") as session_file:
                 file_data = session_file.read()
             # Don't fail if there is no data in the session file.
             # We may have opened the empty placeholder file.

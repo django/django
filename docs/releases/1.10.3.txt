@@ -26,7 +26,7 @@ DNS rebinding vulnerability when ``DEBUG=True``
 Older versions of Django don't validate the ``Host`` header against
 ``settings.ALLOWED_HOSTS`` when ``settings.DEBUG=True``. This makes them
 vulnerable to a `DNS rebinding attack
-<http://benmmurphy.github.io/blog/2016/07/11/rails-webconsole-dns-rebinding/>`_.
+<https://benmmurphy.github.io/blog/2016/07/11/rails-webconsole-dns-rebinding/>`_.
 
 While Django doesn't ship a module that allows remote code execution, this is
 at least a cross-site scripting vector, which could be quite serious if
