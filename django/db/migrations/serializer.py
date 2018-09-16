@@ -269,6 +269,20 @@ class UUIDSerializer(BaseSerializer):
         return "uuid.%s" % repr(self.value), {"import uuid"}
 
 
+class UnserializablesSerializer(BaseSerializer):
+    def serialize(self):
+        from django.utils.deconstruct import deconstructible
+        deconstructible_klass = deconstructible(
+            self.value.__class__,
+            path=self.value.__module__ + "." + self.value.__class__.__name__
+        )
+        init_values = self.value.__reduce__()
+        new_value = deconstructible_klass()
+        if len(init_values) > 2:
+            new_value = deconstructible_klass(*[v for v in init_values[2].values()])
+
+        return DeconstructableSerializer(new_value).serialize()
+
 def serializer_factory(value):
     from django.db.migrations.writer import SettingsReference
     if isinstance(value, Promise):
@@ -325,6 +339,11 @@ def serializer_factory(value):
         return RegexSerializer(value)
     if isinstance(value, uuid.UUID):
         return UUIDSerializer(value)
+
+    # Last try to serialize
+    if hasattr(value, "__module__") and hasattr(value, "__class__"):
+        return UnserializablesSerializer(value)
+
     raise ValueError(
         "Cannot serialize: %r\nThere are some values Django cannot serialize into "
         "migration files.\nFor more, see https://docs.djangoproject.com/en/%s/"
