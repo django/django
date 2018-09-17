@@ -90,6 +90,10 @@ Minor features
 * :class:`~django.contrib.postgres.indexes.BrinIndex` now has the
   ``autosummarize`` parameter.
 
+* The new ``search_type`` parameter of
+  :class:`~django.contrib.postgres.search.SearchQuery` allows searching for
+  a phrase or raw expression.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
