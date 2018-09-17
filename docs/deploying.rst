@@ -221,7 +221,7 @@ Setup your nginx upstream conf file for your project::
             try_files $uri @proxy_to_app;
         }
         ...
-        localtion @proxy_to_app {
+        location @proxy_to_app {
             proxy_pass http://channels-backend;
 
             proxy_http_version 1.1;
