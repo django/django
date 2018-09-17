@@ -14,7 +14,7 @@ from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.db import models
 from django.http import Http404
 from django.template.engine import Engine
-from django.urls import get_mod_func, get_resolver, get_urlconf, reverse
+from django.urls import get_mod_func, get_resolver, get_urlconf
 from django.utils.decorators import method_decorator
 from django.utils.inspect import (
     func_accepts_kwargs, func_accepts_var_args, get_func_full_args,
@@ -44,21 +44,12 @@ class BaseAdminDocsView(TemplateView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**{
             **kwargs,
-            'root_path': reverse('admin:index'),
             **admin.site.each_context(self.request),
         })
 
 
 class BookmarkletsView(BaseAdminDocsView):
     template_name = 'admin_doc/bookmarklets.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({
-            'admin_url': "%s://%s%s" % (
-                self.request.scheme, self.request.get_host(), context['root_path'])
-        })
-        return context
 
 
 class TemplateTagIndexView(BaseAdminDocsView):
