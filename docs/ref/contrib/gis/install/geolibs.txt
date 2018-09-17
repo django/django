@@ -9,7 +9,7 @@ geospatial libraries:
 Program                   Description                           Required                          Supported Versions
 ========================  ====================================  ================================  ===================================
 :doc:`GEOS <../geos>`     Geometry Engine Open Source           Yes                               3.6, 3.5, 3.4
-`PROJ.4`_                 Cartographic Projections library      Yes (PostgreSQL and SQLite only)  4.9, 4.8, 4.7, 4.6, 4.5, 4.4
+`PROJ.4`_                 Cartographic Projections library      Yes (PostgreSQL and SQLite only)  5.2, 5.1, 5.0, 4.x
 :doc:`GDAL <../gdal>`     Geospatial Data Abstraction Library   Yes                               2.3, 2.2, 2.1, 2.0, 1.11
 :doc:`GeoIP <../geoip2>`  IP-based geolocation library          No                                2
 `PostGIS`__               Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             2.4, 2.3, 2.2, 2.1
