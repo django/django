@@ -326,9 +326,9 @@ New default view permission could allow unwanted access to admin views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you have a custom permission with a codename of the form
-``can_view_<modelname>``, the new view permission handling in the admin will
-allow view access to the changelist and detail pages for those models. If this
-is unwanted, you must change your custom permission codename.
+``view_<modelname>``, the new view permission handling in the admin will allow
+view access to the changelist and detail pages for those models. If this is
+unwanted, you must change your custom permission codename.
 
 Miscellaneous
 -------------
