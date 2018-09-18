@@ -81,10 +81,18 @@ class AppsTests(SimpleTestCase):
                 pass
 
     def test_no_such_app_config(self):
-        """
-        Tests when INSTALLED_APPS contains an entry that doesn't exist.
-        """
-        with self.assertRaises(ImportError):
+        msg = "No module named 'apps.NoSuchConfig'"
+        with self.assertRaisesMessage(ImportError, msg):
+            with self.settings(INSTALLED_APPS=['apps.NoSuchConfig']):
+                pass
+
+    def test_no_such_app_config_with_choices(self):
+        msg = (
+            "'apps.apps' does not contain a class 'NoSuchConfig'. Choices are: "
+            "'BadConfig', 'MyAdmin', 'MyAuth', 'NoSuchApp', 'PlainAppsConfig', "
+            "'RelabeledAppsConfig'."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             with self.settings(INSTALLED_APPS=['apps.apps.NoSuchConfig']):
                 pass
 

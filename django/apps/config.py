@@ -118,8 +118,21 @@ class AppConfig:
             cls = getattr(mod, cls_name)
         except AttributeError:
             if module is None:
-                # If importing as an app module failed, that error probably
-                # contains the most informative traceback. Trigger it again.
+                # If importing as an app module failed, check if the module
+                # contains any valid AppConfigs and show them as choices.
+                # Otherwise, that error probably contains the most informative
+                # traceback, so trigger it again.
+                candidates = sorted(
+                    repr(name) for name, candidate in mod.__dict__.items()
+                    if isinstance(candidate, type) and
+                    issubclass(candidate, AppConfig) and
+                    candidate is not AppConfig
+                )
+                if candidates:
+                    raise ImproperlyConfigured(
+                        "'%s' does not contain a class '%s'. Choices are: %s."
+                        % (mod_path, cls_name, ', '.join(candidates))
+                    )
                 import_module(entry)
             else:
                 raise
