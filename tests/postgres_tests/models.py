@@ -63,9 +63,9 @@ class NestedIntegerArrayModel(PostgreSQLModel):
 
 
 class OtherTypesArrayModel(PostgreSQLModel):
-    ips = ArrayField(models.GenericIPAddressField())
-    uuids = ArrayField(models.UUIDField())
-    decimals = ArrayField(models.DecimalField(max_digits=5, decimal_places=2))
+    ips = ArrayField(models.GenericIPAddressField(), default=list)
+    uuids = ArrayField(models.UUIDField(), default=list)
+    decimals = ArrayField(models.DecimalField(max_digits=5, decimal_places=2), default=list)
     tags = ArrayField(TagField(), blank=True, null=True)
     json = ArrayField(JSONField(default=dict), default=list)
     int_ranges = ArrayField(IntegerRangeField(), blank=True, null=True)
