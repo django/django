@@ -2,6 +2,7 @@ import datetime
 import decimal
 import unittest
 
+from django.conf import settings
 from django.db import connection, models
 from django.db.models import Avg
 from django.db.models.expressions import Value
@@ -9,6 +10,7 @@ from django.db.models.functions import Cast
 from django.test import (
     TestCase, ignore_warnings, override_settings, skipUnlessDBFeature,
 )
+from django.utils import timezone
 
 from ..models import Author, Fan
 
@@ -53,18 +55,24 @@ class CastTests(TestCase):
 
     def test_case_from_db_datetime_to_date(self):
         author = Author.objects.create(name='John Smith', age=45)
-        Fan.objects.create(name='Margaret', age=50, author=author)
-        fans = Fan.objects.annotate(fan_for_day=Cast("fan_since", models.DateField()))
-        self.assertTrue(isinstance(fans.get().fan_for_day, datetime.date))
+        fan_since = datetime.datetime(2016, 2, 3, 15, 0, 0)
+        if settings.USE_TZ:
+            fan_since = timezone.make_aware(fan_since, is_dst=False)
+        Fan.objects.create(name='Margaret', age=50, author=author, fan_since=fan_since)
+        fan = Fan.objects.annotate(fan_for_day=Cast("fan_since", models.DateField())).first()
+        self.assertIsInstance(fan.fan_for_day, datetime.date)
 
     def test_case_from_db_datetime_to_date_group_by(self):
         # Create a fan
         author = Author.objects.create(name='John Smith', age=45)
-        Fan.objects.create(name='Margaret', age=50, author=author)
+        fan_since = datetime.datetime(2016, 2, 3, 15, 0, 0)
+        if settings.USE_TZ:
+            fan_since = timezone.make_aware(fan_since, is_dst=False)
+        Fan.objects.create(name='Margaret', age=50, author=author, fan_since=fan_since)
         fans = Fan.objects.values("author").annotate(
             fan_for_day=Cast("fan_since", models.DateField()),
             fans=models.Count("*")).values()
-        self.assertTrue(isinstance(fans[0]['fan_for_day'], datetime.date))
+        self.assertIsInstance(fans[0]['fan_for_day'], datetime.date)
         self.assertEqual(fans[0]['fans'], 1)
 
     def test_cast_from_python_to_date(self):
