@@ -28,7 +28,8 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
-# Application definition
+# Application definition, the order in INSTALLED_APPS matters
+# https://docs.djangoproject.com/en/{{ docs_version }}/ref/settings/#installed-apps
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -38,6 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
+
+# Activating middleware, the order in MIDDLEWARE matters
+# https://docs.djangoproject.com/en/{{ docs_version }}/topics/http/middleware/#activating-middleware
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
