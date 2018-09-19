@@ -20,6 +20,11 @@ from .models import UnicodeModel, UnserializableModel
 from .routers import TestRouter
 from .test_base import MigrationTestBase
 
+try:
+    import sqlparse
+except ImportError:
+    sqlparse = None
+
 
 class MigrateTests(MigrationTestBase):
     """
@@ -311,10 +316,10 @@ class MigrateTests(MigrationTestBase):
             '    Raw Python operation -> Grow salamander tail.\n'
             'migrations.0002_second\n'
             '    Create model Book\n'
-            '    Raw SQL operation -> SELECT * FROM migrations_book\n'
+            "    Raw SQL operation -> ['SELECT * FROM migrations_book']\n"
             'migrations.0003_third\n'
             '    Create model Author\n'
-            '    Raw SQL operation -> SELECT * FROM migrations_author\n',
+            "    Raw SQL operation -> ['SELECT * FROM migrations_author']\n",
             out.getvalue()
         )
         # Migrate to the third migration.
@@ -334,10 +339,10 @@ class MigrateTests(MigrationTestBase):
             'Planned operations:\n'
             'migrations.0003_third\n'
             '    Undo Create model Author\n'
-            '    Raw SQL operation -> SELECT * FROM migrations_book\n'
+            "    Raw SQL operation -> ['SELECT * FROM migrations_book']\n"
             'migrations.0002_second\n'
             '    Undo Create model Book\n'
-            '    Raw SQL operation -> SELECT * FROM migrations_salamander\n',
+            "    Raw SQL operation -> ['SELECT * FROM migrations_salamand…\n",
             out.getvalue()
         )
         out = io.StringIO()
@@ -349,20 +354,23 @@ class MigrateTests(MigrationTestBase):
             '    Raw SQL operation -> SELECT * FROM migrations_author WHE…\n',
             out.getvalue()
         )
-        # Migrate to the fourth migration.
-        call_command('migrate', 'migrations', '0004', verbosity=0)
-        out = io.StringIO()
         # Show the plan when an operation is irreversible.
-        call_command('migrate', 'migrations', '0003', plan=True, stdout=out, no_color=True)
-        self.assertEqual(
-            'Planned operations:\n'
-            'migrations.0004_fourth\n'
-            '    Raw SQL operation -> IRREVERSIBLE\n',
-            out.getvalue()
-        )
-        # Cleanup by unmigrating everything: fake the irreversible, then
-        # migrate all to zero.
-        call_command('migrate', 'migrations', '0003', fake=True, verbosity=0)
+        # Migration 0004's RunSQL uses a SQL string instead of a list, so
+        # sqlparse may be required for splitting.
+        if sqlparse or not connection.features.requires_sqlparse_for_splitting:
+            # Migrate to the fourth migration.
+            call_command('migrate', 'migrations', '0004', verbosity=0)
+            out = io.StringIO()
+            call_command('migrate', 'migrations', '0003', plan=True, stdout=out, no_color=True)
+            self.assertEqual(
+                'Planned operations:\n'
+                'migrations.0004_fourth\n'
+                '    Raw SQL operation -> IRREVERSIBLE\n',
+                out.getvalue()
+            )
+            # Cleanup by unmigrating everything: fake the irreversible, then
+            # migrate all to zero.
+            call_command('migrate', 'migrations', '0003', fake=True, verbosity=0)
         call_command('migrate', 'migrations', 'zero', verbosity=0)
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_empty"})
