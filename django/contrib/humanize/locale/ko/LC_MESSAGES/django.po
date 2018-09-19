@@ -228,7 +228,7 @@ msgstr "어제"
 #. weeks'
 #, python-format
 msgid "%(delta)s ago"
-msgstr ""
+msgstr "%(delta)s 전"
 
 #. Translators: 'naturaltime-past' strings will be included in
 #. '%(delta)s ago'
@@ -296,7 +296,7 @@ msgstr[0] "%(count)s 시간 전"
 #. weeks'
 #, python-format
 msgid "%(delta)s from now"
-msgstr ""
+msgstr "지금부터 %(delta)s"
 
 #. Translators: 'naturaltime-future' strings will be included in
 #. '%(delta)s from now'
