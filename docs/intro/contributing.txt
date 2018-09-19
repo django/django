@@ -117,38 +117,22 @@ Download the Django source code repository using the following command:
 
 Now that you have a local copy of Django, you can install it just like you would
 install any package using ``pip``. The most convenient way to do so is by using
-a *virtual environment* (or virtualenv) which is a feature built into Python
-that allows you to keep a separate directory of installed packages for each of
-your projects so that they don't interfere with each other.
+a *virtual environment*, which is a feature built into Python that allows you
+to keep a separate directory of installed packages for each of your projects so
+that they don't interfere with each other.
 
-It's a good idea to keep all your virtualenvs in one place, for example in
-``.virtualenvs/`` in your home directory. Create it if it doesn't exist yet:
+It's a good idea to keep all your virtual environments in one place, for
+example in ``.virtualenvs/`` in your home directory.
 
-.. console::
-
-    $ mkdir ~/.virtualenvs
-
-Now create a new virtualenv by running:
+Create a new virtual environment by running:
 
 .. console::
 
-    $ python -m venv ~/.virtualenvs/djangodev
+    $ python3 -m venv ~/.virtualenvs/djangodev
 
 The path is where the new environment will be saved on your computer.
 
-.. admonition:: For Ubuntu users
-
-    On some versions of Ubuntu the above command might fail. Use the
-    ``virtualenv`` package instead, first making sure you have ``pip3``:
-
-    .. code-block:: console
-
-        $ sudo apt-get install python3-pip
-        $ # Prefix the next command with sudo if it gives a permission denied error
-        $ pip3 install virtualenv
-        $ virtualenv --python=`which python3` ~/.virtualenvs/djangodev
-
-The final step in setting up your virtualenv is to activate it:
+The final step in setting up your virtual environment is to activate it:
 
 .. code-block:: console
 
@@ -162,22 +146,23 @@ If the ``source`` command is not available, you can try using a dot instead:
 
 .. admonition:: For Windows users
 
-    To activate your virtualenv on Windows, run:
+    To activate your virtual environment on Windows, run:
 
     .. code-block:: doscon
 
         ...\> %HOMEPATH%\.virtualenvs\djangodev\Scripts\activate.bat
 
-You have to activate the virtualenv whenever you open a new terminal window.
-virtualenvwrapper__ is a useful tool for making this more convenient.
+You have to activate the virtual environment whenever you open a new
+terminal window. virtualenvwrapper__ is a useful tool for making this
+more convenient.
 
 __ https://virtualenvwrapper.readthedocs.io/en/latest/
 
-Anything you install through ``pip`` from now on will be installed in your new
-virtualenv, isolated from other environments and system-wide packages. Also, the
-name of the currently activated virtualenv is displayed on the command line to
-help you keep track of which one you are using. Go ahead and install the
-previously cloned copy of Django:
+The name of the currently activated virtual environment is displayed on the
+command line to help you keep track of which one you are using. Anything you
+install through ``pip`` while this name is displayed will be installed in that
+virtual environment, isolated from other environments and system-wide packages.
+Go ahead and install the previously cloned copy of Django:
 
 .. console::
 
