@@ -1102,9 +1102,6 @@ A boolean that turns on/off debug mode.
 
 Never deploy a site into production with :setting:`DEBUG` turned on.
 
-Did you catch that? NEVER deploy a site into production with :setting:`DEBUG`
-turned on.
-
 One of the main features of debug mode is the display of detailed error pages.
 If your app raises an exception when :setting:`DEBUG` is ``True``, Django will
 display a detailed traceback, including a lot of metadata about your
@@ -1263,8 +1260,8 @@ backend supports it (see :doc:`/topics/db/tablespaces`).
 
 Default: ``[]`` (Empty list)
 
-List of compiled regular expression objects representing User-Agent strings that
-are not allowed to visit any page, systemwide. Use this for bad robots/crawlers.
+List of compiled regular expression objects representing User-Agent strings
+that are not allowed to visit any page, systemwide. Use this for bots/crawlers.
 This is only used if ``CommonMiddleware`` is installed (see
 :doc:`/topics/http/middleware`).
 
@@ -1640,8 +1637,7 @@ ignored when reporting HTTP 404 errors via email (see
 :doc:`/howto/error-reporting`). Regular expressions are matched against
 :meth:`request's full paths <django.http.HttpRequest.get_full_path>` (including
 query string, if any). Use this if your site does not provide a commonly
-requested file such as ``favicon.ico`` or ``robots.txt``, or if it gets
-hammered by script kiddies.
+requested file such as ``favicon.ico`` or ``robots.txt``.
 
 This is only used if
 :class:`~django.middleware.common.BrokenLinkEmailsMiddleware` is enabled (see
@@ -2056,8 +2052,8 @@ used if :class:`~django.middleware.common.CommonMiddleware` is installed
 
 Default: Not defined
 
-A string representing the full Python import path to your root URLconf. For example:
-``"mydjangoapps.urls"``. Can be overridden on a per-request basis by
+A string representing the full Python import path to your root URLconf, for
+example ``"mydjangoapps.urls"``. Can be overridden on a per-request basis by
 setting the attribute ``urlconf`` on the incoming ``HttpRequest``
 object. See :ref:`how-django-processes-a-request` for details.
 
@@ -2189,31 +2185,30 @@ A tuple representing a HTTP header/value combination that signifies a request
 is secure. This controls the behavior of the request object's ``is_secure()``
 method.
 
-This takes some explanation. By default, ``is_secure()`` is able to determine
-whether a request is secure by looking at whether the requested URL uses
-``https://``. This is important for Django's CSRF protection, and may be used
-by your own code or third-party apps.
+By default, ``is_secure()`` determines if a request is secure by confirming
+that a requested URL uses ``https://``. This method is important for Django's
+CSRF protection, and it may be used by your own code or third-party apps.
 
 If your Django app is behind a proxy, though, the proxy may be "swallowing" the
 fact that a request is HTTPS, using a non-HTTPS connection between the proxy
 and Django. In this case, ``is_secure()`` would always return ``False`` -- even
 for requests that were made via HTTPS by the end user.
 
-In this situation, you'll want to configure your proxy to set a custom HTTP
-header that tells Django whether the request came in via HTTPS, and you'll want
-to set ``SECURE_PROXY_SSL_HEADER`` so that Django knows what header to look
-for.
+In this situation, configure your proxy to set a custom HTTP header that tells
+Django whether the request came in via HTTPS, and set
+``SECURE_PROXY_SSL_HEADER`` so that Django knows what header to look for.
 
-You'll need to set a tuple with two elements -- the name of the header to look
-for and the required value. For example::
+Set a tuple with two elements -- the name of the header to look for and the
+required value. For example::
 
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-Here, we're telling Django that we trust the ``X-Forwarded-Proto`` header
-that comes from our proxy, and any time its value is ``'https'``, then the
-request is guaranteed to be secure (i.e., it originally came in via HTTPS).
-Obviously, you should *only* set this setting if you control your proxy or
-have some other guarantee that it sets/strips this header appropriately.
+This tells Django to trust the ``X-Forwarded-Proto`` header that comes from our
+proxy, and any time its value is ``'https'``, then the request is guaranteed to
+be secure (i.e., it originally came in via HTTPS).
+
+You should *only* set this setting if you control your proxy or have some other
+guarantee that it sets/strips this header appropriately.
 
 Note that the header needs to be in the format as used by ``request.META`` --
 all caps and likely starting with ``HTTP_``. (Remember, Django automatically
@@ -2222,9 +2217,8 @@ available in ``request.META``.)
 
 .. warning::
 
-    **You will probably open security holes in your site if you set this
-    without knowing what you're doing. And if you fail to set it when you
-    should. Seriously.**
+    **Modifying this setting can compromise your site's security. Ensure you
+    fully understand your setup before changing it.**
 
     Make sure ALL of the following are true before setting this (assuming the
     values from the example above):
@@ -3000,10 +2994,10 @@ consistently by all browsers. However, when it is honored, it can be a
 useful way to mitigate the risk of a client side script accessing the
 protected cookie data.
 
-Turning it on makes it less trivial for an attacker to escalate a cross-site
-scripting vulnerability into full hijacking of a user's session. There's not
-much excuse for leaving this off, either: if your code depends on reading
-session cookies from JavaScript, you're probably doing it wrong.
+This makes it less trivial for an attacker to escalate a cross-site scripting
+vulnerability into full hijacking of a user's session. There aren't many good
+reasons for turning this off. Your code shouldn't read session cookies from
+JavaScript.
 
 .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
 
@@ -3080,12 +3074,9 @@ Whether to use a secure cookie for the session cookie. If this is set to
 ``True``, the cookie will be marked as "secure," which means browsers may
 ensure that the cookie is only sent under an HTTPS connection.
 
-Since it's trivial for a packet sniffer (e.g. `Firesheep`_) to hijack a user's
-session if the session cookie is sent unencrypted, there's really no good
-excuse to leave this off. It will prevent you from using sessions on insecure
-requests and that's a good thing.
-
-.. _Firesheep: https://codebutler.com/firesheep/
+Leaving this setting off isn't a good idea because an attacker could capture an
+unencrypted session cookie with a packet sniffer and use the cookie to hijack
+the user's session.
 
 .. setting:: SESSION_ENGINE
 
