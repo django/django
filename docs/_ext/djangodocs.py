@@ -320,6 +320,8 @@ class ConsoleDirective(CodeBlock):
                 return 'runtests.py ' + args_to_win(line[15:])
             if line.startswith('$ ./'):
                 return args_to_win(line[4:])
+            if line.startswith('$ python3'):
+                return 'py ' + args_to_win(line[9:])
             if line.startswith('$ python'):
                 return 'py ' + args_to_win(line[8:])
             if line.startswith('$ '):
