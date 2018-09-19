@@ -24,6 +24,7 @@ MRO is an acronym for Method Resolution Order.
 
     **Method Flowchart**
 
+    #. :meth:`setup()`
     #. :meth:`dispatch()`
     #. :meth:`http_method_not_allowed()`
     #. :meth:`options()`
@@ -70,11 +71,22 @@ MRO is an acronym for Method Resolution Order.
         attributes.
 
         When the view is called during the request/response cycle, the
-        :class:`~django.http.HttpRequest` is assigned to the view's ``request``
-        attribute. Any positional and/or keyword arguments :ref:`captured from
-        the URL pattern <how-django-processes-a-request>` are assigned to the
-        ``args`` and ``kwargs`` attributes, respectively. Then :meth:`dispatch`
-        is called.
+        :meth:`setup` method assigns the :class:`~django.http.HttpRequest` to
+        the view's ``request`` attribute, and any positional and/or keyword
+        arguments :ref:`captured from the URL pattern
+        <how-django-processes-a-request>` to the ``args`` and ``kwargs``
+        attributes, respectively. Then :meth:`dispatch` is called.
+
+    .. method:: setup(request, *args, **kwargs)
+
+        .. versionadded:: 2.2
+
+        Initializes view instance attributes: ``self.request``, ``self.args``,
+        and ``self.kwargs`` prior to :meth:`dispatch`.
+
+        Overriding this method allows mixins to setup instance attributes for
+        reuse in child classes. When overriding this method, you must call
+        ``super()``.
 
     .. method:: dispatch(request, *args, **kwargs)
 
@@ -123,6 +135,7 @@ MRO is an acronym for Method Resolution Order.
 
     **Method Flowchart**
 
+    #. :meth:`~django.views.generic.base.View.setup()`
     #. :meth:`~django.views.generic.base.View.dispatch()`
     #. :meth:`~django.views.generic.base.View.http_method_not_allowed()`
     #. :meth:`~django.views.generic.base.ContextMixin.get_context_data()`
@@ -184,6 +197,7 @@ MRO is an acronym for Method Resolution Order.
 
     **Method Flowchart**
 
+    #. :meth:`~django.views.generic.base.View.setup()`
     #. :meth:`~django.views.generic.base.View.dispatch()`
     #. :meth:`~django.views.generic.base.View.http_method_not_allowed()`
     #. :meth:`get_redirect_url()`

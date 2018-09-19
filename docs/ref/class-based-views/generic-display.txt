@@ -25,6 +25,7 @@ many projects they are typically the most commonly used views.
 
     **Method Flowchart**
 
+    #. :meth:`~django.views.generic.base.View.setup()`
     #. :meth:`~django.views.generic.base.View.dispatch()`
     #. :meth:`~django.views.generic.base.View.http_method_not_allowed()`
     #. :meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names()`
@@ -95,6 +96,7 @@ many projects they are typically the most commonly used views.
 
     **Method Flowchart**
 
+    #. :meth:`~django.views.generic.base.View.setup()`
     #. :meth:`~django.views.generic.base.View.dispatch()`
     #. :meth:`~django.views.generic.base.View.http_method_not_allowed()`
     #. :meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names()`

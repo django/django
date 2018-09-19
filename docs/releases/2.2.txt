@@ -166,7 +166,10 @@ Forms
 Generic Views
 ~~~~~~~~~~~~~
 
-* ...
+* The new :meth:`View.setup <django.views.generic.base.View.setup>` hook
+  initializes view attributes before calling
+  :meth:`~django.views.generic.base.View.dispatch`. It allows mixins to setup
+  instance attributes for reuse in child classes.
 
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
