@@ -3,7 +3,7 @@ from django.db import models
 
 from .fields import (
     ArrayField, BigIntegerRangeField, CICharField, CIEmailField, CITextField,
-    DateRangeField, DateTimeRangeField, FloatRangeField, HStoreField,
+    DateRangeField, DateTimeRangeField, DecimalRangeField, HStoreField,
     IntegerRangeField, JSONField, SearchVectorField,
 )
 
@@ -129,7 +129,7 @@ class Line(PostgreSQLModel):
 class RangesModel(PostgreSQLModel):
     ints = IntegerRangeField(blank=True, null=True)
     bigints = BigIntegerRangeField(blank=True, null=True)
-    floats = FloatRangeField(blank=True, null=True)
+    decimals = DecimalRangeField(blank=True, null=True)
     timestamps = DateTimeRangeField(blank=True, null=True)
     dates = DateRangeField(blank=True, null=True)
 

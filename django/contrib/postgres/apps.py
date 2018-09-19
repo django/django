@@ -19,7 +19,7 @@ class PostgresConfig(AppConfig):
                 conn.introspection.data_types_reverse.update({
                     3802: 'django.contrib.postgres.fields.JSONField',
                     3904: 'django.contrib.postgres.fields.IntegerRangeField',
-                    3906: 'django.contrib.postgres.fields.FloatRangeField',
+                    3906: 'django.contrib.postgres.fields.DecimalRangeField',
                     3910: 'django.contrib.postgres.fields.DateTimeRangeField',
                     3912: 'django.contrib.postgres.fields.DateRangeField',
                     3926: 'django.contrib.postgres.fields.BigIntegerRangeField',

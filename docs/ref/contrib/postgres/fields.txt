@@ -653,6 +653,18 @@ excluded; that is, ``[)``.
     returns a range in a canonical form that includes the lower bound and
     excludes the upper bound; that is ``[)``.
 
+``DecimalRangeField``
+---------------------
+
+.. class:: DecimalRangeField(**options)
+
+    .. versionadded:: 2.2
+
+    Stores a range of floating point values. Based on a
+    :class:`~django.db.models.DecimalField`. Represented by a ``numrange`` in
+    the database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in
+    Python.
+
 ``FloatRangeField``
 -------------------
 
@@ -661,6 +673,10 @@ excluded; that is, ``[)``.
     Stores a range of floating point values. Based on a
     :class:`~django.db.models.FloatField`. Represented by a ``numrange`` in the
     database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in Python.
+
+    .. deprecated:: 2.2
+
+        Use :class:`DecimalRangeField` instead.
 
 ``DateTimeRangeField``
 ----------------------
