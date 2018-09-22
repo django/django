@@ -1660,11 +1660,17 @@ generating a ``SELECT ... FOR UPDATE`` SQL statement on supported databases.
 
 For example::
 
-    entries = Entry.objects.select_for_update().filter(author=request.user)
+    from django.db import transaction
 
-All matched entries will be locked until the end of the transaction block,
-meaning that other transactions will be prevented from changing or acquiring
-locks on them.
+    entries = Entry.objects.select_for_update().filter(author=request.user)
+    with transaction.atomic():
+        for entry in entries:
+            ...
+
+When the queryset is evaluated (``for entry in entries`` in this case), all
+matched entries will be locked until the end of the transaction block, meaning
+that other transactions will be prevented from changing or acquiring locks on
+them.
 
 Usually, if another transaction has already acquired a lock on one of the
 selected rows, the query will block until the lock is released. If this is
