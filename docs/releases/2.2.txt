@@ -291,6 +291,8 @@ Miscellaneous
   is now the real ellipsis character (``…``) instead of 3 dots. You may have to
   adapt some test output comparisons.
 
+* Support for bytestring paths in the template filesystem loader is removed.
+
 .. _deprecated-features-2.2:
 
 Features deprecated in 2.2
