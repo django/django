@@ -515,7 +515,7 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
             __friends = cached_property(get_friends, name='_Person__friends')
 
-        __ https://docs.python.org/3/faq/programming.html#i-try-to-use-spam-and-i-get-an-error-about-someclassname-spam
+        __ https://docs.python.org/faq/programming.html#i-try-to-use-spam-and-i-get-an-error-about-someclassname-spam
 
 .. function:: keep_lazy(func, *resultclasses)
 
