@@ -337,7 +337,7 @@ class HttpResponseTests(unittest.TestCase):
         f = 'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz a\xcc\x88'.encode('latin-1')
         f = f.decode('utf-8')
         h['Content-Disposition'] = 'attachment; filename="%s"' % f
-        # This one is triggering http://bugs.python.org/issue20747, that is Python
+        # This one is triggering https://bugs.python.org/issue20747, that is Python
         # will itself insert a newline in the header
         h['Content-Disposition'] = 'attachment; filename="EdelRot_Blu\u0308te (3)-0.JPG"'
 

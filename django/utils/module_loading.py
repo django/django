@@ -76,7 +76,7 @@ def module_has_submodule(package, module_name):
         # When module_name is an invalid dotted path, Python raises ImportError
         # (or ModuleNotFoundError in Python 3.6+). AttributeError may be raised
         # if the penultimate part of the path is not a package.
-        # (http://bugs.python.org/issue30436)
+        # (https://bugs.python.org/issue30436)
         return False
 
 

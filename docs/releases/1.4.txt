@@ -273,7 +273,7 @@ details, see :ref:`auth_password_storage`.
 
 .. _sha1: https://en.wikipedia.org/wiki/SHA1
 .. _pbkdf2: https://en.wikipedia.org/wiki/PBKDF2
-.. _nist: http://csrc.nist.gov/publications/nistpubs/800-132/nist-sp800-132.pdf
+.. _nist: https://csrc.nist.gov/publications/detail/sp/800-132/final
 .. _bcrypt: https://en.wikipedia.org/wiki/Bcrypt
 
 HTML5 doctype
@@ -730,7 +730,7 @@ Obviously, this new policy **has no impact** on sites you develop using Django.
 It only applies to the Django admin. Feel free to develop apps compatible with
 any range of browsers.
 
-.. _YUI's A-grade: http://yuilibrary.com/yui/docs/tutorials/gbs/
+.. _YUI's A-grade: https://github.com/yui/yui3/wiki/Graded-Browser-Support
 
 Removed admin icons
 -------------------
