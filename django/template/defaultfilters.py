@@ -225,7 +225,7 @@ def stringformat(value, arg):
     This specifier uses Python string formatting syntax, with the exception
     that the leading "%" is dropped.
 
-    See https://docs.python.org/3/library/stdtypes.html#printf-style-string-formatting
+    See https://docs.python.org/library/stdtypes.html#printf-style-string-formatting
     for documentation of Python string formatting.
     """
     if isinstance(value, tuple):
