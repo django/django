@@ -9,7 +9,6 @@ from django.db.backends.utils import split_identifier
 from django.db.models import Index
 from django.db.transaction import TransactionManagementError, atomic
 from django.utils import timezone
-from django.utils.encoding import force_bytes
 
 logger = logging.getLogger('django.db.backends.schema')
 
@@ -144,7 +143,7 @@ class BaseDatabaseSchemaEditor:
         """
         h = hashlib.md5()
         for arg in args:
-            h.update(force_bytes(arg))
+            h.update(arg.encode())
         return h.hexdigest()[:8]
 
     # Field <-> database mapping functions
