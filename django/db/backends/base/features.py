@@ -269,6 +269,9 @@ class BaseDatabaseFeatures:
     # in UPDATE statements to ensure the expression has the correct type?
     requires_casted_case_in_updates = False
 
+    # Does this backend use composite index to search by any prefix of its key?
+    composite_index_supports_prefix_search = True
+
     def __init__(self, connection):
         self.connection = connection
 
