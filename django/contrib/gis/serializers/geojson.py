@@ -13,7 +13,7 @@ class Serializer(JSONSerializer):
         self.srid = self.json_kwargs.pop('srid', 4326)
         if (self.selected_fields is not None and self.geometry_field is not None and
                 self.geometry_field not in self.selected_fields):
-            self.selected_fields = list(self.selected_fields) + [self.geometry_field]
+            self.selected_fields = [*self.selected_fields, self.geometry_field]
 
     def start_serialization(self):
         self._init_options()

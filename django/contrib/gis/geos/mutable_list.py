@@ -109,11 +109,11 @@ class ListMixin:
     # ### Special methods for arithmetic operations ###
     def __add__(self, other):
         'add another list-like object'
-        return self.__class__(list(self) + list(other))
+        return self.__class__([*self, *other])
 
     def __radd__(self, other):
         'add to another list-like object'
-        return other.__class__(list(other) + list(self))
+        return other.__class__([*other, *self])
 
     def __iadd__(self, other):
         'add another list-like object to self'

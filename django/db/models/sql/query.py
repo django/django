@@ -1406,11 +1406,11 @@ class Query:
                 # one step.
                 pos -= 1
                 if pos == -1 or fail_on_missing:
-                    field_names = list(get_field_names_from_opts(opts))
-                    available = sorted(
-                        field_names + list(self.annotation_select) +
-                        list(self._filtered_relations)
-                    )
+                    available = sorted([
+                        *get_field_names_from_opts(opts),
+                        *self.annotation_select,
+                        *self._filtered_relations,
+                    ])
                     raise FieldError("Cannot resolve keyword '%s' into field. "
                                      "Choices are: %s" % (name, ", ".join(available)))
                 break
@@ -1776,10 +1776,10 @@ class Query:
                 # from the model on which the lookup failed.
                 raise
             else:
-                names = sorted(
-                    list(get_field_names_from_opts(opts)) + list(self.extra) +
-                    list(self.annotation_select) + list(self._filtered_relations)
-                )
+                names = sorted([
+                    *get_field_names_from_opts(opts), *self.extra,
+                    *self.annotation_select, *self._filtered_relations
+                ])
                 raise FieldError("Cannot resolve keyword %r into field. "
                                  "Choices are: %s" % (name, ", ".join(names)))
 

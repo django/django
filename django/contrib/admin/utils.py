@@ -78,10 +78,9 @@ def unquote(s):
     """Undo the effects of quote(). Based heavily on urllib.parse.unquote()."""
     mychr = chr
     myatoi = int
-    list = s.split('_')
-    res = [list[0]]
+    head, *list = s.split('_')
+    res = [head]
     myappend = res.append
-    del list[0]
     for item in list:
         if item[1:2]:
             try:

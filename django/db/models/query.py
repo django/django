@@ -96,13 +96,12 @@ class ValuesIterable(BaseIterable):
         query = queryset.query
         compiler = query.get_compiler(queryset.db)
 
-        field_names = list(query.values_select)
-        extra_names = list(query.extra_select)
-        annotation_names = list(query.annotation_select)
-
         # extra(select=...) cols are always at the start of the row.
-        names = extra_names + field_names + annotation_names
-
+        names = [
+            *query.extra_select,
+            *query.values_select,
+            *query.annotation_select,
+        ]
         indexes = range(len(names))
         for row in compiler.results_iter(chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size):
             yield {names[i]: row[i] for i in indexes}
@@ -120,14 +119,13 @@ class ValuesListIterable(BaseIterable):
         compiler = query.get_compiler(queryset.db)
 
         if queryset._fields:
-            field_names = list(query.values_select)
-            extra_names = list(query.extra_select)
-            annotation_names = list(query.annotation_select)
-
             # extra(select=...) cols are always at the start of the row.
-            names = extra_names + field_names + annotation_names
-
-            fields = list(queryset._fields) + [f for f in annotation_names if f not in queryset._fields]
+            names = [
+                *query.extra_select,
+                *query.values_select,
+                *query.annotation_select,
+            ]
+            fields = [*queryset._fields, *(f for f in query.annotation_select if f not in queryset._fields)]
             if fields != names:
                 # Reorder according to fields.
                 index_map = {name: idx for idx, name in enumerate(names)}
@@ -352,7 +350,7 @@ class QuerySet:
         """
         if self.query.distinct_fields:
             raise NotImplementedError("aggregate() + distinct(fields) not implemented.")
-        self._validate_values_are_expressions(args + tuple(kwargs.values()), method_name='aggregate')
+        self._validate_values_are_expressions((*args, *kwargs.values()), method_name='aggregate')
         for arg in args:
             # The default_alias property raises TypeError if default_alias
             # can't be set automatically or AttributeError if it isn't an
