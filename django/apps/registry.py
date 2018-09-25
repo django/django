@@ -176,7 +176,7 @@ class Apps:
 
         result = []
         for app_config in self.app_configs.values():
-            result.extend(list(app_config.get_models(include_auto_created, include_swapped)))
+            result.extend(app_config.get_models(include_auto_created, include_swapped))
         return result
 
     def get_model(self, app_label, model_name=None, require_ready=True):
