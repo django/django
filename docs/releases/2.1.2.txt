@@ -19,3 +19,6 @@ Bugfixes
   (:ticket:`29755`).
 
 * Added compatibility for ``cx_Oracle`` 7 (:ticket:`29759`).
+
+* Fixed a regression in Django 2.0 where unique index names weren't quoted
+  (:ticket:`29778`).
