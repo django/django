@@ -24,7 +24,7 @@ class CheckConstraintTests(TestCase):
         self.assertEqual(kwargs, {'constraint': constraint, 'name': name})
 
     @skipUnlessDBFeature('supports_table_check_constraints')
-    def test_model_constraint(self):
+    def test_database_constraint(self):
         Product.objects.create(name='Valid', price=10, discounted_price=5)
         with self.assertRaises(IntegrityError):
             Product.objects.create(name='Invalid', price=10, discounted_price=20)
