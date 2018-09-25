@@ -1000,11 +1000,13 @@ class BaseDatabaseSchemaEditor:
         )
 
     def _create_unique_sql(self, model, columns):
+        def create_unique_name(*args, **kwargs):
+            return self.quote_name(self._create_index_name(*args, **kwargs))
         table = model._meta.db_table
         return Statement(
             self.sql_create_unique,
             table=Table(table, self.quote_name),
-            name=IndexName(table, columns, '_uniq', self._create_index_name),
+            name=IndexName(table, columns, '_uniq', create_unique_name),
             columns=Columns(table, columns, self.quote_name),
         )
 
