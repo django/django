@@ -383,6 +383,9 @@ class AnonymousUser:
     def __hash__(self):
         return 1  # instances always return the same hash value
 
+    def __int__(self):
+        raise TypeError('Cannot cast AnonymousUser to int. Are you trying to use it in place of User?')
+
     def save(self):
         raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
 

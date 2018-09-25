@@ -345,6 +345,14 @@ class AnonymousUserTests(SimpleTestCase):
     def test_hash(self):
         self.assertEqual(hash(self.user), 1)
 
+    def test_int(self):
+        msg = (
+            'Cannot cast AnonymousUser to int. Are you trying to use it in '
+            'place of User?'
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            int(self.user)
+
     def test_delete(self):
         with self.assertRaisesMessage(NotImplementedError, self.no_repr_msg):
             self.user.delete()
