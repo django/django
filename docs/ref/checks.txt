@@ -731,3 +731,5 @@ configured:
   or list.
 * **staticfiles.E002**: The :setting:`STATICFILES_DIRS` setting should not
   contain the :setting:`STATIC_ROOT` setting.
+* **staticfiles.E003**: The prefix ``<prefix>`` in the
+  :setting:`STATICFILES_DIRS` setting must not end with a slash.
