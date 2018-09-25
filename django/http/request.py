@@ -538,7 +538,7 @@ def split_domain_port(host):
     """
     Return a (domain, port) tuple from a given host.
 
-    Returned domain is lower-cased. If the host is invalid, the domain will be
+    Returned domain is lowercased. If the host is invalid, the domain will be
     empty.
     """
     host = host.lower()
@@ -566,7 +566,7 @@ def validate_host(host, allowed_hosts):
     ``example.com`` and any subdomain), ``*`` matches anything, and anything
     else must match exactly.
 
-    Note: This function assumes that the given host is lower-cased and has
+    Note: This function assumes that the given host is lowercased and has
     already had the port, if any, stripped off.
 
     Return ``True`` for a valid host, ``False`` otherwise.

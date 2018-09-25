@@ -112,7 +112,7 @@ Imports
   imports for other Django components and relative imports for local components.
 
 * On each line, alphabetize the items with the upper case items grouped before
-  the lower case items.
+  the lowercase items.
 
 * Break long lines using parentheses and indent continuation lines by 4 spaces.
   Include a trailing comma after the last import and put the closing

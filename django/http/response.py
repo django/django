@@ -36,7 +36,7 @@ class HttpResponseBase:
     status_code = 200
 
     def __init__(self, content_type=None, status=None, reason=None, charset=None):
-        # _headers is a mapping of the lower-case name to the original case of
+        # _headers is a mapping of the lowercase name to the original case of
         # the header (required for working with legacy systems) and the header
         # value. Both the name of the header and its value are ASCII strings.
         self._headers = {}

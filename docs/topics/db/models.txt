@@ -981,11 +981,11 @@ To work around this problem, when you are using
 class (only), part of the value should contain ``'%(app_label)s'`` and
 ``'%(class)s'``.
 
-- ``'%(class)s'`` is replaced by the lower-cased name of the child class
-  that the field is used in.
-- ``'%(app_label)s'`` is replaced by the lower-cased name of the app the child
-  class is contained within. Each installed application name must be unique
-  and the model class names within each app must also be unique, therefore the
+- ``'%(class)s'`` is replaced by the lowercased name of the child class that
+  the field is used in.
+- ``'%(app_label)s'`` is replaced by the lowercased name of the app the child
+  class is contained within. Each installed application name must be unique and
+  the model class names within each app must also be unique, therefore the
   resulting name will end up being different.
 
 For example, given an app ``common/models.py``::
@@ -1065,8 +1065,8 @@ possible::
     >>> Restaurant.objects.filter(name="Bob's Cafe")
 
 If you have a ``Place`` that is also a ``Restaurant``, you can get from the
-``Place`` object to the ``Restaurant`` object by using the lower-case version
-of the model name::
+``Place`` object to the ``Restaurant`` object by using the lowercase version of
+the model name::
 
     >>> p = Place.objects.get(id=12)
     # If p is a Restaurant object, this will give the child class:

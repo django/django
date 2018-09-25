@@ -44,7 +44,7 @@ class AppConfig:
         # None if the application doesn't have a models module.
         self.models_module = None
 
-        # Mapping of lower case model names to model classes. Initially set to
+        # Mapping of lowercase model names to model classes. Initially set to
         # None to prevent accidental access before import_models() runs.
         self.models = None
 

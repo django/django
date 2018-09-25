@@ -37,8 +37,8 @@ a model object and return its URL. This is a way of inserting or overriding
         'news.story': lambda o: "/stories/%s/%s/" % (o.pub_year, o.slug),
     }
 
-Note that the model name used in this setting should be all lower-case, regardless
-of the case of the actual model class name.
+The model name used in this setting should be all lowercase, regardless of the
+case of the actual model class name.
 
 .. setting:: ADMINS
 
