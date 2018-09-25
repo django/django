@@ -1678,9 +1678,9 @@ related. This works exactly the same as it does for :class:`ForeignKey`,
 including all the options regarding :ref:`recursive <recursive-relationships>`
 and :ref:`lazy <lazy-relationships>` relationships.
 
-If you do not specify the :attr:`~ForeignKey.related_name` argument for
-the ``OneToOneField``, Django will use the lower-case name of the current model
-as default value.
+If you do not specify the :attr:`~ForeignKey.related_name` argument for the
+``OneToOneField``, Django will use the lowercase name of the current model as
+default value.
 
 With the following example::
 

@@ -44,8 +44,8 @@ class District(models.Model):
 
 
 # If ticket #1578 ever slips back in, these models will not be able to be
-# created (the field names being lower-cased versions of their opposite
-# classes is important here).
+# created (the field names being lowercased versions of their opposite classes
+# is important here).
 class First(models.Model):
     second = models.IntegerField()
 
