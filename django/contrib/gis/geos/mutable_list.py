@@ -117,7 +117,7 @@ class ListMixin:
 
     def __iadd__(self, other):
         'add another list-like object to self'
-        self.extend(list(other))
+        self.extend(other)
         return self
 
     def __mul__(self, n):
