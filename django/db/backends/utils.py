@@ -7,7 +7,6 @@ from time import time
 
 from django.conf import settings
 from django.db.utils import NotSupportedError
-from django.utils.encoding import force_bytes
 from django.utils.timezone import utc
 
 logger = logging.getLogger('django.db.backends')
@@ -214,7 +213,7 @@ def truncate_name(identifier, length=None, hash_len=4):
     if length is None or len(name) <= length:
         return identifier
 
-    digest = hashlib.md5(force_bytes(name)).hexdigest()[:hash_len]
+    digest = hashlib.md5(name.encode()).hexdigest()[:hash_len]
     return '%s%s%s' % ('%s"."' % namespace if namespace else '', name[:length - hash_len], digest)
 
 
