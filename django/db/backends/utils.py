@@ -213,8 +213,19 @@ def truncate_name(identifier, length=None, hash_len=4):
     if length is None or len(name) <= length:
         return identifier
 
-    digest = hashlib.md5(name.encode()).hexdigest()[:hash_len]
+    digest = names_digest(name, length=hash_len)
     return '%s%s%s' % ('%s"."' % namespace if namespace else '', name[:length - hash_len], digest)
+
+
+def names_digest(*args, length):
+    """
+    Generate a 32-bit digest of a set of arguments that can be used to shorten
+    identifying names.
+    """
+    h = hashlib.md5()
+    for arg in args:
+        h.update(arg.encode())
+    return h.hexdigest()[:length]
 
 
 def format_number(value, max_digits, decimal_places):
