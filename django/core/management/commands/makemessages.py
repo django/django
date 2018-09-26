@@ -229,6 +229,10 @@ class Command(BaseCommand):
             help='The domain of the message files (default: "django").',
         )
         parser.add_argument(
+            '--directory', '-D', default='.',
+            help='The root directory to find translatable files in.',
+        )
+        parser.add_argument(
             '--all', '-a', action='store_true',
             help='Updates the message files for all existing locales.',
         )
@@ -285,6 +289,7 @@ class Command(BaseCommand):
         locale = options['locale']
         exclude = options['exclude']
         self.domain = options['domain']
+        self.root = options['directory']
         self.verbosity = options['verbosity']
         process_all = options['all']
         extensions = options['extensions']
@@ -421,7 +426,7 @@ class Command(BaseCommand):
         """
         Build pot files and apply msguniq to them.
         """
-        file_list = self.find_files(".")
+        file_list = self.find_files(self.root)
         self.remove_potfiles()
         self.process_files(file_list)
         potfiles = []
