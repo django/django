@@ -43,6 +43,7 @@ class Permission(models.Model):
         - The "change" permission limits a user's ability to view the change
           list, view the "change" form and change an object.
         - The "delete" permission limits the ability to delete an object.
+        - The "view" permission limits the ability to view an object.
 
     Permissions are set globally per type of object, not per specific object
     instance. It is possible to say "Mary may change news stories," but it's
@@ -50,8 +51,7 @@ class Permission(models.Model):
     ones she created herself" or "Mary may only change news stories that have a
     certain status or publication date."
 
-    Three basic permissions -- add, change and delete -- are automatically
-    created for each Django model.
+    The permissions listed above are automatically created for each model.
     """
     name = models.CharField(_('name'), max_length=255)
     content_type = models.ForeignKey(
