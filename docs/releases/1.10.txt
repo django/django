@@ -656,7 +656,7 @@ The apps registry is no longer auto-populated when unpickling models. This was
 added in Django 1.7.2 as an attempt to allow unpickling models outside of
 Django, such as in an RQ worker, without calling ``django.setup()``, but it
 creates the possibility of a deadlock. To adapt your code in the case of RQ,
-you can `provide your own worker script <http://python-rq.org/docs/workers/>`_
+you can `provide your own worker script <https://python-rq.org/docs/workers/>`_
 that calls ``django.setup()``.
 
 Removed null assignment check for non-null foreign key fields

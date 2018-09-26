@@ -82,7 +82,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     }
     # SQLite requires LIKE statements to include an ESCAPE clause if the value
     # being escaped has a percent or underscore in it.
-    # See http://www.sqlite.org/lang_expr.html for an explanation.
+    # See https://www.sqlite.org/lang_expr.html for an explanation.
     operators = {
         'exact': '= %s',
         'iexact': "LIKE %s ESCAPE '\\'",

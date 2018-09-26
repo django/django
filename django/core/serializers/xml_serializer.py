@@ -286,7 +286,7 @@ class Deserializer(base.Deserializer):
 
 def getInnerText(node):
     """Get all the inner text of a DOM node (recursively)."""
-    # inspired by http://mail.python.org/pipermail/xml-sig/2005-March/011022.html
+    # inspired by https://mail.python.org/pipermail/xml-sig/2005-March/011022.html
     inner_text = []
     for child in node.childNodes:
         if child.nodeType == child.TEXT_NODE or child.nodeType == child.CDATA_SECTION_NODE:

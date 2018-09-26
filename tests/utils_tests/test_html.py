@@ -84,7 +84,7 @@ class TestUtilsHtml(SimpleTestCase):
             ('d<a:b c:d>e</p>f', 'def'),
             ('<strong>foo</strong><a href="http://example.com">bar</a>', 'foobar'),
             # caused infinite loop on Pythons not patched with
-            # http://bugs.python.org/issue20288
+            # https://bugs.python.org/issue20288
             ('&gotcha&#;<>', '&gotcha&#;<>'),
             ('<sc<!-- -->ript>test<<!-- -->/script>', 'ript>test'),
             ('<script>alert()</script>&h', 'alert()h'),

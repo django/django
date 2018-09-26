@@ -275,7 +275,7 @@ class RequestFactory:
         # This is a minimal valid WSGI environ dictionary, plus:
         # - HTTP_COOKIE: for cookie support,
         # - REMOTE_ADDR: often useful, see #8551.
-        # See http://www.python.org/dev/peps/pep-3333/#environ-variables
+        # See https://www.python.org/dev/peps/pep-3333/#environ-variables
         return {
             'HTTP_COOKIE': self.cookies.output(header='', sep='; '),
             'PATH_INFO': '/',

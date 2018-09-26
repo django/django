@@ -29,7 +29,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     explain_prefix = 'EXPLAIN'
 
     def date_extract_sql(self, lookup_type, field_name):
-        # http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
+        # https://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
         if lookup_type == 'week_day':
             # DAYOFWEEK() returns an integer, 1-7, Sunday=1.
             # Note: WEEKDAY() returns 0-6, Monday=0.

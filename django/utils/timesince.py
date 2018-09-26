@@ -39,7 +39,7 @@ def timesince(d, now=None, reversed=False, time_strings=None):
     TIME_STRINGS dict.
 
     Adapted from
-    http://web.archive.org/web/20060617175230/http://blog.natbat.co.uk/archive/2003/Jun/14/time_since
+    https://web.archive.org/web/20060617175230/http://blog.natbat.co.uk/archive/2003/Jun/14/time_since
     """
     if time_strings is None:
         time_strings = TIME_STRINGS

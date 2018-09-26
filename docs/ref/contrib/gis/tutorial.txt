@@ -36,8 +36,8 @@ basic apps`_ project. [#]_
     Proceed through the tutorial sections sequentially for step-by-step
     instructions.
 
-.. _OGC: http://www.opengeospatial.org/
-.. _world borders: http://thematicmapping.org/downloads/world_borders.php
+.. _OGC: https://www.opengeospatial.org/
+.. _world borders: https://thematicmapping.org/downloads/world_borders.php
 .. _GeoDjango basic apps: https://code.google.com/p/geodjango-basic-apps/
 
 Setting Up
@@ -115,7 +115,7 @@ unzip. On GNU/Linux platforms, use the following commands:
 
     $ mkdir world/data
     $ cd world/data
-    $ wget http://thematicmapping.org/downloads/TM_WORLD_BORDERS-0.3.zip
+    $ wget https://thematicmapping.org/downloads/TM_WORLD_BORDERS-0.3.zip
     $ unzip TM_WORLD_BORDERS-0.3.zip
     $ cd ../..
 
@@ -131,7 +131,7 @@ extensions:
 * ``.prj``: Contains the spatial reference information for the geographic
   data stored in the shapefile.
 
-__ http://thematicmapping.org/downloads/TM_WORLD_BORDERS-0.3.zip
+__ https://thematicmapping.org/downloads/TM_WORLD_BORDERS-0.3.zip
 __ https://en.wikipedia.org/wiki/Shapefile
 
 Use ``ogrinfo`` to examine spatial data
@@ -302,7 +302,7 @@ besides the tools included within GeoDjango, you may also use the following:
 * `shp2pgsql`_: This utility included with PostGIS imports ESRI shapefiles into
   PostGIS.
 
-.. _ogr2ogr: http://www.gdal.org/ogr2ogr.html
+.. _ogr2ogr: https://www.gdal.org/ogr2ogr.html
 .. _shp2pgsql: https://postgis.net/docs/using_postgis_dbmanagement.html#shp2pgsql_usage
 
 .. _gdalinterface:
@@ -745,7 +745,7 @@ position.
 .. _OpenLayers: https://openlayers.org/
 .. _Open Street Map: https://www.openstreetmap.org/
 .. _Vector Map Level 0: http://earth-info.nga.mil/publications/vmap0.html
-.. _OSGeo: http://www.osgeo.org
+.. _OSGeo: https://www.osgeo.org/
 
 .. _osmgeoadmin-intro:
 
@@ -769,11 +769,11 @@ option class in your ``admin.py`` file::
 .. rubric:: Footnotes
 
 .. [#] Special thanks to Bjørn Sandvik of `thematicmapping.org
-       <http://thematicmapping.org>`_ for providing and maintaining this
+       <https://thematicmapping.org/>`_ for providing and maintaining this
        dataset.
 .. [#] GeoDjango basic apps was written by Dane Springmeyer, Josh Livni, and
        Christopher Schmidt.
 .. [#] This point is the `University of Houston Law Center
        <https://www.law.uh.edu/>`_.
 .. [#] Open Geospatial Consortium, Inc., `OpenGIS Simple Feature Specification
-       For SQL <http://www.opengeospatial.org/standards/sfs>`_.
+       For SQL <https://www.opengeospatial.org/standards/sfs>`_.
