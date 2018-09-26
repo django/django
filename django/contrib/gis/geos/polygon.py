@@ -31,8 +31,7 @@ class Polygon(GEOSGeometry):
             return
 
         # Getting the ext_ring and init_holes parameters from the argument list
-        ext_ring = args[0]
-        init_holes = args[1:]
+        ext_ring, *init_holes = args
         n_holes = len(init_holes)
 
         # If initialized as Polygon(shell, (LinearRing, LinearRing)) [for backward-compatibility]

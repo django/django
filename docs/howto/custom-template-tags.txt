@@ -300,7 +300,7 @@ Template filter code falls into one of two situations:
 
       @register.filter(needs_autoescape=True)
       def initial_letter_filter(text, autoescape=True):
-          first, other = text[0], text[1:]
+          first, *other = text
           if autoescape:
               esc = conditional_escape
           else:
