@@ -1131,7 +1131,7 @@ def now(parser, token):
     """
     Display the date, formatted according to the given string.
 
-    Use the same format as PHP's ``date()`` function; see http://php.net/date
+    Use the same format as PHP's ``date()`` function; see https://php.net/date
     for all the possible values.
 
     Sample usage::

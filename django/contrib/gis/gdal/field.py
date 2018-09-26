@@ -8,7 +8,7 @@ from django.utils.encoding import force_text
 
 
 # For more information, see the OGR C API source code:
-#  http://www.gdal.org/ogr__api_8h.html
+#  https://www.gdal.org/ogr__api_8h.html
 #
 # The OGR_Fld_* routines are relevant here.
 class Field(GDALBase):
@@ -167,7 +167,7 @@ class OFTDateTime(Field):
     def value(self):
         "Return a Python `datetime` object for this OFTDateTime field."
         # TODO: Adapt timezone information.
-        #  See http://lists.osgeo.org/pipermail/gdal-dev/2006-February/007990.html
+        #  See https://lists.osgeo.org/pipermail/gdal-dev/2006-February/007990.html
         #  The `tz` variable has values of: 0=unknown, 1=localtime (ambiguous),
         #  100=GMT, 104=GMT+1, 80=GMT-5, etc.
         try:

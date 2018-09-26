@@ -335,5 +335,5 @@ JavaScript style
 For details about the JavaScript code style used by Django, see
 :doc:`javascript`.
 
-.. _editorconfig: http://editorconfig.org/
+.. _editorconfig: https://editorconfig.org/
 .. _flake8: https://pypi.org/project/flake8/

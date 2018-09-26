@@ -53,7 +53,7 @@ not cause any issues with the typical round-trip from ``dumpdata`` to
 ``loaddata``, but if you feed your own XML documents to the ``loaddata``
 management command, you will need to ensure they do not contain a DTD.
 
-.. _from the Python security team: http://blog.python.org/2013/02/announcing-defusedxml-fixes-for-xml.html
+.. _from the Python security team: https://blog.python.org/2013/02/announcing-defusedxml-fixes-for-xml.html
 
 
 Formset memory exhaustion

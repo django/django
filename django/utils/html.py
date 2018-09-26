@@ -204,8 +204,8 @@ def smart_urlquote(url):
     def unquote_quote(segment):
         segment = unquote(segment)
         # Tilde is part of RFC3986 Unreserved Characters
-        # http://tools.ietf.org/html/rfc3986#section-2.3
-        # See also http://bugs.python.org/issue16285
+        # https://tools.ietf.org/html/rfc3986#section-2.3
+        # See also https://bugs.python.org/issue16285
         return quote(segment, safe=RFC3986_SUBDELIMS + RFC3986_GENDELIMS + '~')
 
     # Handle IDN before quoting.

@@ -152,7 +152,7 @@ class BaseDatabaseFeatures:
     can_distinct_on_fields = False
 
     # Does the backend decide to commit before SAVEPOINT statements
-    # when autocommit is disabled? http://bugs.python.org/issue8145#msg109965
+    # when autocommit is disabled? https://bugs.python.org/issue8145#msg109965
     autocommits_when_autocommit_is_off = False
 
     # Does the backend prevent running SQL queries in broken transactions?

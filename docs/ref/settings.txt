@@ -3085,7 +3085,7 @@ session if the session cookie is sent unencrypted, there's really no good
 excuse to leave this off. It will prevent you from using sessions on insecure
 requests and that's a good thing.
 
-.. _Firesheep: http://codebutler.com/firesheep
+.. _Firesheep: https://codebutler.com/firesheep/
 
 .. setting:: SESSION_ENGINE
 

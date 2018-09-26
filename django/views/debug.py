@@ -369,7 +369,7 @@ class ExceptionReporter:
             encoding = 'ascii'
             for line in source[:2]:
                 # File coding may be specified. Match pattern from PEP-263
-                # (http://www.python.org/dev/peps/pep-0263/)
+                # (https://www.python.org/dev/peps/pep-0263/)
                 match = re.search(br'coding[:=]\s*([-\w.]+)', line)
                 if match:
                     encoding = match.group(1).decode('ascii')
