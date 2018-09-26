@@ -1,5 +1,6 @@
 from django.db.backends.base.features import BaseDatabaseFeatures
 from django.db.utils import InterfaceError
+from django.utils.functional import cached_property
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
@@ -55,3 +56,11 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_callproc_kwargs = True
     supports_over_clause = True
     max_query_params = 2**16 - 1
+
+    @cached_property
+    def has_fetch_offset_support(self):
+        return self.connection.oracle_version >= (12, 2)
+
+    @cached_property
+    def allow_sliced_subqueries_with_in(self):
+        return self.has_fetch_offset_support
