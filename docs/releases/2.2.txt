@@ -266,6 +266,7 @@ Database backend API
 -------------------------
 
 * Support for GDAL 1.9 and 1.10 is dropped.
+* Support for PostGIS 2.1 and 2.2 is dropped.
 
 Miscellaneous
 -------------
