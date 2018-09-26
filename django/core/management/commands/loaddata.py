@@ -327,7 +327,7 @@ class Command(BaseCommand):
             else:
                 raise CommandError(
                     "Problem installing fixture '%s': %s is not a known "
-                    "serialization format." % (''.join(parts[:-1]), parts[-1]))
+                    "serialization format." % ('.'.join(parts[:-1]), parts[-1]))
         else:
             ser_fmt = None
 
