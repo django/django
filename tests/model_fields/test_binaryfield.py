@@ -34,3 +34,13 @@ class BinaryFieldTests(TestCase):
         self.assertIs(field.editable, True)
         field = models.BinaryField(editable=False)
         self.assertIs(field.editable, False)
+
+    def test_filter(self):
+        dm = DataModel.objects.create(data=self.binary_data)
+        DataModel.objects.create(data=b'\xef\xbb\xbf')
+        self.assertSequenceEqual(DataModel.objects.filter(data=self.binary_data), [dm])
+
+    def test_filter_memoryview(self):
+        dm = DataModel.objects.create(data=self.binary_data)
+        DataModel.objects.create(data=b'\xef\xbb\xbf')
+        self.assertSequenceEqual(DataModel.objects.filter(data=memoryview(self.binary_data)), [dm])
