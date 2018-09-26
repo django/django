@@ -22,3 +22,6 @@ Bugfixes
 
 * Fixed a regression in Django 2.0 where unique index names weren't quoted
   (:ticket:`29778`).
+
+* Fixed a regression where sliced queries with multiple columns with the same
+  name crashed on Oracle 12.1 (:ticket:`29630`).
