@@ -209,6 +209,11 @@ Models
 * The new :meth:`.QuerySet.bulk_update` method allows efficiently updating
   specific fields on multiple model instances.
 
+* Django no longer always starts a transaction when a single query is being
+  performed, such as ``Model.save()``, ``QuerySet.update()``, and
+  ``Model.delete()``. This improves the performance of autocommit by reducing
+  the number of database round trips.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
