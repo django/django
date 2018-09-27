@@ -13,6 +13,10 @@ __pycache__/
 TODO
 node_modules
 
+# Pipenv
+Pipfile
+Pipfile.lock
+
 # IDE and Tooling files
 .idea/*
 *~

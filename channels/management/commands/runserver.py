@@ -1,4 +1,5 @@
 import datetime
+import logging
 import sys
 
 from django.apps import apps
@@ -7,12 +8,13 @@ from django.core.management import CommandError
 from django.core.management.commands.runserver import Command as RunserverCommand
 
 from channels import __version__
-from channels.log import setup_logger
 from channels.routing import get_default_application
 from daphne.endpoints import build_endpoint_description_strings
 from daphne.server import Server
 
 from ...staticfiles import StaticFilesWrapper
+
+logger = logging.getLogger("django.channels.server")
 
 
 class Command(RunserverCommand):
@@ -46,8 +48,6 @@ class Command(RunserverCommand):
         )
 
     def handle(self, *args, **options):
-        self.verbosity = options.get("verbosity", 1)
-        self.logger = setup_logger("django.channels", self.verbosity)
         self.http_timeout = options.get("http_timeout", None)
         self.websocket_handshake_timeout = options.get("websocket_handshake_timeout", 5)
         # Check Channels is installed right
@@ -92,7 +92,7 @@ class Command(RunserverCommand):
 
         # Launch server in 'main' thread. Signals are disabled as it's still
         # actually a subthread under the autoreloader.
-        self.logger.debug("Daphne running, listening on %s:%s", self.addr, self.port)
+        logger.debug("Daphne running, listening on %s:%s", self.addr, self.port)
 
         # build the endpoint description string from host/port options
         endpoints = build_endpoint_description_strings(host=self.addr, port=self.port)
@@ -106,7 +106,7 @@ class Command(RunserverCommand):
                 root_path=getattr(settings, "FORCE_SCRIPT_NAME", "") or "",
                 websocket_handshake_timeout=self.websocket_handshake_timeout,
             ).run()
-            self.logger.debug("Daphne exited")
+            logger.debug("Daphne exited")
         except KeyboardInterrupt:
             shutdown_message = options.get("shutdown_message", "")
             if shutdown_message:
@@ -131,39 +131,34 @@ class Command(RunserverCommand):
         """
         Logs various different kinds of requests to the console.
         """
-        # All start with timestamp
-        msg = "[%s] " % datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
         # HTTP requests
         if protocol == "http" and action == "complete":
-            msg += (
-                "HTTP %(method)s %(path)s %(status)s [%(time_taken).2f, %(client)s]\n"
-                % details
-            )
+            msg = "HTTP %(method)s %(path)s %(status)s [%(time_taken).2f, %(client)s]"
+
             # Utilize terminal colors, if available
             if 200 <= details["status"] < 300:
                 # Put 2XX first, since it should be the common case
-                msg = self.style.HTTP_SUCCESS(msg)
+                logger.info(self.style.HTTP_SUCCESS(msg), details)
             elif 100 <= details["status"] < 200:
-                msg = self.style.HTTP_INFO(msg)
+                logger.info(self.style.HTTP_INFO(msg), details)
             elif details["status"] == 304:
-                msg = self.style.HTTP_NOT_MODIFIED(msg)
+                logger.info(self.style.HTTP_NOT_MODIFIED(msg), details)
             elif 300 <= details["status"] < 400:
-                msg = self.style.HTTP_REDIRECT(msg)
+                logger.info(self.style.HTTP_REDIRECT(msg), details)
             elif details["status"] == 404:
-                msg = self.style.HTTP_NOT_FOUND(msg)
+                logger.warn(self.style.HTTP_NOT_FOUND(msg), details)
             elif 400 <= details["status"] < 500:
-                msg = self.style.HTTP_BAD_REQUEST(msg)
+                logger.warn(self.style.HTTP_BAD_REQUEST(msg), details)
             else:
                 # Any 5XX, or any other response
-                msg = self.style.HTTP_SERVER_ERROR(msg)
+                logger.error(self.style.HTTP_SERVER_ERROR(msg), details)
+
         # Websocket requests
         elif protocol == "websocket" and action == "connected":
-            msg += "WebSocket CONNECT %(path)s [%(client)s]\n" % details
+            logger.info("WebSocket CONNECT %(path)s [%(client)s]", details)
         elif protocol == "websocket" and action == "disconnected":
-            msg += "WebSocket DISCONNECT %(path)s [%(client)s]\n" % details
+            logger.info("WebSocket DISCONNECT %(path)s [%(client)s]", details)
         elif protocol == "websocket" and action == "connecting":
-            msg += "WebSocket HANDSHAKING %(path)s [%(client)s]\n" % details
+            logger.info("WebSocket HANDSHAKING %(path)s [%(client)s]", details)
         elif protocol == "websocket" and action == "rejected":
-            msg += "WebSocket REJECT %(path)s [%(client)s]\n" % details
-
-        sys.stderr.write(msg)
+            logger.info("WebSocket REJECT %(path)s [%(client)s]", details)
