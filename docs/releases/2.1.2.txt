@@ -35,3 +35,6 @@ Bugfixes
 
 * Fixed a regression where sliced queries with multiple columns with the same
   name crashed on Oracle 12.1 (:ticket:`29630`).
+
+* Fixed a crash when a user with the view (but not change) permission made a
+  POST request to an admin user change form (:ticket:`29809`).
