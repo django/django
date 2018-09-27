@@ -99,7 +99,7 @@ attribute. The ``name`` attribute of the base class will be ignored.
 In order to fully serialize your ``Restaurant`` instances, you will need to
 serialize the ``Place`` models as well::
 
-    all_objects = list(Restaurant.objects.all()) + list(Place.objects.all())
+    all_objects = [*Restaurant.objects.all(), *Place.objects.all()]
     data = serializers.serialize('xml', all_objects)
 
 Deserializing data
