@@ -5,7 +5,7 @@ def monkeypatch_django():
     # Ensure that the staticfiles version of runserver bows down to us
     # This one is particularly horrible
     from django.contrib.staticfiles.management.commands.runserver import (
-        Command as StaticRunserverCommand
+        Command as StaticRunserverCommand,
     )
     from .management.commands.runserver import Command as RunserverCommand
 
