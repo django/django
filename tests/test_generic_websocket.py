@@ -197,6 +197,41 @@ async def test_async_websocket_consumer_groups():
 
 
 @pytest.mark.asyncio
+async def test_async_websocket_consumer_specific_channel_layer():
+    """
+    Tests that AsyncWebsocketConsumer uses the specified channel layer.
+    """
+    results = {}
+
+    class TestConsumer(AsyncWebsocketConsumer):
+        channel_layer_alias = "testlayer"
+
+        async def receive(self, text_data=None, bytes_data=None):
+            results["received"] = (text_data, bytes_data)
+            await self.send(text_data=text_data, bytes_data=bytes_data)
+
+    channel_layers_setting = {
+        "testlayer": {"BACKEND": "channels.layers.InMemoryChannelLayer"}
+    }
+    with override_settings(CHANNEL_LAYERS=channel_layers_setting):
+        communicator = WebsocketCommunicator(TestConsumer, "/testws/")
+        await communicator.connect()
+
+        channel_layer = get_channel_layer("testlayer")
+        # Test that the specific channel layer is retreived
+        assert channel_layer != None
+
+        channel_name = list(channel_layer.channels.keys())[0]
+        message = {"type": "websocket.receive", "text": "hello"}
+        await channel_layer.send(channel_name, message)
+        response = await communicator.receive_from()
+        assert response == "hello"
+        assert results["received"] == ("hello", None)
+
+        await communicator.disconnect()
+
+
+@pytest.mark.asyncio
 async def test_json_websocket_consumer():
     """
     Tests that JsonWebsocketConsumer is implemented correctly.

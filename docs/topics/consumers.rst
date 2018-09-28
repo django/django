@@ -143,7 +143,20 @@ Channel Layers
 
 Consumers also let you deal with Channel's *channel layers*, to let them
 send messages between each other either one-to-one or via a broadcast system
-called groups. You can read more in :doc:`/topics/channel_layers`.
+called groups.
+
+Consumers will use the channel layer ``default`` unless
+the ``channel_layer_alias`` attribute is set when subclassing any
+of the provided ``Consumer`` classes.
+
+To use the channel layer ``echo_alias`` we would set it like so::
+
+    from channels.consumer import SyncConsumer
+
+    class EchoConsumer(SyncConsumer):
+        channel_layer_alias = "echo_alias"
+
+You can read more in :doc:`/topics/channel_layers`.
 
 
 .. _scope:
@@ -198,11 +211,11 @@ just deals with text and binary frames::
         groups = ["broadcast"]
 
         def connect(self):
-            # Called on connection. 
+            # Called on connection.
             # To accept the connection call:
             self.accept()
             # Or accept the connection and specify a chosen subprotocol.
-            # A list of subprotocols specified by the connecting client 
+            # A list of subprotocols specified by the connecting client
             # will be available in self.scope['subprotocols']
             self.accept("subprotocol")
             # To reject the connection, call:
@@ -251,11 +264,11 @@ is async, and the functions you need to write have to be as well::
         groups = ["broadcast"]
 
         async def connect(self):
-            # Called on connection. 
+            # Called on connection.
             # To accept the connection call:
             await self.accept()
             # Or accept the connection and specify a chosen subprotocol.
-            # A list of subprotocols specified by the connecting client 
+            # A list of subprotocols specified by the connecting client
             # will be available in self.scope['subprotocols']
             await self.accept("subprotocol")
             # To reject the connection, call:

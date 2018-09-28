@@ -2,6 +2,7 @@ import functools
 
 from asgiref.sync import async_to_sync
 
+from . import DEFAULT_CHANNEL_LAYER
 from .db import database_sync_to_async
 from .exceptions import StopConsumer
 from .layers import get_channel_layer
@@ -30,6 +31,7 @@ class AsyncConsumer:
     """
 
     _sync = False
+    channel_layer_alias = DEFAULT_CHANNEL_LAYER
 
     def __init__(self, scope):
         self.scope = scope
@@ -39,7 +41,7 @@ class AsyncConsumer:
         Dispatches incoming messages to type-based handlers asynchronously.
         """
         # Initalize channel layer
-        self.channel_layer = get_channel_layer()
+        self.channel_layer = get_channel_layer(self.channel_layer_alias)
         if self.channel_layer is not None:
             self.channel_name = await self.channel_layer.new_channel()
             self.channel_receive = functools.partial(

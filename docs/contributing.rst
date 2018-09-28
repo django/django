@@ -79,7 +79,7 @@ the ``tests`` extra, which will bring in testing depedencies like
 
 Then, you can run the tests::
 
-    ``pytest``
+    pytest
 
 
 Can you pay me for my time?
