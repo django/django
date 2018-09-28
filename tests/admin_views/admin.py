@@ -43,7 +43,8 @@ from .models import (
     Restaurant, RowLevelChangePermissionModel, Section, ShortMessage, Simple,
     Sketch, State, Story, StumpJoke, Subscriber, SuperVillain, Telegram, Thing,
     Topping, UnchangeableObject, UndeletableObject, UnorderedObject,
-    UserMessenger, Villain, Vodcast, Whatsit, Widget, Worker, WorkHour,
+    UserMessenger, UserProxy, Villain, Vodcast, Whatsit, Widget, Worker,
+    WorkHour,
 )
 
 
@@ -1075,6 +1076,7 @@ site.register(Ingredient)
 site.register(NotReferenced)
 site.register(ExplicitlyProvidedPK, GetFormsetsArgumentCheckingAdmin)
 site.register(ImplicitlyGeneratedPK, GetFormsetsArgumentCheckingAdmin)
+site.register(UserProxy)
 
 # Register core models we need in our tests
 site.register(User, UserAdmin)

@@ -52,7 +52,8 @@ from .models import (
     Report, Restaurant, RowLevelChangePermissionModel, SecretHideout, Section,
     ShortMessage, Simple, State, Story, SuperSecretHideout, SuperVillain,
     Telegram, TitleTranslation, Topping, UnchangeableObject, UndeletableObject,
-    UnorderedObject, Villain, Vodcast, Whatsit, Widget, Worker, WorkHour,
+    UnorderedObject, UserProxy, Villain, Vodcast, Whatsit, Widget, Worker,
+    WorkHour,
 )
 
 ERROR_MESSAGE = "Please enter the correct username and password \
@@ -1362,10 +1363,10 @@ class CustomModelAdminTest(AdminViewBasicTestCase):
         self.assertEqual(response.status_code, 200)
 
 
-def get_perm(Model, perm):
+def get_perm(Model, codename):
     """Return the permission object, for the Model"""
-    ct = ContentType.objects.get_for_model(Model)
-    return Permission.objects.get(content_type=ct, codename=perm)
+    ct = ContentType.objects.get_for_model(Model, for_concrete_model=False)
+    return Permission.objects.get(content_type=ct, codename=codename)
 
 
 @override_settings(
@@ -2382,6 +2383,81 @@ class AdminViewPermissionsTest(TestCase):
             '<li class="success">The article "Fun &amp; games" was added successfully.</li>',
             html=True
         )
+
+
+@override_settings(
+    ROOT_URLCONF='admin_views.urls',
+    TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    }],
+)
+class AdminViewProxyModelPermissionsTests(TestCase):
+    """Tests for proxy models permissions in the admin."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.viewuser = User.objects.create_user(username='viewuser', password='secret', is_staff=True)
+        cls.adduser = User.objects.create_user(username='adduser', password='secret', is_staff=True)
+        cls.changeuser = User.objects.create_user(username='changeuser', password='secret', is_staff=True)
+        cls.deleteuser = User.objects.create_user(username='deleteuser', password='secret', is_staff=True)
+        # Setup permissions.
+        opts = UserProxy._meta
+        cls.viewuser.user_permissions.add(get_perm(UserProxy, get_permission_codename('view', opts)))
+        cls.adduser.user_permissions.add(get_perm(UserProxy, get_permission_codename('add', opts)))
+        cls.changeuser.user_permissions.add(get_perm(UserProxy, get_permission_codename('change', opts)))
+        cls.deleteuser.user_permissions.add(get_perm(UserProxy, get_permission_codename('delete', opts)))
+        # UserProxy instances.
+        cls.user_proxy = UserProxy.objects.create(username='user_proxy', password='secret')
+
+    def test_add(self):
+        self.client.force_login(self.adduser)
+        url = reverse('admin:admin_views_userproxy_add')
+        data = {
+            'username': 'can_add',
+            'password': 'secret',
+            'date_joined_0': '2019-01-15',
+            'date_joined_1': '16:59:10',
+        }
+        response = self.client.post(url, data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(UserProxy.objects.filter(username='can_add').exists())
+
+    def test_view(self):
+        self.client.force_login(self.viewuser)
+        response = self.client.get(reverse('admin:admin_views_userproxy_changelist'))
+        self.assertContains(response, '<h1>Select user proxy to view</h1>')
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('admin:admin_views_userproxy_change', args=(self.user_proxy.pk,)))
+        self.assertContains(response, '<h1>View user proxy</h1>')
+        self.assertContains(response, '<div class="readonly">user_proxy</div>')
+
+    def test_change(self):
+        self.client.force_login(self.changeuser)
+        data = {
+            'password': self.user_proxy.password,
+            'username': self.user_proxy.username,
+            'date_joined_0': self.user_proxy.date_joined.strftime('%Y-%m-%d'),
+            'date_joined_1': self.user_proxy.date_joined.strftime('%H:%M:%S'),
+            'first_name': 'first_name',
+        }
+        url = reverse('admin:admin_views_userproxy_change', args=(self.user_proxy.pk,))
+        response = self.client.post(url, data)
+        self.assertRedirects(response, reverse('admin:admin_views_userproxy_changelist'))
+        self.assertEqual(UserProxy.objects.get(pk=self.user_proxy.pk).first_name, 'first_name')
+
+    def test_delete(self):
+        self.client.force_login(self.deleteuser)
+        url = reverse('admin:admin_views_userproxy_delete', args=(self.user_proxy.pk,))
+        response = self.client.post(url, {'post': 'yes'}, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(UserProxy.objects.filter(pk=self.user_proxy.pk).exists())
 
 
 @override_settings(ROOT_URLCONF='admin_views.urls')
