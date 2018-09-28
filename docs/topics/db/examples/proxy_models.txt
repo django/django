@@ -1,0 +1,96 @@
+===========================
+Proxy model as relationship
+===========================
+
+You can use a proxy model, instead of its concrete model, as ``ForeignKey``,
+``ManyToManyField``, or ``OneToOneField``.
+
+We will use ``Student`` as our main proxy model:
+
+.. code-block:: python
+
+    from django.contrib.auth import get_user_model
+
+    class Student(get_user_model()):
+        class Meta:
+            proxy = True
+
+        def graduate(self):
+            print('Congrats, you got your Pizza degree!')
+
+ForeignKey
+~~~~~~~~~~
+
+.. code-block:: python
+
+    from django.db import models
+
+    class Grade(models.Model):
+        student = models.ForeignKey(Student)
+        value = models.IntegerField()
+
+.. code-block:: pycon
+
+    >>> student = Student.objects.create(first_name='Pizza', last_name='Iolo')
+    >>> grade = Grade.objects.create(student=student, value=480)
+    >>> grade.student.graduate()
+    'Congrats, you got your Pizza degree!'
+    >>> Student.objects.filter(grade__value__gt=450).get()
+    <Student: Pizza Iolo>
+    # You can do the lookup on `Grade` in a `User` queryset
+    >>> user = User.objects.filter(grade__value__gt=450).get()
+    >>> user == student
+    True
+    >>> # The `User` instances don't have the custom methods of `Student`
+    >>> user.graduate()
+    AttributeError: 'User' object has no attribute 'graduate'
+    >>> # You can get a `Student` from a `User` and vice versa by querying by pk
+    >>> Student.objects.get(pk=user.pk)
+    <Student: Pizza Iolo>
+
+OneToOneField
+~~~~~~~~~~~~~
+
+.. code-block:: python
+
+    from django.db import models
+
+    class LibraryCard(models.Model):
+        student = models.OneToOneField(Student)
+        code = models.CharField(max_length=10)
+
+.. code-block:: pycon
+
+    >>> # You can use a `User` or `Student` instance to create a `LibraryCard`
+    >>> LibraryCard.objects.create(student=user, code='abcd12345')
+    >>> user.library_card
+    <LibraryCard: abcd12345>
+    >>> student.refresh_from_db()
+    >>> student.library_card
+    <LibraryCard: abcd12345>
+    >>> # And just like for a `ForeignKey`, you can do the lookup on `User`
+    >>> User.objects.get(librarycard__code='abcd1235')
+
+ManyToManyField
+~~~~~~~~~~~~~~~
+
+.. code-block:: python
+
+    from django.db import models
+
+    class Course(models.Model):
+        students = models.ManyToManyField(Student)
+        code = models.CharField(max_length=5)
+
+.. code-block:: pycon
+
+    >>> course = Class.objects.create(code='PZ101')
+    >>> # You must use a `Student` instance to add a relation
+    >>> course.students.add(user)
+    TypeError: 'Student' instance expected, got <User: Pizza Iolo>
+    >>> course.students.add(student)
+    >>> course.students.all()
+    <QuerySet [<Student: Pizza Iolo>]>
+    >>> # But you can still do lookups from `User`
+    >>> User.objects.filter(course__isnull=False).count()
+    1

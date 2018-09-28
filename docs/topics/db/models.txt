@@ -1242,7 +1242,9 @@ For example, suppose you want to add a method to the ``Person`` model. You can d
 
 The ``MyPerson`` class operates on the same database table as its parent
 ``Person`` class. In particular, any new instances of ``Person`` will also be
-accessible through ``MyPerson``, and vice-versa::
+accessible through ``MyPerson``, and vice-versa:
+
+.. code-block:: pycon
 
     >>> p = Person.objects.create(first_name="foobar")
     >>> MyPerson.objects.get(first_name="foobar")
@@ -1273,6 +1275,12 @@ on the original ``Person`` will use those and your own code can use the
 extensions you included (that no other code is relying on anyway). It is not
 a way to replace the ``Person`` (or any other) model everywhere with something
 of your own creation.
+
+>>> Person.objects.create(first_name="foobar")
+>>> Person.objects.all()
+<QuerySet [<Person: foobar>]>
+>>> MyPerson.objects.all()
+<QuerySet [<MyPerson: foobar>]
 
 Base class restrictions
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1325,6 +1333,34 @@ containing the new managers and inherit that after the primary base class::
 
 You probably won't need to do this very often, but, when you do, it's
 possible.
+
+Another use case for proxy models is to represent a subset of the concrete
+model they subclass. For example::
+
+    from django.contrib.auth import get_user_model
+    from django.contrib.auth.models import UserManager
+
+    class StaffUserManager(UserManager):
+        def get_queryset(self):
+            queryset = super().get_queryset()
+            return queryset.filter(is_staff=True)
+
+    class StaffUser(get_user_model()):
+        objects = StaffUserManager()
+
+        class Meta:
+            proxy = True
+
+    >>> User.objects.create(is_staff=False)
+    >>> User.objects.count()
+    1
+    >>> StaffUser.objects.count()
+    0
+    >>> User.objects.create(is_staff=True)
+    >>> User.objects.count()
+    2
+    >>> StaffUser.objects.count()
+    1
 
 .. _proxy-vs-unmanaged-models:
 

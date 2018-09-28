@@ -8,3 +8,4 @@ Examples of model relationship API usage
    many_to_many
    many_to_one
    one_to_one
+   proxy_models
