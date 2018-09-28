@@ -15,9 +15,7 @@ def _get_all_permissions(opts):
     """
     Return (codename, name) for all permissions in the given opts.
     """
-    builtin = _get_builtin_permissions(opts)
-    custom = list(opts.permissions)
-    return builtin + custom
+    return [*_get_builtin_permissions(opts), *opts.permissions]
 
 
 def _get_builtin_permissions(opts):

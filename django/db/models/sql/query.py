@@ -1096,12 +1096,11 @@ class Query:
         and get_transform().
         """
         # __exact is the default lookup if one isn't given.
-        lookups = lookups or ['exact']
-        for name in lookups[:-1]:
+        *transforms, lookup_name = lookups or ['exact']
+        for name in transforms:
             lhs = self.try_transform(lhs, name)
         # First try get_lookup() so that the lookup takes precedence if the lhs
         # supports both transform and lookup for the name.
-        lookup_name = lookups[-1]
         lookup_class = lhs.get_lookup(lookup_name)
         if not lookup_class:
             if lhs.field.is_relation:
@@ -1406,11 +1405,11 @@ class Query:
                 # one step.
                 pos -= 1
                 if pos == -1 or fail_on_missing:
-                    field_names = list(get_field_names_from_opts(opts))
-                    available = sorted(
-                        field_names + list(self.annotation_select) +
-                        list(self._filtered_relations)
-                    )
+                    available = sorted([
+                        *get_field_names_from_opts(opts),
+                        *self.annotation_select,
+                        *self._filtered_relations,
+                    ])
                     raise FieldError("Cannot resolve keyword '%s' into field. "
                                      "Choices are: %s" % (name, ", ".join(available)))
                 break
@@ -1776,10 +1775,10 @@ class Query:
                 # from the model on which the lookup failed.
                 raise
             else:
-                names = sorted(
-                    list(get_field_names_from_opts(opts)) + list(self.extra) +
-                    list(self.annotation_select) + list(self._filtered_relations)
-                )
+                names = sorted([
+                    *get_field_names_from_opts(opts), *self.extra,
+                    *self.annotation_select, *self._filtered_relations
+                ])
                 raise FieldError("Cannot resolve keyword %r into field. "
                                  "Choices are: %s" % (name, ", ".join(names)))
 

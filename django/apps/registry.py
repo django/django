@@ -389,7 +389,7 @@ class Apps:
         # to lazy_model_operation() along with the remaining model args and
         # repeat until all models are loaded and all arguments are applied.
         else:
-            next_model, more_models = model_keys[0], model_keys[1:]
+            next_model, *more_models = model_keys
 
             # This will be executed after the class corresponding to next_model
             # has been imported and registered. The `func` attribute provides

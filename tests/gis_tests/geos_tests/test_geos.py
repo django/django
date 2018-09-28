@@ -476,8 +476,8 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 Polygon('foo')
 
             # Polygon(shell, (hole1, ... holeN))
-            rings = tuple(r for r in poly)
-            self.assertEqual(poly, Polygon(rings[0], rings[1:]))
+            ext_ring, *int_rings = poly
+            self.assertEqual(poly, Polygon(ext_ring, int_rings))
 
             # Polygon(shell_tuple, hole_tuple1, ... , hole_tupleN)
             ring_tuples = tuple(r.tuple for r in poly)

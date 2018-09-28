@@ -261,14 +261,14 @@ class StateApps(Apps):
                 self.real_models.append(ModelState.from_model(model, exclude_rels=True))
         # Populate the app registry with a stub for each application.
         app_labels = {model_state.app_label for model_state in models.values()}
-        app_configs = [AppConfigStub(label) for label in sorted(real_apps + list(app_labels))]
+        app_configs = [AppConfigStub(label) for label in sorted([*real_apps, *app_labels])]
         super().__init__(app_configs)
 
         # The lock gets in the way of copying as implemented in clone(), which
         # is called whenever Django duplicates a StateApps before updating it.
         self._lock = None
 
-        self.render_multiple(list(models.values()) + self.real_models)
+        self.render_multiple([*models.values(), *self.real_models])
 
         # There shouldn't be any operations pending at this point.
         from django.core.checks.model_checks import _check_lazy_references
