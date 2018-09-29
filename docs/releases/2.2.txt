@@ -293,6 +293,11 @@ Miscellaneous
 
 * Support for bytestring paths in the template filesystem loader is removed.
 
+* When :exc:`~django.core.exceptions.FieldError` is raised because of an unsupported
+  or invalid lookup field, the error message may suggest alternatives that are
+  typographically similar, e.g. it may suggest 'isnull' if a user incorrectly writes
+  'is_null'.
+
 .. _deprecated-features-2.2:
 
 Features deprecated in 2.2
