@@ -5,14 +5,15 @@
 # Erik Wognsen <r4mses@gmail.com>, 2013-2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Stevenn, 2013
+# tiktuk <tiktuk@gmail.com>, 2018
 # valberg <valberg@orn.li>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-09-24 16:13+0000\n"
-"Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
+"PO-Revision-Date: 2018-08-23 08:30+0000\n"
+"Last-Translator: tiktuk <tiktuk@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -80,8 +81,8 @@ msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
-"Indtast venligst et korrekt %(username)s og adgangskode. Bemærk at begge "
-"felter kan være versalfølsomme."
+"Indtast venligst korrekt %(username)s og adgangskode. Bemærk at begge felter "
+"kan være versalfølsomme."
 
 msgid "This account is inactive."
 msgstr "Denne konto er inaktiv."
