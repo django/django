@@ -1,72 +1,72 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Eneko Illarramendi <eneko@illarra.com>, 2017-2018
-# Urtzi Odriozola <urtzi.odriozola@gmail.com>, 2017
+# Emin Mastizada <emin@linux.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-08-24 07:33+0000\n"
-"Last-Translator: Eneko Illarramendi <eneko@illarra.com>\n"
-"Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
+"PO-Revision-Date: 2018-09-09 13:45+0000\n"
+"Last-Translator: Emin Mastizada <emin@linux.com>\n"
+"Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
+"az/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: eu\n"
+"Language: az\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "PostgreSQL extensions"
-msgstr "PostgreSQL hedapenak"
+msgstr "PostgreSQL uzantıları"
 
 #, python-format
 msgid "Item %(nth)s in the array did not validate:"
-msgstr "Array-ko %(nth)s elementua ez da balekoa:"
+msgstr "Array-dəki %(nth)s element təsdiqlənə bilmir:"
 
 msgid "Nested arrays must have the same length."
-msgstr "Array habiaratuek luzera bera izan behar dute."
+msgstr "İç-içə array-lərin uzunluğu eyni olmalıdır."
 
 msgid "Map of strings to strings/nulls"
-msgstr "String-etik string/null-era mapa"
+msgstr "String-lərin string/null-lara xəritələnmə cədvəli"
 
 #, python-format
 msgid "The value of \"%(key)s\" is not a string or null."
-msgstr "\"%(key)s\"-ren balioa ez da string bat, edo null."
+msgstr "\"%(key)s\" dəyəri string və ya null deyil."
 
 msgid "A JSON object"
-msgstr "JSON objetu bat"
+msgstr "JSON obyekt"
 
 msgid "Value must be valid JSON."
-msgstr "Balioa ez da baleko JSON bat."
+msgstr "Dəyər düzgün JSON olmalıdır."
 
 msgid "Could not load JSON data."
-msgstr "Ezin izan dira JSON datuak kargatu."
+msgstr "JSON məlumat yüklənə bilmir."
 
 msgid "Input must be a JSON dictionary."
-msgstr "Sarrera JSON hiztegi bat izan behar da."
+msgstr "Giriş JSON lüğət olmalıdır."
 
 #, python-format
 msgid "'%(value)s' value must be valid JSON."
-msgstr "'%(value)s' balioa ez da baleko JSON bat."
+msgstr "'%(value)s' dəyəri düzgün JSON olmalıdır."
 
 msgid "Enter two valid values."
-msgstr "Idatzi bi baleko balio."
+msgstr "İki düzgün dəyər daxil edin."
 
 msgid "The start of the range must not exceed the end of the range."
-msgstr "Tartearen hasierak ezin du amaierako tartearen balioa gainditu."
+msgstr "Aralığın başlanğıcı bitişindən böyük ola bilməz."
 
 msgid "Enter two whole numbers."
-msgstr "Idatzi bi zenbaki oso."
+msgstr "İki tam rəqəm daxil edin."
 
 msgid "Enter two numbers."
-msgstr "Idatzi bi zenbaki."
+msgstr "İki rəqəm daxil edin."
 
 msgid "Enter two valid date/times."
-msgstr "Idatzi bi baleko data/ordu."
+msgstr "İki düzgün tarix/vaxt daxil edin."
 
 msgid "Enter two valid dates."
-msgstr "Idatzi bi baleko data."
+msgstr "İki düzgün tarix daxil edin."
 
 #, python-format
 msgid ""
@@ -76,11 +76,9 @@ msgid_plural ""
 "List contains %(show_value)d items, it should contain no more than "
 "%(limit_value)d."
 msgstr[0] ""
-"Zerrendak elementu %(show_value)d du, ez lituzke %(limit_value)dbaino "
-"gehiago izan behar."
+"Siyahıda %(show_value)d element var, ən çox %(limit_value)d ola bilər."
 msgstr[1] ""
-"Zerrendak %(show_value)d elementu ditu, ez lituzke %(limit_value)d baino "
-"gehiago izan behar."
+"Siyahıda %(show_value)d element var, ən çox %(limit_value)d ola bilər."
 
 #, python-format
 msgid ""
@@ -90,29 +88,25 @@ msgid_plural ""
 "List contains %(show_value)d items, it should contain no fewer than "
 "%(limit_value)d."
 msgstr[0] ""
-"Zerrendak elementu %(show_value)d du, ez lituzke %(limit_value)d baino "
-"gutxiago izan behar."
+"Siyahıda %(show_value)d element var, ən az %(limit_value)d ola bilər."
 msgstr[1] ""
-"Zerrendak %(show_value)d elementu ditu, ez lituzke %(limit_value)d baino "
-"gutxiago izan behar."
+"Siyahıda %(show_value)d element var, ən az %(limit_value)d ola bilər."
 
 #, python-format
 msgid "Some keys were missing: %(keys)s"
-msgstr "Gako batzuk falta dira: %(keys)s"
+msgstr "Bəzi açarlar əksikdir: %(keys)s"
 
 #, python-format
 msgid "Some unknown keys were provided: %(keys)s"
-msgstr "Gako ezezagun batzuk eman dira: %(keys)s"
+msgstr "Bəzi bilinməyən açarlar təchiz edilib: %(keys)s"
 
 #, python-format
 msgid ""
 "Ensure that this range is completely less than or equal to %(limit_value)s."
-msgstr ""
-"Ziurtatu guztiz tarte hau %(limit_value)s baino txikiagoa edo berdina dela."
+msgstr "Bu aralığın %(limit_value)s və ya daha az olduğuna əmin olun."
 
 #, python-format
 msgid ""
 "Ensure that this range is completely greater than or equal to "
 "%(limit_value)s."
-msgstr ""
-"Ziurtatu guztiz tarte hau %(limit_value)s baino handiagoa edo berdina dela."
+msgstr "Bu aralığın %(limit_value)s və ya daha böyük olduğuna əmin olun."

@@ -31,7 +31,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-05-18 23:43+0000\n"
+"PO-Revision-Date: 2018-09-17 17:25+0000\n"
 "Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -516,7 +516,7 @@ msgstr "wartość '%(value)s' musi być True lub False."
 
 #, python-format
 msgid "'%(value)s' value must be either True, False, or None."
-msgstr "Wartość „%(value)s” musi wynosić True, False lub None."
+msgstr "Wartość „%(value)s” musi być True, False lub None."
 
 msgid "Boolean (Either True or False)"
 msgstr "Wartość logiczna (True lub False – prawda lub fałsz)"
