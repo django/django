@@ -416,8 +416,8 @@ guaranteed to fit numbers from ``-9223372036854775808`` to
 
 .. class:: BinaryField(max_length=None, **options)
 
-A field to store raw binary data. It can be assigned :class:`bytes` or a
-:class:`memoryview`.
+A field to store raw binary data. It can be assigned :class:`bytes`,
+:class:`bytearray`, or :class:`memoryview`.
 
 By default, ``BinaryField`` sets :attr:`~Field.editable` to ``False``, in which
 case it can't be included in a :class:`~django.forms.ModelForm`.
