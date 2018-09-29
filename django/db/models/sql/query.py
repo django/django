@@ -9,6 +9,7 @@ all about the internals of models in order to get the information it needs.
 import functools
 from collections import Counter, OrderedDict, namedtuple
 from collections.abc import Iterator, Mapping
+import difflib
 from itertools import chain, count, product
 from string import ascii_uppercase
 
@@ -1140,10 +1141,17 @@ class Query:
         if transform_class:
             return transform_class(lhs)
         else:
+            cls = lhs.output_field.__class__
+            # get a list of all valid lookups for this class
+            lookups = cls.get_lookups()
+            alternatives = difflib.get_close_matches(name, lookups)
+            suggestion = "."  # just punctuation, to be used if there are no "did you mean"s available
+            if alternatives:
+                suggestion = "- perhaps you meant %s?" % " or ".join(alternatives)
             raise FieldError(
                 "Unsupported lookup '%s' for %s or join on the field not "
-                "permitted." %
-                (name, lhs.output_field.__class__.__name__))
+                "permitted%s" %
+                (name, cls.__name__, suggestion))
 
     def build_filter(self, filter_expr, branch_negated=False, current_negated=False,
                      can_reuse=None, allow_joins=True, split_subq=True,
