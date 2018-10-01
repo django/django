@@ -2,7 +2,7 @@
 Django 2.1.2 release notes
 ==========================
 
-*Expected October 1, 2018*
+*October 1, 2018*
 
 Django 2.1.2 fixes a security issue and several bugs in 2.1.1. Also, the latest
 string translations from Transifex are incorporated.
