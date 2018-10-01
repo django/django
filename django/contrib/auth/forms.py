@@ -12,7 +12,6 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMultiAlternatives
 from django.template import loader
-from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.text import capfirst
 from django.utils.translation import gettext, gettext_lazy as _
@@ -284,7 +283,7 @@ class PasswordResetForm(forms.Form):
                 'email': email,
                 'domain': domain,
                 'site_name': site_name,
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
+                'uid': urlsafe_base64_encode(str(user.pk).encode()).decode(),
                 'user': user,
                 'token': token_generator.make_token(user),
                 'protocol': 'https' if use_https else 'http',
