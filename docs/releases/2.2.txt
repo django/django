@@ -298,6 +298,10 @@ Miscellaneous
 
 * Support for bytestring paths in the template filesystem loader is removed.
 
+* :func:`django.utils.http.urlsafe_base64_encode` now returns a string instead
+  of a bytestring, and :func:`django.utils.http.urlsafe_base64_decode` may no
+  longer be passed a bytestring.
+
 .. _deprecated-features-2.2:
 
 Features deprecated in 2.2

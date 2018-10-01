@@ -726,13 +726,21 @@ escaping HTML.
 
 .. function:: urlsafe_base64_encode(s)
 
-    Encodes a bytestring in base64 for use in URLs, stripping any trailing
-    equal signs.
+    Encodes a bytestring to a base64 string for use in URLs, stripping any
+    trailing equal signs.
+
+    .. versionchanged:: 2.2
+
+        In older versions, it returns a bytestring instead of a string.
 
 .. function::  urlsafe_base64_decode(s)
 
     Decodes a base64 encoded string, adding back any trailing equal signs that
     might have been stripped.
+
+    .. versionchanged:: 2.2
+
+        In older versions, ``s`` may be a bytestring.
 
 ``django.utils.module_loading``
 ===============================
