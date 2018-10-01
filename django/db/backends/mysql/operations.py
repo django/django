@@ -5,7 +5,6 @@ from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.utils import timezone
 from django.utils.duration import duration_microseconds
-from django.utils.encoding import force_text
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -142,7 +141,10 @@ class DatabaseOperations(BaseDatabaseOperations):
         # With MySQLdb, cursor objects have an (undocumented) "_last_executed"
         # attribute where the exact query sent to the database is saved.
         # See MySQLdb/cursors.py in the source distribution.
-        return force_text(getattr(cursor, '_last_executed', None), errors='replace')
+        query = getattr(cursor, '_last_executed', None)
+        if query is not None:
+            query = query.decode(errors='replace')
+        return query
 
     def no_limit_value(self):
         # 2**64 - 1, as recommended by the MySQL documentation
@@ -233,9 +235,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     def get_db_converters(self, expression):
         converters = super().get_db_converters(expression)
         internal_type = expression.output_field.get_internal_type()
-        if internal_type == 'TextField':
-            converters.append(self.convert_textfield_value)
-        elif internal_type in ['BooleanField', 'NullBooleanField']:
+        if internal_type in ['BooleanField', 'NullBooleanField']:
             converters.append(self.convert_booleanfield_value)
         elif internal_type == 'DateTimeField':
             if settings.USE_TZ:
@@ -243,11 +243,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         elif internal_type == 'UUIDField':
             converters.append(self.convert_uuidfield_value)
         return converters
-
-    def convert_textfield_value(self, value, expression, connection):
-        if value is not None:
-            value = force_text(value)
-        return value
 
     def convert_booleanfield_value(self, value, expression, connection):
         if value in (0, 1):
