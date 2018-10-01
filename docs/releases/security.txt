@@ -902,7 +902,7 @@ Versions affected
 October 1, 2018 - :cve:`2018-16984`
 -----------------------------------
 
-Information disclosure in Django Admin. `Full description
+Password hash disclosure to "view only" admin users. `Full description
 <https://www.djangoproject.com/weblog/2018/oct/01/security-release/>`__
 
 Versions affected
