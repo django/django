@@ -381,8 +381,9 @@ class MigrateTests(MigrationTestBase):
 
     @override_settings(INSTALLED_APPS=['migrations.migrations_test_apps.unmigrated_app'])
     def test_showmigrations_unmigrated_app(self):
-        with self.assertRaisesMessage(CommandError, 'No migrations present for: unmigrated_app'):
-            call_command('showmigrations', 'unmigrated_app')
+        out = io.StringIO()
+        call_command('showmigrations', 'unmigrated_app', stdout=out, no_color=True)
+        self.assertEqual('unmigrated_app\n (no migrations)\n', out.getvalue().lower())
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_empty"})
     def test_showmigrations_plan_no_migrations(self):
@@ -390,12 +391,12 @@ class MigrateTests(MigrationTestBase):
         Tests --plan output of showmigrations command without migrations
         """
         out = io.StringIO()
-        call_command("showmigrations", format='plan', stdout=out)
-        self.assertEqual("", out.getvalue().lower())
+        call_command('showmigrations', format='plan', stdout=out, no_color=True)
+        self.assertEqual('(no migrations)\n', out.getvalue().lower())
 
         out = io.StringIO()
-        call_command("showmigrations", format='plan', stdout=out, verbosity=2)
-        self.assertEqual("", out.getvalue().lower())
+        call_command('showmigrations', format='plan', stdout=out, verbosity=2, no_color=True)
+        self.assertEqual('(no migrations)\n', out.getvalue().lower())
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed_complex"})
     def test_showmigrations_plan_squashed(self):
@@ -522,22 +523,10 @@ class MigrateTests(MigrationTestBase):
         )
 
     @override_settings(INSTALLED_APPS=['migrations.migrations_test_apps.unmigrated_app'])
-    def test_showmigrations_plan_app_label_error(self):
-        """
-        `showmigrations --plan app_label` raises an error when no app or
-        no migrations are present in provided app labels.
-        """
-        # App with no migrations.
-        with self.assertRaisesMessage(CommandError, 'No migrations present for: unmigrated_app'):
-            call_command('showmigrations', 'unmigrated_app', format='plan')
-        # Nonexistent app (wrong app label).
-        with self.assertRaisesMessage(CommandError, 'No migrations present for: nonexistent_app'):
-            call_command('showmigrations', 'nonexistent_app', format='plan')
-        # Multiple nonexistent apps; input order shouldn't matter.
-        with self.assertRaisesMessage(CommandError, 'No migrations present for: nonexistent_app1, nonexistent_app2'):
-            call_command('showmigrations', 'nonexistent_app1', 'nonexistent_app2', format='plan')
-        with self.assertRaisesMessage(CommandError, 'No migrations present for: nonexistent_app1, nonexistent_app2'):
-            call_command('showmigrations', 'nonexistent_app2', 'nonexistent_app1', format='plan')
+    def test_showmigrations_plan_app_label_no_migrations(self):
+        out = io.StringIO()
+        call_command('showmigrations', 'unmigrated_app', format='plan', stdout=out, no_color=True)
+        self.assertEqual('(no migrations)\n', out.getvalue())
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_sqlmigrate_forwards(self):
@@ -1560,6 +1549,18 @@ class AppLabelErrorTests(TestCase):
     def test_migrate_app_name_specified_as_label(self):
         with self.assertRaisesMessage(CommandError, self.did_you_mean_auth_error):
             call_command('migrate', 'django.contrib.auth')
+
+    def test_showmigrations_nonexistent_app_label(self):
+        err = io.StringIO()
+        with self.assertRaises(SystemExit):
+            call_command('showmigrations', 'nonexistent_app', stderr=err)
+        self.assertIn(self.nonexistent_app_error, err.getvalue())
+
+    def test_showmigrations_app_name_specified_as_label(self):
+        err = io.StringIO()
+        with self.assertRaises(SystemExit):
+            call_command('showmigrations', 'django.contrib.auth', stderr=err)
+        self.assertIn(self.did_you_mean_auth_error, err.getvalue())
 
     def test_sqlmigrate_nonexistent_app_label(self):
         with self.assertRaisesMessage(CommandError, self.nonexistent_app_error):
