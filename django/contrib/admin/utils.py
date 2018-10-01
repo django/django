@@ -13,6 +13,8 @@ from django.utils.html import format_html
 from django.utils.text import capfirst
 from django.utils.translation import ngettext, override as translation_override
 
+QUOTE_MAP = {i: '_%02X' % i for i in b'":/_#?;@&=+$,"[]<>%\n\\'}
+
 
 class FieldIsAForeignKeyColumnName(Exception):
     """A field is a foreign key attname, i.e. <FK>_id."""
@@ -64,14 +66,7 @@ def quote(s):
     Similar to urllib.parse.quote(), except that the quoting is slightly
     different so that it doesn't get automatically unquoted by the Web browser.
     """
-    if not isinstance(s, str):
-        return s
-    res = list(s)
-    for i in range(len(res)):
-        c = res[i]
-        if c in """:/_#?;@&=+$,"[]<>%\n\\""":
-            res[i] = '_%02X' % ord(c)
-    return ''.join(res)
+    return s.translate(QUOTE_MAP) if isinstance(s, str) else s
 
 
 def unquote(s):
