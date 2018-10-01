@@ -898,3 +898,14 @@ Versions affected
 * Django 2.1 `(patch) <https://github.com/django/django/commit/c4e5ff7fdb5fce447675e90291fd33fddd052b3c>`__
 * Django 2.0 `(patch) <https://github.com/django/django/commit/6fffc3c6d420e44f4029d5643f38d00a39b08525>`__
 * Django 1.11 `(patch) <https://github.com/django/django/commit/d6eaee092709aad477a9894598496c6deec532ff>`__
+
+October 1, 2018 - :cve:`2018-16984`
+-----------------------------------
+
+Information disclosure in Django Admin. `Full description
+<https://www.djangoproject.com/weblog/2018/oct/01/security-release/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 2.1 `(patch) <https://github.com/django/django/commit/c4bd5b597e0aa2432e4c867b86650f18af117851>`__
