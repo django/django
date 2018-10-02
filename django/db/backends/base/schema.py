@@ -1,11 +1,10 @@
-import hashlib
 import logging
 from datetime import datetime
 
 from django.db.backends.ddl_references import (
     Columns, ForeignKeyName, IndexName, Statement, Table,
 )
-from django.db.backends.utils import split_identifier
+from django.db.backends.utils import names_digest, split_identifier
 from django.db.models import Index
 from django.db.transaction import TransactionManagementError, atomic
 from django.utils import timezone
@@ -134,17 +133,6 @@ class BaseDatabaseSchemaEditor:
 
     def quote_name(self, name):
         return self.connection.ops.quote_name(name)
-
-    @classmethod
-    def _digest(cls, *args):
-        """
-        Generate a 32-bit digest of a set of arguments that can be used to
-        shorten identifying names.
-        """
-        h = hashlib.md5()
-        for arg in args:
-            h.update(arg.encode())
-        return h.hexdigest()[:8]
 
     # Field <-> database mapping functions
 
@@ -885,7 +873,7 @@ class BaseDatabaseSchemaEditor:
         and a unique digest and suffix.
         """
         _, table_name = split_identifier(table_name)
-        hash_suffix_part = '%s%s' % (self._digest(table_name, *column_names), suffix)
+        hash_suffix_part = '%s%s' % (names_digest(table_name, *column_names, length=8), suffix)
         max_length = self.connection.ops.max_name_length() or 200
         # If everything fits into max_length, use that name.
         index_name = '%s_%s_%s' % (table_name, '_'.join(column_names), hash_suffix_part)
