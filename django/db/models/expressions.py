@@ -1,5 +1,6 @@
 import copy
 import datetime
+import inspect
 from decimal import Decimal
 
 from django.core.exceptions import EmptyResultSet, FieldError
@@ -135,6 +136,16 @@ class Combinable:
         raise NotImplementedError(
             "Use .bitand() and .bitor() for bitwise logical operations."
         )
+
+
+def make_hashable(value):
+    if isinstance(value, list):
+        return tuple(map(make_hashable, value))
+    if isinstance(value, dict):
+        return tuple([
+            (key, make_hashable(nested_value)) for key, nested_value in value.items()
+        ])
+    return value
 
 
 @deconstructible
@@ -360,28 +371,27 @@ class BaseExpression:
             if expr:
                 yield from expr.flatten()
 
+    @cached_property
+    def identity(self):
+        constructor_signature = inspect.signature(self.__init__)
+        args, kwargs = self._constructor_args
+        signature = constructor_signature.bind_partial(*args, **kwargs)
+        signature.apply_defaults()
+        arguments = signature.arguments.items()
+        identity = [self.__class__]
+        for arg, value in arguments:
+            if isinstance(value, fields.Field):
+                value = type(value)
+            else:
+                value = make_hashable(value)
+            identity.append((arg, value))
+        return tuple(identity)
+
     def __eq__(self, other):
-        if self.__class__ != other.__class__:
-            return False
-        path, args, kwargs = self.deconstruct()
-        other_path, other_args, other_kwargs = other.deconstruct()
-        if (path, args) == (other_path, other_args):
-            kwargs = kwargs.copy()
-            other_kwargs = other_kwargs.copy()
-            output_field = type(kwargs.pop('output_field', None))
-            other_output_field = type(other_kwargs.pop('output_field', None))
-            if output_field == other_output_field:
-                return kwargs == other_kwargs
-        return False
+        return isinstance(other, BaseExpression) and other.identity == self.identity
 
     def __hash__(self):
-        path, args, kwargs = self.deconstruct()
-        kwargs = kwargs.copy()
-        output_field = type(kwargs.pop('output_field', None))
-        return hash((path, output_field) + args + tuple([
-            (key, tuple(value)) if isinstance(value, list) else (key, value)
-            for key, value in kwargs.items()
-        ]))
+        return hash(self.identity)
 
 
 class Expression(BaseExpression, Combinable):
@@ -694,9 +704,6 @@ class RawSQL(Expression):
 
     def get_group_by_cols(self):
         return [self]
-
-    def __hash__(self):
-        return hash((self.sql, self.output_field) + tuple(self.params))
 
 
 class Star(Expression):
