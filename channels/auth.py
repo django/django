@@ -137,6 +137,15 @@ def _get_user_session_key(session):
     return get_user_model()._meta.pk.to_python(session[SESSION_KEY])
 
 
+class UserLazyObject(LazyObject):
+    """
+    Throw a more useful error message when scope['user'] is accessed before it's resolved
+    """
+
+    def _setup(self):
+        raise ValueError("Accessing scope user before it is ready.")
+
+
 class AuthMiddleware(BaseMiddleware):
     """
     Middleware which populates scope["user"] from a Django session.
@@ -151,9 +160,7 @@ class AuthMiddleware(BaseMiddleware):
             )
         # Add it to the scope if it's not there already
         if "user" not in scope:
-            # We can't make this a LazyObject because there's no way to await attribute access,
-            # and this is an async function under the hood.
-            scope["user"] = LazyObject()
+            scope["user"] = UserLazyObject()
 
     async def resolve_scope(self, scope):
         scope["user"]._wrapped = await get_user(scope)

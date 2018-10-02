@@ -14,8 +14,9 @@ from django.contrib.auth import (
 from django.contrib.auth.models import AnonymousUser
 
 from asgiref.sync import sync_to_async
-from channels.auth import get_user, login, logout
+from channels.auth import AuthMiddleware, get_user, login, logout
 from channels.db import database_sync_to_async
+from channels.generic.websocket import WebsocketConsumer
 
 
 class CatchSignal:
@@ -245,3 +246,22 @@ async def test_logout_not_logged_in(session):
 
     assert "user" not in scope
     assert isinstance(await get_user(scope), AnonymousUser)
+
+
+@pytest.mark.django_db(transaction=True)
+async def test_scope_user_error_message(session):
+    """
+    Tests that the correct error message is thrown when scope user is accessed before it's ready
+    """
+
+    class TestConsumer(WebsocketConsumer):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            if "user" in self.scope:
+                # access scope user before it's ready
+                getattr(self.scope["user"], "test")
+
+    with pytest.raises(ValueError, match="Accessing scope user before it is ready."):
+        scope = {"session": session}
+        auth = AuthMiddleware(TestConsumer)
+        auth(scope)
