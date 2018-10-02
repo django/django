@@ -1,5 +1,6 @@
 import datetime
 import decimal
+import re
 from collections import defaultdict
 
 from django.core.exceptions import FieldDoesNotExist
@@ -14,6 +15,8 @@ from django.utils.text import capfirst
 from django.utils.translation import ngettext, override as translation_override
 
 QUOTE_MAP = {i: '_%02X' % i for i in b'":/_#?;@&=+$,"[]<>%\n\\'}
+UNQUOTE_MAP = {v: chr(k) for k, v in QUOTE_MAP.items()}
+UNQUOTE_RE = re.compile('_(?:%s)' % '|'.join([x[1:] for x in UNQUOTE_MAP]))
 
 
 class FieldIsAForeignKeyColumnName(Exception):
@@ -70,22 +73,8 @@ def quote(s):
 
 
 def unquote(s):
-    """Undo the effects of quote(). Based heavily on urllib.parse.unquote()."""
-    mychr = chr
-    myatoi = int
-    list = s.split('_')
-    res = [list[0]]
-    myappend = res.append
-    del list[0]
-    for item in list:
-        if item[1:2]:
-            try:
-                myappend(mychr(myatoi(item[:2], 16)) + item[2:])
-            except ValueError:
-                myappend('_' + item)
-        else:
-            myappend('_' + item)
-    return "".join(res)
+    """Undo the effects of quote()."""
+    return UNQUOTE_RE.sub(lambda m: UNQUOTE_MAP[m.group(0)], s)
 
 
 def flatten(fields):
