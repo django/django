@@ -210,6 +210,8 @@ class ConsoleNode(nodes.literal_block):
     Custom node to override the visit/depart event handlers at registration
     time. Wrap a literal_block object and defer to it.
     """
+    tagname = 'ConsoleNode'
+
     def __init__(self, litblk_obj):
         self.wrapped = litblk_obj
 
