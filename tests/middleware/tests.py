@@ -7,7 +7,7 @@ from urllib.parse import quote
 
 from django.conf import settings
 from django.core import mail
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import DisallowedHost, PermissionDenied
 from django.http import (
     FileResponse, HttpRequest, HttpResponse, HttpResponseNotFound,
     HttpResponsePermanentRedirect, HttpResponseRedirect, StreamingHttpResponse,
@@ -336,6 +336,16 @@ class CommonMiddlewareTest(SimpleTestCase):
         self.assertEqual(r.status_code, 302)
         self.assertEqual(r.url, '/slash/')
         self.assertIsInstance(r, HttpResponseRedirect)
+
+    @override_settings(ALLOWED_HOSTS=[])
+    def test_allowed_hosts_exempt(self):
+        request = self.rf.get('/slash/')
+        with self.assertRaises(DisallowedHost):
+            CommonMiddleware().process_request(request)
+
+        with override_settings(ALLOWED_HOSTS_EXEMPT=['^slas[a-z]/']):
+            request = self.rf.get('/slash/')
+            CommonMiddleware().process_request(request)
 
 
 @override_settings(

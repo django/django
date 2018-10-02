@@ -99,6 +99,16 @@ This validation only applies via :meth:`~django.http.HttpRequest.get_host()`;
 if your code accesses the ``Host`` header directly from ``request.META`` you
 are bypassing this security protection.
 
+.. setting:: ALLOWED_HOSTS_EXEMPT
+
+``ALLOWED_HOSTS_EXEMPT``
+--------------------------
+
+Default: ``[]`` (Empty list)
+
+If a URL path matches a regular expression in this list, the request will not be
+subject to host validation using the :setting:`ALLOWED_HOSTS` setting.
+
 .. setting:: APPEND_SLASH
 
 ``APPEND_SLASH``

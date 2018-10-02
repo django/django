@@ -34,6 +34,9 @@ INTERNAL_IPS = []
 # "*" matches anything, ".example.com" matches example.com and all subdomains
 ALLOWED_HOSTS = []
 
+# List of URLs that should be exempt from host validation.
+ALLOWED_HOSTS_EXEMPT = []
+
 # Local time zone for this installation. All choices can be found here:
 # https://en.wikipedia.org/wiki/List_of_tz_zones_by_name (although not all
 # systems may support all possibilities). When USE_TZ is True, this is

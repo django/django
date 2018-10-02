@@ -205,7 +205,8 @@ Models
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Added the :setting:`ALLOWED_HOSTS_EXEMPT` setting to allow excluding some
+  URLs from Host header validation.
 
 Serialization
 ~~~~~~~~~~~~~

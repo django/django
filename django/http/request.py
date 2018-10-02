@@ -84,9 +84,12 @@ class HttpRequest:
                 host = '%s:%s' % (host, server_port)
         return host
 
-    def get_host(self):
+    def get_host(self, skip_validation=False):
         """Return the HTTP host using the environment or request headers."""
         host = self._get_raw_host()
+
+        if skip_validation:
+            return host
 
         # Allow variants of localhost if ALLOWED_HOSTS is empty and DEBUG=True.
         allowed_hosts = settings.ALLOWED_HOSTS
