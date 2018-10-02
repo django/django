@@ -5,7 +5,6 @@ from email.errors import HeaderParseError
 from email.parser import HeaderParser
 
 from django.urls import reverse
-from django.utils.encoding import force_bytes
 from django.utils.safestring import mark_safe
 
 try:
@@ -77,7 +76,7 @@ def parse_rst(text, default_reference_context, thing_being_parsed=None):
         'raw_enabled': False,
         'file_insertion_enabled': False,
     }
-    thing_being_parsed = thing_being_parsed and force_bytes('<%s>' % thing_being_parsed)
+    thing_being_parsed = thing_being_parsed and '<%s>' % thing_being_parsed
     # Wrap ``text`` in some reST that sets the default role to ``cmsreference``,
     # then restores it.
     source = """
