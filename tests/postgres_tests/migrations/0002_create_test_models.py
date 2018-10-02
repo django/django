@@ -3,7 +3,7 @@ from django.db import migrations, models
 
 from ..fields import (
     ArrayField, BigIntegerRangeField, CICharField, CIEmailField, CITextField,
-    DateRangeField, DateTimeRangeField, FloatRangeField, HStoreField,
+    DateRangeField, DateTimeRangeField, DecimalRangeField, HStoreField,
     IntegerRangeField, JSONField, SearchVectorField,
 )
 from ..models import TagField
@@ -209,7 +209,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('ints', IntegerRangeField(null=True, blank=True)),
                 ('bigints', BigIntegerRangeField(null=True, blank=True)),
-                ('floats', FloatRangeField(null=True, blank=True)),
+                ('decimals', DecimalRangeField(null=True, blank=True)),
                 ('timestamps', DateTimeRangeField(null=True, blank=True)),
                 ('dates', DateRangeField(null=True, blank=True)),
             ],

@@ -21,6 +21,9 @@ details on these changes.
 
 * A model's ``Meta.ordering`` will no longer affect ``GROUP BY`` queries.
 
+* ``django.contrib.postgres.fields.FloatRangeField`` and
+  ``django.contrib.postgres.forms.FloatRangeField`` will be removed.
+
 .. _deprecation-removed-in-3.0:
 
 3.0

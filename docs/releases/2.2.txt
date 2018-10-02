@@ -320,3 +320,7 @@ Miscellaneous
 
 * The undocumented ``QuerySetPaginator`` alias of
   ``django.core.paginator.Paginator`` is deprecated.
+
+* The ``FloatRangeField`` model and form fields in ``django.contrib.postgres``
+  are deprecated in favor of a new name, ``DecimalRangeField``, to match the
+  underlying ``numrange`` data type used in the database.

@@ -1,13 +1,16 @@
+import warnings
+
 from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange
 
 from django import forms
 from django.core import exceptions
 from django.forms.widgets import MultiWidget
+from django.utils.deprecation import RemovedInDjango31Warning
 from django.utils.translation import gettext_lazy as _
 
 __all__ = [
-    'BaseRangeField', 'IntegerRangeField', 'FloatRangeField',
-    'DateTimeRangeField', 'DateRangeField', 'RangeWidget',
+    'BaseRangeField', 'IntegerRangeField', 'DecimalRangeField',
+    'DateTimeRangeField', 'DateRangeField', 'FloatRangeField', 'RangeWidget',
 ]
 
 
@@ -66,10 +69,21 @@ class IntegerRangeField(BaseRangeField):
     range_type = NumericRange
 
 
-class FloatRangeField(BaseRangeField):
+class DecimalRangeField(BaseRangeField):
     default_error_messages = {'invalid': _('Enter two numbers.')}
-    base_field = forms.FloatField
+    base_field = forms.DecimalField
     range_type = NumericRange
+
+
+class FloatRangeField(DecimalRangeField):
+    base_field = forms.FloatField
+
+    def __init__(self, **kwargs):
+        warnings.warn(
+            'FloatRangeField is deprecated in favor of DecimalRangeField.',
+            RemovedInDjango31Warning, stacklevel=2,
+        )
+        super().__init__(**kwargs)
 
 
 class DateTimeRangeField(BaseRangeField):
