@@ -613,8 +613,7 @@ the :ref:`i18n documentation <how-to-create-language-files>` for details.
 
 This command doesn't require configured settings. However, when settings aren't
 configured, the command can't ignore the :setting:`MEDIA_ROOT` and
-:setting:`STATIC_ROOT` directories or include :setting:`LOCALE_PATHS`. It will
-also write files in UTF-8 rather than in :setting:`FILE_CHARSET`.
+:setting:`STATIC_ROOT` directories or include :setting:`LOCALE_PATHS`.
 
 .. django-admin-option:: --all, -a
 

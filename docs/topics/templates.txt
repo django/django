@@ -351,7 +351,7 @@ applications. This generic name was kept for backwards-compatibility.
 
 * ``'file_charset'``: the charset used to read template files on disk.
 
-  It defaults to the value of :setting:`FILE_CHARSET`.
+  It defaults to ``'utf-8'``.
 
 * ``'libraries'``: A dictionary of labels and dotted Python paths of template
   tag modules to register with the template engine. This can be used to add
