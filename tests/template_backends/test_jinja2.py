@@ -1,9 +1,9 @@
 from unittest import skipIf
 
 from django.template import TemplateSyntaxError
-from django.test import RequestFactory
+from django.test import RequestFactory, SimpleTestCase
 
-from .test_dummy import TemplateStringsTests
+from .mixins import TemplateBackendMixin
 
 try:
     import jinja2
@@ -15,7 +15,7 @@ else:
 
 
 @skipIf(jinja2 is None, "this test requires jinja2")
-class Jinja2Tests(TemplateStringsTests):
+class Jinja2Tests(TemplateBackendMixin, SimpleTestCase):
 
     engine_class = Jinja2
     backend_name = 'jinja2'
