@@ -270,11 +270,9 @@ querysets are identical::
 Templates
 =========
 
-You can use either strings or UTF-8 bytestrings when creating templates
-manually::
+Use strings when creating templates manually::
 
     from django.template import Template
-    t1 = Template(b'This is a bytestring template.')
     t2 = Template('This is a string template.')
 
 But the common case is to read templates from the filesystem, and this creates
