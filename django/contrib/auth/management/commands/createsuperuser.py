@@ -72,7 +72,7 @@ class Command(BaseCommand):
             pass
         else:
             # If not provided, create the user with an unusable password.
-            user_data[PASSWORD_FIELD] = os.getenv('SUPERUSER_PASSWORD', None)
+            user_data[PASSWORD_FIELD] = os.getenv('SUPERUSER_PASSWORD')
         try:
             if options['interactive']:
                 # Same as user_data but with foreign keys as fake model
