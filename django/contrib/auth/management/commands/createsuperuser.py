@@ -2,6 +2,7 @@
 Management utility to create superusers.
 """
 import getpass
+import os
 import sys
 
 from django.contrib.auth import get_user_model
@@ -71,7 +72,7 @@ class Command(BaseCommand):
             pass
         else:
             # If not provided, create the user with an unusable password.
-            user_data[PASSWORD_FIELD] = None
+            user_data[PASSWORD_FIELD] = os.getenv('SUPERUSER_PASSWORD', None)
         try:
             if options['interactive']:
                 # Same as user_data but with foreign keys as fake model
