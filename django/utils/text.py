@@ -280,25 +280,12 @@ def compress_string(s):
     return zbuf.getvalue()
 
 
-class StreamingBuffer:
-    def __init__(self):
-        self.vals = []
-
-    def write(self, val):
-        self.vals.append(val)
-
+class StreamingBuffer(BytesIO):
     def read(self):
-        if not self.vals:
-            return b''
-        ret = b''.join(self.vals)
-        self.vals = []
+        ret = self.getvalue()
+        self.seek(0)
+        self.truncate()
         return ret
-
-    def flush(self):
-        return
-
-    def close(self):
-        return
 
 
 # Like compress_string, but for iterators of strings.
