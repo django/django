@@ -257,16 +257,6 @@ non-ASCII characters would have been removed in quoting in the first line.)
 
 .. _above: `URI and IRI handling`_
 
-The database API
-================
-
-You can pass either strings or UTF-8 bytestrings as arguments to
-``filter()`` methods and the like in the database API. The following two
-querysets are identical::
-
-    qs = People.objects.filter(name__contains='Å')
-    qs = People.objects.filter(name__contains=b'\xc3\x85') # UTF-8 encoding of Å
-
 Templates
 =========
 
