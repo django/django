@@ -14,7 +14,7 @@ from django.test import (
 from .models import Reporter
 
 
-@skipUnless(connection.features.uses_savepoints, "'atomic' requires transactions and savepoints.")
+@skipUnlessDBFeature('uses_savepoints')
 class AtomicTests(TransactionTestCase):
     """
     Tests for the atomic decorator and context manager.
@@ -228,10 +228,7 @@ class AtomicInsideTransactionTests(AtomicTests):
         self.atomic.__exit__(*sys.exc_info())
 
 
-@skipIf(
-    connection.features.autocommits_when_autocommit_is_off,
-    "This test requires a non-autocommit mode that doesn't autocommit."
-)
+@skipIfDBFeature('autocommits_when_autocommit_is_off')
 class AtomicWithoutAutocommitTests(AtomicTests):
     """All basic tests for atomic should also pass when autocommit is turned off."""
 
@@ -245,7 +242,7 @@ class AtomicWithoutAutocommitTests(AtomicTests):
         transaction.set_autocommit(True)
 
 
-@skipUnless(connection.features.uses_savepoints, "'atomic' requires transactions and savepoints.")
+@skipUnlessDBFeature('uses_savepoints')
 class AtomicMergeTests(TransactionTestCase):
     """Test merging transactions with savepoint=False."""
 
@@ -295,7 +292,7 @@ class AtomicMergeTests(TransactionTestCase):
         self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Tintin>'])
 
 
-@skipUnless(connection.features.uses_savepoints, "'atomic' requires transactions and savepoints.")
+@skipUnlessDBFeature('uses_savepoints')
 class AtomicErrorsTests(TransactionTestCase):
 
     available_apps = ['transactions']
@@ -437,10 +434,7 @@ class AtomicMiscTests(TransactionTestCase):
                 connection.savepoint_rollback(sid)
 
 
-@skipIf(
-    connection.features.autocommits_when_autocommit_is_off,
-    "This test requires a non-autocommit mode that doesn't autocommit."
-)
+@skipIfDBFeature('autocommits_when_autocommit_is_off')
 class NonAutocommitTests(TransactionTestCase):
 
     available_apps = []
