@@ -1,8 +1,5 @@
-from django.core.exceptions import (
-    ImproperlyConfigured, SuspiciousFileOperation,
-)
+from django.core.exceptions import ImproperlyConfigured
 from django.template.utils import get_app_template_dirs
-from django.utils._os import safe_join
 from django.utils.functional import cached_property
 
 
@@ -64,18 +61,3 @@ class BaseEngine:
         if self.app_dirs:
             template_dirs += get_app_template_dirs(self.app_dirname)
         return template_dirs
-
-    def iter_template_filenames(self, template_name):
-        """
-        Iterate over candidate files for template_name.
-
-        Ignore files that don't lie inside configured template dirs to avoid
-        directory traversal attacks.
-        """
-        for template_dir in self.template_dirs:
-            try:
-                yield safe_join(template_dir, template_name)
-            except SuspiciousFileOperation:
-                # The joined path was located outside of this template_dir
-                # (it might be inside another one, so this isn't fatal).
-                pass

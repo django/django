@@ -3,12 +3,12 @@ from template_tests.test_response import test_processor_name
 from django.template import Context, EngineHandler, RequestContext
 from django.template.backends.django import DjangoTemplates
 from django.template.library import InvalidTemplateLibrary
-from django.test import RequestFactory, override_settings
+from django.test import RequestFactory, SimpleTestCase, override_settings
 
-from .test_dummy import TemplateStringsTests
+from .mixins import TemplateBackendMixin
 
 
-class DjangoTemplatesTests(TemplateStringsTests):
+class DjangoTemplatesTests(TemplateBackendMixin, SimpleTestCase):
 
     engine_class = DjangoTemplates
     backend_name = 'django'

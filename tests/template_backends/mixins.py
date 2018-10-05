@@ -6,14 +6,12 @@ from django.middleware.csrf import (
     CsrfViewMiddleware, _compare_salted_tokens as equivalent_tokens, get_token,
 )
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
-from django.template.backends.dummy import TemplateStrings
-from django.test import SimpleTestCase
 
 
-class TemplateStringsTests(SimpleTestCase):
+class TemplateBackendMixin:
 
-    engine_class = TemplateStrings
-    backend_name = 'dummy'
+    engine_class = None  # subclasses must specify
+    backend_name = None  # subclasses must specify
     options = {}
 
     @classmethod
@@ -43,10 +41,6 @@ class TemplateStringsTests(SimpleTestCase):
         self.assertEqual(e.exception.backend, self.engine)
 
     def test_get_template_syntax_error(self):
-        # There's no way to trigger a syntax error with the dummy backend.
-        # The test still lives here to factor it between other backends.
-        if self.backend_name == 'dummy':
-            self.skipTest("test doesn't apply to dummy backend")
         with self.assertRaises(TemplateSyntaxError):
             self.engine.get_template('template_backends/syntax_error.html')
 
@@ -59,9 +53,6 @@ class TemplateStringsTests(SimpleTestCase):
         self.assertNotIn('<script>', content)
 
     def test_django_html_escaping(self):
-        if self.backend_name == 'dummy':
-            self.skipTest("test doesn't apply to dummy backend")
-
         class TestForm(Form):
             test_field = CharField()
 

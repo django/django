@@ -252,7 +252,7 @@ class DebugViewQueriesAllowedTests(SimpleTestCase):
     ROOT_URLCONF='view_tests.urls',
     # No template directories are configured, so no templates will be found.
     TEMPLATES=[{
-        'BACKEND': 'django.template.backends.dummy.TemplateStrings',
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
     }],
 )
 class NonDjangoTemplatesDebugViewTests(SimpleTestCase):
