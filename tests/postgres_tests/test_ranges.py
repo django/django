@@ -32,6 +32,7 @@ class TestSaveLoad(PostgreSQLTestCase):
             decimals=NumericRange(20, 30),
             timestamps=DateTimeTZRange(now - datetime.timedelta(hours=1), now),
             dates=DateRange(now.date() - datetime.timedelta(days=1), now.date()),
+            inclusive_dates=DateRange(now.date() - datetime.timedelta(days=1), now.date(), '[]'),
         )
         instance.save()
         loaded = RangesModel.objects.get()
@@ -40,6 +41,7 @@ class TestSaveLoad(PostgreSQLTestCase):
         self.assertEqual(instance.decimals, loaded.decimals)
         self.assertEqual(instance.timestamps, loaded.timestamps)
         self.assertEqual(instance.dates, loaded.dates)
+        self.assertEqual(instance.inclusive_dates, loaded.inclusive_dates)
 
     def test_range_object(self):
         r = NumericRange(0, 10)
@@ -53,6 +55,14 @@ class TestSaveLoad(PostgreSQLTestCase):
         instance.save()
         loaded = RangesModel.objects.get()
         self.assertEqual(NumericRange(0, 10), loaded.ints)
+
+    def test_tuple_bounds(self):
+        now = timezone.now()
+        dates = (now.date() - datetime.timedelta(days=1), now.date())
+        instance = RangesModel(inclusive_dates=dates)
+        instance.save()
+        loaded = RangesModel.objects.get()
+        self.assertEqual(DateRange(*dates, '[]'), loaded.inclusive_dates)
 
     def test_range_object_boundaries(self):
         r = NumericRange(0, 10, '[]')
@@ -361,8 +371,9 @@ class TestSerialization(PostgreSQLTestCase):
         '\\"bounds\\": \\"[)\\"}", "decimals": "{\\"empty\\": true}", '
         '"bigints": null, "timestamps": "{\\"upper\\": \\"2014-02-02T12:12:12+00:00\\", '
         '\\"lower\\": \\"2014-01-01T00:00:00+00:00\\", \\"bounds\\": \\"[)\\"}", '
-        '"dates": "{\\"upper\\": \\"2014-02-02\\", \\"lower\\": \\"2014-01-01\\", \\"bounds\\": \\"[)\\"}" }, '
-        '"model": "postgres_tests.rangesmodel", "pk": null}]'
+        '"dates": "{\\"upper\\": \\"2014-02-02\\", \\"lower\\": \\"2014-01-01\\", \\"bounds\\": \\"[)\\"}", '
+        '"inclusive_dates": "{\\"lower\\": \\"2014-01-01\\", \\"upper\\": \\"2014-02-02\\", '
+        '\\"bounds\\": \\"[]\\"}" }, "model": "postgres_tests.rangesmodel", "pk": null}]'
     )
 
     lower_date = datetime.date(2014, 1, 1)
@@ -375,13 +386,14 @@ class TestSerialization(PostgreSQLTestCase):
             ints=NumericRange(0, 10), decimals=NumericRange(empty=True),
             timestamps=DateTimeTZRange(self.lower_dt, self.upper_dt),
             dates=DateRange(self.lower_date, self.upper_date),
+            inclusive_dates=DateRange(self.lower_date, self.upper_date, '[]'),
         )
         data = serializers.serialize('json', [instance])
         dumped = json.loads(data)
-        for field in ('ints', 'dates', 'timestamps'):
+        for field in ('inclusive_dates', 'ints', 'dates', 'timestamps'):
             dumped[0]['fields'][field] = json.loads(dumped[0]['fields'][field])
         check = json.loads(self.test_data)
-        for field in ('ints', 'dates', 'timestamps'):
+        for field in ('inclusive_dates', 'ints', 'dates', 'timestamps'):
             check[0]['fields'][field] = json.loads(check[0]['fields'][field])
         self.assertEqual(dumped, check)
 
@@ -392,6 +404,7 @@ class TestSerialization(PostgreSQLTestCase):
         self.assertIsNone(instance.bigints)
         self.assertEqual(instance.dates, DateRange(self.lower_date, self.upper_date))
         self.assertEqual(instance.timestamps, DateTimeTZRange(self.lower_dt, self.upper_dt))
+        self.assertEqual(instance.inclusive_dates, DateRange(self.lower_date, self.upper_date, '[]'))
 
     def test_serialize_range_with_null(self):
         instance = RangesModel(ints=NumericRange(None, 10))
@@ -466,6 +479,40 @@ class TestFormField(PostgreSQLTestCase):
         lower = datetime.date(2014, 1, 1)
         upper = datetime.date(2014, 2, 2)
         self.assertEqual(value, DateRange(lower, upper))
+
+    def test_same_dates(self):
+        class MyModelForm(forms.ModelForm):
+            class Meta:
+                model = RangesModel
+                fields = ['dates']
+
+        form = MyModelForm(data={'dates_0': '01/01/2014', 'dates_1': '01/01/2014'})
+        self.assertIs(form.is_valid(), True)
+        instance = form.save()
+        # Reload to compare canonical form.
+        instance.refresh_from_db()
+        self.assertEqual(instance.dates, DateRange(empty=True))
+
+    def test_valid_dates_inclusive(self):
+        field = pg_forms.DateRangeField(bounds='[]')
+        value = field.clean(['01/01/2014', '02/02/2014'])
+        lower = datetime.date(2014, 1, 1)
+        upper = datetime.date(2014, 2, 2)
+        self.assertEqual(value, DateRange(lower, upper, '[]'))
+
+    def test_same_dates_inclusive(self):
+        class MyModelForm(forms.ModelForm):
+            class Meta:
+                model = RangesModel
+                fields = ['inclusive_dates']
+
+        form = MyModelForm(data={'inclusive_dates_0': '01/01/2014', 'inclusive_dates_1': '01/01/2014'})
+        self.assertIs(form.is_valid(), True)
+        instance = form.save()
+        instance.refresh_from_db()
+        # Reload to compare canonical form.
+        date = datetime.date(2014, 1, 1)
+        self.assertEqual(instance.inclusive_dates, DateRange(date, date, '[]'))
 
     def test_using_split_datetime_widget(self):
         class SplitDateTimeRangeField(pg_forms.DateTimeRangeField):
@@ -686,26 +733,49 @@ class TestFormField(PostgreSQLTestCase):
         model_field = pg_fields.IntegerRangeField()
         form_field = model_field.formfield()
         self.assertIsInstance(form_field, pg_forms.IntegerRangeField)
+        self.assertEqual(form_field.bounds, '[)')
+
+    def test_model_field_formfield_integer_inclusive(self):
+        model_field = pg_fields.IntegerRangeField(bounds='[]')
+        form_field = model_field.formfield()
+        self.assertIsInstance(form_field, pg_forms.IntegerRangeField)
+        self.assertEqual(form_field.bounds, '[]')
 
     def test_model_field_formfield_biginteger(self):
         model_field = pg_fields.BigIntegerRangeField()
         form_field = model_field.formfield()
         self.assertIsInstance(form_field, pg_forms.IntegerRangeField)
+        self.assertEqual(form_field.bounds, '[)')
+
+    def test_model_field_formfield_biginteger_inclusive(self):
+        model_field = pg_fields.BigIntegerRangeField(bounds='[]')
+        form_field = model_field.formfield()
+        self.assertIsInstance(form_field, pg_forms.IntegerRangeField)
+        self.assertEqual(form_field.bounds, '[]')
 
     def test_model_field_formfield_float(self):
         model_field = pg_fields.DecimalRangeField()
         form_field = model_field.formfield()
         self.assertIsInstance(form_field, pg_forms.DecimalRangeField)
+        self.assertEqual(form_field.bounds, '[)')
 
     def test_model_field_formfield_date(self):
         model_field = pg_fields.DateRangeField()
         form_field = model_field.formfield()
         self.assertIsInstance(form_field, pg_forms.DateRangeField)
+        self.assertEqual(form_field.bounds, '[)')
+
+    def test_model_field_formfield_date_inclusive(self):
+        model_field = pg_fields.DateRangeField(bounds='[]')
+        form_field = model_field.formfield()
+        self.assertIsInstance(form_field, pg_forms.DateRangeField)
+        self.assertEqual(form_field.bounds, '[]')
 
     def test_model_field_formfield_datetime(self):
         model_field = pg_fields.DateTimeRangeField()
         form_field = model_field.formfield()
         self.assertIsInstance(form_field, pg_forms.DateTimeRangeField)
+        self.assertEqual(form_field.bounds, '[)')
 
 
 class TestWidget(PostgreSQLTestCase):

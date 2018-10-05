@@ -94,6 +94,9 @@ Minor features
   :class:`~django.contrib.postgres.search.SearchQuery` allows searching for
   a phrase or raw expression.
 
+* :ref:`Range fields <range-fields>` now have the
+  :attr:`~django.contrib.postgres.fields.RangeField.bounds` parameter.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -28,15 +28,19 @@ except ImportError:
         def __init__(self, encoder=None, **kwargs):
             super().__init__(**kwargs)
 
+    class DummyRangeField(models.Field):
+        def __init__(self, *args, bounds='[)', **kwargs):
+            super().__init__(**kwargs)
+
     ArrayField = DummyArrayField
-    BigIntegerRangeField = models.Field
+    BigIntegerRangeField = DummyRangeField
     CICharField = models.Field
     CIEmailField = models.Field
     CITextField = models.Field
-    DateRangeField = models.Field
-    DateTimeRangeField = models.Field
-    DecimalRangeField = models.Field
+    DateRangeField = DummyRangeField
+    DateTimeRangeField = DummyRangeField
+    DecimalRangeField = DummyRangeField
     HStoreField = models.Field
-    IntegerRangeField = models.Field
+    IntegerRangeField = DummyRangeField
     JSONField = DummyJSONField
     SearchVectorField = models.Field

@@ -132,6 +132,7 @@ class RangesModel(PostgreSQLModel):
     decimals = DecimalRangeField(blank=True, null=True)
     timestamps = DateTimeRangeField(blank=True, null=True)
     dates = DateRangeField(blank=True, null=True)
+    inclusive_dates = DateRangeField(blank=True, null=True, bounds='[]')
 
 
 class RangeLookupsModel(PostgreSQLModel):

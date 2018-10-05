@@ -17,11 +17,13 @@ __all__ = [
 
 class RangeField(models.Field):
     empty_strings_allowed = False
+    step = None
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, bounds='[)', **kwargs):
         # Initializing base_field here ensures that its model matches the model for self.
         if hasattr(self, 'base_field'):
             self.base_field = self.base_field()
+        self.bounds = bounds
         super().__init__(*args, **kwargs)
 
     @property
@@ -36,13 +38,18 @@ class RangeField(models.Field):
         self.__dict__['model'] = model
         self.base_field.model = model
 
+    def deconstruct(self):
+        name, path, args, kwargs = super().deconstruct()
+        kwargs['bounds'] = self.bounds
+        return name, path, args, kwargs
+
     def get_prep_value(self, value):
         if value is None:
             return None
         elif isinstance(value, Range):
             return value
         elif isinstance(value, (list, tuple)):
-            return self.range_type(value[0], value[1])
+            return self.range_type(value[0], value[1], self.bounds)
         return value
 
     def to_python(self, value):
@@ -54,7 +61,21 @@ class RangeField(models.Field):
                     vals[end] = self.base_field.to_python(vals[end])
             value = self.range_type(**vals)
         elif isinstance(value, (list, tuple)):
-            value = self.range_type(value[0], value[1])
+            value = self.range_type(value[0], value[1], bounds=self.bounds)
+        return value
+
+    def from_db_value(self, value, expression, connection):
+        if value and self.step:
+            # PostgeSQL always returns discrete range types in the canonical
+            # form with bounds '[)'. Convert to the bounds specified on the
+            # field.
+            lower = value.lower
+            upper = value.upper
+            if lower and self.bounds[0] == '(':
+                lower = lower - self.step
+            if upper and self.bounds[1] == ']':
+                upper = upper - self.step
+            value = self.range_type(lower, upper, self.bounds)
         return value
 
     def set_attributes_from_name(self, name):
@@ -80,6 +101,7 @@ class RangeField(models.Field):
 
     def formfield(self, **kwargs):
         kwargs.setdefault('form_class', self.form_field)
+        kwargs.setdefault('bounds', self.bounds)
         return super().formfield(**kwargs)
 
 
@@ -87,6 +109,7 @@ class IntegerRangeField(RangeField):
     base_field = models.IntegerField
     range_type = NumericRange
     form_field = forms.IntegerRangeField
+    step = 1
 
     def db_type(self, connection):
         return 'int4range'
@@ -96,6 +119,7 @@ class BigIntegerRangeField(RangeField):
     base_field = models.BigIntegerField
     range_type = NumericRange
     form_field = forms.IntegerRangeField
+    step = 1
 
     def db_type(self, connection):
         return 'int8range'
@@ -139,6 +163,7 @@ class DateRangeField(RangeField):
     base_field = models.DateField
     range_type = DateRange
     form_field = forms.DateRangeField
+    step = datetime.timedelta(days=1)
 
     def db_type(self, connection):
         return 'daterange'

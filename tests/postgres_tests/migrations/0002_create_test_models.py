@@ -212,6 +212,7 @@ class Migration(migrations.Migration):
                 ('decimals', DecimalRangeField(null=True, blank=True)),
                 ('timestamps', DateTimeRangeField(null=True, blank=True)),
                 ('dates', DateRangeField(null=True, blank=True)),
+                ('inclusive_dates', DateRangeField(null=True, blank=True, bounds='[]')),
             ],
             options={
                 'required_db_vendor': 'postgresql'

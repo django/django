@@ -621,9 +621,14 @@ start and end timestamps of an event, or the range of ages an activity is
 suitable for.
 
 All of the range fields translate to :ref:`psycopg2 Range objects
-<psycopg2:adapt-range>` in Python, but also accept tuples as input if no bounds
-information is necessary. The default is lower bound included, upper bound
-excluded; that is, ``[)``.
+<psycopg2:adapt-range>` in Python, but also accept tuples as input if the
+default bounds are sufficient.
+
+.. attribute:: RangeField.bounds
+
+    The bounds of the :ref:`psycopg2 Range object <psycopg2:adapt-range>` in
+    Python. Only affects discrete range types. The default is lower bound
+    included, upper bound excluded; that is, ``[)``.
 
 ``IntegerRangeField``
 ---------------------
@@ -633,11 +638,8 @@ excluded; that is, ``[)``.
     Stores a range of integers. Based on an
     :class:`~django.db.models.IntegerField`. Represented by an ``int4range`` in
     the database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in
-    Python.
-
-    Regardless of the bounds specified when saving the data, PostgreSQL always
-    returns a range in a canonical form that includes the lower bound and
-    excludes the upper bound; that is ``[)``.
+    Python. The ``NumericRange`` instance will have the bounds specified by
+    :attr:`RangeField.bounds`.
 
 ``BigIntegerRangeField``
 ------------------------
@@ -647,11 +649,8 @@ excluded; that is, ``[)``.
     Stores a range of large integers. Based on a
     :class:`~django.db.models.BigIntegerField`. Represented by an ``int8range``
     in the database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in
-    Python.
-
-    Regardless of the bounds specified when saving the data, PostgreSQL always
-    returns a range in a canonical form that includes the lower bound and
-    excludes the upper bound; that is ``[)``.
+    Python. The ``NumericRange`` instance will have the bounds specified by
+    :attr:`RangeField.bounds`.
 
 ``DecimalRangeField``
 ---------------------
@@ -693,13 +692,10 @@ excluded; that is, ``[)``.
 
 .. class:: DateRangeField(**options)
 
-    Stores a range of dates. Based on a
-    :class:`~django.db.models.DateField`. Represented by a ``daterange`` in the
-    database and a :class:`~psycopg2:psycopg2.extras.DateRange` in Python.
-
-    Regardless of the bounds specified when saving the data, PostgreSQL always
-    returns a range in a canonical form that includes the lower bound and
-    excludes the upper bound; that is ``[)``.
+    Stores a range of dates. Based on a :class:`~django.db.models.DateField`.
+    Represented by a ``daterange`` in the database and a
+    :class:`~psycopg2:psycopg2.extras.DateRange` in Python. The ``DateRange``
+    instance will have the bounds specified by :attr:`RangeField.bounds`.
 
 Querying Range Fields
 ---------------------
