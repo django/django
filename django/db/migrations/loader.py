@@ -24,7 +24,7 @@ class MigrationLoader:
     but will probably follow the 1234_name.py convention.
 
     On initialization, this class will scan those directories, and open and
-    read the python files, looking for a class called Migration, which should
+    read the Python files, looking for a class called Migration, which should
     inherit from django.db.migrations.Migration. See
     django.db.migrations.migration for what that looks like.
 

@@ -60,7 +60,7 @@ def ogrinspect(*args, **kwargs):
 
     ...will print model definition to stout
 
-    or put this in a python script and use to redirect the output to a new
+    or put this in a Python script and use to redirect the output to a new
     model like:
 
     $ python generate_model.py > myapp/models.py
