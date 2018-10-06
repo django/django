@@ -25,7 +25,7 @@ from django.utils.timezone import get_default_timezone, get_fixed_timezone, utc
 from django.utils.translation import gettext_lazy as _
 from django.utils.version import PY36
 
-from .models import FoodManager, FoodQuerySet
+from .models import FoodManager, FoodQuerySet, ClassSerializable
 
 
 class Money(decimal.Decimal):
@@ -647,3 +647,11 @@ class WriterTests(SimpleTestCase):
 
         string = MigrationWriter.serialize(models.CharField(default=DeconstructibleInstances))[0]
         self.assertEqual(string, "models.CharField(default=migrations.test_writer.DeconstructibleInstances)")
+
+    def test_force_construct_class_arguments(self):
+        """
+        Test for class serializer
+        """
+
+        string = MigrationWriter.serialize(models.CharField(default=ClassSerializable()))[0]
+        self.assertEqual(string, "models.CharField(default=migrations.models.ClassSerializable())")
