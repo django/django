@@ -25,7 +25,7 @@ from django.utils.timezone import get_default_timezone, get_fixed_timezone, utc
 from django.utils.translation import gettext_lazy as _
 from django.utils.version import PY36
 
-from .models import FoodManager, FoodQuerySet, ClassSerializable
+from .models import ClassSerializable, FoodManager, FoodQuerySet
 
 
 class Money(decimal.Decimal):
