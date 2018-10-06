@@ -35,7 +35,6 @@ from django.db.models.sql.datastructures import (
 from django.db.models.sql.where import (
     AND, OR, ExtraWhere, NothingNode, WhereNode,
 )
-from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.tree import Node
 
@@ -1872,7 +1871,7 @@ class Query:
             else:
                 param_iter = iter([])
             for name, entry in select.items():
-                entry = force_text(entry)
+                entry = str(entry)
                 entry_params = []
                 pos = entry.find("%s")
                 while pos != -1:
