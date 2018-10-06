@@ -23,15 +23,31 @@ class UnicodeModel(models.Model):
         return self.title
 
 
-class Unserializable:
+class ClassSerializable:
     """
-    An object that migration doesn't know how to serialize.
+    An object that migration for class serializer.
     """
     pass
 
 
+class ClassSerializableModel(models.Model):
+    title = models.CharField(max_length=20, default=ClassSerializable())
+
+    class Meta:
+        # Disable auto loading of this model as we load it on our own
+        apps = Apps()
+
+
+class Unserializable:
+    """
+    An object that migration doesn't know how to serialize.
+    """
+    def __init__(self, args1):
+        self.args1 = args1
+
+
 class UnserializableModel(models.Model):
-    title = models.CharField(max_length=20, default=Unserializable())
+    title = models.CharField(max_length=20, default=Unserializable(args1="args1"))
 
     class Meta:
         # Disable auto loading of this model as we load it on our own

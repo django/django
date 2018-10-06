@@ -25,7 +25,7 @@ from django.utils.timezone import get_default_timezone, get_fixed_timezone, utc
 from django.utils.translation import gettext_lazy as _
 from django.utils.version import PY36
 
-from .models import FoodManager, FoodQuerySet, Unserializable
+from .models import FoodManager, FoodQuerySet, ClassSerializable
 
 
 class Money(decimal.Decimal):
@@ -650,8 +650,8 @@ class WriterTests(SimpleTestCase):
 
     def test_force_construct_class_arguments(self):
         """
-        Unserializable values can be migrated anymore
+        Test for class serializer
         """
 
-        string = MigrationWriter.serialize(models.CharField(default=Unserializable))[0]
-        self.assertEqual(string, "models.CharField(default=migrations.models.Unserializable)")
+        string = MigrationWriter.serialize(models.CharField(default=ClassSerializable()))[0]
+        self.assertEqual(string, "models.CharField(default=migrations.models.ClassSerializable())")

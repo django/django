@@ -269,18 +269,21 @@ class UUIDSerializer(BaseSerializer):
         return "uuid.%s" % repr(self.value), {"import uuid"}
 
 
-class UnserializablesSerializer(BaseSerializer):
+class ClassSerializer(BaseSerializer):
     def serialize(self):
         from django.utils.deconstruct import deconstructible
         deconstructible_klass = deconstructible(
             self.value.__class__,
             path=self.value.__module__ + "." + self.value.__class__.__name__
         )
-        init_values = self.value.__reduce__()
-        new_value = deconstructible_klass()
-        if len(init_values) > 2:
-            new_value = deconstructible_klass(*[v for v in init_values[2].values()])
-        return DeconstructableSerializer(new_value).serialize()
+        try:
+            init_values = self.value.__reduce__()
+            new_value = deconstructible_klass()
+            if len(init_values) > 2:
+                new_value = deconstructible_klass(*[v for v in init_values[2].values()])
+            return DeconstructableSerializer(new_value).serialize()
+        except TypeError:
+            pass  # not suitable for deconstructible
 
 
 def serializer_factory(value):
@@ -342,7 +345,9 @@ def serializer_factory(value):
 
     # Last try to serialize
     if hasattr(value, "__module__") and hasattr(value, "__class__"):
-        return UnserializablesSerializer(value)
+        class_serializer = ClassSerializer(value)
+        if class_serializer.serialize():
+            return class_serializer
 
     raise ValueError(
         "Cannot serialize: %r\nThere are some values Django cannot serialize into "
