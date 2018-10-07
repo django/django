@@ -179,7 +179,7 @@ Migrations
 * The new :option:`migrate --plan` option prints the list of migration
   operations that will be performed.
 
-* Added class serializer :class:`django.db.migrations.serializer.ClassSerializer`
+* Added class serializer ``ClassSerializer``
 
 Models
 ~~~~~~
