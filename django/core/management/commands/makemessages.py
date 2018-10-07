@@ -19,6 +19,7 @@ from django.utils.functional import cached_property
 from django.utils.jslex import prepare_js_for_gettext
 from django.utils.text import get_text_list
 from django.utils.translation import templatize
+from django.utils.translation.trans_real import language_code_re
 
 plural_forms_re = re.compile(r'^(?P<value>"Plural-Forms.+?\\n")\s*$', re.MULTILINE | re.DOTALL)
 STATUS_OK = 0
@@ -370,7 +371,8 @@ class Command(BaseCommand):
 
         # Check if input given as locale is valid
         for l in locale:
-            if l not in all_locales:
+            match_result = re.match(language_code_re, l)
+            if not match_result:
                 self.stdout.write("Invalid locale %s" % l)
 
         # Account for excluded locales
