@@ -11,6 +11,11 @@ from ..models import DecimalModel, FloatModel, IntegerModel
 
 class LnTests(TestCase):
 
+    def test_null(self):
+        IntegerModel.objects.create()
+        obj = IntegerModel.objects.annotate(null_ln=Ln('normal')).first()
+        self.assertIsNone(obj.null_ln)
+
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('12.9'), n2=Decimal('0.6'))
         obj = DecimalModel.objects.annotate(n1_ln=Ln('n1'), n2_ln=Ln('n2')).first()

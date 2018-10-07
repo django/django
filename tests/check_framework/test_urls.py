@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.core.checks.messages import Warning
+from django.core.checks.messages import Error, Warning
 from django.core.checks.urls import (
     E006, check_url_config, check_url_namespaces_unique, check_url_settings,
     get_warning_for_invalid_pattern,
@@ -163,6 +163,28 @@ class UpdatedToPathTests(SimpleTestCase):
         self.assertEqual(warning.id, '2_0.W001')
         expected_msg = "Your URL pattern 'ending-with-dollar$' has a route"
         self.assertIn(expected_msg, warning.msg)
+
+
+class CheckCustomErrorHandlersTests(SimpleTestCase):
+
+    @override_settings(ROOT_URLCONF='check_framework.urls.bad_error_handlers')
+    def test_bad_handlers(self):
+        result = check_url_config(None)
+        self.assertEqual(len(result), 4)
+        for code, num_params, error in zip([400, 403, 404, 500], [2, 2, 2, 1], result):
+            with self.subTest('handler{}'.format(code)):
+                self.assertEqual(error, Error(
+                    "The custom handler{} view "
+                    "'check_framework.urls.bad_error_handlers.bad_handler' "
+                    "does not take the correct number of arguments (request{})."
+                    .format(code, ', exception' if num_params == 2 else ''),
+                    id='urls.E007',
+                ))
+
+    @override_settings(ROOT_URLCONF='check_framework.urls.good_error_handlers')
+    def test_good_handlers(self):
+        result = check_url_config(None)
+        self.assertEqual(result, [])
 
 
 class CheckURLSettingsTests(SimpleTestCase):

@@ -181,7 +181,8 @@ class CsrfViewMiddleware(MiddlewareMixin):
 
     def _set_token(self, request, response):
         if settings.CSRF_USE_SESSIONS:
-            request.session[CSRF_SESSION_KEY] = request.META['CSRF_COOKIE']
+            if request.session.get(CSRF_SESSION_KEY) != request.META['CSRF_COOKIE']:
+                request.session[CSRF_SESSION_KEY] = request.META['CSRF_COOKIE']
         else:
             response.set_cookie(
                 settings.CSRF_COOKIE_NAME,

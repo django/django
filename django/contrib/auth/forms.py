@@ -22,6 +22,7 @@ UserModel = get_user_model()
 
 class ReadOnlyPasswordHashWidget(forms.Widget):
     template_name = 'auth/widgets/read_only_password_hash.html'
+    read_only = True
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
@@ -149,7 +150,7 @@ class UserChangeForm(forms.ModelForm):
         # Regardless of what the user provides, return the initial value.
         # This is done here, rather than on the field, because the
         # field does not have access to the initial value
-        return self.initial["password"]
+        return self.initial.get('password')
 
 
 class AuthenticationForm(forms.Form):

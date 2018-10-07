@@ -606,6 +606,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
             *self._check_search_fields(admin_obj),
             *self._check_date_hierarchy(admin_obj),
             *self._check_action_permission_methods(admin_obj),
+            *self._check_actions_uniqueness(admin_obj),
         ]
 
     def _check_save_as(self, obj):
@@ -943,6 +944,18 @@ class ModelAdminChecks(BaseModelAdminChecks):
                         )
                     )
         return errors
+
+    def _check_actions_uniqueness(self, obj):
+        """Check that every action has a unique __name__."""
+        names = [name for _, name, _ in obj._get_base_actions()]
+        if len(names) != len(set(names)):
+            return [checks.Error(
+                '__name__ attributes of actions defined in %s must be '
+                'unique.' % obj.__class__,
+                obj=obj.__class__,
+                id='admin.E130',
+            )]
+        return []
 
 
 class InlineModelAdminChecks(BaseModelAdminChecks):

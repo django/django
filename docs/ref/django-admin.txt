@@ -383,13 +383,6 @@ you run it, you'll want to look over the generated models yourself to make
 customizations. In particular, you'll need to rearrange models' order, so that
 models that refer to other models are ordered properly.
 
-Primary keys are automatically introspected for PostgreSQL, MySQL and
-SQLite, in which case Django puts in the ``primary_key=True`` where
-needed.
-
-``inspectdb`` works with PostgreSQL, MySQL and SQLite. Foreign-key detection
-only works in PostgreSQL and with certain types of MySQL tables.
-
 Django doesn't create database defaults when a
 :attr:`~django.db.models.Field.default` is specified on a model field.
 Similarly, database defaults aren't translated to model field defaults or
@@ -401,6 +394,20 @@ modification, and deletion. If you do want to allow Django to manage the
 table's lifecycle, you'll need to change the
 :attr:`~django.db.models.Options.managed` option to ``True`` (or simply remove
 it because ``True`` is its default value).
+
+Database-specific notes
+~~~~~~~~~~~~~~~~~~~~~~~
+
+PostgreSQL
+^^^^^^^^^^
+
+* Models are created for foreign tables.
+* Models are created for materialized views if
+  :option:`--include-views` is used.
+
+.. versionchanged:: 2.2
+
+    Support for foreign tables and materialized views was added.
 
 .. django-admin-option:: --database DATABASE
 
@@ -1657,6 +1664,14 @@ Example usage::
 
     django-admin runserver --no-color
 
+.. django-admin-option:: --force-color
+
+.. versionadded:: 2.2
+
+Forces colorization of the command output if it would otherwise be disabled
+as discussed in :ref:`syntax-coloring`. For example, you may want to pipe
+colored output to another command.
+
 Extra niceties
 ==============
 
@@ -1668,7 +1683,7 @@ Syntax coloring
 The ``django-admin`` / ``manage.py`` commands will use pretty
 color-coded output if your terminal supports ANSI-colored output. It
 won't use the color codes if you're piping the command's output to
-another program.
+another program unless the :option:`--force-color` option is used.
 
 Under Windows, the native console doesn't support ANSI escape sequences so by
 default there is no color output. But you can install the `ANSICON`_

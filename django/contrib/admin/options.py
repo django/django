@@ -256,7 +256,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             kwargs['widget'] = AutocompleteSelectMultiple(db_field.remote_field, self.admin_site, using=db)
         elif db_field.name in self.raw_id_fields:
             kwargs['widget'] = widgets.ManyToManyRawIdWidget(db_field.remote_field, self.admin_site, using=db)
-        elif db_field.name in list(self.filter_vertical) + list(self.filter_horizontal):
+        elif db_field.name in [*self.filter_vertical, *self.filter_horizontal]:
             kwargs['widget'] = widgets.FilteredSelectMultiple(
                 db_field.verbose_name,
                 db_field.name in self.filter_vertical
@@ -318,7 +318,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             return self.fields
         # _get_form_for_get_fields() is implemented in subclasses.
         form = self._get_form_for_get_fields(request, obj)
-        return list(form.base_fields) + list(self.get_readonly_fields(request, obj))
+        return [*form.base_fields, *self.get_readonly_fields(request, obj)]
 
     def get_fieldsets(self, request, obj=None):
         """
@@ -724,7 +724,7 @@ class ModelAdmin(BaseModelAdmin):
         list_display_links = self.get_list_display_links(request, list_display)
         # Add the action checkboxes if any actions are available.
         if self.get_actions(request):
-            list_display = ['action_checkbox'] + list(list_display)
+            list_display = ['action_checkbox', *list_display]
         sortable_by = self.get_sortable_by(request)
         ChangeList = self.get_changelist(request)
         return ChangeList(

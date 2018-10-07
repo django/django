@@ -1558,6 +1558,18 @@ class SchemaTests(TransactionTestCase):
             TagUniqueRename.objects.create(title="bar", slug2="foo")
         Tag.objects.all().delete()
 
+    def test_unique_name_quoting(self):
+        old_table_name = TagUniqueRename._meta.db_table
+        try:
+            with connection.schema_editor() as editor:
+                editor.create_model(TagUniqueRename)
+                editor.alter_db_table(TagUniqueRename, old_table_name, 'unique-table')
+                TagUniqueRename._meta.db_table = 'unique-table'
+                # This fails if the unique index name isn't quoted.
+                editor.alter_unique_together(TagUniqueRename, [], (('title', 'slug2'),))
+        finally:
+            TagUniqueRename._meta.db_table = old_table_name
+
     @isolate_apps('schema')
     @unittest.skipIf(connection.vendor == 'sqlite', 'SQLite naively remakes the table on field alteration.')
     @skipUnlessDBFeature('supports_foreign_keys')

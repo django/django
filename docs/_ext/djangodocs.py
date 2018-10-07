@@ -6,16 +6,18 @@ import os
 import re
 
 from docutils import nodes
-from docutils.parsers.rst import Directive, directives
+from docutils.parsers.rst import Directive
 from docutils.statemachine import ViewList
 from sphinx import addnodes
 from sphinx.builders.html import StandaloneHTMLBuilder
 from sphinx.directives import CodeBlock
 from sphinx.domains.std import Cmdoption
+from sphinx.errors import ExtensionError
+from sphinx.util import logging
 from sphinx.util.console import bold
-from sphinx.util.nodes import set_source_info
 from sphinx.writers.html import HTMLTranslator
 
+logger = logging.getLogger(__name__)
 # RE for option descriptions without a '--' prefix
 simple_option_desc_re = re.compile(
     r'([-_a-zA-Z0-9]+)(\s*.*?)(?=,\s+(?:/|-|--)|$)')
@@ -42,7 +44,7 @@ def setup(app):
         rolename="lookup",
         indextemplate="pair: %s; field lookup type",
     )
-    app.add_description_unit(
+    app.add_object_type(
         directivename="django-admin",
         rolename="djadmin",
         indextemplate="pair: %s; django-admin command",
@@ -53,17 +55,6 @@ def setup(app):
     app.add_directive('versionadded', VersionDirective)
     app.add_directive('versionchanged', VersionDirective)
     app.add_builder(DjangoStandaloneHTMLBuilder)
-
-    # register the snippet directive
-    app.add_directive('snippet', SnippetWithFilename)
-    # register a node for snippet directive so that the xml parser
-    # knows how to handle the enter/exit parsing event
-    app.add_node(snippet_with_filename,
-                 html=(visit_snippet, depart_snippet_literal),
-                 latex=(visit_snippet_latex, depart_snippet_latex),
-                 man=(visit_snippet_literal, depart_snippet_literal),
-                 text=(visit_snippet_literal, depart_snippet_literal),
-                 texinfo=(visit_snippet_literal, depart_snippet_literal))
     app.set_translator('djangohtml', DjangoHTMLTranslator)
     app.set_translator('json', DjangoHTMLTranslator)
     app.add_node(
@@ -77,133 +68,6 @@ def setup(app):
     app.add_directive('console', ConsoleDirective)
     app.connect('html-page-context', html_page_context_hook)
     return {'parallel_read_safe': True}
-
-
-class snippet_with_filename(nodes.literal_block):
-    """
-    Subclass the literal_block to override the visit/depart event handlers
-    """
-    pass
-
-
-def visit_snippet_literal(self, node):
-    """
-    default literal block handler
-    """
-    self.visit_literal_block(node)
-
-
-def depart_snippet_literal(self, node):
-    """
-    default literal block handler
-    """
-    self.depart_literal_block(node)
-
-
-def visit_snippet(self, node):
-    """
-    HTML document generator visit handler
-    """
-    lang = self.highlightlang
-    linenos = node.rawsource.count('\n') >= self.highlightlinenothreshold - 1
-    fname = node['filename']
-    highlight_args = node.get('highlight_args', {})
-    if 'language' in node:
-        # code-block directives
-        lang = node['language']
-        highlight_args['force'] = True
-    if 'linenos' in node:
-        linenos = node['linenos']
-
-    def warner(msg):
-        self.builder.warn(msg, (self.builder.current_docname, node.line))
-
-    highlighted = self.highlighter.highlight_block(node.rawsource, lang,
-                                                   warn=warner,
-                                                   linenos=linenos,
-                                                   **highlight_args)
-    starttag = self.starttag(node, 'div', suffix='',
-                             CLASS='highlight-%s snippet' % lang)
-    self.body.append(starttag)
-    self.body.append('<div class="snippet-filename">%s</div>\n''' % (fname,))
-    self.body.append(highlighted)
-    self.body.append('</div>\n')
-    raise nodes.SkipNode
-
-
-def visit_snippet_latex(self, node):
-    """
-    Latex document generator visit handler
-    """
-    code = node.rawsource.rstrip('\n')
-
-    lang = self.hlsettingstack[-1][0]
-    linenos = code.count('\n') >= self.hlsettingstack[-1][1] - 1
-    fname = node['filename']
-    highlight_args = node.get('highlight_args', {})
-    if 'language' in node:
-        # code-block directives
-        lang = node['language']
-        highlight_args['force'] = True
-    if 'linenos' in node:
-        linenos = node['linenos']
-
-    def warner(msg):
-        self.builder.warn(msg, (self.curfilestack[-1], node.line))
-
-    hlcode = self.highlighter.highlight_block(code, lang, warn=warner,
-                                              linenos=linenos,
-                                              **highlight_args)
-
-    self.body.append(
-        '\n{\\colorbox[rgb]{0.9,0.9,0.9}'
-        '{\\makebox[\\textwidth][l]'
-        '{\\small\\texttt{%s}}}}\n' % (
-            # Some filenames have '_', which is special in latex.
-            fname.replace('_', r'\_'),
-        )
-    )
-
-    if self.table:
-        hlcode = hlcode.replace('\\begin{Verbatim}',
-                                '\\begin{OriginalVerbatim}')
-        self.table.has_problematic = True
-        self.table.has_verbatim = True
-
-    hlcode = hlcode.rstrip()[:-14]  # strip \end{Verbatim}
-    hlcode = hlcode.rstrip() + '\n'
-    self.body.append('\n' + hlcode + '\\end{%sVerbatim}\n' %
-                     (self.table and 'Original' or ''))
-
-    # Prevent rawsource from appearing in output a second time.
-    raise nodes.SkipNode
-
-
-def depart_snippet_latex(self, node):
-    """
-    Latex document generator depart handler.
-    """
-    pass
-
-
-class SnippetWithFilename(Directive):
-    """
-    The 'snippet' directive that allows to add the filename (optional)
-    of a code snippet in the document. This is modeled after CodeBlock.
-    """
-    has_content = True
-    optional_arguments = 1
-    option_spec = {'filename': directives.unchanged_required}
-
-    def run(self):
-        code = '\n'.join(self.content)
-
-        literal = snippet_with_filename(code, code)
-        if self.arguments:
-            literal['language'] = self.arguments[0]
-        literal['filename'] = self.options['filename']
-        set_source_info(self, literal)
-        return [literal]
 
 
 class VersionDirective(Directive):
@@ -233,7 +97,11 @@ class VersionDirective(Directive):
         node['type'] = self.name
         if self.content:
             self.state.nested_parse(self.content, self.content_offset, node)
-        env.note_versionchange(node['type'], node['version'], node, self.lineno)
+        try:
+            env.get_domain('changeset').note_changeset(node)
+        except ExtensionError:
+            # Sphinx < 1.8: Domain 'changeset' is not registered
+            env.note_versionchange(node['type'], node['version'], node, self.lineno)
         return ret
 
 
@@ -318,7 +186,7 @@ class DjangoStandaloneHTMLBuilder(StandaloneHTMLBuilder):
 
     def finish(self):
         super().finish()
-        self.info(bold("writing templatebuiltins.js..."))
+        logger.info(bold("writing templatebuiltins.js..."))
         xrefs = self.env.domaindata["std"]["objects"]
         templatebuiltins = {
             "ttags": [
@@ -342,6 +210,8 @@ class ConsoleNode(nodes.literal_block):
     Custom node to override the visit/depart event handlers at registration
     time. Wrap a literal_block object and defer to it.
     """
+    tagname = 'ConsoleNode'
+
     def __init__(self, litblk_obj):
         self.wrapped = litblk_obj
 
@@ -452,6 +322,8 @@ class ConsoleDirective(CodeBlock):
                 return 'runtests.py ' + args_to_win(line[15:])
             if line.startswith('$ ./'):
                 return args_to_win(line[4:])
+            if line.startswith('$ python3'):
+                return 'py ' + args_to_win(line[9:])
             if line.startswith('$ python'):
                 return 'py ' + args_to_win(line[8:])
             if line.startswith('$ '):

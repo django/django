@@ -21,8 +21,8 @@ to raster (image) data.
     Although the module is named ``gdal``, GeoDjango only supports some of the
     capabilities of OGR and GDAL's raster features at this time.
 
-__ http://www.gdal.org/
-__ http://www.gdal.org/ogr_arch.html
+__ https://www.gdal.org/
+__ https://www.gdal.org/ogr_arch.html
 
 Overview
 ========
@@ -92,7 +92,7 @@ each feature in that layer.
 
     Returns the name of the data source.
 
-__ http://www.gdal.org/ogr_formats.html
+__ https://www.gdal.org/ogr_formats.html
 
 ``Layer``
 ---------
@@ -446,7 +446,7 @@ coordinate transformation::
     :class:`Feature.geom` attribute, when reading vector data from
     :class:`Layer` (which is in turn a part of a :class:`DataSource`).
 
-    __ http://www.gdal.org/classOGRGeometry.html
+    __ https://www.gdal.org/classOGRGeometry.html
 
     .. classmethod:: from_gml(gml_string)
 
@@ -1176,7 +1176,7 @@ blue.
         needed. For instance, use ``GTiff`` for a ``GeoTiff`` file. For a list of file types,
         see also the `GDAL Raster Formats`__ list.
 
-        __ http://www.gdal.org/formats_list.html
+        __ https://www.gdal.org/formats_list.html
 
         An in-memory raster is created through the following example:
 
@@ -1403,7 +1403,7 @@ blue.
         Returns a string with a summary of the raster. This is equivalent to
         the `gdalinfo`__ command line utility.
 
-        __ http://www.gdal.org/gdalinfo.html
+        __ https://www.gdal.org/gdalinfo.html
 
     .. attribute:: metadata
 
@@ -1732,7 +1732,7 @@ Key               Default  Usage
         ...    }
         ... })
 
-__ http://www.gdal.org/frmt_gtiff.html
+__ https://www.gdal.org/frmt_gtiff.html
 
 The ``band_input`` dictionary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

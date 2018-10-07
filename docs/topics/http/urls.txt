@@ -761,8 +761,8 @@ and one called ``'publisher-polls'``. Assume we have enhanced that application
 so that it takes the instance namespace into consideration when creating and
 displaying polls.
 
-.. snippet::
-    :filename: urls.py
+.. code-block:: python
+    :caption: urls.py
 
     from django.urls import include, path
 
@@ -771,8 +771,8 @@ displaying polls.
         path('publisher-polls/', include('polls.urls', namespace='publisher-polls')),
     ]
 
-.. snippet::
-    :filename: polls/urls.py
+.. code-block:: python
+    :caption: polls/urls.py
 
     from django.urls import path
 
@@ -830,8 +830,8 @@ at the same level as the ``urlpatterns`` attribute. You have to pass the actual
 module, or a string reference to the module, to :func:`~django.urls.include`,
 not the list of ``urlpatterns`` itself.
 
-.. snippet::
-    :filename: polls/urls.py
+.. code-block:: python
+    :caption: polls/urls.py
 
     from django.urls import path
 
@@ -844,8 +844,8 @@ not the list of ``urlpatterns`` itself.
         ...
     ]
 
-.. snippet::
-    :filename: urls.py
+.. code-block:: python
+    :caption: urls.py
 
     from django.urls import include, path
 

@@ -8,14 +8,14 @@
 # Jannis Vajen, 2011,2013
 # Jannis Leidel <jannis@leidel.info>, 2013-2018
 # Jannis Vajen, 2016
-# Markus Holtermann <inyoka@markusholtermann.eu>, 2013,2015
+# Markus Holtermann <info@markusholtermann.eu>, 2013,2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-05-18 00:21+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2018-08-14 08:25+0000\n"
+"Last-Translator: Florian Apolloner <florian@apolloner.eu>\n"
 "Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -482,7 +482,7 @@ msgstr "„%(value)s“ Wert muss entweder True oder False sein."
 
 #, python-format
 msgid "'%(value)s' value must be either True, False, or None."
-msgstr ""
+msgstr "„%(value)s“ Wert muss True, False oder None sein."
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolescher Wert (True oder False)"
@@ -673,7 +673,7 @@ msgstr "Bitte eine gültige Zeitspanne eingeben."
 
 #, python-brace-format
 msgid "The number of days must be between {min_days} and {max_days}."
-msgstr ""
+msgstr "Die Anzahl der Tage muss zwischen {min_days} und {max_days} sein."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""

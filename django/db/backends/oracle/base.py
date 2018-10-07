@@ -301,16 +301,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             return True
 
     @cached_property
-    def oracle_full_version(self):
-        with self.temporary_connection():
-            return self.connection.version
-
-    @cached_property
     def oracle_version(self):
-        try:
-            return int(self.oracle_full_version.split('.')[0])
-        except ValueError:
-            return None
+        with self.temporary_connection():
+            return tuple(int(x) for x in self.connection.version.split('.'))
 
 
 class OracleParam:

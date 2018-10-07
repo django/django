@@ -3,7 +3,7 @@ from django.db import models
 
 from .fields import (
     ArrayField, BigIntegerRangeField, CICharField, CIEmailField, CITextField,
-    DateRangeField, DateTimeRangeField, FloatRangeField, HStoreField,
+    DateRangeField, DateTimeRangeField, DecimalRangeField, HStoreField,
     IntegerRangeField, JSONField, SearchVectorField,
 )
 
@@ -63,9 +63,9 @@ class NestedIntegerArrayModel(PostgreSQLModel):
 
 
 class OtherTypesArrayModel(PostgreSQLModel):
-    ips = ArrayField(models.GenericIPAddressField())
-    uuids = ArrayField(models.UUIDField())
-    decimals = ArrayField(models.DecimalField(max_digits=5, decimal_places=2))
+    ips = ArrayField(models.GenericIPAddressField(), default=list)
+    uuids = ArrayField(models.UUIDField(), default=list)
+    decimals = ArrayField(models.DecimalField(max_digits=5, decimal_places=2), default=list)
     tags = ArrayField(TagField(), blank=True, null=True)
     json = ArrayField(JSONField(default=dict), default=list)
     int_ranges = ArrayField(IntegerRangeField(), blank=True, null=True)
@@ -129,7 +129,7 @@ class Line(PostgreSQLModel):
 class RangesModel(PostgreSQLModel):
     ints = IntegerRangeField(blank=True, null=True)
     bigints = BigIntegerRangeField(blank=True, null=True)
-    floats = FloatRangeField(blank=True, null=True)
+    decimals = DecimalRangeField(blank=True, null=True)
     timestamps = DateTimeRangeField(blank=True, null=True)
     dates = DateRangeField(blank=True, null=True)
 

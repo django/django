@@ -6,6 +6,7 @@ themselves do not have to (and could be backed by things other than SQL
 databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
+import difflib
 import functools
 from collections import Counter, OrderedDict, namedtuple
 from collections.abc import Iterator, Mapping
@@ -1096,12 +1097,11 @@ class Query:
         and get_transform().
         """
         # __exact is the default lookup if one isn't given.
-        lookups = lookups or ['exact']
-        for name in lookups[:-1]:
+        *transforms, lookup_name = lookups or ['exact']
+        for name in transforms:
             lhs = self.try_transform(lhs, name)
         # First try get_lookup() so that the lookup takes precedence if the lhs
         # supports both transform and lookup for the name.
-        lookup_name = lookups[-1]
         lookup_class = lhs.get_lookup(lookup_name)
         if not lookup_class:
             if lhs.field.is_relation:
@@ -1141,10 +1141,16 @@ class Query:
         if transform_class:
             return transform_class(lhs)
         else:
+            output_field = lhs.output_field.__class__
+            suggested_lookups = difflib.get_close_matches(name, output_field.get_lookups())
+            if suggested_lookups:
+                suggestion = ', perhaps you meant %s?' % ' or '.join(suggested_lookups)
+            else:
+                suggestion = '.'
             raise FieldError(
                 "Unsupported lookup '%s' for %s or join on the field not "
-                "permitted." %
-                (name, lhs.output_field.__class__.__name__))
+                "permitted%s" % (name, output_field.__name__, suggestion)
+            )
 
     def build_filter(self, filter_expr, branch_negated=False, current_negated=False,
                      can_reuse=None, allow_joins=True, split_subq=True,
@@ -1406,11 +1412,11 @@ class Query:
                 # one step.
                 pos -= 1
                 if pos == -1 or fail_on_missing:
-                    field_names = list(get_field_names_from_opts(opts))
-                    available = sorted(
-                        field_names + list(self.annotation_select) +
-                        list(self._filtered_relations)
-                    )
+                    available = sorted([
+                        *get_field_names_from_opts(opts),
+                        *self.annotation_select,
+                        *self._filtered_relations,
+                    ])
                     raise FieldError("Cannot resolve keyword '%s' into field. "
                                      "Choices are: %s" % (name, ", ".join(available)))
                 break
@@ -1594,10 +1600,13 @@ class Query:
         else:
             field_list = name.split(LOOKUP_SEP)
             join_info = self.setup_joins(field_list, self.get_meta(), self.get_initial_alias(), can_reuse=reuse)
-            targets, _, join_list = self.trim_joins(join_info.targets, join_info.joins, join_info.path)
+            targets, final_alias, join_list = self.trim_joins(join_info.targets, join_info.joins, join_info.path)
             if len(targets) > 1:
                 raise FieldError("Referencing multicolumn fields with F() objects "
                                  "isn't supported")
+            # Verify that the last lookup in name is a field or a transform:
+            # transform_function() raises FieldError if not.
+            join_info.transform_function(targets[0], final_alias)
             if reuse is not None:
                 reuse.update(join_list)
             col = _get_col(targets[0], join_info.targets[0], join_list[-1], simple_col)
@@ -1773,10 +1782,10 @@ class Query:
                 # from the model on which the lookup failed.
                 raise
             else:
-                names = sorted(
-                    list(get_field_names_from_opts(opts)) + list(self.extra) +
-                    list(self.annotation_select) + list(self._filtered_relations)
-                )
+                names = sorted([
+                    *get_field_names_from_opts(opts), *self.extra,
+                    *self.annotation_select, *self._filtered_relations
+                ])
                 raise FieldError("Cannot resolve keyword %r into field. "
                                  "Choices are: %s" % (name, ", ".join(names)))
 

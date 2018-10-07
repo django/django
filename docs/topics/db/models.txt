@@ -649,7 +649,7 @@ just refer to the other model class wherever needed. For example::
 Field name restrictions
 -----------------------
 
-Django places only two restrictions on model field names:
+Django places some restrictions on model field names:
 
 1. A field name cannot be a Python reserved word, because that would result
    in a Python syntax error. For example::
@@ -662,6 +662,8 @@ Django places only two restrictions on model field names:
 
        class Example(models.Model):
            foo__bar = models.IntegerField() # 'foo__bar' has two underscores!
+
+3. A field name cannot end with an underscore, for similar reasons.
 
 These limitations can be worked around, though, because your field name doesn't
 necessarily have to match your database column name. See the
@@ -979,11 +981,11 @@ To work around this problem, when you are using
 class (only), part of the value should contain ``'%(app_label)s'`` and
 ``'%(class)s'``.
 
-- ``'%(class)s'`` is replaced by the lower-cased name of the child class
-  that the field is used in.
-- ``'%(app_label)s'`` is replaced by the lower-cased name of the app the child
-  class is contained within. Each installed application name must be unique
-  and the model class names within each app must also be unique, therefore the
+- ``'%(class)s'`` is replaced by the lowercased name of the child class that
+  the field is used in.
+- ``'%(app_label)s'`` is replaced by the lowercased name of the app the child
+  class is contained within. Each installed application name must be unique and
+  the model class names within each app must also be unique, therefore the
   resulting name will end up being different.
 
 For example, given an app ``common/models.py``::
@@ -1063,8 +1065,8 @@ possible::
     >>> Restaurant.objects.filter(name="Bob's Cafe")
 
 If you have a ``Place`` that is also a ``Restaurant``, you can get from the
-``Place`` object to the ``Restaurant`` object by using the lower-case version
-of the model name::
+``Place`` object to the ``Restaurant`` object by using the lowercase version of
+the model name::
 
     >>> p = Place.objects.get(id=12)
     # If p is a Restaurant object, this will give the child class:
@@ -1429,8 +1431,8 @@ store your models. You must import the models in the ``__init__.py`` file.
 For example, if you had ``organic.py`` and ``synthetic.py`` in the ``models``
 directory:
 
-.. snippet::
-    :filename: myapp/models/__init__.py
+.. code-block:: python
+    :caption: myapp/models/__init__.py
 
     from .organic import Person
     from .synthetic import Robot

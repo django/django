@@ -58,7 +58,7 @@ look like in JSON:
 
 And here's that same fixture as YAML:
 
-.. code-block:: none
+.. code-block:: yaml
 
     - model: myapp.person
       pk: 1

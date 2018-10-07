@@ -3,22 +3,23 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Juraj Bubniak <translations@jbub.eu>, 2012-2013
-# Marian Andre <marian@andre.sk>, 2013,2015,2017
+# Marian Andre <marian@andre.sk>, 2013,2015,2017-2018
 # Martin Kosír, 2011
 # Martin Tóth <ezimir@gmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-01 21:10+0100\n"
-"PO-Revision-Date: 2017-12-05 11:02+0000\n"
-"Last-Translator: Martin Tóth <ezimir@gmail.com>\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-08-25 06:21+0000\n"
+"Last-Translator: Marian Andre <marian@andre.sk>\n"
 "Language-Team: Slovak (http://www.transifex.com/django/django/language/sk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: sk\n"
-"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n "
+">= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);\n"
 
 msgid "Afrikaans"
 msgstr "afrikánsky"
@@ -374,6 +375,9 @@ msgstr[1] ""
 msgstr[2] ""
 "Uistite sa, že zadaná hodnota má najmenej %(limit_value)d znakov (má "
 "%(show_value)d)."
+msgstr[3] ""
+"Uistite sa, že zadaná hodnota má najmenej %(limit_value)d znakov (má "
+"%(show_value)d)."
 
 #, python-format
 msgid ""
@@ -391,6 +395,12 @@ msgstr[1] ""
 msgstr[2] ""
 "Uistite sa, že táto hodnota má najviac %(limit_value)d  znakov (má "
 "%(show_value)d)."
+msgstr[3] ""
+"Uistite sa, že táto hodnota má najviac %(limit_value)d  znakov (má "
+"%(show_value)d)."
+
+msgid "Enter a number."
+msgstr "Zadajte číslo."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
@@ -398,6 +408,7 @@ msgid_plural "Ensure that there are no more than %(max)s digits in total."
 msgstr[0] "Uistite sa, že nie je zadaných celkovo viac ako %(max)s číslica."
 msgstr[1] "Uistite sa, že nie je zadaných celkovo viac ako %(max)s číslice."
 msgstr[2] "Uistite sa, že nie je zadaných celkovo viac ako %(max)s číslic."
+msgstr[3] "Uistite sa, že nie je zadaných celkovo viac ako %(max)s číslic."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
@@ -405,6 +416,7 @@ msgid_plural "Ensure that there are no more than %(max)s decimal places."
 msgstr[0] "Uistite sa, že nie je zadané viac ako %(max)s desatinné miesto."
 msgstr[1] "Uistite sa, že nie sú zadané viac ako %(max)s desatinné miesta."
 msgstr[2] "Uistite sa, že nie je zadaných viac ako %(max)s desatinných miest."
+msgstr[3] "Uistite sa, že nie je zadaných viac ako %(max)s desatinných miest."
 
 #, python-format
 msgid ""
@@ -418,6 +430,9 @@ msgstr[1] ""
 "Uistite sa, že nie sú zadané viac ako %(max)s číslice pred desatinnou "
 "čiarkou."
 msgstr[2] ""
+"Uistite sa, že nie je zadaných viac ako %(max)s číslic pred desatinnou "
+"čiarkou."
+msgstr[3] ""
 "Uistite sa, že nie je zadaných viac ako %(max)s číslic pred desatinnou "
 "čiarkou."
 
@@ -478,6 +493,10 @@ msgstr "Veľké celé číslo (8 bajtov)"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' value musí byť True alebo False."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "'%(value)s' musí byť True, False alebo None."
 
 msgid "Boolean (Either True or False)"
 msgstr "Logická hodnota (buď True alebo False)"
@@ -649,9 +668,6 @@ msgstr "Toto pole je povinné."
 msgid "Enter a whole number."
 msgstr "Zadajte celé číslo."
 
-msgid "Enter a number."
-msgstr "Zadajte číslo."
-
 msgid "Enter a valid date."
 msgstr "Zadajte platný dátum."
 
@@ -663,6 +679,10 @@ msgstr "Zadajte platný dátum/čas."
 
 msgid "Enter a valid duration."
 msgstr "Zadajte platnú dobu trvania."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Počet dní musí byť medzi {min_days} a {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Súbor nebol odoslaný. Skontrolujte typ kódovania vo formulári."
@@ -682,6 +702,8 @@ msgstr[0] ""
 msgstr[1] ""
 "Uistite sa, že názov súboru má najviac %(max)d znaky (má %(length)d)."
 msgstr[2] ""
+"Uistite sa, že názov súboru má najviac %(max)d znakov (má %(length)d)."
+msgstr[3] ""
 "Uistite sa, že názov súboru má najviac %(max)d znakov (má %(length)d)."
 
 msgid "Please either submit a file or check the clear checkbox, not both."
@@ -726,6 +748,7 @@ msgid_plural "Please submit %d or fewer forms."
 msgstr[0] "Prosím odošlite %d alebo menej formulárov."
 msgstr[1] "Prosím odošlite %d alebo menej formulárov."
 msgstr[2] "Prosím odošlite %d alebo menej formulárov."
+msgstr[3] "Prosím odošlite %d alebo menej formulárov."
 
 #, python-format
 msgid "Please submit %d or more forms."
@@ -733,6 +756,7 @@ msgid_plural "Please submit %d or more forms."
 msgstr[0] "Prosím odošlite %d alebo viac formulárov."
 msgstr[1] "Prosím odošlite %d alebo viac formulárov."
 msgstr[2] "Prosím odošlite %d alebo viac formulárov."
+msgstr[3] "Prosím odošlite %d alebo viac formulárov."
 
 msgid "Order"
 msgstr "Poradie"
@@ -805,6 +829,7 @@ msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d bajt"
 msgstr[1] "%(size)d bajty"
 msgstr[2] "%(size)d bajtov"
+msgstr[3] "%(size)d bajtov"
 
 #, python-format
 msgid "%s KB"
@@ -1075,6 +1100,7 @@ msgid_plural "%d years"
 msgstr[0] "%d rok"
 msgstr[1] "%d roky"
 msgstr[2] "%d rokov"
+msgstr[3] "%d rokov"
 
 #, python-format
 msgid "%d month"
@@ -1082,6 +1108,7 @@ msgid_plural "%d months"
 msgstr[0] "%d mesiac"
 msgstr[1] "%d mesiace"
 msgstr[2] "%d mesiacov"
+msgstr[3] "%d mesiacov"
 
 #, python-format
 msgid "%d week"
@@ -1089,6 +1116,7 @@ msgid_plural "%d weeks"
 msgstr[0] "%d týždeň"
 msgstr[1] "%d týždne"
 msgstr[2] "%d týždňov"
+msgstr[3] "%d týždňov"
 
 #, python-format
 msgid "%d day"
@@ -1096,6 +1124,7 @@ msgid_plural "%d days"
 msgstr[0] "%d deň"
 msgstr[1] "%d dni"
 msgstr[2] "%d dní"
+msgstr[3] "%d dní"
 
 #, python-format
 msgid "%d hour"
@@ -1103,6 +1132,7 @@ msgid_plural "%d hours"
 msgstr[0] "%d hodina"
 msgstr[1] "%d hodiny"
 msgstr[2] "%d hodín"
+msgstr[3] "%d hodín"
 
 #, python-format
 msgid "%d minute"
@@ -1110,6 +1140,7 @@ msgid_plural "%d minutes"
 msgstr[0] "%d minúta"
 msgstr[1] "%d minúty"
 msgstr[2] "%d minút"
+msgstr[3] "%d minút"
 
 msgid "0 minutes"
 msgstr "0 minút"

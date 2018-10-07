@@ -249,7 +249,7 @@ Advanced features of ``TransactionTestCase``
     By default, ``available_apps`` is set to ``None``. After each test, Django
     calls :djadmin:`flush` to reset the database state. This empties all tables
     and emits the :data:`~django.db.models.signals.post_migrate` signal, which
-    re-creates one content type and three permissions for each model. This
+    recreates one content type and four permissions for each model. This
     operation gets expensive proportionally to the number of models.
 
     Setting ``available_apps`` to a list of applications instructs Django to
@@ -325,8 +325,8 @@ following structure::
 
 Let's take a look inside a couple of those files:
 
-.. snippet::
-    :filename: runtests.py
+.. code-block:: python
+    :caption: runtests.py
 
     #!/usr/bin/env python
     import os
@@ -353,8 +353,8 @@ necessary to use the Django test runner. You may want to add
 command-line options for controlling verbosity, passing in specific test
 labels to run, etc.
 
-.. snippet::
-    :filename: tests/test_settings.py
+.. code-block:: python
+    :caption: tests/test_settings.py
 
     SECRET_KEY = 'fake-key'
     INSTALLED_APPS = [

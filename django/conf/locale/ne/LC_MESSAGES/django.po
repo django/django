@@ -3,14 +3,14 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2014
 # Paras Nath Chaudhary <opnchaudhary@gmail.com>, 2012
-# Sagar Chalise <chalisesagar@gmail.com>, 2011-2012,2015
+# Sagar Chalise <chalisesagar@gmail.com>, 2011-2012,2015,2018
 # Sagar Chalise <chalisesagar@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-07-21 02:37+0000\n"
+"PO-Revision-Date: 2018-09-29 06:13+0000\n"
 "Last-Translator: Sagar Chalise <chalisesagar@gmail.com>\n"
 "Language-Team: Nepali (http://www.transifex.com/django/django/language/ne/)\n"
 "MIME-Version: 1.0\n"
@@ -463,7 +463,7 @@ msgstr "%(value)s' को मान True अथवा False हुनुपर�
 
 #, python-format
 msgid "'%(value)s' value must be either True, False, or None."
-msgstr ""
+msgstr "'%(value)s' को मान True, False अथवा None हुनुपर्दछ ।"
 
 msgid "Boolean (Either True or False)"
 msgstr "बुलियन (True अथवा False)"

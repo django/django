@@ -3,7 +3,6 @@ import tempfile
 from os.path import abspath, dirname, join, normcase, sep
 
 from django.core.exceptions import SuspiciousFileOperation
-from django.utils.encoding import force_text
 
 # For backwards-compatibility in Django 2.0
 abspathu = abspath
@@ -30,8 +29,6 @@ def safe_join(base, *paths):
     Raise ValueError if the final path isn't located inside of the base path
     component.
     """
-    base = force_text(base)
-    paths = [force_text(p) for p in paths]
     final_path = abspath(join(base, *paths))
     base_path = abspath(base)
     # Ensure final_path starts with base_path (using normcase to ensure we

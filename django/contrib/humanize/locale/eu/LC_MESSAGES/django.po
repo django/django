@@ -3,15 +3,15 @@
 # Translators:
 # Aitzol Naberan <anaberan@codesyntax.com>, 2011-2012,2016
 # Ander Martínez <ander.basaundi@gmail.com>, 2014
-# Eneko Illarramendi <eneko@illarra.com>, 2017
+# Eneko Illarramendi <eneko@illarra.com>, 2017-2018
 # Jannis Leidel <jannis@leidel.info>, 2011
-# julen <julenx@gmail.com>, 2014
+# julen, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-08-23 14:56+0000\n"
 "Last-Translator: Eneko Illarramendi <eneko@illarra.com>\n"
 "Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
 "MIME-Version: 1.0\n"
@@ -23,17 +23,60 @@ msgstr ""
 msgid "Humanize"
 msgstr "Humanizatu"
 
-msgid "th"
-msgstr "."
+#. Translators: Ordinal format for 11 (11th), 12 (12th), and 13 (13th).
+msgctxt "ordinal 11, 12, 13"
+msgid "{}th"
+msgstr "{}."
 
-msgid "st"
-msgstr "."
+#. Translators: Ordinal format when value ends with 0, e.g. 80th.
+msgctxt "ordinal 0"
+msgid "{}th"
+msgstr "{}."
 
-msgid "nd"
-msgstr "."
+#. Translators: Ordinal format when value ends with 1, e.g. 81st, except 11.
+msgctxt "ordinal 1"
+msgid "{}st"
+msgstr "{}."
 
-msgid "rd"
-msgstr "."
+#. Translators: Ordinal format when value ends with 2, e.g. 82nd, except 12.
+msgctxt "ordinal 2"
+msgid "{}nd"
+msgstr "{}."
+
+#. Translators: Ordinal format when value ends with 3, e.g. 83th, except 13.
+msgctxt "ordinal 3"
+msgid "{}rd"
+msgstr "{}."
+
+#. Translators: Ordinal format when value ends with 4, e.g. 84th.
+msgctxt "ordinal 4"
+msgid "{}th"
+msgstr "{}."
+
+#. Translators: Ordinal format when value ends with 5, e.g. 85th.
+msgctxt "ordinal 5"
+msgid "{}th"
+msgstr "{}."
+
+#. Translators: Ordinal format when value ends with 6, e.g. 86th.
+msgctxt "ordinal 6"
+msgid "{}th"
+msgstr "{}."
+
+#. Translators: Ordinal format when value ends with 7, e.g. 87th.
+msgctxt "ordinal 7"
+msgid "{}th"
+msgstr "{}."
+
+#. Translators: Ordinal format when value ends with 8, e.g. 88th.
+msgctxt "ordinal 8"
+msgid "{}th"
+msgstr "{}."
+
+#. Translators: Ordinal format when value ends with 9, e.g. 89th.
+msgctxt "ordinal 9"
+msgid "{}th"
+msgstr "{}."
 
 #, python-format
 msgid "%(value).1f million"
@@ -203,10 +246,55 @@ msgstr "bihar"
 msgid "yesterday"
 msgstr "atzo"
 
+#. Translators: delta will contain a string like '2 months' or '1 month, 2
+#. weeks'
 #, python-format
-msgctxt "naturaltime"
 msgid "%(delta)s ago"
 msgstr "duela %(delta)s"
+
+#. Translators: 'naturaltime-past' strings will be included in
+#. '%(delta)s ago'
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] "urte %d"
+msgstr[1] "%d urte"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d month"
+msgid_plural "%d months"
+msgstr[0] "hilabete %d"
+msgstr[1] "%d hilabete"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d week"
+msgid_plural "%d weeks"
+msgstr[0] "aste %d"
+msgstr[1] "%d aste"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "egun %d"
+msgstr[1] "%d egun"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "ordu %d"
+msgstr[1] "%d ordu"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "minutu %d"
+msgstr[1] "%d minutu"
 
 msgid "now"
 msgstr "orain"
@@ -217,7 +305,7 @@ msgstr "orain"
 msgid "a second ago"
 msgid_plural "%(count)s seconds ago"
 msgstr[0] "duela segundu bat"
-msgstr[1] "duela %(count)s segundu"
+msgstr[1] "duela %(count)s segundu"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -225,7 +313,7 @@ msgstr[1] "duela %(count)s segundu"
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
 msgstr[0] "duela minutu bat"
-msgstr[1] "duela %(count)s minutu"
+msgstr[1] "duela %(count)s minutu"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -233,12 +321,57 @@ msgstr[1] "duela %(count)s minutu"
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
 msgstr[0] "duela ordubete"
-msgstr[1] "duela %(count)s ordu"
+msgstr[1] "duela %(count)s ordu"
 
+#. Translators: delta will contain a string like '2 months' or '1 month, 2
+#. weeks'
 #, python-format
-msgctxt "naturaltime"
 msgid "%(delta)s from now"
 msgstr "%(delta)s barru"
+
+#. Translators: 'naturaltime-future' strings will be included in
+#. '%(delta)s from now'
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] "urte %d"
+msgstr[1] "%d urte"
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d month"
+msgid_plural "%d months"
+msgstr[0] "hilabete %d"
+msgstr[1] "%d hilabete"
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d week"
+msgid_plural "%d weeks"
+msgstr[0] "aste %d"
+msgstr[1] "%d aste"
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "egun %d"
+msgstr[1] "%d egun"
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "ordu %d"
+msgstr[1] "%d ordu"
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "minutu %d"
+msgstr[1] "%d minutu"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.

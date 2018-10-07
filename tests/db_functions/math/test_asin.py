@@ -11,6 +11,11 @@ from ..models import DecimalModel, FloatModel, IntegerModel
 
 class ASinTests(TestCase):
 
+    def test_null(self):
+        IntegerModel.objects.create()
+        obj = IntegerModel.objects.annotate(null_asin=ASin('normal')).first()
+        self.assertIsNone(obj.null_asin)
+
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('0.9'), n2=Decimal('0.6'))
         obj = DecimalModel.objects.annotate(n1_asin=ASin('n1'), n2_asin=ASin('n2')).first()

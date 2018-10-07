@@ -85,8 +85,8 @@ Django's system checks are organized using the following tags:
 * ``signals``: Checks on signal declarations and handler registrations.
 * ``staticfiles``: Checks :mod:`django.contrib.staticfiles` configuration.
 * ``templates``: Checks template related configuration.
+* ``translation``: Checks translation related configuration.
 * ``urls``: Checks URL configuration.
-* ``translation``: Checks language formats used for translation.
 
 Some checks may be registered with multiple tags.
 
@@ -168,6 +168,8 @@ Model fields
   check appeared in Django 1.10 and 1.11*.
 * **fields.E901**: ``CommaSeparatedIntegerField`` is removed except for support
   in historical migrations.
+* **fields.W902**: ``FloatRangeField`` is deprecated and will be removed in
+  Django 3.1.
 
 File fields
 ~~~~~~~~~~~
@@ -427,6 +429,14 @@ configured:
   :setting:`OPTIONS <TEMPLATES-OPTIONS>` must be a string but got: ``{value}``
   (``{type}``).
 
+Translation
+-----------
+
+The following checks are performed on your translation configuration:
+
+* **translation.E001**: You have provided an invalid value for the
+  :setting:`LANGUAGE_CODE` setting.
+
 URLs
 ----
 
@@ -449,18 +459,8 @@ The following checks are performed on your URL configuration:
   able to reverse all URLs in this namespace.
 * **urls.E006**: The :setting:`MEDIA_URL`/ :setting:`STATIC_URL` setting must
   end with a slash.
-
-Translation
------------
-
-The following checks are performed on your translation configuration:
-
-* **translation.E001**: LANGUAGE_CODE in settings.py is ``<language_code>``.
-   It should be in the form ll or ll-cc where ll is the language and cc is the
-   country. Examples include: ``it``, ``de-at``, ``es``, ``pt-br``. The full
-   set of language codes specifications is outlined by
-   https://en.wikipedia.org/wiki/IETF_language_tag#Syntax_of_language_tags
-
+* **urls.E007**: The custom ``handlerXXX`` view ``'path.to.view'`` does not
+  take the correct number of arguments (…).
 
 ``contrib`` app checks
 ======================
@@ -595,6 +595,8 @@ with the admin site:
   ``DateTimeField``.
 * **admin.E129**: ``<modeladmin>`` must define a ``has_<foo>_permission()``
   method for the ``<action>`` action.
+* **admin.E130**: ``__name__`` attributes of actions defined in
+  ``<modeladmin>`` must be unique.
 
 ``InlineModelAdmin``
 ~~~~~~~~~~~~~~~~~~~~
@@ -733,3 +735,5 @@ configured:
   or list.
 * **staticfiles.E002**: The :setting:`STATICFILES_DIRS` setting should not
   contain the :setting:`STATIC_ROOT` setting.
+* **staticfiles.E003**: The prefix ``<prefix>`` in the
+  :setting:`STATICFILES_DIRS` setting must not end with a slash.

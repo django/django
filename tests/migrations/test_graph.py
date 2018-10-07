@@ -1,9 +1,7 @@
 from django.db.migrations.exceptions import (
     CircularDependencyError, NodeNotFoundError,
 )
-from django.db.migrations.graph import (
-    RECURSION_DEPTH_WARNING, DummyNode, MigrationGraph, Node,
-)
+from django.db.migrations.graph import DummyNode, MigrationGraph, Node
 from django.test import SimpleTestCase
 
 
@@ -145,7 +143,7 @@ class GraphTests(SimpleTestCase):
         graph.add_dependency("app_b.0001", ("app_b", "0001"), ("app_a", "0003"))
         # Test whole graph
         with self.assertRaises(CircularDependencyError):
-            graph.forwards_plan(("app_a", "0003"))
+            graph.ensure_not_cyclic()
 
     def test_circular_graph_2(self):
         graph = MigrationGraph()
@@ -157,9 +155,9 @@ class GraphTests(SimpleTestCase):
         graph.add_dependency('C.0001', ('C', '0001'), ('B', '0001'))
 
         with self.assertRaises(CircularDependencyError):
-            graph.forwards_plan(('C', '0001'))
+            graph.ensure_not_cyclic()
 
-    def test_graph_recursive(self):
+    def test_iterative_dfs(self):
         graph = MigrationGraph()
         root = ("app_a", "1")
         graph.add_node(root, None)
@@ -178,28 +176,29 @@ class GraphTests(SimpleTestCase):
         backwards_plan = graph.backwards_plan(root)
         self.assertEqual(expected[::-1], backwards_plan)
 
-    def test_graph_iterative(self):
+    def test_iterative_dfs_complexity(self):
+        """
+        In a graph with merge migrations, iterative_dfs() traverses each node
+        only once even if there are multiple paths leading to it.
+        """
+        n = 50
         graph = MigrationGraph()
-        root = ("app_a", "1")
-        graph.add_node(root, None)
-        expected = [root]
-        for i in range(2, 1000):
-            parent = ("app_a", str(i - 1))
-            child = ("app_a", str(i))
-            graph.add_node(child, None)
-            graph.add_dependency(str(i), child, parent)
-            expected.append(child)
-        leaf = expected[-1]
-
-        with self.assertWarnsMessage(RuntimeWarning, RECURSION_DEPTH_WARNING):
-            forwards_plan = graph.forwards_plan(leaf)
-
-        self.assertEqual(expected, forwards_plan)
-
-        with self.assertWarnsMessage(RuntimeWarning, RECURSION_DEPTH_WARNING):
-            backwards_plan = graph.backwards_plan(root)
-
-        self.assertEqual(expected[::-1], backwards_plan)
+        for i in range(1, n + 1):
+            graph.add_node(('app_a', str(i)), None)
+            graph.add_node(('app_b', str(i)), None)
+            graph.add_node(('app_c', str(i)), None)
+        for i in range(1, n):
+            graph.add_dependency(None, ('app_b', str(i)), ('app_a', str(i)))
+            graph.add_dependency(None, ('app_c', str(i)), ('app_a', str(i)))
+            graph.add_dependency(None, ('app_a', str(i + 1)), ('app_b', str(i)))
+            graph.add_dependency(None, ('app_a', str(i + 1)), ('app_c', str(i)))
+        plan = graph.forwards_plan(('app_a', str(n)))
+        expected = [
+            (app, str(i))
+            for i in range(1, n)
+            for app in ['app_a', 'app_c', 'app_b']
+        ] + [('app_a', str(n))]
+        self.assertEqual(plan, expected)
 
     def test_plan_invalid_node(self):
         """
@@ -241,34 +240,39 @@ class GraphTests(SimpleTestCase):
         with self.assertRaisesMessage(NodeNotFoundError, msg):
             graph.add_dependency("app_a.0002", ("app_a", "0002"), ("app_a", "0001"))
 
-    def test_validate_consistency(self):
-        """
-        Tests for missing nodes, using `validate_consistency()` to raise the error.
-        """
-        # Build graph
+    def test_validate_consistency_missing_parent(self):
         graph = MigrationGraph()
         graph.add_node(("app_a", "0001"), None)
-        # Add dependency with missing parent node (skipping validation).
         graph.add_dependency("app_a.0001", ("app_a", "0001"), ("app_b", "0002"), skip_validation=True)
         msg = "Migration app_a.0001 dependencies reference nonexistent parent node ('app_b', '0002')"
         with self.assertRaisesMessage(NodeNotFoundError, msg):
             graph.validate_consistency()
-        # Add missing parent node and ensure `validate_consistency()` no longer raises error.
+
+    def test_validate_consistency_missing_child(self):
+        graph = MigrationGraph()
         graph.add_node(("app_b", "0002"), None)
-        graph.validate_consistency()
-        # Add dependency with missing child node (skipping validation).
-        graph.add_dependency("app_a.0002", ("app_a", "0002"), ("app_a", "0001"), skip_validation=True)
-        msg = "Migration app_a.0002 dependencies reference nonexistent child node ('app_a', '0002')"
+        graph.add_dependency("app_b.0002", ("app_a", "0001"), ("app_b", "0002"), skip_validation=True)
+        msg = "Migration app_b.0002 dependencies reference nonexistent child node ('app_a', '0001')"
         with self.assertRaisesMessage(NodeNotFoundError, msg):
             graph.validate_consistency()
-        # Add missing child node and ensure `validate_consistency()` no longer raises error.
-        graph.add_node(("app_a", "0002"), None)
+
+    def test_validate_consistency_no_error(self):
+        graph = MigrationGraph()
+        graph.add_node(("app_a", "0001"), None)
+        graph.add_node(("app_b", "0002"), None)
+        graph.add_dependency("app_a.0001", ("app_a", "0001"), ("app_b", "0002"), skip_validation=True)
         graph.validate_consistency()
-        # Rawly add dummy node.
-        msg = "app_a.0001 (req'd by app_a.0002) is missing!"
+
+    def test_validate_consistency_dummy(self):
+        """
+        validate_consistency() raises an error if there's an isolated dummy
+        node.
+        """
+        msg = "app_a.0001 (req'd by app_b.0002) is missing!"
+        graph = MigrationGraph()
         graph.add_dummy_node(
             key=("app_a", "0001"),
-            origin="app_a.0002",
+            origin="app_b.0002",
             error_message=msg
         )
         with self.assertRaisesMessage(NodeNotFoundError, msg):
@@ -382,7 +386,7 @@ class GraphTests(SimpleTestCase):
         graph.add_dependency("app_c.0001_squashed_0002", ("app_c", "0001_squashed_0002"), ("app_b", "0002"))
 
         with self.assertRaises(CircularDependencyError):
-            graph.forwards_plan(("app_c", "0001_squashed_0002"))
+            graph.ensure_not_cyclic()
 
     def test_stringify(self):
         graph = MigrationGraph()
@@ -413,14 +417,3 @@ class NodeTests(SimpleTestCase):
             error_message='x is missing',
         )
         self.assertEqual(repr(node), "<DummyNode: ('app_a', '0001')>")
-
-    def test_dummynode_promote(self):
-        dummy = DummyNode(
-            key=('app_a', '0001'),
-            origin='app_a.0002',
-            error_message="app_a.0001 (req'd by app_a.0002) is missing!",
-        )
-        dummy.promote()
-        self.assertIsInstance(dummy, Node)
-        self.assertFalse(hasattr(dummy, 'origin'))
-        self.assertFalse(hasattr(dummy, 'error_message'))

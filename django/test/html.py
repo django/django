@@ -72,7 +72,7 @@ class Element:
         return self.children == element.children
 
     def __hash__(self):
-        return hash((self.name,) + tuple(a for a in self.attributes))
+        return hash((self.name, *(a for a in self.attributes)))
 
     def _count(self, element, count=True):
         if not isinstance(element, str):

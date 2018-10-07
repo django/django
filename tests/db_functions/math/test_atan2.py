@@ -9,6 +9,15 @@ from ..models import DecimalModel, FloatModel, IntegerModel
 
 class ATan2Tests(TestCase):
 
+    def test_null(self):
+        IntegerModel.objects.create(big=100)
+        obj = IntegerModel.objects.annotate(
+            null_atan2_sn=ATan2('small', 'normal'),
+            null_atan2_nb=ATan2('normal', 'big'),
+        ).first()
+        self.assertIsNone(obj.null_atan2_sn)
+        self.assertIsNone(obj.null_atan2_nb)
+
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('-9.9'), n2=Decimal('4.6'))
         obj = DecimalModel.objects.annotate(n_atan2=ATan2('n1', 'n2')).first()

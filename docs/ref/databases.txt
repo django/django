@@ -819,6 +819,24 @@ You should either supply both :setting:`HOST` and :setting:`PORT`, or leave
 both as empty strings. Django will use a different connect descriptor depending
 on that choice.
 
+Full DSN and Easy Connect
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A Full DSN or Easy Connect string can be used in :setting:`NAME` if both
+:setting:`HOST` and :setting:`PORT` are empty. This format is required when
+using RAC or pluggable databases without ``tnsnames.ora``, for example.
+
+Example of an Easy Connect string::
+
+    'NAME': 'localhost:1521/orclpdb1',
+
+Example of a full DSN string::
+
+    'NAME': (
+        '(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))'
+        '(CONNECT_DATA=(SERVICE_NAME=orclpdb1)))'
+    ),
+
 Threaded option
 ----------------
 

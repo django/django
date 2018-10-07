@@ -1087,7 +1087,7 @@ For example, a ``Blog`` object ``b`` has access to a list of all related
 All examples in this section use the sample ``Blog``, ``Author`` and ``Entry``
 models defined at the top of this page.
 
-.. _descriptors: https://docs.python.org/3/howto/descriptor.html
+.. _descriptors: https://docs.python.org/howto/descriptor.html
 
 One-to-many relationships
 -------------------------

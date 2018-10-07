@@ -112,7 +112,7 @@ Imports
   imports for other Django components and relative imports for local components.
 
 * On each line, alphabetize the items with the upper case items grouped before
-  the lower case items.
+  the lowercase items.
 
 * Break long lines using parentheses and indent continuation lines by 4 spaces.
   Include a trailing comma after the last import and put the closing
@@ -123,8 +123,8 @@ Imports
 
   For example (comments are for explanatory purposes only):
 
-  .. snippet::
-      :filename: django/contrib/admin/example.py
+  .. code-block:: python
+      :caption: django/contrib/admin/example.py
 
       # future
       from __future__ import unicode_literals
@@ -335,5 +335,5 @@ JavaScript style
 For details about the JavaScript code style used by Django, see
 :doc:`javascript`.
 
-.. _editorconfig: http://editorconfig.org/
+.. _editorconfig: https://editorconfig.org/
 .. _flake8: https://pypi.org/project/flake8/

@@ -15,6 +15,7 @@
 # slene <vslene@gmail.com>, 2011
 # Sun Liwen <sunliwen@gmail.com>, 2014
 # Liping Wang <lynn.config@gmail.com>, 2016
+# Wentao Han <wentao.han@gmail.com>, 2018
 # Xiang Yu <bupt.aswmtjdsj@gmail.com>, 2014
 # Yin Jifeng <jifeng.yin@gmail.com>, 2013
 # Zhengyang Wang <sufforest@gmail.com>, 2017
@@ -26,8 +27,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-06-25 13:50+0000\n"
-"Last-Translator: Le Yang <youngleocn@qq.com>\n"
+"PO-Revision-Date: 2018-09-28 07:47+0000\n"
+"Last-Translator: Wentao Han <wentao.han@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -653,7 +654,7 @@ msgstr "请输入有效的时长。"
 
 #, python-brace-format
 msgid "The number of days must be between {min_days} and {max_days}."
-msgstr ""
+msgstr "天数应该在 {min_days} 和 {max_days} 之间。"
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "未提交文件。请检查表单的编码类型。"

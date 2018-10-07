@@ -52,7 +52,7 @@ def _get_sitemap_full_url(sitemap_url):
 
 class Sitemap:
     # This limit is defined by Google. See the index documentation at
-    # http://www.sitemaps.org/protocol.html#index.
+    # https://www.sitemaps.org/protocol.html#index.
     limit = 50000
 
     # If protocol is None, the URLs in the sitemap will use the protocol

@@ -10,7 +10,7 @@ from django.test import (
     TestCase, ignore_warnings, override_settings, skipUnlessDBFeature,
 )
 
-from ..models import Author
+from ..models import Author, DTModel, Fan
 
 
 class CastTests(TestCase):
@@ -51,6 +51,40 @@ class CastTests(TestCase):
                 numbers = Author.objects.annotate(cast_int=Cast('alias', field_class()))
                 self.assertEqual(numbers.get().cast_int, 1)
 
+    def test_cast_from_db_datetime_to_date(self):
+        dt_value = datetime.datetime(2018, 9, 28, 12, 42, 10, 234567)
+        DTModel.objects.create(start_datetime=dt_value)
+        dtm = DTModel.objects.annotate(
+            start_datetime_as_date=Cast('start_datetime', models.DateField())
+        ).first()
+        self.assertEqual(dtm.start_datetime_as_date, datetime.date(2018, 9, 28))
+
+    def test_cast_from_db_datetime_to_time(self):
+        dt_value = datetime.datetime(2018, 9, 28, 12, 42, 10, 234567)
+        DTModel.objects.create(start_datetime=dt_value)
+        dtm = DTModel.objects.annotate(
+            start_datetime_as_time=Cast('start_datetime', models.TimeField())
+        ).first()
+        rounded_ms = int(round(.234567, connection.features.time_cast_precision) * 10**6)
+        self.assertEqual(dtm.start_datetime_as_time, datetime.time(12, 42, 10, rounded_ms))
+
+    def test_cast_from_db_date_to_datetime(self):
+        dt_value = datetime.date(2018, 9, 28)
+        DTModel.objects.create(start_date=dt_value)
+        dtm = DTModel.objects.annotate(start_as_datetime=Cast('start_date', models.DateTimeField())).first()
+        self.assertEqual(dtm.start_as_datetime, datetime.datetime(2018, 9, 28, 0, 0, 0, 0))
+
+    def test_cast_from_db_datetime_to_date_group_by(self):
+        author = Author.objects.create(name='John Smith', age=45)
+        dt_value = datetime.datetime(2018, 9, 28, 12, 42, 10, 234567)
+        Fan.objects.create(name='Margaret', age=50, author=author, fan_since=dt_value)
+        fans = Fan.objects.values('author').annotate(
+            fan_for_day=Cast('fan_since', models.DateField()),
+            fans=models.Count('*')
+        ).values()
+        self.assertEqual(fans[0]['fan_for_day'], datetime.date(2018, 9, 28))
+        self.assertEqual(fans[0]['fans'], 1)
+
     def test_cast_from_python_to_date(self):
         today = datetime.date.today()
         dates = Author.objects.annotate(cast_date=Cast(today, models.DateField()))
@@ -59,7 +93,10 @@ class CastTests(TestCase):
     def test_cast_from_python_to_datetime(self):
         now = datetime.datetime.now()
         dates = Author.objects.annotate(cast_datetime=Cast(now, models.DateTimeField()))
-        self.assertEqual(dates.get().cast_datetime, now)
+        time_precision = datetime.timedelta(
+            microseconds=10**(6 - connection.features.time_cast_precision)
+        )
+        self.assertAlmostEqual(dates.get().cast_datetime, now, delta=time_precision)
 
     def test_cast_from_python(self):
         numbers = Author.objects.annotate(cast_float=Cast(decimal.Decimal(0.125), models.FloatField()))
