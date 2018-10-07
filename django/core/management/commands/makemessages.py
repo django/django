@@ -371,8 +371,7 @@ class Command(BaseCommand):
 
         # Check if input given as locale is valid
         for l in locale:
-            match_result = re.match(language_code_re, l)
-            if not match_result:
+            if not re.match(language_code_re, l):
                 self.stdout.write("Invalid locale %s" % l)
 
         # Account for excluded locales
