@@ -42,9 +42,9 @@ class CommandParser(ArgumentParser):
     SystemExit in several occasions, as SystemExit is unacceptable when a
     command is called programmatically.
     """
-    def __init__(self, **kwargs):
-        self.missing_args_message = kwargs.pop('missing_args_message', None)
-        self.called_from_command_line = kwargs.pop('called_from_command_line', None)
+    def __init__(self, *, missing_args_message=None, called_from_command_line=None, **kwargs):
+        self.missing_args_message = missing_args_message
+        self.called_from_command_line = called_from_command_line
         super().__init__(**kwargs)
 
     def parse_args(self, args=None, namespace=None):
