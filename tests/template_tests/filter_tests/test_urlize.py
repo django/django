@@ -371,3 +371,15 @@ class FunctionTests(SimpleTestCase):
             urlize(prepend_www('google.com')),
             '<a href="http://www.google.com" rel="nofollow">www.google.com</a>',
         )
+
+    def test_anglebrackets(self):
+        self.assertEqual(
+            urlize('<https://www.example.org/>'),
+            '&lt;<a href="https://www.example.org/" rel="nofollow">https://www.example.org/</a>&gt;',
+        )
+
+    def test_anglebrackets_html(self):
+        self.assertEqual(
+            urlize('&lt;https://www.example.org/&gt;'),
+            '&lt;<a href="https://www.example.org/" rel="nofollow">https://www.example.org/</a>&gt;',
+        )
