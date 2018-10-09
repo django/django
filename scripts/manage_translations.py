@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# This python file contains utility scripts to manage Django translations.
+# This Python file contains utility scripts to manage Django translations.
 # It has to be run inside the django git root directory.
 #
 # The following commands are available:

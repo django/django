@@ -611,7 +611,7 @@ class DiscoverRunner:
 
 def is_discoverable(label):
     """
-    Check if a test label points to a python package or file directory.
+    Check if a test label points to a Python package or file directory.
 
     Relative labels like "." and ".." are seen as directories.
     """

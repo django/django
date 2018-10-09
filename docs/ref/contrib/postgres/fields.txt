@@ -621,7 +621,7 @@ start and end timestamps of an event, or the range of ages an activity is
 suitable for.
 
 All of the range fields translate to :ref:`psycopg2 Range objects
-<psycopg2:adapt-range>` in python, but also accept tuples as input if no bounds
+<psycopg2:adapt-range>` in Python, but also accept tuples as input if no bounds
 information is necessary. The default is lower bound included, upper bound
 excluded; that is, ``[)``.
 

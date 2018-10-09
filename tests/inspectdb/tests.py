@@ -138,7 +138,7 @@ class InspectDBTestCase(TestCase):
         out = StringIO()
         call_command('inspectdb', table_name_filter=inspectdb_tables_only, stdout=out)
         output = out.getvalue()
-        error_message = "inspectdb generated an attribute name which is a python keyword"
+        error_message = "inspectdb generated an attribute name which is a Python keyword"
         # Recursive foreign keys should be set to 'self'
         self.assertIn("parent = models.ForeignKey('self', models.DO_NOTHING)", output)
         self.assertNotIn(
