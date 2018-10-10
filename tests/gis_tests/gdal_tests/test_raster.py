@@ -1,3 +1,4 @@
+import gc
 import os
 import struct
 import tempfile
@@ -581,8 +582,9 @@ class GDALBandTests(SimpleTestCase):
             self.assertAlmostEqual(self.band.mean, 2.828326634228898)
             self.assertAlmostEqual(self.band.std, 2.4260526986669095)
 
-            # Statistics are persisted into PAM file on band close
+            # Statistics are persisted into PAM file on band close when the object is deleted.
             self.band = None
+            gc.collect()
             self.assertTrue(os.path.isfile(pam_file))
         finally:
             # Close band and remove file if created
