@@ -4,6 +4,16 @@ Tutorial Part 4: Automated Testing
 This tutorial begins where :doc:`Tutorial 3 </tutorial/part_3>` left off.
 We've built a simple chat server and now we'll create some automated tests for it.
 
+.. note::
+    The ChannelsLiveServerTestCase used in this tutorial hangs on macOS due to
+    a `known issue`_.
+    
+    If you want to complete this tutorial on macOS, please downgrade Channels
+    to version 2.0.2 using ``pip3 install channels==2.0.2`` until the issue
+    is fixed.
+
+.. _known issue: https://github.com/django/channels/issues/962
+
 Testing the views
 -----------------
 
