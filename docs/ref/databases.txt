@@ -731,7 +731,7 @@ Oracle notes
 ============
 
 Django supports `Oracle Database Server`_ versions 12.1 and higher. Version
-5.2 or higher of the `cx_Oracle`_ Python driver is required.
+6.0 or higher of the `cx_Oracle`_ Python driver is required.
 
 .. _`Oracle Database Server`: https://www.oracle.com/
 .. _`cx_Oracle`: https://oracle.github.io/python-cx_Oracle/

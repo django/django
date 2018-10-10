@@ -302,6 +302,8 @@ Miscellaneous
   of a bytestring, and :func:`django.utils.http.urlsafe_base64_decode` may no
   longer be passed a bytestring.
 
+* Support for ``cx_Oracle`` < 6.0 is removed.
+
 .. _deprecated-features-2.2:
 
 Features deprecated in 2.2
