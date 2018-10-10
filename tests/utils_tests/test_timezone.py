@@ -212,3 +212,14 @@ class TimezoneTests(SimpleTestCase):
         with self.assertWarnsMessage(RemovedInDjango31Warning, msg) as cm:
             timezone.FixedOffset()
         self.assertEqual(cm.filename, __file__)
+
+    @ignore_warnings(category=RemovedInDjango31Warning)
+    def test_fixedoffset_utcoffset(self):
+        delta = datetime.timedelta(minutes=1)
+        self.assertEqual(timezone.FixedOffset(1).utcoffset(None), delta)
+
+    @ignore_warnings(category=RemovedInDjango31Warning)
+    def test_fixedoffset_dst(self):
+        ZERO = datetime.timedelta(minutes=0)
+        delta = datetime.timedelta(hours=0)
+        self.assertEqual(timezone.FixedOffset().dst(delta), ZERO)
