@@ -689,6 +689,8 @@ Django can serialize the following:
 
 .. versionchanged:: 2.2
 
+    Serialization support for deconstructible classes was added.
+
     Serialization support for ``NoneType`` was added.
 
 Django cannot serialize:
