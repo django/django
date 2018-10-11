@@ -14,7 +14,7 @@ from django.utils.text import normalize_newlines
 
 # Configuration for urlize() function.
 TRAILING_PUNCTUATION_CHARS = '.,:;!'
-WRAPPING_PUNCTUATION = [('(', ')'), ('<', '>'), ('[', ']'), ('&lt;', '&gt;'), ('"', '"'), ('\'', '\'')]
+WRAPPING_PUNCTUATION = [('(', ')'), ('[', ']')]
 
 # List of possible strings used for bullets in bulleted lists.
 DOTS = ['&middot;', '*', '\u2022', '&#149;', '&bull;', '&#8226;']
