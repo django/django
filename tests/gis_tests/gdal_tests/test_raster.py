@@ -582,7 +582,7 @@ class GDALBandTests(SimpleTestCase):
             self.assertAlmostEqual(self.band.mean, 2.828326634228898)
             self.assertAlmostEqual(self.band.std, 2.4260526986669095)
 
-            # Statistics are persisted into PAM file on band close when the object 
+            # Statistics are persisted into PAM file on band close when the object
             # is garbage collected or reclaimed from memory.
             self.band = None
             gc.collect()
