@@ -112,6 +112,8 @@ js_catalog_template = r"""
       var value = django.catalog[singular];
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
+      } if (typeof(count) == 'undefined') {
+        return singular;
       } else {
         return value[django.pluralidx(count)];
       }

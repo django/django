@@ -435,6 +435,8 @@ class I18nSeleniumTests(SeleniumTestCase):
         self.assertEqual(elem.text, "1 Element")
         elem = self.selenium.find_element_by_id("ngettext_plur")
         self.assertEqual(elem.text, "455 Elemente")
+        elem = self.selenium.find_element_by_id("ngettext_undefcount")
+        self.assertEqual(elem.text, "Image")
         elem = self.selenium.find_element_by_id("pgettext")
         self.assertEqual(elem.text, "Kann")
         elem = self.selenium.find_element_by_id("npgettext_sing")
