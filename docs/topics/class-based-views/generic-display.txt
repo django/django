@@ -172,9 +172,9 @@ they're dealing with publishers here.
 
 Well, if you're dealing with a model object, this is already done for you. When
 you are dealing with an object or queryset, Django is able to populate the
-context using the lower cased version of the model class' name. This is
-provided in addition to the default ``object_list`` entry, but contains exactly
-the same data, i.e. ``publisher_list``.
+context using the lowercased version of the model class' name. This is provided
+in addition to the default ``object_list`` entry, but contains exactly the same
+data, i.e. ``publisher_list``.
 
 If this still isn't a good match, you can manually set the name of the
 context variable. The ``context_object_name`` attribute on a generic view

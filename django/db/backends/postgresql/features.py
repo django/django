@@ -48,6 +48,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             V_I := P_I;
         END;
     $$ LANGUAGE plpgsql;"""
+    requires_casted_case_in_updates = True
     supports_over_clause = True
     supports_aggregate_filter_clause = True
     supported_explain_formats = {'JSON', 'TEXT', 'XML', 'YAML'}
@@ -56,6 +57,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def is_postgresql_9_5(self):
         return self.connection.pg_version >= 90500
+
+    @cached_property
+    def is_postgresql_9_6(self):
+        return self.connection.pg_version >= 90600
 
     @cached_property
     def is_postgresql_10(self):
@@ -67,3 +72,4 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_brin_autosummarize = is_postgresql_10
     has_gin_pending_list_limit = is_postgresql_9_5
     supports_ignore_conflicts = is_postgresql_9_5
+    has_phraseto_tsquery = is_postgresql_9_6

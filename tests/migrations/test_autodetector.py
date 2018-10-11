@@ -65,7 +65,7 @@ class AutodetectorTests(TestCase):
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=200)),
     ],
-        {'constraints': [models.CheckConstraint(models.Q(name__contains='Bob'), 'name_contains_bob')]},
+        {'constraints': [models.CheckConstraint(check=models.Q(name__contains='Bob'), name='name_contains_bob')]},
     )
     author_dates_of_birth_auto_now = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
@@ -1399,9 +1399,9 @@ class AutodetectorTests(TestCase):
         author = ModelState('otherapp', 'Author', [
             ('id', models.AutoField(primary_key=True)),
             ('name', models.CharField(max_length=200)),
-        ], {'constraints': [models.CheckConstraint(models.Q(name__contains='Bob'), 'name_contains_bob')]})
+        ], {'constraints': [models.CheckConstraint(check=models.Q(name__contains='Bob'), name='name_contains_bob')]})
         changes = self.get_changes([], [author])
-        added_constraint = models.CheckConstraint(models.Q(name__contains='Bob'), 'name_contains_bob')
+        added_constraint = models.CheckConstraint(check=models.Q(name__contains='Bob'), name='name_contains_bob')
         # Right number of migrations?
         self.assertEqual(len(changes['otherapp']), 1)
         # Right number of actions?
@@ -1417,7 +1417,7 @@ class AutodetectorTests(TestCase):
         changes = self.get_changes([self.author_name], [self.author_name_check_constraint])
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ['AddConstraint'])
-        added_constraint = models.CheckConstraint(models.Q(name__contains='Bob'), 'name_contains_bob')
+        added_constraint = models.CheckConstraint(check=models.Q(name__contains='Bob'), name='name_contains_bob')
         self.assertOperationAttributes(changes, 'testapp', 0, 0, model_name='author', constraint=added_constraint)
 
     def test_remove_constraints(self):

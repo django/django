@@ -544,8 +544,7 @@ class CustomStorage(FileSystemStorage):
         """
         Append numbers to duplicate files rather than underscores, like Trac.
         """
-        parts = name.split('.')
-        basename, ext = parts[0], parts[1:]
+        basename, *ext = name.split('.')
         number = 2
         while self.exists(name):
             name = '.'.join([basename, str(number)] + ext)
@@ -822,7 +821,7 @@ class FileFieldStorageTests(TestCase):
         # Create sample file
         temp_storage.save('tests/example.txt', ContentFile('some content'))
 
-        # Load it as python file object
+        # Load it as Python file object
         with open(temp_storage.path('tests/example.txt')) as file_obj:
             # Save it using storage and read its content
             temp_storage.save('tests/file_obj', file_obj)

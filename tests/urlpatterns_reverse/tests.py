@@ -18,7 +18,7 @@ from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import override_script_prefix
 from django.urls import (
     NoReverseMatch, Resolver404, ResolverMatch, URLPattern, URLResolver,
-    get_callable, get_resolver, resolve, reverse, reverse_lazy,
+    get_callable, get_resolver, get_urlconf, resolve, reverse, reverse_lazy,
 )
 from django.urls.resolvers import RegexPattern
 
@@ -1033,6 +1033,13 @@ class RequestURLconfTests(SimpleTestCase):
         with self.assertRaisesMessage(NoReverseMatch, message):
             self.client.get('/second_test/')
             b''.join(self.client.get('/second_test/'))
+
+    def test_urlconf_is_reset_after_request(self):
+        """The URLconf is reset after each request."""
+        self.assertIsNone(get_urlconf())
+        with override_settings(MIDDLEWARE=['%s.ChangeURLconfMiddleware' % middleware.__name__]):
+            self.client.get(reverse('inner'))
+        self.assertIsNone(get_urlconf())
 
 
 class ErrorHandlerResolutionTests(SimpleTestCase):

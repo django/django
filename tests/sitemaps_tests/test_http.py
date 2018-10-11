@@ -2,7 +2,6 @@ import os
 from datetime import date
 from unittest import skipUnless
 
-from django.apps import apps
 from django.conf import settings
 from django.contrib.sitemaps import Sitemap
 from django.contrib.sites.models import Site
@@ -203,8 +202,6 @@ class HTTPSitemapTests(SitemapTestsBase):
 """ % date.today()
         self.assertXMLEqual(response.content.decode(), expected_content)
 
-    @skipUnless(apps.is_installed('django.contrib.sites'),
-                "django.contrib.sites app not installed.")
     def test_sitemap_get_urls_no_site_1(self):
         """
         Check we get ImproperlyConfigured if we don't pass a site object to

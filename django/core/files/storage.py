@@ -35,7 +35,7 @@ class Storage:
     def save(self, name, content, max_length=None):
         """
         Save new content to the file specified by name. The content should be
-        a proper File object or any python file-like object, ready to be read
+        a proper File object or any Python file-like object, ready to be read
         from the beginning.
         """
         # Get the proper name for the file, as it will actually be saved.

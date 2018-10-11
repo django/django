@@ -252,6 +252,7 @@ class TypeSerializer(BaseSerializer):
     def serialize(self):
         special_cases = [
             (models.Model, "models.Model", []),
+            (type(None), 'type(None)', []),
         ]
         for case, string, imports in special_cases:
             if case is self.value:

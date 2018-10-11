@@ -1,5 +1,5 @@
 # Autoreloading launcher.
-# Borrowed from Peter Hunt and the CherryPy project (http://www.cherrypy.org).
+# Borrowed from Peter Hunt and the CherryPy project (https://cherrypy.org/).
 # Some taken from Ian Bicking's Paste (http://pythonpaste.org/).
 #
 # Portions copyright (c) 2004, CherryPy Team (team@cherrypy.org)
@@ -42,7 +42,7 @@ from django.conf import settings
 from django.core.signals import request_finished
 
 # This import does nothing, but it's necessary to avoid some race conditions
-# in the threading module. See http://code.djangoproject.com/ticket/2330 .
+# in the threading module. See https://code.djangoproject.com/ticket/2330 .
 try:
     import threading  # NOQA
 except ImportError:

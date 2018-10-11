@@ -66,7 +66,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         load_cmd = DatabaseClient.settings_to_cmd_args(self.connection.settings_dict)
         load_cmd[-1] = target_database_name
 
-        dump_proc = subprocess.Popen(dump_cmd, stdout=subprocess.PIPE)
-        load_proc = subprocess.Popen(load_cmd, stdin=dump_proc.stdout, stdout=subprocess.PIPE)
-        dump_proc.stdout.close()    # allow dump_proc to receive a SIGPIPE if load_proc exits.
-        load_proc.communicate()
+        with subprocess.Popen(dump_cmd, stdout=subprocess.PIPE) as dump_proc:
+            with subprocess.Popen(load_cmd, stdin=dump_proc.stdout, stdout=subprocess.DEVNULL):
+                # Allow dump_proc to receive a SIGPIPE if the load process exits.
+                dump_proc.stdout.close()

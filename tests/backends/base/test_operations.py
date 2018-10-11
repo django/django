@@ -3,11 +3,13 @@ import decimal
 from django.db import NotSupportedError, connection
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.models import DurationField
-from django.test import SimpleTestCase, override_settings, skipIfDBFeature
+from django.test import (
+    SimpleTestCase, TestCase, override_settings, skipIfDBFeature,
+)
 from django.utils import timezone
 
 
-class DatabaseOperationTests(SimpleTestCase):
+class SimpleDatabaseOperationTests(SimpleTestCase):
     may_requre_msg = 'subclasses of BaseDatabaseOperations may require a %s() method'
 
     def setUp(self):
@@ -132,6 +134,10 @@ class DatabaseOperationTests(SimpleTestCase):
         with self.assertRaisesMessage(NotSupportedError, msg):
             self.ops.subtract_temporals(duration_field_internal_type, None, None)
 
+
+class DatabaseOperationTests(TestCase):
+    # Checking the 'supports_over_clause' feature requires a query for the
+    # MySQL backend to perform a version check.
     @skipIfDBFeature('supports_over_clause')
     def test_window_frame_raise_not_supported_error(self):
         msg = 'This backend does not support window expressions.'

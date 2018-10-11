@@ -469,6 +469,8 @@ class URLResolver:
                                     )
                                 )
                         for namespace, (prefix, sub_pattern) in url_pattern.namespace_dict.items():
+                            current_converters = url_pattern.pattern.converters
+                            sub_pattern.pattern.converters.update(current_converters)
                             namespaces[namespace] = (p_pattern + prefix, sub_pattern)
                         for app_name, namespace_list in url_pattern.app_dict.items():
                             apps.setdefault(app_name, []).extend(namespace_list)

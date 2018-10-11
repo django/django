@@ -44,7 +44,7 @@ from django.utils.encoding import force_bytes, force_text
 
 
 # For more information, see the OGR C API source code:
-#  http://www.gdal.org/ogr__api_8h.html
+#  https://www.gdal.org/ogr__api_8h.html
 #
 # The OGR_DS_* routines are relevant here.
 class DataSource(GDALBase):
@@ -57,7 +57,7 @@ class DataSource(GDALBase):
             self._write = 1
         else:
             self._write = 0
-        # See also http://trac.osgeo.org/gdal/wiki/rfc23_ogr_unicode
+        # See also https://trac.osgeo.org/gdal/wiki/rfc23_ogr_unicode
         self.encoding = encoding
 
         Driver.ensure_registered()

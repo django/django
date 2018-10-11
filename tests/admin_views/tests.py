@@ -68,17 +68,10 @@ class AdminFieldExtractionMixin:
         """
         Return a list of AdminFields for the AdminForm in the response.
         """
-        admin_form = response.context['adminform']
-        fieldsets = list(admin_form)
-
-        field_lines = []
-        for fieldset in fieldsets:
-            field_lines += list(fieldset)
-
         fields = []
-        for field_line in field_lines:
-            fields += list(field_line)
-
+        for fieldset in response.context['adminform']:
+            for field_line in fieldset:
+                fields.extend(field_line)
         return fields
 
     def get_admin_readonly_fields(self, response):

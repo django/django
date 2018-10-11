@@ -1,26 +1,27 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Martin Tóth <ezimir@gmail.com>, 2017
+# Martin Tóth <ezimir@gmail.com>, 2017-2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 20:42+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-09-05 17:06+0000\n"
 "Last-Translator: Martin Tóth <ezimir@gmail.com>\n"
 "Language-Team: Slovak (http://www.transifex.com/django/django/language/sk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: sk\n"
-"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n "
+">= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);\n"
 
 msgid "PostgreSQL extensions"
 msgstr "PostgreSQL rozšírenia"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
+msgid "Item %(nth)s in the array did not validate:"
 msgstr "%(nth)s. položka poľa je neplatná:"
 
 msgid "Nested arrays must have the same length."
@@ -83,6 +84,9 @@ msgstr[1] ""
 msgstr[2] ""
 "Zoznam obsahuje %(show_value)d položku, ale nemal by obsahovať viac ako "
 "%(limit_value)d."
+msgstr[3] ""
+"Zoznam obsahuje %(show_value)d položku, ale nemal by obsahovať viac ako "
+"%(limit_value)d."
 
 #, python-format
 msgid ""
@@ -98,6 +102,9 @@ msgstr[1] ""
 "Zoznam obsahuje %(show_value)d položku, ale nemal by obsahovať menej ako "
 "%(limit_value)d."
 msgstr[2] ""
+"Zoznam obsahuje %(show_value)d položku, ale nemal by obsahovať menej ako "
+"%(limit_value)d."
+msgstr[3] ""
 "Zoznam obsahuje %(show_value)d položku, ale nemal by obsahovať menej ako "
 "%(limit_value)d."
 

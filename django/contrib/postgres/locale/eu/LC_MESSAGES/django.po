@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Eneko Illarramendi <eneko@illarra.com>, 2017
+# Eneko Illarramendi <eneko@illarra.com>, 2017-2018
 # Urtzi Odriozola <urtzi.odriozola@gmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-25 08:36+0000\n"
-"Last-Translator: Urtzi Odriozola <urtzi.odriozola@gmail.com>\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-08-24 07:33+0000\n"
+"Last-Translator: Eneko Illarramendi <eneko@illarra.com>\n"
 "Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21,7 +21,7 @@ msgid "PostgreSQL extensions"
 msgstr "PostgreSQL hedapenak"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
+msgid "Item %(nth)s in the array did not validate:"
 msgstr "Array-ko %(nth)s elementua ez da balekoa:"
 
 msgid "Nested arrays must have the same length."

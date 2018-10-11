@@ -9,7 +9,7 @@ class Product(models.Model):
     class Meta:
         constraints = [
             models.CheckConstraint(
-                models.Q(price__gt=models.F('discounted_price')),
-                'price_gt_discounted_price'
-            )
+                check=models.Q(price__gt=models.F('discounted_price')),
+                name='price_gt_discounted_price',
+            ),
         ]

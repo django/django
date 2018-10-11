@@ -33,7 +33,7 @@ class ExtractingStringsWithPercentSigns(POFileAssertionMixin, FrenchTestCase):
     Percent signs are python formatted.
 
     These tests should all have an analogous translation tests below, ensuring
-    the python formatting does not persist through to a rendered template.
+    the Python formatting does not persist through to a rendered template.
     """
 
     def setUp(self):

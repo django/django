@@ -1,7 +1,4 @@
-import hashlib
-
-from django.db.backends.utils import split_identifier
-from django.utils.encoding import force_bytes
+from django.db.backends.utils import names_digest, split_identifier
 
 __all__ = ['Index']
 
@@ -81,17 +78,6 @@ class Index:
         _, _, kwargs = self.deconstruct()
         return self.__class__(**kwargs)
 
-    @staticmethod
-    def _hash_generator(*args):
-        """
-        Generate a 32-bit digest of a set of arguments that can be used to
-        shorten identifying names.
-        """
-        h = hashlib.md5()
-        for arg in args:
-            h.update(force_bytes(arg))
-        return h.hexdigest()[:6]
-
     def set_name_with_model(self, model):
         """
         Generate a unique name for the index.
@@ -112,7 +98,7 @@ class Index:
         self.name = '%s_%s_%s' % (
             table_name[:11],
             column_names[0][:7],
-            '%s_%s' % (self._hash_generator(*hash_data), self.suffix),
+            '%s_%s' % (names_digest(*hash_data, length=6), self.suffix),
         )
         assert len(self.name) <= self.max_name_length, (
             'Index too long for multiple database support. Is self.suffix '

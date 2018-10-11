@@ -9,7 +9,7 @@ from django.contrib.postgres.search import (
     SearchQuery, SearchRank, SearchVector,
 )
 from django.db.models import F
-from django.test import SimpleTestCase, modify_settings
+from django.test import SimpleTestCase, modify_settings, skipUnlessDBFeature
 
 from . import PostgreSQLTestCase
 from .models import Character, Line, Scene
@@ -75,7 +75,7 @@ class GrailTestData:
         cls.french = Line.objects.create(
             scene=trojan_rabbit,
             character=guards,
-            dialogue='Oh. Un cadeau. Oui oui.',
+            dialogue='Oh. Un beau cadeau. Oui oui.',
             dialogue_config='french',
         )
 
@@ -160,6 +160,46 @@ class MultipleFieldsTest(GrailTestData, PostgreSQLTestCase):
             search=SearchVector('id'),
         ).filter(search=str(self.crowd.id))
         self.assertSequenceEqual(searched, [self.crowd])
+
+    @skipUnlessDBFeature('has_phraseto_tsquery')
+    def test_phrase_search(self):
+        line_qs = Line.objects.annotate(search=SearchVector('dialogue'))
+        searched = line_qs.filter(search=SearchQuery('burned body his away', search_type='phrase'))
+        self.assertSequenceEqual(searched, [])
+        searched = line_qs.filter(search=SearchQuery('his body burned away', search_type='phrase'))
+        self.assertSequenceEqual(searched, [self.verse1])
+
+    @skipUnlessDBFeature('has_phraseto_tsquery')
+    def test_phrase_search_with_config(self):
+        line_qs = Line.objects.annotate(
+            search=SearchVector('scene__setting', 'dialogue', config='french'),
+        )
+        searched = line_qs.filter(
+            search=SearchQuery('cadeau beau un', search_type='phrase', config='french'),
+        )
+        self.assertSequenceEqual(searched, [])
+        searched = line_qs.filter(
+            search=SearchQuery('un beau cadeau', search_type='phrase', config='french'),
+        )
+        self.assertSequenceEqual(searched, [self.french])
+
+    def test_raw_search(self):
+        line_qs = Line.objects.annotate(search=SearchVector('dialogue'))
+        searched = line_qs.filter(search=SearchQuery('Robin', search_type='raw'))
+        self.assertEqual(set(searched), {self.verse0, self.verse1})
+        searched = line_qs.filter(search=SearchQuery("Robin & !'Camelot'", search_type='raw'))
+        self.assertSequenceEqual(searched, [self.verse1])
+
+    def test_raw_search_with_config(self):
+        line_qs = Line.objects.annotate(search=SearchVector('dialogue', config='french'))
+        searched = line_qs.filter(
+            search=SearchQuery("'cadeaux' & 'beaux'", search_type='raw', config='french'),
+        )
+        self.assertSequenceEqual(searched, [self.french])
+
+    def test_bad_search_type(self):
+        with self.assertRaisesMessage(ValueError, "Unknown search_type argument 'foo'."):
+            SearchQuery('kneecaps', search_type='foo')
 
     def test_config_query_explicit(self):
         searched = Line.objects.annotate(

@@ -15,7 +15,6 @@ from urllib.parse import (
 from django.core.exceptions import TooManyFieldsSent
 from django.utils.datastructures import MultiValueDict
 from django.utils.deprecation import RemovedInDjango30Warning
-from django.utils.encoding import force_bytes
 from django.utils.functional import keep_lazy_text
 
 # based on RFC 7232, Appendix C
@@ -220,10 +219,10 @@ def int_to_base36(i):
 
 def urlsafe_base64_encode(s):
     """
-    Encode a bytestring in base64 for use in URLs. Strip any trailing equal
-    signs.
+    Encode a bytestring to a base64 string for use in URLs. Strip any trailing
+    equal signs.
     """
-    return base64.urlsafe_b64encode(s).rstrip(b'\n=')
+    return base64.urlsafe_b64encode(s).rstrip(b'\n=').decode('ascii')
 
 
 def urlsafe_base64_decode(s):
@@ -231,7 +230,7 @@ def urlsafe_base64_decode(s):
     Decode a base64 encoded string. Add back any trailing equal signs that
     might have been stripped.
     """
-    s = force_bytes(s)
+    s = s.encode()
     try:
         return base64.urlsafe_b64decode(s.ljust(len(s) + len(s) % 4, b'='))
     except (LookupError, BinasciiError) as e:

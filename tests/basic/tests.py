@@ -532,6 +532,7 @@ class ManagerTest(SimpleTestCase):
         'update_or_create',
         'create',
         'bulk_create',
+        'bulk_update',
         'filter',
         'aggregate',
         'annotate',

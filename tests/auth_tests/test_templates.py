@@ -47,7 +47,7 @@ class AuthTemplateTests(TestCase):
         client = PasswordResetConfirmClient()
         default_token_generator = PasswordResetTokenGenerator()
         token = default_token_generator.make_token(self.user)
-        uidb64 = urlsafe_base64_encode(str(self.user.pk).encode()).decode()
+        uidb64 = urlsafe_base64_encode(str(self.user.pk).encode())
         url = reverse('password_reset_confirm', kwargs={'uidb64': uidb64, 'token': token})
         response = client.get(url)
         self.assertContains(response, '<title>Enter new password</title>')

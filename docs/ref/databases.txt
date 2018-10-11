@@ -731,7 +731,7 @@ Oracle notes
 ============
 
 Django supports `Oracle Database Server`_ versions 12.1 and higher. Version
-5.2 or higher of the `cx_Oracle`_ Python driver is required.
+6.0 or higher of the `cx_Oracle`_ Python driver is required.
 
 .. _`Oracle Database Server`: https://www.oracle.com/
 .. _`cx_Oracle`: https://oracle.github.io/python-cx_Oracle/
@@ -818,6 +818,24 @@ and want to connect using the SID ("xe" in this example), then fill in both
 You should either supply both :setting:`HOST` and :setting:`PORT`, or leave
 both as empty strings. Django will use a different connect descriptor depending
 on that choice.
+
+Full DSN and Easy Connect
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A Full DSN or Easy Connect string can be used in :setting:`NAME` if both
+:setting:`HOST` and :setting:`PORT` are empty. This format is required when
+using RAC or pluggable databases without ``tnsnames.ora``, for example.
+
+Example of an Easy Connect string::
+
+    'NAME': 'localhost:1521/orclpdb1',
+
+Example of a full DSN string::
+
+    'NAME': (
+        '(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))'
+        '(CONNECT_DATA=(SERVICE_NAME=orclpdb1)))'
+    ),
 
 Threaded option
 ----------------

@@ -145,7 +145,7 @@ Then run the tests with:
     $ npm test
 
 .. _Closure Compiler: https://developers.google.com/closure/compiler/
-.. _EditorConfig: http://editorconfig.org/
+.. _EditorConfig: https://editorconfig.org/
 .. _Java: https://www.java.com
 .. _jshint: http://jshint.com/
 .. _node.js: https://nodejs.org/

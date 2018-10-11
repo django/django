@@ -6,6 +6,7 @@ themselves do not have to (and could be backed by things other than SQL
 databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
+import difflib
 import functools
 from collections import Counter, OrderedDict, namedtuple
 from collections.abc import Iterator, Mapping
@@ -34,7 +35,6 @@ from django.db.models.sql.datastructures import (
 from django.db.models.sql.where import (
     AND, OR, ExtraWhere, NothingNode, WhereNode,
 )
-from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.tree import Node
 
@@ -1096,12 +1096,11 @@ class Query:
         and get_transform().
         """
         # __exact is the default lookup if one isn't given.
-        lookups = lookups or ['exact']
-        for name in lookups[:-1]:
+        *transforms, lookup_name = lookups or ['exact']
+        for name in transforms:
             lhs = self.try_transform(lhs, name)
         # First try get_lookup() so that the lookup takes precedence if the lhs
         # supports both transform and lookup for the name.
-        lookup_name = lookups[-1]
         lookup_class = lhs.get_lookup(lookup_name)
         if not lookup_class:
             if lhs.field.is_relation:
@@ -1141,10 +1140,16 @@ class Query:
         if transform_class:
             return transform_class(lhs)
         else:
+            output_field = lhs.output_field.__class__
+            suggested_lookups = difflib.get_close_matches(name, output_field.get_lookups())
+            if suggested_lookups:
+                suggestion = ', perhaps you meant %s?' % ' or '.join(suggested_lookups)
+            else:
+                suggestion = '.'
             raise FieldError(
                 "Unsupported lookup '%s' for %s or join on the field not "
-                "permitted." %
-                (name, lhs.output_field.__class__.__name__))
+                "permitted%s" % (name, output_field.__name__, suggestion)
+            )
 
     def build_filter(self, filter_expr, branch_negated=False, current_negated=False,
                      can_reuse=None, allow_joins=True, split_subq=True,
@@ -1406,11 +1411,11 @@ class Query:
                 # one step.
                 pos -= 1
                 if pos == -1 or fail_on_missing:
-                    field_names = list(get_field_names_from_opts(opts))
-                    available = sorted(
-                        field_names + list(self.annotation_select) +
-                        list(self._filtered_relations)
-                    )
+                    available = sorted([
+                        *get_field_names_from_opts(opts),
+                        *self.annotation_select,
+                        *self._filtered_relations,
+                    ])
                     raise FieldError("Cannot resolve keyword '%s' into field. "
                                      "Choices are: %s" % (name, ", ".join(available)))
                 break
@@ -1776,10 +1781,10 @@ class Query:
                 # from the model on which the lookup failed.
                 raise
             else:
-                names = sorted(
-                    list(get_field_names_from_opts(opts)) + list(self.extra) +
-                    list(self.annotation_select) + list(self._filtered_relations)
-                )
+                names = sorted([
+                    *get_field_names_from_opts(opts), *self.extra,
+                    *self.annotation_select, *self._filtered_relations
+                ])
                 raise FieldError("Cannot resolve keyword %r into field. "
                                  "Choices are: %s" % (name, ", ".join(names)))
 
@@ -1866,7 +1871,7 @@ class Query:
             else:
                 param_iter = iter([])
             for name, entry in select.items():
-                entry = force_text(entry)
+                entry = str(entry)
                 entry_params = []
                 pos = entry.find("%s")
                 while pos != -1:

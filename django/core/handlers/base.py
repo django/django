@@ -3,6 +3,7 @@ import types
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, MiddlewareNotUsed
+from django.core.signals import request_finished
 from django.db import connections, transaction
 from django.urls import get_resolver, set_urlconf
 from django.utils.log import log_response
@@ -167,3 +168,11 @@ class BaseHandler:
             if response:
                 return response
         raise
+
+
+def reset_urlconf(sender, **kwargs):
+    """Reset the URLconf after each request is finished."""
+    set_urlconf(None)
+
+
+request_finished.connect(reset_urlconf)

@@ -8,6 +8,7 @@ from django.db.backends.utils import strip_quotes, truncate_name
 from django.db.utils import DatabaseError
 from django.utils import timezone
 from django.utils.encoding import force_bytes
+from django.utils.functional import cached_property
 
 from .base import Database
 from .utils import BulkInsertMapper, InsertIdVar, Oracle_datetime
@@ -579,3 +580,9 @@ END;
         if fields:
             return self.connection.features.max_query_params // len(fields)
         return len(objs)
+
+    @cached_property
+    def compiler_module(self):
+        if self.connection.features.has_fetch_offset_support:
+            return super().compiler_module
+        return 'django.db.backends.oracle.compiler'

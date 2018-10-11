@@ -1,7 +1,7 @@
 """
 YAML serializer.
 
-Requires PyYaml (http://pyyaml.org/), but that's checked for in __init__.
+Requires PyYaml (https://pyyaml.org/), but that's checked for in __init__.
 """
 
 import collections

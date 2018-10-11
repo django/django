@@ -158,7 +158,7 @@ Widget classes
     ``OpenLayers.js`` file `tailored to your needs`_ in the ``js`` property of
     the inner ``Media`` class (see :ref:`assets-as-a-static-definition`).
 
-    .. _tailored to your needs: http://openlayers.org/en/latest/doc/tutorials/custom-builds.html
+    .. _tailored to your needs: https://openlayers.org/en/latest/doc/tutorials/custom-builds.html
 
 ``OSMWidget``
 

@@ -152,7 +152,7 @@ class BaseDatabaseFeatures:
     can_distinct_on_fields = False
 
     # Does the backend decide to commit before SAVEPOINT statements
-    # when autocommit is disabled? http://bugs.python.org/issue8145#msg109965
+    # when autocommit is disabled? https://bugs.python.org/issue8145#msg109965
     autocommits_when_autocommit_is_off = False
 
     # Does the backend prevent running SQL queries in broken transactions?
@@ -240,6 +240,10 @@ class BaseDatabaseFeatures:
     # Does the backend support CAST with precision?
     supports_cast_with_precision = True
 
+    # How many second decimals does the database return when casting a value to
+    # a type with time?
+    time_cast_precision = 6
+
     # SQL to create a procedure for use by the Django test suite. The
     # functionality of the procedure isn't important.
     create_test_procedure_without_params_sql = None
@@ -264,6 +268,10 @@ class BaseDatabaseFeatures:
     # Does the backend support ignoring constraint or uniqueness errors during
     # INSERT?
     supports_ignore_conflicts = True
+
+    # Does this backend require casting the results of CASE expressions used
+    # in UPDATE statements to ensure the expression has the correct type?
+    requires_casted_case_in_updates = False
 
     def __init__(self, connection):
         self.connection = connection

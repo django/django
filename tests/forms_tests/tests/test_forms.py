@@ -1566,7 +1566,7 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/
         p = TestForm()
         self.assertEqual(list(p.fields), TestFormMissing.field_order)
         p = TestFormInit()
-        order = list(TestForm.field_order) + ['field1']
+        order = [*TestForm.field_order, 'field1']
         self.assertEqual(list(p.fields), order)
         TestForm.field_order = ['unknown']
         p = TestForm()

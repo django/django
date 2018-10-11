@@ -196,8 +196,8 @@ Default permissions
 -------------------
 
 When ``django.contrib.auth`` is listed in your :setting:`INSTALLED_APPS`
-setting, it will ensure that three default permissions -- add, change and
-delete -- are created for each Django model defined in one of your installed
+setting, it will ensure that four default permissions -- add, change, delete,
+and view -- are created for each Django model defined in one of your installed
 applications.
 
 These permissions will be created when you run :djadmin:`manage.py migrate

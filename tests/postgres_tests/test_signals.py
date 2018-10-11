@@ -18,10 +18,12 @@ class OIDTests(PostgreSQLTestCase):
         self.assertTrue(all(isinstance(oid, int) for oid in oids))
 
     def test_hstore_cache(self):
+        get_hstore_oids(connection.alias)
         with self.assertNumQueries(0):
             get_hstore_oids(connection.alias)
 
     def test_citext_cache(self):
+        get_citext_oids(connection.alias)
         with self.assertNumQueries(0):
             get_citext_oids(connection.alias)
 

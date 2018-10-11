@@ -1,0 +1,12 @@
+===========================
+Django 2.0.10 release notes
+===========================
+
+*Expected November 1, 2018*
+
+Django 2.0.10 fixes several bugs in 2.0.9.
+
+Bugfixes
+========
+
+* ...

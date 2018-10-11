@@ -298,7 +298,7 @@ class Command(BaseCommand):
                 continue
             if os.path.isdir(app_dir):
                 dirs.append(app_dir)
-        dirs.extend(list(fixture_dirs))
+        dirs.extend(fixture_dirs)
         dirs.append('')
         dirs = [os.path.abspath(os.path.realpath(d)) for d in dirs]
         return dirs
@@ -327,7 +327,7 @@ class Command(BaseCommand):
             else:
                 raise CommandError(
                     "Problem installing fixture '%s': %s is not a known "
-                    "serialization format." % (''.join(parts[:-1]), parts[-1]))
+                    "serialization format." % ('.'.join(parts[:-1]), parts[-1]))
         else:
             ser_fmt = None
 

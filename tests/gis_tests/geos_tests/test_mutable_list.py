@@ -72,7 +72,7 @@ class ListMixinTest(unittest.TestCase):
         return range(-self.limit - b, self.limit + b)
 
     def step_range(self):
-        return list(range(-1 - self.limit, 0)) + list(range(1, 1 + self.limit))
+        return [*range(-1 - self.limit, 0), *range(1, 1 + self.limit)]
 
     def test01_getslice(self):
         'Slice retrieval'
@@ -172,13 +172,13 @@ class ListMixinTest(unittest.TestCase):
                     del pl[i:j]
                     del ul[i:j]
                     self.assertEqual(pl[:], ul[:], 'del slice [%d:%d]' % (i, j))
-                    for k in list(range(-Len - 1, 0)) + list(range(1, Len)):
+                    for k in [*range(-Len - 1, 0), *range(1, Len)]:
                         pl, ul = self.lists_of_len(Len)
                         del pl[i:j:k]
                         del ul[i:j:k]
                         self.assertEqual(pl[:], ul[:], 'del slice [%d:%d:%d]' % (i, j, k))
 
-                for k in list(range(-Len - 1, 0)) + list(range(1, Len)):
+                for k in [*range(-Len - 1, 0), *range(1, Len)]:
                     pl, ul = self.lists_of_len(Len)
                     del pl[:i:k]
                     del ul[:i:k]
@@ -189,7 +189,7 @@ class ListMixinTest(unittest.TestCase):
                     del ul[i::k]
                     self.assertEqual(pl[:], ul[:], 'del slice [%d::%d]' % (i, k))
 
-            for k in list(range(-Len - 1, 0)) + list(range(1, Len)):
+            for k in [*range(-Len - 1, 0), *range(1, Len)]:
                 pl, ul = self.lists_of_len(Len)
                 del pl[::k]
                 del ul[::k]

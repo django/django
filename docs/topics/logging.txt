@@ -148,7 +148,7 @@ by a name. This name is used to identify the logger for configuration
 purposes.
 
 By convention, the logger name is usually ``__name__``, the name of
-the python module that contains the logger. This allows you to filter
+the Python module that contains the logger. This allows you to filter
 and handle logging calls on a per-module basis. However, if you have
 some other way of organizing your logging messages, you can provide
 any dot-separated name to identify your logger::

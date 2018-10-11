@@ -10,7 +10,6 @@ from django.utils import timezone
 from django.utils.crypto import (
     constant_time_compare, get_random_string, salted_hmac,
 )
-from django.utils.encoding import force_bytes
 from django.utils.module_loading import import_string
 
 # session_key should not be case sensitive because some backends can store it
@@ -98,7 +97,7 @@ class SessionBase:
         return base64.b64encode(hash.encode() + b":" + serialized).decode('ascii')
 
     def decode(self, session_data):
-        encoded_data = base64.b64decode(force_bytes(session_data))
+        encoded_data = base64.b64decode(session_data.encode('ascii'))
         try:
             # could produce ValueError if there is no ':'
             hash, serialized = encoded_data.split(b':', 1)

@@ -133,8 +133,9 @@ def format_html_join(sep, format_string, args_generator):
                                                   for u in users))
     """
     return mark_safe(conditional_escape(sep).join(
-        format_html(format_string, *tuple(args))
-        for args in args_generator))
+        format_html(format_string, *args)
+        for args in args_generator
+    ))
 
 
 @keep_lazy_text
@@ -204,8 +205,8 @@ def smart_urlquote(url):
     def unquote_quote(segment):
         segment = unquote(segment)
         # Tilde is part of RFC3986 Unreserved Characters
-        # http://tools.ietf.org/html/rfc3986#section-2.3
-        # See also http://bugs.python.org/issue16285
+        # https://tools.ietf.org/html/rfc3986#section-2.3
+        # See also https://bugs.python.org/issue16285
         return quote(segment, safe=RFC3986_SUBDELIMS + RFC3986_GENDELIMS + '~')
 
     # Handle IDN before quoting.
