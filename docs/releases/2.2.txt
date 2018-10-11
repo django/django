@@ -189,6 +189,7 @@ Migrations
   operations that will be performed.
 
 * Added class serializer ``ClassSerializer``
+
 * ``NoneType`` can now be serialized in migrations.
 
 Models
