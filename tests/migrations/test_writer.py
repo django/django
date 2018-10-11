@@ -513,6 +513,9 @@ class WriterTests(SimpleTestCase):
         self.assertEqual(result.args, value.args)
         self.assertEqual(result.keywords, value.keywords)
 
+    def test_serialize_type_none(self):
+        self.assertSerializedEqual(type(None))
+
     def test_simple_migration(self):
         """
         Tests serializing a simple migration.

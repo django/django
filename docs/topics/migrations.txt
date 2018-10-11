@@ -666,7 +666,7 @@ for basic values, and doesn't specify import paths).
 
 Django can serialize the following:
 
-- ``int``, ``float``, ``bool``, ``str``, ``bytes``, ``None``
+- ``int``, ``float``, ``bool``, ``str``, ``bytes``, ``None``, ``NoneType``
 - ``list``, ``set``, ``tuple``, ``dict``
 - ``datetime.date``, ``datetime.time``, and ``datetime.datetime`` instances
   (include those that are timezone-aware)
@@ -685,6 +685,10 @@ Django can serialize the following:
 .. versionchanged:: 2.1
 
     Serialization support for :class:`functools.partialmethod` was added.
+
+.. versionchanged:: 2.2
+
+    Serialization support for ``NoneType`` was added.
 
 Django cannot serialize:
 

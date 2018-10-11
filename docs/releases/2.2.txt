@@ -188,6 +188,8 @@ Migrations
 * The new :option:`migrate --plan` option prints the list of migration
   operations that will be performed.
 
+* ``NoneType`` can now be serialized in migrations.
+
 Models
 ~~~~~~
 
