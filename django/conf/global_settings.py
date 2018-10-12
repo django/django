@@ -256,11 +256,6 @@ ABSOLUTE_URL_OVERRIDES = {}
 #    ]
 IGNORABLE_404_URLS = []
 
-# A secret key for this particular Django installation. Used in secret-key
-# hashing algorithms. Set this in your settings, or Django will complain
-# loudly.
-SECRET_KEY = ''
-
 # Default file storage mechanism that holds media.
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 

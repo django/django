@@ -160,9 +160,6 @@ class Settings:
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
 
-        if not self.SECRET_KEY:
-            raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
-
         if self.is_overridden('DEFAULT_CONTENT_TYPE'):
             warnings.warn(DEFAULT_CONTENT_TYPE_DEPRECATED_MSG, RemovedInDjango30Warning)
         if self.is_overridden('FILE_CHARSET'):
@@ -188,6 +185,23 @@ class Settings:
             'cls': self.__class__.__name__,
             'settings_module': self.SETTINGS_MODULE,
         }
+
+    @property
+    def SECRET_KEY(self):
+        try:
+            return self.__dict__['SECRET_KEY']
+        except KeyError:
+            raise ImproperlyConfigured("The SECRET_KEY setting must be set.")
+
+    @SECRET_KEY.setter
+    def SECRET_KEY(self, value):
+        if not value:
+            raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
+        self.__dict__['SECRET_KEY'] = value
+
+    @SECRET_KEY.deleter
+    def SECRET_KEY(self):
+        del self.__dict__['SECRET_KEY']
 
 
 class UserSettingsHolder:
@@ -238,6 +252,26 @@ class UserSettingsHolder:
         return '<%(cls)s>' % {
             'cls': self.__class__.__name__,
         }
+
+    @property
+    def SECRET_KEY(self):
+        try:
+            return self.__dict__['SECRET_KEY']
+        except KeyError:
+            try:
+                return getattr(self.default_settings, 'SECRET_KEY')
+            except AttributeError:
+                raise ImproperlyConfigured("The SECRET_KEY setting must be set.")
+
+    @SECRET_KEY.setter
+    def SECRET_KEY(self, value):
+        if not value:
+            raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
+        self.__dict__['SECRET_KEY'] = value
+
+    @SECRET_KEY.deleter
+    def SECRET_KEY(self):
+        del self.__dict__['SECRET_KEY']
 
 
 settings = LazySettings()

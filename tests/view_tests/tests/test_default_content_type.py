@@ -35,7 +35,6 @@ class DefaultContentTypeTests(SimpleTestCase):
     def test_settings_init_warning(self):
         settings_module = ModuleType('fake_settings_module')
         settings_module.DEFAULT_CONTENT_TYPE = 'text/xml'
-        settings_module.SECRET_KEY = 'abc'
         sys.modules['fake_settings_module'] = settings_module
         try:
             with self.assertRaisesMessage(RemovedInDjango30Warning, self.msg):

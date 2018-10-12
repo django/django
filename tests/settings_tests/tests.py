@@ -288,15 +288,83 @@ class SettingsTests(SimpleTestCase):
         with self.assertRaises(AttributeError):
             getattr(settings, 'TEST2')
 
+    def test_get_secret_key(self):
+        settings_module = ModuleType('fake_settings_module')
+        settings_module.SECRET_KEY = 'abc'
+        sys.modules['fake_settings_module'] = settings_module
+        try:
+            settings = Settings('fake_settings_module')
+            self.assertEqual(settings.SECRET_KEY, 'abc')
+        finally:
+            del sys.modules['fake_settings_module']
+
     def test_no_secret_key(self):
         settings_module = ModuleType('fake_settings_module')
         sys.modules['fake_settings_module'] = settings_module
-        msg = 'The SECRET_KEY setting must not be empty.'
+        msg = 'The SECRET_KEY setting must be set.'
         try:
+            settings = Settings('fake_settings_module')
             with self.assertRaisesMessage(ImproperlyConfigured, msg):
-                Settings('fake_settings_module')
+                settings.SECRET_KEY
         finally:
             del sys.modules['fake_settings_module']
+
+    def test_lazy_settings_no_secret_key(self):
+        lazy_settings = LazySettings()
+        lazy_settings.configure()
+        msg = 'The SECRET_KEY setting must be set.'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            lazy_settings.SECRET_KEY
+
+    def test_secret_key_empty(self):
+        for value in ['', None]:
+            with self.subTest(SECRET_KEY=value):
+                settings_module = ModuleType('fake_settings_module')
+                settings_module.SECRET_KEY = value
+                sys.modules['fake_settings_module'] = settings_module
+                msg = 'The SECRET_KEY setting must not be empty.'
+                try:
+                    with self.assertRaisesMessage(ImproperlyConfigured, msg):
+                        Settings('fake_settings_module')
+                finally:
+                    del sys.modules['fake_settings_module']
+
+    def test_override_secret_key_empty(self):
+        for value in ['', None]:
+            with self.subTest(SECRET_KEY=value):
+                msg = 'The SECRET_KEY setting must not be empty.'
+                with self.assertRaisesMessage(ImproperlyConfigured, msg):
+                    with self.settings(SECRET_KEY=value):
+                        pass
+
+    def test_lazy_settings_secret_key_empty(self):
+        for value in ['', None]:
+            with self.subTest(SECRET_KEY=value):
+                lazy_settings = LazySettings()
+                msg = 'The SECRET_KEY setting must not be empty.'
+                with self.assertRaisesMessage(ImproperlyConfigured, msg):
+                    lazy_settings.configure(SECRET_KEY=value)
+
+    def test_del_secret_key(self):
+        settings_module = ModuleType('fake_settings_module')
+        settings_module.SECRET_KEY = 'abc'
+        sys.modules['fake_settings_module'] = settings_module
+        msg = 'The SECRET_KEY setting must be set.'
+        try:
+            settings = Settings('fake_settings_module')
+            del settings.SECRET_KEY
+            with self.assertRaisesMessage(ImproperlyConfigured, msg):
+                settings.SECRET_KEY
+        finally:
+            del sys.modules['fake_settings_module']
+
+    def test_lazy_settings_del_secret_key(self):
+        lazy_settings = LazySettings()
+        lazy_settings.configure(SECRET_KEY='abc')
+        del lazy_settings.SECRET_KEY
+        msg = 'The SECRET_KEY setting must be set.'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            lazy_settings.SECRET_KEY
 
     def test_no_settings_module(self):
         msg = (
@@ -431,7 +499,6 @@ class TestListSettings(unittest.TestCase):
 
     def test_tuple_settings(self):
         settings_module = ModuleType('fake_settings_module')
-        settings_module.SECRET_KEY = 'foo'
         for setting in self.list_or_tuple_settings:
             setattr(settings_module, setting, ('non_list_or_tuple_value'))
             sys.modules['fake_settings_module'] = settings_module

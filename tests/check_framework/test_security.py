@@ -482,10 +482,10 @@ class CheckSecretKeyTest(SimpleTestCase):
     def test_empty_secret_key(self):
         self.assertEqual(self.func(None), [base.W009])
 
-    @override_settings(SECRET_KEY=None)
+    @override_settings()
     def test_missing_secret_key(self):
         del settings.SECRET_KEY
-        self.assertEqual(self.func(None), [base.W009])
+        self.assertEqual(self.func(None), [])
 
     @override_settings(SECRET_KEY=None)
     def test_none_secret_key(self):
