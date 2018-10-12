@@ -13,6 +13,7 @@ from django.db import models
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
 from django.utils.functional import LazyObject, Promise
+from django.utils.module_loading import import_module
 from django.utils.timezone import utc
 from django.utils.version import get_docs_version
 
@@ -272,11 +273,19 @@ class UUIDSerializer(BaseSerializer):
 
 class ClassSerializer(BaseSerializer):
     def serialize(self):
+        _module = self.value.__module__
+        module_first_part, module_second_part = _module.split('.')
+        _class = self.value.__class__
+        # if module for internal usage, try to find in extras
+        if module_second_part.startswith('_'):
+            _module = "{0}.extras".format(module_first_part)
+            try:
+                import_module(_module)
+            except ImportError as e:
+                return
+        _path = _module + "." + _class.__name__
         from django.utils.deconstruct import deconstructible
-        deconstructible_klass = deconstructible(
-            self.value.__class__,
-            path=self.value.__module__ + "." + self.value.__class__.__name__
-        )
+        deconstructible_klass = deconstructible(_class, path=_path)
         try:
             init_values = self.value.__reduce__()
             new_value = deconstructible_klass()

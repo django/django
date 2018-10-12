@@ -16,7 +16,7 @@ from django.db.migrations.exceptions import InconsistentMigrationHistory
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import TestCase, override_settings
 
-from .models import UnicodeModel, UnserializableModel
+from .models import ClassSerializableModel, UnicodeModel, UnserializableModel
 from .routers import TestRouter
 from .test_base import MigrationTestBase
 
@@ -1424,6 +1424,21 @@ class MakeMigrationsTests(MigrationTestBase):
             prompt_output = prompt_stdout.getvalue()
             self.assertIn("You can accept the default 'timezone.now' by pressing 'Enter'", prompt_output)
             self.assertIn("Add field creation_date to entry", output)
+
+    def test_makemigrations_for_class_serializable_model(self):
+        """
+        Python internal built-in modules rename in particular
+        """
+        self.assertTableNotExists('migrations_unicodemodel')
+        apps.register_model('migrations', ClassSerializableModel)
+        with self.temporary_migration_module() as migration_dir:
+            call_command("makemigrations", "migrations", verbosity=0)
+            # Check for existing 0001_initial.py file in migration folder
+            initial_file = os.path.join(migration_dir, "0001_initial.py")
+            self.assertTrue(os.path.exists(initial_file))
+            with open(initial_file, 'r', encoding='utf-8') as fp:
+                content = fp.read()
+                self.assertIn('psycopg2.extras.DateTimeTZRange', content)
 
 
 class SquashMigrationsTests(MigrationTestBase):

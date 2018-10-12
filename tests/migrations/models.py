@@ -1,5 +1,7 @@
 from django.apps.registry import Apps
 from django.db import models
+from django.contrib.postgres.fields import DateTimeRangeField
+from psycopg2.extras import DateTimeTZRange
 
 
 class CustomModelBase(models.base.ModelBase):
@@ -32,6 +34,7 @@ class ClassSerializable:
 
 class ClassSerializableModel(models.Model):
     title = models.CharField(max_length=20, default=ClassSerializable())
+    date = DateTimeRangeField(default=DateTimeTZRange(None, None, '[]'))
 
     class Meta:
         # Disable auto loading of this model as we load it on our own
