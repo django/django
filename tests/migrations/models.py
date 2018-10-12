@@ -1,7 +1,11 @@
+try:
+    from psycopg2.extras import DateTimeTZRange
+    from django.contrib.postgres.fields import DateTimeRangeField
+except ImportError:
+    pass  # psycopg2 isn't installed.
+
 from django.apps.registry import Apps
 from django.db import models
-from django.contrib.postgres.fields import DateTimeRangeField
-from psycopg2.extras import DateTimeTZRange
 
 
 class CustomModelBase(models.base.ModelBase):
