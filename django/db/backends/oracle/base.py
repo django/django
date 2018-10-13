@@ -1,7 +1,7 @@
 """
 Oracle database backend for Django.
 
-Requires cx_Oracle: http://cx-oracle.sourceforge.net/
+Requires cx_Oracle: https://oracle.github.io/python-cx_Oracle/
 """
 import datetime
 import decimal
@@ -149,8 +149,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     # The patterns below are used to generate SQL pattern lookup clauses when
     # the right-hand side of the lookup isn't a raw string (it might be an expression
     # or the result of a bilateral transformation).
-    # In those cases, special characters for LIKE operators (e.g. \, *, _) should be
-    # escaped on database side.
+    # In those cases, special characters for LIKE operators (e.g. \, %, _)
+    # should be escaped on the database side.
     #
     # Note: we use str.format() here for readability as '%' is used as a wildcard for
     # the LIKE operator.
@@ -381,9 +381,6 @@ class FormatStylePlaceholderCursor:
     Django uses "format" (e.g. '%s') style placeholders, but Oracle uses ":var"
     style. This fixes it -- but note that if you want to use a literal "%s" in
     a query, you'll need to use "%%s".
-
-    We also do automatic conversion between Unicode on the Python side and
-    UTF-8 -- for talking to Oracle -- in here.
     """
     charset = 'utf-8'
 
