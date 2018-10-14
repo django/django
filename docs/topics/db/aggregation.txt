@@ -26,7 +26,6 @@ used to track the inventory for a series of online bookstores:
 
     class Publisher(models.Model):
         name = models.CharField(max_length=300)
-        num_awards = models.IntegerField()
 
     class Book(models.Model):
         name = models.CharField(max_length=300)
@@ -40,7 +39,6 @@ used to track the inventory for a series of online bookstores:
     class Store(models.Model):
         name = models.CharField(max_length=300)
         books = models.ManyToManyField(Book)
-        registered_users = models.PositiveIntegerField()
 
 Cheat sheet
 ===========
