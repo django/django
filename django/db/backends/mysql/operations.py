@@ -19,6 +19,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         'AutoField': 'signed integer',
         'BigAutoField': 'signed integer',
         'CharField': 'char(%(max_length)s)',
+        'DecimalField': 'decimal(%(max_digits)s, %(decimal_places)s)',
         'TextField': 'char',
         'IntegerField': 'signed integer',
         'BigIntegerField': 'signed integer',
