@@ -1,5 +1,6 @@
 from django.http import Http404, JsonResponse
 from django.views.generic.list import BaseListView
+from django.contrib.admin.exceptions import DisallowedModelAdminToField
 
 
 class AutocompleteJsonView(BaseListView):
@@ -24,12 +25,19 @@ class AutocompleteJsonView(BaseListView):
             return JsonResponse({'error': '403 Forbidden'}, status=403)
 
         self.term = request.GET.get('term', '')
+        self.to_field = request.GET.get('to_field')
+        if self.to_field:
+            if not self.model_admin.to_field_allowed(request, self.to_field):
+                raise DisallowedModelAdminToField("The field %s cannot be referenced." % self.to_field)
+        else:
+            self.to_field = 'pk'
+
         self.paginator_class = self.model_admin.paginator
         self.object_list = self.get_queryset()
         context = self.get_context_data()
         return JsonResponse({
             'results': [
-                {'id': str(obj.pk), 'text': str(obj)}
+                {'id': str(getattr(obj, self.to_field)), 'text': str(obj)}
                 for obj in context['object_list']
             ],
             'pagination': {'more': context['page_obj'].has_next()},

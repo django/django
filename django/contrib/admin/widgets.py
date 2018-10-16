@@ -384,10 +384,12 @@ class AutocompleteMixin:
         self.db = using
         self.choices = choices
         self.attrs = {} if attrs is None else attrs.copy()
+        self.to_field = self.rel.field.to_fields[0] if hasattr(self.rel.field, 'to_fields') else 'pk'
 
     def get_url(self):
         model = self.rel.model
-        return reverse(self.url_name % (self.admin_site.name, model._meta.app_label, model._meta.model_name))
+        url = reverse(self.url_name % (self.admin_site.name, model._meta.app_label, model._meta.model_name))
+        return url + '?to_field=' + self.to_field
 
     def build_attrs(self, base_attrs, extra_attrs=None):
         """
@@ -422,8 +424,8 @@ class AutocompleteMixin:
         if not self.is_required and not self.allow_multiple_selected:
             default[1].append(self.create_option(name, '', '', False, 0))
         choices = (
-            (obj.pk, self.choices.field.label_from_instance(obj))
-            for obj in self.choices.queryset.using(self.db).filter(pk__in=selected_choices)
+            (getattr(obj, self.to_field), self.choices.field.label_from_instance(obj))
+            for obj in self.choices.queryset.using(self.db).filter(**{ self.to_field + '__in':selected_choices})
         )
         for option_value, option_label in choices:
             selected = (

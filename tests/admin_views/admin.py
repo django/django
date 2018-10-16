@@ -37,7 +37,7 @@ from .models import (
     Person, Persona, Picture, Pizza, Plot, PlotDetails, PlotProxy,
     PluggableSearchPerson, Podcast, Post, PrePopulatedPost,
     PrePopulatedPostLargeSlug, PrePopulatedSubPost, Promo, Question,
-    ReadablePizza, ReadOnlyPizza, Recipe, Recommendation, Recommender,
+    ReadablePizza, ReadOnlyPizza, Recipe, Recommendation, Recommender, ParentWithFK,
     ReferencedByGenRel, ReferencedByInline, ReferencedByParent,
     RelatedPrepopulated, RelatedWithUUIDPKModel, Report, Reservation,
     Restaurant, RowLevelChangePermissionModel, Section, ShortMessage, Simple,
@@ -644,12 +644,17 @@ class PluggableSearchPersonAdmin(admin.ModelAdmin):
 class AlbumAdmin(admin.ModelAdmin):
     list_filter = ['title']
 
-
 class QuestionAdmin(admin.ModelAdmin):
     ordering = ['-posted']
     search_fields = ['question']
     autocomplete_fields = ['related_questions']
 
+class ReferencedByParentAdmin(admin.ModelAdmin):
+    search_fields = ['name']
+
+class ParentWithFKAdmin(admin.ModelAdmin):
+    search_fields = ['fk__name']
+    autocomplete_fields = ['fk']
 
 class AnswerAdmin(admin.ModelAdmin):
     autocomplete_fields = ['question']
@@ -1012,7 +1017,6 @@ site.register(City, CityAdmin)
 site.register(Restaurant, RestaurantAdmin)
 site.register(Worker, WorkerAdmin)
 site.register(FunkyTag, FunkyTagAdmin)
-site.register(ReferencedByParent)
 site.register(ChildOfReferer)
 site.register(ReferencedByInline)
 site.register(InlineReferer, InlineRefererAdmin)
@@ -1039,6 +1043,8 @@ site.register(ReadablePizza)
 site.register(Topping, ToppingAdmin)
 site.register(Album, AlbumAdmin)
 site.register(Question, QuestionAdmin)
+site.register(ReferencedByParent, ReferencedByParentAdmin)
+site.register(ParentWithFK, ParentWithFKAdmin)
 site.register(Answer, AnswerAdmin, date_hierarchy='question__posted')
 site.register(Answer2, date_hierarchy='question__expires')
 site.register(PrePopulatedPost, PrePopulatedPostAdmin)

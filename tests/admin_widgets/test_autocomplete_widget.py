@@ -5,7 +5,7 @@ from django.forms import ModelChoiceField
 from django.test import TestCase, override_settings
 from django.utils import translation
 
-from .models import Album, Band
+from .models import Album, Band, Profile
 
 
 class AlbumForm(forms.ModelForm):
@@ -53,7 +53,7 @@ class AutocompleteMixinTests(TestCase):
             'class': 'my-class admin-autocomplete',
             'data-ajax--cache': 'true',
             'data-ajax--type': 'GET',
-            'data-ajax--url': '/admin_widgets/band/autocomplete/',
+            'data-ajax--url': '/admin_widgets/band/autocomplete/?to_field=id',
             'data-theme': 'admin-autocomplete',
             'data-allow-clear': 'false',
             'data-placeholder': ''
@@ -78,7 +78,13 @@ class AutocompleteMixinTests(TestCase):
         rel = Album._meta.get_field('band').remote_field
         w = AutocompleteSelect(rel, admin.site)
         url = w.get_url()
-        self.assertEqual(url, '/admin_widgets/band/autocomplete/')
+        self.assertEqual(url, '/admin_widgets/band/autocomplete/?to_field=id')
+
+    def test_get_url_to_field(self):
+        rel = Profile._meta.get_field('user').remote_field
+        w = AutocompleteSelect(rel, admin.site)
+        url = w.get_url()
+        self.assertEqual(url, '/auth/user/autocomplete/?to_field=username')
 
     def test_render_options(self):
         beatles = Band.objects.create(name='The Beatles', style='rock')
