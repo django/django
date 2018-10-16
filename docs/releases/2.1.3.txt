@@ -4,9 +4,10 @@ Django 2.1.3 release notes
 
 *Expected November 1, 2018*
 
-Django 2.1.3 fixes several bugs in 2.1.2
+Django 2.1.3 fixes several bugs in 2.1.2.
 
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 2.0 where combining ``Q`` objects with ``__in``
+  lookups and lists crashed (:ticket:`29838`).
