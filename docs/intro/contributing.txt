@@ -168,6 +168,7 @@ The name of the currently activated virtual environment is displayed on the
 command line to help you keep track of which one you are using. Anything you
 install through ``pip`` while this name is displayed will be installed in that
 virtual environment, isolated from other environments and system-wide packages.
+
 Go ahead and install the previously cloned copy of Django:
 
 .. console::
