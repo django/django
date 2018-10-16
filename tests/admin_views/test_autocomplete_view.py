@@ -9,8 +9,8 @@ from django.http import Http404
 from django.test import RequestFactory, override_settings
 from django.urls import reverse, reverse_lazy
 
-from .admin import AnswerAdmin, QuestionAdmin
-from .models import Answer, Author, Authorship, Book, Question
+from .admin import AnswerAdmin, QuestionAdmin, ReferencedByParentAdmin, ParentWithFKAdmin
+from .models import Answer, Author, Authorship, Book, Question, InlineReference, ReferencedByParent, ParentWithFK
 from .tests import AdminViewBasicTestCase
 
 PAGINATOR_SIZE = AutocompleteJsonView.paginate_by
@@ -25,13 +25,14 @@ class AuthorshipInline(admin.TabularInline):
     model = Authorship
     autocomplete_fields = ['author']
 
-
 class BookAdmin(admin.ModelAdmin):
     inlines = [AuthorshipInline]
 
 
 site = admin.AdminSite(name='autocomplete_admin')
 site.register(Question, QuestionAdmin)
+site.register(ReferencedByParent, ReferencedByParentAdmin)
+site.register(ParentWithFK, ParentWithFKAdmin)
 site.register(Answer, AnswerAdmin)
 site.register(Author, AuthorAdmin)
 site.register(Book, BookAdmin)
@@ -39,8 +40,10 @@ site.register(Book, BookAdmin)
 
 class AutocompleteJsonViewTests(AdminViewBasicTestCase):
     as_view_args = {'model_admin': QuestionAdmin(Question, site)}
+    as_view_args_to_field = {'model_admin': ParentWithFKAdmin(ParentWithFK, site)}
     factory = RequestFactory()
     url = reverse_lazy('autocomplete_admin:admin_views_question_autocomplete')
+    url_to_field = reverse_lazy('autocomplete_admin:admin_views_parentwithfk_autocomplete')
 
     @classmethod
     def setUpTestData(cls):
@@ -52,7 +55,7 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
 
     def test_success(self):
         q = Question.objects.create(question='Is this a question?')
-        request = self.factory.get(self.url, {'term': 'is'})
+        request = self.factory.get(self.url, {'term': 'is'}) # return_id defaults to 'pk'
         request.user = self.superuser
         response = AutocompleteJsonView.as_view(**self.as_view_args)(request)
         self.assertEqual(response.status_code, 200)
@@ -61,6 +64,19 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
             'results': [{'id': str(q.pk), 'text': q.question}],
             'pagination': {'more': False},
         })
+        # test for `to_field`
+        fk = ReferencedByParent.objects.create(name='ref by parent')
+        p = ParentWithFK.objects.create(fk=fk)
+        request = self.factory.get(self.url_to_field, {'term': 'by', 'to_field': 'fk'})
+        request.user = self.superuser
+        response = AutocompleteJsonView.as_view(**self.as_view_args_to_field)(request)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(data, {
+            'results': [{'id': str(p.fk), 'text': str(p.fk)}],
+            'pagination': {'more': False},
+        })
+
 
     def test_must_be_logged_in(self):
         response = self.client.get(self.url, {'term': ''})
