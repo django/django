@@ -887,6 +887,9 @@ class Worker(models.Model):
 class ReferencedByParent(models.Model):
     name = models.CharField(max_length=20, unique=True)
 
+    def __str__(self):
+        return self.name
+
 
 class ParentWithFK(models.Model):
     fk = models.ForeignKey(
@@ -895,6 +898,9 @@ class ParentWithFK(models.Model):
         to_field='name',
         related_name='hidden+',
     )
+
+    def __str__(self):
+        return str(self.fk)
 
 
 class ChildOfReferer(ParentWithFK):
