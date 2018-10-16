@@ -9,6 +9,7 @@ from django.db.models import fields
 from django.db.models.query_utils import Q
 from django.utils.deconstruct import deconstructible
 from django.utils.functional import cached_property
+from django.utils.hashable import make_hashable
 
 
 class SQLiteNumericMixin:
@@ -136,16 +137,6 @@ class Combinable:
         raise NotImplementedError(
             "Use .bitand() and .bitor() for bitwise logical operations."
         )
-
-
-def make_hashable(value):
-    if isinstance(value, list):
-        return tuple(map(make_hashable, value))
-    if isinstance(value, dict):
-        return tuple([
-            (key, make_hashable(nested_value)) for key, nested_value in value.items()
-        ])
-    return value
 
 
 @deconstructible
