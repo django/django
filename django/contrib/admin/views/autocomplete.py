@@ -25,7 +25,7 @@ class AutocompleteJsonView(BaseListView):
             return JsonResponse({'error': '403 Forbidden'}, status=403)
 
         self.term = request.GET.get('term', '')
-        self.to_field = request.GET.get('to_field')
+        self.to_field = request.GET.get('to_field', None)
         if self.to_field:
             if not self.model_admin.to_field_allowed(request, self.to_field):
                 raise DisallowedModelAdminToField("The field %s cannot be referenced." % self.to_field)
@@ -33,7 +33,7 @@ class AutocompleteJsonView(BaseListView):
             self.to_field = 'pk'
 
         self.paginator_class = self.model_admin.paginator
-        self.object_list = self.get_queryset()
+        self.object_list = self.get_queryset().order_by(self.to_field)
         context = self.get_context_data()
         return JsonResponse({
             'results': [

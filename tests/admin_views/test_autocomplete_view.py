@@ -25,6 +25,7 @@ class AuthorshipInline(admin.TabularInline):
     model = Authorship
     autocomplete_fields = ['author']
 
+
 class BookAdmin(admin.ModelAdmin):
     inlines = [AuthorshipInline]
 
@@ -40,10 +41,10 @@ site.register(Book, BookAdmin)
 
 class AutocompleteJsonViewTests(AdminViewBasicTestCase):
     as_view_args = {'model_admin': QuestionAdmin(Question, site)}
-    as_view_args_to_field = {'model_admin': ParentWithFKAdmin(ParentWithFK, site)}
+    as_view_args_to_field = {'model_admin': ReferencedByParentAdmin(ReferencedByParent, site)}
     factory = RequestFactory()
     url = reverse_lazy('autocomplete_admin:admin_views_question_autocomplete')
-    url_to_field = reverse_lazy('autocomplete_admin:admin_views_parentwithfk_autocomplete')
+    url_to_field = reverse_lazy('autocomplete_admin:admin_views_referencedbyparent_autocomplete')
 
     @classmethod
     def setUpTestData(cls):
@@ -55,7 +56,7 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
 
     def test_success(self):
         q = Question.objects.create(question='Is this a question?')
-        request = self.factory.get(self.url, {'term': 'is'}) # return_id defaults to 'pk'
+        request = self.factory.get(self.url, {'term': 'is'})
         request.user = self.superuser
         response = AutocompleteJsonView.as_view(**self.as_view_args)(request)
         self.assertEqual(response.status_code, 200)
@@ -67,7 +68,7 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
         # test for `to_field`
         fk = ReferencedByParent.objects.create(name='ref by parent')
         p = ParentWithFK.objects.create(fk=fk)
-        request = self.factory.get(self.url_to_field, {'term': 'by', 'to_field': 'fk'})
+        request = self.factory.get(self.url_to_field, {'term': 'by', 'to_field': 'name'})
         request.user = self.superuser
         response = AutocompleteJsonView.as_view(**self.as_view_args_to_field)(request)
         self.assertEqual(response.status_code, 200)
