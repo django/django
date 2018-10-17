@@ -890,6 +890,9 @@ class ReferencedByParent(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ['name']
+
 
 class ParentWithFK(models.Model):
     fk = models.ForeignKey(

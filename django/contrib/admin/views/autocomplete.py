@@ -33,7 +33,7 @@ class AutocompleteJsonView(BaseListView):
             self.to_field = 'pk'
 
         self.paginator_class = self.model_admin.paginator
-        self.object_list = self.get_queryset().order_by(self.to_field)
+        self.object_list = self.get_queryset()
         context = self.get_context_data()
         return JsonResponse({
             'results': [
