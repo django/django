@@ -12,6 +12,7 @@ from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.utils import (
     COMPILED_REGEX_TYPE, RegexObject, get_migration_name_timestamp,
 )
+from django.utils.functional import SimpleLazyObject
 
 from .topological_sort import stable_topological_sort
 
@@ -70,6 +71,8 @@ class MigrationAutodetector:
             # If this is a type that implements 'deconstruct' as an instance method,
             # avoid treating this as being deconstructible itself - see #22951
             return obj
+        elif isinstance(obj, SimpleLazyObject):
+            return obj._setupfunc
         elif hasattr(obj, 'deconstruct'):
             deconstructed = obj.deconstruct()
             if isinstance(obj, models.Field):
