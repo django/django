@@ -1,3 +1,4 @@
+import datetime
 import functools
 import re
 from unittest import mock
@@ -5,7 +6,9 @@ from unittest import mock
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser
-from django.core.validators import RegexValidator, validate_slug
+from django.core.validators import (
+    MinValueValidator, RegexValidator, validate_slug,
+)
 from django.db import connection, models
 from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.graph import MigrationGraph
@@ -1299,6 +1302,33 @@ class AutodetectorTests(TestCase):
         )
         to_state = ModelState(
             "testapp", "model", [("id", models.AutoField(primary_key=True, validators=[validate_slug]))]
+        )
+        changes = self.get_changes([from_state], [to_state])
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["AlterField"])
+
+    def test_identical_callable_validator_doesnt_alter(self):
+        lt_now_validator = MinValueValidator(datetime.datetime.now)
+        from_state = ModelState(
+            "testapp", "model", [
+                ('dob', models.DateTimeField(validators=[MinValueValidator(datetime.datetime.now)])),
+            ]
+        )
+        to_state = ModelState(
+            "testapp", "model", [('dob', models.DateTimeField(validators=[lt_now_validator]))]
+        )
+        changes = self.get_changes([from_state], [to_state])
+        self.assertNumberMigrations(changes, "testapp", 0)
+
+    def test_different_callable_validator_does_alter(self):
+        lt_today_validator = MinValueValidator(datetime.datetime.today)
+        from_state = ModelState(
+            "testapp", "model", [
+                ('dob', models.DateTimeField(validators=[MinValueValidator(datetime.datetime.now)])),
+            ]
+        )
+        to_state = ModelState(
+            "testapp", "model", [('dob', models.DateTimeField(validators=[lt_today_validator]))]
         )
         changes = self.get_changes([from_state], [to_state])
         self.assertNumberMigrations(changes, "testapp", 1)
