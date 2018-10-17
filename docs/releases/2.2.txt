@@ -259,7 +259,9 @@ URLs
 Validators
 ~~~~~~~~~~
 
-* ...
+* :class:`.MaxValueValidator`, :class:`.MinValueValidator`,
+  :class:`.MinLengthValidator`, and :class:`.MaxLengthValidator` now accept
+  a callable ``limit_value``.
 
 .. _backwards-incompatible-2.2:
 
