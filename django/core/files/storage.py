@@ -16,7 +16,10 @@ from django.utils.functional import LazyObject, cached_property
 from django.utils.module_loading import import_string
 from django.utils.text import get_valid_filename
 
-__all__ = ('Storage', 'FileSystemStorage', 'DefaultStorage', 'default_storage')
+__all__ = (
+    'Storage', 'FileSystemStorage', 'DefaultStorage', 'default_storage',
+    'get_storage_class',
+)
 
 
 class Storage:
