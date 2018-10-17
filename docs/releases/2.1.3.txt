@@ -11,3 +11,6 @@ Bugfixes
 
 * Fixed a regression in Django 2.0 where combining ``Q`` objects with ``__in``
   lookups and lists crashed (:ticket:`29838`).
+
+* Fixed a regression in Django 1.11 where ``django-admin shell`` may hang
+  on startup (:ticket:`29774`).
