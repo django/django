@@ -170,7 +170,7 @@ class SafeMIMEText(MIMEMixin, MIMEText):
         MIMEText.__setitem__(self, name, val)
 
     def set_payload(self, payload, charset=None):
-        if charset == 'utf-8':
+        if charset == 'utf-8' and not isinstance(charset, Charset.Charset):
             has_long_lines = any(
                 len(l.encode()) > RFC5322_EMAIL_LINE_LENGTH_LIMIT
                 for l in payload.splitlines()
