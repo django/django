@@ -10,6 +10,7 @@ from django import db
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
+from django.core.management.base import SystemCheckError
 from django.test import (
     TestCase, TransactionTestCase, skipUnlessDBFeature, testcases,
 )
@@ -407,3 +408,59 @@ class EmptyDefaultDatabaseTest(unittest.TestCase):
         connection = testcases.connections[db.utils.DEFAULT_DB_ALIAS]
         self.assertEqual(connection.settings_dict['ENGINE'], 'django.db.backends.dummy')
         connections_support_transactions()
+
+
+class RunTestsExceptionHandlingTests(unittest.TestCase):
+    def test_run_checks_raises(self):
+        """
+        Teardown functions are run when run_checks() raises SystemCheckError.
+        """
+        with mock.patch('django.test.runner.DiscoverRunner.setup_test_environment'), \
+                mock.patch('django.test.runner.DiscoverRunner.setup_databases'), \
+                mock.patch('django.test.runner.DiscoverRunner.build_suite'), \
+                mock.patch('django.test.runner.DiscoverRunner.run_checks', side_effect=SystemCheckError), \
+                mock.patch('django.test.runner.DiscoverRunner.teardown_databases') as teardown_databases, \
+                mock.patch('django.test.runner.DiscoverRunner.teardown_test_environment') as teardown_test_environment:
+            runner = DiscoverRunner(verbosity=0, interactive=False)
+            with self.assertRaises(SystemCheckError):
+                runner.run_tests(['test_runner_apps.sample.tests_sample.TestDjangoTestCase'])
+            self.assertTrue(teardown_databases.called)
+            self.assertTrue(teardown_test_environment.called)
+
+    def test_run_checks_raises_and_teardown_raises(self):
+        """
+        SystemCheckError is surfaced when run_checks() raises SystemCheckError
+        and teardown databases() raises ValueError.
+        """
+        with mock.patch('django.test.runner.DiscoverRunner.setup_test_environment'), \
+                mock.patch('django.test.runner.DiscoverRunner.setup_databases'), \
+                mock.patch('django.test.runner.DiscoverRunner.build_suite'), \
+                mock.patch('django.test.runner.DiscoverRunner.run_checks', side_effect=SystemCheckError), \
+                mock.patch('django.test.runner.DiscoverRunner.teardown_databases', side_effect=ValueError) \
+                as teardown_databases, \
+                mock.patch('django.test.runner.DiscoverRunner.teardown_test_environment') as teardown_test_environment:
+            runner = DiscoverRunner(verbosity=0, interactive=False)
+            with self.assertRaises(SystemCheckError):
+                runner.run_tests(['test_runner_apps.sample.tests_sample.TestDjangoTestCase'])
+            self.assertTrue(teardown_databases.called)
+            self.assertFalse(teardown_test_environment.called)
+
+    def test_run_checks_passes_and_teardown_raises(self):
+        """
+        Exceptions on teardown are surfaced if no exceptions happen during
+        run_checks().
+        """
+        with mock.patch('django.test.runner.DiscoverRunner.setup_test_environment'), \
+                mock.patch('django.test.runner.DiscoverRunner.setup_databases'), \
+                mock.patch('django.test.runner.DiscoverRunner.build_suite'), \
+                mock.patch('django.test.runner.DiscoverRunner.run_checks'), \
+                mock.patch('django.test.runner.DiscoverRunner.teardown_databases', side_effect=ValueError) \
+                as teardown_databases, \
+                mock.patch('django.test.runner.DiscoverRunner.teardown_test_environment') as teardown_test_environment:
+            runner = DiscoverRunner(verbosity=0, interactive=False)
+            with self.assertRaises(ValueError):
+                # Suppress the output when running TestDjangoTestCase.
+                with mock.patch('sys.stderr'):
+                    runner.run_tests(['test_runner_apps.sample.tests_sample.TestDjangoTestCase'])
+            self.assertTrue(teardown_databases.called)
+            self.assertFalse(teardown_test_environment.called)
