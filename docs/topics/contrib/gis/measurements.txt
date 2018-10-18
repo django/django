@@ -1,0 +1,48 @@
+``Weight()``
+================
+
+.. versionadded:: 2.2
+
+.. class:: Weight(**kwarg)
+
+   Returns an Weight class that can be used to dynamically convert units
+   of weight.
+
+Required arguments
+------------------
+
+``**kwarg``
+   A weight unit parameter, detailed in the UNIT attribute, and an
+   integer or float.
+
+Example
+------------------
+
+Create a 1 kilogram ``Weight`` object and convert to milliliters::
+   w = Weight(kg=1)
+   w.g  # 1000
+
+
+``Volume()``
+================
+
+.. versionadded:: 2.2
+
+.. class:: Volume(**kwarg)
+
+   Returns an Volume class that can be used to dynamically convert units
+   of volume
+
+Required arguments
+------------------
+
+``**kwarg``
+   A volume unit parameter, detailed in the UNIT attribute, and an
+   integer or float.
+
+Example
+------------------
+
+Create a 1 liter ``Volume`` object and convert to milliliters::
+   v = Volume(l=1)
+   v.ml  # 1000

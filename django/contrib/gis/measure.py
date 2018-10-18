@@ -27,10 +27,10 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 """
-Distance and Area objects to allow for sensible and convenient calculation
+Distance, Area, Weight and Volume objects to allow for sensible and convenient calculation
 and conversions.
 
-Authors: Robert Coup, Justin Bronn, Riccardo Di Virgilio
+Authors: Robert Coup, Justin Bronn, Riccardo Di Virgilio, David Ross
 
 Inspired by GeoPy (https://github.com/geopy/geopy)
 and Geoff Biggs' PhD work on dimensioned units for robotics.
@@ -38,7 +38,7 @@ and Geoff Biggs' PhD work on dimensioned units for robotics.
 from decimal import Decimal
 from functools import total_ordering
 
-__all__ = ['A', 'Area', 'D', 'Distance']
+__all__ = ['A', 'Area', 'D', 'Distance', 'W', 'Weight', 'V', 'Volume']
 
 NUMERIC_TYPES = (int, float, Decimal)
 AREA_PREFIX = "sq_"
@@ -328,6 +328,109 @@ class Area(MeasureBase):
             raise TypeError('%(class)s must be divided by a number' % {"class": pretty_name(self)})
 
 
+class Weight(MeasureBase):
+    STANDARD_UNIT = 'kg'
+    UNITS = {
+        'lb': 2.205,
+        'oz': 35.274,
+        'st': 6.35,
+        't': 1000,
+        'kg': 1.0,
+        'g': 0.001,
+        'mg': 0.000001,
+        'ug': 0.000000001,
+        'ng': 0.000000000001,
+        'pg': 0.00000000000001,
+    }
+
+    ALIAS = {
+        'pound': 'lb',
+        'ounce': 'oz',
+        'stone': 'st',
+        'tonne': 't',
+        'metric ton': 't',
+        'ton': 't',
+        'kilogram': 'kg',
+        'kilogramme': 'kg',
+        'gram': 'g',
+        'gramme': 'g',
+        'milligram': 'mg',
+        'microgram': 'ug',
+        'nanogram': 'ng',
+        'picogram': 'pg',
+    }
+    LALIAS = {k.lower(): v for k, v in ALIAS.items()}
+
+
+class Volume(MeasureBase):
+    STANDARD_UNIT = 'l'
+    UNITS = {
+        'l': 1.0,
+        'ml': 0.001,
+        'ul': 0.000001,
+        'nl': 0.000000001,
+        'pl': 0.000000000001,
+        'gal': 0.219969,
+        'us_gal': 0.264172,
+        'qt': 0.879877,
+        'us_qt': 1.05669,
+        'pt': 0.568261,
+        'us_pt': 0.473176,
+        'cup': 0.284131,
+        'us_cup': 0.236588,
+        'tbsp': 0.0177582,
+        'us_tbsp': 0.0147868,
+        'tsp': 0.00591939,
+        'us_tsp': 0.00492892,
+        'floz': 0.0284131,
+        'us_floz': 0.946353,
+        'cuft': 28.3168,
+        'ci': 0.0163871,
+        'cum': 1000,
+    }
+
+    ALIAS = {
+        'liter': 'l',
+        'litre': 'l',
+        'milliliter': 'ml',
+        'millilitre': 'ml',
+        'microliter': 'ul',
+        'microlitre': 'ul',
+        'nanoliter': 'nl',
+        'nanolitre': 'nl',
+        'picoliter': 'pl',
+        'picolitre': 'pl',
+        'gallon': 'gal',
+        'us_gallon': 'us_gal',
+        'american_gallon': 'us_gal',
+        'pint': 'pt',
+        'us_pint': 'us_pt',
+        'american_cup': 'us_cup',
+        'tablespoon': 'tbsp',
+        'us_tablespoon': 'us_tbsp',
+        'american_tablespoon': 'us_tbsp',
+        'teaspoon': 'tsp',
+        'us_teaspoon': 'us_tsp',
+        'american_teaspoon': 'us_tsp',
+        'fluid_ounce': 'floz',
+        'fo': 'floz',
+        'fl-oz': 'floz',
+        'us_fluid_ounce': 'us_floz',
+        'us_fo': 'us_floz',
+        'us_fl-oz': 'us_floz',
+        'cubic_feet': 'cuft',
+        'cbf': 'cuft',
+        'cbft': 'cuft',
+        'cubic_inch': 'ci',
+        'cui': 'ci',
+        'cubic_meter': 'cum',
+        'cubic_metre': 'cum',
+    }
+    LALIAS = {k.lower(): v for k, v in ALIAS.items()}
+
+
 # Shortcuts
 D = Distance
 A = Area
+W = Weight
+V = Volume

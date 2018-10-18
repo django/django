@@ -94,6 +94,17 @@ Minor features
   :class:`~django.contrib.postgres.search.SearchQuery` allows searching for
   a phrase or raw expression.
 
+* ...
+
+:mod:`django.contrib.gis.measurements`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :class:`~django.contrib.gis.measurements.Volume` and
+  :class:`~django.contrib.gis.measurements.Weight` classes which
+  allows the dynamic conversion of various units of measurement.
+
+* ...
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
