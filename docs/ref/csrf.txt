@@ -60,9 +60,10 @@ AJAX
 While the above method can be used for AJAX POST requests, it has some
 inconveniences: you have to remember to pass the CSRF token in as POST data with
 every POST request. For this reason, there is an alternative method: on each
-XMLHttpRequest, set a custom ``X-CSRFToken`` header to the value of the CSRF
-token. This is often easier, because many JavaScript frameworks provide hooks
-that allow headers to be set on every request.
+XMLHttpRequest, set a custom ``X-CSRFToken`` header (as specified by the
+:setting:`CSRF_HEADER_NAME` setting) to the value of the CSRF token. This is
+often easier because many JavaScript frameworks provide hooks that allow
+headers to be set on every request.
 
 First, you must get the CSRF token. How to do that depends on whether or not
 the :setting:`CSRF_USE_SESSIONS` setting is enabled.
@@ -73,13 +74,8 @@ Acquiring the token if :setting:`CSRF_USE_SESSIONS` is ``False``
 The recommended source for the token is the ``csrftoken`` cookie, which will be
 set if you've enabled CSRF protection for your views as outlined above.
 
-.. note::
-
-    The CSRF token cookie is named ``csrftoken`` by default, but you can control
-    the cookie name via the :setting:`CSRF_COOKIE_NAME` setting.
-
-    The CSRF header name is ``HTTP_X_CSRFTOKEN`` by default, but you can
-    customize it using the :setting:`CSRF_HEADER_NAME` setting.
+The CSRF token cookie is named ``csrftoken`` by default, but you can control
+the cookie name via the :setting:`CSRF_COOKIE_NAME` setting.
 
 Acquiring the token is straightforward:
 
