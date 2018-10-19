@@ -118,8 +118,8 @@ class Collector:
 
     def can_fast_delete(self, objs, from_field=None):
         """
-        Determine if the objects in the given queryset-like can be
-        fast-deleted. This can be done if there are no cascades, no
+        Determine if the objects in the given queryset-like or single object
+        can be fast-deleted. This can be done if there are no cascades, no
         parents and no signal listeners for the object class.
 
         The 'from_field' tells where we are coming from - we need this to
@@ -129,9 +129,12 @@ class Collector:
         """
         if from_field and from_field.remote_field.on_delete is not CASCADE:
             return False
-        if not (hasattr(objs, 'model') and hasattr(objs, '_raw_delete')):
+        if hasattr(objs, '_meta'):
+            model = type(objs)
+        elif hasattr(objs, 'model') and hasattr(objs, '_raw_delete'):
+            model = objs.model
+        else:
             return False
-        model = objs.model
         if (signals.pre_delete.has_listeners(model) or
                 signals.post_delete.has_listeners(model) or
                 signals.m2m_changed.has_listeners(model)):
@@ -147,7 +150,7 @@ class Collector:
                 for related in get_candidate_relations_to_delete(opts)
             ) and (
                 # Something like generic foreign key.
-                not any(hasattr(field, 'bulk_related_objects') for field in model._meta.private_fields)
+                not any(hasattr(field, 'bulk_related_objects') for field in opts.private_fields)
             )
         )
 
@@ -268,6 +271,14 @@ class Collector:
         self.sort()
         # number of objects deleted for each model label
         deleted_counter = Counter()
+
+        # Optimize for the case with a single obj and no dependencies
+        if len(self.data) == 1 and len(instances) == 1:
+            instance = list(instances)[0]
+            if self.can_fast_delete(instance):
+                with transaction.mark_for_rollback_on_error():
+                    count = sql.DeleteQuery(model).delete_batch([instance.pk], self.using)
+                return count, {model._meta.label: count}
 
         with transaction.atomic(using=self.using, savepoint=False):
             # send pre_delete signals

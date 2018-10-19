@@ -211,6 +211,11 @@ Models
 * The new :meth:`.QuerySet.bulk_update` method allows efficiently updating
   specific fields on multiple model instances.
 
+* Django no longer always starts a transaction when a single query is being
+  performed, such as ``Model.save()``, ``QuerySet.update()``, and
+  ``Model.delete()``. This improves the performance of autocommit by reducing
+  the number of database round trips.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -334,3 +339,6 @@ Miscellaneous
 * The ``FloatRangeField`` model and form fields in ``django.contrib.postgres``
   are deprecated in favor of a new name, ``DecimalRangeField``, to match the
   underlying ``numrange`` data type used in the database.
+
+* The ``FILE_CHARSET`` setting is deprecated. Starting with Django 3.1, files
+  read from disk must be UTF-8 encoded.

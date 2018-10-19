@@ -278,6 +278,24 @@ class FunctionTests(SimpleTestCase):
             'http://168.192.0.1](http://168.192.0.1)</a>',
         )
 
+    def test_wrapping_characters(self):
+        wrapping_chars = (
+            ('()', ('(', ')')),
+            ('<>', ('&lt;', '&gt;')),
+            ('[]', ('[', ']')),
+            ('""', ('&quot;', '&quot;')),
+            ("''", ('&#39;', '&#39;')),
+        )
+        for wrapping_in, (start_out, end_out) in wrapping_chars:
+            with self.subTest(wrapping_in=wrapping_in):
+                start_in, end_in = wrapping_in
+                self.assertEqual(
+                    urlize(start_in + 'https://www.example.org/' + end_in),
+                    start_out +
+                    '<a href="https://www.example.org/" rel="nofollow">https://www.example.org/</a>' +
+                    end_out,
+                )
+
     def test_ipv4(self):
         self.assertEqual(
             urlize('http://192.168.0.15/api/9'),

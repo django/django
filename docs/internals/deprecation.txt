@@ -24,6 +24,8 @@ details on these changes.
 * ``django.contrib.postgres.fields.FloatRangeField`` and
   ``django.contrib.postgres.forms.FloatRangeField`` will be removed.
 
+* The ``FILE_CHARSET`` setting will be removed.
+
 .. _deprecation-removed-in-3.0:
 
 3.0

@@ -1424,7 +1424,12 @@ attempt.
 Default: ``'utf-8'``
 
 The character encoding used to decode any files read from disk. This includes
-template files and initial SQL data files.
+template files, static files, and translation catalogs.
+
+.. deprecated:: 2.2
+
+    This setting is deprecated. Starting with Django 3.1, files read from disk
+    must be UTF-8 encoded.
 
 .. setting:: FILE_UPLOAD_HANDLERS
 
@@ -3374,7 +3379,6 @@ Error reporting
 File uploads
 ------------
 * :setting:`DEFAULT_FILE_STORAGE`
-* :setting:`FILE_CHARSET`
 * :setting:`FILE_UPLOAD_HANDLERS`
 * :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`
 * :setting:`FILE_UPLOAD_PERMISSIONS`

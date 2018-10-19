@@ -109,7 +109,7 @@ class DefaultLoggingTests(SetupDefaultLoggingMixin, LoggingCaptureMixin, SimpleT
         self.assertEqual(self.logger_output.getvalue(), '')
 
 
-class LoggingAssertionMixin(object):
+class LoggingAssertionMixin:
 
     def assertLogsRequest(self, url, level, msg, status_code, logger='django.request', exc_class=None):
         with self.assertLogs(logger, level) as cm:
