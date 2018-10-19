@@ -375,3 +375,18 @@ class UUIDChild(PrimaryKeyUUIDModel):
 
 class UUIDGrandchild(UUIDChild):
     pass
+
+
+class BaseModel(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    subx = models.ForeignKey('SubModel', models.CASCADE, blank=True, null=True)
+    # setting a related_name explicitly to the default will make the test pass
+    # subx = models.ForeignKey('SubModel', models.CASCADE, blank=True, null=True, related_name='submodel_set')
+    suby = models.ForeignKey('SubModel', models.CASCADE, blank=True, null=True, related_name='i_work')
+
+    def __str__(self):
+        return str(self.id)
+
+
+class SubModel(BaseModel):
+    pass

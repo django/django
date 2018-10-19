@@ -6,7 +6,9 @@ from django.db import models
 from django.test import TestCase, skipIfDBFeature
 from django.test.utils import isolate_apps
 
-from .models import Bar, FkToChar, Foo, PrimaryKeyCharModel
+from .models import Bar, FkToChar, Foo, PrimaryKeyCharModel, SubModel
+import uuid
+from django.db.models.manager import Manager
 
 
 class ForeignKeyTests(TestCase):
@@ -103,3 +105,19 @@ class ForeignKeyTests(TestCase):
             fk = models.ForeignKey(Foo, models.CASCADE)
 
         self.assertEqual(Bar._meta.get_field('fk').to_python('1'), 1)
+
+    def test_fk_on_baseclass_to_subclass(self):
+        sub1, sub2 = SubModel(), SubModel()
+        sub1.save()
+        sub2.save()
+        sub2.subx, sub2.suby = sub1, sub1
+        sub2.save()
+        sub1.refresh_from_db()
+
+        try:
+            for attribute in (sub1.i_work, sub1.submodel_set):
+                self.assertTrue(Manager in attribute.__class__.__bases__)
+                self.assertEqual(attribute.first().id, sub2.id)
+        except AttributeError as e:
+            # an AttributeError means no related manager is available (should be available)
+            self.fail(e)
