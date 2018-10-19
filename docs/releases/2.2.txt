@@ -182,6 +182,9 @@ Management Commands
 * :option:`inspectdb --include-views` now creates models for materialized views
   on PostgreSQL.
 
+* :djadmin:`inspectdb` now introspects :class:`~django.db.models.DurationField`
+  for Oracle and PostgreSQL.
+
 Migrations
 ~~~~~~~~~~
 
@@ -273,6 +276,10 @@ Database backend API
 * Third party database backends must implement support for ignoring
   constraints or uniqueness errors while inserting or set
   ``DatabaseFeatures.supports_ignore_conflicts`` to ``False``.
+
+* Third party database backends must implement introspection for
+  ``DurationField`` or set ``DatabaseFeatures.can_introspect_duration_field``
+  to ``False``.
 
 :mod:`django.contrib.gis`
 -------------------------

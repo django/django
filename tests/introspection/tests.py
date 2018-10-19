@@ -77,11 +77,16 @@ class IntrospectionTests(TransactionTestCase):
             desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
         self.assertEqual(
             [datatype(r[1], r) for r in desc],
-            ['AutoField' if connection.features.can_introspect_autofield else 'IntegerField',
-             'CharField', 'CharField', 'CharField',
-             'BigIntegerField' if connection.features.can_introspect_big_integer_field else 'IntegerField',
-             'BinaryField' if connection.features.can_introspect_binary_field else 'TextField',
-             'SmallIntegerField' if connection.features.can_introspect_small_integer_field else 'IntegerField']
+            [
+                'AutoField' if connection.features.can_introspect_autofield else 'IntegerField',
+                'CharField',
+                'CharField',
+                'CharField',
+                'BigIntegerField' if connection.features.can_introspect_big_integer_field else 'IntegerField',
+                'BinaryField' if connection.features.can_introspect_binary_field else 'TextField',
+                'SmallIntegerField' if connection.features.can_introspect_small_integer_field else 'IntegerField',
+                'DurationField' if connection.features.can_introspect_duration_field else 'BigIntegerField',
+            ]
         )
 
     def test_get_table_description_col_lengths(self):
@@ -98,7 +103,7 @@ class IntrospectionTests(TransactionTestCase):
         nullable_by_backend = connection.features.interprets_empty_strings_as_nulls
         self.assertEqual(
             [r[6] for r in desc],
-            [False, nullable_by_backend, nullable_by_backend, nullable_by_backend, True, True, False]
+            [False, nullable_by_backend, nullable_by_backend, nullable_by_backend, True, True, False, False]
         )
 
     @skipUnlessDBFeature('can_introspect_autofield')

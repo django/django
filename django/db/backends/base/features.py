@@ -129,6 +129,9 @@ class BaseDatabaseFeatures:
     # Can the backend introspect an DecimalField, instead of an FloatField?
     can_introspect_decimal_field = True
 
+    # Can the backend introspect a DurationField, instead of a BigIntegerField?
+    can_introspect_duration_field = True
+
     # Can the backend introspect an IPAddressField, instead of an CharField?
     can_introspect_ip_address_field = False
 
