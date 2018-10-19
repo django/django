@@ -217,18 +217,17 @@ class IncludeNode(Node):
         except Exception as e:
             if context.template.engine.debug:
                 raise
-            template_name = getattr(context, 'template_name', None) or 'unknown'
             warnings.warn(
                 "Rendering {%% include '%s' %%} raised %s. In Django 2.1, "
                 "this exception will be raised rather than silenced and "
                 "rendered as an empty string." %
-                (template_name, e.__class__.__name__),
+                (self.template, e.__class__.__name__),
                 RemovedInDjango21Warning,
             )
             logger.warning(
                 "Exception raised while rendering {%% include %%} for "
                 "template '%s'. Empty string rendered instead.",
-                template_name,
+                self.template,
                 exc_info=True,
             )
             return ''
