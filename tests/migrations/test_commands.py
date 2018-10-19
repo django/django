@@ -1352,6 +1352,11 @@ class MakeMigrationsTests(MigrationTestBase):
             self.assertIn("dependencies=[\n('migrations','0001_%s'),\n]" % migration_name_0001, content)
             self.assertIn("operations=[\n]", content)
 
+    def test_makemigrations_with_invalid_custom_name(self):
+        msg = 'The migration name must be a valid Python identifier.'
+        with self.assertRaisesMessage(CommandError, msg):
+            call_command('makemigrations', 'migrations', '--name', 'invalid name', '--empty')
+
     def test_makemigrations_check(self):
         """
         makemigrations --check should exit with a non-zero status when

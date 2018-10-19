@@ -61,6 +61,8 @@ class Command(BaseCommand):
         self.merge = options['merge']
         self.empty = options['empty']
         self.migration_name = options['name']
+        if self.migration_name and not self.migration_name.isidentifier():
+            raise CommandError('The migration name must be a valid Python identifier.')
         check_changes = options['check_changes']
 
         # Make sure the app they asked for exists

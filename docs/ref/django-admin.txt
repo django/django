@@ -756,7 +756,8 @@ Enables fixing of migration conflicts.
 
 .. django-admin-option:: --name NAME, -n NAME
 
-Allows naming the generated migration(s) instead of using a generated name.
+Allows naming the generated migration(s) instead of using a generated name. The
+name must be a valid Python :ref:`identifier <python:identifiers>`.
 
 .. django-admin-option:: --check
 
