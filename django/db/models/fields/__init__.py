@@ -807,7 +807,7 @@ class Field(RegisterLookupMixin):
             return return_None
         return str  # return empty string
 
-    def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH, limit_choices_to=None):
+    def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH, limit_choices_to=None, ordering=()):
         """
         Return choices with a default blank choices included, for use
         as <select> choices for this field.
@@ -828,7 +828,7 @@ class Field(RegisterLookupMixin):
         )
         return (blank_choice if include_blank else []) + [
             (choice_func(x), str(x))
-            for x in rel_model._default_manager.complex_filter(limit_choices_to)
+            for x in rel_model._default_manager.complex_filter(limit_choices_to).order_by(*ordering)
         ]
 
     def value_to_string(self, obj):
