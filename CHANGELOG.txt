@@ -1,6 +1,23 @@
 Full release notes, with more details and upgrade information, are available at:
 https://channels.readthedocs.io/en/latest/releases
 
+2.1.4 (2018-10-19)
+------------------
+
+* Django middleware is now cached rather than instantiated per request
+  resulting in a sigificant speed improvement
+
+* ChannelServerLiveTestCase now serves static files again
+
+* Improved error message resulting from bad Origin headers
+
+* runserver logging now goes through the Django logging framework
+
+* Generic consumers can now have non-default channel layers
+
+* Improved error when accessing scope['user'] before it's ready
+
+
 2.1.3 (2018-08-16)
 ------------------
 

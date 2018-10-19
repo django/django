@@ -1,0 +1,33 @@
+2.1.4 Release Notes
+===================
+
+Channels 2.1.4 is another bugfix release in the 2.1 series.
+
+
+Bugfixes & Small Changes
+------------------------
+
+* Django middleware is now cached rather than instantiated per request
+  resulting in a sigificant speed improvement. Some middleware took seconds to
+  load and as a result Channels was unusable for HTTP serving before.
+
+* ChannelServerLiveTestCase now serves static files again.
+
+* Improved error message resulting from bad Origin headers.
+
+* ``runserver`` logging now goes through the Django logging framework to match
+  modern Django.
+
+* Generic consumers can now have non-default channel layers - set the
+  ``channel_layer_alias`` property on the consumer class
+
+* Improved error when accessing ``scope['user']`` before it's ready - the user
+  is not accessible in the constructor of ASGI apps as it needs an async
+  environment to load in. Previously it raised a generic error when you tried to
+  access it early; now it tells you more clearly what's happening.
+
+
+Backwards Incompatible Changes
+------------------------------
+
+None.
