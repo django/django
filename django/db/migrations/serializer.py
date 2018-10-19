@@ -4,8 +4,10 @@ import datetime
 import decimal
 import enum
 import functools
+import inspect
 import math
 import re
+import sys
 import types
 import uuid
 
@@ -13,7 +15,6 @@ from django.db import models
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
 from django.utils.functional import LazyObject, Promise
-from django.utils.module_loading import import_module
 from django.utils.timezone import utc
 from django.utils.version import get_docs_version
 
@@ -276,14 +277,23 @@ class ClassSerializer(BaseSerializer):
         _module = self.value.__module__
         module_first_part, module_second_part = _module.split('.')
         _class = self.value.__class__
-        # if module for internal usage, try to find in extras
+        _path = ""
         if module_second_part.startswith('_'):
-            _module = "{0}.extras".format(module_first_part)
-            try:
-                import_module(_module)
-            except ImportError as e:
-                return
-        _path = _module + "." + _class.__name__
+            related_modules = [
+                m for m in sys.modules
+                if module_first_part in m and
+                m != _module and len(m.split('.')) > 1 and not
+                m.split('.')[1].startswith('_')
+            ]
+            for related_module in related_modules:
+                klass_members = dict(
+                    inspect.getmembers(
+                        sys.modules[related_module],
+                        lambda m: inspect.isclass(m))).keys()
+                if _class.__name__ not in klass_members:
+                    continue
+                _path = related_module + "." + _class.__name__
+                break
         from django.utils.deconstruct import deconstructible
         deconstructible_klass = deconstructible(_class, path=_path)
         try:
