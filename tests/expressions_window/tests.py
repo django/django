@@ -16,13 +16,6 @@ from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from .models import Employee
 
 
-def fix_ordering_for_mariadb(qs, ordering):
-    if connection.vendor == 'mysql' and connection.mysql_is_mariadb:
-        # MariaDB requires repeating the ordering when using window functions
-        qs = qs.order_by(*ordering)
-    return qs
-
-
 @skipUnlessDBFeature('supports_over_clause')
 class WindowFunctionTests(TestCase):
     @classmethod
@@ -193,8 +186,7 @@ class WindowFunctionTests(TestCase):
             expression=Lag(expression='salary', offset=1),
             partition_by=F('department'),
             order_by=[F('salary').asc(), F('name').asc()],
-        )).order_by('department')
-        qs = fix_ordering_for_mariadb(qs, ('department', F('salary').asc(), F('name').asc()))
+        )).order_by('department', F('salary').asc(), F('name').asc())
         self.assertQuerysetEqual(qs, [
             ('Williams', 37000, 'Accounting', None),
             ('Jenson', 45000, 'Accounting', 37000),
@@ -257,8 +249,8 @@ class WindowFunctionTests(TestCase):
             expression=Lead(expression='salary'),
             order_by=[F('hire_date').asc(), F('name').desc()],
             partition_by='department',
-        )).values_list('name', 'salary', 'department', 'hire_date', 'lead')
-        qs = fix_ordering_for_mariadb(qs, ('department', F('hire_date').asc(), F('name').desc()))
+        )).values_list('name', 'salary', 'department', 'hire_date', 'lead') \
+          .order_by('department', F('hire_date').asc(), F('name').desc())
         self.assertNotIn('GROUP BY', str(qs.query))
         self.assertSequenceEqual(qs, [
             ('Jones', 45000, 'Accounting', datetime.date(2005, 11, 1), 45000),
@@ -381,9 +373,7 @@ class WindowFunctionTests(TestCase):
             expression=Lead(expression='salary'),
             order_by=[F('hire_date').asc(), F('name').desc()],
             partition_by='department',
-        )).order_by('department')
-        ('department', F('hire_date').asc(), F('name').desc())
-        qs = fix_ordering_for_mariadb(qs, ('department', F('hire_date').asc(), F('name').desc()))
+        )).order_by('department', F('hire_date').asc(), F('name').desc())
         self.assertQuerysetEqual(qs, [
             ('Jones', 45000, 'Accounting', datetime.date(2005, 11, 1), 45000),
             ('Jenson', 45000, 'Accounting', datetime.date(2008, 4, 1), 37000),
