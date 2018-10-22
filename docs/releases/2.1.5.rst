@@ -1,0 +1,17 @@
+2.1.5 Release Notes
+===================
+
+Channels 2.1.5 is another bugfix release in the 2.1 series.
+
+
+Bugfixes & Small Changes
+------------------------
+
+* Django middleware caching now works on Django 1.11 and Django 2.0.
+  The previous release only ran on 2.1.
+
+
+Backwards Incompatible Changes
+------------------------------
+
+None.

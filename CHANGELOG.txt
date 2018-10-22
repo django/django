@@ -1,6 +1,14 @@
 Full release notes, with more details and upgrade information, are available at:
 https://channels.readthedocs.io/en/latest/releases
 
+
+2.1.5 (2018-10-22)
+------------------
+
+* Django middleware caching now works on Django 1.11 and Django 2.0.
+  The previous release only ran on 2.1.
+
+
 2.1.4 (2018-10-19)
 ------------------
 
