@@ -18,6 +18,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         cx_Oracle.DATETIME: 'DateField',
         cx_Oracle.FIXED_CHAR: 'CharField',
         cx_Oracle.FIXED_NCHAR: 'CharField',
+        cx_Oracle.INTERVAL: 'DurationField',
         cx_Oracle.NATIVE_FLOAT: 'FloatField',
         cx_Oracle.NCHAR: 'CharField',
         cx_Oracle.NCLOB: 'TextField',

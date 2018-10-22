@@ -22,6 +22,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         1083: 'TimeField',
         1114: 'DateTimeField',
         1184: 'DateTimeField',
+        1186: 'DurationField',
         1266: 'TimeField',
         1700: 'DecimalField',
         2950: 'UUIDField',

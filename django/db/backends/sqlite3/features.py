@@ -15,6 +15,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_mixed_date_datetime_comparisons = False
     autocommits_when_autocommit_is_off = True
     can_introspect_decimal_field = False
+    can_introspect_duration_field = False
     can_introspect_positive_integer_field = True
     can_introspect_small_integer_field = True
     supports_transactions = True
