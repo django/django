@@ -1351,8 +1351,8 @@ implementation details see :ref:`using-the-views`.
 
     **Template context:**
 
-    * ``form``: The form (see ``set_password_form`` above) for setting the
-      new user's password.
+    * ``form``: The form (see ``form_class`` above) for setting the new user's
+      password.
 
     * ``validlink``: Boolean, True if the link (combination of ``uidb64`` and
       ``token``) is valid or unused yet.
