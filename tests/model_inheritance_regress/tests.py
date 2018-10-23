@@ -10,10 +10,11 @@ from django.test import TestCase
 
 from .models import (
     ArticleWithAuthor, BachelorParty, BirthdayParty, BusStation, Child,
-    DerivedM, InternalCertificationAudit, ItalianRestaurant, M2MChild,
-    MessyBachelorParty, ParkingLot, ParkingLot3, ParkingLot4A, ParkingLot4B,
-    Person, Place, Profile, QualityControl, Restaurant, SelfRefChild,
-    SelfRefParent, Senator, Supplier, TrainStation, User, Wholesaler,
+    Congressman, DerivedM, InternalCertificationAudit, ItalianRestaurant,
+    M2MChild, MessyBachelorParty, ParkingLot, ParkingLot3, ParkingLot4A,
+    ParkingLot4B, Person, Place, Politician, Profile, QualityControl,
+    Restaurant, SelfRefChild, SelfRefParent, Senator, Supplier, TrainStation,
+    User, Wholesaler,
 )
 
 
@@ -558,3 +559,15 @@ class ModelInheritanceTest(TestCase):
         italian_restaurant.restaurant_ptr = None
         self.assertIsNone(italian_restaurant.pk)
         self.assertIsNone(italian_restaurant.id)
+
+    def test_create_new_instance_with_pk_equals_none(self):
+        c1 = Congressman.objects.create(state='PA', title='senator 1')
+        c2 = Politician.objects.get(pk=c1.pk).congressman
+        # Create a new congressman by setting pk = None.
+        c2.pk = None
+        c2.title = 'senator 2'
+        c2.save()
+        self.assertEqual(Congressman.objects.count(), 2)
+        # p1 remains unaffected.
+        p1 = Politician.objects.get(pk=c1.pk)
+        self.assertEqual(p1.title, 'senator 1')
