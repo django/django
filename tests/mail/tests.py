@@ -8,7 +8,7 @@ import socket
 import sys
 import tempfile
 import threading
-from email import message_from_binary_file, message_from_bytes
+from email import charset, message_from_binary_file, message_from_bytes
 from email.header import Header
 from email.mime.text import MIMEText
 from email.utils import parseaddr
@@ -685,6 +685,21 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
         # The child message header is not base64 encoded
         self.assertIn('Child Subject', parent_s)
+
+    def test_custom_utf8_encoding(self):
+        """A UTF-8 charset with a custom body encoding is respected."""
+        body = 'Body with latin characters: àáä.'
+        msg = EmailMessage('Subject', body, 'bounce@example.com', ['to@example.com'])
+        encoding = charset.Charset('utf-8')
+        encoding.body_encoding = charset.QP
+        msg.encoding = encoding
+        message = msg.message()
+        self.assertMessageHasHeaders(message, {
+            ('MIME-Version', '1.0'),
+            ('Content-Type', 'text/plain; charset="utf-8"'),
+            ('Content-Transfer-Encoding', 'quoted-printable'),
+        })
+        self.assertEqual(message.get_payload(), encoding.body_encode(body))
 
     def test_sanitize_address(self):
         """

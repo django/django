@@ -182,11 +182,16 @@ Management Commands
 * :option:`inspectdb --include-views` now creates models for materialized views
   on PostgreSQL.
 
+* :djadmin:`inspectdb` now introspects :class:`~django.db.models.DurationField`
+  for Oracle and PostgreSQL.
+
 Migrations
 ~~~~~~~~~~
 
 * The new :option:`migrate --plan` option prints the list of migration
   operations that will be performed.
+
+* ``NoneType`` can now be serialized in migrations.
 
 Models
 ~~~~~~
@@ -206,6 +211,11 @@ Models
 
 * The new :meth:`.QuerySet.bulk_update` method allows efficiently updating
   specific fields on multiple model instances.
+
+* Django no longer always starts a transaction when a single query is being
+  performed, such as ``Model.save()``, ``QuerySet.update()``, and
+  ``Model.delete()``. This improves the performance of autocommit by reducing
+  the number of database round trips.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -249,7 +259,9 @@ URLs
 Validators
 ~~~~~~~~~~
 
-* ...
+* :class:`.MaxValueValidator`, :class:`.MinValueValidator`,
+  :class:`.MinLengthValidator`, and :class:`.MaxLengthValidator` now accept
+  a callable ``limit_value``.
 
 .. _backwards-incompatible-2.2:
 
@@ -266,6 +278,10 @@ Database backend API
 * Third party database backends must implement support for ignoring
   constraints or uniqueness errors while inserting or set
   ``DatabaseFeatures.supports_ignore_conflicts`` to ``False``.
+
+* Third party database backends must implement introspection for
+  ``DurationField`` or set ``DatabaseFeatures.can_introspect_duration_field``
+  to ``False``.
 
 :mod:`django.contrib.gis`
 -------------------------
@@ -298,6 +314,12 @@ Miscellaneous
 
 * Support for bytestring paths in the template filesystem loader is removed.
 
+* :func:`django.utils.http.urlsafe_base64_encode` now returns a string instead
+  of a bytestring, and :func:`django.utils.http.urlsafe_base64_decode` may no
+  longer be passed a bytestring.
+
+* Support for ``cx_Oracle`` < 6.0 is removed.
+
 .. _deprecated-features-2.2:
 
 Features deprecated in 2.2
@@ -324,3 +346,6 @@ Miscellaneous
 * The ``FloatRangeField`` model and form fields in ``django.contrib.postgres``
   are deprecated in favor of a new name, ``DecimalRangeField``, to match the
   underlying ``numrange`` data type used in the database.
+
+* The ``FILE_CHARSET`` setting is deprecated. Starting with Django 3.1, files
+  read from disk must be UTF-8 encoded.

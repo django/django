@@ -15,6 +15,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_date_lookup_using_string = False
     can_introspect_autofield = True
     can_introspect_binary_field = False
+    can_introspect_duration_field = False
     can_introspect_small_integer_field = True
     can_introspect_positive_integer_field = True
     introspected_boolean_field_type = 'IntegerField'

@@ -1,13 +1,13 @@
 import sys
 from types import ModuleType
 
-from django.conf import Settings
+from django.conf import DEFAULT_CONTENT_TYPE_DEPRECATED_MSG, Settings, settings
 from django.test import SimpleTestCase, ignore_warnings
 from django.utils.deprecation import RemovedInDjango30Warning
 
 
 class DefaultContentTypeTests(SimpleTestCase):
-    msg = 'The DEFAULT_CONTENT_TYPE setting is deprecated.'
+    msg = DEFAULT_CONTENT_TYPE_DEPRECATED_MSG
 
     @ignore_warnings(category=RemovedInDjango30Warning)
     def test_default_content_type_is_text_html(self):
@@ -42,3 +42,17 @@ class DefaultContentTypeTests(SimpleTestCase):
                 Settings('fake_settings_module')
         finally:
             del sys.modules['fake_settings_module']
+
+    def test_access_warning(self):
+        with self.assertRaisesMessage(RemovedInDjango30Warning, self.msg):
+            settings.DEFAULT_CONTENT_TYPE
+        # Works a second time.
+        with self.assertRaisesMessage(RemovedInDjango30Warning, self.msg):
+            settings.DEFAULT_CONTENT_TYPE
+
+    @ignore_warnings(category=RemovedInDjango30Warning)
+    def test_access(self):
+        with self.settings(DEFAULT_CONTENT_TYPE='text/xml'):
+            self.assertEqual(settings.DEFAULT_CONTENT_TYPE, 'text/xml')
+            # Works a second time.
+            self.assertEqual(settings.DEFAULT_CONTENT_TYPE, 'text/xml')

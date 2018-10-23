@@ -749,7 +749,12 @@ class Model(metaclass=ModelBase):
                 sender=origin, instance=self, raw=raw, using=using,
                 update_fields=update_fields,
             )
-        with transaction.atomic(using=using, savepoint=False):
+        # A transaction isn't needed if one query is issued.
+        if meta.parents:
+            context_manager = transaction.atomic(using=using, savepoint=False)
+        else:
+            context_manager = transaction.mark_for_rollback_on_error(using=using)
+        with context_manager:
             parent_inserted = False
             if not raw:
                 parent_inserted = self._save_parents(cls, using, update_fields)
