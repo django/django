@@ -64,7 +64,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         with self._nodb_connection.cursor() as cursor:
             try:
                 self._execute_create_test_db(cursor, test_db_params, keepdb)
-            except Exception as e:
+            except Exception:
                 try:
                     if verbosity >= 1:
                         print("Destroying old test database for alias %s..." % (
