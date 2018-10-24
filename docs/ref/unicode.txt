@@ -2,9 +2,7 @@
 Unicode data
 ============
 
-Django natively supports Unicode data everywhere. Providing your database can
-somehow store the data, you can safely pass around strings to templates,
-models, and the database.
+Django supports Unicode data everywhere.
 
 This document tells you what you need to know if you're writing applications
 that use data or templates that are encoded in something other than ASCII.
