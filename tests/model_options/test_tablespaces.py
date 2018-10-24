@@ -100,10 +100,11 @@ class TablespacesTests(TestCase):
         sql = sql_for_index(Authors).lower()
         # The ManyToManyField declares no db_tablespace, its indexes go to
         # the model's tablespace, unless DEFAULT_INDEX_TABLESPACE is set.
+        expected_through_indexes = 1 if connection.features.composite_index_supports_prefix_search else 2
         if settings.DEFAULT_INDEX_TABLESPACE:
-            self.assertNumContains(sql, settings.DEFAULT_INDEX_TABLESPACE, 2)
+            self.assertNumContains(sql, settings.DEFAULT_INDEX_TABLESPACE, expected_through_indexes)
         else:
-            self.assertNumContains(sql, 'tbl_tbsp', 2)
+            self.assertNumContains(sql, 'tbl_tbsp', expected_through_indexes)
         self.assertNumContains(sql, 'idx_tbsp', 0)
 
         sql = sql_for_table(Reviewers).lower()
@@ -122,4 +123,4 @@ class TablespacesTests(TestCase):
         sql = sql_for_index(Reviewers).lower()
         # The ManyToManyField declares db_tablespace, its indexes go there.
         self.assertNumContains(sql, 'tbl_tbsp', 0)
-        self.assertNumContains(sql, 'idx_tbsp', 2)
+        self.assertNumContains(sql, 'idx_tbsp', expected_through_indexes)
