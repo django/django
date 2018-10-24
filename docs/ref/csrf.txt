@@ -66,10 +66,13 @@ often easier because many JavaScript frameworks provide hooks that allow
 headers to be set on every request.
 
 First, you must get the CSRF token. How to do that depends on whether or not
-the :setting:`CSRF_USE_SESSIONS` setting is enabled.
+the :setting:`CSRF_USE_SESSIONS` and :setting:`CSRF_COOKIE_HTTPONLY` settings
+are enabled.
 
-Acquiring the token if :setting:`CSRF_USE_SESSIONS` is ``False``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _acquiring-csrf-token-from-cookie:
+
+Acquiring the token if :setting:`CSRF_USE_SESSIONS` and :setting:`CSRF_COOKIE_HTTPONLY` are ``False``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The recommended source for the token is the ``csrftoken`` cookie, which will be
 set if you've enabled CSRF protection for your views as outlined above.
@@ -122,11 +125,14 @@ The above code could be simplified by using the `JavaScript Cookie library
     Django provides a view decorator which forces setting of the cookie:
     :func:`~django.views.decorators.csrf.ensure_csrf_cookie`.
 
-Acquiring the token if :setting:`CSRF_USE_SESSIONS` is ``True``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _acquiring-csrf-token-from-html:
 
-If you activate :setting:`CSRF_USE_SESSIONS`, you must include the CSRF token
-in your HTML and read the token from the DOM with JavaScript:
+Acquiring the token if :setting:`CSRF_USE_SESSIONS` or :setting:`CSRF_COOKIE_HTTPONLY` is ``True``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you activate :setting:`CSRF_USE_SESSIONS` or
+:setting:`CSRF_COOKIE_HTTPONLY`, you must include the CSRF token in your HTML
+and read the token from the DOM with JavaScript:
 
 .. code-block:: html+django
 

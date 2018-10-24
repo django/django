@@ -335,8 +335,9 @@ Although the setting offers little practical benefit, it's sometimes required
 by security auditors.
 
 If you enable this and need to send the value of the CSRF token with an AJAX
-request, your JavaScript must pull the value from a hidden CSRF token form
-input on the page instead of from the cookie.
+request, your JavaScript must pull the value :ref:`from a hidden CSRF token
+form input <acquiring-csrf-token-from-html>` instead of :ref:`from the cookie
+<acquiring-csrf-token-from-cookie>`.
 
 See :setting:`SESSION_COOKIE_HTTPONLY` for details on ``HttpOnly``.
 
