@@ -230,6 +230,7 @@ class MigrationExecutor:
 
     def apply_migration(self, state, migration, fake=False, fake_initial=False):
         """Run a migration forwards."""
+        migration_recorded = False
         if self.progress_callback:
             self.progress_callback("apply_start", migration, fake)
         if not fake:
@@ -242,16 +243,22 @@ class MigrationExecutor:
                 # Alright, do it normally
                 with self.connection.schema_editor(atomic=migration.atomic) as schema_editor:
                     state = migration.apply(state, schema_editor)
+                    self.record_migration(migration)
+                    migration_recorded = True
+        if not migration_recorded:
+            self.record_migration(migration)
+        # Report progress
+        if self.progress_callback:
+            self.progress_callback("apply_success", migration, fake)
+        return state
+
+    def record_migration(self, migration):
         # For replacement migrations, record individual statuses
         if migration.replaces:
             for app_label, name in migration.replaces:
                 self.recorder.record_applied(app_label, name)
         else:
             self.recorder.record_applied(migration.app_label, migration.name)
-        # Report progress
-        if self.progress_callback:
-            self.progress_callback("apply_success", migration, fake)
-        return state
 
     def unapply_migration(self, state, migration, fake=False):
         """Run a migration backwards."""
