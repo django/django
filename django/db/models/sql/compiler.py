@@ -353,7 +353,8 @@ class SQLCompiler:
                         expr.set_source_expressions([RawSQL('%d' % (idx + 1), ())])
                         break
                 else:
-                    raise DatabaseError('ORDER BY term does not match any column in the result set.')
+                    # Exception is removed. Combined queries columns can be removed by values_list, values or only
+                    self.query.combined_order_not_match = True
             resolved = expr.resolve_expression(
                 self.query, allow_joins=True, reuse=None)
             sql, params = self.compile(resolved)
@@ -405,7 +406,7 @@ class SQLCompiler:
             return node.output_field.select_format(self, sql, params)
         return sql, params
 
-    def get_combinator_sql(self, combinator, all):
+    def get_combinator_sql(self, combinator, all, with_col_aliases=False):
         features = self.connection.features
         compilers = [
             query.get_compiler(self.using, self.connection)
@@ -438,6 +439,17 @@ class SQLCompiler:
                 raise
         if not parts:
             raise EmptyResultSet
+
+        col_idx = 1
+        out_cols = []
+        for _, (s_sql, s_params), alias in compiler.select:
+            if alias:
+                s_sql = '%s AS %s' % (s_sql, self.connection.ops.quote_name(alias))
+            elif with_col_aliases:
+                s_sql = '%s AS %s' % (s_sql, 'Col%d' % col_idx)
+                col_idx += 1
+            out_cols.append(s_sql)
+
         combinator_sql = self.connection.ops.set_operators[combinator]
         if all and combinator == 'union':
             combinator_sql += ' ALL'
@@ -447,7 +459,7 @@ class SQLCompiler:
         params = []
         for part in args_parts:
             params.extend(part)
-        return result, params
+        return result, params, out_cols
 
     def as_sql(self, with_limits=True, with_col_aliases=False):
         """
@@ -465,10 +477,16 @@ class SQLCompiler:
             with_limit_offset = with_limits and (self.query.high_mark is not None or self.query.low_mark)
             combinator = self.query.combinator
             features = self.connection.features
+            out_cols = []
+
             if combinator:
                 if not getattr(features, 'supports_select_{}'.format(combinator)):
                     raise NotSupportedError('{} is not supported on this database backend.'.format(combinator))
-                result, params = self.get_combinator_sql(combinator, self.query.combinator_all)
+                result, params, out_cols = self.get_combinator_sql(
+                    combinator,
+                    self.query.combinator_all,
+                    with_col_aliases
+                )
             else:
                 distinct_fields, distinct_params = self.get_distinct()
                 # This must come after 'select', 'ordering', and 'distinct'
@@ -478,7 +496,6 @@ class SQLCompiler:
                 having, h_params = self.compile(self.having) if self.having is not None else ("", [])
                 result = ['SELECT']
                 params = []
-
                 if self.query.distinct:
                     distinct_result, distinct_params = self.connection.ops.distinct_sql(
                         distinct_fields,
@@ -487,7 +504,6 @@ class SQLCompiler:
                     result += distinct_result
                     params += distinct_params
 
-                out_cols = []
                 col_idx = 1
                 for _, (s_sql, s_params), alias in self.select + extra_select:
                     if alias:
@@ -605,6 +621,22 @@ class SQLCompiler:
                     ', '.join(sub_selects),
                     ' '.join(result),
                 ), tuple(sub_params + params)
+
+            if combinator and order_by and self.query.combined_order_not_match:
+                removed_cols = []
+                for order_col in ordering:
+                    order_col_name, _ = order_col.split(' ')
+                    if order_col_name not in out_cols:
+                        removed_cols.append(order_col_name)
+
+                if removed_cols:
+                    changed_query = 'SELECT %s FROM (%s) "union_query"' % (
+                        ', '.join(['%s.%s' % ('"union_query"', c.split('.')[1]) for c in out_cols]),
+                        ' '.join([r.replace(' FROM', ',%s FROM' % ', '.join(removed_cols)) for r in result])
+                    )
+                    return changed_query, tuple(params)
+                else:
+                    raise DatabaseError('ORDER BY term does not match any column in the result set.')
 
             return ' '.join(result), tuple(params)
         finally:

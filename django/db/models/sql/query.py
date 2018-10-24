@@ -210,6 +210,7 @@ class Query:
         self.combinator = None
         self.combinator_all = False
         self.combined_queries = ()
+        self.combined_order_not_match = False
 
         # These are for extensions. The contents are more or less appended
         # verbatim to the appropriate clause.

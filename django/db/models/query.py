@@ -926,6 +926,7 @@ class QuerySet:
         clone.query.combined_queries = (self.query,) + tuple(qs.query for qs in other_qs)
         clone.query.combinator = combinator
         clone.query.combinator_all = all
+        clone.query.combined_order_not_match = False
         return clone
 
     def union(self, *other_qs, all=False):
