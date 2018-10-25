@@ -14,3 +14,6 @@ Bugfixes
 
 * Fixed a regression in Django 1.11 where ``django-admin shell`` may hang
   on startup (:ticket:`29774`).
+
+* Fixed a regression in Django 2.0 where test databases aren't reused with
+  ``manage.py test --keepdb`` on MySQL (:ticket:`29827`).
