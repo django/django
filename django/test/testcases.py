@@ -1303,6 +1303,10 @@ class LiveServerTestCase(TransactionTestCase):
     def live_server_url(cls):
         return 'http://%s:%s' % (cls.host, cls.server_thread.port)
 
+    @classproperty
+    def allowed_host(cls):
+        return cls.host
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -1316,7 +1320,7 @@ class LiveServerTestCase(TransactionTestCase):
                 connections_override[conn.alias] = conn
 
         cls._live_server_modified_settings = modify_settings(
-            ALLOWED_HOSTS={'append': cls.host},
+            ALLOWED_HOSTS={'append': cls.allowed_host},
         )
         cls._live_server_modified_settings.enable()
         cls.server_thread = cls._create_server_thread(connections_override)
