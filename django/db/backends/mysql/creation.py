@@ -19,17 +19,7 @@ class DatabaseCreation(BaseDatabaseCreation):
 
     def _execute_create_test_db(self, cursor, parameters, keepdb=False):
         try:
-            if keepdb:
-                # If the database should be kept, add "IF NOT EXISTS" to avoid
-                # "database exists" error, also temporarily disable "database
-                # exists" warning.
-                cursor.execute('''
-                    SET @_tmp_sql_notes := @@sql_notes, sql_notes = 0;
-                    CREATE DATABASE IF NOT EXISTS %(dbname)s %(suffix)s;
-                    SET sql_notes = @_tmp_sql_notes;
-                ''' % parameters)
-            else:
-                super()._execute_create_test_db(cursor, parameters, keepdb)
+            super()._execute_create_test_db(cursor, parameters, keepdb)
         except Exception as e:
             if len(e.args) < 1 or e.args[0] != 1007:
                 # All errors except "database exists" (1007) cancel tests.
@@ -49,6 +39,9 @@ class DatabaseCreation(BaseDatabaseCreation):
             try:
                 self._execute_create_test_db(cursor, test_db_params, keepdb)
             except Exception:
+                if keepdb:
+                    # If the database should be kept, skip everything else.
+                    return
                 try:
                     if verbosity >= 1:
                         print("Destroying old test database for alias %s..." % (
@@ -59,7 +52,9 @@ class DatabaseCreation(BaseDatabaseCreation):
                 except Exception as e:
                     sys.stderr.write("Got an error recreating the test database: %s\n" % e)
                     sys.exit(2)
+        self._clone_db(source_database_name, target_database_name)
 
+    def _clone_db(self, source_database_name, target_database_name):
         dump_cmd = DatabaseClient.settings_to_cmd_args(self.connection.settings_dict)
         dump_cmd[0] = 'mysqldump'
         dump_cmd[-1] = source_database_name
