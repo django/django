@@ -26,7 +26,7 @@ class BaseDatabaseFeatures:
     can_return_id_from_insert = False
     can_return_ids_from_bulk_insert = False
     has_bulk_insert = True
-    uses_savepoints = False
+    uses_savepoints = True
     can_release_savepoints = False
 
     # If True, don't use integer foreign keys referring to, e.g., positive

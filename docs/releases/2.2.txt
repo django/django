@@ -283,6 +283,8 @@ Database backend API
   ``DurationField`` or set ``DatabaseFeatures.can_introspect_duration_field``
   to ``False``.
 
+* ``DatabaseFeatures.uses_savepoints`` now defaults to ``True``.
+
 :mod:`django.contrib.gis`
 -------------------------
 

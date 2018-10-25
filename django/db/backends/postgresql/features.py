@@ -14,7 +14,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_select_for_update = True
     has_select_for_update_nowait = True
     has_select_for_update_of = True
-    uses_savepoints = True
     can_release_savepoints = True
     supports_tablespaces = True
     supports_transactions = True

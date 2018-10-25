@@ -29,7 +29,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     ignores_table_name_case = True
     supports_cast_with_precision = False
     time_cast_precision = 3
-    uses_savepoints = True
     can_release_savepoints = True
 
     @cached_property

@@ -5,7 +5,6 @@ from django.utils.functional import cached_property
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     interprets_empty_strings_as_nulls = True
-    uses_savepoints = True
     has_select_for_update = True
     has_select_for_update_nowait = True
     has_select_for_update_skip_locked = True
