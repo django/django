@@ -331,6 +331,14 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     def _alter_field(self, model, old_field, new_field, old_type, new_type,
                      old_db_params, new_db_params, strict=False):
         """Perform a "physical" (non-ManyToMany) field update."""
+        # Use "ALTER TABLE ... RENAME COLUMN" if only the column name
+        # changed and there aren't any constraints.
+        if (self.connection.features.can_alter_table_rename_column and
+            old_field.column != new_field.column and
+            self.column_sql(model, old_field) == self.column_sql(model, new_field) and
+            not (old_field.remote_field and old_field.db_constraint or
+                 new_field.remote_field and new_field.db_constraint)):
+            return self.execute(self._rename_field_sql(model._meta.db_table, old_field, new_field, new_type))
         # Alter by remaking table
         self._remake_table(model, alter_field=(old_field, new_field))
         # Rebuild tables with FKs pointing to this field if the PK type changed.

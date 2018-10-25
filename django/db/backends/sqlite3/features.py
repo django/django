@@ -4,6 +4,8 @@ from django.db import utils
 from django.db.backends.base.features import BaseDatabaseFeatures
 from django.utils.functional import cached_property
 
+from .base import Database
+
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     # SQLite can read from a cursor since SQLite 3.6.5, subject to the caveat
@@ -32,6 +34,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_cast_with_precision = False
     time_cast_precision = 3
     can_release_savepoints = True
+    # Is "ALTER TABLE ... RENAME COLUMN" supported?
+    can_alter_table_rename_column = Database.sqlite_version_info >= (3, 25, 0)
 
     @cached_property
     def supports_stddev(self):
