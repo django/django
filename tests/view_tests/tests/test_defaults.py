@@ -72,6 +72,13 @@ class DefaultsTests(TestCase):
         response = self.client.get('/server_error/')
         self.assertEqual(response.status_code, 500)
 
+    def test_bad_request(self):
+        rf = RequestFactory()
+        request = rf.get('/')
+        response = bad_request(request, Exception())
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.content, b'<h1>Bad Request (400)</h1>')
+
     @override_settings(TEMPLATES=[{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'OPTIONS': {
