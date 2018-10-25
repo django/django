@@ -395,7 +395,7 @@ class BaseDatabaseWrapper:
 
         start_transaction_under_autocommit = (
             force_begin_transaction_with_broken_autocommit and not autocommit and
-            self.features.autocommits_when_autocommit_is_off
+            hasattr(self, '_start_transaction_under_autocommit')
         )
 
         if start_transaction_under_autocommit:
@@ -593,15 +593,6 @@ class BaseDatabaseWrapper:
             {**self.settings_dict, 'NAME': None},
             alias=NO_DB_ALIAS,
             allow_thread_sharing=False,
-        )
-
-    def _start_transaction_under_autocommit(self):
-        """
-        Only required when autocommits_when_autocommit_is_off = True.
-        """
-        raise NotImplementedError(
-            'subclasses of BaseDatabaseWrapper may require a '
-            '_start_transaction_under_autocommit() method'
         )
 
     def schema_editor(self, *args, **kwargs):
