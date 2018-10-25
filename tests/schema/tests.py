@@ -1350,6 +1350,36 @@ class SchemaTests(TransactionTestCase):
     def test_m2m_custom(self):
         self._test_m2m(CustomManyToManyField)
 
+    def test_m2m_through_indexes(self):
+        """
+        Tests for correct indexes in autocreated through model
+        """
+        class LocalAuthorWithM2M(Model):
+            name = CharField(max_length=255)
+            tags = ManyToManyField(Tag, related_name="authors")
+
+            class Meta:
+                app_label = 'schema'
+                apps = new_apps
+
+        self.local_models = [LocalAuthorWithM2M]
+
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Tag)
+            editor.create_model(LocalAuthorWithM2M)
+
+        through = LocalAuthorWithM2M._meta.get_field("tags").remote_field.through
+        indexes = [constraint['columns']
+                   for constraint in self.get_constraints(through._meta.db_table).values()
+                   if constraint['index'] or constraint['unique']]
+        self.assertIn(['tag_id'], indexes)
+        self.assertIn(['localauthorwithm2m_id', 'tag_id'], indexes)
+        if connection.features.composite_index_supports_prefix_search:
+            self.assertNotIn(['localauthorwithm2m_id'], indexes)
+        else:
+            self.assertIn(['localauthorwithm2m_id'], indexes)
+
     def test_m2m_inherited(self):
         self._test_m2m(InheritedManyToManyField)
 
