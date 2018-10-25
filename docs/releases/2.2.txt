@@ -185,6 +185,9 @@ Management Commands
 * :djadmin:`inspectdb` now introspects :class:`~django.db.models.DurationField`
   for Oracle and PostgreSQL.
 
+* On Oracle, :djadmin:`dbshell` is wrapped with ``rlwrap``, if available.
+  ``rlwrap`` provides a command history and editing of keyboard input.
+
 Migrations
 ~~~~~~~~~~
 
