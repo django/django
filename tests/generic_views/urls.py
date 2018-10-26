@@ -168,6 +168,7 @@ urlpatterns = [
     # MonthArchiveView
     path('dates/books/<int:year>/<int:month>/', views.BookMonthArchive.as_view(month_format='%m')),
     path('dates/books/<int:year>/<month>/', views.BookMonthArchive.as_view()),
+    path('dates/books/without_month/<int:year>/', views.BookMonthArchive.as_view()),
     path('dates/books/<int:year>/<month>/allow_empty/', views.BookMonthArchive.as_view(allow_empty=True)),
     path('dates/books/<int:year>/<month>/allow_future/', views.BookMonthArchive.as_view(allow_future=True)),
     path('dates/books/<int:year>/<month>/paginated/', views.BookMonthArchive.as_view(paginate_by=30)),
