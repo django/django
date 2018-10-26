@@ -1,5 +1,7 @@
 from channels.consumer import AsyncConsumer
 
+from ..exceptions import StopConsumer
+
 
 class AsyncHttpConsumer(AsyncConsumer):
     """
@@ -7,25 +9,9 @@ class AsyncHttpConsumer(AsyncConsumer):
     HTTP endpoints.
     """
 
-    async def __call__(self, receive, send):
-        """
-        Async entrypoint - concatenates body fragments and hands off control
-        to ``self.handle`` when the body has been completely received.
-        """
-        self.send = send
-        body = []
-        try:
-            while True:
-                message = await receive()
-                if message["type"] == "http.disconnect":
-                    return
-                else:
-                    if "body" in message:
-                        body.append(message["body"])
-                    if not message.get("more_body"):
-                        await self.handle(b"".join(body))
-        finally:
-            await self.disconnect()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.body = []
 
     async def send_headers(self, *, status=200, headers=None):
         """
@@ -83,3 +69,24 @@ class AsyncHttpConsumer(AsyncConsumer):
         from here.
         """
         pass
+
+    async def http_request(self, message):
+        """
+        Async entrypoint - concatenates body fragments and hands off control
+        to ``self.handle`` when the body has been completely received.
+        """
+        if "body" in message:
+            self.body.append(message["body"])
+        if not message.get("more_body"):
+            try:
+                await self.handle(b"".join(self.body))
+            finally:
+                await self.disconnect()
+                raise StopConsumer()
+
+    async def http_disconnect(self, message):
+        """
+        Let the user do their cleanup and close the consumer.
+        """
+        await self.disconnect()
+        raise StopConsumer()
