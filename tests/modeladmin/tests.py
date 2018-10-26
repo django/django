@@ -248,11 +248,11 @@ class ModelAdminTests(TestCase):
         # displayed as read-only.
         self.assertEqual(
             list(ma.get_fields(request)),
-            ['bio', 'sign_date', 'name']
+            ['name', 'bio', 'sign_date']
         )
         self.assertEqual(
             list(ma.get_fieldsets(request)),
-            [(None, {'fields': ['bio', 'sign_date', 'name']})]
+            [(None, {'fields': ['name', 'bio', 'sign_date']})]
         )
 
     def test_custom_form_meta_exclude(self):

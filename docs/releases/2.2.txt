@@ -43,7 +43,11 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Fields marked as read-only in
+  :class:`~django.contrib.admin.options.ModelAdmin` now replace their
+  editable fields (instead of being moved to the end) in the case neither
+  :attr:`~django.contrib.admin.options.ModelAdmin.fields` nor
+  :attr:`~django.contrib.admin.options.ModelAdmin.fieldsets` are specified.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

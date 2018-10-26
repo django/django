@@ -74,6 +74,22 @@ class AdminFieldExtractionMixin:
                 fields.extend(field_line)
         return fields
 
+    def get_admin_formset_fields(self, response):
+        """
+        Return a the AdminFields for the InlineAdminFormSets in the response.
+        """
+        formsets = []
+        for formset in response.context['inline_admin_formsets']:
+            forms = []
+            for form in formset:
+                fields = []
+                for fieldset in form:
+                    for field_line in fieldset:
+                        fields.extend(field_line)
+                forms.append(fields)
+            formsets.append(forms)
+        return formsets
+
     def get_admin_readonly_fields(self, response):
         """
         Return the readonly fields for the response's AdminForm.
@@ -4689,6 +4705,35 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         su = User.objects.filter(is_superuser=True)[0]
         response = self.client.get(reverse('admin2:auth_user_password_change', args=(su.pk,)))
         self.assertEqual(response.status_code, 404)
+
+    def test_readonly_field_order(self):
+        """
+        Readonly fields are not placed at the end, but replace the field in the
+        default order if in there.
+        """
+        response = self.client.get(reverse('admin:admin_views_post_add'))
+        fields = [
+            (field.field['name'] if isinstance(field.field, dict) else field.field.name, field.is_readonly)
+            for field in self.get_admin_form_fields(response)]
+        self.assertEqual(
+            fields[:5],
+            [
+                ('title', False),
+                ('content', False),
+                ('readonly_content', True),
+                ('posted', True),
+                ('public', False),
+            ]
+        )
+
+        link_forms = self.get_admin_formset_fields(response)[0]
+        link_form_fields = [
+            (field.field['name'] if isinstance(field.field, dict) else field.field.name, field.is_readonly)
+            for field in link_forms[0]]
+        self.assertEqual(
+            link_form_fields[:3],
+            [('posted', True), ('url', False), ('readonly_link_content', True)]
+        )
 
     def test_change_form_renders_correct_null_choice_value(self):
         """

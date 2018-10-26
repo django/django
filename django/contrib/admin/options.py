@@ -319,7 +319,11 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             return self.fields
         # _get_form_for_get_fields() is implemented in subclasses.
         form = self._get_form_for_get_fields(request, obj)
-        return [*form.base_fields, *self.get_readonly_fields(request, obj)]
+        fields = list(form.base_fields.keys())
+        for readonly_field in self.get_readonly_fields(request, obj):
+            if readonly_field not in fields:
+                fields.append(readonly_field)
+        return fields
 
     def get_fieldsets(self, request, obj=None):
         """
@@ -656,7 +660,7 @@ class ModelAdmin(BaseModelAdmin):
         }
 
     def _get_form_for_get_fields(self, request, obj):
-        return self.get_form(request, obj, fields=None)
+        return self.get_form(request, obj, fields=None, readonly_fields=())
 
     def get_form(self, request, obj=None, change=False, **kwargs):
         """
@@ -669,7 +673,10 @@ class ModelAdmin(BaseModelAdmin):
             fields = flatten_fieldsets(self.get_fieldsets(request, obj))
         excluded = self.get_exclude(request, obj)
         exclude = [] if excluded is None else list(excluded)
-        readonly_fields = self.get_readonly_fields(request, obj)
+        if 'readonly_fields' in kwargs:
+            readonly_fields = kwargs.pop('readonly_fields')
+        else:
+            readonly_fields = self.get_readonly_fields(request, obj)
         exclude.extend(readonly_fields)
         # Exclude all fields if it's a change form and the user doesn't have
         # the change permission.
@@ -2023,7 +2030,10 @@ class InlineModelAdmin(BaseModelAdmin):
             fields = flatten_fieldsets(self.get_fieldsets(request, obj))
         excluded = self.get_exclude(request, obj)
         exclude = [] if excluded is None else list(excluded)
-        exclude.extend(self.get_readonly_fields(request, obj))
+        if 'readonly_fields' in kwargs:
+            exclude.extend(kwargs.pop('readonly_fields'))
+        else:
+            exclude.extend(self.get_readonly_fields(request, obj))
         if excluded is None and hasattr(self.form, '_meta') and self.form._meta.exclude:
             # Take the custom ModelForm's Meta.exclude into account only if the
             # InlineModelAdmin doesn't define its own.
@@ -2103,7 +2113,7 @@ class InlineModelAdmin(BaseModelAdmin):
         return inlineformset_factory(self.parent_model, self.model, **defaults)
 
     def _get_form_for_get_fields(self, request, obj=None):
-        return self.get_formset(request, obj, fields=None).form
+        return self.get_formset(request, obj, fields=None, readonly_fields=()).form
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
