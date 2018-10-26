@@ -18,6 +18,7 @@ class SimpleHttpApp(AsyncConsumer):
     async def http_request(self, event):
         assert self.scope["path"] == "/test/"
         assert self.scope["method"] == "GET"
+        assert self.scope["query_string"] == b"foo=bar"
         await self.send({"type": "http.response.start", "status": 200, "headers": []})
         await self.send({"type": "http.response.body", "body": b"test response"})
 
@@ -27,7 +28,7 @@ async def test_http_communicator():
     """
     Tests that the HTTP communicator class works at a basic level.
     """
-    communicator = HttpCommunicator(SimpleHttpApp, "GET", "/test/")
+    communicator = HttpCommunicator(SimpleHttpApp, "GET", "/test/?foo=bar")
     response = await communicator.get_response()
     assert response["body"] == b"test response"
     assert response["status"] == 200

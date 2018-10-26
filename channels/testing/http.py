@@ -1,3 +1,5 @@
+from urllib.parse import unquote, urlparse
+
 from asgiref.testing import ApplicationCommunicator
 
 
@@ -13,11 +15,13 @@ class HttpCommunicator(ApplicationCommunicator):
     """
 
     def __init__(self, application, method, path, body=b"", headers=None):
+        parsed = urlparse(path)
         self.scope = {
             "type": "http",
             "http_version": "1.1",
             "method": method.upper(),
-            "path": path,
+            "path": unquote(parsed.path),
+            "query_string": parsed.query.encode("utf-8"),
             "headers": headers or [],
         }
         assert isinstance(body, bytes)
