@@ -9,3 +9,12 @@ class RandomUUID(Func):
 class TransactionNow(Func):
     template = 'CURRENT_TIMESTAMP'
     output_field = DateTimeField()
+
+
+class ToJsonb(Func):
+    function = 'to_jsonb'
+
+
+class JsonbCast(Func):
+    template = '%(function)s(%(expressions)s)::jsonb'
+    function = 'to_json'

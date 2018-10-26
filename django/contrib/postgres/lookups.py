@@ -1,6 +1,9 @@
-from django.db.models import Lookup, Transform
-from django.db.models.lookups import Exact
+from collections import OrderedDict
 
+from django.db.models import Lookup, Transform
+from django.db.models.lookups import Exact, In
+
+from .functions import ToJsonb, JsonbCast
 from .search import SearchVector, SearchVectorExact, SearchVectorField
 
 
@@ -74,3 +77,21 @@ class JSONExact(Exact):
         result = super().process_rhs(compiler, connection)
         # Treat None lookup values as null.
         return ("'null'", []) if result == ('%s', [None]) else result
+
+
+class JSONIn(In):
+    def process_rhs(self, compiler, connection):
+        has_to_jsonb = connection.features.has_to_jsonb
+        func = (ToJsonb if has_to_jsonb else JsonbCast)
+        if hasattr(self.rhs, 'as_sql'):
+            # Here we're always expecting a single column being
+            # either SELECTed or created via an annotation, as
+            # multi-field values cannot be used as rhs on a
+            # filter query
+            if self.rhs.select:
+                self.rhs.select = (func(self.rhs.select[0]),)
+            elif self.rhs._annotations:
+                annotation_name, annotation_val = list(self.rhs._annotations.items())[0]
+                self.rhs._annotations = OrderedDict({annotation_name: func(annotation_val)})
+        rhs, rhs_params = super().process_rhs(compiler, connection)
+        return rhs, rhs_params

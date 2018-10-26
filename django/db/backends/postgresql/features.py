@@ -67,6 +67,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     has_select_for_update_skip_locked = is_postgresql_9_5
     has_brin_index_support = is_postgresql_9_5
+    has_to_jsonb = is_postgresql_9_5
     has_jsonb_agg = is_postgresql_9_5
     has_brin_autosummarize = is_postgresql_10
     has_gin_pending_list_limit = is_postgresql_9_5

@@ -89,6 +89,7 @@ JSONField.register_lookup(lookups.HasKey)
 JSONField.register_lookup(lookups.HasKeys)
 JSONField.register_lookup(lookups.HasAnyKeys)
 JSONField.register_lookup(lookups.JSONExact)
+JSONField.register_lookup(lookups.JSONIn)
 
 
 class KeyTransform(Transform):

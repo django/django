@@ -8,9 +8,10 @@ from django.db.models import Q
 from django.forms import CharField, Form, widgets
 from django.test.utils import isolate_apps
 from django.utils.html import escape
+from django.db.models.functions import Lower
 
 from . import PostgreSQLTestCase
-from .models import JSONModel, PostgreSQLModel
+from .models import Character, JSONModel, PostgreSQLModel
 
 try:
     from django.contrib.postgres import forms
@@ -298,6 +299,34 @@ class TestQuerying(PostgreSQLTestCase):
 
     def test_iregex(self):
         self.assertTrue(JSONModel.objects.filter(field__foo__iregex=r'^bAr$').exists())
+
+    def test_deep_lookup_empty_qset_rhs(self):
+        query = JSONModel.objects.filter(
+            field__foo__in=Character.objects.values('name')
+        )
+        self.assertSequenceEqual(query, [])
+
+    def test_deep_lookup_qset_rhs_returns_single_row(self):
+        Character.objects.create(name='bar')
+        query = JSONModel.objects.filter(
+            field__foo__in=Character.objects.values('name')
+        )
+        self.assertSequenceEqual(query, [self.objs[11]])
+
+    def test_deep_lookup_qset_rhs_returns_multiple_rows(self):
+        Character.objects.create(name='bar')
+        Character.objects.create(name='baz')
+        query = JSONModel.objects.filter(
+            field__foo__in=Character.objects.values('name')
+        )
+        self.assertSequenceEqual(query, [self.objs[11]])
+
+    def test_deep_lookup_qset_rhs_w_annotation(self):
+        Character.objects.create(name='bar')
+        query = JSONModel.objects.filter(
+            field__foo__in=Character.objects.annotate(name_lower=Lower('name')).values('name_lower')
+        )
+        self.assertSequenceEqual(query, [self.objs[11]])
 
 
 @isolate_apps('postgres_tests')
