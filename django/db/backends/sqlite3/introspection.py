@@ -210,29 +210,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             'pk': field[5],  # undocumented
         } for field in cursor.fetchall()]
 
-    def _get_foreign_key_constraints(self, cursor, table_name):
-        constraints = {}
-        cursor.execute('PRAGMA foreign_key_list(%s)' % self.connection.ops.quote_name(table_name))
-        for row in cursor.fetchall():
-            # Remaining on_update/on_delete/match values are of no interest.
-            id_, _, table, from_, to = row[:5]
-            constraints['fk_%d' % id_] = {
-                'columns': [from_],
-                'primary_key': False,
-                'unique': False,
-                'foreign_key': (table, to),
-                'check': False,
-                'index': False,
-            }
-        return constraints
-
-    def get_constraints(self, cursor, table_name):
-        """
-        Retrieve any constraints or keys (unique, pk, fk, check, index) across
-        one or more columns.
-        """
-        constraints = {}
-        # Find inline check constraints.
+    def _get_check_constraints(self, cursor, table_name):
+        checks = {}
         try:
             table_schema = cursor.execute(
                 "SELECT sql FROM sqlite_master WHERE type='table' and name=%s" % (
@@ -258,12 +237,12 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             _name = None
             _columns = []
 
-            def update_constraints():
-                if _constraint or _check:
-                    constraints[_name] = {
+            def update_checks():
+                if _check:
+                    checks[_name] = {
                         'columns': _columns,
                         'primary_key': False,
-                        'unique': _unique,
+                        'unique': False,
                         'foreign_key': False,
                         'check': _check,
                         'index': False,
@@ -275,10 +254,15 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     _constraint = True
                 elif token.match(Token.Keyword, 'CHECK'):
                     _check = True
-                elif token.match(Token.Keyword, 'UNIQUE'):
-                    _unique = True
+                elif (token.match(Token.Keyword, 'UNIQUE') or
+                      token.match(Token.Keyword, 'PRIMARY') or
+                      token.match(Token.Keyword, 'FOREIGN')):
+                    # Ignore unique, primary, or foreign constraints as these
+                    # will be retrieve later on.
+                    _constraint = False
+                    _check = False
                 elif token.match(Token.Punctuation, ','):
-                    update_constraints()
+                    update_checks()
                     _constraint = False
                     _check = False
                     _unique = False
@@ -297,8 +281,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                         _name = '__check__%s' % field_name
             # If this is the last part, there isn't a terminating comma
             # so update here also.
-            update_constraints()
+            update_checks()
+        return checks
 
+    def _get_indexes(self, cursor, table_name):
+        indexes = {}
         # Get the index info
         cursor.execute("PRAGMA index_list(%s)" % self.connection.ops.quote_name(table_name))
         for row in cursor.fetchall():
@@ -308,8 +295,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             # Get the index info for that index
             cursor.execute('PRAGMA index_info(%s)' % self.connection.ops.quote_name(index))
             for index_rank, column_rank, column in cursor.fetchall():
-                if index not in constraints:
-                    constraints[index] = {
+                if index not in indexes:
+                    indexes[index] = {
                         "columns": [],
                         "primary_key": False,
                         "unique": bool(unique),
@@ -317,11 +304,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                         "check": False,
                         "index": True,
                     }
-                constraints[index]['columns'].append(column)
+                indexes[index]['columns'].append(column)
             # Add type and column orders for indexes
-            if constraints[index]['index'] and not constraints[index]['unique']:
+            if indexes[index]['index'] and not indexes[index]['unique']:
                 # SQLite doesn't support any index type other than b-tree
-                constraints[index]['type'] = Index.suffix
+                indexes[index]['type'] = Index.suffix
                 cursor.execute(
                     "SELECT sql FROM sqlite_master "
                     "WHERE type='index' AND name=%s" % self.connection.ops.quote_name(index)
@@ -331,15 +318,17 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 for sql, in cursor.fetchall():
                     order_info = sql.split('(')[-1].split(')')[0].split(',')
                     orders = ['DESC' if info.endswith('DESC') else 'ASC' for info in order_info]
-                constraints[index]['orders'] = orders
-        # Get the PK
+                indexes[index]['orders'] = orders
+        return indexes
+
+    def _get_primary_key_constraint(self, cursor, table_name):
         pk_column = self.get_primary_key_column(cursor, table_name)
         if pk_column:
             # SQLite doesn't actually give a name to the PK constraint,
             # so we invent one. This is fine, as the SQLite backend never
             # deletes PK constraints by name, as you can't delete constraints
             # in SQLite; we remake the table with a new PK instead.
-            constraints["__primary__"] = {
+            constraint = {
                 "columns": [pk_column],
                 "primary_key": True,
                 "unique": False,  # It's not actually a unique constraint.
@@ -347,5 +336,33 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 "check": False,
                 "index": False,
             }
-        constraints.update(self._get_foreign_key_constraints(cursor, table_name))
+            return {"__primary__": constraint}
+        return {}
+
+    def _get_foreign_key_constraints(self, cursor, table_name):
+        constraints = {}
+        cursor.execute('PRAGMA foreign_key_list(%s)' % self.connection.ops.quote_name(table_name))
+        for row in cursor.fetchall():
+            # Remaining on_update/on_delete/match values are of no interest.
+            id_, _, table, from_, to = row[:5]
+            constraints['fk_%d' % id_] = {
+                'columns': [from_],
+                'primary_key': False,
+                'unique': False,
+                'foreign_key': (table, to),
+                'check': False,
+                'index': False,
+            }
         return constraints
+
+    def get_constraints(self, cursor, table_name):
+        """
+        Retrieve any constraints or keys (unique, pk, fk, check, index) across
+        one or more columns.
+        """
+        return {
+            **self._get_check_constraints(cursor, table_name),
+            **self._get_indexes(cursor, table_name),
+            **self._get_primary_key_constraint(cursor, table_name),
+            **self._get_foreign_key_constraints(cursor, table_name),
+        }

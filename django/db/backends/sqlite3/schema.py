@@ -55,6 +55,45 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         else:
             raise ValueError("Cannot quote parameter value %r of type %s" % (value, type(value)))
 
+    def _constraint_names(self, model, column_names=None, unique=None,
+                          primary_key=None, index=None, foreign_key=None,
+                          check=None, type_=None):
+        if index or primary_key or foreign_key or unique or check is False:
+            # Avoid calling _get_check_constraints if not necessary as it
+            # requires the sqlparse package.
+            table_name = model._meta.db_table
+            with self.connection.cursor() as cursor:
+                constraints = {
+                    **self.connection.introspection._get_indexes(cursor, table_name),
+                    **self.connection.introspection._get_primary_key_constraint(cursor, table_name),
+                    **self.connection.introspection._get_foreign_key_constraints(cursor, table_name),
+                }
+            result = []
+            for name, infodict in constraints.items():
+                if column_names is None or column_names == infodict['columns']:
+                    if unique is not None and infodict['unique'] != unique:
+                        continue
+                    if primary_key is not None and infodict['primary_key'] != primary_key:
+                        continue
+                    if index is not None and infodict['index'] != index:
+                        continue
+                    if foreign_key is not None and not infodict['foreign_key']:
+                        continue
+                    if type_ is not None and infodict['type'] != type_:
+                        continue
+                    result.append(name)
+            return result
+        return super(DatabaseSchemaEditor, self)._constraint_names(
+            model,
+            column_names=column_names,
+            unique=unique,
+            primary_key=primary_key,
+            index=index,
+            foreign_key=foreign_key,
+            check=check,
+            type_=type,
+        )
+
     def _is_referenced_by_fk_constraint(self, table_name, column_name=None, ignore_self=False):
         """
         Return whether or not the provided table name is referenced by another
