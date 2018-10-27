@@ -1092,7 +1092,7 @@ class OverrideSettingsTests(SimpleTestCase):
         Overriding the STATICFILES_STORAGE setting should be reflected in
         the value of django.contrib.staticfiles.storage.staticfiles_storage.
         """
-        new_class = 'CachedStaticFilesStorage'
+        new_class = 'ManifestStaticFilesStorage'
         new_storage = 'django.contrib.staticfiles.storage.' + new_class
         with self.settings(STATICFILES_STORAGE=new_storage):
             self.assertEqual(staticfiles_storage.__class__.__name__, new_class)

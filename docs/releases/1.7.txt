@@ -506,8 +506,7 @@ Minor features
   and :attr:`~django.core.files.storage.FileSystemStorage.directory_permissions_mode`
   parameters. See :djadmin:`collectstatic` for example usage.
 
-* The :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
-  backend gets a sibling class called
+* The ``CachedStaticFilesStorage`` backend gets a sibling class called
   :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`
   that doesn't use the cache system at all but instead a JSON file called
   ``staticfiles.json`` for storing the mapping between the original file name

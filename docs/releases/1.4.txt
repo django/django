@@ -466,14 +466,11 @@ files from a cloud service<staticfiles-from-cdn>`.
 --------------------------------------------
 
 The :mod:`staticfiles<django.contrib.staticfiles>` contrib app now has a
-:class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage` backend
+``django.contrib.staticfiles.storage.CachedStaticFilesStorage`` backend
 that caches the files it saves (when running the :djadmin:`collectstatic`
 management command) by appending the MD5 hash of the file's content to the
 filename. For example, the file ``css/styles.css`` would also be saved as
 ``css/styles.55e7cbb9ba48.css``
-
-See the :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
-docs for more information.
 
 Simple clickjacking protection
 ------------------------------

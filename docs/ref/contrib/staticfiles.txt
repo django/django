@@ -62,7 +62,7 @@ The :djadmin:`collectstatic` management command calls the
 method of the :setting:`STATICFILES_STORAGE` after each run and passes
 a list of paths that have been found by the management command. It also
 receives all command line options of :djadmin:`collectstatic`. This is used
-by the :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
+by the :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`
 by default.
 
 By default, collected files receive permissions from
@@ -229,9 +229,7 @@ local development, should **never be used in production** and is only
 available if the :doc:`staticfiles </ref/contrib/staticfiles>` app is
 in your project's :setting:`INSTALLED_APPS` setting.
 
-``--insecure`` doesn't work with
-:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` or
-:class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`.
+``--insecure`` doesn't work with :class:`~.storage.ManifestStaticFilesStorage`.
 
 Example usage::
 
@@ -262,7 +260,7 @@ line options. It yields tuples of three values:
 ``processed`` is a boolean indicating whether or not the value was
 post-processed, or an exception if post-processing failed.
 
-The :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
+The :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`
 uses this behind the scenes to replace the paths with their hashed
 counterparts and update the cache appropriately.
 
@@ -361,6 +359,13 @@ hashing algorithm.
 ----------------------------
 
 .. class:: storage.CachedStaticFilesStorage
+
+.. deprecated:: 2.1
+
+    ``CachedStaticFilesStorage`` is deprecated as it has some intractable
+    problems, some of which are outlined below. Use
+    :class:`~storage.ManifestStaticFilesStorage` or a third-party cloud storage
+    instead.
 
 ``CachedStaticFilesStorage`` is a similar class like the
 :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` class

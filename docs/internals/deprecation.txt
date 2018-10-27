@@ -26,6 +26,9 @@ details on these changes.
 
 * The ``FILE_CHARSET`` setting will be removed.
 
+* ``django.contrib.staticfiles.storage.CachedStaticFilesStorage`` will be
+  removed.
+
 .. _deprecation-removed-in-3.0:
 
 3.0
