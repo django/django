@@ -17,3 +17,6 @@ Bugfixes
 
 * Fixed a regression in Django 2.0 where test databases aren't reused with
   ``manage.py test --keepdb`` on MySQL (:ticket:`29827`).
+
+* Fixed a regression where cached foreign keys that use ``to_field`` were
+  incorrectly cleared in ``Model.save()`` (:ticket:`29896`).
