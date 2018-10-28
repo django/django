@@ -345,6 +345,9 @@ class MigrationAutodetector:
             dependency_graph = {op: set() for op in ops}
             for op in ops:
                 for dep in op._auto_deps:
+                    # Resolve intra-app dependencies to handle circular
+                    # references involving a swappable model.
+                    dep = self._resolve_dependency(dep)[0]
                     if dep[0] == app_label:
                         for op2 in ops:
                             if self.check_dependency(op2, dep):
