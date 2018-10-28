@@ -274,7 +274,7 @@ class MigrationAutodetector:
                             resolved_app_label, resolved_object_name = getattr(settings, dep[1]).split('.')
                             original_dep = dep
                             dep = (resolved_app_label, resolved_object_name.lower(), dep[2], dep[3])
-                        if dep[0] != app_label and dep[0] != "__setting__":
+                        if dep[0] != app_label:
                             # External app dependency. See if it's not yet
                             # satisfied.
                             for other_operation in self.generated_operations.get(dep[0], []):
