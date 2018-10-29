@@ -182,6 +182,10 @@ urlpatterns = [
     path('dates/books/<int:year>/week/<int:week>/paginated/', views.BookWeekArchive.as_view(paginate_by=30)),
     path('dates/books/<int:year>/week/no_week/', views.BookWeekArchive.as_view()),
     path('dates/books/<int:year>/week/<int:week>/monday/', views.BookWeekArchive.as_view(week_format='%W')),
+    path(
+        'dates/books/<int:year>/week/<int:week>/unknown_week_format/',
+        views.BookWeekArchive.as_view(week_format='%T'),
+    ),
     path('dates/booksignings/<int:year>/week/<int:week>/', views.BookSigningWeekArchive.as_view()),
 
     # DayArchiveView

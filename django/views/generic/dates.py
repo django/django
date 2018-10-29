@@ -485,10 +485,14 @@ class BaseWeekArchiveView(YearMixin, WeekMixin, BaseDateListView):
 
         date_field = self.get_date_field()
         week_format = self.get_week_format()
-        week_start = {
-            '%W': '1',
-            '%U': '0',
-        }[week_format]
+        week_choices = {'%W': '1', '%U': '0'}
+        try:
+            week_start = week_choices[week_format]
+        except KeyError:
+            raise ValueError('Unknown week format %r. Choices are: %s' % (
+                week_format,
+                ', '.join(sorted(week_choices)),
+            ))
         date = _date_from_string(year, self.get_year_format(),
                                  week_start, '%w',
                                  week, week_format)

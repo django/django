@@ -528,6 +528,10 @@ class WeekArchiveViewTests(TestDataMixin, TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['week'], datetime.date(2008, 9, 29))
 
+    def test_unknown_week_format(self):
+        with self.assertRaisesMessage(ValueError, "Unknown week format '%T'. Choices are: %U, %W"):
+            self.client.get('/dates/books/2008/week/39/unknown_week_format/')
+
     def test_datetime_week_view(self):
         BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0))
         res = self.client.get('/dates/booksignings/2008/week/13/')
