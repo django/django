@@ -84,8 +84,6 @@ respectively. For example::
 Then set the :setting:`STATICFILES_STORAGE` setting to
 ``'path.to.MyStaticFilesStorage'``.
 
-.. highlight:: console
-
 Some commonly used options are:
 
 .. django-admin-option:: --noinput, --no-input
@@ -125,7 +123,9 @@ Some commonly used options are:
     Don't ignore the common private glob-style patterns ``'CVS'``, ``'.*'``
     and ``'*~'``.
 
-For a full list of options, refer to the commands own help by running::
+For a full list of options, refer to the commands own help by running:
+
+.. console::
 
    $ python manage.py collectstatic --help
 
@@ -155,7 +155,9 @@ class, override the ``ignore_patterns`` attribute of this class and replace
 
 Searches for one or more relative paths with the enabled finders.
 
-For example::
+For example:
+
+.. console::
 
    $ python manage.py findstatic css/base.css admin/js/core.js
    Found 'css/base.css' here:
@@ -167,7 +169,9 @@ For example::
 .. django-admin-option:: findstatic --first
 
 By default, all matching locations are found. To only return the first match
-for each relative path, use the ``--first`` option::
+for each relative path, use the ``--first`` option:
+
+.. console::
 
    $ python manage.py findstatic css/base.css --first
    Found 'css/base.css' here:
@@ -177,14 +181,18 @@ This is a debugging aid; it'll show you exactly which static file will be
 collected for a given path.
 
 By setting the ``--verbosity`` flag to 0, you can suppress the extra output and
-just get the path names::
+just get the path names:
+
+.. console::
 
    $ python manage.py findstatic css/base.css --verbosity 0
    /home/special.polls.com/core/static/css/base.css
    /home/polls.com/core/static/css/base.css
 
 On the other hand, by setting the ``--verbosity`` flag to 2, you can get all
-the directories which were searched::
+the directories which were searched:
+
+.. console::
 
    $ python manage.py findstatic css/base.css --verbosity 2
    Found 'css/base.css' here:
@@ -215,9 +223,11 @@ Use the ``--nostatic`` option to disable serving of static files with the
 only available if the :doc:`staticfiles </ref/contrib/staticfiles>` app is
 in your project's :setting:`INSTALLED_APPS` setting.
 
-Example usage::
+Example usage:
 
-    django-admin runserver --nostatic
+.. console::
+
+    $ django-admin runserver --nostatic
 
 .. django-admin-option:: --insecure
 
@@ -231,9 +241,11 @@ in your project's :setting:`INSTALLED_APPS` setting.
 
 ``--insecure`` doesn't work with :class:`~.storage.ManifestStaticFilesStorage`.
 
-Example usage::
+Example usage:
 
-    django-admin runserver --insecure
+.. console::
+
+    $ django-admin runserver --insecure
 
 .. _staticfiles-storages:
 
@@ -289,7 +301,7 @@ by default covers the `@import`_ rule and `url()`_ statement of `Cascading
 Style Sheets`_. For example, the ``'css/styles.css'`` file with the
 content
 
-.. code-block:: css+django
+.. code-block:: css
 
     @import url("../admin/css/base.css");
 
@@ -298,7 +310,7 @@ method of the ``ManifestStaticFilesStorage`` storage backend, ultimately
 saving a ``'css/styles.55e7cbb9ba48.css'`` file with the following
 content:
 
-.. code-block:: css+django
+.. code-block:: css
 
     @import url("../admin/css/base.27e20196a850.css");
 
@@ -435,8 +447,6 @@ dedicated static file server, which is a lot of overhead to mess with when
 developing locally. Thus, the ``staticfiles`` app ships with a
 **quick and dirty helper view** that you can use to serve files locally in
 development.
-
-.. highlight:: python
 
 .. function:: views.serve(request, path)
 
