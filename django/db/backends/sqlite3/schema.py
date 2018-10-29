@@ -126,8 +126,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         else:
             super().alter_field(model, old_field, new_field, strict=strict)
 
-    def _remake_table(self, model, create_field=None, delete_field=None, alter_field=None,
-                      add_constraint=None, remove_constraint=None):
+    def _remake_table(self, model, create_field=None, delete_field=None, alter_field=None):
         """
         Shortcut to transform a model from old_model into new_model
 
@@ -224,13 +223,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             ]
 
         constraints = list(model._meta.constraints)
-        if add_constraint:
-            constraints.append(add_constraint)
-        if remove_constraint:
-            constraints = [
-                constraint for constraint in constraints
-                if remove_constraint.name != constraint.name
-            ]
 
         # Construct a new model for the new state
         meta_contents = {
@@ -383,7 +375,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         self.delete_model(old_field.remote_field.through)
 
     def add_constraint(self, model, constraint):
-        self._remake_table(model, add_constraint=constraint)
+        self._remake_table(model)
 
     def remove_constraint(self, model, constraint):
-        self._remake_table(model, remove_constraint=constraint)
+        self._remake_table(model)
