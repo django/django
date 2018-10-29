@@ -237,6 +237,17 @@ class MigrationAutodetector:
                     )
                     self.through_users[through_key] = (app_label, old_model_name, field_name)
 
+    @staticmethod
+    def _resolve_dependency(dependency):
+        """
+        Return the resolved dependency and a boolean denoting whether or not
+        it was swappable.
+        """
+        if dependency[0] != '__setting__':
+            return dependency, False
+        resolved_app_label, resolved_object_name = getattr(settings, dependency[1]).split('.')
+        return (resolved_app_label, resolved_object_name.lower()) + dependency[2:], True
+
     def _build_migration_list(self, graph=None):
         """
         Chop the lists of operations up into migrations with dependencies on
@@ -265,15 +276,12 @@ class MigrationAutodetector:
                     deps_satisfied = True
                     operation_dependencies = set()
                     for dep in operation._auto_deps:
-                        is_swappable_dep = dep[0] == '__setting__'
-                        if is_swappable_dep:
-                            # We need to temporarily resolve the swappable dependency to prevent
-                            # circular references. While keeping the dependency checks on the
-                            # resolved model we still add the swappable dependencies.
-                            # See #23322
-                            resolved_app_label, resolved_object_name = getattr(settings, dep[1]).split('.')
-                            original_dep = dep
-                            dep = (resolved_app_label, resolved_object_name.lower(), dep[2], dep[3])
+                        # Temporarily resolve the swappable dependency to
+                        # prevent circular references. While keeping the
+                        # dependency checks on the resolved model, add the
+                        # swappable dependencies.
+                        original_dep = dep
+                        dep, is_swappable_dep = self._resolve_dependency(dep)
                         if dep[0] != app_label:
                             # External app dependency. See if it's not yet
                             # satisfied.
