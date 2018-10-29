@@ -347,11 +347,11 @@ The following checks are run if you use the :option:`check --deploy` option:
   your domain should be served exclusively via SSL.
 * **security.W006**: Your :setting:`SECURE_CONTENT_TYPE_NOSNIFF` setting is not
   set to ``True``, so your pages will not be served with an
-  ``'x-content-type-options: nosniff'`` header. You should consider enabling
+  ``'X-Content-Type-Options: nosniff'`` header. You should consider enabling
   this header to prevent the browser from identifying content types incorrectly.
 * **security.W007**: Your :setting:`SECURE_BROWSER_XSS_FILTER` setting is not
   set to ``True``, so your pages will not be served with an
-  ``'x-xss-protection: 1; mode=block'`` header. You should consider enabling
+  ``'X-XSS-Protection: 1; mode=block'`` header. You should consider enabling
   this header to activate the browser's XSS filtering and help prevent XSS
   attacks.
 * **security.W008**: Your :setting:`SECURE_SSL_REDIRECT` setting is not set to
