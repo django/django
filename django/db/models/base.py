@@ -669,9 +669,9 @@ class Model(metaclass=ModelBase):
                         "save() prohibited to prevent data loss due to "
                         "unsaved related object '%s'." % field.name
                     )
-                # If the relationship's pk was changed, clear the cached
-                # relationship.
-                if obj and obj.pk != getattr(self, field.attname):
+                # If the relationship's pk/to_field was changed, clear the
+                # cached relationship.
+                if obj and getattr(obj, field.target_field.attname) != getattr(self, field.attname):
                     field.delete_cached_value(self)
 
         using = using or router.db_for_write(self.__class__, instance=self)
