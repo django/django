@@ -2,7 +2,7 @@ from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.urls import path, re_path
 from django.views.decorators.cache import cache_page
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, dates
 
 from . import views
 from .models import Book
@@ -115,6 +115,7 @@ urlpatterns = [
     path('dates/booksignings/', views.BookSigningArchive.as_view()),
     path('dates/books/sortedbyname/', views.BookArchive.as_view(ordering='name')),
     path('dates/books/sortedbynamedec/', views.BookArchive.as_view(ordering='-name')),
+    path('dates/books/without_date_field/', views.BookArchiveWithoutDateField.as_view()),
 
 
     # ListView
@@ -225,5 +226,7 @@ urlpatterns = [
     path('dates/booksignings/<int:year>/<month>/<int:day>/<int:pk>/', views.BookSigningDetail.as_view()),
 
     # Useful for testing redirects
-    path('accounts/login/', auth_views.LoginView.as_view())
+    path('accounts/login/', auth_views.LoginView.as_view()),
+
+    path('BaseDateListViewTest/', dates.BaseDateListView.as_view()),
 ]

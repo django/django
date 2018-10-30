@@ -156,6 +156,11 @@ class ArchiveIndexViewTests(TestDataMixin, TestCase):
         self.assertEqual(list(res.context['latest']), list(Book.objects.order_by('-name').all()))
         self.assertTemplateUsed(res, 'generic_views/book_archive.html')
 
+    def test_archive_view_without_date_field(self):
+        msg = 'BookArchiveWithoutDateField.date_field is required.'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            self.client.get('/dates/books/without_date_field/')
+
 
 @override_settings(ROOT_URLCONF='generic_views.urls')
 class YearArchiveViewTests(TestDataMixin, TestCase):
@@ -290,6 +295,11 @@ class YearArchiveViewTests(TestDataMixin, TestCase):
         self.assertEqual(kwargs['year'], datetime.date(2008, 1, 1))
         self.assertIsNone(kwargs['previous_year'])
         self.assertIsNone(kwargs['next_year'])
+
+    def test_get_dated_items_not_implemented(self):
+        msg = 'A DateView must provide an implementation of get_dated_items()'
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            self.client.get('/BaseDateListViewTest/')
 
 
 @override_settings(ROOT_URLCONF='generic_views.urls')
