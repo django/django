@@ -344,6 +344,11 @@ Argument        Value
 ``using``       ``"default"`` (since the default router sends writes here)
 ==============  ============================================================
 
+.. note::
+   Multiple calls to ``add()`` with the same related object will only emit a single ``m2m_changed`` signal.
+   All subsequent calls do not trigger ``m2m_changed`` due to a filtering check that happens to avoid ``django.db.utils.IntegrityError``.
+   In contrast, multiple calls to ``remove()`` method, would trigger call to ``m2m_changed`` method with ``post_remove`` action each and every time.
+
 ``class_prepared``
 ------------------
 
