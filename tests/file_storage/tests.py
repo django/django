@@ -415,9 +415,9 @@ class FileStorageTests(SimpleTestCase):
                 real_makedirs(path)
             elif path == os.path.join(self.temp_dir, 'raced'):
                 real_makedirs(path)
-                raise FileNotFoundError()
-            elif path == os.path.join(self.temp_dir, 'error'):
                 raise FileExistsError()
+            elif path == os.path.join(self.temp_dir, 'error'):
+                raise PermissionError()
             else:
                 self.fail('unexpected argument %r' % path)
 
@@ -432,8 +432,8 @@ class FileStorageTests(SimpleTestCase):
             with self.storage.open('raced/test.file') as f:
                 self.assertEqual(f.read(), b'saved with race')
 
-            # Exceptions aside from FileNotFoundError are raised.
-            with self.assertRaises(FileExistsError):
+            # Exceptions aside from FileExistsError are raised.
+            with self.assertRaises(PermissionError):
                 self.storage.save('error/test.file', ContentFile('not saved'))
         finally:
             os.makedirs = real_makedirs

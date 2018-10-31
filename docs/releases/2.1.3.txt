@@ -20,3 +20,7 @@ Bugfixes
 
 * Fixed a regression where cached foreign keys that use ``to_field`` were
   incorrectly cleared in ``Model.save()`` (:ticket:`29896`).
+
+* Fixed a regression in Django 2.0 where ``FileSystemStorage`` crashes with
+  ``FileExistsError`` if concurrent saves try to create the same directory
+  (:ticket:`29890`).
