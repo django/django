@@ -240,9 +240,9 @@ class FileSystemStorage(Storage):
                         os.umask(old_umask)
                 else:
                     os.makedirs(directory)
-            except FileNotFoundError:
+            except FileExistsError:
                 # There's a race between os.path.exists() and os.makedirs().
-                # If os.makedirs() fails with FileNotFoundError, the directory
+                # If os.makedirs() fails with FileExistsError, the directory
                 # was created concurrently.
                 pass
         if not os.path.isdir(directory):
