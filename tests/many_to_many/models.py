@@ -65,3 +65,23 @@ class NullableTargetArticle(models.Model):
 class NullablePublicationThrough(models.Model):
     article = models.ForeignKey(NullableTargetArticle, models.CASCADE)
     publication = models.ForeignKey(Publication, models.CASCADE, null=True)
+
+
+class ProxyTag(Tag):
+    class Meta:
+        proxy = True
+
+
+class Item(models.Model):
+    name = models.CharField(max_length=10)
+    tags = models.ManyToManyField(ProxyTag, through='TaggedItem', related_name='items')
+
+
+class ProxyItem(Item):
+    class Meta:
+        proxy = True
+
+
+class TaggedItem(models.Model):
+    proxyitem = models.ForeignKey(ProxyItem, models.CASCADE)
+    proxytag = models.ForeignKey(ProxyTag, models.CASCADE)

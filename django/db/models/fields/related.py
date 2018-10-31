@@ -1260,12 +1260,16 @@ class ManyToManyField(RelatedField):
 
             else:
                 # Count foreign keys in relationship model
+
+                def get_concrete_model(model):
+                    return model._meta.concrete_model if hasattr(model, '_meta') else model
+
                 seen_from = sum(
-                    from_model == getattr(field.remote_field, 'model', None)
+                    get_concrete_model(from_model) == get_concrete_model(getattr(field.remote_field, 'model', None))
                     for field in self.remote_field.through._meta.fields
                 )
                 seen_to = sum(
-                    to_model == getattr(field.remote_field, 'model', None)
+                    get_concrete_model(to_model) == get_concrete_model(getattr(field.remote_field, 'model', None))
                     for field in self.remote_field.through._meta.fields
                 )
 
@@ -1522,7 +1526,7 @@ class ManyToManyField(RelatedField):
         else:
             link_field_name = None
         for f in self.remote_field.through._meta.fields:
-            if (f.is_relation and f.remote_field.model == related.related_model and
+            if (f.is_relation and f.remote_field.model._meta.concrete_model == related.related_model and
                     (link_field_name is None or link_field_name == f.name)):
                 setattr(self, cache_attr, getattr(f, attr))
                 return getattr(self, cache_attr)

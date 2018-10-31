@@ -174,6 +174,7 @@ class Issue(models.Model):
 class Bug(Issue):
     version = models.CharField(max_length=50)
     reporter = models.ForeignKey(BaseUser, models.CASCADE)
+    comment_users = models.ManyToManyField(ProxyTrackerUser, through='Comment', related_name='bugs_commented')
 
 
 class ProxyBug(Bug):
@@ -205,3 +206,9 @@ class Improvement(Issue):
 class ProxyImprovement(Improvement):
     class Meta:
         proxy = True
+
+
+class Comment(models.Model):
+    bug = models.ForeignKey(ProxyProxyBug, models.CASCADE)
+    user = models.ForeignKey(ProxyTrackerUser, models.CASCADE)
+    comment = models.TextField()

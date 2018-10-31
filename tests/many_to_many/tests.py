@@ -5,8 +5,9 @@ from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
 from .models import (
-    Article, InheritedArticleA, InheritedArticleB, NullablePublicationThrough,
-    NullableTargetArticle, Publication,
+    Article, InheritedArticleA, InheritedArticleB, Item,
+    NullablePublicationThrough, NullableTargetArticle, ProxyItem, ProxyTag,
+    Publication, Tag, TaggedItem,
 )
 
 
@@ -30,6 +31,12 @@ class ManyToManyTests(TestCase):
 
         self.a4 = Article.objects.create(headline='Oxygen-free diet works wonders')
         self.a4.publications.add(self.p2)
+
+        self.t1 = Tag.objects.create(name='Awesome', id=1)
+        self.pt1 = ProxyTag.objects.get(id=1)
+
+        self.i1 = Item.objects.create(name='Django', id=1)
+        self.pi1 = ProxyItem.objects.get(id=1)
 
     def test_add(self):
         # Create an Article.
@@ -560,6 +567,16 @@ class ManyToManyTests(TestCase):
             ]
         )
         self.assertQuerysetEqual(b.publications.all(), ['<Publication: Science Weekly>'])
+
+    def test_proxy_models(self):
+        TaggedItem.objects.create(proxyitem=self.i1, proxytag=self.t1)
+        self.assertSequenceEqual(self.i1.tags.all(), [self.pt1])
+        TaggedItem.objects.all().delete()
+        self.assertSequenceEqual(self.i1.tags.all(), [])
+        TaggedItem.objects.create(proxyitem=self.pi1, proxytag=self.pt1)
+        self.assertSequenceEqual(self.i1.tags.all(), [self.pt1])
+        self.assertSequenceEqual(self.pi1.tags.all(), [self.pt1])
+        self.assertSequenceEqual(self.pt1.items.all(), [self.pi1])
 
 
 class ManyToManyQueryTests(TestCase):
