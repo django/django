@@ -121,7 +121,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     #
     # Note: we use str.format() here for readability as '%' is used as a wildcard for
     # the LIKE operator.
-    pattern_esc = r"REPLACE(REPLACE(REPLACE({}, '\', '\\'), '%%', '\%%'), '_', '\_')"
+    pattern_esc = r"REPLACE(REPLACE(REPLACE({}, E'\\', E'\\\\'), E'%%', E'\\%%'), E'_', E'\\_')"
     pattern_ops = {
         'contains': "LIKE '%%' || {} || '%%'",
         'icontains': "LIKE '%%' || UPPER({}) || '%%'",
