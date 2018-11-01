@@ -2,7 +2,7 @@
 Django 2.1.3 release notes
 ==========================
 
-*Expected November 1, 2018*
+*November 1, 2018*
 
 Django 2.1.3 fixes several bugs in 2.1.2.
 
