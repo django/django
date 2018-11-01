@@ -400,6 +400,14 @@ simply specify a custom entry in the :setting:`CACHES` setting named
     required to ensure that the file hash is correct in the case of nested file
     paths.
 
+``ManifestFilesMixin``
+----------------------
+
+.. class:: storage.ManifestFilesMixin
+
+Use this mixin with a custom storage to append the MD5 hash of the file's
+content to the filename as :class:`~storage.ManifestStaticFilesStorage` does.
+
 Finders Module
 ==============
 
