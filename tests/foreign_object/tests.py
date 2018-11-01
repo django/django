@@ -69,12 +69,10 @@ class MultiColumnFKTests(TestCase):
             membership_country_id=self.soviet_union.id, person_id=self.bob.id,
             group_id=self.republican.id)
 
-        self.assertQuerysetEqual(
-            self.bob.membership_set.all(), [
-                self.cia.id
-            ],
-            attrgetter("group_id")
-        )
+        with self.assertNumQueries(1):
+            membership = self.bob.membership_set.get()
+            self.assertEqual(membership.group_id, self.cia.id)
+            self.assertIs(membership.person, self.bob)
 
     def test_query_filters_correctly(self):
 
@@ -198,8 +196,11 @@ class MultiColumnFKTests(TestCase):
                 list(p.membership_set.all())
                 for p in Person.objects.prefetch_related('membership_set').order_by('pk')]
 
-        normal_membership_sets = [list(p.membership_set.all())
-                                  for p in Person.objects.order_by('pk')]
+        with self.assertNumQueries(7):
+            normal_membership_sets = [
+                list(p.membership_set.all())
+                for p in Person.objects.order_by('pk')
+            ]
         self.assertEqual(membership_sets, normal_membership_sets)
 
     def test_m2m_through_forward_returns_valid_members(self):

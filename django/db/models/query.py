@@ -61,6 +61,16 @@ class ModelIterable(BaseIterable):
         init_list = [f[0].target.attname
                      for f in select[model_fields_start:model_fields_end]]
         related_populators = get_related_populators(klass_info, select, db)
+        known_related_objects = [
+            (field, related_objs, [
+                operator.attrgetter(
+                    field.attname
+                    if from_field == 'self' else
+                    queryset.model._meta.get_field(from_field).attname
+                )
+                for from_field in field.from_fields
+            ]) for field, related_objs in queryset._known_related_objects.items()
+        ]
         for row in compiler.results_iter(results):
             obj = model_cls.from_db(db, init_list, row[model_fields_start:model_fields_end])
             for rel_populator in related_populators:
@@ -69,19 +79,18 @@ class ModelIterable(BaseIterable):
                 for attr_name, col_pos in annotation_col_map.items():
                     setattr(obj, attr_name, row[col_pos])
 
-            # Add the known related objects to the model, if there are any
-            if queryset._known_related_objects:
-                for field, rel_objs in queryset._known_related_objects.items():
-                    # Avoid overwriting objects loaded e.g. by select_related
-                    if field.is_cached(obj):
-                        continue
-                    pk = getattr(obj, field.get_attname())
-                    try:
-                        rel_obj = rel_objs[pk]
-                    except KeyError:
-                        pass  # may happen in qs1 | qs2 scenarios
-                    else:
-                        setattr(obj, field.name, rel_obj)
+            # Add the known related objects to the model.
+            for field, rel_objs, rel_getters in known_related_objects:
+                # Avoid overwriting objects loaded by, e.g., select_related().
+                if field.is_cached(obj):
+                    continue
+                rel_obj_id = tuple([rel_getter(obj) for rel_getter in rel_getters])
+                try:
+                    rel_obj = rel_objs[rel_obj_id]
+                except KeyError:
+                    pass  # May happen in qs1 | qs2 scenarios.
+                else:
+                    setattr(obj, field.name, rel_obj)
 
             yield obj
 

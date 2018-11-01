@@ -576,7 +576,16 @@ def create_reverse_many_to_one_manager(superclass, rel):
                 val = getattr(self.instance, field.attname)
                 if val is None or (val == '' and empty_strings_as_null):
                     return queryset.none()
-            queryset._known_related_objects = {self.field: {self.instance.pk: self.instance}}
+            if self.field.many_to_one:
+                # Guard against field-like objects such as GenericRelation
+                # that abuse create_reverse_many_to_one_manager() with reverse
+                # one-to-many relationships instead and break known related
+                # objects assignment.
+                rel_obj_id = tuple([
+                    getattr(self.instance, target_field.attname)
+                    for target_field in self.field.get_path_info()[-1].target_fields
+                ])
+                queryset._known_related_objects = {self.field: {rel_obj_id: self.instance}}
             return queryset
 
         def _remove_prefetched_objects(self):
