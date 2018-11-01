@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.conf import settings
 from django.contrib.flatpages.forms import FlatpageForm
 from django.contrib.flatpages.models import FlatPage
@@ -8,7 +6,7 @@ from django.test import TestCase, modify_settings, override_settings
 from django.utils import translation
 
 
-@modify_settings(INSTALLED_APPS={'append': ['django.contrib.flatpages', ]})
+@modify_settings(INSTALLED_APPS={'append': ['django.contrib.flatpages']})
 @override_settings(SITE_ID=1)
 class FlatpageAdminFormTests(TestCase):
 
@@ -51,6 +49,11 @@ class FlatpageAdminFormTests(TestCase):
     def test_flatpage_requires_trailing_slash_with_append_slash(self):
         form = FlatpageForm(data=dict(url='/no_trailing_slash', **self.form_data))
         with translation.override('en'):
+            self.assertEqual(
+                form.fields['url'].help_text,
+                "Example: '/about/contact/'. Make sure to have leading and "
+                "trailing slashes."
+            )
             self.assertFalse(form.is_valid())
             self.assertEqual(form.errors['url'], ["URL is missing a trailing slash."])
 
@@ -58,24 +61,11 @@ class FlatpageAdminFormTests(TestCase):
     def test_flatpage_doesnt_requires_trailing_slash_without_append_slash(self):
         form = FlatpageForm(data=dict(url='/no_trailing_slash', **self.form_data))
         self.assertTrue(form.is_valid())
-
-    @override_settings(
-        APPEND_SLASH=True, MIDDLEWARE=None,
-        MIDDLEWARE_CLASSES=['django.middleware.common.CommonMiddleware'],
-    )
-    def test_flatpage_requires_trailing_slash_with_append_slash_middleware_classes(self):
-        form = FlatpageForm(data=dict(url='/no_trailing_slash', **self.form_data))
         with translation.override('en'):
-            self.assertFalse(form.is_valid())
-            self.assertEqual(form.errors['url'], ["URL is missing a trailing slash."])
-
-    @override_settings(
-        APPEND_SLASH=False, MIDDLEWARE=None,
-        MIDDLEWARE_CLASSES=['django.middleware.common.CommonMiddleware'],
-    )
-    def test_flatpage_doesnt_requires_trailing_slash_without_append_slash_middleware_classes(self):
-        form = FlatpageForm(data=dict(url='/no_trailing_slash', **self.form_data))
-        self.assertTrue(form.is_valid())
+            self.assertEqual(
+                form.fields['url'].help_text,
+                "Example: '/about/contact'. Make sure to have a leading slash."
+            )
 
     def test_flatpage_admin_form_url_uniqueness_validation(self):
         "The flatpage admin form correctly enforces url uniqueness among flatpages of the same site"
@@ -119,6 +109,4 @@ class FlatpageAdminFormTests(TestCase):
 
         self.assertFalse(f.is_valid())
 
-        self.assertEqual(
-            f.errors,
-            {'sites': [translation.ugettext('This field is required.')]})
+        self.assertEqual(f.errors, {'sites': [translation.gettext('This field is required.')]})

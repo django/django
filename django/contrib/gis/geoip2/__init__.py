@@ -14,8 +14,10 @@ directory corresponding to settings.GEOIP_PATH.
 __all__ = ['HAS_GEOIP2']
 
 try:
+    import geoip2  # NOQA
+except ImportError:
+    HAS_GEOIP2 = False
+else:
     from .base import GeoIP2, GeoIP2Exception
     HAS_GEOIP2 = True
     __all__ += ['GeoIP2', 'GeoIP2Exception']
-except ImportError:
-    HAS_GEOIP2 = False

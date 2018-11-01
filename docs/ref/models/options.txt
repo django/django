@@ -38,8 +38,6 @@ Available ``Meta`` options
 
 .. attribute:: Options.base_manager_name
 
-    .. versionadded:: 1.10
-
     The name of the manager to use for the model's
     :attr:`~django.db.models.Model._base_manager`.
 
@@ -108,8 +106,6 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.default_manager_name
 
-    .. versionadded:: 1.10
-
     The name of the manager to use for the model's
     :attr:`~django.db.models.Model._default_manager`.
 
@@ -130,44 +126,24 @@ Django quotes column and table names behind the scenes.
     and the name of the model, both lowercased. See the paragraph on
     :ref:`related names for abstract models <abstract-related-name>`.
 
-    .. deprecated:: 1.10
-
-        This attribute now affects ``related_query_name``. The old query lookup
-        name is deprecated::
-
-            from django.db import models
-
-            class Foo(models.Model):
-                pass
-
-            class Bar(models.Model):
-                foo = models.ForeignKey(Foo)
-
-                class Meta:
-                    default_related_name = 'bars'
-
-        ::
-
-            >>> bar = Bar.objects.get(pk=1)
-            >>> # Using model name "bar" as lookup string is deprecated.
-            >>> Foo.objects.get(bar=bar)
-            >>> # You should use default_related_name "bars".
-            >>> Foo.objects.get(bars=bar)
-
 ``get_latest_by``
 -----------------
 
 .. attribute:: Options.get_latest_by
 
-    The name of an orderable field in the model, typically a :class:`DateField`,
-    :class:`DateTimeField`, or :class:`IntegerField`. This specifies the default
-    field to use in your model :class:`Manager`’s
+    The name of a field or a list of field names in the model, typically
+    :class:`DateField`, :class:`DateTimeField`, or :class:`IntegerField`. This
+    specifies the default field(s) to use in your model :class:`Manager`’s
     :meth:`~django.db.models.query.QuerySet.latest` and
     :meth:`~django.db.models.query.QuerySet.earliest` methods.
 
     Example::
 
+        # Latest by ascending order_date.
         get_latest_by = "order_date"
+
+        # Latest by priority descending, order_date ascending.
+        get_latest_by = ['-priority', 'order_date']
 
     See the :meth:`~django.db.models.query.QuerySet.latest` docs for more.
 
@@ -284,9 +260,10 @@ Django quotes column and table names behind the scenes.
 
         ordering = ['-order_date']
 
-    This is a tuple or list of strings. Each string is a field name with an optional
-    "-" prefix, which indicates descending order. Fields without a leading "-" will
-    be ordered ascending. Use the string "?" to order randomly.
+    This is a tuple or list of strings and/or query expressions. Each string is
+    a field name with an optional "-" prefix, which indicates descending order.
+    Fields without a leading "-" will be ordered ascending. Use the string "?"
+    to order randomly.
 
     For example, to order by a ``pub_date`` field ascending, use this::
 
@@ -300,8 +277,16 @@ Django quotes column and table names behind the scenes.
 
         ordering = ['-pub_date', 'author']
 
+    You can also use :doc:`query expressions </ref/models/expressions>`. To
+    order by ``author`` ascending and make null values sort last, use this::
+
+        from django.db.models import F
+
+        ordering = [F('author').asc(nulls_last=True)]
+
     Default ordering also affects :ref:`aggregation queries
-    <aggregation-ordering-interaction>`.
+    <aggregation-ordering-interaction>` but this won't be the case starting
+    in Django 3.1.
 
 .. warning::
 
@@ -321,7 +306,7 @@ Django quotes column and table names behind the scenes.
 .. attribute:: Options.permissions
 
     Extra permissions to enter into the permissions table when creating this object.
-    Add, delete and change permissions are automatically created for each
+    Add, change, delete, and view permissions are automatically created for each
     model. This example specifies an extra permission, ``can_deliver_pizzas``::
 
         permissions = (("can_deliver_pizzas", "Can deliver pizzas"),)
@@ -330,15 +315,19 @@ Django quotes column and table names behind the scenes.
     human_readable_permission_name)``.
 
 ``default_permissions``
-------------------------------
+-----------------------
 
 .. attribute:: Options.default_permissions
 
-    Defaults to ``('add', 'change', 'delete')``. You may customize this list,
-    for example, by setting this to an empty list if your app doesn't require
-    any of the default permissions. It must be specified on the model before
-    the model is created by :djadmin:`migrate` in order to prevent any omitted
-    permissions from being created.
+    Defaults to ``('add', 'change', 'delete', 'view')``. You may customize this
+    list, for example, by setting this to an empty list if your app doesn't
+    require any of the default permissions. It must be specified on the model
+    before the model is created by :djadmin:`migrate` in order to prevent any
+    omitted permissions from being created.
+
+    .. versionchanged:: 2.1
+
+        The ``view`` permission was added.
 
 ``proxy``
 ---------
@@ -395,8 +384,6 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.indexes
 
-    .. versionadded:: 1.11
-
     A list of :doc:`indexes </ref/models/indexes>` that you want to define on
     the model::
 
@@ -445,6 +432,12 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.index_together
 
+    .. admonition:: Use the :attr:`~Options.indexes` option instead.
+
+        The newer :attr:`~Options.indexes` option provides more functionality
+        than ``index_together``. ``index_together`` may be deprecated in the
+        future.
+
     Sets of field names that, taken together, are indexed::
 
         index_together = [
@@ -458,6 +451,26 @@ Django quotes column and table names behind the scenes.
     set of fields::
 
         index_together = ["pub_date", "deadline"]
+
+``constraints``
+---------------
+
+.. attribute:: Options.constraints
+
+    .. versionadded:: 2.2
+
+    A list of :doc:`constraints </ref/models/check-constraints>` that you want
+    to define on the model::
+
+        from django.db import models
+
+        class Customer(models.Model):
+            age = models.IntegerField()
+
+            class Meta:
+                constraints = [
+                    models.CheckConstraint(check=models.Q(age__gte=18), name='age_gte_18'),
+                ]
 
 ``verbose_name``
 ----------------

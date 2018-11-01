@@ -1,9 +1,11 @@
+from unittest import mock
+
 from django.db import connections, models
-from django.test import TestCase, mock
+from django.test import TestCase
 from django.test.utils import isolate_apps, override_settings
 
 
-class TestRouter(object):
+class TestRouter:
     """
     Routes to the 'other' database if the model name starts with 'Other'.
     """

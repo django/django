@@ -1,7 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.contrib.flatpages.models import FlatPage
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 
 class FlatpageForm(forms.ModelForm):
@@ -22,19 +22,29 @@ class FlatpageForm(forms.ModelForm):
         model = FlatPage
         fields = '__all__'
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self._trailing_slash_required():
+            self.fields['url'].help_text = _(
+                "Example: '/about/contact'. Make sure to have a leading slash."
+            )
+
+    def _trailing_slash_required(self):
+        return (
+            settings.APPEND_SLASH and
+            'django.middleware.common.CommonMiddleware' in settings.MIDDLEWARE
+        )
+
     def clean_url(self):
         url = self.cleaned_data['url']
         if not url.startswith('/'):
             raise forms.ValidationError(
-                ugettext("URL is missing a leading slash."),
+                gettext("URL is missing a leading slash."),
                 code='missing_leading_slash',
             )
-        if (settings.APPEND_SLASH and (
-                (settings.MIDDLEWARE and 'django.middleware.common.CommonMiddleware' in settings.MIDDLEWARE) or
-                'django.middleware.common.CommonMiddleware' in settings.MIDDLEWARE_CLASSES) and
-                not url.endswith('/')):
+        if self._trailing_slash_required() and not url.endswith('/'):
             raise forms.ValidationError(
-                ugettext("URL is missing a trailing slash."),
+                gettext("URL is missing a trailing slash."),
                 code='missing_trailing_slash',
             )
         return url
@@ -56,4 +66,4 @@ class FlatpageForm(forms.ModelForm):
                         params={'url': url, 'site': site},
                     )
 
-        return super(FlatpageForm, self).clean()
+        return super().clean()

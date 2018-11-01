@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from calendar import timegm
 
 from django.conf import settings
@@ -7,8 +5,8 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.http import Http404, HttpResponse
 from django.template import TemplateDoesNotExist, loader
-from django.utils import feedgenerator, six
-from django.utils.encoding import force_text, iri_to_uri
+from django.utils import feedgenerator
+from django.utils.encoding import iri_to_uri
 from django.utils.html import escape
 from django.utils.http import http_date
 from django.utils.timezone import get_default_timezone, is_naive, make_aware
@@ -28,7 +26,7 @@ class FeedDoesNotExist(ObjectDoesNotExist):
     pass
 
 
-class Feed(object):
+class Feed:
     feed_type = feedgenerator.DefaultFeed
     title_template = None
     description_template = None
@@ -50,10 +48,10 @@ class Feed(object):
 
     def item_title(self, item):
         # Titles should be double escaped by default (see #6533)
-        return escape(force_text(item))
+        return escape(str(item))
 
     def item_description(self, item):
-        return force_text(item)
+        return str(item)
 
     def item_link(self, item):
         try:
@@ -68,9 +66,9 @@ class Feed(object):
         enc_url = self._get_dynamic_attr('item_enclosure_url', item)
         if enc_url:
             enc = feedgenerator.Enclosure(
-                url=force_text(enc_url),
-                length=force_text(self._get_dynamic_attr('item_enclosure_length', item)),
-                mime_type=force_text(self._get_dynamic_attr('item_enclosure_mime_type', item)),
+                url=str(enc_url),
+                length=str(self._get_dynamic_attr('item_enclosure_length', item)),
+                mime_type=str(self._get_dynamic_attr('item_enclosure_mime_type', item)),
             )
             return [enc]
         return []
@@ -85,9 +83,9 @@ class Feed(object):
             # catching the TypeError, because something inside the function
             # may raise the TypeError. This technique is more accurate.
             try:
-                code = six.get_function_code(attr)
+                code = attr.__code__
             except AttributeError:
-                code = six.get_function_code(attr.__call__)
+                code = attr.__call__.__code__
             if code.co_argcount == 2:       # one argument is 'self'
                 return attr(obj)
             else:
@@ -96,14 +94,14 @@ class Feed(object):
 
     def feed_extra_kwargs(self, obj):
         """
-        Returns an extra keyword arguments dictionary that is used when
+        Return an extra keyword arguments dictionary that is used when
         initializing the feed generator.
         """
         return {}
 
     def item_extra_kwargs(self, item):
         """
-        Returns an extra keyword arguments dictionary that is used with
+        Return an extra keyword arguments dictionary that is used with
         the `add_item` call of the feed generator.
         """
         return {}
@@ -113,7 +111,7 @@ class Feed(object):
 
     def get_context_data(self, **kwargs):
         """
-        Returns a dictionary to use as extra context if either
+        Return a dictionary to use as extra context if either
         ``self.description_template`` or ``self.item_template`` are used.
 
         Default implementation preserves the old behavior
@@ -123,8 +121,8 @@ class Feed(object):
 
     def get_feed(self, obj, request):
         """
-        Returns a feedgenerator.DefaultFeed object, fully populated, for
-        this feed. Raises FeedDoesNotExist for invalid parameters.
+        Return a feedgenerator.DefaultFeed object, fully populated, for
+        this feed. Raise FeedDoesNotExist for invalid parameters.
         """
         current_site = get_current_site(request)
 

@@ -1,14 +1,11 @@
-from __future__ import unicode_literals
-
-import os
+import pkgutil
 import sys
-from importlib import import_module
+from importlib import import_module, reload
 
 from django.apps import apps
 from django.conf import settings
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
-from django.utils import six
 
 from .exceptions import (
     AmbiguityError, BadMigrationError, InconsistentMigrationHistory,
@@ -18,16 +15,16 @@ from .exceptions import (
 MIGRATIONS_MODULE_NAME = 'migrations'
 
 
-class MigrationLoader(object):
+class MigrationLoader:
     """
-    Loads migration files from disk, and their status from the database.
+    Load migration files from disk and their status from the database.
 
     Migration files are expected to live in the "migrations" directory of
     an app. Their names are entirely unimportant from a code perspective,
     but will probably follow the 1234_name.py convention.
 
     On initialization, this class will scan those directories, and open and
-    read the python files, looking for a class called Migration, which should
+    read the Python files, looking for a class called Migration, which should
     inherit from django.db.migrations.Migration. See
     django.db.migrations.migration for what that looks like.
 
@@ -65,9 +62,7 @@ class MigrationLoader(object):
             return '%s.%s' % (app_package_name, MIGRATIONS_MODULE_NAME), False
 
     def load_disk(self):
-        """
-        Loads the migrations from all INSTALLED_APPS from disk.
-        """
+        """Load the migrations from all INSTALLED_APPS from disk."""
         self.disk_migrations = {}
         self.unmigrated_apps = set()
         self.migrated_apps = set()
@@ -89,8 +84,9 @@ class MigrationLoader(object):
                     continue
                 raise
             else:
-                # PY3 will happily import empty dirs as namespaces.
-                if not hasattr(module, '__file__'):
+                # Empty directories are namespaces.
+                # getattr() needed on PY36 and older (replace w/attribute access).
+                if getattr(module, '__file__', None) is None:
                     self.unmigrated_apps.add(app_config.label)
                     continue
                 # Module is not a package (e.g. migrations.py).
@@ -99,19 +95,25 @@ class MigrationLoader(object):
                     continue
                 # Force a reload if it's already loaded (tests need this)
                 if was_loaded:
-                    six.moves.reload_module(module)
+                    reload(module)
             self.migrated_apps.add(app_config.label)
-            directory = os.path.dirname(module.__file__)
-            # Scan for .py files
-            migration_names = set()
-            for name in os.listdir(directory):
-                if name.endswith(".py"):
-                    import_name = name.rsplit(".", 1)[0]
-                    if import_name[0] not in "_.~":
-                        migration_names.add(import_name)
-            # Load them
+            migration_names = {
+                name for _, name, is_pkg in pkgutil.iter_modules(module.__path__)
+                if not is_pkg and name[0] not in '_~'
+            }
+            # Load migrations
             for migration_name in migration_names:
-                migration_module = import_module("%s.%s" % (module_name, migration_name))
+                migration_path = '%s.%s' % (module_name, migration_name)
+                try:
+                    migration_module = import_module(migration_path)
+                except ImportError as e:
+                    if 'bad magic number' in str(e):
+                        raise ImportError(
+                            "Couldn't import %r as it appears to be a stale "
+                            ".pyc file." % migration_path
+                        ) from e
+                    else:
+                        raise
                 if not hasattr(migration_module, "Migration"):
                     raise BadMigrationError(
                         "Migration %s in app %s has no Migration class" % (migration_name, app_config.label)
@@ -122,21 +124,23 @@ class MigrationLoader(object):
                 )
 
     def get_migration(self, app_label, name_prefix):
-        "Gets the migration exactly named, or raises `graph.NodeNotFoundError`"
+        """Return the named migration or raise NodeNotFoundError."""
         return self.graph.nodes[app_label, name_prefix]
 
     def get_migration_by_prefix(self, app_label, name_prefix):
-        "Returns the migration(s) which match the given app label and name _prefix_"
+        """
+        Return the migration(s) which match the given app label and name_prefix.
+        """
         # Do the search
         results = []
-        for l, n in self.disk_migrations:
-            if l == app_label and n.startswith(name_prefix):
-                results.append((l, n))
+        for migration_app_label, migration_name in self.disk_migrations:
+            if migration_app_label == app_label and migration_name.startswith(name_prefix):
+                results.append((migration_app_label, migration_name))
         if len(results) > 1:
             raise AmbiguityError(
                 "There is more than one migration for '%s' with the prefix '%s'" % (app_label, name_prefix)
             )
-        elif len(results) == 0:
+        elif not results:
             raise KeyError("There no migrations for '%s' with the prefix '%s'" % (app_label, name_prefix))
         else:
             return self.disk_migrations[results[0]]
@@ -159,9 +163,9 @@ class MigrationLoader(object):
         if key[0] in self.migrated_apps:
             try:
                 if key[1] == "__first__":
-                    return list(self.graph.root_nodes(key[0]))[0]
+                    return self.graph.root_nodes(key[0])[0]
                 else:  # "__latest__"
-                    return list(self.graph.leaf_nodes(key[0]))[0]
+                    return self.graph.leaf_nodes(key[0])[0]
             except IndexError:
                 if self.ignore_no_migrations:
                     return None
@@ -175,10 +179,9 @@ class MigrationLoader(object):
         dependencies find the correct root node.
         """
         for parent in migration.dependencies:
-            if parent[0] != key[0] or parent[1] == '__first__':
-                # Ignore __first__ references to the same app (#22325).
-                continue
-            self.graph.add_dependency(migration, key, parent, skip_validation=True)
+            # Ignore __first__ references to the same app.
+            if parent[0] == key[0] and parent[1] != '__first__':
+                self.graph.add_dependency(migration, key, parent, skip_validation=True)
 
     def add_external_dependencies(self, key, migration):
         for parent in migration.dependencies:
@@ -195,7 +198,7 @@ class MigrationLoader(object):
 
     def build_graph(self):
         """
-        Builds a migration dependency graph using both the disk and database.
+        Build a migration dependency graph using both the disk and database.
         You'll need to rebuild the graph if you apply migrations. This isn't
         usually a problem as generally migration stuff runs in a one-shot process.
         """
@@ -213,11 +216,12 @@ class MigrationLoader(object):
         self.replacements = {}
         for key, migration in self.disk_migrations.items():
             self.graph.add_node(key, migration)
-            # Internal (aka same-app) dependencies.
-            self.add_internal_dependencies(key, migration)
             # Replacing migrations.
             if migration.replaces:
                 self.replacements[key] = migration
+        for key, migration in self.disk_migrations.items():
+            # Internal (same app) dependencies.
+            self.add_internal_dependencies(key, migration)
         # Add external dependencies now that the internal ones have been resolved.
         for key, migration in self.disk_migrations.items():
             self.add_external_dependencies(key, migration)
@@ -258,7 +262,7 @@ class MigrationLoader(object):
                 is_replaced = any(candidate in self.graph.nodes for candidate in candidates)
                 if not is_replaced:
                     tries = ', '.join('%s.%s' % c for c in candidates)
-                    exc_value = NodeNotFoundError(
+                    raise NodeNotFoundError(
                         "Migration {0} depends on nonexistent node ('{1}', '{2}'). "
                         "Django tried to replace migration {1}.{2} with any of [{3}] "
                         "but wasn't able to because some of the replaced migrations "
@@ -266,12 +270,9 @@ class MigrationLoader(object):
                             exc.origin, exc.node[0], exc.node[1], tries
                         ),
                         exc.node
-                    )
-                    exc_value.__cause__ = exc
-                    if not hasattr(exc, '__traceback__'):
-                        exc.__traceback__ = sys.exc_info()[2]
-                    six.reraise(NodeNotFoundError, exc_value, sys.exc_info()[2])
+                    ) from exc
             raise exc
+        self.graph.ensure_not_cyclic()
 
     def check_consistent_history(self, connection):
         """
@@ -301,8 +302,8 @@ class MigrationLoader(object):
 
     def detect_conflicts(self):
         """
-        Looks through the loaded graph and detects any conflicts - apps
-        with more than one leaf migration. Returns a dict of the app labels
+        Look through the loaded graph and detect any conflicts - apps
+        with more than one leaf migration. Return a dict of the app labels
         that conflict with the migration names that conflict.
         """
         seen_apps = {}
@@ -315,9 +316,9 @@ class MigrationLoader(object):
 
     def project_state(self, nodes=None, at_end=True):
         """
-        Returns a ProjectState object representing the most recent state
-        that the migrations we loaded represent.
+        Return a ProjectState object representing the most recent state
+        that the loaded migrations represent.
 
-        See graph.make_state for the meaning of "nodes" and "at_end"
+        See graph.make_state() for the meaning of "nodes" and "at_end".
         """
         return self.graph.make_state(nodes=nodes, at_end=at_end, real_apps=list(self.unmigrated_apps))

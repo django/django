@@ -7,8 +7,6 @@ Trigram similarity
 
 .. fieldlookup:: trigram_similar
 
-.. versionadded:: 1.10
-
 The ``trigram_similar`` lookup allows you to perform trigram lookups,
 measuring the number of trigrams (three consecutive characters) shared, using a
 dedicated PostgreSQL extension. A trigram lookup is given an expression and

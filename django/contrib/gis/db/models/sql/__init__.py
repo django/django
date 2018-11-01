@@ -1,7 +1,7 @@
 from django.contrib.gis.db.models.sql.conversion import (
-    AreaField, DistanceField, GeomField, GMLField,
+    AreaField, DistanceField,
 )
 
 __all__ = [
-    'AreaField', 'DistanceField', 'GeomField', 'GMLField'
+    'AreaField', 'DistanceField',
 ]

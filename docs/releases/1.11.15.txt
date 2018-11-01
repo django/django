@@ -1,0 +1,20 @@
+============================
+Django 1.11.15 release notes
+============================
+
+*August 1, 2018*
+
+Django 1.11.15 fixes a security issue in 1.11.14.
+
+CVE-2018-14574: Open redirect possibility in ``CommonMiddleware``
+=================================================================
+
+If the :class:`~django.middleware.common.CommonMiddleware` and the
+:setting:`APPEND_SLASH` setting are both enabled, and if the project has a
+URL pattern that accepts any path ending in a slash (many content management
+systems have such a pattern), then a request to a maliciously crafted URL of
+that site could lead to a redirect to another site, enabling phishing and other
+attacks.
+
+``CommonMiddleware`` now escapes leading slashes to prevent redirects to other
+domains.

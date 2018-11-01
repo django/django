@@ -1,0 +1,40 @@
+===========================
+Django 1.11.4 release notes
+===========================
+
+*August 1, 2017*
+
+Django 1.11.4 fixes several bugs in 1.11.3.
+
+Bugfixes
+========
+
+* Fixed a regression in 1.11.3 on Python 2 where non-ASCII ``format`` values
+  for date/time widgets results in an empty ``value`` in the widget's HTML
+  (:ticket:`28355`).
+
+* Fixed ``QuerySet.union()`` and ``difference()`` when combining with
+  a queryset raising ``EmptyResultSet`` (:ticket:`28378`).
+
+* Fixed a regression in pickling of ``LazyObject`` on Python 2 when the wrapped
+  object doesn't have ``__reduce__()`` (:ticket:`28389`).
+
+* Fixed crash in ``runserver``'s ``autoreload`` with Python 2 on Windows with
+  non-``str`` environment variables (:ticket:`28174`).
+
+* Corrected ``Field.has_changed()`` to return ``False`` for disabled form
+  fields: ``BooleanField``, ``MultipleChoiceField``, ``MultiValueField``,
+  ``FileField``, ``ModelChoiceField``, and ``ModelMultipleChoiceField``.
+
+* Fixed ``QuerySet.count()`` for ``union()``, ``difference()``, and
+  ``intersection()`` queries. (:ticket:`28399`).
+
+* Fixed ``ClearableFileInput`` rendering as a subwidget of ``MultiWidget``
+  (:ticket:`28414`). Custom ``clearable_file_input.html`` widget templates
+  will need to adapt for the fact that context values
+  ``checkbox_name``, ``checkbox_id``, ``is_initial``, ``input_text``,
+  ``initial_text``, and ``clear_checkbox_label`` are now attributes of
+  ``widget`` rather than appearing in the top-level context.
+
+* Fixed queryset crash when using a ``GenericRelation`` to a proxy model
+  (:ticket:`28418`).

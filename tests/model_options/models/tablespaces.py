@@ -1,6 +1,5 @@
 from django.db import models
 
-
 # Since the test database doesn't have tablespaces, it's impossible for Django
 # to create the tables for models where db_tablespace is set. To avoid this
 # problem, we mark the models as unmanaged, and temporarily revert them to
@@ -39,6 +38,7 @@ class Article(models.Model):
         db_table = 'model_options_articleref'
         db_tablespace = 'tbl_tbsp'
         managed = False
+
 
 # Also set the tables for automatically created models
 

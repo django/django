@@ -3,10 +3,10 @@ from importlib import import_module
 
 from django.conf import settings
 from django.contrib.sessions.backends.base import UpdateError
-from django.shortcuts import redirect
+from django.core.exceptions import SuspiciousOperation
 from django.utils.cache import patch_vary_headers
 from django.utils.deprecation import MiddlewareMixin
-from django.utils.http import cookie_date
+from django.utils.http import http_date
 
 
 class SessionMiddleware(MiddlewareMixin):
@@ -50,17 +50,18 @@ class SessionMiddleware(MiddlewareMixin):
                     else:
                         max_age = request.session.get_expiry_age()
                         expires_time = time.time() + max_age
-                        expires = cookie_date(expires_time)
+                        expires = http_date(expires_time)
                     # Save the session data and refresh the client cookie.
                     # Skip session save for 500 responses, refs #3881.
                     if response.status_code != 500:
                         try:
                             request.session.save()
                         except UpdateError:
-                            # The user is now logged out; redirecting to same
-                            # page will result in a redirect to the login page
-                            # if required.
-                            return redirect(request.path)
+                            raise SuspiciousOperation(
+                                "The request's session was deleted before the "
+                                "request completed. The user may have logged "
+                                "out in a concurrent request, for example."
+                            )
                         response.set_cookie(
                             settings.SESSION_COOKIE_NAME,
                             request.session.session_key, max_age=max_age,
@@ -68,5 +69,6 @@ class SessionMiddleware(MiddlewareMixin):
                             path=settings.SESSION_COOKIE_PATH,
                             secure=settings.SESSION_COOKIE_SECURE or None,
                             httponly=settings.SESSION_COOKIE_HTTPONLY or None,
+                            samesite=settings.SESSION_COOKIE_SAMESITE,
                         )
         return response

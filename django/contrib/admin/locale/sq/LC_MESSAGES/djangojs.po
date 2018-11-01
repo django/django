@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Besnik <besnik@programeshqip.org>, 2011-2012
-# Besnik <besnik@programeshqip.org>, 2015
+# Besnik <besnik@programeshqip.org>, 2011-2012,2015
+# Besnik <besnik@programeshqip.org>, 2015,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 10:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
+"PO-Revision-Date: 2017-11-29 22:17+0000\n"
+"Last-Translator: Besnik <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
@@ -101,26 +101,8 @@ msgstr ""
 "individuale. Ndoshta po kërkonit për butonin Shko, në vend se për butonin "
 "Ruaje."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Shënim: Jeni %s orë para kohës së shërbyesit."
-msgstr[1] "Shënim: Jeni %s orë para kohës së shërbyesit."
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Shënim: Jeni %s orë pas kohës së shërbyesit."
-msgstr[1] "Shënim: Jeni %s orë pas kohës së shërbyesit."
-
 msgid "Now"
 msgstr "Tani"
-
-msgid "Choose a Time"
-msgstr "Zgjidhni një Kohë"
-
-msgid "Choose a time"
-msgstr "Zgjidhni një kohë"
 
 msgid "Midnight"
 msgstr "Mesnatë"
@@ -133,6 +115,24 @@ msgstr "Mesditë"
 
 msgid "6 p.m."
 msgstr "6 p.m."
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Shënim: Jeni %s orë para kohës së shërbyesit."
+msgstr[1] "Shënim: Jeni %s orë para kohës së shërbyesit."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Shënim: Jeni %s orë pas kohës së shërbyesit."
+msgstr[1] "Shënim: Jeni %s orë pas kohës së shërbyesit."
+
+msgid "Choose a Time"
+msgstr "Zgjidhni një Kohë"
+
+msgid "Choose a time"
+msgstr "Zgjidhni një kohë"
 
 msgid "Cancel"
 msgstr "Anuloje"
@@ -150,68 +150,68 @@ msgid "Tomorrow"
 msgstr "Nesër"
 
 msgid "January"
-msgstr ""
+msgstr "Janar"
 
 msgid "February"
-msgstr ""
+msgstr "Shkurt"
 
 msgid "March"
-msgstr ""
+msgstr "Mars"
 
 msgid "April"
-msgstr ""
+msgstr "Prill"
 
 msgid "May"
-msgstr ""
+msgstr "Maj"
 
 msgid "June"
-msgstr ""
+msgstr "Qershor"
 
 msgid "July"
-msgstr ""
+msgstr "Korrik"
 
 msgid "August"
-msgstr ""
+msgstr "Gusht"
 
 msgid "September"
-msgstr ""
+msgstr "Shtator"
 
 msgid "October"
-msgstr ""
+msgstr "Tetor"
 
 msgid "November"
-msgstr ""
+msgstr "Nëntor"
 
 msgid "December"
-msgstr ""
+msgstr "Dhjetor"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr ""
+msgstr "D"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr ""
+msgstr "H"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr ""
+msgstr "M"
 
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr ""
+msgstr "M"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr ""
+msgstr "E"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr ""
+msgstr "P"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr ""
+msgstr "S"
 
 msgid "Show"
 msgstr "Shfaqe"

@@ -1,25 +1,21 @@
-from __future__ import unicode_literals
-
 import base64
 import calendar
 import datetime
 import re
-import sys
 import unicodedata
 import warnings
 from binascii import Error as BinasciiError
 from email.utils import formatdate
+from urllib.parse import (
+    ParseResult, SplitResult, _coerce_args, _splitnetloc, _splitparams, quote,
+    quote_plus, scheme_chars, unquote, unquote_plus,
+    urlencode as original_urlencode, uses_params,
+)
 
 from django.core.exceptions import TooManyFieldsSent
-from django.utils import six
 from django.utils.datastructures import MultiValueDict
-from django.utils.deprecation import RemovedInDjango21Warning
-from django.utils.encoding import force_bytes, force_str, force_text
+from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.functional import keep_lazy_text
-from django.utils.six.moves.urllib.parse import (
-    quote, quote_plus, unquote, unquote_plus, urlencode as original_urlencode,
-    urlparse,
-)
 
 # based on RFC 7232, Appendix C
 ETAG_MATCH = re.compile(r'''
@@ -42,8 +38,8 @@ RFC1123_DATE = re.compile(r'^\w{3}, %s %s %s %s GMT$' % (__D, __M, __Y, __T))
 RFC850_DATE = re.compile(r'^\w{6,9}, %s-%s-%s %s GMT$' % (__D, __M, __Y2, __T))
 ASCTIME_DATE = re.compile(r'^\w{3} %s %s %s %s$' % (__M, __D2, __T, __Y))
 
-RFC3986_GENDELIMS = str(":/?#[]@")
-RFC3986_SUBDELIMS = str("!$&'()*+,;=")
+RFC3986_GENDELIMS = ":/?#[]@"
+RFC3986_SUBDELIMS = "!$&'()*+,;="
 
 FIELDS_MATCH = re.compile('[&;]')
 
@@ -51,98 +47,111 @@ FIELDS_MATCH = re.compile('[&;]')
 @keep_lazy_text
 def urlquote(url, safe='/'):
     """
-    A version of Python's urllib.quote() function that can operate on unicode
-    strings. The url is first UTF-8 encoded before quoting. The returned string
-    can safely be used as part of an argument to a subsequent iri_to_uri() call
-    without double-quoting occurring.
+    A legacy compatibility wrapper to Python's urllib.parse.quote() function.
+    (was used for unicode handling on Python 2)
     """
-    return force_text(quote(force_str(url), force_str(safe)))
+    return quote(url, safe)
 
 
 @keep_lazy_text
 def urlquote_plus(url, safe=''):
     """
-    A version of Python's urllib.quote_plus() function that can operate on
-    unicode strings. The url is first UTF-8 encoded before quoting. The
-    returned string can safely be used as part of an argument to a subsequent
-    iri_to_uri() call without double-quoting occurring.
+    A legacy compatibility wrapper to Python's urllib.parse.quote_plus()
+    function. (was used for unicode handling on Python 2)
     """
-    return force_text(quote_plus(force_str(url), force_str(safe)))
+    return quote_plus(url, safe)
 
 
 @keep_lazy_text
 def urlunquote(quoted_url):
     """
-    A wrapper for Python's urllib.unquote() function that can operate on
-    the result of django.utils.http.urlquote().
+    A legacy compatibility wrapper to Python's urllib.parse.unquote() function.
+    (was used for unicode handling on Python 2)
     """
-    return force_text(unquote(force_str(quoted_url)))
+    return unquote(quoted_url)
 
 
 @keep_lazy_text
 def urlunquote_plus(quoted_url):
     """
-    A wrapper for Python's urllib.unquote_plus() function that can operate on
-    the result of django.utils.http.urlquote_plus().
+    A legacy compatibility wrapper to Python's urllib.parse.unquote_plus()
+    function. (was used for unicode handling on Python 2)
     """
-    return force_text(unquote_plus(force_str(quoted_url)))
+    return unquote_plus(quoted_url)
 
 
-def urlencode(query, doseq=0):
+def urlencode(query, doseq=False):
     """
-    A version of Python's urllib.urlencode() function that can operate on
-    unicode strings. The parameters are first cast to UTF-8 encoded strings and
-    then encoded as per normal.
+    A version of Python's urllib.parse.urlencode() function that can operate on
+    MultiValueDict and non-string values.
     """
     if isinstance(query, MultiValueDict):
         query = query.lists()
     elif hasattr(query, 'items'):
         query = query.items()
-    return original_urlencode(
-        [(force_str(k),
-         [force_str(i) for i in v] if isinstance(v, (list, tuple)) else force_str(v))
-            for k, v in query],
-        doseq)
+    query_params = []
+    for key, value in query:
+        if isinstance(value, (str, bytes)):
+            query_val = value
+        else:
+            try:
+                iter(value)
+            except TypeError:
+                query_val = value
+            else:
+                # Consume generators and iterators, even when doseq=True, to
+                # work around https://bugs.python.org/issue31706.
+                query_val = [
+                    item if isinstance(item, bytes) else str(item)
+                    for item in value
+                ]
+        query_params.append((key, query_val))
+    return original_urlencode(query_params, doseq)
 
 
 def cookie_date(epoch_seconds=None):
     """
-    Formats the time to ensure compatibility with Netscape's cookie standard.
+    Format the time to ensure compatibility with Netscape's cookie standard.
 
-    Accepts a floating point number expressed in seconds since the epoch, in
-    UTC - such as that outputted by time.time(). If set to None, defaults to
-    the current time.
+    `epoch_seconds` is a floating point number expressed in seconds since the
+    epoch, in UTC - such as that outputted by time.time(). If set to None, it
+    defaults to the current time.
 
-    Outputs a string in the format 'Wdy, DD-Mon-YYYY HH:MM:SS GMT'.
+    Output a string in the format 'Wdy, DD-Mon-YYYY HH:MM:SS GMT'.
     """
+    warnings.warn(
+        'cookie_date() is deprecated in favor of http_date(), which follows '
+        'the format of the latest RFC.',
+        RemovedInDjango30Warning, stacklevel=2,
+    )
     rfcdate = formatdate(epoch_seconds)
     return '%s-%s-%s GMT' % (rfcdate[:7], rfcdate[8:11], rfcdate[12:25])
 
 
 def http_date(epoch_seconds=None):
     """
-    Formats the time to match the RFC1123 date format as specified by HTTP
+    Format the time to match the RFC1123 date format as specified by HTTP
     RFC7231 section 7.1.1.1.
 
-    Accepts a floating point number expressed in seconds since the epoch, in
-    UTC - such as that outputted by time.time(). If set to None, defaults to
-    the current time.
+    `epoch_seconds` is a floating point number expressed in seconds since the
+    epoch, in UTC - such as that outputted by time.time(). If set to None, it
+    defaults to the current time.
 
-    Outputs a string in the format 'Wdy, DD Mon YYYY HH:MM:SS GMT'.
+    Output a string in the format 'Wdy, DD Mon YYYY HH:MM:SS GMT'.
     """
     return formatdate(epoch_seconds, usegmt=True)
 
 
 def parse_http_date(date):
     """
-    Parses a date format as specified by HTTP RFC7231 section 7.1.1.1.
+    Parse a date format as specified by HTTP RFC7231 section 7.1.1.1.
 
     The three formats allowed by the RFC are accepted, even if only the first
     one is still in widespread use.
 
-    Returns an integer expressed in seconds since the epoch, in UTC.
+    Return an integer expressed in seconds since the epoch, in UTC.
     """
-    # emails.Util.parsedate does the job for RFC1123 dates; unfortunately
+    # email.utils.parsedate() does the job for RFC1123 dates; unfortunately
     # RFC7231 makes it mandatory to support RFC850 dates too. So we roll
     # our own RFC-compliant parsing.
     for regex in RFC1123_DATE, RFC850_DATE, ASCTIME_DATE:
@@ -165,13 +174,13 @@ def parse_http_date(date):
         sec = int(m.group('sec'))
         result = datetime.datetime(year, month, day, hour, min, sec)
         return calendar.timegm(result.utctimetuple())
-    except Exception:
-        six.reraise(ValueError, ValueError("%r is not a valid date" % date), sys.exc_info()[2])
+    except Exception as exc:
+        raise ValueError("%r is not a valid date" % date) from exc
 
 
 def parse_http_date_safe(date):
     """
-    Same as parse_http_date, but returns None if the input is invalid.
+    Same as parse_http_date, but return None if the input is invalid.
     """
     try:
         return parse_http_date(date)
@@ -183,34 +192,22 @@ def parse_http_date_safe(date):
 
 def base36_to_int(s):
     """
-    Converts a base 36 string to an ``int``. Raises ``ValueError` if the
-    input won't fit into an int.
+    Convert a base 36 string to an int. Raise ValueError if the input won't fit
+    into an int.
     """
     # To prevent overconsumption of server resources, reject any
-    # base36 string that is long than 13 base36 digits (13 digits
+    # base36 string that is longer than 13 base36 digits (13 digits
     # is sufficient to base36-encode any 64-bit integer)
     if len(s) > 13:
         raise ValueError("Base36 input too large")
-    value = int(s, 36)
-    # ... then do a final check that the value will fit into an int to avoid
-    # returning a long (#15067). The long type was removed in Python 3.
-    if six.PY2 and value > sys.maxint:
-        raise ValueError("Base36 input too large")
-    return value
+    return int(s, 36)
 
 
 def int_to_base36(i):
-    """
-    Converts an integer to a base36 string
-    """
+    """Convert an integer to a base36 string."""
     char_set = '0123456789abcdefghijklmnopqrstuvwxyz'
     if i < 0:
         raise ValueError("Negative base36 conversion input.")
-    if six.PY2:
-        if not isinstance(i, six.integer_types):
-            raise TypeError("Non-integer base36 conversion input.")
-        if i > sys.maxint:
-            raise ValueError("Base36 conversion input too large.")
     if i < 36:
         return char_set[i]
     b36 = ''
@@ -222,18 +219,18 @@ def int_to_base36(i):
 
 def urlsafe_base64_encode(s):
     """
-    Encodes a bytestring in base64 for use in URLs, stripping any trailing
+    Encode a bytestring to a base64 string for use in URLs. Strip any trailing
     equal signs.
     """
-    return base64.urlsafe_b64encode(s).rstrip(b'\n=')
+    return base64.urlsafe_b64encode(s).rstrip(b'\n=').decode('ascii')
 
 
 def urlsafe_base64_decode(s):
     """
-    Decodes a base64 encoded string, adding back any trailing equal signs that
+    Decode a base64 encoded string. Add back any trailing equal signs that
     might have been stripped.
     """
-    s = force_bytes(s)
+    s = s.encode()
     try:
         return base64.urlsafe_b64decode(s.ljust(len(s) + len(s) % 4, b'='))
     except (LookupError, BinasciiError) as e:
@@ -284,12 +281,12 @@ def is_same_domain(host, pattern):
     )
 
 
-def is_safe_url(url, host=None, allowed_hosts=None, require_https=False):
+def is_safe_url(url, allowed_hosts, require_https=False):
     """
     Return ``True`` if the url is a safe redirection (i.e. it doesn't point to
     a different host and uses a safe scheme).
 
-    Always returns ``False`` on an empty url.
+    Always return ``False`` on an empty url.
 
     If ``require_https`` is ``True``, only 'https' will be considered a valid
     scheme, as opposed to 'http' and 'https' with the default, ``False``.
@@ -298,25 +295,63 @@ def is_safe_url(url, host=None, allowed_hosts=None, require_https=False):
         url = url.strip()
     if not url:
         return False
-    if six.PY2:
-        try:
-            url = force_text(url)
-        except UnicodeDecodeError:
-            return False
     if allowed_hosts is None:
         allowed_hosts = set()
-    if host:
-        warnings.warn(
-            "The host argument is deprecated, use allowed_hosts instead.",
-            RemovedInDjango21Warning,
-            stacklevel=2,
-        )
-        # Avoid mutating the passed in allowed_hosts.
-        allowed_hosts = allowed_hosts | {host}
+    elif isinstance(allowed_hosts, str):
+        allowed_hosts = {allowed_hosts}
     # Chrome treats \ completely as / in paths but it could be part of some
     # basic auth credentials so we need to check both URLs.
     return (_is_safe_url(url, allowed_hosts, require_https=require_https) and
             _is_safe_url(url.replace('\\', '/'), allowed_hosts, require_https=require_https))
+
+
+# Copied from urllib.parse.urlparse() but uses fixed urlsplit() function.
+def _urlparse(url, scheme='', allow_fragments=True):
+    """Parse a URL into 6 components:
+    <scheme>://<netloc>/<path>;<params>?<query>#<fragment>
+    Return a 6-tuple: (scheme, netloc, path, params, query, fragment).
+    Note that we don't break the components up in smaller bits
+    (e.g. netloc is a single string) and we don't expand % escapes."""
+    url, scheme, _coerce_result = _coerce_args(url, scheme)
+    splitresult = _urlsplit(url, scheme, allow_fragments)
+    scheme, netloc, url, query, fragment = splitresult
+    if scheme in uses_params and ';' in url:
+        url, params = _splitparams(url)
+    else:
+        params = ''
+    result = ParseResult(scheme, netloc, url, params, query, fragment)
+    return _coerce_result(result)
+
+
+# Copied from urllib.parse.urlsplit() with
+# https://github.com/python/cpython/pull/661 applied.
+def _urlsplit(url, scheme='', allow_fragments=True):
+    """Parse a URL into 5 components:
+    <scheme>://<netloc>/<path>?<query>#<fragment>
+    Return a 5-tuple: (scheme, netloc, path, query, fragment).
+    Note that we don't break the components up in smaller bits
+    (e.g. netloc is a single string) and we don't expand % escapes."""
+    url, scheme, _coerce_result = _coerce_args(url, scheme)
+    netloc = query = fragment = ''
+    i = url.find(':')
+    if i > 0:
+        for c in url[:i]:
+            if c not in scheme_chars:
+                break
+        else:
+            scheme, url = url[:i].lower(), url[i + 1:]
+
+    if url[:2] == '//':
+        netloc, url = _splitnetloc(url, 2)
+        if (('[' in netloc and ']' not in netloc) or
+                (']' in netloc and '[' not in netloc)):
+            raise ValueError("Invalid IPv6 URL")
+    if allow_fragments and '#' in url:
+        url, fragment = url.split('#', 1)
+    if '?' in url:
+        url, query = url.split('?', 1)
+    v = SplitResult(scheme, netloc, url, query, fragment)
+    return _coerce_result(v)
 
 
 def _is_safe_url(url, allowed_hosts, require_https=False):
@@ -324,7 +359,10 @@ def _is_safe_url(url, allowed_hosts, require_https=False):
     # urlparse is not so flexible. Treat any url with three slashes as unsafe.
     if url.startswith('///'):
         return False
-    url_info = urlparse(url)
+    try:
+        url_info = _urlparse(url)
+    except ValueError:  # e.g. invalid IPv6 addresses
+        return False
     # Forbid URLs like http:///example.com - with a scheme, but without a hostname.
     # In that URL, example.com is not the hostname but, a path component. However,
     # Chrome will still consider example.com to be the hostname, so we must not
@@ -382,21 +420,28 @@ def limited_parse_qsl(qs, keep_blank_values=False, encoding='utf-8',
     for name_value in pairs:
         if not name_value:
             continue
-        nv = name_value.split(str('='), 1)
+        nv = name_value.split('=', 1)
         if len(nv) != 2:
             # Handle case of a control-name with no equal sign
             if keep_blank_values:
                 nv.append('')
             else:
                 continue
-        if len(nv[1]) or keep_blank_values:
-            if six.PY3:
-                name = nv[0].replace('+', ' ')
-                name = unquote(name, encoding=encoding, errors=errors)
-                value = nv[1].replace('+', ' ')
-                value = unquote(value, encoding=encoding, errors=errors)
-            else:
-                name = unquote(nv[0].replace(b'+', b' '))
-                value = unquote(nv[1].replace(b'+', b' '))
+        if nv[1] or keep_blank_values:
+            name = nv[0].replace('+', ' ')
+            name = unquote(name, encoding=encoding, errors=errors)
+            value = nv[1].replace('+', ' ')
+            value = unquote(value, encoding=encoding, errors=errors)
             r.append((name, value))
     return r
+
+
+def escape_leading_slashes(url):
+    """
+    If redirecting to an absolute path (two leading slashes), a slash must be
+    escaped to prevent browsers from handling the path as schemaless and
+    redirecting to another host.
+    """
+    if url.startswith('//'):
+        url = '/%2F{}'.format(url[2:])
+    return url

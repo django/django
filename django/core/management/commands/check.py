@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.apps import apps
 from django.core import checks
 from django.core.checks.registry import registry
@@ -19,18 +16,17 @@ class Command(BaseCommand):
             help='Run only checks labeled with given tag.',
         )
         parser.add_argument(
-            '--list-tags', action='store_true', dest='list_tags',
+            '--list-tags', action='store_true',
             help='List available tags.',
         )
         parser.add_argument(
-            '--deploy', action='store_true', dest='deploy',
+            '--deploy', action='store_true',
             help='Check deployment settings.',
         )
         parser.add_argument(
             '--fail-level',
             default='ERROR',
             choices=['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG'],
-            dest='fail_level',
             help=(
                 'Message level that will cause the command to exit with a '
                 'non-zero status. Default is ERROR.'

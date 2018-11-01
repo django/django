@@ -1,8 +1,9 @@
 import os
 
+from django.core.exceptions import ImproperlyConfigured
 from django.template import Context
 from django.template.engine import Engine
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
 
 from .utils import ROOT, TEMPLATE_DIR
 
@@ -21,6 +22,35 @@ class RenderToStringTest(SimpleTestCase):
         )
 
 
+class GetDefaultTests(SimpleTestCase):
+
+    @override_settings(TEMPLATES=[])
+    def test_no_engines_configured(self):
+        msg = 'No DjangoTemplates backend is configured.'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            Engine.get_default()
+
+    @override_settings(TEMPLATES=[{
+        'NAME': 'default',
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'OPTIONS': {'file_charset': 'abc'},
+    }])
+    def test_single_engine_configured(self):
+        self.assertEqual(Engine.get_default().file_charset, 'abc')
+
+    @override_settings(TEMPLATES=[{
+        'NAME': 'default',
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'OPTIONS': {'file_charset': 'abc'},
+    }, {
+        'NAME': 'other',
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'OPTIONS': {'file_charset': 'def'},
+    }])
+    def test_multiple_engines_configured(self):
+        self.assertEqual(Engine.get_default().file_charset, 'abc')
+
+
 class LoaderTests(SimpleTestCase):
 
     def test_origin(self):
@@ -30,7 +60,7 @@ class LoaderTests(SimpleTestCase):
 
     def test_loader_priority(self):
         """
-        #21460 -- Check that the order of template loader works.
+        #21460 -- The order of template loader works.
         """
         loaders = [
             'django.template.loaders.filesystem.Loader',
@@ -42,7 +72,7 @@ class LoaderTests(SimpleTestCase):
 
     def test_cached_loader_priority(self):
         """
-        Check that the order of template loader works. Refs #21460.
+        The order of template loader works. Refs #21460.
         """
         loaders = [
             ('django.template.loaders.cached.Loader', [

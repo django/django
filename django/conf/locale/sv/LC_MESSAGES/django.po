@@ -8,7 +8,7 @@
 # Jonathan Lindén, 2015
 # Jonathan Lindén, 2014
 # Mattias Hansson <mattias.gothenburg@gmail.com>, 2016
-# Mattias Jansson <mattias@colourandcode.se>, 2011
+# Mattias Benjaminsson <mattias@colourandcode.se>, 2011
 # Rasmus Précenth <prillan91@gmail.com>, 2014
 # Samuel Linde <samuel@linde.im>, 2011
 # Thomas Lundqvist <thomas@biljettshop.se>, 2013,2016
@@ -16,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-07-07 19:03+0000\n"
-"Last-Translator: Mattias Hansson <mattias.gothenburg@gmail.com>\n"
+"POT-Creation-Date: 2017-11-15 16:15+0100\n"
+"PO-Revision-Date: 2017-11-16 01:13+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -303,6 +303,15 @@ msgstr "Statiska filer"
 msgid "Syndication"
 msgstr "Syndikering"
 
+msgid "That page number is not an integer"
+msgstr ""
+
+msgid "That page number is less than 1"
+msgstr ""
+
+msgid "That page contains no results"
+msgstr ""
+
 msgid "Enter a valid value."
 msgstr "Fyll i ett giltigt värde."
 
@@ -315,6 +324,7 @@ msgstr "Fyll i ett giltigt heltal."
 msgid "Enter a valid email address."
 msgstr "Fyll i en giltig e-postadress."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -404,6 +414,15 @@ msgstr[0] ""
 "Säkerställ att det inte är mer än %(max)s siffra före decimalavskiljaren."
 msgstr[1] ""
 "Säkerställ att det inte är mer än %(max)s siffror före decimalavskiljaren."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+
+msgid "Null characters are not allowed."
+msgstr ""
 
 msgid "and"
 msgstr "och"
@@ -736,10 +755,8 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Vänligen korrigera duplikatvärdena nedan."
 
-msgid "The inline foreign key did not match the parent instance primary key."
+msgid "The inline value did not match the parent instance."
 msgstr ""
-"Den infogade främmande nyckeln matchade inte den överordnade instansens "
-"primära nyckel."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
@@ -747,8 +764,8 @@ msgstr ""
 "alternativ."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" är inte ett giltigt värde för en primärnyckel."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -758,14 +775,14 @@ msgstr ""
 "%(datetime)s kunde inte tolkas i tidszonen %(current_timezone)s; det kan "
 "vara en ogiltig eller tvetydigt tidpunkt"
 
+msgid "Clear"
+msgstr "Rensa"
+
 msgid "Currently"
 msgstr "Nuvarande"
 
 msgid "Change"
 msgstr "Ändra"
-
-msgid "Clear"
-msgstr "Rensa"
 
 msgid "Unknown"
 msgstr "Okänt"
@@ -1113,6 +1130,14 @@ msgstr ""
 "origin'-förfrågningar."
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1131,31 +1156,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "Mer information är tillgänglig med DEBUG=True."
 
-msgid "Welcome to Django"
-msgstr "Välkommen till Django"
-
-msgid "It worked!"
-msgstr "Det fungerade!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Grattis till din nya Django-drivna sida."
-
-msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
-msgstr ""
-"Självklart har du inte hunnit jobba något med sidan än. Starta din första "
-"app genom att köra <code>python manage.py startapp [app_label]</code>."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Du ser detta meddelande eftersom du har <code>DEBUG = True</code> i din "
-"inställningsfil och inte har konfigurerat några URLer än. Börja jobba!"
-
 msgid "No year specified"
 msgstr "Inget år angivet"
+
+msgid "Date out of range"
+msgstr ""
 
 msgid "No month specified"
 msgstr "Ingen månad angiven"
@@ -1207,3 +1212,41 @@ msgstr "\"%(path)s\" finns inte"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Innehåll i %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr ""
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+
+msgid "The install worked successfully! Congratulations!"
+msgstr ""
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+
+msgid "Django Documentation"
+msgstr ""
+
+msgid "Topics, references, &amp; how-to's"
+msgstr ""
+
+msgid "Tutorial: A Polling App"
+msgstr ""
+
+msgid "Get started with Django"
+msgstr ""
+
+msgid "Django Community"
+msgstr ""
+
+msgid "Connect, get help, or contribute"
+msgstr ""

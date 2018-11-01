@@ -1,6 +1,3 @@
-# -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 """
 LANG_INFO is a dictionary structure to provide meta information about languages.
 
@@ -292,6 +289,12 @@ LANG_INFO = {
         'code': 'ka',
         'name': 'Georgian',
         'name_local': 'ქართული',
+    },
+    'kab': {
+        'bidi': False,
+        'code': 'kab',
+        'name': 'Kabyle',
+        'name_local': 'taqbaylit',
     },
     'kk': {
         'bidi': False,

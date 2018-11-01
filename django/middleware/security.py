@@ -29,18 +29,18 @@ class SecurityMiddleware(MiddlewareMixin):
 
     def process_response(self, request, response):
         if (self.sts_seconds and request.is_secure() and
-                'strict-transport-security' not in response):
+                'Strict-Transport-Security' not in response):
             sts_header = "max-age=%s" % self.sts_seconds
             if self.sts_include_subdomains:
                 sts_header = sts_header + "; includeSubDomains"
             if self.sts_preload:
                 sts_header = sts_header + "; preload"
-            response["strict-transport-security"] = sts_header
+            response['Strict-Transport-Security'] = sts_header
 
-        if self.content_type_nosniff and 'x-content-type-options' not in response:
-            response["x-content-type-options"] = "nosniff"
+        if self.content_type_nosniff:
+            response.setdefault('X-Content-Type-Options', 'nosniff')
 
-        if self.xss_filter and 'x-xss-protection' not in response:
-            response["x-xss-protection"] = "1; mode=block"
+        if self.xss_filter:
+            response.setdefault('X-XSS-Protection', '1; mode=block')
 
         return response

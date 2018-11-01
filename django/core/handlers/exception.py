@@ -1,22 +1,18 @@
-from __future__ import unicode_literals
-
 import logging
 import sys
-import warnings
 from functools import wraps
 
 from django.conf import settings
 from django.core import signals
-from django.core.exceptions import PermissionDenied, SuspiciousOperation
+from django.core.exceptions import (
+    PermissionDenied, RequestDataTooBig, SuspiciousOperation,
+    TooManyFieldsSent,
+)
 from django.http import Http404
 from django.http.multipartparser import MultiPartParserError
 from django.urls import get_resolver, get_urlconf
-from django.utils.decorators import available_attrs
-from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import force_text
+from django.utils.log import log_response
 from django.views import debug
-
-logger = logging.getLogger('django.request')
 
 
 def convert_exception_to_response(get_response):
@@ -32,7 +28,7 @@ def convert_exception_to_response(get_response):
     no middleware leaks an exception and that the next middleware in the stack
     can rely on getting a response instead of an exception.
     """
-    @wraps(get_response, assigned=available_attrs(get_response))
+    @wraps(get_response)
     def inner(request):
         try:
             response = get_response(request)
@@ -50,25 +46,34 @@ def response_for_exception(request, exc):
             response = get_exception_response(request, get_resolver(get_urlconf()), 404, exc)
 
     elif isinstance(exc, PermissionDenied):
-        logger.warning(
-            'Forbidden (Permission denied): %s', request.path,
-            extra={'status_code': 403, 'request': request},
-        )
         response = get_exception_response(request, get_resolver(get_urlconf()), 403, exc)
+        log_response(
+            'Forbidden (Permission denied): %s', request.path,
+            response=response,
+            request=request,
+            exc_info=sys.exc_info(),
+        )
 
     elif isinstance(exc, MultiPartParserError):
-        logger.warning(
-            'Bad request (Unable to parse request body): %s', request.path,
-            extra={'status_code': 400, 'request': request},
-        )
         response = get_exception_response(request, get_resolver(get_urlconf()), 400, exc)
+        log_response(
+            'Bad request (Unable to parse request body): %s', request.path,
+            response=response,
+            request=request,
+            exc_info=sys.exc_info(),
+        )
 
     elif isinstance(exc, SuspiciousOperation):
+        if isinstance(exc, (RequestDataTooBig, TooManyFieldsSent)):
+            # POST data can't be accessed again, otherwise the original
+            # exception would be raised.
+            request._mark_post_parse_error()
+
         # The request logger receives events for any problematic request
         # The security logger receives events for all SuspiciousOperations
         security_logger = logging.getLogger('django.security.%s' % exc.__class__.__name__)
         security_logger.error(
-            force_text(exc),
+            str(exc),
             extra={'status_code': 400, 'request': request},
         )
         if settings.DEBUG:
@@ -83,6 +88,12 @@ def response_for_exception(request, exc):
     else:
         signals.got_request_exception.send(sender=None, request=request)
         response = handle_uncaught_exception(request, get_resolver(get_urlconf()), sys.exc_info())
+        log_response(
+            '%s: %s', response.reason_phrase, request.path,
+            response=response,
+            request=request,
+            exc_info=sys.exc_info(),
+        )
 
     # Force a TemplateResponse to be rendered.
     if not getattr(response, 'is_rendered', True) and callable(getattr(response, 'render', None)):
@@ -94,18 +105,7 @@ def response_for_exception(request, exc):
 def get_exception_response(request, resolver, status_code, exception, sender=None):
     try:
         callback, param_dict = resolver.resolve_error_handler(status_code)
-        # Unfortunately, inspect.getargspec result is not trustable enough
-        # depending on the callback wrapping in decorators (frequent for handlers).
-        # Falling back on try/except:
-        try:
-            response = callback(request, **dict(param_dict, exception=exception))
-        except TypeError:
-            warnings.warn(
-                "Error handlers should accept an exception parameter. Update "
-                "your code as this parameter will be required in Django 2.0",
-                RemovedInDjango20Warning, stacklevel=2
-            )
-            response = callback(request, **param_dict)
+        response = callback(request, **{**param_dict, 'exception': exception})
     except Exception:
         signals.got_request_exception.send(sender=sender, request=request)
         response = handle_uncaught_exception(request, resolver, sys.exc_info())
@@ -120,12 +120,6 @@ def handle_uncaught_exception(request, resolver, exc_info):
     """
     if settings.DEBUG_PROPAGATE_EXCEPTIONS:
         raise
-
-    logger.error(
-        'Internal Server Error: %s', request.path,
-        exc_info=exc_info,
-        extra={'status_code': 500, 'request': request},
-    )
 
     if settings.DEBUG:
         return debug.technical_500_response(request, *exc_info)

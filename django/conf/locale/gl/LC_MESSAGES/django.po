@@ -4,15 +4,16 @@
 # fasouto <fsoutomoure@gmail.com>, 2011-2012
 # fonso <fonzzo@gmail.com>, 2011,2013
 # fonso <fonzzo@gmail.com>, 2013
+# fasouto <fsoutomoure@gmail.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Leandro Regueiro <leandro.regueiro@gmail.com>, 2013
-# Oscar Carballal <oscar.carballal@gmail.com>, 2012
+# Oscar Carballal <oscar.carballal@protonmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-06-30 08:31+0000\n"
+"POT-Creation-Date: 2017-11-15 16:15+0100\n"
+"PO-Revision-Date: 2017-11-16 01:13+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Galician (http://www.transifex.com/django/django/language/"
 "gl/)\n"
@@ -29,7 +30,7 @@ msgid "Arabic"
 msgstr "Árabe"
 
 msgid "Asturian"
-msgstr ""
+msgstr "Asturiano"
 
 msgid "Azerbaijani"
 msgstr "azerí"
@@ -59,7 +60,7 @@ msgid "Welsh"
 msgstr "Galés"
 
 msgid "Danish"
-msgstr "dinamarqués"
+msgstr "Dinamarqués"
 
 msgid "German"
 msgstr "Alemán"
@@ -74,7 +75,7 @@ msgid "English"
 msgstr "Inglés"
 
 msgid "Australian English"
-msgstr ""
+msgstr "Inglés australiano"
 
 msgid "British English"
 msgstr "inglés británico"
@@ -116,7 +117,7 @@ msgid "French"
 msgstr "Francés"
 
 msgid "Frisian"
-msgstr "frisón"
+msgstr "Frisón"
 
 msgid "Irish"
 msgstr "irlandés"
@@ -155,7 +156,7 @@ msgid "Icelandic"
 msgstr "islandés"
 
 msgid "Italian"
-msgstr "italiano"
+msgstr "Italiano"
 
 msgid "Japanese"
 msgstr "xaponés"
@@ -173,7 +174,7 @@ msgid "Kannada"
 msgstr "canará"
 
 msgid "Korean"
-msgstr "coreano"
+msgstr "Coreano"
 
 msgid "Luxembourgish"
 msgstr "luxemburgués"
@@ -298,6 +299,15 @@ msgstr ""
 msgid "Syndication"
 msgstr ""
 
+msgid "That page number is not an integer"
+msgstr ""
+
+msgid "That page number is less than 1"
+msgstr ""
+
+msgid "That page contains no results"
+msgstr ""
+
 msgid "Enter a valid value."
 msgstr "Insira un valor válido."
 
@@ -310,6 +320,7 @@ msgstr ""
 msgid "Enter a valid email address."
 msgstr "Insira un enderezo de correo electrónico válido."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -369,8 +380,8 @@ msgstr[1] ""
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Asegure que non hai mais de %(max)s díxito en total."
+msgstr[1] "Asegure que non hai mais de %(max)s díxitos en total."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
@@ -386,6 +397,15 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+
+msgid "Null characters are not allowed."
+msgstr ""
+
 msgid "and"
 msgstr "e"
 
@@ -395,7 +415,7 @@ msgstr ""
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
-msgstr ""
+msgstr "O valor %(value)r non é unha opción válida."
 
 msgid "This field cannot be null."
 msgstr "Este campo non pode ser nulo."
@@ -652,7 +672,7 @@ msgid "Enter a complete value."
 msgstr ""
 
 msgid "Enter a valid UUID."
-msgstr ""
+msgstr "Insira un UUID válido."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
@@ -702,9 +722,8 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Corrixa os valores duplicados de abaixo."
 
-msgid "The inline foreign key did not match the parent instance primary key."
+msgid "The inline value did not match the parent instance."
 msgstr ""
-"A clave estranxeira en liña non coincide coa clave primaria da instancia nai."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
@@ -712,7 +731,7 @@ msgstr ""
 "dispoñíbeis"
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
+msgid "\"%(pk)s\" is not a valid value."
 msgstr ""
 
 #, python-format
@@ -723,14 +742,14 @@ msgstr ""
 "%(datetime)s non se puido interpretar na zona hora horaria "
 "%(current_timezone)s; pode ser ambiguo ou non existir."
 
+msgid "Clear"
+msgstr "Limpar"
+
 msgid "Currently"
 msgstr "Actualmente"
 
 msgid "Change"
 msgstr "Modificar"
-
-msgid "Clear"
-msgstr "Limpar"
 
 msgid "Unknown"
 msgstr "Descoñecido"
@@ -1072,6 +1091,14 @@ msgid ""
 msgstr ""
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1083,29 +1110,13 @@ msgid ""
 msgstr ""
 
 msgid "More information is available with DEBUG=True."
-msgstr ""
-
-msgid "Welcome to Django"
-msgstr ""
-
-msgid "It worked!"
-msgstr ""
-
-msgid "Congratulations on your first Django-powered page."
-msgstr ""
-
-msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
-msgstr ""
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
+msgstr "Pode ver máis información se establece DEBUG=True."
 
 msgid "No year specified"
 msgstr "Non se especificou ningún ano"
+
+msgid "Date out of range"
+msgstr ""
 
 msgid "No month specified"
 msgstr "Non se especificou ningún mes"
@@ -1157,3 +1168,41 @@ msgstr "\"%(path)s\" non existe"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Índice de %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr ""
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+
+msgid "The install worked successfully! Congratulations!"
+msgstr ""
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+
+msgid "Django Documentation"
+msgstr ""
+
+msgid "Topics, references, &amp; how-to's"
+msgstr ""
+
+msgid "Tutorial: A Polling App"
+msgstr ""
+
+msgid "Get started with Django"
+msgstr ""
+
+msgid "Django Community"
+msgstr ""
+
+msgid "Connect, get help, or contribute"
+msgstr ""

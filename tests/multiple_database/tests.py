@@ -1,8 +1,8 @@
-from __future__ import unicode_literals
-
 import datetime
 import pickle
+from io import StringIO
 from operator import attrgetter
+from unittest.mock import Mock
 
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -11,7 +11,6 @@ from django.db import DEFAULT_DB_ALIAS, connections, router, transaction
 from django.db.models import signals
 from django.db.utils import ConnectionRouter
 from django.test import SimpleTestCase, TestCase, override_settings
-from django.utils.six import StringIO
 
 from .models import Book, Person, Pet, Review, UserProfile
 from .routers import AuthRouter, TestRouter, WriteRouter
@@ -21,7 +20,7 @@ class QueryTestCase(TestCase):
     multi_db = True
 
     def test_db_selection(self):
-        "Check that querysets will use the default database by default"
+        "Querysets will use the default database by default"
         self.assertEqual(Book.objects.db, DEFAULT_DB_ALIAS)
         self.assertEqual(Book.objects.all().db, DEFAULT_DB_ALIAS)
 
@@ -41,7 +40,7 @@ class QueryTestCase(TestCase):
         dive.published = datetime.date(2009, 5, 4)
         dive.save()
 
-        # Check that book exists on the default database, but not on other database
+        # Book exists on the default database, but not on other database
         try:
             Book.objects.get(title="Pro Django")
             Book.objects.using('default').get(title="Pro Django")
@@ -72,7 +71,7 @@ class QueryTestCase(TestCase):
         dive.published = datetime.date(2009, 5, 4)
         dive.save(using='other')
 
-        # Check that book exists on the default database, but not on other database
+        # Book exists on the default database, but not on other database
         try:
             Book.objects.using('other').get(title="Pro Django")
         except Book.DoesNotExist:
@@ -104,6 +103,14 @@ class QueryTestCase(TestCase):
         dive.refresh_from_db(using='default')
         self.assertEqual(dive.title, "Dive into Python (on default)")
         self.assertEqual(dive._state.db, "default")
+
+    def test_refresh_router_instance_hint(self):
+        router = Mock()
+        router.db_for_read.return_value = None
+        book = Book.objects.create(title='Dive Into Python', published=datetime.date(1957, 10, 12))
+        with self.settings(DATABASE_ROUTERS=[router]):
+            book.refresh_from_db()
+        router.db_for_read.assert_called_once_with(Book, instance=book)
 
     def test_basic_queries(self):
         "Queries are constrained to a single database"
@@ -162,7 +169,7 @@ class QueryTestCase(TestCase):
         self.assertEqual(Book.authors.through.objects.using('default').count(), 1)
         self.assertEqual(Book.authors.through.objects.using('other').count(), 1)
 
-        # Check that queries work across m2m joins
+        # Queries work across m2m joins
         self.assertEqual(
             list(Book.objects.using('default').filter(authors__name='Marty Alchin').values_list('title', flat=True)),
             ['Pro Django']
@@ -323,27 +330,39 @@ class QueryTestCase(TestCase):
 
         mark = Person.objects.using('other').create(name="Mark Pilgrim")
         # Set a foreign key set with an object from a different database
-        with self.assertRaises(ValueError):
+        msg = (
+            'Cannot assign "<Person: Marty Alchin>": the current database '
+            'router prevents this relation.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             with transaction.atomic(using='default'):
                 marty.edited.set([pro, dive])
 
         # Add to an m2m with an object from a different database
-        with self.assertRaises(ValueError):
+        msg = (
+            'Cannot add "<Book: Dive into Python>": instance is on '
+            'database "default", value is on database "other"'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             with transaction.atomic(using='default'):
                 marty.book_set.add(dive)
 
         # Set a m2m with an object from a different database
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, msg):
             with transaction.atomic(using='default'):
                 marty.book_set.set([pro, dive])
 
         # Add to a reverse m2m with an object from a different database
-        with self.assertRaises(ValueError):
+        msg = (
+            'Cannot add "<Person: Marty Alchin>": instance is on '
+            'database "other", value is on database "default"'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             with transaction.atomic(using='other'):
                 dive.authors.add(marty)
 
         # Set a reverse m2m with an object from a different database
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, msg):
             with transaction.atomic(using='other'):
                 dive.authors.set([mark, marty])
 
@@ -428,7 +447,7 @@ class QueryTestCase(TestCase):
         dive = Book.objects.using('other').get(title="Dive into Python")
         self.assertEqual(dive.editor.name, "Chris Mills")
 
-        # Check that queries work across foreign key joins
+        # Queries work across foreign key joins
         self.assertEqual(
             list(Person.objects.using('default').filter(edited__title='Pro Django').values_list('name', flat=True)),
             ['George Vilches']
@@ -539,16 +558,20 @@ class QueryTestCase(TestCase):
         dive = Book.objects.using('other').create(title="Dive into Python", published=datetime.date(2009, 5, 4))
 
         # Set a foreign key with an object from a different database
-        with self.assertRaises(ValueError):
+        msg = (
+            'Cannot assign "<Person: Marty Alchin>": the current database '
+            'router prevents this relation.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             dive.editor = marty
 
         # Set a foreign key set with an object from a different database
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, msg):
             with transaction.atomic(using='default'):
                 marty.edited.set([pro, dive])
 
         # Add to a foreign key set with an object from a different database
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, msg):
             with transaction.atomic(using='default'):
                 marty.edited.add(dive)
 
@@ -608,7 +631,7 @@ class QueryTestCase(TestCase):
         bob = User.objects.using('other').get(username="bob")
         self.assertEqual(bob.userprofile.flavor, "crunchy frog")
 
-        # Check that queries work across joins
+        # Queries work across joins
         self.assertEqual(
             list(
                 User.objects.using('default')
@@ -657,7 +680,11 @@ class QueryTestCase(TestCase):
 
         # Set a one-to-one relation with an object from a different database
         alice_profile = UserProfile.objects.using('default').create(user=alice, flavor='chocolate')
-        with self.assertRaises(ValueError):
+        msg = (
+            'Cannot assign "%r": the current database router prevents this '
+            'relation.' % alice_profile
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             bob.userprofile = alice_profile
 
         # BUT! if you assign a FK object when the base object hasn't
@@ -812,11 +839,19 @@ class QueryTestCase(TestCase):
         Review.objects.using('other').create(source="Python Weekly", content_object=dive)
 
         # Set a foreign key with an object from a different database
-        with self.assertRaises(ValueError):
+        msg = (
+            'Cannot assign "<ContentType: book>": the current database router '
+            'prevents this relation.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             review1.content_object = dive
 
         # Add to a foreign key set with an object from a different database
-        with self.assertRaises(ValueError):
+        msg = (
+            "<Review: Python Monthly> instance isn't saved. "
+            "Use bulk=False or save the object first."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             with transaction.atomic(using='other'):
                 dive.reviews.add(review1)
 
@@ -915,11 +950,15 @@ class QueryTestCase(TestCase):
         # When you call __str__ on the query object, it doesn't know about using
         # so it falls back to the default. If the subquery explicitly uses a
         # different database, an error should be raised.
-        with self.assertRaises(ValueError):
+        msg = (
+            "Subqueries aren't allowed across different databases. Force the "
+            "inner query to be evaluated using `list(inner_query)`."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             str(qs.query)
 
         # Evaluating the query shouldn't work, either
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, msg):
             for obj in qs:
                 pass
 
@@ -942,18 +981,18 @@ class ConnectionRouterTestCase(SimpleTestCase):
         'multiple_database.tests.WriteRouter'])
     def test_router_init_default(self):
         connection_router = ConnectionRouter()
-        self.assertListEqual([r.__class__.__name__ for r in connection_router.routers], ['TestRouter', 'WriteRouter'])
+        self.assertEqual([r.__class__.__name__ for r in connection_router.routers], ['TestRouter', 'WriteRouter'])
 
     def test_router_init_arg(self):
         connection_router = ConnectionRouter([
             'multiple_database.tests.TestRouter',
             'multiple_database.tests.WriteRouter'
         ])
-        self.assertListEqual([r.__class__.__name__ for r in connection_router.routers], ['TestRouter', 'WriteRouter'])
+        self.assertEqual([r.__class__.__name__ for r in connection_router.routers], ['TestRouter', 'WriteRouter'])
 
         # Init with instances instead of strings
         connection_router = ConnectionRouter([TestRouter(), WriteRouter()])
-        self.assertListEqual([r.__class__.__name__ for r in connection_router.routers], ['TestRouter', 'WriteRouter'])
+        self.assertEqual([r.__class__.__name__ for r in connection_router.routers], ['TestRouter', 'WriteRouter'])
 
 
 # Make the 'other' database appear to be a replica of the 'default'
@@ -962,7 +1001,7 @@ class RouterTestCase(TestCase):
     multi_db = True
 
     def test_db_selection(self):
-        "Check that querysets obey the router for db suggestions"
+        "Querysets obey the router for db suggestions"
         self.assertEqual(Book.objects.db, 'other')
         self.assertEqual(Book.objects.all().db, 'other')
 
@@ -1029,9 +1068,11 @@ class RouterTestCase(TestCase):
 
     def test_database_routing(self):
         marty = Person.objects.using('default').create(name="Marty Alchin")
-        pro = Book.objects.using('default').create(title="Pro Django",
-                                                   published=datetime.date(2008, 12, 16),
-                                                   editor=marty)
+        pro = Book.objects.using('default').create(
+            title='Pro Django',
+            published=datetime.date(2008, 12, 16),
+            editor=marty,
+        )
         pro.authors.set([marty])
 
         # Create a book and author on the other database
@@ -1047,7 +1088,7 @@ class RouterTestCase(TestCase):
         # But the same query issued explicitly at a database will work.
         pro = Book.objects.using('default').get(title='Pro Django')
 
-        # Check that the update worked.
+        # The update worked.
         self.assertEqual(pro.pages, 200)
 
         # An update query with an explicit using clause will be routed
@@ -1230,7 +1271,7 @@ class RouterTestCase(TestCase):
         dive.save(using='other')
         mark.save(using='other')
 
-        # Check that we have 2 of both types of object on both databases
+        # We have 2 of both types of object on both databases
         self.assertEqual(Book.objects.using('default').count(), 2)
         self.assertEqual(Book.objects.using('other').count(), 2)
         self.assertEqual(Person.objects.using('default').count(), 2)
@@ -1423,10 +1464,12 @@ class RouterTestCase(TestCase):
     def test_foreign_key_managers(self):
         "FK reverse relations are represented by managers, and can be controlled like managers"
         marty = Person.objects.using('other').create(pk=1, name="Marty Alchin")
-        Book.objects.using('other').create(pk=1, title="Pro Django",
-                                           published=datetime.date(2008, 12, 16),
-                                           editor=marty)
-
+        Book.objects.using('other').create(
+            pk=1,
+            title='Pro Django',
+            published=datetime.date(2008, 12, 16),
+            editor=marty,
+        )
         self.assertEqual(marty.edited.db, 'other')
         self.assertEqual(marty.edited.db_manager('default').db, 'default')
         self.assertEqual(marty.edited.db_manager('default').all().db, 'default')
@@ -1436,8 +1479,7 @@ class RouterTestCase(TestCase):
         pro = Book.objects.using('other').create(title="Pro Django",
                                                  published=datetime.date(2008, 12, 16))
 
-        Review.objects.using('other').create(source="Python Monthly",
-                                             content_object=pro)
+        Review.objects.using('other').create(source='Python Monthly', content_object=pro)
 
         self.assertEqual(pro.reviews.db, 'other')
         self.assertEqual(pro.reviews.db_manager('default').db, 'default')
@@ -1448,9 +1490,11 @@ class RouterTestCase(TestCase):
         # Create a book and author on the other database
 
         mark = Person.objects.using('other').create(name="Mark Pilgrim")
-        Book.objects.using('other').create(title="Dive into Python",
-                                           published=datetime.date(2009, 5, 4),
-                                           editor=mark)
+        Book.objects.using('other').create(
+            title='Dive into Python',
+            published=datetime.date(2009, 5, 4),
+            editor=mark,
+        )
 
         sub = Person.objects.filter(name='Mark Pilgrim')
         qs = Book.objects.filter(editor__in=sub)
@@ -1466,9 +1510,11 @@ class RouterTestCase(TestCase):
     def test_deferred_models(self):
         mark_def = Person.objects.using('default').create(name="Mark Pilgrim")
         mark_other = Person.objects.using('other').create(name="Mark Pilgrim")
-        orig_b = Book.objects.using('other').create(title="Dive into Python",
-                                                    published=datetime.date(2009, 5, 4),
-                                                    editor=mark_other)
+        orig_b = Book.objects.using('other').create(
+            title='Dive into Python',
+            published=datetime.date(2009, 5, 4),
+            editor=mark_other,
+        )
         b = Book.objects.using('other').only('title').get(pk=orig_b.pk)
         self.assertEqual(b.published, datetime.date(2009, 5, 4))
         b = Book.objects.using('other').only('title').get(pk=orig_b.pk)
@@ -1513,25 +1559,25 @@ class AuthTestCase(TestCase):
         self.assertEqual(User.objects.using('other').count(), 1)
 
     def test_dumpdata(self):
-        "Check that dumpdata honors allow_migrate restrictions on the router"
+        "dumpdata honors allow_migrate restrictions on the router"
         User.objects.create_user('alice', 'alice@example.com')
         User.objects.db_manager('default').create_user('bob', 'bob@example.com')
 
-        # Check that dumping the default database doesn't try to include auth
-        # because allow_migrate prohibits auth on default
+        # dumping the default database doesn't try to include auth because
+        # allow_migrate prohibits auth on default
         new_io = StringIO()
         management.call_command('dumpdata', 'auth', format='json', database='default', stdout=new_io)
         command_output = new_io.getvalue().strip()
         self.assertEqual(command_output, '[]')
 
-        # Check that dumping the other database does include auth
+        # dumping the other database does include auth
         new_io = StringIO()
         management.call_command('dumpdata', 'auth', format='json', database='other', stdout=new_io)
         command_output = new_io.getvalue().strip()
         self.assertIn('"email": "alice@example.com"', command_output)
 
 
-class AntiPetRouter(object):
+class AntiPetRouter:
     # A router that only expresses an opinion on migrate,
     # passing pets to the 'other' database
 
@@ -1549,14 +1595,14 @@ class FixtureTestCase(TestCase):
     @override_settings(DATABASE_ROUTERS=[AntiPetRouter()])
     def test_fixture_loading(self):
         "Multi-db fixtures are loaded correctly"
-        # Check that "Pro Django" exists on the default database, but not on other database
+        # "Pro Django" exists on the default database, but not on other database
         Book.objects.get(title="Pro Django")
         Book.objects.using('default').get(title="Pro Django")
 
         with self.assertRaises(Book.DoesNotExist):
             Book.objects.using('other').get(title="Pro Django")
 
-        # Check that "Dive into Python" exists on the default database, but not on other database
+        # "Dive into Python" exists on the default database, but not on other database
         Book.objects.using('other').get(title="Dive into Python")
 
         with self.assertRaises(Book.DoesNotExist):
@@ -1564,7 +1610,7 @@ class FixtureTestCase(TestCase):
         with self.assertRaises(Book.DoesNotExist):
             Book.objects.using('default').get(title="Dive into Python")
 
-        # Check that "Definitive Guide" exists on the both databases
+        # "Definitive Guide" exists on the both databases
         Book.objects.get(title="The Definitive Guide to Django")
         Book.objects.using('default').get(title="The Definitive Guide to Django")
         Book.objects.using('other').get(title="The Definitive Guide to Django")
@@ -1592,7 +1638,7 @@ class PickleQuerySetTestCase(TestCase):
             self.assertEqual(qs.db, pickle.loads(pickle.dumps(qs)).db)
 
 
-class DatabaseReceiver(object):
+class DatabaseReceiver:
     """
     Used in the tests for the database argument in signals (#13552)
     """
@@ -1600,7 +1646,7 @@ class DatabaseReceiver(object):
         self._database = kwargs['using']
 
 
-class WriteToOtherRouter(object):
+class WriteToOtherRouter:
     """
     A router that sends all writes to the other database.
     """
@@ -1616,8 +1662,7 @@ class SignalTests(TestCase):
 
     def test_database_arg_save_and_delete(self):
         """
-        Tests that the pre/post_save signal contains the correct database.
-        (#13552)
+        The pre/post_save signal contains the correct database.
         """
         # Make some signal receivers
         pre_save_receiver = DatabaseReceiver()
@@ -1654,7 +1699,7 @@ class SignalTests(TestCase):
 
     def test_database_arg_m2m(self):
         """
-        Test that the m2m_changed signal has a correct database arg (#13552)
+        The m2m_changed signal has a correct database arg.
         """
         # Make a receiver
         receiver = DatabaseReceiver()
@@ -1668,8 +1713,7 @@ class SignalTests(TestCase):
 
         # Create a copy of the models on the 'other' database to prevent
         # integrity errors on backends that don't defer constraints checks
-        Book.objects.using('other').create(pk=b.pk, title=b.title,
-                                           published=b.published)
+        Book.objects.using('other').create(pk=b.pk, title=b.title, published=b.published)
         Person.objects.using('other').create(pk=p.pk, name=p.name)
 
         # Test addition
@@ -1701,7 +1745,7 @@ class SignalTests(TestCase):
         self.assertEqual(receiver._database, "other")
 
 
-class AttributeErrorRouter(object):
+class AttributeErrorRouter:
     "A router to test the exception handling of ConnectionRouter"
     def db_for_read(self, model, **hints):
         raise AttributeError
@@ -1717,7 +1761,7 @@ class RouterAttributeErrorTestCase(TestCase):
         return override_settings(DATABASE_ROUTERS=[AttributeErrorRouter()])
 
     def test_attribute_error_read(self):
-        "Check that the AttributeError from AttributeErrorRouter bubbles up"
+        "The AttributeError from AttributeErrorRouter bubbles up"
         b = Book.objects.create(title="Pro Django",
                                 published=datetime.date(2008, 12, 16))
         with self.override_router():
@@ -1725,7 +1769,7 @@ class RouterAttributeErrorTestCase(TestCase):
                 Book.objects.get(pk=b.pk)
 
     def test_attribute_error_save(self):
-        "Check that the AttributeError from AttributeErrorRouter bubbles up"
+        "The AttributeError from AttributeErrorRouter bubbles up"
         dive = Book()
         dive.title = "Dive into Python"
         dive.published = datetime.date(2009, 5, 4)
@@ -1734,7 +1778,7 @@ class RouterAttributeErrorTestCase(TestCase):
                 dive.save()
 
     def test_attribute_error_delete(self):
-        "Check that the AttributeError from AttributeErrorRouter bubbles up"
+        "The AttributeError from AttributeErrorRouter bubbles up"
         b = Book.objects.create(title="Pro Django",
                                 published=datetime.date(2008, 12, 16))
         p = Person.objects.create(name="Marty Alchin")
@@ -1745,7 +1789,7 @@ class RouterAttributeErrorTestCase(TestCase):
                 b.delete()
 
     def test_attribute_error_m2m(self):
-        "Check that the AttributeError from AttributeErrorRouter bubbles up"
+        "The AttributeError from AttributeErrorRouter bubbles up"
         b = Book.objects.create(title="Pro Django",
                                 published=datetime.date(2008, 12, 16))
         p = Person.objects.create(name="Marty Alchin")
@@ -1754,7 +1798,7 @@ class RouterAttributeErrorTestCase(TestCase):
                 b.authors.set([p])
 
 
-class ModelMetaRouter(object):
+class ModelMetaRouter:
     "A router to ensure model arguments are real model classes"
     def db_for_write(self, model, **hints):
         if not hasattr(model, '_meta'):
@@ -1788,13 +1832,14 @@ class RouterModelArgumentTestCase(TestCase):
         person.delete()
 
 
-class SyncOnlyDefaultDatabaseRouter(object):
+class SyncOnlyDefaultDatabaseRouter:
     def allow_migrate(self, db, app_label, **hints):
         return db == DEFAULT_DB_ALIAS
 
 
 class MigrateTestCase(TestCase):
 
+    # Limit memory usage when calling 'migrate'.
     available_apps = [
         'multiple_database',
         'django.contrib.auth',
@@ -1836,7 +1881,7 @@ class RouterUsed(Exception):
 class RouteForWriteTestCase(TestCase):
     multi_db = True
 
-    class WriteCheckRouter(object):
+    class WriteCheckRouter:
         def db_for_write(self, model, **hints):
             raise RouterUsed(mode=RouterUsed.WRITE, model=model, hints=hints)
 
@@ -2037,3 +2082,28 @@ class RouteForWriteTestCase(TestCase):
         self.assertEqual(e.mode, RouterUsed.WRITE)
         self.assertEqual(e.model, Book)
         self.assertEqual(e.hints, {'instance': auth})
+
+
+class NoRelationRouter:
+    """Disallow all relations."""
+    def allow_relation(self, obj1, obj2, **hints):
+        return False
+
+
+@override_settings(DATABASE_ROUTERS=[NoRelationRouter()])
+class RelationAssignmentTests(TestCase):
+    """allow_relation() is called with unsaved model instances."""
+    multi_db = True
+    router_prevents_msg = 'the current database router prevents this relation'
+
+    def test_foreign_key_relation(self):
+        person = Person(name='Someone')
+        pet = Pet()
+        with self.assertRaisesMessage(ValueError, self.router_prevents_msg):
+            pet.owner = person
+
+    def test_reverse_one_to_one_relation(self):
+        user = User(username='Someone', password='fake_hash')
+        profile = UserProfile()
+        with self.assertRaisesMessage(ValueError, self.router_prevents_msg):
+            user.userprofile = profile

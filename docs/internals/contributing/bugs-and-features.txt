@@ -19,10 +19,8 @@ Otherwise, before reporting a bug or requesting a new feature on the
 * Don't use the ticket system to ask support questions. Use the
   |django-users| list or the `#django`_ IRC channel for that.
 
-* Don't reopen issues that have been marked "wontfix" by a core developer.
-  This mark means that the decision has been made that we can't or won't fix
-  this particular issue. If you're not sure why, please ask
-  on |django-developers|.
+* Don't reopen issues that have been marked "wontfix" without finding consensus
+  to do so on |django-developers|.
 
 * Don't use the ticket tracker for lengthy discussions, because they're
   likely to get lost. If a particular ticket is controversial, please move the
@@ -75,8 +73,7 @@ are a few additional guidelines to follow:
 
 * If you're offering a patch which changes the look or behavior of Django's
   UI, you **must** attach before *and* after screenshots/screencasts.
-  Tickets lacking these are difficult for triagers and core developers to
-  assess quickly.
+  Tickets lacking these are difficult for triagers to assess quickly.
 
 * Screenshots don't absolve you of other good reporting practices. Make sure
   to include URLs, code snippets, and step-by-step instructions on how to
@@ -113,9 +110,9 @@ part of that. Here are some tips on how to make a request most effectively:
   you'll need to explain it, if it isn't obvious why the feature would be
   useful.
 
-If core developers agree on the feature, then it's appropriate to create a
-ticket. Include a link the discussion on |django-developers| in the ticket
-description.
+If there's a consensus agreement on the feature, then it's appropriate to
+create a ticket. Include a link the discussion on |django-developers| in the
+ticket description.
 
 As with most open-source projects, code talks. If you are willing to write the
 code for the feature yourself or, even better, if you've already written it,
@@ -149,8 +146,7 @@ follow the votes.
 
 However, consensus is not always possible. If consensus cannot be reached, or
 if the discussion towards a consensus fizzles out without a concrete decision,
-any :ref:`core team member <core-team>` may defer the decision to the
-:ref:`technical board <technical-board>`.
+the decision may be deferred to the :ref:`technical board <technical-board>`.
 
 Internally, the technical board will use the same voting mechanism. A
 proposition will be considered carried if:

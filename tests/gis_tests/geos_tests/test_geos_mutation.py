@@ -3,10 +3,9 @@
 # released under the New BSD license.
 
 import unittest
-from unittest import skipUnless
 
 from django.contrib.gis.geos import (
-    HAS_GEOS, LinearRing, LineString, MultiPoint, Point, Polygon, fromstr,
+    LinearRing, LineString, MultiPoint, Point, Polygon, fromstr,
 )
 
 
@@ -65,13 +64,13 @@ def api_get_area(x):
 def api_get_length(x):
     return x.length
 
+
 geos_function_tests = [
     val for name, val in vars().items()
     if hasattr(val, '__call__') and name.startswith('api_get_')
 ]
 
 
-@skipUnless(HAS_GEOS, "Geos is required.")
 class GEOSMutationTest(unittest.TestCase):
     """
     Tests Pythonic Mutability of Python GEOS geometry wrappers

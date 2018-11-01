@@ -1,8 +1,12 @@
 from django.contrib.gis.db.backends.base.adapter import WKTAdapter
-from django.contrib.gis.db.backends.base.operations import \
-    BaseSpatialOperations
+from django.contrib.gis.db.backends.base.operations import (
+    BaseSpatialOperations,
+)
 from django.contrib.gis.db.backends.utils import SpatialOperator
-from django.contrib.gis.db.models import GeometryField, aggregates
+from django.contrib.gis.db.models import aggregates
+from django.contrib.gis.geos.geometry import GEOSGeometryBase
+from django.contrib.gis.geos.prototypes.io import wkb_r
+from django.contrib.gis.measure import Distance
 from django.db.backends.mysql.operations import DatabaseOperations
 from django.utils.functional import cached_property
 
@@ -11,32 +15,13 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
 
     mysql = True
     name = 'mysql'
+    geom_func_prefix = 'ST_'
 
     Adapter = WKTAdapter
 
     @cached_property
-    def geom_func_prefix(self):
-        return '' if self.is_mysql_5_5 else 'ST_'
-
-    @cached_property
-    def is_mysql_5_5(self):
-        return self.connection.mysql_version < (5, 6, 1)
-
-    @cached_property
-    def is_mysql_5_6(self):
-        return self.connection.mysql_version < (5, 7, 6)
-
-    @cached_property
-    def uses_invalid_empty_geometry_collection(self):
-        return self.connection.mysql_version >= (5, 7, 5)
-
-    @cached_property
     def select(self):
-        return self.geom_func_prefix + 'AsText(%s)'
-
-    @cached_property
-    def from_wkb(self):
-        return self.geom_func_prefix + 'GeomFromWKB'
+        return self.geom_func_prefix + 'AsBinary(%s)'
 
     @cached_property
     def from_text(self):
@@ -44,7 +29,9 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
 
     @cached_property
     def gis_operators(self):
-        MBREquals = 'MBREqual' if self.is_mysql_5_6 else 'MBREquals'
+        MBREquals = 'MBREqual' if (
+            self.connection.mysql_is_mariadb or self.connection.mysql_version < (5, 7, 6)
+        ) else 'MBREquals'
         return {
             'bbcontains': SpatialOperator(func='MBRContains'),  # For consistency w/PostGIS API
             'bboverlaps': SpatialOperator(func='MBROverlaps'),  # ...
@@ -60,10 +47,6 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
             'within': SpatialOperator(func='MBRWithin'),
         }
 
-    @cached_property
-    def function_names(self):
-        return {'Length': 'GLength'} if self.is_mysql_5_5 else {}
-
     disallowed_aggregates = (
         aggregates.Collect, aggregates.Extent, aggregates.Extent3D,
         aggregates.MakeLine, aggregates.Union,
@@ -72,39 +55,46 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
     @cached_property
     def unsupported_functions(self):
         unsupported = {
-            'AsGeoJSON', 'AsGML', 'AsKML', 'AsSVG', 'BoundingCircle',
-            'ForceRHR', 'GeoHash', 'IsValid', 'MakeValid', 'MemSize',
-            'Perimeter', 'PointOnSurface', 'Reverse', 'Scale', 'SnapToGrid',
-            'Transform', 'Translate',
+            'AsGML', 'AsKML', 'AsSVG', 'Azimuth', 'BoundingCircle',
+            'ForcePolygonCW', 'ForceRHR', 'LineLocatePoint', 'MakeValid',
+            'MemSize', 'Perimeter', 'PointOnSurface', 'Reverse', 'Scale',
+            'SnapToGrid', 'Transform', 'Translate',
         }
-        if self.is_mysql_5_5:
-            unsupported.update({'Difference', 'Distance', 'Intersection', 'SymDifference', 'Union'})
+        if self.connection.mysql_is_mariadb:
+            unsupported.update({'GeoHash', 'IsValid'})
+            if self.connection.mysql_version < (10, 2, 4):
+                unsupported.add('AsGeoJSON')
+        elif self.connection.mysql_version < (5, 7, 5):
+            unsupported.update({'AsGeoJSON', 'GeoHash', 'IsValid'})
         return unsupported
 
     def geo_db_type(self, f):
         return f.geom_type
 
-    def get_geom_placeholder(self, f, value, compiler):
-        """
-        The placeholder here has to include MySQL's WKT constructor.  Because
-        MySQL does not support spatial transformations, there is no need to
-        modify the placeholder based on the contents of the given value.
-        """
-        if hasattr(value, 'as_sql'):
-            placeholder, _ = compiler.compile(value)
+    def get_distance(self, f, value, lookup_type):
+        value = value[0]
+        if isinstance(value, Distance):
+            if f.geodetic(self.connection):
+                raise ValueError(
+                    'Only numeric values of degree units are allowed on '
+                    'geodetic distance queries.'
+                )
+            dist_param = getattr(value, Distance.unit_attname(f.units_name(self.connection)))
         else:
-            placeholder = '%s(%%s)' % self.from_text
-        return placeholder
+            dist_param = value
+        return [dist_param]
 
-    def get_db_converters(self, expression):
-        converters = super(MySQLOperations, self).get_db_converters(expression)
-        if isinstance(expression.output_field, GeometryField) and self.uses_invalid_empty_geometry_collection:
-            converters.append(self.convert_invalid_empty_geometry_collection)
-        return converters
+    def get_geometry_converter(self, expression):
+        read = wkb_r().read
+        srid = expression.output_field.srid
+        if srid == -1:
+            srid = None
+        geom_class = expression.output_field.geom_class
 
-    # https://dev.mysql.com/doc/refman/en/spatial-function-argument-handling.html
-    # MySQL 5.7.5 adds support for the empty geometry collections, but they are represented with invalid WKT.
-    def convert_invalid_empty_geometry_collection(self, value, expression, connection, context):
-        if value == b'GEOMETRYCOLLECTION()':
-            return b'GEOMETRYCOLLECTION EMPTY'
-        return value
+        def converter(value, expression, connection):
+            if value is not None:
+                geom = GEOSGeometryBase(read(memoryview(value)), geom_class)
+                if srid:
+                    geom.srid = srid
+                return geom
+        return converter

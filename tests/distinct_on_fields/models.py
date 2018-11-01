@@ -1,10 +1,6 @@
-from __future__ import unicode_literals
-
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Tag(models.Model):
     name = models.CharField(max_length=10)
     parent = models.ForeignKey(
@@ -22,7 +18,6 @@ class Tag(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Celebrity(models.Model):
     name = models.CharField("Name", max_length=20)
     greatest_fan = models.ForeignKey(
@@ -40,7 +35,6 @@ class Fan(models.Model):
     fan_of = models.ForeignKey(Celebrity, models.CASCADE)
 
 
-@python_2_unicode_compatible
 class Staff(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=50)
@@ -52,7 +46,6 @@ class Staff(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class StaffTag(models.Model):
     staff = models.ForeignKey(Staff, models.CASCADE)
     tag = models.ForeignKey(Tag, models.CASCADE)

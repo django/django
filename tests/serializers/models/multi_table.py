@@ -12,11 +12,8 @@ class Parent(models.Model):
     objects = ParentManager()
 
     def natural_key(self):
-        return (self.parent_data, )
+        return (self.parent_data,)
 
 
 class Child(Parent):
     child_data = models.CharField(max_length=30, unique=True)
-
-    class Meta:
-        manager_inheritance_from_future = True

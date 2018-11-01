@@ -2,13 +2,14 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# peterisb <pb@sungis.lv>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 08:31+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2017-09-19 16:40+0000\n"
+"Last-Translator: peterisb <pb@sungis.lv>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -19,10 +20,10 @@ msgstr ""
 "2);\n"
 
 msgid "Redirects"
-msgstr ""
+msgstr "Pārvirzīšanas"
 
 msgid "site"
-msgstr ""
+msgstr "vietne"
 
 msgid "redirect from"
 msgstr "pārvirzīt(redirect) no"

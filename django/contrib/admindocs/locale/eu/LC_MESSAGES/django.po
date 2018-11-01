@@ -2,14 +2,16 @@
 #
 # Translators:
 # Aitzol Naberan <anaberan@codesyntax.com>, 2011-2013
+# Eneko Illarramendi <eneko@illarra.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Urtzi Odriozola <urtzi.odriozola@gmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:51+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-25 09:47+0000\n"
+"Last-Translator: Urtzi Odriozola <urtzi.odriozola@gmail.com>\n"
 "Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -18,7 +20,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Administrative Documentation"
-msgstr ""
+msgstr "Kudeaketa dokumentazioa"
 
 msgid "Home"
 msgstr "Hasiera"
@@ -37,6 +39,9 @@ msgid ""
 "click the link and add it to your bookmarks. Now you can select the "
 "bookmarklet from any page in the site."
 msgstr ""
+"Markadoreak instalatzeko eraman linka zure erreminta panelera (toolbar), edo "
+"eskuineko botoiarekin klik egin eta gehitu erreminta panelera. Orain edozein "
+"markadore aukera dezakezu webguneko edozein orrialdetatik."
 
 msgid "Documentation for this page"
 msgstr "Web orri honen dokumentazioa"
@@ -113,7 +118,7 @@ msgid "Model: %(name)s"
 msgstr "Modeloa: %(name)s"
 
 msgid "Fields"
-msgstr ""
+msgstr "Eremuak"
 
 msgid "Field"
 msgstr "Eremua"
@@ -125,16 +130,16 @@ msgid "Description"
 msgstr "Deskribapena"
 
 msgid "Methods with arguments"
-msgstr ""
+msgstr "Argumentudun metodoak"
 
 msgid "Method"
-msgstr ""
+msgstr "Metodoa"
 
 msgid "Arguments"
-msgstr ""
+msgstr "Argumentuak"
 
 msgid "Back to Model documentation"
-msgstr ""
+msgstr "Bueltatu Modeloaren Dokumentaziora"
 
 msgid "Model documentation"
 msgstr "Modeloaren dokumentazioa"
@@ -156,7 +161,7 @@ msgstr "Txantiloia: \"%(name)s\""
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
-msgstr ""
+msgstr "\"%(name)s\" txantiloiaren bilaketa bidea:"
 
 msgid "(does not exist)"
 msgstr "(ez da existitzen)"
@@ -171,7 +176,7 @@ msgid "Template filter documentation"
 msgstr "Txantiloi iragazkien dokumentazioa"
 
 msgid "Built-in filters"
-msgstr ""
+msgstr "Iragazki integratuak"
 
 #, python-format
 msgid ""
@@ -188,7 +193,7 @@ msgid "Template tag documentation"
 msgstr "Template tag documentazioa"
 
 msgid "Built-in tags"
-msgstr ""
+msgstr "Etiketa integratuak"
 
 #, python-format
 msgid ""
@@ -209,23 +214,23 @@ msgid "Templates:"
 msgstr "Txantiloia:"
 
 msgid "Back to View documentation"
-msgstr ""
+msgstr "Bueltatu Bisten Dokumentaziora"
 
 msgid "View documentation"
 msgstr "Bisten dokumentazioa"
 
 msgid "Jump to namespace"
-msgstr ""
+msgstr "Joan izen-espaziora"
 
 msgid "Empty namespace"
-msgstr ""
+msgstr "Izen-espazio hutsa"
 
 #, python-format
 msgid "Views by namespace %(name)s"
-msgstr ""
+msgstr "Bistak %(name)s izen-espazio arabera"
 
 msgid "Views by empty namespace"
-msgstr ""
+msgstr "Bistak izen-espazio hutsen arabera"
 
 #, python-format
 msgid ""
@@ -233,13 +238,9 @@ msgid ""
 "    View function: <code>%(full_name)s</code>. Name: <code>%(url_name)s</"
 "code>.\n"
 msgstr ""
-
-msgid "Boolean (Either True or False)"
-msgstr "Boolearra (egia ala gezurra)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Eremuaren mota: %(field_type)s"
+"\n"
+"    Bista funtzioa: <code>%(full_name)s</code>. Izena: <code>%(url_name)s</"
+"code>.\n"
 
 msgid "tag:"
 msgstr "etiketa:"
@@ -252,7 +253,7 @@ msgstr "bista:"
 
 #, python-format
 msgid "App %(app_label)r not found"
-msgstr ""
+msgstr "%(app_label)r aplikazioa ez da aurkitu"
 
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"

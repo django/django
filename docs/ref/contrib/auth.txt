@@ -34,28 +34,27 @@ Fields
 
         .. admonition:: Usernames and Unicode
 
-            Django originally accepted only ASCII letters in usernames.
-            Although it wasn't a deliberate choice, Unicode characters have
-            always been accepted when using Python 3. Django 1.10 officially
-            added Unicode support in usernames, keeping the ASCII-only behavior
-            on Python 2, with the option to customize the behavior using
-            :attr:`.User.username_validator`.
-
-        .. versionchanged:: 1.10
-
-            The ``max_length`` increased from 30 to 150 characters.
+            Django originally accepted only ASCII letters and numbers in
+            usernames. Although it wasn't a deliberate choice, Unicode
+            characters have always been accepted when using Python 3. Django
+            1.10 officially added Unicode support in usernames, keeping the
+            ASCII-only behavior on Python 2, with the option to customize the
+            behavior using :attr:`.User.username_validator`.
 
     .. attribute:: first_name
 
-        Optional. 30 characters or fewer.
+        Optional (:attr:`blank=True <django.db.models.Field.blank>`). 30
+        characters or fewer.
 
     .. attribute:: last_name
 
-        Optional. 30 characters or fewer.
+        Optional (:attr:`blank=True <django.db.models.Field.blank>`). 150
+        characters or fewer.
 
     .. attribute:: email
 
-        Optional. Email address.
+        Optional (:attr:`blank=True <django.db.models.Field.blank>`). Email
+        address.
 
     .. attribute:: password
 
@@ -99,13 +98,6 @@ Fields
         authentication in the Django admin all return ``False`` for inactive
         users.
 
-        .. versionchanged:: 1.10
-
-            In older versions,
-            :class:`~django.contrib.auth.backends.ModelBackend` and
-            :class:`~django.contrib.auth.backends.RemoteUserBackend` allowed
-            inactive users to authenticate.
-
     .. attribute:: is_superuser
 
         Boolean. Designates that this user has all permissions without
@@ -137,11 +129,6 @@ Attributes
         (representing the currently logged-in user), you should know this
         attribute is ``True`` for any :class:`~models.User` instance.
 
-        .. versionchanged:: 1.10
-
-            In older versions, this was a method. Backwards-compatibility
-            support for using it as a method will be removed in Django 2.0.
-
     .. attribute:: is_anonymous
 
         Read-only attribute which is always ``False``. This is a way of
@@ -150,22 +137,14 @@ Attributes
         :attr:`~django.contrib.auth.models.User.is_authenticated` to this
         attribute.
 
-        .. versionchanged:: 1.10
-
-            In older versions, this was a method. Backwards-compatibility
-            support for using it as a method will be removed in Django 2.0.
-
     .. attribute:: username_validator
 
-        .. versionadded:: 1.10
-
         Points to a validator instance used to validate usernames. Defaults to
-        :class:`validators.UnicodeUsernameValidator` on Python 3 and
-        :class:`validators.ASCIIUsernameValidator` on Python 2.
+        :class:`validators.UnicodeUsernameValidator`.
 
         To change the default username validator, you can subclass the ``User``
         model and set this attribute to a different validator instance. For
-        example, to use ASCII usernames on Python 3::
+        example, to use ASCII usernames::
 
             from django.contrib.auth.models import User
             from django.contrib.auth.validators import ASCIIUsernameValidator
@@ -183,9 +162,9 @@ Methods
 
     .. method:: get_username()
 
-        Returns the username for the user. Since the User model can be swapped
-        out, you should use this method instead of referencing the username
-        attribute directly.
+        Returns the username for the user. Since the ``User`` model can be
+        swapped out, you should use this method instead of referencing the
+        username attribute directly.
 
     .. method:: get_full_name()
 
@@ -230,6 +209,14 @@ Methods
         Returns ``False`` if
         :meth:`~django.contrib.auth.models.User.set_unusable_password()` has
         been called for this user.
+
+        .. versionchanged:: 2.1
+
+            In older versions, this also returns ``False`` if the password is
+            ``None`` or an empty string, or if the password uses a hasher
+            that's not in the :setting:`PASSWORD_HASHERS` setting. That
+            behavior is considered a bug as it prevents users with such
+            passwords from requesting a password reset.
 
     .. method:: get_group_permissions(obj=None)
 
@@ -305,7 +292,7 @@ Manager methods
 
         The ``extra_fields`` keyword arguments are passed through to the
         :class:`~django.contrib.auth.models.User`’s ``__init__`` method to
-        allow setting arbitrary fields on a :ref:`custom User model
+        allow setting arbitrary fields on a :ref:`custom user model
         <auth-custom-user>`.
 
         See :ref:`Creating users <topics-auth-creating-users>` for example usage.
@@ -412,19 +399,13 @@ Validators
 
 .. class:: validators.ASCIIUsernameValidator
 
-    .. versionadded:: 1.10
-
-    A field validator allowing only ASCII letters, in addition to ``@``, ``.``,
-    ``+``, ``-``, and ``_``. The default validator for ``User.username`` on
-    Python 2.
+    A field validator allowing only ASCII letters and numbers, in addition to
+    ``@``, ``.``, ``+``, ``-``, and ``_``.
 
 .. class:: validators.UnicodeUsernameValidator
 
-    .. versionadded:: 1.10
-
-    A field validator allowing Unicode letters, in addition to ``@``, ``.``,
-    ``+``, ``-``, and ``_``. The default validator for ``User.username`` on
-    Python 3.
+    A field validator allowing Unicode characters, in addition to ``@``, ``.``,
+    ``+``, ``-``, and ``_``. The default validator for ``User.username``.
 
 .. _topics-auth-signals:
 
@@ -483,10 +464,6 @@ can be used for notification when a user logs in or out.
         The :class:`~django.http.HttpRequest` object, if one was provided to
         :func:`~django.contrib.auth.authenticate`.
 
-    .. versionchanged:: 1.11
-
-        The ``request`` argument was added.
-
 .. _authentication-backends-reference:
 
 Authentication backends
@@ -540,10 +517,6 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         if it wasn't provided to :func:`~django.contrib.auth.authenticate`
         (which passes it on to the backend).
 
-        .. versionchanged:: 1.11
-
-            The ``request`` argument was added.
-
     .. method:: get_user_permissions(user_obj, obj=None)
 
         Returns the set of permission strings the ``user_obj`` has from their
@@ -571,14 +544,12 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         permission string ``perm``. Returns ``False`` if the user is not
         :attr:`~django.contrib.auth.models.CustomUser.is_active`.
 
-    .. method:: has_module_perms(self, user_obj, app_label)
+    .. method:: has_module_perms(user_obj, app_label)
 
         Returns whether the ``user_obj`` has any permissions on the app
         ``app_label``.
 
     .. method:: ModelBackend.user_can_authenticate()
-
-        .. versionadded:: 1.10
 
         Returns whether the user is allowed to authenticate. To match the
         behavior of :class:`~django.contrib.auth.forms.AuthenticationForm`
@@ -590,8 +561,6 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         field are allowed.
 
 .. class:: AllowAllUsersModelBackend
-
-   .. versionadded:: 1.10
 
    Same as :class:`ModelBackend` except that it doesn't reject inactive users
    because :meth:`~ModelBackend.user_can_authenticate` always returns ``True``.
@@ -615,16 +584,14 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
 .. attribute:: RemoteUserBackend.create_unknown_user
 
-    ``True`` or ``False``.  Determines whether or not a
-    :class:`~django.contrib.auth.models.User` object is created if not already
-    in the database.  Defaults to ``True``.
+    ``True`` or ``False``. Determines whether or not a user object is created
+    if not already in the database  Defaults to ``True``.
 
 .. method:: RemoteUserBackend.authenticate(request, remote_user)
 
     The username passed as ``remote_user`` is considered trusted. This method
-    simply returns the ``User`` object with the given username, creating a new
-    ``User`` object if :attr:`~RemoteUserBackend.create_unknown_user` is
-    ``True``.
+    simply returns the user object with the given username, creating a new
+    user object if :attr:`~RemoteUserBackend.create_unknown_user` is ``True``.
 
     Returns ``None`` if :attr:`~RemoteUserBackend.create_unknown_user` is
     ``False`` and a ``User`` object with the given username is not found in the
@@ -637,9 +604,8 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 .. method:: RemoteUserBackend.clean_username(username)
 
    Performs any cleaning on the ``username`` (e.g. stripping LDAP DN
-   information) prior to using it to get or create a
-   :class:`~django.contrib.auth.models.User` object.  Returns the cleaned
-   username.
+   information) prior to using it to get or create a user object. Returns the
+   cleaned username.
 
 .. method:: RemoteUserBackend.configure_user(user)
 
@@ -650,8 +616,6 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
 .. method:: RemoteUserBackend.user_can_authenticate()
 
-    .. versionadded:: 1.10
-
     Returns whether the user is allowed to authenticate. This method returns
     ``False`` for users with :attr:`is_active=False
     <django.contrib.auth.models.User.is_active>`. Custom user models that don't
@@ -659,8 +623,6 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
     allowed.
 
 .. class:: AllowAllUsersRemoteUserBackend
-
-   .. versionadded:: 1.10
 
    Same as :class:`RemoteUserBackend` except that it doesn't reject inactive
    users because :attr:`~RemoteUserBackend.user_can_authenticate` always

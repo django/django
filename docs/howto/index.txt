@@ -24,6 +24,7 @@ you quickly accomplish common tasks.
    legacy-databases
    outputting-csv
    outputting-pdf
+   overriding-templates
    static-files/index
    static-files/deployment
    windows

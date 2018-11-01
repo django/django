@@ -1,9 +1,12 @@
-import collections
+import collections.abc
+import inspect
 import warnings
 from math import ceil
 
-from django.utils import six
+from django.utils.deprecation import RemovedInDjango31Warning
 from django.utils.functional import cached_property
+from django.utils.inspect import method_has_no_args
+from django.utils.translation import gettext_lazy as _
 
 
 class UnorderedObjectListWarning(RuntimeWarning):
@@ -22,7 +25,7 @@ class EmptyPage(InvalidPage):
     pass
 
 
-class Paginator(object):
+class Paginator:
 
     def __init__(self, object_list, per_page, orphans=0,
                  allow_empty_first_page=True):
@@ -33,26 +36,37 @@ class Paginator(object):
         self.allow_empty_first_page = allow_empty_first_page
 
     def validate_number(self, number):
-        """
-        Validates the given 1-based page number.
-        """
+        """Validate the given 1-based page number."""
         try:
+            if isinstance(number, float) and not number.is_integer():
+                raise ValueError
             number = int(number)
         except (TypeError, ValueError):
-            raise PageNotAnInteger('That page number is not an integer')
+            raise PageNotAnInteger(_('That page number is not an integer'))
         if number < 1:
-            raise EmptyPage('That page number is less than 1')
+            raise EmptyPage(_('That page number is less than 1'))
         if number > self.num_pages:
             if number == 1 and self.allow_empty_first_page:
                 pass
             else:
-                raise EmptyPage('That page contains no results')
+                raise EmptyPage(_('That page contains no results'))
         return number
 
+    def get_page(self, number):
+        """
+        Return a valid page, even if the page argument isn't a number or isn't
+        in range.
+        """
+        try:
+            number = self.validate_number(number)
+        except PageNotAnInteger:
+            number = 1
+        except EmptyPage:
+            number = self.num_pages
+        return self.page(number)
+
     def page(self, number):
-        """
-        Returns a Page object for the given 1-based page number.
-        """
+        """Return a Page object for the given 1-based page number."""
         number = self.validate_number(number)
         bottom = (number - 1) * self.per_page
         top = bottom + self.per_page
@@ -62,7 +76,7 @@ class Paginator(object):
 
     def _get_page(self, *args, **kwargs):
         """
-        Returns an instance of a single page.
+        Return an instance of a single page.
 
         This hook can be used by subclasses to use an alternative to the
         standard :cls:`Page` object.
@@ -71,51 +85,58 @@ class Paginator(object):
 
     @cached_property
     def count(self):
-        """
-        Returns the total number of objects, across all pages.
-        """
-        try:
-            return self.object_list.count()
-        except (AttributeError, TypeError):
-            # AttributeError if object_list has no count() method.
-            # TypeError if object_list.count() requires arguments
-            # (i.e. is of type list).
-            return len(self.object_list)
+        """Return the total number of objects, across all pages."""
+        c = getattr(self.object_list, 'count', None)
+        if callable(c) and not inspect.isbuiltin(c) and method_has_no_args(c):
+            return c()
+        return len(self.object_list)
 
     @cached_property
     def num_pages(self):
-        """
-        Returns the total number of pages.
-        """
+        """Return the total number of pages."""
         if self.count == 0 and not self.allow_empty_first_page:
             return 0
         hits = max(1, self.count - self.orphans)
-        return int(ceil(hits / float(self.per_page)))
+        return ceil(hits / self.per_page)
 
     @property
     def page_range(self):
         """
-        Returns a 1-based range of pages for iterating through within
+        Return a 1-based range of pages for iterating through within
         a template for loop.
         """
-        return six.moves.range(1, self.num_pages + 1)
+        return range(1, self.num_pages + 1)
 
     def _check_object_list_is_ordered(self):
         """
         Warn if self.object_list is unordered (typically a QuerySet).
         """
-        if hasattr(self.object_list, 'ordered') and not self.object_list.ordered:
+        ordered = getattr(self.object_list, 'ordered', None)
+        if ordered is not None and not ordered:
+            obj_list_repr = (
+                '{} {}'.format(self.object_list.model, self.object_list.__class__.__name__)
+                if hasattr(self.object_list, 'model')
+                else '{!r}'.format(self.object_list)
+            )
             warnings.warn(
                 'Pagination may yield inconsistent results with an unordered '
-                'object_list: {!r}'.format(self.object_list),
-                UnorderedObjectListWarning
+                'object_list: {}.'.format(obj_list_repr),
+                UnorderedObjectListWarning,
+                stacklevel=3
             )
 
 
-QuerySetPaginator = Paginator   # For backwards-compatibility.
+class QuerySetPaginator(Paginator):
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            'The QuerySetPaginator alias of Paginator is deprecated.',
+            RemovedInDjango31Warning, stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
 
 
-class Page(collections.Sequence):
+class Page(collections.abc.Sequence):
 
     def __init__(self, object_list, number, paginator):
         self.object_list = object_list
@@ -129,7 +150,7 @@ class Page(collections.Sequence):
         return len(self.object_list)
 
     def __getitem__(self, index):
-        if not isinstance(index, (slice,) + six.integer_types):
+        if not isinstance(index, (int, slice)):
             raise TypeError
         # The object_list is converted to a list so that if it was a QuerySet
         # it won't be a database hit per __getitem__.
@@ -154,7 +175,7 @@ class Page(collections.Sequence):
 
     def start_index(self):
         """
-        Returns the 1-based index of the first object on this page,
+        Return the 1-based index of the first object on this page,
         relative to total objects in the paginator.
         """
         # Special case, return zero if no items.
@@ -164,7 +185,7 @@ class Page(collections.Sequence):
 
     def end_index(self):
         """
-        Returns the 1-based index of the last object on this page,
+        Return the 1-based index of the last object on this page,
         relative to total objects found (hits).
         """
         # Special case for the last page because there can be orphans.

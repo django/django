@@ -1,11 +1,8 @@
-from __future__ import unicode_literals
-
 from math import ceil
 
 from django.db import IntegrityError, connection, models
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
-from django.utils.six.moves import range
 
 from .models import (
     MR, A, Avatar, Base, Child, HiddenUser, HiddenUserProfile, M, M2MFrom,
@@ -63,7 +60,11 @@ class OnDeleteTests(TestCase):
 
     def test_protect(self):
         a = create_a('protect')
-        with self.assertRaises(IntegrityError):
+        msg = (
+            "Cannot delete some instances of model 'R' because they are "
+            "referenced through a protected foreign key: 'A.protect'"
+        )
+        with self.assertRaisesMessage(IntegrityError, msg):
             a.protect.delete()
 
     def test_do_nothing(self):
@@ -83,7 +84,7 @@ class OnDeleteTests(TestCase):
 
     def test_do_nothing_qscount(self):
         """
-        Test that a models.DO_NOTHING relation doesn't trigger a query.
+        A models.DO_NOTHING relation doesn't trigger a query.
         """
         b = Base.objects.create()
         with self.assertNumQueries(1):
@@ -189,7 +190,7 @@ class DeletionTests(TestCase):
             obj = kwargs['instance']
             deleted.append(obj)
             if isinstance(obj, R):
-                related_setnull_sets.append(list(a.pk for a in obj.setnull_set.all()))
+                related_setnull_sets.append([a.pk for a in obj.setnull_set.all()])
 
         models.signals.pre_delete.connect(pre_delete)
         a = create_a('update_setnull')
@@ -324,7 +325,7 @@ class DeletionTests(TestCase):
         # Calculate the number of queries needed.
         batch_size = connection.ops.bulk_batch_size(['pk'], objs)
         # The related fetches are done in batches.
-        batches = int(ceil(float(len(objs)) / batch_size))
+        batches = ceil(len(objs) / batch_size)
         # One query for Avatar.objects.all() and then one related fast delete for
         # each batch.
         fetches_to_mem = 1 + batches
@@ -341,12 +342,12 @@ class DeletionTests(TestCase):
 
         batch_size = max(connection.ops.bulk_batch_size(['pk'], range(TEST_SIZE)), 1)
 
-        # TEST_SIZE // batch_size (select related `T` instances)
+        # TEST_SIZE / batch_size (select related `T` instances)
         # + 1 (select related `U` instances)
-        # + TEST_SIZE // GET_ITERATOR_CHUNK_SIZE (delete `T` instances in batches)
+        # + TEST_SIZE / GET_ITERATOR_CHUNK_SIZE (delete `T` instances in batches)
         # + 1 (delete `s`)
-        expected_num_queries = (ceil(TEST_SIZE // batch_size) +
-                                ceil(TEST_SIZE // GET_ITERATOR_CHUNK_SIZE) + 2)
+        expected_num_queries = ceil(TEST_SIZE / batch_size)
+        expected_num_queries += ceil(TEST_SIZE / GET_ITERATOR_CHUNK_SIZE) + 2
 
         self.assertNumQueries(expected_num_queries, s.delete)
         self.assertFalse(S.objects.exists())
@@ -358,6 +359,15 @@ class DeletionTests(TestCase):
         child.delete(keep_parents=True)
         self.assertFalse(RChild.objects.filter(id=child.id).exists())
         self.assertTrue(R.objects.filter(id=parent_id).exists())
+
+    def test_delete_with_keeping_parents_relationships(self):
+        child = RChild.objects.create()
+        parent_id = child.r_ptr_id
+        parent_referent_id = S.objects.create(r=child.r_ptr).pk
+        child.delete(keep_parents=True)
+        self.assertFalse(RChild.objects.filter(id=child.id).exists())
+        self.assertTrue(R.objects.filter(id=parent_id).exists())
+        self.assertTrue(S.objects.filter(pk=parent_referent_id).exists())
 
     def test_queryset_delete_returns_num_rows(self):
         """

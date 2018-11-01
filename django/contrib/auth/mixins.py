@@ -2,11 +2,9 @@ from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.utils import six
-from django.utils.encoding import force_text
 
 
-class AccessMixin(object):
+class AccessMixin:
     """
     Abstract CBV mixin that gives access mixins the same customizable
     functionality.
@@ -26,7 +24,7 @@ class AccessMixin(object):
                 '{0} is missing the login_url attribute. Define {0}.login_url, settings.LOGIN_URL, or override '
                 '{0}.get_login_url().'.format(self.__class__.__name__)
             )
-        return force_text(login_url)
+        return str(login_url)
 
     def get_permission_denied_message(self):
         """
@@ -41,26 +39,21 @@ class AccessMixin(object):
         return self.redirect_field_name
 
     def handle_no_permission(self):
-        if self.raise_exception:
+        if self.raise_exception or self.request.user.is_authenticated:
             raise PermissionDenied(self.get_permission_denied_message())
         return redirect_to_login(self.request.get_full_path(), self.get_login_url(), self.get_redirect_field_name())
 
 
 class LoginRequiredMixin(AccessMixin):
-    """
-    CBV mixin which verifies that the current user is authenticated.
-    """
+    """Verify that the current user is authenticated."""
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return self.handle_no_permission()
-        return super(LoginRequiredMixin, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class PermissionRequiredMixin(AccessMixin):
-    """
-    CBV mixin which verifies that the current user has all specified
-    permissions.
-    """
+    """Verify that the current user has all specified permissions."""
     permission_required = None
 
     def get_permission_required(self):
@@ -73,8 +66,8 @@ class PermissionRequiredMixin(AccessMixin):
                 '{0} is missing the permission_required attribute. Define {0}.permission_required, or override '
                 '{0}.get_permission_required().'.format(self.__class__.__name__)
             )
-        if isinstance(self.permission_required, six.string_types):
-            perms = (self.permission_required, )
+        if isinstance(self.permission_required, str):
+            perms = (self.permission_required,)
         else:
             perms = self.permission_required
         return perms
@@ -89,13 +82,13 @@ class PermissionRequiredMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
         if not self.has_permission():
             return self.handle_no_permission()
-        return super(PermissionRequiredMixin, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class UserPassesTestMixin(AccessMixin):
     """
-    CBV Mixin that allows you to define a test function which must return True
-    if the current user can access the view.
+    Deny a request with a permission error if the test_func() method returns
+    False.
     """
 
     def test_func(self):
@@ -113,4 +106,4 @@ class UserPassesTestMixin(AccessMixin):
         user_test_result = self.get_test_func()()
         if not user_test_result:
             return self.handle_no_permission()
-        return super(UserPassesTestMixin, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)

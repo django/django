@@ -99,7 +99,7 @@ are loaded from the database::
                 values.pop() if f.attname in field_names else DEFERRED
                 for f in cls._meta.concrete_fields
             ]
-        new = cls(*values)
+        instance = cls(*values)
         instance._state.adding = False
         instance._state.db = db
         # customization to store the original field values on the instance
@@ -113,17 +113,11 @@ are loaded from the database::
         if not self._state.adding and (
                 self.creator_id != self._loaded_values['creator_id']):
             raise ValueError("Updating the value of creator isn't allowed")
-        super(...).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
 The example above shows a full ``from_db()`` implementation to clarify how that
 is done. In this case it would of course be possible to just use ``super()`` call
 in the ``from_db()`` method.
-
-.. versionchanged:: 1.10
-
-    In older versions, you could check if all fields were loaded by consulting
-    ``cls._deferred``. This attribute is removed and
-    ``django.db.models.DEFERRED`` is new.
 
 Refreshing objects from database
 ================================
@@ -135,11 +129,6 @@ value from the database::
     >>> del obj.field
     >>> obj.field  # Loads the field from the database
 
-.. versionchanged:: 1.10
-
-    In older versions, accessing a deleted field raised ``AttributeError``
-    instead of reloading it.
-
 .. method:: Model.refresh_from_db(using=None, fields=None)
 
 If you need to reload a model's values from the database, you can use the
@@ -148,12 +137,7 @@ following is done:
 
 1. All non-deferred fields of the model are updated to the values currently
    present in the database.
-2. The previously loaded related instances for which the relation's value is no
-   longer valid are removed from the reloaded instance. For example, if you have
-   a foreign key from the reloaded instance to another model with name
-   ``Author``, then if ``obj.author_id != obj.author.id``, ``obj.author`` will
-   be thrown away, and when next accessed it will be reloaded with the value of
-   ``obj.author_id``.
+2. Any cached relations are cleared from the reloaded instance.
 
 Only fields of the model are reloaded from the database. Other
 database-dependent values such as annotations aren't reloaded. Any
@@ -195,7 +179,7 @@ all of the instance's fields when a deferred field is reloaded::
                 if fields.intersection(deferred_fields):
                     # then load all of them
                     fields = fields.union(deferred_fields)
-            super(ExampleModel, self).refresh_from_db(using, fields, **kwargs)
+            super().refresh_from_db(using, fields, **kwargs)
 
 .. method:: Model.get_deferred_fields()
 
@@ -272,7 +256,7 @@ access to more than a single field::
     import datetime
     from django.core.exceptions import ValidationError
     from django.db import models
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
     class Article(models.Model):
         ...
@@ -293,7 +277,7 @@ will be stored in a special error dictionary key,
 :data:`~django.core.exceptions.NON_FIELD_ERRORS`. This key is used for errors
 that are tied to the entire model instead of to a specific field::
 
-    from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
+    from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
     try:
         article.full_clean()
     except ValidationError as e:
@@ -321,6 +305,35 @@ pass a dictionary mapping field names to errors::
     })
 
 Finally, ``full_clean()`` will check any unique constraints on your model.
+
+.. admonition:: How to raise field-specific validation errors if those fields don't appear in a ``ModelForm``
+
+    You can't raise validation errors in ``Model.clean()`` for fields that
+    don't appear in a model form (a form may limit its fields using
+    ``Meta.fields`` or ``Meta.exclude``). Doing so will raise a ``ValueError``
+    because the validation error won't be able to be associated with the
+    excluded field.
+
+    To work around this dilemma, instead override :meth:`Model.clean_fields()
+    <django.db.models.Model.clean_fields>` as it receives the list of fields
+    that are excluded from validation. For example::
+
+        class Article(models.Model):
+            ...
+            def clean_fields(self, exclude=None):
+                super().clean_fields(exclude=exclude)
+                if self.status == 'draft' and self.pub_date is not None:
+                    if exclude and 'status' in exclude:
+                        raise ValidationError(
+                            _('Draft entries may not have a publication date.')
+                        )
+                    else:
+                        raise ValidationError({
+                            'status': _(
+                                'Set status to draft if there is not a '
+                                'publication date.'
+                             ),
+                        })
 
 .. method:: Model.validate_unique(exclude=None)
 
@@ -408,48 +421,44 @@ happens.
 Explicitly specifying auto-primary-key values is mostly useful for bulk-saving
 objects, when you're confident you won't have primary-key collision.
 
+If you're using PostgreSQL, the sequence associated with the primary key might
+need to be updated; see :ref:`manually-specified-autoincrement-pk`.
+
 What happens when you save?
 ---------------------------
 
 When you save an object, Django performs the following steps:
 
-1. **Emit a pre-save signal.** The :doc:`signal </ref/signals>`
-   :attr:`django.db.models.signals.pre_save` is sent, allowing any
-   functions listening for that signal to take some customized
-   action.
+#. **Emit a pre-save signal.** The :data:`~django.db.models.signals.pre_save`
+   signal is sent, allowing any functions listening for that signal to do
+   something.
 
-2. **Pre-process the data.** Each field on the object is asked to
-   perform any automated data modification that the field may need
-   to perform.
+#. **Preprocess the data.** Each field's
+   :meth:`~django.db.models.Field.pre_save` method is called to perform any
+   automated data modification that's needed. For example, the date/time fields
+   override ``pre_save()`` to implement
+   :attr:`~django.db.models.DateField.auto_now_add` and
+   :attr:`~django.db.models.DateField.auto_now`.
 
-   Most fields do *no* pre-processing — the field data is kept as-is.
-   Pre-processing is only used on fields that have special behavior.  For
-   example, if your model has a :class:`~django.db.models.DateField` with
-   ``auto_now=True``, the pre-save phase will alter the data in the object
-   to ensure that the date field contains the current date stamp. (Our
-   documentation doesn't yet include a list of all the fields with this
-   "special behavior.")
-
-3. **Prepare the data for the database.** Each field is asked to provide
+#. **Prepare the data for the database.** Each field's
+   :meth:`~django.db.models.Field.get_db_prep_save` method is asked to provide
    its current value in a data type that can be written to the database.
 
-   Most fields require *no* data preparation. Simple data types, such as
-   integers and strings, are 'ready to write' as a Python object. However,
-   more complex data types often require some modification.
+   Most fields don't require data preparation. Simple data types, such as
+   integers and strings, are 'ready to write' as a Python object. However, more
+   complex data types often require some modification.
 
    For example, :class:`~django.db.models.DateField` fields use a Python
    ``datetime`` object to store data. Databases don't store ``datetime``
    objects, so the field value must be converted into an ISO-compliant date
    string for insertion into the database.
 
-4. **Insert the data into the database.** The pre-processed, prepared
-   data is then composed into an SQL statement for insertion into the
-   database.
+#. **Insert the data into the database.** The preprocessed, prepared data is
+   composed into an SQL statement for insertion into the database.
 
-5. **Emit a post-save signal.** The signal
-   :attr:`django.db.models.signals.post_save` is sent, allowing
-   any functions listening for that signal to take some customized
-   action.
+#. **Emit a post-save signal.** The :data:`~django.db.models.signals.post_save`
+   signal is sent, allowing any functions listening for that signal to do
+   something.
 
 How Django knows to UPDATE vs. INSERT
 -------------------------------------
@@ -619,18 +628,13 @@ representation of the model from the ``__str__()`` method.
 For example::
 
     from django.db import models
-    from django.utils.encoding import python_2_unicode_compatible
 
-    @python_2_unicode_compatible  # only if you need to support Python 2
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
 
         def __str__(self):
             return '%s %s' % (self.first_name, self.last_name)
-
-If you'd like compatibility with Python 2, you can decorate your model class
-with :func:`~django.utils.encoding.python_2_unicode_compatible` as shown above.
 
 ``__eq__()``
 ------------
@@ -660,7 +664,7 @@ For example::
     # Primary keys compared
     MyModel(id=1) == MyModel(id=1)
     MyModel(id=1) != MyModel(id=2)
-    # Primay keys are None
+    # Primary keys are None
     MyModel(id=None) != MyModel(id=None)
     # Same instance
     instance = MyModel(id=None)
@@ -756,8 +760,7 @@ in ``get_absolute_url()`` and have all your other code call that one place.
     Code and templates calling ``get_absolute_url()`` should be able to use the
     result directly without any further processing. You may wish to use the
     ``django.utils.encoding.iri_to_uri()`` function to help with this if you
-    are using unicode strings containing characters outside the ASCII range at
-    all.
+    are using strings containing characters outside the ASCII range.
 
 Extra instance methods
 ======================

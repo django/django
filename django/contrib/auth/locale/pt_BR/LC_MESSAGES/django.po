@@ -2,8 +2,9 @@
 #
 # Translators:
 # Allisson Azevedo <allisson@gmail.com>, 2014
-# Carlos E C Leite <caduado@gmail.com>, 2016
-# Filipe Cifali <cifali.filipe@gmail.com>, 2016
+# Camilo B. Moreira <camilo.moreira@fatec.sp.gov.br>, 2017
+# Carlos Leite <caduado@gmail.com>, 2016
+# Filipe Cifali Stangler <cifali.filipe@gmail.com>, 2016
 # Claudemiro Alves Feitosa Neto <dimiro1@gmail.com>, 2015
 # dudanogueira <dudanogueira@gmail.com>, 2012
 # dudanogueira <dudanogueira@gmail.com>, 2014
@@ -11,7 +12,7 @@
 # Elyézer Rezende <elyezermr@gmail.com>, 2013
 # Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2015
 # gilberto dos santos alves <gsavix@gmail.com>, 2013
-# Guilherme Gondim, 2012
+# semente, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lucas Infante <maccinza@gmail.com>, 2015
 # Sandro <sandrossv@hotmail.com>, 2011
@@ -19,9 +20,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-06-05 14:23+0000\n"
-"Last-Translator: Carlos E C Leite <caduado@gmail.com>\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-11-21 22:11+0000\n"
+"Last-Translator: Camilo B. Moreira <camilo.moreira@fatec.sp.gov.br>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -79,12 +80,10 @@ msgstr "Informe a mesma senha informada anteriormente, para verificação."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Não são armazenadas senhas desprotegidas e, por isso, não há como visualizar "
-"a senha de um usuário, mas você pode alterá-la utilizando <a href=\"../"
-"password/\">este formulário</a>"
+"Não são salvas senhas brutas, então não é possível ver a senha deste "
+"usuário, mas você pode trocá-la usando <a href=\"{}\">este formulário</a>."
 
 #, python-format
 msgid ""

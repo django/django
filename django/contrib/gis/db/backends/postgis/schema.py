@@ -15,11 +15,11 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
     def _field_should_be_indexed(self, model, field):
         if getattr(field, 'spatial_index', False):
             return True
-        return super(PostGISSchemaEditor, self)._field_should_be_indexed(model, field)
+        return super()._field_should_be_indexed(model, field)
 
-    def _create_index_sql(self, model, fields, suffix="", sql=None):
+    def _create_index_sql(self, model, fields, **kwargs):
         if len(fields) != 1 or not hasattr(fields[0], 'geodetic'):
-            return super(PostGISSchemaEditor, self)._create_index_sql(model, fields, suffix=suffix, sql=sql)
+            return super()._create_index_sql(model, fields, **kwargs)
 
         field = fields[0]
         field_column = self.quote_name(field.column)
@@ -38,6 +38,7 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
             "using": "USING %s" % self.geom_index_type,
             "columns": field_column,
             "extra": '',
+            "condition": '',
         }
 
     def _alter_column_type_sql(self, table, old_field, new_field, new_type):
@@ -45,9 +46,7 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
         Special case when dimension changed.
         """
         if not hasattr(old_field, 'dim') or not hasattr(new_field, 'dim'):
-            return super(PostGISSchemaEditor, self)._alter_column_type_sql(
-                table, old_field, new_field, new_type
-            )
+            return super()._alter_column_type_sql(table, old_field, new_field, new_type)
 
         if old_field.dim == 2 and new_field.dim == 3:
             sql_alter = self.sql_alter_column_to_3d

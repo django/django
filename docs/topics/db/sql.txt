@@ -85,17 +85,6 @@ options that make it very powerful.
     both rows will match. To prevent this, perform the correct typecasting
     before using the value in a query.
 
-.. warning::
-
-    While a ``RawQuerySet`` instance can be iterated over like a normal
-    :class:`~django.db.models.query.QuerySet`, ``RawQuerySet`` doesn't
-    implement all methods you can use with ``QuerySet``. For example,
-    ``__bool__()`` and ``__len__()`` are not defined in ``RawQuerySet``, and
-    thus all ``RawQuerySet`` instances are considered ``True``. The reason
-    these methods are not implemented in ``RawQuerySet`` is that implementing
-    them without internal caching would be a performance drawback and adding
-    such caching would be backward incompatible.
-
 Mapping query fields to model fields
 ------------------------------------
 
@@ -210,20 +199,26 @@ argument.
 
 .. warning::
 
-    **Do not use string formatting on raw queries!**
+    **Do not use string formatting on raw queries or quote placeholders in your
+    SQL strings!**
 
     It's tempting to write the above query as::
 
         >>> query = 'SELECT * FROM myapp_person WHERE last_name = %s' % lname
         >>> Person.objects.raw(query)
 
-    **Don't.**
+    You might also think you should write your query like this (with quotes
+    around ``%s``)::
 
-    Using the ``params`` argument completely protects you from `SQL injection
-    attacks`__, a common exploit where attackers inject arbitrary SQL into
-    your database. If you use string interpolation, sooner or later you'll
-    fall victim to SQL injection. As long as you remember to always use the
-    ``params`` argument you'll be protected.
+        >>> query = "SELECT * FROM myapp_person WHERE last_name = '%s'"
+
+    **Don't make either of these mistakes.**
+
+    As discussed in :ref:`sql-injection-protection`, using the ``params``
+    argument and leaving the placeholders unquoted protects you from `SQL
+    injection attacks`__, a common exploit where attackers inject arbitrary
+    SQL into your database. If you use string interpolation or quote the
+    placeholder, you're at risk for SQL injection.
 
 __ https://en.wikipedia.org/wiki/SQL_injection
 
@@ -257,6 +252,9 @@ For example::
 
         return row
 
+To protect against SQL injection, you must not include quotes around the ``%s``
+placeholders in the SQL string.
+
 Note that if you want to include literal percent signs in the query, you have to
 double them in the case you are passing parameters::
 
@@ -270,8 +268,8 @@ object that allows you to retrieve a specific connection using its
 alias::
 
     from django.db import connections
-    cursor = connections['my_db_alias'].cursor()
-    # Your code here...
+    with connections['my_db_alias'].cursor() as cursor:
+        # Your code here...
 
 By default, the Python DB API will return results without their field names,
 which means you end up with a ``list`` of values, rather than a ``dict``. At a
@@ -346,3 +344,31 @@ is equivalent to::
         c.execute(...)
     finally:
         c.close()
+
+Calling stored procedures
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. method:: CursorWrapper.callproc(procname, params=None, kparams=None)
+
+    Calls a database stored procedure with the given name. A sequence
+    (``params``) or dictionary (``kparams``) of input parameters may be
+    provided. Most databases don't support ``kparams``. Of Django's built-in
+    backends, only Oracle supports it.
+
+    For example, given this stored procedure in an Oracle database:
+
+    .. code-block:: sql
+
+        CREATE PROCEDURE "TEST_PROCEDURE"(v_i INTEGER, v_text NVARCHAR2(10)) AS
+            p_i INTEGER;
+            p_text NVARCHAR2(10);
+        BEGIN
+            p_i := v_i;
+            p_text := v_text;
+            ...
+        END;
+
+    This will call it::
+
+        with connection.cursor() as cursor:
+            cursor.callproc('test_procedure', [1, 'test'])

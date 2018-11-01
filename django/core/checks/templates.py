@@ -1,10 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import copy
 
 from django.conf import settings
-from django.utils import six
 
 from . import Error, Tags, register
 
@@ -21,13 +17,10 @@ E002 = Error(
 
 @register(Tags.templates)
 def check_setting_app_dirs_loaders(app_configs, **kwargs):
-    passed_check = True
-    for conf in settings.TEMPLATES:
-        if not conf.get('APP_DIRS'):
-            continue
-        if 'loaders' in conf.get('OPTIONS', {}):
-            passed_check = False
-    return [] if passed_check else [E001]
+    return [E001] if any(
+        conf.get('APP_DIRS') and 'loaders' in conf.get('OPTIONS', {})
+        for conf in settings.TEMPLATES
+    ) else []
 
 
 @register(Tags.templates)
@@ -35,7 +28,7 @@ def check_string_if_invalid_is_string(app_configs, **kwargs):
     errors = []
     for conf in settings.TEMPLATES:
         string_if_invalid = conf.get('OPTIONS', {}).get('string_if_invalid', '')
-        if not isinstance(string_if_invalid, six.string_types):
+        if not isinstance(string_if_invalid, str):
             error = copy.copy(E002)
             error.msg = error.msg.format(string_if_invalid, type(string_if_invalid).__name__)
             errors.append(error)

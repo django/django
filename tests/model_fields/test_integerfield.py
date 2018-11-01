@@ -1,8 +1,9 @@
+import unittest
+
 from django.core import validators
 from django.core.exceptions import ValidationError
-from django.db import connection, models
+from django.db import IntegrityError, connection, models
 from django.test import SimpleTestCase, TestCase
-from django.utils import six
 
 from .models import (
     BigIntegerModel, IntegerModel, PositiveIntegerModel,
@@ -121,11 +122,11 @@ class IntegerFieldTests(TestCase):
 
     def test_types(self):
         instance = self.model(value=0)
-        self.assertIsInstance(instance.value, six.integer_types)
+        self.assertIsInstance(instance.value, int)
         instance.save()
-        self.assertIsInstance(instance.value, six.integer_types)
+        self.assertIsInstance(instance.value, int)
         instance = self.model.objects.get()
-        self.assertIsInstance(instance.value, six.integer_types)
+        self.assertIsInstance(instance.value, int)
 
     def test_coercing(self):
         self.model.objects.create(value='10')
@@ -151,6 +152,13 @@ class PositiveSmallIntegerFieldTests(IntegerFieldTests):
 class PositiveIntegerFieldTests(IntegerFieldTests):
     model = PositiveIntegerModel
     documented_range = (0, 2147483647)
+
+    @unittest.skipIf(connection.vendor == 'sqlite', "SQLite doesn't have a constraint.")
+    def test_negative_values(self):
+        p = PositiveIntegerModel.objects.create(value=0)
+        p.value = models.F('value') - 1
+        with self.assertRaises(IntegrityError):
+            p.save()
 
 
 class ValidationTests(SimpleTestCase):

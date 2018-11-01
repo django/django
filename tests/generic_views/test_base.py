@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import time
 import unittest
 
@@ -43,7 +41,7 @@ class DecoratedDispatchView(SimpleView):
 
     @decorator
     def dispatch(self, request, *args, **kwargs):
-        return super(DecoratedDispatchView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class AboutTemplateView(TemplateView):
@@ -76,14 +74,14 @@ class ViewTest(unittest.TestCase):
 
     def test_no_init_kwargs(self):
         """
-        Test that a view can't be accidentally instantiated before deployment
+        A view can't be accidentally instantiated before deployment
         """
         with self.assertRaises(AttributeError):
             SimpleView(key='value').as_view()
 
     def test_no_init_args(self):
         """
-        Test that a view can't be accidentally instantiated before deployment
+        A view can't be accidentally instantiated before deployment
         """
         with self.assertRaises(TypeError):
             SimpleView.as_view('value')
@@ -133,14 +131,13 @@ class ViewTest(unittest.TestCase):
 
     def test_invalid_keyword_argument(self):
         """
-        Test that view arguments must be predefined on the class and can't
+        View arguments must be predefined on the class and can't
         be named like a HTTP method.
         """
         # Check each of the allowed method names
         for method in SimpleView.http_method_names:
-            kwargs = dict(((method, "value"),))
             with self.assertRaises(TypeError):
-                SimpleView.as_view(**kwargs)
+                SimpleView.as_view(**{method: 'value'})
 
         # Check the case view argument is ok if predefined on the class...
         CustomizableView.as_view(parameter="value")
@@ -158,7 +155,7 @@ class ViewTest(unittest.TestCase):
 
     def test_class_attributes(self):
         """
-        Test that the callable returned from as_view() has proper
+        The callable returned from as_view() has proper
         docstring, name and module.
         """
         self.assertEqual(SimpleView.__doc__, SimpleView.as_view().__doc__)
@@ -167,14 +164,14 @@ class ViewTest(unittest.TestCase):
 
     def test_dispatch_decoration(self):
         """
-        Test that attributes set by decorators on the dispatch method
+        Attributes set by decorators on the dispatch method
         are also present on the closure.
         """
         self.assertTrue(DecoratedDispatchView.as_view().is_decorated)
 
     def test_options(self):
         """
-        Test that views respond to HTTP OPTIONS requests with an Allow header
+        Views respond to HTTP OPTIONS requests with an Allow header
         appropriate for the methods implemented by the view class.
         """
         request = self.rf.options('/')
@@ -185,7 +182,7 @@ class ViewTest(unittest.TestCase):
 
     def test_options_for_get_view(self):
         """
-        Test that a view implementing GET allows GET and HEAD.
+        A view implementing GET allows GET and HEAD.
         """
         request = self.rf.options('/')
         view = SimpleView.as_view()
@@ -194,7 +191,7 @@ class ViewTest(unittest.TestCase):
 
     def test_options_for_get_and_post_view(self):
         """
-        Test that a view implementing GET and POST allows GET, HEAD, and POST.
+        A view implementing GET and POST allows GET, HEAD, and POST.
         """
         request = self.rf.options('/')
         view = SimplePostView.as_view()
@@ -203,7 +200,7 @@ class ViewTest(unittest.TestCase):
 
     def test_options_for_post_view(self):
         """
-        Test that a view implementing POST allows POST.
+        A view implementing POST allows POST.
         """
         request = self.rf.options('/')
         view = PostOnlyView.as_view()
@@ -276,7 +273,11 @@ class TemplateViewTest(SimpleTestCase):
         """
         A template view must provide a template name.
         """
-        with self.assertRaises(ImproperlyConfigured):
+        msg = (
+            "TemplateResponseMixin requires either a definition of "
+            "'template_name' or an implementation of 'get_template_names()'"
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             self.client.get('/template/no_template/')
 
     @require_jinja2
@@ -346,6 +347,10 @@ class TemplateViewTest(SimpleTestCase):
         match = resolve('/template/login_required/')
         self.assertIs(match.func.view_class, TemplateView)
 
+    def test_extra_context(self):
+        response = self.client.get('/template/extra_context/')
+        self.assertEqual(response.context['title'], 'Title')
+
 
 @override_settings(ROOT_URLCONF='generic_views.urls')
 class RedirectViewTest(SimpleTestCase):
@@ -408,11 +413,6 @@ class RedirectViewTest(SimpleTestCase):
         response = RedirectView.as_view(pattern_name='artist_detail')(self.rf.get('/foo/'), 1)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], '/detail/artist/1/')
-
-    def test_wrong_named_url_pattern(self):
-        "A wrong pattern name returns 410 GONE"
-        response = RedirectView.as_view(pattern_name='wrong.pattern_name')(self.rf.get('/foo/'))
-        self.assertEqual(response.status_code, 410)
 
     def test_redirect_POST(self):
         "Default is a temporary redirect"

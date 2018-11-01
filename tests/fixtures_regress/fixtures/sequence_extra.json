@@ -14,7 +14,7 @@
         "pk": "1",
         "model": "fixtures_regress.animal_extra",
         "fields": {
-            "name": "Non-existent model",
+            "name": "Nonexistent model",
             "extra_name": "test for ticket #21799",
             "latin_name": "Panthera leo",
             "count": 3,

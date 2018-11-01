@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.forms import CharField, ComboField, EmailField, ValidationError
 from django.test import SimpleTestCase
 

@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import os
 from collections import OrderedDict
 
@@ -9,21 +7,19 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.storage import FileSystemStorage
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
-from django.utils.encoding import force_text
 from django.utils.functional import cached_property
-from django.utils.six.moves import input
 
 
 class Command(BaseCommand):
     """
-    Command that allows to copy or symlink static files from different
-    locations to the settings.STATIC_ROOT.
+    Copies or symlinks static files from different locations to the
+    settings.STATIC_ROOT.
     """
     help = "Collect static files in a single location."
     requires_system_checks = False
 
     def __init__(self, *args, **kwargs):
-        super(Command, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.copied_files = []
         self.symlinked_files = []
         self.unmodified_files = []
@@ -41,13 +37,11 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--noinput', '--no-input',
-            action='store_false', dest='interactive', default=True,
+            '--noinput', '--no-input', action='store_false', dest='interactive',
             help="Do NOT prompt the user for input of any kind.",
         )
         parser.add_argument(
-            '--no-post-process',
-            action='store_false', dest='post_process', default=True,
+            '--no-post-process', action='store_false', dest='post_process',
             help="Do NOT post process collected files.",
         )
         parser.add_argument(
@@ -57,24 +51,20 @@ class Command(BaseCommand):
                  "pattern. Use multiple times to ignore more.",
         )
         parser.add_argument(
-            '-n', '--dry-run',
-            action='store_true', dest='dry_run', default=False,
+            '-n', '--dry-run', action='store_true',
             help="Do everything except modify the filesystem.",
         )
         parser.add_argument(
-            '-c', '--clear',
-            action='store_true', dest='clear', default=False,
+            '-c', '--clear', action='store_true',
             help="Clear the existing files using the storage "
                  "before trying to copy or link the original file.",
         )
         parser.add_argument(
-            '-l', '--link',
-            action='store_true', dest='link', default=False,
+            '-l', '--link', action='store_true',
             help="Create a symbolic link to each file instead of copying.",
         )
         parser.add_argument(
-            '--no-default-ignore', action='store_false',
-            dest='use_default_ignore_patterns', default=True,
+            '--no-default-ignore', action='store_false', dest='use_default_ignore_patterns',
             help="Don't ignore the common private glob-style patterns (defaults to 'CVS', '.*' and '*~').",
         )
 
@@ -90,7 +80,7 @@ class Command(BaseCommand):
         ignore_patterns = options['ignore_patterns']
         if options['use_default_ignore_patterns']:
             ignore_patterns += apps.get_app_config('staticfiles').ignore_patterns
-        self.ignore_patterns = list(set(ignore_patterns))
+        self.ignore_patterns = list(set(os.path.normpath(p) for p in ignore_patterns))
         self.post_process = options['post_process']
 
     def collect(self):
@@ -131,8 +121,7 @@ class Command(BaseCommand):
                         level=1,
                     )
 
-        # Here we check if the storage backend has a post_process
-        # method and pass it the list of modified files.
+        # Storage backends may define a post_process() method.
         if self.post_process and hasattr(self.storage, 'post_process'):
             processor = self.storage.post_process(found_files,
                                                   dry_run=self.dry_run)
@@ -145,7 +134,7 @@ class Command(BaseCommand):
                     raise processed
                 if processed:
                     self.log("Post-processed '%s' as '%s'" %
-                             (original_path, processed_path), level=1)
+                             (original_path, processed_path), level=2)
                     self.post_processed_files.append(original_path)
                 else:
                     self.log("Skipped post-processing '%s'" % original_path)
@@ -228,7 +217,7 @@ class Command(BaseCommand):
 
     def clear_dir(self, path):
         """
-        Deletes the given relative path using the destination storage backend.
+        Delete the given relative path using the destination storage backend.
         """
         if not self.storage.exists(path):
             return
@@ -237,9 +226,9 @@ class Command(BaseCommand):
         for f in files:
             fpath = os.path.join(path, f)
             if self.dry_run:
-                self.log("Pretending to delete '%s'" % force_text(fpath), level=1)
+                self.log("Pretending to delete '%s'" % fpath, level=1)
             else:
-                self.log("Deleting '%s'" % force_text(fpath), level=1)
+                self.log("Deleting '%s'" % fpath, level=1)
                 try:
                     full_path = self.storage.path(fpath)
                 except NotImplementedError:
@@ -255,7 +244,7 @@ class Command(BaseCommand):
 
     def delete_file(self, path, prefixed_path, source_storage):
         """
-        Checks if the target file should be deleted if it already exists
+        Check if the target file should be deleted if it already exists.
         """
         if self.storage.exists(prefixed_path):
             try:
@@ -274,12 +263,24 @@ class Command(BaseCommand):
                     # The full path of the target file
                     if self.local:
                         full_path = self.storage.path(prefixed_path)
+                        # If it's --link mode and the path isn't a link (i.e.
+                        # the previous collectstatic wasn't with --link) or if
+                        # it's non-link mode and the path is a link (i.e. the
+                        # previous collectstatic was with --link), the old
+                        # links/files must be deleted so it's not safe to skip
+                        # unmodified files.
+                        can_skip_unmodified_files = not (self.symlink ^ os.path.islink(full_path))
                     else:
                         full_path = None
-                    # Skip the file if the source file is younger
+                        # In remote storages, skipping is only based on the
+                        # modified times since symlinks aren't relevant.
+                        can_skip_unmodified_files = True
                     # Avoid sub-second precision (see #14665, #19540)
-                    if (target_last_modified.replace(microsecond=0) >= source_last_modified.replace(microsecond=0) and
-                            full_path and not (self.symlink ^ os.path.islink(full_path))):
+                    file_is_unmodified = (
+                        target_last_modified.replace(microsecond=0) >=
+                        source_last_modified.replace(microsecond=0)
+                    )
+                    if file_is_unmodified and can_skip_unmodified_files:
                         if prefixed_path not in self.unmodified_files:
                             self.unmodified_files.append(prefixed_path)
                         self.log("Skipping '%s' (not modified)" % path)
@@ -308,7 +309,7 @@ class Command(BaseCommand):
         if self.dry_run:
             self.log("Pretending to link '%s'" % source_path, level=1)
         else:
-            self.log("Linking '%s'" % source_path, level=1)
+            self.log("Linking '%s'" % source_path, level=2)
             full_path = self.storage.path(prefixed_path)
             try:
                 os.makedirs(os.path.dirname(full_path))
@@ -347,7 +348,7 @@ class Command(BaseCommand):
         if self.dry_run:
             self.log("Pretending to copy '%s'" % source_path, level=1)
         else:
-            self.log("Copying '%s'" % source_path, level=1)
+            self.log("Copying '%s'" % source_path, level=2)
             with source_storage.open(path) as source_file:
                 self.storage.save(prefixed_path, source_file)
         self.copied_files.append(prefixed_path)

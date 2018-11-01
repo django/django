@@ -70,7 +70,7 @@ Django source tree, as for any code change:
 
 .. _Transifex: https://www.transifex.com/
 .. _Django project page: https://www.transifex.com/django/django/
-.. _Transifex User Guide: http://docs.transifex.com/
+.. _Transifex User Guide: https://docs.transifex.com/
 
 .. _translating-documentation:
 

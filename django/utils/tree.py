@@ -5,10 +5,10 @@ ORM.
 
 import copy
 
-from django.utils.encoding import force_str, force_text
+from django.utils.hashable import make_hashable
 
 
-class Node(object):
+class Node:
     """
     A single internal node in the tree graph. A Node should be viewed as a
     connection (the root) with the children being either leaf nodes or other
@@ -19,25 +19,22 @@ class Node(object):
     default = 'DEFAULT'
 
     def __init__(self, children=None, connector=None, negated=False):
-        """
-        Constructs a new Node. If no connector is given, the default will be
-        used.
-        """
+        """Construct a new Node. If no connector is given, use the default."""
         self.children = children[:] if children else []
         self.connector = connector or self.default
         self.negated = negated
 
-    # We need this because of django.db.models.query_utils.Q. Q. __init__() is
+    # Required because django.db.models.query_utils.Q. Q. __init__() is
     # problematic, but it is a natural Node subclass in all other respects.
     @classmethod
     def _new_instance(cls, children=None, connector=None, negated=False):
         """
-        This is called to create a new instance of this class when we need new
-        Nodes (or subclasses) in the internal code in this class. Normally, it
-        just shadows __init__(). However, subclasses with an __init__ signature
-        that is not an extension of Node.__init__ might need to implement this
-        method to allow a Node to create a new instance of them (if they have
-        any extra setting up to do).
+        Create a new instance of this class when new Nodes (or subclasses) are
+        needed in the internal code in this class. Normally, it just shadows
+        __init__(). However, subclasses with an __init__ signature that aren't
+        an extension of Node.__init__ might need to implement this method to
+        allow a Node to create a new instance of them (if they have any extra
+        setting up to do).
         """
         obj = Node(children, connector, negated)
         obj.__class__ = cls
@@ -45,52 +42,50 @@ class Node(object):
 
     def __str__(self):
         template = '(NOT (%s: %s))' if self.negated else '(%s: %s)'
-        return force_str(template % (self.connector, ', '.join(force_text(c) for c in self.children)))
+        return template % (self.connector, ', '.join(str(c) for c in self.children))
 
     def __repr__(self):
-        return str("<%s: %s>") % (self.__class__.__name__, self)
+        return "<%s: %s>" % (self.__class__.__name__, self)
 
     def __deepcopy__(self, memodict):
-        """
-        Utility method used by copy.deepcopy().
-        """
         obj = Node(connector=self.connector, negated=self.negated)
         obj.__class__ = self.__class__
         obj.children = copy.deepcopy(self.children, memodict)
         return obj
 
     def __len__(self):
-        """
-        The size of a node if the number of children it has.
-        """
+        """Return the number of children this node has."""
         return len(self.children)
 
     def __bool__(self):
-        """
-        For truth value testing.
-        """
+        """Return whether or not this node has children."""
         return bool(self.children)
 
-    def __nonzero__(self):      # Python 2 compatibility
-        return type(self).__bool__(self)
-
     def __contains__(self, other):
-        """
-        Returns True is 'other' is a direct child of this instance.
-        """
+        """Return True if 'other' is a direct child of this instance."""
         return other in self.children
+
+    def __eq__(self, other):
+        return (
+            self.__class__ == other.__class__ and
+            (self.connector, self.negated) == (other.connector, other.negated) and
+            self.children == other.children
+        )
+
+    def __hash__(self):
+        return hash((self.__class__, self.connector, self.negated, *make_hashable(self.children)))
 
     def add(self, data, conn_type, squash=True):
         """
-        Combines this tree and the data represented by data using the
+        Combine this tree and the data represented by data using the
         connector conn_type. The combine is done by squashing the node other
         away if possible.
 
         This tree (self) will never be pushed to a child node of the
         combined tree, nor will the connector or negated properties change.
 
-        The function returns a node which can be used in place of data
-        regardless if the node other got squashed or not.
+        Return a node which can be used in place of data regardless if the
+        node other got squashed or not.
 
         If `squash` is False the data is prepared and added as a child to
         this tree without further logic.
@@ -125,7 +120,5 @@ class Node(object):
             return data
 
     def negate(self):
-        """
-        Negate the sense of the root connector.
-        """
+        """Negate the sense of the root connector."""
         self.negated = not self.negated

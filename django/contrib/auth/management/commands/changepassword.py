@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import getpass
 
 from django.contrib.auth import get_user_model
@@ -7,7 +5,8 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS
-from django.utils.encoding import force_str
+
+UserModel = get_user_model()
 
 
 class Command(BaseCommand):
@@ -16,7 +15,7 @@ class Command(BaseCommand):
     requires_system_checks = False
 
     def _get_pass(self, prompt="Password: "):
-        p = getpass.getpass(prompt=force_str(prompt))
+        p = getpass.getpass(prompt=prompt)
         if not p:
             raise CommandError("aborted")
         return p
@@ -27,7 +26,7 @@ class Command(BaseCommand):
             help='Username to change password for; by default, it\'s the current username.',
         )
         parser.add_argument(
-            '--database', action='store', dest='database',
+            '--database',
             default=DEFAULT_DB_ALIAS,
             help='Specifies the database to use. Default is "default".',
         )
@@ -37,8 +36,6 @@ class Command(BaseCommand):
             username = options['username']
         else:
             username = getpass.getuser()
-
-        UserModel = get_user_model()
 
         try:
             u = UserModel._default_manager.using(options['database']).get(**{

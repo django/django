@@ -13,7 +13,7 @@ In this example, a ``Place`` optionally can be a ``Restaurant``::
         name = models.CharField(max_length=50)
         address = models.CharField(max_length=80)
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return "%s the place" % self.name
 
     class Restaurant(models.Model):
@@ -25,14 +25,14 @@ In this example, a ``Place`` optionally can be a ``Restaurant``::
         serves_hot_dogs = models.BooleanField(default=False)
         serves_pizza = models.BooleanField(default=False)
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return "%s the restaurant" % self.place.name
 
     class Waiter(models.Model):
         restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
         name = models.CharField(max_length=50)
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return "%s the waiter at %s" % (self.name, self.restaurant)
 
 What follows are examples of operations that can be performed using the Python

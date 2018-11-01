@@ -1,8 +1,8 @@
-class EmptyRouter(object):
+class EmptyRouter:
     pass
 
 
-class TestRouter(object):
+class TestRouter:
     def allow_migrate(self, db, app_label, model_name=None, **hints):
         """
         The Tribble model should be the only one to appear in the 'other' db.

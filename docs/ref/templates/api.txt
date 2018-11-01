@@ -71,10 +71,6 @@ what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
 
           Only set it to ``False`` if you're rendering non-HTML templates!
 
-      .. versionadded:: 1.10
-
-          The ``autoescape`` option was added.
-
     * ``context_processors`` is a list of dotted Python paths to callables
       that are used to populate the context when a template is rendered with a
       request. These callables take a request object as their argument and
@@ -107,11 +103,6 @@ what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
       :class:`django.template.loaders.cached.Loader`.
 
       See :ref:`template-loaders` for details.
-
-      .. versionchanged:: 1.11
-
-          Enabling of the cached template loader when ``debug`` is ``False``
-          was added.
 
     * ``string_if_invalid`` is the output, as a string, that the template
       system should use for invalid (e.g. misspelled) variables.
@@ -150,10 +141,10 @@ what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
 
 .. staticmethod:: Engine.get_default()
 
-    When a Django project configures one and only one
-    :class:`~django.template.backends.django.DjangoTemplates` engine, this
-    method returns the underlying :class:`Engine`. In other circumstances it
-    will raise :exc:`~django.core.exceptions.ImproperlyConfigured`.
+    Returns the underlying :class:`Engine` from the first configured
+    :class:`~django.template.backends.django.DjangoTemplates` engine. Raises
+    :exc:`~django.core.exceptions.ImproperlyConfigured` if no engines are
+    configured.
 
     It's required for preserving APIs that rely on a globally available,
     implicitly configured engine. Any other use is strongly discouraged.
@@ -167,7 +158,7 @@ what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
     Loads a template with the given name, compiles it and returns a
     :class:`Template` object.
 
-.. method:: Engine.select_template(self, template_name_list)
+.. method:: Engine.select_template(template_name_list)
 
     Like :meth:`~Engine.get_template`, except it takes a list of names
     and returns the first template that was found.
@@ -179,9 +170,11 @@ The recommended way to create a :class:`Template` is by calling the factory
 methods of the :class:`Engine`: :meth:`~Engine.get_template`,
 :meth:`~Engine.select_template` and :meth:`~Engine.from_string`.
 
-In a Django project where the :setting:`TEMPLATES` setting defines exactly one
+In a Django project where the :setting:`TEMPLATES` setting defines a
 :class:`~django.template.backends.django.DjangoTemplates` engine, it's
-possible to instantiate a :class:`Template` directly.
+possible to instantiate a :class:`Template` directly. If more than one
+:class:`~django.template.backends.django.DjangoTemplates` engine is defined,
+the first one will be used.
 
 .. class:: Template
 
@@ -210,14 +203,8 @@ different contexts.
 
 .. class:: Context(dict_=None)
 
-    This class lives at ``django.template.Context``. The constructor takes
-    two optional arguments:
-
-    * A dictionary mapping variable names to variable values.
-
-    * The name of the current application. This application name is used
-      to help :ref:`resolve namespaced URLs<topics-http-reversing-url-namespaces>`.
-      If you're not using namespaced URLs, you can ignore this argument.
+    The constructor of ``django.template.Context`` takes an optional argument —
+    a dictionary mapping variable names to variable values.
 
     For details, see :ref:`playing-with-context` below.
 
@@ -384,10 +371,10 @@ replaced with the name of the invalid variable.
     While ``string_if_invalid`` can be a useful debugging tool, it is a bad
     idea to turn it on as a 'development default'.
 
-    Many templates, including those in the Admin site, rely upon the silence
-    of the template system when a non-existent variable is encountered. If you
-    assign a value other than ``''`` to ``string_if_invalid``, you will
-    experience rendering problems with these templates and sites.
+    Many templates, including some of Django's, rely upon the silence of the
+    template system when a nonexistent variable is encountered. If you assign a
+    value other than ``''`` to ``string_if_invalid``, you will experience
+    rendering problems with these templates and sites.
 
     Generally, ``string_if_invalid`` should only be enabled in order to debug
     a specific template problem, then cleared once debugging is complete.
@@ -700,22 +687,23 @@ the request's IP address (``request.META['REMOTE_ADDR']``) is in the
   and how long it took. The list is in order by database alias and then by
   query. It's lazily generated on access.
 
-.. versionchanged:: 1.10
-
-    In older versions, only the queries for the default database alias were
-    included.
-
 ``django.template.context_processors.i18n``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If this processor is enabled, every ``RequestContext`` will contain these two
+.. function:: i18n
+
+If this processor is enabled, every ``RequestContext`` will contain these
 variables:
 
 * ``LANGUAGES`` -- The value of the :setting:`LANGUAGES` setting.
+* ``LANGUAGE_BIDI`` -- ``True`` if the current language is a right-to-left
+  language, e.g. Hebrew, Arabic. ``False`` if it's a left-to-right language,
+  e.g. English, French, German.
 * ``LANGUAGE_CODE`` -- ``request.LANGUAGE_CODE``, if it exists. Otherwise,
   the value of the :setting:`LANGUAGE_CODE` setting.
 
-See :doc:`/topics/i18n/index` for more.
+See :ref:`i18n template tags <i18n-template-tags>` for template tags that
+generate the same values.
 
 ``django.template.context_processors.media``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -847,6 +835,21 @@ loaders that come with Django:
             'DIRS': [os.path.join(BASE_DIR, 'templates')],
         }]
 
+    You can also override ``'DIRS'`` and specify specific directories for a
+    particular filesystem loader::
+
+        TEMPLATES = [{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'OPTIONS': {
+                'loaders': [
+                    (
+                        'django.template.loaders.filesystem.Loader',
+                        [os.path.join(BASE_DIR, 'templates')],
+                    ),
+                ],
+            },
+        }]
+
 ``django.template.loaders.app_directories.Loader``
 
 .. class:: app_directories.Loader
@@ -890,19 +893,6 @@ loaders that come with Django:
             'APP_DIRS': True,
         }]
 
-``django.template.loaders.eggs.Loader``
-
-.. class:: eggs.Loader
-
-    .. deprecated:: 1.9
-
-        Distributing applications as eggs is not recommended.
-
-    Just like ``app_directories`` above, but it loads templates from Python
-    eggs rather than from the filesystem.
-
-    This loader is disabled by default.
-
 ``django.template.loaders.cached.Loader``
 
 .. class:: cached.Loader
@@ -918,8 +908,10 @@ loaders that come with Django:
     ``Template`` in memory. The cached ``Template`` instance is returned for
     subsequent requests to load the same template.
 
-    This loader is automatically enabled if :setting:`DEBUG` is ``False`` and
-    :setting:`OPTIONS['loaders'] <TEMPLATES-OPTIONS>` isn't specified.
+    This loader is automatically enabled if :setting:`OPTIONS['loaders']
+    <TEMPLATES-OPTIONS>` isn't specified and :setting:`OPTIONS['debug']
+    <TEMPLATES-OPTIONS>` is ``False`` (the latter option defaults to the value
+    of :setting:`DEBUG`).
 
     You can also enable template caching with some custom template loaders
     using settings like this::
@@ -946,11 +938,6 @@ loaders that come with Django:
         that the ``Node`` implementation for each tag is thread-safe. For more
         information, see :ref:`template tag thread safety considerations
         <template_tag_thread_safety>`.
-
-    .. versionchanged:: 1.11
-
-        The automatic enabling of the cached template loader when ``debug`` is
-        ``False`` was added.
 
 ``django.template.loaders.locmem.Loader``
 
@@ -1037,37 +1024,6 @@ Loader methods
         :meth:`get_contents` for custom template loaders. ``get_template()``
         will usually not need to be overridden.
 
-    .. method:: load_template_source(template_name, template_dirs=None)
-
-        Returns a tuple of (``template_string``, ``template_origin``), where
-        ``template_string`` is a string containing the template contents,
-        and ``template_origin`` is a string identifying the template source.
-        A filesystem-based loader may return the full path to the file as the
-        ``template_origin``, for example.
-
-        ``template_dirs`` is an optional argument used to control which
-        directories the loader will search.
-
-        This method is called automatically by :meth:`load_template` and should
-        be overridden when writing custom template loaders.
-
-        .. deprecated:: 1.9
-
-             Custom loaders should use :meth:`get_template` and
-             :meth:`get_contents` instead.
-
-    .. method:: load_template(template_name, template_dirs=None)
-
-        Returns a tuple of (``template``, ``template_origin``), where ``template``
-        is a ``Template`` object and ``template_origin`` is a string identifying
-        the template source. A filesystem-based loader may return the full
-        path to the file as the ``template_origin``, for example.
-
-        .. deprecated:: 1.9
-
-             Custom loaders should use :meth:`get_template` and
-             :meth:`get_contents` instead.
-
 .. admonition:: Building your own
 
     For examples, `read the source code for Django's built-in loaders`_.
@@ -1082,7 +1038,7 @@ Template origin
 Templates have an ``origin`` containing attributes depending on the source
 they are loaded from.
 
-.. class:: Origin
+.. class:: Origin(name, template_name=None, loader=None)
 
     .. attribute:: name
 
@@ -1100,3 +1056,14 @@ they are loaded from.
 
         If the template is instantiated directly rather than through a
         template loader, this is ``None``.
+
+    .. attribute:: loader
+
+        The template loader instance that constructed this ``Origin``.
+
+        If the template is instantiated directly rather than through a
+        template loader, this is ``None``.
+
+        :class:`django.template.loaders.cached.Loader` requires all of its
+        wrapped loaders to set this attribute, typically by instantiating
+        the ``Origin`` with ``loader=self``.

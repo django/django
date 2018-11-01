@@ -66,7 +66,3 @@ Would output::
 When the ``fields`` parameter is not specified, the ``geojson`` serializer adds
 a ``pk`` key to the ``properties`` dictionary with the primary key of the
 object as the value.
-
-.. versionchanged:: 1.10
-
-    The ``pk`` key was added to the ``properties`` dictionary.

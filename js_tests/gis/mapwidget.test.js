@@ -1,51 +1,67 @@
-/* global module, test, MapWidget */
+/* global QUnit, MapWidget */
 /* eslint global-strict: 0, strict: 0 */
 'use strict';
 
-module('gis.OLMapWidget');
+QUnit.module('gis.OLMapWidget');
 
-test('MapWidget.featureAdded', function(assert) {
+QUnit.test('MapWidget.featureAdded', function(assert) {
     var options = {id: 'id_point', map_id: 'id_point_map', geom_name: 'Point'};
     var widget = new MapWidget(options);
-    assert.equal(widget.layers.vector.features.length, 1);
+    assert.equal(widget.featureCollection.getLength(), 1);
+    widget.serializeFeatures();
     assert.equal(
-        widget.layers.vector.features[0].geometry.toString(),
-        'POINT(7.8177 47.397)',
-        'Point addded to vector layer'
+        document.getElementById('id_point').value,
+        '{"type":"Point","coordinates":[7.8177,47.397]}',
+        'Point added to vector layer'
     );
 });
 
-test('MapWidget.map_srid', function(assert) {
+QUnit.test('MapWidget.map_srid', function(assert) {
     var options = {id: 'id_point', map_id: 'id_point_map', geom_name: 'Point'};
     var widget = new MapWidget(options);
-    assert.equal(widget.options.map_srid, 4326, 'SRID 4326');
+    assert.equal(widget.map.getView().getProjection().getCode(), 'EPSG:3857', 'SRID 3857');
 });
 
-test('MapWidget.defaultCenter', function(assert) {
+QUnit.test('MapWidget.defaultCenter', function(assert) {
     var options = {id: 'id_point', map_id: 'id_point_map', geom_name: 'Point'};
     var widget = new MapWidget(options);
-    assert.equal(widget.defaultCenter().toString(), 'lon=0,lat=0', 'Default center at 0, 0');
+    assert.equal(widget.defaultCenter().toString(), '0,0', 'Default center at 0, 0');
     options.default_lat = 47.08;
     options.default_lon = 6.81;
     widget = new MapWidget(options);
     assert.equal(
         widget.defaultCenter().toString(),
-        'lon=6.81,lat=47.08',
+        '6.81,47.08',
         'Default center at 6.81, 47.08'
     );
+    assert.equal(widget.map.getView().getZoom(), 12);
 });
 
-test('MapWidget.getControls', function(assert) {
+QUnit.test('MapWidget.interactions', function(assert) {
     var options = {id: 'id_point', map_id: 'id_point_map', geom_name: 'Point'};
     var widget = new MapWidget(options);
-    widget.getControls(widget.layers.vector);
-    assert.equal(widget.controls.length, 3);
-    assert.equal(widget.controls[0].displayClass, 'olControlNavigation', 'Navigation control');
-    assert.equal(widget.controls[1].displayClass, 'olControlDrawFeaturePoint', 'Draw control');
-    assert.equal(widget.controls[2].displayClass, 'olControlModifyFeature', 'Modify control');
+    assert.equal(Object.keys(widget.interactions).length, 2);
+    assert.equal(widget.interactions.draw.getActive(), false, "Draw is inactive with an existing point");
+    assert.equal(widget.interactions.modify.getActive(), true, "Modify is active with an existing point");
 });
 
-test('MapWidget.IsCollection', function(assert) {
+QUnit.test('MapWidget.clearFeatures', function(assert) {
+    var options = {id: 'id_point', map_id: 'id_point_map', geom_name: 'Point'};
+    var widget = new MapWidget(options);
+    var initial_value = document.getElementById('id_point').value;
+    widget.clearFeatures();
+    assert.equal(document.getElementById('id_point').value, "");
+    document.getElementById('id_point').value = initial_value;
+});
+
+QUnit.test('MapWidget.multipolygon', function(assert) {
+    var options = {id: 'id_multipolygon', map_id: 'id_multipolygon_map', geom_name: 'MultiPolygon'};
+    var widget = new MapWidget(options);
+    assert.ok(widget.options.is_collection);
+    assert.equal(widget.interactions.draw.getActive(), true, "Draw is active with no existing content");
+});
+
+QUnit.test('MapWidget.IsCollection', function(assert) {
     var options = {id: 'id_point', map_id: 'id_point_map', geom_name: 'Point'};
     var widget = new MapWidget(options);
     assert.notOk(widget.options.is_collection);

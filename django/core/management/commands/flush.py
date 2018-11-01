@@ -1,15 +1,10 @@
-from __future__ import unicode_literals
-
-import sys
 from importlib import import_module
 
 from django.apps import apps
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
 from django.core.management.sql import emit_post_migrate_signal, sql_flush
-from django.db import DEFAULT_DB_ALIAS, connections, transaction
-from django.utils import six
-from django.utils.six.moves import input
+from django.db import DEFAULT_DB_ALIAS, connections
 
 
 class Command(BaseCommand):
@@ -17,15 +12,15 @@ class Command(BaseCommand):
         'Removes ALL DATA from the database, including data added during '
         'migrations. Does not achieve a "fresh install" state.'
     )
+    stealth_options = ('reset_sequences', 'allow_cascade', 'inhibit_post_migrate')
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--noinput', '--no-input',
-            action='store_false', dest='interactive', default=True,
+            '--noinput', '--no-input', action='store_false', dest='interactive',
             help='Tells Django to NOT prompt the user for input of any kind.',
         )
         parser.add_argument(
-            '--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
+            '--database', default=DEFAULT_DB_ALIAS,
             help='Nominates a database to flush. Defaults to the "default" database.',
         )
 
@@ -65,21 +60,18 @@ Are you sure you want to do this?
 
         if confirm == 'yes':
             try:
-                with transaction.atomic(using=database,
-                                        savepoint=connection.features.can_rollback_ddl):
-                    with connection.cursor() as cursor:
-                        for sql in sql_list:
-                            cursor.execute(sql)
-            except Exception as e:
-                new_msg = (
+                connection.ops.execute_sql_flush(database, sql_list)
+            except Exception as exc:
+                raise CommandError(
                     "Database %s couldn't be flushed. Possible reasons:\n"
                     "  * The database isn't running or isn't configured correctly.\n"
                     "  * At least one of the expected database tables doesn't exist.\n"
                     "  * The SQL was invalid.\n"
                     "Hint: Look at the output of 'django-admin sqlflush'. "
-                    "That's the SQL this command wasn't able to run.\n"
-                    "The full error: %s") % (connection.settings_dict['NAME'], e)
-                six.reraise(CommandError, CommandError(new_msg), sys.exc_info()[2])
+                    "That's the SQL this command wasn't able to run.\n" % (
+                        connection.settings_dict['NAME'],
+                    )
+                ) from exc
 
             # Empty sql_list may signify an empty database and post_migrate would then crash
             if sql_list and not inhibit_post_migrate:

@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
@@ -152,10 +150,11 @@ class AbstractInheritanceTests(TestCase):
             def full_name(self):
                 return self.first_name + self.last_name
 
-        with self.assertRaises(FieldDoesNotExist):
+        msg = "Descendant has no field named %r"
+        with self.assertRaisesMessage(FieldDoesNotExist, msg % 'middle_name'):
             Descendant._meta.get_field('middle_name')
 
-        with self.assertRaises(FieldDoesNotExist):
+        with self.assertRaisesMessage(FieldDoesNotExist, msg % 'full_name'):
             Descendant._meta.get_field('full_name')
 
     def test_overriding_field_removed_by_concrete_model(self):
@@ -303,10 +302,10 @@ class AbstractInheritanceTests(TestCase):
             class Meta:
                 abstract = True
 
-        class Mixin(object):
+        class Mixin:
             age = None
 
-        class Mixin2(object):
+        class Mixin2:
             age = 2
 
         class DescendantMixin(Mixin):
@@ -320,15 +319,15 @@ class AbstractInheritanceTests(TestCase):
 
         def fields(model):
             if not hasattr(model, '_meta'):
-                return list()
-            return list((f.name, f.__class__) for f in model._meta.get_fields())
+                return []
+            return [(f.name, f.__class__) for f in model._meta.get_fields()]
 
         model_dict = {'__module__': 'model_inheritance'}
-        model1 = type(str('Model1'), (AbstractModel, Mixin), model_dict.copy())
-        model2 = type(str('Model2'), (Mixin2, AbstractModel), model_dict.copy())
-        model3 = type(str('Model3'), (DescendantMixin, AbstractModel), model_dict.copy())
-        model4 = type(str('Model4'), (Mixin2, Mixin, AbstractModel), model_dict.copy())
-        model5 = type(str('Model5'), (Mixin2, ConcreteModel2, Mixin, AbstractModel), model_dict.copy())
+        model1 = type('Model1', (AbstractModel, Mixin), model_dict.copy())
+        model2 = type('Model2', (Mixin2, AbstractModel), model_dict.copy())
+        model3 = type('Model3', (DescendantMixin, AbstractModel), model_dict.copy())
+        model4 = type('Model4', (Mixin2, Mixin, AbstractModel), model_dict.copy())
+        model5 = type('Model5', (Mixin2, ConcreteModel2, Mixin, AbstractModel), model_dict.copy())
 
         self.assertEqual(
             fields(model1),

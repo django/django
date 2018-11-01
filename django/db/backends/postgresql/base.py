@@ -4,17 +4,17 @@ PostgreSQL database backend for Django.
 Requires psycopg 2: http://initd.org/projects/psycopg2
 """
 
+import threading
 import warnings
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.db import DEFAULT_DB_ALIAS
+from django.db import connections
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.utils import DatabaseError as WrappedDatabaseError
-from django.utils import six
-from django.utils.encoding import force_str
 from django.utils.functional import cached_property
-from django.utils.safestring import SafeBytes, SafeText
+from django.utils.safestring import SafeText
+from django.utils.version import get_version_tuple
 
 try:
     import psycopg2 as Database
@@ -26,12 +26,13 @@ except ImportError as e:
 
 def psycopg2_version():
     version = psycopg2.__version__.split(' ', 1)[0]
-    return tuple(int(v) for v in version.split('.') if v.isdigit())
+    return get_version_tuple(version)
+
 
 PSYCOPG2_VERSION = psycopg2_version()
 
-if PSYCOPG2_VERSION < (2, 4, 5):
-    raise ImproperlyConfigured("psycopg2_version 2.4.5 or newer is required; you have %s" % psycopg2.__version__)
+if PSYCOPG2_VERSION < (2, 5, 4):
+    raise ImproperlyConfigured("psycopg2_version 2.5.4 or newer is required; you have %s" % psycopg2.__version__)
 
 
 # Some of these import psycopg2, so import them after checking if it's installed.
@@ -42,12 +43,7 @@ from .introspection import DatabaseIntrospection            # NOQA isort:skip
 from .operations import DatabaseOperations                  # NOQA isort:skip
 from .schema import DatabaseSchemaEditor                    # NOQA isort:skip
 from .utils import utc_tzinfo_factory                       # NOQA isort:skip
-from .version import get_version                            # NOQA isort:skip
 
-if six.PY2:
-    psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
-    psycopg2.extensions.register_type(psycopg2.extensions.UNICODEARRAY)
-psycopg2.extensions.register_adapter(SafeBytes, psycopg2.extensions.QuotedString)
 psycopg2.extensions.register_adapter(SafeText, psycopg2.extensions.QuotedString)
 psycopg2.extras.register_uuid()
 
@@ -64,6 +60,7 @@ psycopg2.extensions.register_type(INETARRAY)
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'postgresql'
+    display_name = 'PostgreSQL'
     # This dictionary maps Field objects to their associated PostgreSQL column
     # types, as strings. Column-type strings can contain format strings; they'll
     # be interpolated against the values of Field.__dict__ before being output.
@@ -74,7 +71,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'BinaryField': 'bytea',
         'BooleanField': 'boolean',
         'CharField': 'varchar(%(max_length)s)',
-        'CommaSeparatedIntegerField': 'varchar(%(max_length)s)',
         'DateField': 'date',
         'DateTimeField': 'timestamp with time zone',
         'DecimalField': 'numeric(%(max_digits)s, %(decimal_places)s)',
@@ -143,6 +139,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     features_class = DatabaseFeatures
     introspection_class = DatabaseIntrospection
     ops_class = DatabaseOperations
+    # PostgreSQL backend-specific attributes.
+    _named_cursor_idx = 0
 
     def get_connection_params(self):
         settings_dict = self.settings_dict
@@ -151,15 +149,25 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             raise ImproperlyConfigured(
                 "settings.DATABASES is improperly configured. "
                 "Please supply the NAME value.")
+        if len(settings_dict['NAME'] or '') > self.ops.max_name_length():
+            raise ImproperlyConfigured(
+                "The database name '%s' (%d characters) is longer than "
+                "PostgreSQL's limit of %d characters. Supply a shorter NAME "
+                "in settings.DATABASES." % (
+                    settings_dict['NAME'],
+                    len(settings_dict['NAME']),
+                    self.ops.max_name_length(),
+                )
+            )
         conn_params = {
             'database': settings_dict['NAME'] or 'postgres',
+            **settings_dict['OPTIONS'],
         }
-        conn_params.update(settings_dict['OPTIONS'])
         conn_params.pop('isolation_level', None)
         if settings_dict['USER']:
             conn_params['user'] = settings_dict['USER']
         if settings_dict['PASSWORD']:
-            conn_params['password'] = force_str(settings_dict['PASSWORD'])
+            conn_params['password'] = settings_dict['PASSWORD']
         if settings_dict['HOST']:
             conn_params['host'] = settings_dict['HOST']
         if settings_dict['PORT']:
@@ -205,10 +213,25 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             if not self.get_autocommit():
                 self.connection.commit()
 
-    def create_cursor(self):
-        cursor = self.connection.cursor()
+    def create_cursor(self, name=None):
+        if name:
+            # In autocommit mode, the cursor will be used outside of a
+            # transaction, hence use a holdable cursor.
+            cursor = self.connection.cursor(name, scrollable=False, withhold=self.connection.autocommit)
+        else:
+            cursor = self.connection.cursor()
         cursor.tzinfo_factory = utc_tzinfo_factory if settings.USE_TZ else None
         return cursor
+
+    def chunked_cursor(self):
+        self._named_cursor_idx += 1
+        return self._cursor(
+            name='_django_curs_%d_%d' % (
+                # Avoid reusing name in other threads
+                threading.current_thread().ident,
+                self._named_cursor_idx,
+            )
+        )
 
     def _set_autocommit(self, autocommit):
         with self.wrap_database_errors:
@@ -216,8 +239,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def check_constraints(self, table_names=None):
         """
-        To check constraints, we set constraints to immediate. Then, when, we're done we must ensure they
-        are returned to deferred.
+        Check constraints by setting them to immediate. Return them to deferred
+        afterward.
         """
         self.cursor().execute('SET CONSTRAINTS ALL IMMEDIATE')
         self.cursor().execute('SET CONSTRAINTS ALL DEFERRED')
@@ -233,7 +256,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @property
     def _nodb_connection(self):
-        nodb_connection = super(DatabaseWrapper, self)._nodb_connection
+        nodb_connection = super()._nodb_connection
         try:
             nodb_connection.ensure_connection()
         except (Database.DatabaseError, WrappedDatabaseError):
@@ -242,22 +265,19 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 "to avoid running initialization queries against the production "
                 "database when it's not needed (for example, when running tests). "
                 "Django was unable to create a connection to the 'postgres' database "
-                "and will use the default database instead.",
+                "and will use the first PostgreSQL database instead.",
                 RuntimeWarning
             )
-            settings_dict = self.settings_dict.copy()
-            settings_dict['NAME'] = settings.DATABASES[DEFAULT_DB_ALIAS]['NAME']
-            nodb_connection = self.__class__(
-                self.settings_dict.copy(),
-                alias=self.alias,
-                allow_thread_sharing=False)
+            for connection in connections.all():
+                if connection.vendor == 'postgresql' and connection.settings_dict['NAME'] != 'postgres':
+                    return self.__class__(
+                        {**self.settings_dict, 'NAME': connection.settings_dict['NAME']},
+                        alias=self.alias,
+                        allow_thread_sharing=False,
+                    )
         return nodb_connection
-
-    @cached_property
-    def psycopg2_version(self):
-        return PSYCOPG2_VERSION
 
     @cached_property
     def pg_version(self):
         with self.temporary_connection():
-            return get_version(self.connection)
+            return self.connection.server_version

@@ -1,13 +1,8 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import unittest
-from unittest import skipUnless
 
-from django.contrib.gis.gdal import HAS_GDAL
-
-if HAS_GDAL:
-    from django.contrib.gis.gdal import SpatialReference, CoordTransform, GDALException, SRSException
+from django.contrib.gis.gdal import (
+    CoordTransform, GDALException, SpatialReference, SRSException,
+)
 
 
 class TestSRS:
@@ -15,6 +10,7 @@ class TestSRS:
         self.wkt = wkt
         for key, value in kwargs.items():
             setattr(self, key, value)
+
 
 WGS84_proj = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs '
 
@@ -150,7 +146,6 @@ bad_srlist = (
 )
 
 
-@skipUnless(HAS_GDAL, "GDAL is required")
 class SpatialRefTest(unittest.TestCase):
 
     def test01_wkt(self):
@@ -182,8 +177,8 @@ class SpatialRefTest(unittest.TestCase):
         ]
         srs1 = SpatialReference(srlist[0].wkt)
         srs2 = SpatialReference(WGS84_proj)
-        self.assertTrue(all([part in proj_parts for part in srs1.proj.split()]))
-        self.assertTrue(all([part in proj_parts for part in srs2.proj.split()]))
+        self.assertTrue(all(part in proj_parts for part in srs1.proj.split()))
+        self.assertTrue(all(part in proj_parts for part in srs2.proj.split()))
 
     def test05_epsg(self):
         "Test EPSG import."

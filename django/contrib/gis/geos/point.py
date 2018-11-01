@@ -1,12 +1,9 @@
-import warnings
 from ctypes import c_uint
 
+from django.contrib.gis import gdal
 from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.geos.geometry import GEOSGeometry
-from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.six.moves import range
 
 
 class Point(GEOSGeometry):
@@ -19,18 +16,18 @@ class Point(GEOSGeometry):
         The Point object may be initialized with either a tuple, or individual
         parameters.
 
-        For Example:
-        >>> p = Point((5, 23)) # 2D point, passed in as a tuple
-        >>> p = Point(5, 23, 8) # 3D point, passed in with individual parameters
+        For example:
+        >>> p = Point((5, 23))  # 2D point, passed in as a tuple
+        >>> p = Point(5, 23, 8)  # 3D point, passed in with individual parameters
         """
         if x is None:
             coords = []
         elif isinstance(x, (tuple, list)):
             # Here a tuple or list was passed in under the `x` parameter.
             coords = x
-        elif isinstance(x, six.integer_types + (float,)) and isinstance(y, six.integer_types + (float,)):
+        elif isinstance(x, (float, int)) and isinstance(y, (float, int)):
             # Here X, Y, and (optionally) Z were passed in individually, as parameters.
-            if isinstance(z, six.integer_types + (float,)):
+            if isinstance(z, (float, int)):
                 coords = [x, y, z]
             else:
                 coords = [x, y]
@@ -41,9 +38,23 @@ class Point(GEOSGeometry):
 
         # Initializing using the address returned from the GEOS
         #  createPoint factory.
-        super(Point, self).__init__(point, srid=srid)
+        super().__init__(point, srid=srid)
 
-    def _create_point(self, ndim, coords):
+    def _to_pickle_wkb(self):
+        return None if self.empty else super()._to_pickle_wkb()
+
+    def _from_pickle_wkb(self, wkb):
+        return self._create_empty() if wkb is None else super()._from_pickle_wkb(wkb)
+
+    def _ogr_ptr(self):
+        return gdal.geometries.Point._create_empty() if self.empty else super()._ogr_ptr()
+
+    @classmethod
+    def _create_empty(cls):
+        return cls._create_point(None, None)
+
+    @classmethod
+    def _create_point(cls, ndim, coords):
         """
         Create a coordinate sequence, set X, Y, [Z], and create point
         """
@@ -51,7 +62,7 @@ class Point(GEOSGeometry):
             return capi.create_point(None)
 
         if ndim < 2 or ndim > 3:
-            raise TypeError('Invalid point dimension: %s' % str(ndim))
+            raise TypeError('Invalid point dimension: %s' % ndim)
 
         cs = capi.create_cs(c_uint(1), c_uint(ndim))
         i = iter(coords)
@@ -67,7 +78,7 @@ class Point(GEOSGeometry):
         if ptr:
             capi.destroy_geom(self.ptr)
             self._ptr = ptr
-            self._set_cs()
+            self._post_init()
         else:
             # can this happen?
             raise GEOSException('Geometry resulting from slice deletion was invalid.')
@@ -76,12 +87,12 @@ class Point(GEOSGeometry):
         self._cs.setOrdinate(index, 0, value)
 
     def __iter__(self):
-        "Allows iteration over coordinates of this Point."
+        "Iterate over coordinates of this Point."
         for i in range(len(self)):
             yield self[i]
 
     def __len__(self):
-        "Returns the number of dimensions for this Point (either 0, 2 or 3)."
+        "Return the number of dimensions for this Point (either 0, 2 or 3)."
         if self.empty:
             return 0
         if self.hasz:
@@ -101,102 +112,46 @@ class Point(GEOSGeometry):
 
     @property
     def x(self):
-        "Returns the X component of the Point."
+        "Return the X component of the Point."
         return self._cs.getOrdinate(0, 0)
 
     @x.setter
     def x(self, value):
-        "Sets the X component of the Point."
+        "Set the X component of the Point."
         self._cs.setOrdinate(0, 0, value)
 
     @property
     def y(self):
-        "Returns the Y component of the Point."
+        "Return the Y component of the Point."
         return self._cs.getOrdinate(1, 0)
 
     @y.setter
     def y(self, value):
-        "Sets the Y component of the Point."
+        "Set the Y component of the Point."
         self._cs.setOrdinate(1, 0, value)
 
     @property
     def z(self):
-        "Returns the Z component of the Point."
+        "Return the Z component of the Point."
         return self._cs.getOrdinate(2, 0) if self.hasz else None
 
     @z.setter
     def z(self, value):
-        "Sets the Z component of the Point."
+        "Set the Z component of the Point."
         if not self.hasz:
             raise GEOSException('Cannot set Z on 2D Point.')
         self._cs.setOrdinate(2, 0, value)
 
-    def get_x(self):
-        warnings.warn(
-            "`get_x()` is deprecated, use the `x` property instead.",
-            RemovedInDjango20Warning, 2
-        )
-        return self.x
-
-    def set_x(self, value):
-        warnings.warn(
-            "`set_x()` is deprecated, use the `x` property instead.",
-            RemovedInDjango20Warning, 2
-        )
-        self.x = value
-
-    def get_y(self):
-        warnings.warn(
-            "`get_y()` is deprecated, use the `y` property instead.",
-            RemovedInDjango20Warning, 2
-        )
-        return self.y
-
-    def set_y(self, value):
-        warnings.warn(
-            "`set_y()` is deprecated, use the `y` property instead.",
-            RemovedInDjango20Warning, 2
-        )
-        self.y = value
-
-    def get_z(self):
-        warnings.warn(
-            "`get_z()` is deprecated, use the `z` property instead.",
-            RemovedInDjango20Warning, 2
-        )
-        return self.z
-
-    def set_z(self, value):
-        warnings.warn(
-            "`set_z()` is deprecated, use the `z` property instead.",
-            RemovedInDjango20Warning, 2
-        )
-        self.z = value
-
     # ### Tuple setting and retrieval routines. ###
     @property
     def tuple(self):
-        "Returns a tuple of the point."
+        "Return a tuple of the point."
         return self._cs.tuple
 
     @tuple.setter
     def tuple(self, tup):
-        "Sets the coordinates of the point with the given tuple."
+        "Set the coordinates of the point with the given tuple."
         self._cs[0] = tup
-
-    def get_coords(self):
-        warnings.warn(
-            "`get_coords()` is deprecated, use the `tuple` property instead.",
-            RemovedInDjango20Warning, 2
-        )
-        return self.tuple
-
-    def set_coords(self, tup):
-        warnings.warn(
-            "`set_coords()` is deprecated, use the `tuple` property instead.",
-            RemovedInDjango20Warning, 2
-        )
-        self.tuple = tup
 
     # The tuple and coords properties
     coords = tuple

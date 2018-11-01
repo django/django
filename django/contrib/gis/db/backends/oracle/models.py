@@ -9,10 +9,8 @@
 """
 from django.contrib.gis.db import models
 from django.contrib.gis.db.backends.base.models import SpatialRefSysMixin
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class OracleGeometryColumns(models.Model):
     "Maps to the Oracle USER_SDO_GEOM_METADATA table."
     table_name = models.CharField(max_length=32)
@@ -28,7 +26,7 @@ class OracleGeometryColumns(models.Model):
     @classmethod
     def table_name_col(cls):
         """
-        Returns the name of the metadata column used to store the feature table
+        Return the name of the metadata column used to store the feature table
         name.
         """
         return 'table_name'
@@ -36,7 +34,7 @@ class OracleGeometryColumns(models.Model):
     @classmethod
     def geom_col_name(cls):
         """
-        Returns the name of the metadata column used to store the feature
+        Return the name of the metadata column used to store the feature
         geometry column.
         """
         return 'column_name'
@@ -55,7 +53,6 @@ class OracleSpatialRefSys(models.Model, SpatialRefSysMixin):
     # Optional geometry representing the bounds of this coordinate
     # system.  By default, all are NULL in the table.
     cs_bounds = models.PolygonField(null=True)
-    objects = models.GeoManager()
 
     class Meta:
         app_label = 'gis'

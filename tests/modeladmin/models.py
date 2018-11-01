@@ -1,10 +1,7 @@
-# -*- coding: utf-8 -*-
 from django.contrib.auth.models import User
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Band(models.Model):
     name = models.CharField(max_length=100)
     bio = models.TextField()
@@ -12,6 +9,15 @@ class Band(models.Model):
 
     class Meta:
         ordering = ('name',)
+
+    def __str__(self):
+        return self.name
+
+
+class Song(models.Model):
+    name = models.CharField(max_length=100)
+    band = models.ForeignKey(Band, models.CASCADE)
+    featuring = models.ManyToManyField(Band, related_name='featured')
 
     def __str__(self):
         return self.name
@@ -36,6 +42,7 @@ class ValidationTestModel(models.Model):
     is_active = models.BooleanField(default=False)
     pub_date = models.DateTimeField()
     band = models.ForeignKey(Band, models.CASCADE)
+    best_friend = models.OneToOneField(User, models.CASCADE, related_name='best_friend')
     # This field is intentionally 2 characters long (#16080).
     no = models.IntegerField(verbose_name="Number", blank=True, null=True)
 

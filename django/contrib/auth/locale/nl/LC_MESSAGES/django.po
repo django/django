@@ -4,19 +4,20 @@
 # Bas Peschier <bas.peschier@gmail.com>, 2013
 # Erik Romijn <transifex@solidlinks.nl>, 2013
 # Erik Romijn <transifex@solidlinks.nl>, 2013
+# Evelijn Saaltink <evelijnsaaltink@gmail.com>, 2016
 # Harro van der Klauw <hvdklauw@gmail.com>, 2012
 # Ilja Maas <iljamaas@dreamsolution.nl>, 2015
 # jaap3 <jaap.roes@gmail.com>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeffrey Gelens <jeffrey@noppo.pro>, 2011-2012
-# Sander Steffann <sander@steffann.nl>, 2015
+# Sander Steffann <inactive+steffann@transifex.com>, 2015
 # Tino de Bruijn <tinodb@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 08:39+0000\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-09-24 14:24+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -74,12 +75,8 @@ msgstr "Vul  ter verificatie nogmaals het wachtwoord in."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Wachtwoorden worden niet als tekst opgeslagen. Er is geen mogelijkheid het "
-"wachtwoord van een gebruiker te zien.  Het wachtwoord kan wel worden "
-"aangepast met <a href=\"../password/\">dit formulier</a>."
 
 #, python-format
 msgid ""
@@ -125,19 +122,19 @@ msgid "hash"
 msgstr "hash"
 
 msgid "variety"
-msgstr ""
+msgstr "variatie"
 
 msgid "version"
-msgstr ""
+msgstr "versie"
 
 msgid "memory cost"
-msgstr ""
+msgstr "geheugenkosten"
 
 msgid "time cost"
-msgstr ""
+msgstr "tijdskosten"
 
 msgid "parallelism"
-msgstr ""
+msgstr "evenwijdigheid"
 
 msgid "work factor"
 msgstr "arbeidsfactor"
@@ -194,6 +191,8 @@ msgstr "gebruikersnaam"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
+"Vereist. 150 tekens of minder. Alleen letters, cijfers en @/,/+/-/_ tekens "
+"zijn toegestaan."
 
 msgid "A user with that username already exists."
 msgstr "Een gebruiker met deze gebruikersnaam bestaat al."
@@ -278,11 +277,15 @@ msgid ""
 "Enter a valid username. This value may contain only English letters, "
 "numbers, and @/./+/-/_ characters."
 msgstr ""
+"Geef een geldige gebruikersnaam op. Deze waarde mag alleen Engelse letters, "
+"cijfers en de tekens @/./+/-/_ bevatten."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
 msgstr ""
+"Geef een geldige gebruikersnaam op. Deze waarde mag alleen letters, cijfers "
+"en de tekens @/./+/-/_ bevatten."
 
 msgid "Logged out"
 msgstr "Afmelden"

@@ -47,8 +47,7 @@ class NullBooleanSelectTest(WidgetTest):
     @override_settings(USE_L10N=True)
     def test_l10n(self):
         """
-        Ensure that the NullBooleanSelect widget's options are lazily
-        localized (#17190).
+        The NullBooleanSelect widget's options are lazily localized (#17190).
         """
         widget = NullBooleanSelect()
 

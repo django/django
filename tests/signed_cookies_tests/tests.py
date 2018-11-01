@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.core import signing
 from django.http import HttpRequest, HttpResponse
 from django.test import SimpleTestCase, override_settings

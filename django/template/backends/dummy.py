@@ -1,8 +1,3 @@
-# Since this package contains a "django" module, this is required on Python 2.
-from __future__ import absolute_import
-
-import errno
-import io
 import string
 
 from django.conf import settings
@@ -24,7 +19,7 @@ class TemplateStrings(BaseEngine):
         if options:
             raise ImproperlyConfigured(
                 "Unknown options: {}".format(", ".join(options)))
-        super(TemplateStrings, self).__init__(params)
+        super().__init__(params)
 
     def from_string(self, template_code):
         return Template(template_code)
@@ -33,21 +28,16 @@ class TemplateStrings(BaseEngine):
         tried = []
         for template_file in self.iter_template_filenames(template_name):
             try:
-                with io.open(template_file, encoding=settings.FILE_CHARSET) as fp:
+                with open(template_file, encoding=settings.FILE_CHARSET) as fp:
                     template_code = fp.read()
-            except IOError as e:
-                if e.errno == errno.ENOENT:
-                    tried.append((
-                        Origin(template_file, template_name, self),
-                        'Source does not exist',
-                    ))
-                    continue
-                raise
-
-            return Template(template_code)
-
-        else:
-            raise TemplateDoesNotExist(template_name, tried=tried, backend=self)
+            except FileNotFoundError:
+                tried.append((
+                    Origin(template_file, template_name, self),
+                    'Source does not exist',
+                ))
+            else:
+                return Template(template_code)
+        raise TemplateDoesNotExist(template_name, tried=tried, backend=self)
 
 
 class Template(string.Template):

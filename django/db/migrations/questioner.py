@@ -1,20 +1,18 @@
-from __future__ import print_function, unicode_literals
-
+import datetime
 import importlib
 import os
 import sys
 
 from django.apps import apps
 from django.db.models.fields import NOT_PROVIDED
-from django.utils import datetime_safe, six, timezone
-from django.utils.six.moves import input
+from django.utils import timezone
 
 from .loader import MigrationLoader
 
 
-class MigrationQuestioner(object):
+class MigrationQuestioner:
     """
-    Gives the autodetector responses to questions it might have.
+    Give the autodetector responses to questions it might have.
     This base class has a built-in noninteractive mode, but the
     interactive subclass is what the command-line arguments will use.
     """
@@ -25,13 +23,13 @@ class MigrationQuestioner(object):
         self.dry_run = dry_run
 
     def ask_initial(self, app_label):
-        "Should we create an initial migration for the app?"
+        """Should we create an initial migration for the app?"""
         # If it was specified on the command line, definitely true
         if app_label in self.specified_apps:
             return True
         # Otherwise, we look to see if it has a migrations module
         # without any Python files in it, apart from __init__.py.
-        # Apps from the new app template will have these; the python
+        # Apps from the new app template will have these; the Python
         # file check will ensure we skip South ones.
         try:
             app_config = apps.get_app_config(app_label)
@@ -46,7 +44,8 @@ class MigrationQuestioner(object):
         except ImportError:
             return self.defaults.get("ask_initial", False)
         else:
-            if hasattr(migrations_module, "__file__"):
+            # getattr() needed on PY36 and older (replace with attribute access).
+            if getattr(migrations_module, "__file__", None):
                 filenames = os.listdir(os.path.dirname(migrations_module.__file__))
             elif hasattr(migrations_module, "__path__"):
                 if len(migrations_module.__path__) > 1:
@@ -55,29 +54,29 @@ class MigrationQuestioner(object):
             return not any(x.endswith(".py") for x in filenames if x != "__init__.py")
 
     def ask_not_null_addition(self, field_name, model_name):
-        "Adding a NOT NULL field to a model"
+        """Adding a NOT NULL field to a model."""
         # None means quit
         return None
 
     def ask_not_null_alteration(self, field_name, model_name):
-        "Changing a NULL field to NOT NULL"
+        """Changing a NULL field to NOT NULL."""
         # None means quit
         return None
 
     def ask_rename(self, model_name, old_name, new_name, field_instance):
-        "Was this field really renamed?"
+        """Was this field really renamed?"""
         return self.defaults.get("ask_rename", False)
 
     def ask_rename_model(self, old_model_state, new_model_state):
-        "Was this model really renamed?"
+        """Was this model really renamed?"""
         return self.defaults.get("ask_rename_model", False)
 
     def ask_merge(self, app_label):
-        "Do you really want to merge these migrations?"
+        """Do you really want to merge these migrations?"""
         return self.defaults.get("ask_merge", False)
 
     def ask_auto_now_add_addition(self, field_name, model_name):
-        "Adding an auto_now_add field to a model"
+        """Adding an auto_now_add field to a model."""
         # None means quit
         return None
 
@@ -88,7 +87,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
         result = input("%s " % question)
         if not result and default is not None:
             return default
-        while len(result) < 1 or result[0].lower() not in "yn":
+        while not result or result[0].lower() not in "yn":
             result = input("Please answer yes or no: ")
         return result[0].lower() == "y"
 
@@ -100,10 +99,11 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
         while True:
             try:
                 value = int(result)
-                if 0 < value <= len(choices):
-                    return value
             except ValueError:
                 pass
+            else:
+                if 0 < value <= len(choices):
+                    return value
             result = input("Please select a valid option: ")
 
     def _ask_default(self, default=''):
@@ -127,13 +127,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                 prompt = "[default: {}] >>> ".format(default)
             else:
                 prompt = ">>> "
-            if six.PY3:
-                # Six does not correctly abstract over the fact that
-                # py3 input returns a unicode string, while py2 raw_input
-                # returns a bytestring.
-                code = input(prompt)
-            else:
-                code = input(prompt).decode(sys.stdin.encoding)
+            code = input(prompt)
             if not code and default:
                 code = default
             if not code:
@@ -142,12 +136,12 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                 sys.exit(1)
             else:
                 try:
-                    return eval(code, {}, {"datetime": datetime_safe, "timezone": timezone})
+                    return eval(code, {}, {'datetime': datetime, 'timezone': timezone})
                 except (SyntaxError, NameError) as e:
                     print("Invalid input: %s" % e)
 
     def ask_not_null_addition(self, field_name, model_name):
-        "Adding a NOT NULL field to a model"
+        """Adding a NOT NULL field to a model."""
         if not self.dry_run:
             choice = self._choice_input(
                 "You are trying to add a non-nullable field '%s' to %s without a default; "
@@ -166,7 +160,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
         return None
 
     def ask_not_null_alteration(self, field_name, model_name):
-        "Changing a NULL field to NOT NULL"
+        """Changing a NULL field to NOT NULL."""
         if not self.dry_run:
             choice = self._choice_input(
                 "You are trying to change the nullable field '%s' on %s to non-nullable "
@@ -191,13 +185,13 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
         return None
 
     def ask_rename(self, model_name, old_name, new_name, field_instance):
-        "Was this field really renamed?"
+        """Was this field really renamed?"""
         msg = "Did you rename %s.%s to %s.%s (a %s)? [y/N]"
         return self._boolean_input(msg % (model_name, old_name, model_name, new_name,
                                           field_instance.__class__.__name__), False)
 
     def ask_rename_model(self, old_model_state, new_model_state):
-        "Was this model really renamed?"
+        """Was this model really renamed?"""
         msg = "Did you rename the %s.%s model to %s? [y/N]"
         return self._boolean_input(msg % (old_model_state.app_label, old_model_state.name,
                                           new_model_state.name), False)
@@ -211,7 +205,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
         )
 
     def ask_auto_now_add_addition(self, field_name, model_name):
-        "Adding an auto_now_add field to a model"
+        """Adding an auto_now_add field to a model."""
         if not self.dry_run:
             choice = self._choice_input(
                 "You are trying to add the field '{}' with 'auto_now_add=True' "

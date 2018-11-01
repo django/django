@@ -1,6 +1,3 @@
-from importlib import import_module
-
-from django.core.management.base import CommandError
 from django.core.management.templates import TemplateCommand
 
 
@@ -12,18 +9,6 @@ class Command(TemplateCommand):
     missing_args_message = "You must provide an application name."
 
     def handle(self, **options):
-        app_name, target = options.pop('name'), options.pop('directory')
-        self.validate_name(app_name, "app")
-
-        # Check that the app_name cannot be imported.
-        try:
-            import_module(app_name)
-        except ImportError:
-            pass
-        else:
-            raise CommandError(
-                "%r conflicts with the name of an existing Python module and "
-                "cannot be used as an app name. Please try another name." % app_name
-            )
-
-        super(Command, self).handle('app', app_name, target, **options)
+        app_name = options.pop('name')
+        target = options.pop('directory')
+        super().handle('app', app_name, target, **options)

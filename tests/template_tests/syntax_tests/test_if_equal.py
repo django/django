@@ -1,3 +1,5 @@
+from django.template import TemplateSyntaxError
+from django.template.defaulttags import IfEqualNode
 from django.test import SimpleTestCase
 
 from ..utils import setup
@@ -215,3 +217,14 @@ class IfNotEqualTagTests(SimpleTestCase):
     def test_ifnotequal04(self):
         output = self.engine.render_to_string('ifnotequal04', {'a': 1, 'b': 1})
         self.assertEqual(output, 'no')
+
+    @setup({'one_var': '{% ifnotequal a %}yes{% endifnotequal %}'})
+    def test_one_var(self):
+        with self.assertRaisesMessage(TemplateSyntaxError, "'ifnotequal' takes two arguments"):
+            self.engine.render_to_string('one_var', {'a': 1})
+
+
+class IfEqualTests(SimpleTestCase):
+    def test_repr(self):
+        node = IfEqualNode(var1='a', var2='b', nodelist_true=[], nodelist_false=[], negate=False)
+        self.assertEqual(repr(node), '<IfEqualNode>')

@@ -1,9 +1,5 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.template.defaultfilters import urlize
 from django.test import SimpleTestCase
-from django.utils import six
 from django.utils.functional import lazy
 from django.utils.safestring import mark_safe
 
@@ -282,6 +278,24 @@ class FunctionTests(SimpleTestCase):
             'http://168.192.0.1](http://168.192.0.1)</a>',
         )
 
+    def test_wrapping_characters(self):
+        wrapping_chars = (
+            ('()', ('(', ')')),
+            ('<>', ('&lt;', '&gt;')),
+            ('[]', ('[', ']')),
+            ('""', ('&quot;', '&quot;')),
+            ("''", ('&#39;', '&#39;')),
+        )
+        for wrapping_in, (start_out, end_out) in wrapping_chars:
+            with self.subTest(wrapping_in=wrapping_in):
+                start_in, end_in = wrapping_in
+                self.assertEqual(
+                    urlize(start_in + 'https://www.example.org/' + end_in),
+                    start_out +
+                    '<a href="https://www.example.org/" rel="nofollow">https://www.example.org/</a>' +
+                    end_out,
+                )
+
     def test_ipv4(self):
         self.assertEqual(
             urlize('http://192.168.0.15/api/9'),
@@ -370,7 +384,7 @@ class FunctionTests(SimpleTestCase):
         )
 
     def test_lazystring(self):
-        prepend_www = lazy(lambda url: 'www.' + url, six.text_type)
+        prepend_www = lazy(lambda url: 'www.' + url, str)
         self.assertEqual(
             urlize(prepend_www('google.com')),
             '<a href="http://www.google.com" rel="nofollow">www.google.com</a>',

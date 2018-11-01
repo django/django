@@ -1,11 +1,11 @@
-from django import http
 from django.core.exceptions import PermissionDenied
+from django.http import Http404, HttpResponse
 from django.template import engines
 from django.template.response import TemplateResponse
 
 
 def normal_view(request):
-    return http.HttpResponse('OK')
+    return HttpResponse('OK')
 
 
 def template_response(request):
@@ -19,7 +19,7 @@ def template_response_error(request):
 
 
 def not_found(request):
-    raise http.Http404()
+    raise Http404()
 
 
 def server_error(request):
@@ -35,7 +35,7 @@ def permission_denied(request):
 
 
 def exception_in_render(request):
-    class CustomHttpResponse(http.HttpResponse):
+    class CustomHttpResponse(HttpResponse):
         def render(self):
             raise Exception('Exception in HttpResponse.render()')
 

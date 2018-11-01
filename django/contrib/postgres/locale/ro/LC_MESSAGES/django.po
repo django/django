@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2015
+# Bogdan Mateescu, 2018
+# Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2015,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-07-15 09:52+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 06:23+0000\n"
+"Last-Translator: Bogdan Mateescu\n"
 "Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
@@ -22,18 +23,18 @@ msgid "PostgreSQL extensions"
 msgstr "Extensiile PostgreSQL"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
-msgstr "Elementul %(nth)s din vector nu a fost validat:"
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "Elementul %(nth)s din mulțime nu s-a validat:"
 
 msgid "Nested arrays must have the same length."
 msgstr "Vectorii imbricați trebuie să aibă aceeași lungime."
 
-msgid "Map of strings to strings"
-msgstr "Asociere de șiruri de caractere cu șiruri de caractere"
+msgid "Map of strings to strings/nulls"
+msgstr "Asociere de șiruri de caractere cu șiruri de caractere/null."
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "Valoarea lui \"%(key)s\" nu este un șir de caractere."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "Valoarea lui \"%(key)s\" nu este un șir de caractere sau null."
 
 msgid "A JSON object"
 msgstr "Un obiect JSON"
@@ -45,7 +46,7 @@ msgid "Could not load JSON data."
 msgstr "Nu am putut încărca datele JSON."
 
 msgid "Input must be a JSON dictionary."
-msgstr ""
+msgstr "Intrarea trebuie să fie un dicționar JSON valid."
 
 #, python-format
 msgid "'%(value)s' value must be valid JSON."

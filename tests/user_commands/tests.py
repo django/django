@@ -1,17 +1,19 @@
 import os
+from io import StringIO
+from unittest import mock
 
 from admin_scripts.tests import AdminScriptTestCase
 
 from django.apps import apps
 from django.core import management
 from django.core.management import BaseCommand, CommandError, find_commands
-from django.core.management.utils import find_command, popen_wrapper
+from django.core.management.utils import (
+    find_command, get_random_secret_key, popen_wrapper,
+)
 from django.db import connection
-from django.test import SimpleTestCase, mock, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, extend_sys_path
 from django.utils import translation
-from django.utils._os import upath
-from django.utils.six import StringIO
 
 from .management.commands import dance
 
@@ -45,8 +47,8 @@ class CommandTests(SimpleTestCase):
             self.assertEqual(translation.get_language(), 'fr')
 
     def test_explode(self):
-        """ Test that an unknown command raises CommandError """
-        with self.assertRaises(CommandError):
+        """ An unknown command raises CommandError """
+        with self.assertRaisesMessage(CommandError, "Unknown command: 'explode'"):
             management.call_command(('explode',))
 
     def test_system_exit(self):
@@ -55,21 +57,24 @@ class CommandTests(SimpleTestCase):
         """
         with self.assertRaises(CommandError):
             management.call_command('dance', example="raise")
-        with captured_stderr() as stderr, self.assertRaises(SystemExit):
-            management.ManagementUtility(['manage.py', 'dance', '--example=raise']).execute()
+        dance.Command.requires_system_checks = False
+        try:
+            with captured_stderr() as stderr, self.assertRaises(SystemExit):
+                management.ManagementUtility(['manage.py', 'dance', '--example=raise']).execute()
+        finally:
+            dance.Command.requires_system_checks = True
         self.assertIn("CommandError", stderr.getvalue())
 
-    def test_deactivate_locale_set(self):
-        # Deactivate translation when set to true
+    def test_no_translations_deactivate_translations(self):
+        """
+        When the Command handle method is decorated with @no_translations,
+        translations are deactivated inside the command.
+        """
+        current_locale = translation.get_language()
         with translation.override('pl'):
-            result = management.call_command('leave_locale_alone_false', stdout=StringIO())
+            result = management.call_command('no_translations', stdout=StringIO())
             self.assertIsNone(result)
-
-    def test_configured_locale_preserved(self):
-        # Leaves locale from settings when set to false
-        with translation.override('pl'):
-            result = management.call_command('leave_locale_alone_true', stdout=StringIO())
-            self.assertEqual(result, "pl")
+        self.assertEqual(translation.get_language(), current_locale)
 
     def test_find_command_without_PATH(self):
         """
@@ -86,9 +91,9 @@ class CommandTests(SimpleTestCase):
 
     def test_discover_commands_in_eggs(self):
         """
-        Test that management commands can also be loaded from Python eggs.
+        Management commands can also be loaded from Python eggs.
         """
-        egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
+        egg_dir = '%s/eggs' % os.path.dirname(__file__)
         egg_name = '%s/basic.egg' % egg_dir
         with extend_sys_path(egg_name):
             with self.settings(INSTALLED_APPS=['commandegg']):
@@ -171,6 +176,58 @@ class CommandTests(SimpleTestCase):
         finally:
             dance.Command.requires_migrations_checks = requires_migrations_checks
 
+    def test_call_command_unrecognized_option(self):
+        msg = (
+            'Unknown option(s) for dance command: unrecognized. Valid options '
+            'are: example, force_color, help, integer, no_color, opt_3, '
+            'option3, pythonpath, settings, skip_checks, stderr, stdout, '
+            'style, traceback, verbosity, version.'
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            management.call_command('dance', unrecognized=1)
+
+        msg = (
+            'Unknown option(s) for dance command: unrecognized, unrecognized2. '
+            'Valid options are: example, force_color, help, integer, no_color, '
+            'opt_3, option3, pythonpath, settings, skip_checks, stderr, '
+            'stdout, style, traceback, verbosity, version.'
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            management.call_command('dance', unrecognized=1, unrecognized2=1)
+
+    def test_call_command_with_required_parameters_in_options(self):
+        out = StringIO()
+        management.call_command('required_option', need_me='foo', needme2='bar', stdout=out)
+        self.assertIn('need_me', out.getvalue())
+        self.assertIn('needme2', out.getvalue())
+
+    def test_call_command_with_required_parameters_in_mixed_options(self):
+        out = StringIO()
+        management.call_command('required_option', '--need-me=foo', needme2='bar', stdout=out)
+        self.assertIn('need_me', out.getvalue())
+        self.assertIn('needme2', out.getvalue())
+
+    def test_command_add_arguments_after_common_arguments(self):
+        out = StringIO()
+        management.call_command('common_args', stdout=out)
+        self.assertIn('Detected that --version already exists', out.getvalue())
+
+    def test_subparser(self):
+        out = StringIO()
+        management.call_command('subparser', 'foo', 12, stdout=out)
+        self.assertIn('bar', out.getvalue())
+
+    def test_subparser_invalid_option(self):
+        msg = "Error: invalid choice: 'test' (choose from 'foo')"
+        with self.assertRaisesMessage(CommandError, msg):
+            management.call_command('subparser', 'test', 12)
+
+    def test_create_parser_kwargs(self):
+        """BaseCommand.create_parser() passes kwargs to CommandParser."""
+        epilog = 'some epilog text'
+        parser = BaseCommand().create_parser('prog_name', 'subcommand', epilog=epilog)
+        self.assertEqual(parser.epilog, epilog)
+
 
 class CommandRunTests(AdminScriptTestCase):
     """
@@ -188,9 +245,26 @@ class CommandRunTests(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertEqual(out.strip(), '/PREFIX/some/url/')
 
+    def test_disallowed_abbreviated_options(self):
+        """
+        To avoid conflicts with custom options, commands don't allow
+        abbreviated forms of the --setting and --pythonpath options.
+        """
+        self.write_settings('settings.py', apps=['user_commands'])
+        out, err = self.run_manage(['set_option', '--set', 'foo'])
+        self.assertNoOutput(err)
+        self.assertEqual(out.strip(), 'Set foo')
+
 
 class UtilsTests(SimpleTestCase):
 
     def test_no_existent_external_program(self):
-        with self.assertRaises(CommandError):
+        msg = 'Error executing a_42_command_that_doesnt_exist_42'
+        with self.assertRaisesMessage(CommandError, msg):
             popen_wrapper(['a_42_command_that_doesnt_exist_42'])
+
+    def test_get_random_secret_key(self):
+        key = get_random_secret_key()
+        self.assertEqual(len(key), 50)
+        for char in key:
+            self.assertIn(char, 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)')

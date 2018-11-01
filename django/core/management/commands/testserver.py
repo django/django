@@ -14,7 +14,7 @@ class Command(BaseCommand):
             help='Path(s) to fixtures to load before running the server.',
         )
         parser.add_argument(
-            '--noinput', '--no-input', action='store_false', dest='interactive', default=True,
+            '--noinput', '--no-input', action='store_false', dest='interactive',
             help='Tells Django to NOT prompt the user for input of any kind.',
         )
         parser.add_argument(
@@ -22,7 +22,7 @@ class Command(BaseCommand):
             help='Port number or ipaddr:port to run the server on.',
         )
         parser.add_argument(
-            '--ipv6', '-6', action='store_true', dest='use_ipv6', default=False,
+            '--ipv6', '-6', action='store_true', dest='use_ipv6',
             help='Tells Django to use an IPv6 address.',
         )
 

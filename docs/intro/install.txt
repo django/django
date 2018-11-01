@@ -16,20 +16,13 @@ database called SQLite_ so you won't need to set up a database just yet.
 
 .. _sqlite: https://sqlite.org/
 
-Get the latest version of Python at https://www.python.org/download/ or with
+Get the latest version of Python at https://www.python.org/downloads/ or with
 your operating system's package manager.
-
-.. admonition:: Django on Jython
-
-    If you use Jython_ (a Python implementation for the Java platform), you'll
-    need to follow a few additional steps. See :doc:`/howto/jython` for details.
-
-.. _jython: http://www.jython.org/
 
 You can verify that Python is installed by typing ``python`` from your shell;
 you should see something like::
 
-    Python 3.4.x
+    Python 3.x.y
     [GCC 4.x] on linux
     Type "help", "copyright", "credits" or "license" for more information.
     >>>
@@ -41,24 +34,16 @@ This step is only necessary if you'd like to work with a "large" database engine
 like PostgreSQL, MySQL, or Oracle. To install such a database, consult the
 :ref:`database installation information <database-installation>`.
 
-Remove any old versions of Django
-=================================
-
-If you are upgrading your installation of Django from a previous version, you
-will need to :ref:`uninstall the old Django version before installing the new
-version <removing-old-versions-of-django>`.
-
 Install Django
 ==============
 
 You've got three easy options to install Django:
 
-* Install a version of Django :doc:`provided by your operating system
-  distribution </misc/distributions>`. This is the quickest option for those
-  who have operating systems that distribute Django.
-
 * :ref:`Install an official release <installing-official-release>`. This
   is the best approach for most users.
+
+* Install a version of Django :ref:`provided by your operating system
+  distribution <installing-distribution-package>`.
 
 * :ref:`Install the latest development version
   <installing-development-version>`. This option is for enthusiasts who want

@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
+from django.apps import apps
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.migrations.executor import MigrationExecutor
@@ -20,8 +18,7 @@ class Command(BaseCommand):
             help='Nominates a database to create SQL for. Defaults to the "default" database.',
         )
         parser.add_argument(
-            '--backwards', action='store_true', dest='backwards',
-            default=False,
+            '--backwards', action='store_true',
             help='Creates SQL to unapply the migration, rather than to apply it',
         )
 
@@ -30,7 +27,7 @@ class Command(BaseCommand):
         # no_color=True so that the BEGIN/COMMIT statements added by
         # output_transaction don't get colored either.
         options['no_color'] = True
-        return super(Command, self).execute(*args, **options)
+        return super().execute(*args, **options)
 
     def handle(self, *args, **options):
         # Get the database we're operating from
@@ -41,6 +38,11 @@ class Command(BaseCommand):
 
         # Resolve command-line arguments into a migration
         app_label, migration_name = options['app_label'], options['migration_name']
+        # Validate app_label
+        try:
+            apps.get_app_config(app_label)
+        except LookupError as err:
+            raise CommandError(str(err))
         if app_label not in executor.loader.migrated_apps:
             raise CommandError("App '%s' does not have migrations" % app_label)
         try:

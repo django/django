@@ -1,15 +1,8 @@
-from __future__ import unicode_literals
-
 import re
 import warnings
+from io import StringIO
 
-from django.template.base import (
-    TOKEN_BLOCK, TOKEN_COMMENT, TOKEN_TEXT, TOKEN_VAR, TRANSLATOR_COMMENT_MARK,
-    Lexer,
-)
-from django.utils import six
-from django.utils.encoding import force_text
-from django.utils.six import StringIO
+from django.template.base import TRANSLATOR_COMMENT_MARK, Lexer, TokenType
 
 from . import TranslatorCommentWarning, trim_whitespace
 
@@ -39,13 +32,12 @@ plural_re = re.compile(r"""^\s*plural$""")
 constant_re = re.compile(r"""_\(((?:".*?")|(?:'.*?'))\)""")
 
 
-def templatize(src, origin=None, charset='utf-8'):
+def templatize(src, origin=None):
     """
     Turn a Django template into something that is understood by xgettext. It
     does so by translating the Django translation tags into standard gettext
     function invocations.
     """
-    src = force_text(src, charset)
     out = StringIO('')
     message_context = None
     intrans = False
@@ -57,9 +49,8 @@ def templatize(src, origin=None, charset='utf-8'):
     comment = []
     lineno_comment_map = {}
     comment_lineno_cache = None
-    # Adding the u prefix allows gettext to recognize the Unicode string
-    # (#26093).
-    raw_prefix = 'u' if six.PY3 else ''
+    # Adding the u prefix allows gettext to recognize the string (#26093).
+    raw_prefix = 'u'
 
     def join_tokens(tokens, trim=False):
         message = ''.join(tokens)
@@ -69,7 +60,7 @@ def templatize(src, origin=None, charset='utf-8'):
 
     for t in Lexer(src).tokenize():
         if incomment:
-            if t.token_type == TOKEN_BLOCK and t.contents == 'endcomment':
+            if t.token_type == TokenType.BLOCK and t.contents == 'endcomment':
                 content = ''.join(comment)
                 translators_comment_start = None
                 for lineno, line in enumerate(content.splitlines(True)):
@@ -85,7 +76,7 @@ def templatize(src, origin=None, charset='utf-8'):
             else:
                 comment.append(t.contents)
         elif intrans:
-            if t.token_type == TOKEN_BLOCK:
+            if t.token_type == TokenType.BLOCK:
                 endbmatch = endblock_re.match(t.contents)
                 pluralmatch = plural_re.match(t.contents)
                 if endbmatch:
@@ -136,12 +127,12 @@ def templatize(src, origin=None, charset='utf-8'):
                         "Translation blocks must not include other block tags: "
                         "%s (%sline %d)" % (t.contents, filemsg, t.lineno)
                     )
-            elif t.token_type == TOKEN_VAR:
+            elif t.token_type == TokenType.VAR:
                 if inplural:
                     plural.append('%%(%s)s' % t.contents)
                 else:
                     singular.append('%%(%s)s' % t.contents)
-            elif t.token_type == TOKEN_TEXT:
+            elif t.token_type == TokenType.TEXT:
                 contents = t.contents.replace('%', '%%')
                 if inplural:
                     plural.append(contents)
@@ -153,7 +144,7 @@ def templatize(src, origin=None, charset='utf-8'):
             if comment_lineno_cache is not None:
                 cur_lineno = t.lineno + t.contents.count('\n')
                 if comment_lineno_cache == cur_lineno:
-                    if t.token_type != TOKEN_COMMENT:
+                    if t.token_type != TokenType.COMMENT:
                         for c in lineno_comment_map[comment_lineno_cache]:
                             filemsg = ''
                             if origin:
@@ -169,7 +160,7 @@ def templatize(src, origin=None, charset='utf-8'):
                     out.write('# %s' % ' | '.join(lineno_comment_map[comment_lineno_cache]))
                 comment_lineno_cache = None
 
-            if t.token_type == TOKEN_BLOCK:
+            if t.token_type == TokenType.BLOCK:
                 imatch = inline_re.match(t.contents)
                 bmatch = block_re.match(t.contents)
                 cmatches = constant_re.findall(t.contents)
@@ -217,7 +208,7 @@ def templatize(src, origin=None, charset='utf-8'):
                     incomment = True
                 else:
                     out.write(blankout(t.contents, 'B'))
-            elif t.token_type == TOKEN_VAR:
+            elif t.token_type == TokenType.VAR:
                 parts = t.contents.split('|')
                 cmatch = constant_re.match(parts[0])
                 if cmatch:
@@ -227,7 +218,7 @@ def templatize(src, origin=None, charset='utf-8'):
                         out.write(' %s ' % p.split(':', 1)[1])
                     else:
                         out.write(blankout(p, 'F'))
-            elif t.token_type == TOKEN_COMMENT:
+            elif t.token_type == TokenType.COMMENT:
                 if t.contents.lstrip().startswith(TRANSLATOR_COMMENT_MARK):
                     lineno_comment_map.setdefault(t.lineno, []).append(t.contents)
                     comment_lineno_cache = t.lineno

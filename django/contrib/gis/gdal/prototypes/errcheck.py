@@ -8,18 +8,17 @@ from django.contrib.gis.gdal.error import (
     GDALException, SRSException, check_err,
 )
 from django.contrib.gis.gdal.libgdal import lgdal
-from django.utils import six
 
 
 # Helper routines for retrieving pointers and/or values from
 # arguments passed in by reference.
 def arg_byref(args, offset=-1):
-    "Returns the pointer argument's by-reference value."
+    "Return the pointer argument's by-reference value."
     return args[offset]._obj.value
 
 
 def ptr_byref(args, offset=-1):
-    "Returns the pointer argument passed in by-reference."
+    "Return the pointer argument passed in by-reference."
     return args[offset]._obj
 
 
@@ -38,7 +37,7 @@ def check_const_string(result, func, cargs, offset=None, cpl=False):
 
 def check_string(result, func, cargs, offset=-1, str_result=False):
     """
-    Checks the string output returned from the given function, and frees
+    Check the string output returned from the given function, and free
     the string pointer allocated by OGR.  The `str_result` keyword
     may be used when the result is the string pointer, otherwise
     the OGR error code is assumed.  The `offset` keyword may be used
@@ -69,17 +68,17 @@ def check_string(result, func, cargs, offset=-1, str_result=False):
 
 # ### Envelope checking ###
 def check_envelope(result, func, cargs, offset=-1):
-    "Checks a function that returns an OGR Envelope by reference."
+    "Check a function that returns an OGR Envelope by reference."
     env = ptr_byref(cargs, offset)
     return env
 
 
 # ### Geometry error-checking routines ###
 def check_geom(result, func, cargs):
-    "Checks a function that returns a geometry."
+    "Check a function that returns a geometry."
     # OGR_G_Clone may return an integer, even though the
     # restype is set to c_void_p
-    if isinstance(result, six.integer_types):
+    if isinstance(result, int):
         result = c_void_p(result)
     if not result:
         raise GDALException('Invalid geometry pointer returned from "%s".' % func.__name__)
@@ -87,7 +86,7 @@ def check_geom(result, func, cargs):
 
 
 def check_geom_offset(result, func, cargs, offset=-1):
-    "Chcks the geometry at the given offset in the C parameter list."
+    "Check the geometry at the given offset in the C parameter list."
     check_err(result)
     geom = ptr_byref(cargs, offset=offset)
     return check_geom(geom, func, cargs)
@@ -95,7 +94,7 @@ def check_geom_offset(result, func, cargs, offset=-1):
 
 # ### Spatial Reference error-checking routines ###
 def check_srs(result, func, cargs):
-    if isinstance(result, six.integer_types):
+    if isinstance(result, int):
         result = c_void_p(result)
     if not result:
         raise SRSException('Invalid spatial reference pointer returned from "%s".' % func.__name__)
@@ -120,8 +119,8 @@ def check_errcode(result, func, cargs, cpl=False):
 
 
 def check_pointer(result, func, cargs):
-    "Makes sure the result pointer is valid."
-    if isinstance(result, six.integer_types):
+    "Make sure the result pointer is valid."
+    if isinstance(result, int):
         result = c_void_p(result)
     if result:
         return result

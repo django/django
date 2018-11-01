@@ -6,16 +6,15 @@ from django.contrib.sessions.backends.base import (
 from django.core.exceptions import SuspiciousOperation
 from django.db import DatabaseError, IntegrityError, router, transaction
 from django.utils import timezone
-from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 
 
 class SessionStore(SessionBase):
     """
-    Implements database session store.
+    Implement database session store.
     """
     def __init__(self, session_key=None):
-        super(SessionStore, self).__init__(session_key)
+        super().__init__(session_key)
 
     @classmethod
     def get_model_class(cls):
@@ -28,19 +27,21 @@ class SessionStore(SessionBase):
     def model(self):
         return self.get_model_class()
 
-    def load(self):
+    def _get_session_from_db(self):
         try:
-            s = self.model.objects.get(
+            return self.model.objects.get(
                 session_key=self.session_key,
                 expire_date__gt=timezone.now()
             )
-            return self.decode(s.session_data)
         except (self.model.DoesNotExist, SuspiciousOperation) as e:
             if isinstance(e, SuspiciousOperation):
                 logger = logging.getLogger('django.security.%s' % e.__class__.__name__)
-                logger.warning(force_text(e))
+                logger.warning(str(e))
             self._session_key = None
-            return {}
+
+    def load(self):
+        s = self._get_session_from_db()
+        return self.decode(s.session_data) if s else {}
 
     def exists(self, session_key):
         return self.model.objects.filter(session_key=session_key).exists()
@@ -72,10 +73,9 @@ class SessionStore(SessionBase):
 
     def save(self, must_create=False):
         """
-        Saves the current session data to the database. If 'must_create' is
-        True, a database error will be raised if the saving operation doesn't
-        create a *new* entry (as opposed to possibly updating an existing
-        entry).
+        Save the current session data to the database. If 'must_create' is
+        True, raise a database error if the saving operation doesn't create a
+        new entry (as opposed to possibly updating an existing entry).
         """
         if self.session_key is None:
             return self.create()

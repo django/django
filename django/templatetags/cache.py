@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.core.cache import InvalidCacheBackendError, caches
 from django.core.cache.utils import make_template_fragment_key
 from django.template import (
@@ -22,10 +20,11 @@ class CacheNode(Node):
             expire_time = self.expire_time_var.resolve(context)
         except VariableDoesNotExist:
             raise TemplateSyntaxError('"cache" tag got an unknown variable: %r' % self.expire_time_var.var)
-        try:
-            expire_time = int(expire_time)
-        except (ValueError, TypeError):
-            raise TemplateSyntaxError('"cache" tag got a non-integer timeout value: %r' % expire_time)
+        if expire_time is not None:
+            try:
+                expire_time = int(expire_time)
+            except (ValueError, TypeError):
+                raise TemplateSyntaxError('"cache" tag got a non-integer timeout value: %r' % expire_time)
         if self.cache_name:
             try:
                 cache_name = self.cache_name.resolve(context)

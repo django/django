@@ -1,32 +1,26 @@
 import cgi
-import errno
-import io
 import mimetypes
 import os
 import posixpath
-import re
 import shutil
 import stat
-import sys
 import tempfile
+from importlib import import_module
 from os import path
+from urllib.request import urlretrieve
 
 import django
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import handle_extensions
 from django.template import Context, Engine
-from django.utils import archive, six
-from django.utils.six.moves.urllib.request import urlretrieve
+from django.utils import archive
 from django.utils.version import get_docs_version
-
-_drive_re = re.compile('^([a-z]):', re.I)
-_url_drive_re = re.compile('^([a-z])[:|]', re.I)
 
 
 class TemplateCommand(BaseCommand):
     """
-    Copies either a Django application layout template or a Django project
+    Copy either a Django application layout template or a Django project
     layout template into the specified directory.
 
     :param style: A color style object (see django.core.management.color).
@@ -38,9 +32,6 @@ class TemplateCommand(BaseCommand):
     requires_system_checks = False
     # The supported URL schemes
     url_schemes = ['http', 'https', 'ftp']
-    # Can't perform any active locale changes during this command, because
-    # setting might not be available at all.
-    leave_locale_alone = True
     # Rewrite the following suffixes when determining the target filename.
     rewrite_template_suffixes = (
         # Allow shipping invalid .py files without byte-compilation.
@@ -61,7 +52,7 @@ class TemplateCommand(BaseCommand):
         parser.add_argument(
             '--name', '-n', dest='files',
             action='append', default=[],
-            help='The file name(s) to render. Separate multiple extensions '
+            help='The file name(s) to render. Separate multiple file names '
                  'with commas, or use -n multiple times.'
         )
 
@@ -77,12 +68,10 @@ class TemplateCommand(BaseCommand):
             top_dir = path.join(os.getcwd(), name)
             try:
                 os.makedirs(top_dir)
+            except FileExistsError:
+                raise CommandError("'%s' already exists" % top_dir)
             except OSError as e:
-                if e.errno == errno.EEXIST:
-                    message = "'%s' already exists" % top_dir
-                else:
-                    message = e
-                raise CommandError(message)
+                raise CommandError(e)
         else:
             top_dir = os.path.abspath(path.expanduser(target))
             if not os.path.exists(top_dir):
@@ -107,15 +96,14 @@ class TemplateCommand(BaseCommand):
         camel_case_name = 'camel_case_%s_name' % app_or_project
         camel_case_value = ''.join(x for x in name.title() if x != '_')
 
-        context = Context(dict(options, **{
+        context = Context({
+            **options,
             base_name: name,
             base_directory: top_dir,
             camel_case_name: camel_case_value,
             'docs_version': get_docs_version(),
             'django_version': django.__version__,
-            'unicode_literals': '' if six.PY3 else '# -*- coding: utf-8 -*-\n'
-                                                   'from __future__ import unicode_literals\n\n',
-        }), autoescape=False)
+        }, autoescape=False)
 
         # Setup a stub settings environment for template rendering
         if not settings.configured:
@@ -160,11 +148,11 @@ class TemplateCommand(BaseCommand):
                 # Only render the Python files, as we don't want to
                 # accidentally render Django templates files
                 if new_path.endswith(extensions) or filename in extra_files:
-                    with io.open(old_path, 'r', encoding='utf-8') as template_file:
+                    with open(old_path, 'r', encoding='utf-8') as template_file:
                         content = template_file.read()
                     template = Engine().from_string(content)
                     content = template.render(context)
-                    with io.open(new_path, 'w', encoding='utf-8') as new_file:
+                    with open(new_path, 'w', encoding='utf-8') as new_file:
                         new_file.write(content)
                 else:
                     shutil.copyfile(old_path, new_path)
@@ -191,9 +179,9 @@ class TemplateCommand(BaseCommand):
 
     def handle_template(self, template, subdir):
         """
-        Determines where the app or project templates are.
-        Use django.__path__[0] as the default because we don't
-        know into which directory Django has been installed.
+        Determine where the app or project templates are.
+        Use django.__path__[0] as the default because the Django install
+        directory isn't known.
         """
         if template is None:
             return path.join(django.__path__[0], 'conf', subdir)
@@ -216,29 +204,40 @@ class TemplateCommand(BaseCommand):
                            (self.app_or_project, template))
 
     def validate_name(self, name, app_or_project):
+        a_or_an = 'an' if app_or_project == 'app' else 'a'
         if name is None:
-            raise CommandError("you must provide %s %s name" % (
-                "an" if app_or_project == "app" else "a", app_or_project))
-        # If it's not a valid directory name.
-        if six.PY2:
-            if not re.search(r'^[_a-zA-Z]\w*$', name):
-                # Provide a smart error message, depending on the error.
-                if not re.search(r'^[_a-zA-Z]', name):
-                    message = 'make sure the name begins with a letter or underscore'
-                else:
-                    message = 'use only numbers, letters and underscores'
-                raise CommandError("%r is not a valid %s name. Please %s." %
-                                   (name, app_or_project, message))
-        else:
-            if not name.isidentifier():
-                raise CommandError(
-                    "%r is not a valid %s name. Please make sure the name is "
-                    "a valid identifier." % (name, app_or_project)
+            raise CommandError('you must provide {an} {app} name'.format(
+                an=a_or_an,
+                app=app_or_project,
+            ))
+        # Check it's a valid directory name.
+        if not name.isidentifier():
+            raise CommandError(
+                "'{name}' is not a valid {app} name. Please make sure the "
+                "name is a valid identifier.".format(
+                    name=name,
+                    app=app_or_project,
                 )
+            )
+        # Check it cannot be imported.
+        try:
+            import_module(name)
+        except ImportError:
+            pass
+        else:
+            raise CommandError(
+                "'{name}' conflicts with the name of an existing Python "
+                "module and cannot be used as {an} {app} name. Please try "
+                "another name.".format(
+                    name=name,
+                    an=a_or_an,
+                    app=app_or_project,
+                )
+            )
 
     def download(self, url):
         """
-        Downloads the given URL and returns the file name.
+        Download the given URL and return the file name.
         """
         def cleanup_url(url):
             tmp = url.rstrip('/')
@@ -302,7 +301,7 @@ class TemplateCommand(BaseCommand):
 
     def extract(self, filename):
         """
-        Extracts the given file to a temporarily and returns
+        Extract the given file to a temporarily and return
         the path of the directory with the extracted content.
         """
         prefix = 'django_%s_template_' % self.app_or_project
@@ -318,9 +317,7 @@ class TemplateCommand(BaseCommand):
                                (filename, tempdir, e))
 
     def is_url(self, template):
-        """
-        Returns True if the name looks like a URL
-        """
+        """Return True if the name looks like a URL."""
         if ':' not in template:
             return False
         scheme = template.split(':', 1)[0].lower()
@@ -331,9 +328,6 @@ class TemplateCommand(BaseCommand):
         Make sure that the file is writeable.
         Useful if our source is read-only.
         """
-        if sys.platform.startswith('java'):
-            # On Jython there is no os.access()
-            return
         if not os.access(filename, os.W_OK):
             st = os.stat(filename)
             new_permissions = stat.S_IMODE(st.st_mode) | stat.S_IWUSR

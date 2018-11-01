@@ -26,7 +26,6 @@ used to track the inventory for a series of online bookstores:
 
     class Publisher(models.Model):
         name = models.CharField(max_length=300)
-        num_awards = models.IntegerField()
 
     class Book(models.Model):
         name = models.CharField(max_length=300)
@@ -34,13 +33,12 @@ used to track the inventory for a series of online bookstores:
         price = models.DecimalField(max_digits=10, decimal_places=2)
         rating = models.FloatField()
         authors = models.ManyToManyField(Author)
-        publisher = models.ForeignKey(Publisher)
+        publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE)
         pubdate = models.DateField()
 
     class Store(models.Model):
         name = models.CharField(max_length=300)
         books = models.ManyToManyField(Book)
-        registered_users = models.PositiveIntegerField()
 
 Cheat sheet
 ===========
@@ -67,11 +65,11 @@ In a hurry? Here's how to do common aggregate queries, assuming the models above
     >>> Book.objects.all().aggregate(Max('price'))
     {'price__max': Decimal('81.20')}
 
-    # Cost per page
-    >>> from django.db.models import F, FloatField, Sum
-    >>> Book.objects.all().aggregate(
-    ...    price_per_page=Sum(F('price')/F('pages'), output_field=FloatField()))
-    {'price_per_page': 0.4470664529184653}
+    # Difference between the highest priced book and the average price of all books.
+    >>> from django.db.models import FloatField
+    >>> Book.objects.aggregate(
+    ...     price_diff=Max('price', output_field=FloatField()) - Avg('price'))
+    {'price_diff': 46.85}
 
     # All the following queries involve traversing the Book<->Publisher
     # foreign key relationship backwards.
@@ -83,6 +81,16 @@ In a hurry? Here's how to do common aggregate queries, assuming the models above
     <QuerySet [<Publisher: BaloneyPress>, <Publisher: SalamiPress>, ...]>
     >>> pubs[0].num_books
     73
+
+    # Each publisher, with a separate count of books with a rating above and below 5
+    >>> from django.db.models import Q
+    >>> above_5 = Count('book', filter=Q(book__rating__gt=5))
+    >>> below_5 = Count('book', filter=Q(book__rating__lte=5))
+    >>> pubs = Publisher.objects.annotate(below_5=below_5).annotate(above_5=above_5)
+    >>> pubs[0].above_5
+    23
+    >>> pubs[0].below_5
+    12
 
     # The top 5 publishers, in order by number of books.
     >>> pubs = Publisher.objects.annotate(num_books=Count('book')).order_by('-num_books')[:5]
@@ -139,19 +147,20 @@ Generating aggregates for each item in a ``QuerySet``
 =====================================================
 
 The second way to generate summary values is to generate an independent
-summary for each object in a ``QuerySet``. For example, if you are retrieving
-a list of books, you may want to know how many authors contributed to
-each book. Each Book has a many-to-many relationship with the Author; we
+summary for each object in a :class:`.QuerySet`. For example, if you are
+retrieving a list of books, you may want to know how many authors contributed
+to each book. Each Book has a many-to-many relationship with the Author; we
 want to summarize this relationship for each book in the ``QuerySet``.
 
-Per-object summaries can be generated using the ``annotate()`` clause.
-When an ``annotate()`` clause is specified, each object in the ``QuerySet``
-will be annotated with the specified values.
+Per-object summaries can be generated using the
+:meth:`~.QuerySet.annotate` clause. When an ``annotate()`` clause is
+specified, each object in the ``QuerySet`` will be annotated with the
+specified values.
 
 The syntax for these annotations is identical to that used for the
-``aggregate()`` clause. Each argument to ``annotate()`` describes an
-aggregate that is to be calculated. For example, to annotate books with
-the number of authors:
+:meth:`~.QuerySet.aggregate` clause. Each argument to ``annotate()`` describes
+an aggregate that is to be calculated. For example, to annotate books with the
+number of authors:
 
 .. code-block:: python
 
@@ -267,7 +276,7 @@ For example, we can ask for all publishers, annotated with their respective
 total book stock counters (note how we use ``'book'`` to specify the
 ``Publisher`` -> ``Book`` reverse foreign key hop)::
 
-    >>> from django.db.models import Count, Min, Sum, Avg
+    >>> from django.db.models import Avg, Count, Min, Sum
     >>> Publisher.objects.annotate(Count('book'))
 
 (Every ``Publisher`` in the resulting ``QuerySet`` will have an extra attribute
@@ -314,7 +323,7 @@ constraining the objects for which an annotation is calculated. For example,
 you can generate an annotated list of all books that have a title starting
 with "Django" using the query::
 
-    >>> from django.db.models import Count, Avg
+    >>> from django.db.models import Avg, Count
     >>> Book.objects.filter(name__startswith="Django").annotate(num_authors=Count('authors'))
 
 When used with an ``aggregate()`` clause, a filter has the effect of
@@ -323,6 +332,8 @@ For example, you can generate the average price of all books with a
 title that starts with "Django" using the query::
 
     >>> Book.objects.filter(name__startswith="Django").aggregate(Avg('price'))
+
+.. _filtering-on-annotations:
 
 Filtering on annotations
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -338,6 +349,23 @@ you can issue the query::
 
 This query generates an annotated result set, and then generates a filter
 based upon that annotation.
+
+If you need two annotations with two separate filters you can use the
+``filter`` argument with any aggregate. For example, to generate a list of
+authors with a count of highly rated books::
+
+    >>> highly_rated = Count('books', filter=Q(books__rating__gte=7))
+    >>> Author.objects.annotate(num_books=Count('books'), highly_rated_books=highly_rated)
+
+Each ``Author`` in the result set will have the ``num_books`` and
+``highly_rated_books`` attributes.
+
+.. admonition:: Choosing between ``filter`` and ``QuerySet.filter()``
+
+    Avoid using the ``filter`` argument with a single annotation or
+    aggregation. It's more efficient to use ``QuerySet.filter()`` to exclude
+    rows. The aggregation ``filter`` argument is only useful when using two or
+    more aggregations over the same relations with different conditionals.
 
 Order of ``annotate()`` and ``filter()`` clauses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -482,7 +510,14 @@ include the aggregate column.
 .. _aggregation-ordering-interaction:
 
 Interaction with default ordering or ``order_by()``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. deprecated:: 2.2
+
+    Starting in Django 3.1, the ordering from a model's ``Meta.ordering`` won't
+    be used in ``GROUP BY`` queries, such as ``.annotate().values()``. Since
+    Django 2.2, these queries issue a deprecation warning indicating to add an
+    explicit ``order_by()`` to the queryset to silence the warning.
 
 Fields that are mentioned in the ``order_by()`` part of a queryset (or which
 are used in the default ordering on a model) are used when selecting the
@@ -545,6 +580,6 @@ For example, if you wanted to calculate the average number of authors per
 book you first annotate the set of books with the author count, then
 aggregate that author count, referencing the annotation field::
 
-    >>> from django.db.models import Count, Avg
+    >>> from django.db.models import Avg, Count
     >>> Book.objects.annotate(num_authors=Count('authors')).aggregate(Avg('num_authors'))
     {'num_authors__avg': 1.66}

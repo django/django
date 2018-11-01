@@ -1,13 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Besnik <besnik@programeshqip.org>, 2017-2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-07-15 09:52+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 09:27+0000\n"
+"Last-Translator: Besnik <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
@@ -20,18 +21,18 @@ msgid "PostgreSQL extensions"
 msgstr "Zgjerime PostgreSQL"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
-msgstr "Elementi %(nth)s te vargu s’u vleftësua dot: "
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "Objekti %(nth)s te vargu nuk u vleftësua:"
 
 msgid "Nested arrays must have the same length."
 msgstr "Vargjet brenda vargjesh duhet të kenë të njëjtën gjatësi."
 
-msgid "Map of strings to strings"
-msgstr ""
+msgid "Map of strings to strings/nulls"
+msgstr "Hartë vargjesh te strings/nulls"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "Vlera \"%(key)s\" s’është varg."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "Vlera e \"%(key)s\" s’është varg ose nul."
 
 msgid "A JSON object"
 msgstr "Një objekt JSON"
@@ -43,7 +44,7 @@ msgid "Could not load JSON data."
 msgstr "S’u ngarkuan dot të dhëna JSON."
 
 msgid "Input must be a JSON dictionary."
-msgstr ""
+msgstr "Vlera duhet të jetë një fjalor JSON."
 
 #, python-format
 msgid "'%(value)s' value must be valid JSON."
@@ -56,7 +57,7 @@ msgid "The start of the range must not exceed the end of the range."
 msgstr "Fillimi i një intervali s’duhet të tejkalojë fundin e një intervali."
 
 msgid "Enter two whole numbers."
-msgstr "Jepni dy numra të plotë."
+msgstr "Jepni dy vlera të plota numrash."
 
 msgid "Enter two numbers."
 msgstr "Jepni dy numra."
@@ -106,11 +107,11 @@ msgstr "Janë dhënë kyçe të panjohur: %(keys)s"
 #, python-format
 msgid ""
 "Ensure that this range is completely less than or equal to %(limit_value)s."
-msgstr "Sigurohuni që ky interval është më pak ose baraz me %(limit_value)s."
+msgstr "Sigurohuni që ky interval është më pak ose baras me %(limit_value)s."
 
 #, python-format
 msgid ""
 "Ensure that this range is completely greater than or equal to "
 "%(limit_value)s."
 msgstr ""
-"Sigurohuni që ky interval është më i madh ose baraz me %(limit_value)s."
+"Sigurohuni që ky interval është më i madh ose baras me %(limit_value)s."

@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Aarni Koskela, 2015
+# Aarni Koskela, 2015,2017
 # Elias Luttinen <elias.luttinen@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:51+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-19 16:40+0000\n"
+"Last-Translator: Aarni Koskela\n"
 "Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
@@ -135,7 +135,7 @@ msgid "Arguments"
 msgstr "Argumentit"
 
 msgid "Back to Model documentation"
-msgstr ""
+msgstr "Takaisin mallidokumentaatioon"
 
 msgid "Model documentation"
 msgstr "Mallidokumentaatio"
@@ -210,7 +210,7 @@ msgid "Templates:"
 msgstr "Mallineet:"
 
 msgid "Back to View documentation"
-msgstr ""
+msgstr "Takaisin näkymädokumentaatioon"
 
 msgid "View documentation"
 msgstr "Näkymädokumentaatio"
@@ -236,13 +236,6 @@ msgid ""
 msgstr ""
 "\n"
 "Näkymäfunktio: <code>%(full_name)s</code>. Nimi: <code>%(url_name)s</code>.\n"
-
-msgid "Boolean (Either True or False)"
-msgstr "Totuusarvo: joko tosi (True) tai epätosi (False)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Kenttä tyyppiä: %(field_type)s"
 
 msgid "tag:"
 msgstr "tagi:"

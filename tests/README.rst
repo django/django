@@ -3,7 +3,7 @@ install some requirements and run the tests::
 
     $ cd tests
     $ pip install -e ..
-    $ pip install -r requirements/py3.txt  # or py2.txt
+    $ pip install -r requirements/py3.txt
     $ ./runtests.py
 
 For more information about the test suite, see

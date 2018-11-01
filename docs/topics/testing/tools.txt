@@ -109,7 +109,7 @@ Making requests
 
 Use the ``django.test.Client`` class to make requests.
 
-.. class:: Client(enforce_csrf_checks=False, **defaults)
+.. class:: Client(enforce_csrf_checks=False, json_encoder=DjangoJSONEncoder, **defaults)
 
     It requires no arguments at time of construction. However, you can use
     keywords arguments to specify some default headers. For example, this will
@@ -124,6 +124,13 @@ Use the ``django.test.Client`` class to make requests.
 
     The ``enforce_csrf_checks`` argument can be used to test CSRF
     protection (see above).
+
+    The ``json_encoder`` argument allows setting a custom JSON encoder for
+    the JSON serialization that's described in :meth:`post`.
+
+    .. versionchanged:: 2.1
+
+        The ``json_encoder`` argument was added.
 
     Once you have a ``Client`` instance, you can call any of the following
     methods:
@@ -161,7 +168,7 @@ Use the ``django.test.Client`` class to make requests.
             HTTP request from the browser to the server should be passed
             as ``HTTP_HOST``.
 
-            .. _CGI: http://www.w3.org/CGI/
+            .. _CGI: https://www.w3.org/CGI/
 
         If you already have the GET arguments in URL-encoded form, you can
         use that encoding instead of using the data argument. For example,
@@ -206,9 +213,29 @@ Use the ``django.test.Client`` class to make requests.
 
             name=fred&passwd=secret
 
-        If you provide ``content_type`` (e.g. :mimetype:`text/xml` for an XML
-        payload), the contents of ``data`` will be sent as-is in the POST
-        request, using ``content_type`` in the HTTP ``Content-Type`` header.
+        If you provide ``content_type`` as :mimetype:`application/json`, the
+        ``data`` is serialized using :func:`json.dumps` if it's a dict, list,
+        or tuple. Serialization is performed with
+        :class:`~django.core.serializers.json.DjangoJSONEncoder` by default,
+        and can be overridden by providing a ``json_encoder`` argument to
+        :class:`Client`. This serialization also happens for :meth:`put`,
+        :meth:`patch`, and :meth:`delete` requests.
+
+        .. versionchanged:: 2.1
+
+            The JSON serialization described above was added. In older versions,
+            you can call :func:`json.dumps` on ``data`` before passing it to
+            ``post()`` to achieve the same thing.
+
+        .. versionchanged:: 2.2
+
+            The JSON serialization was extended to support lists and tuples. In
+            older versions, only dicts are serialized.
+
+        If you provide any other ``content_type`` (e.g. :mimetype:`text/xml`
+        for an XML payload), the contents of ``data`` are sent as-is in the
+        POST request, using ``content_type`` in the HTTP ``Content-Type``
+        header.
 
         If you don't provide a value for ``content_type``, the values in
         ``data`` will be transmitted with a content type of
@@ -235,7 +262,15 @@ Use the ``django.test.Client`` class to make requests.
         file-processing code expects.)
 
         You may also provide any file-like object (e.g., :class:`~io.StringIO` or
-        :class:`~io.BytesIO`) as a file handle.
+        :class:`~io.BytesIO`) as a file handle. If you're uploading to an
+        :class:`~django.db.models.ImageField`, the object needs a ``name``
+        attribute that passes the
+        :data:`~django.core.validators.validate_image_file_extension` validator.
+        For example::
+
+            >>> from io import BytesIO
+            >>> img = BytesIO(b'mybinarydata')
+            >>> img.name = 'myimage.jpg'
 
         Note that if you wish to use the same file handle for multiple
         ``post()`` calls then you will need to manually reset the file
@@ -370,12 +405,6 @@ Use the ``django.test.Client`` class to make requests.
         store a correctly hashed password. Alternatively, you can use the
         :meth:`~django.contrib.auth.models.UserManager.create_user` helper
         method to create a new user with a correctly hashed password.
-
-        .. versionchanged:: 1.10
-
-            In previous versions, inactive users (:attr:`is_active=False
-            <django.contrib.auth.models.User.is_active>`) were not permitted
-            to login.
 
     .. method:: Client.force_login(user, backend=None)
 
@@ -669,12 +698,15 @@ A subclass of :class:`unittest.TestCase` that adds this functionality:
 
   * Checking that a callable :meth:`raises a certain exception
     <SimpleTestCase.assertRaisesMessage>`.
+  * Checking that a callable :meth:`triggers a certain warning
+    <SimpleTestCase.assertWarnsMessage>`.
   * Testing form field :meth:`rendering and error treatment
     <SimpleTestCase.assertFieldOutput>`.
   * Testing :meth:`HTML responses for the presence/lack of a given fragment
     <SimpleTestCase.assertContains>`.
   * Verifying that a template :meth:`has/hasn't been used to generate a given
     response content <SimpleTestCase.assertTemplateUsed>`.
+  * Verifying that two :meth:`URLs <SimpleTestCase.assertURLEqual>` are equal.
   * Verifying a HTTP :meth:`redirect <SimpleTestCase.assertRedirects>` is
     performed by the app.
   * Robustly testing two :meth:`HTML fragments <SimpleTestCase.assertHTMLEqual>`
@@ -710,20 +742,20 @@ If your tests make any database queries, use subclasses
 
             @classmethod
             def setUpClass(cls):
-                super(MyTestCase, cls).setUpClass()
+                super().setUpClass()
                 ...
 
             @classmethod
             def tearDownClass(cls):
                 ...
-                super(MyTestCase, cls).tearDownClass()
+                super().tearDownClass()
 
     Be sure to account for Python's behavior if an exception is raised during
     ``setUpClass()``. If that happens, neither the tests in the class nor
     ``tearDownClass()`` are run. In the case of :class:`django.test.TestCase`,
     this will leak the transaction created in ``super()``  which results in
     various symptoms including a segmentation fault on some platforms (reported
-    on OS X). If you want to intentionally raise an exception such as
+    on macOS). If you want to intentionally raise an exception such as
     :exc:`unittest.SkipTest` in ``setUpClass()``, be sure to do it before
     calling ``super()`` to avoid this.
 
@@ -795,11 +827,6 @@ The class:
 
 * Checks deferrable database constraints at the end of each test.
 
-.. versionchanged:: 1.10
-
-    The check for deferrable database constraints at the end of each test was
-    added.
-
 It also provides an additional method:
 
 .. classmethod:: TestCase.setUpTestData()
@@ -856,18 +883,11 @@ The live server listens on ``localhost`` and binds to port 0 which uses a free
 port assigned by the operating system. The server's URL can be accessed with
 ``self.live_server_url`` during the tests.
 
-.. versionchanged:: 1.11
-
-    In older versions, Django tried a predefined port range which could be
-    customized in various ways including the ``DJANGO_LIVE_TEST_SERVER_ADDRESS``
-    environment variable. This is removed in favor of the simpler "bind to port
-    0" technique.
-
 To demonstrate how to use ``LiveServerTestCase``, let's write a simple Selenium
 test. First of all, you need to install the `selenium package`_ into your
 Python path:
 
-.. code-block:: console
+.. console::
 
     $ pip install selenium
 
@@ -891,14 +911,14 @@ The code for this test may look as follows::
 
         @classmethod
         def setUpClass(cls):
-            super(MySeleniumTests, cls).setUpClass()
+            super().setUpClass()
             cls.selenium = WebDriver()
             cls.selenium.implicitly_wait(10)
 
         @classmethod
         def tearDownClass(cls):
             cls.selenium.quit()
-            super(MySeleniumTests, cls).tearDownClass()
+            super().tearDownClass()
 
         def test_login(self):
             self.selenium.get('%s%s' % (self.live_server_url, '/login/'))
@@ -910,7 +930,7 @@ The code for this test may look as follows::
 
 Finally, you may run the test as follows:
 
-.. code-block:: console
+.. console::
 
     $ ./manage.py test myapp.tests.MySeleniumTests.test_login
 
@@ -921,7 +941,7 @@ example above is just a tiny fraction of what the Selenium client can do; check
 out the `full reference`_ for more details.
 
 .. _Selenium: http://seleniumhq.org/
-.. _selenium package: https://pypi.python.org/pypi/selenium
+.. _selenium package: https://pypi.org/project/selenium/
 .. _full reference: https://selenium-python.readthedocs.io/api.html
 .. _Firefox: https://www.mozilla.com/firefox/
 
@@ -1010,7 +1030,7 @@ If you want to use a different ``Client`` class (for example, a subclass
 with customized behavior), use the :attr:`~SimpleTestCase.client_class` class
 attribute::
 
-    from django.test import TestCase, Client
+    from django.test import Client, TestCase
 
     class MyTestClient(Client):
         # Specialized methods for your environment
@@ -1059,7 +1079,7 @@ subclass::
             # Test definitions as before.
             call_setup_methods()
 
-        def testFluffyAnimals(self):
+        def test_fluffy_animals(self):
             # A test that uses the fixtures.
             call_some_test_code()
 
@@ -1094,7 +1114,7 @@ tests can't rely upon the fact that your views will be available at a
 particular URL. Decorate your test class or test method with
 ``@override_settings(ROOT_URLCONF=...)`` for URLconf configuration.
 
-.. _emptying-test-outbox:
+.. _testing-multi-db:
 
 Multi-database support
 ----------------------
@@ -1128,7 +1148,7 @@ This test case will flush *all* the test databases before running
 ``test_index_page_view``.
 
 The ``multi_db`` flag also affects into which databases the
-attr:`TransactionTestCase.fixtures` are loaded. By default (when
+:attr:`TransactionTestCase.fixtures` are loaded. By default (when
 ``multi_db=False``), fixtures are only loaded into the ``default`` database.
 If ``multi_db=True``, fixtures are loaded into all databases.
 
@@ -1263,6 +1283,23 @@ The decorator can also be applied to test case classes::
     decorator. For a given class, :func:`~django.test.modify_settings` is
     always applied after :func:`~django.test.override_settings`.
 
+.. admonition:: Considerations with Python 3.5
+
+    If using Python 3.5 (or older, if using an older version of Django), avoid
+    mixing  ``remove`` with ``append`` and ``prepend`` in
+    :func:`~django.test.modify_settings`. In some cases it matters whether a
+    value is first added and then removed or vice versa, and dictionary key
+    order isn't preserved until Python 3.6. Instead, apply the decorator twice
+    to guarantee the order of operations. For example, to ensure that
+    ``SessionMiddleware`` appears first in ``MIDDLEWARE``::
+
+        @modify_settings(MIDDLEWARE={
+            'remove': ['django.contrib.sessions.middleware.SessionMiddleware'],
+        )
+        @modify_settings(MIDDLEWARE={
+            'prepend': ['django.contrib.sessions.middleware.SessionMiddleware'],
+        })
+
 .. warning::
 
     The settings file contains some settings that are only consulted during
@@ -1310,6 +1347,8 @@ LOCALE_PATHS, LANGUAGE_CODE      Default translation and loaded translations
 MEDIA_ROOT, DEFAULT_FILE_STORAGE Default file storage
 ================================ ========================
 
+.. _emptying-test-outbox:
+
 Emptying the test outbox
 ------------------------
 
@@ -1351,10 +1390,14 @@ your test suite.
         with self.assertRaisesMessage(ValueError, 'invalid literal for int()'):
             int('a')
 
-    .. deprecated:: 1.9
+.. method:: SimpleTestCase.assertWarnsMessage(expected_warning, expected_message, callable, *args, **kwargs)
+            SimpleTestCase.assertWarnsMessage(expected_warning, expected_message)
 
-        Passing ``callable`` as a keyword argument called ``callable_obj`` is
-        deprecated. Pass the callable as a positional argument instead.
+    .. versionadded:: 2.1
+
+    Analogous to :meth:`SimpleTestCase.assertRaisesMessage` but for
+    :meth:`~unittest.TestCase.assertWarnsRegex` instead of
+    :meth:`~unittest.TestCase.assertRaisesRegex`.
 
 .. method:: SimpleTestCase.assertFieldOutput(fieldclass, valid, invalid, field_args=None, field_kwargs=None, empty_value='')
 
@@ -1460,6 +1503,15 @@ your test suite.
     You can use this as a context manager in the same way as
     :meth:`~SimpleTestCase.assertTemplateUsed`.
 
+.. method:: SimpleTestCase.assertURLEqual(url1, url2, msg_prefix='')
+
+    .. versionadded:: 2.2
+
+    Asserts that two URLs are the same, ignoring the order of query string
+    parameters except for parameters with the same name. For example,
+    ``/path/?x=1&y=2`` is equal to ``/path/?y=2&x=1``, but
+    ``/path/?a=1&a=2`` isn't equal to ``/path/?a=2&a=1``.
+
 .. method:: SimpleTestCase.assertRedirects(response, expected_url, status_code=302, target_status_code=200, msg_prefix='', fetch_redirect_response=True)
 
     Asserts that the response returned a ``status_code`` redirect status,
@@ -1471,18 +1523,13 @@ your test suite.
     point of the redirect chain.
 
     If ``fetch_redirect_response`` is ``False``, the final page won't be
-    loaded. Since the test client can't fetch externals URLs, this is
+    loaded. Since the test client can't fetch external URLs, this is
     particularly useful if ``expected_url`` isn't part of your Django app.
 
     Scheme is handled correctly when making comparisons between two URLs. If
     there isn't any scheme specified in the location where we are redirected to,
     the original request's scheme is used. If present, the scheme in
     ``expected_url`` is the one used to make the comparisons to.
-
-    .. deprecated:: 1.9
-
-        The ``host`` argument is deprecated, as redirections are no longer
-        forced to be absolute URLs.
 
 .. method:: SimpleTestCase.assertHTMLEqual(html1, html2, msg=None)
 
@@ -1505,7 +1552,7 @@ your test suite.
         self.assertHTMLEqual(
             '<p>Hello <b>world!</p>',
             '''<p>
-                Hello   <b>world! <b/>
+                Hello   <b>world! </b>
             </p>'''
         )
         self.assertHTMLEqual(
@@ -1614,8 +1661,6 @@ your test suite.
 Tagging tests
 -------------
 
-.. versionadded:: 1.10
-
 You can tag your tests so you can easily run a particular subset. For example,
 you might label fast or slow tests::
 
@@ -1641,21 +1686,40 @@ You can also tag a test case::
     class SampleTestCase(TestCase):
         ...
 
+Subclasses inherit tags from superclasses, and methods inherit tags from their
+class. Given::
+
+    @tag('foo')
+    class SampleTestCaseChild(SampleTestCase):
+
+        @tag('bar')
+        def test(self):
+            ...
+
+``SampleTestCaseChild.test`` will be labeled with ``'slow'``, ``'core'``,
+``'bar'``, and ``'foo'``.
+
+.. versionchanged:: 2.1
+
+   In older versions, tagged tests don't inherit tags from classes, and
+   tagged subclasses don't inherit tags from superclasses. For example,
+   ``SampleTestCaseChild.test`` is labeled only with ``'bar'``.
+
 Then you can choose which tests to run. For example, to run only fast tests:
 
-.. code-block:: console
+.. console::
 
     $ ./manage.py test --tag=fast
 
 Or to run fast tests and the core one (even though it's slow):
 
-.. code-block:: console
+.. console::
 
     $ ./manage.py test --tag=fast --tag=core
 
 You can also exclude tests by tag. To run core tests if they are not slow:
 
-.. code-block:: console
+.. console::
 
     $ ./manage.py test --tag=core --exclude-tag=slow
 
@@ -1731,9 +1795,9 @@ Management commands can be tested with the
 :func:`~django.core.management.call_command` function. The output can be
 redirected into a ``StringIO`` instance::
 
+    from io import StringIO
     from django.core.management import call_command
     from django.test import TestCase
-    from django.utils.six import StringIO
 
     class ClosepollTest(TestCase):
         def test_command_output(self):

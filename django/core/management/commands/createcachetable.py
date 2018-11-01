@@ -6,7 +6,6 @@ from django.db import (
     DEFAULT_DB_ALIAS, connections, models, router, transaction,
 )
 from django.db.utils import DatabaseError
-from django.utils.encoding import force_text
 
 
 class Command(BaseCommand):
@@ -20,13 +19,13 @@ class Command(BaseCommand):
             help='Optional table names. Otherwise, settings.CACHES is used to find cache tables.',
         )
         parser.add_argument(
-            '--database', action='store', dest='database',
+            '--database',
             default=DEFAULT_DB_ALIAS,
             help='Nominates a database onto which the cache tables will be '
                  'installed. Defaults to the "default" database.',
         )
         parser.add_argument(
-            '--dry-run', action='store_true', dest='dry_run',
+            '--dry-run', action='store_true',
             help='Does not create the table, just prints the SQL that would be run.',
         )
 
@@ -34,7 +33,7 @@ class Command(BaseCommand):
         db = options['database']
         self.verbosity = options['verbosity']
         dry_run = options['dry_run']
-        if len(tablenames):
+        if tablenames:
             # Legacy behavior, tablename specified as argument
             for tablename in tablenames:
                 self.create_table(db, tablename, dry_run)
@@ -101,7 +100,7 @@ class Command(BaseCommand):
                 except DatabaseError as e:
                     raise CommandError(
                         "Cache table '%s' could not be created.\nThe error was: %s." %
-                        (tablename, force_text(e)))
+                        (tablename, e))
                 for statement in index_output:
                     curs.execute(statement)
 

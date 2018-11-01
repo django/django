@@ -1,15 +1,12 @@
-from __future__ import unicode_literals
-
 import os
 import shutil
 from unittest import skipIf
 
-from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.exceptions import ImproperlyConfigured
 from django.core.files import File
 from django.core.files.images import ImageFile
 from django.test import TestCase
 from django.test.testcases import SerializeMixin
-from django.utils._os import upath
 
 try:
     from .models import Image
@@ -24,7 +21,7 @@ if Image:
     from .models import temp_storage_dir
 else:
     # Pillow not available, create dummy classes (tests will be skipped anyway)
-    class Person():
+    class Person:
         pass
     PersonWithHeight = PersonWithHeightAndWidth = PersonDimensionsFirst = Person
     PersonTwoImages = Person
@@ -53,10 +50,10 @@ class ImageFieldTestMixin(SerializeMixin):
             shutil.rmtree(temp_storage_dir)
         os.mkdir(temp_storage_dir)
 
-        file_path1 = os.path.join(os.path.dirname(upath(__file__)), "4x8.png")
+        file_path1 = os.path.join(os.path.dirname(__file__), '4x8.png')
         self.file1 = self.File(open(file_path1, 'rb'), name='4x8.png')
 
-        file_path2 = os.path.join(os.path.dirname(upath(__file__)), "8x4.png")
+        file_path2 = os.path.join(os.path.dirname(__file__), '8x4.png')
         self.file2 = self.File(open(file_path2, 'rb'), name='8x4.png')
 
     def tearDown(self):
@@ -67,8 +64,7 @@ class ImageFieldTestMixin(SerializeMixin):
         self.file2.close()
         shutil.rmtree(temp_storage_dir)
 
-    def check_dimensions(self, instance, width, height,
-                         field_name='mugshot'):
+    def check_dimensions(self, instance, width, height, field_name='mugshot'):
         """
         Asserts that the given width and height values match both the
         field's height and width attributes and the height and width fields
@@ -133,12 +129,6 @@ class ImageFieldTests(ImageFieldTestMixin, TestCase):
         self.assertEqual(hash(p1_db.mugshot), hash(p1.mugshot))
         self.assertIs(p1_db.mugshot != p1.mugshot, False)
 
-    def test_validation(self):
-        p = self.PersonModel(name="Joan")
-        p.mugshot.save("shot.txt", self.file1)
-        with self.assertRaisesMessage(ValidationError, "File extension 'txt' is not allowed."):
-            p.full_clean()
-
     def test_instantiate_missing(self):
         """
         If the underlying file is unavailable, still create instantiate the
@@ -179,8 +169,8 @@ class ImageFieldTests(ImageFieldTestMixin, TestCase):
 
     def test_pickle(self):
         """
-        Tests that ImageField can be pickled, unpickled, and that the
-        image of the unpickled version is the same as the original.
+        ImageField can be pickled, unpickled, and that the image of
+        the unpickled version is the same as the original.
         """
         import pickle
 
@@ -242,7 +232,7 @@ class ImageFieldTwoDimensionsTests(ImageFieldTestMixin, TestCase):
 
     def test_default_value(self):
         """
-        Tests that the default value for an ImageField is an instance of
+        The default value for an ImageField is an instance of
         the field's attr_class (TestImageFieldFile in this case) with no
         name (name set to None).
         """
@@ -252,7 +242,7 @@ class ImageFieldTwoDimensionsTests(ImageFieldTestMixin, TestCase):
 
     def test_assignment_to_None(self):
         """
-        Tests that assigning ImageField to None clears dimensions.
+        Assigning ImageField to None clears dimensions.
         """
         p = self.PersonModel(name='Joe', mugshot=self.file1)
         self.check_dimensions(p, 4, 8)
@@ -284,7 +274,7 @@ class ImageFieldTwoDimensionsTests(ImageFieldTestMixin, TestCase):
 
     def test_dimensions(self):
         """
-        Checks that dimensions are updated correctly in various situations.
+        Dimensions are updated correctly in various situations.
         """
         p = self.PersonModel(name='Joe')
 
@@ -372,8 +362,7 @@ class TwoImageFieldTests(ImageFieldTestMixin, TestCase):
         self.check_dimensions(p, 8, 4, 'headshot')
 
     def test_create(self):
-        p = self.PersonModel.objects.create(mugshot=self.file1,
-                                            headshot=self.file2)
+        p = self.PersonModel.objects.create(mugshot=self.file1, headshot=self.file2)
         self.check_dimensions(p, 4, 8)
         self.check_dimensions(p, 8, 4, 'headshot')
 
@@ -417,7 +406,7 @@ class TwoImageFieldTests(ImageFieldTestMixin, TestCase):
 
     def test_dimensions(self):
         """
-        Checks that dimensions are updated correctly in various situations.
+        Dimensions are updated correctly in various situations.
         """
         p = self.PersonModel(name='Joe')
 

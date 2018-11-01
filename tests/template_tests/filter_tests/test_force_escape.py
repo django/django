@@ -1,9 +1,5 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.template.defaultfilters import force_escape
-from django.test import SimpleTestCase, ignore_warnings
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.test import SimpleTestCase
 from django.utils.safestring import SafeData
 
 from ..utils import setup
@@ -36,8 +32,7 @@ class ForceEscapeTests(SimpleTestCase):
         self.assertEqual(output, "x&amp;amp;y")
 
     # Because the result of force_escape is "safe", an additional
-    # escape filter has no effect (to be changed in Django 2.0).
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    # escape filter has no effect.
     @setup({'force-escape05': '{% autoescape off %}{{ a|force_escape|escape }}{% endautoescape %}'})
     def test_force_escape05(self):
         output = self.engine.render_to_string('force-escape05', {"a": "x&y"})
@@ -48,17 +43,15 @@ class ForceEscapeTests(SimpleTestCase):
         output = self.engine.render_to_string('force-escape06', {"a": "x&y"})
         self.assertEqual(output, "x&amp;y")
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'force-escape07': '{% autoescape off %}{{ a|escape|force_escape }}{% endautoescape %}'})
     def test_force_escape07(self):
         output = self.engine.render_to_string('force-escape07', {"a": "x&y"})
-        self.assertEqual(output, "x&amp;y")
+        self.assertEqual(output, "x&amp;amp;y")
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'force-escape08': '{{ a|escape|force_escape }}'})
     def test_force_escape08(self):
         output = self.engine.render_to_string('force-escape08', {"a": "x&y"})
-        self.assertEqual(output, "x&amp;y")
+        self.assertEqual(output, "x&amp;amp;y")
 
 
 class FunctionTests(SimpleTestCase):

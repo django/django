@@ -1,4 +1,4 @@
-from django.utils.translation import ugettext
+from django.utils.translation import gettext
 
 # This will generate an xgettext warning
-my_string = ugettext("This string contain two placeholders: %s and %s" % ('a', 'b'))
+my_string = gettext("This string contain two placeholders: %s and %s" % ('a', 'b'))

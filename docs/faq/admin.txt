@@ -62,7 +62,7 @@ Some objects aren't appearing in the admin.
 Inconsistent row counts may be caused by missing foreign key values or a
 foreign key field incorrectly set to :attr:`null=False
 <django.db.models.Field.null>`. If you have a record with a
-:class:`~django.db.models.ForeignKey` pointing to a non-existent object and
+:class:`~django.db.models.ForeignKey` pointing to a nonexistent object and
 that foreign key is included is
 :attr:`~django.contrib.admin.ModelAdmin.list_display`, the record will not be
 shown in the admin changelist because the Django model is declaring an

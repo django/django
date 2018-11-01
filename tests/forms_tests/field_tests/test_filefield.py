@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import pickle
 
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -36,7 +33,7 @@ class FileFieldTest(SimpleTestCase):
             f.clean(SimpleUploadedFile('name', b''))
         self.assertEqual(SimpleUploadedFile, type(f.clean(SimpleUploadedFile('name', b'Some File Content'))))
         self.assertIsInstance(
-            f.clean(SimpleUploadedFile('我隻氣墊船裝滿晒鱔.txt', 'मेरी मँडराने वाली नाव सर्पमीनों से भरी ह'.encode('utf-8'))),
+            f.clean(SimpleUploadedFile('我隻氣墊船裝滿晒鱔.txt', 'मेरी मँडराने वाली नाव सर्पमीनों से भरी ह'.encode())),
             SimpleUploadedFile
         )
         self.assertIsInstance(
@@ -76,6 +73,10 @@ class FileFieldTest(SimpleTestCase):
         # A file was uploaded and there is initial data (file identity is not dealt
         # with here)
         self.assertTrue(f.has_changed('resume.txt', {'filename': 'resume.txt', 'content': 'My resume'}))
+
+    def test_disabled_has_changed(self):
+        f = FileField(disabled=True)
+        self.assertIs(f.has_changed('x', 'y'), False)
 
     def test_file_picklable(self):
         self.assertIsInstance(pickle.loads(pickle.dumps(FileField())), FileField)

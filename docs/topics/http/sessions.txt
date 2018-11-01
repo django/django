@@ -167,7 +167,7 @@ and the :setting:`SECRET_KEY` setting.
 
 .. _`common limit of 4096 bytes`: https://tools.ietf.org/html/rfc2965#section-5.3
 .. _`replay attacks`: https://en.wikipedia.org/wiki/Replay_attack
-.. _`speed of your site`: http://yuiblog.com/blog/2007/03/01/performance-research-part-3/
+.. _`speed of your site`: https://yuiblog.com/blog/2007/03/01/performance-research-part-3/
 
 Using sessions in views
 =======================
@@ -629,6 +629,7 @@ behavior:
 * :setting:`SESSION_COOKIE_HTTPONLY`
 * :setting:`SESSION_COOKIE_NAME`
 * :setting:`SESSION_COOKIE_PATH`
+* :setting:`SESSION_COOKIE_SAMESITE`
 * :setting:`SESSION_COOKIE_SECURE`
 * :setting:`SESSION_ENGINE`
 * :setting:`SESSION_EXPIRE_AT_BROWSER_CLOSE`
@@ -653,7 +654,7 @@ you'll be logged in as the attacker and might inadvertently enter your
 sensitive personal data (e.g. credit card info) into the attackers account.
 
 Another possible attack would be if ``good.example.com`` sets its
-:setting:`SESSION_COOKIE_DOMAIN` to ``".example.com"`` which would cause
+:setting:`SESSION_COOKIE_DOMAIN` to ``"example.com"`` which would cause
 session cookies from that site to be sent to ``bad.example.com``.
 
 Technical details
@@ -810,7 +811,7 @@ to query the database for all active sessions for an account)::
             return CustomSession
 
         def create_model_instance(self, data):
-            obj = super(SessionStore, self).create_model_instance(data)
+            obj = super().create_model_instance(data)
             try:
                 account_id = int(data.get('_auth_user_id'))
             except (ValueError, TypeError):

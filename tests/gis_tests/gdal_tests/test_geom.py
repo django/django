@@ -1,28 +1,17 @@
 import json
-import unittest
-from binascii import b2a_hex
-from unittest import skipUnless
+import pickle
 
-from django.contrib.gis.gdal import HAS_GDAL
-from django.utils.six.moves import range
+from django.contrib.gis.gdal import (
+    CoordTransform, GDALException, OGRGeometry, OGRGeomType, SpatialReference,
+)
+from django.template import Context
+from django.template.engine import Engine
+from django.test import SimpleTestCase
 
 from ..test_data import TestDataMixin
 
-try:
-    from django.utils.six.moves import cPickle as pickle
-except ImportError:
-    import pickle
 
-
-if HAS_GDAL:
-    from django.contrib.gis.gdal import (
-        OGRGeometry, OGRGeomType, GDALException, OGRIndexError,
-        SpatialReference, CoordTransform, GDAL_VERSION,
-    )
-
-
-@skipUnless(HAS_GDAL, "GDAL is required")
-class OGRGeomTest(unittest.TestCase, TestDataMixin):
+class OGRGeomTest(SimpleTestCase, TestDataMixin):
     "This tests the OGR Geometry."
 
     def test_geomtype(self):
@@ -94,10 +83,6 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         for g in self.geometries.wkt_out:
             geom = OGRGeometry(g.wkt)
             exp_gml = g.gml
-            if GDAL_VERSION >= (1, 8):
-                # In GDAL 1.8, the non-conformant GML tag  <gml:GeometryCollection> was
-                # replaced with <gml:MultiGeometry>.
-                exp_gml = exp_gml.replace('GeometryCollection', 'MultiGeometry')
             self.assertEqual(exp_gml, geom.gml)
 
     def test_hex(self):
@@ -114,7 +99,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         for g in self.geometries.hex_wkt:
             geom1 = OGRGeometry(g.wkt)
             wkb = geom1.wkb
-            self.assertEqual(b2a_hex(wkb).upper(), g.hex.encode())
+            self.assertEqual(wkb.hex().upper(), g.hex)
             # Constructing w/WKB.
             geom2 = OGRGeometry(wkb)
             self.assertEqual(geom1, geom2)
@@ -172,7 +157,8 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(ls.coords, linestr.tuple)
             self.assertEqual(linestr, OGRGeometry(ls.wkt))
             self.assertNotEqual(linestr, prev)
-            with self.assertRaises(OGRIndexError):
+            msg = 'Index out of range when accessing points of a line string: %s.'
+            with self.assertRaisesMessage(IndexError, msg % len(linestr)):
                 linestr.__getitem__(len(linestr))
             prev = linestr
 
@@ -197,7 +183,8 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             for ls in mlinestr:
                 self.assertEqual(2, ls.geom_type)
                 self.assertEqual('LINESTRING', ls.geom_name)
-            with self.assertRaises(OGRIndexError):
+            msg = 'Index out of range when accessing geometry in a collection: %s.'
+            with self.assertRaisesMessage(IndexError, msg % len(mlinestr)):
                 mlinestr.__getitem__(len(mlinestr))
 
     def test_linearring(self):
@@ -227,6 +214,9 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             self.assertEqual('POLYGON', poly.geom_name)
             self.assertEqual(p.n_p, poly.point_count)
             self.assertEqual(p.n_i + 1, len(poly))
+            msg = 'Index out of range when accessing rings of a polygon: %s.'
+            with self.assertRaisesMessage(IndexError, msg % len(poly)):
+                poly.__getitem__(len(poly))
 
             # Testing area & centroid.
             self.assertAlmostEqual(p.area, poly.area, 9)
@@ -246,6 +236,14 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
 
             for r in poly:
                 self.assertEqual('LINEARRING', r.geom_name)
+
+    def test_polygons_templates(self):
+        # Accessing Polygon attributes in templates should work.
+        engine = Engine()
+        template = engine.from_string('{{ polygons.0.wkt }}')
+        polygons = [OGRGeometry(p.wkt) for p in self.geometries.multipolygons[:2]]
+        content = template.render(Context({'polygons': polygons}))
+        self.assertIn('MULTIPOLYGON (((100', content)
 
     def test_closepolygons(self):
         "Testing closing Polygon objects."
@@ -269,7 +267,8 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             if mp.valid:
                 self.assertEqual(mp.n_p, mpoly.point_count)
                 self.assertEqual(mp.num_geom, len(mpoly))
-                with self.assertRaises(OGRIndexError):
+                msg = 'Index out of range when accessing geometry in a collection: %s.'
+                with self.assertRaisesMessage(IndexError, msg % len(mpoly)):
                     mpoly.__getitem__(len(mpoly))
                 for p in mpoly:
                     self.assertEqual('POLYGON', p.geom_name)
@@ -553,3 +552,11 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
                 '</gml:Point>'
             ),
         )
+
+    def test_empty(self):
+        self.assertIs(OGRGeometry('POINT (0 0)').empty, False)
+        self.assertIs(OGRGeometry('POINT EMPTY').empty, True)
+
+    def test_empty_point_to_geos(self):
+        p = OGRGeometry('POINT EMPTY', srs=4326)
+        self.assertEqual(p.geos.ewkt, p.ewkt)

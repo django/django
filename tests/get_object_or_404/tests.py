@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.http import Http404
 from django.shortcuts import get_list_or_404, get_object_or_404
 from django.test import TestCase
@@ -83,9 +81,9 @@ class GetObjectOr404Tests(TestCase):
         # raises a helpful ValueError message
         msg = "First argument to get_object_or_404() must be a Model, Manager, or QuerySet, not 'str'."
         with self.assertRaisesMessage(ValueError, msg):
-            get_object_or_404(str("Article"), title__icontains="Run")
+            get_object_or_404("Article", title__icontains="Run")
 
-        class CustomClass(object):
+        class CustomClass:
             pass
 
         msg = "First argument to get_object_or_404() must be a Model, Manager, or QuerySet, not 'CustomClass'."
@@ -96,3 +94,13 @@ class GetObjectOr404Tests(TestCase):
         msg = "First argument to get_list_or_404() must be a Model, Manager, or QuerySet, not 'list'."
         with self.assertRaisesMessage(ValueError, msg):
             get_list_or_404([Article], title__icontains="Run")
+
+    def test_get_object_or_404_queryset_attribute_error(self):
+        """AttributeError raised by QuerySet.get() isn't hidden."""
+        with self.assertRaisesMessage(AttributeError, 'AttributeErrorManager'):
+            get_object_or_404(Article.attribute_error_objects, id=42)
+
+    def test_get_list_or_404_queryset_attribute_error(self):
+        """AttributeError raised by QuerySet.filter() isn't hidden."""
+        with self.assertRaisesMessage(AttributeError, 'AttributeErrorManager'):
+            get_list_or_404(Article.attribute_error_objects, title__icontains='Run')

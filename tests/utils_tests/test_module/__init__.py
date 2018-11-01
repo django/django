@@ -1,3 +1,5 @@
-class SiteMock(object):
+class SiteMock:
     _registry = {}
+
+
 site = SiteMock()

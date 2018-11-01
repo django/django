@@ -1,3 +1,5 @@
+from urllib.request import urlopen
+
 from django.http import HttpResponse
 
 from .models import Person
@@ -20,3 +22,19 @@ def create_model_instance(request):
 
 def environ_view(request):
     return HttpResponse("\n".join("%s: %r" % (k, v) for k, v in request.environ.items()))
+
+
+def subview(request):
+    return HttpResponse('subview')
+
+
+def subview_calling_view(request):
+    with urlopen(request.GET['url'] + '/subview/') as response:
+        return HttpResponse('subview calling view: {}'.format(response.read().decode()))
+
+
+def check_model_instance_from_subview(request):
+    with urlopen(request.GET['url'] + '/create_model_instance/'):
+        pass
+    with urlopen(request.GET['url'] + '/model_view/') as response:
+        return HttpResponse('subview calling view: {}'.format(response.read().decode()))

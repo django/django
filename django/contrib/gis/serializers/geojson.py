@@ -1,11 +1,6 @@
-from __future__ import unicode_literals
-
-from django.contrib.gis.gdal import HAS_GDAL
+from django.contrib.gis.gdal import CoordTransform, SpatialReference
 from django.core.serializers.base import SerializerDoesNotExist
 from django.core.serializers.json import Serializer as JSONSerializer
-
-if HAS_GDAL:
-    from django.contrib.gis.gdal import CoordTransform, SpatialReference
 
 
 class Serializer(JSONSerializer):
@@ -13,12 +8,12 @@ class Serializer(JSONSerializer):
     Convert a queryset to GeoJSON, http://geojson.org/
     """
     def _init_options(self):
-        super(Serializer, self)._init_options()
+        super()._init_options()
         self.geometry_field = self.json_kwargs.pop('geometry_field', None)
         self.srid = self.json_kwargs.pop('srid', 4326)
         if (self.selected_fields is not None and self.geometry_field is not None and
                 self.geometry_field not in self.selected_fields):
-            self.selected_fields = list(self.selected_fields) + [self.geometry_field]
+            self.selected_fields = [*self.selected_fields, self.geometry_field]
 
     def start_serialization(self):
         self._init_options()
@@ -31,7 +26,7 @@ class Serializer(JSONSerializer):
         self.stream.write(']}')
 
     def start_object(self, obj):
-        super(Serializer, self).start_object(obj)
+        super().start_object(obj)
         self._geometry = None
         if self.geometry_field is None:
             # Find the first declared geometry field
@@ -64,9 +59,9 @@ class Serializer(JSONSerializer):
         if field.name == self.geometry_field:
             self._geometry = field.value_from_object(obj)
         else:
-            super(Serializer, self).handle_field(obj, field)
+            super().handle_field(obj, field)
 
 
-class Deserializer(object):
+class Deserializer:
     def __init__(self, *args, **kwargs):
         raise SerializerDoesNotExist("geojson is a serialization-only serializer")

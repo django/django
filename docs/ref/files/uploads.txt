@@ -196,7 +196,7 @@ attributes:
 
     ``field_name`` is a string name of the file ``<input>`` field.
 
-    ``file_name`` is the unicode filename that was provided by the browser.
+    ``file_name`` is the filename provided by the browser.
 
     ``content_type`` is the MIME type provided by the browser -- E.g.
     ``'image/jpeg'``.

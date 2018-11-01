@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# This python file contains utility scripts to manage Django translations.
+# This Python file contains utility scripts to manage Django translations.
 # It has to be run inside the django git root directory.
 #
 # The following commands are available:
@@ -114,21 +114,26 @@ def lang_stats(resources=None, languages=None):
 
     for name, dir_ in locale_dirs:
         print("\nShowing translations stats for '%s':" % name)
-        langs = sorted([d for d in os.listdir(dir_) if not d.startswith('_')])
+        langs = sorted(d for d in os.listdir(dir_) if not d.startswith('_'))
         for lang in langs:
             if languages and lang not in languages:
                 continue
             # TODO: merge first with the latest en catalog
-            p = Popen("msgfmt -vc -o /dev/null %(path)s/%(lang)s/LC_MESSAGES/django%(ext)s.po" % {
-                'path': dir_, 'lang': lang, 'ext': 'js' if name.endswith('-js') else ''},
-                stdout=PIPE, stderr=PIPE, shell=True)
+            po_path = '{path}/{lang}/LC_MESSAGES/django{ext}.po'.format(
+                path=dir_, lang=lang, ext='js' if name.endswith('-js') else ''
+            )
+            p = Popen(
+                ['msgfmt', '-vc', '-o', '/dev/null', po_path],
+                stdout=PIPE, stderr=PIPE,
+                env={'LANG': 'C'}
+            )
             output, errors = p.communicate()
             if p.returncode == 0:
                 # msgfmt output stats on stderr
-                print("%s: %s" % (lang, errors.strip()))
+                print("%s: %s" % (lang, errors.decode().strip()))
             else:
                 print("Errors happened when checking %s translation for %s:\n%s" % (
-                    lang, name, errors))
+                    lang, name, errors.decode()))
 
 
 def fetch(resources=None, languages=None):
@@ -142,7 +147,7 @@ def fetch(resources=None, languages=None):
         # Transifex pull
         if languages is None:
             call('tx pull -r %(res)s -a -f  --minimum-perc=5' % {'res': _tx_resource_for_name(name)}, shell=True)
-            target_langs = sorted([d for d in os.listdir(dir_) if not d.startswith('_') and d != 'en'])
+            target_langs = sorted(d for d in os.listdir(dir_) if not d.startswith('_') and d != 'en')
         else:
             for lang in languages:
                 call('tx pull -r %(res)s -f -l %(lang)s' % {

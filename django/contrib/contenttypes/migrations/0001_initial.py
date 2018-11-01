@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import django.contrib.contenttypes.models
 from django.db import migrations, models
 
@@ -32,6 +29,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='contenttype',
-            unique_together=set([('app_label', 'model')]),
+            unique_together={('app_label', 'model')},
         ),
     ]

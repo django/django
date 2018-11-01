@@ -1,3 +1,5 @@
+from unittest import mock
+
 from django.apps.registry import apps as global_apps
 from django.db import connection
 from django.db.migrations.exceptions import InvalidMigrationPlan
@@ -5,7 +7,9 @@ from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.utils import DatabaseError
-from django.test import TestCase, modify_settings, override_settings
+from django.test import (
+    TestCase, modify_settings, override_settings, skipUnlessDBFeature,
+)
 
 from .test_base import MigrationTestBase
 
@@ -126,6 +130,14 @@ class ExecutorTests(MigrationTestBase):
         migrations_apps = executor.loader.project_state(("migrations", "0001_initial")).apps
         Editor = migrations_apps.get_model("migrations", "Editor")
         self.assertFalse(Editor.objects.exists())
+        # Record previous migration as successful.
+        executor.migrate([("migrations", "0001_initial")], fake=True)
+        # Rebuild the graph to reflect the new DB state.
+        executor.loader.build_graph()
+        # Migrating backwards is also atomic.
+        with self.assertRaisesMessage(RuntimeError, "Abort migration"):
+            executor.migrate([("migrations", None)])
+        self.assertFalse(Editor.objects.exists())
 
     @override_settings(MIGRATION_MODULES={
         "migrations": "migrations.test_migrations",
@@ -133,7 +145,7 @@ class ExecutorTests(MigrationTestBase):
     })
     def test_empty_plan(self):
         """
-        Tests that re-planning a full migration of a fully-migrated set doesn't
+        Re-planning a full migration of a fully-migrated set doesn't
         perform spurious unmigrations and remigrations.
 
         There was previously a bug where the executor just always performed the
@@ -404,7 +416,7 @@ class ExecutorTests(MigrationTestBase):
     )
     def test_unrelated_model_lookups_forwards(self):
         """
-        #24123 - Tests that all models of apps already applied which are
+        #24123 - All models of apps already applied which are
         unrelated to the first app being applied are part of the initial model
         state.
         """
@@ -449,7 +461,7 @@ class ExecutorTests(MigrationTestBase):
     )
     def test_unrelated_model_lookups_backwards(self):
         """
-        #24123 - Tests that all models of apps being unapplied which are
+        #24123 - All models of apps being unapplied which are
         unrelated to the first app being unapplied are part of the initial
         model state.
         """
@@ -512,6 +524,9 @@ class ExecutorTests(MigrationTestBase):
             ('mutate_state_a', None),
         ])
         self.assertIn('added', dict(state.models['mutate_state_b', 'b'].fields))
+        executor.migrate([
+            ('mutate_state_b', None),
+        ])
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_process_callback(self):
@@ -543,14 +558,14 @@ class ExecutorTests(MigrationTestBase):
 
         migrations = executor.loader.graph.nodes
         expected = [
-            ("render_start", ),
-            ("render_success", ),
+            ("render_start",),
+            ("render_success",),
             ("apply_start", migrations['migrations', '0001_initial'], False),
             ("apply_success", migrations['migrations', '0001_initial'], False),
             ("apply_start", migrations['migrations', '0002_second'], False),
             ("apply_success", migrations['migrations', '0002_second'], False),
-            ("render_start", ),
-            ("render_success", ),
+            ("render_start",),
+            ("render_success",),
             ("unapply_start", migrations['migrations', '0002_second'], False),
             ("unapply_success", migrations['migrations', '0002_second'], False),
             ("unapply_start", migrations['migrations', '0001_initial'], False),
@@ -592,6 +607,7 @@ class ExecutorTests(MigrationTestBase):
                 editor.execute(editor.sql_delete_table % {"table": "author_app_author"})
             self.assertTableNotExists("author_app_author")
             self.assertTableNotExists("book_app_book")
+            executor.migrate([("author_app", None)], fake=True)
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
     def test_apply_all_replaced_marks_replacement_as_applied(self):
@@ -637,14 +653,30 @@ class ExecutorTests(MigrationTestBase):
             recorder.applied_migrations(),
         )
 
+    # When the feature is False, the operation and the record won't be
+    # performed in a transaction and the test will systematically pass.
+    @skipUnlessDBFeature('can_rollback_ddl')
+    @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations'})
+    def test_migrations_applied_and_recorded_atomically(self):
+        """Migrations are applied and recorded atomically."""
+        executor = MigrationExecutor(connection)
+        with mock.patch('django.db.migrations.executor.MigrationExecutor.record_migration') as record_migration:
+            record_migration.side_effect = RuntimeError('Recording migration failed.')
+            with self.assertRaisesMessage(RuntimeError, 'Recording migration failed.'):
+                executor.migrate([('migrations', '0001_initial')])
+        # The migration isn't recorded as applied since it failed.
+        migration_recorder = MigrationRecorder(connection)
+        self.assertFalse(migration_recorder.migration_qs.filter(app='migrations', name='0001_initial').exists())
+        self.assertTableNotExists('migrations_author')
 
-class FakeLoader(object):
+
+class FakeLoader:
     def __init__(self, graph, applied):
         self.graph = graph
         self.applied_migrations = applied
 
 
-class FakeMigration(object):
+class FakeMigration:
     """Really all we need is any object with a debug-useful repr."""
     def __init__(self, name):
         self.name = name

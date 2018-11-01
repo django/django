@@ -1,3 +1,4 @@
+import functools
 import sys
 import threading
 import warnings
@@ -5,16 +6,15 @@ from collections import Counter, OrderedDict, defaultdict
 from functools import partial
 
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
-from django.utils import lru_cache
 
 from .config import AppConfig
 
 
-class Apps(object):
+class Apps:
     """
     A registry that stores the configuration of installed applications.
 
-    It also keeps track of models eg. to provide reverse-relations.
+    It also keeps track of models, e.g. to provide reverse relations.
     """
 
     def __init__(self, installed_apps=()):
@@ -44,7 +44,8 @@ class Apps(object):
         self.apps_ready = self.models_ready = self.ready = False
 
         # Lock for thread-safe population.
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
+        self.loading = False
 
         # Maps ("app_label", "modelname") tuples to lists of functions to be
         # called when the corresponding model is ready. Used by this class's
@@ -57,11 +58,11 @@ class Apps(object):
 
     def populate(self, installed_apps=None):
         """
-        Loads application configurations and models.
+        Load application configurations and models.
 
-        This method imports each application module and then each model module.
+        Import each application module and then each model module.
 
-        It is thread safe and idempotent, but not reentrant.
+        It is thread-safe and idempotent, but not reentrant.
         """
         if self.ready:
             return
@@ -72,12 +73,15 @@ class Apps(object):
             if self.ready:
                 return
 
-            # app_config should be pristine, otherwise the code below won't
-            # guarantee that the order matches the order in INSTALLED_APPS.
-            if self.app_configs:
+            # An RLock prevents other threads from entering this section. The
+            # compare and set operation below is atomic.
+            if self.loading:
+                # Prevent reentrant calls to avoid running AppConfig.ready()
+                # methods twice.
                 raise RuntimeError("populate() isn't reentrant")
+            self.loading = True
 
-            # Load app configs and app modules.
+            # Phase 1: initialize app configs and import app modules.
             for entry in installed_apps:
                 if isinstance(entry, AppConfig):
                     app_config = entry
@@ -89,6 +93,7 @@ class Apps(object):
                         "duplicates: %s" % app_config.label)
 
                 self.app_configs[app_config.label] = app_config
+                app_config.apps = self
 
             # Check for duplicate app names.
             counts = Counter(
@@ -102,46 +107,45 @@ class Apps(object):
 
             self.apps_ready = True
 
-            # Load models.
+            # Phase 2: import models modules.
             for app_config in self.app_configs.values():
-                all_models = self.all_models[app_config.label]
-                app_config.import_models(all_models)
+                app_config.import_models()
 
             self.clear_cache()
 
             self.models_ready = True
 
+            # Phase 3: run ready() methods of app configs.
             for app_config in self.get_app_configs():
                 app_config.ready()
 
             self.ready = True
 
     def check_apps_ready(self):
-        """
-        Raises an exception if all apps haven't been imported yet.
-        """
+        """Raise an exception if all apps haven't been imported yet."""
         if not self.apps_ready:
+            from django.conf import settings
+            # If "not ready" is due to unconfigured settings, accessing
+            # INSTALLED_APPS raises a more helpful ImproperlyConfigured
+            # exception.
+            settings.INSTALLED_APPS
             raise AppRegistryNotReady("Apps aren't loaded yet.")
 
     def check_models_ready(self):
-        """
-        Raises an exception if all models haven't been imported yet.
-        """
+        """Raise an exception if all models haven't been imported yet."""
         if not self.models_ready:
             raise AppRegistryNotReady("Models aren't loaded yet.")
 
     def get_app_configs(self):
-        """
-        Imports applications and returns an iterable of app configs.
-        """
+        """Import applications and return an iterable of app configs."""
         self.check_apps_ready()
         return self.app_configs.values()
 
     def get_app_config(self, app_label):
         """
-        Imports applications and returns an app config for the given label.
+        Import applications and returns an app config for the given label.
 
-        Raises LookupError if no application exists with this label.
+        Raise LookupError if no application exists with this label.
         """
         self.check_apps_ready()
         try:
@@ -155,16 +159,15 @@ class Apps(object):
             raise LookupError(message)
 
     # This method is performance-critical at least for Django's test suite.
-    @lru_cache.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=None)
     def get_models(self, include_auto_created=False, include_swapped=False):
         """
-        Returns a list of all installed models.
+        Return a list of all installed models.
 
         By default, the following models aren't included:
 
         - auto-created models for many-to-many relations without
           an explicit intermediate table,
-        - models created to satisfy deferred attribute queries,
         - models that have been swapped out.
 
         Set the corresponding keyword argument to True to include such models.
@@ -173,26 +176,35 @@ class Apps(object):
 
         result = []
         for app_config in self.app_configs.values():
-            result.extend(list(app_config.get_models(include_auto_created, include_swapped)))
+            result.extend(app_config.get_models(include_auto_created, include_swapped))
         return result
 
-    def get_model(self, app_label, model_name=None):
+    def get_model(self, app_label, model_name=None, require_ready=True):
         """
-        Returns the model matching the given app_label and model_name.
+        Return the model matching the given app_label and model_name.
 
-        As a shortcut, this function also accepts a single argument in the
-        form <app_label>.<model_name>.
+        As a shortcut, app_label may be in the form <app_label>.<model_name>.
 
         model_name is case-insensitive.
 
-        Raises LookupError if no application exists with this label, or no
-        model exists with this name in the application. Raises ValueError if
+        Raise LookupError if no application exists with this label, or no
+        model exists with this name in the application. Raise ValueError if
         called with a single argument that doesn't contain exactly one dot.
         """
-        self.check_models_ready()
+        if require_ready:
+            self.check_models_ready()
+        else:
+            self.check_apps_ready()
+
         if model_name is None:
             app_label, model_name = app_label.split('.')
-        return self.get_app_config(app_label).get_model(model_name.lower())
+
+        app_config = self.get_app_config(app_label)
+
+        if not require_ready and app_config.models is None:
+            app_config.import_models()
+
+        return app_config.get_model(model_name, require_ready=require_ready)
 
     def register_model(self, app_label, model):
         # Since this method is called when models are imported, it cannot
@@ -218,9 +230,9 @@ class Apps(object):
 
     def is_installed(self, app_name):
         """
-        Checks whether an application with this name exists in the registry.
+        Check whether an application with this name exists in the registry.
 
-        app_name is the full name of the app eg. 'django.contrib.admin'.
+        app_name is the full name of the app e.g. 'django.contrib.admin'.
         """
         self.check_apps_ready()
         return any(ac.name == app_name for ac in self.app_configs.values())
@@ -231,8 +243,8 @@ class Apps(object):
 
         object_name is the dotted Python path to the object.
 
-        Returns the app config for the inner application in case of nesting.
-        Returns None if the object isn't in any registered app config.
+        Return the app config for the inner application in case of nesting.
+        Return None if the object isn't in any registered app config.
         """
         self.check_apps_ready()
         candidates = []
@@ -258,7 +270,7 @@ class Apps(object):
                 "Model '%s.%s' not registered." % (app_label, model_name))
         return model
 
-    @lru_cache.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=None)
     def get_swappable_settings_name(self, to_string):
         """
         For a given model string (e.g. "auth.User"), return the name of the
@@ -282,7 +294,7 @@ class Apps(object):
 
     def set_available_apps(self, available):
         """
-        Restricts the set of installed apps used by get_app_config[s].
+        Restrict the set of installed apps used by get_app_config[s].
 
         available must be an iterable of application names.
 
@@ -290,10 +302,10 @@ class Apps(object):
 
         Primarily used for performance optimization in TransactionTestCase.
 
-        This method is safe is the sense that it doesn't trigger any imports.
+        This method is safe in the sense that it doesn't trigger any imports.
         """
         available = set(available)
-        installed = set(app_config.name for app_config in self.get_app_configs())
+        installed = {app_config.name for app_config in self.get_app_configs()}
         if not available.issubset(installed):
             raise ValueError(
                 "Available apps isn't a subset of installed apps, extra apps: %s"
@@ -308,15 +320,13 @@ class Apps(object):
         self.clear_cache()
 
     def unset_available_apps(self):
-        """
-        Cancels a previous call to set_available_apps().
-        """
+        """Cancel a previous call to set_available_apps()."""
         self.app_configs = self.stored_app_configs.pop()
         self.clear_cache()
 
     def set_installed_apps(self, installed):
         """
-        Enables a different set of installed apps for get_app_config[s].
+        Enable a different set of installed apps for get_app_config[s].
 
         installed must be an iterable in the same format as INSTALLED_APPS.
 
@@ -328,28 +338,26 @@ class Apps(object):
         This method may trigger new imports, which may add new models to the
         registry of all imported models. They will stay in the registry even
         after unset_installed_apps(). Since it isn't possible to replay
-        imports safely (eg. that could lead to registering listeners twice),
+        imports safely (e.g. that could lead to registering listeners twice),
         models are registered when they're imported and never removed.
         """
         if not self.ready:
             raise AppRegistryNotReady("App registry isn't ready yet.")
         self.stored_app_configs.append(self.app_configs)
         self.app_configs = OrderedDict()
-        self.apps_ready = self.models_ready = self.ready = False
+        self.apps_ready = self.models_ready = self.loading = self.ready = False
         self.clear_cache()
         self.populate(installed)
 
     def unset_installed_apps(self):
-        """
-        Cancels a previous call to set_installed_apps().
-        """
+        """Cancel a previous call to set_installed_apps()."""
         self.app_configs = self.stored_app_configs.pop()
         self.apps_ready = self.models_ready = self.ready = True
         self.clear_cache()
 
     def clear_cache(self):
         """
-        Clears all internal caches, for methods that alter the app registry.
+        Clear all internal caches, for methods that alter the app registry.
 
         This is mostly used in tests.
         """
@@ -381,7 +389,7 @@ class Apps(object):
         # to lazy_model_operation() along with the remaining model args and
         # repeat until all models are loaded and all arguments are applied.
         else:
-            next_model, more_models = model_keys[0], model_keys[1:]
+            next_model, *more_models = model_keys
 
             # This will be executed after the class corresponding to next_model
             # has been imported and registered. The `func` attribute provides
@@ -405,10 +413,11 @@ class Apps(object):
     def do_pending_operations(self, model):
         """
         Take a newly-prepared model and pass it to each function waiting for
-        it. This is called at the very end of `Apps.register_model()`.
+        it. This is called at the very end of Apps.register_model().
         """
         key = model._meta.app_label, model._meta.model_name
         for function in self._pending_operations.pop(key, []):
             function(model)
+
 
 apps = Apps(installed_apps=None)

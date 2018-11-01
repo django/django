@@ -1,30 +1,22 @@
-import sys
 import threading
-import warnings
 import weakref
 
-from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.inspect import func_accepts_kwargs
-from django.utils.six.moves import range
-
-if six.PY2:
-    from .weakref_backports import WeakMethod
-else:
-    from weakref import WeakMethod
 
 
 def _make_id(target):
     if hasattr(target, '__func__'):
         return (id(target.__self__), id(target.__func__))
     return id(target)
+
+
 NONE_ID = _make_id(None)
 
 # A marker for caching
 NO_RECEIVERS = object()
 
 
-class Signal(object):
+class Signal:
     """
     Base class for all signals
 
@@ -107,29 +99,23 @@ class Signal(object):
             receiver_object = receiver
             # Check for bound methods
             if hasattr(receiver, '__self__') and hasattr(receiver, '__func__'):
-                ref = WeakMethod
+                ref = weakref.WeakMethod
                 receiver_object = receiver.__self__
-            if six.PY3:
-                receiver = ref(receiver)
-                weakref.finalize(receiver_object, self._remove_receiver)
-            else:
-                receiver = ref(receiver, self._remove_receiver)
+            receiver = ref(receiver)
+            weakref.finalize(receiver_object, self._remove_receiver)
 
         with self.lock:
             self._clear_dead_receivers()
-            for r_key, _ in self.receivers:
-                if r_key == lookup_key:
-                    break
-            else:
+            if not any(r_key == lookup_key for r_key, _ in self.receivers):
                 self.receivers.append((lookup_key, receiver))
             self.sender_receivers_cache.clear()
 
-    def disconnect(self, receiver=None, sender=None, weak=None, dispatch_uid=None):
+    def disconnect(self, receiver=None, sender=None, dispatch_uid=None):
         """
         Disconnect receiver from sender for signal.
 
         If weak references are used, disconnect need not be called. The receiver
-        will be remove from dispatch automatically.
+        will be removed from dispatch automatically.
 
         Arguments:
 
@@ -143,8 +129,6 @@ class Signal(object):
             dispatch_uid
                 the unique identifier of the receiver to disconnect
         """
-        if weak is not None:
-            warnings.warn("Passing `weak` to disconnect has no effect.", RemovedInDjango20Warning, stacklevel=2)
         if dispatch_uid:
             lookup_key = (dispatch_uid, _make_id(sender))
         else:
@@ -181,16 +165,15 @@ class Signal(object):
             named
                 Named arguments which will be passed to receivers.
 
-        Returns a list of tuple pairs [(receiver, response), ... ].
+        Return a list of tuple pairs [(receiver, response), ... ].
         """
-        responses = []
         if not self.receivers or self.sender_receivers_cache.get(sender) is NO_RECEIVERS:
-            return responses
+            return []
 
-        for receiver in self._live_receivers(sender):
-            response = receiver(signal=self, sender=sender, **named)
-            responses.append((receiver, response))
-        return responses
+        return [
+            (receiver, receiver(signal=self, sender=sender, **named))
+            for receiver in self._live_receivers(sender)
+        ]
 
     def send_robust(self, sender, **named):
         """
@@ -199,7 +182,7 @@ class Signal(object):
         Arguments:
 
             sender
-                The sender of the signal. Can be any python object (normally one
+                The sender of the signal. Can be any Python object (normally one
                 registered with a connect if you actually want something to
                 occur).
 
@@ -208,26 +191,21 @@ class Signal(object):
                 arguments must be a subset of the argument names defined in
                 providing_args.
 
-        Return a list of tuple pairs [(receiver, response), ... ]. May raise
-        DispatcherKeyError.
+        Return a list of tuple pairs [(receiver, response), ... ].
 
         If any receiver raises an error (specifically any subclass of
-        Exception), the error instance is returned as the result for that
-        receiver. The traceback is always attached to the error at
-        ``__traceback__``.
+        Exception), return the error instance as the result for that receiver.
         """
-        responses = []
         if not self.receivers or self.sender_receivers_cache.get(sender) is NO_RECEIVERS:
-            return responses
+            return []
 
         # Call each receiver with whatever arguments it can accept.
         # Return a list of tuple pairs [(receiver, response), ... ].
+        responses = []
         for receiver in self._live_receivers(sender):
             try:
                 response = receiver(signal=self, sender=sender, **named)
             except Exception as err:
-                if not hasattr(err, '__traceback__'):
-                    err.__traceback__ = sys.exc_info()[2]
                 responses.append((receiver, err))
             else:
                 responses.append((receiver, response))
@@ -237,12 +215,10 @@ class Signal(object):
         # Note: caller is assumed to hold self.lock.
         if self._dead_receivers:
             self._dead_receivers = False
-            new_receivers = []
-            for r in self.receivers:
-                if isinstance(r[1], weakref.ReferenceType) and r[1]() is None:
-                    continue
-                new_receivers.append(r)
-            self.receivers = new_receivers
+            self.receivers = [
+                r for r in self.receivers
+                if not(isinstance(r[1], weakref.ReferenceType) and r[1]() is None)
+            ]
 
     def _live_receivers(self, sender):
         """

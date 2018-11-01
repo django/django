@@ -2,13 +2,13 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 
 from .fields import (
-    ArrayField, BigIntegerRangeField, CITextField, DateRangeField,
-    DateTimeRangeField, FloatRangeField, HStoreField, IntegerRangeField,
-    JSONField, SearchVectorField,
+    ArrayField, BigIntegerRangeField, CICharField, CIEmailField, CITextField,
+    DateRangeField, DateTimeRangeField, DecimalRangeField, HStoreField,
+    IntegerRangeField, JSONField, SearchVectorField,
 )
 
 
-class Tag(object):
+class Tag:
     def __init__(self, tag_id):
         self.tag_id = tag_id
 
@@ -18,7 +18,7 @@ class Tag(object):
 
 class TagField(models.SmallIntegerField):
 
-    def from_db_value(self, value, expression, connection, context):
+    def from_db_value(self, value, expression, connection):
         if value is None:
             return value
         return Tag(int(value))
@@ -41,7 +41,7 @@ class PostgreSQLModel(models.Model):
 
 
 class IntegerArrayModel(PostgreSQLModel):
-    field = ArrayField(models.IntegerField(), default=[], blank=True)
+    field = ArrayField(models.IntegerField(), default=list, blank=True)
 
 
 class NullableIntegerArrayModel(PostgreSQLModel):
@@ -63,14 +63,18 @@ class NestedIntegerArrayModel(PostgreSQLModel):
 
 
 class OtherTypesArrayModel(PostgreSQLModel):
-    ips = ArrayField(models.GenericIPAddressField())
-    uuids = ArrayField(models.UUIDField())
-    decimals = ArrayField(models.DecimalField(max_digits=5, decimal_places=2))
+    ips = ArrayField(models.GenericIPAddressField(), default=list)
+    uuids = ArrayField(models.UUIDField(), default=list)
+    decimals = ArrayField(models.DecimalField(max_digits=5, decimal_places=2), default=list)
     tags = ArrayField(TagField(), blank=True, null=True)
+    json = ArrayField(JSONField(default=dict), default=list)
+    int_ranges = ArrayField(IntegerRangeField(), blank=True, null=True)
+    bigint_ranges = ArrayField(BigIntegerRangeField(), blank=True, null=True)
 
 
 class HStoreModel(PostgreSQLModel):
     field = HStoreField(blank=True, null=True)
+    array_field = ArrayField(HStoreField(), null=True)
 
 
 class CharFieldModel(models.Model):
@@ -101,8 +105,11 @@ class Character(models.Model):
         return self.name
 
 
-class CITextTestModel(PostgreSQLModel):
-    name = CITextField(primary_key=True, max_length=255)
+class CITestModel(PostgreSQLModel):
+    name = CICharField(primary_key=True, max_length=255)
+    email = CIEmailField()
+    description = CITextField()
+    array_field = ArrayField(CITextField(), null=True)
 
     def __str__(self):
         return self.name
@@ -122,7 +129,7 @@ class Line(PostgreSQLModel):
 class RangesModel(PostgreSQLModel):
     ints = IntegerRangeField(blank=True, null=True)
     bigints = BigIntegerRangeField(blank=True, null=True)
-    floats = FloatRangeField(blank=True, null=True)
+    decimals = DecimalRangeField(blank=True, null=True)
     timestamps = DateTimeRangeField(blank=True, null=True)
     dates = DateRangeField(blank=True, null=True)
 
@@ -136,17 +143,14 @@ class RangeLookupsModel(PostgreSQLModel):
     date = models.DateField(blank=True, null=True)
 
 
-class JSONModel(models.Model):
+class JSONModel(PostgreSQLModel):
     field = JSONField(blank=True, null=True)
     field_custom = JSONField(blank=True, null=True, encoder=DjangoJSONEncoder)
-
-    class Meta:
-        required_db_features = ['has_jsonb_datatype']
 
 
 class ArrayFieldSubclass(ArrayField):
     def __init__(self, *args, **kwargs):
-        super(ArrayFieldSubclass, self).__init__(models.IntegerField())
+        super().__init__(models.IntegerField())
 
 
 class AggregateTestModel(models.Model):
@@ -155,7 +159,7 @@ class AggregateTestModel(models.Model):
     """
     char_field = models.CharField(max_length=30, blank=True)
     integer_field = models.IntegerField(null=True)
-    boolean_field = models.NullBooleanField()
+    boolean_field = models.BooleanField(null=True)
 
 
 class StatTestModel(models.Model):
@@ -169,3 +173,7 @@ class StatTestModel(models.Model):
 
 class NowTestModel(models.Model):
     when = models.DateTimeField(null=True, default=None)
+
+
+class UUIDTestModel(models.Model):
+    uuid = models.UUIDField(default=None, null=True)

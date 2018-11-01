@@ -24,19 +24,6 @@ class AuthenticationMiddleware(MiddlewareMixin):
         request.user = SimpleLazyObject(lambda: get_user(request))
 
 
-class SessionAuthenticationMiddleware(MiddlewareMixin):
-    """
-    Formerly, a middleware for invalidating a user's sessions that don't
-    correspond to the user's current session authentication hash. However, it
-    caused the "Vary: Cookie" header on all responses.
-
-    It's now a shim to allow a single settings file to more easily support
-    multiple versions of Django. Will be RemovedInDjango20Warning.
-    """
-    def process_request(self, request):
-        pass
-
-
 class RemoteUserMiddleware(MiddlewareMixin):
     """
     Middleware for utilizing Web-server-provided authentication.
@@ -97,7 +84,7 @@ class RemoteUserMiddleware(MiddlewareMixin):
 
     def clean_username(self, username, request):
         """
-        Allows the backend to clean the username, if the backend defines a
+        Allow the backend to clean the username, if the backend defines a
         clean_username method.
         """
         backend_str = request.session[auth.BACKEND_SESSION_KEY]
@@ -110,7 +97,7 @@ class RemoteUserMiddleware(MiddlewareMixin):
 
     def _remove_invalid_user(self, request):
         """
-        Removes the current authenticated user in the request which is invalid
+        Remove the current authenticated user in the request which is invalid
         but only if the user is authenticated via the RemoteUserBackend.
         """
         try:

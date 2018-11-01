@@ -1,9 +1,9 @@
-from __future__ import unicode_literals
-
 import datetime
 
+from django.core.exceptions import ValidationError
 from django.forms import DurationField
 from django.test import SimpleTestCase
+from django.utils import translation
 from django.utils.duration import duration_string
 
 from . import FormFieldAssertionsMixin
@@ -20,6 +20,26 @@ class DurationFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             datetime.timedelta(days=1, hours=1, minutes=15, seconds=30, milliseconds=300),
             f.clean('1 1:15:30.3')
         )
+
+    def test_overflow(self):
+        msg = "The number of days must be between {min_days} and {max_days}.".format(
+            min_days=datetime.timedelta.min.days,
+            max_days=datetime.timedelta.max.days,
+        )
+        f = DurationField()
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean('1000000000 00:00:00')
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean('-1000000000 00:00:00')
+
+    def test_overflow_translation(self):
+        msg = "Le nombre de jours doit être entre {min_days} et {max_days}.".format(
+            min_days=datetime.timedelta.min.days,
+            max_days=datetime.timedelta.max.days,
+        )
+        with translation.override('fr'):
+            with self.assertRaisesMessage(ValidationError, msg):
+                DurationField().clean('1000000000 00:00:00')
 
     def test_durationfield_render(self):
         self.assertWidgetRendersTo(

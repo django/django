@@ -1,7 +1,6 @@
 from django.conf import settings
 
 from .. import Tags, Warning, register
-from ..utils import patch_middleware_message
 
 SECRET_KEY_MIN_LENGTH = 50
 SECRET_KEY_MIN_UNIQUE_CHARACTERS = 5
@@ -46,7 +45,7 @@ W005 = Warning(
 W006 = Warning(
     "Your SECURE_CONTENT_TYPE_NOSNIFF setting is not set to True, "
     "so your pages will not be served with an "
-    "'x-content-type-options: nosniff' header. "
+    "'X-Content-Type-Options: nosniff' header. "
     "You should consider enabling this header to prevent the "
     "browser from identifying content types incorrectly.",
     id='security.W006',
@@ -55,7 +54,7 @@ W006 = Warning(
 W007 = Warning(
     "Your SECURE_BROWSER_XSS_FILTER setting is not set to True, "
     "so your pages will not be served with an "
-    "'x-xss-protection: 1; mode=block' header. "
+    "'X-XSS-Protection: 1; mode=block' header. "
     "You should consider enabling this header to activate the "
     "browser's XSS filtering and help prevent XSS attacks.",
     id='security.W007',
@@ -109,25 +108,23 @@ W021 = Warning(
 
 
 def _security_middleware():
-    return ("django.middleware.security.SecurityMiddleware" in settings.MIDDLEWARE_CLASSES or
-            settings.MIDDLEWARE and "django.middleware.security.SecurityMiddleware" in settings.MIDDLEWARE)
+    return 'django.middleware.security.SecurityMiddleware' in settings.MIDDLEWARE
 
 
 def _xframe_middleware():
-    return ("django.middleware.clickjacking.XFrameOptionsMiddleware" in settings.MIDDLEWARE_CLASSES or
-            settings.MIDDLEWARE and "django.middleware.clickjacking.XFrameOptionsMiddleware" in settings.MIDDLEWARE)
+    return 'django.middleware.clickjacking.XFrameOptionsMiddleware' in settings.MIDDLEWARE
 
 
 @register(Tags.security, deploy=True)
 def check_security_middleware(app_configs, **kwargs):
     passed_check = _security_middleware()
-    return [] if passed_check else [patch_middleware_message(W001)]
+    return [] if passed_check else [W001]
 
 
 @register(Tags.security, deploy=True)
 def check_xframe_options_middleware(app_configs, **kwargs):
     passed_check = _xframe_middleware()
-    return [] if passed_check else [patch_middleware_message(W002)]
+    return [] if passed_check else [W002]
 
 
 @register(Tags.security, deploy=True)
@@ -205,7 +202,7 @@ def check_xframe_deny(app_configs, **kwargs):
         not _xframe_middleware() or
         settings.X_FRAME_OPTIONS == 'DENY'
     )
-    return [] if passed_check else [patch_middleware_message(W019)]
+    return [] if passed_check else [W019]
 
 
 @register(Tags.security, deploy=True)

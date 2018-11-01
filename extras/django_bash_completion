@@ -43,7 +43,7 @@ _python_django_completion()
 {
     if [[ ${COMP_CWORD} -ge 2 ]]; then
         local PYTHON_EXE=${COMP_WORDS[0]##*/}
-        echo $PYTHON_EXE | egrep "python([2-9]\.[0-9])?" >/dev/null 2>&1
+        echo $PYTHON_EXE | egrep "python([3-9]\.[0-9])?" >/dev/null 2>&1
         if [[ $? == 0 ]]; then
             local PYTHON_SCRIPT=${COMP_WORDS[1]##*/}
             echo $PYTHON_SCRIPT | egrep "manage\.py|django-admin(\.py)?" >/dev/null 2>&1

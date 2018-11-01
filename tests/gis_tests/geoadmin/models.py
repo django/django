@@ -1,17 +1,14 @@
-from django.utils.encoding import python_2_unicode_compatible
+from django.contrib.gis.db import models
 
 from ..admin import admin
-from ..models import models
 
 
-@python_2_unicode_compatible
 class City(models.Model):
     name = models.CharField(max_length=30)
     point = models.PointField()
 
     class Meta:
         app_label = 'geoadmin'
-        required_db_features = ['gis_enabled']
 
     def __str__(self):
         return self.name

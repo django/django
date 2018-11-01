@@ -3,14 +3,14 @@
 # Translators:
 # Bruno Miguel Custódio <bruno@brunomcustodio.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Nuno Mariz <nmariz@gmail.com>, 2011-2013,2015
+# Nuno Mariz <nmariz@gmail.com>, 2011-2013,2015,2017
 # Raúl Pedro Fernandes Santos, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:51+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-23 18:54+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Portuguese (http://www.transifex.com/django/django/language/"
 "pt/)\n"
@@ -142,7 +142,7 @@ msgid "Arguments"
 msgstr "Argumentos"
 
 msgid "Back to Model documentation"
-msgstr ""
+msgstr "Voltar para a documentação dos Models"
 
 msgid "Model documentation"
 msgstr "Documentação dos Models"
@@ -217,7 +217,7 @@ msgid "Templates:"
 msgstr "Templates:"
 
 msgid "Back to View documentation"
-msgstr ""
+msgstr "Voltar para a documentação das Views"
 
 msgid "View documentation"
 msgstr "Ver documentação"
@@ -244,13 +244,6 @@ msgstr ""
 "\n"
 "    Função de view: <code>%(full_name)s</code>. Nome: <code>%(url_name)s</"
 "code>.\n"
-
-msgid "Boolean (Either True or False)"
-msgstr "Boolean (Pode ser True ou False)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Campo do tipo: %(field_type)s"
 
 msgid "tag:"
 msgstr "tag:"

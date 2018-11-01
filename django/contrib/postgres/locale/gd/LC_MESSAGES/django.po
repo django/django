@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# GunChleoc, 2016
+# GunChleoc, 2016-2017
+# GunChleoc, 2015
 # GunChleoc, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-07-15 10:28+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-29 09:32+0000\n"
 "Last-Translator: GunChleoc\n"
 "Language-Team: Gaelic, Scottish (http://www.transifex.com/django/django/"
 "language/gd/)\n"
@@ -23,18 +24,18 @@ msgid "PostgreSQL extensions"
 msgstr "Leudachain PostgreSQL"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
-msgstr "Cha deach le dearbhadh an nì %(nth)s san arraigh: "
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "Cha deach le dearbhadh an nì %(nth)s san arraigh:"
 
 msgid "Nested arrays must have the same length."
 msgstr "Feumaidh an aon fhaid a bhith aig a h-uile arraigh neadaichte."
 
-msgid "Map of strings to strings"
-msgstr "Mapaichean de shreangan gu sreangan"
+msgid "Map of strings to strings/nulls"
+msgstr "Mapaichean de shreangan gu sreangan/luachan null"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "Chan eil an luach air “%(key)s” ’na shreang."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "Chan eil an luach air “%(key)s” ’na shreang no null."
 
 msgid "A JSON object"
 msgstr "Oibjeact JSON"

@@ -1,10 +1,6 @@
-import logging
 import posixpath
-import warnings
 from collections import defaultdict
 
-from django.utils import six
-from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.safestring import mark_safe
 
 from .base import (
@@ -16,20 +12,14 @@ register = Library()
 
 BLOCK_CONTEXT_KEY = 'block_context'
 
-logger = logging.getLogger('django.template')
 
-
-class ExtendsError(Exception):
-    pass
-
-
-class BlockContext(object):
+class BlockContext:
     def __init__(self):
         # Dictionary of FIFO queues.
         self.blocks = defaultdict(list)
 
     def add_blocks(self, blocks):
-        for name, block in six.iteritems(blocks):
+        for name, block in blocks.items():
             self.blocks[name].insert(0, block)
 
     def pop(self, name):
@@ -98,7 +88,7 @@ class ExtendsNode(Node):
         self.blocks = {n.name: n for n in nodelist.get_nodes_by_type(BlockNode)}
 
     def __repr__(self):
-        return '<ExtendsNode: extends %s>' % self.parent_name.token
+        return '<%s: extends %s>' % (self.__class__.__name__, self.parent_name.token)
 
     def find_template(self, template_name, context):
         """
@@ -107,25 +97,8 @@ class ExtendsNode(Node):
         passed as the skip argument. This enables extends to work recursively
         without extending the same template twice.
         """
-        # RemovedInDjango20Warning: If any non-recursive loaders are installed
-        # do a direct template lookup. If the same template name appears twice,
-        # raise an exception to avoid system recursion.
-        for loader in context.template.engine.template_loaders:
-            if not loader.supports_recursion:
-                history = context.render_context.setdefault(
-                    self.context_key, [context.template.origin.template_name],
-                )
-                if template_name in history:
-                    raise ExtendsError(
-                        "Cannot extend templates recursively when using "
-                        "non-recursive template loaders",
-                    )
-                template = context.template.engine.get_template(template_name)
-                history.append(template_name)
-                return template
-
         history = context.render_context.setdefault(
-            self.context_key, [context.template.origin],
+            self.context_key, [self.origin],
         )
         template, origin = context.template.engine.find_template(
             template_name, skip=history,
@@ -173,17 +146,18 @@ class ExtendsNode(Node):
 
         # Call Template._render explicitly so the parser context stays
         # the same.
-        return compiled_parent._render(context)
+        with context.render_context.push_state(compiled_parent, isolated_context=False):
+            return compiled_parent._render(context)
 
 
 class IncludeNode(Node):
     context_key = '__include_context'
 
-    def __init__(self, template, *args, **kwargs):
+    def __init__(self, template, *args, extra_context=None, isolated_context=False, **kwargs):
         self.template = template
-        self.extra_context = kwargs.pop('extra_context', {})
-        self.isolated_context = kwargs.pop('isolated_context', False)
-        super(IncludeNode, self).__init__(*args, **kwargs)
+        self.extra_context = extra_context or {}
+        self.isolated_context = isolated_context
+        super().__init__(*args, **kwargs)
 
     def render(self, context):
         """
@@ -191,43 +165,27 @@ class IncludeNode(Node):
         in render_context to avoid reparsing and loading when used in a for
         loop.
         """
-        try:
-            template = self.template.resolve(context)
-            # Does this quack like a Template?
-            if not callable(getattr(template, 'render', None)):
-                # If not, we'll try our cache, and get_template()
-                template_name = template
-                cache = context.render_context.setdefault(self.context_key, {})
-                template = cache.get(template_name)
-                if template is None:
-                    template = context.template.engine.get_template(template_name)
-                    cache[template_name] = template
-            values = {
-                name: var.resolve(context)
-                for name, var in six.iteritems(self.extra_context)
-            }
-            if self.isolated_context:
-                return template.render(context.new(values))
-            with context.push(**values):
-                return template.render(context)
-        except Exception as e:
-            if context.template.engine.debug:
-                raise
-            template_name = getattr(context, 'template_name', None) or 'unknown'
-            warnings.warn(
-                "Rendering {%% include '%s' %%} raised %s. In Django 2.1, "
-                "this exception will be raised rather than silenced and "
-                "rendered as an empty string." %
-                (template_name, e.__class__.__name__),
-                RemovedInDjango21Warning,
-            )
-            logger.warning(
-                "Exception raised while rendering {%% include %%} for "
-                "template '%s'. Empty string rendered instead.",
-                template_name,
-                exc_info=True,
-            )
-            return ''
+        template = self.template.resolve(context)
+        # Does this quack like a Template?
+        if not callable(getattr(template, 'render', None)):
+            # If not, try the cache and get_template().
+            template_name = template
+            cache = context.render_context.dicts[0].setdefault(self, {})
+            template = cache.get(template_name)
+            if template is None:
+                template = context.template.engine.get_template(template_name)
+                cache[template_name] = template
+        # Use the base.Template of a backends.django.Template.
+        elif hasattr(template, 'template'):
+            template = template.template
+        values = {
+            name: var.resolve(context)
+            for name, var in self.extra_context.items()
+        }
+        if self.isolated_context:
+            return template.render(context.new(values))
+        with context.push(**values):
+            return template.render(context)
 
 
 @register.tag('block')
@@ -264,7 +222,7 @@ def construct_relative_path(current_template_name, relative_name):
     Convert a relative path (starting with './' or '../') to the full template
     name based on the current_template_name.
     """
-    if not any(relative_name.startswith(x) for x in ["'./", "'../", '"./', '"../']):
+    if not relative_name.startswith(("'./", "'../", '"./', '"../')):
         # relative_name is a variable or a literal that doesn't contain a
         # relative path.
         return relative_name
@@ -314,7 +272,7 @@ def do_extends(parser, token):
 @register.tag('include')
 def do_include(parser, token):
     """
-    Loads a template and renders it with the current context. You can pass
+    Load a template and render it with the current context. You can pass
     additional context using keyword arguments.
 
     Example::

@@ -11,8 +11,7 @@ class MySQLIntrospection(DatabaseIntrospection):
     data_types_reverse[FIELD_TYPE.GEOMETRY] = 'GeometryField'
 
     def get_geometry_type(self, table_name, geo_col):
-        cursor = self.connection.cursor()
-        try:
+        with self.connection.cursor() as cursor:
             # In order to get the specific geometry type of the field,
             # we introspect on the table definition using `DESCRIBE`.
             cursor.execute('DESCRIBE %s' %
@@ -27,15 +26,13 @@ class MySQLIntrospection(DatabaseIntrospection):
                     field_type = OGRGeomType(typ).django
                     field_params = {}
                     break
-        finally:
-            cursor.close()
-
         return field_type, field_params
 
     def supports_spatial_index(self, cursor, table_name):
-        # Supported with MyISAM, or InnoDB on MySQL 5.7.5+
+        # Supported with MyISAM/Aria, or InnoDB on MySQL 5.7.5+/MariaDB 10.2.2+
         storage_engine = self.get_storage_engine(cursor, table_name)
-        return (
-            (storage_engine == 'InnoDB' and self.connection.mysql_version >= (5, 7, 5)) or
-            storage_engine == 'MyISAM'
-        )
+        if storage_engine == 'InnoDB':
+            return self.connection.mysql_version >= (
+                (10, 2, 2) if self.connection.mysql_is_mariadb else (5, 7, 5)
+            )
+        return storage_engine in ('MyISAM', 'Aria')

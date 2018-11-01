@@ -8,6 +8,7 @@ def inner_view(request):
                        '{% url "inner" as inner_url %}inner:{{ inner_url }}').render(Context())
     return HttpResponse(content)
 
+
 urlpatterns = [
     url(r'^second_test/$', inner_view, name='inner'),
 ]

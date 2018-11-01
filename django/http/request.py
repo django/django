@@ -1,10 +1,9 @@
-from __future__ import unicode_literals
-
 import copy
 import re
-import sys
+import warnings
 from io import BytesIO
 from itertools import chain
+from urllib.parse import quote, urlencode, urljoin, urlsplit
 
 from django.conf import settings
 from django.core import signing
@@ -13,15 +12,11 @@ from django.core.exceptions import (
 )
 from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser, MultiPartParserError
-from django.utils import six
 from django.utils.datastructures import ImmutableList, MultiValueDict
-from django.utils.encoding import (
-    escape_uri_path, force_bytes, force_str, force_text, iri_to_uri,
-)
+from django.utils.deprecation import RemovedInDjango30Warning
+from django.utils.encoding import escape_uri_path, iri_to_uri
+from django.utils.functional import cached_property
 from django.utils.http import is_same_domain, limited_parse_qsl
-from django.utils.six.moves.urllib.parse import (
-    quote, urlencode, urljoin, urlsplit,
-)
 
 RAISE_ERROR = object()
 host_validation_re = re.compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?$")
@@ -40,7 +35,7 @@ class RawPostDataException(Exception):
     pass
 
 
-class HttpRequest(object):
+class HttpRequest:
     """A basic HTTP request."""
 
     # The encoding used in GET/POST dicts. None means use default setting.
@@ -62,16 +57,13 @@ class HttpRequest(object):
         self.path_info = ''
         self.method = None
         self.resolver_match = None
-        self._post_parse_error = False
         self.content_type = None
         self.content_params = None
 
     def __repr__(self):
         if self.method is None or not self.get_full_path():
-            return force_str('<%s>' % self.__class__.__name__)
-        return force_str(
-            '<%s: %s %r>' % (self.__class__.__name__, self.method, force_str(self.get_full_path()))
-        )
+            return '<%s>' % self.__class__.__name__
+        return '<%s: %s %r>' % (self.__class__.__name__, self.method, self.get_full_path())
 
     def _get_raw_host(self):
         """
@@ -96,12 +88,13 @@ class HttpRequest(object):
         """Return the HTTP host using the environment or request headers."""
         host = self._get_raw_host()
 
-        # There is no hostname validation when DEBUG=True
-        if settings.DEBUG:
-            return host
+        # Allow variants of localhost if ALLOWED_HOSTS is empty and DEBUG=True.
+        allowed_hosts = settings.ALLOWED_HOSTS
+        if settings.DEBUG and not allowed_hosts:
+            allowed_hosts = ['localhost', '127.0.0.1', '[::1]']
 
         domain, port = split_domain_port(host)
-        if domain and validate_host(domain, settings.ALLOWED_HOSTS):
+        if domain and validate_host(domain, allowed_hosts):
             return host
         else:
             msg = "Invalid HTTP_HOST header: %r." % host
@@ -120,19 +113,25 @@ class HttpRequest(object):
         return str(port)
 
     def get_full_path(self, force_append_slash=False):
+        return self._get_full_path(self.path, force_append_slash)
+
+    def get_full_path_info(self, force_append_slash=False):
+        return self._get_full_path(self.path_info, force_append_slash)
+
+    def _get_full_path(self, path, force_append_slash):
         # RFC 3986 requires query string arguments to be in the ASCII range.
         # Rather than crash if this doesn't happen, we encode defensively.
         return '%s%s%s' % (
-            escape_uri_path(self.path),
-            '/' if force_append_slash and not self.path.endswith('/') else '',
+            escape_uri_path(path),
+            '/' if force_append_slash and not path.endswith('/') else '',
             ('?' + iri_to_uri(self.META.get('QUERY_STRING', ''))) if self.META.get('QUERY_STRING', '') else ''
         )
 
     def get_signed_cookie(self, key, default=RAISE_ERROR, salt='', max_age=None):
         """
-        Attempts to return a signed cookie. If the signature fails or the
-        cookie has expired, raises an exception... unless you provide the
-        default argument in which case that value will be returned instead.
+        Attempt to return a signed cookie. If the signature fails or the
+        cookie has expired, raise an exception, unless the `default` argument
+        is provided,  in which case return that value.
         """
         try:
             cookie_value = self.COOKIES[key]
@@ -164,13 +163,12 @@ class HttpRequest(object):
 
     def build_absolute_uri(self, location=None):
         """
-        Builds an absolute URI from the location and the variables available in
-        this request. If no ``location`` is specified, the absolute URI is
-        built on ``request.get_full_path()``. Anyway, if the location is
-        absolute, it is simply converted to an RFC 3987 compliant URI and
-        returned and if location is relative or is scheme-relative (i.e.,
-        ``//example.com/``), it is urljoined to a base URL constructed from the
-        request variables.
+        Build an absolute URI from the location and the variables available in
+        this request. If no ``location`` is specified, build the absolute URI
+        using request.get_full_path(). If the location is absolute, convert it
+        to an RFC 3987 compliant URI and return it. If location is relative or
+        is scheme-relative (i.e., ``//example.com/``), urljoin() it to a base
+        URL constructed from the request variables.
         """
         if location is None:
             # Make it an absolute url (but schemeless and domainless) for the
@@ -178,18 +176,31 @@ class HttpRequest(object):
             location = '//%s' % self.get_full_path()
         bits = urlsplit(location)
         if not (bits.scheme and bits.netloc):
-            current_uri = '{scheme}://{host}{path}'.format(scheme=self.scheme,
-                                                           host=self.get_host(),
-                                                           path=self.path)
-            # Join the constructed URL with the provided location, which will
-            # allow the provided ``location`` to apply query strings to the
-            # base path as well as override the host, if it begins with //
-            location = urljoin(current_uri, location)
+            # Handle the simple, most common case. If the location is absolute
+            # and a scheme or host (netloc) isn't provided, skip an expensive
+            # urljoin() as long as no path segments are '.' or '..'.
+            if (bits.path.startswith('/') and not bits.scheme and not bits.netloc and
+                    '/./' not in bits.path and '/../' not in bits.path):
+                # If location starts with '//' but has no netloc, reuse the
+                # schema and netloc from the current request. Strip the double
+                # slashes and continue as if it wasn't specified.
+                if location.startswith('//'):
+                    location = location[2:]
+                location = self._current_scheme_host + location
+            else:
+                # Join the constructed URL with the provided location, which
+                # allows the provided location to apply query strings to the
+                # base path.
+                location = urljoin(self._current_scheme_host + self.path, location)
         return iri_to_uri(location)
+
+    @cached_property
+    def _current_scheme_host(self):
+        return '{}://{}'.format(self.scheme, self.get_host())
 
     def _get_scheme(self):
         """
-        Hook for subclasses like WSGIRequest to implement. Returns 'http' by
+        Hook for subclasses like WSGIRequest to implement. Return 'http' by
         default.
         """
         return 'http'
@@ -220,13 +231,13 @@ class HttpRequest(object):
     @encoding.setter
     def encoding(self, val):
         """
-        Sets the encoding used for GET/POST accesses. If the GET or POST
-        dictionary has already been created, it is removed and recreated on the
+        Set the encoding used for GET/POST accesses. If the GET or POST
+        dictionary has already been created, remove and recreate it on the
         next access (so that it is decoded correctly).
         """
         self._encoding = val
-        if hasattr(self, '_get'):
-            del self._get
+        if hasattr(self, 'GET'):
+            del self.GET
         if hasattr(self, '_post'):
             del self._post
 
@@ -248,7 +259,7 @@ class HttpRequest(object):
         self._upload_handlers = upload_handlers
 
     def parse_file_upload(self, META, post_data):
-        """Returns a tuple of (POST QueryDict, FILES MultiValueDict)."""
+        """Return a tuple of (POST QueryDict, FILES MultiValueDict)."""
         self.upload_handlers = ImmutableList(
             self.upload_handlers,
             warning="You cannot alter upload handlers after the upload has been processed."
@@ -270,14 +281,13 @@ class HttpRequest(object):
             try:
                 self._body = self.read()
             except IOError as e:
-                six.reraise(UnreadablePostError, UnreadablePostError(*e.args), sys.exc_info()[2])
+                raise UnreadablePostError(*e.args) from e
             self._stream = BytesIO(self._body)
         return self._body
 
     def _mark_post_parse_error(self):
         self._post = QueryDict()
         self._files = MultiValueDict()
-        self._post_parse_error = True
 
     def _load_post_and_files(self):
         """Populate self._post and self._files if the content-type is a form type"""
@@ -301,9 +311,6 @@ class HttpRequest(object):
                 # formatting the error the request handler might access
                 # self.POST, set self._post and self._file to prevent
                 # attempts to parse POST data again.
-                # Mark that an error occurred. This allows self.__repr__ to
-                # be explicit about it instead of simply representing an
-                # empty POST
                 self._mark_post_parse_error()
                 raise
         elif self.content_type == 'application/x-www-form-urlencoded':
@@ -329,26 +336,27 @@ class HttpRequest(object):
         try:
             return self._stream.read(*args, **kwargs)
         except IOError as e:
-            six.reraise(UnreadablePostError, UnreadablePostError(*e.args), sys.exc_info()[2])
+            raise UnreadablePostError(*e.args) from e
 
     def readline(self, *args, **kwargs):
         self._read_started = True
         try:
             return self._stream.readline(*args, **kwargs)
         except IOError as e:
-            six.reraise(UnreadablePostError, UnreadablePostError(*e.args), sys.exc_info()[2])
+            raise UnreadablePostError(*e.args) from e
+
+    def __iter__(self):
+        return iter(self.readline, b'')
 
     def xreadlines(self):
-        while True:
-            buf = self.readline()
-            if not buf:
-                break
-            yield buf
-
-    __iter__ = xreadlines
+        warnings.warn(
+            'HttpRequest.xreadlines() is deprecated in favor of iterating the '
+            'request.', RemovedInDjango30Warning, stacklevel=2,
+        )
+        yield from self
 
     def readlines(self):
-        return list(iter(self))
+        return list(self)
 
 
 class QueryDict(MultiValueDict):
@@ -363,7 +371,7 @@ class QueryDict(MultiValueDict):
     will always return a mutable copy.
 
     Both keys and values set on this class are converted from the given encoding
-    (DEFAULT_CHARSET by default) to unicode.
+    (DEFAULT_CHARSET by default) to str.
     """
 
     # These are both reset in __init__, but is specified here at the class
@@ -372,34 +380,23 @@ class QueryDict(MultiValueDict):
     _encoding = None
 
     def __init__(self, query_string=None, mutable=False, encoding=None):
-        super(QueryDict, self).__init__()
-        if not encoding:
-            encoding = settings.DEFAULT_CHARSET
-        self.encoding = encoding
+        super().__init__()
+        self.encoding = encoding or settings.DEFAULT_CHARSET
         query_string = query_string or ''
         parse_qsl_kwargs = {
             'keep_blank_values': True,
             'fields_limit': settings.DATA_UPLOAD_MAX_NUMBER_FIELDS,
-            'encoding': encoding,
+            'encoding': self.encoding,
         }
-        if six.PY3:
-            if isinstance(query_string, bytes):
-                # query_string normally contains URL-encoded data, a subset of ASCII.
-                try:
-                    query_string = query_string.decode(encoding)
-                except UnicodeDecodeError:
-                    # ... but some user agents are misbehaving :-(
-                    query_string = query_string.decode('iso-8859-1')
-            for key, value in limited_parse_qsl(query_string, **parse_qsl_kwargs):
-                self.appendlist(key, value)
-        else:
-            for key, value in limited_parse_qsl(query_string, **parse_qsl_kwargs):
-                try:
-                    value = value.decode(encoding)
-                except UnicodeDecodeError:
-                    value = value.decode('iso-8859-1')
-                self.appendlist(force_text(key, encoding, errors='replace'),
-                                value)
+        if isinstance(query_string, bytes):
+            # query_string normally contains URL-encoded data, a subset of ASCII.
+            try:
+                query_string = query_string.decode(self.encoding)
+            except UnicodeDecodeError:
+                # ... but some user agents are misbehaving :-(
+                query_string = query_string.decode('iso-8859-1')
+        for key, value in limited_parse_qsl(query_string, **parse_qsl_kwargs):
+            self.appendlist(key, value)
         self._mutable = mutable
 
     @classmethod
@@ -433,22 +430,22 @@ class QueryDict(MultiValueDict):
         self._assert_mutable()
         key = bytes_to_text(key, self.encoding)
         value = bytes_to_text(value, self.encoding)
-        super(QueryDict, self).__setitem__(key, value)
+        super().__setitem__(key, value)
 
     def __delitem__(self, key):
         self._assert_mutable()
-        super(QueryDict, self).__delitem__(key)
+        super().__delitem__(key)
 
     def __copy__(self):
         result = self.__class__('', mutable=True, encoding=self.encoding)
-        for key, value in six.iterlists(self):
+        for key, value in self.lists():
             result.setlist(key, value)
         return result
 
     def __deepcopy__(self, memo):
         result = self.__class__('', mutable=True, encoding=self.encoding)
         memo[id(self)] = result
-        for key, value in six.iterlists(self):
+        for key, value in self.lists():
             result.setlist(copy.deepcopy(key, memo), copy.deepcopy(value, memo))
         return result
 
@@ -456,57 +453,56 @@ class QueryDict(MultiValueDict):
         self._assert_mutable()
         key = bytes_to_text(key, self.encoding)
         list_ = [bytes_to_text(elt, self.encoding) for elt in list_]
-        super(QueryDict, self).setlist(key, list_)
+        super().setlist(key, list_)
 
     def setlistdefault(self, key, default_list=None):
         self._assert_mutable()
-        return super(QueryDict, self).setlistdefault(key, default_list)
+        return super().setlistdefault(key, default_list)
 
     def appendlist(self, key, value):
         self._assert_mutable()
         key = bytes_to_text(key, self.encoding)
         value = bytes_to_text(value, self.encoding)
-        super(QueryDict, self).appendlist(key, value)
+        super().appendlist(key, value)
 
     def pop(self, key, *args):
         self._assert_mutable()
-        return super(QueryDict, self).pop(key, *args)
+        return super().pop(key, *args)
 
     def popitem(self):
         self._assert_mutable()
-        return super(QueryDict, self).popitem()
+        return super().popitem()
 
     def clear(self):
         self._assert_mutable()
-        super(QueryDict, self).clear()
+        super().clear()
 
     def setdefault(self, key, default=None):
         self._assert_mutable()
         key = bytes_to_text(key, self.encoding)
         default = bytes_to_text(default, self.encoding)
-        return super(QueryDict, self).setdefault(key, default)
+        return super().setdefault(key, default)
 
     def copy(self):
-        """Returns a mutable copy of this object."""
+        """Return a mutable copy of this object."""
         return self.__deepcopy__({})
 
     def urlencode(self, safe=None):
         """
-        Returns an encoded string of all query string arguments.
+        Return an encoded string of all query string arguments.
 
-        :arg safe: Used to specify characters which do not require quoting, for
-            example::
+        `safe` specifies characters which don't require quoting, for example::
 
-                >>> q = QueryDict(mutable=True)
-                >>> q['next'] = '/a&b/'
-                >>> q.urlencode()
-                'next=%2Fa%26b%2F'
-                >>> q.urlencode(safe='/')
-                'next=/a%26b/'
+            >>> q = QueryDict(mutable=True)
+            >>> q['next'] = '/a&b/'
+            >>> q.urlencode()
+            'next=%2Fa%26b%2F'
+            >>> q.urlencode(safe='/')
+            'next=/a%26b/'
         """
         output = []
         if safe:
-            safe = force_bytes(safe, self.encoding)
+            safe = safe.encode(self.encoding)
 
             def encode(k, v):
                 return '%s=%s' % ((quote(k, safe), quote(v, safe)))
@@ -514,9 +510,10 @@ class QueryDict(MultiValueDict):
             def encode(k, v):
                 return urlencode({k: v})
         for k, list_ in self.lists():
-            k = force_bytes(k, self.encoding)
-            output.extend(encode(k, force_bytes(v, self.encoding))
-                          for v in list_)
+            output.extend(
+                encode(k.encode(self.encoding), str(v).encode(self.encoding))
+                for v in list_
+            )
         return '&'.join(output)
 
 
@@ -525,14 +522,14 @@ class QueryDict(MultiValueDict):
 # this slightly more restricted function, used by QueryDict.
 def bytes_to_text(s, encoding):
     """
-    Converts basestring objects to unicode, using the given encoding. Illegally
+    Convert bytes objects to strings, using the given encoding. Illegally
     encoded input characters are replaced with Unicode "unknown" codepoint
     (\ufffd).
 
-    Returns any non-basestring objects without change.
+    Return any non-bytes objects without change.
     """
     if isinstance(s, bytes):
-        return six.text_type(s, encoding, 'replace')
+        return str(s, encoding, 'replace')
     else:
         return s
 
@@ -541,7 +538,7 @@ def split_domain_port(host):
     """
     Return a (domain, port) tuple from a given host.
 
-    Returned domain is lower-cased. If the host is invalid, the domain will be
+    Returned domain is lowercased. If the host is invalid, the domain will be
     empty.
     """
     host = host.lower()
@@ -553,9 +550,10 @@ def split_domain_port(host):
         # It's an IPv6 address without a port.
         return host, ''
     bits = host.rsplit(':', 1)
-    if len(bits) == 2:
-        return tuple(bits)
-    return bits[0], ''
+    domain, port = bits if len(bits) == 2 else (bits[0], '')
+    # Remove a trailing dot (if present) from the domain.
+    domain = domain[:-1] if domain.endswith('.') else domain
+    return domain, port
 
 
 def validate_host(host, allowed_hosts):
@@ -568,15 +566,9 @@ def validate_host(host, allowed_hosts):
     ``example.com`` and any subdomain), ``*`` matches anything, and anything
     else must match exactly.
 
-    Note: This function assumes that the given host is lower-cased and has
+    Note: This function assumes that the given host is lowercased and has
     already had the port, if any, stripped off.
 
     Return ``True`` for a valid host, ``False`` otherwise.
     """
-    host = host[:-1] if host.endswith('.') else host
-
-    for pattern in allowed_hosts:
-        if pattern == '*' or is_same_domain(host, pattern):
-            return True
-
-    return False
+    return any(pattern == '*' or is_same_domain(host, pattern) for pattern in allowed_hosts)

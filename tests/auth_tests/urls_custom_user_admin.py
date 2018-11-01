@@ -12,8 +12,9 @@ class CustomUserAdmin(UserAdmin):
         # integer manually to avoid causing an error.
         original_pk = request.user.pk
         request.user.pk = 1
-        super(CustomUserAdmin, self).log_change(request, object, message)
+        super().log_change(request, object, message)
         request.user.pk = original_pk
+
 
 site.register(get_user_model(), CustomUserAdmin)
 

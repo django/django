@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.contrib.auth.models import User
 
 from .tests import AdminDocsTestCase, TestDataMixin
@@ -42,3 +40,8 @@ class XViewMiddlewareTest(TestDataMixin, AdminDocsTestCase):
         user.save()
         response = self.client.head('/xview/class/')
         self.assertNotIn('X-View', response)
+
+    def test_callable_object_view(self):
+        self.client.force_login(self.superuser)
+        response = self.client.head('/xview/callable_object/')
+        self.assertEqual(response['X-View'], 'admin_docs.views.XViewCallableObject')

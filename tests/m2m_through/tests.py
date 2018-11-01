@@ -1,9 +1,7 @@
-from __future__ import unicode_literals
-
 from datetime import datetime
 from operator import attrgetter
 
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import TestCase
 
 from .models import (
     CustomMembership, Employee, Event, Friendship, Group, Ingredient,
@@ -89,7 +87,7 @@ class M2mThroughTests(TestCase):
 
         self.assertQuerysetEqual(
             self.rock.members.all(),
-            ['Jim', ],
+            ['Jim'],
             attrgetter("name")
         )
 
@@ -158,7 +156,7 @@ class M2mThroughTests(TestCase):
 
         self.assertQuerysetEqual(
             self.bob.group_set.all(),
-            ['Rock', ],
+            ['Rock'],
             attrgetter('name')
         )
 
@@ -194,11 +192,10 @@ class M2mThroughTests(TestCase):
 
         self.assertQuerysetEqual(
             Group.objects.filter(members__name='Bob'),
-            ['Roll', ],
+            ['Roll'],
             attrgetter("name")
         )
 
-    @skipUnlessDBFeature('supports_microsecond_precision')
     def test_order_by_relational_field_through_model(self):
         CustomMembership.objects.create(person=self.jim, group=self.rock)
         CustomMembership.objects.create(person=self.bob, group=self.rock)
@@ -341,7 +338,7 @@ class M2mThroughTests(TestCase):
 
     def test_through_fields(self):
         """
-        Tests that relations with intermediary tables with multiple FKs
+        Relations with intermediary tables with multiple FKs
         to the M2M's ``to`` model are possible.
         """
         event = Event.objects.create(title='Rockwhale 2014')

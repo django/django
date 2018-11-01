@@ -2,14 +2,15 @@
 #
 # Translators:
 # Martin Pajuste <martinpajuste@gmail.com>, 2015
+# Martin Pajuste <martinpajuste@gmail.com>, 2017
 # Marti Raudsepp <marti@juffo.org>, 2015-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-07-18 21:31+0000\n"
-"Last-Translator: Marti Raudsepp <marti@juffo.org>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-23 20:42+0000\n"
+"Last-Translator: Martin Pajuste <martinpajuste@gmail.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -28,12 +29,12 @@ msgstr "Selement %(nth)s massiivis pole korrektne:"
 msgid "Nested arrays must have the same length."
 msgstr "Mitmemõõtmelised massiivid peavad olema sama pikad."
 
-msgid "Map of strings to strings"
-msgstr "Teisendus stringidest stringideks"
+msgid "Map of strings to strings/nulls"
+msgstr ""
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "Võtme \"%(key)s\" väärtus ei ole string."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "Võtme \"%(key)s\" väärtus ei ole string ega tühi."
 
 msgid "A JSON object"
 msgstr "JSON objekt"

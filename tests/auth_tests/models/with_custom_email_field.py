@@ -19,5 +19,6 @@ class CustomEmailField(AbstractBaseUser):
     is_active = models.BooleanField(default=True)
 
     EMAIL_FIELD = 'email_address'
+    USERNAME_FIELD = 'username'
 
     objects = CustomEmailFieldUserManager()

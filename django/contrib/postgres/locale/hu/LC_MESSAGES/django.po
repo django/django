@@ -1,14 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Akos Zsolt Hochrein <hoch.akos@gmail.com>, 2018
 # András Veres-Szentkirályi, 2016
+# Dóra Szendrei <szendrgigi@gmail.com>, 2017
+# János R (Hangya), 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-07-19 07:41+0000\n"
-"Last-Translator: András Veres-Szentkirályi\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-26 09:51+0000\n"
+"Last-Translator: Akos Zsolt Hochrein <hoch.akos@gmail.com>\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
@@ -21,18 +24,18 @@ msgid "PostgreSQL extensions"
 msgstr "PostgreSQL kiterjesztések"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
-msgstr "A tömb %(nth)s. értéke érvénytelen:"
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "A tömb %(nth)s-ik eleme érvénytelen:"
 
 msgid "Nested arrays must have the same length."
 msgstr "A belső tömböknek egyforma hosszúaknak kell lenniük."
 
-msgid "Map of strings to strings"
-msgstr "String-string leképezés"
+msgid "Map of strings to strings/nulls"
+msgstr "String-string/null leképezés"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "A(z) \"%(key)s\" érték nem string."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "\"%(key)s\" értéke nem karakterlánc vagy null."
 
 msgid "A JSON object"
 msgstr "Egy JSON objektum"

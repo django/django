@@ -1,10 +1,10 @@
-/* global module, test, parseTimeString */
+/* global QUnit, parseTimeString */
 /* eslint global-strict: 0, strict: 0 */
 'use strict';
 
-module('admin.timeparse');
+QUnit.module('admin.timeparse');
 
-test('parseTimeString', function(assert) {
+QUnit.test('parseTimeString', function(assert) {
     function time(then, expected) {
         assert.equal(parseTimeString(then), expected);
     }

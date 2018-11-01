@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.db import connection, models
 from django.db.backends.utils import truncate_name
 from django.test import TestCase

@@ -1,8 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
-import warnings
-
 from django.contrib.auth import get_user, get_user_model
 from django.contrib.auth.models import AnonymousUser, User
 from django.core.exceptions import ImproperlyConfigured
@@ -16,7 +11,7 @@ from .models import CustomUser
 
 class BasicTestCase(TestCase):
     def test_user(self):
-        "Check that users can be created and can set their password"
+        "Users can be created and can set their password"
         u = User.objects.create_user('testuser', 'test@example.com', 'testpw')
         self.assertTrue(u.has_usable_password())
         self.assertFalse(u.check_password('bad'))
@@ -56,28 +51,8 @@ class BasicTestCase(TestCase):
         with self.assertRaises(IntegrityError):
             User.objects.create_user(omega_username)
 
-    def test_is_anonymous_authenticated_method_deprecation(self):
-        deprecation_message = (
-            'Using user.is_authenticated() and user.is_anonymous() as a '
-            'method is deprecated. Remove the parentheses to use it as an '
-            'attribute.'
-        )
-        u = User.objects.create_user('testuser', 'test@example.com', 'testpw')
-        # Backwards-compatibility callables
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')
-            self.assertFalse(u.is_anonymous())
-            self.assertEqual(len(warns), 1)
-            self.assertEqual(str(warns[0].message), deprecation_message)
-
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')
-            self.assertTrue(u.is_authenticated())
-            self.assertEqual(len(warns), 1)
-            self.assertEqual(str(warns[0].message), deprecation_message)
-
     def test_user_no_email(self):
-        "Check that users can be created without an email"
+        "Users can be created without an email"
         u = User.objects.create_user('testuser1')
         self.assertEqual(u.email, '')
 
@@ -86,40 +61,6 @@ class BasicTestCase(TestCase):
 
         u3 = User.objects.create_user('testuser3', email=None)
         self.assertEqual(u3.email, '')
-
-    def test_anonymous_user(self):
-        "Check the properties of the anonymous user"
-        a = AnonymousUser()
-        self.assertIsNone(a.pk)
-        self.assertEqual(a.username, '')
-        self.assertEqual(a.get_username(), '')
-        self.assertTrue(a.is_anonymous)
-        self.assertFalse(a.is_authenticated)
-        self.assertFalse(a.is_staff)
-        self.assertFalse(a.is_active)
-        self.assertFalse(a.is_superuser)
-        self.assertEqual(a.groups.all().count(), 0)
-        self.assertEqual(a.user_permissions.all().count(), 0)
-
-    def test_anonymous_user_is_anonymous_authenticated_method_deprecation(self):
-        a = AnonymousUser()
-        deprecation_message = (
-            'Using user.is_authenticated() and user.is_anonymous() as a '
-            'method is deprecated. Remove the parentheses to use it as an '
-            'attribute.'
-        )
-        # Backwards-compatibility callables
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')  # prevent warnings from appearing as errors
-            self.assertTrue(a.is_anonymous())
-            self.assertEqual(len(warns), 1)
-            self.assertEqual(str(warns[0].message), deprecation_message)
-
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')  # prevent warnings from appearing as errors
-            self.assertFalse(a.is_authenticated())
-            self.assertEqual(len(warns), 1)
-            self.assertEqual(str(warns[0].message), deprecation_message)
 
     def test_superuser(self):
         "Check the creation and properties of a superuser"
@@ -142,13 +83,18 @@ class BasicTestCase(TestCase):
     @override_settings(AUTH_USER_MODEL='badsetting')
     def test_swappable_user_bad_setting(self):
         "The alternate user setting must point to something in the format app.model"
-        with self.assertRaises(ImproperlyConfigured):
+        msg = "AUTH_USER_MODEL must be of the form 'app_label.model_name'"
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             get_user_model()
 
     @override_settings(AUTH_USER_MODEL='thismodel.doesntexist')
     def test_swappable_user_nonexistent_model(self):
         "The current user model must point to an installed model"
-        with self.assertRaises(ImproperlyConfigured):
+        msg = (
+            "AUTH_USER_MODEL refers to model 'thismodel.doesntexist' "
+            "that has not been installed"
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             get_user_model()
 
     def test_user_verbose_names_translatable(self):

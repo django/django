@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.contrib.auth.checks import (
     check_models_permissions, check_user_model,
 )
@@ -59,8 +57,8 @@ class UserModelChecksTests(SimpleTestCase):
     @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserNonUniqueUsername')
     def test_username_non_unique(self):
         """
-        A non-unique USERNAME_FIELD should raise an error only if we use the
-        default authentication backend. Otherwise, an warning should be raised.
+        A non-unique USERNAME_FIELD raises an error only if the default
+        authentication backend is used. Otherwise, a warning is raised.
         """
         errors = checks.run_checks()
         self.assertEqual(errors, [

@@ -12,6 +12,7 @@ otherobj2 = URLObject('nodefault', 'other-ns2')
 
 newappobj1 = URLObject('newapp')
 
+app_name = 'namespace_urls'
 urlpatterns = [
     url(r'^normal/$', views.empty_view, name='normal-view'),
     url(r'^normal/(?P<arg1>[0-9]+)/(?P<arg2>[0-9]+)/$', views.empty_view, name='normal-view'),
@@ -27,12 +28,12 @@ urlpatterns = [
     url(r'^unnamed/normal/(?P<arg1>[0-9]+)/(?P<arg2>[0-9]+)/$', views.empty_view),
     url(r'^unnamed/view_class/(?P<arg1>[0-9]+)/(?P<arg2>[0-9]+)/$', views.view_class_instance),
 
-    url(r'^test1/', include(testobj1.urls)),
-    url(r'^test2/', include(testobj2.urls)),
-    url(r'^default/', include(default_testobj.urls)),
+    url(r'^test1/', include(*testobj1.urls)),
+    url(r'^test2/', include(*testobj2.urls)),
+    url(r'^default/', include(*default_testobj.urls)),
 
-    url(r'^other1/', include(otherobj1.urls)),
-    url(r'^other[246]/', include(otherobj2.urls)),
+    url(r'^other1/', include(*otherobj1.urls)),
+    url(r'^other[246]/', include(*otherobj2.urls)),
 
     url(r'^newapp1/', include(newappobj1.app_urls, 'new-ns1')),
     url(r'^new-default/', include(newappobj1.app_urls)),
@@ -43,10 +44,12 @@ urlpatterns = [
     url(r'^ns-included[135]/', include('urlpatterns_reverse.included_namespace_urls', namespace='inc-ns1')),
     url(r'^ns-included2/', include('urlpatterns_reverse.included_namespace_urls', namespace='inc-ns2')),
 
-    url(r'^app-included/', include('urlpatterns_reverse.included_namespace_urls', 'inc-app', 'inc-app')),
+    url(r'^app-included/', include('urlpatterns_reverse.included_namespace_urls', 'inc-app')),
 
     url(r'^included/', include('urlpatterns_reverse.included_namespace_urls')),
-    url(r'^inc(?P<outer>[0-9]+)/', include('urlpatterns_reverse.included_urls', namespace='inc-ns5')),
+    url(
+        r'^inc(?P<outer>[0-9]+)/', include(('urlpatterns_reverse.included_urls', 'included_urls'), namespace='inc-ns5')
+    ),
     url(r'^included/([0-9]+)/', include('urlpatterns_reverse.included_namespace_urls')),
 
     url(

@@ -5,7 +5,7 @@ Django 1.4.11 release notes
 *April 21, 2014*
 
 Django 1.4.11 fixes three security issues in 1.4.10. Additionally,
-Django's vendored version of six, :mod:`django.utils.six`, has been
+Django's vendored version of six, ``django.utils.six``, has been
 upgraded to the latest release (1.6.1).
 
 Unexpected code execution using ``reverse()``

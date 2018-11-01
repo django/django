@@ -1,12 +1,7 @@
-from __future__ import unicode_literals
-
 from django.contrib.auth.models import User
 from django.db import models
-from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Animal(models.Model):
     name = models.CharField(max_length=150)
     latin_name = models.CharField(max_length=150)
@@ -28,13 +23,12 @@ class Plant(models.Model):
         db_table = "Fixtures_regress_plant"
 
 
-@python_2_unicode_compatible
 class Stuff(models.Model):
     name = models.CharField(max_length=20, null=True)
     owner = models.ForeignKey(User, models.SET_NULL, null=True)
 
     def __str__(self):
-        return six.text_type(self.name) + ' is owned by ' + six.text_type(self.owner)
+        return self.name + ' is owned by ' + str(self.owner)
 
 
 class Absolute(models.Model):
@@ -82,7 +76,6 @@ class Feature(CommonFeature):
 
 
 # Models to regression test #11428
-@python_2_unicode_compatible
 class Widget(models.Model):
     name = models.CharField(max_length=255)
 
@@ -104,7 +97,6 @@ class TestManager(models.Manager):
         return self.get(name=key)
 
 
-@python_2_unicode_compatible
 class Store(models.Model):
     objects = TestManager()
     name = models.CharField(max_length=255)
@@ -120,7 +112,6 @@ class Store(models.Model):
         return (self.name,)
 
 
-@python_2_unicode_compatible
 class Person(models.Model):
     objects = TestManager()
     name = models.CharField(max_length=255)
@@ -138,7 +129,6 @@ class Person(models.Model):
     natural_key.dependencies = ['fixtures_regress.store']
 
 
-@python_2_unicode_compatible
 class Book(models.Model):
     name = models.CharField(max_length=255)
     author = models.ForeignKey(Person, models.CASCADE)
@@ -160,7 +150,6 @@ class NKManager(models.Manager):
         return self.get(data=data)
 
 
-@python_2_unicode_compatible
 class NKChild(Parent):
     data = models.CharField(max_length=10, unique=True)
     objects = NKManager()
@@ -172,7 +161,6 @@ class NKChild(Parent):
         return 'NKChild %s:%s' % (self.name, self.data)
 
 
-@python_2_unicode_compatible
 class RefToNKChild(models.Model):
     text = models.CharField(max_length=10)
     nk_fk = models.ForeignKey(NKChild, models.CASCADE, related_name='ref_fks')
@@ -252,7 +240,6 @@ class M2MToSelf(models.Model):
     parent = models.ManyToManyField("self", blank=True)
 
 
-@python_2_unicode_compatible
 class BaseNKModel(models.Model):
     """
     Base model with a natural_key and a manager with `get_by_natural_key`

@@ -1,11 +1,12 @@
 import gc
 import sys
 import time
-import unittest
 import weakref
 from types import TracebackType
 
 from django.dispatch import Signal, receiver
+from django.test import SimpleTestCase
+from django.test.utils import override_settings
 
 if sys.platform.startswith('java'):
     def garbage_collect():
@@ -28,12 +29,13 @@ def receiver_1_arg(val, **kwargs):
     return val
 
 
-class Callable(object):
+class Callable:
     def __call__(self, val, **kwargs):
         return val
 
     def a(self, val, **kwargs):
         return val
+
 
 a_signal = Signal(providing_args=["val"])
 b_signal = Signal(providing_args=["val"])
@@ -41,8 +43,7 @@ c_signal = Signal(providing_args=["val"])
 d_signal = Signal(providing_args=["val"], use_caching=True)
 
 
-class DispatcherTests(unittest.TestCase):
-    """Test suite for dispatcher (barely started)"""
+class DispatcherTests(SimpleTestCase):
 
     def assertTestIsClean(self, signal):
         """Assert that everything has been cleaned up automatically"""
@@ -52,30 +53,55 @@ class DispatcherTests(unittest.TestCase):
         self.assertFalse(signal.has_listeners())
         self.assertEqual(signal.receivers, [])
 
-    def test_exact(self):
+    @override_settings(DEBUG=True)
+    def test_cannot_connect_no_kwargs(self):
+        def receiver_no_kwargs(sender):
+            pass
+
+        msg = 'Signal receivers must accept keyword arguments (**kwargs).'
+        with self.assertRaisesMessage(ValueError, msg):
+            a_signal.connect(receiver_no_kwargs)
+        self.assertTestIsClean(a_signal)
+
+    @override_settings(DEBUG=True)
+    def test_cannot_connect_non_callable(self):
+        msg = 'Signal receivers must be callable.'
+        with self.assertRaisesMessage(AssertionError, msg):
+            a_signal.connect(object())
+        self.assertTestIsClean(a_signal)
+
+    def test_send(self):
         a_signal.connect(receiver_1_arg, sender=self)
-        expected = [(receiver_1_arg, "test")]
-        result = a_signal.send(sender=self, val="test")
-        self.assertEqual(result, expected)
+        result = a_signal.send(sender=self, val='test')
+        self.assertEqual(result, [(receiver_1_arg, 'test')])
         a_signal.disconnect(receiver_1_arg, sender=self)
         self.assertTestIsClean(a_signal)
 
-    def test_ignored_sender(self):
+    def test_send_no_receivers(self):
+        result = a_signal.send(sender=self, val='test')
+        self.assertEqual(result, [])
+
+    def test_send_connected_no_sender(self):
         a_signal.connect(receiver_1_arg)
-        expected = [(receiver_1_arg, "test")]
-        result = a_signal.send(sender=self, val="test")
-        self.assertEqual(result, expected)
+        result = a_signal.send(sender=self, val='test')
+        self.assertEqual(result, [(receiver_1_arg, 'test')])
         a_signal.disconnect(receiver_1_arg)
+        self.assertTestIsClean(a_signal)
+
+    def test_send_different_no_sender(self):
+        a_signal.connect(receiver_1_arg, sender=object)
+        result = a_signal.send(sender=self, val='test')
+        self.assertEqual(result, [])
+        a_signal.disconnect(receiver_1_arg, sender=object)
         self.assertTestIsClean(a_signal)
 
     def test_garbage_collected(self):
         a = Callable()
         a_signal.connect(a.a, sender=self)
-        expected = []
         del a
         garbage_collect()
         result = a_signal.send(sender=self, val="test")
-        self.assertEqual(result, expected)
+        self.assertEqual(result, [])
         self.assertTestIsClean(a_signal)
 
     def test_cached_garbaged_collected(self):
@@ -125,8 +151,25 @@ class DispatcherTests(unittest.TestCase):
         a_signal.disconnect(dispatch_uid="uid")
         self.assertTestIsClean(a_signal)
 
-    def test_robust(self):
-        """Test the send_robust() function"""
+    def test_send_robust_success(self):
+        a_signal.connect(receiver_1_arg)
+        result = a_signal.send_robust(sender=self, val='test')
+        self.assertEqual(result, [(receiver_1_arg, 'test')])
+        a_signal.disconnect(receiver_1_arg)
+        self.assertTestIsClean(a_signal)
+
+    def test_send_robust_no_receivers(self):
+        result = a_signal.send_robust(sender=self, val='test')
+        self.assertEqual(result, [])
+
+    def test_send_robust_ignored_sender(self):
+        a_signal.connect(receiver_1_arg)
+        result = a_signal.send_robust(sender=self, val='test')
+        self.assertEqual(result, [(receiver_1_arg, 'test')])
+        a_signal.disconnect(receiver_1_arg)
+        self.assertTestIsClean(a_signal)
+
+    def test_send_robust_fail(self):
         def fails(val, **kwargs):
             raise ValueError('this')
         a_signal.connect(fails)
@@ -174,10 +217,8 @@ class DispatcherTests(unittest.TestCase):
         self.assertFalse(a_signal.has_listeners(sender=object()))
 
 
-class ReceiverTestCase(unittest.TestCase):
-    """
-    Test suite for receiver.
-    """
+class ReceiverTestCase(SimpleTestCase):
+
     def test_receiver_single_signal(self):
         @receiver(a_signal)
         def f(val, **kwargs):

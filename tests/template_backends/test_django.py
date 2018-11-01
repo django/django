@@ -1,6 +1,6 @@
 from template_tests.test_response import test_processor_name
 
-from django.template import EngineHandler
+from django.template import Context, EngineHandler, RequestContext
 from django.template.backends.django import DjangoTemplates
 from django.template.library import InvalidTemplateLibrary
 from django.test import RequestFactory, override_settings
@@ -27,13 +27,31 @@ class DjangoTemplatesTests(TemplateStringsTests):
         template = engine.from_string('{{ processors }}')
         request = RequestFactory().get('/')
 
-        # Check that context processors run
+        # Context processors run
         content = template.render({}, request)
         self.assertEqual(content, 'yes')
 
-        # Check that context overrides context processors
+        # Context overrides context processors
         content = template.render({'processors': 'no'}, request)
         self.assertEqual(content, 'no')
+
+    def test_render_requires_dict(self):
+        """django.Template.render() requires a dict."""
+        engine = DjangoTemplates({
+            'DIRS': [],
+            'APP_DIRS': False,
+            'NAME': 'django',
+            'OPTIONS': {},
+        })
+        template = engine.from_string('')
+        context = Context()
+        request_context = RequestContext(RequestFactory().get('/'), {})
+        msg = 'context must be a dict rather than Context.'
+        with self.assertRaisesMessage(TypeError, msg):
+            template.render(context)
+        msg = 'context must be a dict rather than RequestContext.'
+        with self.assertRaisesMessage(TypeError, msg):
+            template.render(request_context)
 
     @override_settings(INSTALLED_APPS=['template_backends.apps.good'])
     def test_templatetag_discovery(self):

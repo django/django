@@ -4,7 +4,7 @@ from django.template.response import TemplateResponse
 from django.test import SimpleTestCase, modify_settings, override_settings
 
 
-class MiddlewareAccessingContent(object):
+class MiddlewareAccessingContent:
     def __init__(self, get_response):
         self.get_response = get_response
 

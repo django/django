@@ -1,9 +1,7 @@
-from __future__ import unicode_literals
-
 from django.db import DEFAULT_DB_ALIAS
 
 
-class TestRouter(object):
+class TestRouter:
     """
     Vaguely behave like primary/replica, but the databases aren't assumed to
     propagate changes.
@@ -24,7 +22,7 @@ class TestRouter(object):
         return True
 
 
-class AuthRouter(object):
+class AuthRouter:
     """
     Control all database operations on models in the contrib.auth application.
     """
@@ -45,9 +43,7 @@ class AuthRouter(object):
 
     def allow_relation(self, obj1, obj2, **hints):
         "Allow any relation if a model in Auth is involved"
-        if obj1._meta.app_label == 'auth' or obj2._meta.app_label == 'auth':
-            return True
-        return None
+        return obj1._meta.app_label == 'auth' or obj2._meta.app_label == 'auth' or None
 
     def allow_migrate(self, db, app_label, **hints):
         "Make sure the auth app only appears on the 'other' db"
@@ -56,7 +52,7 @@ class AuthRouter(object):
         return None
 
 
-class WriteRouter(object):
+class WriteRouter:
     # A router that only expresses an opinion on writes
     def db_for_write(self, model, **hints):
         return 'writer'

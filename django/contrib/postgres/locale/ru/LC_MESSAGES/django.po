@@ -1,15 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Eugene <eugene.mechanism@gmail.com>, 2016
 # eXtractor <evg.kirov@gmail.com>, 2015
 # Kirill Gagarski <gagarin.gtn@gmail.com>, 2015
-# Алексей Борискин <sun.void@gmail.com>, 2015-2016
+# Вася Аникин <anikin.vasya@gmail.com>, 2017
+# Алексей Борискин <sun.void@gmail.com>, 2015-2018
+# Дмитрий Шатера <mr.bobsans@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-07-20 10:00+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-07-27 11:04+0000\n"
 "Last-Translator: Алексей Борискин <sun.void@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
@@ -22,21 +25,23 @@ msgstr ""
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
 msgid "PostgreSQL extensions"
-msgstr "Дополнения для PostgreSQL"
+msgstr "Расширения PostgreSQL"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
-msgstr "Элемент массива №%(nth)s не прошёл проверку:"
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "Элемент %(nth)s массива не прошёл проверку:"
 
 msgid "Nested arrays must have the same length."
 msgstr "Вложенные массивы должны иметь одинаковую длину."
 
-msgid "Map of strings to strings"
-msgstr "Ассоциативный массив, ключами и значениями которого являются строки."
+msgid "Map of strings to strings/nulls"
+msgstr ""
+"Ассоциативный массив со строковыми ключами и строковыми или отсутствующими "
+"значениями."
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "Значение, соответствующее ключу \"%(key)s\", не является строкой."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "Значение \"%(key)s\" не является строкой или отсутствующим значением."
 
 msgid "A JSON object"
 msgstr "JSON-объект"
@@ -48,7 +53,7 @@ msgid "Could not load JSON data."
 msgstr "Не удалось загрузить JSON-данные."
 
 msgid "Input must be a JSON dictionary."
-msgstr "Значение должно быть словарём в формате JSON."
+msgstr "Значение должно быть JSON-словарём."
 
 #, python-format
 msgid "'%(value)s' value must be valid JSON."
@@ -58,7 +63,7 @@ msgid "Enter two valid values."
 msgstr "Введите два правильных значения."
 
 msgid "The start of the range must not exceed the end of the range."
-msgstr "Значение начала интервала не должно превышать значения его конца."
+msgstr "Начало диапазона не может превышать его предел."
 
 msgid "Enter two whole numbers."
 msgstr "Введите два целых числа."
@@ -114,7 +119,7 @@ msgstr[3] ""
 
 #, python-format
 msgid "Some keys were missing: %(keys)s"
-msgstr "Не хватает некоторых ключей: %(keys)s"
+msgstr "Некоторые ключи пропущены: %(keys)s"
 
 #, python-format
 msgid "Some unknown keys were provided: %(keys)s"
@@ -133,6 +138,4 @@ msgstr ""
 msgid ""
 "Ensure that this range is completely greater than or equal to "
 "%(limit_value)s."
-msgstr ""
-"Убедитесь, что все значения, принадлежащие этому интервалу, больше или равны "
-"%(limit_value)s."
+msgstr "Убедитесь, что этот диапазон, больше или равен %(limit_value)s."

@@ -3,21 +3,17 @@ A Python "serializer". Doesn't do much serializing per se -- just converts to
 and from basic Python data types (lists, dicts, strings, etc.). Useful as a basis for
 other serializers.
 """
-from __future__ import unicode_literals
-
 from collections import OrderedDict
 
 from django.apps import apps
-from django.conf import settings
 from django.core.serializers import base
 from django.db import DEFAULT_DB_ALIAS, models
-from django.utils import six
-from django.utils.encoding import force_text, is_protected_type
+from django.utils.encoding import is_protected_type
 
 
 class Serializer(base.Serializer):
     """
-    Serializes a QuerySet to basic Python objects.
+    Serialize a QuerySet to basic Python objects.
     """
 
     internal_use_only = True
@@ -37,21 +33,21 @@ class Serializer(base.Serializer):
         self._current = None
 
     def get_dump_object(self, obj):
-        data = OrderedDict([('model', force_text(obj._meta))])
+        data = OrderedDict([('model', str(obj._meta))])
         if not self.use_natural_primary_keys or not hasattr(obj, 'natural_key'):
-            data["pk"] = force_text(obj._get_pk_val(), strings_only=True)
+            data["pk"] = self._value_from_field(obj, obj._meta.pk)
         data['fields'] = self._current
         return data
 
-    def handle_field(self, obj, field):
+    def _value_from_field(self, obj, field):
         value = field.value_from_object(obj)
         # Protected types (i.e., primitives like None, numbers, dates,
         # and Decimals) are passed through as is. All other values are
         # converted to string first.
-        if is_protected_type(value):
-            self._current[field.name] = value
-        else:
-            self._current[field.name] = field.value_to_string(obj)
+        return value if is_protected_type(value) else field.value_to_string(obj)
+
+    def handle_field(self, obj, field):
+        self._current[field.name] = self._value_from_field(obj, field)
 
     def handle_fk_field(self, obj, field):
         if self.use_natural_foreign_keys and hasattr(field.remote_field.model, 'natural_key'):
@@ -61,9 +57,7 @@ class Serializer(base.Serializer):
             else:
                 value = None
         else:
-            value = getattr(obj, field.get_attname())
-            if not is_protected_type(value):
-                value = field.value_to_string(obj)
+            value = self._value_from_field(obj, field)
         self._current[field.name] = value
 
     def handle_m2m_field(self, obj, field):
@@ -73,7 +67,7 @@ class Serializer(base.Serializer):
                     return value.natural_key()
             else:
                 def m2m_value(value):
-                    return force_text(value._get_pk_val(), strings_only=True)
+                    return self._value_from_field(value, value._meta.pk)
             self._current[field.name] = [
                 m2m_value(related) for related in getattr(obj, field.name).iterator()
             ]
@@ -82,15 +76,14 @@ class Serializer(base.Serializer):
         return self.objects
 
 
-def Deserializer(object_list, **options):
+def Deserializer(object_list, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False, **options):
     """
     Deserialize simple Python objects back into Django ORM instances.
 
     It's expected that you pass the Python objects themselves (instead of a
     stream or a string) to the constructor
     """
-    db = options.pop('using', DEFAULT_DB_ALIAS)
-    ignore = options.pop('ignorenonexistent', False)
+    handle_forward_references = options.pop('handle_forward_references', False)
     field_names_cache = {}  # Model: <list of field_names>
 
     for d in object_list:
@@ -98,7 +91,7 @@ def Deserializer(object_list, **options):
         try:
             Model = _get_model(d["model"])
         except base.DeserializationError:
-            if ignore:
+            if ignorenonexistent:
                 continue
             else:
                 raise
@@ -109,70 +102,41 @@ def Deserializer(object_list, **options):
             except Exception as e:
                 raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), None)
         m2m_data = {}
+        deferred_fields = {}
 
         if Model not in field_names_cache:
             field_names_cache[Model] = {f.name for f in Model._meta.get_fields()}
         field_names = field_names_cache[Model]
 
         # Handle each field
-        for (field_name, field_value) in six.iteritems(d["fields"]):
+        for (field_name, field_value) in d["fields"].items():
 
-            if ignore and field_name not in field_names:
+            if ignorenonexistent and field_name not in field_names:
                 # skip fields no longer on model
                 continue
-
-            if isinstance(field_value, str):
-                field_value = force_text(
-                    field_value, options.get("encoding", settings.DEFAULT_CHARSET), strings_only=True
-                )
 
             field = Model._meta.get_field(field_name)
 
             # Handle M2M relations
             if field.remote_field and isinstance(field.remote_field, models.ManyToManyRel):
-                model = field.remote_field.model
-                if hasattr(model._default_manager, 'get_by_natural_key'):
-                    def m2m_convert(value):
-                        if hasattr(value, '__iter__') and not isinstance(value, six.text_type):
-                            return model._default_manager.db_manager(db).get_by_natural_key(*value).pk
-                        else:
-                            return force_text(model._meta.pk.to_python(value), strings_only=True)
-                else:
-                    def m2m_convert(v):
-                        return force_text(model._meta.pk.to_python(v), strings_only=True)
-
                 try:
-                    m2m_data[field.name] = []
-                    for pk in field_value:
-                        m2m_data[field.name].append(m2m_convert(pk))
-                except Exception as e:
-                    raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), pk)
-
+                    values = base.deserialize_m2m_values(field, field_value, using, handle_forward_references)
+                except base.M2MDeserializationError as e:
+                    raise base.DeserializationError.WithData(e.original_exc, d['model'], d.get('pk'), e.pk)
+                if values == base.DEFER_FIELD:
+                    deferred_fields[field] = field_value
+                else:
+                    m2m_data[field.name] = values
             # Handle FK fields
             elif field.remote_field and isinstance(field.remote_field, models.ManyToOneRel):
-                model = field.remote_field.model
-                if field_value is not None:
-                    try:
-                        default_manager = model._default_manager
-                        field_name = field.remote_field.field_name
-                        if hasattr(default_manager, 'get_by_natural_key'):
-                            if hasattr(field_value, '__iter__') and not isinstance(field_value, six.text_type):
-                                obj = default_manager.db_manager(db).get_by_natural_key(*field_value)
-                                value = getattr(obj, field.remote_field.field_name)
-                                # If this is a natural foreign key to an object that
-                                # has a FK/O2O as the foreign key, use the FK value
-                                if model._meta.pk.remote_field:
-                                    value = value.pk
-                            else:
-                                value = model._meta.get_field(field_name).to_python(field_value)
-                            data[field.attname] = value
-                        else:
-                            data[field.attname] = model._meta.get_field(field_name).to_python(field_value)
-                    except Exception as e:
-                        raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), field_value)
+                try:
+                    value = base.deserialize_fk_value(field, field_value, using, handle_forward_references)
+                except Exception as e:
+                    raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), field_value)
+                if value == base.DEFER_FIELD:
+                    deferred_fields[field] = field_value
                 else:
-                    data[field.attname] = None
-
+                    data[field.attname] = value
             # Handle all other fields
             else:
                 try:
@@ -180,14 +144,12 @@ def Deserializer(object_list, **options):
                 except Exception as e:
                     raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), field_value)
 
-        obj = base.build_instance(Model, data, db)
-        yield base.DeserializedObject(obj, m2m_data)
+        obj = base.build_instance(Model, data, using)
+        yield base.DeserializedObject(obj, m2m_data, deferred_fields)
 
 
 def _get_model(model_identifier):
-    """
-    Helper to look up a model from an "app_label.model_name" string.
-    """
+    """Look up a model from an "app_label.model_name" string."""
     try:
         return apps.get_model(model_identifier)
     except (LookupError, TypeError):

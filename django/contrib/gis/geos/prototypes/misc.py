@@ -7,7 +7,6 @@ from ctypes import POINTER, c_double, c_int
 from django.contrib.gis.geos.libgeos import GEOM_PTR, GEOSFuncFactory
 from django.contrib.gis.geos.prototypes.errcheck import check_dbl, check_string
 from django.contrib.gis.geos.prototypes.geom import geos_char_p
-from django.utils.six.moves import range
 
 __all__ = ['geos_area', 'geos_distance', 'geos_length', 'geos_isvalidreason']
 
@@ -20,19 +19,13 @@ class DblFromGeom(GEOSFuncFactory):
     restype = c_int  # Status code returned
     errcheck = staticmethod(check_dbl)
 
-    def get_func(self, num_geom=1):
-        argtypes = [GEOM_PTR for i in range(num_geom)]
-        argtypes += [POINTER(c_double)]
-        self.argtypes = argtypes
-        return super(DblFromGeom, self).get_func()
-
 
 # ### ctypes prototypes ###
 
 # Area, distance, and length prototypes.
-geos_area = DblFromGeom('GEOSArea')
-geos_distance = DblFromGeom('GEOSDistance', num_geom=2)
-geos_length = DblFromGeom('GEOSLength')
+geos_area = DblFromGeom('GEOSArea', argtypes=[GEOM_PTR, POINTER(c_double)])
+geos_distance = DblFromGeom('GEOSDistance', argtypes=[GEOM_PTR, GEOM_PTR, POINTER(c_double)])
+geos_length = DblFromGeom('GEOSLength', argtypes=[GEOM_PTR, POINTER(c_double)])
 geos_isvalidreason = GEOSFuncFactory(
     'GEOSisValidReason', restype=geos_char_p, errcheck=check_string, argtypes=[GEOM_PTR]
 )

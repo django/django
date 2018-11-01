@@ -1,22 +1,16 @@
 """
 Internationalization support.
 """
-from __future__ import unicode_literals
-
 import re
-import warnings
+from contextlib import ContextDecorator
 
-from django.utils import six
-from django.utils.decorators import ContextDecorator
-from django.utils.deprecation import RemovedInDjango21Warning
-from django.utils.encoding import force_text
 from django.utils.functional import lazy
 
 __all__ = [
     'activate', 'deactivate', 'override', 'deactivate_all',
     'get_language', 'get_language_from_request',
     'get_language_info', 'get_language_bidi',
-    'check_for_language', 'to_locale', 'templatize', 'string_concat',
+    'check_for_language', 'to_language', 'to_locale', 'templatize',
     'gettext', 'gettext_lazy', 'gettext_noop',
     'ugettext', 'ugettext_lazy', 'ugettext_noop',
     'ngettext', 'ngettext_lazy',
@@ -41,7 +35,7 @@ class TranslatorCommentWarning(SyntaxWarning):
 # replace the functions with their real counterparts (once we do access the
 # settings).
 
-class Trans(object):
+class Trans:
     """
     The purpose of this class is to store the actual translation function upon
     receiving the first call to that function. After this is done, changes to
@@ -63,6 +57,7 @@ class Trans(object):
         setattr(self, real_name, getattr(trans, real_name))
         return getattr(trans, real_name)
 
+
 _trans = Trans()
 
 # The Trans class is no more needed, so remove it from the namespace.
@@ -72,6 +67,7 @@ del Trans
 def gettext_noop(message):
     return _trans.gettext_noop(message)
 
+
 ugettext_noop = gettext_noop
 
 
@@ -79,16 +75,16 @@ def gettext(message):
     return _trans.gettext(message)
 
 
+# An alias since Django 2.0
+ugettext = gettext
+
+
 def ngettext(singular, plural, number):
     return _trans.ngettext(singular, plural, number)
 
 
-def ugettext(message):
-    return _trans.ugettext(message)
-
-
-def ungettext(singular, plural, number):
-    return _trans.ungettext(singular, plural, number)
+# An alias since Django 2.0
+ungettext = ngettext
 
 
 def pgettext(context, message):
@@ -98,13 +94,13 @@ def pgettext(context, message):
 def npgettext(context, singular, plural, number):
     return _trans.npgettext(context, singular, plural, number)
 
-gettext_lazy = lazy(gettext, str)
-ugettext_lazy = lazy(ugettext, six.text_type)
-pgettext_lazy = lazy(pgettext, six.text_type)
+
+gettext_lazy = ugettext_lazy = lazy(gettext, str)
+pgettext_lazy = lazy(pgettext, str)
 
 
 def lazy_number(func, resultclass, number=None, **kwargs):
-    if isinstance(number, six.integer_types):
+    if isinstance(number, int):
         kwargs['number'] = number
         proxy = lazy(func, resultclass)(**kwargs)
     else:
@@ -113,9 +109,6 @@ def lazy_number(func, resultclass, number=None, **kwargs):
         class NumberAwareString(resultclass):
             def __bool__(self):
                 return bool(kwargs['singular'])
-
-            def __nonzero__(self):  # Python 2 compatibility
-                return type(self).__bool__(self)
 
             def __mod__(self, rhs):
                 if isinstance(rhs, dict) and number:
@@ -134,7 +127,7 @@ def lazy_number(func, resultclass, number=None, **kwargs):
                 try:
                     translated = translated % rhs
                 except TypeError:
-                    # String doesn't contain a placeholder for the number
+                    # String doesn't contain a placeholder for the number.
                     pass
                 return translated
 
@@ -151,12 +144,12 @@ def ngettext_lazy(singular, plural, number=None):
     return lazy_number(ngettext, str, singular=singular, plural=plural, number=number)
 
 
-def ungettext_lazy(singular, plural, number=None):
-    return lazy_number(ungettext, six.text_type, singular=singular, plural=plural, number=number)
+# An alias since Django 2.0
+ungettext_lazy = ngettext_lazy
 
 
 def npgettext_lazy(context, singular, plural, number=None):
-    return lazy_number(npgettext, six.text_type, context=context, singular=singular, plural=plural, number=number)
+    return lazy_number(npgettext, str, context=context, singular=singular, plural=plural, number=number)
 
 
 def activate(language):
@@ -200,8 +193,29 @@ def check_for_language(lang_code):
     return _trans.check_for_language(lang_code)
 
 
+def to_language(locale):
+    """Turn a locale name (en_US) into a language name (en-us)."""
+    p = locale.find('_')
+    if p >= 0:
+        return locale[:p].lower() + '-' + locale[p + 1:].lower()
+    else:
+        return locale.lower()
+
+
 def to_locale(language):
-    return _trans.to_locale(language)
+    """Turn a language name (en-us) into a locale name (en_US)."""
+    language = language.lower()
+    parts = language.split('-')
+    try:
+        country = parts[1]
+    except IndexError:
+        return language
+    # A language with > 2 characters after the dash only has its first
+    # character after the dash capitalized; e.g. sr-latn becomes sr_Latn.
+    # A language with 2 characters after the dash has both characters
+    # capitalized; e.g. en-us becomes en_US.
+    parts[1] = country.title() if len(country) > 2 else country.upper()
+    return parts[0] + '_' + '-'.join(parts[1:])
 
 
 def get_language_from_request(request, check_path=False):
@@ -212,6 +226,10 @@ def get_language_from_path(path):
     return _trans.get_language_from_path(path)
 
 
+def get_supported_language_variant(lang_code, *, strict=False):
+    return _trans.get_supported_language_variant(lang_code, strict)
+
+
 def templatize(src, **kwargs):
     from .template import templatize
     return templatize(src, **kwargs)
@@ -219,19 +237,6 @@ def templatize(src, **kwargs):
 
 def deactivate_all():
     return _trans.deactivate_all()
-
-
-def _string_concat(*strings):
-    """
-    Lazy variant of string concatenation, needed for translations that are
-    constructed from multiple parts.
-    """
-    warnings.warn(
-        'django.utils.translate.string_concat() is deprecated in '
-        'favor of django.utils.text.format_lazy().',
-        RemovedInDjango21Warning, stacklevel=2)
-    return ''.join(force_text(s) for s in strings)
-string_concat = lazy(_string_concat, six.text_type)
 
 
 def get_language_info(lang_code):
@@ -252,8 +257,9 @@ def get_language_info(lang_code):
             raise KeyError("Unknown language code %s and %s." % (lang_code, generic_lang_code))
 
     if info:
-        info['name_translated'] = ugettext_lazy(info['name'])
+        info['name_translated'] = gettext_lazy(info['name'])
     return info
+
 
 trim_whitespace_re = re.compile(r'\s*\n\s*')
 

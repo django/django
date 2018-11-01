@@ -12,5 +12,6 @@ Detailed form API reference. For introductory material, see the
    fields
    models
    formsets
+   renderers
    widgets
    validation

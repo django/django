@@ -1,32 +1,23 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import os
 import unittest
 from copy import copy
 from decimal import Decimal
 
 from django.conf import settings
-from django.contrib.gis.gdal import HAS_GDAL
-from django.contrib.gis.geos import HAS_GEOS
+from django.contrib.gis.gdal import DataSource
+from django.contrib.gis.utils.layermapping import (
+    InvalidDecimal, InvalidString, LayerMapError, LayerMapping,
+    MissingForeignKey,
+)
 from django.db import connection
-from django.test import TestCase, override_settings, skipUnlessDBFeature
-from django.utils._os import upath
+from django.test import TestCase, override_settings
 
-if HAS_GEOS and HAS_GDAL:
-    from django.contrib.gis.utils.layermapping import (
-        LayerMapping, LayerMapError, InvalidDecimal, InvalidString,
-        MissingForeignKey,
-    )
-    from django.contrib.gis.gdal import DataSource
+from .models import (
+    City, County, CountyFeat, ICity1, ICity2, Interstate, Invalid, State,
+    city_mapping, co_mapping, cofeat_mapping, inter_mapping,
+)
 
-    from .models import (
-        City, County, CountyFeat, Interstate, ICity1, ICity2, Invalid, State,
-        city_mapping, co_mapping, cofeat_mapping, inter_mapping,
-    )
-
-
-shp_path = os.path.realpath(os.path.join(os.path.dirname(upath(__file__)), os.pardir, 'data'))
+shp_path = os.path.realpath(os.path.join(os.path.dirname(__file__), os.pardir, 'data'))
 city_shp = os.path.join(shp_path, 'cities', 'cities.shp')
 co_shp = os.path.join(shp_path, 'counties', 'counties.shp')
 inter_shp = os.path.join(shp_path, 'interstates', 'interstates.shp')
@@ -38,7 +29,6 @@ NUMS = [1, 2, 1, 19, 1]  # Number of polygons for each.
 STATES = ['Texas', 'Texas', 'Texas', 'Hawaii', 'Colorado']
 
 
-@skipUnlessDBFeature("gis_enabled")
 class LayerMapTest(TestCase):
 
     def test_init(self):
@@ -304,7 +294,7 @@ class LayerMapTest(TestCase):
             lm.save(silent=True, strict=True)
 
     def test_textfield(self):
-        "Tests that String content fits also in a TextField"
+        "String content fits also in a TextField"
         mapping = copy(city_mapping)
         mapping['name_txt'] = 'Name'
         lm = LayerMapping(City, city_shp, mapping)
@@ -320,8 +310,19 @@ class LayerMapTest(TestCase):
         self.assertEqual(City.objects.count(), 1)
         self.assertEqual(City.objects.all()[0].name, "Zürich")
 
+    def test_null_geom_with_unique(self):
+        """LayerMapping may be created with a unique and a null geometry."""
+        State.objects.bulk_create([State(name='Colorado'), State(name='Hawaii'), State(name='Texas')])
+        hw = State.objects.get(name='Hawaii')
+        hu = County.objects.create(name='Honolulu', state=hw, mpoly=None)
+        lm = LayerMapping(County, co_shp, co_mapping, transform=False, unique='name')
+        lm.save(silent=True, strict=True)
+        hu.refresh_from_db()
+        self.assertIsNotNone(hu.mpoly)
+        self.assertEqual(hu.mpoly.ogr.num_coords, 449)
 
-class OtherRouter(object):
+
+class OtherRouter:
     def db_for_read(self, model, **hints):
         return 'other'
 
@@ -329,15 +330,18 @@ class OtherRouter(object):
         return self.db_for_read(model, **hints)
 
     def allow_relation(self, obj1, obj2, **hints):
-        return None
+        # ContentType objects are created during a post-migrate signal while
+        # performing fixture teardown using the default database alias and
+        # don't abide by the database specified by this router.
+        return True
 
     def allow_migrate(self, db, app_label, **hints):
         return True
 
 
-@skipUnlessDBFeature("gis_enabled")
 @override_settings(DATABASE_ROUTERS=[OtherRouter()])
 class LayerMapRouterTest(TestCase):
+    multi_db = True
 
     @unittest.skipUnless(len(settings.DATABASES) > 1, 'multiple databases required')
     def test_layermapping_default_db(self):

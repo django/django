@@ -1,25 +1,21 @@
 """
 Testing some internals of the template processing. These are *not* examples to be copied in user code.
 """
-from __future__ import unicode_literals
-
-from unittest import TestCase
-
 from django.template import Library, TemplateSyntaxError
 from django.template.base import (
-    TOKEN_BLOCK, FilterExpression, Parser, Token, Variable,
+    FilterExpression, Parser, Token, TokenType, Variable,
 )
 from django.template.defaultfilters import register as filter_library
-from django.utils import six
+from django.test import SimpleTestCase
 
 
-class ParserTests(TestCase):
+class ParserTests(SimpleTestCase):
 
     def test_token_smart_split(self):
         """
         #7027 -- _() syntax should work with spaces
         """
-        token = Token(TOKEN_BLOCK, 'sometag _("Page not found") value|yesno:_("yes,no")')
+        token = Token(TokenType.BLOCK, 'sometag _("Page not found") value|yesno:_("yes,no")')
         split = token.split_contents()
         self.assertEqual(split, ["sometag", '_("Page not found")', 'value|yesno:_("yes,no")'])
 
@@ -44,7 +40,8 @@ class ParserTests(TestCase):
 
         # Filtered variables should reject access of attributes beginning with
         # underscores.
-        with self.assertRaises(TemplateSyntaxError):
+        msg = "Variables and attributes may not begin with underscores: 'article._hidden'"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             FilterExpression("article._hidden|upper", p)
 
     def test_variable_parsing(self):
@@ -68,37 +65,38 @@ class ParserTests(TestCase):
 
         # Variables should reject access of attributes beginning with
         # underscores.
-        with self.assertRaises(TemplateSyntaxError):
+        msg = "Variables and attributes may not begin with underscores: 'article._hidden'"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             Variable("article._hidden")
 
         # Variables should raise on non string type
-        with six.assertRaisesRegex(self, TypeError, "Variable must be a string or number, got <(class|type) 'dict'>"):
+        with self.assertRaisesMessage(TypeError, "Variable must be a string or number, got <class 'dict'>"):
             Variable({})
 
     def test_filter_args_count(self):
-        p = Parser("")
-        l = Library()
+        parser = Parser("")
+        register = Library()
 
-        @l.filter
+        @register.filter
         def no_arguments(value):
             pass
 
-        @l.filter
+        @register.filter
         def one_argument(value, arg):
             pass
 
-        @l.filter
+        @register.filter
         def one_opt_argument(value, arg=False):
             pass
 
-        @l.filter
+        @register.filter
         def two_arguments(value, arg, arg2):
             pass
 
-        @l.filter
+        @register.filter
         def two_one_opt_arg(value, arg, arg2=False):
             pass
-        p.add_library(l)
+        parser.add_library(register)
         for expr in (
                 '1|no_arguments:"1"',
                 '1|two_arguments',
@@ -106,7 +104,7 @@ class ParserTests(TestCase):
                 '1|two_one_opt_arg',
         ):
             with self.assertRaises(TemplateSyntaxError):
-                FilterExpression(expr, p)
+                FilterExpression(expr, parser)
         for expr in (
                 # Correct number of arguments
                 '1|no_arguments',
@@ -117,4 +115,4 @@ class ParserTests(TestCase):
                 # Not supplying all
                 '1|two_one_opt_arg:"1"',
         ):
-            FilterExpression(expr, p)
+            FilterExpression(expr, parser)

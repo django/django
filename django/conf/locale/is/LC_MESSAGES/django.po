@@ -1,18 +1,20 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# gudmundur <gudmundur.bjarni@gmail.com>, 2011
+# gudmundur <inactive+gudmundur@transifex.com>, 2011
 # Hafsteinn Einarsson <haffi67@gmail.com>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Matt R, 2018
 # saevarom <saevar@saevar.is>, 2011
 # saevarom <saevar@saevar.is>, 2013,2015
+# Thordur Sigurdsson <thordur@ja.is>, 2016-2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-06-30 08:31+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-06-22 20:45+0000\n"
+"Last-Translator: Thordur Sigurdsson <thordur@ja.is>\n"
 "Language-Team: Icelandic (http://www.transifex.com/django/django/language/"
 "is/)\n"
 "MIME-Version: 1.0\n"
@@ -22,13 +24,13 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);\n"
 
 msgid "Afrikaans"
-msgstr ""
+msgstr "Afríkanska"
 
 msgid "Arabic"
 msgstr "Arabíska"
 
 msgid "Asturian"
-msgstr ""
+msgstr "Astúríska"
 
 msgid "Azerbaijani"
 msgstr "Aserbaídsjíska"
@@ -37,13 +39,13 @@ msgid "Bulgarian"
 msgstr "Búlgarska"
 
 msgid "Belarusian"
-msgstr ""
+msgstr "Hvítrússneska"
 
 msgid "Bengali"
 msgstr "Bengalska"
 
 msgid "Breton"
-msgstr ""
+msgstr "Bretónska"
 
 msgid "Bosnian"
 msgstr "Bosníska"
@@ -64,7 +66,7 @@ msgid "German"
 msgstr "Þýska"
 
 msgid "Lower Sorbian"
-msgstr ""
+msgstr "Neðri sorbíska"
 
 msgid "Greek"
 msgstr "Gríska"
@@ -73,13 +75,13 @@ msgid "English"
 msgstr "Enska"
 
 msgid "Australian English"
-msgstr ""
+msgstr "Áströlsk enska"
 
 msgid "British English"
 msgstr "Bresk enska"
 
 msgid "Esperanto"
-msgstr ""
+msgstr "Esperanto"
 
 msgid "Spanish"
 msgstr "Spænska"
@@ -88,19 +90,19 @@ msgid "Argentinian Spanish"
 msgstr "Argentínsk spænska"
 
 msgid "Colombian Spanish"
-msgstr ""
+msgstr "Kólumbísk spænska"
 
 msgid "Mexican Spanish"
-msgstr "Mexíkósk Spænska"
+msgstr "Mexíkósk spænska"
 
 msgid "Nicaraguan Spanish"
 msgstr "Níkaragva spænska"
 
 msgid "Venezuelan Spanish"
-msgstr ""
+msgstr "Venesúelsk spænska"
 
 msgid "Estonian"
-msgstr "Eistland"
+msgstr "Eistneska"
 
 msgid "Basque"
 msgstr "Baskneska"
@@ -121,7 +123,7 @@ msgid "Irish"
 msgstr "Írska"
 
 msgid "Scottish Gaelic"
-msgstr ""
+msgstr "Skosk gelíska"
 
 msgid "Galician"
 msgstr "Galíska"
@@ -136,19 +138,19 @@ msgid "Croatian"
 msgstr "Króatíska"
 
 msgid "Upper Sorbian"
-msgstr ""
+msgstr "Efri sorbíska"
 
 msgid "Hungarian"
 msgstr "Ungverska"
 
 msgid "Interlingua"
-msgstr ""
+msgstr "Interlingua"
 
 msgid "Indonesian"
 msgstr "Indónesíska"
 
 msgid "Ido"
-msgstr ""
+msgstr "Ido"
 
 msgid "Icelandic"
 msgstr "Íslenska"
@@ -162,8 +164,11 @@ msgstr "Japanska"
 msgid "Georgian"
 msgstr "Georgíska"
 
-msgid "Kazakh"
+msgid "Kabyle"
 msgstr ""
+
+msgid "Kazakh"
+msgstr "Kasakska"
 
 msgid "Khmer"
 msgstr "Kmeríska"
@@ -175,7 +180,7 @@ msgid "Korean"
 msgstr "Kóreska"
 
 msgid "Luxembourgish"
-msgstr ""
+msgstr "Lúxemborgíska"
 
 msgid "Lithuanian"
 msgstr "Litháenska"
@@ -193,16 +198,16 @@ msgid "Mongolian"
 msgstr "Mongólska"
 
 msgid "Marathi"
-msgstr ""
+msgstr "Maratí"
 
 msgid "Burmese"
-msgstr ""
+msgstr "Búrmíska"
 
 msgid "Norwegian Bokmål"
-msgstr ""
+msgstr "Norskt bókmál"
 
 msgid "Nepali"
-msgstr ""
+msgstr "Nepalska"
 
 msgid "Dutch"
 msgstr "Hollenska"
@@ -211,7 +216,7 @@ msgid "Norwegian Nynorsk"
 msgstr "Nýnorska"
 
 msgid "Ossetic"
-msgstr ""
+msgstr "Ossetíska"
 
 msgid "Punjabi"
 msgstr "Púndjabíska"
@@ -223,7 +228,7 @@ msgid "Portuguese"
 msgstr "Portúgalska"
 
 msgid "Brazilian Portuguese"
-msgstr "Brasilísk Portúgalska"
+msgstr "Brasilísk portúgalska"
 
 msgid "Romanian"
 msgstr "Rúmenska"
@@ -232,7 +237,7 @@ msgid "Russian"
 msgstr "Rússneska"
 
 msgid "Slovak"
-msgstr "Slóvaska"
+msgstr "Slóvakíska"
 
 msgid "Slovenian"
 msgstr "Slóvenska"
@@ -250,7 +255,7 @@ msgid "Swedish"
 msgstr "Sænska"
 
 msgid "Swahili"
-msgstr ""
+msgstr "Svahílí"
 
 msgid "Tamil"
 msgstr "Tamílska"
@@ -265,10 +270,10 @@ msgid "Turkish"
 msgstr "Tyrkneska"
 
 msgid "Tatar"
-msgstr ""
+msgstr "Tataríska"
 
 msgid "Udmurt"
-msgstr ""
+msgstr "Údmúrt"
 
 msgid "Ukrainian"
 msgstr "Úkraínska"
@@ -286,7 +291,7 @@ msgid "Traditional Chinese"
 msgstr "Hefðbundin kínverska"
 
 msgid "Messages"
-msgstr ""
+msgstr "Skilaboð"
 
 msgid "Site Maps"
 msgstr ""
@@ -297,6 +302,15 @@ msgstr ""
 msgid "Syndication"
 msgstr ""
 
+msgid "That page number is not an integer"
+msgstr "Þetta síðunúmer er ekki heiltala"
+
+msgid "That page number is less than 1"
+msgstr "Þetta síðunúmer er minna en 1"
+
+msgid "That page contains no results"
+msgstr "Þessi síða hefur engar niðurstöður"
+
 msgid "Enter a valid value."
 msgstr "Sláðu inn gilt gildi."
 
@@ -304,21 +318,24 @@ msgid "Enter a valid URL."
 msgstr "Sláðu inn gilt veffang (URL)."
 
 msgid "Enter a valid integer."
-msgstr ""
+msgstr "Sláðu inn gilda heiltölu."
 
 msgid "Enter a valid email address."
 msgstr "Sláðu inn gilt netfang."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Settu inn gildan vefslóðartitil sem samanstendur af latneskum bókstöfum, "
-"númerin, undirstrikum og bandstrikum."
+"Settu inn gildan vefslóðartitil sem má innihalda latneska bókstafi, "
+"tölustafi, undirstrik og bandstrik."
 
 msgid ""
 "Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
+"Settu inn gildan vefslóðartitil sem má innihalda unicode bókstafi, "
+"tölustafi, undirstrik og bandstrik."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Sláðu inn gilda IPv4 tölu."
@@ -355,10 +372,10 @@ msgid_plural ""
 "Ensure this value has at least %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
-"Gildið má mest vera %(limit_value)d stafur að lengd (það er %(show_value)d "
+"Gildið má minnst vera %(limit_value)d stafur að lengd (það er %(show_value)d "
 "nú)"
 msgstr[1] ""
-"Gildið má mest vera %(limit_value)d stafir að lengd (það er %(show_value)d "
+"Gildið má minnst vera %(limit_value)d stafir að lengd (það er %(show_value)d "
 "nú)"
 
 #, python-format
@@ -369,7 +386,14 @@ msgid_plural ""
 "Ensure this value has at most %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
+"Gildið má mest vera %(limit_value)d stafur að lengd (það er %(show_value)d "
+"nú)"
 msgstr[1] ""
+"Gildið má mest vera %(limit_value)d stafir að lengd (það er %(show_value)d "
+"nú)"
+
+msgid "Enter a number."
+msgstr "Sláðu inn tölu."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
@@ -380,27 +404,39 @@ msgstr[1] "Gildið má ekki hafa fleiri en %(max)s tölur."
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] ""
+msgstr[0] "Gildið má ekki hafa meira en %(max)s tugatölustaf (decimal places)."
 msgstr[1] ""
+"Gildið má ekki hafa meira en %(max)s tugatölustafi (decimal places)."
 
 #, python-format
 msgid ""
 "Ensure that there are no more than %(max)s digit before the decimal point."
 msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Gildið má ekki hafa fleiri en %(max)s tölu fyrir tugabrotskil."
+msgstr[1] "Gildið má ekki hafa fleiri en %(max)s tölur fyrir tugabrotskil."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"Skrár með endingunni '%(extension)s' eru ekki leyfðar. Leyfilegar endingar "
+"eru: '%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
+msgstr "Núlltákn eru ekki leyfileg."
 
 msgid "and"
 msgstr "og"
 
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
-msgstr ""
+msgstr "%(model_name)s með þessi %(field_labels)s er nú þegar til."
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
-msgstr ""
+msgstr "Gildið %(value)r er ógilt."
 
 msgid "This field cannot be null."
 msgstr "Þessi reitur getur ekki haft tómgildi (null)."
@@ -418,6 +454,8 @@ msgstr "%(model_name)s með þetta %(field_label)s er nú þegar til."
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
 msgstr ""
+"%(field_label)s verður að vera einkvæmt fyrir %(date_field_label)s "
+"%(lookup_type)s."
 
 #, python-format
 msgid "Field of type: %(field_type)s"
@@ -428,14 +466,18 @@ msgstr "Heiltala"
 
 #, python-format
 msgid "'%(value)s' value must be an integer."
-msgstr ""
+msgstr "Gildi '%(value)s' verður að vera heiltala."
 
 msgid "Big (8 byte) integer"
 msgstr "Stór (8 bæta) heiltala"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr ""
+msgstr "'%(value)s' verður að vera annaðhvort satt eða ósatt."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "'%(value)s' verður að vera eitt eftirtalinna: True, False eða None."
 
 msgid "Boolean (Either True or False)"
 msgstr "Boole-gildi (True eða False)"
@@ -452,12 +494,14 @@ msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
+"'%(value)s' er ógilt dagsetningarsnið. Það verður að vera á sniðinu YYYY-MM-"
+"DD."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
-msgstr ""
+msgstr "'%(value)s' hefur rétt snið (YYYY-MM-DD) en dagsetningin er ógild."
 
 msgid "Date (without time)"
 msgstr "Dagsetning (án tíma)"
@@ -467,19 +511,23 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"'%(value)s' hefur ógilt snið. Það verður að vera á sniðinu: YYYY-MM-DD HH:"
+"MM[:ss[.uuuuuu]][TZ]."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
+"'%(value)s' hefur rétt snið (YYYY-MM-DD HH:MM [:ss[.uuuuuu]][TZ]) en það er "
+"ógild dagsetning/tími."
 
 msgid "Date (with time)"
 msgstr "Dagsetning (með tíma)"
 
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
-msgstr ""
+msgstr "'%(value)s' verður að vera tugatala."
 
 msgid "Decimal number"
 msgstr "Tugatala"
@@ -489,9 +537,11 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
 "uuuuuu] format."
 msgstr ""
+"'%(value)s' er á ógildu sniði. Það verður að vera á sniðinu [DD] [HH:"
+"[MM:]]ss[.uuuuuu]."
 
 msgid "Duration"
-msgstr ""
+msgstr "Tímalengd"
 
 msgid "Email address"
 msgstr "Netfang"
@@ -501,7 +551,7 @@ msgstr "Skjalaslóð"
 
 #, python-format
 msgid "'%(value)s' value must be a float."
-msgstr ""
+msgstr "'%(value)s' verður að vera fleytitala."
 
 msgid "Floating point number"
 msgstr "Fleytitala (floating point number)"
@@ -514,7 +564,7 @@ msgstr "IP tala"
 
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
-msgstr ""
+msgstr "'%(value)s' verður að vera eitt eftirtalinna: None, True eða False."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Boole-gildi (True, False eða None)"
@@ -540,12 +590,16 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
+"'%(value)s' er á ógildu sniði. Það verður að vera á sniðinu HH:MM[:ss[."
+"uuuuuu]]."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
+"'%(value)s' er á réttu sniði (HH:MM[:ss[.uuuuuu]]), en það er ógild "
+"dagsetning/tími."
 
 msgid "Time"
 msgstr "Tími"
@@ -554,11 +608,11 @@ msgid "URL"
 msgstr "Veffang"
 
 msgid "Raw binary data"
-msgstr ""
+msgstr "Hrá tvíundargögn (binary data)"
 
 #, python-format
 msgid "'%(value)s' is not a valid UUID."
-msgstr ""
+msgstr "'%(value)s' er ekki gilt UUID."
 
 msgid "File"
 msgstr "Skrá"
@@ -568,7 +622,7 @@ msgstr "Mynd"
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr ""
+msgstr "%(model)s hlutur með %(field)s %(value)r er ekki til."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Ytri lykill (Gerð ákveðin af skyldum reit)"
@@ -578,11 +632,11 @@ msgstr "Einn-á-einn samband."
 
 #, python-format
 msgid "%(from)s-%(to)s relationship"
-msgstr ""
+msgstr "%(from)s-%(to)s samband"
 
 #, python-format
 msgid "%(from)s-%(to)s relationships"
-msgstr ""
+msgstr "%(from)s-%(to)s sambönd"
 
 msgid "Many-to-many relationship"
 msgstr "Margir-til-margra samband."
@@ -591,16 +645,13 @@ msgstr "Margir-til-margra samband."
 #. characters will prevent the default label_suffix to be appended to the
 #. label
 msgid ":?.!"
-msgstr ""
+msgstr ":?.!"
 
 msgid "This field is required."
 msgstr "Þennan reit þarf að fylla út."
 
 msgid "Enter a whole number."
-msgstr "Sláðu inn heila tölu."
-
-msgid "Enter a number."
-msgstr "Sláðu inn heila tölu."
+msgstr "Sláðu inn heiltölu."
 
 msgid "Enter a valid date."
 msgstr "Sláðu inn gilda dagsetningu."
@@ -613,6 +664,10 @@ msgstr "Sláðu inn gilda dagsetningu ásamt tíma."
 
 msgid "Enter a valid duration."
 msgstr "Sláðu inn gilt tímabil."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Fjöldi daga verður að vera á milli {min_days} og {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Engin skrá var send. Athugaðu kótunartegund á forminu (encoding type)."
@@ -658,7 +713,7 @@ msgstr "Sláðu inn gilt UUID."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
-msgstr ""
+msgstr ":"
 
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
@@ -705,8 +760,8 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Vinsamlegast lagfærðu tvítöldu gögnin fyrir neðan."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "Ytri lykill virðist ekki passa við aðallykil eiganda."
+msgid "The inline value did not match the parent instance."
+msgstr "Innra gildið passar ekki við eiganda."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
@@ -714,8 +769,8 @@ msgstr ""
 "valmöguleikum."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "'%(pk)s' er ekki gilt sem lykill."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "„%(pk)s“ er ekki gilt gildi."
 
 #, python-format
 msgid ""
@@ -725,14 +780,14 @@ msgstr ""
 "%(datetime)s er ekki hægt að túlka í tímabelti %(current_timezone)s, það "
 "getur verið óljóst eða að það er ekki til."
 
+msgid "Clear"
+msgstr "Hreinsa"
+
 msgid "Currently"
 msgstr "Eins og er:"
 
 msgid "Change"
 msgstr "Breyta"
-
-msgid "Clear"
-msgstr "Hreinsa"
 
 msgid "Unknown"
 msgstr "Óþekkt"
@@ -812,25 +867,25 @@ msgid "Sunday"
 msgstr "sunnudagur"
 
 msgid "Mon"
-msgstr "Mán"
+msgstr "mán"
 
 msgid "Tue"
-msgstr "Þri"
+msgstr "þri"
 
 msgid "Wed"
-msgstr "Mið"
+msgstr "mið"
 
 msgid "Thu"
-msgstr "Fim"
+msgstr "fim"
 
 msgid "Fri"
-msgstr "Fös"
+msgstr "fös"
 
 msgid "Sat"
-msgstr "Lau"
+msgstr "lau"
 
 msgid "Sun"
-msgstr "Sun"
+msgstr "sun"
 
 msgid "January"
 msgstr "janúar"
@@ -869,7 +924,7 @@ msgid "December"
 msgstr "desember"
 
 msgid "jan"
-msgstr "Jan"
+msgstr "jan"
 
 msgid "feb"
 msgstr "feb"
@@ -906,99 +961,99 @@ msgstr "des"
 
 msgctxt "abbrev. month"
 msgid "Jan."
-msgstr "Jan."
+msgstr "jan."
 
 msgctxt "abbrev. month"
 msgid "Feb."
-msgstr "Feb."
+msgstr "feb."
 
 msgctxt "abbrev. month"
 msgid "March"
-msgstr "Mars"
+msgstr "mars"
 
 msgctxt "abbrev. month"
 msgid "April"
-msgstr "Apríl"
+msgstr "apríl"
 
 msgctxt "abbrev. month"
 msgid "May"
-msgstr "Maí"
+msgstr "maí"
 
 msgctxt "abbrev. month"
 msgid "June"
-msgstr "Júní"
+msgstr "júní"
 
 msgctxt "abbrev. month"
 msgid "July"
-msgstr "Júlí"
+msgstr "júlí"
 
 msgctxt "abbrev. month"
 msgid "Aug."
-msgstr "Ág."
+msgstr "ág."
 
 msgctxt "abbrev. month"
 msgid "Sept."
-msgstr "Sept."
+msgstr "sept."
 
 msgctxt "abbrev. month"
 msgid "Oct."
-msgstr "Okt."
+msgstr "okt."
 
 msgctxt "abbrev. month"
 msgid "Nov."
-msgstr "Nóv."
+msgstr "nóv."
 
 msgctxt "abbrev. month"
 msgid "Dec."
-msgstr "Des."
+msgstr "des."
 
 msgctxt "alt. month"
 msgid "January"
-msgstr "Janúar"
+msgstr "janúar"
 
 msgctxt "alt. month"
 msgid "February"
-msgstr "Febrúar"
+msgstr "febrúar"
 
 msgctxt "alt. month"
 msgid "March"
-msgstr "Mars"
+msgstr "mars"
 
 msgctxt "alt. month"
 msgid "April"
-msgstr "Apríl"
+msgstr "apríl"
 
 msgctxt "alt. month"
 msgid "May"
-msgstr "Maí"
+msgstr "maí"
 
 msgctxt "alt. month"
 msgid "June"
-msgstr "Júní"
+msgstr "júní"
 
 msgctxt "alt. month"
 msgid "July"
-msgstr "Júlí"
+msgstr "júlí"
 
 msgctxt "alt. month"
 msgid "August"
-msgstr "Ágúst"
+msgstr "ágúst"
 
 msgctxt "alt. month"
 msgid "September"
-msgstr "September"
+msgstr "september"
 
 msgctxt "alt. month"
 msgid "October"
-msgstr "Október"
+msgstr "október"
 
 msgctxt "alt. month"
 msgid "November"
-msgstr "Nóvember"
+msgstr "nóvember"
 
 msgctxt "alt. month"
 msgid "December"
-msgstr "Desember"
+msgstr "desember"
 
 msgid "This is not a valid IPv6 address."
 msgstr "Þetta er ekki gilt IPv6 vistfang."
@@ -1066,11 +1121,26 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
+"Þú ert að fá þessi skilaboð því þetta HTTPS vefsvæði þarfnast að vafrinn "
+"þinn sendi ‚Referer‘ haus (e. referer header) sem var ekki sendur. Þessi "
+"haus er nauðsynlegur af öryggisástæðum til að ganga úr skugga um að "
+"utanaðkomandi aðili sé ekki að senda fyrirspurnir úr vafranum þínum."
 
 msgid ""
 "If you have configured your browser to disable 'Referer' headers, please re-"
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
 "origin' requests."
+msgstr ""
+"Ef þú hefur stillt vafrann þinn til að gera ‚Referer‘ hausa óvirka þarftu að "
+"virkja þá aftur. Að minnsta kosti fyrir þetta vefsvæði, eða HTTPS tengingar "
+"eða ‚same-origin‘ fyrirspurnir."
+
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
 msgstr ""
 
 msgid ""
@@ -1078,40 +1148,27 @@ msgid ""
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
+"Þú ert að fá þessi skilaboð því þetta vefsvæði þarfnast að CSRF kaka (e. "
+"cookie) sé send þegar form eru send. Þessi kaka er nauðsynleg af "
+"öryggisástæðum til að ganga úr skugga um að utanaðkomandi aðili sé ekki að "
+"senda fyrirspurnir úr vafranum þínum."
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for 'same-origin' requests."
 msgstr ""
+"Ef þú hefur stillt vafrann þinn til að gera kökur óvirkar þarftu að virkja "
+"þær aftur. Að minnsta kosti fyrir þetta vefsvæði eða ‚same-origin‘ "
+"fyrirspurnir."
 
 msgid "More information is available with DEBUG=True."
 msgstr "Meiri upplýsingar fást með DEBUG=True."
 
-msgid "Welcome to Django"
-msgstr "Velkomin/n í Django"
-
-msgid "It worked!"
-msgstr "Það tókst!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Til hamingju með fyrstu Django síðuna þína."
-
-msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
-msgstr ""
-"Þetta er auðvitað ekki nóg. Næst skaltu búa til fyrsta appið þitt með því að "
-"nota skipunina<code>python manage.py startapp [app_heiti]</code>."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Þú sérð þessi skilaboð vegna þess að þú hefur <code>DEBUG = True</code> í "
-"Django stillingunum þínum og hefur ekki sett upp neinar vefslóðir."
-
 msgid "No year specified"
 msgstr "Ekkert ár tilgreint"
+
+msgid "Date out of range"
+msgstr "Dagsetning utan tímabils"
 
 msgid "No month specified"
 msgstr "Enginn mánuður tilgreindur"
@@ -1124,7 +1181,7 @@ msgstr "Engin vika tilgreind"
 
 #, python-format
 msgid "No %(verbose_name_plural)s available"
-msgstr "Ekkert %(verbose_name_plural)s í boði."
+msgstr "Ekkert %(verbose_name_plural)s í boði"
 
 #, python-format
 msgid ""
@@ -1163,3 +1220,41 @@ msgstr "\"%(path)s\" er ekki til"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Innihald %(directory)s "
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr ""
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+
+msgid "The install worked successfully! Congratulations!"
+msgstr ""
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+
+msgid "Django Documentation"
+msgstr ""
+
+msgid "Topics, references, &amp; how-to's"
+msgstr ""
+
+msgid "Tutorial: A Polling App"
+msgstr ""
+
+msgid "Get started with Django"
+msgstr ""
+
+msgid "Django Community"
+msgstr ""
+
+msgid "Connect, get help, or contribute"
+msgstr ""

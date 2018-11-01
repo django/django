@@ -5,7 +5,7 @@ from django.utils.version import get_docs_version
 
 class DatabaseValidation(BaseDatabaseValidation):
     def check(self, **kwargs):
-        issues = super(DatabaseValidation, self).check(**kwargs)
+        issues = super().check(**kwargs)
         issues.extend(self._check_sql_mode(**kwargs))
         return issues
 
@@ -26,31 +26,35 @@ class DatabaseValidation(BaseDatabaseValidation):
             )]
         return []
 
-    def check_field(self, field, **kwargs):
+    def check_field_type(self, field, field_type):
         """
         MySQL has the following field length restriction:
         No character (varchar) fields can have a length exceeding 255
         characters if they have a unique index on them.
+        MySQL doesn't support a database index on some data types.
         """
-        from django.db import connection
-
-        errors = super(DatabaseValidation, self).check_field(field, **kwargs)
-
-        # Ignore any related fields.
-        if getattr(field, 'remote_field', None) is None:
-            field_type = field.db_type(connection)
-
-            # Ignore any non-concrete fields
-            if field_type is None:
-                return errors
-
-            if (field_type.startswith('varchar') and field.unique and
-                    (field.max_length is None or int(field.max_length) > 255)):
-                errors.append(
-                    checks.Error(
-                        'MySQL does not allow unique CharFields to have a max_length > 255.',
-                        obj=field,
-                        id='mysql.E001',
-                    )
+        errors = []
+        if (field_type.startswith('varchar') and field.unique and
+                (field.max_length is None or int(field.max_length) > 255)):
+            errors.append(
+                checks.Error(
+                    'MySQL does not allow unique CharFields to have a max_length > 255.',
+                    obj=field,
+                    id='mysql.E001',
                 )
+            )
+
+        if field.db_index and field_type.lower() in self.connection._limited_data_types:
+            errors.append(
+                checks.Warning(
+                    'MySQL does not support a database index on %s columns.'
+                    % field_type,
+                    hint=(
+                        "An index won't be created. Silence this warning if "
+                        "you don't care about it."
+                    ),
+                    obj=field,
+                    id='fields.W162',
+                )
+            )
         return errors

@@ -3,7 +3,6 @@ from django.contrib.sessions.backends.base import (
     CreateError, SessionBase, UpdateError,
 )
 from django.core.cache import caches
-from django.utils.six.moves import range
 
 KEY_PREFIX = "django.contrib.sessions.cache"
 
@@ -16,7 +15,7 @@ class SessionStore(SessionBase):
 
     def __init__(self, session_key=None):
         self._cache = caches[settings.SESSION_CACHE_ALIAS]
-        super(SessionStore, self).__init__(session_key)
+        super().__init__(session_key)
 
     @property
     def cache_key(self):
@@ -68,7 +67,7 @@ class SessionStore(SessionBase):
             raise CreateError
 
     def exists(self, session_key):
-        return session_key and (self.cache_key_prefix + session_key) in self._cache
+        return bool(session_key) and (self.cache_key_prefix + session_key) in self._cache
 
     def delete(self, session_key=None):
         if session_key is None:

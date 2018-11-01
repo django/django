@@ -1,10 +1,11 @@
-from django.db.models import DateTimeField, Func
+from django.db.models import DateTimeField, Func, UUIDField
+
+
+class RandomUUID(Func):
+    template = 'GEN_RANDOM_UUID()'
+    output_field = UUIDField()
 
 
 class TransactionNow(Func):
     template = 'CURRENT_TIMESTAMP'
-
-    def __init__(self, output_field=None, **extra):
-        if output_field is None:
-            output_field = DateTimeField()
-        super(TransactionNow, self).__init__(output_field=output_field, **extra)
+    output_field = DateTimeField()

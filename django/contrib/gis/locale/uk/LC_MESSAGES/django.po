@@ -1,8 +1,9 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Denis Podlesniy <haos616@gmail.com>, 2016
+# Денис Подлесный <haos616@gmail.com>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Kirill Gagarski <gagarin.gtn@gmail.com>, 2016
 # Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
 # Roman Kozlovskyi <krzroman@gmail.com>, 2012
 # Sergey Lysach <sergikoff88@gmail.com>, 2011
@@ -11,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2016-07-07 23:11+0000\n"
-"Last-Translator: Denis Podlesniy <haos616@gmail.com>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-23 18:54+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -55,10 +56,10 @@ msgid "Geometry collection"
 msgstr "Набір геометричних об'єктів"
 
 msgid "Extent Aggregate Field"
-msgstr ""
+msgstr "Поле, агрегуюче площу чи об'єм"
 
 msgid "Raster Field"
-msgstr "Raster поле"
+msgstr "Растрове поле"
 
 msgid "No geometry value provided."
 msgstr "Не задано геометричне значення."
@@ -78,13 +79,10 @@ msgid "Delete all Features"
 msgstr "Видалити всі Features"
 
 msgid "WKT debugging window:"
-msgstr ""
-
-msgid "Google Maps via GeoDjango"
-msgstr "Google Maps за допомогою GeoDjango"
+msgstr "Вікно налагождення WKT:"
 
 msgid "Debugging window (serialized value)"
-msgstr ""
+msgstr "Вікно налагождення (серіалізоване значення)"
 
 msgid "No feeds are registered."
 msgstr "Немає зареєстрованих підписок."

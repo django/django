@@ -3,13 +3,14 @@
 # Translators:
 # Hafsteinn Einarsson <haffi67@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Thordur Sigurdsson <thordur@ja.is>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2014-10-05 20:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2017-09-19 16:40+0000\n"
+"Last-Translator: Thordur Sigurdsson <thordur@ja.is>\n"
 "Language-Team: Icelandic (http://www.transifex.com/django/django/language/"
 "is/)\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +20,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);\n"
 
 msgid "Content Types"
-msgstr ""
+msgstr "Efnistög"
 
 msgid "python model class name"
 msgstr "python eininga klasa nafn"

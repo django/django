@@ -9,7 +9,6 @@ import posixpath
 from django.conf import settings
 from django.contrib.staticfiles import finders
 from django.http import Http404
-from django.utils.six.moves.urllib.parse import unquote
 from django.views import static
 
 
@@ -30,7 +29,7 @@ def serve(request, path, insecure=False, **kwargs):
     """
     if not settings.DEBUG and not insecure:
         raise Http404
-    normalized_path = posixpath.normpath(unquote(path)).lstrip('/')
+    normalized_path = posixpath.normpath(path).lstrip('/')
     absolute_path = finders.find(normalized_path)
     if not absolute_path:
         if path.endswith('/') or path == '':

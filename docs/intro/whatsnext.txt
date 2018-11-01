@@ -116,8 +116,8 @@ https://docs.djangoproject.com/en/dev/. These HTML pages are generated
 automatically from the text files in source control. That means they reflect the
 "latest and greatest" in Django -- they include the very latest corrections and
 additions, and they discuss the latest Django features, which may only be
-available to users of the Django development version. (See "Differences between
-versions" below.)
+available to users of the Django development version. (See
+:ref:`differences-between-doc-versions` below.)
 
 We encourage you to help improve the docs by submitting changes, corrections and
 suggestions in the `ticket system`_. The Django developers actively monitor the
@@ -137,11 +137,11 @@ In plain text
 For offline reading, or just for convenience, you can read the Django
 documentation in plain text.
 
-If you're using an official release of Django, note that the zipped package
-(tarball) of the code includes a ``docs/`` directory, which contains all the
-documentation for that release.
+If you're using an official release of Django, the zipped package (tarball) of
+the code includes a ``docs/`` directory, which contains all the documentation
+for that release.
 
-If you're using the development version of Django (aka "trunk"), note that the
+If you're using the development version of Django (aka the master branch), the
 ``docs/`` directory contains all of the documentation. You can update your
 Git checkout to get the latest changes.
 
@@ -150,7 +150,7 @@ Unix ``grep`` utility to search for a phrase in all of the documentation. For
 example, this will show you each mention of the phrase "max_length" in any
 Django document:
 
-.. code-block:: console
+.. console::
 
     $ grep -r max_length /path/to/django/docs/
 
@@ -163,7 +163,7 @@ You can get a local copy of the HTML documentation following a few easy steps:
   plain text to HTML. You'll need to install Sphinx by either downloading
   and installing the package from the Sphinx website, or with ``pip``:
 
-  .. code-block:: console
+  .. console::
 
         $ pip install Sphinx
 
@@ -194,34 +194,32 @@ __ https://www.gnu.org/software/make/
 Differences between versions
 ============================
 
-As previously mentioned, the text documentation in our Git repository
-contains the "latest and greatest" changes and additions. These changes often
-include documentation of new features added in the Django development version
--- the Git ("trunk") version of Django. For that reason, it's worth
-pointing out our policy on keeping straight the documentation for various
-versions of the framework.
+The text documentation in the master branch of the Git repository contains the
+"latest and greatest" changes and additions. These changes include
+documentation of new features targeted for Django's next :term:`feature
+release`. For that reason, it's worth pointing out our policy to highlight
+recent changes and additions to Django.
 
 We follow this policy:
 
-* The primary documentation on djangoproject.com is an HTML version of the
-  latest docs in Git. These docs always correspond to the latest
-  official Django release, plus whatever features we've added/changed in
-  the framework *since* the latest release.
+* The development documentation at https://docs.djangoproject.com/en/dev/ is
+  from the master branch. These docs correspond to the latest feature release,
+  plus whatever features have been added/changed in the framework since then.
 
-* As we add features to Django's development version, we try to update the
+* As we add features to Django's development version, we update the
   documentation in the same Git commit transaction.
 
 * To distinguish feature changes/additions in the docs, we use the phrase:
-  "New in version X.Y", being X.Y the next release version (hence, the one
-  being developed).
+  "New in Django Development version" for the version of Django that hasn't
+  been released yet, or "New in version X.Y" for released versions.
 
 * Documentation fixes and improvements may be backported to the last release
   branch, at the discretion of the committer, however, once a version of
-  Django is :ref:`no longer supported<backwards-compatibility-policy>`, that
-  version of the docs won't get any further updates.
+  Django is :ref:`no longer supported<supported-versions-policy>`, that version
+  of the docs won't get any further updates.
 
 * The `main documentation Web page`_ includes links to documentation for
-  all previous versions. Be sure you are using the version of the docs
+  previous versions. Be sure you are using the version of the docs
   corresponding to the version of Django you are using!
 
 .. _main documentation Web page: https://docs.djangoproject.com/en/dev/

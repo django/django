@@ -81,10 +81,3 @@ application that later delegates to the Django WSGI application, if you want
 to combine a Django application with a WSGI application of another framework.
 
 .. _`WSGI middleware`: https://www.python.org/dev/peps/pep-3333/#middleware-components-that-play-both-sides
-
-.. note::
-
-    Some third-party WSGI middleware do not call ``close`` on the response
-    object after handling a request. In those cases the
-    :data:`~django.core.signals.request_finished` signal isn't sent. This can
-    result in idle connections to database and memcache servers.

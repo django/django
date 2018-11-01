@@ -1,28 +1,12 @@
-from __future__ import unicode_literals
-
-import sys
-import warnings
-from collections import deque
 from functools import total_ordering
 
 from django.db.migrations.state import ProjectState
-from django.utils import six
-from django.utils.datastructures import OrderedSet
-from django.utils.encoding import python_2_unicode_compatible
 
 from .exceptions import CircularDependencyError, NodeNotFoundError
 
-RECURSION_DEPTH_WARNING = (
-    "Maximum recursion depth exceeded while generating migration graph, "
-    "falling back to iterative approach. If you're experiencing performance issues, "
-    "consider squashing migrations as described at "
-    "https://docs.djangoproject.com/en/dev/topics/migrations/#squashing-migrations."
-)
 
-
-@python_2_unicode_compatible
 @total_ordering
-class Node(object):
+class Node:
     """
     A single node in the migration graph. Contains direct links to adjacent
     nodes in either direction.
@@ -48,7 +32,7 @@ class Node(object):
         return str(self.key)
 
     def __repr__(self):
-        return '<Node: (%r, %r)>' % self.key
+        return '<%s: (%r, %r)>' % (self.__class__.__name__, self.key[0], self.key[1])
 
     def add_child(self, child):
         self.children.add(child)
@@ -56,58 +40,27 @@ class Node(object):
     def add_parent(self, parent):
         self.parents.add(parent)
 
-    # Use manual caching, @cached_property effectively doubles the
-    # recursion depth for each recursion.
-    def ancestors(self):
-        # Use self.key instead of self to speed up the frequent hashing
-        # when constructing an OrderedSet.
-        if '_ancestors' not in self.__dict__:
-            ancestors = deque([self.key])
-            for parent in sorted(self.parents):
-                ancestors.extendleft(reversed(parent.ancestors()))
-            self.__dict__['_ancestors'] = list(OrderedSet(ancestors))
-        return self.__dict__['_ancestors']
-
-    # Use manual caching, @cached_property effectively doubles the
-    # recursion depth for each recursion.
-    def descendants(self):
-        # Use self.key instead of self to speed up the frequent hashing
-        # when constructing an OrderedSet.
-        if '_descendants' not in self.__dict__:
-            descendants = deque([self.key])
-            for child in sorted(self.children):
-                descendants.extendleft(reversed(child.descendants()))
-            self.__dict__['_descendants'] = list(OrderedSet(descendants))
-        return self.__dict__['_descendants']
-
 
 class DummyNode(Node):
+    """
+    A node that doesn't correspond to a migration file on disk.
+    (A squashed migration that was removed, for example.)
+
+    After the migration graph is processed, all dummy nodes should be removed.
+    If there are any left, a nonexistent dependency error is raised.
+    """
     def __init__(self, key, origin, error_message):
-        super(DummyNode, self).__init__(key)
+        super().__init__(key)
         self.origin = origin
         self.error_message = error_message
-
-    def __repr__(self):
-        return '<DummyNode: (%r, %r)>' % self.key
-
-    def promote(self):
-        """
-        Transition dummy to a normal node and clean off excess attribs.
-        Creating a Node object from scratch would be too much of a
-        hassle as many dependendies would need to be remapped.
-        """
-        del self.origin
-        del self.error_message
-        self.__class__ = Node
 
     def raise_error(self):
         raise NodeNotFoundError(self.error_message, self.key, origin=self.origin)
 
 
-@python_2_unicode_compatible
-class MigrationGraph(object):
+class MigrationGraph:
     """
-    Represents the digraph of all migrations in a project.
+    Represent the digraph of all migrations in a project.
 
     Each migration is a node, and each dependency is an edge. There are
     no implicit dependencies between numbered migrations - the numbering is
@@ -131,19 +84,12 @@ class MigrationGraph(object):
     def __init__(self):
         self.node_map = {}
         self.nodes = {}
-        self.cached = False
 
     def add_node(self, key, migration):
-        # If the key already exists, then it must be a dummy node.
-        dummy_node = self.node_map.get(key)
-        if dummy_node:
-            # Promote DummyNode to Node.
-            dummy_node.promote()
-        else:
-            node = Node(key)
-            self.node_map[key] = node
+        assert key not in self.node_map
+        node = Node(key)
+        self.node_map[key] = node
         self.nodes[key] = migration
-        self.clear_cache()
 
     def add_dummy_node(self, key, origin, error_message):
         node = DummyNode(key, origin, error_message)
@@ -152,8 +98,9 @@ class MigrationGraph(object):
 
     def add_dependency(self, migration, child, parent, skip_validation=False):
         """
-        This may create dummy nodes if they don't yet exist.
-        If `skip_validation` is set, validate_consistency should be called afterwards.
+        This may create dummy nodes if they don't yet exist. If
+        `skip_validation=True`, validate_consistency() should be called
+        afterwards.
         """
         if child not in self.nodes:
             error_message = (
@@ -171,11 +118,10 @@ class MigrationGraph(object):
         self.node_map[parent].add_child(self.node_map[child])
         if not skip_validation:
             self.validate_consistency()
-        self.clear_cache()
 
     def remove_replaced_nodes(self, replacement, replaced):
         """
-        Removes each of the `replaced` nodes (when they exist). Any
+        Remove each of the `replaced` nodes (when they exist). Any
         dependencies that were referencing them are changed to reference the
         `replacement` node instead.
         """
@@ -183,16 +129,12 @@ class MigrationGraph(object):
         replaced = set(replaced)
         try:
             replacement_node = self.node_map[replacement]
-        except KeyError as exc:
-            exc_value = NodeNotFoundError(
+        except KeyError as err:
+            raise NodeNotFoundError(
                 "Unable to find replacement node %r. It was either never added"
-                " to the migration graph, or has been removed." % (replacement, ),
+                " to the migration graph, or has been removed." % (replacement,),
                 replacement
-            )
-            exc_value.__cause__ = exc
-            if not hasattr(exc, '__traceback__'):
-                exc.__traceback__ = sys.exc_info()[2]
-            six.reraise(NodeNotFoundError, exc_value, sys.exc_info()[2])
+            ) from err
         for replaced_key in replaced:
             self.nodes.pop(replaced_key, None)
             replaced_node = self.node_map.pop(replaced_key, None)
@@ -211,28 +153,23 @@ class MigrationGraph(object):
                     if parent.key not in replaced:
                         replacement_node.add_parent(parent)
                         parent.add_child(replacement_node)
-        self.clear_cache()
 
     def remove_replacement_node(self, replacement, replaced):
         """
-        The inverse operation to `remove_replaced_nodes`. Almost. Removes the
-        replacement node `replacement` and remaps its child nodes to
-        `replaced` - the list of nodes it would have replaced. Its parent
-        nodes are not remapped as they are expected to be correct already.
+        The inverse operation to `remove_replaced_nodes`. Almost. Remove the
+        replacement node `replacement` and remap its child nodes to `replaced`
+        - the list of nodes it would have replaced. Don't remap its parent
+        nodes as they are expected to be correct already.
         """
         self.nodes.pop(replacement, None)
         try:
             replacement_node = self.node_map.pop(replacement)
-        except KeyError as exc:
-            exc_value = NodeNotFoundError(
+        except KeyError as err:
+            raise NodeNotFoundError(
                 "Unable to remove replacement node %r. It was either never added"
-                " to the migration graph, or has been removed already." % (replacement, ),
+                " to the migration graph, or has been removed already." % (replacement,),
                 replacement
-            )
-            exc_value.__cause__ = exc
-            if not hasattr(exc, '__traceback__'):
-                exc.__traceback__ = sys.exc_info()[2]
-            six.reraise(NodeNotFoundError, exc_value, sys.exc_info()[2])
+            ) from err
         replaced_nodes = set()
         replaced_nodes_parents = set()
         for key in replaced:
@@ -252,98 +189,62 @@ class MigrationGraph(object):
             parent.children.remove(replacement_node)
             # NOTE: There is no need to remap parent dependencies as we can
             # assume the replaced nodes already have the correct ancestry.
-        self.clear_cache()
 
     def validate_consistency(self):
-        """
-        Ensure there are no dummy nodes remaining in the graph.
-        """
+        """Ensure there are no dummy nodes remaining in the graph."""
         [n.raise_error() for n in self.node_map.values() if isinstance(n, DummyNode)]
-
-    def clear_cache(self):
-        if self.cached:
-            for node in self.nodes:
-                self.node_map[node].__dict__.pop('_ancestors', None)
-                self.node_map[node].__dict__.pop('_descendants', None)
-            self.cached = False
 
     def forwards_plan(self, target):
         """
-        Given a node, returns a list of which previous nodes (dependencies)
-        must be applied, ending with the node itself.
-        This is the list you would follow if applying the migrations to
-        a database.
+        Given a node, return a list of which previous nodes (dependencies) must
+        be applied, ending with the node itself. This is the list you would
+        follow if applying the migrations to a database.
         """
         if target not in self.nodes:
-            raise NodeNotFoundError("Node %r not a valid node" % (target, ), target)
-        # Use parent.key instead of parent to speed up the frequent hashing in ensure_not_cyclic
-        self.ensure_not_cyclic(target, lambda x: (parent.key for parent in self.node_map[x].parents))
-        self.cached = True
-        node = self.node_map[target]
-        try:
-            return node.ancestors()
-        except RuntimeError:
-            # fallback to iterative dfs
-            warnings.warn(RECURSION_DEPTH_WARNING, RuntimeWarning)
-            return self.iterative_dfs(node)
+            raise NodeNotFoundError("Node %r not a valid node" % (target,), target)
+        return self.iterative_dfs(self.node_map[target])
 
     def backwards_plan(self, target):
         """
-        Given a node, returns a list of which dependent nodes (dependencies)
-        must be unapplied, ending with the node itself.
-        This is the list you would follow if removing the migrations from
-        a database.
+        Given a node, return a list of which dependent nodes (dependencies)
+        must be unapplied, ending with the node itself. This is the list you
+        would follow if removing the migrations from a database.
         """
         if target not in self.nodes:
-            raise NodeNotFoundError("Node %r not a valid node" % (target, ), target)
-        # Use child.key instead of child to speed up the frequent hashing in ensure_not_cyclic
-        self.ensure_not_cyclic(target, lambda x: (child.key for child in self.node_map[x].children))
-        self.cached = True
-        node = self.node_map[target]
-        try:
-            return node.descendants()
-        except RuntimeError:
-            # fallback to iterative dfs
-            warnings.warn(RECURSION_DEPTH_WARNING, RuntimeWarning)
-            return self.iterative_dfs(node, forwards=False)
+            raise NodeNotFoundError("Node %r not a valid node" % (target,), target)
+        return self.iterative_dfs(self.node_map[target], forwards=False)
 
     def iterative_dfs(self, start, forwards=True):
-        """
-        Iterative depth first search, for finding dependencies.
-        """
-        visited = deque()
-        visited.append(start)
-        if forwards:
-            stack = deque(sorted(start.parents))
-        else:
-            stack = deque(sorted(start.children))
+        """Iterative depth-first search for finding dependencies."""
+        visited = []
+        visited_set = set()
+        stack = [(start, False)]
         while stack:
-            node = stack.popleft()
-            visited.appendleft(node)
-            if forwards:
-                children = sorted(node.parents, reverse=True)
+            node, processed = stack.pop()
+            if node in visited_set:
+                pass
+            elif processed:
+                visited_set.add(node)
+                visited.append(node.key)
             else:
-                children = sorted(node.children, reverse=True)
-            # reverse sorting is needed because prepending using deque.extendleft
-            # also effectively reverses values
-            stack.extendleft(children)
-
-        return list(OrderedSet(visited))
+                stack.append((node, True))
+                stack += [(n, False) for n in sorted(node.parents if forwards else node.children)]
+        return visited
 
     def root_nodes(self, app=None):
         """
-        Returns all root nodes - that is, nodes with no dependencies inside
+        Return all root nodes - that is, nodes with no dependencies inside
         their app. These are the starting point for an app.
         """
         roots = set()
         for node in self.nodes:
-            if not any(key[0] == node[0] for key in self.node_map[node].parents) and (not app or app == node[0]):
+            if all(key[0] != node[0] for key in self.node_map[node].parents) and (not app or app == node[0]):
                 roots.add(node)
         return sorted(roots)
 
     def leaf_nodes(self, app=None):
         """
-        Returns all leaf nodes - that is, nodes with no dependents in their app.
+        Return all leaf nodes - that is, nodes with no dependents in their app.
         These are the "most current" version of an app's schema.
         Having more than one per app is technically an error, but one that
         gets handled further up, in the interactive command - it's usually the
@@ -351,20 +252,23 @@ class MigrationGraph(object):
         """
         leaves = set()
         for node in self.nodes:
-            if not any(key[0] == node[0] for key in self.node_map[node].children) and (not app or app == node[0]):
+            if all(key[0] != node[0] for key in self.node_map[node].children) and (not app or app == node[0]):
                 leaves.add(node)
         return sorted(leaves)
 
-    def ensure_not_cyclic(self, start, get_children):
+    def ensure_not_cyclic(self):
         # Algo from GvR:
-        # http://neopythonic.blogspot.co.uk/2009/01/detecting-cycles-in-directed-graph.html
+        # https://neopythonic.blogspot.com/2009/01/detecting-cycles-in-directed-graph.html
         todo = set(self.nodes)
         while todo:
             node = todo.pop()
             stack = [node]
             while stack:
                 top = stack[-1]
-                for node in get_children(top):
+                for child in self.node_map[top].children:
+                    # Use child.key instead of child to speed up the frequent
+                    # hashing.
+                    node = child.key
                     if node in stack:
                         cycle = stack[stack.index(node):]
                         raise CircularDependencyError(", ".join("%s.%s" % n for n in cycle))
@@ -385,25 +289,27 @@ class MigrationGraph(object):
     def _nodes_and_edges(self):
         return len(self.nodes), sum(len(node.parents) for node in self.node_map.values())
 
-    def make_state(self, nodes=None, at_end=True, real_apps=None):
-        """
-        Given a migration node or nodes, returns a complete ProjectState for it.
-        If at_end is False, returns the state before the migration has run.
-        If nodes is not provided, returns the overall most current project state.
-        """
-        if nodes is None:
-            nodes = list(self.leaf_nodes())
-        if len(nodes) == 0:
-            return ProjectState()
-        if not isinstance(nodes[0], tuple):
-            nodes = [nodes]
+    def _generate_plan(self, nodes, at_end):
         plan = []
         for node in nodes:
             for migration in self.forwards_plan(node):
-                if migration not in plan:
-                    if not at_end and migration in nodes:
-                        continue
+                if migration not in plan and (at_end or migration not in nodes):
                     plan.append(migration)
+        return plan
+
+    def make_state(self, nodes=None, at_end=True, real_apps=None):
+        """
+        Given a migration node or nodes, return a complete ProjectState for it.
+        If at_end is False, return the state before the migration has run.
+        If nodes is not provided, return the overall most current project state.
+        """
+        if nodes is None:
+            nodes = list(self.leaf_nodes())
+        if not nodes:
+            return ProjectState()
+        if not isinstance(nodes[0], tuple):
+            nodes = [nodes]
+        plan = self._generate_plan(nodes, at_end)
         project_state = ProjectState(real_apps=real_apps)
         for node in plan:
             project_state = self.nodes[node].mutate_state(project_state, preserve=False)

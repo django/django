@@ -120,10 +120,10 @@ Filtering error reports
 .. warning::
 
     Filtering sensitive data is a hard problem, and it's nearly impossible to
-    guarantee that sensitive won't leak into an error report. Therefore, error
-    reports should only be available to trusted team members and you should
-    avoid transmitting error reports unencrypted over the Internet (such as
-    through email).
+    guarantee that sensitive data won't leak into an error report. Therefore,
+    error reports should only be available to trusted team members and you
+    should avoid transmitting error reports unencrypted over the Internet
+    (such as through email).
 
 Filtering sensitive information
 -------------------------------

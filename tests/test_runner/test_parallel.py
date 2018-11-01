@@ -2,7 +2,7 @@ import unittest
 
 from django.test import SimpleTestCase
 from django.test.runner import RemoteTestResult
-from django.utils import six
+from django.utils.version import PY37
 
 try:
     import tblib
@@ -16,7 +16,7 @@ class ExceptionThatFailsUnpickling(Exception):
     arguments passed to __init__().
     """
     def __init__(self, arg):
-        super(ExceptionThatFailsUnpickling, self).__init__()
+        super().__init__()
 
 
 class ParallelTestRunnerTest(SimpleTestCase):
@@ -28,10 +28,9 @@ class ParallelTestRunnerTest(SimpleTestCase):
     parallel.
     """
 
-    @unittest.skipUnless(six.PY3, 'subtests were added in Python 3.4')
     def test_subtest(self):
         """
-        Check that passing subtests work.
+        Passing subtests work.
         """
         for i in range(2):
             with self.subTest(index=i):
@@ -61,12 +60,10 @@ class RemoteTestResultTest(SimpleTestCase):
         result._confirm_picklable(picklable_error)
 
         msg = '__init__() missing 1 required positional argument'
-        if six.PY2:
-            msg = '__init__() takes exactly 2 arguments (1 given)'
         with self.assertRaisesMessage(TypeError, msg):
             result._confirm_picklable(not_unpicklable_error)
 
-    @unittest.skipUnless(six.PY3 and tblib is not None, 'requires tblib to be installed')
+    @unittest.skipUnless(tblib is not None, 'requires tblib to be installed')
     def test_add_failing_subtests(self):
         """
         Failing subtests are added correctly using addSubTest().
@@ -83,7 +80,8 @@ class RemoteTestResultTest(SimpleTestCase):
         event = events[1]
         self.assertEqual(event[0], 'addSubTest')
         self.assertEqual(str(event[2]), 'dummy_test (test_runner.test_parallel.SampleFailingSubtest) (index=0)')
-        self.assertEqual(repr(event[3][1]), "AssertionError('0 != 1',)")
+        trailing_comma = '' if PY37 else ','
+        self.assertEqual(repr(event[3][1]), "AssertionError('0 != 1'%s)" % trailing_comma)
 
         event = events[2]
-        self.assertEqual(repr(event[3][1]), "AssertionError('2 != 1',)")
+        self.assertEqual(repr(event[3][1]), "AssertionError('2 != 1'%s)" % trailing_comma)

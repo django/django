@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-07-18 22:34+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-26 10:59+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Upper Sorbian (http://www.transifex.com/django/django/"
 "language/hsb/)\n"
@@ -22,18 +22,18 @@ msgid "PostgreSQL extensions"
 msgstr "Rozšěrjenja PostgreSQL"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
-msgstr "Element %(nth)s w pólnej wariabli njeje so wobkrućił:"
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "Zapisk %(nth)s w pólnym wariabli njeje so wokrućił:"
 
 msgid "Nested arrays must have the same length."
 msgstr "Zakašćikowane pólne wariable maja samsnu dołhosć."
 
-msgid "Map of strings to strings"
-msgstr "Přirjadowanje znamješkowych rjećazkow k znamješkowym rjećazkam"
+msgid "Map of strings to strings/nulls"
+msgstr "Konwertowanje znamješkowych rjećazkow do znamješkowych rjećazkow/nulow"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "Hódnota „%(key)s“ znamješkowy rjećazk njeje."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "Hódnota \" %(key)s\" znamješkowy rjećazk abo null njeje."
 
 msgid "A JSON object"
 msgstr "JSON-objekt"

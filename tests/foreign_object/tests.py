@@ -13,7 +13,6 @@ from .models import (
     Group, Membership, NewsArticle, Person,
 )
 
-
 # Note that these tests are testing internal implementation details.
 # ForeignObject is not part of public API.
 
@@ -369,7 +368,12 @@ class MultiColumnFKTests(TestCase):
         ArticleTag.objects.create(article=a1, name="foo")
         self.assertEqual(Article.objects.filter(tag__name="foo").count(), 1)
         self.assertEqual(Article.objects.filter(tag__name="bar").count(), 0)
-        with self.assertRaises(FieldError):
+        msg = (
+            "Cannot resolve keyword 'tags' into field. Choices are: "
+            "active_translation, active_translation_q, articletranslation, "
+            "id, idea_things, newsarticle, pub_date, tag"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(tags__name="foo")
 
     def test_many_to_many_related_query_name(self):
@@ -378,7 +382,12 @@ class MultiColumnFKTests(TestCase):
         a1.ideas.add(i1)
         self.assertEqual(Article.objects.filter(idea_things__name="idea1").count(), 1)
         self.assertEqual(Article.objects.filter(idea_things__name="idea2").count(), 0)
-        with self.assertRaises(FieldError):
+        msg = (
+            "Cannot resolve keyword 'ideas' into field. Choices are: "
+            "active_translation, active_translation_q, articletranslation, "
+            "id, idea_things, newsarticle, pub_date, tag"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(ideas__name="idea1")
 
     @translation.override('fi')
@@ -398,7 +407,6 @@ class MultiColumnFKTests(TestCase):
 
     @skipUnlessDBFeature('has_bulk_insert')
     def test_batch_create_foreign_object(self):
-        """ See: https://code.djangoproject.com/ticket/21566 """
         objs = [Person(name="abcd_%s" % i, person_country=self.usa) for i in range(0, 5)]
         Person.objects.bulk_create(objs, 10)
 

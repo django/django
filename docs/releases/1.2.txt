@@ -359,12 +359,8 @@ keyword to 3 in your :class:`~django.contrib.gis.db.models.GeometryField`.
 The :class:`~django.contrib.gis.db.models.Extent3D` aggregate
 and ``extent3d()`` ``GeoQuerySet`` method were added as a part of this feature.
 
-The following :class:`~django.contrib.gis.db.models.GeoQuerySet`
-methods are new in 1.2:
-
-* :meth:`~django.contrib.gis.db.models.GeoQuerySet.force_rhr`
-* :meth:`~django.contrib.gis.db.models.GeoQuerySet.reverse_geom`
-* :meth:`~django.contrib.gis.db.models.GeoQuerySet.geohash`
+The ``force_rhr()``, ``reverse_geom()``, and ``geohash()`` ``GeoQuerySet``
+methods are new.
 
 The GEOS interface was updated to use thread-safe C library functions when
 available on the platform.
@@ -438,7 +434,7 @@ should be aware of:
      The upgrade notes have been removed in current Django docs. Please refer
      to the docs for Django 1.3 or older to find these instructions.
 
-* ``CsrfViewMiddleware`` is included in :setting:`MIDDLEWARE_CLASSES` by
+* ``CsrfViewMiddleware`` is included in ``MIDDLEWARE_CLASSES`` by
   default. This turns on CSRF protection by default, so views that accept
   POST requests need to be written to work with the middleware. Instructions
   on how to do this are found in the CSRF docs.

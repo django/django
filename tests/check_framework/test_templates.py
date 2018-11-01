@@ -59,7 +59,7 @@ class CheckTemplateStringIfInvalidTest(SimpleTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(CheckTemplateStringIfInvalidTest, cls).setUpClass()
+        super().setUpClass()
         cls.error1 = copy(E002)
         cls.error2 = copy(E002)
         string_if_invalid1 = cls.TEMPLATES_STRING_IF_INVALID[0]['OPTIONS']['string_if_invalid']

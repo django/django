@@ -1,7 +1,7 @@
 from django.db.models import Q
 from django.test import TestCase
 
-from .models import Issue, UnicodeReferenceModel, User
+from .models import Issue, StringReferenceModel, User
 
 
 class RelatedObjectTests(TestCase):
@@ -84,11 +84,11 @@ class RelatedObjectTests(TestCase):
 class RelatedObjectUnicodeTests(TestCase):
     def test_m2m_with_unicode_reference(self):
         """
-        Regression test for #6045: references to other models can be unicode
+        Regression test for #6045: references to other models can be
         strings, providing they are directly convertible to ASCII.
         """
-        m1 = UnicodeReferenceModel.objects.create()
-        m2 = UnicodeReferenceModel.objects.create()
+        m1 = StringReferenceModel.objects.create()
+        m2 = StringReferenceModel.objects.create()
         m2.others.add(m1)  # used to cause an error (see ticket #6045)
         m2.save()
         list(m2.others.all())  # Force retrieval.

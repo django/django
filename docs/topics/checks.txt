@@ -133,10 +133,6 @@ perform any extra checks you need, and append any messages to those generated
 by the base class. It's recommended that you delegate each check to separate
 methods.
 
-.. versionchanged:: 1.10
-
-    Database backend checks were added.
-
 Consider an example where you are implementing a custom field named
 ``RangedIntegerField``. This field adds ``min`` and ``max`` arguments to the
 constructor of ``IntegerField``. You may want to add a check to ensure that users
@@ -148,13 +144,13 @@ code snippet shows how you can implement this check::
 
     class RangedIntegerField(models.IntegerField):
         def __init__(self, min=None, max=None, **kwargs):
-            super(RangedIntegerField, self).__init__(**kwargs)
+            super().__init__(**kwargs)
             self.min = min
             self.max = max
 
         def check(self, **kwargs):
             # Call the superclass
-            errors = super(RangedIntegerField, self).check(**kwargs)
+            errors = super().check(**kwargs)
 
             # Do some custom checks and add messages to `errors`:
             errors.extend(self._check_min_max_values(**kwargs))
@@ -186,7 +182,7 @@ the only difference is that the check is a classmethod, not an instance method::
     class MyModel(models.Model):
         @classmethod
         def check(cls, **kwargs):
-            errors = super(MyModel, cls).check(**kwargs)
+            errors = super().check(**kwargs)
             # ... your own checks ...
             return errors
 

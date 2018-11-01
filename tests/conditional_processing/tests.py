@@ -1,6 +1,3 @@
-# -*- coding:utf-8 -*-
-from __future__ import unicode_literals
-
 from datetime import datetime
 
 from django.test import SimpleTestCase, override_settings
@@ -22,10 +19,14 @@ class ConditionalGet(SimpleTestCase):
     def assertFullResponse(self, response, check_last_modified=True, check_etag=True):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, FULL_RESPONSE.encode())
-        if check_last_modified:
-            self.assertEqual(response['Last-Modified'], LAST_MODIFIED_STR)
-        if check_etag:
-            self.assertEqual(response['ETag'], ETAG)
+        if response.request['REQUEST_METHOD'] in ('GET', 'HEAD'):
+            if check_last_modified:
+                self.assertEqual(response['Last-Modified'], LAST_MODIFIED_STR)
+            if check_etag:
+                self.assertEqual(response['ETag'], ETAG)
+        else:
+            self.assertNotIn('Last-Modified', response)
+            self.assertNotIn('ETag', response)
 
     def assertNotModified(self, response):
         self.assertEqual(response.status_code, 304)

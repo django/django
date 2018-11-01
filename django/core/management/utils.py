@@ -1,40 +1,34 @@
-from __future__ import unicode_literals
-
 import os
-import sys
 from subprocess import PIPE, Popen
 
 from django.apps import apps as installed_apps
-from django.utils import six
 from django.utils.crypto import get_random_string
-from django.utils.encoding import DEFAULT_LOCALE_ENCODING, force_text
+from django.utils.encoding import DEFAULT_LOCALE_ENCODING
 
-from .base import CommandError
+from .base import CommandError, CommandParser
 
 
-def popen_wrapper(args, os_err_exc_type=CommandError, stdout_encoding='utf-8'):
+def popen_wrapper(args, stdout_encoding='utf-8'):
     """
     Friendly wrapper around Popen.
 
-    Returns stdout output, stderr output and OS status code.
+    Return stdout output, stderr output, and OS status code.
     """
     try:
         p = Popen(args, shell=False, stdout=PIPE, stderr=PIPE, close_fds=os.name != 'nt')
-    except OSError as e:
-        strerror = force_text(e.strerror, DEFAULT_LOCALE_ENCODING, strings_only=True)
-        six.reraise(os_err_exc_type, os_err_exc_type('Error executing %s: %s' %
-                    (args[0], strerror)), sys.exc_info()[2])
+    except OSError as err:
+        raise CommandError('Error executing %s' % args[0]) from err
     output, errors = p.communicate()
     return (
-        force_text(output, stdout_encoding, strings_only=True, errors='strict'),
-        force_text(errors, DEFAULT_LOCALE_ENCODING, strings_only=True, errors='replace'),
+        output.decode(stdout_encoding),
+        errors.decode(DEFAULT_LOCALE_ENCODING, errors='replace'),
         p.returncode
     )
 
 
 def handle_extensions(extensions):
     """
-    Organizes multiple extensions that are separated with commas or passed by
+    Organize multiple extensions that are separated with commas or passed by
     using --extension/-e multiple times.
 
     For example: running 'django-admin makemessages -e js,txt -e xhtml -a'
@@ -57,7 +51,7 @@ def handle_extensions(extensions):
 def find_command(cmd, path=None, pathext=None):
     if path is None:
         path = os.environ.get('PATH', '').split(os.pathsep)
-    if isinstance(path, six.string_types):
+    if isinstance(path, str):
         path = [path]
     # check if there are funny path extensions for executables, e.g. Windows
     if pathext is None:
@@ -112,3 +106,19 @@ def parse_apps_and_model_labels(labels):
             apps.add(app_config)
 
     return models, apps
+
+
+def get_command_line_option(argv, option):
+    """
+    Return the value of a command line option (which should include leading
+    dashes, e.g. '--testrunnner') from an argument list. Return None if the
+    option wasn't passed or if the argument list couldn't be parsed.
+    """
+    parser = CommandParser(add_help=False, allow_abbrev=False)
+    parser.add_argument(option, dest='value')
+    try:
+        options, _ = parser.parse_known_args(argv[2:])
+    except CommandError:
+        return None
+    else:
+        return options.value

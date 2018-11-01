@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:09+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-23 18:54+0000\n"
+"Last-Translator: jon_atkinson <jon@jonatkinson.co.uk>\n"
 "Language-Team: English (United Kingdom) (http://www.transifex.com/django/"
 "django/language/en_GB/)\n"
 "MIME-Version: 1.0\n"
@@ -206,8 +206,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "The %(name)s \"%(obj)s\" was deleted successfully."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "%(name)s object with primary key %(key)r does not exist."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr ""
 
 #, python-format
 msgid "Add %s"

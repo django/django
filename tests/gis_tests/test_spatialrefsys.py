@@ -1,8 +1,6 @@
 import re
-import unittest
 
-from django.test import skipUnlessDBFeature
-from django.utils import six
+from django.test import TestCase, skipUnlessDBFeature
 
 from .utils import SpatialRefSys, oracle, postgis, spatialite
 
@@ -51,7 +49,7 @@ test_srs = ({
 
 
 @skipUnlessDBFeature("has_spatialrefsys_table")
-class SpatialRefSysTest(unittest.TestCase):
+class SpatialRefSysTest(TestCase):
 
     def test_get_units(self):
         epsg_4326 = next(f for f in test_srs if f['srid'] == 4326)
@@ -79,7 +77,7 @@ class SpatialRefSysTest(unittest.TestCase):
             # No proj.4 and different srtext on oracle backends :(
             if postgis:
                 self.assertTrue(srs.wkt.startswith(sd['srtext']))
-                six.assertRegex(self, srs.proj4text, sd['proj4_re'])
+                self.assertRegex(srs.proj4text, sd['proj4_re'])
 
     def test_osr(self):
         """
@@ -99,7 +97,7 @@ class SpatialRefSysTest(unittest.TestCase):
             # Testing the SpatialReference object directly.
             if postgis or spatialite:
                 srs = sr.srs
-                six.assertRegex(self, srs.proj4, sd['proj4_re'])
+                self.assertRegex(srs.proj4, sd['proj4_re'])
                 self.assertTrue(srs.wkt.startswith(sd['srtext']))
 
     def test_ellipsoid(self):

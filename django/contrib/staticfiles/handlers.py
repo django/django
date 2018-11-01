@@ -1,9 +1,11 @@
+from urllib.parse import urlparse
+from urllib.request import url2pathname
+
 from django.conf import settings
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.views import serve
+from django.core.handlers.exception import response_for_exception
 from django.core.handlers.wsgi import WSGIHandler, get_path_info
-from django.utils.six.moves.urllib.parse import urlparse
-from django.utils.six.moves.urllib.request import url2pathname
 
 
 class StaticFilesHandler(WSGIHandler):
@@ -18,7 +20,12 @@ class StaticFilesHandler(WSGIHandler):
     def __init__(self, application):
         self.application = application
         self.base_url = urlparse(self.get_base_url())
-        super(StaticFilesHandler, self).__init__()
+        super().__init__()
+
+    def load_middleware(self):
+        # Middleware are already loaded for self.application; no need to reload
+        # them for self.
+        pass
 
     def get_base_url(self):
         utils.check_settings()
@@ -26,8 +33,7 @@ class StaticFilesHandler(WSGIHandler):
 
     def _should_handle(self, path):
         """
-        Checks if the path should be handled. Ignores the path if:
-
+        Check if the path should be handled. Ignore the path if:
         * the host is provided as part of the base_url
         * the request's path isn't under the media path (or equal)
         """
@@ -35,15 +41,13 @@ class StaticFilesHandler(WSGIHandler):
 
     def file_path(self, url):
         """
-        Returns the relative path to the media file on disk for the given URL.
+        Return the relative path to the media file on disk for the given URL.
         """
         relative_url = url[len(self.base_url[2]):]
         return url2pathname(relative_url)
 
     def serve(self, request):
-        """
-        Actually serves the request path.
-        """
+        """Serve the request path."""
         return serve(request, self.file_path(request.path), insecure=True)
 
     def get_response(self, request):
@@ -53,12 +57,10 @@ class StaticFilesHandler(WSGIHandler):
             try:
                 return self.serve(request)
             except Http404 as e:
-                if settings.DEBUG:
-                    from django.views import debug
-                    return debug.technical_404_response(request, e)
-        return super(StaticFilesHandler, self).get_response(request)
+                return response_for_exception(request, e)
+        return super().get_response(request)
 
     def __call__(self, environ, start_response):
         if not self._should_handle(get_path_info(environ)):
             return self.application(environ, start_response)
-        return super(StaticFilesHandler, self).__call__(environ, start_response)
+        return super().__call__(environ, start_response)

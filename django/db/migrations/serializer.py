@@ -1,30 +1,23 @@
-from __future__ import unicode_literals
-
-import collections
+import builtins
+import collections.abc
 import datetime
 import decimal
+import enum
 import functools
 import math
+import re
 import types
-from importlib import import_module
+import uuid
 
 from django.db import models
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
-from django.utils import datetime_safe, six
-from django.utils.encoding import force_text
 from django.utils.functional import LazyObject, Promise
 from django.utils.timezone import utc
 from django.utils.version import get_docs_version
 
-try:
-    import enum
-except ImportError:
-    # No support on Python 2 if enum34 isn't installed.
-    enum = None
 
-
-class BaseSerializer(object):
+class BaseSerializer:
     def __init__(self, value):
         self.value = value
 
@@ -52,34 +45,21 @@ class BaseSimpleSerializer(BaseSerializer):
         return repr(self.value), set()
 
 
-class ByteTypeSerializer(BaseSerializer):
+class DateTimeSerializer(BaseSerializer):
+    """For datetime.*, except datetime.datetime."""
     def serialize(self):
-        value_repr = repr(self.value)
-        if six.PY2:
-            # Prepend the `b` prefix since we're importing unicode_literals
-            value_repr = 'b' + value_repr
-        return value_repr, set()
+        return repr(self.value), {'import datetime'}
 
 
-class DatetimeSerializer(BaseSerializer):
+class DatetimeDatetimeSerializer(BaseSerializer):
+    """For datetime.datetime."""
     def serialize(self):
         if self.value.tzinfo is not None and self.value.tzinfo != utc:
             self.value = self.value.astimezone(utc)
-        value_repr = repr(self.value).replace("<UTC>", "utc")
-        if isinstance(self.value, datetime_safe.datetime):
-            value_repr = "datetime.%s" % value_repr
         imports = ["import datetime"]
         if self.value.tzinfo is not None:
             imports.append("from django.utils.timezone import utc")
-        return value_repr, set(imports)
-
-
-class DateSerializer(BaseSerializer):
-    def serialize(self):
-        value_repr = repr(self.value)
-        if isinstance(self.value, datetime_safe.date):
-            value_repr = "datetime.%s" % value_repr
-        return value_repr, {"import datetime"}
+        return repr(self.value).replace('<UTC>', 'utc'), set(imports)
 
 
 class DecimalSerializer(BaseSerializer):
@@ -134,9 +114,8 @@ class EnumSerializer(BaseSerializer):
     def serialize(self):
         enum_class = self.value.__class__
         module = enum_class.__module__
-        imports = {"import %s" % module}
         v_string, v_imports = serializer_factory(self.value.value).serialize()
-        imports.update(v_imports)
+        imports = {'import %s' % module, *v_imports}
         return "%s.%s(%s)" % (module, enum_class.__name__, v_string), imports
 
 
@@ -144,7 +123,7 @@ class FloatSerializer(BaseSimpleSerializer):
     def serialize(self):
         if math.isnan(self.value) or math.isinf(self.value):
             return 'float("{}")'.format(self.value), set()
-        return super(FloatSerializer, self).serialize()
+        return super().serialize()
 
 
 class FrozensetSerializer(BaseSequenceSerializer):
@@ -163,46 +142,31 @@ class FunctionTypeSerializer(BaseSerializer):
             raise ValueError("Cannot serialize function: lambda")
         if self.value.__module__ is None:
             raise ValueError("Cannot serialize function %r: No module" % self.value)
-        # Python 3 is a lot easier, and only uses this branch if it's not local.
-        if getattr(self.value, "__qualname__", None) and getattr(self.value, "__module__", None):
-            if "<" not in self.value.__qualname__:  # Qualname can include <locals>
-                return "%s.%s" % \
-                    (self.value.__module__, self.value.__qualname__), {"import %s" % self.value.__module__}
-        # Python 2/fallback version
+
         module_name = self.value.__module__
-        # Make sure it's actually there and not an unbound method
-        module = import_module(module_name)
-        if not hasattr(module, self.value.__name__):
-            raise ValueError(
-                "Could not find function %s in %s.\n"
-                "Please note that due to Python 2 limitations, you cannot "
-                "serialize unbound method functions (e.g. a method "
-                "declared and used in the same class body). Please move "
-                "the function into the main module body to use migrations.\n"
-                "For more information, see "
-                "https://docs.djangoproject.com/en/%s/topics/migrations/#serializing-values"
-                % (self.value.__name__, module_name, get_docs_version())
-            )
-        # Needed on Python 2 only
-        if module_name == '__builtin__':
-            return self.value.__name__, set()
-        return "%s.%s" % (module_name, self.value.__name__), {"import %s" % module_name}
+
+        if '<' not in self.value.__qualname__:  # Qualname can include <locals>
+            return '%s.%s' % (module_name, self.value.__qualname__), {'import %s' % self.value.__module__}
+
+        raise ValueError(
+            'Could not find function %s in %s.\n' % (self.value.__name__, module_name)
+        )
 
 
 class FunctoolsPartialSerializer(BaseSerializer):
     def serialize(self):
-        imports = {'import functools'}
         # Serialize functools.partial() arguments
         func_string, func_imports = serializer_factory(self.value.func).serialize()
         args_string, args_imports = serializer_factory(self.value.args).serialize()
         keywords_string, keywords_imports = serializer_factory(self.value.keywords).serialize()
         # Add any imports needed by arguments
-        imports.update(func_imports)
-        imports.update(args_imports)
-        imports.update(keywords_imports)
+        imports = {'import functools', *func_imports, *args_imports, *keywords_imports}
         return (
-            "functools.partial(%s, *%s, **%s)" % (
-                func_string, args_string, keywords_string,
+            'functools.%s(%s, *%s, **%s)' % (
+                self.value.__class__.__name__,
+                func_string,
+                args_string,
+                keywords_string,
             ),
             imports,
         )
@@ -248,13 +212,14 @@ class OperationSerializer(BaseSerializer):
 
 class RegexSerializer(BaseSerializer):
     def serialize(self):
-        imports = {"import re"}
         regex_pattern, pattern_imports = serializer_factory(self.value.pattern).serialize()
-        regex_flags, flag_imports = serializer_factory(self.value.flags).serialize()
-        imports.update(pattern_imports)
-        imports.update(flag_imports)
+        # Turn off default implicit flags (e.g. re.U) because regexes with the
+        # same implicit and explicit flags aren't equal.
+        flags = self.value.flags ^ re.compile('').flags
+        regex_flags, flag_imports = serializer_factory(flags).serialize()
+        imports = {'import re', *pattern_imports, *flag_imports}
         args = [regex_pattern]
-        if self.value.flags:
+        if flags:
             args.append(regex_flags)
         return "re.compile(%s)" % ', '.join(args), imports
 
@@ -266,35 +231,14 @@ class SequenceSerializer(BaseSequenceSerializer):
 
 class SetSerializer(BaseSequenceSerializer):
     def _format(self):
-        # Don't use the literal "{%s}" as it doesn't support empty set
-        return "set([%s])"
+        # Serialize as a set literal except when value is empty because {}
+        # is an empty dict.
+        return '{%s}' if self.value else 'set(%s)'
 
 
 class SettingsReferenceSerializer(BaseSerializer):
     def serialize(self):
         return "settings.%s" % self.value.setting_name, {"from django.conf import settings"}
-
-
-class TextTypeSerializer(BaseSerializer):
-    def serialize(self):
-        value_repr = repr(self.value)
-        if six.PY2:
-            # Strip the `u` prefix since we're importing unicode_literals
-            value_repr = value_repr[1:]
-        return value_repr, set()
-
-
-class TimedeltaSerializer(BaseSerializer):
-    def serialize(self):
-        return repr(self.value), {"import datetime"}
-
-
-class TimeSerializer(BaseSerializer):
-    def serialize(self):
-        value_repr = repr(self.value)
-        if isinstance(self.value, datetime_safe.time):
-            value_repr = "datetime.%s" % value_repr
-        return value_repr, {"import datetime"}
 
 
 class TupleSerializer(BaseSequenceSerializer):
@@ -308,22 +252,28 @@ class TypeSerializer(BaseSerializer):
     def serialize(self):
         special_cases = [
             (models.Model, "models.Model", []),
+            (type(None), 'type(None)', []),
         ]
         for case, string, imports in special_cases:
             if case is self.value:
                 return string, set(imports)
         if hasattr(self.value, "__module__"):
             module = self.value.__module__
-            if module == six.moves.builtins.__name__:
+            if module == builtins.__name__:
                 return self.value.__name__, set()
             else:
                 return "%s.%s" % (module, self.value.__name__), {"import %s" % module}
 
 
+class UUIDSerializer(BaseSerializer):
+    def serialize(self):
+        return "uuid.%s" % repr(self.value), {"import uuid"}
+
+
 def serializer_factory(value):
     from django.db.migrations.writer import SettingsReference
     if isinstance(value, Promise):
-        value = force_text(value)
+        value = str(value)
     elif isinstance(value, LazyObject):
         # The unwrapped value is returned as the first item of the arguments
         # tuple.
@@ -352,36 +302,30 @@ def serializer_factory(value):
         return TupleSerializer(value)
     if isinstance(value, dict):
         return DictionarySerializer(value)
-    if enum and isinstance(value, enum.Enum):
+    if isinstance(value, enum.Enum):
         return EnumSerializer(value)
     if isinstance(value, datetime.datetime):
-        return DatetimeSerializer(value)
-    if isinstance(value, datetime.date):
-        return DateSerializer(value)
-    if isinstance(value, datetime.time):
-        return TimeSerializer(value)
-    if isinstance(value, datetime.timedelta):
-        return TimedeltaSerializer(value)
+        return DatetimeDatetimeSerializer(value)
+    if isinstance(value, (datetime.date, datetime.timedelta, datetime.time)):
+        return DateTimeSerializer(value)
     if isinstance(value, SettingsReference):
         return SettingsReferenceSerializer(value)
     if isinstance(value, float):
         return FloatSerializer(value)
-    if isinstance(value, six.integer_types + (bool, type(None))):
+    if isinstance(value, (bool, int, type(None), bytes, str)):
         return BaseSimpleSerializer(value)
-    if isinstance(value, six.binary_type):
-        return ByteTypeSerializer(value)
-    if isinstance(value, six.text_type):
-        return TextTypeSerializer(value)
     if isinstance(value, decimal.Decimal):
         return DecimalSerializer(value)
-    if isinstance(value, functools.partial):
+    if isinstance(value, (functools.partial, functools.partialmethod)):
         return FunctoolsPartialSerializer(value)
     if isinstance(value, (types.FunctionType, types.BuiltinFunctionType, types.MethodType)):
         return FunctionTypeSerializer(value)
-    if isinstance(value, collections.Iterable):
+    if isinstance(value, collections.abc.Iterable):
         return IterableSerializer(value)
     if isinstance(value, (COMPILED_REGEX_TYPE, RegexObject)):
         return RegexSerializer(value)
+    if isinstance(value, uuid.UUID):
+        return UUIDSerializer(value)
     raise ValueError(
         "Cannot serialize: %r\nThere are some values Django cannot serialize into "
         "migration files.\nFor more, see https://docs.djangoproject.com/en/%s/"

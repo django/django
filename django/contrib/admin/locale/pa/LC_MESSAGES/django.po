@@ -1,13 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# A S Alam <alam.yellow@gmail.com>, 2018
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:09+0000\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-05-28 01:29+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Panjabi (Punjabi) (http://www.transifex.com/django/django/"
 "language/pa/)\n"
@@ -23,7 +24,7 @@ msgstr "%(count)d %(items)s ਠੀਕ ਤਰ੍ਹਾਂ ਹਟਾਈਆਂ ਗ�
 
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr ""
+msgstr "%(name)s ਨੂੰ ਹਟਾਇਆ ਨਹੀਂ ਜਾ ਸਕਦਾ"
 
 msgid "Are you sure?"
 msgstr "ਕੀ ਤੁਸੀਂ ਇਹ ਚਾਹੁੰਦੇ ਹੋ?"
@@ -33,7 +34,7 @@ msgid "Delete selected %(verbose_name_plural)s"
 msgstr "ਚੁਣੇ %(verbose_name_plural)s ਹਟਾਓ"
 
 msgid "Administration"
-msgstr ""
+msgstr "ਪਰਸ਼ਾਸ਼ਨ"
 
 msgid "All"
 msgstr "ਸਭ"
@@ -84,14 +85,23 @@ msgstr "%(verbose_name)s ਹੋਰ ਸ਼ਾਮਲ"
 msgid "Remove"
 msgstr "ਹਟਾਓ"
 
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "ਬਦਲੋ"
+
+msgid "Deletion"
+msgstr ""
+
 msgid "action time"
 msgstr "ਕਾਰਵਾਈ ਸਮਾਂ"
 
 msgid "user"
-msgstr ""
+msgstr "ਵਰਤੋਂਕਾਰ"
 
 msgid "content type"
-msgstr ""
+msgstr "ਸਮੱਗਰੀ ਕਿਸਮ"
 
 msgid "object id"
 msgstr "ਆਬਜੈਕਟ id"
@@ -161,8 +171,10 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -172,12 +184,13 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -203,7 +216,7 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" ਠੀਕ ਤਰ੍ਹਾਂ ਹਟਾਇਆ ਗਿਆ ਹੈ।"
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
 msgstr ""
 
 #, python-format
@@ -213,6 +226,10 @@ msgstr "%s ਸ਼ਾਮਲ"
 #, python-format
 msgid "Change %s"
 msgstr "%s ਬਦਲੋ"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "ਡਾਟਾਬੇਸ ਗਲਤੀ"
@@ -316,7 +333,7 @@ msgid "Change password"
 msgstr "ਪਾਸਵਰਡ ਬਦਲੋ"
 
 msgid "Please correct the error below."
-msgstr "ਹੇਠ ਦਿੱਤੀਆਂ ਗਲਤੀਆਂ ਠੀਕ ਕਰੋ ਜੀ।"
+msgstr ""
 
 msgid "Please correct the errors below."
 msgstr ""
@@ -413,8 +430,8 @@ msgid ""
 "following objects and their related items will be deleted:"
 msgstr ""
 
-msgid "Change"
-msgstr "ਬਦਲੋ"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr "ਹਟਾਉਣਾ?"
@@ -433,8 +450,8 @@ msgstr ""
 msgid "Add"
 msgstr "ਸ਼ਾਮਲ"
 
-msgid "You don't have permission to edit anything."
-msgstr "ਤੁਹਾਨੂੰ ਕੁਝ ਵੀ ਸੋਧਣ ਦਾ ਅਧਿਕਾਰ ਨਹੀਂ ਹੈ।"
+msgid "You don't have permission to view or edit anything."
+msgstr ""
 
 msgid "Recent actions"
 msgstr ""
@@ -491,6 +508,10 @@ msgid "Change selected %(model)s"
 msgstr ""
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr ""
 
@@ -519,6 +540,12 @@ msgstr "ਸੰਭਾਲੋ ਤੇ ਹੋਰ ਸ਼ਾਮਲ"
 
 msgid "Save and continue editing"
 msgstr "ਸੰਭਾਲੋ ਤੇ ਸੋਧਣਾ ਜਾਰੀ ਰੱਖੋ"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "ਅੱਜ ਵੈੱਬਸਾਈਟ ਨੂੰ ਕੁਝ ਚੰਗਾ ਸਮਾਂ ਦੇਣ ਲਈ ਧੰਨਵਾਦ ਹੈ।"
@@ -620,6 +647,10 @@ msgstr "%s ਚੁਣੋ"
 #, python-format
 msgid "Select %s to change"
 msgstr "ਬਦਲਣ ਲਈ %s ਚੁਣੋ"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "ਮਿਤੀ:"

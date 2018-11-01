@@ -2,7 +2,7 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import modify_settings
 from django.test.selenium import SeleniumTestCase
 from django.utils.deprecation import MiddlewareMixin
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 class CSPMiddleware(MiddlewareMixin):
@@ -25,10 +25,10 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
 
     def wait_until(self, callback, timeout=10):
         """
-        Helper function that blocks the execution of the tests until the
-        specified callback returns a value that is not falsy. This function can
-        be called, for example, after clicking a link or submitting a form.
-        See the other public methods that call this function for more details.
+        Block the execution of the tests until the specified callback returns a
+        value that is not falsy. This method can be called, for example, after
+        clicking a link or submitting a form. See the other public methods that
+        call this function for more details.
         """
         from selenium.webdriver.support.wait import WebDriverWait
         WebDriverWait(self.selenium, timeout).until(callback)
@@ -42,7 +42,7 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
 
     def wait_for(self, css_selector, timeout=10):
         """
-        Helper function that blocks until a CSS selector is found on the page.
+        Block until a CSS selector is found on the page.
         """
         from selenium.webdriver.common.by import By
         from selenium.webdriver.support import expected_conditions as ec
@@ -53,7 +53,7 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
 
     def wait_for_text(self, css_selector, text, timeout=10):
         """
-        Helper function that blocks until the text is found in the CSS selector.
+        Block until the text is found in the CSS selector.
         """
         from selenium.webdriver.common.by import By
         from selenium.webdriver.support import expected_conditions as ec
@@ -65,7 +65,7 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
 
     def wait_for_value(self, css_selector, text, timeout=10):
         """
-        Helper function that blocks until the value is found in the CSS selector.
+        Block until the value is found in the CSS selector.
         """
         from selenium.webdriver.common.by import By
         from selenium.webdriver.support import expected_conditions as ec
@@ -113,7 +113,7 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
 
     def admin_login(self, username, password, login_url='/admin/'):
         """
-        Helper function to log into the admin.
+        Log in to the admin.
         """
         self.selenium.get('%s%s' % (self.live_server_url, login_url))
         username_input = self.selenium.find_element_by_name('username')
@@ -127,16 +127,15 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
 
     def get_css_value(self, selector, attribute):
         """
-        Helper function that returns the value for the CSS attribute of an
-        DOM element specified by the given selector. Uses the jQuery that ships
-        with Django.
+        Return the value for the CSS attribute of a DOM element specified by
+        the given selector. Uses the jQuery that ships with Django.
         """
         return self.selenium.execute_script(
             'return django.jQuery("%s").css("%s")' % (selector, attribute))
 
     def get_select_option(self, selector, value):
         """
-        Returns the <OPTION> with the value `value` inside the <SELECT> widget
+        Return the <OPTION> with the value `value` inside the <SELECT> widget
         identified by the CSS selector `selector`.
         """
         from selenium.common.exceptions import NoSuchElementException
@@ -159,26 +158,26 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
             # to be the case.
             with self.disable_implicit_wait():
                 self.wait_until(
-                    lambda driver: len(driver.find_elements_by_css_selector(options_selector)) == 0
+                    lambda driver: not driver.find_elements_by_css_selector(options_selector)
                 )
 
     def assertSelectOptions(self, selector, values):
         """
-        Asserts that the <SELECT> widget identified by `selector` has the
+        Assert that the <SELECT> widget identified by `selector` has the
         options with the given `values`.
         """
         self._assertOptionsValues("%s > option" % selector, values)
 
     def assertSelectedOptions(self, selector, values):
         """
-        Asserts that the <SELECT> widget identified by `selector` has the
+        Assert that the <SELECT> widget identified by `selector` has the
         selected options with the given `values`.
         """
         self._assertOptionsValues("%s > option:checked" % selector, values)
 
     def has_css_class(self, selector, klass):
         """
-        Returns True if the element identified by `selector` has the CSS class
+        Return True if the element identified by `selector` has the CSS class
         `klass`.
         """
         return (self.selenium.find_element_by_css_selector(selector)

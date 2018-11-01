@@ -1,11 +1,9 @@
-from __future__ import unicode_literals
-
 from django.conf.urls import url
 
 from . import views
 
 
-class URLObject(object):
+class URLObject:
     urlpatterns = [
         url(r'^inner/$', views.empty_view, name='urlobject-view'),
         url(r'^inner/(?P<arg1>[0-9]+)/(?P<arg2>[0-9]+)/$', views.empty_view, name='urlobject-view'),
@@ -18,7 +16,7 @@ class URLObject(object):
 
     @property
     def urls(self):
-        return self.urlpatterns, self.app_name, self.namespace
+        return (self.urlpatterns, self.app_name), self.namespace
 
     @property
     def app_urls(self):

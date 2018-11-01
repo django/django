@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-
-from __future__ import unicode_literals
-
 import io
 
 from django.conf import settings
@@ -135,6 +131,11 @@ class HttpResponseTests(SimpleTestCase):
         response = HttpResponse(content="Café :)".encode(UTF8), status=201)
         expected = '<HttpResponse status_code=201, "text/html; charset=utf-8">'
         self.assertEqual(repr(response), expected)
+
+    def test_repr_no_content_type(self):
+        response = HttpResponse(status=204)
+        del response['Content-Type']
+        self.assertEqual(repr(response), '<HttpResponse status_code=204>')
 
     def test_wrap_textiowrapper(self):
         content = "Café :)"

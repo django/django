@@ -11,7 +11,7 @@ To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`:
         last_name = models.CharField(max_length=30)
         email = models.EmailField()
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return "%s %s" % (self.first_name, self.last_name)
 
     class Article(models.Model):
@@ -19,7 +19,7 @@ To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`:
         pub_date = models.DateField()
         reporter = models.ForeignKey(Reporter, on_delete=models.CASCADE)
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.headline
 
         class Meta:
@@ -64,13 +64,6 @@ Article objects have access to their related Reporter objects::
 
     >>> r = a.reporter
 
-On Python 2, these are strings of type ``str`` instead of unicode strings
-because that's what was used in the creation of this reporter (and we haven't
-refreshed the data from the database, which always returns unicode strings)::
-
-    >>> r.first_name, r.last_name
-    ('John', 'Smith')
-
 Create an Article via the Reporter object::
 
     >>> new_article = r.article_set.create(headline="John's second story", pub_date=date(2005, 7, 29))
@@ -81,10 +74,9 @@ Create an Article via the Reporter object::
     >>> new_article.reporter.id
     1
 
-Create a new article, and add it to the article set::
+Create a new article::
 
-    >>> new_article2 = Article(headline="Paul's story", pub_date=date(2006, 1, 17))
-    >>> r.article_set.add(new_article2)
+    >>> new_article2 = Article.objects.create(headline="Paul's story", pub_date=date(2006, 1, 17), reporter=r)
     >>> new_article2.reporter
     <Reporter: John Smith>
     >>> new_article2.reporter.id
@@ -105,7 +97,7 @@ Adding an object of the wrong type raises TypeError::
     >>> r.article_set.add(r2)
     Traceback (most recent call last):
     ...
-    TypeError: 'Article' instance expected
+    TypeError: 'Article' instance expected, got <Reporter: Paul Jones>
 
     >>> r.article_set.all()
     <QuerySet [<Article: John's second story>, <Article: This is a test>]>

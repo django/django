@@ -1,21 +1,19 @@
 """
  This object provides quoting for GEOS geometries into PostgreSQL/PostGIS.
 """
-from __future__ import unicode_literals
-
 from psycopg2 import Binary
 from psycopg2.extensions import ISQLQuote
 
 from django.contrib.gis.db.backends.postgis.pgraster import to_pgraster
-from django.contrib.gis.geometry.backend import Geometry
+from django.contrib.gis.geos import GEOSGeometry
 
 
-class PostGISAdapter(object):
+class PostGISAdapter:
     def __init__(self, obj, geography=False):
         """
         Initialize on the spatial object.
         """
-        self.is_geometry = isinstance(obj, (Geometry, PostGISAdapter))
+        self.is_geometry = isinstance(obj, (GEOSGeometry, PostGISAdapter))
 
         # Getting the WKB (in string form, to allow easy pickling of
         # the adaptor) and the SRID from the geometry or raster.
@@ -29,19 +27,17 @@ class PostGISAdapter(object):
         self.geography = geography
 
     def __conform__(self, proto):
-        # Does the given protocol conform to what Psycopg2 expects?
+        """Does the given protocol conform to what Psycopg2 expects?"""
         if proto == ISQLQuote:
             return self
         else:
             raise Exception('Error implementing psycopg2 protocol. Is psycopg2 installed?')
 
     def __eq__(self, other):
-        if not isinstance(other, PostGISAdapter):
-            return False
-        return (self.ewkb == other.ewkb) and (self.srid == other.srid)
+        return isinstance(other, PostGISAdapter) and self.ewkb == other.ewkb
 
     def __hash__(self):
-        return hash((self.ewkb, self.srid))
+        return hash(self.ewkb)
 
     def __str__(self):
         return self.getquoted()
@@ -60,9 +56,9 @@ class PostGISAdapter(object):
         """
         if self.is_geometry:
             # Psycopg will figure out whether to use E'\\000' or '\000'.
-            return str('%s(%s)' % (
+            return '%s(%s)' % (
                 'ST_GeogFromWKB' if self.geography else 'ST_GeomFromEWKB',
-                self._adapter.getquoted().decode())
+                self._adapter.getquoted().decode()
             )
         else:
             # For rasters, add explicit type cast to WKB string.

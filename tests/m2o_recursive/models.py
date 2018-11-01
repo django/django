@@ -11,10 +11,8 @@ Set ``related_name`` to designate what the reverse relationship is called.
 """
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Category(models.Model):
     name = models.CharField(max_length=20)
     parent = models.ForeignKey('self', models.SET_NULL, blank=True, null=True, related_name='child_set')
@@ -23,7 +21,6 @@ class Category(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Person(models.Model):
     full_name = models.CharField(max_length=20)
     mother = models.ForeignKey('self', models.SET_NULL, null=True, related_name='mothers_child_set')

@@ -359,7 +359,7 @@ class ManyToManySignalsTest(TestCase):
 
         self._initialize_signal_car(add_default_parts_before_set_signal=True)
 
-        # Check that signals still work when model inheritance is involved
+        # Signals still work when model inheritance is involved
         c4 = SportsCar.objects.create(name='Bugatti', price='1000000')
         c4b = Car.objects.get(name='Bugatti')
         c4.default_parts.set([self.doors])

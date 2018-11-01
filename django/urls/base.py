@@ -1,11 +1,8 @@
-from __future__ import unicode_literals
-
 from threading import local
+from urllib.parse import urlsplit, urlunsplit
 
-from django.utils import six
-from django.utils.encoding import force_text, iri_to_uri
+from django.utils.encoding import iri_to_uri
 from django.utils.functional import lazy
-from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
 from django.utils.translation import override
 
 from .exceptions import NoReverseMatch, Resolver404
@@ -36,7 +33,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
 
     prefix = get_script_prefix()
 
-    if not isinstance(viewname, six.string_types):
+    if not isinstance(viewname, str):
         view = viewname
     else:
         parts = viewname.split(':')
@@ -52,6 +49,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
 
         resolved_path = []
         ns_pattern = ''
+        ns_converters = {}
         while path:
             ns = path.pop()
             current_ns = current_path.pop() if current_path else None
@@ -77,6 +75,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
                 extra, resolver = resolver.namespace_dict[ns]
                 resolved_path.append(ns)
                 ns_pattern = ns_pattern + extra
+                ns_converters.update(resolver.pattern.converters)
             except KeyError as key:
                 if resolved_path:
                     raise NoReverseMatch(
@@ -86,11 +85,12 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
                 else:
                     raise NoReverseMatch("%s is not a registered namespace" % key)
         if ns_pattern:
-            resolver = get_ns_resolver(ns_pattern, resolver)
+            resolver = get_ns_resolver(ns_pattern, resolver, tuple(ns_converters.items()))
 
-    return force_text(iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs)))
+    return iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs))
 
-reverse_lazy = lazy(reverse, six.text_type)
+
+reverse_lazy = lazy(reverse, str)
 
 
 def clear_url_caches():

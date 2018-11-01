@@ -8,10 +8,8 @@ reserved-name usage.
 """
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Thing(models.Model):
     when = models.CharField(max_length=1, primary_key=True)
     join = models.CharField(max_length=1)

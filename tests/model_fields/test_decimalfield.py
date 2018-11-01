@@ -1,8 +1,9 @@
+import unittest
 from decimal import Decimal
 
 from django.core import validators
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import connection, models
 from django.test import TestCase
 
 from .models import BigD, Foo
@@ -14,18 +15,19 @@ class DecimalFieldTests(TestCase):
         f = models.DecimalField(max_digits=4, decimal_places=2)
         self.assertEqual(f.to_python(3), Decimal('3'))
         self.assertEqual(f.to_python('3.14'), Decimal('3.14'))
-        with self.assertRaises(ValidationError):
+        # to_python() converts floats and honors max_digits.
+        self.assertEqual(f.to_python(3.1415926535897), Decimal('3.142'))
+        self.assertEqual(f.to_python(2.4), Decimal('2.400'))
+        # Uses default rounding of ROUND_HALF_EVEN.
+        self.assertEqual(f.to_python(2.0625), Decimal('2.062'))
+        self.assertEqual(f.to_python(2.1875), Decimal('2.188'))
+        msg = "'abc' value must be a decimal number."
+        with self.assertRaisesMessage(ValidationError, msg):
             f.to_python('abc')
 
     def test_default(self):
         f = models.DecimalField(default=Decimal('0.00'))
         self.assertEqual(f.get_default(), Decimal('0.00'))
-
-    def test_format(self):
-        f = models.DecimalField(max_digits=5, decimal_places=1)
-        self.assertEqual(f._format(f.to_python(2)), '2.0')
-        self.assertEqual(f._format(f.to_python('2.6')), '2.6')
-        self.assertIsNone(f._format(None))
 
     def test_get_prep_value(self):
         f = models.DecimalField(max_digits=5, decimal_places=1)
@@ -48,6 +50,12 @@ class DecimalFieldTests(TestCase):
         bd.save()
         bd = BigD.objects.get(pk=bd.pk)
         self.assertEqual(bd.d, Decimal('12.9'))
+
+    @unittest.skipIf(connection.vendor == 'sqlite', 'SQLite stores values rounded to 15 significant digits.')
+    def test_fetch_from_db_without_float_rounding(self):
+        big_decimal = BigD.objects.create(d=Decimal('.100000000000000000000000000005'))
+        big_decimal.refresh_from_db()
+        self.assertEqual(big_decimal.d, Decimal('.100000000000000000000000000005'))
 
     def test_lookup_really_big_value(self):
         """
@@ -73,3 +81,9 @@ class DecimalFieldTests(TestCase):
         expected_message = validators.DecimalValidator.messages['max_whole_digits'] % {'max': 2}
         with self.assertRaisesMessage(ValidationError, expected_message):
             field.clean(Decimal('999'), None)
+
+    def test_roundtrip_with_trailing_zeros(self):
+        """Trailing zeros in the fractional part aren't truncated."""
+        obj = Foo.objects.create(a='bar', d=Decimal('8.320'))
+        obj.refresh_from_db()
+        self.assertEqual(obj.d.compare_total(Decimal('8.320')), Decimal('0'))

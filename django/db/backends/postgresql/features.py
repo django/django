@@ -10,12 +10,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_real_datatype = True
     has_native_uuid_field = True
     has_native_duration_field = True
-    driver_supports_timedelta_args = True
     can_defer_constraint_checks = True
     has_select_for_update = True
     has_select_for_update_nowait = True
-    has_bulk_insert = True
-    uses_savepoints = True
+    has_select_for_update_of = True
     can_release_savepoints = True
     supports_tablespaces = True
     supports_transactions = True
@@ -32,11 +30,45 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     greatest_least_ignores_nulls = True
     can_clone_databases = True
     supports_temporal_subtraction = True
+    supports_slicing_ordering_in_compound = True
+    create_test_procedure_without_params_sql = """
+        CREATE FUNCTION test_procedure () RETURNS void AS $$
+        DECLARE
+            V_I INTEGER;
+        BEGIN
+            V_I := 1;
+        END;
+    $$ LANGUAGE plpgsql;"""
+    create_test_procedure_with_int_param_sql = """
+        CREATE FUNCTION test_procedure (P_I INTEGER) RETURNS void AS $$
+        DECLARE
+            V_I INTEGER;
+        BEGIN
+            V_I := P_I;
+        END;
+    $$ LANGUAGE plpgsql;"""
+    requires_casted_case_in_updates = True
+    supports_over_clause = True
+    supports_aggregate_filter_clause = True
+    supported_explain_formats = {'JSON', 'TEXT', 'XML', 'YAML'}
+    validates_explain_options = False  # A query will error on invalid options.
 
     @cached_property
-    def has_select_for_update_skip_locked(self):
+    def is_postgresql_9_5(self):
         return self.connection.pg_version >= 90500
 
     @cached_property
-    def has_jsonb_datatype(self):
-        return self.connection.pg_version >= 90400
+    def is_postgresql_9_6(self):
+        return self.connection.pg_version >= 90600
+
+    @cached_property
+    def is_postgresql_10(self):
+        return self.connection.pg_version >= 100000
+
+    has_select_for_update_skip_locked = is_postgresql_9_5
+    has_brin_index_support = is_postgresql_9_5
+    has_jsonb_agg = is_postgresql_9_5
+    has_brin_autosummarize = is_postgresql_10
+    has_gin_pending_list_limit = is_postgresql_9_5
+    supports_ignore_conflicts = is_postgresql_9_5
+    has_phraseto_tsquery = is_postgresql_9_6

@@ -37,20 +37,19 @@ from ctypes import byref
 
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.driver import Driver
-from django.contrib.gis.gdal.error import GDALException, OGRIndexError
+from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.gdal.layer import Layer
 from django.contrib.gis.gdal.prototypes import ds as capi
-from django.utils import six
 from django.utils.encoding import force_bytes, force_text
-from django.utils.six.moves import range
 
 
 # For more information, see the OGR C API source code:
-#  http://www.gdal.org/ogr__api_8h.html
+#  https://www.gdal.org/ogr__api_8h.html
 #
 # The OGR_DS_* routines are relevant here.
 class DataSource(GDALBase):
     "Wraps an OGR Data Source object."
+    destructor = capi.destroy_ds
 
     def __init__(self, ds_input, ds_driver=False, write=False, encoding='utf-8'):
         # The write flag.
@@ -58,12 +57,12 @@ class DataSource(GDALBase):
             self._write = 1
         else:
             self._write = 0
-        # See also http://trac.osgeo.org/gdal/wiki/rfc23_ogr_unicode
+        # See also https://trac.osgeo.org/gdal/wiki/rfc23_ogr_unicode
         self.encoding = encoding
 
         Driver.ensure_registered()
 
-        if isinstance(ds_input, six.string_types):
+        if isinstance(ds_input, str):
             # The data source driver is a void pointer.
             ds_driver = Driver.ptr_type()
             try:
@@ -85,47 +84,37 @@ class DataSource(GDALBase):
             # Raise an exception if the returned pointer is NULL
             raise GDALException('Invalid data source file "%s"' % ds_input)
 
-    def __del__(self):
-        "Destroys this DataStructure object."
-        try:
-            capi.destroy_ds(self._ptr)
-        except (AttributeError, TypeError):
-            pass  # Some part might already have been garbage collected
-
-    def __iter__(self):
-        "Allows for iteration over the layers in a data source."
-        for i in range(self.layer_count):
-            yield self[i]
-
     def __getitem__(self, index):
         "Allows use of the index [] operator to get a layer at the index."
-        if isinstance(index, six.string_types):
-            l = capi.get_layer_by_name(self.ptr, force_bytes(index))
-            if not l:
-                raise OGRIndexError('invalid OGR Layer name given: "%s"' % index)
+        if isinstance(index, str):
+            try:
+                layer = capi.get_layer_by_name(self.ptr, force_bytes(index))
+            except GDALException:
+                raise IndexError('Invalid OGR layer name given: %s.' % index)
         elif isinstance(index, int):
-            if index < 0 or index >= self.layer_count:
-                raise OGRIndexError('index out of range')
-            l = capi.get_layer(self._ptr, index)
+            if 0 <= index < self.layer_count:
+                layer = capi.get_layer(self._ptr, index)
+            else:
+                raise IndexError('Index out of range when accessing layers in a datasource: %s.' % index)
         else:
             raise TypeError('Invalid index type: %s' % type(index))
-        return Layer(l, self)
+        return Layer(layer, self)
 
     def __len__(self):
-        "Returns the number of layers within the data source."
+        "Return the number of layers within the data source."
         return self.layer_count
 
     def __str__(self):
-        "Returns OGR GetName and Driver for the Data Source."
-        return '%s (%s)' % (self.name, str(self.driver))
+        "Return OGR GetName and Driver for the Data Source."
+        return '%s (%s)' % (self.name, self.driver)
 
     @property
     def layer_count(self):
-        "Returns the number of layers in the data source."
+        "Return the number of layers in the data source."
         return capi.get_layer_count(self._ptr)
 
     @property
     def name(self):
-        "Returns the name of the data source."
+        "Return the name of the data source."
         name = capi.get_ds_name(self._ptr)
         return force_text(name, self.encoding, strings_only=True)

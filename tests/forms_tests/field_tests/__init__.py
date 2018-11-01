@@ -1,7 +1,7 @@
 from django import forms
 
 
-class FormFieldAssertionsMixin(object):
+class FormFieldAssertionsMixin:
 
     def assertWidgetRendersTo(self, field, to):
         class Form(forms.Form):

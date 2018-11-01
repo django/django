@@ -6,25 +6,25 @@ objects corresponding to geographic model fields.
 Thanks to Robert Coup for providing this functionality (see #4322).
 """
 from django.db.models.query_utils import DeferredAttribute
-from django.utils import six
 
 
 class SpatialProxy(DeferredAttribute):
-    def __init__(self, klass, field):
+    def __init__(self, klass, field, load_func=None):
         """
-        Proxy initializes on the given Geometry or Raster class (not an instance)
+        Initialize on the given Geometry or Raster class (not an instance)
         and the corresponding field.
         """
         self._field = field
         self._klass = klass
-        super(SpatialProxy, self).__init__(field.attname, klass)
+        self._load_func = load_func or klass
+        super().__init__(field.attname)
 
     def __get__(self, instance, cls=None):
         """
-        This accessor retrieves the geometry or raster, initializing it using
-        the corresponding class specified during initialization and the value
-        of the field. Currently, GEOS or OGR geometries as well as GDALRasters
-        are supported.
+        Retrieve the geometry or raster, initializing it using the
+        corresponding class specified during initialization and the value of
+        the field. Currently, GEOS or OGR geometries as well as GDALRasters are
+        supported.
         """
         if instance is None:
             # Accessed on a class, not an instance
@@ -34,7 +34,7 @@ class SpatialProxy(DeferredAttribute):
         try:
             geo_value = instance.__dict__[self._field.attname]
         except KeyError:
-            geo_value = super(SpatialProxy, self).__get__(instance, cls)
+            geo_value = super().__get__(instance, cls)
 
         if isinstance(geo_value, self._klass):
             geo_obj = geo_value
@@ -43,32 +43,32 @@ class SpatialProxy(DeferredAttribute):
         else:
             # Otherwise, a geometry or raster object is built using the field's
             # contents, and the model's corresponding attribute is set.
-            geo_obj = self._klass(geo_value)
+            geo_obj = self._load_func(geo_value)
             setattr(instance, self._field.attname, geo_obj)
         return geo_obj
 
     def __set__(self, instance, value):
         """
-        This accessor sets the proxied geometry or raster with the
-        corresponding class specified during initialization.
+        Retrieve the proxied geometry or raster with the corresponding class
+        specified during initialization.
 
-        To set geometries, values of None, HEXEWKB, or WKT may be used.
-        To set rasters, JSON or dict values may be used.
+        To set geometries, use values of None, HEXEWKB, or WKT.
+        To set rasters, use JSON or dict values.
         """
         # The geographic type of the field.
         gtype = self._field.geom_type
 
-        if gtype == 'RASTER' and (value is None or isinstance(value, six.string_types + (dict, self._klass))):
+        if gtype == 'RASTER' and (value is None or isinstance(value, (str, dict, self._klass))):
             # For raster fields, assure input is None or a string, dict, or
             # raster instance.
             pass
-        elif isinstance(value, self._klass) and (str(value.geom_type).upper() == gtype or gtype == 'GEOMETRY'):
+        elif isinstance(value, self._klass):
             # The geometry type must match that of the field -- unless the
             # general GeometryField is used.
             if value.srid is None:
                 # Assigning the field SRID if the geometry has no SRID.
                 value.srid = self._field.srid
-        elif value is None or isinstance(value, six.string_types + (six.memoryview,)):
+        elif value is None or isinstance(value, (str, memoryview)):
             # Set geometries with None, WKT, HEX, or WKB
             pass
         else:

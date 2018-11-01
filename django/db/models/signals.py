@@ -1,11 +1,7 @@
-import warnings
 from functools import partial
 
 from django.db.models.utils import make_model_tuple
 from django.dispatch import Signal
-from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
-
 
 class_prepared = Signal(providing_args=["class"])
 
@@ -20,7 +16,7 @@ class ModelSignal(Signal):
 
         # This partial takes a single optional argument named "sender".
         partial_method = partial(method, receiver, **kwargs)
-        if isinstance(sender, six.string_types):
+        if isinstance(sender, str):
             apps = apps or Options.default_apps
             apps.lazy_model_operation(partial_method, make_model_tuple(sender))
         else:
@@ -28,15 +24,13 @@ class ModelSignal(Signal):
 
     def connect(self, receiver, sender=None, weak=True, dispatch_uid=None, apps=None):
         self._lazy_method(
-            super(ModelSignal, self).connect, apps, receiver, sender,
+            super().connect, apps, receiver, sender,
             weak=weak, dispatch_uid=dispatch_uid,
         )
 
-    def disconnect(self, receiver=None, sender=None, weak=None, dispatch_uid=None, apps=None):
-        if weak is not None:
-            warnings.warn("Passing `weak` to disconnect has no effect.", RemovedInDjango20Warning, stacklevel=2)
+    def disconnect(self, receiver=None, sender=None, dispatch_uid=None, apps=None):
         return self._lazy_method(
-            super(ModelSignal, self).disconnect, apps, receiver, sender, dispatch_uid=dispatch_uid
+            super().disconnect, apps, receiver, sender, dispatch_uid=dispatch_uid
         )
 
 

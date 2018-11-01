@@ -56,10 +56,10 @@ Django tools
 ~~~~~~~~~~~~
 
 `django-debug-toolbar
-<https://github.com/django-debug-toolbar/django-debug-toolbar/>`_ is a very
-handy tool that provides insights into what your code is doing and how much
-time it spends doing it. In particular it can show you all the SQL queries your
-page is generating, and how long each one has taken.
+<https://github.com/jazzband/django-debug-toolbar/>`_ is a very handy tool that
+provides insights into what your code is doing and how much time it spends
+doing it. In particular it can show you all the SQL queries your page is
+generating, and how long each one has taken.
 
 Third-party panels are also available for the toolbar, that can (for example)
 report on cache performance and template rendering times.
@@ -235,7 +235,7 @@ Databases
 Database optimization
 ---------------------
 
-Django’s database layer provides various ways to help developers get the best
+Django's database layer provides various ways to help developers get the best
 performance from their databases. The :doc:`database optimization documentation
 </topics/db/optimization>` gathers together links to the relevant
 documentation and adds various tips that outline the steps to take when
@@ -290,13 +290,13 @@ Static files
 Static files, which by definition are not dynamic, make an excellent target for
 optimization gains.
 
-:class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By taking advantage of web browsers' caching abilities, you can
 eliminate network hits entirely for a given file after the initial download.
 
-:class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage` appends a
+:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` appends a
 content-dependent tag to the filenames of :doc:`static files
 </ref/contrib/staticfiles>` to make it safe for browsers to cache them
 long-term without missing future changes - when a file changes, so will the
@@ -410,15 +410,15 @@ performance gains for your application to outweigh the potential risks.
 
 With these caveats in mind, you should be aware of:
 
-`PyPy <http://pypy.org/>`_
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+`PyPy <https://pypy.org/>`_
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`PyPy <http://pypy.org/>`_ is an implementation of Python in Python itself (the
-'standard' Python implementation is in C). PyPy can offer substantial
+`PyPy <https://pypy.org/>`_ is an implementation of Python in Python itself
+(the 'standard' Python implementation is in C). PyPy can offer substantial
 performance gains, typically for heavyweight applications.
 
 A key aim of the PyPy project is `compatibility
-<http://pypy.org/compat.html>`_ with existing Python APIs and libraries.
+<https://pypy.org/compat.html>`_ with existing Python APIs and libraries.
 Django is compatible, but you will need to check the compatibility of other
 libraries you rely on.
 

@@ -3,7 +3,7 @@
 # The locale directory for this app is generated automatically
 # by the test cases.
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 # Translators: This comment should be extracted
 dummy1 = _("This is a translatable string.")

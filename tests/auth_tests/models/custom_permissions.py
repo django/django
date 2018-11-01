@@ -5,7 +5,6 @@ includes everything that is needed to interact with the ModelBackend.
 """
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 from .custom_user import CustomUserManager, RemoveGroupsAndPermissions
 
@@ -19,7 +18,6 @@ class CustomPermissionsUserManager(CustomUserManager):
 
 
 with RemoveGroupsAndPermissions():
-    @python_2_unicode_compatible
     class CustomPermissionsUser(AbstractBaseUser, PermissionsMixin):
         email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
         date_of_birth = models.DateField()
@@ -28,12 +26,6 @@ with RemoveGroupsAndPermissions():
 
         USERNAME_FIELD = 'email'
         REQUIRED_FIELDS = ['date_of_birth']
-
-        def get_full_name(self):
-            return self.email
-
-        def get_short_name(self):
-            return self.email
 
         def __str__(self):
             return self.email

@@ -38,11 +38,9 @@ and Geoff Biggs' PhD work on dimensioned units for robotics.
 from decimal import Decimal
 from functools import total_ordering
 
-from django.utils import six
-
 __all__ = ['A', 'Area', 'D', 'Distance']
 
-NUMERIC_TYPES = six.integer_types + (float, Decimal)
+NUMERIC_TYPES = (int, float, Decimal)
 AREA_PREFIX = "sq_"
 
 
@@ -51,7 +49,7 @@ def pretty_name(obj):
 
 
 @total_ordering
-class MeasureBase(object):
+class MeasureBase:
     STANDARD_UNIT = None
     ALIAS = {}
     UNITS = {}
@@ -60,7 +58,7 @@ class MeasureBase(object):
     def __init__(self, default_unit=None, **kwargs):
         value, self._default_unit = self.default_units(kwargs)
         setattr(self, self.STANDARD_UNIT, value)
-        if default_unit and isinstance(default_unit, six.string_types):
+        if default_unit and isinstance(default_unit, str):
             self._default_unit = default_unit
 
     def _get_standard(self):
@@ -161,9 +159,6 @@ class MeasureBase(object):
         else:
             raise TypeError('%(class)s must be divided with number or %(class)s' % {"class": pretty_name(self)})
 
-    def __div__(self, other):   # Python 2 compatibility
-        return type(self).__truediv__(self, other)
-
     def __itruediv__(self, other):
         if isinstance(other, NUMERIC_TYPES):
             self.standard /= float(other)
@@ -171,14 +166,8 @@ class MeasureBase(object):
         else:
             raise TypeError('%(class)s must be divided with number' % {"class": pretty_name(self)})
 
-    def __idiv__(self, other):  # Python 2 compatibility
-        return type(self).__itruediv__(self, other)
-
     def __bool__(self):
         return bool(self.standard)
-
-    def __nonzero__(self):      # Python 2 compatibility
-        return type(self).__bool__(self)
 
     def default_units(self, kwargs):
         """
@@ -187,7 +176,7 @@ class MeasureBase(object):
         """
         val = 0.0
         default_unit = self.STANDARD_UNIT
-        for unit, value in six.iteritems(kwargs):
+        for unit, value in kwargs.items():
             if not isinstance(value, float):
                 value = float(value)
             if unit in self.UNITS:
@@ -213,9 +202,9 @@ class MeasureBase(object):
     @classmethod
     def unit_attname(cls, unit_str):
         """
-        Retrieves the unit attribute name for the given unit string.
-        For example, if the given unit string is 'metre', 'm' would be returned.
-        An exception is raised if an attribute cannot be found.
+        Retrieve the unit attribute name for the given unit string.
+        For example, if the given unit string is 'metre', return 'm'.
+        Raise an exception if an attribute cannot be found.
         """
         lower = unit_str.lower()
         if unit_str in cls.UNITS:
@@ -337,9 +326,6 @@ class Area(MeasureBase):
             )
         else:
             raise TypeError('%(class)s must be divided by a number' % {"class": pretty_name(self)})
-
-    def __div__(self, other):  # Python 2 compatibility
-        return type(self).__truediv__(self, other)
 
 
 # Shortcuts

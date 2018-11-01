@@ -9,13 +9,13 @@ from django.contrib.postgres.search import (
     SearchQuery, SearchRank, SearchVector,
 )
 from django.db.models import F
-from django.test import modify_settings
+from django.test import SimpleTestCase, modify_settings, skipUnlessDBFeature
 
 from . import PostgreSQLTestCase
 from .models import Character, Line, Scene
 
 
-class GrailTestData(object):
+class GrailTestData:
 
     @classmethod
     def setUpTestData(cls):
@@ -75,7 +75,7 @@ class GrailTestData(object):
         cls.french = Line.objects.create(
             scene=trojan_rabbit,
             character=guards,
-            dialogue='Oh. Un cadeau. Oui oui.',
+            dialogue='Oh. Un beau cadeau. Oui oui.',
             dialogue_config='french',
         )
 
@@ -125,7 +125,7 @@ class MultipleFieldsTest(GrailTestData, PostgreSQLTestCase):
         searched = Line.objects.annotate(
             search=SearchVector('scene__setting', 'dialogue'),
         ).filter(search='Forest')
-        self.assertSequenceEqual(searched, self.verses)
+        self.assertCountEqual(searched, self.verses)
 
     def test_non_exact_match(self):
         searched = Line.objects.annotate(
@@ -143,7 +143,7 @@ class MultipleFieldsTest(GrailTestData, PostgreSQLTestCase):
         searched = Line.objects.annotate(
             search=SearchVector('character__name', 'dialogue'),
         ).filter(search='minstrel')
-        self.assertSequenceEqual(searched, self.verses)
+        self.assertCountEqual(searched, self.verses)
         searched = Line.objects.annotate(
             search=SearchVector('scene__setting', 'dialogue'),
         ).filter(search='minstrelbravely')
@@ -154,6 +154,52 @@ class MultipleFieldsTest(GrailTestData, PostgreSQLTestCase):
             search=SearchVector('scene__setting', 'dialogue'),
         ).filter(search='bedemir')
         self.assertEqual(set(searched), {self.bedemir0, self.bedemir1, self.crowd, self.witch, self.duck})
+
+    def test_search_with_non_text(self):
+        searched = Line.objects.annotate(
+            search=SearchVector('id'),
+        ).filter(search=str(self.crowd.id))
+        self.assertSequenceEqual(searched, [self.crowd])
+
+    @skipUnlessDBFeature('has_phraseto_tsquery')
+    def test_phrase_search(self):
+        line_qs = Line.objects.annotate(search=SearchVector('dialogue'))
+        searched = line_qs.filter(search=SearchQuery('burned body his away', search_type='phrase'))
+        self.assertSequenceEqual(searched, [])
+        searched = line_qs.filter(search=SearchQuery('his body burned away', search_type='phrase'))
+        self.assertSequenceEqual(searched, [self.verse1])
+
+    @skipUnlessDBFeature('has_phraseto_tsquery')
+    def test_phrase_search_with_config(self):
+        line_qs = Line.objects.annotate(
+            search=SearchVector('scene__setting', 'dialogue', config='french'),
+        )
+        searched = line_qs.filter(
+            search=SearchQuery('cadeau beau un', search_type='phrase', config='french'),
+        )
+        self.assertSequenceEqual(searched, [])
+        searched = line_qs.filter(
+            search=SearchQuery('un beau cadeau', search_type='phrase', config='french'),
+        )
+        self.assertSequenceEqual(searched, [self.french])
+
+    def test_raw_search(self):
+        line_qs = Line.objects.annotate(search=SearchVector('dialogue'))
+        searched = line_qs.filter(search=SearchQuery('Robin', search_type='raw'))
+        self.assertEqual(set(searched), {self.verse0, self.verse1})
+        searched = line_qs.filter(search=SearchQuery("Robin & !'Camelot'", search_type='raw'))
+        self.assertSequenceEqual(searched, [self.verse1])
+
+    def test_raw_search_with_config(self):
+        line_qs = Line.objects.annotate(search=SearchVector('dialogue', config='french'))
+        searched = line_qs.filter(
+            search=SearchQuery("'cadeaux' & 'beaux'", search_type='raw', config='french'),
+        )
+        self.assertSequenceEqual(searched, [self.french])
+
+    def test_bad_search_type(self):
+        with self.assertRaisesMessage(ValueError, "Unknown search_type argument 'foo'."):
+            SearchQuery('kneecaps', search_type='foo')
 
     def test_config_query_explicit(self):
         searched = Line.objects.annotate(
@@ -218,13 +264,13 @@ class TestCombinations(GrailTestData, PostgreSQLTestCase):
 
     def test_query_or(self):
         searched = Line.objects.filter(dialogue__search=SearchQuery('kneecaps') | SearchQuery('nostrils'))
-        self.assertSequenceEqual(set(searched), {self.verse1, self.verse2})
+        self.assertEqual(set(searched), {self.verse1, self.verse2})
 
     def test_query_multiple_or(self):
         searched = Line.objects.filter(
             dialogue__search=SearchQuery('kneecaps') | SearchQuery('nostrils') | SearchQuery('Sir Robin')
         )
-        self.assertSequenceEqual(set(searched), {self.verse1, self.verse2, self.verse0})
+        self.assertEqual(set(searched), {self.verse1, self.verse2, self.verse0})
 
     def test_query_invert(self):
         searched = Line.objects.filter(character=self.minstrel, dialogue__search=~SearchQuery('kneecaps'))
@@ -286,3 +332,29 @@ class TestRankingAndWeights(GrailTestData, PostgreSQLTestCase):
             rank=SearchRank(SearchVector('dialogue'), SearchQuery('brave sir robin')),
         ).filter(rank__gt=0.3)
         self.assertSequenceEqual(searched, [self.verse0])
+
+
+class SearchQueryTests(SimpleTestCase):
+    def test_str(self):
+        tests = (
+            (~SearchQuery('a'), '~SearchQuery(a)'),
+            (
+                (SearchQuery('a') | SearchQuery('b')) & (SearchQuery('c') | SearchQuery('d')),
+                '((SearchQuery(a) || SearchQuery(b)) && (SearchQuery(c) || SearchQuery(d)))',
+            ),
+            (
+                SearchQuery('a') & (SearchQuery('b') | SearchQuery('c')),
+                '(SearchQuery(a) && (SearchQuery(b) || SearchQuery(c)))',
+            ),
+            (
+                (SearchQuery('a') | SearchQuery('b')) & SearchQuery('c'),
+                '((SearchQuery(a) || SearchQuery(b)) && SearchQuery(c))'
+            ),
+            (
+                SearchQuery('a') & (SearchQuery('b') & (SearchQuery('c') | SearchQuery('d'))),
+                '(SearchQuery(a) && (SearchQuery(b) && (SearchQuery(c) || SearchQuery(d))))',
+            ),
+        )
+        for query, expected_str in tests:
+            with self.subTest(query=query):
+                self.assertEqual(str(query), expected_str)

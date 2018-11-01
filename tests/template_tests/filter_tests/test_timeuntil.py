@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from datetime import datetime, timedelta
 
 from django.template.defaultfilters import timeuntil_filter
@@ -70,7 +68,7 @@ class TimeuntilTests(TimezoneTestCase):
         output = self.engine.render_to_string('timeuntil09', {'now': self.now, 'later': self.now + timedelta(days=7)})
         self.assertEqual(output, '1\xa0week')
 
-    # Ensures that differing timezones are calculated correctly.
+    # Differing timezones are calculated correctly.
     @requires_tz_support
     @setup({'timeuntil10': '{{ a|timeuntil }}'})
     def test_timeuntil10(self):
@@ -99,11 +97,24 @@ class TimeuntilTests(TimezoneTestCase):
         output = self.engine.render_to_string('timeuntil14', {'a': self.today, 'b': self.today - timedelta(hours=24)})
         self.assertEqual(output, '1\xa0day')
 
+    @setup({'timeuntil15': '{{ a|timeuntil:b }}'})
+    def test_naive_aware_type_error(self):
+        output = self.engine.render_to_string('timeuntil15', {'a': self.now, 'b': self.now_tz_i})
+        self.assertEqual(output, '')
+
+    @setup({'timeuntil16': '{{ a|timeuntil:b }}'})
+    def test_aware_naive_type_error(self):
+        output = self.engine.render_to_string('timeuntil16', {'a': self.now_tz_i, 'b': self.now})
+        self.assertEqual(output, '')
+
 
 class FunctionTests(SimpleTestCase):
 
     def test_until_now(self):
         self.assertEqual(timeuntil_filter(datetime.now() + timedelta(1, 1)), '1\xa0day')
+
+    def test_no_args(self):
+        self.assertEqual(timeuntil_filter(None), '')
 
     def test_explicit_date(self):
         self.assertEqual(timeuntil_filter(datetime(2005, 12, 30), datetime(2005, 12, 29)), '1\xa0day')

@@ -1,14 +1,9 @@
-from __future__ import unicode_literals
-
 import re
 
-from django.core.exceptions import FieldDoesNotExist
-from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import Col, Expression
-from django.db.models.lookups import BuiltinLookup, Lookup, Transform
-from django.utils import six
-
-gis_lookups = {}
+from django.contrib.gis.db.models.fields import BaseSpatialField
+from django.db.models.expressions import Expression
+from django.db.models.lookups import Lookup, Transform
+from django.db.models.sql.query import Query
 
 
 class RasterBandTransform(Transform):
@@ -23,49 +18,21 @@ class GISLookup(Lookup):
     band_rhs = None
     band_lhs = None
 
-    def __init__(self, *args, **kwargs):
-        super(GISLookup, self).__init__(*args, **kwargs)
+    def __init__(self, lhs, rhs):
+        rhs, *self.rhs_params = rhs if isinstance(rhs, (list, tuple)) else [rhs]
+        super().__init__(lhs, rhs)
         self.template_params = {}
+        self.process_rhs_params()
 
-    @classmethod
-    def _check_geo_field(cls, opts, lookup):
-        """
-        Utility for checking the given lookup with the given model options.
-        The lookup is a string either specifying the geographic field, e.g.
-        'point, 'the_geom', or a related lookup on a geographic field like
-        'address__point'.
-
-        If a BaseSpatialField exists according to the given lookup on the model
-        options, it will be returned. Otherwise return None.
-        """
-        from django.contrib.gis.db.models.fields import BaseSpatialField
-        # This takes into account the situation where the lookup is a
-        # lookup to a related geographic field, e.g., 'address__point'.
-        field_list = lookup.split(LOOKUP_SEP)
-
-        # Reversing so list operates like a queue of related lookups,
-        # and popping the top lookup.
-        field_list.reverse()
-        fld_name = field_list.pop()
-
-        try:
-            geo_fld = opts.get_field(fld_name)
-            # If the field list is still around, then it means that the
-            # lookup was for a geometry field across a relationship --
-            # thus we keep on getting the related model options and the
-            # model field associated with the next field in the list
-            # until there's no more left.
-            while len(field_list):
-                opts = geo_fld.remote_field.model._meta
-                geo_fld = opts.get_field(field_list.pop())
-        except (FieldDoesNotExist, AttributeError):
-            return False
-
-        # Finally, make sure we got a Geographic field and return.
-        if isinstance(geo_fld, BaseSpatialField):
-            return geo_fld
-        else:
-            return False
+    def process_rhs_params(self):
+        if self.rhs_params:
+            # Check if a band index was passed in the query argument.
+            if len(self.rhs_params) == (2 if self.lookup_name == 'relate' else 1):
+                self.process_band_indices()
+            elif len(self.rhs_params) > 1:
+                raise ValueError('Tuple too long for lookup %s.' % self.lookup_name)
+        elif isinstance(self.lhs, RasterBandTransform):
+            self.process_band_indices(only_lhs=True)
 
     def process_band_indices(self, only_lhs=False):
         """
@@ -84,51 +51,21 @@ class GISLookup(Lookup):
         else:
             self.band_lhs = 1
 
-        self.band_rhs = self.rhs[1]
-        if len(self.rhs) == 1:
-            self.rhs = self.rhs[0]
-        else:
-            self.rhs = (self.rhs[0], ) + self.rhs[2:]
+        self.band_rhs, *self.rhs_params = self.rhs_params
 
     def get_db_prep_lookup(self, value, connection):
         # get_db_prep_lookup is called by process_rhs from super class
-        if isinstance(value, (tuple, list)):
-            # First param is assumed to be the geometric object
-            params = [connection.ops.Adapter(value[0])] + list(value)[1:]
-        else:
-            params = [connection.ops.Adapter(value)]
-        return ('%s', params)
+        return ('%s', [connection.ops.Adapter(value)])
 
     def process_rhs(self, compiler, connection):
-        if hasattr(self.rhs, '_as_sql'):
-            # If rhs is some QuerySet, don't touch it
-            return super(GISLookup, self).process_rhs(compiler, connection)
-
-        geom = self.rhs
-        if isinstance(self.rhs, Col):
-            # Make sure the F Expression destination field exists, and
-            # set an `srid` attribute with the same as that of the
-            # destination.
-            geo_fld = self.rhs.output_field
-            if not hasattr(geo_fld, 'srid'):
-                raise ValueError('No geographic field found in expression.')
-            self.rhs.srid = geo_fld.srid
-        elif isinstance(self.rhs, Expression):
-            raise ValueError('Complex expressions not supported for spatial fields.')
-        elif isinstance(self.rhs, (list, tuple)):
-            geom = self.rhs[0]
-            # Check if a band index was passed in the query argument.
-            if ((len(self.rhs) == 2 and not self.lookup_name == 'relate') or
-                    (len(self.rhs) == 3 and self.lookup_name == 'relate')):
-                self.process_band_indices()
-            elif len(self.rhs) > 2:
-                raise ValueError('Tuple too long for lookup %s.' % self.lookup_name)
-        elif isinstance(self.lhs, RasterBandTransform):
-            self.process_band_indices(only_lhs=True)
-
-        rhs, rhs_params = super(GISLookup, self).process_rhs(compiler, connection)
-        rhs = connection.ops.get_geom_placeholder(self.lhs.output_field, geom, compiler)
-        return rhs, rhs_params
+        if isinstance(self.rhs, Query):
+            # If rhs is some Query, don't touch it.
+            return super().process_rhs(compiler, connection)
+        if isinstance(self.rhs, Expression):
+            self.rhs = self.rhs.resolve_expression(compiler.query)
+        rhs, rhs_params = super().process_rhs(compiler, connection)
+        placeholder = connection.ops.get_geom_placeholder(self.lhs.output_field, self.rhs, compiler)
+        return placeholder % rhs, rhs_params
 
     def get_rhs_op(self, connection, rhs):
         # Unlike BuiltinLookup, the GIS get_rhs_op() implementation should return
@@ -141,8 +78,7 @@ class GISLookup(Lookup):
         rhs_sql, rhs_params = self.process_rhs(compiler, connection)
         sql_params.extend(rhs_params)
 
-        template_params = {'lhs': lhs_sql, 'rhs': rhs_sql, 'value': '%s'}
-        template_params.update(self.template_params)
+        template_params = {'lhs': lhs_sql, 'rhs': rhs_sql, 'value': '%s', **self.template_params}
         rhs_op = self.get_rhs_op(connection, rhs_sql)
         return rhs_op.as_sql(connection, self, template_params, sql_params)
 
@@ -151,78 +87,79 @@ class GISLookup(Lookup):
 # Geometry operators
 # ------------------
 
+@BaseSpatialField.register_lookup
 class OverlapsLeftLookup(GISLookup):
     """
     The overlaps_left operator returns true if A's bounding box overlaps or is to the
     left of B's bounding box.
     """
     lookup_name = 'overlaps_left'
-gis_lookups['overlaps_left'] = OverlapsLeftLookup
 
 
+@BaseSpatialField.register_lookup
 class OverlapsRightLookup(GISLookup):
     """
     The 'overlaps_right' operator returns true if A's bounding box overlaps or is to the
     right of B's bounding box.
     """
     lookup_name = 'overlaps_right'
-gis_lookups['overlaps_right'] = OverlapsRightLookup
 
 
+@BaseSpatialField.register_lookup
 class OverlapsBelowLookup(GISLookup):
     """
     The 'overlaps_below' operator returns true if A's bounding box overlaps or is below
     B's bounding box.
     """
     lookup_name = 'overlaps_below'
-gis_lookups['overlaps_below'] = OverlapsBelowLookup
 
 
+@BaseSpatialField.register_lookup
 class OverlapsAboveLookup(GISLookup):
     """
     The 'overlaps_above' operator returns true if A's bounding box overlaps or is above
     B's bounding box.
     """
     lookup_name = 'overlaps_above'
-gis_lookups['overlaps_above'] = OverlapsAboveLookup
 
 
+@BaseSpatialField.register_lookup
 class LeftLookup(GISLookup):
     """
     The 'left' operator returns true if A's bounding box is strictly to the left
     of B's bounding box.
     """
     lookup_name = 'left'
-gis_lookups['left'] = LeftLookup
 
 
+@BaseSpatialField.register_lookup
 class RightLookup(GISLookup):
     """
     The 'right' operator returns true if A's bounding box is strictly to the right
     of B's bounding box.
     """
     lookup_name = 'right'
-gis_lookups['right'] = RightLookup
 
 
+@BaseSpatialField.register_lookup
 class StrictlyBelowLookup(GISLookup):
     """
     The 'strictly_below' operator returns true if A's bounding box is strictly below B's
     bounding box.
     """
     lookup_name = 'strictly_below'
-gis_lookups['strictly_below'] = StrictlyBelowLookup
 
 
+@BaseSpatialField.register_lookup
 class StrictlyAboveLookup(GISLookup):
     """
     The 'strictly_above' operator returns true if A's bounding box is strictly above B's
     bounding box.
     """
     lookup_name = 'strictly_above'
-gis_lookups['strictly_above'] = StrictlyAboveLookup
 
 
+@BaseSpatialField.register_lookup
 class SameAsLookup(GISLookup):
     """
     The "~=" operator is the "same as" operator. It tests actual geometric
@@ -230,188 +167,180 @@ class SameAsLookup(GISLookup):
     vertex-by-vertex, the operator returns true.
     """
     lookup_name = 'same_as'
-gis_lookups['same_as'] = SameAsLookup
 
 
-class ExactLookup(SameAsLookup):
-    # Alias of same_as
-    lookup_name = 'exact'
-gis_lookups['exact'] = ExactLookup
+BaseSpatialField.register_lookup(SameAsLookup, 'exact')
 
 
+@BaseSpatialField.register_lookup
 class BBContainsLookup(GISLookup):
     """
     The 'bbcontains' operator returns true if A's bounding box completely contains
     by B's bounding box.
     """
     lookup_name = 'bbcontains'
-gis_lookups['bbcontains'] = BBContainsLookup
 
 
+@BaseSpatialField.register_lookup
 class BBOverlapsLookup(GISLookup):
     """
     The 'bboverlaps' operator returns true if A's bounding box overlaps B's bounding box.
     """
     lookup_name = 'bboverlaps'
-gis_lookups['bboverlaps'] = BBOverlapsLookup
 
 
+@BaseSpatialField.register_lookup
 class ContainedLookup(GISLookup):
     """
     The 'contained' operator returns true if A's bounding box is completely contained
     by B's bounding box.
     """
     lookup_name = 'contained'
-gis_lookups['contained'] = ContainedLookup
 
 
 # ------------------
 # Geometry functions
 # ------------------
 
+@BaseSpatialField.register_lookup
 class ContainsLookup(GISLookup):
     lookup_name = 'contains'
-gis_lookups['contains'] = ContainsLookup
 
 
+@BaseSpatialField.register_lookup
 class ContainsProperlyLookup(GISLookup):
     lookup_name = 'contains_properly'
-gis_lookups['contains_properly'] = ContainsProperlyLookup
 
 
+@BaseSpatialField.register_lookup
 class CoveredByLookup(GISLookup):
     lookup_name = 'coveredby'
-gis_lookups['coveredby'] = CoveredByLookup
 
 
+@BaseSpatialField.register_lookup
 class CoversLookup(GISLookup):
     lookup_name = 'covers'
-gis_lookups['covers'] = CoversLookup
 
 
+@BaseSpatialField.register_lookup
 class CrossesLookup(GISLookup):
     lookup_name = 'crosses'
-gis_lookups['crosses'] = CrossesLookup
 
 
+@BaseSpatialField.register_lookup
 class DisjointLookup(GISLookup):
     lookup_name = 'disjoint'
-gis_lookups['disjoint'] = DisjointLookup
 
 
+@BaseSpatialField.register_lookup
 class EqualsLookup(GISLookup):
     lookup_name = 'equals'
-gis_lookups['equals'] = EqualsLookup
 
 
+@BaseSpatialField.register_lookup
 class IntersectsLookup(GISLookup):
     lookup_name = 'intersects'
-gis_lookups['intersects'] = IntersectsLookup
 
 
-class IsValidLookup(BuiltinLookup):
-    lookup_name = 'isvalid'
-
-    def as_sql(self, compiler, connection):
-        if self.lhs.field.geom_type == 'RASTER':
-            raise ValueError('The isvalid lookup is only available on geometry fields.')
-        gis_op = connection.ops.gis_operators[self.lookup_name]
-        sql, params = self.process_lhs(compiler, connection)
-        sql = '%(func)s(%(lhs)s)' % {'func': gis_op.func, 'lhs': sql}
-        if not self.rhs:
-            sql = 'NOT ' + sql
-        return sql, params
-gis_lookups['isvalid'] = IsValidLookup
-
-
+@BaseSpatialField.register_lookup
 class OverlapsLookup(GISLookup):
     lookup_name = 'overlaps'
-gis_lookups['overlaps'] = OverlapsLookup
 
 
+@BaseSpatialField.register_lookup
 class RelateLookup(GISLookup):
     lookup_name = 'relate'
     sql_template = '%(func)s(%(lhs)s, %(rhs)s, %%s)'
     pattern_regex = re.compile(r'^[012TF\*]{9}$')
 
-    def get_db_prep_lookup(self, value, connection):
-        if len(value) != 2:
-            raise ValueError('relate must be passed a two-tuple')
+    def process_rhs(self, compiler, connection):
         # Check the pattern argument
+        pattern = self.rhs_params[0]
         backend_op = connection.ops.gis_operators[self.lookup_name]
         if hasattr(backend_op, 'check_relate_argument'):
-            backend_op.check_relate_argument(value[1])
-        else:
-            pattern = value[1]
-            if not isinstance(pattern, six.string_types) or not self.pattern_regex.match(pattern):
-                raise ValueError('Invalid intersection matrix pattern "%s".' % pattern)
-        return super(RelateLookup, self).get_db_prep_lookup(value, connection)
-gis_lookups['relate'] = RelateLookup
+            backend_op.check_relate_argument(pattern)
+        elif not isinstance(pattern, str) or not self.pattern_regex.match(pattern):
+            raise ValueError('Invalid intersection matrix pattern "%s".' % pattern)
+        sql, params = super().process_rhs(compiler, connection)
+        return sql, params + [pattern]
 
 
+@BaseSpatialField.register_lookup
 class TouchesLookup(GISLookup):
     lookup_name = 'touches'
-gis_lookups['touches'] = TouchesLookup
 
 
+@BaseSpatialField.register_lookup
 class WithinLookup(GISLookup):
     lookup_name = 'within'
-gis_lookups['within'] = WithinLookup
 
 
 class DistanceLookupBase(GISLookup):
     distance = True
     sql_template = '%(func)s(%(lhs)s, %(rhs)s) %(op)s %(value)s'
 
-    def process_rhs(self, compiler, connection):
-        if not isinstance(self.rhs, (tuple, list)) or not 2 <= len(self.rhs) <= 4:
+    def process_rhs_params(self):
+        if not 1 <= len(self.rhs_params) <= 3:
             raise ValueError("2, 3, or 4-element tuple required for '%s' lookup." % self.lookup_name)
-        elif len(self.rhs) == 4 and not self.rhs[3] == 'spheroid':
-            raise ValueError("For 4-element tuples the last argument must be the 'speroid' directive.")
+        elif len(self.rhs_params) == 3 and self.rhs_params[2] != 'spheroid':
+            raise ValueError("For 4-element tuples the last argument must be the 'spheroid' directive.")
 
         # Check if the second parameter is a band index.
-        if len(self.rhs) > 2 and not self.rhs[2] == 'spheroid':
+        if len(self.rhs_params) > 1 and self.rhs_params[1] != 'spheroid':
             self.process_band_indices()
 
-        params = [connection.ops.Adapter(self.rhs[0])]
-
-        # Getting the distance parameter in the units of the field.
-        dist_param = self.rhs[1]
-        if hasattr(dist_param, 'resolve_expression'):
-            dist_param = dist_param.resolve_expression(compiler.query)
-            sql, expr_params = compiler.compile(dist_param)
-            self.template_params['value'] = sql
-            params.extend(expr_params)
-        else:
-            params += connection.ops.get_distance(
-                self.lhs.output_field, (dist_param,) + self.rhs[2:],
-                self.lookup_name, handle_spheroid=False
-            )
-        rhs = connection.ops.get_geom_placeholder(self.lhs.output_field, params[0], compiler)
-        return (rhs, params)
+    def process_distance(self, compiler, connection):
+        dist_param = self.rhs_params[0]
+        return (
+            compiler.compile(dist_param.resolve_expression(compiler.query))
+            if hasattr(dist_param, 'resolve_expression') else
+            ('%s', connection.ops.get_distance(self.lhs.output_field, self.rhs_params, self.lookup_name))
+        )
 
 
+@BaseSpatialField.register_lookup
 class DWithinLookup(DistanceLookupBase):
     lookup_name = 'dwithin'
     sql_template = '%(func)s(%(lhs)s, %(rhs)s, %%s)'
-gis_lookups['dwithin'] = DWithinLookup
+
+    def process_rhs(self, compiler, connection):
+        dist_sql, dist_params = self.process_distance(compiler, connection)
+        self.template_params['value'] = dist_sql
+        rhs_sql, params = super().process_rhs(compiler, connection)
+        return rhs_sql, params + dist_params
 
 
-class DistanceGTLookup(DistanceLookupBase):
+class DistanceLookupFromFunction(DistanceLookupBase):
+    def as_sql(self, compiler, connection):
+        spheroid = (len(self.rhs_params) == 2 and self.rhs_params[-1] == 'spheroid') or None
+        distance_expr = connection.ops.distance_expr_for_lookup(self.lhs, self.rhs, spheroid=spheroid)
+        sql, params = compiler.compile(distance_expr.resolve_expression(compiler.query))
+        dist_sql, dist_params = self.process_distance(compiler, connection)
+        return (
+            '%(func)s %(op)s %(dist)s' % {'func': sql, 'op': self.op, 'dist': dist_sql},
+            params + dist_params,
+        )
+
+
+@BaseSpatialField.register_lookup
+class DistanceGTLookup(DistanceLookupFromFunction):
     lookup_name = 'distance_gt'
-gis_lookups['distance_gt'] = DistanceGTLookup
+    op = '>'
 
 
-class DistanceGTELookup(DistanceLookupBase):
+@BaseSpatialField.register_lookup
+class DistanceGTELookup(DistanceLookupFromFunction):
     lookup_name = 'distance_gte'
-gis_lookups['distance_gte'] = DistanceGTELookup
+    op = '>='
 
 
-class DistanceLTLookup(DistanceLookupBase):
+@BaseSpatialField.register_lookup
+class DistanceLTLookup(DistanceLookupFromFunction):
     lookup_name = 'distance_lt'
-gis_lookups['distance_lt'] = DistanceLTLookup
+    op = '<'
 
 
-class DistanceLTELookup(DistanceLookupBase):
+@BaseSpatialField.register_lookup
+class DistanceLTELookup(DistanceLookupFromFunction):
     lookup_name = 'distance_lte'
-gis_lookups['distance_lte'] = DistanceLTELookup
+    op = '<='

@@ -1,0 +1,130 @@
+======================
+The form rendering API
+======================
+
+.. module:: django.forms.renderers
+   :synopsis: Built-in form renderers.
+
+Django's form widgets are rendered using Django's :doc:`template engines
+system </topics/templates>`.
+
+The form rendering process can be customized at several levels:
+
+* Widgets can specify custom template names.
+* Forms and widgets can specify custom renderer classes.
+* A widget's template can be overridden by a project. (Reusable applications
+  typically shouldn't override built-in templates because they might conflict
+  with a project's custom templates.)
+
+.. _low-level-widget-render-api:
+
+The low-level render API
+========================
+
+The rendering of form templates is controlled by a customizable renderer class.
+A custom renderer can be specified by updating the :setting:`FORM_RENDERER`
+setting. It defaults to
+``'``:class:`django.forms.renderers.DjangoTemplates`\ ``'``.
+
+You can also provide a custom renderer by setting the
+:attr:`.Form.default_renderer` attribute or by using the ``renderer`` argument
+of :meth:`.Widget.render`.
+
+Use one of the :ref:`built-in template form renderers
+<built-in-template-form-renderers>` or implement your own. Custom renderers
+must implement a ``render(template_name, context, request=None)`` method. It
+should return a rendered templates (as a string) or raise
+:exc:`~django.template.TemplateDoesNotExist`.
+
+.. _built-in-template-form-renderers:
+
+Built-in-template form renderers
+================================
+
+``DjangoTemplates``
+-------------------
+
+.. class:: DjangoTemplates
+
+This renderer uses a standalone
+:class:`~django.template.backends.django.DjangoTemplates`
+engine (unconnected to what you might have configured in the
+:setting:`TEMPLATES` setting). It loads templates first from the built-in form
+templates directory in ``django/forms/templates`` and then from the installed
+apps' templates directories using the :class:`app_directories
+<django.template.loaders.app_directories.Loader>` loader.
+
+If you want to render templates with customizations from your
+:setting:`TEMPLATES` setting, such as context processors for example, use the
+:class:`TemplatesSetting` renderer.
+
+``Jinja2``
+----------
+
+.. class:: Jinja2
+
+This renderer is the same as the :class:`DjangoTemplates` renderer except that
+it uses a :class:`~django.template.backends.jinja2.Jinja2` backend. Templates
+for the built-in widgets are located in ``django/forms/jinja2`` and installed
+apps can provide templates in a ``jinja2`` directory.
+
+To use this backend, all the widgets in your project and its third-party apps
+must have Jinja2 templates. Unless you provide your own Jinja2 templates for
+widgets that don't have any, you can't use this renderer. For example,
+:mod:`django.contrib.admin` doesn't include Jinja2 templates for its widgets
+due to their usage of Django template tags.
+
+``TemplatesSetting``
+--------------------
+
+.. class:: TemplatesSetting
+
+This renderer gives you complete control of how widget templates are sourced.
+It uses :func:`~django.template.loader.get_template` to find widget
+templates based on what's configured in the :setting:`TEMPLATES` setting.
+
+Using this renderer along with the built-in widget templates requires either:
+
+* ``'django.forms'`` in :setting:`INSTALLED_APPS` and at least one engine
+  with :setting:`APP_DIRS=True <TEMPLATES-APP_DIRS>`.
+
+* Adding the built-in widgets templates directory in :setting:`DIRS
+  <TEMPLATES-DIRS>` of one of your template engines. To generate that path::
+
+    import django
+    django.__path__[0] + '/forms/templates'  # or '/forms/jinja2'
+
+Using this renderer requires you to make sure the form templates your project
+needs can be located.
+
+Context available in widget templates
+=====================================
+
+Widget templates receive a context from :meth:`.Widget.get_context`. By
+default, widgets receive a single value in the context, ``widget``. This is a
+dictionary that contains values like:
+
+* ``name``
+* ``value``
+* ``attrs``
+* ``is_hidden``
+* ``template_name``
+
+Some widgets add further information to the context. For instance, all widgets
+that subclass ``Input`` defines ``widget['type']`` and :class:`.MultiWidget`
+defines ``widget['subwidgets']`` for looping purposes.
+
+.. _overriding-built-in-widget-templates:
+
+Overriding built-in widget templates
+====================================
+
+Each widget has a ``template_name`` attribute with a value such as
+``input.html``. Built-in widget templates are stored in the
+``django/forms/widgets`` path. You can provide a custom template for
+``input.html`` by defining ``django/forms/widgets/input.html``, for example.
+See :ref:`built-in widgets` for the name of each widget's template.
+
+To override widget templates, you must use the :class:`TemplatesSetting`
+renderer. Then overriding widget templates works :doc:`the same as
+</howto/overriding-templates>` overriding any other template in your project.

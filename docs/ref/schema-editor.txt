@@ -72,16 +72,12 @@ or indexes it has.
 
 .. method:: BaseDatabaseSchemaEditor.add_index(model, index)
 
-.. versionadded:: 1.11
-
 Adds ``index`` to ``model``’s table.
 
 ``remove_index()``
 ------------------
 
 .. method:: BaseDatabaseSchemaEditor.remove_index(model, index)
-
-.. versionadded:: 1.11
 
 Removes ``index`` from ``model``’s table.
 

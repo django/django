@@ -1,0 +1,25 @@
+===========================
+Django 1.10.6 release notes
+===========================
+
+*March 1, 2017*
+
+Django 1.10.6 fixes several bugs in 1.10.5.
+
+Bugfixes
+========
+
+* Fixed ``ClearableFileInput``’s "Clear" checkbox on model form fields where
+  the model field has a ``default`` (:ticket:`27805`).
+
+* Fixed ``RequestDataTooBig`` and ``TooManyFieldsSent`` exceptions crashing
+  rather than generating a bad request response (:ticket:`27820`).
+
+* Fixed a crash on Oracle and PostgreSQL when subtracting ``DurationField``
+  or ``IntegerField`` from ``DateField`` (:ticket:`27828`).
+
+* Fixed query expression date subtraction accuracy on PostgreSQL for
+  differences larger than a month (:ticket:`27856`).
+
+* Fixed a ``GDALException`` raised by ``GDALClose`` on GDAL ≥ 2.0
+  (:ticket:`27479`).

@@ -21,8 +21,8 @@ Basic file uploads
 
 Consider a simple form containing a :class:`~django.forms.FileField`:
 
-.. snippet::
-    :filename: forms.py
+.. code-block:: python
+    :caption: forms.py
 
     from django import forms
 
@@ -46,8 +46,8 @@ Most of the time, you'll simply pass the file data from ``request`` into the
 form as described in :ref:`binding-uploaded-files`. This would look
 something like:
 
-.. snippet::
-    :filename: views.py
+.. code-block:: python
+    :caption: views.py
 
     from django.http import HttpResponseRedirect
     from django.shortcuts import render
@@ -133,8 +133,8 @@ Uploading multiple files
 If you want to upload multiple files using one form field, set the ``multiple``
 HTML attribute of field's widget:
 
-.. snippet::
-    :filename: forms.py
+.. code-block:: python
+    :caption: forms.py
 
     from django import forms
 
@@ -145,8 +145,8 @@ Then override the ``post`` method of your
 :class:`~django.views.generic.edit.FormView` subclass to handle multiple file
 uploads:
 
-.. snippet::
-    :filename: views.py
+.. code-block:: python
+    :caption: views.py
 
     from django.views.generic.edit import FormView
     from .forms import FileFieldForm
@@ -190,8 +190,6 @@ data on the fly, render progress bars, and even send data to another storage
 location directly without storing it locally. See :ref:`custom_upload_handlers`
 for details on how you can customize or completely replace upload behavior.
 
-.. _modifying_upload_handlers_on_the_fly:
-
 Where uploaded data is stored
 -----------------------------
 
@@ -215,6 +213,8 @@ Changing upload handler behavior
 
 There are a few settings which control Django's file upload behavior. See
 :ref:`File Upload Settings <file-upload-settings>` for details.
+
+.. _modifying_upload_handlers_on_the_fly:
 
 Modifying upload handlers on the fly
 ------------------------------------

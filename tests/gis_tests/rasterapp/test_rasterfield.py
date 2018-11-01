@@ -1,21 +1,19 @@
 import json
 
+from django.contrib.gis.db.models.fields import BaseSpatialField
 from django.contrib.gis.db.models.functions import Distance
-from django.contrib.gis.db.models.lookups import (
-    DistanceLookupBase, gis_lookups,
-)
-from django.contrib.gis.gdal import HAS_GDAL
+from django.contrib.gis.db.models.lookups import DistanceLookupBase, GISLookup
+from django.contrib.gis.gdal import GDALRaster
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D
 from django.contrib.gis.shortcuts import numpy
+from django.db import connection
 from django.db.models import Q
 from django.test import TransactionTestCase, skipUnlessDBFeature
+from django.test.utils import CaptureQueriesContext
 
 from ..data.rasters.textrasters import JSON_RASTER
-
-if HAS_GDAL:
-    from django.contrib.gis.gdal import GDALRaster
-    from .models import RasterModel, RasterRelatedModel
+from .models import RasterModel, RasterRelatedModel
 
 
 @skipUnlessDBFeature('supports_raster')
@@ -99,11 +97,12 @@ class RasterFieldTest(TransactionTestCase):
         # Confirm raster has been transformed to the default srid
         self.assertEqual(r.rast.srs.srid, 4326)
         # Confirm geotransform is in lat/lon
-        self.assertEqual(
-            r.rast.geotransform,
-            [-87.9298551266551, 9.459646421449934e-06, 0.0,
-             23.94249275457565, 0.0, -9.459646421449934e-06]
-        )
+        expected = [
+            -87.9298551266551, 9.459646421449934e-06, 0.0, 23.94249275457565,
+            0.0, -9.459646421449934e-06,
+        ]
+        for val, exp in zip(r.rast.geotransform, expected):
+            self.assertAlmostEqual(exp, val)
 
     def test_verbose_name_arg(self):
         """
@@ -128,8 +127,14 @@ class RasterFieldTest(TransactionTestCase):
         stx_pnt = GEOSGeometry('POINT (-95.370401017314293 29.704867409475465)', 4326)
         stx_pnt.transform(3086)
 
+        lookups = [
+            (name, lookup)
+            for name, lookup in BaseSpatialField.get_lookups().items()
+            if issubclass(lookup, GISLookup)
+        ]
+        self.assertNotEqual(lookups, [], 'No lookups found')
         # Loop through all the GIS lookups.
-        for name, lookup in gis_lookups.items():
+        for name, lookup in lookups:
             # Construct lookup filter strings.
             combo_keys = [
                 field + name for field in [
@@ -166,16 +171,27 @@ class RasterFieldTest(TransactionTestCase):
                 # Set lookup values for all function based operators.
                 combo_values = [
                     rast, (rast, 0), (rast, 0), (stx_pnt, 0), stx_pnt,
-                    rast, rast, json.loads(JSON_RASTER)
+                    rast, json.loads(JSON_RASTER)
                 ]
             else:
                 # Override band lookup for these, as it's not supported.
                 combo_keys[2] = 'rastprojected__' + name
                 # Set lookup values for all other operators.
-                combo_values = [rast, rast, rast, stx_pnt, stx_pnt, rast, rast, json.loads(JSON_RASTER)]
+                combo_values = [rast, None, rast, stx_pnt, stx_pnt, rast, json.loads(JSON_RASTER)]
 
             # Create query filter combinations.
-            combos = [{x[0]: x[1]} for x in zip(combo_keys, combo_values)]
+            self.assertEqual(
+                len(combo_keys),
+                len(combo_values),
+                'Number of lookup names and values should be the same',
+            )
+            combos = [x for x in zip(combo_keys, combo_values) if x[1]]
+            self.assertEqual(
+                [(n, x) for n, x in enumerate(combos) if x in combos[:n]],
+                [],
+                'There are repeated test lookups',
+            )
+            combos = [{k: v} for k, v in combos]
 
             for combo in combos:
                 # Apply this query filter.
@@ -255,10 +271,9 @@ class RasterFieldTest(TransactionTestCase):
 
     def test_lookup_input_tuple_too_long(self):
         rast = GDALRaster(json.loads(JSON_RASTER))
-        qs = RasterModel.objects.filter(rast__bbcontains=(rast, 1, 2))
         msg = 'Tuple too long for lookup bbcontains.'
         with self.assertRaisesMessage(ValueError, msg):
-            qs.count()
+            RasterModel.objects.filter(rast__bbcontains=(rast, 1, 2))
 
     def test_lookup_input_band_not_allowed(self):
         rast = GDALRaster(json.loads(JSON_RASTER))
@@ -269,8 +284,8 @@ class RasterFieldTest(TransactionTestCase):
 
     def test_isvalid_lookup_with_raster_error(self):
         qs = RasterModel.objects.filter(rast__isvalid=True)
-        msg = 'The isvalid lookup is only available on geometry fields.'
-        with self.assertRaisesMessage(ValueError, msg):
+        msg = 'IsValid function requires a GeometryField in position 1, got RasterField.'
+        with self.assertRaisesMessage(TypeError, msg):
             qs.count()
 
     def test_result_of_gis_lookup_with_rasters(self):
@@ -318,7 +333,7 @@ class RasterFieldTest(TransactionTestCase):
 
     def test_lookup_value_error(self):
         # Test with invalid dict lookup parameter
-        obj = dict()
+        obj = {}
         msg = "Couldn't create spatial object from lookup value '%s'." % obj
         with self.assertRaisesMessage(ValueError, msg):
             RasterModel.objects.filter(geom__intersects=obj)
@@ -334,11 +349,18 @@ class RasterFieldTest(TransactionTestCase):
         """
         point = GEOSGeometry("SRID=3086;POINT (-697024.9213808845 683729.1705516104)")
         rast = GDALRaster(json.loads(JSON_RASTER))
-        msg = "Please provide a geometry object."
+        msg = "Distance function requires a geometric argument in position 2."
         with self.assertRaisesMessage(TypeError, msg):
             RasterModel.objects.annotate(distance_from_point=Distance("geom", rast))
         with self.assertRaisesMessage(TypeError, msg):
             RasterModel.objects.annotate(distance_from_point=Distance("rastprojected", rast))
-        msg = "Geometry functions not supported for raster fields."
+        msg = "Distance function requires a GeometryField in position 1, got RasterField."
         with self.assertRaisesMessage(TypeError, msg):
             RasterModel.objects.annotate(distance_from_point=Distance("rastprojected", point)).count()
+
+    def test_lhs_with_index_rhs_without_index(self):
+        with CaptureQueriesContext(connection) as queries:
+            RasterModel.objects.filter(rast__0__contains=json.loads(JSON_RASTER)).exists()
+        # It's easier to check the indexes in the generated SQL than to write
+        # tests that cover all index combinations.
+        self.assertRegex(queries[-1]['sql'], r'WHERE ST_Contains\([^)]*, 1, [^)]*, 1\)')

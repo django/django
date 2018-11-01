@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from unittest import skipIf
 
 from django.contrib.gis.db.models import fields
@@ -14,15 +12,13 @@ from django.test import (
 
 from ..utils import mysql, spatialite
 
-if connection.features.gis_enabled:
-    try:
-        GeometryColumns = connection.ops.geometry_columns()
-        HAS_GEOMETRY_COLUMNS = True
-    except NotImplementedError:
-        HAS_GEOMETRY_COLUMNS = False
+try:
+    GeometryColumns = connection.ops.geometry_columns()
+    HAS_GEOMETRY_COLUMNS = True
+except NotImplementedError:
+    HAS_GEOMETRY_COLUMNS = False
 
 
-@skipUnlessDBFeature('gis_enabled')
 class OperationTestCase(TransactionTestCase):
     available_apps = ['gis_tests.gis_migrations']
 
@@ -30,7 +26,7 @@ class OperationTestCase(TransactionTestCase):
         # Delete table after testing
         if hasattr(self, 'current_state'):
             self.apply_operations('gis', self.current_state, [migrations.DeleteModel('Neighborhood')])
-        super(OperationTestCase, self).tearDown()
+        super().tearDown()
 
     @property
     def has_spatial_indexes(self):
@@ -105,7 +101,7 @@ class OperationTestCase(TransactionTestCase):
 class OperationTests(OperationTestCase):
 
     def setUp(self):
-        super(OperationTests, self).setUp()
+        super().setUp()
         self.set_up_test_model()
 
     def test_add_geom_field(self):

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.template.defaultfilters import lower
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe

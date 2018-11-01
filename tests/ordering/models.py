@@ -14,15 +14,15 @@ undefined -- not random, just undefined.
 """
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
 class Author(models.Model):
+    name = models.CharField(max_length=63, null=True, blank=True)
+
     class Meta:
         ordering = ('-pk',)
 
 
-@python_2_unicode_compatible
 class Article(models.Model):
     author = models.ForeignKey(Author, models.SET_NULL, null=True)
     second_author = models.ForeignKey(Author, models.SET_NULL, null=True, related_name='+')
@@ -40,6 +40,12 @@ class OrderedByAuthorArticle(Article):
     class Meta:
         proxy = True
         ordering = ('author', 'second_author')
+
+
+class OrderedByFArticle(Article):
+    class Meta:
+        proxy = True
+        ordering = (models.F('author').asc(nulls_first=True), 'id')
 
 
 class Reference(models.Model):

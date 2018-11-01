@@ -2,14 +2,15 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Primož Verdnik <primoz.verdnik@gmail.com>, 2017
 # zejn <zejn@kiberpipa.org>, 2013,2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2016-05-14 13:23+0000\n"
-"Last-Translator: zejn <zejn@kiberpipa.org>\n"
+"PO-Revision-Date: 2017-09-23 18:54+0000\n"
+"Last-Translator: Primož Verdnik <primoz.verdnik@gmail.com>\n"
 "Language-Team: Slovenian (http://www.transifex.com/django/django/language/"
 "sl/)\n"
 "MIME-Version: 1.0\n"
@@ -23,7 +24,7 @@ msgid "Sites"
 msgstr "Strani"
 
 msgid "The domain name cannot contain any spaces or tabs."
-msgstr "Domena ne more vsebovati presledkov ali tabulatorjev."
+msgstr "Domena ne sme vsebovati presledkov ali tabulatorjev."
 
 msgid "domain name"
 msgstr "ime domene"

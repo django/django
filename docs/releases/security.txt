@@ -781,3 +781,131 @@ Versions affected
 
 * Django 1.9 `(patch) <https://github.com/django/django/commit/d1bc980db1c0fffd6d60677e62f70beadb9fe64a>`__
 * Django 1.8 `(patch) <https://github.com/django/django/commit/6118ab7d0676f0d622278e5be215f14fb5410b6a>`__
+
+November 1, 2016 - :cve:`2016-9013`
+-----------------------------------
+
+User with hardcoded password created when running tests on Oracle. `Full
+description <https://www.djangoproject.com/weblog/2016/nov/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 1.10 `(patch) <https://github.com/django/django/commit/34e10720d81b8d407aa14d763b6a7fe8f13b4f2e>`__
+* Django 1.9 `(patch) <https://github.com/django/django/commit/4844d86c7728c1a5a3bbce4ad336a8d32304072b>`__
+* Django 1.8 `(patch) <https://github.com/django/django/commit/70f99952965a430daf69eeb9947079aae535d2d0>`__
+
+November 1, 2016 - :cve:`2016-9014`
+-----------------------------------
+
+DNS rebinding vulnerability when ``DEBUG=True``. `Full description
+<https://www.djangoproject.com/weblog/2016/nov/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 1.10 `(patch) <https://github.com/django/django/commit/884e113838e5a72b4b0ec9e5e87aa480f6aa4472>`__
+* Django 1.9 `(patch) <https://github.com/django/django/commit/45acd6d836895a4c36575f48b3fb36a3dae98d19>`__
+* Django 1.8 `(patch) <https://github.com/django/django/commit/c401ae9a7dfb1a94a8a61927ed541d6f93089587>`__
+
+April 4, 2017 - :cve:`2017-7233`
+--------------------------------
+
+Open redirect and possible XSS attack via user-supplied numeric redirect URLs.
+`Full description <https://www.djangoproject.com/weblog/2017/apr/04/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 1.10 `(patch) <https://github.com/django/django/commit/f824655bc2c50b19d2f202d7640785caabc82787>`__
+* Django 1.9 `(patch) <https://github.com/django/django/commit/254326cb3682389f55f886804d2c43f7b9f23e4f>`__
+* Django 1.8 `(patch) <https://github.com/django/django/commit/8339277518c7d8ec280070a780915304654e3b66>`__
+
+April 4, 2017 - :cve:`2017-7234`
+--------------------------------
+
+Open redirect vulnerability in ``django.views.static.serve()``. `Full
+description <https://www.djangoproject.com/weblog/2017/apr/04/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 1.10 `(patch) <https://github.com/django/django/commit/2a9f6ef71b8e23fd267ee2be1be26dde8ab67037>`__
+* Django 1.9 `(patch) <https://github.com/django/django/commit/5f1ffb07afc1e59729ce2b283124116d6c0659e4>`__
+* Django 1.8 `(patch) <https://github.com/django/django/commit/4a6b945dffe8d10e7cec107d93e6efaebfbded29>`__
+
+September 5, 2017 - :cve:`2017-12794`
+-------------------------------------
+
+Possible XSS in traceback section of technical 500 debug page. `Full
+description <https://www.djangoproject.com/weblog/2017/sep/05/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 1.11 `(patch) <https://github.com/django/django/commit/e35a0c56086924f331e9422daa266e907a4784cc>`__
+* Django 1.10 `(patch) <https://github.com/django/django/commit/58e08e80e362db79eb0fd775dc81faad90dca47a>`__
+
+February 1, 2018 - :cve:`2018-6188`
+-----------------------------------
+
+Information leakage in ``AuthenticationForm``. `Full description
+<https://www.djangoproject.com/weblog/2018/feb/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 2.0 `(patch) <https://github.com/django/django/commit/c37bb28677295f6edda61d8ac461014ef0d3aeb2>`__
+* Django 1.11 `(patch) <https://github.com/django/django/commit/57b95fedad5e0b83fc9c81466b7d1751c6427aae>`__
+
+March 6, 2018 - :cve:`2018-7536`
+--------------------------------
+
+Denial-of-service possibility in ``urlize`` and ``urlizetrunc`` template
+filters. `Full description
+<https://www.djangoproject.com/weblog/2018/mar/06/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 2.0 `(patch) <https://github.com/django/django/commit/e157315da3ae7005fa0683ffc9751dbeca7306c8>`__
+* Django 1.11 `(patch) <https://github.com/django/django/commit/abf89d729f210c692a50e0ad3f75fb6bec6fae16>`__
+* Django 1.8  `(patch) <https://github.com/django/django/commit/1ca63a66ef3163149ad822701273e8a1844192c2>`__
+
+March 6, 2018 - :cve:`2018-7537`
+--------------------------------
+
+Denial-of-service possibility in ``truncatechars_html`` and
+``truncatewords_html`` template filters. `Full description
+<https://www.djangoproject.com/weblog/2018/mar/06/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 2.0 `(patch) <https://github.com/django/django/commit/94c5da1d17a6b0d378866c66b605102c19f7988c>`__
+* Django 1.11 `(patch) <https://github.com/django/django/commit/a91436360b79a6ff995c3e5018bcc666dfaf1539>`__
+* Django 1.8  `(patch) <https://github.com/django/django/commit/d17974a287a6ea2e361daff88fcc004cbd6835fa>`__
+
+August 1, 2018 - :cve:`2018-14574`
+----------------------------------
+
+Open redirect possibility in ``CommonMiddleware``. `Full description
+<https://www.djangoproject.com/weblog/2018/aug/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 2.1 `(patch) <https://github.com/django/django/commit/c4e5ff7fdb5fce447675e90291fd33fddd052b3c>`__
+* Django 2.0 `(patch) <https://github.com/django/django/commit/6fffc3c6d420e44f4029d5643f38d00a39b08525>`__
+* Django 1.11 `(patch) <https://github.com/django/django/commit/d6eaee092709aad477a9894598496c6deec532ff>`__
+
+October 1, 2018 - :cve:`2018-16984`
+-----------------------------------
+
+Password hash disclosure to "view only" admin users. `Full description
+<https://www.djangoproject.com/weblog/2018/oct/01/security-release/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 2.1 `(patch) <https://github.com/django/django/commit/c4bd5b597e0aa2432e4c867b86650f18af117851>`__

@@ -7,6 +7,65 @@ in a backward incompatible way, following their deprecation, as per the
 :ref:`deprecation policy <internal-release-deprecation-policy>`. More details
 about each item can often be found in the release notes of two versions prior.
 
+.. _deprecation-removed-in-3.1:
+
+3.1
+---
+
+See the :ref:`Django 2.2 release notes <deprecated-features-2.2>` for more
+details on these changes.
+
+* ``django.utils.timezone.FixedOffset`` will be removed.
+
+* ``django.core.paginator.QuerySetPaginator`` will be removed.
+
+* A model's ``Meta.ordering`` will no longer affect ``GROUP BY`` queries.
+
+* ``django.contrib.postgres.fields.FloatRangeField`` and
+  ``django.contrib.postgres.forms.FloatRangeField`` will be removed.
+
+* The ``FILE_CHARSET`` setting will be removed.
+
+* ``django.contrib.staticfiles.storage.CachedStaticFilesStorage`` will be
+  removed.
+
+.. _deprecation-removed-in-3.0:
+
+3.0
+---
+
+See the :ref:`Django 2.0 release notes<deprecated-features-2.0>` for more
+details on these changes.
+
+* The ``django.db.backends.postgresql_psycopg2`` module will be removed.
+
+* ``django.shortcuts.render_to_response()`` will be removed.
+
+* The ``DEFAULT_CONTENT_TYPE`` setting will be removed.
+
+* ``HttpRequest.xreadlines()`` will be removed.
+
+* Support for the ``context`` argument of ``Field.from_db_value()`` and
+  ``Expression.convert_value()`` will be removed.
+
+* The ``field_name`` keyword argument of ``QuerySet.earliest()`` and
+  ``latest()`` will be removed.
+
+See the :ref:`Django 2.1 release notes <deprecated-features-2.1>` for more
+details on these changes.
+
+* ``django.contrib.gis.db.models.functions.ForceRHR`` will be removed.
+
+* ``django.utils.http.cookie_date()`` will be removed.
+
+* The ``staticfiles`` and ``admin_static`` template tag libraries will be
+  removed.
+
+* ``django.contrib.staticfiles.templatetags.static()`` will be removed.
+
+* The shim to allow ``InlineModelAdmin.has_add_permission()`` to be defined
+  without an ``obj`` argument will be removed.
+
 .. _deprecation-removed-in-2.1:
 
 2.1
@@ -38,13 +97,21 @@ details on these changes.
 
 * ``DatabaseIntrospection.get_indexes()`` will be removed.
 
-* The ``authenticate()`` method of authentication backends will require a
-  ``request`` argument.
+* The ``authenticate()`` method of authentication backends will require
+  ``request`` as the first positional argument.
 
 * The ``django.db.models.permalink()`` decorator will be removed.
 
 * The ``USE_ETAGS`` setting will be removed. ``CommonMiddleware`` and
   ``django.utils.cache.patch_response_headers()`` will no longer set ETags.
+
+* The ``Model._meta.has_auto_field`` attribute will be removed.
+
+* ``url()``'s support for inline flags in regular expression groups (``(?i)``,
+  ``(?L)``, ``(?m)``, ``(?s)``, and ``(?u)``) will be removed.
+
+* Support for ``Widget.render()`` methods without the ``renderer`` argument
+  will be removed.
 
 .. _deprecation-removed-in-2.0:
 
@@ -56,6 +123,9 @@ details on these changes.
 
 * The ``weak`` argument to ``django.dispatch.signals.Signal.disconnect()`` will
   be removed.
+
+* ``django.db.backends.base.BaseDatabaseOperations.check_aggregate_support()``
+  will be removed.
 
 * The ``django.forms.extras`` package will be removed.
 
@@ -114,7 +184,7 @@ details on these changes.
   ``django.utils.feedgenerator.RssFeed`` will be removed in favor of
   ``content_type``.
 
-* The ``app_name`` argument to :func:`~django.conf.urls.include()` will be
+* The ``app_name`` argument to ``django.conf.urls.include()`` will be
   removed.
 
 * Support for passing a 3-tuple as the first argument to ``include()`` will
@@ -307,7 +377,7 @@ details on these changes.
 * ``django.db.models.field.subclassing.SubfieldBase`` will be removed.
 
 * ``django.utils.checksums`` will be removed; its functionality is included
-  in django-localflavor 1.1+.
+  in ``django-localflavor`` 1.1+.
 
 * The ``original_content_type_id`` attribute on
   ``django.contrib.admin.helpers.InlineAdminForm`` will be removed.
@@ -560,7 +630,7 @@ details on these changes.
 
 * The ``SEND_BROKEN_LINK_EMAILS`` setting will be removed. Add the
   :class:`django.middleware.common.BrokenLinkEmailsMiddleware` middleware to
-  your :setting:`MIDDLEWARE_CLASSES` setting instead.
+  your ``MIDDLEWARE_CLASSES`` setting instead.
 
 * ``django.middleware.doc.XViewMiddleware`` will be removed. Use
   ``django.contrib.admindocs.middleware.XViewMiddleware`` instead.
@@ -584,9 +654,6 @@ details on these changes.
 
 * Support for the Python Imaging Library (PIL) module will be removed, as it
   no longer appears to be actively maintained & does not work on Python 3.
-  You are advised to install `Pillow`_, which should be used instead.
-
-  .. _`Pillow`: https://pypi.python.org/pypi/Pillow
 
 * The following private APIs will be removed:
 
@@ -681,7 +748,7 @@ details on these changes.
   remove calls to this method, and instead ensure that their auth related views
   are CSRF protected, which ensures that cookies are enabled.
 
-* The version of :func:`django.contrib.auth.views.password_reset_confirm` that
+* The version of ``django.contrib.auth.views.password_reset_confirm()`` that
   supports base36 encoded user IDs
   (``django.contrib.auth.views.password_reset_confirm_uidb36``) will be
   removed. If your site has been running Django 1.6 for more than
@@ -748,15 +815,14 @@ details on these changes.
   and ``django.utils.text.truncate_html_words()`` will be removed in
   favor of the ``django.utils.text.Truncator`` class.
 
-* The :class:`~django.contrib.gis.geoip.GeoIP` class was moved to
-  :mod:`django.contrib.gis.geoip` in 1.4 -- the shortcut in
-  :mod:`django.contrib.gis.utils` will be removed.
+* The ``django.contrib.gis.geoip.GeoIP`` class was moved to
+  ``django.contrib.gis.geoip`` in 1.4 -- the shortcut in
+  ``django.contrib.gis.utils`` will be removed.
 
 * ``django.conf.urls.defaults`` will be removed. The functions
-  :func:`~django.conf.urls.include`, ``patterns()`` and
-  :func:`~django.conf.urls.url` plus :data:`~django.conf.urls.handler404`,
-  :data:`~django.conf.urls.handler500`, are now available through
-  :mod:`django.conf.urls` .
+  ``include()``, ``patterns()``, and ``url()``, plus
+  :data:`~django.conf.urls.handler404` and :data:`~django.conf.urls.handler500`
+  are now available through ``django.conf.urls``.
 
 * The functions ``setup_environ()`` and ``execute_manager()`` will be removed
   from :mod:`django.core.management`. This also means that the old (pre-1.4)
@@ -796,10 +862,9 @@ details on these changes.
   used instead.
 
 * The ``django.test.simple.DjangoTestRunner`` will be removed.
-  Instead use a unittest-native class.  The features of the
+  Instead use a ``unittest``-native class. The features of the
   ``django.test.simple.DjangoTestRunner`` (including fail-fast and
-  Ctrl-C test termination) can currently be provided by the unittest-native
-  :class:`~unittest.TextTestRunner`.
+  Ctrl-C test termination) can be provided by :class:`unittest.TextTestRunner`.
 
 * The undocumented function
   ``django.contrib.formtools.utils.security_hash`` will be removed,

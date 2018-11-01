@@ -16,8 +16,8 @@ active community of helpful individuals who may be able to solve your problem.
 
 .. _message-does-not-appear-on-django-users:
 
-Why hasn't my message appeared on django-users?
-===============================================
+Why hasn't my message appeared on `django-users`?
+=================================================
 
 |django-users| has a lot of subscribers. This is good for the community, as
 it means many people are available to contribute answers to questions.
@@ -30,8 +30,8 @@ that spammers get caught, but it also means that your first question to the
 list might take a little longer to get answered. We apologize for any
 inconvenience that this policy may cause.
 
-Nobody on django-users answered my question! What should I do?
-==============================================================
+Nobody on `django-users` answered my question! What should I do?
+================================================================
 
 Try making your question more specific, or provide a better example of your
 problem.

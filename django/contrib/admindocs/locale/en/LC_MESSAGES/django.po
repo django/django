@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -301,17 +301,8 @@ msgid ""
 "code>.\n"
 msgstr ""
 
-#: contrib/admindocs/tests/test_fields.py:32
-msgid "Boolean (Either True or False)"
-msgstr ""
-
-#: contrib/admindocs/tests/test_fields.py:42
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr ""
-
-#: contrib/admindocs/views.py:75 contrib/admindocs/views.py:77
-#: contrib/admindocs/views.py:79
+#: contrib/admindocs/views.py:78 contrib/admindocs/views.py:80
+#: contrib/admindocs/views.py:82
 msgid "tag:"
 msgstr ""
 

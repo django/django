@@ -1,7 +1,8 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Bouke Haarsma <bouke@webatoom.nl>, 2013
+# Bouke Haarsma <bouke@haarsma.eu>, 2013
+# Evelijn Saaltink <evelijnsaaltink@gmail.com>, 2016
 # Ilja Maas <iljamaas@dreamsolution.nl>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeffrey Gelens <jeffrey@noppo.pro>, 2012,2014
@@ -9,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:51+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-19 16:40+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -138,7 +139,7 @@ msgid "Arguments"
 msgstr "Argumenten"
 
 msgid "Back to Model documentation"
-msgstr ""
+msgstr "Terug naar Model documentatie"
 
 msgid "Model documentation"
 msgstr "Model documentatie"
@@ -212,7 +213,7 @@ msgid "Templates:"
 msgstr "Templates:"
 
 msgid "Back to View documentation"
-msgstr ""
+msgstr "Terug naar Bekijk documentatie"
 
 msgid "View documentation"
 msgstr "Bekijk documentatie"
@@ -239,13 +240,6 @@ msgstr ""
 "\n"
 "    View functie: <code>%(full_name)s</code>. Naam: <code>%(url_name)s</"
 "code>.\n"
-
-msgid "Boolean (Either True or False)"
-msgstr "Boolean (True danwel False)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Veld van type: %(field_type)s"
 
 msgid "tag:"
 msgstr "tag:"

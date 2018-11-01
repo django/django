@@ -1,12 +1,9 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from itertools import chain
 
 from django.utils.itercompat import is_iterable
 
 
-class Tags(object):
+class Tags:
     """
     Built-in tags for internal checks.
     """
@@ -18,14 +15,15 @@ class Tags(object):
     security = 'security'
     signals = 'signals'
     templates = 'templates'
+    translation = 'translation'
     urls = 'urls'
 
 
-class CheckRegistry(object):
+class CheckRegistry:
 
     def __init__(self):
-        self.registered_checks = []
-        self.deployment_checks = []
+        self.registered_checks = set()
+        self.deployment_checks = set()
 
     def register(self, check=None, *tags, **kwargs):
         """
@@ -43,22 +41,17 @@ class CheckRegistry(object):
             # or
             registry.register(my_check, 'mytag', 'anothertag')
         """
-        kwargs.setdefault('deploy', False)
-
         def inner(check):
             check.tags = tags
-            if kwargs['deploy']:
-                if check not in self.deployment_checks:
-                    self.deployment_checks.append(check)
-            elif check not in self.registered_checks:
-                self.registered_checks.append(check)
+            checks = self.deployment_checks if kwargs.get('deploy') else self.registered_checks
+            checks.add(check)
             return check
 
         if callable(check):
             return inner(check)
         else:
             if check:
-                tags += (check, )
+                tags += (check,)
             return inner
 
     def run_checks(self, app_configs=None, tags=None, include_deployment_checks=False):
@@ -69,13 +62,11 @@ class CheckRegistry(object):
         checks = self.get_checks(include_deployment_checks)
 
         if tags is not None:
-            checks = [check for check in checks
-                      if hasattr(check, 'tags') and set(check.tags) & set(tags)]
+            checks = [check for check in checks if not set(check.tags).isdisjoint(tags)]
         else:
             # By default, 'database'-tagged checks are not run as they do more
             # than mere static code analysis.
-            checks = [check for check in checks
-                      if not hasattr(check, 'tags') or Tags.database not in check.tags]
+            checks = [check for check in checks if Tags.database not in check.tags]
 
         for check in checks:
             new_errors = check(app_configs=app_configs)
@@ -89,7 +80,9 @@ class CheckRegistry(object):
         return tag in self.tags_available(include_deployment_checks)
 
     def tags_available(self, deployment_checks=False):
-        return set(chain(*[check.tags for check in self.get_checks(deployment_checks) if hasattr(check, 'tags')]))
+        return set(chain.from_iterable(
+            check.tags for check in self.get_checks(deployment_checks)
+        ))
 
     def get_checks(self, include_deployment_checks=False):
         checks = list(self.registered_checks)

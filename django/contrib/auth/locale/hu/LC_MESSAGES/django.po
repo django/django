@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# András Veres-Szentkirályi, 2016
+# András Veres-Szentkirályi, 2016-2017
 # Jannis Leidel <jannis@leidel.info>, 2011
-# János Péter Ronkay <transifex2@hangya.net>, 2014
+# János R (Hangya), 2014
 # Szilveszter Farkas <szilveszter.farkas@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-07-19 07:41+0000\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-11-24 13:37+0000\n"
 "Last-Translator: András Veres-Szentkirályi\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
 "hu/)\n"
@@ -69,12 +69,11 @@ msgstr "Írja be az előbb megadott jelszót, ellenőrzés céljából."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "A kódolatlan jelszavakat nem tároljuk, így a felhasználó jelszavát nem lehet "
-"megtekinteni, azonban <a href=\"../password/\">ezzel az űrlappal</a> a "
-"jelszó megváltoztatható."
+"megtekinteni, azonban <a href=\"{}\">ezzel az űrlappal</a> a jelszó "
+"megváltoztatható."
 
 #, python-format
 msgid ""

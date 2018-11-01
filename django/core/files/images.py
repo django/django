@@ -32,7 +32,7 @@ class ImageFile(File):
 
 def get_image_dimensions(file_or_path, close=False):
     """
-    Returns the (width, height) of an image, given an open file or a path.  Set
+    Return the (width, height) of an image, given an open file or a path.  Set
     'close' to True to close the file at the end if it is initially in an open
     state.
     """
@@ -68,6 +68,10 @@ def get_image_dimensions(file_or_path, close=False):
                 # Ignore PIL failing on a too short buffer when reads return
                 # less bytes than expected. Skip and feed more data to the
                 # parser (ticket #24544).
+                pass
+            except RuntimeError:
+                # e.g. "RuntimeError: could not create decoder object" for
+                # WebP files. A different chunk_size may work.
                 pass
             if p.image:
                 return p.image.size

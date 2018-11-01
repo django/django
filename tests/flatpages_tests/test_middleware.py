@@ -3,13 +3,11 @@ from django.contrib.auth.models import User
 from django.contrib.flatpages.models import FlatPage
 from django.contrib.sites.models import Site
 from django.test import TestCase, modify_settings, override_settings
-from django.test.utils import ignore_warnings
-from django.utils.deprecation import RemovedInDjango20Warning
 
 from .settings import FLATPAGES_TEMPLATES
 
 
-class TestDataMixin(object):
+class TestDataMixin:
 
     @classmethod
     def setUpTestData(cls):
@@ -62,7 +60,10 @@ class FlatpageMiddlewareTests(TestDataMixin, TestCase):
         self.assertContains(response, "<p>Isn't it flat!</p>")
 
     def test_view_non_existent_flatpage(self):
-        "A non-existent flatpage raises 404 when served through a view, even when the middleware is in use"
+        """
+        A nonexistent flatpage raises 404 when served through a view, even when
+        the middleware is in use.
+        """
         response = self.client.get('/flatpage_root/no_such_flatpage/')
         self.assertEqual(response.status_code, 404)
 
@@ -81,7 +82,10 @@ class FlatpageMiddlewareTests(TestDataMixin, TestCase):
         self.assertContains(response, "<p>Isn't it flat!</p>")
 
     def test_fallback_non_existent_flatpage(self):
-        "A non-existent flatpage raises a 404 when served by the fallback middleware"
+        """
+        A nonexistent flatpage raises a 404 when served by the fallback
+        middleware.
+        """
         response = self.client.get('/no_such_flatpage/')
         self.assertEqual(response.status_code, 404)
 
@@ -109,22 +113,6 @@ class FlatpageMiddlewareTests(TestDataMixin, TestCase):
         self.assertContains(response, "<p>Isn't it special!</p>")
 
 
-@ignore_warnings(category=RemovedInDjango20Warning)
-@override_settings(
-    MIDDLEWARE=None,
-    MIDDLEWARE_CLASSES=[
-        'django.middleware.common.CommonMiddleware',
-        'django.contrib.sessions.middleware.SessionMiddleware',
-        'django.middleware.csrf.CsrfViewMiddleware',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.contrib.messages.middleware.MessageMiddleware',
-        'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
-    ],
-)
-class FlatpageMiddlewareClassesTests(FlatpageMiddlewareTests):
-    pass
-
-
 @modify_settings(INSTALLED_APPS={'append': 'django.contrib.flatpages'})
 @override_settings(
     APPEND_SLASH=True,
@@ -149,7 +137,10 @@ class FlatpageMiddlewareAppendSlashTests(TestDataMixin, TestCase):
         self.assertRedirects(response, '/flatpage_root/flatpage/', status_code=301)
 
     def test_redirect_view_non_existent_flatpage(self):
-        "A non-existent flatpage raises 404 when served through a view and should not add a slash"
+        """
+        A nonexistent flatpage raises 404 when served through a view and
+        should not add a slash.
+        """
         response = self.client.get('/flatpage_root/no_such_flatpage')
         self.assertEqual(response.status_code, 404)
 
@@ -159,7 +150,10 @@ class FlatpageMiddlewareAppendSlashTests(TestDataMixin, TestCase):
         self.assertRedirects(response, '/flatpage/', status_code=301)
 
     def test_redirect_fallback_non_existent_flatpage(self):
-        "A non-existent flatpage raises a 404 when served by the fallback middleware and should not add a slash"
+        """
+        A nonexistent flatpage raises a 404 when served by the fallback
+        middleware and should not add a slash.
+        """
         response = self.client.get('/no_such_flatpage')
         self.assertEqual(response.status_code, 404)
 
@@ -190,19 +184,3 @@ class FlatpageMiddlewareAppendSlashTests(TestDataMixin, TestCase):
 
         response = self.client.get('/')
         self.assertContains(response, "<p>Root</p>")
-
-
-@ignore_warnings(category=RemovedInDjango20Warning)
-@override_settings(
-    MIDDLEWARE=None,
-    MIDDLEWARE_CLASSES=[
-        'django.middleware.common.CommonMiddleware',
-        'django.contrib.sessions.middleware.SessionMiddleware',
-        'django.middleware.csrf.CsrfViewMiddleware',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.contrib.messages.middleware.MessageMiddleware',
-        'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
-    ],
-)
-class FlatpageAppendSlashMiddlewareClassesTests(FlatpageMiddlewareAppendSlashTests):
-    pass

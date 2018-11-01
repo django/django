@@ -1,0 +1,40 @@
+==========================
+Django 2.1.2 release notes
+==========================
+
+*October 1, 2018*
+
+Django 2.1.2 fixes a security issue and several bugs in 2.1.1. Also, the latest
+string translations from Transifex are incorporated.
+
+CVE-2018-16984: Password hash disclosure to "view only" admin users
+===================================================================
+
+If an admin user has the change permission to the user model, only part of the
+password hash is displayed in the change form. Admin users with the view (but
+not change) permission to the user model were displayed the entire hash. While
+it's typically infeasible to reverse a strong password hash, if your site uses
+weaker password hashing algorithms such as MD5 or SHA1, it could be a problem.
+
+Bugfixes
+========
+
+* Fixed a regression where nonexistent joins in ``F()`` no longer raised
+  ``FieldError`` (:ticket:`29727`).
+
+* Fixed a regression where files starting with a tilde or underscore weren't
+  ignored by the migrations loader (:ticket:`29749`).
+
+* Made migrations detect changes to ``Meta.default_related_name``
+  (:ticket:`29755`).
+
+* Added compatibility for ``cx_Oracle`` 7 (:ticket:`29759`).
+
+* Fixed a regression in Django 2.0 where unique index names weren't quoted
+  (:ticket:`29778`).
+
+* Fixed a regression where sliced queries with multiple columns with the same
+  name crashed on Oracle 12.1 (:ticket:`29630`).
+
+* Fixed a crash when a user with the view (but not change) permission made a
+  POST request to an admin user change form (:ticket:`29809`).

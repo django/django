@@ -9,7 +9,6 @@ from django.urls import reverse
 from django.views.decorators.cache import never_cache
 from django.views.generic.edit import FormView
 
-
 TEMPLATE = """{% if messages %}
 <ul class="messages">
     {% for message in messages %}
@@ -24,27 +23,22 @@ TEMPLATE = """{% if messages %}
 
 @never_cache
 def add(request, message_type):
-    # don't default to False here, because we want to test that it defaults
-    # to False if unspecified
+    # Don't default to False here to test that it defaults to False if
+    # unspecified.
     fail_silently = request.POST.get('fail_silently', None)
     for msg in request.POST.getlist('messages'):
         if fail_silently is not None:
-            getattr(messages, message_type)(request, msg,
-                                            fail_silently=fail_silently)
+            getattr(messages, message_type)(request, msg, fail_silently=fail_silently)
         else:
             getattr(messages, message_type)(request, msg)
-
-    show_url = reverse('show_message')
-    return HttpResponseRedirect(show_url)
+    return HttpResponseRedirect(reverse('show_message'))
 
 
 @never_cache
 def add_template_response(request, message_type):
     for msg in request.POST.getlist('messages'):
         getattr(messages, message_type)(request, msg)
-
-    show_url = reverse('show_template_response')
-    return HttpResponseRedirect(show_url)
+    return HttpResponseRedirect(reverse('show_template_response'))
 
 
 @never_cache

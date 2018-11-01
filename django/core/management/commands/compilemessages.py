@@ -1,12 +1,10 @@
-from __future__ import unicode_literals
-
 import codecs
+import concurrent.futures
 import glob
 import os
 
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import find_command, popen_wrapper
-from django.utils._os import npath, upath
 
 
 def has_bom(fn):
@@ -30,23 +28,22 @@ class Command(BaseCommand):
     help = 'Compiles .po files to .mo files for use with builtin gettext support.'
 
     requires_system_checks = False
-    leave_locale_alone = True
 
     program = 'msgfmt'
     program_options = ['--check-format']
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--locale', '-l', dest='locale', action='append', default=[],
+            '--locale', '-l', action='append', default=[],
             help='Locale(s) to process (e.g. de_AT). Default is to process all. '
                  'Can be used multiple times.',
         )
         parser.add_argument(
-            '--exclude', '-x', dest='exclude', action='append', default=[],
+            '--exclude', '-x', action='append', default=[],
             help='Locales to exclude. Default is none. Can be used multiple times.',
         )
         parser.add_argument(
-            '--use-fuzzy', '-f', dest='fuzzy', action='store_true', default=False,
+            '--use-fuzzy', '-f', dest='fuzzy', action='store_true',
             help='Use fuzzy translations.',
         )
 
@@ -64,7 +61,7 @@ class Command(BaseCommand):
         basedirs = [os.path.join('conf', 'locale'), 'locale']
         if os.environ.get('DJANGO_SETTINGS_MODULE'):
             from django.conf import settings
-            basedirs.extend(upath(path) for path in settings.LOCALE_PATHS)
+            basedirs.extend(settings.LOCALE_PATHS)
 
         # Walk entire tree, looking for locale directories
         for dirpath, dirnames, filenames in os.walk('.', topdown=True):
@@ -88,8 +85,9 @@ class Command(BaseCommand):
 
         # Account for excluded locales
         locales = locale or all_locales
-        locales = set(locales) - set(exclude)
+        locales = set(locales).difference(exclude)
 
+        self.has_errors = False
         for basedir in basedirs:
             if locales:
                 dirs = [os.path.join(basedir, l, 'LC_MESSAGES') for l in locales]
@@ -102,33 +100,48 @@ class Command(BaseCommand):
             if locations:
                 self.compile_messages(locations)
 
+        if self.has_errors:
+            raise CommandError('compilemessages generated one or more errors.')
+
     def compile_messages(self, locations):
         """
         Locations is a list of tuples: [(directory, file), ...]
         """
-        for i, (dirpath, f) in enumerate(locations):
-            if self.verbosity > 0:
-                self.stdout.write('processing file %s in %s\n' % (f, dirpath))
-            po_path = os.path.join(dirpath, f)
-            if has_bom(po_path):
-                raise CommandError("The %s file has a BOM (Byte Order Mark). "
-                                   "Django only supports .po files encoded in "
-                                   "UTF-8 and without any BOM." % po_path)
-            base_path = os.path.splitext(po_path)[0]
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            futures = []
+            for i, (dirpath, f) in enumerate(locations):
+                if self.verbosity > 0:
+                    self.stdout.write('processing file %s in %s\n' % (f, dirpath))
+                po_path = os.path.join(dirpath, f)
+                if has_bom(po_path):
+                    self.stderr.write(
+                        'The %s file has a BOM (Byte Order Mark). Django only '
+                        'supports .po files encoded in UTF-8 and without any BOM.' % po_path
+                    )
+                    self.has_errors = True
+                    continue
+                base_path = os.path.splitext(po_path)[0]
 
-            # Check writability on first location
-            if i == 0 and not is_writable(npath(base_path + '.mo')):
-                self.stderr.write("The po files under %s are in a seemingly not writable location. "
-                                  "mo files will not be updated/created." % dirpath)
-                return
+                # Check writability on first location
+                if i == 0 and not is_writable(base_path + '.mo'):
+                    self.stderr.write(
+                        'The po files under %s are in a seemingly not writable location. '
+                        'mo files will not be updated/created.' % dirpath
+                    )
+                    self.has_errors = True
+                    return
 
-            args = [self.program] + self.program_options + [
-                '-o', npath(base_path + '.mo'), npath(base_path + '.po')
-            ]
-            output, errors, status = popen_wrapper(args)
-            if status:
-                if errors:
-                    msg = "Execution of %s failed: %s" % (self.program, errors)
-                else:
-                    msg = "Execution of %s failed" % self.program
-                raise CommandError(msg)
+                args = [self.program] + self.program_options + [
+                    '-o', base_path + '.mo', base_path + '.po'
+                ]
+                futures.append(executor.submit(popen_wrapper, args))
+
+            for future in concurrent.futures.as_completed(futures):
+                output, errors, status = future.result()
+                if status:
+                    if self.verbosity > 0:
+                        if errors:
+                            self.stderr.write("Execution of %s failed: %s" % (self.program, errors))
+                        else:
+                            self.stderr.write("Execution of %s failed" % self.program)
+                    self.has_errors = True

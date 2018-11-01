@@ -21,8 +21,7 @@ Running the unit tests
 Quickstart
 ----------
 
-First, `fork Django on GitHub
-<https://github.com/django/django#fork-destination-box>`__.
+First, `fork Django on GitHub <https://github.com/django/django/fork>`__.
 
 Second, create and activate a virtual environment. If you're not familiar with
 how to do that, read our :doc:`contributing tutorial </intro/contributing>`.
@@ -32,7 +31,7 @@ Next, clone your fork, install some requirements, and run the tests::
    $ git clone git@github.com:YourGitHubName/django.git django-repo
    $ cd django-repo/tests
    $ pip install -e ..
-   $ pip install -r requirements/py3.txt  # Python 2: py2.txt
+   $ pip install -r requirements/py3.txt
    $ ./runtests.py
 
 Installing the requirements will likely require some operating system packages
@@ -40,8 +39,7 @@ that your computer doesn't have installed. You can usually figure out which
 package to install by doing a Web search for the last line or so of the error
 message. Try adding your operating system to the search query if needed.
 
-If you have trouble installing the requirements, you can skip that step, except
-on Python 2, where you must ``pip install mock``. See
+If you have trouble installing the requirements, you can skip that step. See
 :ref:`running-unit-tests-dependencies` for details on installing the optional
 test dependencies. If you don't have an optional dependency installed, the
 tests that require it will be skipped.
@@ -62,7 +60,7 @@ Having problems? See :ref:`troubleshooting-unit-tests` for some common issues.
 Running tests using ``tox``
 ---------------------------
 
-`Tox <http://tox.testrun.org/>`_ is a tool for running tests in different
+`Tox <https://tox.readthedocs.io/>`_ is a tool for running tests in different
 virtual environments. Django includes a basic ``tox.ini`` that automates some
 checks that our build server performs on pull requests. To run the unit tests
 and other checks (such as :ref:`import sorting <coding-style-imports>`, the
@@ -76,9 +74,8 @@ command from any place in the Django source tree::
 By default, ``tox`` runs the test suite with the bundled test settings file for
 SQLite, ``flake8``, ``isort``, and the documentation spelling checker. In
 addition to the system dependencies noted elsewhere in this documentation,
-the commands ``python2`` and ``python3`` must be on your path and linked to
-the appropriate versions of Python. A list of default environments can be seen
-as follows::
+the command ``python3`` must be on your path and linked to the appropriate
+version of Python. A list of default environments can be seen as follows::
 
     $ tox -l
     py3
@@ -226,7 +223,6 @@ dependencies:
 *  argon2-cffi_ 16.1.0+
 *  bcrypt_
 *  docutils_
-*  enum34_ (Python 2 only)
 *  geoip2_
 *  jinja2_ 2.7+
 *  numpy_
@@ -235,7 +231,6 @@ dependencies:
 *  pytz_ (required)
 *  setuptools_
 *  memcached_, plus a :ref:`supported Python binding <memcached>`
-*  mock_ (for Python 2)
 *  gettext_ (:ref:`gettext_on_windows`)
 *  selenium_
 *  sqlparse_
@@ -244,7 +239,7 @@ You can find these dependencies in `pip requirements files`_ inside the
 ``tests/requirements`` directory of the Django source tree and install them
 like so::
 
-   $ pip install -r tests/requirements/py3.txt  # Python 2: py2.txt
+   $ pip install -r tests/requirements/py3.txt
 
 If you encounter an error during the installation, your system might be missing
 a dependency for one or more of the Python packages. Consult the failing
@@ -263,23 +258,21 @@ and install the Geospatial libraries</ref/contrib/gis/install/index>`.
 Each of these dependencies is optional. If you're missing any of them, the
 associated tests will be skipped.
 
-.. _argon2-cffi: https://pypi.python.org/pypi/argon2_cffi
-.. _bcrypt: https://pypi.python.org/pypi/bcrypt
-.. _docutils: https://pypi.python.org/pypi/docutils
-.. _enum34: https://pypi.python.org/pypi/enum34
-.. _geoip2: https://pypi.python.org/pypi/geoip2
-.. _jinja2: https://pypi.python.org/pypi/jinja2
-.. _numpy: https://pypi.python.org/pypi/numpy
-.. _Pillow: https://pypi.python.org/pypi/Pillow/
-.. _PyYAML: http://pyyaml.org/wiki/PyYAML
-.. _pytz: https://pypi.python.org/pypi/pytz/
-.. _setuptools: https://pypi.python.org/pypi/setuptools/
-.. _memcached: http://memcached.org/
-.. _mock: https://pypi.python.org/pypi/mock
+.. _argon2-cffi: https://pypi.org/project/argon2_cffi/
+.. _bcrypt: https://pypi.org/project/bcrypt/
+.. _docutils: https://pypi.org/project/docutils/
+.. _geoip2: https://pypi.org/project/geoip2/
+.. _jinja2: https://pypi.org/project/jinja2/
+.. _numpy: https://pypi.org/project/numpy/
+.. _Pillow: https://pypi.org/project/Pillow/
+.. _PyYAML: https://pyyaml.org/wiki/PyYAML
+.. _pytz: https://pypi.org/project/pytz/
+.. _setuptools: https://pypi.org/project/setuptools/
+.. _memcached: https://memcached.org/
 .. _gettext: https://www.gnu.org/software/gettext/manual/gettext.html
-.. _selenium: https://pypi.python.org/pypi/selenium
-.. _sqlparse: https://pypi.python.org/pypi/sqlparse
-.. _pip requirements files: https://pip.pypa.io/en/latest/user_guide.html#requirements-files
+.. _selenium: https://pypi.org/project/selenium/
+.. _sqlparse: https://pypi.org/project/sqlparse/
+.. _pip requirements files: https://pip.pypa.io/en/latest/user_guide/#requirements-files
 
 Code coverage
 -------------
@@ -326,6 +319,15 @@ You can resolve this on Debian-based systems, for example, by running::
 
     $ apt-get install locales
     $ dpkg-reconfigure locales
+
+You can resolve this for macOS systems by configuring your shell's locale::
+
+    $ export LANG="en_US.UTF-8"
+    $ export LC_ALL="en_US.UTF-8"
+
+Run the ``locale`` command to confirm the change. Optionally, add those export
+commands to your shell's startup file (e.g. ``~/.bashrc`` for Bash) to avoid
+having to retype them.
 
 Tests that only fail in combination
 -----------------------------------
@@ -420,8 +422,6 @@ a temporary ``Apps`` instance::
 
 .. function:: django.test.utils.isolate_apps(*app_labels, attr_name=None, kwarg_name=None)
 
-.. versionadded:: 1.10
-
 Since this pattern involves a lot of boilerplate, Django provides the
 :func:`~django.test.utils.isolate_apps` decorator. It's used like this::
 
@@ -446,8 +446,8 @@ Since this pattern involves a lot of boilerplate, Django provides the
     :func:`~django.test.utils.isolate_apps` instances are correctly
     installed, you should pass the set of targeted ``app_label`` as arguments:
 
-    .. snippet::
-        :filename: tests/app_label/tests.py
+    .. code-block:: python
+        :caption: tests/app_label/tests.py
 
         from django.db import models
         from django.test import SimpleTestCase

@@ -1,8 +1,5 @@
-from __future__ import unicode_literals
-
 from django.template.defaultfilters import escapejs_filter
 from django.test import SimpleTestCase
-from django.utils import six
 from django.utils.functional import lazy
 
 from ..utils import setup
@@ -55,7 +52,7 @@ class FunctionTests(SimpleTestCase):
         )
 
     def test_lazy_string(self):
-        append_script = lazy(lambda string: r'<script>this</script>' + string, six.text_type)
+        append_script = lazy(lambda string: r'<script>this</script>' + string, str)
         self.assertEqual(
             escapejs_filter(append_script('whitespace: \r\n\t\v\f\b')),
             '\\u003Cscript\\u003Ethis\\u003C/script\\u003E'

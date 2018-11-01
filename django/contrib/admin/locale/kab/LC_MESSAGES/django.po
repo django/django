@@ -1,0 +1,631 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-10-06 11:59+0000\n"
+"Last-Translator: Muḥend Belqasem <belkacem77@gmail.com>\n"
+"Language-Team: Kabyle (http://www.transifex.com/django/django/language/"
+"kab/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: kab\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr ""
+
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr ""
+
+msgid "Are you sure?"
+msgstr "Tebɣiḍ?"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr ""
+
+msgid "Administration"
+msgstr "Tadbelt"
+
+msgid "All"
+msgstr "Akkw"
+
+msgid "Yes"
+msgstr "Ih"
+
+msgid "No"
+msgstr "Uhu"
+
+msgid "Unknown"
+msgstr "Arussin"
+
+msgid "Any date"
+msgstr "Yal azemz"
+
+msgid "Today"
+msgstr "Ass-a"
+
+msgid "Past 7 days"
+msgstr "Di 7 n wussan ineggura"
+
+msgid "This month"
+msgstr "Aggur-agi"
+
+msgid "This year"
+msgstr "Aseggass-agi"
+
+msgid "No date"
+msgstr "Ulac azemz"
+
+msgid "Has date"
+msgstr "Ɣur-s azemz"
+
+#, python-format
+msgid ""
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
+msgstr ""
+
+msgid "Action:"
+msgstr "Tigawt:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr ""
+
+msgid "Remove"
+msgstr "Kkes"
+
+msgid "action time"
+msgstr "akud n tigawt"
+
+msgid "user"
+msgstr "aseqdac"
+
+msgid "content type"
+msgstr "anaw n ugbur"
+
+msgid "object id"
+msgstr "asulay n tɣawsa"
+
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
+msgid "object repr"
+msgstr ""
+
+msgid "action flag"
+msgstr "anay n tigawt"
+
+msgid "change message"
+msgstr ""
+
+msgid "log entry"
+msgstr "anekcum n uɣmis"
+
+msgid "log entries"
+msgstr "inekcam n uɣmis"
+
+#, python-format
+msgid "Added \"%(object)s\"."
+msgstr ""
+
+#, python-format
+msgid "Changed \"%(object)s\" - %(changes)s"
+msgstr ""
+
+#, python-format
+msgid "Deleted \"%(object)s.\""
+msgstr ""
+
+msgid "LogEntry Object"
+msgstr ""
+
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr ""
+
+msgid "Added."
+msgstr "yettwarna."
+
+msgid "and"
+msgstr "akked"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr ""
+
+msgid "No fields changed."
+msgstr ""
+
+msgid "None"
+msgstr "Ula yiwen"
+
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
+
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+
+msgid "No action selected."
+msgstr ""
+
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr ""
+
+#, python-format
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr ""
+
+#, python-format
+msgid "Add %s"
+msgstr "Rnu %s"
+
+#, python-format
+msgid "Change %s"
+msgstr ""
+
+msgid "Database error"
+msgstr "Agul n database"
+
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr ""
+
+#, python-format
+msgid "Change history: %s"
+msgstr ""
+
+#. Translators: Model verbose name and instance representation,
+#. suitable to be an item in a list.
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr ""
+
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+
+msgid "Django site admin"
+msgstr ""
+
+msgid "Django administration"
+msgstr ""
+
+msgid "Site administration"
+msgstr "Asmel n tedbelt"
+
+msgid "Log in"
+msgstr "Kcem"
+
+#, python-format
+msgid "%(app)s administration"
+msgstr ""
+
+msgid "Page not found"
+msgstr "Asebtar ulac-it"
+
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Ad nesḥissef imi asebter i d-sutreḍ ulac-it."
+
+msgid "Home"
+msgstr "Agejdan"
+
+msgid "Server error"
+msgstr "Tuccḍa n uqeddac"
+
+msgid "Server error (500)"
+msgstr ""
+
+msgid "Server Error <em>(500)</em>"
+msgstr ""
+
+msgid ""
+"There's been an error. It's been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+
+msgid "Run the selected action"
+msgstr ""
+
+msgid "Go"
+msgstr "Ẓer"
+
+msgid "Click here to select the objects across all pages"
+msgstr ""
+
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr ""
+
+msgid "Clear selection"
+msgstr ""
+
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr ""
+
+msgid "Enter a username and password."
+msgstr ""
+
+msgid "Change password"
+msgstr "Beddel awal n tbaḍnit"
+
+msgid "Please correct the error below."
+msgstr ""
+
+msgid "Please correct the errors below."
+msgstr ""
+
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr ""
+
+msgid "Welcome,"
+msgstr "Anṣuf,"
+
+msgid "View site"
+msgstr "Wali asmel"
+
+msgid "Documentation"
+msgstr "Tasemlit"
+
+msgid "Log out"
+msgstr "Asenser"
+
+#, python-format
+msgid "Add %(name)s"
+msgstr ""
+
+msgid "History"
+msgstr "Amazray"
+
+msgid "View on site"
+msgstr "Wali deg usmel"
+
+msgid "Filter"
+msgstr "Tastayt"
+
+msgid "Remove from sorting"
+msgstr ""
+
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr ""
+
+msgid "Toggle sorting"
+msgstr ""
+
+msgid "Delete"
+msgstr "Mḥu"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+
+msgid "Objects"
+msgstr "Tiɣawsiwin"
+
+msgid "Yes, I'm sure"
+msgstr ""
+
+msgid "No, take me back"
+msgstr ""
+
+msgid "Delete multiple objects"
+msgstr ""
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+
+msgid "Change"
+msgstr "Beddel"
+
+msgid "Delete?"
+msgstr "Kkes?"
+
+#, python-format
+msgid " By %(filter_title)s "
+msgstr ""
+
+msgid "Summary"
+msgstr "Agzul"
+
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr ""
+
+msgid "Add"
+msgstr "Rnu"
+
+msgid "You don't have permission to edit anything."
+msgstr ""
+
+msgid "Recent actions"
+msgstr ""
+
+msgid "My actions"
+msgstr "Tigawin-iw"
+
+msgid "None available"
+msgstr ""
+
+msgid "Unknown content"
+msgstr ""
+
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+
+msgid "Forgotten your password or username?"
+msgstr ""
+
+msgid "Date/time"
+msgstr "Azemz/asrag"
+
+msgid "User"
+msgstr "Amseqdac"
+
+msgid "Action"
+msgstr "Tigawt"
+
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+
+msgid "Show all"
+msgstr "Sken akk"
+
+msgid "Save"
+msgstr "Sekles"
+
+msgid "Popup closing..."
+msgstr ""
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr ""
+
+msgid "Search"
+msgstr "Anadi"
+
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr ""
+
+msgid "Save as new"
+msgstr "Sekles d amaynut:"
+
+msgid "Save and add another"
+msgstr ""
+
+msgid "Save and continue editing"
+msgstr ""
+
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr ""
+
+msgid "Log in again"
+msgstr ""
+
+msgid "Password change"
+msgstr "Abeddel n wawal uffir"
+
+msgid "Your password was changed."
+msgstr ""
+
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+
+msgid "Change my password"
+msgstr ""
+
+msgid "Password reset"
+msgstr "Awennez n wawal uffir"
+
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr ""
+
+msgid "Password reset confirmation"
+msgstr "Asentem n uwennez n wawal uffir"
+
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+
+msgid "New password:"
+msgstr "Awal n tbaḍnit amaynut:"
+
+msgid "Confirm password:"
+msgstr "Sentem awal uffir"
+
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+
+msgid ""
+"We've emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
+msgstr ""
+
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+
+msgid "Please go to the following page and choose a new password:"
+msgstr ""
+
+msgid "Your username, in case you've forgotten:"
+msgstr ""
+
+msgid "Thanks for using our site!"
+msgstr ""
+
+#, python-format
+msgid "The %(site_name)s team"
+msgstr ""
+
+msgid ""
+"Forgotten your password? Enter your email address below, and we'll email "
+"instructions for setting a new one."
+msgstr ""
+
+msgid "Email address:"
+msgstr "Tansa e-mail :"
+
+msgid "Reset my password"
+msgstr "Wennez awal-iw uffir"
+
+msgid "All dates"
+msgstr "Izemzen merra"
+
+#, python-format
+msgid "Select %s"
+msgstr "Fren %s"
+
+#, python-format
+msgid "Select %s to change"
+msgstr ""
+
+msgid "Date:"
+msgstr "Azemz:"
+
+msgid "Time:"
+msgstr "Akud:"
+
+msgid "Lookup"
+msgstr "Anadi"
+
+msgid "Currently:"
+msgstr "Tura:"
+
+msgid "Change:"
+msgstr "Beddel:"

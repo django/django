@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import json
+import sys
 
 from django.test import SimpleTestCase
-from django.utils import six, text
+from django.utils import text
 from django.utils.functional import lazystr
 from django.utils.text import format_lazy
-from django.utils.translation import override, ugettext_lazy
+from django.utils.translation import gettext_lazy, override
 
 IS_WIDE_BUILD = (len('\U0001F4A9') == 1)
 
@@ -56,27 +54,24 @@ class TestUtilsText(SimpleTestCase):
             self.assertEqual(list(text.smart_split(test)), expected)
 
     def test_truncate_chars(self):
-        truncator = text.Truncator(
-            'The quick brown fox jumped over the lazy dog.'
-        )
+        truncator = text.Truncator('The quick brown fox jumped over the lazy dog.')
         self.assertEqual('The quick brown fox jumped over the lazy dog.', truncator.chars(100)),
-        self.assertEqual('The quick brown fox ...', truncator.chars(23)),
+        self.assertEqual('The quick brown fox …', truncator.chars(21)),
         self.assertEqual('The quick brown fo.....', truncator.chars(23, '.....')),
 
-        # Ensure that we normalize our unicode data first
         nfc = text.Truncator('o\xfco\xfco\xfco\xfc')
         nfd = text.Truncator('ou\u0308ou\u0308ou\u0308ou\u0308')
         self.assertEqual('oüoüoüoü', nfc.chars(8))
         self.assertEqual('oüoüoüoü', nfd.chars(8))
-        self.assertEqual('oü...', nfc.chars(5))
-        self.assertEqual('oü...', nfd.chars(5))
+        self.assertEqual('oü…', nfc.chars(3))
+        self.assertEqual('oü…', nfd.chars(3))
 
         # Ensure the final length is calculated correctly when there are
         # combining characters with no precomposed form, and that combining
         # characters are not split up.
         truncator = text.Truncator('-B\u030AB\u030A----8')
-        self.assertEqual('-B\u030A...', truncator.chars(5))
-        self.assertEqual('-B\u030AB\u030A-...', truncator.chars(7))
+        self.assertEqual('-B\u030A…', truncator.chars(3))
+        self.assertEqual('-B\u030AB\u030A-…', truncator.chars(5))
         self.assertEqual('-B\u030AB\u030A----8', truncator.chars(8))
 
         # Ensure the length of the end text is correctly calculated when it
@@ -87,18 +82,18 @@ class TestUtilsText(SimpleTestCase):
 
         # Make a best effort to shorten to the desired length, but requesting
         # a length shorter than the ellipsis shouldn't break
-        self.assertEqual('...', text.Truncator('asdf').chars(1))
-        # Ensure that lazy strings are handled correctly
-        self.assertEqual(text.Truncator(lazystr('The quick brown fox')).chars(12), 'The quick...')
+        self.assertEqual('…', text.Truncator('asdf').chars(0))
+        # lazy strings are handled correctly
+        self.assertEqual(text.Truncator(lazystr('The quick brown fox')).chars(10), 'The quick…')
 
     def test_truncate_words(self):
         truncator = text.Truncator('The quick brown fox jumped over the lazy dog.')
         self.assertEqual('The quick brown fox jumped over the lazy dog.', truncator.words(10))
-        self.assertEqual('The quick brown fox...', truncator.words(4))
+        self.assertEqual('The quick brown fox…', truncator.words(4))
         self.assertEqual('The quick brown fox[snip]', truncator.words(4, '[snip]'))
-        # Ensure that lazy strings are handled correctly
+        # lazy strings are handled correctly
         truncator = text.Truncator(lazystr('The quick brown fox jumped over the lazy dog.'))
-        self.assertEqual('The quick brown fox...', truncator.words(4))
+        self.assertEqual('The quick brown fox…', truncator.words(4))
 
     def test_truncate_html_words(self):
         truncator = text.Truncator(
@@ -109,7 +104,7 @@ class TestUtilsText(SimpleTestCase):
             truncator.words(10, html=True)
         )
         self.assertEqual(
-            '<p id="par"><strong><em>The quick brown fox...</em></strong></p>',
+            '<p id="par"><strong><em>The quick brown fox…</em></strong></p>',
             truncator.words(4, html=True)
         )
         self.assertEqual(
@@ -126,21 +121,25 @@ class TestUtilsText(SimpleTestCase):
             '<p>The quick <a href="xyz.html"\n id="mylink">brown fox</a> jumped over the lazy dog.</p>'
         )
         self.assertEqual(
-            '<p>The quick <a href="xyz.html"\n id="mylink">brown...</a></p>',
-            truncator.words(3, '...', html=True)
+            '<p>The quick <a href="xyz.html"\n id="mylink">brown…</a></p>',
+            truncator.words(3, html=True)
         )
 
         # Test self-closing tags
         truncator = text.Truncator('<br/>The <hr />quick brown fox jumped over the lazy dog.')
-        self.assertEqual('<br/>The <hr />quick brown...', truncator.words(3, '...', html=True))
+        self.assertEqual('<br/>The <hr />quick brown…', truncator.words(3, html=True))
         truncator = text.Truncator('<br>The <hr/>quick <em>brown fox</em> jumped over the lazy dog.')
-        self.assertEqual('<br>The <hr/>quick <em>brown...</em>', truncator.words(3, '...', html=True))
+        self.assertEqual('<br>The <hr/>quick <em>brown…</em>', truncator.words(3, html=True))
 
         # Test html entities
         truncator = text.Truncator('<i>Buenos d&iacute;as! &#x00bf;C&oacute;mo est&aacute;?</i>')
-        self.assertEqual('<i>Buenos d&iacute;as! &#x00bf;C&oacute;mo...</i>', truncator.words(3, '...', html=True))
+        self.assertEqual('<i>Buenos d&iacute;as! &#x00bf;C&oacute;mo…</i>', truncator.words(3, html=True))
         truncator = text.Truncator('<p>I &lt;3 python, what about you?</p>')
-        self.assertEqual('<p>I &lt;3 python...</p>', truncator.words(3, '...', html=True))
+        self.assertEqual('<p>I &lt;3 python…</p>', truncator.words(3, html=True))
+
+        re_tag_catastrophic_test = ('</a' + '\t' * 50000) + '//>'
+        truncator = text.Truncator(re_tag_catastrophic_test)
+        self.assertEqual(re_tag_catastrophic_test, truncator.words(500, html=True))
 
     def test_wrap(self):
         digits = '1234 67 9'
@@ -163,12 +162,6 @@ class TestUtilsText(SimpleTestCase):
         self.assertEqual(text.normalize_newlines(""), "")
         self.assertEqual(text.normalize_newlines(lazystr("abc\ndef\rghi\r\n")), "abc\ndef\nghi\n")
 
-    def test_normalize_newlines_bytes(self):
-        """normalize_newlines should be able to handle bytes too"""
-        normalized = text.normalize_newlines(b"abc\ndef\rghi\r\n")
-        self.assertEqual(normalized, "abc\ndef\nghi\n")
-        self.assertIsInstance(normalized, six.text_type)
-
     def test_phone2numeric(self):
         numeric = text.phone2numeric('0800 flowers')
         self.assertEqual(numeric, '0800 3569377')
@@ -187,6 +180,8 @@ class TestUtilsText(SimpleTestCase):
         )
         for value, output, is_unicode in items:
             self.assertEqual(text.slugify(value, allow_unicode=is_unicode), output)
+        # interning the result may be useful, e.g. when fed to Path.
+        self.assertEqual(sys.intern(text.slugify('a')), 'a')
 
     def test_unescape_entities(self):
         items = [
@@ -221,7 +216,7 @@ class TestUtilsText(SimpleTestCase):
     def test_compress_sequence(self):
         data = [{'key': i} for i in range(10)]
         seq = list(json.JSONEncoder().iterencode(data))
-        seq = [s.encode('utf-8') for s in seq]
+        seq = [s.encode() for s in seq]
         actual_length = len(b''.join(seq))
         out = text.compress_sequence(seq)
         compressed_length = len(b''.join(out))
@@ -242,8 +237,8 @@ class TestUtilsText(SimpleTestCase):
 
         # The format string can be lazy. (string comes from contrib.admin)
         s = format_lazy(
-            ugettext_lazy("Added {name} \"{object}\"."),
+            gettext_lazy("Added {name} \"{object}\"."),
             name='article', object='My first try',
         )
         with override('fr'):
-            self.assertEqual('article «\xa0My first try\xa0» ajouté.', s)
+            self.assertEqual('Ajout de article «\xa0My first try\xa0».', s)

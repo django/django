@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Abraham Estrada <abraham.estrada@gmail.com>, 2011-2012
+# Abraham Estrada, 2011-2012
 # Alex Dzul <alexexc2@gmail.com>, 2015
+# Juan Pablo Flores <juanpflores94@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-12-30 19:27+0000\n"
-"Last-Translator: Alex Dzul <alexexc2@gmail.com>\n"
+"PO-Revision-Date: 2017-09-19 18:03+0000\n"
+"Last-Translator: Juan Pablo Flores <juanpflores94@gmail.com>\n"
 "Language-Team: Spanish (Mexico) (http://www.transifex.com/django/django/"
 "language/es_MX/)\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +20,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Humanize"
-msgstr ""
+msgstr "Humanizar"
 
 msgid "th"
 msgstr "to"
@@ -214,8 +215,8 @@ msgstr "ahora"
 #, python-format
 msgid "a second ago"
 msgid_plural "%(count)s seconds ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "hace un segundo"
+msgstr[1] "Hace %(count)s segundos"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -243,8 +244,8 @@ msgstr "%(delta)s a partir de ahora"
 #, python-format
 msgid "a second from now"
 msgid_plural "%(count)s seconds from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Un segundo desde ahora"
+msgstr[1] "%(count)s desde ahora"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.

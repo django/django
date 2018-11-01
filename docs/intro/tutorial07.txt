@@ -18,8 +18,8 @@ Django the options you want when you register the object.
 Let's see how this works by reordering the fields on the edit form. Replace
 the ``admin.site.register(Question)`` line with:
 
-.. snippet::
-    :filename: polls/admin.py
+.. code-block:: python
+    :caption: polls/admin.py
 
     from django.contrib import admin
 
@@ -47,8 +47,8 @@ of fields, choosing an intuitive order is an important usability detail.
 And speaking of forms with dozens of fields, you might want to split the form
 up into fieldsets:
 
-.. snippet::
-    :filename: polls/admin.py
+.. code-block:: python
+    :caption: polls/admin.py
 
     from django.contrib import admin
 
@@ -81,8 +81,8 @@ Yet.
 There are two ways to solve this problem. The first is to register ``Choice``
 with the admin just as we did with ``Question``. That's easy:
 
-.. snippet::
-    :filename: polls/admin.py
+.. code-block:: python
+    :caption: polls/admin.py
 
     from django.contrib import admin
 
@@ -115,8 +115,8 @@ It'd be better if you could add a bunch of Choices directly when you create the
 Remove the ``register()`` call for the ``Choice`` model. Then, edit the ``Question``
 registration code to read:
 
-.. snippet::
-    :filename: polls/admin.py
+.. code-block:: python
+    :caption: polls/admin.py
 
     from django.contrib import admin
 
@@ -162,8 +162,8 @@ fields for entering related ``Choice`` objects. For that reason, Django offers a
 tabular way of displaying inline related objects; you just need to change
 the ``ChoiceInline`` declaration to read:
 
-.. snippet::
-    :filename: polls/admin.py
+.. code-block:: python
+    :caption: polls/admin.py
 
     class ChoiceInline(admin.TabularInline):
         #...
@@ -194,8 +194,8 @@ more helpful if we could display individual fields. To do that, use the
 tuple of field names to display, as columns, on the change list page for the
 object:
 
-.. snippet::
-    :filename: polls/admin.py
+.. code-block:: python
+    :caption: polls/admin.py
 
     class QuestionAdmin(admin.ModelAdmin):
         # ...
@@ -204,8 +204,8 @@ object:
 Just for good measure, let's also include the ``was_published_recently()``
 method from :doc:`Tutorial 2 </intro/tutorial02>`:
 
-.. snippet::
-    :filename: polls/admin.py
+.. code-block:: python
+    :caption: polls/admin.py
 
     class QuestionAdmin(admin.ModelAdmin):
         # ...
@@ -226,8 +226,8 @@ representation of the output.
 You can improve that by giving that method (in :file:`polls/models.py`) a few
 attributes, as follows:
 
-.. snippet::
-    :filename: polls/models.py
+.. code-block:: python
+    :caption: polls/models.py
 
     class Question(models.Model):
         # ...
@@ -301,8 +301,8 @@ keeping your templates within the project is a good convention to follow.
 Open your settings file (:file:`mysite/settings.py`, remember) and add a
 :setting:`DIRS <TEMPLATES-DIRS>` option in the :setting:`TEMPLATES` setting:
 
-.. snippet::
-    :filename: mysite/settings.py
+.. code-block:: python
+    :caption: mysite/settings.py
 
     TEMPLATES = [
         {
@@ -328,8 +328,8 @@ when loading Django templates; it's a search path.
     Just like the static files, we *could* have all our templates together, in
     one big templates directory, and it would work perfectly well. However,
     templates that belong to a particular application should be placed in that
-    application’s template directory (e.g. ``polls/templates``) rather than the
-    project’s (``templates``). We'll discuss in more detail in the
+    application's template directory (e.g. ``polls/templates``) rather than the
+    project's (``templates``). We'll discuss in more detail in the
     :doc:`reusable apps tutorial </intro/reusable-apps>` *why* we do this.
 
 Now create a directory called ``admin`` inside ``templates``, and copy the
@@ -342,7 +342,7 @@ template directory in the source code of Django itself
     If you have difficulty finding where the Django source files are located
     on your system, run the following command:
 
-    .. code-block:: console
+    .. console::
 
         $ python -c "import django; print(django.__path__)"
 

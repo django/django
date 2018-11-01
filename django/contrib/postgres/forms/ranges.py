@@ -1,11 +1,17 @@
+import warnings
+
 from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange
 
 from django import forms
 from django.core import exceptions
 from django.forms.widgets import MultiWidget
-from django.utils.translation import ugettext_lazy as _
+from django.utils.deprecation import RemovedInDjango31Warning
+from django.utils.translation import gettext_lazy as _
 
-__all__ = ['IntegerRangeField', 'FloatRangeField', 'DateTimeRangeField', 'DateRangeField']
+__all__ = [
+    'BaseRangeField', 'IntegerRangeField', 'DecimalRangeField',
+    'DateTimeRangeField', 'DateRangeField', 'FloatRangeField', 'RangeWidget',
+]
 
 
 class BaseRangeField(forms.MultiValueField):
@@ -21,7 +27,7 @@ class BaseRangeField(forms.MultiValueField):
             kwargs['fields'] = [self.base_field(required=False), self.base_field(required=False)]
         kwargs.setdefault('required', False)
         kwargs.setdefault('require_all_fields', False)
-        super(BaseRangeField, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def prepare_value(self, value):
         lower_base, upper_base = self.fields
@@ -63,10 +69,21 @@ class IntegerRangeField(BaseRangeField):
     range_type = NumericRange
 
 
-class FloatRangeField(BaseRangeField):
+class DecimalRangeField(BaseRangeField):
     default_error_messages = {'invalid': _('Enter two numbers.')}
-    base_field = forms.FloatField
+    base_field = forms.DecimalField
     range_type = NumericRange
+
+
+class FloatRangeField(DecimalRangeField):
+    base_field = forms.FloatField
+
+    def __init__(self, **kwargs):
+        warnings.warn(
+            'FloatRangeField is deprecated in favor of DecimalRangeField.',
+            RemovedInDjango31Warning, stacklevel=2,
+        )
+        super().__init__(**kwargs)
 
 
 class DateTimeRangeField(BaseRangeField):
@@ -84,7 +101,7 @@ class DateRangeField(BaseRangeField):
 class RangeWidget(MultiWidget):
     def __init__(self, base_widget, attrs=None):
         widgets = (base_widget, base_widget)
-        super(RangeWidget, self).__init__(widgets, attrs)
+        super().__init__(widgets, attrs)
 
     def decompress(self, value):
         if value:

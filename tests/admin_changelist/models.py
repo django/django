@@ -1,5 +1,6 @@
+import uuid
+
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
 class Event(models.Model):
@@ -27,15 +28,14 @@ class Band(models.Model):
     genres = models.ManyToManyField(Genre)
 
 
-@python_2_unicode_compatible
 class Musician(models.Model):
     name = models.CharField(max_length=30)
+    age = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.name
 
 
-@python_2_unicode_compatible
 class Group(models.Model):
     name = models.CharField(max_length=30)
     members = models.ManyToManyField(Musician, through='Membership')
@@ -75,6 +75,7 @@ class Invitation(models.Model):
 
 
 class Swallow(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4)
     origin = models.CharField(max_length=255)
     load = models.FloatField()
     speed = models.FloatField()
@@ -97,7 +98,7 @@ class UnorderedObject(models.Model):
 
 class OrderedObjectManager(models.Manager):
     def get_queryset(self):
-        return super(OrderedObjectManager, self).get_queryset().order_by('number')
+        return super().get_queryset().order_by('number')
 
 
 class OrderedObject(models.Model):
@@ -114,3 +115,7 @@ class OrderedObject(models.Model):
 
 class CustomIdUser(models.Model):
     uuid = models.AutoField(primary_key=True)
+
+
+class CharPK(models.Model):
+    char_pk = models.CharField(max_length=100, primary_key=True)

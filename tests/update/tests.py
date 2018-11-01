@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.core.exceptions import FieldError
 from django.db.models import Count, F, Max
 from django.test import TestCase
@@ -17,7 +15,7 @@ class SimpleTest(TestCase):
 
     def test_nonempty_update(self):
         """
-        Test that update changes the right number of rows for a nonempty queryset
+        Update changes the right number of rows for a nonempty queryset
         """
         num_updated = self.a1.b_set.update(y=100)
         self.assertEqual(num_updated, 20)
@@ -26,7 +24,7 @@ class SimpleTest(TestCase):
 
     def test_empty_update(self):
         """
-        Test that update changes the right number of rows for an empty queryset
+        Update changes the right number of rows for an empty queryset
         """
         num_updated = self.a2.b_set.update(y=100)
         self.assertEqual(num_updated, 0)
@@ -35,7 +33,7 @@ class SimpleTest(TestCase):
 
     def test_nonempty_update_with_inheritance(self):
         """
-        Test that update changes the right number of rows for an empty queryset
+        Update changes the right number of rows for an empty queryset
         when the update affects only a base table
         """
         num_updated = self.a1.d_set.update(y=100)
@@ -45,7 +43,7 @@ class SimpleTest(TestCase):
 
     def test_empty_update_with_inheritance(self):
         """
-        Test that update changes the right number of rows for an empty queryset
+        Update changes the right number of rows for an empty queryset
         when the update affects only a base table
         """
         num_updated = self.a2.d_set.update(y=100)
@@ -55,7 +53,7 @@ class SimpleTest(TestCase):
 
     def test_foreign_key_update_with_id(self):
         """
-        Test that update works using <field>_id for foreign keys
+        Update works using <field>_id for foreign keys
         """
         num_updated = self.a1.d_set.update(a_id=self.a2)
         self.assertEqual(num_updated, 20)
@@ -85,8 +83,7 @@ class AdvancedTests(TestCase):
         """
         We can update multiple objects at once.
         """
-        resp = DataPoint.objects.filter(value="banana").update(
-            value="pineapple")
+        resp = DataPoint.objects.filter(value='banana').update(value='pineapple')
         self.assertEqual(resp, 2)
         self.assertEqual(DataPoint.objects.get(name="d2").value, 'pineapple')
 
@@ -125,7 +122,8 @@ class AdvancedTests(TestCase):
         We do not support update on already sliced query sets.
         """
         method = DataPoint.objects.all()[:2].update
-        with self.assertRaises(AssertionError):
+        msg = 'Cannot update a query once a slice has been taken.'
+        with self.assertRaisesMessage(AssertionError, msg):
             method(another_value='another thing')
 
     def test_update_respects_to_field(self):
@@ -140,6 +138,15 @@ class AdvancedTests(TestCase):
         self.assertEqual(bar_qs[0].foo_id, a_foo.target)
         bar_qs.update(foo=b_foo)
         self.assertEqual(bar_qs[0].foo_id, b_foo.target)
+
+    def test_update_m2m_field(self):
+        msg = (
+            'Cannot update model field '
+            '<django.db.models.fields.related.ManyToManyField: m2m_foo> '
+            '(only non-relations and foreign keys permitted).'
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            Bar.objects.update(m2m_foo='whatever')
 
     def test_update_annotated_queryset(self):
         """

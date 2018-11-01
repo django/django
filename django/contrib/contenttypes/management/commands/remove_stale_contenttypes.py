@@ -3,8 +3,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.management import BaseCommand
 from django.db import DEFAULT_DB_ALIAS, router
 from django.db.models.deletion import Collector
-from django.utils import six
-from django.utils.six.moves import input
 
 from ...management import get_contenttypes_and_models
 
@@ -13,12 +11,11 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--noinput', '--no-input',
-            action='store_false', dest='interactive', default=True,
+            '--noinput', '--no-input', action='store_false', dest='interactive',
             help='Tells Django to NOT prompt the user for input of any kind.',
         )
         parser.add_argument(
-            '--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
+            '--database', default=DEFAULT_DB_ALIAS,
             help='Nominates the database to use. Defaults to the "default" database.',
         )
 
@@ -29,10 +26,8 @@ class Command(BaseCommand):
 
         for app_config in apps.get_app_configs():
             content_types, app_models = get_contenttypes_and_models(app_config, db, ContentType)
-            if not app_models:
-                continue
             to_remove = [
-                ct for (model_name, ct) in six.iteritems(content_types)
+                ct for (model_name, ct) in content_types.items()
                 if model_name not in app_models
             ]
             # Confirm that the content type is stale before deletion.
@@ -46,13 +41,12 @@ class Command(BaseCommand):
                         collector.collect([ct])
 
                         for obj_type, objs in collector.data.items():
-                            if objs == {ct}:
-                                continue
-                            ct_info.append('    - %s %s object(s)' % (
-                                len(objs),
-                                obj_type._meta.label,
-                            ))
-                        content_type_display = '\n'.join(ct_info)
+                            if objs != {ct}:
+                                ct_info.append('    - %s %s object(s)' % (
+                                    len(objs),
+                                    obj_type._meta.label,
+                                ))
+                    content_type_display = '\n'.join(ct_info)
                     self.stdout.write("""Some content types in your database are stale and can be deleted.
 Any objects that depend on these content types will also be deleted.
 The content types and dependent objects that would be deleted are:
@@ -66,7 +60,7 @@ Are you sure you want to delete these content types?
 If you're unsure, answer 'no'.\n""" % content_type_display)
                     ok_to_delete = input("Type 'yes' to continue, or 'no' to cancel: ")
                 else:
-                    ok_to_delete = False
+                    ok_to_delete = 'yes'
 
                 if ok_to_delete == 'yes':
                     for ct in to_remove:

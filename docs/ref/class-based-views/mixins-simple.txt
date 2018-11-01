@@ -7,6 +7,17 @@ Simple mixins
 
 .. class:: django.views.generic.base.ContextMixin
 
+    **Attributes**
+
+    .. attribute:: extra_context
+
+        A dictionary to include in the context. This is a convenient way of
+        specifying some simple context in
+        :meth:`~django.views.generic.base.View.as_view`. Example usage::
+
+            from django.views.generic import TemplateView
+            TemplateView.as_view(extra_context={'title': 'Custom Title'})
+
     **Methods**
 
     .. method:: get_context_data(**kwargs)
@@ -15,7 +26,7 @@ Simple mixins
         arguments provided will make up the returned context. Example usage::
 
             def get_context_data(self, **kwargs):
-                context = super(RandomNumberView, self).get_context_data(**kwargs)
+                context = super().get_context_data(**kwargs)
                 context['number'] = random.randrange(1, 100)
                 return context
 

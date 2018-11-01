@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.db.models.query_utils import InvalidQuery
 from django.test import TestCase
 
@@ -8,7 +6,7 @@ from .models import (
 )
 
 
-class AssertionMixin(object):
+class AssertionMixin:
     def assert_delayed(self, obj, num):
         """
         Instances with deferred fields look the same as normal instances when
@@ -190,6 +188,11 @@ class BigChildDeferTests(AssertionMixin, TestCase):
         self.assertEqual(obj.value, "foo")
         self.assertEqual(obj.other, "bar")
 
+    def test_defer_subclass_both(self):
+        # Deferring fields from both superclass and subclass works.
+        obj = BigChild.objects.defer("other", "value").get(name="b1")
+        self.assert_delayed(obj, 2)
+
     def test_only_baseclass_when_subclass_has_added_field(self):
         # You can retrieve a single field on a baseclass
         obj = BigChild.objects.only("name").get(name="b1")
@@ -227,12 +230,10 @@ class TestDefer2(AssertionMixin, TestCase):
         """
         When an inherited model is fetched from the DB, its PK is also fetched.
         When getting the PK of the parent model it is useful to use the already
-        fetched parent model PK if it happens to be available. Tests that this
-        is done.
+        fetched parent model PK if it happens to be available.
         """
         s1 = Secondary.objects.create(first="x1", second="y1")
-        bc = BigChild.objects.create(name="b1", value="foo", related=s1,
-                                     other="bar")
+        bc = BigChild.objects.create(name='b1', value='foo', related=s1, other='bar')
         bc_deferred = BigChild.objects.only('name').get(pk=bc.pk)
         with self.assertNumQueries(0):
             bc_deferred.id

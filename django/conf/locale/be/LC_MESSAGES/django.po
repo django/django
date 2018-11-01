@@ -2,14 +2,14 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2014-2015
-# znotdead <zhirafchik@gmail.com>, 2016
+# znotdead <zhirafchik@gmail.com>, 2016-2017
 # Дмитрий Шатера <mr.bobsans@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-09-15 07:39+0000\n"
+"POT-Creation-Date: 2017-12-01 21:10+0100\n"
+"PO-Revision-Date: 2017-12-02 06:40+0000\n"
 "Last-Translator: znotdead <zhirafchik@gmail.com>\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
@@ -162,6 +162,9 @@ msgstr "Японская"
 msgid "Georgian"
 msgstr "Грузінская"
 
+msgid "Kabyle"
+msgstr "Кабільскі"
+
 msgid "Kazakh"
 msgstr "Казаская"
 
@@ -297,6 +300,15 @@ msgstr "Cтатычныя файлы"
 msgid "Syndication"
 msgstr "Сындыкацыя"
 
+msgid "That page number is not an integer"
+msgstr "Лік гэтай старонкі не з'яўляецца цэлым лікам"
+
+msgid "That page number is less than 1"
+msgstr "Лік старонкі менш чым 1"
+
+msgid "That page contains no results"
+msgstr "Гэтая старонка не мае ніякіх вынікаў"
+
 msgid "Enter a valid value."
 msgstr "Пазначце правільнае значэньне."
 
@@ -309,6 +321,7 @@ msgstr "Увядзіце цэлы лік."
 msgid "Enter a valid email address."
 msgstr "Увядзіце сапраўдны адрас электроннай пошты."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "Бірка можа зьмяшчаць літары, лічбы, знакі падкрэсьліваньня ды злучкі."
@@ -411,6 +424,17 @@ msgstr[0] "Упэўніцеся, што набралі ня болей за %(ma
 msgstr[1] "Упэўніцеся, што набралі ня болей за %(max)s лічбы да коскі."
 msgstr[2] "Упэўніцеся, што набралі ня болей за %(max)s лічбаў да коскі."
 msgstr[3] "Упэўніцеся, што набралі ня болей за %(max)s лічбаў да коскі."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"Пашырэнне файла '%(extension)s' не дапускаецца. Дапушчальныя пашырэння: "
+"'%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
+msgstr "Null сімвалы не дапускаюцца."
 
 msgid "and"
 msgstr "і"
@@ -753,15 +777,15 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Выпраўце зьвесткі, якія паўтараюцца (гл. ніжэй)."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "Вонкавы ключ не супадае з бацькоўскім першасным ключом."
+msgid "The inline value did not match the parent instance."
+msgstr "Убудаванае значэнне не супадае з бацькоўскім значэннем."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Абярыце дазволенае. Абранага няма ў даступных значэньнях."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" мае недапушчальнае значэнне для першаснага ключа."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "\"%(pk)s\" не сапраўднае значэнне"
 
 #, python-format
 msgid ""
@@ -771,14 +795,14 @@ msgstr ""
 "У часавым абсягу «%(current_timezone)s» нельга зразумець дату %(datetime)s: "
 "яна можа быць неадназначнаю або яе можа не існаваць."
 
+msgid "Clear"
+msgstr "Ачысьціць"
+
 msgid "Currently"
 msgstr "Зараз"
 
 msgid "Change"
 msgstr "Зьмяніць"
-
-msgid "Clear"
-msgstr "Ачысьціць"
 
 msgid "Unknown"
 msgstr "Невядома"
@@ -1141,6 +1165,19 @@ msgstr ""
 "злучэнняў, ці для 'same-origin' запытаў."
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+"Калі вы выкарыстоўваеце <meta name=\"referrer\" content=\"no-referrer\"> тэг "
+"ці дадалі загаловак 'Referrer-Policy: no-referrer', калі ласка выдаліце іх. "
+"CSRF абароне неабходны 'Referer' загаловак для строгай праверкі. Калі Вы "
+"турбуецеся аб прыватнасці, выкарыстоўвайце альтэрнатывы, напрыклад <a rel="
+"\"noreferrer\" ...>, для спасылкі на сайты трэціх асоб."
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1159,32 +1196,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "Больш падрабязная інфармацыя даступная з DEBUG=True."
 
-msgid "Welcome to Django"
-msgstr "Вітаем у Django"
-
-msgid "It worked!"
-msgstr "Гэта спрацавала!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Віншуем Вас з першай старонкай на базе Django."
-
-msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
-msgstr ""
-"Канешне вы не зрабілі яшчэ ніякай работы. Далей, пачніце вашу першую "
-"праграму выканаўшы <code>python manage.py startapp [app_label]</code>."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Вы бачыце гэта паведамленне, таму што вы маеце <code>DEBUG = True</code> у "
-"вашым файлу настройцы Django і вы не сканфігуравалі ніякіх спасылак URL. За "
-"працу!"
-
 msgid "No year specified"
 msgstr "Не пазначылі год"
+
+msgid "Date out of range"
+msgstr "Дата выходзіць за межы дыяпазону"
 
 msgid "No month specified"
 msgstr "Не пазначылі месяц"
@@ -1239,3 +1255,47 @@ msgstr "Шлях «%(path)s» не існуе."
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Файлы каталёґа «%(directory)s»"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Джанга: Web рамкі для перфекцыяністаў з крайнімі тэрмінамі."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Паглядзець <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/"
+"\" target=\"_blank\" rel=\"noopener\">заўвагі да выпуску</a> для Джангі "
+"%(version)s"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Усталяванне прайшло паспяхова! Віншаванні!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"Вы бачыце гэту старонку таму што <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True </a> у вашым файле налад і вы не сканфігурыравалі ніякіх URL."
+
+msgid "Django Documentation"
+msgstr "Дакументацыя Джангі"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr "Тэмы, спасылкі, &amp; як зрабіць"
+
+msgid "Tutorial: A Polling App"
+msgstr "Падручнік: Дадатак для галасавання"
+
+msgid "Get started with Django"
+msgstr "Пачніце з Джангаю"
+
+msgid "Django Community"
+msgstr "Джанга супольнасць"
+
+msgid "Connect, get help, or contribute"
+msgstr "Злучайцеся, атрымлівайце дапамогу, ці спрыяйце"

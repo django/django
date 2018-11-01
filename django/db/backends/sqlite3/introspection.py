@@ -1,14 +1,11 @@
 import re
-import warnings
-from collections import namedtuple
 
 from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo, TableInfo,
 )
-from django.utils.deprecation import RemovedInDjango21Warning
+from django.db.models.indexes import Index
 
 field_size_re = re.compile(r'^\s*(?:var)?char\s*\(\s*(\d+)\s*\)\s*$')
-FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('default',))
 
 
 def get_field_size(name):
@@ -20,7 +17,7 @@ def get_field_size(name):
 # This light wrapper "fakes" a dictionary interface, because some SQLite data
 # types include variables in them -- e.g. "varchar(30)" -- and can't be matched
 # as a simple dictionary lookup.
-class FlexibleFieldLookupDict(object):
+class FlexibleFieldLookupDict:
     # Maps SQL types to Django Field types. Some of the SQL types have multiple
     # entries here because SQLite allows for anything and doesn't normalize the
     # field type; it uses whatever was given.
@@ -59,9 +56,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     data_types_reverse = FlexibleFieldLookupDict()
 
     def get_table_list(self, cursor):
-        """
-        Returns a list of table and view names in the current database.
-        """
+        """Return a list of table and view names in the current database."""
         # Skip the sqlite_sequence system table used for autoincrement key
         # generation.
         cursor.execute("""
@@ -71,7 +66,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         return [TableInfo(row[0], row[1][0]) for row in cursor.fetchall()]
 
     def get_table_description(self, cursor, table_name):
-        "Returns a description of the table, with the DB-API cursor.description interface."
+        """
+        Return a description of the table with the DB-API cursor.description
+        interface.
+        """
         return [
             FieldInfo(
                 info['name'],
@@ -85,20 +83,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             ) for info in self._table_info(cursor, table_name)
         ]
 
-    def column_name_converter(self, name):
-        """
-        SQLite will in some cases, e.g. when returning columns from views and
-        subselects, return column names in 'alias."column"' format instead of
-        simply 'column'.
-
-        Affects SQLite < 3.7.15, fixed by http://www.sqlite.org/src/info/5526e0aa3c
-        """
-        # TODO: remove when SQLite < 3.7.15 is sufficiently old.
-        # 3.7.13 ships in Debian stable as of 2014-03-21.
-        if self.connection.Database.sqlite_version_info < (3, 7, 15):
-            return name.split('.')[-1].strip('"')
-        else:
-            return name
+    def get_sequences(self, cursor, table_name, table_fields=()):
+        pk_col = self.get_primary_key_column(cursor, table_name)
+        return [{'table': table_name, 'column': pk_col}]
 
     def get_relations(self, cursor, table_name):
         """
@@ -109,13 +96,16 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         relations = {}
 
         # Schema for this table
-        cursor.execute("SELECT sql FROM sqlite_master WHERE tbl_name = %s AND type = %s", [table_name, "table"])
-        try:
-            results = cursor.fetchone()[0].strip()
-        except TypeError:
+        cursor.execute(
+            "SELECT sql, type FROM sqlite_master "
+            "WHERE tbl_name = %s AND type IN ('table', 'view')",
+            [table_name]
+        )
+        create_sql, table_type = cursor.fetchone()
+        if table_type == 'view':
             # It might be a view, then no results will be returned
             return relations
-        results = results[results.index('(') + 1:results.rindex(')')]
+        results = create_sql[create_sql.index('(') + 1:create_sql.rindex(')')]
 
         # Walk through and look for references to other tables. SQLite doesn't
         # really have enforced references, but since it echoes out the SQL used
@@ -132,7 +122,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
             if field_desc.startswith("FOREIGN KEY"):
                 # Find name of the target FK field
-                m = re.match(r'FOREIGN KEY\(([^\)]*)\).*', field_desc, re.I)
+                m = re.match(r'FOREIGN KEY\s*\(([^\)]*)\).*', field_desc, re.I)
                 field_name = m.groups()[0].strip('"')
             else:
                 field_name = field_desc.split()[0].strip('"')
@@ -157,8 +147,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_key_columns(self, cursor, table_name):
         """
-        Returns a list of (column_name, referenced_table_name, referenced_column_name) for all
-        key columns in given table.
+        Return a list of (column_name, referenced_table_name, referenced_column_name)
+        for all key columns in given table.
         """
         key_columns = []
 
@@ -184,45 +174,27 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
         return key_columns
 
-    def get_indexes(self, cursor, table_name):
-        warnings.warn(
-            "get_indexes() is deprecated in favor of get_constraints().",
-            RemovedInDjango21Warning, stacklevel=2
-        )
-        indexes = {}
-        for info in self._table_info(cursor, table_name):
-            if info['pk'] != 0:
-                indexes[info['name']] = {'primary_key': True,
-                                         'unique': False}
-        cursor.execute('PRAGMA index_list(%s)' % self.connection.ops.quote_name(table_name))
-        # seq, name, unique
-        for index, unique in [(field[1], field[2]) for field in cursor.fetchall()]:
-            cursor.execute('PRAGMA index_info(%s)' % self.connection.ops.quote_name(index))
-            info = cursor.fetchall()
-            # Skip indexes across multiple fields
-            if len(info) != 1:
-                continue
-            name = info[0][2]  # seqno, cid, name
-            indexes[name] = {'primary_key': indexes.get(name, {}).get("primary_key", False),
-                             'unique': unique}
-        return indexes
-
     def get_primary_key_column(self, cursor, table_name):
-        """
-        Get the column name of the primary key for the given table.
-        """
+        """Return the column name of the primary key for the given table."""
         # Don't use PRAGMA because that causes issues with some transactions
-        cursor.execute("SELECT sql FROM sqlite_master WHERE tbl_name = %s AND type = %s", [table_name, "table"])
+        cursor.execute(
+            "SELECT sql, type FROM sqlite_master "
+            "WHERE tbl_name = %s AND type IN ('table', 'view')",
+            [table_name]
+        )
         row = cursor.fetchone()
         if row is None:
             raise ValueError("Table %s does not exist" % table_name)
-        results = row[0].strip()
-        results = results[results.index('(') + 1:results.rindex(')')]
-        for field_desc in results.split(','):
+        create_sql, table_type = row
+        if table_type == 'view':
+            # Views don't have a primary key.
+            return None
+        fields_sql = create_sql[create_sql.index('(') + 1:create_sql.rindex(')')]
+        for field_desc in fields_sql.split(','):
             field_desc = field_desc.strip()
-            m = re.search('"(.*)".*PRIMARY KEY( AUTOINCREMENT)?', field_desc)
+            m = re.match(r'(?:(?:["`\[])(.*)(?:["`\]])|(\w+)).*PRIMARY KEY.*', field_desc)
             if m:
-                return m.groups()[0]
+                return m.group(1) if m.group(1) else m.group(2)
         return None
 
     def _table_info(self, cursor, name):
@@ -237,11 +209,54 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             'pk': field[5],  # undocumented
         } for field in cursor.fetchall()]
 
+    def _get_foreign_key_constraints(self, cursor, table_name):
+        constraints = {}
+        cursor.execute('PRAGMA foreign_key_list(%s)' % self.connection.ops.quote_name(table_name))
+        for row in cursor.fetchall():
+            # Remaining on_update/on_delete/match values are of no interest.
+            id_, _, table, from_, to = row[:5]
+            constraints['fk_%d' % id_] = {
+                'columns': [from_],
+                'primary_key': False,
+                'unique': False,
+                'foreign_key': (table, to),
+                'check': False,
+                'index': False,
+            }
+        return constraints
+
     def get_constraints(self, cursor, table_name):
         """
-        Retrieves any constraints or keys (unique, pk, fk, check, index) across one or more columns.
+        Retrieve any constraints or keys (unique, pk, fk, check, index) across
+        one or more columns.
         """
         constraints = {}
+        # Find inline check constraints.
+        try:
+            table_schema = cursor.execute(
+                "SELECT sql FROM sqlite_master WHERE type='table' and name=%s" % (
+                    self.connection.ops.quote_name(table_name),
+                )
+            ).fetchone()[0]
+        except TypeError:
+            # table_name is a view.
+            pass
+        else:
+            fields_with_check_constraints = [
+                schema_row.strip().split(' ')[0][1:-1]
+                for schema_row in table_schema.split(',')
+                if schema_row.find('CHECK') >= 0
+            ]
+            for field_name in fields_with_check_constraints:
+                # An arbitrary made up name.
+                constraints['__check__%s' % field_name] = {
+                    'columns': [field_name],
+                    'primary_key': False,
+                    'unique': False,
+                    'foreign_key': False,
+                    'check': True,
+                    'index': False,
+                }
         # Get the index info
         cursor.execute("PRAGMA index_list(%s)" % self.connection.ops.quote_name(table_name))
         for row in cursor.fetchall():
@@ -264,7 +279,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             # Add type and column orders for indexes
             if constraints[index]['index'] and not constraints[index]['unique']:
                 # SQLite doesn't support any index type other than b-tree
-                constraints[index]['type'] = 'btree'
+                constraints[index]['type'] = Index.suffix
                 cursor.execute(
                     "SELECT sql FROM sqlite_master "
                     "WHERE type='index' AND name=%s" % self.connection.ops.quote_name(index)
@@ -290,4 +305,5 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 "check": False,
                 "index": False,
             }
+        constraints.update(self._get_foreign_key_constraints(cursor, table_name))
         return constraints

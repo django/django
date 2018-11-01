@@ -1,14 +1,11 @@
 """
 Tests for F() query expression syntax.
 """
-
-from __future__ import unicode_literals
+import uuid
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Employee(models.Model):
     firstname = models.CharField(max_length=50)
     lastname = models.CharField(max_length=50)
@@ -18,7 +15,6 @@ class Employee(models.Model):
         return '%s %s' % (self.firstname, self.lastname)
 
 
-@python_2_unicode_compatible
 class Company(models.Model):
     name = models.CharField(max_length=100)
     num_employees = models.PositiveIntegerField()
@@ -26,18 +22,19 @@ class Company(models.Model):
     ceo = models.ForeignKey(
         Employee,
         models.CASCADE,
-        related_name='company_ceo_set')
+        related_name='company_ceo_set',
+    )
     point_of_contact = models.ForeignKey(
         Employee,
         models.SET_NULL,
         related_name='company_point_of_contact_set',
-        null=True)
+        null=True,
+    )
 
     def __str__(self):
         return self.name
 
 
-@python_2_unicode_compatible
 class Number(models.Model):
     integer = models.BigIntegerField(db_column='the_integer')
     float = models.FloatField(null=True, db_column='the_float')
@@ -55,13 +52,13 @@ class Experiment(models.Model):
     end = models.DateTimeField()
 
     class Meta:
+        db_table = 'expressions_ExPeRiMeNt'
         ordering = ('name',)
 
     def duration(self):
         return self.end - self.start
 
 
-@python_2_unicode_compatible
 class Result(models.Model):
     experiment = models.ForeignKey(Experiment, models.CASCADE)
     result_time = models.DateTimeField()
@@ -70,7 +67,6 @@ class Result(models.Model):
         return "Result at %s" % self.result_time
 
 
-@python_2_unicode_compatible
 class Time(models.Model):
     time = models.TimeField(null=True)
 
@@ -78,7 +74,6 @@ class Time(models.Model):
         return "%s" % self.time
 
 
-@python_2_unicode_compatible
 class SimulationRun(models.Model):
     start = models.ForeignKey(Time, models.CASCADE, null=True, related_name='+')
     end = models.ForeignKey(Time, models.CASCADE, null=True, related_name='+')
@@ -88,9 +83,13 @@ class SimulationRun(models.Model):
         return "%s (%s to %s)" % (self.midpoint, self.start, self.end)
 
 
-@python_2_unicode_compatible
+class UUIDPK(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+
+
 class UUID(models.Model):
     uuid = models.UUIDField(null=True)
+    uuid_fk = models.ForeignKey(UUIDPK, models.CASCADE, null=True)
 
     def __str__(self):
         return "%s" % self.uuid

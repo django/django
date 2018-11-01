@@ -6,8 +6,8 @@ Cookbook [1] (licensed under the Python Software License) and a ctypes port by
 Anatoly Techtonik for Roundup [2] (license [3]).
 
 [1] http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/65203
-[2] http://sourceforge.net/p/roundup/code/ci/default/tree/roundup/backends/portalocker.py
-[3] http://sourceforge.net/p/roundup/code/ci/default/tree/COPYING.txt
+[2] https://sourceforge.net/p/roundup/code/ci/default/tree/roundup/backends/portalocker.py
+[3] https://sourceforge.net/p/roundup/code/ci/default/tree/COPYING.txt
 
 Example Usage::
 
@@ -106,8 +106,8 @@ else:
     else:
         def lock(f, flags):
             ret = fcntl.flock(_fd(f), flags)
-            return (ret == 0)
+            return ret == 0
 
         def unlock(f):
             ret = fcntl.flock(_fd(f), fcntl.LOCK_UN)
-            return (ret == 0)
+            return ret == 0

@@ -1,10 +1,7 @@
-# -*- encoding: utf-8 -*-
 # This file is distributed under the same license as the Django package.
 #
-from __future__ import unicode_literals
-
 # The *_FORMAT strings use the Django date format syntax,
-# see http://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
+# see https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
 DATE_FORMAT = 'Y年n月j日'                # 2016年9月5日
 TIME_FORMAT = 'H:i'                     # 20:45
 DATETIME_FORMAT = 'Y年n月j日 H:i'        # 2016年9月5日 20:45
@@ -15,7 +12,7 @@ SHORT_DATETIME_FORMAT = 'Y年n月j日 H:i'  # 2016年9月5日 20:45
 FIRST_DAY_OF_WEEK = 1                   # 星期一 (Monday)
 
 # The *_INPUT_FORMATS strings use the Python strftime format syntax,
-# see http://docs.python.org/library/datetime.html#strftime-strptime-behavior
+# see https://docs.python.org/library/datetime.html#strftime-strptime-behavior
 DATE_INPUT_FORMATS = [
     '%Y/%m/%d',     # '2016/09/05'
     '%Y-%m-%d',     # '2016-09-05'

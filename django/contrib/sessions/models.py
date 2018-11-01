@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.contrib.sessions.base_session import (
     AbstractBaseSession, BaseSessionManager,
 )

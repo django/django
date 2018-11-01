@@ -1,25 +1,20 @@
-from __future__ import unicode_literals
-
+import functools
 import gzip
-import os
 import re
 from difflib import SequenceMatcher
+from pathlib import Path
 
 from django.conf import settings
 from django.core.exceptions import (
     FieldDoesNotExist, ImproperlyConfigured, ValidationError,
 )
-from django.utils import lru_cache
-from django.utils._os import upath
-from django.utils.encoding import force_text
 from django.utils.functional import lazy
-from django.utils.html import format_html
+from django.utils.html import format_html, format_html_join
 from django.utils.module_loading import import_string
-from django.utils.six import string_types, text_type
-from django.utils.translation import ugettext as _, ungettext
+from django.utils.translation import gettext as _, ngettext
 
 
-@lru_cache.lru_cache(maxsize=None)
+@functools.lru_cache(maxsize=None)
 def get_default_password_validators():
     return get_password_validators(settings.AUTH_PASSWORD_VALIDATORS)
 
@@ -86,12 +81,14 @@ def _password_validators_help_text_html(password_validators=None):
     in an <ul>.
     """
     help_texts = password_validators_help_texts(password_validators)
-    help_items = [format_html('<li>{}</li>', help_text) for help_text in help_texts]
-    return '<ul>%s</ul>' % ''.join(help_items) if help_items else ''
-password_validators_help_text_html = lazy(_password_validators_help_text_html, text_type)
+    help_items = format_html_join('', '<li>{}</li>', ((help_text,) for help_text in help_texts))
+    return format_html('<ul>{}</ul>', help_items) if help_items else ''
 
 
-class MinimumLengthValidator(object):
+password_validators_help_text_html = lazy(_password_validators_help_text_html, str)
+
+
+class MinimumLengthValidator:
     """
     Validate whether the password is of a minimum length.
     """
@@ -101,7 +98,7 @@ class MinimumLengthValidator(object):
     def validate(self, password, user=None):
         if len(password) < self.min_length:
             raise ValidationError(
-                ungettext(
+                ngettext(
                     "This password is too short. It must contain at least %(min_length)d character.",
                     "This password is too short. It must contain at least %(min_length)d characters.",
                     self.min_length
@@ -111,14 +108,14 @@ class MinimumLengthValidator(object):
             )
 
     def get_help_text(self):
-        return ungettext(
+        return ngettext(
             "Your password must contain at least %(min_length)d character.",
             "Your password must contain at least %(min_length)d characters.",
             self.min_length
         ) % {'min_length': self.min_length}
 
 
-class UserAttributeSimilarityValidator(object):
+class UserAttributeSimilarityValidator:
     """
     Validate whether the password is sufficiently different from the user's
     attributes.
@@ -141,13 +138,13 @@ class UserAttributeSimilarityValidator(object):
 
         for attribute_name in self.user_attributes:
             value = getattr(user, attribute_name, None)
-            if not value or not isinstance(value, string_types):
+            if not value or not isinstance(value, str):
                 continue
             value_parts = re.split(r'\W+', value) + [value]
             for value_part in value_parts:
-                if SequenceMatcher(a=password.lower(), b=value_part.lower()).quick_ratio() > self.max_similarity:
+                if SequenceMatcher(a=password.lower(), b=value_part.lower()).quick_ratio() >= self.max_similarity:
                     try:
-                        verbose_name = force_text(user._meta.get_field(attribute_name).verbose_name)
+                        verbose_name = str(user._meta.get_field(attribute_name).verbose_name)
                     except FieldDoesNotExist:
                         verbose_name = attribute_name
                     raise ValidationError(
@@ -160,24 +157,22 @@ class UserAttributeSimilarityValidator(object):
         return _("Your password can't be too similar to your other personal information.")
 
 
-class CommonPasswordValidator(object):
+class CommonPasswordValidator:
     """
     Validate whether the password is a common password.
 
     The password is rejected if it occurs in a provided list, which may be gzipped.
-    The list Django ships with contains 1000 common passwords, created by Mark Burnett:
-    https://xato.net/passwords/more-top-worst-passwords/
+    The list Django ships with contains 20000 common passwords, created by
+    Royce Williams: https://gist.github.com/roycewilliams/281ce539915a947a23db17137d91aeb7
     """
-    DEFAULT_PASSWORD_LIST_PATH = os.path.join(
-        os.path.dirname(os.path.realpath(upath(__file__))), 'common-passwords.txt.gz'
-    )
+    DEFAULT_PASSWORD_LIST_PATH = Path(__file__).resolve().parent / 'common-passwords.txt.gz'
 
     def __init__(self, password_list_path=DEFAULT_PASSWORD_LIST_PATH):
         try:
-            with gzip.open(password_list_path) as f:
-                common_passwords_lines = f.read().decode('utf-8').splitlines()
+            with gzip.open(str(password_list_path)) as f:
+                common_passwords_lines = f.read().decode().splitlines()
         except IOError:
-            with open(password_list_path) as f:
+            with open(str(password_list_path)) as f:
                 common_passwords_lines = f.readlines()
 
         self.passwords = {p.strip() for p in common_passwords_lines}
@@ -193,7 +188,7 @@ class CommonPasswordValidator(object):
         return _("Your password can't be a commonly used password.")
 
 
-class NumericPasswordValidator(object):
+class NumericPasswordValidator:
     """
     Validate whether the password is alphanumeric.
     """

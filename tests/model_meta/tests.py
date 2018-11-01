@@ -162,7 +162,7 @@ class PrivateFieldsTests(OptionsBaseTests):
     def test_private_fields(self):
         for model, expected_names in TEST_RESULTS['private_fields'].items():
             objects = model._meta.private_fields
-            self.assertEqual(sorted([f.name for f in objects]), sorted(expected_names))
+            self.assertEqual(sorted(f.name for f in objects), sorted(expected_names))
 
 
 class GetFieldByNameTests(OptionsBaseTests):
@@ -243,8 +243,8 @@ class RelationTreeTests(SimpleTestCase):
     def test_relations_related_objects(self):
         # Testing non hidden related objects
         self.assertEqual(
-            sorted([field.related_query_name() for field in Relation._meta._relation_tree
-                   if not field.remote_field.field.remote_field.is_hidden()]),
+            sorted(field.related_query_name() for field in Relation._meta._relation_tree
+                   if not field.remote_field.field.remote_field.is_hidden()),
             sorted([
                 'fk_abstract_rel', 'fk_base_rel', 'fk_concrete_rel', 'fo_abstract_rel',
                 'fo_base_rel', 'fo_concrete_rel', 'm2m_abstract_rel',
@@ -253,7 +253,7 @@ class RelationTreeTests(SimpleTestCase):
         )
         # Testing hidden related objects
         self.assertEqual(
-            sorted([field.related_query_name() for field in BasePerson._meta._relation_tree]),
+            sorted(field.related_query_name() for field in BasePerson._meta._relation_tree),
             sorted([
                 '+', '_relating_basepeople_hidden_+', 'BasePerson_following_abstract+',
                 'BasePerson_following_abstract+', 'BasePerson_following_base+', 'BasePerson_following_base+',
@@ -272,3 +272,10 @@ class ParentListTests(SimpleTestCase):
         self.assertEqual(FirstParent._meta.get_parent_list(), [CommonAncestor])
         self.assertEqual(SecondParent._meta.get_parent_list(), [CommonAncestor])
         self.assertEqual(Child._meta.get_parent_list(), [FirstParent, SecondParent, CommonAncestor])
+
+
+class PropertyNamesTests(SimpleTestCase):
+    def test_person(self):
+        # Instance only descriptors don't appear in _property_names.
+        self.assertEqual(AbstractPerson().test_instance_only_descriptor, 1)
+        self.assertEqual(AbstractPerson._meta._property_names, frozenset(['pk', 'test_property']))

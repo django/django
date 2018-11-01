@@ -21,6 +21,7 @@ class Topology(GEOSFuncFactory):
 # Topology Routines
 geos_boundary = Topology('GEOSBoundary')
 geos_buffer = Topology('GEOSBuffer', argtypes=[GEOM_PTR, c_double, c_int])
+geos_bufferwithstyle = Topology('GEOSBufferWithStyle', argtypes=[GEOM_PTR, c_double, c_int, c_int, c_int, c_double])
 geos_centroid = Topology('GEOSGetCentroid')
 geos_convexhull = Topology('GEOSConvexHull')
 geos_difference = Topology('GEOSDifference', argtypes=[GEOM_PTR, GEOM_PTR])
@@ -33,7 +34,6 @@ geos_simplify = Topology('GEOSSimplify', argtypes=[GEOM_PTR, c_double])
 geos_symdifference = Topology('GEOSSymDifference', argtypes=[GEOM_PTR, GEOM_PTR])
 geos_union = Topology('GEOSUnion', argtypes=[GEOM_PTR, GEOM_PTR])
 
-geos_cascaded_union = GEOSFuncFactory('GEOSUnionCascaded', argtypes=[GEOM_PTR], restype=GEOM_PTR)
 geos_unary_union = GEOSFuncFactory('GEOSUnaryUnion', argtypes=[GEOM_PTR], restype=GEOM_PTR)
 
 # GEOSRelate returns a string, not a geometry.

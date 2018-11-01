@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 11:20+0000\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
+"PO-Revision-Date: 2017-09-23 18:54+0000\n"
 "Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
@@ -102,26 +102,8 @@ msgstr ""
 "Bir eylem seçtiniz, fakat bireysel alanlar üzerinde hiçbir değişiklik "
 "yapmadınız. Muhtemelen Kaydet düğmesi yerine Git düğmesini arıyorsunuz."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Not: Sunucu saatinin %s saat ilerisindesiniz."
-msgstr[1] "Not: Sunucu saatinin %s saat ilerisindesiniz."
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Not: Sunucu saatinin %s saat gerisindesiniz."
-msgstr[1] "Not: Sunucu saatinin %s saat gerisindesiniz."
-
 msgid "Now"
 msgstr "Şimdi"
-
-msgid "Choose a Time"
-msgstr "Bir Saat Seçin"
-
-msgid "Choose a time"
-msgstr "Bir saat seçin"
 
 msgid "Midnight"
 msgstr "Geceyarısı"
@@ -134,6 +116,24 @@ msgstr "Öğle"
 
 msgid "6 p.m."
 msgstr "6 ö.s."
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Not: Sunucu saatinin %s saat ilerisindesiniz."
+msgstr[1] "Not: Sunucu saatinin %s saat ilerisindesiniz."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Not: Sunucu saatinin %s saat gerisindesiniz."
+msgstr[1] "Not: Sunucu saatinin %s saat gerisindesiniz."
+
+msgid "Choose a Time"
+msgstr "Bir Saat Seçin"
+
+msgid "Choose a time"
+msgstr "Bir saat seçin"
 
 msgid "Cancel"
 msgstr "İptal"
