@@ -33,6 +33,7 @@ class Book(models.Model):
     date_registered = models.DateField(null=True)
     # This field name is intentionally 2 characters long (#16080).
     no = models.IntegerField(verbose_name='number', blank=True, null=True)
+    description = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -48,13 +49,10 @@ class Department(models.Model):
 
 class Employee(models.Model):
     department = models.ForeignKey(Department, models.CASCADE, to_field="code")
-    name = models.CharField(max_length=100, blank=True)
+    name = models.CharField(max_length=100)
 
     def __str__(self):
-        if self.name:
-            return self.name
-        else:
-            return "Anonymous %d" % self.id
+        return self.name
 
 
 class TaggedItem(models.Model):

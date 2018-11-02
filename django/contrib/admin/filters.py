@@ -425,22 +425,26 @@ class RelatedOnlyFieldListFilter(RelatedFieldListFilter):
 class BlankFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         self.lookup_kwarg = '%s__blank' % field_path
-        self.lookup_val = request.GET.get(self.lookup_kwarg)
+        self.lookup_val = params.get(self.lookup_kwarg)
         super().__init__(field, request, params, model, model_admin, field_path)
 
     def queryset(self, request, queryset):
-        if self.lookup_kwarg not in self.used_parameters:
+        if not self.used_parameters or self.lookup_kwarg not in self.used_parameters:
             return queryset
 
-        kwargs = {self.field_path: ''}
-        blank = self.used_parameters.get(self.lookup_kwarg)
-        if blank == '1':
-            return queryset.filter(**kwargs)
-        elif blank == '0':
-            return queryset.exclude(**kwargs)
-        else:
-            raise IncorrectLookupParameters(
-                "Invalid 'blank' filter value: %r" % blank)
+        del (self.used_parameters[self.lookup_kwarg])
+        blank = True if self.lookup_val == '1' else False
+
+        if not isinstance(self.field, models.CharField):
+            self.used_parameters['%s__isnull' % self.field_path] = blank
+            return super().queryset(request, queryset)
+
+        self.used_parameters['%s__isnull' % self.field_path] = True
+        # A blank CharField can be None or an empty string ('')
+        lookup_condition = models.Q(**self.used_parameters) | models.Q(**{self.field_path: ''})
+        if blank:
+            return queryset.filter(lookup_condition)
+        return queryset.exclude(lookup_condition)
 
     def expected_parameters(self):
         return [self.lookup_kwarg]

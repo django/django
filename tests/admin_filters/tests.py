@@ -190,6 +190,13 @@ class BookAdminRelatedOnlyFilter(ModelAdmin):
     ordering = ('-id',)
 
 
+class BookAdminWithBlankFieldListFilter(BookAdmin):
+    list_filter = (
+        ('author', BlankFieldListFilter),
+        ('description', BlankFieldListFilter),
+    )
+
+
 class DecadeFilterBookAdmin(ModelAdmin):
     list_filter = ('author', DecadeListFilterWithTitleAndParameter)
     ordering = ('-id',)
@@ -230,12 +237,6 @@ class DecadeFilterBookAdminParameterEndsWith__Isnull(ModelAdmin):
 class EmployeeAdmin(ModelAdmin):
     list_display = ['name', 'department']
     list_filter = ['department']
-
-
-class EmployeeAdminWithBlankFilter(BookAdmin):
-    list_filter = [
-        ('name', BlankFieldListFilter),
-    ]
 
 
 class DepartmentFilterEmployeeAdmin(EmployeeAdmin):
@@ -1261,42 +1262,48 @@ class ListFiltersTests(TestCase):
         self.assertEqual(changelist.full_result_count, 4)
 
     def test_blanklistfieldfilter(self):
-        anon_designer = Employee.objects.create(department=self.design)
-        anon_dev = Employee.objects.create(department=self.dev)
+        modeladmin = BookAdminWithBlankFieldListFilter(Book, site)
 
-        modeladmin = EmployeeAdminWithBlankFilter(Employee, site)
-        request = self.request_factory.get('/')
+        # Blank Field (not a CharField)
+        request = self.request_factory.get('/', {'author__blank': '1'})
+        request.user = self.alfred
         changelist = modeladmin.get_changelist_instance(request)
-
-        request = self.request_factory.get('/', {'name__blank': 0})
-        changelist = modeladmin.get_changelist_instance(request)
-
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.jack, self.john])
-
+        self.assertListEqual(list(queryset), [self.guitar_book])
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][0]
-        self.assertEqual(filterspec.title, 'name')
-        choice = select_by(filterspec.choices(changelist), "display", "Not blank")
-        self.assertIs(choice['selected'], True)
-        self.assertEqual(choice['query_string'], '?name__blank=0')
-
-        request = self.request_factory.get('/', {'name__blank': 1})
-        changelist = modeladmin.get_changelist_instance(request)
-
-        # Make sure the correct queryset is returned
-        queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [anon_dev, anon_designer])
-
-        # Make sure the correct choice is selected
-        filterspec = changelist.get_filters(request)[0][0]
-        self.assertEqual(filterspec.title, 'name')
+        self.assertEqual(filterspec.title, 'Verbose Author')
         choice = select_by(filterspec.choices(changelist), "display", "Blank")
         self.assertIs(choice['selected'], True)
-        self.assertEqual(choice['query_string'], '?name__blank=1')
+        self.assertEqual(choice['query_string'], '?author__blank=1')
 
-        # Test invalid value:
-        request = self.request_factory.get('/', {'name__blank': 'a'})
-        with self.assertRaises(IncorrectLookupParameters):
-            modeladmin.get_changelist_instance(request)
+        # Not blank Field (Not a CharField)
+        request = self.request_factory.get('/', {'author__blank': '0'})
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        # Make sure the correct queryset is returned
+        queryset = changelist.get_queryset(request)
+        self.assertListEqual(list(queryset), [self.django_book, self.bio_book, self.djangonaut_book])
+        # Make sure the correct choice is selected
+        filterspec = changelist.get_filters(request)[0][0]
+        self.assertEqual(filterspec.title, 'Verbose Author')
+        choice = select_by(filterspec.choices(changelist), "display", "Not blank")
+        self.assertIs(choice['selected'], True)
+        self.assertEqual(choice['query_string'], '?author__blank=0')
+
+        # Blank CharField
+        request = self.request_factory.get('/', {'description__blank': '1'})
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        # Make sure the correct queryset is returned
+        queryset = changelist.get_queryset(request)
+        self.assertListEqual(list(queryset), [self.django_book, self.bio_book, self.djangonaut_book])
+
+        # Not blank CharField
+        request = self.request_factory.get('/', {'description__blank': '0'})
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        # Make sure the correct queryset is returned
+        queryset = changelist.get_queryset(request)
+        self.assertListEqual(list(queryset), [self.guitar_book])
