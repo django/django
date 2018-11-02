@@ -227,10 +227,6 @@ You'll see the following output on the command line::
     Starting development server at http://127.0.0.1:8000/
     Quit the server with CONTROL-C.
 
-.. note::
-    Ignore the warning about unapplied database migrations.
-    We won't be using a database in this tutorial.
-
 Go to http://127.0.0.1:8000/chat/ in your browser and you should see the text
 "What chat room would you like to enter?" along with a text input to provide a
 room name.
