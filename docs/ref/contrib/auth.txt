@@ -628,6 +628,16 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
    users because :attr:`~RemoteUserBackend.user_can_authenticate` always
    returns ``True``.
 
+.. class:: DefaultObjectPermissionsBackend
+
+   .. versionadded:: 2.2
+
+   The default auth backend, :class:`ModelBackend`, unconditionally returns
+   ``False`` if :meth:`~django.contrib.auth.models.User.has_perm` is passed an
+   object. In some cases this is unexpected. Use this backend to make
+   :ref:`object permissions <object_permissions>` a superset of global
+   permissions.
+
 Utility functions
 =================
 

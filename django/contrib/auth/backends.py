@@ -172,3 +172,27 @@ class RemoteUserBackend(ModelBackend):
 class AllowAllUsersRemoteUserBackend(RemoteUserBackend):
     def user_can_authenticate(self, user):
         return True
+
+
+class DefaultObjectPermissionsBackend:
+    """
+    Include all global permissions if an object is passed.
+    """
+
+    def authenticate(self, username, password):
+        return None
+
+    def get_group_permissions(self, user, obj=None):
+        if obj is None:
+            return set()
+        return user.get_group_permissions()
+
+    def get_all_permissions(self, user, obj=None):
+        if obj is None:
+            return set()
+        return user.get_all_permissions()
+
+    def has_perm(self, user, perm, obj=None):
+        if obj is None:
+            return False
+        return user.has_perm(perm)
