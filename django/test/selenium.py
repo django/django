@@ -2,9 +2,6 @@ import sys
 import unittest
 from contextlib import contextmanager
 
-from selenium import webdriver
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-
 from django.test import LiveServerTestCase, tag
 from django.utils.decorators import classproperty
 from django.utils.module_loading import import_string
@@ -67,10 +64,12 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
 
     @classmethod
     def get_capability(cls, browser):
+        from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
         return getattr(DesiredCapabilities, browser.upper())
 
     def create_webdriver(self):
         if self.selenium_hub:
+            from selenium import webdriver
             return webdriver.Remote(
                 command_executor=self.selenium_hub,
                 desired_capabilities=self.get_capability(self.browser),
