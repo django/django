@@ -422,9 +422,9 @@ class RelatedOnlyFieldListFilter(RelatedFieldListFilter):
         return field.get_choices(include_blank=False, limit_choices_to={'pk__in': pk_qs})
 
 
-class BlankFieldListFilter(FieldListFilter):
+class EmptyFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
-        self.lookup_kwarg = '%s__blank' % field_path
+        self.lookup_kwarg = '%s__empty' % field_path
         self.lookup_val = params.get(self.lookup_kwarg)
         super().__init__(field, request, params, model, model_admin, field_path)
 
@@ -433,16 +433,15 @@ class BlankFieldListFilter(FieldListFilter):
             return queryset
 
         del (self.used_parameters[self.lookup_kwarg])
-        blank = True if self.lookup_val == '1' else False
+        empty = True if self.lookup_val == '1' else False
 
-        if not isinstance(self.field, models.CharField):
-            self.used_parameters['%s__isnull' % self.field_path] = blank
+        if not self.field.empty_strings_allowed:
+            self.used_parameters['%s__isnull' % self.field_path] = empty
             return super().queryset(request, queryset)
 
-        self.used_parameters['%s__isnull' % self.field_path] = True
-        # A blank CharField can be None or an empty string ('')
-        lookup_condition = models.Q(**self.used_parameters) | models.Q(**{self.field_path: ''})
-        if blank:
+        # Special case for fields allowing empty strings
+        lookup_condition = models.Q(**{'%s__isnull' % self.field_path: True}) | models.Q(**{self.field_path: ''})
+        if empty:
             return queryset.filter(lookup_condition)
         return queryset.exclude(lookup_condition)
 
@@ -452,8 +451,8 @@ class BlankFieldListFilter(FieldListFilter):
     def choices(self, changelist):
         for lookup, title in (
                 (None, _('All')),
-                ('1', _('Blank')),
-                ('0', _('Not blank'))):
+                ('1', _('Empty')),
+                ('0', _('Not empty'))):
             yield {
                 'selected':
                     self.lookup_val == lookup,

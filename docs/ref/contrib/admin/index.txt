@@ -972,12 +972,12 @@ subclass::
       limit the ``list_filter`` choices to the users who have written a book
       instead of listing all users.
 
-      Or you can filter out objects with a blank (or non-blank) field value
-      using ``BlankFieldListFilter``::
+      Or you can filter out objects with an empty (or non-empty) field value
+      using ``EmptyFieldListFilter``::
 
           class BookAdmin(admin.ModelAdmin):
               list_filter = (
-                  ('author', admin.BlankFieldListFilter),
+                  ('author', admin.EmptyFieldListFilter),
               )
 
       .. note::
