@@ -343,10 +343,8 @@ Conditionally enabling or disabling actions
     This returns a dictionary of actions allowed. The keys are action names, and
     the values are ``(function, name, short_description)`` tuples.
 
-    Most of the time you'll use this method to conditionally remove actions from
-    the list gathered by the superclass. For example, if I only wanted users
-    whose names begin with 'J' to be able to delete objects in bulk, I could do
-    the following::
+    For example, if you only want users whose names begin with 'J' to be able
+    to delete objects in bulk::
 
         class MyModelAdmin(admin.ModelAdmin):
             ...

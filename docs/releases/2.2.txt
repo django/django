@@ -293,6 +293,27 @@ Database backend API
 * Third party database backends must implement support for partial indexes or
   set ``DatabaseFeatures.supports_partial_indexes`` to ``False``.
 
+Admin actions are no longer collected from base ``ModelAdmin`` classes
+----------------------------------------------------------------------
+
+For example, in older versions of Django::
+
+    from django.contrib import admin
+
+    class BaseAdmin(admin.ModelAdmin):
+        actions = ['a']
+
+    class SubAdmin(BaseAdmin):
+        actions = ['b']
+
+``SubAdmin`` will have actions ``'a'`` and ``'b'``.
+
+Now ``actions`` follows standard Python inheritance. To get the same result as
+before::
+
+    class SubAdmin(BaseAdmin):
+        actions = BaseAdmin.actions + ['b']
+
 :mod:`django.contrib.gis`
 -------------------------
 

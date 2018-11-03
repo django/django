@@ -859,13 +859,8 @@ class ModelAdmin(BaseModelAdmin):
         for (name, func) in self.admin_site.actions:
             description = getattr(func, 'short_description', name.replace('_', ' '))
             actions.append((func, name, description))
-
-        # Then gather them from the model admin and all parent classes,
-        # starting with self and working back up.
-        for klass in self.__class__.mro()[::-1]:
-            class_actions = getattr(klass, 'actions', []) or []
-            actions.extend(self.get_action(action) for action in class_actions)
-
+        # Add actions from this ModelAdmin.
+        actions.extend(self.get_action(action) for action in self.actions or [])
         # get_action might have returned None, so filter any of those out.
         return filter(None, actions)
 
