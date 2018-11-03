@@ -255,6 +255,8 @@ authenticated users do not.
 Do not forget to test for the ``is_active`` attribute of the user in your own
 backend permission methods.
 
+.. _object_permissions:
+
 Handling object permissions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

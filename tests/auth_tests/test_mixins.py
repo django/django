@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import (
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, TestCase, override_settings
 from django.views.generic import View
 
 
@@ -44,6 +44,15 @@ class StackedMixinsView1(LoginRequiredMixin, PermissionRequiredMixin, EmptyRespo
 class StackedMixinsView2(PermissionRequiredMixin, LoginRequiredMixin, EmptyResponseView):
     permission_required = ['auth_tests.add_customuser', 'auth_tests.change_customuser']
     raise_exception = True
+
+
+class CustomAuthBackend:
+    def authenticate(self, username, password):
+        return None
+
+    def has_perm(self, user, perm, obj=None):
+        if obj:
+            return True
 
 
 class AccessMixinTests(TestCase):
@@ -264,6 +273,33 @@ class PermissionsRequiredMixinTests(TestCase):
         request.user = AnonymousUser()
         resp = AView.as_view()(request)
         self.assertEqual(resp.status_code, 302)
+
+    def test_object_permission_denied(self):
+        class AView(PermissionRequiredMixin, EmptyResponseView):
+            permission_required = 'auth_tests.add_customuser'
+
+            def get_permission_object(self):
+                return object()
+
+        request = self.factory.get('/rand')
+        request.user = self.user
+        with self.assertRaises(PermissionDenied):
+            AView.as_view()(request)
+
+    @override_settings(AUTHENTICATION_BACKENDS=(
+        'django.contrib.auth.backends.ModelBackend',
+        'auth_tests.test_mixins.CustomAuthBackend'))
+    def test_object_permission_pass_with_custom_backend(self):
+        class AView(PermissionRequiredMixin, EmptyResponseView):
+            permission_required = 'auth_tests.add_customuser'
+
+            def get_permission_object(self):
+                return object()
+
+        request = self.factory.get('/rand')
+        request.user = self.user
+        resp = AView.as_view()(request)
+        self.assertEqual(resp.status_code, 200)
 
     def test_permissioned_denied_exception_raised(self):
         class AView(PermissionRequiredMixin, EmptyResponseView):

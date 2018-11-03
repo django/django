@@ -754,12 +754,20 @@ To apply permission checks to :doc:`class-based views
         the ``permission_required`` attribute, converted to a tuple if
         necessary.
 
+    .. method:: get_permission_object()
+
+        .. versionadded:: 2.2
+
+        Returns the object that is used for checking :ref:`object permissions
+        <object_permissions>`. Defaults to ``None``.
+
     .. method:: has_permission()
 
         Returns a boolean denoting whether the current user has permission to
         execute the decorated view. By default, this returns the result of
         calling :meth:`~django.contrib.auth.models.User.has_perms()` with the
-        list of permissions returned by :meth:`get_permission_required()`.
+        list of permissions returned by :meth:`get_permission_required()` and
+        the object returned by :meth:`get_permission_object()`.
 
 Redirecting unauthorized requests in class-based views
 ------------------------------------------------------
