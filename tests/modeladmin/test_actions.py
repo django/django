@@ -55,3 +55,27 @@ class AdminActionsTests(TestCase):
                 mock_request.user = user
                 actions = ma.get_actions(mock_request)
                 self.assertEqual(list(actions.keys()), expected)
+
+    def test_actions_mro(self):
+        class AdminBase(admin.ModelAdmin):
+            actions = ['base_action']
+
+            def base_action(modeladmin, request, queryset):
+                pass
+
+        class NoCustomAction(AdminBase):
+            pass
+
+        class WithCustomAction(AdminBase):
+            actions = ['custom_action']
+
+            def custom_action(modeladmin, request, queryset):
+                pass
+
+        ma = NoCustomAction(Band, admin.AdminSite())
+        action_names = [a[1] for a in ma._get_base_actions()]
+        self.assertEqual(action_names, ['delete_selected', 'base_action'])
+
+        ma = WithCustomAction(Band, admin.AdminSite())
+        action_names = [a[1] for a in ma._get_base_actions()]
+        self.assertEqual(action_names, ['delete_selected', 'base_action', 'custom_action'])

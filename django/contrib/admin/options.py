@@ -863,7 +863,8 @@ class ModelAdmin(BaseModelAdmin):
         # Then gather them from the model admin and all parent classes,
         # starting with self and working back up.
         for klass in self.__class__.mro()[::-1]:
-            class_actions = getattr(klass, 'actions', []) or []
+            # Access __dict__ directly to avoid walking MRO twice.
+            class_actions = klass.__dict__.get('actions', []) or []
             actions.extend(self.get_action(action) for action in class_actions)
 
         # get_action might have returned None, so filter any of those out.
