@@ -233,6 +233,7 @@ class IsSameDomainTests(unittest.TestCase):
             ('example2.com', 'example.com'),
             ('foo.example.com', 'example.com'),
             ('example.com:9999', 'example.com:8888'),
+            ('foo.example.com:8888', ''),
         ):
             self.assertIs(is_same_domain(*pair), False)
 
@@ -275,6 +276,10 @@ class HttpDateProcessingTests(unittest.TestCase):
     def test_parsing_asctime(self):
         parsed = parse_http_date('Sun Nov  6 08:49:37 1994')
         self.assertEqual(datetime.utcfromtimestamp(parsed), datetime(1994, 11, 6, 8, 49, 37))
+
+    def test_parsing_year_less_than_70(self):
+        parsed = parse_http_date('Sun Nov  6 08:49:37 0050')
+        self.assertEqual(datetime.utcfromtimestamp(parsed), datetime(2050, 11, 6, 8, 49, 37))
 
 
 class EscapeLeadingSlashesTests(unittest.TestCase):
