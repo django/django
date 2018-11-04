@@ -74,11 +74,23 @@ class WSGIServer(simple_server.WSGIServer):
 
 class ThreadedWSGIServer(socketserver.ThreadingMixIn, WSGIServer):
     """A threaded version of the WSGIServer"""
-    pass
+    daemon_threads = True
 
 
 class ServerHandler(simple_server.ServerHandler):
     http_version = '1.1'
+
+    def cleanup_headers(self):
+        super().cleanup_headers()
+        # HTTP/1.1 requires us to support persistent connections, so
+        # explicitly send close if we do not know the content length to
+        # prevent clients from reusing the connection.
+        if 'Content-Length' not in self.headers:
+            self.headers['Connection'] = 'close'
+        # Mark the connection for closing if we set it as such above or
+        # if the application sent the header.
+        if self.headers.get('Connection') == 'close':
+            self.request_handler.close_connection = True
 
     def handle_error(self):
         # Ignore broken pipe errors, otherwise pass on
@@ -135,6 +147,16 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
         return super().get_environ()
 
     def handle(self):
+        self.close_connection = True
+        self.handle_one_request()
+        while not self.close_connection:
+            self.handle_one_request()
+        try:
+            self.connection.shutdown(socket.SHUT_WR)
+        except (socket.error, AttributeError):
+            pass
+
+    def handle_one_request(self):
         """Copy of WSGIRequestHandler.handle() but with different ServerHandler"""
         self.raw_requestline = self.rfile.readline(65537)
         if len(self.raw_requestline) > 65536:
@@ -150,7 +172,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
         handler = ServerHandler(
             self.rfile, self.wfile, self.get_stderr(), self.get_environ()
         )
-        handler.request_handler = self      # backpointer for logging
+        handler.request_handler = self      # backpointer for logging & connection closing
         handler.run(self.server.get_app())
 
 
