@@ -315,12 +315,6 @@ END;
     def return_insert_id(self):
         return "RETURNING %s INTO %%s", (InsertIdVar(),)
 
-    def savepoint_create_sql(self, sid):
-        return "SAVEPOINT " + self.quote_name(sid)
-
-    def savepoint_rollback_sql(self, sid):
-        return "ROLLBACK TO SAVEPOINT " + self.quote_name(sid)
-
     def _foreign_key_constraints(self, table_name, recursive=False):
         with self.connection.cursor() as cursor:
             if recursive:
