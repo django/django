@@ -1,12 +1,16 @@
 from urllib.request import urlopen
 
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 
 from .models import Person
 
 
 def example_view(request):
     return HttpResponse('example view')
+
+
+def streaming_example_view(request):
+    return StreamingHttpResponse((b'I', b'am', b'a', b'stream'))
 
 
 def model_view(request):

@@ -4,8 +4,7 @@ Tests for django.core.servers.
 import errno
 import os
 import socket
-import sys
-from http.client import HTTPConnection, RemoteDisconnected
+from http.client import HTTPConnection
 from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import urlopen
@@ -57,29 +56,60 @@ class LiveServerViews(LiveServerBase):
         with self.urlopen('/example_view/') as f:
             self.assertEqual(f.version, 11)
 
-    @override_settings(MIDDLEWARE=[])
     def test_closes_connection_without_content_length(self):
         """
-        The server doesn't support keep-alive because Python's http.server
-        module that it uses hangs if a Content-Length header isn't set (for
-        example, if CommonMiddleware isn't enabled or if the response is a
-        StreamingHttpResponse) (#28440 / https://bugs.python.org/issue31076).
+        A HTTP 1.1 server is supposed to support keep-alive. Since our
+        development server is rather simple we support it only in cases where
+        we can detect a content length from the response. This should be doable
+        for all simple views and streaming responses where an iterable with
+        length of one is passed. The latter follows as result of `set_content_length`
+        from https://github.com/python/cpython/blob/master/Lib/wsgiref/handlers.py.
+
+        If we cannot detect a content length we explicitly set the `Connection`
+        header to `close` to notify the client that we do not actually support
+        it.
         """
         conn = HTTPConnection(LiveServerViews.server_thread.host, LiveServerViews.server_thread.port, timeout=1)
         try:
-            conn.request('GET', '/example_view/', headers={'Connection': 'keep-alive'})
-            response = conn.getresponse().read()
-            conn.request('GET', '/example_view/', headers={'Connection': 'close'})
-            # macOS may give ConnectionResetError.
-            with self.assertRaises((RemoteDisconnected, ConnectionResetError)):
-                try:
-                    conn.getresponse()
-                except ConnectionAbortedError:
-                    if sys.platform == 'win32':
-                        self.skipTest('Ignore nondeterministic failure on Windows.')
+            conn.request('GET', '/streaming_example_view/', headers={'Connection': 'keep-alive'})
+            response = conn.getresponse()
+            self.assertTrue(response.will_close)
+            self.assertEqual(response.read(), b'Iamastream')
+            self.assertEqual(response.status, 200)
+            self.assertEqual(response.getheader('Connection'), 'close')
+
+            conn.request('GET', '/streaming_example_view/', headers={'Connection': 'close'})
+            response = conn.getresponse()
+            self.assertTrue(response.will_close)
+            self.assertEqual(response.read(), b'Iamastream')
+            self.assertEqual(response.status, 200)
+            self.assertEqual(response.getheader('Connection'), 'close')
         finally:
             conn.close()
-        self.assertEqual(response, b'example view')
+
+    def test_keep_alive_on_connection_with_content_length(self):
+        """
+        See `test_closes_connection_without_content_length` for details. This
+        is a follow up test, which ensure that we do not close the connection
+        if not needed, hence allowing us to take advantage of keep-alive.
+        """
+        conn = HTTPConnection(LiveServerViews.server_thread.host, LiveServerViews.server_thread.port)
+        try:
+            conn.request('GET', '/example_view/', headers={"Connection": "keep-alive"})
+            response = conn.getresponse()
+            self.assertFalse(response.will_close)
+            self.assertEqual(response.read(), b'example view')
+            self.assertEqual(response.status, 200)
+            self.assertIsNone(response.getheader('Connection'))
+
+            conn.request('GET', '/example_view/', headers={"Connection": "close"})
+            response = conn.getresponse()
+            self.assertFalse(response.will_close)
+            self.assertEqual(response.read(), b'example view')
+            self.assertEqual(response.status, 200)
+            self.assertIsNone(response.getheader('Connection'))
+        finally:
+            conn.close()
 
     def test_404(self):
         with self.assertRaises(HTTPError) as err:
