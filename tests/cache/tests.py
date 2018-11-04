@@ -1,6 +1,7 @@
 # Unit tests for cache framework
 # Uses whatever cache backend is set in the test settings file.
 import copy
+import hashlib
 import io
 import os
 import pickle
@@ -9,7 +10,6 @@ import shutil
 import tempfile
 import threading
 import time
-import hashlib
 import unittest
 from unittest import mock
 
