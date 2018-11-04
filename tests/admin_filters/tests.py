@@ -741,6 +741,43 @@ class ListFiltersTests(TestCase):
         expected = [(self.alfred.pk, 'alfred'), (self.bob.pk, 'bob')]
         self.assertEqual(sorted(filterspec.lookup_choices), sorted(expected))
 
+    def test_relatedonlyfieldlistfilter_foreignkey_reverse_relationships(self):
+        class EmployeeAdminReverseRelationship(ModelAdmin):
+            list_filter = (
+                ('book', RelatedOnlyFieldListFilter),
+            )
+
+        self.djangonaut_book.employee = self.john
+        self.djangonaut_book.save()
+        self.django_book.employee = self.jack
+        self.django_book.save()
+
+        modeladmin = EmployeeAdminReverseRelationship(Employee, site)
+        request = self.request_factory.get('/')
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        filterspec = changelist.get_filters(request)[0][0]
+        self.assertEqual(filterspec.lookup_choices, [
+            (self.djangonaut_book.pk, 'Djangonaut: an art of living'),
+            (self.django_book.pk, 'The Django Book'),
+        ])
+
+    def test_relatedonlyfieldlistfilter_manytomany_reverse_relationships(self):
+        class UserAdminReverseRelationship(ModelAdmin):
+            list_filter = (
+                ('books_contributed', RelatedOnlyFieldListFilter),
+            )
+
+        modeladmin = UserAdminReverseRelationship(User, site)
+        request = self.request_factory.get('/')
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        filterspec = changelist.get_filters(request)[0][0]
+        self.assertEqual(
+            filterspec.lookup_choices,
+            [(self.guitar_book.pk, 'Guitar for dummies')],
+        )
+
     def test_relatedonlyfieldlistfilter_foreignkey_ordering(self):
         """RelatedOnlyFieldListFilter ordering respects ModelAdmin.ordering."""
         class EmployeeAdminWithOrdering(ModelAdmin):
