@@ -2310,28 +2310,32 @@ class TestMakeTemplateFragmentKey(SimpleTestCase):
     def test_without_vary_on(self):
         key = make_template_fragment_key('a.fragment')
         if is_fips_mode():
-            self.assertEqual(key, 'template.cache.a.fragment.e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855')
+            self.assertEqual(
+                key, 'template.cache.a.fragment.e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855')
         else:
             self.assertEqual(key, 'template.cache.a.fragment.d41d8cd98f00b204e9800998ecf8427e')
 
     def test_with_one_vary_on(self):
         key = make_template_fragment_key('foo', ['abc'])
         if is_fips_mode():
-            self.assertEqual(key, 'template.cache.foo.ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad')
+            self.assertEqual(
+                key, 'template.cache.foo.ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad')
         else:
             self.assertEqual(key, 'template.cache.foo.900150983cd24fb0d6963f7d28e17f72')
 
     def test_with_many_vary_on(self):
         key = make_template_fragment_key('bar', ['abc', 'def'])
         if is_fips_mode():
-            self.assertEqual(key, 'template.cache.bar.ec5952851b8051e1ecf6b6076d99d05646cd90a9f293c17250105742b9e4a19e')
+            self.assertEqual(
+                key, 'template.cache.bar.ec5952851b8051e1ecf6b6076d99d05646cd90a9f293c17250105742b9e4a19e')
         else:
             self.assertEqual(key, 'template.cache.bar.4b35f12ab03cec09beec4c21b2d2fa88')
 
     def test_proper_escaping(self):
         key = make_template_fragment_key('spam', ['abc:def%'])
         if is_fips_mode():
-            self.assertEqual(key, 'template.cache.spam.7b1ef69067d8402226ee6e85f2d7d42bb30cc178678019b2d1c45b310ed88447')
+            self.assertEqual(
+                key, 'template.cache.spam.7b1ef69067d8402226ee6e85f2d7d42bb30cc178678019b2d1c45b310ed88447')
         else:
             self.assertEqual(key, 'template.cache.spam.f27688177baec990cdf3fbd9d9c3f469')
 
