@@ -96,12 +96,12 @@ def get_test_modules():
         SUBDIRS_TO_SKIP.append('gis_tests')
 
     for modpath, dirpath in discovery_paths:
-        for f in os.listdir(dirpath):
-            if ('.' not in f and
-                    os.path.basename(f) not in SUBDIRS_TO_SKIP and
-                    not os.path.isfile(f) and
-                    os.path.exists(os.path.join(dirpath, f, '__init__.py'))):
-                modules.append((modpath, f))
+        for f in os.scandir(dirpath):
+            if ('.' not in f.name and
+                    os.path.basename(f.name) not in SUBDIRS_TO_SKIP and
+                    not f.is_file() and
+                    os.path.exists(os.path.join(f.path, '__init__.py'))):
+                modules.append((modpath, f.name))
     return modules
 
 
