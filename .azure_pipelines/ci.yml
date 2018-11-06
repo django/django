@@ -1,0 +1,86 @@
+#################
+# Azure Pipelines
+#################
+
+jobs:
+######################
+- job: Django
+######################
+
+  strategy:
+    matrix:
+      'SQLite Python 3.5':
+        PYTHON_VERSION: '3.5'
+        COMPOSE_SERVICE: sqlite
+      'Postgres Python 3.5':
+        PYTHON_VERSION: '3.5'
+        COMPOSE_SERVICE: postgres
+      'MySQL Python 3.5':
+        PYTHON_VERSION: '3.5'
+        COMPOSE_SERVICE: mysql
+      'MariaDB Python 3.5':
+        PYTHON_VERSION: '3.5'
+        COMPOSE_SERVICE: mariadb
+      'SQLite Python 3.6':
+        PYTHON_VERSION: '3.6'
+        COMPOSE_SERVICE: sqlite
+      'Postgres Python 3.6':
+        PYTHON_VERSION: '3.6'
+        COMPOSE_SERVICE: postgres
+      'MySQL Python 3.6':
+        PYTHON_VERSION: '3.6'
+        COMPOSE_SERVICE: mysql
+      'MariaDB Python 3.6':
+        PYTHON_VERSION: '3.6'
+        COMPOSE_SERVICE: mariadb
+      'SQLite Python 3.7':
+        PYTHON_VERSION: '3.7'
+        COMPOSE_SERVICE: sqlite
+      'Postgres Python 3.7':
+        PYTHON_VERSION: '3.7'
+        COMPOSE_SERVICE: postgres
+      'MySQL Python 3.7':
+        PYTHON_VERSION: '3.7'
+        COMPOSE_SERVICE: mysql
+      'MariaDB Python 3.7':
+        PYTHON_VERSION: '3.7'
+        COMPOSE_SERVICE: mariadb
+
+  pool:
+    vmImage: ubuntu-16.04
+
+  variables:
+    DJANGO_PATH: $(Build.SourcesDirectory)
+
+  steps:
+  - template: steps.yml
+
+######################
+- job: Utilities
+######################
+
+  pool:
+    vmImage: ubuntu-16.04
+
+  variables:
+    DJANGO_PATH: $(Build.SourcesDirectory)
+    PYTHON_VERSION: '3.6'
+
+  steps:
+  - script: git clone https://github.com/orf/django-docker-box.git
+    displayName: Get Django-Docker-Box
+    workingDirectory: $(Build.SourcesDirectory)
+
+  - script: |
+      docker-compose pull docs
+      docker-compose pull flake8
+    displayName: Get images
+    workingDirectory: $(Build.SourcesDirectory)/django-docker-box
+
+  - script: docker-compose run --rm docs
+    displayName: Run docs
+    workingDirectory: $(Build.SourcesDirectory)/django-docker-box
+
+  - script: docker-compose run --rm flake8
+    displayName: Run flake8
+    workingDirectory: $(Build.SourcesDirectory)/django-docker-box

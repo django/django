@@ -1,0 +1,24 @@
+steps:
+- script: git clone https://github.com/orf/django-docker-box.git
+  displayName: Get Django-Docker-Box
+  workingDirectory: $(Build.SourcesDirectory)
+
+- bash: |
+    docker-compose pull --include-deps $(COMPOSE_SERVICE)
+  displayName: Get $(COMPOSE_SERVICE) image
+  workingDirectory: $(Build.SourcesDirectory)/django-docker-box
+
+- bash: |
+    mkdir $TEST_RESULTS_DIR
+    chmod a+rw $TEST_RESULTS_DIR
+    docker-compose run -v$TEST_RESULTS_DIR:/tests/results $(COMPOSE_SERVICE) --noinput
+  displayName: Run tests
+  workingDirectory: $(Build.SourcesDirectory)/django-docker-box
+  env:
+    TEST_RESULTS_DIR: $(Build.SourcesDirectory)/results
+
+- task: PublishTestResults@2
+  inputs:
+    testResultsFiles: "**/TEST-*.xml"
+    testRunTitle: '$(COMPOSE_SERVICE) Python $(PYTHON_VERSION)'
+  displayName: Publish test results
