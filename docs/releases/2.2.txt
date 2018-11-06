@@ -257,6 +257,9 @@ Tests
   serialization of list and tuple ``data`` when
   ``content_type='application/json'``.
 
+* The new :setting:`ORACLE_MANAGED_FILES <TEST_ORACLE_MANAGED_FILES>` test
+  database setting allows using Oracle Managed Files (OMF) tablespaces.
+
 URLs
 ~~~~
 
