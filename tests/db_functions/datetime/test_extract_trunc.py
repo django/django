@@ -1113,3 +1113,58 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
 
         qs = DTModel.objects.filter(start_datetime__date=Trunc('start_datetime', 'day', output_field=DateField()))
         self.assertEqual(qs.count(), 2)
+
+    def _create_truncday_data(self, tzinfo):
+        """
+        Creates dtmodel rows where the start_datetime represents the dt below, and
+        the end_datetime represents the truncated day in the given timezone
+        """
+        datetimes = [
+            datetime(2018, 10, 24, 7, 4, tzinfo=pytz.utc),
+            datetime(2018, 10, 24, 5, 13, tzinfo=pytz.utc),
+            datetime(2018, 10, 24, 8, 56, tzinfo=pytz.utc),
+            datetime(2018, 10, 24, 13, 49, tzinfo=pytz.utc),
+            datetime(2018, 10, 24, 15, 33, tzinfo=pytz.utc),
+            datetime(2018, 10, 24, 18, 29, tzinfo=pytz.utc),
+            datetime(2018, 10, 24, 19, 12, tzinfo=pytz.utc),
+            datetime(2018, 10, 24, 21, 37, tzinfo=pytz.utc),
+            datetime(2018, 10, 24, 22, 9, tzinfo=pytz.utc),
+            datetime(2018, 10, 24, 23, 23, tzinfo=pytz.utc),
+        ]
+        objects = [
+            DTModel(
+                name=str(dt),
+                start_datetime=dt,
+                end_datetime=truncate_to(dt, 'day', tzinfo)
+            ) for dt in datetimes
+        ]
+        DTModel.objects.bulk_create(objects)
+
+
+    def test_trunc_day_match(self):
+        """
+        Test that result of database level day truncation matches python level day truncation
+        """
+        euberlin = pytz.timezone('Europe/Berlin')
+        self._create_truncday_data(euberlin)
+        # Make sure that the truncation at the database level matches the truncation at the python level
+        queryset = DTModel.objects.annotate(
+            day=TruncDay('start_datetime', tzinfo=euberlin)
+        )
+        for dtmodel in queryset:
+            self.assertEqual(dtmodel.day, dtmodel.end_datetime)
+
+    def test_trunc_day_filter(self):
+        """
+        Test that timezone.make_aware can be used for filtering
+        """
+        euberlin = pytz.timezone('Europe/Berlin')
+        self._create_truncday_data(euberlin)
+        # Make sure that the truncation at the database level matches the truncation at the python level
+        queryset = DTModel.objects.annotate(
+            day=TruncDay('start_datetime', tzinfo=euberlin)
+        ).filter(
+            day=timezone.make_aware(datetime(2018, 10, 24), euberlin)
+        )
+        count = len(queryset)
+        self.assertGreater(count, 0)
