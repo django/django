@@ -120,7 +120,6 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             domain=self.domain,
             localedir=localedir,
             languages=[self.__locale],
-            codeset='utf-8',
             fallback=use_null_fallback,
         )
 
