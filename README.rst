@@ -2,32 +2,31 @@ Django is a high-level Python Web framework that encourages rapid development
 and clean, pragmatic design. Thanks for checking it out.
 
 All documentation is in the "``docs``" directory and online at
-https://docs.djangoproject.com/en/stable/. If you're just getting started,
-here's how we recommend you read the docs:
+https://docs.djangoproject.com/en/stable/. To get started reading the documents is highly recommended:
 
 * First, read ``docs/intro/install.txt`` for instructions on installing Django.
 
 * Next, work through the tutorials in order (``docs/intro/tutorial01.txt``,
   ``docs/intro/tutorial02.txt``, etc.).
 
-* If you want to set up an actual deployment server, read
+* To set up an actual deployment server, read
   ``docs/howto/deployment/index.txt`` for instructions.
 
-* You'll probably want to read through the topical guides (in ``docs/topics``)
-  next; from there you can jump to the HOWTOs (in ``docs/howto``) for specific
-  problems, and check out the reference (``docs/ref``) for gory details.
+* Read through the topical guides (in ``docs/topics``)
+  from there you can jump to the HOWTOs (in ``docs/howto``) for specific
+  problems, and check out the reference (``docs/ref``) for more details.
 
 * See ``docs/README`` for instructions on building an HTML version of the docs.
 
-Docs are updated rigorously. If you find any problems in the docs, or think
-they should be clarified in any way, please take 30 seconds to fill out a
+Docs are updated rigorously. If there are any problems in the docs, or something
+needs to be clarified in any way, please take 30 seconds to fill out a
 ticket here: https://code.djangoproject.com/newticket
 
 To get more help:
 
-* Join the ``#django`` channel on irc.freenode.net. Lots of helpful people hang out
+* Join the ``#django`` channel on irc.freenode.net. Many helpful people can be found
   there. Read the archives at https://botbot.me/freenode/django/. See
-  https://en.wikipedia.org/wiki/Wikipedia:IRC/Tutorial if you're new to IRC.
+  https://en.wikipedia.org/wiki/Wikipedia:IRC/Tutorial for new users of IRC.
 
 * Join the django-users mailing list, or read the archives, at
   https://groups.google.com/group/django-users.
