@@ -187,14 +187,11 @@ def naturalday(value, arg=None):
     present day return representing string. Otherwise, return a string
     formatted according to settings.DATE_FORMAT.
     """
+    tzinfo = getattr(value, 'tzinfo', None)
     try:
-        tzinfo = getattr(value, 'tzinfo', None)
         value = date(value.year, value.month, value.day)
     except AttributeError:
         # Passed value wasn't a date object
-        return value
-    except ValueError:
-        # Date arguments out of range
         return value
     today = datetime.now(tzinfo).date()
     delta = value - today
