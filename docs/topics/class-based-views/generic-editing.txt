@@ -238,6 +238,12 @@ works for AJAX requests as well as 'normal' form POSTs::
         Mixin to add AJAX support to a form.
         Must be used with an object-based FormView (e.g. CreateView)
         """
+        def get_success_url(self):
+            if self.request.is_ajax():
+                return None
+            else:
+                return super().get_success_url()
+
         def form_invalid(self, form):
             response = super().form_invalid(form)
             if self.request.is_ajax():
