@@ -359,8 +359,8 @@ Writing the code for your ticket
 
 Next we'll be adding the ``make_toast()`` function.
 
-Navigate to the ``django/`` folder and open the ``shortcuts.py`` file.
-Add the bottom, add the function::
+Navigate to the ``django/`` folder and open the ``shortcuts.py`` file. At the
+bottom, add::
 
     def make_toast():
         return 'toast'
