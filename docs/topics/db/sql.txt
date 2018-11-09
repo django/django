@@ -4,14 +4,27 @@ Performing raw SQL queries
 
 .. currentmodule:: django.db.models
 
-When the :doc:`model query APIs </topics/db/queries>` don't go far enough, you
-can fall back to writing raw SQL. Django gives you two ways of performing raw
-SQL queries: you can use :meth:`Manager.raw()` to `perform raw queries and
-return model instances`__, or you can avoid the model layer entirely and
-`execute custom SQL directly`__.
+Django gives you two ways of performing raw SQL queries: you can use
+:meth:`Manager.raw()` to `perform raw queries and return model instances`__, or
+you can avoid the model layer entirely and `execute custom SQL directly`__.
 
 __ `performing raw queries`_
 __ `executing custom SQL directly`_
+
+.. admonition:: Explore the ORM before using raw SQL!
+
+    The Django ORM provides many tools to express queries without writing raw
+    SQL. For example:
+
+    * The :doc:`QuerySet API </ref/models/querysets>` is extensive.
+    * You can :meth:`annotate <.QuerySet.annotate>` and :doc:`aggregate
+      </topics/db/aggregation>` using many built-in :doc:`database functions
+      </ref/models/database-functions>`. Beyond those, you can create
+      :doc:`custom query expressions </ref/models/expressions/>`.
+
+    Before using raw SQL, explore :doc:`the ORM </topics/db/index>`. Ask on
+    |django-users| or the `#django IRC channel
+    <irc://irc.freenode.net/django>`_ to see if the ORM supports your use case.
 
 .. warning::
 
@@ -173,6 +186,9 @@ of people with their ages calculated by the database::
     John is 37.
     Jane is 42.
     ...
+
+You can often avoid using raw SQL to compute annotations by instead using a
+:ref:`Func() expression <func-expressions>`.
 
 __ https://www.postgresql.org/docs/current/static/functions-datetime.html
 
