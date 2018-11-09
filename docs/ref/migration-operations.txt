@@ -240,8 +240,7 @@ partial indexes.
 
 ``sql``, and ``reverse_sql`` if provided, should be strings of SQL to run on
 the database. On most database backends (all but PostgreSQL), Django will
-split the SQL into individual statements prior to executing them. This
-requires installing the sqlparse_ Python library.
+split the SQL into individual statements prior to executing them.
 
 You can also pass a list of strings or 2-tuples. The latter is used for passing
 queries and parameters in the same way as :ref:`cursor.execute()
@@ -293,8 +292,6 @@ be removed (elided) when :ref:`squashing migrations <migration-squashing>`.
     Pass the ``RunSQL.noop`` attribute to ``sql`` or ``reverse_sql`` when you
     want the operation not to do anything in the given direction. This is
     especially useful in making the operation reversible.
-
-.. _sqlparse: https://pypi.org/project/sqlparse/
 
 ``RunPython``
 -------------

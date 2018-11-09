@@ -2,8 +2,9 @@ import datetime
 import decimal
 from importlib import import_module
 
+import sqlparse
+
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.db import NotSupportedError, transaction
 from django.db.backends import utils
 from django.utils import timezone
@@ -298,16 +299,10 @@ class BaseDatabaseOperations:
         cursor.execute() call and PEP 249 doesn't talk about this use case,
         the default implementation is conservative.
         """
-        try:
-            import sqlparse
-        except ImportError:
-            raise ImproperlyConfigured(
-                "The sqlparse package is required if you don't split your SQL "
-                "statements manually."
-            )
-        else:
-            return [sqlparse.format(statement, strip_comments=True)
-                    for statement in sqlparse.split(sql) if statement]
+        return [
+            sqlparse.format(statement, strip_comments=True)
+            for statement in sqlparse.split(sql) if statement
+        ]
 
     def process_clob(self, value):
         """
