@@ -23,7 +23,7 @@ You can optionally compress the JSON prior to base64 encoding it to save
 space, using the compress=True argument. This checks if compression actually
 helps and only applies compression if the result is a shorter string:
 
->>> signing.dumps(range(1, 20), compress=True)
+>>> signing.dumps(list(range(1, 20)), compress=True)
 '.eJwFwcERACAIwLCF-rCiILN47r-GyZVJsNgkxaFxoDgxcOHGxMKD_T7vhAml:1QaUaL:BA0thEZrp4FQVXIXuOvYJtLJSrQ'
 
 The fact that the string is compressed is signalled by the prefixed '.' at the
