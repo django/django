@@ -271,7 +271,6 @@ class Command(BaseCommand):
                         # unmodified files.
                         can_skip_unmodified_files = not (self.symlink ^ os.path.islink(full_path))
                     else:
-                        full_path = None
                         # In remote storages, skipping is only based on the
                         # modified times since symlinks aren't relevant.
                         can_skip_unmodified_files = True

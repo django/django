@@ -86,7 +86,6 @@ class ContentTypeManager(models.Manager):
                 model__in=needed_models
             )
             for ct in cts:
-                model = ct.model_class()
                 opts_models = needed_opts.pop(ct.model_class()._meta, [])
                 for model in opts_models:
                     results[model] = ct
