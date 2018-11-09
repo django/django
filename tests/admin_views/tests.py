@@ -4211,6 +4211,25 @@ class PrePopulatedTest(TestCase):
         response = self.client.get(reverse('admin:admin_views_prepopulatedpostlargeslug_add'))
         self.assertContains(response, "&quot;maxLength&quot;: 1000")  # instead of 1,000
 
+    def test_view_only_add_form(self):
+        """
+        PrePopulatedPostReadOnlyAdmin.prepopulated_fields includes 'slug'
+        which is present in the add view, even if the
+        ModelAdmin.has_change_permission() returns False.
+        """
+        response = self.client.get(reverse('admin7:admin_views_prepopulatedpost_add'))
+        self.assertContains(response, 'data-prepopulated-fields=')
+        self.assertContains(response, '&quot;id&quot;: &quot;#id_slug&quot;')
+
+    def test_view_only_change_form(self):
+        """
+        PrePopulatedPostReadOnlyAdmin.prepopulated_fields includes 'slug'. That
+        doesn't break a view-only change view.
+        """
+        response = self.client.get(reverse('admin7:admin_views_prepopulatedpost_change', args=(self.p1.pk,)))
+        self.assertContains(response, 'data-prepopulated-fields="[]"')
+        self.assertContains(response, '<div class="readonly">%s</div>' % self.p1.slug)
+
 
 @override_settings(ROOT_URLCONF='admin_views.urls')
 class SeleniumTests(AdminSeleniumTestCase):

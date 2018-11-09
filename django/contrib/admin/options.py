@@ -1585,7 +1585,8 @@ class ModelAdmin(BaseModelAdmin):
         adminForm = helpers.AdminForm(
             form,
             list(self.get_fieldsets(request, obj)),
-            self.get_prepopulated_fields(request, obj),
+            # Clear prepopulated fields on a view-only form to avoid a crash.
+            self.get_prepopulated_fields(request, obj) if add or self.has_change_permission(request, obj) else {},
             readonly_fields,
             model_admin=self)
         media = self.media + adminForm.media

@@ -459,6 +459,13 @@ class PrePopulatedPostAdmin(admin.ModelAdmin):
         return self.prepopulated_fields
 
 
+class PrePopulatedPostReadOnlyAdmin(admin.ModelAdmin):
+    prepopulated_fields = {'slug': ('title',)}
+
+    def has_change_permission(self, *args, **kwargs):
+        return False
+
+
 class PostAdmin(admin.ModelAdmin):
     list_display = ['title', 'public']
     readonly_fields = (
@@ -1085,6 +1092,7 @@ site2.register(Person, save_as_continue=False)
 site7 = admin.AdminSite(name="admin7")
 site7.register(Article, ArticleAdmin2)
 site7.register(Section)
+site7.register(PrePopulatedPost, PrePopulatedPostReadOnlyAdmin)
 
 
 # Used to test ModelAdmin.sortable_by and get_sortable_by().
