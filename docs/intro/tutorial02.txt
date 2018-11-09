@@ -502,7 +502,7 @@ Save these changes and start a new Python interactive shell by running
 
     # Make sure our custom method worked.
     >>> q = Question.objects.get(pk=1)
-    >>> q.was_published_recently()
+    >>> q[0].was_published_recently()
     True
 
     # Give the Question a couple of Choices. The create call constructs a new
@@ -513,15 +513,15 @@ Save these changes and start a new Python interactive shell by running
     >>> q = Question.objects.get(pk=1)
 
     # Display any choices from the related object set -- none so far.
-    >>> q.choice_set.all()
+    >>> q[0].choice_set.all()
     <QuerySet []>
 
     # Create three choices.
-    >>> q.choice_set.create(choice_text='Not much', votes=0)
+    >>> q[0].choice_set.create(choice_text='Not much', votes=0)
     <Choice: Not much>
-    >>> q.choice_set.create(choice_text='The sky', votes=0)
+    >>> q[0].choice_set.create(choice_text='The sky', votes=0)
     <Choice: The sky>
-    >>> c = q.choice_set.create(choice_text='Just hacking again', votes=0)
+    >>> c = q[0].choice_set.create(choice_text='Just hacking again', votes=0)
 
     # Choice objects have API access to their related Question objects.
     >>> c.question
@@ -542,7 +542,7 @@ Save these changes and start a new Python interactive shell by running
     <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
 
     # Let's delete one of the choices. Use delete() for that.
-    >>> c = q.choice_set.filter(choice_text__startswith='Just hacking')
+    >>> c = q[0].choice_set.filter(choice_text__startswith='Just hacking')
     >>> c.delete()
 
 For more information on model relations, see :doc:`Accessing related objects
