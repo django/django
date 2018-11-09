@@ -19,3 +19,6 @@ Bugfixes
 
 * Fixed keep-alive support in ``runserver`` after it was disabled to fix
   another issue in Django 2.0 (:ticket:`29849`).
+
+* Fixed admin view-only change form crash when using
+  ``ModelAdmin.prepopulated_fields`` (:ticket:`29929`).
