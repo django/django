@@ -214,22 +214,26 @@ class CreateViewTests(TestCase):
 @override_settings(ROOT_URLCONF='generic_views.urls')
 class UpdateViewTests(TestCase):
 
-    def test_update_post(self):
-        a = Author.objects.create(
+    @classmethod
+    def setUpTestData(cls):
+        cls.author = Author.objects.create(
+            pk=1,  # Required for OneAuthorUpdate.
             name='Randall Munroe',
             slug='randall-munroe',
         )
-        res = self.client.get('/edit/author/%d/update/' % a.pk)
+
+    def test_update_post(self):
+        res = self.client.get('/edit/author/%d/update/' % self.author.pk)
         self.assertEqual(res.status_code, 200)
         self.assertIsInstance(res.context['form'], forms.ModelForm)
-        self.assertEqual(res.context['object'], Author.objects.get(pk=a.pk))
-        self.assertEqual(res.context['author'], Author.objects.get(pk=a.pk))
+        self.assertEqual(res.context['object'], self.author)
+        self.assertEqual(res.context['author'], self.author)
         self.assertTemplateUsed(res, 'generic_views/author_form.html')
         self.assertEqual(res.context['view'].get_form_called_count, 1)
 
         # Modification with both POST and PUT (browser compatible)
         res = self.client.post(
-            '/edit/author/%d/update/' % a.pk,
+            '/edit/author/%d/update/' % self.author.pk,
             {'name': 'Randall Munroe (xkcd)', 'slug': 'randall-munroe'}
         )
         self.assertEqual(res.status_code, 302)
@@ -237,11 +241,10 @@ class UpdateViewTests(TestCase):
         self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe (xkcd)>'])
 
     def test_update_invalid(self):
-        a = Author.objects.create(
-            name='Randall Munroe',
-            slug='randall-munroe',
+        res = self.client.post(
+            '/edit/author/%d/update/' % self.author.pk,
+            {'name': 'A' * 101, 'slug': 'randall-munroe'}
         )
-        res = self.client.post('/edit/author/%d/update/' % a.pk, {'name': 'A' * 101, 'slug': 'randall-munroe'})
         self.assertEqual(res.status_code, 200)
         self.assertTemplateUsed(res, 'generic_views/author_form.html')
         self.assertEqual(len(res.context['form'].errors), 1)
@@ -256,12 +259,8 @@ class UpdateViewTests(TestCase):
         self.assertQuerysetEqual(Artist.objects.all(), ['<Artist: Rene Magritte>'])
 
     def test_update_with_redirect(self):
-        a = Author.objects.create(
-            name='Randall Munroe',
-            slug='randall-munroe',
-        )
         res = self.client.post(
-            '/edit/author/%d/update/redirect/' % a.pk,
+            '/edit/author/%d/update/redirect/' % self.author.pk,
             {'name': 'Randall Munroe (author of xkcd)', 'slug': 'randall-munroe'}
         )
         self.assertEqual(res.status_code, 302)
@@ -269,12 +268,8 @@ class UpdateViewTests(TestCase):
         self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe (author of xkcd)>'])
 
     def test_update_with_interpolated_redirect(self):
-        a = Author.objects.create(
-            name='Randall Munroe',
-            slug='randall-munroe',
-        )
         res = self.client.post(
-            '/edit/author/%d/update/interpolate_redirect/' % a.pk,
+            '/edit/author/%d/update/interpolate_redirect/' % self.author.pk,
             {'name': 'Randall Munroe (author of xkcd)', 'slug': 'randall-munroe'}
         )
         self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe (author of xkcd)>'])
@@ -283,7 +278,7 @@ class UpdateViewTests(TestCase):
         self.assertRedirects(res, '/edit/author/%d/update/' % pk)
         # Also test with escaped chars in URL
         res = self.client.post(
-            '/edit/author/%d/update/interpolate_redirect_nonascii/' % a.pk,
+            '/edit/author/%d/update/interpolate_redirect_nonascii/' % self.author.pk,
             {'name': 'John Doe', 'slug': 'john-doe'}
         )
         self.assertEqual(res.status_code, 302)
@@ -291,53 +286,40 @@ class UpdateViewTests(TestCase):
         self.assertRedirects(res, '/%C3%A9dit/author/{}/update/'.format(pk))
 
     def test_update_with_special_properties(self):
-        a = Author.objects.create(
-            name='Randall Munroe',
-            slug='randall-munroe',
-        )
-        res = self.client.get('/edit/author/%d/update/special/' % a.pk)
+        res = self.client.get('/edit/author/%d/update/special/' % self.author.pk)
         self.assertEqual(res.status_code, 200)
         self.assertIsInstance(res.context['form'], views.AuthorForm)
-        self.assertEqual(res.context['object'], Author.objects.get(pk=a.pk))
-        self.assertEqual(res.context['thingy'], Author.objects.get(pk=a.pk))
+        self.assertEqual(res.context['object'], self.author)
+        self.assertEqual(res.context['thingy'], self.author)
         self.assertNotIn('author', res.context)
         self.assertTemplateUsed(res, 'generic_views/form.html')
 
         res = self.client.post(
-            '/edit/author/%d/update/special/' % a.pk,
+            '/edit/author/%d/update/special/' % self.author.pk,
             {'name': 'Randall Munroe (author of xkcd)', 'slug': 'randall-munroe'}
         )
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, '/detail/author/%d/' % a.pk)
+        self.assertRedirects(res, '/detail/author/%d/' % self.author.pk)
         self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe (author of xkcd)>'])
 
     def test_update_without_redirect(self):
-        a = Author.objects.create(
-            name='Randall Munroe',
-            slug='randall-munroe',
-        )
         msg = (
             'No URL to redirect to.  Either provide a url or define a '
             'get_absolute_url method on the Model.'
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             self.client.post(
-                '/edit/author/%d/update/naive/' % a.pk,
+                '/edit/author/%d/update/naive/' % self.author.pk,
                 {'name': 'Randall Munroe (author of xkcd)', 'slug': 'randall-munroe'}
             )
 
     def test_update_get_object(self):
-        a = Author.objects.create(
-            pk=1,
-            name='Randall Munroe',
-            slug='randall-munroe',
-        )
         res = self.client.get('/edit/author/update/')
         self.assertEqual(res.status_code, 200)
         self.assertIsInstance(res.context['form'], forms.ModelForm)
         self.assertIsInstance(res.context['view'], View)
-        self.assertEqual(res.context['object'], Author.objects.get(pk=a.pk))
-        self.assertEqual(res.context['author'], Author.objects.get(pk=a.pk))
+        self.assertEqual(res.context['object'], self.author)
+        self.assertEqual(res.context['author'], self.author)
         self.assertTemplateUsed(res, 'generic_views/author_form.html')
 
         # Modification with both POST and PUT (browser compatible)
