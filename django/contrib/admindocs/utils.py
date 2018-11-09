@@ -110,8 +110,6 @@ def create_reference_role(rolename, urlbase):
     def _role(name, rawtext, text, lineno, inliner, options=None, content=None):
         if options is None:
             options = {}
-        if content is None:
-            content = []
         node = docutils.nodes.reference(
             rawtext,
             text,
@@ -128,8 +126,6 @@ def create_reference_role(rolename, urlbase):
 def default_reference_role(name, rawtext, text, lineno, inliner, options=None, content=None):
     if options is None:
         options = {}
-    if content is None:
-        content = []
     context = inliner.document.settings.default_reference_context
     node = docutils.nodes.reference(
         rawtext,
