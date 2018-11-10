@@ -194,10 +194,6 @@ class BaseDatabaseFeatures:
     # Does 'a' LIKE 'A' match?
     has_case_insensitive_like = True
 
-    # Does the backend require the sqlparse library for splitting multi-line
-    # statements before executing them?
-    requires_sqlparse_for_splitting = True
-
     # Suffix for backends that don't support "SELECT xxx;" queries.
     bare_select_suffix = ''
 

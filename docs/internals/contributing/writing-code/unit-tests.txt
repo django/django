@@ -233,7 +233,7 @@ dependencies:
 *  memcached_, plus a :ref:`supported Python binding <memcached>`
 *  gettext_ (:ref:`gettext_on_windows`)
 *  selenium_
-*  sqlparse_
+*  sqlparse_ (required)
 
 You can find these dependencies in `pip requirements files`_ inside the
 ``tests/requirements`` directory of the Django source tree and install them

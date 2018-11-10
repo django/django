@@ -330,6 +330,13 @@ properly (the database was empty at the end of the whole test suite). This
 change shouldn't have an impact on your tests unless you've customized
 :class:`~django.test.TransactionTestCase`'s internals.
 
+``sqlparse`` is required dependency
+-----------------------------------
+
+To simplify a few parts of Django's database handling, `sqlparse
+<https://pypi.org/project/sqlparse/>`_ is now a required dependency. It's
+automatically installed along with Django.
+
 Miscellaneous
 -------------
 

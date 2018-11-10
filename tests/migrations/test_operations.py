@@ -1,5 +1,3 @@
-import unittest
-
 from django.core.exceptions import FieldDoesNotExist
 from django.db import connection, migrations, models, transaction
 from django.db.migrations.migration import Migration
@@ -13,11 +11,6 @@ from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
 
 from .models import FoodManager, FoodQuerySet, UnicodeModel
 from .test_base import MigrationTestBase
-
-try:
-    import sqlparse
-except ImportError:
-    sqlparse = None
 
 
 class Mixin:
@@ -2051,7 +2044,6 @@ class OperationTests(OperationTestBase):
         self.assertColumnExists("test_afknfk_rider", "pony_id")
         self.assertColumnNotExists("test_afknfk_rider", "pony")
 
-    @unittest.skipIf(sqlparse is None and connection.features.requires_sqlparse_for_splitting, "Missing sqlparse")
     def test_run_sql(self):
         """
         Tests the RunSQL operation.
@@ -2561,7 +2553,6 @@ class OperationTests(OperationTestBase):
             operation.database_forwards("test_runpython", editor, project_state, new_state)
             operation.database_backwards("test_runpython", editor, new_state, project_state)
 
-    @unittest.skipIf(sqlparse is None and connection.features.requires_sqlparse_for_splitting, "Missing sqlparse")
     def test_separate_database_and_state(self):
         """
         Tests the SeparateDatabaseAndState operation.
