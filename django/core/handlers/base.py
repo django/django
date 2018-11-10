@@ -167,7 +167,7 @@ class BaseHandler:
             response = middleware_method(request, exception)
             if response:
                 return response
-        raise
+        raise response
 
 
 def reset_urlconf(sender, **kwargs):
