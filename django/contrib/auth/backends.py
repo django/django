@@ -179,7 +179,10 @@ class DefaultObjectPermissionsBackend:
     Include all global permissions if an object is passed.
     """
 
-    def authenticate(self, username, password):
+    def authenticate(self, request, **kwargs):
+        return None
+
+    def get_user(self, user_id):
         return None
 
     def get_group_permissions(self, user, obj=None):
