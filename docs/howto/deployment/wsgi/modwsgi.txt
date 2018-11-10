@@ -6,13 +6,13 @@ Deploying Django with Apache_ and `mod_wsgi`_ is a tried and tested way to get
 Django into production.
 
 .. _Apache: https://httpd.apache.org/
-.. _mod_wsgi: http://www.modwsgi.org/
+.. _mod_wsgi: https://modwsgi.readthedocs.io/en/develop/
 
 mod_wsgi is an Apache module which can host any Python WSGI_ application,
 including Django. Django will work with any version of Apache which supports
 mod_wsgi.
 
-.. _WSGI: http://www.wsgi.org
+.. _WSGI: https://wsgi.readthedocs.io/en/latest/
 
 The `official mod_wsgi documentation`_ is your source for all the details about
 how to use mod_wsgi. You'll probably want to start with the `installation and

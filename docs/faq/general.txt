@@ -42,7 +42,7 @@ Django is pronounced **JANG**-oh. Rhymes with FANG-oh. The "D" is silent.
 We've also recorded an `audio clip of the pronunciation`_.
 
 .. _Django Reinhardt: https://en.wikipedia.org/wiki/Django_Reinhardt
-.. _audio clip of the pronunciation: http://red-bean.com/~adrian/django_pronunciation.mp3
+.. _audio clip of the pronunciation: https://www.red-bean.com/~adrian/django_pronunciation.mp3
 
 Is Django stable?
 =================
@@ -218,4 +218,4 @@ If you need a name, just use "Django", without any tagline.
 If you need a publication date, use the year of release of the version you're
 referencing (e.g., 2013 for v1.5)
 
-.. _APA style: http://www.apastyle.org
+.. _APA style: https://www.apastyle.org
