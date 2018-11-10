@@ -124,7 +124,8 @@ For example, we could look up the
 :class:`~django.contrib.auth.models.User` model::
 
     >>> from django.contrib.contenttypes.models import ContentType
-    >>> ContentType.objects.get(app_label="auth", model="user")
+    >>> user_type = ContentType.objects.get(app_label='auth', model='user')
+    >>> user_type
     <ContentType: user>
 
 And then use it to query for a particular
