@@ -101,7 +101,7 @@ directly from Python using ctypes.
 
 First, download GEOS from the GEOS website and untar the source archive::
 
-    $ wget http://download.osgeo.org/geos/geos-X.Y.Z.tar.bz2
+    $ wget https://download.osgeo.org/geos/geos-X.Y.Z.tar.bz2
     $ tar xjf geos-X.Y.Z.tar.bz2
 
 Next, change into the directory where GEOS was unpacked, run the configure
@@ -159,8 +159,8 @@ reference systems.
 
 First, download the PROJ.4 source code and datum shifting files [#]_::
 
-    $ wget http://download.osgeo.org/proj/proj-X.Y.Z.tar.gz
-    $ wget http://download.osgeo.org/proj/proj-datumgrid-X.Y.tar.gz
+    $ wget https://download.osgeo.org/proj/proj-X.Y.Z.tar.gz
+    $ wget https://download.osgeo.org/proj/proj-datumgrid-X.Y.tar.gz
 
 Next, untar the source code archive, and extract the datum shifting files in the
 ``nad`` subdirectory.  This must be done *prior* to configuration::
@@ -189,7 +189,7 @@ supports :doc:`GDAL's vector data <../gdal>` capabilities [#]_.
 
 First download the latest GDAL release version and untar the archive::
 
-    $ wget http://download.osgeo.org/gdal/X.Y.Z/gdal-X.Y.Z.tar.gz
+    $ wget https://download.osgeo.org/gdal/X.Y.Z/gdal-X.Y.Z.tar.gz
     $ tar xzf gdal-X.Y.Z.tar.gz
     $ cd gdal-X.Y.Z
 
