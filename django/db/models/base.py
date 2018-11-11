@@ -1643,9 +1643,35 @@ class Model(metaclass=ModelBase):
         # Convert "-field" to "field".
         fields = ((f[1:] if f.startswith('-') else f) for f in fields)
 
-        # Skip ordering in the format field1__field2 (FIXME: checking
-        # this format would be nice, but it's a little fiddly).
-        fields = (f for f in fields if LOOKUP_SEP not in f)
+        # Separate related field and non related fields.
+        _fields = []
+        related_fields = []
+        for f in fields:
+            if LOOKUP_SEP in f:
+                related_fields.append(f)
+            else:
+                _fields.append(f)
+        fields = _fields
+
+        # Check related fields.
+        for field in related_fields:
+            _cls = cls
+            fld = None
+            for part in field.split(LOOKUP_SEP):
+                try:
+                    fld = _cls._meta.get_field(part)
+                    if fld.is_relation:
+                        _cls = fld.get_path_info()[-1].to_opts.model
+                except (FieldDoesNotExist, AttributeError):
+                    if fld is None or fld.get_transform(part) is None:
+                        errors.append(
+                            checks.Error(
+                                "'ordering' refers to the nonexistent field, "
+                                "related field or lookup '%s'." % field,
+                                obj=cls,
+                                id='models.E015',
+                            )
+                        )
 
         # Skip ordering on pk. This is always a valid order_by field
         # but is an alias and therefore won't be found by opts.get_field.

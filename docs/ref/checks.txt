@@ -277,8 +277,8 @@ Models
   supported for that option.
 * **models.E014**: ``ordering`` must be a tuple or list (even if you want to
   order by only one field).
-* **models.E015**: ``ordering`` refers to the nonexistent field
-  ``<field name>``.
+* **models.E015**: ``ordering`` refers to the nonexistent field, related field
+  or lookup ``<field name>``.
 * **models.E016**: ``indexes/index_together/unique_together`` refers to field
   ``<field_name>`` which is not local to model ``<model>``.
 * **models.E017**: Proxy model ``<model>`` contains model fields.
