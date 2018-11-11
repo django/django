@@ -91,6 +91,7 @@ class SuperuserRequiredTestCase(TestCase):
         """
         superuser_required is assignable to normal views.
         """
+        @superuser_required
         def normal_view(request):
             return HttpResponse('OK')
 
