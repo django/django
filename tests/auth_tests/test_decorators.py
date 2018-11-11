@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib.auth import models
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required, permission_required, superuser_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.test import TestCase, override_settings
@@ -52,6 +52,67 @@ class LoginRequiredTestCase(AuthViewsTestCase):
         decorator with a login_url set.
         """
         self.testLoginRequired(view_url='/login_required_login_url/', login_url='/somewhere/')
+
+
+class SuperuserRequiredTestCase(TestCase):
+    """
+    Tests the login_required decorators
+    """
+
+    def setUp(self):
+        self.superuser = models.User.objects.create_user(
+            username='superuser',
+            password='password',
+            email='superuser@example.com',
+            is_superuser=True,
+        )
+
+        self.user = models.User.objects.create_user(
+            username='user',
+            password='password',
+            email='user@example.com',
+        )
+
+        self.factory = RequestFactory()
+
+    def testCallable(self):
+        """
+        superuser_required is assignable to callable objects.
+        """
+        class CallableView:
+            def __call__(self, *args, **kwargs):
+                pass
+
+        superuser_required(CallableView())
+
+    def testView(self):
+        """
+        superuser_required is assignable to normal views.
+        """
+        def normal_view(request):
+            return HttpResponse('OK')
+
+        request = self.factory.get('/superuser')
+        request.user = self.superuser
+        resp = normal_view(request)
+
+        self.assertEqual(resp.status_code, 200)
+
+    def testSuperuserRequired(self):
+        """
+        superuser_required works on a simple view wrapped in a superuser_required
+        decorator.
+        """
+        @superuser_required
+        def only_superusers(request):
+            return HttpResponse('OK')
+
+        request = self.factory.get('/superuser')
+        request.user = self.user
+
+        with self.assertRaises(PermissionDenied):
+          resp = only_superusers(request)
+          self.assertEqual(resp.status_code, 403)
 
 
 class PermissionsRequiredDecoratorTest(TestCase):

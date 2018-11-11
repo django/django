@@ -521,6 +521,37 @@ The ``login_required`` decorator
     :func:`django.contrib.admin.views.decorators.staff_member_required`
     decorator a useful alternative to ``login_required()``.
 
+The ``superuser_required`` decorator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. function:: superuser_required()
+
+    As a shortcut, you can use the convenient
+    :func:`~django.contrib.auth.decorators.superuser_required` decorator::
+
+        from django.contrib.auth.decorators import superuser_required
+
+        @superuser_required
+        def superuser_view(request):
+            ...
+
+    :func:`~django.contrib.auth.decorators.superuser_required` if the user is
+    a superuser, execute the view normally otherwise :class:`~django.core.exceptions.PermissionDenied`
+    will be raised.
+
+.. note::
+
+    The ``superuser_required`` decorator does NOT check the ``is_active`` flag on a
+    user, but the default :setting:`AUTHENTICATION_BACKENDS` reject inactive
+    users.
+
+.. seealso::
+
+    If you are writing custom views for Django's admin (or need the same
+    authorization check that the built-in views use), you may find the
+    :func:`django.contrib.admin.views.decorators.staff_member_required`
+    decorator a useful alternative to ``superuser_required()``.
+
 .. currentmodule:: django.contrib.auth.mixins
 
 The ``LoginRequired`` mixin
