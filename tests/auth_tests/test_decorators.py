@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.contrib.auth import models
-from django.contrib.auth.decorators import login_required, permission_required, superuser_required
+from django.contrib.auth.decorators import (
+    login_required, permission_required, superuser_required,
+)
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.test import TestCase, override_settings
@@ -111,8 +113,8 @@ class SuperuserRequiredTestCase(TestCase):
         request.user = self.user
 
         with self.assertRaises(PermissionDenied):
-          resp = only_superusers(request)
-          self.assertEqual(resp.status_code, 403)
+            resp = only_superusers(request)
+            self.assertEqual(resp.status_code, 403)
 
 
 class PermissionsRequiredDecoratorTest(TestCase):
