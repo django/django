@@ -522,7 +522,7 @@ The ``login_required`` decorator
     decorator a useful alternative to ``login_required()``.
 
 The ``superuser_required`` decorator
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. function:: superuser_required()
 
