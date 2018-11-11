@@ -98,12 +98,13 @@ class HumanizeTests(SimpleTestCase):
         test_list = (
             '100', '1000000', '1200000', '1290000', '1000000000', '2000000000',
             '6000000000000', '1300000000000000', '3500000000000000000000',
-            '8100000000000000000000000000000000', None,
+            '8100000000000000000000000000000000', None, ('1' + '0' * 100),
+            ('1' + '0' * 104),
         )
         result_list = (
             '100', '1.0 million', '1.2 million', '1.3 million', '1.0 billion',
             '2.0 billion', '6.0 trillion', '1.3 quadrillion', '3.5 sextillion',
-            '8.1 decillion', None,
+            '8.1 decillion', None, '1.0 googol', ('1' + '0' * 104),
         )
         with translation.override('en'):
             self.humanize_tester(test_list, result_list, 'intword')
@@ -183,7 +184,9 @@ class HumanizeTests(SimpleTestCase):
             def utcoffset(self, dt):
                 return None
         test_list = [
+            'test',
             now,
+            now - datetime.timedelta(microseconds=1),
             now - datetime.timedelta(seconds=1),
             now - datetime.timedelta(seconds=30),
             now - datetime.timedelta(minutes=1, seconds=30),
@@ -205,6 +208,8 @@ class HumanizeTests(SimpleTestCase):
             now.replace(tzinfo=utc),
         ]
         result_list = [
+            'test',
+            'now',
             'now',
             'a second ago',
             '30\xa0seconds ago',
