@@ -342,8 +342,8 @@ class DeleteViewTests(TestCase):
     def test_delete_by_post(self):
         res = self.client.get('/edit/author/%d/delete/' % self.author.pk)
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['object'], Author.objects.get(pk=self.author.pk))
-        self.assertEqual(res.context['author'], Author.objects.get(pk=self.author.pk))
+        self.assertEqual(res.context['object'], self.author)
+        self.assertEqual(res.context['author'], self.author)
         self.assertTemplateUsed(res, 'generic_views/author_confirm_delete.html')
 
         # Deletion with POST
@@ -379,8 +379,8 @@ class DeleteViewTests(TestCase):
     def test_delete_with_special_properties(self):
         res = self.client.get('/edit/author/%d/delete/special/' % self.author.pk)
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['object'], Author.objects.get(pk=self.author.pk))
-        self.assertEqual(res.context['thingy'], Author.objects.get(pk=self.author.pk))
+        self.assertEqual(res.context['object'], self.author)
+        self.assertEqual(res.context['thingy'], self.author)
         self.assertNotIn('author', res.context)
         self.assertTemplateUsed(res, 'generic_views/confirm_delete.html')
 
