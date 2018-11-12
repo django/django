@@ -919,8 +919,9 @@ methods and attributes:
 
         Returns ``True`` if the user has the specified permission, where
         ``perm`` is in the format ``"<app label>.<permission codename>"`` (see
-        :ref:`permissions <topic-authorization>`). If the user is inactive, this method will
-        always return ``False``.
+        :ref:`permissions <topic-authorization>`). If :attr:`.User.is_active`
+        and :attr:`~.User.is_superuser` are both ``True``, this method always
+        returns ``True``.
 
         If ``obj`` is passed in, this method won't check for a permission for
         the model, but for this specific object.
@@ -929,8 +930,9 @@ methods and attributes:
 
         Returns ``True`` if the user has each of the specified permissions,
         where each perm is in the format
-        ``"<app label>.<permission codename>"``. If the user is inactive,
-        this method will always return ``False``.
+        ``"<app label>.<permission codename>"``. If :attr:`.User.is_active` and
+        :attr:`~.User.is_superuser` are both ``True``, this method always
+        returns ``True``.
 
         If ``obj`` is passed in, this method won't check for permissions for
         the model, but for the specific object.
@@ -938,8 +940,9 @@ methods and attributes:
     .. method:: models.PermissionsMixin.has_module_perms(package_name)
 
         Returns ``True`` if the user has any permissions in the given package
-        (the Django app label). If the user is inactive, this method will
-        always return ``False``.
+        (the Django app label). If :attr:`.User.is_active` and
+        :attr:`~.User.is_superuser` are both ``True``, this method always
+        returns ``True``.
 
 .. admonition:: ``PermissionsMixin`` and ``ModelBackend``
 
