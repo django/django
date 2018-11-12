@@ -36,7 +36,7 @@ Registration API
 Django uses :class:`~lookups.RegisterLookupMixin` to give a class the interface to
 register lookups on itself. The two prominent examples are
 :class:`~django.db.models.Field`, the base class of all model fields, and
-``Aggregate``, the base class of all Django aggregates.
+:class:`Transform`, the base class of all Django transforms.
 
 .. class:: lookups.RegisterLookupMixin
 
