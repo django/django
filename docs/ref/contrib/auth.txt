@@ -382,8 +382,12 @@ Fields
 
     .. attribute:: name
 
-        Required. 80 characters or fewer. Any characters are permitted. Example:
-        ``'Awesome Users'``.
+        Required. 150 characters or fewer. Any characters are permitted.
+        Example: ``'Awesome Users'``.
+
+        .. versionchanged:: 2.2
+
+             The ``max_length`` increased from 80 to 150 characters.
 
     .. attribute:: permissions
 
