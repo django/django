@@ -125,7 +125,7 @@ Conditional GET middleware
 .. class:: ConditionalGetMiddleware
 
 Handles conditional GET operations. If the response doesn't have an ``ETag``
-header, the middleware adds one if needed. If the response has a ``ETag`` or
+header, the middleware adds one if needed. If the response has an ``ETag`` or
 ``Last-Modified`` header, and the request has ``If-None-Match`` or
 ``If-Modified-Since``, the response is replaced by an
 :class:`~django.http.HttpResponseNotModified`.
