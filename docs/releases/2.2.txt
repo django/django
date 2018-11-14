@@ -380,6 +380,11 @@ Miscellaneous
 
 * Support for ``cx_Oracle`` < 6.0 is removed.
 
+* In an attempt to provide more semantic query data, ``NullBooleanSelect`` now
+  renders ``<option>`` values of ``unknown``, ``true``, and ``false`` instead
+  of ``1``, ``2``, and ``3``. For backwards compatibility, the old values are
+  still accepted as data.
+
 .. _deprecated-features-2.2:
 
 Features deprecated in 2.2
