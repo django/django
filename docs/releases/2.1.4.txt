@@ -9,4 +9,6 @@ Django 2.1.4 fixes several bugs in 2.1.3.
 Bugfixes
 ========
 
-* ...
+* Corrected the default password list that ``CommonPasswordValidator`` uses by
+  lowercasing all passwords to match the format expected by the validator
+  (:ticket:`29952`).
