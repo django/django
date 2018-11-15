@@ -120,7 +120,7 @@ Python *packaging* refers to preparing your app in a specific format that can
 be easily installed and used. Django itself is packaged very much like
 this. For a small app like polls, this process isn't too difficult.
 
-1. First, create a parent directory for ``polls``, outside of your Django
+#. First, create a parent directory for ``polls``, outside of your Django
    project. Call this directory ``django-polls``.
 
    .. admonition::  Choosing a name for your app
@@ -137,9 +137,9 @@ this. For a small app like polls, this process isn't too difficult.
        </ref/contrib/index>`, for example ``auth``, ``admin``, or
        ``messages``.
 
-2. Move the ``polls`` directory into the ``django-polls`` directory.
+#. Move the ``polls`` directory into the ``django-polls`` directory.
 
-3. Create a file ``django-polls/README.rst`` with the following contents:
+#. Create a file ``django-polls/README.rst`` with the following contents:
 
    .. code-block:: rst
        :caption: django-polls/README.rst
@@ -174,14 +174,14 @@ this. For a small app like polls, this process isn't too difficult.
 
        5. Visit http://127.0.0.1:8000/polls/ to participate in the poll.
 
-4. Create a ``django-polls/LICENSE`` file. Choosing a license is beyond the
+#. Create a ``django-polls/LICENSE`` file. Choosing a license is beyond the
    scope of this tutorial, but suffice it to say that code released publicly
    without a license is *useless*. Django and many Django-compatible apps are
    distributed under the BSD license; however, you're free to pick your own
    license. Just be aware that your licensing choice will affect who is able
    to use your code.
 
-5. Next we'll create a ``setup.py`` file which provides details about how to
+#. Next we'll create a ``setup.py`` file which provides details about how to
    build and install the app.  A full explanation of this file is beyond the
    scope of this tutorial, but the `setuptools docs
    <https://setuptools.readthedocs.io/en/latest/>`_ have a good
@@ -226,7 +226,7 @@ this. For a small app like polls, this process isn't too difficult.
            ],
        )
 
-6. Only Python modules and packages are included in the package by default. To
+#. Only Python modules and packages are included in the package by default. To
    include additional files, we'll need to create a ``MANIFEST.in`` file. The
    setuptools docs referred to in the previous step discuss this file in more
    details. To include the templates, the ``README.rst`` and our ``LICENSE``
@@ -241,7 +241,7 @@ this. For a small app like polls, this process isn't too difficult.
        recursive-include polls/static *
        recursive-include polls/templates *
 
-7. It's optional, but recommended, to include detailed documentation with your
+#. It's optional, but recommended, to include detailed documentation with your
    app. Create an empty directory ``django-polls/docs`` for future
    documentation. Add an additional line to ``django-polls/MANIFEST.in``::
 
@@ -251,7 +251,7 @@ this. For a small app like polls, this process isn't too difficult.
    you add some files to it. Many Django apps also provide their documentation
    online through sites like `readthedocs.org <https://readthedocs.org>`_.
 
-8. Try building your package with ``python setup.py sdist`` (run from inside
+#. Try building your package with ``python setup.py sdist`` (run from inside
    ``django-polls``). This creates a directory called ``dist`` and builds your
    new package, ``django-polls-0.1.tar.gz``.
 
@@ -276,15 +276,15 @@ working. We'll now fix this by installing our new ``django-polls`` package.
    tools that run as that user, so ``virtualenv`` is a more robust solution
    (see below).
 
-1. To install the package, use pip (you already :ref:`installed it
+#. To install the package, use pip (you already :ref:`installed it
    <installing-reusable-apps-prerequisites>`, right?)::
 
     pip install --user django-polls/dist/django-polls-0.1.tar.gz
 
-2. With luck, your Django project should now work correctly again. Run the
+#. With luck, your Django project should now work correctly again. Run the
    server again to confirm this.
 
-3. To uninstall the package, use pip::
+#. To uninstall the package, use pip::
 
     pip uninstall django-polls
 

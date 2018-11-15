@@ -415,10 +415,10 @@ Refer to the :doc:`settings documentation </ref/settings>`.
 
 Connection settings are used in this order:
 
-1. :setting:`OPTIONS`.
-2. :setting:`NAME`, :setting:`USER`, :setting:`PASSWORD`,
-   :setting:`HOST`, :setting:`PORT`
-3. MySQL option files.
+#. :setting:`OPTIONS`.
+#. :setting:`NAME`, :setting:`USER`, :setting:`PASSWORD`, :setting:`HOST`,
+   :setting:`PORT`
+#. MySQL option files.
 
 In other words, if you set the name of the database in :setting:`OPTIONS`,
 this will take precedence over :setting:`NAME`, which would override

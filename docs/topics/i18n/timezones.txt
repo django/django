@@ -462,7 +462,7 @@ FAQ
 Setup
 -----
 
-1. **I don't need multiple time zones. Should I enable time zone support?**
+#. **I don't need multiple time zones. Should I enable time zone support?**
 
    Yes. When time zone support is enabled, Django uses a more accurate model
    of local time. This shields you from subtle and unreproducible bugs around
@@ -481,7 +481,7 @@ Setup
    For these reasons, time zone support is enabled by default in new projects,
    and you should keep it unless you have a very good reason not to.
 
-2. **I've enabled time zone support. Am I safe?**
+#. **I've enabled time zone support. Am I safe?**
 
    Maybe. You're better protected from DST-related bugs, but you can still
    shoot yourself in the foot by carelessly turning naive datetimes into aware
@@ -508,7 +508,7 @@ Setup
    one year is 2011-02-28 or 2011-03-01, which depends on your business
    requirements.)
 
-3. **How do I interact with a database that stores datetimes in local time?**
+#. **How do I interact with a database that stores datetimes in local time?**
 
    Set the :setting:`TIME_ZONE <DATABASE-TIME_ZONE>` option to the appropriate
    time zone for this database in the :setting:`DATABASES` setting.
@@ -519,7 +519,7 @@ Setup
 Troubleshooting
 ---------------
 
-1. **My application crashes with** ``TypeError: can't compare offset-naive``
+#. **My application crashes with** ``TypeError: can't compare offset-naive``
    ``and offset-aware datetimes`` **-- what's wrong?**
 
    Let's reproduce this error by comparing a naive and an aware datetime::
@@ -551,7 +551,7 @@ Troubleshooting
    datetime when ``USE_TZ = True``. You can add or subtract
    :class:`datetime.timedelta` as needed.
 
-2. **I see lots of** ``RuntimeWarning: DateTimeField received a naive
+#. **I see lots of** ``RuntimeWarning: DateTimeField received a naive
    datetime`` ``(YYYY-MM-DD HH:MM:SS)`` ``while time zone support is active``
    **-- is that bad?**
 
@@ -564,7 +564,7 @@ Troubleshooting
    In the meantime, for backwards compatibility, the datetime is considered to
    be in the default time zone, which is generally what you expect.
 
-3. ``now.date()`` **is yesterday! (or tomorrow)**
+#. ``now.date()`` **is yesterday! (or tomorrow)**
 
    If you've always used naive datetimes, you probably believe that you can
    convert a datetime to a date by calling its :meth:`~datetime.datetime.date`
@@ -623,7 +623,7 @@ Troubleshooting
        >>> local.date()
        datetime.date(2012, 3, 3)
 
-4. **I get an error** "``Are time zone definitions for your database
+#. **I get an error** "``Are time zone definitions for your database
    installed?``"
 
    If you are using MySQL, see the :ref:`mysql-time-zone-definitions` section
@@ -632,7 +632,7 @@ Troubleshooting
 Usage
 -----
 
-1. **I have a string** ``"2012-02-21 10:28:45"`` **and I know it's in the**
+#. **I have a string** ``"2012-02-21 10:28:45"`` **and I know it's in the**
    ``"Europe/Helsinki"`` **time zone. How do I turn that into an aware
    datetime?**
 
@@ -649,7 +649,7 @@ Usage
    documentation of pytz contains `more examples`_. You should review it
    before attempting to manipulate aware datetimes.
 
-2. **How can I obtain the local time in the current time zone?**
+#. **How can I obtain the local time in the current time zone?**
 
    Well, the first question is, do you really need to?
 
@@ -672,7 +672,7 @@ Usage
 
    In this example, the current time zone is ``"Europe/Paris"``.
 
-3. **How can I see all available time zones?**
+#. **How can I see all available time zones?**
 
    pytz_ provides helpers_, including a list of current time zones and a list
    of all available time zones -- some of which are only of historical

@@ -1400,10 +1400,10 @@ For example, this command::
 
 ...would perform the following steps:
 
-1. Create a test database, as described in :ref:`the-test-database`.
-2. Populate the test database with fixture data from the given fixtures.
+#. Create a test database, as described in :ref:`the-test-database`.
+#. Populate the test database with fixture data from the given fixtures.
    (For more on fixtures, see the documentation for :djadmin:`loaddata` above.)
-3. Runs the Django development server (as in :djadmin:`runserver`), pointed at
+#. Runs the Django development server (as in :djadmin:`runserver`), pointed at
    this newly created test database instead of your production database.
 
 This is useful in a number of ways:

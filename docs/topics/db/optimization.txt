@@ -283,7 +283,7 @@ many-to-many relation to User, the following template code is optimal:
 
 It is optimal because:
 
-1. Since QuerySets are lazy, this does no database queries if 'display_inbox'
+#. Since QuerySets are lazy, this does no database queries if 'display_inbox'
    is False.
 
 #. Use of :ttag:`with` means that we store ``user.emails.all`` in a variable

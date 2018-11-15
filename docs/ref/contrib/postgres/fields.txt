@@ -292,8 +292,8 @@ transform do not change. For example::
 
     To use this field, you'll need to:
 
-    1. Add ``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS`.
-    2. :ref:`Setup the hstore extension <create-postgresql-extensions>` in
+    #. Add ``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS`.
+    #. :ref:`Setup the hstore extension <create-postgresql-extensions>` in
        PostgreSQL.
 
     You'll see an error like ``can't adapt type 'dict'`` if you skip the first

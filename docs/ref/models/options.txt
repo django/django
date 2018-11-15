@@ -163,12 +163,12 @@ Django quotes column and table names behind the scenes.
     the *only* difference when ``managed=False``. All other aspects of
     model handling are exactly the same as normal. This includes
 
-    1. Adding an automatic primary key field to the model if you don't
+    #. Adding an automatic primary key field to the model if you don't
        declare it.  To avoid confusion for later code readers, it's
        recommended to specify all the columns from the database table you
        are modeling when using unmanaged models.
 
-    2. If a model with ``managed=False`` contains a
+    #. If a model with ``managed=False`` contains a
        :class:`~django.db.models.ManyToManyField` that points to another
        unmanaged model, then the intermediate table for the many-to-many
        join will also not be created. However, the intermediary table

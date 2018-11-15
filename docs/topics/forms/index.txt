@@ -148,9 +148,9 @@ Instantiating, processing, and rendering forms
 
 When rendering an object in Django, we generally:
 
-1. get hold of it in the view (fetch it from the database, for example)
-2. pass it to the template context
-3. expand it to HTML markup using template variables
+#. get hold of it in the view (fetch it from the database, for example)
+#. pass it to the template context
+#. expand it to HTML markup using template variables
 
 Rendering a form in a template involves nearly the same work as rendering any
 other kind of object, but there are some key differences.

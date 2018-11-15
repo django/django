@@ -211,11 +211,11 @@ Let's convert our poll app to use the generic views system, so we can delete a
 bunch of our own code. We'll just have to take a few steps to make the
 conversion. We will:
 
-1. Convert the URLconf.
+#. Convert the URLconf.
 
-2. Delete some of the old, unneeded views.
+#. Delete some of the old, unneeded views.
 
-3. Introduce new views based on Django's generic views.
+#. Introduce new views based on Django's generic views.
 
 Read on for details.
 

@@ -63,12 +63,12 @@ as a shorter alias, ``_``, to save typing.
     global namespace, as an alias for ``gettext()``. In Django, we have chosen
     not to follow this practice, for a couple of reasons:
 
-    1. Sometimes, you should use :func:`~django.utils.translation.gettext_lazy`
+    #. Sometimes, you should use :func:`~django.utils.translation.gettext_lazy`
        as the default translation method for a particular file. Without ``_()``
        in the global namespace, the developer has to think about which is the
        most appropriate translation function.
 
-    2. The underscore character (``_``) is used to represent "the previous
+    #. The underscore character (``_``) is used to represent "the previous
        result" in Python's interactive shell and doctest tests. Installing a
        global ``_()`` function causes interference. Explicitly importing
        ``gettext()`` as ``_()`` avoids this problem.
@@ -2073,13 +2073,13 @@ the order in which it examines the different file paths to load the compiled
 :term:`message files <message file>` (``.mo``) and the precedence of multiple
 translations for the same literal:
 
-1. The directories listed in :setting:`LOCALE_PATHS` have the highest
+#. The directories listed in :setting:`LOCALE_PATHS` have the highest
    precedence, with the ones appearing first having higher precedence than
    the ones appearing later.
-2. Then, it looks for and uses if it exists a ``locale`` directory in each
+#. Then, it looks for and uses if it exists a ``locale`` directory in each
    of the installed apps listed in :setting:`INSTALLED_APPS`.  The ones
    appearing first have higher precedence than the ones appearing later.
-3. Finally, the Django-provided base translation in ``django/conf/locale``
+#. Finally, the Django-provided base translation in ``django/conf/locale``
    is used as a fallback.
 
 .. seealso::

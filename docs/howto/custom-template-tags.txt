@@ -842,13 +842,13 @@ A naive implementation of ``CycleNode`` might look something like this::
 But, suppose we have two templates rendering the template snippet from above at
 the same time:
 
-1. Thread 1 performs its first loop iteration, ``CycleNode.render()``
+#. Thread 1 performs its first loop iteration, ``CycleNode.render()``
    returns 'row1'
-2. Thread 2 performs its first loop iteration, ``CycleNode.render()``
+#. Thread 2 performs its first loop iteration, ``CycleNode.render()``
    returns 'row2'
-3. Thread 1 performs its second loop iteration, ``CycleNode.render()``
+#. Thread 1 performs its second loop iteration, ``CycleNode.render()``
    returns 'row1'
-4. Thread 2 performs its second loop iteration, ``CycleNode.render()``
+#. Thread 2 performs its second loop iteration, ``CycleNode.render()``
    returns 'row2'
 
 The CycleNode is iterating, but it's iterating globally. As far as Thread 1
