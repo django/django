@@ -80,7 +80,7 @@ class ParameterHandlingTest(TestCase):
         "An executemany call with too many/not enough parameters will raise an exception (Refs #12612)"
         with connection.cursor() as cursor:
             query = ('INSERT INTO %s (%s, %s) VALUES (%%s, %%s)' % (
-                connection.introspection.table_name_converter('backends_square'),
+                connection.introspection.identifier_converter('backends_square'),
                 connection.ops.quote_name('root'),
                 connection.ops.quote_name('square')
             ))
@@ -217,7 +217,7 @@ class BackendTestCase(TransactionTestCase):
 
     def create_squares(self, args, paramstyle, multiple):
         opts = Square._meta
-        tbl = connection.introspection.table_name_converter(opts.db_table)
+        tbl = connection.introspection.identifier_converter(opts.db_table)
         f1 = connection.ops.quote_name(opts.get_field('root').column)
         f2 = connection.ops.quote_name(opts.get_field('square').column)
         if paramstyle == 'format':
@@ -303,7 +303,7 @@ class BackendTestCase(TransactionTestCase):
                 'SELECT %s, %s FROM %s ORDER BY %s' % (
                     qn(f3.column),
                     qn(f4.column),
-                    connection.introspection.table_name_converter(opts2.db_table),
+                    connection.introspection.identifier_converter(opts2.db_table),
                     qn(f3.column),
                 )
             )

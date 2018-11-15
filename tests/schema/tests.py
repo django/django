@@ -85,7 +85,7 @@ class SchemaTests(TransactionTestCase):
 
     def delete_tables(self):
         "Deletes all model tables for our models for a clean test environment"
-        converter = connection.introspection.table_name_converter
+        converter = connection.introspection.identifier_converter
         with connection.schema_editor() as editor:
             connection.disable_constraint_checking()
             table_names = connection.introspection.table_names()
@@ -1868,9 +1868,6 @@ class SchemaTests(TransactionTestCase):
                 table_name=AuthorWithIndexedName._meta.db_table,
                 column_names=('name',),
             )
-        if connection.features.uppercases_column_names:
-            author_index_name = author_index_name.upper()
-            db_index_name = db_index_name.upper()
         try:
             AuthorWithIndexedName._meta.indexes = [index]
             with connection.schema_editor() as editor:
@@ -1908,8 +1905,6 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.add_index(Author, index)
         if connection.features.supports_index_column_ordering:
-            if connection.features.uppercases_column_names:
-                index_name = index_name.upper()
             self.assertIndexOrder(Author._meta.db_table, index_name, ['ASC', 'DESC'])
         # Drop the index
         with connection.schema_editor() as editor:
@@ -2122,12 +2117,14 @@ class SchemaTests(TransactionTestCase):
         field = get_field()
         table = model._meta.db_table
         column = field.column
+        identifier_converter = connection.introspection.identifier_converter
 
         with connection.schema_editor() as editor:
             editor.create_model(model)
             editor.add_field(model, field)
 
-            constraint_name = "CamelCaseIndex"
+            constraint_name = 'CamelCaseIndex'
+            expected_constraint_name = identifier_converter(constraint_name)
             editor.execute(
                 editor.sql_create_index % {
                     "table": editor.quote_name(table),
@@ -2138,22 +2135,20 @@ class SchemaTests(TransactionTestCase):
                     "condition": "",
                 }
             )
-            if connection.features.uppercases_column_names:
-                constraint_name = constraint_name.upper()
-            self.assertIn(constraint_name, self.get_constraints(model._meta.db_table))
+            self.assertIn(expected_constraint_name, self.get_constraints(model._meta.db_table))
             editor.alter_field(model, get_field(db_index=True), field, strict=True)
-            self.assertNotIn(constraint_name, self.get_constraints(model._meta.db_table))
+            self.assertNotIn(expected_constraint_name, self.get_constraints(model._meta.db_table))
 
-            constraint_name = "CamelCaseUniqConstraint"
+            constraint_name = 'CamelCaseUniqConstraint'
+            expected_constraint_name = identifier_converter(constraint_name)
             editor.execute(editor._create_unique_sql(model, [field.column], constraint_name))
-            if connection.features.uppercases_column_names:
-                constraint_name = constraint_name.upper()
-            self.assertIn(constraint_name, self.get_constraints(model._meta.db_table))
+            self.assertIn(expected_constraint_name, self.get_constraints(model._meta.db_table))
             editor.alter_field(model, get_field(unique=True), field, strict=True)
-            self.assertNotIn(constraint_name, self.get_constraints(model._meta.db_table))
+            self.assertNotIn(expected_constraint_name, self.get_constraints(model._meta.db_table))
 
             if editor.sql_foreign_key_constraint:
-                constraint_name = "CamelCaseFKConstraint"
+                constraint_name = 'CamelCaseFKConstraint'
+                expected_constraint_name = identifier_converter(constraint_name)
                 fk_sql = editor.sql_foreign_key_constraint % {
                     "column": editor.quote_name(column),
                     "to_table": editor.quote_name(table),
@@ -2170,11 +2165,9 @@ class SchemaTests(TransactionTestCase):
                         "constraint": constraint_sql,
                     }
                 )
-                if connection.features.uppercases_column_names:
-                    constraint_name = constraint_name.upper()
-                self.assertIn(constraint_name, self.get_constraints(model._meta.db_table))
+                self.assertIn(expected_constraint_name, self.get_constraints(model._meta.db_table))
                 editor.alter_field(model, get_field(Author, CASCADE, field_class=ForeignKey), field, strict=True)
-                self.assertNotIn(constraint_name, self.get_constraints(model._meta.db_table))
+                self.assertNotIn(expected_constraint_name, self.get_constraints(model._meta.db_table))
 
     def test_add_field_use_effective_default(self):
         """
@@ -2491,11 +2484,7 @@ class SchemaTests(TransactionTestCase):
         new_field.set_attributes_from_name('weight')
         with connection.schema_editor() as editor:
             editor.alter_field(Author, old_field, new_field, strict=True)
-
-        expected = 'schema_author_weight_587740f9'
-        if connection.features.uppercases_column_names:
-            expected = expected.upper()
-        self.assertEqual(self.get_constraints_for_column(Author, 'weight'), [expected])
+        self.assertEqual(self.get_constraints_for_column(Author, 'weight'), ['schema_author_weight_587740f9'])
 
         # Remove db_index=True to drop index.
         with connection.schema_editor() as editor:

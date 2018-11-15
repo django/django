@@ -48,8 +48,6 @@ class CheckConstraintTests(TestCase):
     def test_name(self):
         constraints = get_constraints(Product._meta.db_table)
         expected_name = 'price_gt_discounted_price'
-        if connection.features.uppercases_column_names:
-            expected_name = expected_name.upper()
         self.assertIn(expected_name, constraints)
 
 
@@ -87,6 +85,4 @@ class UniqueConstraintTests(TestCase):
     def test_name(self):
         constraints = get_constraints(Product._meta.db_table)
         expected_name = 'unique_name'
-        if connection.features.uppercases_column_names:
-            expected_name = expected_name.upper()
         self.assertIn(expected_name, constraints)
