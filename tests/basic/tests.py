@@ -649,6 +649,12 @@ class ModelRefreshTests(TestCase):
         with self.assertRaisesMessage(TypeError, msg):
             s.refresh_from_db(unknown_kwarg=10)
 
+    def test_lookup_in_fields(self):
+        s = SelfRef.objects.create()
+        msg = 'Found "__" in fields argument. Relations and transforms are not allowed in fields.'
+        with self.assertRaisesMessage(ValueError, msg):
+            s.refresh_from_db(fields=['foo__bar'])
+
     def test_refresh_fk(self):
         s1 = SelfRef.objects.create()
         s2 = SelfRef.objects.create()
