@@ -327,8 +327,11 @@ class QuerySet:
             return other
         if isinstance(other, EmptyQuerySet):
             return self
-        combined = self._chain()
+        query = self if self.query.can_filter() else self.model._base_manager.filter(pk__in=self.values('pk'))
+        combined = query._chain()
         combined._merge_known_related_objects(other)
+        if not other.query.can_filter():
+            other = other.model._base_manager.filter(pk__in=other.values('pk'))
         combined.query.combine(other.query, sql.OR)
         return combined
 
