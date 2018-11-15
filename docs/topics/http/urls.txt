@@ -34,20 +34,20 @@ How Django processes a request
 When a user requests a page from your Django-powered site, this is the
 algorithm the system follows to determine which Python code to execute:
 
-1. Django determines the root URLconf module to use. Ordinarily,
+#. Django determines the root URLconf module to use. Ordinarily,
    this is the value of the :setting:`ROOT_URLCONF` setting, but if the incoming
    ``HttpRequest`` object has a :attr:`~django.http.HttpRequest.urlconf`
    attribute (set by middleware), its value will be used in place of the
    :setting:`ROOT_URLCONF` setting.
 
-2. Django loads that Python module and looks for the variable
+#. Django loads that Python module and looks for the variable
    ``urlpatterns``. This should be a Python list of :func:`django.urls.path`
    and/or :func:`django.urls.re_path` instances.
 
-3. Django runs through each URL pattern, in order, and stops at the first
+#. Django runs through each URL pattern, in order, and stops at the first
    one that matches the requested URL.
 
-4. Once one of the URL patterns matches, Django imports and calls the given
+#. Once one of the URL patterns matches, Django imports and calls the given
    view, which is a simple Python function (or a :doc:`class-based view
    </topics/class-based-views/index>`). The view gets passed the following
    arguments:
@@ -60,7 +60,7 @@ algorithm the system follows to determine which Python code to execute:
      ``kwargs`` argument to :func:`django.urls.path` or
      :func:`django.urls.re_path`.
 
-5. If no URL pattern matches, or if an exception is raised during any
+#. If no URL pattern matches, or if an exception is raised during any
    point in this process, Django invokes an appropriate
    error-handling view. See `Error handling`_ below.
 
@@ -718,11 +718,11 @@ Reversing namespaced URLs
 When given a namespaced URL (e.g. ``'polls:index'``) to resolve, Django splits
 the fully qualified name into parts and then tries the following lookup:
 
-1. First, Django looks for a matching :term:`application namespace` (in this
+#. First, Django looks for a matching :term:`application namespace` (in this
    example, ``'polls'``). This will yield a list of instances of that
    application.
 
-2. If there is a current application defined, Django finds and returns the URL
+#. If there is a current application defined, Django finds and returns the URL
    resolver for that instance. The current application can be specified with
    the ``current_app`` argument to the :func:`~django.urls.reverse()`
    function.
@@ -733,15 +733,15 @@ the fully qualified name into parts and then tries the following lookup:
    setting the current application on the :attr:`request.current_app
    <django.http.HttpRequest.current_app>` attribute.
 
-3. If there is no current application, Django looks for a default
+#. If there is no current application, Django looks for a default
    application instance. The default application instance is the instance
    that has an :term:`instance namespace` matching the :term:`application
    namespace` (in this example, an instance of ``polls`` called ``'polls'``).
 
-4. If there is no default application instance, Django will pick the last
+#. If there is no default application instance, Django will pick the last
    deployed instance of the application, whatever its instance name may be.
 
-5. If the provided namespace doesn't match an :term:`application namespace` in
+#. If the provided namespace doesn't match an :term:`application namespace` in
    step 1, Django will attempt a direct lookup of the namespace as an
    :term:`instance namespace`.
 

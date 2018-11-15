@@ -319,7 +319,7 @@ may need some changes to adjust to the new semantics.
 These are the behavioral differences between using :setting:`MIDDLEWARE` and
 ``MIDDLEWARE_CLASSES``:
 
-1. Under ``MIDDLEWARE_CLASSES``, every middleware will always have its
+#. Under ``MIDDLEWARE_CLASSES``, every middleware will always have its
    ``process_response`` method called, even if an earlier middleware
    short-circuited by returning a response from its ``process_request``
    method. Under :setting:`MIDDLEWARE`, middleware behaves more like an onion:
@@ -328,7 +328,7 @@ These are the behavioral differences between using :setting:`MIDDLEWARE` and
    that middleware and the ones before it in :setting:`MIDDLEWARE` will see the
    response.
 
-2. Under ``MIDDLEWARE_CLASSES``, ``process_exception`` is applied to
+#. Under ``MIDDLEWARE_CLASSES``, ``process_exception`` is applied to
    exceptions raised from a middleware ``process_request`` method. Under
    :setting:`MIDDLEWARE`, ``process_exception`` applies only to exceptions
    raised from the view (or from the ``render`` method of a
@@ -336,7 +336,7 @@ These are the behavioral differences between using :setting:`MIDDLEWARE` and
    a middleware are converted to the appropriate HTTP response and then passed
    to the next middleware.
 
-3. Under ``MIDDLEWARE_CLASSES``, if a ``process_response`` method raises
+#. Under ``MIDDLEWARE_CLASSES``, if a ``process_response`` method raises
    an exception, the ``process_response`` methods of all earlier middleware are
    skipped and a ``500 Internal Server Error`` HTTP response is always
    returned (even if the exception raised was e.g. an

@@ -27,7 +27,7 @@ How to use it
 
 To take advantage of CSRF protection in your views, follow these steps:
 
-1. The CSRF middleware is activated by default in the :setting:`MIDDLEWARE`
+#. The CSRF middleware is activated by default in the :setting:`MIDDLEWARE`
    setting. If you override that setting, remember that
    ``'django.middleware.csrf.CsrfViewMiddleware'`` should come before any view
    middleware that assume that CSRF attacks have been dealt with.
@@ -36,7 +36,7 @@ To take advantage of CSRF protection in your views, follow these steps:
    :func:`~django.views.decorators.csrf.csrf_protect` on particular views
    you want to protect (see below).
 
-2. In any template that uses a POST form, use the :ttag:`csrf_token` tag inside
+#. In any template that uses a POST form, use the :ttag:`csrf_token` tag inside
    the ``<form>`` element if the form is for an internal URL, e.g.:
 
    .. code-block:: html+django
@@ -46,7 +46,7 @@ To take advantage of CSRF protection in your views, follow these steps:
    This should not be done for POST forms that target external URLs, since
    that would cause the CSRF token to be leaked, leading to a vulnerability.
 
-3. In the corresponding view functions, ensure that
+#. In the corresponding view functions, ensure that
    :class:`~django.template.RequestContext` is used to render the response so
    that ``{% csrf_token %}`` will work properly. If you're using the
    :func:`~django.shortcuts.render` function, generic views, or contrib apps,
@@ -241,7 +241,7 @@ How it works
 
 The CSRF protection is based on the following things:
 
-1. A CSRF cookie that is based on a random secret value, which other sites
+#. A CSRF cookie that is based on a random secret value, which other sites
    will not have access to.
 
    This cookie is set by ``CsrfViewMiddleware``. It is sent with every
@@ -255,7 +255,7 @@ The CSRF protection is based on the following things:
    For security reasons, the value of the secret is changed each time a
    user logs in.
 
-2. A hidden form field with the name 'csrfmiddlewaretoken' present in all
+#. A hidden form field with the name 'csrfmiddlewaretoken' present in all
    outgoing POST forms. The value of this field is, again, the value of the
    secret, with a salt which is both added to it and used to scramble it. The
    salt is regenerated on every call to ``get_token()`` so that the form field
@@ -263,7 +263,7 @@ The CSRF protection is based on the following things:
 
    This part is done by the template tag.
 
-3. For all incoming requests that are not using HTTP GET, HEAD, OPTIONS or
+#. For all incoming requests that are not using HTTP GET, HEAD, OPTIONS or
    TRACE, a CSRF cookie must be present, and the 'csrfmiddlewaretoken' field
    must be present and correct. If it isn't, the user will get a 403 error.
 
@@ -274,7 +274,7 @@ The CSRF protection is based on the following things:
 
    This check is done by ``CsrfViewMiddleware``.
 
-4. In addition, for HTTPS requests, strict referer checking is done by
+#. In addition, for HTTPS requests, strict referer checking is done by
    ``CsrfViewMiddleware``. This means that even if a subdomain can set or
    modify cookies on your domain, it can't force a user to post to your
    application since that request won't come from your own exact domain.

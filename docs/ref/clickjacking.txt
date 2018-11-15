@@ -40,9 +40,9 @@ loading in a frame no matter which site made the request.
 Django provides a few simple ways to include this header in responses from your
 site:
 
-1. A simple middleware that sets the header in all responses.
+#. A simple middleware that sets the header in all responses.
 
-2. A set of view decorators that can be used to override the middleware or to
+#. A set of view decorators that can be used to override the middleware or to
    only set the header for certain views.
 
 The ``X-Frame-Options`` HTTP header will only be set by the middleware or view

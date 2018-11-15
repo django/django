@@ -303,10 +303,10 @@ Django applications require a single base filesystem path where Django
 etc. Thus, namespace packages may only be Django applications if one of the
 following is true:
 
-1. The namespace package actually has only a single location (i.e. is not
+#. The namespace package actually has only a single location (i.e. is not
    spread across more than one directory.)
 
-2. The :class:`~django.apps.AppConfig` class used to configure the application
+#. The :class:`~django.apps.AppConfig` class used to configure the application
    has a :attr:`~django.apps.AppConfig.path` class attribute, which is the
    absolute directory path Django will use as the single base path for the
    application.
