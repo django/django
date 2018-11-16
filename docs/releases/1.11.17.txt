@@ -9,4 +9,6 @@ Django 1.11.17 fixes several bugs in 1.11.16.
 Bugfixes
 ========
 
-* ...
+* Prevented repetitive calls to ``geos_version_tuple()`` in the ``WKBWriter``
+  class in an attempt to fix a random crash involving ``LooseVersion`` since
+  Django 1.11.14 (:ticket:`29959`).

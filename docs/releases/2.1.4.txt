@@ -12,3 +12,7 @@ Bugfixes
 * Corrected the default password list that ``CommonPasswordValidator`` uses by
   lowercasing all passwords to match the format expected by the validator
   (:ticket:`29952`).
+
+* Prevented repetitive calls to ``geos_version_tuple()`` in the ``WKBWriter``
+  class in an attempt to fix a random crash involving ``LooseVersion``
+  (:ticket:`29959`).
