@@ -62,14 +62,12 @@ class ModelIterable(BaseIterable):
                      for f in select[model_fields_start:model_fields_end]]
         related_populators = get_related_populators(klass_info, select, db)
         known_related_objects = [
-            (field, related_objs, [
-                operator.attrgetter(
-                    field.attname
-                    if from_field == 'self' else
-                    queryset.model._meta.get_field(from_field).attname
-                )
+            (field, related_objs, operator.attrgetter(*[
+                field.attname
+                if from_field == 'self' else
+                queryset.model._meta.get_field(from_field).attname
                 for from_field in field.from_fields
-            ]) for field, related_objs in queryset._known_related_objects.items()
+            ])) for field, related_objs in queryset._known_related_objects.items()
         ]
         for row in compiler.results_iter(results):
             obj = model_cls.from_db(db, init_list, row[model_fields_start:model_fields_end])
@@ -80,11 +78,11 @@ class ModelIterable(BaseIterable):
                     setattr(obj, attr_name, row[col_pos])
 
             # Add the known related objects to the model.
-            for field, rel_objs, rel_getters in known_related_objects:
+            for field, rel_objs, rel_getter in known_related_objects:
                 # Avoid overwriting objects loaded by, e.g., select_related().
                 if field.is_cached(obj):
                     continue
-                rel_obj_id = tuple([rel_getter(obj) for rel_getter in rel_getters])
+                rel_obj_id = rel_getter(obj)
                 try:
                     rel_obj = rel_objs[rel_obj_id]
                 except KeyError:
