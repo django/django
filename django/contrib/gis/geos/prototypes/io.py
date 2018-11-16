@@ -216,6 +216,7 @@ class WKBWriter(IOBase):
     _constructor = wkb_writer_create
     ptr_type = WKB_WRITE_PTR
     destructor = wkb_writer_destroy
+    geos_version = geos_version_info()
 
     def __init__(self, dim=2):
         super(WKBWriter, self).__init__()
@@ -238,7 +239,7 @@ class WKBWriter(IOBase):
         from django.contrib.gis.geos import Polygon
         geom = self._handle_empty_point(geom)
         wkb = wkb_writer_write(self.ptr, geom.ptr, byref(c_size_t()))
-        if geos_version_info()['version'] < '3.6.1' and isinstance(geom, Polygon) and geom.empty:
+        if self.geos_version['version'] < '3.6.1' and isinstance(geom, Polygon) and geom.empty:
             # Fix GEOS output for empty polygon.
             # See https://trac.osgeo.org/geos/ticket/680.
             wkb = wkb[:-8] + b'\0' * 4
@@ -249,7 +250,7 @@ class WKBWriter(IOBase):
         from django.contrib.gis.geos.polygon import Polygon
         geom = self._handle_empty_point(geom)
         wkb = wkb_writer_write_hex(self.ptr, geom.ptr, byref(c_size_t()))
-        if geos_version_info()['version'] < '3.6.1' and isinstance(geom, Polygon) and geom.empty:
+        if self.geos_version['version'] < '3.6.1' and isinstance(geom, Polygon) and geom.empty:
             wkb = wkb[:-16] + b'0' * 8
         return wkb
 
