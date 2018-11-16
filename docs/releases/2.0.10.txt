@@ -9,4 +9,6 @@ Django 2.0.10 fixes several bugs in 2.0.9.
 Bugfixes
 ========
 
-* ...
+* Prevented repetitive calls to ``geos_version_tuple()`` in the ``WKBWriter``
+  class in an attempt to fix a random crash involving ``LooseVersion`` since
+  Django 2.0.6 (:ticket:`29959`).
