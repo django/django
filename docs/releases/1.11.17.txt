@@ -2,7 +2,7 @@
 Django 1.11.17 release notes
 ============================
 
-*Expected November 1, 2018*
+*Release date TBD*
 
 Django 1.11.17 fixes several bugs in 1.11.16.
 
