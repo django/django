@@ -95,7 +95,7 @@ a set of optional permission related :ref:`authorization methods
 
 The ``get_user`` method takes a ``user_id`` -- which could be a username,
 database ID or whatever, but has to be the primary key of your user object --
-and returns a user object.
+and returns a user object or ``None``.
 
 The ``authenticate`` method takes a ``request`` argument and credentials as
 keyword arguments. Most of the time, it'll just look like this::
@@ -255,6 +255,8 @@ authenticated users do not.
 Do not forget to test for the ``is_active`` attribute of the user in your own
 backend permission methods.
 
+.. _object_permissions:
+
 Handling object permissions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -264,6 +266,74 @@ object permissions will always return ``False`` or an empty list (depending on
 the check performed). An authentication backend will receive the keyword
 parameters ``obj`` and ``user_obj`` for each object related authorization
 method and can return the object level permission as appropriate.
+
+Here is a complete example authentication backend handling object permissions::
+
+    class BlogPost(models.Model):
+        owner = models.ForeignKey(User, on_delete=models.CASCADE)
+        ...
+
+    class BlogPostBackend:
+        def authenticate(self, request, **kwargs):
+            """This backend only handles permissions, not authentication"""
+            return None
+
+        def get_user(self, user_id):
+            """This backend only handles permissions, not authentication"""
+            return None
+
+        def get_all_permissions(self, user_obj, obj=None):
+            """Owner can edit/delete posts, others can only view"""
+            if user_obj.is_active and not user_obj.is_anonymous:
+                if isinstance(obj, BlogPost) and obj.owner == user_obj:
+                    return set(
+                        'blog.change_blogpost',
+                        'blog.delete_blogpost',
+                    )
+            return set()
+
+        def has_perm(self, user_obj, perm, obj=None):
+            return perm in self.get_all_permissions(user_obj, obj=obj)
+
+        def has_module_perms(self, user_obj, app_label):
+            return any(
+                perm.split('.')[0] == app_label
+                for perm in self.get_all_permissions(user_obj)
+            )
+
+Let's assume ``user`` only has the permission ``blog.view_blogpost`` but is
+also the owner of ``post``. If we only use the default
+:class:`~django.contrib.auth.backends.ModelBackend`, they will not have any
+object-level permissions::
+
+    AUTHENTICATION_BACKENDS = [
+        "django.contrib.auth.backends.ModelBackend",
+    ]
+
+    user.has_permission("blog.view_blogpost")  # True
+    user.has_permission("blog.change_blogpost")  # False
+    user.has_permission("blog.view_blogpost", obj=post)  # False
+    user.has_permission("blog.change_blogpost", obj=post)  # False
+
+Now if we add the ``BlogPostBackend`` defined above they are also allowed to
+change ``post``::
+
+    AUTHENTICATION_BACKENDS = [
+        "django.contrib.auth.backends.ModelBackend",
+        "blog.backends.BlogPostBackend",
+    ]
+
+    user.has_permission("blog.view_blogpost")  # True
+    user.has_permission("blog.change_blogpost")  # False
+    user.has_permission("blog.view_blogpost", obj=post)  # False
+    user.has_permission("blog.change_blogpost", obj=post)  # True
+
+Note that the permission ``blog.view_blogpost`` is only granted when not
+passing an object. If you do not care about the distinction, you can check for
+both::
+
+    if user.has_permission(perm) or user.has_permission(perm, obj=post):
+        …
 
 .. _custom-permissions:
 
