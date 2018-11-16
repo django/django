@@ -72,12 +72,16 @@ class PermissionRequiredMixin(AccessMixin):
             perms = self.permission_required
         return perms
 
+    def get_permission_object(self):
+        return None
+
     def has_permission(self):
         """
         Override this method to customize the way permissions are checked.
         """
         perms = self.get_permission_required()
-        return self.request.user.has_perms(perms)
+        permission_object = self.get_permission_object()
+        return self.request.user.has_perms(perms, obj=permission_object)
 
     def dispatch(self, request, *args, **kwargs):
         if not self.has_permission():

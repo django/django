@@ -62,6 +62,10 @@ Minor features
   new :class:`~django.contrib.auth.backends.DefaultObjectPermissionsBackend` to
   get that behavior by default.
 
+* The new ``get_permission_object()`` method on
+  :class:`~django.contrib.auth.mixins.PermissionRequiredMixin` allows
+  checking object permissions.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
