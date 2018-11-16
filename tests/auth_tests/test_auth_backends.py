@@ -746,3 +746,21 @@ class AllowAllUsersModelBackendTest(TestCase):
         request.session = self.client.session
         user = get_user(request)
         self.assertEqual(user, self.user)
+
+
+@override_settings(AUTHENTICATION_BACKENDS=[
+    'django.contrib.auth.backends.ModelBackend',
+    'django.contrib.auth.backends.DefaultObjectPermissionsBackend',
+])
+class DefaultObjectPermissionsBackendTest(TestCase):
+    def test_custom_perms(self):
+        user = User.objects.create_user(email='test@example.com', username='test', password='test')
+        content_type = ContentType.objects.get_for_model(Group)
+        perm = Permission.objects.create(name='test', content_type=content_type, codename='test')
+        user.user_permissions.add(perm)
+
+        # reloading user to purge the _perm_cache
+        user = User._default_manager.get(pk=user.pk)
+
+        self.assertEqual(user.get_all_permissions(), {'auth.test'})
+        self.assertEqual(user.get_all_permissions(obj=object()), {'auth.test'})

@@ -335,6 +335,21 @@ both::
     if user.has_permission(perm) or user.has_permission(perm, obj=post):
         …
 
+Alternatively, you can add the
+:class:`~django.contrib.auth.backends.DefaultObjectPermissionsBackend` to get
+that behavior by default::
+
+    AUTHENTICATION_BACKENDS = [
+        "django.contrib.auth.backends.ModelBackend",
+        "blog.backends.BlogPostBackend",
+        "django.contrib.auth.backends.DefaultObjectPermissionsBackend",
+    ]
+
+    user.has_permission("blog.view_blogpost")  # True
+    user.has_permission("blog.change_blogpost")  # False
+    user.has_permission("blog.view_blogpost", obj=post)  # True
+    user.has_permission("blog.change_blogpost", obj=post)  # True
+
 .. _custom-permissions:
 
 Custom permissions

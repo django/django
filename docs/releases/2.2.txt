@@ -57,6 +57,10 @@ Minor features
 
 * The ``HttpRequest`` is now passed as the first positional argument to
   :meth:`.RemoteUserBackend.configure_user`, if it accepts it.
+* If you are using something like ``user.has_permission(perm) or
+  user.has_permission(perm, obj=obj)`` a lot in your code, you can now use the
+  new :class:`~django.contrib.auth.backends.DefaultObjectPermissionsBackend` to
+  get that behavior by default.
 
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

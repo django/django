@@ -574,6 +574,16 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
     :meth:`~django.contrib.auth.forms.AuthenticationForm.confirm_login_allowed`
     method as it rejects inactive users.
 
+.. class:: DefaultObjectPermissionsBackend
+
+   .. versionadded:: 2.2
+
+   If you are using :class:`ModelBackend` together with another backend that
+   handles object permissions, the permissions usually granted by
+   :class:`ModelBackend` will be ignored when checking object permissions. If
+   you want the global permissions to be included, you can add this as a third
+   backend.
+
 .. class:: RemoteUserBackend
 
     Use this backend to take advantage of external-to-Django-handled
