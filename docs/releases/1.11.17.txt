@@ -4,7 +4,8 @@ Django 1.11.17 release notes
 
 *Release date TBD*
 
-Django 1.11.17 fixes several bugs in 1.11.16.
+Django 1.11.17 fixes several bugs in 1.11.16 and adds compatibility with
+Python 3.7.
 
 Bugfixes
 ========
