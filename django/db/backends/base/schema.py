@@ -199,8 +199,9 @@ class BaseDatabaseSchemaEditor:
             'requires_literal_defaults must provide a prepare_default() method'
         )
 
-    def effective_default(self, field):
-        """Return a field's effective database default value."""
+    @classmethod
+    def _effective_default(self, field):
+        # This method allows testing its logic without a connection.
         if field.has_default():
             default = field.get_default()
         elif not field.null and field.blank and field.empty_strings_allowed:
@@ -219,8 +220,11 @@ class BaseDatabaseSchemaEditor:
                 default = timezone.now()
         else:
             default = None
-        # Convert the value so it can be sent to the database.
-        return field.get_db_prep_save(default, self.connection)
+        return default
+
+    def effective_default(self, field):
+        """Return a field's effective database default value."""
+        return field.get_db_prep_save(self._effective_default(field), self.connection)
 
     def quote_value(self, value):
         """
