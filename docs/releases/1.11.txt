@@ -22,9 +22,9 @@ for the previous LTS, Django 1.8, will end in April 2018.
 Python compatibility
 ====================
 
-Django 1.11 requires Python 2.7, 3.4, 3.5, or 3.6. Django 1.11 is the first
-release to support Python 3.6. We **highly recommend** and only officially
-support the latest release of each series.
+Django 1.11 requires Python 2.7, 3.4, 3.5, 3.6, or 3.7 (as of 1.11.17). We
+**highly recommend** and only officially support the latest release of each
+series.
 
 The Django 1.11.x series is the last to support Python 2. The next major
 release, Django 2.0, will only support Python 3.4+.
