@@ -212,16 +212,13 @@ class BaseDatabaseSchemaEditor:
             default = datetime.now()
             internal_type = field.get_internal_type()
             if internal_type == 'DateField':
-                default = default.date
+                default = default.date()
             elif internal_type == 'TimeField':
-                default = default.time
+                default = default.time()
             elif internal_type == 'DateTimeField':
-                default = timezone.now
+                default = timezone.now()
         else:
             default = None
-        # If it's a callable, call it
-        if callable(default):
-            default = default()
         # Convert the value so it can be sent to the database.
         return field.get_db_prep_save(default, self.connection)
 
