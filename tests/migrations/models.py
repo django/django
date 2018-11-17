@@ -1,3 +1,9 @@
+try:
+    from psycopg2.extras import DateTimeTZRange
+    from django.contrib.postgres.fields import DateTimeRangeField
+except ImportError:
+    pass  # psycopg2 isn't installed.
+
 from django.apps.registry import Apps
 from django.db import models
 
@@ -23,15 +29,35 @@ class UnicodeModel(models.Model):
         return self.title
 
 
-class Unserializable:
+class ClassSerializable:
     """
-    An object that migration doesn't know how to serialize.
+    An object that migration for class serializer.
     """
     pass
 
 
+class ClassSerializableModel(models.Model):
+    title = models.CharField(max_length=20, default=ClassSerializable())
+    try:
+        date = DateTimeRangeField(default=DateTimeTZRange(None, None, '[]'))
+    except NameError:
+        date = models.DateTimeField()
+
+    class Meta:
+        # Disable auto loading of this model as we load it on our own
+        apps = Apps()
+
+
+class Unserializable:
+    """
+    An object that migration doesn't know how to serialize.
+    """
+    def __init__(self, args1):
+        self.args1 = args1
+
+
 class UnserializableModel(models.Model):
-    title = models.CharField(max_length=20, default=Unserializable())
+    title = models.CharField(max_length=20, default=Unserializable(args1="args1"))
 
     class Meta:
         # Disable auto loading of this model as we load it on our own

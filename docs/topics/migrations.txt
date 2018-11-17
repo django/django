@@ -681,12 +681,15 @@ Django can serialize the following:
 - Unbound methods used from within the class body
 - Any class reference (must be in module's top-level scope)
 - Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
+- Any class which can be deconstructible. Django tries to serialize these classes last time.
 
 .. versionchanged:: 2.1
 
     Serialization support for :class:`functools.partialmethod` was added.
 
 .. versionchanged:: 2.2
+
+    Serialization support for deconstructible classes was added.
 
     Serialization support for ``NoneType`` was added.
 
