@@ -280,6 +280,9 @@ Backwards incompatible changes in 2.2
 Database backend API
 --------------------
 
+This section describes changes that may be needed in third-party database
+backends.
+
 * Third-party database backends must implement support for table check
   constraints or set ``DatabaseFeatures.supports_table_check_constraints`` to
   ``False``.
