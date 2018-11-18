@@ -254,6 +254,23 @@ class StateTests(SimpleTestCase):
         boss_state = project_state.models['migrations', 'boss']
         self.assertEqual(boss_state.managers, [('objects', Boss.objects)])
 
+    def test_manager_inherits_queryset_migration_flag(self):
+        new_apps = Apps(['migrations'])
+
+        class AuthorQuerySet(models.QuerySet):
+            use_in_migrations = True
+
+        class Author(models.Model):
+            objects = AuthorQuerySet.as_manager()
+
+            class Meta:
+                app_label = 'migrations'
+                apps = new_apps
+
+        project_state = ProjectState.from_apps(new_apps)
+        author_state = project_state.models['migrations', 'author']
+        self.assertEqual(author_state.managers, [('objects', Author.objects)])
+
     def test_custom_default_manager(self):
         new_apps = Apps(['migrations'])
 

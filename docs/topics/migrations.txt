@@ -262,6 +262,15 @@ by defining a ``use_in_migrations`` attribute on the manager class::
     class MyModel(models.Model):
         objects = MyManager()
 
+A manager derived from a queryset also inherits the queryset's
+``use_in_migrations`` attribute:
+
+    class MyQuerySet(models.QuerySet):
+        use_in_migrations = True
+
+    class MyModel(models.Model):
+        objects = MyQuerySet.as_manager()
+
 If you are using the :meth:`~django.db.models.from_queryset` function to
 dynamically generate a manager class, you need to inherit from the generated
 class to make it importable::
