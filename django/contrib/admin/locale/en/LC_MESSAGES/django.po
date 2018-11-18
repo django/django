@@ -111,7 +111,6 @@ msgstr ""
 #: contrib/admin/templates/admin/edit_inline/stacked.html:12
 #: contrib/admin/templates/admin/edit_inline/tabular.html:34
 #: contrib/admin/templates/admin/index.html:40
-#: contrib/admin/templates/admin/related_widget_wrapper.html:12
 #: contrib/admin/templates/admin/widgets/related_widget_wrapper.html:10
 msgid "Change"
 msgstr ""
@@ -519,7 +518,6 @@ msgid "Toggle sorting"
 msgstr ""
 
 #: contrib/admin/templates/admin/delete_confirmation.html:18
-#: contrib/admin/templates/admin/related_widget_wrapper.html:30
 #: contrib/admin/templates/admin/submit_line.html:7
 #: contrib/admin/templates/admin/widgets/related_widget_wrapper.html:24
 msgid "Delete"
@@ -591,7 +589,6 @@ msgstr ""
 #: contrib/admin/templates/admin/edit_inline/stacked.html:12
 #: contrib/admin/templates/admin/edit_inline/tabular.html:34
 #: contrib/admin/templates/admin/index.html:38
-#: contrib/admin/templates/admin/related_widget_wrapper.html:15
 msgid "View"
 msgstr ""
 
@@ -614,7 +611,6 @@ msgid "Models in the %(name)s application"
 msgstr ""
 
 #: contrib/admin/templates/admin/index.html:31
-#: contrib/admin/templates/admin/related_widget_wrapper.html:23
 #: contrib/admin/templates/admin/widgets/related_widget_wrapper.html:17
 msgid "Add"
 msgstr ""
@@ -689,24 +685,16 @@ msgstr ""
 msgid "Popup closing..."
 msgstr ""
 
-#: contrib/admin/templates/admin/related_widget_wrapper.html:11
 #: contrib/admin/templates/admin/widgets/related_widget_wrapper.html:9
 #, python-format
 msgid "Change selected %(model)s"
 msgstr ""
 
-#: contrib/admin/templates/admin/related_widget_wrapper.html:14
-#, python-format
-msgid "View selected %(model)s"
-msgstr ""
-
-#: contrib/admin/templates/admin/related_widget_wrapper.html:22
 #: contrib/admin/templates/admin/widgets/related_widget_wrapper.html:16
 #, python-format
 msgid "Add another %(model)s"
 msgstr ""
 
-#: contrib/admin/templates/admin/related_widget_wrapper.html:29
 #: contrib/admin/templates/admin/widgets/related_widget_wrapper.html:23
 #, python-format
 msgid "Delete selected %(model)s"
