@@ -645,7 +645,11 @@ def reorder_postprocess(reordered_suite):
     the serialized_rollback option present in the next test class in the suite.
     If the next test has no serialized_rollback attribute, it means there
     aren't any more TransactionTestCases.
+    The last test needs a different setup, as there is no further test case, so
+    the data is rollback only if the test initialised it.
     """
+    if not reordered_suite._tests:
+        return reordered_suite
     # Filter out skipped tests.
     active_tests = [
         test for test in reordered_suite._tests
@@ -655,6 +659,8 @@ def reorder_postprocess(reordered_suite):
         next_serialized_rollback = getattr(next_test, 'serialized_rollback', None)
         if next_serialized_rollback is not None:
             previous_test._next_serialized_rollback = next_serialized_rollback
+    last_test = reordered_suite._tests[-1]
+    last_test._next_serialized_rollback = getattr(last_test, 'serialized_rollback', False)
     return reordered_suite
 
 
