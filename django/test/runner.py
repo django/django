@@ -646,7 +646,12 @@ def reorder_postprocess(reordered_suite):
     If the next test has no serialized_rollback attribute, it means there
     aren't any more TransactionTestCases.
     """
-    for previous_test, next_test in zip(reordered_suite._tests[:-1], reordered_suite._tests[1:]):
+    # Filter out skipped tests.
+    active_tests = [
+        test for test in reordered_suite._tests
+        if not getattr(test, '__unittest_skip__', False)
+    ]
+    for previous_test, next_test in zip(active_tests[:-1], active_tests[1:]):
         next_serialized_rollback = getattr(next_test, 'serialized_rollback', None)
         if next_serialized_rollback is not None:
             previous_test._next_serialized_rollback = next_serialized_rollback
