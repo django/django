@@ -9,7 +9,7 @@ from django.urls import get_resolver, set_urlconf
 from django.utils.log import log_response
 from django.utils.module_loading import import_string
 
-from .exception import convert_exception_to_response, get_exception_response
+from .exception import convert_exception_to_response
 
 logger = logging.getLogger('django.request')
 
@@ -67,9 +67,6 @@ class BaseHandler:
             if db.settings_dict['ATOMIC_REQUESTS'] and db.alias not in non_atomic_requests:
                 view = transaction.atomic(using=db.alias)(view)
         return view
-
-    def get_exception_response(self, request, resolver, status_code, exception):
-        return get_exception_response(request, resolver, status_code, exception, self.__class__)
 
     def get_response(self, request):
         """Return an HttpResponse object for the given HttpRequest."""
