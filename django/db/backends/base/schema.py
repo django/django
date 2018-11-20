@@ -199,8 +199,8 @@ class BaseDatabaseSchemaEditor:
             'requires_literal_defaults must provide a prepare_default() method'
         )
 
-    @classmethod
-    def _effective_default(self, field):
+    @staticmethod
+    def _effective_default(field):
         # This method allows testing its logic without a connection.
         if field.has_default():
             default = field.get_default()
