@@ -16,3 +16,6 @@ Bugfixes
 * Prevented repetitive calls to ``geos_version_tuple()`` in the ``WKBWriter``
   class in an attempt to fix a random crash involving ``LooseVersion``
   (:ticket:`29959`).
+
+* Fixed keep-alive support in ``runserver`` after it was disabled to fix
+  another issue in Django 2.0 (:ticket:`29849`).
