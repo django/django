@@ -72,23 +72,14 @@ class BaseHandler:
         """Return an HttpResponse object for the given HttpRequest."""
         # Setup default url resolver for this thread
         set_urlconf(settings.ROOT_URLCONF)
-
         response = self._middleware_chain(request)
-
         response._closable_objects.append(request)
-
-        # If the exception handler returns a TemplateResponse that has not
-        # been rendered, force it to be rendered.
-        if not getattr(response, 'is_rendered', True) and callable(getattr(response, 'render', None)):
-            response = response.render()
-
         if response.status_code >= 400:
             log_response(
                 '%s: %s', response.reason_phrase, request.path,
                 response=response,
                 request=request,
             )
-
         return response
 
     def _get_response(self, request):
