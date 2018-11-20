@@ -225,11 +225,16 @@ class FormCheckTests(CheckTestCase):
         class TestModelAdmin(ModelAdmin):
             form = FakeForm
 
-        self.assertIsInvalid(
-            TestModelAdmin, ValidationTestModel,
-            "The value of 'form' must inherit from 'BaseModelForm'.",
-            'admin.E016'
-        )
+        class TestModelAdminWithNoForm(ModelAdmin):
+            form = 'not a form'
+
+        for model_admin in (TestModelAdmin, TestModelAdminWithNoForm):
+            with self.subTest(model_admin):
+                self.assertIsInvalid(
+                    model_admin, ValidationTestModel,
+                    "The value of 'form' must inherit from 'BaseModelForm'.",
+                    'admin.E016'
+                )
 
     def test_fieldsets_with_custom_form_validation(self):
 
@@ -598,6 +603,40 @@ class ListFilterTests(CheckTestCase):
             'admin.E112'
         )
 
+    def test_not_list_filter_class(self):
+        class TestModelAdmin(ModelAdmin):
+            list_filter = ['RandomClass']
+
+        self.assertIsInvalid(
+            TestModelAdmin, ValidationTestModel,
+            "The value of 'list_filter[0]' refers to 'RandomClass', which "
+            "does not refer to a Field.",
+            'admin.E116'
+        )
+
+    def test_callable(self):
+        def random_callable():
+            pass
+
+        class TestModelAdmin(ModelAdmin):
+            list_filter = [random_callable]
+
+        self.assertIsInvalid(
+            TestModelAdmin, ValidationTestModel,
+            "The value of 'list_filter[0]' must inherit from 'ListFilter'.",
+            'admin.E113'
+        )
+
+    def test_not_callable(self):
+        class TestModelAdmin(ModelAdmin):
+            list_filter = [[42, 42]]
+
+        self.assertIsInvalid(
+            TestModelAdmin, ValidationTestModel,
+            "The value of 'list_filter[0][1]' must inherit from 'FieldListFilter'.",
+            'admin.E115'
+        )
+
     def test_missing_field(self):
         class TestModelAdmin(ModelAdmin):
             list_filter = ('non_existent_field',)
@@ -653,6 +692,19 @@ class ListFilterTests(CheckTestCase):
             TestModelAdmin, ValidationTestModel,
             "The value of 'list_filter[0][1]' must inherit from 'FieldListFilter'.",
             'admin.E115'
+        )
+
+    def test_list_filter_is_func(self):
+        def get_filter():
+            pass
+
+        class TestModelAdmin(ModelAdmin):
+            list_filter = [get_filter]
+
+        self.assertIsInvalid(
+            TestModelAdmin, ValidationTestModel,
+            "The value of 'list_filter[0]' must inherit from 'ListFilter'.",
+            'admin.E113'
         )
 
     def test_not_associated_with_field_name(self):
@@ -918,6 +970,16 @@ class InlinesCheckTests(CheckTestCase):
             'admin.E103'
         )
 
+    def test_not_correct_inline_field(self):
+        class TestModelAdmin(ModelAdmin):
+            inlines = [42]
+
+        self.assertIsInvalidRegexp(
+            TestModelAdmin, ValidationTestModel,
+            r"'.*\.TestModelAdmin' must inherit from 'InlineModelAdmin'\.",
+            'admin.E104'
+        )
+
     def test_not_model_admin(self):
         class ValidationTestInline:
             pass
@@ -958,6 +1020,32 @@ class InlinesCheckTests(CheckTestCase):
             TestModelAdmin, ValidationTestModel,
             r"The value of '.*\.ValidationTestInline.model' must be a Model\.",
             'admin.E106'
+        )
+
+    def test_invalid_model(self):
+        class ValidationTestInline(TabularInline):
+            model = 'Not a class'
+
+        class TestModelAdmin(ModelAdmin):
+            inlines = [ValidationTestInline]
+
+        self.assertIsInvalidRegexp(
+            TestModelAdmin, ValidationTestModel,
+            r"The value of '.*\.ValidationTestInline.model' must be a Model\.",
+            'admin.E106'
+        )
+
+    def test_invalid_callable(self):
+        def random_obj():
+            pass
+
+        class TestModelAdmin(ModelAdmin):
+            inlines = [random_obj]
+
+        self.assertIsInvalidRegexp(
+            TestModelAdmin, ValidationTestModel,
+            r"'.*\.random_obj' must inherit from 'InlineModelAdmin'\.",
+            'admin.E104'
         )
 
     def test_valid_case(self):
@@ -1100,6 +1188,21 @@ class FormsetCheckTests(CheckTestCase):
             "The value of 'formset' must inherit from 'BaseModelFormSet'.",
             'admin.E206',
             invalid_obj=ValidationTestInline
+        )
+
+    def test_inline_without_formset_class(self):
+        class ValidationTestInlineWithoutFormsetClass(TabularInline):
+            model = ValidationTestInlineModel
+            formset = 'Not a FormSet Class'
+
+        class TestModelAdminWithoutFormsetClass(ModelAdmin):
+            inlines = [ValidationTestInlineWithoutFormsetClass]
+
+        self.assertIsInvalid(
+            TestModelAdminWithoutFormsetClass, ValidationTestModel,
+            "The value of 'formset' must inherit from 'BaseModelFormSet'.",
+            'admin.E206',
+            invalid_obj=ValidationTestInlineWithoutFormsetClass
         )
 
     def test_valid_case(self):
