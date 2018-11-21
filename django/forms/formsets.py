@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.forms import Form
 from django.forms.fields import BooleanField, IntegerField
 from django.forms.utils import ErrorList
-from django.forms.widgets import HiddenInput
+from django.forms.widgets import HiddenInput, NumberInput
 from django.utils.functional import cached_property
 from django.utils.html import html_safe
 from django.utils.safestring import mark_safe
@@ -47,6 +47,8 @@ class BaseFormSet:
     """
     A collection of instances of the same Form class.
     """
+    ordering_widget = NumberInput
+
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, form_kwargs=None):
         self.is_bound = data is not None or files is not None
@@ -264,6 +266,10 @@ class BaseFormSet:
     def get_default_prefix(cls):
         return 'form'
 
+    @classmethod
+    def get_ordering_widget(cls):
+        return cls.ordering_widget
+
     def non_form_errors(self):
         """
         Return an ErrorList of errors that aren't associated with a particular
@@ -368,9 +374,18 @@ class BaseFormSet:
         if self.can_order:
             # Only pre-fill the ordering field for initial forms.
             if index is not None and index < self.initial_form_count():
-                form.fields[ORDERING_FIELD_NAME] = IntegerField(label=_('Order'), initial=index + 1, required=False)
+                form.fields[ORDERING_FIELD_NAME] = IntegerField(
+                    label=_('Order'),
+                    initial=index + 1,
+                    required=False,
+                    widget=self.get_ordering_widget(),
+                )
             else:
-                form.fields[ORDERING_FIELD_NAME] = IntegerField(label=_('Order'), required=False)
+                form.fields[ORDERING_FIELD_NAME] = IntegerField(
+                    label=_('Order'),
+                    required=False,
+                    widget=self.get_ordering_widget(),
+                )
         if self.can_delete:
             form.fields[DELETION_FIELD_NAME] = BooleanField(label=_('Delete'), required=False)
 

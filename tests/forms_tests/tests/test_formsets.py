@@ -8,6 +8,7 @@ from django.forms import (
 )
 from django.forms.formsets import BaseFormSet, all_valid, formset_factory
 from django.forms.utils import ErrorList
+from django.forms.widgets import HiddenInput
 from django.test import SimpleTestCase
 
 
@@ -590,6 +591,31 @@ class FormsFormsetTestCase(SimpleTestCase):
                 {'votes': 900, 'ORDER': 2, 'choice': 'Fergie'},
             ],
         )
+
+    def test_formsets_with_order_custom_widget(self):
+        class OrderingAttributFormSet(BaseFormSet):
+            ordering_widget = HiddenInput
+
+        class OrderingMethodFormSet(BaseFormSet):
+            def get_ordering_widget(self):
+                return HiddenInput(attrs={'class': 'ordering'})
+
+        tests = (
+            (OrderingAttributFormSet, '<input type="hidden" name="form-0-ORDER">'),
+            (OrderingMethodFormSet, '<input class="ordering" type="hidden" name="form-0-ORDER">'),
+        )
+        for formset_class, order_html in tests:
+            with self.subTest(formset_class=formset_class):
+                ArticleFormSet = formset_factory(ArticleForm, formset=formset_class, can_order=True)
+                formset = ArticleFormSet(auto_id=False)
+                self.assertHTMLEqual(
+                    '\n'.join(form.as_ul() for form in formset.forms),
+                    (
+                        '<li>Title: <input type="text" name="form-0-title"></li>'
+                        '<li>Pub date: <input type="text" name="form-0-pub_date">'
+                        '%s</li>' % order_html
+                    ),
+                )
 
     def test_empty_ordered_fields(self):
         """
