@@ -312,6 +312,13 @@ backends.
   * ``sql_create_fk`` is replaced with ``sql_foreign_key_constraint``,
     ``sql_constraint``, and ``sql_create_constraint``.
 
+* ``DatabaseIntrospection.table_name_converter()`` and
+  ``column_name_converter()`` are removed. Third party database backends may
+  need to instead implement ``DatabaseIntrospection.identifier_converter()``.
+  In that case, the constraint names that
+  ``DatabaseIntrospection.get_constraints()`` returns must be normalized by
+  ``identifier_converter()``.
+
 Admin actions are no longer collected from base ``ModelAdmin`` classes
 ----------------------------------------------------------------------
 

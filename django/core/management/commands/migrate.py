@@ -308,7 +308,7 @@ class Command(BaseCommand):
 
         def model_installed(model):
             opts = model._meta
-            converter = connection.introspection.table_name_converter
+            converter = connection.introspection.identifier_converter
             return not (
                 (converter(opts.db_table) in tables) or
                 (opts.auto_created and converter(opts.auto_created._meta.db_table) in tables)

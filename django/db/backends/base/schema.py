@@ -1048,7 +1048,7 @@ class BaseDatabaseSchemaEditor:
         """Return all constraint names matching the columns and conditions."""
         if column_names is not None:
             column_names = [
-                self.connection.introspection.column_name_converter(name)
+                self.connection.introspection.identifier_converter(name)
                 for name in column_names
             ]
         with self.connection.cursor() as cursor:
