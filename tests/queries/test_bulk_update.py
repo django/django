@@ -7,7 +7,7 @@ from django.test import TestCase
 
 from .models import (
     Article, CustomDbColumn, CustomPk, Detail, Individual, Member, Note,
-    Number, Paragraph, SpecialCategory, Tag, Valid,
+    Number, Order, Paragraph, SpecialCategory, Tag, Valid,
 )
 
 
@@ -166,6 +166,13 @@ class BulkUpdateTests(TestCase):
             CustomPk.objects.values_list('extra', flat=True),
             [cat.extra for cat in custom_pks]
         )
+
+    def test_falsey_pk_value(self):
+        order = Order.objects.create(pk=0, name='test')
+        order.name = 'updated'
+        Order.objects.bulk_update([order], ['name'])
+        order.refresh_from_db()
+        self.assertEqual(order.name, 'updated')
 
     def test_inherited_fields(self):
         special_categories = [
