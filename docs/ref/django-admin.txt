@@ -399,6 +399,12 @@ it because ``True`` is its default value).
 Database-specific notes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+Oracle
+^^^^^^
+
+* Models are created for materialized views if :option:`--include-views` is
+  used.
+
 PostgreSQL
 ^^^^^^^^^^
 
