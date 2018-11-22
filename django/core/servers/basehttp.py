@@ -140,6 +140,21 @@ class ServerHandler(simple_server.ServerHandler):
         self.get_stdin()._read_limited()
         super().close()
 
+    def finish_response(self):
+        try:
+            if self.environ['REQUEST_METHOD'] == 'HEAD':
+                # Consume the iterator for possible side effects
+                for _ in self.result:
+                    pass
+                self.finish_content()
+            else:
+                if not self.result_is_file() or not self.sendfile():
+                    for data in self.result:
+                        self.write(data)
+                    self.finish_content()
+        finally:
+            self.close()
+
 
 class WSGIRequestHandler(simple_server.WSGIRequestHandler):
     protocol_version = 'HTTP/1.1'
