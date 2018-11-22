@@ -256,15 +256,18 @@ def build_instance(Model, data, db):
     If the model instance doesn't have a primary key and the model supports
     natural keys, try to retrieve it from the database.
     """
-    obj = Model(**data)
-    if (obj.pk is None and hasattr(Model, 'natural_key') and
-            hasattr(Model._default_manager, 'get_by_natural_key')):
-        natural_key = obj.natural_key()
+    default_manager = Model._meta.default_manager
+    pk = data.get(Model._meta.pk.name)
+    if (pk is None and hasattr(default_manager, 'get_by_natural_key') and
+            hasattr(Model, 'natural_key')):
+        natural_key = Model(**data).natural_key()
         try:
-            obj.pk = Model._default_manager.db_manager(db).get_by_natural_key(*natural_key).pk
+            data[Model._meta.pk.attname] = Model._meta.pk.to_python(
+                default_manager.db_manager(db).get_by_natural_key(*natural_key).pk
+            )
         except Model.DoesNotExist:
             pass
-    return obj
+    return Model(**data)
 
 
 def deserialize_m2m_values(field, field_value, using, handle_forward_references):

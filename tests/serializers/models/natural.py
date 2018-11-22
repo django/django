@@ -1,4 +1,6 @@
 """Models for test_natural.py"""
+import uuid
+
 from django.db import models
 
 
@@ -37,3 +39,17 @@ class NaturalKeyThing(models.Model):
 
     def __str__(self):
         return self.key
+
+
+class NaturalPKWithDefault(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100, unique=True)
+
+    class Manager(models.Manager):
+        def get_by_natural_key(self, name):
+            return self.get(name=name)
+
+    objects = Manager()
+
+    def natural_key(self):
+        return (self.name,)
