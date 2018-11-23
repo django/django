@@ -832,7 +832,7 @@ loaders that come with Django:
 
         TEMPLATES = [{
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [os.path.join(BASE_DIR, 'templates')],
+            'DIRS': [BASE_DIR / 'templates')],
         }]
 
     You can also override ``'DIRS'`` and specify specific directories for a
@@ -844,7 +844,7 @@ loaders that come with Django:
                 'loaders': [
                     (
                         'django.template.loaders.filesystem.Loader',
-                        [os.path.join(BASE_DIR, 'templates')],
+                        [BASE_DIR / 'templates')],
                     ),
                 ],
             },
@@ -918,7 +918,7 @@ loaders that come with Django:
 
         TEMPLATES = [{
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [os.path.join(BASE_DIR, 'templates')],
+            'DIRS': [BASE_DIR / 'templates')],
             'OPTIONS': {
                 'loaders': [
                     ('django.template.loaders.cached.Loader', [

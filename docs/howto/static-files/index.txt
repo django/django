@@ -52,7 +52,7 @@ you can define a list of directories (:setting:`STATICFILES_DIRS`) in your
 settings file where Django will also look for static files. For example::
 
     STATICFILES_DIRS = [
-        os.path.join(BASE_DIR, "static"),
+        BASE_DIR / "static",
         '/var/www/static/',
     ]
 
