@@ -37,7 +37,7 @@ IGNORED_PARAMS = (
 
 class ChangeList:
     def __init__(self, request, model, list_display, list_display_links,
-                 list_filter, date_hierarchy, search_fields, list_select_related,
+                 list_filter, date_hierarchy, search_fields, list_select_related, list_prefetch_related,
                  list_per_page, list_max_show_all, list_editable, model_admin, sortable_by):
         self.model = model
         self.opts = model._meta
@@ -50,6 +50,7 @@ class ChangeList:
         self.date_hierarchy = date_hierarchy
         self.search_fields = search_fields
         self.list_select_related = list_select_related
+        self.list_prefetch_related = list_prefetch_related
         self.list_per_page = list_per_page
         self.list_max_show_all = list_max_show_all
         self.model_admin = model_admin
@@ -395,9 +396,9 @@ class ChangeList:
 
         # Remove duplicates from results, if necessary
         if filters_use_distinct | search_use_distinct:
-            return qs.distinct()
-        else:
-            return qs
+            qs = qs.distinct()
+
+        return self.apply_prefetch_related(qs)
 
     def apply_select_related(self, qs):
         if self.list_select_related is True:
@@ -423,6 +424,14 @@ class ChangeList:
                     if field_name != field.get_attname():
                         return True
         return False
+
+    def apply_prefetch_related(self, qs):
+        if self.list_prefetch_related is None:
+            return qs.prefetch_related(None)
+
+        if self.list_prefetch_related:
+            return qs.prefetch_related(*self.list_prefetch_related)
+        return qs
 
     def url_for_result(self, result):
         pk = getattr(result, self.pk_attname)

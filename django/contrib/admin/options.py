@@ -544,6 +544,7 @@ class ModelAdmin(BaseModelAdmin):
     list_display_links = ()
     list_filter = ()
     list_select_related = False
+    list_prefetch_related = ()
     list_per_page = 100
     list_max_show_all = 200
     list_editable = ()
@@ -737,6 +738,7 @@ class ModelAdmin(BaseModelAdmin):
             self.date_hierarchy,
             self.get_search_fields(request),
             self.get_list_select_related(request),
+            self.get_list_prefetch_related(request),
             self.list_per_page,
             self.list_max_show_all,
             self.list_editable,
@@ -969,6 +971,13 @@ class ModelAdmin(BaseModelAdmin):
         changelist items query.
         """
         return self.list_select_related
+
+    def get_list_prefetch_related(self, request):
+        """
+        Return a list of lookups to add to the prefetch_related() part of the
+        changelist items query.
+        """
+        return self.list_prefetch_related
 
     def get_search_fields(self, request):
         """

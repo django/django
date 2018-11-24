@@ -618,6 +618,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
             *self._check_date_hierarchy(admin_obj),
             *self._check_action_permission_methods(admin_obj),
             *self._check_actions_uniqueness(admin_obj),
+            *self._check_list_prefetch_related(admin_obj),
         ]
 
     def _check_save_as(self, obj):
@@ -976,6 +977,14 @@ class ModelAdminChecks(BaseModelAdminChecks):
                 id='admin.E130',
             )]
         return []
+
+    def _check_list_prefetch_related(self, obj):
+        """Check that list_prefetch_related is a list or tuple or None."""
+
+        if not isinstance(obj.list_prefetch_related, (list, tuple)) and obj.list_prefetch_related is not None:
+            return must_be('a list or tuple or None', option='list_prefetch_related', obj=obj, id='admin.E131')
+        else:
+            return []
 
 
 class InlineModelAdminChecks(BaseModelAdminChecks):

@@ -31,6 +31,7 @@ site.register(Event, EventAdmin)
 
 class ParentAdmin(admin.ModelAdmin):
     list_filter = ['child__name']
+    list_prefetch_related = ['child_set']
     search_fields = ['child__name']
 
 

@@ -127,6 +127,44 @@ class ChangeListTests(TestCase):
         cl = ia.get_changelist_instance(request)
         self.assertEqual(cl.queryset.query.select_related, {'player': {}, 'band': {}})
 
+    def test_list_prefetch_related(self):
+        request = self.factory.get('/parent/')
+        request.user = self.superuser
+        m = ParentAdmin(Parent, custom_site)
+        cl = m.get_changelist_instance(request)
+        qs = cl.get_queryset(request)
+        self.assertEqual(qs._prefetch_related_lookups, ('child_set',))
+
+    def test_get_list_prefetch_related(self):
+        class GetListPrefetchRelatedAdmin(ParentAdmin):
+            def get_list_prefetch_related(self, request):
+                return []
+
+        request = self.factory.get('/parent/')
+        request.user = self.superuser
+        m = GetListPrefetchRelatedAdmin(Parent, custom_site)
+        cl = m.get_changelist_instance(request)
+        qs = cl.get_queryset(request)
+        self.assertEqual(qs._prefetch_related_lookups, ())
+
+    def test_list_prefetch_related_none(self):
+        """
+        Setting list_prefetch_related to None should reset lookups.
+        """
+        class ListPrefetchRelatedNoneAdmin(ParentAdmin):
+            list_prefetch_related = None
+
+            def get_queryset(self, request):
+                qs = super().get_queryset(request)
+                return qs.prefetch_related('child_set')
+
+        request = self.factory.get('/parent/')
+        request.user = self.superuser
+        m = ListPrefetchRelatedNoneAdmin(Parent, custom_site)
+        cl = m.get_changelist_instance(request)
+        qs = cl.get_queryset(request)
+        self.assertEqual(qs._prefetch_related_lookups, ())
+
     def test_result_list_empty_changelist_value(self):
         """
         Regression test for #14982: EMPTY_CHANGELIST_VALUE should be honored

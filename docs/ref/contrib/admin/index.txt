@@ -1031,6 +1031,36 @@ subclass::
     If you need to specify a dynamic value based on the request, you can
     implement a :meth:`~ModelAdmin.get_list_select_related` method.
 
+.. attribute:: ModelAdmin.list_prefetch_related
+
+    .. versionadded:: 2.2
+
+    Set ``list_prefetch_related`` to tell Django to use
+    :meth:`~django.db.models.query.QuerySet.prefetch_related` in retrieving
+    the list of objects on the admin change list page.
+
+    The value should be either a list or a tuple, or ``None``. Default is an
+    empty tuple.
+
+    When the value is ``None``, Django will reset any previously set prefetch
+    lookups in the query. When the value is an empty list or tuple,
+    ``prefetch_related`` will not be called.
+
+    If the value is a list or a tuple, it will be passed directly to
+    ``prefetch_related`` as parameters. For example::
+
+        class PizzaAdmin(admin.ModelAdmin):
+            list_prefetch_related = ('toppings',)
+
+    will call ``prefetch_related('toppings')``.
+
+    If you need to specify a dynamic value based on the request, you can
+    implement a :meth:`~ModelAdmin.get_list_prefetch_related` method.
+
+    See
+    :meth:`~django.db.models.query.QuerySet.prefetch_related` for more details
+    of possible lookup values.
+
 .. attribute:: ModelAdmin.ordering
 
     Set ``ordering`` to specify how lists of objects should be ordered in the
@@ -1586,6 +1616,14 @@ templates used by the :class:`ModelAdmin` views:
     The ``get_list_select_related`` method is given the ``HttpRequest`` and
     should return a boolean or list as :attr:`ModelAdmin.list_select_related`
     does.
+
+.. method:: ModelAdmin.get_list_prefetch_related(request)
+
+    .. versionadded:: 2.2
+
+    The ``get_list_prefetch_related`` method is given the ``HttpRequest`` and
+    should return a list, a tuple or None as
+    :attr:`ModelAdmin.list_prefetch_related` does.
 
 .. method:: ModelAdmin.get_search_fields(request)
 

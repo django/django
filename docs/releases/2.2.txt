@@ -46,6 +46,8 @@ Minor features
 
 * Added a CSS class to the column headers of
   :class:`~django.contrib.admin.TabularInline`.
+* Added `list_prefetch_related` option to
+  :class:`~django.contrib.admin.ModelAdmin`.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
