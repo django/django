@@ -66,14 +66,15 @@ class SimpleTests(PostgreSQLTestCase):
 
 class TestQuerying(PostgreSQLTestCase):
 
-    def setUp(self):
-        self.objs = [
-            HStoreModel.objects.create(field={'a': 'b'}),
-            HStoreModel.objects.create(field={'a': 'b', 'c': 'd'}),
-            HStoreModel.objects.create(field={'c': 'd'}),
-            HStoreModel.objects.create(field={}),
-            HStoreModel.objects.create(field=None),
-        ]
+    @classmethod
+    def setUpTestData(cls):
+        cls.objs = HStoreModel.objects.bulk_create([
+            HStoreModel(field={'a': 'b'}),
+            HStoreModel(field={'a': 'b', 'c': 'd'}),
+            HStoreModel(field={'c': 'd'}),
+            HStoreModel(field={}),
+            HStoreModel(field=None),
+        ])
 
     def test_exact(self):
         self.assertSequenceEqual(

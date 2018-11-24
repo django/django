@@ -5,11 +5,12 @@ from .models import Category, Person
 
 class ManyToOneRecursiveTests(TestCase):
 
-    def setUp(self):
-        self.r = Category(id=None, name='Root category', parent=None)
-        self.r.save()
-        self.c = Category(id=None, name='Child category', parent=self.r)
-        self.c.save()
+    @classmethod
+    def setUpTestData(cls):
+        cls.r = Category(id=None, name='Root category', parent=None)
+        cls.r.save()
+        cls.c = Category(id=None, name='Child category', parent=cls.r)
+        cls.c.save()
 
     def test_m2o_recursive(self):
         self.assertQuerysetEqual(self.r.child_set.all(),
@@ -22,13 +23,14 @@ class ManyToOneRecursiveTests(TestCase):
 
 class MultipleManyToOneRecursiveTests(TestCase):
 
-    def setUp(self):
-        self.dad = Person(full_name='John Smith Senior', mother=None, father=None)
-        self.dad.save()
-        self.mom = Person(full_name='Jane Smith', mother=None, father=None)
-        self.mom.save()
-        self.kid = Person(full_name='John Smith Junior', mother=self.mom, father=self.dad)
-        self.kid.save()
+    @classmethod
+    def setUpTestData(cls):
+        cls.dad = Person(full_name='John Smith Senior', mother=None, father=None)
+        cls.dad.save()
+        cls.mom = Person(full_name='Jane Smith', mother=None, father=None)
+        cls.mom.save()
+        cls.kid = Person(full_name='John Smith Junior', mother=cls.mom, father=cls.dad)
+        cls.kid.save()
 
     def test_m2o_recursive2(self):
         self.assertEqual(self.kid.mother.id, self.mom.id)

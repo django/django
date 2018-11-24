@@ -832,8 +832,9 @@ class UniqueTest(TestCase):
     """
     unique/unique_together validation.
     """
-    def setUp(self):
-        self.writer = Writer.objects.create(name='Mike Royko')
+    @classmethod
+    def setUpTestData(cls):
+        cls.writer = Writer.objects.create(name='Mike Royko')
 
     def test_simple_unique(self):
         form = ProductForm({'slug': 'teddy-bear-blue'})
@@ -1587,10 +1588,11 @@ class ModelFormBasicTests(TestCase):
 
 
 class ModelMultipleChoiceFieldTests(TestCase):
-    def setUp(self):
-        self.c1 = Category.objects.create(name='Entertainment', slug='entertainment', url='entertainment')
-        self.c2 = Category.objects.create(name="It's a test", slug='its-test', url='test')
-        self.c3 = Category.objects.create(name='Third', slug='third-test', url='third')
+    @classmethod
+    def setUpTestData(cls):
+        cls.c1 = Category.objects.create(name='Entertainment', slug='entertainment', url='entertainment')
+        cls.c2 = Category.objects.create(name="It's a test", slug='its-test', url='test')
+        cls.c3 = Category.objects.create(name='Third', slug='third-test', url='third')
 
     def test_model_multiple_choice_field(self):
         f = forms.ModelMultipleChoiceField(Category.objects.all())

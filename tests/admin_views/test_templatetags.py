@@ -72,8 +72,9 @@ class AdminTemplateTagsTest(AdminViewBasicTestCase):
 class DateHierarchyTests(TestCase):
     factory = RequestFactory()
 
-    def setUp(self):
-        self.superuser = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
+    @classmethod
+    def setUpTestData(cls):
+        cls.superuser = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
 
     def test_choice_links(self):
         modeladmin = ModelAdmin(Question, site)

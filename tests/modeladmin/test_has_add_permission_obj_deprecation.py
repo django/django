@@ -81,9 +81,12 @@ class BandAdmin(ModelAdmin):
 
 class ModelAdminTests(TestCase):
 
+    @classmethod
+    def setUpTestData(cls):
+        cls.band = Band.objects.create(name='The Doors', bio='', sign_date=date(1965, 1, 1))
+        cls.song = Song.objects.create(name='test', band=cls.band)
+
     def setUp(self):
-        self.band = Band.objects.create(name='The Doors', bio='', sign_date=date(1965, 1, 1))
-        self.song = Song.objects.create(name='test', band=self.band)
         self.site = AdminSite()
         self.request = MockRequest()
         self.request.user = self.MockAddUser()

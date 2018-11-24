@@ -10,11 +10,12 @@ class UnaccentTest(PostgreSQLTestCase):
 
     Model = CharFieldModel
 
-    def setUp(self):
-        self.Model.objects.bulk_create([
-            self.Model(field="àéÖ"),
-            self.Model(field="aeO"),
-            self.Model(field="aeo"),
+    @classmethod
+    def setUpTestData(cls):
+        cls.Model.objects.bulk_create([
+            cls.Model(field="àéÖ"),
+            cls.Model(field="aeO"),
+            cls.Model(field="aeo"),
         ])
 
     def test_unaccent(self):

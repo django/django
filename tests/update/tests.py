@@ -6,12 +6,13 @@ from .models import A, B, Bar, D, DataPoint, Foo, RelatedPoint
 
 
 class SimpleTest(TestCase):
-    def setUp(self):
-        self.a1 = A.objects.create()
-        self.a2 = A.objects.create()
+    @classmethod
+    def setUpTestData(cls):
+        cls.a1 = A.objects.create()
+        cls.a2 = A.objects.create()
         for x in range(20):
-            B.objects.create(a=self.a1)
-            D.objects.create(a=self.a1)
+            B.objects.create(a=cls.a1)
+            D.objects.create(a=cls.a1)
 
     def test_nonempty_update(self):
         """
@@ -62,11 +63,12 @@ class SimpleTest(TestCase):
 
 class AdvancedTests(TestCase):
 
-    def setUp(self):
-        self.d0 = DataPoint.objects.create(name="d0", value="apple")
-        self.d2 = DataPoint.objects.create(name="d2", value="banana")
-        self.d3 = DataPoint.objects.create(name="d3", value="banana")
-        self.r1 = RelatedPoint.objects.create(name="r1", data=self.d3)
+    @classmethod
+    def setUpTestData(cls):
+        cls.d0 = DataPoint.objects.create(name="d0", value="apple")
+        cls.d2 = DataPoint.objects.create(name="d2", value="banana")
+        cls.d3 = DataPoint.objects.create(name="d3", value="banana")
+        cls.r1 = RelatedPoint.objects.create(name="r1", data=cls.d3)
 
     def test_update(self):
         """

@@ -250,53 +250,55 @@ class BookmarkAdminGenericRelation(ModelAdmin):
 
 class ListFiltersTests(TestCase):
 
-    def setUp(self):
-        self.today = datetime.date.today()
-        self.tomorrow = self.today + datetime.timedelta(days=1)
-        self.one_week_ago = self.today - datetime.timedelta(days=7)
-        if self.today.month == 12:
-            self.next_month = self.today.replace(year=self.today.year + 1, month=1, day=1)
+    @classmethod
+    def setUpTestData(cls):
+        cls.today = datetime.date.today()
+        cls.tomorrow = cls.today + datetime.timedelta(days=1)
+        cls.one_week_ago = cls.today - datetime.timedelta(days=7)
+        if cls.today.month == 12:
+            cls.next_month = cls.today.replace(year=cls.today.year + 1, month=1, day=1)
         else:
-            self.next_month = self.today.replace(month=self.today.month + 1, day=1)
-        self.next_year = self.today.replace(year=self.today.year + 1, month=1, day=1)
-
-        self.request_factory = RequestFactory()
+            cls.next_month = cls.today.replace(month=cls.today.month + 1, day=1)
+        cls.next_year = cls.today.replace(year=cls.today.year + 1, month=1, day=1)
 
         # Users
-        self.alfred = User.objects.create_superuser('alfred', 'alfred@example.com', 'password')
-        self.bob = User.objects.create_user('bob', 'bob@example.com')
-        self.lisa = User.objects.create_user('lisa', 'lisa@example.com')
+        cls.alfred = User.objects.create_superuser('alfred', 'alfred@example.com', 'password')
+        cls.bob = User.objects.create_user('bob', 'bob@example.com')
+        cls.lisa = User.objects.create_user('lisa', 'lisa@example.com')
 
         # Books
-        self.djangonaut_book = Book.objects.create(
+        cls.djangonaut_book = Book.objects.create(
             title='Djangonaut: an art of living', year=2009,
-            author=self.alfred, is_best_seller=True, date_registered=self.today,
+            author=cls.alfred, is_best_seller=True, date_registered=cls.today,
             is_best_seller2=True,
         )
-        self.bio_book = Book.objects.create(
-            title='Django: a biography', year=1999, author=self.alfred,
+        cls.bio_book = Book.objects.create(
+            title='Django: a biography', year=1999, author=cls.alfred,
             is_best_seller=False, no=207,
             is_best_seller2=False,
         )
-        self.django_book = Book.objects.create(
-            title='The Django Book', year=None, author=self.bob,
-            is_best_seller=None, date_registered=self.today, no=103,
+        cls.django_book = Book.objects.create(
+            title='The Django Book', year=None, author=cls.bob,
+            is_best_seller=None, date_registered=cls.today, no=103,
             is_best_seller2=None,
         )
-        self.guitar_book = Book.objects.create(
+        cls.guitar_book = Book.objects.create(
             title='Guitar for dummies', year=2002, is_best_seller=True,
-            date_registered=self.one_week_ago,
+            date_registered=cls.one_week_ago,
             is_best_seller2=True,
         )
-        self.guitar_book.contributors.set([self.bob, self.lisa])
+        cls.guitar_book.contributors.set([cls.bob, cls.lisa])
 
         # Departments
-        self.dev = Department.objects.create(code='DEV', description='Development')
-        self.design = Department.objects.create(code='DSN', description='Design')
+        cls.dev = Department.objects.create(code='DEV', description='Development')
+        cls.design = Department.objects.create(code='DSN', description='Design')
 
         # Employees
-        self.john = Employee.objects.create(name='John Blue', department=self.dev)
-        self.jack = Employee.objects.create(name='Jack Red', department=self.design)
+        cls.john = Employee.objects.create(name='John Blue', department=cls.dev)
+        cls.jack = Employee.objects.create(name='Jack Red', department=cls.design)
+
+    def setUp(self):
+        self.request_factory = RequestFactory()
 
     def test_choicesfieldlistfilter_has_none_choice(self):
         """

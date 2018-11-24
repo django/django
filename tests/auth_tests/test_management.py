@@ -132,8 +132,11 @@ class GetDefaultUsernameTestCase(TestCase):
 ])
 class ChangepasswordManagementCommandTestCase(TestCase):
 
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(username='joe', password='qwerty')
+
     def setUp(self):
-        self.user = User.objects.create_user(username='joe', password='qwerty')
         self.stdout = StringIO()
         self.stderr = StringIO()
 

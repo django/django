@@ -1109,10 +1109,15 @@ def get_perm(Model, perm):
 @override_settings(ROOT_URLCONF='auth_tests.urls_admin')
 class ChangelistTests(AuthViewsTestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
         # Make me a superuser before logging in.
         User.objects.filter(username='testclient').update(is_staff=True, is_superuser=True)
+
+    def setUp(self):
         self.login()
+        # Get the latest last_login value.
         self.admin = User.objects.get(pk=self.u1.pk)
 
     def get_user_data(self, user):

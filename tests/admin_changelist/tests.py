@@ -50,9 +50,12 @@ def build_tbody_html(pk, href, extra_fields):
 @override_settings(ROOT_URLCONF="admin_changelist.urls")
 class ChangeListTests(TestCase):
 
+    @classmethod
+    def setUpTestData(cls):
+        cls.superuser = User.objects.create_superuser(username='super', email='a@b.com', password='xxx')
+
     def setUp(self):
         self.factory = RequestFactory()
-        self.superuser = User.objects.create_superuser(username='super', email='a@b.com', password='xxx')
 
     def _create_superuser(self, username):
         return User.objects.create_superuser(username=username, email='a@b.com', password='xxx')

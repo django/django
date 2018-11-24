@@ -372,15 +372,16 @@ class ModelTest(TestCase):
 
 
 class ModelLookupTest(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         # Create an Article.
-        self.a = Article(
+        cls.a = Article(
             id=None,
             headline='Swallow programs in Python',
             pub_date=datetime(2005, 7, 28),
         )
         # Save it into the database. You have to call save() explicitly.
-        self.a.save()
+        cls.a.save()
 
     def test_all_lookup(self):
         # Change values by changing the attributes, then calling save().

@@ -18,28 +18,28 @@ from .models import (
 
 
 class MultiColumnFKTests(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         # Creating countries
-        self.usa = Country.objects.create(name="United States of America")
-        self.soviet_union = Country.objects.create(name="Soviet Union")
-        Person()
+        cls.usa = Country.objects.create(name="United States of America")
+        cls.soviet_union = Country.objects.create(name="Soviet Union")
         # Creating People
-        self.bob = Person()
-        self.bob.name = 'Bob'
-        self.bob.person_country = self.usa
-        self.bob.save()
-        self.jim = Person.objects.create(name='Jim', person_country=self.usa)
-        self.george = Person.objects.create(name='George', person_country=self.usa)
+        cls.bob = Person()
+        cls.bob.name = 'Bob'
+        cls.bob.person_country = cls.usa
+        cls.bob.save()
+        cls.jim = Person.objects.create(name='Jim', person_country=cls.usa)
+        cls.george = Person.objects.create(name='George', person_country=cls.usa)
 
-        self.jane = Person.objects.create(name='Jane', person_country=self.soviet_union)
-        self.mark = Person.objects.create(name='Mark', person_country=self.soviet_union)
-        self.sam = Person.objects.create(name='Sam', person_country=self.soviet_union)
+        cls.jane = Person.objects.create(name='Jane', person_country=cls.soviet_union)
+        cls.mark = Person.objects.create(name='Mark', person_country=cls.soviet_union)
+        cls.sam = Person.objects.create(name='Sam', person_country=cls.soviet_union)
 
         # Creating Groups
-        self.kgb = Group.objects.create(name='KGB', group_country=self.soviet_union)
-        self.cia = Group.objects.create(name='CIA', group_country=self.usa)
-        self.republican = Group.objects.create(name='Republican', group_country=self.usa)
-        self.democrat = Group.objects.create(name='Democrat', group_country=self.usa)
+        cls.kgb = Group.objects.create(name='KGB', group_country=cls.soviet_union)
+        cls.cia = Group.objects.create(name='CIA', group_country=cls.usa)
+        cls.republican = Group.objects.create(name='Republican', group_country=cls.usa)
+        cls.democrat = Group.objects.create(name='Democrat', group_country=cls.usa)
 
     def test_get_succeeds_on_multicolumn_match(self):
         # Membership objects have access to their related Person if both

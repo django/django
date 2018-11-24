@@ -83,8 +83,9 @@ class ArticleForm(forms.ModelForm):
 
 
 class ModelFormsTests(TestCase):
-    def setUp(self):
-        self.author = Author.objects.create(name='Joseph Kocherhans')
+    @classmethod
+    def setUpTestData(cls):
+        cls.author = Author.objects.create(name='Joseph Kocherhans')
 
     def test_partial_validation(self):
         # Make sure the "commit=False and set field values later" idiom still

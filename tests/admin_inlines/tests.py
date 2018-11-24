@@ -27,12 +27,13 @@ class TestDataMixin:
 
 @override_settings(ROOT_URLCONF='admin_inlines.urls')
 class TestInline(TestDataMixin, TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.holder = Holder.objects.create(dummy=13)
+        Inner(dummy=42, holder=cls.holder).save()
 
     def setUp(self):
-        holder = Holder(dummy=13)
-        holder.save()
-        Inner(dummy=42, holder=holder).save()
-
         self.client.force_login(self.superuser)
         self.factory = RequestFactory()
 
@@ -40,9 +41,8 @@ class TestInline(TestDataMixin, TestCase):
         """
         can_delete should be passed to inlineformset factory.
         """
-        holder = Holder.objects.get(dummy=13)
         response = self.client.get(
-            reverse('admin:admin_inlines_holder_change', args=(holder.id,))
+            reverse('admin:admin_inlines_holder_change', args=(self.holder.id,))
         )
         inner_formset = response.context['inline_admin_formsets'][0].formset
         expected = InnerInline.can_delete
@@ -570,41 +570,43 @@ class TestInlinePermissions(TestCase):
     inline. Refs #8060.
     """
 
-    def setUp(self):
-        self.user = User(username='admin')
-        self.user.is_staff = True
-        self.user.is_active = True
-        self.user.set_password('secret')
-        self.user.save()
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User(username='admin')
+        cls.user.is_staff = True
+        cls.user.is_active = True
+        cls.user.set_password('secret')
+        cls.user.save()
 
-        self.author_ct = ContentType.objects.get_for_model(Author)
-        self.holder_ct = ContentType.objects.get_for_model(Holder2)
-        self.book_ct = ContentType.objects.get_for_model(Book)
-        self.inner_ct = ContentType.objects.get_for_model(Inner2)
+        cls.author_ct = ContentType.objects.get_for_model(Author)
+        cls.holder_ct = ContentType.objects.get_for_model(Holder2)
+        cls.book_ct = ContentType.objects.get_for_model(Book)
+        cls.inner_ct = ContentType.objects.get_for_model(Inner2)
 
         # User always has permissions to add and change Authors, and Holders,
         # the main (parent) models of the inlines. Permissions on the inlines
         # vary per test.
-        permission = Permission.objects.get(codename='add_author', content_type=self.author_ct)
-        self.user.user_permissions.add(permission)
-        permission = Permission.objects.get(codename='change_author', content_type=self.author_ct)
-        self.user.user_permissions.add(permission)
-        permission = Permission.objects.get(codename='add_holder2', content_type=self.holder_ct)
-        self.user.user_permissions.add(permission)
-        permission = Permission.objects.get(codename='change_holder2', content_type=self.holder_ct)
-        self.user.user_permissions.add(permission)
+        permission = Permission.objects.get(codename='add_author', content_type=cls.author_ct)
+        cls.user.user_permissions.add(permission)
+        permission = Permission.objects.get(codename='change_author', content_type=cls.author_ct)
+        cls.user.user_permissions.add(permission)
+        permission = Permission.objects.get(codename='add_holder2', content_type=cls.holder_ct)
+        cls.user.user_permissions.add(permission)
+        permission = Permission.objects.get(codename='change_holder2', content_type=cls.holder_ct)
+        cls.user.user_permissions.add(permission)
 
         author = Author.objects.create(pk=1, name='The Author')
         book = author.books.create(name='The inline Book')
-        self.author_change_url = reverse('admin:admin_inlines_author_change', args=(author.id,))
+        cls.author_change_url = reverse('admin:admin_inlines_author_change', args=(author.id,))
         # Get the ID of the automatically created intermediate model for the Author-Book m2m
         author_book_auto_m2m_intermediate = Author.books.through.objects.get(author=author, book=book)
-        self.author_book_auto_m2m_intermediate_id = author_book_auto_m2m_intermediate.pk
+        cls.author_book_auto_m2m_intermediate_id = author_book_auto_m2m_intermediate.pk
 
-        holder = Holder2.objects.create(dummy=13)
-        self.inner2 = Inner2.objects.create(dummy=42, holder=holder)
-        self.holder_change_url = reverse('admin:admin_inlines_holder2_change', args=(holder.id,))
+        cls.holder = Holder2.objects.create(dummy=13)
+        cls.inner2 = Inner2.objects.create(dummy=42, holder=cls.holder)
 
+    def setUp(self):
+        self.holder_change_url = reverse('admin:admin_inlines_holder2_change', args=(self.holder.id,))
         self.client.force_login(self.user)
 
     def test_inline_add_m2m_noperm(self):

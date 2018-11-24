@@ -3426,10 +3426,10 @@ class AdminCustomQuerysetTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
+        cls.pks = [EmptyModel.objects.create().id for i in range(3)]
 
     def setUp(self):
         self.client.force_login(self.superuser)
-        self.pks = [EmptyModel.objects.create().id for i in range(3)]
         self.super_login = {
             REDIRECT_FIELD_NAME: reverse('admin:index'),
             'username': 'super',
@@ -3687,21 +3687,17 @@ class AdminInlineFileUploadTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
-
-    def setUp(self):
-        self.client.force_login(self.superuser)
-
-        # Set up test Picture and Gallery.
-        # These must be set up here instead of in fixtures in order to allow Picture
-        # to use a NamedTemporaryFile.
         file1 = tempfile.NamedTemporaryFile(suffix=".file1")
         file1.write(b'a' * (2 ** 21))
         filename = file1.name
         file1.close()
-        self.gallery = Gallery(name="Test Gallery")
-        self.gallery.save()
-        self.picture = Picture(name="Test Picture", image=filename, gallery=self.gallery)
-        self.picture.save()
+        cls.gallery = Gallery(name="Test Gallery")
+        cls.gallery.save()
+        cls.picture = Picture(name="Test Picture", image=filename, gallery=cls.gallery)
+        cls.picture.save()
+
+    def setUp(self):
+        self.client.force_login(self.superuser)
 
     def test_form_has_multipart_enctype(self):
         response = self.client.get(
@@ -3740,6 +3736,8 @@ class AdminInlineTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
+        cls.collector = Collector(pk=1, name='John Fowles')
+        cls.collector.save()
 
     def setUp(self):
         self.post_data = {
@@ -3828,8 +3826,6 @@ class AdminInlineTests(TestCase):
         }
 
         self.client.force_login(self.superuser)
-        self.collector = Collector(pk=1, name='John Fowles')
-        self.collector.save()
 
     def test_simple_inline(self):
         "A simple model can be saved as inlines"

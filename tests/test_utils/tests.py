@@ -185,9 +185,10 @@ class AssertNumQueriesUponConnectionTests(TransactionTestCase):
 
 
 class AssertQuerysetEqualTests(TestCase):
-    def setUp(self):
-        self.p1 = Person.objects.create(name='p1')
-        self.p2 = Person.objects.create(name='p2')
+    @classmethod
+    def setUpTestData(cls):
+        cls.p1 = Person.objects.create(name='p1')
+        cls.p2 = Person.objects.create(name='p2')
 
     def test_ordered(self):
         self.assertQuerysetEqual(
@@ -255,8 +256,9 @@ class AssertQuerysetEqualTests(TestCase):
 @override_settings(ROOT_URLCONF='test_utils.urls')
 class CaptureQueriesContextManagerTests(TestCase):
 
-    def setUp(self):
-        self.person_pk = str(Person.objects.create(name='test').pk)
+    @classmethod
+    def setUpTestData(cls):
+        cls.person_pk = str(Person.objects.create(name='test').pk)
 
     def test_simple(self):
         with CaptureQueriesContext(connection) as captured_queries:

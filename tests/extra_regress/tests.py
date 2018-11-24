@@ -9,8 +9,9 @@ from .models import Order, RevisionableModel, TestObject
 
 class ExtraRegressTests(TestCase):
 
-    def setUp(self):
-        self.u = User.objects.create_user(
+    @classmethod
+    def setUpTestData(cls):
+        cls.u = User.objects.create_user(
             username="fred",
             password="secret",
             email="fred@example.com"

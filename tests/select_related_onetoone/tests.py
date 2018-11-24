@@ -10,7 +10,8 @@ from .models import (
 
 
 class ReverseSelectRelatedTestCase(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         user = User.objects.create(username="test")
         UserProfile.objects.create(user=user, state="KS", city="Lawrence")
         results = UserStatResult.objects.create(results='first results')

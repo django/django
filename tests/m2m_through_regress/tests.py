@@ -160,18 +160,19 @@ class M2MThroughSerializationTestCase(TestCase):
 
 
 class ToFieldThroughTests(TestCase):
-    def setUp(self):
-        self.car = Car.objects.create(make="Toyota")
-        self.driver = Driver.objects.create(name="Ryan Briscoe")
-        CarDriver.objects.create(car=self.car, driver=self.driver)
+    @classmethod
+    def setUpTestData(cls):
+        cls.car = Car.objects.create(make="Toyota")
+        cls.driver = Driver.objects.create(name="Ryan Briscoe")
+        CarDriver.objects.create(car=cls.car, driver=cls.driver)
         # We are testing if wrong objects get deleted due to using wrong
         # field value in m2m queries. So, it is essential that the pk
         # numberings do not match.
         # Create one intentionally unused driver to mix up the autonumbering
-        self.unused_driver = Driver.objects.create(name="Barney Gumble")
+        cls.unused_driver = Driver.objects.create(name="Barney Gumble")
         # And two intentionally unused cars.
-        self.unused_car1 = Car.objects.create(make="Trabant")
-        self.unused_car2 = Car.objects.create(make="Wartburg")
+        cls.unused_car1 = Car.objects.create(make="Trabant")
+        cls.unused_car2 = Car.objects.create(make="Wartburg")
 
     def test_to_field(self):
         self.assertQuerysetEqual(

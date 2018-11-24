@@ -850,11 +850,12 @@ class SimpleExpressionTests(SimpleTestCase):
 
 class ExpressionsNumericTests(TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         Number(integer=-1).save()
         Number(integer=42).save()
         Number(integer=1337).save()
-        self.assertEqual(Number.objects.update(float=F('integer')), 3)
+        Number.objects.update(float=F('integer'))
 
     def test_fill_with_value_from_same_object(self):
         """
