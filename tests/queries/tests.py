@@ -1962,7 +1962,8 @@ class Queries6Tests(TestCase):
 
 
 class RawQueriesTests(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         Note.objects.create(note='n1', misc='foo', id=1)
 
     def test_ticket14729(self):
@@ -1986,10 +1987,11 @@ class GeneratorExpressionTests(SimpleTestCase):
 
 
 class ComparisonTests(TestCase):
-    def setUp(self):
-        self.n1 = Note.objects.create(note='n1', misc='foo', id=1)
-        e1 = ExtraInfo.objects.create(info='e1', note=self.n1)
-        self.a2 = Author.objects.create(name='a2', num=2002, extra=e1)
+    @classmethod
+    def setUpTestData(cls):
+        cls.n1 = Note.objects.create(note='n1', misc='foo', id=1)
+        e1 = ExtraInfo.objects.create(info='e1', note=cls.n1)
+        cls.a2 = Author.objects.create(name='a2', num=2002, extra=e1)
 
     def test_ticket8597(self):
         # Regression tests for case-insensitive comparisons

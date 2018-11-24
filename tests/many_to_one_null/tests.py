@@ -4,22 +4,23 @@ from .models import Article, Car, Driver, Reporter
 
 
 class ManyToOneNullTests(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         # Create a Reporter.
-        self.r = Reporter(name='John Smith')
-        self.r.save()
+        cls.r = Reporter(name='John Smith')
+        cls.r.save()
         # Create an Article.
-        self.a = Article(headline="First", reporter=self.r)
-        self.a.save()
+        cls.a = Article(headline='First', reporter=cls.r)
+        cls.a.save()
         # Create an Article via the Reporter object.
-        self.a2 = self.r.article_set.create(headline="Second")
+        cls.a2 = cls.r.article_set.create(headline='Second')
         # Create an Article with no Reporter by passing "reporter=None".
-        self.a3 = Article(headline="Third", reporter=None)
-        self.a3.save()
+        cls.a3 = Article(headline='Third', reporter=None)
+        cls.a3.save()
         # Create another article and reporter
-        self.r2 = Reporter(name='Paul Jones')
-        self.r2.save()
-        self.a4 = self.r2.article_set.create(headline='Fourth')
+        cls.r2 = Reporter(name='Paul Jones')
+        cls.r2.save()
+        cls.a4 = cls.r2.article_set.create(headline='Fourth')
 
     def test_get_related(self):
         self.assertEqual(self.a.reporter.id, self.r.id)

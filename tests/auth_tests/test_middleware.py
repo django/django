@@ -6,8 +6,11 @@ from django.test import TestCase
 
 
 class TestAuthenticationMiddleware(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user('test_user', 'test@example.com', 'test_password')
+
     def setUp(self):
-        self.user = User.objects.create_user('test_user', 'test@example.com', 'test_password')
         self.middleware = AuthenticationMiddleware(lambda req: HttpResponse())
         self.client.force_login(self.user)
         self.request = HttpRequest()

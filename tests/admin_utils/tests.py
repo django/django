@@ -22,9 +22,10 @@ class NestedObjectsTests(TestCase):
     """
     Tests for ``NestedObject`` utility collection.
     """
-    def setUp(self):
-        self.n = NestedObjects(using=DEFAULT_DB_ALIAS)
-        self.objs = [Count.objects.create(num=i) for i in range(5)]
+    @classmethod
+    def setUpTestData(cls):
+        cls.n = NestedObjects(using=DEFAULT_DB_ALIAS)
+        cls.objs = [Count.objects.create(num=i) for i in range(5)]
 
     def _check(self, target):
         self.assertEqual(self.n.nested(lambda obj: obj.num), target)

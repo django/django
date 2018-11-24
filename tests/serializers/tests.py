@@ -90,29 +90,30 @@ class SerializerRegistrationTests(SimpleTestCase):
 class SerializersTestBase:
     serializer_name = None  # Set by subclasses to the serialization format name
 
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         sports = Category.objects.create(name="Sports")
         music = Category.objects.create(name="Music")
         op_ed = Category.objects.create(name="Op-Ed")
 
-        self.joe = Author.objects.create(name="Joe")
-        self.jane = Author.objects.create(name="Jane")
+        cls.joe = Author.objects.create(name='Joe')
+        cls.jane = Author.objects.create(name='Jane')
 
-        self.a1 = Article(
-            author=self.jane,
+        cls.a1 = Article(
+            author=cls.jane,
             headline="Poker has no place on ESPN",
             pub_date=datetime(2006, 6, 16, 11, 00)
         )
-        self.a1.save()
-        self.a1.categories.set([sports, op_ed])
+        cls.a1.save()
+        cls.a1.categories.set([sports, op_ed])
 
-        self.a2 = Article(
-            author=self.joe,
+        cls.a2 = Article(
+            author=cls.joe,
             headline="Time to reform copyright",
             pub_date=datetime(2006, 6, 16, 13, 00, 11, 345)
         )
-        self.a2.save()
-        self.a2.categories.set([music, op_ed])
+        cls.a2.save()
+        cls.a2.categories.set([music, op_ed])
 
     def test_serialize(self):
         """Basic serialization works."""

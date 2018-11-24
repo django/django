@@ -865,25 +865,24 @@ class CustomPrefetchTests(TestCase):
 
 class DefaultManagerTests(TestCase):
 
-    def setUp(self):
-        self.qual1 = Qualification.objects.create(name="BA")
-        self.qual2 = Qualification.objects.create(name="BSci")
-        self.qual3 = Qualification.objects.create(name="MA")
-        self.qual4 = Qualification.objects.create(name="PhD")
+    @classmethod
+    def setUpTestData(cls):
+        cls.qual1 = Qualification.objects.create(name='BA')
+        cls.qual2 = Qualification.objects.create(name='BSci')
+        cls.qual3 = Qualification.objects.create(name='MA')
+        cls.qual4 = Qualification.objects.create(name='PhD')
 
-        self.teacher1 = Teacher.objects.create(name="Mr Cleese")
-        self.teacher2 = Teacher.objects.create(name="Mr Idle")
-        self.teacher3 = Teacher.objects.create(name="Mr Chapman")
+        cls.teacher1 = Teacher.objects.create(name='Mr Cleese')
+        cls.teacher2 = Teacher.objects.create(name='Mr Idle')
+        cls.teacher3 = Teacher.objects.create(name='Mr Chapman')
+        cls.teacher1.qualifications.add(cls.qual1, cls.qual2, cls.qual3, cls.qual4)
+        cls.teacher2.qualifications.add(cls.qual1)
+        cls.teacher3.qualifications.add(cls.qual2)
 
-        self.teacher1.qualifications.add(self.qual1, self.qual2, self.qual3, self.qual4)
-        self.teacher2.qualifications.add(self.qual1)
-        self.teacher3.qualifications.add(self.qual2)
-
-        self.dept1 = Department.objects.create(name="English")
-        self.dept2 = Department.objects.create(name="Physics")
-
-        self.dept1.teachers.add(self.teacher1, self.teacher2)
-        self.dept2.teachers.add(self.teacher1, self.teacher3)
+        cls.dept1 = Department.objects.create(name='English')
+        cls.dept2 = Department.objects.create(name='Physics')
+        cls.dept1.teachers.add(cls.teacher1, cls.teacher2)
+        cls.dept2.teachers.add(cls.teacher1, cls.teacher3)
 
     def test_m2m_then_m2m(self):
         with self.assertNumQueries(3):
@@ -1127,42 +1126,42 @@ class LookupOrderingTest(TestCase):
     ensure it is preserved.
     """
 
-    def setUp(self):
-        self.person1 = Person.objects.create(name="Joe")
-        self.person2 = Person.objects.create(name="Mary")
+    @classmethod
+    def setUpTestData(cls):
+        person1 = Person.objects.create(name='Joe')
+        person2 = Person.objects.create(name='Mary')
 
         # Set main_room for each house before creating the next one for
         # databases where supports_nullable_unique_constraints is False.
+        house1 = House.objects.create(address='123 Main St')
+        room1_1 = Room.objects.create(name='Dining room', house=house1)
+        Room.objects.create(name='Lounge', house=house1)
+        Room.objects.create(name='Kitchen', house=house1)
+        house1.main_room = room1_1
+        house1.save()
+        person1.houses.add(house1)
 
-        self.house1 = House.objects.create(address="123 Main St")
-        self.room1_1 = Room.objects.create(name="Dining room", house=self.house1)
-        self.room1_2 = Room.objects.create(name="Lounge", house=self.house1)
-        self.room1_3 = Room.objects.create(name="Kitchen", house=self.house1)
-        self.house1.main_room = self.room1_1
-        self.house1.save()
-        self.person1.houses.add(self.house1)
+        house2 = House.objects.create(address='45 Side St')
+        room2_1 = Room.objects.create(name='Dining room', house=house2)
+        Room.objects.create(name='Lounge', house=house2)
+        house2.main_room = room2_1
+        house2.save()
+        person1.houses.add(house2)
 
-        self.house2 = House.objects.create(address="45 Side St")
-        self.room2_1 = Room.objects.create(name="Dining room", house=self.house2)
-        self.room2_2 = Room.objects.create(name="Lounge", house=self.house2)
-        self.house2.main_room = self.room2_1
-        self.house2.save()
-        self.person1.houses.add(self.house2)
+        house3 = House.objects.create(address='6 Downing St')
+        room3_1 = Room.objects.create(name='Dining room', house=house3)
+        Room.objects.create(name='Lounge', house=house3)
+        Room.objects.create(name='Kitchen', house=house3)
+        house3.main_room = room3_1
+        house3.save()
+        person2.houses.add(house3)
 
-        self.house3 = House.objects.create(address="6 Downing St")
-        self.room3_1 = Room.objects.create(name="Dining room", house=self.house3)
-        self.room3_2 = Room.objects.create(name="Lounge", house=self.house3)
-        self.room3_3 = Room.objects.create(name="Kitchen", house=self.house3)
-        self.house3.main_room = self.room3_1
-        self.house3.save()
-        self.person2.houses.add(self.house3)
-
-        self.house4 = House.objects.create(address="7 Regents St")
-        self.room4_1 = Room.objects.create(name="Dining room", house=self.house4)
-        self.room4_2 = Room.objects.create(name="Lounge", house=self.house4)
-        self.house4.main_room = self.room4_1
-        self.house4.save()
-        self.person2.houses.add(self.house4)
+        house4 = House.objects.create(address='7 Regents St')
+        room4_1 = Room.objects.create(name='Dining room', house=house4)
+        Room.objects.create(name='Lounge', house=house4)
+        house4.main_room = room4_1
+        house4.save()
+        person2.houses.add(house4)
 
     def test_order(self):
         with self.assertNumQueries(4):
@@ -1349,44 +1348,46 @@ class MultiDbTests(TestCase):
 
 
 class Ticket19607Tests(TestCase):
-
-    def setUp(self):
-
-        for id, name1, name2 in [
-            (1, 'einfach', 'simple'),
-            (2, 'schwierig', 'difficult'),
-        ]:
-            LessonEntry.objects.create(id=id, name1=name1, name2=name2)
-
-        for id, lesson_entry_id, name in [
-            (1, 1, 'einfach'),
-            (2, 1, 'simple'),
-            (3, 2, 'schwierig'),
-            (4, 2, 'difficult'),
-        ]:
-            WordEntry.objects.create(id=id, lesson_entry_id=lesson_entry_id, name=name)
+    @classmethod
+    def setUpTestData(cls):
+        LessonEntry.objects.bulk_create(
+            LessonEntry(id=id_, name1=name1, name2=name2)
+            for id_, name1, name2 in [
+                (1, 'einfach', 'simple'),
+                (2, 'schwierig', 'difficult'),
+            ]
+        )
+        WordEntry.objects.bulk_create(
+            WordEntry(id=id_, lesson_entry_id=lesson_entry_id, name=name)
+            for id_, lesson_entry_id, name in [
+                (1, 1, 'einfach'),
+                (2, 1, 'simple'),
+                (3, 2, 'schwierig'),
+                (4, 2, 'difficult'),
+            ]
+        )
 
     def test_bug(self):
         list(WordEntry.objects.prefetch_related('lesson_entry', 'lesson_entry__wordentry_set'))
 
 
 class Ticket21410Tests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        book1 = Book.objects.create(title='Poems')
+        book2 = Book.objects.create(title='Jane Eyre')
+        book3 = Book.objects.create(title='Wuthering Heights')
+        book4 = Book.objects.create(title='Sense and Sensibility')
 
-    def setUp(self):
-        self.book1 = Book.objects.create(title="Poems")
-        self.book2 = Book.objects.create(title="Jane Eyre")
-        self.book3 = Book.objects.create(title="Wuthering Heights")
-        self.book4 = Book.objects.create(title="Sense and Sensibility")
+        author1 = Author2.objects.create(name='Charlotte', first_book=book1)
+        author2 = Author2.objects.create(name='Anne', first_book=book1)
+        author3 = Author2.objects.create(name='Emily', first_book=book1)
+        author4 = Author2.objects.create(name='Jane', first_book=book4)
 
-        self.author1 = Author2.objects.create(name="Charlotte", first_book=self.book1)
-        self.author2 = Author2.objects.create(name="Anne", first_book=self.book1)
-        self.author3 = Author2.objects.create(name="Emily", first_book=self.book1)
-        self.author4 = Author2.objects.create(name="Jane", first_book=self.book4)
-
-        self.author1.favorite_books.add(self.book1, self.book2, self.book3)
-        self.author2.favorite_books.add(self.book1)
-        self.author3.favorite_books.add(self.book2)
-        self.author4.favorite_books.add(self.book3)
+        author1.favorite_books.add(book1, book2, book3)
+        author2.favorite_books.add(book1)
+        author3.favorite_books.add(book2)
+        author4.favorite_books.add(book3)
 
     def test_bug(self):
         list(Author2.objects.prefetch_related('first_book', 'favorite_books'))
@@ -1394,15 +1395,16 @@ class Ticket21410Tests(TestCase):
 
 class Ticket21760Tests(TestCase):
 
-    def setUp(self):
-        self.rooms = []
+    @classmethod
+    def setUpTestData(cls):
+        cls.rooms = []
         for _ in range(3):
             house = House.objects.create()
             for _ in range(3):
-                self.rooms.append(Room.objects.create(house=house))
+                cls.rooms.append(Room.objects.create(house=house))
             # Set main_room for each house before creating the next one for
             # databases where supports_nullable_unique_constraints is False.
-            house.main_room = self.rooms[-3]
+            house.main_room = cls.rooms[-3]
             house.save()
 
     def test_bug(self):

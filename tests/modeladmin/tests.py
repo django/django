@@ -35,12 +35,15 @@ request.user = MockSuperUser()
 
 class ModelAdminTests(TestCase):
 
-    def setUp(self):
-        self.band = Band.objects.create(
+    @classmethod
+    def setUpTestData(cls):
+        cls.band = Band.objects.create(
             name='The Doors',
             bio='',
             sign_date=date(1965, 1, 1),
         )
+
+    def setUp(self):
         self.site = AdminSite()
 
     def test_modeladmin_str(self):
