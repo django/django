@@ -373,7 +373,7 @@ some complex computations::
 
 The ``Aggregate`` API is as follows:
 
-.. class:: Aggregate(expression, output_field=None, filter=None, **extra)
+.. class:: Aggregate(*expressions, output_field=None, filter=None, **extra)
 
     .. attribute:: template
 
@@ -392,9 +392,9 @@ The ``Aggregate`` API is as follows:
         Defaults to ``True`` since most aggregate functions can be used as the
         source expression in :class:`~django.db.models.expressions.Window`.
 
-The ``expression`` argument can be the name of a field on the model, or another
-expression. It will be converted to a string and used as the ``expressions``
-placeholder within the ``template``.
+The ``expressions`` positional arguments can include expressions or the names
+of model fields. They will be converted to a string and used as the
+``expressions`` placeholder within the ``template``.
 
 The ``output_field`` argument requires a model field instance, like
 ``IntegerField()`` or ``BooleanField()``, into which Django will load the value

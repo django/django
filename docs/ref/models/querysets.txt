@@ -3297,10 +3297,10 @@ documentation to learn how to create your aggregates.
 
 All aggregates have the following parameters in common:
 
-``expression``
-~~~~~~~~~~~~~~
+``expressions``
+~~~~~~~~~~~~~~~
 
-A string that references a field on the model, or a :doc:`query expression
+Strings that reference fields on the model, or :doc:`query expressions
 </ref/models/expressions>`.
 
 ``output_field``
