@@ -31,7 +31,7 @@ class TestInline(TestDataMixin, TestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.holder = Holder.objects.create(dummy=13)
-        Inner(dummy=42, holder=cls.holder).save()
+        Inner.objects.create(dummy=42, holder=cls.holder)
 
     def setUp(self):
         self.client.force_login(self.superuser)
@@ -572,9 +572,7 @@ class TestInlinePermissions(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.user = User(username='admin')
-        cls.user.is_staff = True
-        cls.user.is_active = True
+        cls.user = User(username='admin', is_staff=True, is_active=True)
         cls.user.set_password('secret')
         cls.user.save()
 

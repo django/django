@@ -7,8 +7,7 @@ class PropertyTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.a = Person(first_name='John', last_name='Lennon')
-        cls.a.save()
+        cls.a = Person.objects.create(first_name='John', last_name='Lennon')
 
     def test_getter(self):
         self.assertEqual(self.a.full_name, 'John Lennon')

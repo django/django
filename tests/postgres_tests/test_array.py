@@ -376,11 +376,7 @@ class TestDateTimeExactQuerying(PostgreSQLTestCase):
         cls.dates = [now.date()]
         cls.times = [now.time()]
         cls.objs = [
-            DateTimeArrayModel.objects.create(
-                datetimes=cls.datetimes,
-                dates=cls.dates,
-                times=cls.times,
-            )
+            DateTimeArrayModel.objects.create(datetimes=cls.datetimes, dates=cls.dates, times=cls.times),
         ]
 
     def test_exact_datetimes(self):

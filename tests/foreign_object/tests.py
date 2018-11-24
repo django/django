@@ -24,10 +24,7 @@ class MultiColumnFKTests(TestCase):
         cls.usa = Country.objects.create(name="United States of America")
         cls.soviet_union = Country.objects.create(name="Soviet Union")
         # Creating People
-        cls.bob = Person()
-        cls.bob.name = 'Bob'
-        cls.bob.person_country = cls.usa
-        cls.bob.save()
+        cls.bob = Person.objects.create(name='Bob', person_country=cls.usa)
         cls.jim = Person.objects.create(name='Jim', person_country=cls.usa)
         cls.george = Person.objects.create(name='George', person_country=cls.usa)
 

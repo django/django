@@ -3691,10 +3691,12 @@ class AdminInlineFileUploadTest(TestCase):
         file1.write(b'a' * (2 ** 21))
         filename = file1.name
         file1.close()
-        cls.gallery = Gallery(name="Test Gallery")
-        cls.gallery.save()
-        cls.picture = Picture(name="Test Picture", image=filename, gallery=cls.gallery)
-        cls.picture.save()
+        cls.gallery = Gallery.objects.create(name='Test Gallery')
+        cls.picture = Picture.objects.create(
+            name='Test Picture',
+            image=filename,
+            gallery=cls.gallery,
+        )
 
     def setUp(self):
         self.client.force_login(self.superuser)
@@ -3736,8 +3738,7 @@ class AdminInlineTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
-        cls.collector = Collector(pk=1, name='John Fowles')
-        cls.collector.save()
+        cls.collector = Collector.objects.create(pk=1, name='John Fowles')
 
     def setUp(self):
         self.post_data = {
