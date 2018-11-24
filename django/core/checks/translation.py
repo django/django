@@ -24,6 +24,11 @@ E004 = Error(
     id='translation.E004',
 )
 
+E005 = Error(
+    'You have provided an invalid value in the LOCALE_PATHS setting: {!r}.',
+    id='translation.E005',
+)
+
 
 @register(Tags.translation)
 def check_setting_language_code(app_configs, **kwargs):
@@ -59,3 +64,15 @@ def check_language_settings_consistent(app_configs, **kwargs):
     if settings.LANGUAGE_CODE not in available_tags:
         return [E004]
     return []
+
+
+@register(Tags.translation)
+def check_setting_locale_paths(app_configs, **kwargs):
+    errors = []
+    for path in settings.LOCALE_PATHS:
+        if isinstance(path, (tuple, list)):
+            if len(path) != 2 or any(not isinstance(i, str) for i in path):
+                errors.append(Error(E005.msg.format(path), id=E005.id))
+        elif not isinstance(path, str):
+            errors.append(Error(E005.msg.format(path), id=E005.id))
+    return errors

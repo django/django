@@ -214,6 +214,9 @@ Internationalization
   language cookies. The default values of these settings preserve the previous
   behavior.
 
+* The :setting:`LOCALE_PATHS` setting now supports custom gettext domains. See
+  :ref:`how-django-discovers-translations` for more details.
+
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 

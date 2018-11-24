@@ -116,8 +116,12 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         Using param `use_null_fallback` to avoid confusion with any other
         references to 'fallback'.
         """
+        if isinstance(localedir, (tuple, list)):
+            localedir, domain = localedir
+        else:
+            domain = self.domain
         return gettext_module.translation(
-            domain=self.domain,
+            domain=domain,
             localedir=localedir,
             languages=[self.__locale],
             fallback=use_null_fallback,

@@ -1478,6 +1478,27 @@ class MiscTests(SimpleTestCase):
         with override_settings(USE_I18N=True):
             self.assertIsInstance(i18n_patterns([]), list)
 
+    @override_settings(
+        LANGUAGE_CODE='pt',
+        LOCALE_PATHS=[
+            os.path.join(here, 'locale'),
+            (os.path.join(here, 'locale'), 'custom_domain'),
+        ],
+    )
+    def test_custom_gettext_domains(self):
+        """
+        Locale files with custom names have been successfully loaded, they are
+        located in i18n/locale/pt/LC_MESSAGES.
+        """
+        self.assertEqual(
+            gettext('This is a test of the default gettext domain loading.'),
+            'Este é um teste do carregamento de domínio do gettext padrão.',
+        )
+        self.assertEqual(
+            gettext('This is a test of the custom gettext domain loading.'),
+            'Este é um teste do carregamento de domínio personalizado do gettext.',
+        )
+
 
 class ResolutionOrderI18NTests(SimpleTestCase):
 

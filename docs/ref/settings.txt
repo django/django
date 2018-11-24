@@ -1898,18 +1898,24 @@ languages may contain language codes which are not enabled on a given site.
 
 Default: ``[]`` (Empty list)
 
-A list of directories where Django looks for translation files.
-See :ref:`how-django-discovers-translations`.
+A list of directories or ``(directory, domain)`` tuples where Django looks for
+translation files. See :ref:`how-django-discovers-translations`.
 
 Example::
 
     LOCALE_PATHS = [
         '/home/www/project/common_files/locale',
         '/var/local/translations/locale',
+        ('/home/www/project/common_files/locale', 'custom_domain'),
+        ('/home/www/project/translations/locale', 'other_domain'),
     ]
 
 Django will look within each of these paths for the ``<locale_code>/LC_MESSAGES``
 directories containing the actual translation files.
+
+.. versionchanged:: 3.0
+
+    Added support for custom gettext domains.
 
 .. setting:: LOGGING
 

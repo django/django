@@ -2,6 +2,7 @@ from django.core.checks import Error
 from django.core.checks.translation import (
     check_language_settings_consistent, check_setting_language_code,
     check_setting_languages, check_setting_languages_bidi,
+    check_setting_locale_paths,
 )
 from django.test import SimpleTestCase
 
@@ -84,3 +85,26 @@ class TranslationCheckTests(SimpleTestCase):
             self.assertEqual(check_language_settings_consistent(None), [
                 Error(msg, id='translation.E004'),
             ])
+
+    def test_valid_locale_paths(self):
+        valid_locale_paths = [
+            'directory',
+            ('directory', 'domain'),
+            ['directory', 'domain'],
+        ]
+        with self.settings(LOCALE_PATHS=valid_locale_paths):
+            self.assertEqual(check_setting_locale_paths(None), [])
+
+    def test_invalid_locale_paths(self):
+        msg = 'You have provided an invalid value in the LOCALE_PATHS setting: {!r}.'
+        for path in [
+            True,
+            1,
+            ('directory',),
+            ('directory', 'domain', 'x'),
+            (1, 'domain'),
+        ]:
+            with self.subTest(path), self.settings(LOCALE_PATHS=[path]):
+                self.assertEqual(check_setting_locale_paths(None), [
+                    Error(msg.format(path), id='translation.E005'),
+                ])
