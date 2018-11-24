@@ -195,7 +195,10 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* Objects assigned to class attributes in :meth:`.TestCase.setUpTestData` are
+  now isolated for each test method. Such objects are now required to support
+  creating deep copies with :py:func:`copy.deepcopy`. Assigning objects which
+  don't support ``deepcopy()`` is deprecated and will be removed in Django 4.1.
 
 URLs
 ~~~~
@@ -255,4 +258,6 @@ Features deprecated in 3.2
 Miscellaneous
 -------------
 
-* ...
+* Assigning objects which don't support creating deep copies with
+  :py:func:`copy.deepcopy` to class attributes in
+  :meth:`.TestCase.setUpTestData` is deprecated.

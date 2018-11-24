@@ -12,4 +12,4 @@ class Person(models.Model):
 
 class PossessedCar(models.Model):
     car = models.ForeignKey(Car, models.CASCADE)
-    belongs_to = models.ForeignKey(Person, models.CASCADE)
+    belongs_to = models.ForeignKey(Person, models.CASCADE, related_name='possessed_cars')

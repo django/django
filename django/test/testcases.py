@@ -5,9 +5,10 @@ import posixpath
 import sys
 import threading
 import unittest
+import warnings
 from collections import Counter
 from contextlib import contextmanager
-from copy import copy
+from copy import copy, deepcopy
 from difflib import get_close_matches
 from functools import wraps
 from unittest.suite import _DebugResult
@@ -40,6 +41,7 @@ from django.test.utils import (
     CaptureQueriesContext, ContextList, compare_xml, modify_settings,
     override_settings,
 )
+from django.utils.deprecation import RemovedInDjango41Warning
 from django.utils.functional import classproperty
 from django.views.static import serve
 
@@ -1071,6 +1073,59 @@ def connections_support_transactions(aliases=None):
     return all(conn.features.supports_transactions for conn in conns)
 
 
+class TestData:
+    """
+    Descriptor to provide TestCase instance isolation for attributes assigned
+    during the setUpTestData() phase.
+
+    Allow safe alteration of objects assigned in setUpTestData() by test
+    methods by exposing deep copies instead of the original objects.
+
+    Objects are deep copied using a memo kept on the test case instance in
+    order to maintain their original relationships.
+    """
+    memo_attr = '_testdata_memo'
+
+    def __init__(self, name, data):
+        self.name = name
+        self.data = data
+
+    def get_memo(self, testcase):
+        try:
+            memo = getattr(testcase, self.memo_attr)
+        except AttributeError:
+            memo = {}
+            setattr(testcase, self.memo_attr, memo)
+        return memo
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self.data
+        memo = self.get_memo(instance)
+        try:
+            data = deepcopy(self.data, memo)
+        except TypeError:
+            # RemovedInDjango41Warning.
+            msg = (
+                "Assigning objects which don't support copy.deepcopy() during "
+                "setUpTestData() is deprecated. Either assign the %s "
+                "attribute during setUpClass() or setUp(), or add support for "
+                "deepcopy() to %s.%s.%s."
+            ) % (
+                self.name,
+                owner.__module__,
+                owner.__qualname__,
+                self.name,
+            )
+            warnings.warn(msg, category=RemovedInDjango41Warning, stacklevel=2)
+            data = self.data
+        setattr(instance, self.name, data)
+        return data
+
+    def __repr__(self):
+        return '<TestData: name=%r, data=%r>' % (self.name, self.data)
+
+
 class TestCase(TransactionTestCase):
     """
     Similar to TransactionTestCase, but use `transaction.atomic()` to achieve
@@ -1119,12 +1174,16 @@ class TestCase(TransactionTestCase):
                     cls._rollback_atomics(cls.cls_atomics)
                     cls._remove_databases_failures()
                     raise
+        pre_attrs = cls.__dict__.copy()
         try:
             cls.setUpTestData()
         except Exception:
             cls._rollback_atomics(cls.cls_atomics)
             cls._remove_databases_failures()
             raise
+        for name, value in cls.__dict__.items():
+            if value is not pre_attrs.get(name):
+                setattr(cls, name, TestData(name, value))
 
     @classmethod
     def tearDownClass(cls):

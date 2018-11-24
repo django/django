@@ -15,6 +15,10 @@ about each item can often be found in the release notes of two versions prior.
 See the :ref:`Django 3.2 release notes <deprecated-features-3.2>` for more
 details on these changes.
 
+* Support for assigning objects which don't support creating deep copies with
+  ``copy.deepcopy()`` to class attributes in ``TestCase.setUpTestData()`` will
+  be removed.
+
 .. _deprecation-removed-in-4.0:
 
 4.0

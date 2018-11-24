@@ -873,11 +873,13 @@ It also provides an additional method:
     (for instance, MySQL with the MyISAM engine), ``setUpTestData()`` will be
     called before each test, negating the speed benefits.
 
-    Be careful not to modify any objects created in ``setUpTestData()`` in
-    your test methods. Modifications to in-memory objects from setup work done
-    at the class level will persist between test methods. If you do need to
-    modify them, you could reload them in the ``setUp()`` method with
-    :meth:`~django.db.models.Model.refresh_from_db`, for example.
+    .. versionchanged:: 3.2
+
+        Objects assigned to class attributes in ``setUpTestData()`` must
+        support creating deep copies with :py:func:`copy.deepcopy` in order to
+        isolate them from alterations performed by each test methods. In
+        previous versions of Django these objects were reused and changes made
+        to them were persisted between test methods.
 
 .. _live-test-server:
 
