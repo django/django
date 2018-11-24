@@ -1,8 +1,6 @@
 """
 Various complex queries that have been problematic in the past.
 """
-import threading
-
 from django.db import models
 from django.db.models.functions import Now
 
@@ -50,13 +48,6 @@ class Note(models.Model):
 
     def __str__(self):
         return self.note
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Regression for #13227 -- having an attribute that
-        # is unpicklable doesn't stop you from cloning queries
-        # that use objects of that type as an argument.
-        self.lock = threading.Lock()
 
 
 class Annotation(models.Model):
