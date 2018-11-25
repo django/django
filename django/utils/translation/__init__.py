@@ -110,20 +110,30 @@ def lazy_number(func, resultclass, number=None, **kwargs):
             def __bool__(self):
                 return bool(kwargs['singular'])
 
+            def _get_number_value(self, values):
+                try:
+                    return values[number]
+                except KeyError:
+                    raise KeyError(
+                        "Your dictionary lacks key '%s\'. Please provide "
+                        "it, because it is required to determine whether "
+                        "string is singular or plural." % number
+                    )
+
+            def _translate(self, number_value):
+                kwargs['number'] = number_value
+                return func(**kwargs)
+
+            def format(self, *args, **kwargs):
+                number_value = self._get_number_value(kwargs) if kwargs and number else args[0]
+                return self._translate(number_value).format(*args, **kwargs)
+
             def __mod__(self, rhs):
                 if isinstance(rhs, dict) and number:
-                    try:
-                        number_value = rhs[number]
-                    except KeyError:
-                        raise KeyError(
-                            "Your dictionary lacks key '%s\'. Please provide "
-                            "it, because it is required to determine whether "
-                            "string is singular or plural." % number
-                        )
+                    number_value = self._get_number_value(rhs)
                 else:
                     number_value = rhs
-                kwargs['number'] = number_value
-                translated = func(**kwargs)
+                translated = self._translate(number_value)
                 try:
                     translated = translated % rhs
                 except TypeError:
