@@ -8,7 +8,7 @@ from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.views.main import ALL_VAR, SEARCH_VAR
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.db import connection
+from django.db import connection, models
 from django.db.models import F
 from django.db.models.fields import Field, IntegerField
 from django.db.models.functions import Upper
@@ -16,7 +16,9 @@ from django.db.models.lookups import Contains, Exact
 from django.template import Context, Template, TemplateSyntaxError
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
-from django.test.utils import CaptureQueriesContext, register_lookup
+from django.test.utils import (
+    CaptureQueriesContext, isolate_apps, register_lookup,
+)
 from django.urls import reverse
 from django.utils import formats
 
@@ -936,6 +938,81 @@ class ChangeListTests(TestCase):
         check_results_order()
         OrderedObjectAdmin.ordering = ['id', 'bool']
         check_results_order(ascending=True)
+
+    @isolate_apps('admin_changelist')
+    def test_total_ordering_optimization(self):
+        class Related(models.Model):
+            unique_field = models.BooleanField(unique=True)
+
+            class Meta:
+                ordering = ('unique_field',)
+
+        class Model(models.Model):
+            unique_field = models.BooleanField(unique=True)
+            unique_nullable_field = models.BooleanField(unique=True, null=True)
+            related = models.ForeignKey(Related, models.CASCADE)
+            other_related = models.ForeignKey(Related, models.CASCADE)
+            related_unique = models.OneToOneField(Related, models.CASCADE)
+            field = models.BooleanField()
+            other_field = models.BooleanField()
+            null_field = models.BooleanField(null=True)
+
+            class Meta:
+                unique_together = {
+                    ('field', 'other_field'),
+                    ('field', 'null_field'),
+                    ('related', 'other_related_id'),
+                }
+
+        class ModelAdmin(admin.ModelAdmin):
+            def get_queryset(self, request):
+                return Model.objects.none()
+
+        request = self._mocked_authenticated_request('/', self.superuser)
+        site = admin.AdminSite(name='admin')
+        model_admin = ModelAdmin(Model, site)
+        change_list = model_admin.get_changelist_instance(request)
+        tests = (
+            ([], ['-pk']),
+            # Unique non-nullable field.
+            (['unique_field'], ['unique_field']),
+            (['-unique_field'], ['-unique_field']),
+            # Unique nullable field.
+            (['unique_nullable_field'], ['unique_nullable_field', '-pk']),
+            # Field.
+            (['field'], ['field', '-pk']),
+            # Related field introspection is not implemented.
+            (['related__unique_field'], ['related__unique_field', '-pk']),
+            # Related attname unique.
+            (['related_unique_id'], ['related_unique_id']),
+            # Related ordering introspection is not implemented.
+            (['related_unique'], ['related_unique', '-pk']),
+            # Composite unique.
+            (['field', '-other_field'], ['field', '-other_field']),
+            # Composite unique nullable.
+            (['-field', 'null_field'], ['-field', 'null_field', '-pk']),
+            # Composite unique nullable.
+            (['-field', 'null_field'], ['-field', 'null_field', '-pk']),
+            # Composite unique nullable.
+            (['-field', 'null_field'], ['-field', 'null_field', '-pk']),
+            # Composite unique and nullable.
+            (['-field', 'null_field', 'other_field'], ['-field', 'null_field', 'other_field']),
+            # Composite unique attnames.
+            (['related_id', '-other_related_id'], ['related_id', '-other_related_id']),
+            # Composite unique names.
+            (['related', '-other_related_id'], ['related', '-other_related_id', '-pk']),
+        )
+        # F() objects composite unique.
+        total_ordering = [F('field'), F('other_field').desc(nulls_last=True)]
+        # F() objects composite unique nullable.
+        non_total_ordering = [F('field'), F('null_field').desc(nulls_last=True)]
+        tests += (
+            (total_ordering, total_ordering),
+            (non_total_ordering, non_total_ordering + ['-pk']),
+        )
+        for ordering, expected in tests:
+            with self.subTest(ordering=ordering):
+                self.assertEqual(change_list._get_deterministic_ordering(ordering), expected)
 
     def test_dynamic_list_filter(self):
         """
