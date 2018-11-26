@@ -310,16 +310,16 @@ class InspectDBTransactionalTests(TransactionTestCase):
             with connection.cursor() as cursor:
                 cursor.execute('DROP VIEW inspectdb_people_view')
 
-    @skipUnless(connection.vendor == 'postgresql', 'PostgreSQL specific SQL')
+    @skipUnlessDBFeature('can_introspect_materialized_views')
     def test_include_materialized_views(self):
-        """inspectdb --include-views creates models for database materialized views."""
+        """inspectdb --include-views creates models for materialized views."""
         with connection.cursor() as cursor:
             cursor.execute(
-                'CREATE MATERIALIZED VIEW inspectdb_people_materialized_view AS '
+                'CREATE MATERIALIZED VIEW inspectdb_people_materialized AS '
                 'SELECT id, name FROM inspectdb_people'
             )
         out = StringIO()
-        view_model = 'class InspectdbPeopleMaterializedView(models.Model):'
+        view_model = 'class InspectdbPeopleMaterialized(models.Model):'
         view_managed = 'managed = False  # Created from a view.'
         try:
             call_command('inspectdb', table_name_filter=inspectdb_tables_only, stdout=out)
@@ -332,7 +332,7 @@ class InspectDBTransactionalTests(TransactionTestCase):
             self.assertIn(view_managed, with_views_output)
         finally:
             with connection.cursor() as cursor:
-                cursor.execute('DROP MATERIALIZED VIEW IF EXISTS inspectdb_people_materialized_view')
+                cursor.execute('DROP MATERIALIZED VIEW inspectdb_people_materialized')
 
     @skipUnless(connection.vendor == 'postgresql', 'PostgreSQL specific SQL')
     @skipUnlessDBFeature('supports_table_partitions')

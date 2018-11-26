@@ -21,6 +21,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_transactions = True
     can_introspect_autofield = True
     can_introspect_ip_address_field = True
+    can_introspect_materialized_views = True
     can_introspect_small_integer_field = True
     can_distinct_on_fields = True
     can_rollback_ddl = True

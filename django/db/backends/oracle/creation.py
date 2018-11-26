@@ -241,11 +241,14 @@ class DatabaseCreation(BaseDatabaseCreation):
         if not success and self._test_settings_get('PASSWORD') is None:
             set_password = 'ALTER USER %(user)s IDENTIFIED BY "%(password)s"'
             self._execute_statements(cursor, [set_password], parameters, verbosity)
-        # Most test-suites can be run without the create-view privilege. But some need it.
-        extra = "GRANT CREATE VIEW TO %(user)s"
-        success = self._execute_allow_fail_statements(cursor, [extra], parameters, verbosity, 'ORA-01031')
-        if not success and verbosity >= 2:
-            self.log('Failed to grant CREATE VIEW permission to test user. This may be ok.')
+        # Most test suites can be run without "create view" and
+        # "create materialized view" privileges. But some need it.
+        for object_type in ('VIEW', 'MATERIALIZED VIEW'):
+            extra = 'GRANT CREATE %(object_type)s TO %(user)s'
+            parameters['object_type'] = object_type
+            success = self._execute_allow_fail_statements(cursor, [extra], parameters, verbosity, 'ORA-01031')
+            if not success and verbosity >= 2:
+                self.log('Failed to grant CREATE %s permission to test user. This may be ok.' % object_type)
 
     def _execute_test_db_destruction(self, cursor, parameters, verbosity):
         if verbosity >= 2:

@@ -764,9 +764,10 @@ and a user granted ``RESOURCE WITH ADMIN OPTION`` can grant ``RESOURCE``, such
 a user cannot grant the individual privileges (e.g. ``CREATE TABLE``), and thus
 ``RESOURCE WITH ADMIN OPTION`` is not usually sufficient for running tests.
 
-Some test suites also create views; to run these, the user also needs
-the ``CREATE VIEW WITH ADMIN OPTION`` privilege. In particular, this is needed
-for Django's own test suite.
+Some test suites also create views or materialized views; to run these, the
+user also needs ``CREATE VIEW WITH ADMIN OPTION`` and
+``CREATE MATERIALIZED VIEW WITH ADMIN OPTION`` privileges. In particular, this
+is needed for Django's own test suite.
 
 All of these privileges are included in the DBA role, which is appropriate
 for use on a private developer's database.

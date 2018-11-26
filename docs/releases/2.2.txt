@@ -182,7 +182,7 @@ Management Commands
 * :djadmin:`inspectdb` now creates models for foreign tables on PostgreSQL.
 
 * :option:`inspectdb --include-views` now creates models for materialized views
-  on PostgreSQL.
+  on Oracle and PostgreSQL.
 
 * The new :option:`inspectdb --include-partitions` option allows creating
   models for partition tables on PostgreSQL. In older versions, models are
