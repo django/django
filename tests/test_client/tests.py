@@ -861,9 +861,7 @@ class RequestFactoryTest(SimpleTestCase):
         ('options', _generic_view),
         ('trace', trace_view),
     )
-
-    def setUp(self):
-        self.request_factory = RequestFactory()
+    request_factory = RequestFactory()
 
     def test_request_factory(self):
         """The request factory implements all the HTTP/1.1 methods."""

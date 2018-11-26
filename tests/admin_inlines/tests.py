@@ -27,6 +27,8 @@ class TestDataMixin:
 
 @override_settings(ROOT_URLCONF='admin_inlines.urls')
 class TestInline(TestDataMixin, TestCase):
+    factory = RequestFactory()
+
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -35,7 +37,6 @@ class TestInline(TestDataMixin, TestCase):
 
     def setUp(self):
         self.client.force_login(self.superuser)
-        self.factory = RequestFactory()
 
     def test_can_delete(self):
         """

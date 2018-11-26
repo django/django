@@ -34,6 +34,7 @@ class TestAdminOrdering(TestCase):
     in ModelAdmin rather that ordering defined in the model's inner Meta
     class.
     """
+    request_factory = RequestFactory()
 
     @classmethod
     def setUpTestData(cls):
@@ -42,9 +43,6 @@ class TestAdminOrdering(TestCase):
             Band(name='Radiohead', bio='', rank=1),
             Band(name='Van Halen', bio='', rank=2),
         ])
-
-    def setUp(self):
-        self.request_factory = RequestFactory()
 
     def test_default_ordering(self):
         """

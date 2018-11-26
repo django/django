@@ -12,6 +12,8 @@ from .models import Artist, Author
 
 
 class FormMixinTests(SimpleTestCase):
+    request_factory = RequestFactory()
+
     def test_initial_data(self):
         """ Test instance independence of initial data dict (see #16138) """
         initial_1 = FormMixin().get_initial()
@@ -23,8 +25,7 @@ class FormMixinTests(SimpleTestCase):
         """ Test prefix can be set (see #18872) """
         test_string = 'test'
 
-        rf = RequestFactory()
-        get_request = rf.get('/')
+        get_request = self.request_factory.get('/')
 
         class TestFormMixin(FormMixin):
             request = get_request
@@ -39,7 +40,7 @@ class FormMixinTests(SimpleTestCase):
 
     def test_get_form(self):
         class TestFormMixin(FormMixin):
-            request = RequestFactory().get('/')
+            request = self.request_factory.get('/')
 
         self.assertIsInstance(
             TestFormMixin().get_form(forms.Form), forms.Form,
@@ -56,7 +57,7 @@ class FormMixinTests(SimpleTestCase):
 
     def test_get_context_data(self):
         class FormContext(FormMixin):
-            request = RequestFactory().get('/')
+            request = self.request_factory.get('/')
             form_class = forms.Form
 
         self.assertIsInstance(FormContext().get_context_data()['form'], forms.Form)

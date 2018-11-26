@@ -246,6 +246,7 @@ class CallbackFilterTest(SimpleTestCase):
 
 class AdminEmailHandlerTest(SimpleTestCase):
     logger = logging.getLogger('django')
+    request_factory = RequestFactory()
 
     def get_admin_email_handler(self, logger):
         # AdminEmailHandler does not get filtered out
@@ -307,8 +308,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
         orig_filters = admin_email_handler.filters
         try:
             admin_email_handler.filters = []
-            rf = RequestFactory()
-            request = rf.get('/')
+            request = self.request_factory.get('/')
             self.logger.error(
                 message, token1, token2,
                 extra={
@@ -388,9 +388,8 @@ class AdminEmailHandlerTest(SimpleTestCase):
         """
         handler = self.get_admin_email_handler(self.logger)
         record = self.logger.makeRecord('name', logging.ERROR, 'function', 'lno', 'message', None, None)
-        rf = RequestFactory()
         url_path = '/º'
-        record.request = rf.get(url_path)
+        record.request = self.request_factory.get(url_path)
         handler.emit(record)
         self.assertEqual(len(mail.outbox), 1)
         msg = mail.outbox[0]

@@ -249,6 +249,7 @@ class BookmarkAdminGenericRelation(ModelAdmin):
 
 
 class ListFiltersTests(TestCase):
+    request_factory = RequestFactory()
 
     @classmethod
     def setUpTestData(cls):
@@ -296,9 +297,6 @@ class ListFiltersTests(TestCase):
         # Employees
         cls.john = Employee.objects.create(name='John Blue', department=cls.dev)
         cls.jack = Employee.objects.create(name='Jack Red', department=cls.design)
-
-    def setUp(self):
-        self.request_factory = RequestFactory()
 
     def test_choicesfieldlistfilter_has_none_choice(self):
         """

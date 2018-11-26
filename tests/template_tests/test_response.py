@@ -224,9 +224,7 @@ class SimpleTemplateResponseTest(SimpleTestCase):
     },
 }])
 class TemplateResponseTest(SimpleTestCase):
-
-    def setUp(self):
-        self.factory = RequestFactory()
+    factory = RequestFactory()
 
     def _response(self, template='foo', *args, **kwargs):
         self._request = self.factory.get('/')

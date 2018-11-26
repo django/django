@@ -1142,10 +1142,7 @@ class FormattingTests(SimpleTestCase):
 
 
 class MiscTests(SimpleTestCase):
-
-    def setUp(self):
-        super().setUp()
-        self.rf = RequestFactory()
+    rf = RequestFactory()
 
     @override_settings(LANGUAGE_CODE='de')
     def test_english_fallback(self):
@@ -1640,10 +1637,7 @@ class UnprefixedDefaultLanguageTests(SimpleTestCase):
     ROOT_URLCONF='i18n.urls'
 )
 class CountrySpecificLanguageTests(SimpleTestCase):
-
-    def setUp(self):
-        super().setUp()
-        self.rf = RequestFactory()
+    rf = RequestFactory()
 
     def test_check_for_language(self):
         self.assertTrue(check_for_language('en'))

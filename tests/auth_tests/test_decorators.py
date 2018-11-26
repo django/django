@@ -58,15 +58,14 @@ class PermissionsRequiredDecoratorTest(TestCase):
     """
     Tests for the permission_required decorator
     """
+    factory = RequestFactory()
+
     @classmethod
     def setUpTestData(cls):
         cls.user = models.User.objects.create(username='joe', password='qwerty')
         # Add permissions auth.add_customuser and auth.change_customuser
         perms = models.Permission.objects.filter(codename__in=('add_customuser', 'change_customuser'))
         cls.user.user_permissions.add(*perms)
-
-    def setUp(self):
-        self.factory = RequestFactory()
 
     def test_many_permissions_pass(self):
 
