@@ -441,6 +441,16 @@ The following checks are performed on your translation configuration:
 
 * **translation.E001**: You have provided an invalid value for the
   :setting:`LANGUAGE_CODE` setting: ``<value>``.
+* **translation.E002**: You have provided an invalid language code in the
+  :setting:`LANGUAGES` setting: ``<value>``.
+* **translation.E003**: You have provided an invalid language code in the
+  :setting:`LANGUAGES_BIDI` setting: ``<value>``.
+* **translation.E004**: You have provided a value for the
+  :setting:`LANGUAGE_CODE` setting that is not in the :setting:`LANGUAGES`
+  setting.
+* **translation.E005**: You have provided values in the
+  :setting:`LANGUAGES_BIDI` setting that are not in the :setting:`LANGUAGES`
+  setting.
 
 URLs
 ----
