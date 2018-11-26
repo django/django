@@ -633,3 +633,10 @@ SECURE_HSTS_SECONDS = 0
 SECURE_REDIRECT_EXEMPT = []
 SECURE_SSL_HOST = None
 SECURE_SSL_REDIRECT = False
+
+##################
+# BACKGROUND TASKS
+##################
+
+# Pool size is the number of workers for ThreadPoolExecutor
+BACKGROUND_TASK_POOL_SIZE = 2
