@@ -1437,7 +1437,7 @@ class FieldTransformTests(TestCase):
         )
 
 
-class ReprTests(TestCase):
+class ReprTests(SimpleTestCase):
 
     def test_expressions(self):
         self.assertEqual(

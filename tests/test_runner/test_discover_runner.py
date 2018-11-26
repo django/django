@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 from contextlib import contextmanager
 from unittest import TestSuite, TextTestRunner, defaultTestLoader
 
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.test.runner import DiscoverRunner
 from django.test.utils import captured_stdout
 
@@ -20,7 +20,7 @@ def change_cwd(directory):
         os.chdir(old_cwd)
 
 
-class DiscoverRunnerTest(TestCase):
+class DiscoverRunnerTests(SimpleTestCase):
 
     def test_init_debug_mode(self):
         runner = DiscoverRunner()

@@ -12,7 +12,9 @@ from django.test import TransactionTestCase, modify_settings, override_settings
 from django.test.utils import isolate_apps
 from django.utils import timezone
 
-from . import PostgreSQLTestCase, PostgreSQLWidgetTestCase
+from . import (
+    PostgreSQLSimpleTestCase, PostgreSQLTestCase, PostgreSQLWidgetTestCase,
+)
 from .models import (
     ArrayFieldSubclass, CharArrayModel, DateTimeArrayModel, IntegerArrayModel,
     NestedIntegerArrayModel, NullableIntegerArrayModel, OtherTypesArrayModel,
@@ -440,7 +442,7 @@ class TestOtherTypesExactQuerying(PostgreSQLTestCase):
 
 
 @isolate_apps('postgres_tests')
-class TestChecks(PostgreSQLTestCase):
+class TestChecks(PostgreSQLSimpleTestCase):
 
     def test_field_checks(self):
         class MyModel(PostgreSQLModel):
@@ -589,7 +591,7 @@ class TestMigrations(TransactionTestCase):
             self.assertNotIn(table_name, connection.introspection.table_names(cursor))
 
 
-class TestSerialization(PostgreSQLTestCase):
+class TestSerialization(PostgreSQLSimpleTestCase):
     test_data = (
         '[{"fields": {"field": "[\\"1\\", \\"2\\", null]"}, "model": "postgres_tests.integerarraymodel", "pk": null}]'
     )
@@ -604,7 +606,7 @@ class TestSerialization(PostgreSQLTestCase):
         self.assertEqual(instance.field, [1, 2, None])
 
 
-class TestValidation(PostgreSQLTestCase):
+class TestValidation(PostgreSQLSimpleTestCase):
 
     def test_unbounded(self):
         field = ArrayField(models.IntegerField())
@@ -664,7 +666,7 @@ class TestValidation(PostgreSQLTestCase):
         self.assertEqual(exception.params, {'nth': 1, 'value': 0, 'limit_value': 1, 'show_value': 0})
 
 
-class TestSimpleFormField(PostgreSQLTestCase):
+class TestSimpleFormField(PostgreSQLSimpleTestCase):
 
     def test_valid(self):
         field = SimpleArrayField(forms.CharField())
@@ -782,7 +784,7 @@ class TestSimpleFormField(PostgreSQLTestCase):
         self.assertIs(field.has_changed([], ''), False)
 
 
-class TestSplitFormField(PostgreSQLTestCase):
+class TestSplitFormField(PostgreSQLSimpleTestCase):
 
     def test_valid(self):
         class SplitForm(forms.Form):

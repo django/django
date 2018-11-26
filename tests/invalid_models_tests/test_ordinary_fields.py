@@ -2,7 +2,7 @@ import unittest
 
 from django.core.checks import Error, Warning as DjangoWarning
 from django.db import connection, models
-from django.test import SimpleTestCase, TestCase, skipIfDBFeature
+from django.test import SimpleTestCase, skipIfDBFeature
 from django.test.utils import isolate_apps, override_settings
 from django.utils.functional import lazy
 from django.utils.timezone import now
@@ -40,7 +40,7 @@ class AutoFieldTests(SimpleTestCase):
 
 
 @isolate_apps('invalid_models_tests')
-class CharFieldTests(TestCase):
+class CharFieldTests(SimpleTestCase):
 
     def test_valid_field(self):
         class Model(models.Model):
@@ -312,7 +312,7 @@ class CharFieldTests(TestCase):
 
 
 @isolate_apps('invalid_models_tests')
-class DateFieldTests(TestCase):
+class DateFieldTests(SimpleTestCase):
     maxDiff = None
 
     def test_auto_now_and_auto_now_add_raise_error(self):
@@ -375,7 +375,7 @@ class DateFieldTests(TestCase):
 
 
 @isolate_apps('invalid_models_tests')
-class DateTimeFieldTests(TestCase):
+class DateTimeFieldTests(SimpleTestCase):
     maxDiff = None
 
     def test_fix_default_value(self):
@@ -638,7 +638,7 @@ class IntegerFieldTests(SimpleTestCase):
 
 
 @isolate_apps('invalid_models_tests')
-class TimeFieldTests(TestCase):
+class TimeFieldTests(SimpleTestCase):
     maxDiff = None
 
     def test_fix_default_value(self):
@@ -680,7 +680,7 @@ class TimeFieldTests(TestCase):
 
 
 @isolate_apps('invalid_models_tests')
-class TextFieldTests(TestCase):
+class TextFieldTests(SimpleTestCase):
 
     @skipIfDBFeature('supports_index_on_text_field')
     def test_max_length_warning(self):

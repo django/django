@@ -11,7 +11,7 @@ from django.db.utils import NotSupportedError
 from django.test import skipUnlessDBFeature
 from django.test.utils import register_lookup
 
-from . import PostgreSQLTestCase
+from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .models import CharFieldModel, IntegerArrayModel
 
 
@@ -31,7 +31,7 @@ class IndexTestMixin:
 
 
 @skipUnlessDBFeature('has_brin_index_support')
-class BrinIndexTests(IndexTestMixin, PostgreSQLTestCase):
+class BrinIndexTests(IndexTestMixin, PostgreSQLSimpleTestCase):
     index_class = BrinIndex
 
     def test_suffix(self):
@@ -54,7 +54,7 @@ class BrinIndexTests(IndexTestMixin, PostgreSQLTestCase):
             BrinIndex(fields=['title'], name='test_title_brin', pages_per_range=0)
 
 
-class BTreeIndexTests(IndexTestMixin, PostgreSQLTestCase):
+class BTreeIndexTests(IndexTestMixin, PostgreSQLSimpleTestCase):
     index_class = BTreeIndex
 
     def test_suffix(self):
@@ -68,7 +68,7 @@ class BTreeIndexTests(IndexTestMixin, PostgreSQLTestCase):
         self.assertEqual(kwargs, {'fields': ['title'], 'name': 'test_title_btree', 'fillfactor': 80})
 
 
-class GinIndexTests(IndexTestMixin, PostgreSQLTestCase):
+class GinIndexTests(IndexTestMixin, PostgreSQLSimpleTestCase):
     index_class = GinIndex
 
     def test_suffix(self):
@@ -92,7 +92,7 @@ class GinIndexTests(IndexTestMixin, PostgreSQLTestCase):
         })
 
 
-class GistIndexTests(IndexTestMixin, PostgreSQLTestCase):
+class GistIndexTests(IndexTestMixin, PostgreSQLSimpleTestCase):
     index_class = GistIndex
 
     def test_suffix(self):
@@ -111,7 +111,7 @@ class GistIndexTests(IndexTestMixin, PostgreSQLTestCase):
         })
 
 
-class HashIndexTests(IndexTestMixin, PostgreSQLTestCase):
+class HashIndexTests(IndexTestMixin, PostgreSQLSimpleTestCase):
     index_class = HashIndex
 
     def test_suffix(self):
@@ -125,7 +125,7 @@ class HashIndexTests(IndexTestMixin, PostgreSQLTestCase):
         self.assertEqual(kwargs, {'fields': ['title'], 'name': 'test_title_hash', 'fillfactor': 80})
 
 
-class SpGistIndexTests(IndexTestMixin, PostgreSQLTestCase):
+class SpGistIndexTests(IndexTestMixin, PostgreSQLSimpleTestCase):
     index_class = SpGistIndex
 
     def test_suffix(self):

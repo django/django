@@ -8,7 +8,7 @@ from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.utils import DatabaseError
 from django.test import (
-    TestCase, modify_settings, override_settings, skipUnlessDBFeature,
+    SimpleTestCase, modify_settings, override_settings, skipUnlessDBFeature,
 )
 
 from .test_base import MigrationTestBase
@@ -685,7 +685,7 @@ class FakeMigration:
         return 'M<%s>' % self.name
 
 
-class ExecutorUnitTests(TestCase):
+class ExecutorUnitTests(SimpleTestCase):
     """(More) isolated unit tests for executor methods."""
     def test_minimize_rollbacks(self):
         """

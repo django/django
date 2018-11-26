@@ -1785,7 +1785,7 @@ class CacheHEADTest(SimpleTestCase):
         ('es', 'Spanish'),
     ],
 )
-class CacheI18nTest(TestCase):
+class CacheI18nTest(SimpleTestCase):
 
     def setUp(self):
         self.path = '/cache/test/'

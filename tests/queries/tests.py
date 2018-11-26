@@ -9,7 +9,7 @@ from django.db import DEFAULT_DB_ALIAS, connection
 from django.db.models import Count, F, Q
 from django.db.models.sql.constants import LOUTER
 from django.db.models.sql.where import NothingNode, WhereNode
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
 from .models import (
@@ -1959,14 +1959,11 @@ class RawQueriesTests(TestCase):
         self.assertEqual(repr(qs), "<RawQuerySet: SELECT * FROM queries_note WHERE note = n1 and misc = foo>")
 
 
-class GeneratorExpressionTests(TestCase):
+class GeneratorExpressionTests(SimpleTestCase):
     def test_ticket10432(self):
         # Using an empty generator expression as the rvalue for an "__in"
         # lookup is legal.
-        self.assertQuerysetEqual(
-            Note.objects.filter(pk__in=(x for x in ())),
-            []
-        )
+        self.assertCountEqual(Note.objects.filter(pk__in=(x for x in ())), [])
 
 
 class ComparisonTests(TestCase):
@@ -2222,30 +2219,22 @@ class CloneTests(TestCase):
                 opts_class.__deepcopy__ = note_deepcopy
 
 
-class EmptyQuerySetTests(TestCase):
+class EmptyQuerySetTests(SimpleTestCase):
     def test_emptyqueryset_values(self):
         # #14366 -- Calling .values() on an empty QuerySet and then cloning
         # that should not cause an error
-        self.assertQuerysetEqual(
-            Number.objects.none().values('num').order_by('num'), []
-        )
+        self.assertCountEqual(Number.objects.none().values('num').order_by('num'), [])
 
     def test_values_subquery(self):
-        self.assertQuerysetEqual(
-            Number.objects.filter(pk__in=Number.objects.none().values("pk")),
-            []
-        )
-        self.assertQuerysetEqual(
-            Number.objects.filter(pk__in=Number.objects.none().values_list("pk")),
-            []
-        )
+        self.assertCountEqual(Number.objects.filter(pk__in=Number.objects.none().values('pk')), [])
+        self.assertCountEqual(Number.objects.filter(pk__in=Number.objects.none().values_list('pk')), [])
 
     def test_ticket_19151(self):
         # #19151 -- Calling .values() or .values_list() on an empty QuerySet
         # should return an empty QuerySet and not cause an error.
         q = Author.objects.none()
-        self.assertQuerysetEqual(q.values(), [])
-        self.assertQuerysetEqual(q.values_list(), [])
+        self.assertCountEqual(q.values(), [])
+        self.assertCountEqual(q.values_list(), [])
 
 
 class ValuesQuerysetTests(TestCase):
@@ -3013,7 +3002,7 @@ class ProxyQueryCleanupTest(TestCase):
         self.assertEqual(qs.count(), 1)
 
 
-class WhereNodeTest(TestCase):
+class WhereNodeTest(SimpleTestCase):
     class DummyNode:
         def as_sql(self, compiler, connection):
             return 'dummy', []
@@ -3078,7 +3067,7 @@ class WhereNodeTest(TestCase):
             w.as_sql(compiler, connection)
 
 
-class QuerySetExceptionTests(TestCase):
+class QuerySetExceptionTests(SimpleTestCase):
     def test_iter_exceptions(self):
         qs = ExtraInfo.objects.only('author')
         msg = "'ManyToOneRel' object has no attribute 'attname'"
@@ -3531,7 +3520,7 @@ class Ticket20101Tests(TestCase):
         self.assertIn(n, (qs1 | qs2))
 
 
-class EmptyStringPromotionTests(TestCase):
+class EmptyStringPromotionTests(SimpleTestCase):
     def test_empty_string_promotion(self):
         qs = RelatedObject.objects.filter(single__name='')
         if connection.features.interprets_empty_strings_as_nulls:
@@ -3570,7 +3559,7 @@ class DoubleInSubqueryTests(TestCase):
         self.assertSequenceEqual(qs, [lfb1])
 
 
-class Ticket18785Tests(TestCase):
+class Ticket18785Tests(SimpleTestCase):
     def test_ticket_18785(self):
         # Test join trimming from ticket18785
         qs = Item.objects.exclude(
@@ -3858,7 +3847,7 @@ class TestTicket24279(TestCase):
         self.assertQuerysetEqual(qs, [])
 
 
-class TestInvalidValuesRelation(TestCase):
+class TestInvalidValuesRelation(SimpleTestCase):
     def test_invalid_values(self):
         msg = "invalid literal for int() with base 10: 'abc'"
         with self.assertRaisesMessage(ValueError, msg):

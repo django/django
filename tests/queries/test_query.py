@@ -8,13 +8,13 @@ from django.db.models.functions import Lower
 from django.db.models.lookups import Exact, GreaterThan, IsNull, LessThan
 from django.db.models.sql.query import Query
 from django.db.models.sql.where import OR
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.test.utils import register_lookup
 
 from .models import Author, Item, ObjectC, Ranking
 
 
-class TestQuery(TestCase):
+class TestQuery(SimpleTestCase):
     def test_simple_query(self):
         query = Query(Author)
         where = query.build_where(Q(num__gt=2))

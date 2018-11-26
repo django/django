@@ -156,7 +156,7 @@ class UserManagerTestCase(TestCase):
             self.assertIn(char, allowed_chars)
 
 
-class AbstractBaseUserTests(TestCase):
+class AbstractBaseUserTests(SimpleTestCase):
 
     def test_has_usable_password(self):
         """

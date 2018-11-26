@@ -2091,7 +2091,7 @@ class NoRelationRouter:
 
 
 @override_settings(DATABASE_ROUTERS=[NoRelationRouter()])
-class RelationAssignmentTests(TestCase):
+class RelationAssignmentTests(SimpleTestCase):
     """allow_relation() is called with unsaved model instances."""
     multi_db = True
     router_prevents_msg = 'the current database router prevents this relation'

@@ -15,7 +15,7 @@ class Nested:
         pass
 
 
-class BasicFieldTests(TestCase):
+class BasicFieldTests(SimpleTestCase):
 
     def test_show_hidden_initial(self):
         """

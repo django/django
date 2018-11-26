@@ -2849,7 +2849,7 @@ class CustomMetaclassTestCase(SimpleTestCase):
         self.assertEqual(new_cls.base_fields, {})
 
 
-class StrictAssignmentTests(TestCase):
+class StrictAssignmentTests(SimpleTestCase):
     """
     Should a model do anything special with __setattr__() or descriptors which
     raise a ValidationError, a model form should catch the error (#24706).

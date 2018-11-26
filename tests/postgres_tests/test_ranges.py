@@ -9,7 +9,7 @@ from django.test import ignore_warnings, override_settings
 from django.utils import timezone
 from django.utils.deprecation import RemovedInDjango31Warning
 
-from . import PostgreSQLTestCase
+from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .models import RangeLookupsModel, RangesModel
 
 try:
@@ -355,7 +355,7 @@ class TestQueryingWithRanges(PostgreSQLTestCase):
         )
 
 
-class TestSerialization(PostgreSQLTestCase):
+class TestSerialization(PostgreSQLSimpleTestCase):
     test_data = (
         '[{"fields": {"ints": "{\\"upper\\": \\"10\\", \\"lower\\": \\"0\\", '
         '\\"bounds\\": \\"[)\\"}", "decimals": "{\\"empty\\": true}", '
@@ -405,7 +405,7 @@ class TestSerialization(PostgreSQLTestCase):
         self.assertEqual(new_instance.ints, NumericRange(10, None))
 
 
-class TestValidators(PostgreSQLTestCase):
+class TestValidators(PostgreSQLSimpleTestCase):
 
     def test_max(self):
         validator = RangeMaxValueValidator(5)
@@ -430,7 +430,7 @@ class TestValidators(PostgreSQLTestCase):
             validator(NumericRange(None, 10))  # an unbound range
 
 
-class TestFormField(PostgreSQLTestCase):
+class TestFormField(PostgreSQLSimpleTestCase):
 
     def test_valid_integer(self):
         field = pg_forms.IntegerRangeField()
@@ -708,7 +708,7 @@ class TestFormField(PostgreSQLTestCase):
         self.assertIsInstance(form_field, pg_forms.DateTimeRangeField)
 
 
-class TestWidget(PostgreSQLTestCase):
+class TestWidget(PostgreSQLSimpleTestCase):
     def test_range_widget(self):
         f = pg_forms.ranges.DateTimeRangeField()
         self.assertHTMLEqual(
