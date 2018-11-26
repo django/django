@@ -10,6 +10,37 @@ modules in ``django.utils`` are designed for internal use and only the
 following parts can be considered stable and thus backwards compatible as per
 the :ref:`internal release deprecation policy <internal-release-deprecation-policy>`.
 
+``django.utils.background``
+===========================
+
+.. module:: django.utils.background
+   :synopsis: Utilities to support asynchronous background task processing.
+
+This module contains :class:`~django.utils.background.BackgroundTask` instance
+which is called ``task``.
+
+
+.. class:: BackgroundTask(n)
+
+    This class contains implementation for background asynchronous tasks.
+    It uses ``concurrent.futures`` and ``asyncio`` and relies on
+    ``multiprocessing.cpu_count`` if the number of workers is not given.
+    Also you may want to configure the amount of workers in the pool using
+    The :setting:`BACKGROUND_TASK_POOL_SIZE` which defaults to 2.
+
+
+.. function:: task(view_func)
+
+    This decorator allows creation of asynchronous tasks.
+
+    @background.task
+    def my_task(message)
+        # Do some work
+
+    def my_view(request):
+        my_task("Hello world...")
+
+
 ``django.utils.cache``
 ======================
 
