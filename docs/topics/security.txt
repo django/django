@@ -244,7 +244,7 @@ User-uploaded content
   validate all user uploaded file content, however, there are some other steps
   you can take to mitigate these attacks:
 
-  1. One class of attacks can be prevented by always serving user uploaded
+  #. One class of attacks can be prevented by always serving user uploaded
      content from a distinct top-level or second-level domain. This prevents
      any exploit blocked by `same-origin policy`_ protections such as cross
      site scripting. For example, if your site runs on ``example.com``, you
@@ -252,7 +252,7 @@ User-uploaded content
      from something like ``usercontent-example.com``. It's *not* sufficient to
      serve content from a subdomain like ``usercontent.example.com``.
 
-  2. Beyond this, applications may choose to define a whitelist of allowable
+  #. Beyond this, applications may choose to define a whitelist of allowable
      file extensions for user uploaded files and configure the web server
      to only serve such files.
 

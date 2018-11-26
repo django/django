@@ -219,14 +219,14 @@ class SchemaTests(PostgreSQLTestCase):
             editor.remove_index(IntegerArrayModel, index)
         self.assertNotIn(index_name, self.get_constraints(IntegerArrayModel._meta.db_table))
 
+    @mock.patch('django.db.backends.postgresql.features.DatabaseFeatures.has_gin_pending_list_limit', False)
     def test_gin_parameters_exception(self):
         index_name = 'gin_options_exception'
         index = GinIndex(fields=['field'], name=index_name, gin_pending_list_limit=64)
         msg = 'GIN option gin_pending_list_limit requires PostgreSQL 9.5+.'
         with self.assertRaisesMessage(NotSupportedError, msg):
-            with mock.patch('django.db.connection.features.has_gin_pending_list_limit', False):
-                with connection.schema_editor() as editor:
-                    editor.add_index(IntegerArrayModel, index)
+            with connection.schema_editor() as editor:
+                editor.add_index(IntegerArrayModel, index)
         self.assertNotIn(index_name, self.get_constraints(IntegerArrayModel._meta.db_table))
 
     @skipUnlessDBFeature('has_brin_index_support')
@@ -259,7 +259,7 @@ class SchemaTests(PostgreSQLTestCase):
         index_name = 'brin_index_exception'
         index = BrinIndex(fields=['field'], name=index_name)
         with self.assertRaisesMessage(NotSupportedError, 'BRIN indexes require PostgreSQL 9.5+.'):
-            with mock.patch('django.db.connection.features.has_brin_index_support', False):
+            with mock.patch('django.db.backends.postgresql.features.DatabaseFeatures.has_brin_index_support', False):
                 with connection.schema_editor() as editor:
                     editor.add_index(CharFieldModel, index)
         self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))
@@ -269,7 +269,7 @@ class SchemaTests(PostgreSQLTestCase):
         index_name = 'brin_options_exception'
         index = BrinIndex(fields=['field'], name=index_name, autosummarize=True)
         with self.assertRaisesMessage(NotSupportedError, 'BRIN option autosummarize requires PostgreSQL 10+.'):
-            with mock.patch('django.db.connection.features.has_brin_autosummarize', False):
+            with mock.patch('django.db.backends.postgresql.features.DatabaseFeatures.has_brin_autosummarize', False):
                 with connection.schema_editor() as editor:
                     editor.add_index(CharFieldModel, index)
         self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))

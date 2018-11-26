@@ -56,6 +56,15 @@ class MiddlewareTests(SimpleTestCase):
         response = self.client.get('/middleware_exceptions/template_response/')
         self.assertEqual(response.content, b'template_response OK\nTemplateResponseMiddleware')
 
+    @override_settings(MIDDLEWARE=['middleware_exceptions.middleware.NoTemplateResponseMiddleware'])
+    def test_process_template_response_returns_none(self):
+        msg = (
+            "NoTemplateResponseMiddleware.process_template_response didn't "
+            "return an HttpResponse object. It returned None instead."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            self.client.get('/middleware_exceptions/template_response/')
+
     @override_settings(MIDDLEWARE=['middleware_exceptions.middleware.LogMiddleware'])
     def test_view_exception_converted_before_middleware(self):
         response = self.client.get('/middleware_exceptions/permission_denied/')

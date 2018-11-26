@@ -9,7 +9,7 @@ from django.urls import get_resolver, set_urlconf
 from django.utils.log import log_response
 from django.utils.module_loading import import_string
 
-from .exception import convert_exception_to_response, get_exception_response
+from .exception import convert_exception_to_response
 
 logger = logging.getLogger('django.request')
 
@@ -68,30 +68,18 @@ class BaseHandler:
                 view = transaction.atomic(using=db.alias)(view)
         return view
 
-    def get_exception_response(self, request, resolver, status_code, exception):
-        return get_exception_response(request, resolver, status_code, exception, self.__class__)
-
     def get_response(self, request):
         """Return an HttpResponse object for the given HttpRequest."""
         # Setup default url resolver for this thread
         set_urlconf(settings.ROOT_URLCONF)
-
         response = self._middleware_chain(request)
-
         response._closable_objects.append(request)
-
-        # If the exception handler returns a TemplateResponse that has not
-        # been rendered, force it to be rendered.
-        if not getattr(response, 'is_rendered', True) and callable(getattr(response, 'render', None)):
-            response = response.render()
-
         if response.status_code >= 400:
             log_response(
                 '%s: %s', response.reason_phrase, request.path,
                 response=response,
                 request=request,
             )
-
         return response
 
     def _get_response(self, request):

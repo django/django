@@ -6,7 +6,7 @@ from django.test import SimpleTestCase, TestCase
 from django.utils.functional import lazy
 
 from .models import (
-    Foo, RenamedField, VerboseNameField, Whiz, WhizIter, WhizIterEmpty,
+    Bar, Foo, RenamedField, VerboseNameField, Whiz, WhizIter, WhizIterEmpty,
 )
 
 
@@ -157,3 +157,37 @@ class GetChoicesTests(SimpleTestCase):
         lazy_func = lazy(lambda x: 0 / 0, int)  # raises ZeroDivisionError if evaluated.
         f = models.CharField(choices=[(lazy_func('group'), (('a', 'A'), ('b', 'B')))])
         self.assertEqual(f.get_choices(include_blank=True)[0], ('', '---------'))
+
+
+class GetChoicesOrderingTests(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.foo1 = Foo.objects.create(a='a', d='12.34')
+        cls.foo2 = Foo.objects.create(a='b', d='12.34')
+        cls.bar1 = Bar.objects.create(a=cls.foo1, b='a')
+        cls.bar2 = Bar.objects.create(a=cls.foo2, b='a')
+        cls.field = Bar._meta.get_field('a')
+
+    def assertChoicesEqual(self, choices, objs):
+        self.assertEqual(choices, [(obj.pk, str(obj)) for obj in objs])
+
+    def test_get_choices(self):
+        self.assertChoicesEqual(
+            self.field.get_choices(include_blank=False, ordering=('a',)),
+            [self.foo1, self.foo2]
+        )
+        self.assertChoicesEqual(
+            self.field.get_choices(include_blank=False, ordering=('-a',)),
+            [self.foo2, self.foo1]
+        )
+
+    def test_get_choices_reverse_related_field(self):
+        self.assertChoicesEqual(
+            self.field.remote_field.get_choices(include_blank=False, ordering=('a',)),
+            [self.bar1, self.bar2]
+        )
+        self.assertChoicesEqual(
+            self.field.remote_field.get_choices(include_blank=False, ordering=('-a',)),
+            [self.bar2, self.bar1]
+        )

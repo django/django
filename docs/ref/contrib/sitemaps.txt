@@ -31,15 +31,13 @@ Installation
 
 To install the sitemap app, follow these steps:
 
-1. Add ``'django.contrib.sitemaps'`` to your :setting:`INSTALLED_APPS`
-   setting.
+#. Add ``'django.contrib.sitemaps'`` to your :setting:`INSTALLED_APPS` setting.
 
-2. Make sure your :setting:`TEMPLATES` setting contains a ``DjangoTemplates``
+#. Make sure your :setting:`TEMPLATES` setting contains a ``DjangoTemplates``
    backend whose ``APP_DIRS`` options is set to ``True``. It's in there by
    default, so you'll only need to change this if you've changed that setting.
 
-3. Make sure you've installed the
-   :mod:`sites framework <django.contrib.sites>`.
+#. Make sure you've installed the :mod:`sites framework<django.contrib.sites>`.
 
 (Note: The sitemap application doesn't install any database tables. The only
 reason it needs to go into :setting:`INSTALLED_APPS` is so that the

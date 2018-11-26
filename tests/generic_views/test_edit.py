@@ -332,40 +332,43 @@ class UpdateViewTests(TestCase):
 @override_settings(ROOT_URLCONF='generic_views.urls')
 class DeleteViewTests(TestCase):
 
+    @classmethod
+    def setUpTestData(cls):
+        cls.author = Author.objects.create(
+            name='Randall Munroe',
+            slug='randall-munroe',
+        )
+
     def test_delete_by_post(self):
-        a = Author.objects.create(**{'name': 'Randall Munroe', 'slug': 'randall-munroe'})
-        res = self.client.get('/edit/author/%d/delete/' % a.pk)
+        res = self.client.get('/edit/author/%d/delete/' % self.author.pk)
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['object'], Author.objects.get(pk=a.pk))
-        self.assertEqual(res.context['author'], Author.objects.get(pk=a.pk))
+        self.assertEqual(res.context['object'], self.author)
+        self.assertEqual(res.context['author'], self.author)
         self.assertTemplateUsed(res, 'generic_views/author_confirm_delete.html')
 
         # Deletion with POST
-        res = self.client.post('/edit/author/%d/delete/' % a.pk)
+        res = self.client.post('/edit/author/%d/delete/' % self.author.pk)
         self.assertEqual(res.status_code, 302)
         self.assertRedirects(res, '/list/authors/')
         self.assertQuerysetEqual(Author.objects.all(), [])
 
     def test_delete_by_delete(self):
         # Deletion with browser compatible DELETE method
-        a = Author.objects.create(**{'name': 'Randall Munroe', 'slug': 'randall-munroe'})
-        res = self.client.delete('/edit/author/%d/delete/' % a.pk)
+        res = self.client.delete('/edit/author/%d/delete/' % self.author.pk)
         self.assertEqual(res.status_code, 302)
         self.assertRedirects(res, '/list/authors/')
         self.assertQuerysetEqual(Author.objects.all(), [])
 
     def test_delete_with_redirect(self):
-        a = Author.objects.create(**{'name': 'Randall Munroe', 'slug': 'randall-munroe'})
-        res = self.client.post('/edit/author/%d/delete/redirect/' % a.pk)
+        res = self.client.post('/edit/author/%d/delete/redirect/' % self.author.pk)
         self.assertEqual(res.status_code, 302)
         self.assertRedirects(res, '/edit/authors/create/')
         self.assertQuerysetEqual(Author.objects.all(), [])
 
     def test_delete_with_interpolated_redirect(self):
-        a = Author.objects.create(**{'name': 'Randall Munroe', 'slug': 'randall-munroe'})
-        res = self.client.post('/edit/author/%d/delete/interpolate_redirect/' % a.pk)
+        res = self.client.post('/edit/author/%d/delete/interpolate_redirect/' % self.author.pk)
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, '/edit/authors/create/?deleted=%d' % a.pk)
+        self.assertRedirects(res, '/edit/authors/create/?deleted=%d' % self.author.pk)
         self.assertQuerysetEqual(Author.objects.all(), [])
         # Also test with escaped chars in URL
         a = Author.objects.create(**{'name': 'Randall Munroe', 'slug': 'randall-munroe'})
@@ -374,24 +377,19 @@ class DeleteViewTests(TestCase):
         self.assertRedirects(res, '/%C3%A9dit/authors/create/?deleted={}'.format(a.pk))
 
     def test_delete_with_special_properties(self):
-        a = Author.objects.create(**{'name': 'Randall Munroe', 'slug': 'randall-munroe'})
-        res = self.client.get('/edit/author/%d/delete/special/' % a.pk)
+        res = self.client.get('/edit/author/%d/delete/special/' % self.author.pk)
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['object'], Author.objects.get(pk=a.pk))
-        self.assertEqual(res.context['thingy'], Author.objects.get(pk=a.pk))
+        self.assertEqual(res.context['object'], self.author)
+        self.assertEqual(res.context['thingy'], self.author)
         self.assertNotIn('author', res.context)
         self.assertTemplateUsed(res, 'generic_views/confirm_delete.html')
 
-        res = self.client.post('/edit/author/%d/delete/special/' % a.pk)
+        res = self.client.post('/edit/author/%d/delete/special/' % self.author.pk)
         self.assertEqual(res.status_code, 302)
         self.assertRedirects(res, '/list/authors/')
         self.assertQuerysetEqual(Author.objects.all(), [])
 
     def test_delete_without_redirect(self):
-        a = Author.objects.create(
-            name='Randall Munroe',
-            slug='randall-munroe',
-        )
         msg = 'No URL to redirect to. Provide a success_url.'
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            self.client.post('/edit/author/%d/delete/naive/' % a.pk)
+            self.client.post('/edit/author/%d/delete/naive/' % self.author.pk)

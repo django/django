@@ -62,14 +62,12 @@ class ModelIterable(BaseIterable):
                      for f in select[model_fields_start:model_fields_end]]
         related_populators = get_related_populators(klass_info, select, db)
         known_related_objects = [
-            (field, related_objs, [
-                operator.attrgetter(
-                    field.attname
-                    if from_field == 'self' else
-                    queryset.model._meta.get_field(from_field).attname
-                )
+            (field, related_objs, operator.attrgetter(*[
+                field.attname
+                if from_field == 'self' else
+                queryset.model._meta.get_field(from_field).attname
                 for from_field in field.from_fields
-            ]) for field, related_objs in queryset._known_related_objects.items()
+            ])) for field, related_objs in queryset._known_related_objects.items()
         ]
         for row in compiler.results_iter(results):
             obj = model_cls.from_db(db, init_list, row[model_fields_start:model_fields_end])
@@ -80,11 +78,11 @@ class ModelIterable(BaseIterable):
                     setattr(obj, attr_name, row[col_pos])
 
             # Add the known related objects to the model.
-            for field, rel_objs, rel_getters in known_related_objects:
+            for field, rel_objs, rel_getter in known_related_objects:
                 # Avoid overwriting objects loaded by, e.g., select_related().
                 if field.is_cached(obj):
                     continue
-                rel_obj_id = tuple([rel_getter(obj) for rel_getter in rel_getters])
+                rel_obj_id = rel_getter(obj)
                 try:
                     rel_obj = rel_objs[rel_obj_id]
                 except KeyError:
@@ -327,8 +325,11 @@ class QuerySet:
             return other
         if isinstance(other, EmptyQuerySet):
             return self
-        combined = self._chain()
+        query = self if self.query.can_filter() else self.model._base_manager.filter(pk__in=self.values('pk'))
+        combined = query._chain()
         combined._merge_known_related_objects(other)
+        if not other.query.can_filter():
+            other = other.model._base_manager.filter(pk__in=other.values('pk'))
         combined.query.combine(other.query, sql.OR)
         return combined
 
@@ -489,7 +490,7 @@ class QuerySet:
         if not fields:
             raise ValueError('Field names must be given to bulk_update().')
         objs = tuple(objs)
-        if not all(obj.pk for obj in objs):
+        if any(obj.pk is None for obj in objs):
             raise ValueError('All bulk_update() objects must have a primary key set.')
         fields = [self.model._meta.get_field(name) for name in fields]
         if any(not f.concrete or f.many_to_many for f in fields):
@@ -1346,7 +1347,7 @@ class RawQuerySet:
 
     def resolve_model_init_order(self):
         """Resolve the init field names and value positions."""
-        converter = connections[self.db].introspection.column_name_converter
+        converter = connections[self.db].introspection.identifier_converter
         model_init_fields = [f for f in self.model._meta.fields if converter(f.column) in self.columns]
         annotation_fields = [(column, pos) for pos, column in enumerate(self.columns)
                              if column not in self.model_fields]
@@ -1468,7 +1469,7 @@ class RawQuerySet:
     @cached_property
     def model_fields(self):
         """A dict mapping column names to model field names."""
-        converter = connections[self.db].introspection.table_name_converter
+        converter = connections[self.db].introspection.identifier_converter
         model_fields = {}
         for field in self.model._meta.fields:
             name, column = field.get_attname_column()

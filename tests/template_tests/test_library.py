@@ -1,9 +1,9 @@
 from django.template import Library
 from django.template.base import Node
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 
-class FilterRegistrationTests(TestCase):
+class FilterRegistrationTests(SimpleTestCase):
 
     def setUp(self):
         self.library = Library()
@@ -44,7 +44,7 @@ class FilterRegistrationTests(TestCase):
             self.library.filter(None, '')
 
 
-class InclusionTagRegistrationTests(TestCase):
+class InclusionTagRegistrationTests(SimpleTestCase):
 
     def setUp(self):
         self.library = Library()
@@ -62,7 +62,7 @@ class InclusionTagRegistrationTests(TestCase):
         self.assertIn('name', self.library.tags)
 
 
-class SimpleTagRegistrationTests(TestCase):
+class SimpleTagRegistrationTests(SimpleTestCase):
 
     def setUp(self):
         self.library = Library()
@@ -91,7 +91,7 @@ class SimpleTagRegistrationTests(TestCase):
             self.library.simple_tag('invalid')
 
 
-class TagRegistrationTests(TestCase):
+class TagRegistrationTests(SimpleTestCase):
 
     def setUp(self):
         self.library = Library()

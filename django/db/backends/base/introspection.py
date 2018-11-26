@@ -24,21 +24,13 @@ class BaseDatabaseIntrospection:
         """
         return self.data_types_reverse[data_type]
 
-    def table_name_converter(self, name):
+    def identifier_converter(self, name):
         """
-        Apply a conversion to the name for the purposes of comparison.
+        Apply a conversion to the identifier for the purposes of comparison.
 
-        The default table name converter is for case sensitive comparison.
+        The default identifier converter is for case sensitive comparison.
         """
         return name
-
-    def column_name_converter(self, name):
-        """
-        Apply a conversion to the column name for the purposes of comparison.
-
-        Use table_name_converter() by default.
-        """
-        return self.table_name_converter(name)
 
     def table_names(self, cursor=None, include_views=False):
         """
@@ -83,11 +75,11 @@ class BaseDatabaseIntrospection:
                 )
         tables = list(tables)
         if only_existing:
-            existing_tables = self.table_names(include_views=include_views)
+            existing_tables = set(self.table_names(include_views=include_views))
             tables = [
                 t
                 for t in tables
-                if self.table_name_converter(t) in existing_tables
+                if self.identifier_converter(t) in existing_tables
             ]
         return tables
 
@@ -101,10 +93,10 @@ class BaseDatabaseIntrospection:
         all_models = []
         for app_config in apps.get_app_configs():
             all_models.extend(router.get_migratable_models(app_config, self.connection.alias))
-        tables = list(map(self.table_name_converter, tables))
+        tables = set(map(self.identifier_converter, tables))
         return {
             m for m in all_models
-            if self.table_name_converter(m._meta.db_table) in tables
+            if self.identifier_converter(m._meta.db_table) in tables
         }
 
     def sequence_list(self):

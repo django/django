@@ -11,14 +11,14 @@ This page describes how you can serve these static files.
 Configuring static files
 ========================
 
-1. Make sure that ``django.contrib.staticfiles`` is included in your
+#. Make sure that ``django.contrib.staticfiles`` is included in your
    :setting:`INSTALLED_APPS`.
 
-2. In your settings file, define :setting:`STATIC_URL`, for example::
+#. In your settings file, define :setting:`STATIC_URL`, for example::
 
       STATIC_URL = '/static/'
 
-3. In your templates, use the :ttag:`static` template tag to build the URL for
+#. In your templates, use the :ttag:`static` template tag to build the URL for
    the given relative path using the configured :setting:`STATICFILES_STORAGE`.
 
    .. _staticfiles-in-templates:
@@ -28,7 +28,7 @@ Configuring static files
         {% load static %}
         <img src="{% static "my_app/example.jpg" %}" alt="My image">
 
-4. Store your static files in a folder called ``static`` in your app. For
+#. Store your static files in a folder called ``static`` in your app. For
    example ``my_app/static/my_app/example.jpg``.
 
 .. admonition:: Serving the files
@@ -159,19 +159,19 @@ Deployment
 :mod:`django.contrib.staticfiles` provides a convenience management command
 for gathering static files in a single directory so you can serve them easily.
 
-1. Set the :setting:`STATIC_ROOT` setting to the directory from which you'd
+#. Set the :setting:`STATIC_ROOT` setting to the directory from which you'd
    like to serve these files, for example::
 
        STATIC_ROOT = "/var/www/example.com/static/"
 
-2. Run the :djadmin:`collectstatic` management command::
+#. Run the :djadmin:`collectstatic` management command::
 
        $ python manage.py collectstatic
 
    This will copy all files from your static folders into the
    :setting:`STATIC_ROOT` directory.
 
-3. Use a web server of your choice to serve the
+#. Use a web server of your choice to serve the
    files. :doc:`/howto/static-files/deployment` covers some common deployment
    strategies for static files.
 

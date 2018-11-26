@@ -30,10 +30,11 @@ officially support the latest release of each series.
 What's new in Django 2.2
 ========================
 
-Check Constraints
------------------
+Constraints
+-----------
 
-The new :class:`~django.db.models.CheckConstraint` class enables adding custom
+The new :class:`~django.db.models.CheckConstraint` and
+:class:`~django.db.models.UniqueConstraint` classes enable adding custom
 database constraints. Constraints are added to models using the
 :attr:`Meta.constraints <django.db.models.Options.constraints>` option.
 
@@ -43,7 +44,8 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Added a CSS class to the column headers of
+  :class:`~django.contrib.admin.TabularInline`.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -182,6 +184,10 @@ Management Commands
 * :option:`inspectdb --include-views` now creates models for materialized views
   on PostgreSQL.
 
+* The new :option:`inspectdb --include-partitions` option allows creating
+  models for partition tables on PostgreSQL. In older versions, models are
+  created child tables instead the parent.
+
 * :djadmin:`inspectdb` now introspects :class:`~django.db.models.DurationField`
   for Oracle and PostgreSQL.
 
@@ -256,6 +262,9 @@ Tests
   serialization of list and tuple ``data`` when
   ``content_type='application/json'``.
 
+* The new :setting:`ORACLE_MANAGED_FILES <TEST_ORACLE_MANAGED_FILES>` test
+  database setting allows using Oracle Managed Files (OMF) tablespaces.
+
 URLs
 ~~~~
 
@@ -276,6 +285,9 @@ Backwards incompatible changes in 2.2
 Database backend API
 --------------------
 
+This section describes changes that may be needed in third-party database
+backends.
+
 * Third-party database backends must implement support for table check
   constraints or set ``DatabaseFeatures.supports_table_check_constraints`` to
   ``False``.
@@ -292,6 +304,20 @@ Database backend API
 
 * Third party database backends must implement support for partial indexes or
   set ``DatabaseFeatures.supports_partial_indexes`` to ``False``.
+
+* Several ``SchemaEditor`` attributes are changed:
+
+  * ``sql_create_check`` is replaced with ``sql_create_constraint``.
+  * ``sql_delete_check`` is replaced with ``sql_delete_constraint``.
+  * ``sql_create_fk`` is replaced with ``sql_foreign_key_constraint``,
+    ``sql_constraint``, and ``sql_create_constraint``.
+
+* ``DatabaseIntrospection.table_name_converter()`` and
+  ``column_name_converter()`` are removed. Third party database backends may
+  need to instead implement ``DatabaseIntrospection.identifier_converter()``.
+  In that case, the constraint names that
+  ``DatabaseIntrospection.get_constraints()`` returns must be normalized by
+  ``identifier_converter()``.
 
 Admin actions are no longer collected from base ``ModelAdmin`` classes
 ----------------------------------------------------------------------
@@ -337,6 +363,35 @@ To simplify a few parts of Django's database handling, `sqlparse
 <https://pypi.org/project/sqlparse/>`_ is now a required dependency. It's
 automatically installed along with Django.
 
+``cached_property`` aliases
+---------------------------
+
+In usage like::
+
+    from django.utils.functional import cached_property
+
+    class A:
+
+        @cached_property
+        def base(self):
+            return ...
+
+        alias = base
+
+``alias`` is not cached. Such usage now raises ``TypeError: Cannot assign the
+same cached_property to two different names ('base' and 'alias').`` on Python
+3.6 and later.
+
+Use this instead::
+
+    import operator
+
+    class A:
+
+        ...
+
+        alias = property(operator.attrgetter('base'))
+
 Miscellaneous
 -------------
 
@@ -368,6 +423,13 @@ Miscellaneous
   longer be passed a bytestring.
 
 * Support for ``cx_Oracle`` < 6.0 is removed.
+
+* In an attempt to provide more semantic query data, ``NullBooleanSelect`` now
+  renders ``<option>`` values of ``unknown``, ``true``, and ``false`` instead
+  of ``1``, ``2``, and ``3``. For backwards compatibility, the old values are
+  still accepted as data.
+* :attr:`Group.name <django.contrib.auth.models.Group.name>` ``max_length``
+  is increased from 80 to 150 characters.
 
 .. _deprecated-features-2.2:
 

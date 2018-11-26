@@ -31,7 +31,7 @@ then inserting into a GeoDjango model.
 Example
 =======
 
-1. You need a GDAL-supported data source, like a shapefile (here we're using
+#. You need a GDAL-supported data source, like a shapefile (here we're using
    a simple polygon shapefile, ``test_poly.shp``, with three features)::
 
     >>> from django.contrib.gis.gdal import DataSource
@@ -50,7 +50,7 @@ Example
         PRIMEM["Greenwich",0],
         UNIT["Degree",0.017453292519943295]]
 
-2. Now we define our corresponding Django model (make sure to use :djadmin:`migrate`)::
+#. Now we define our corresponding Django model (make sure to use :djadmin:`migrate`)::
 
     from django.contrib.gis.db import models
 
@@ -61,7 +61,7 @@ Example
         def __str__(self):
             return 'Name: %s' % self.name
 
-3. Use :class:`LayerMapping` to extract all the features and place them in the
+#. Use :class:`LayerMapping` to extract all the features and place them in the
    database::
 
     >>> from django.contrib.gis.utils import LayerMapping

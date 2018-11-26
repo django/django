@@ -279,6 +279,7 @@ class InlineAdminFormSet:
                 continue
             if not self.has_change_permission or field_name in self.readonly_fields:
                 yield {
+                    'name': field_name,
                     'label': meta_labels.get(field_name) or label_for_field(field_name, self.opts.model, self.opts),
                     'widget': {'is_hidden': False},
                     'required': False,
@@ -290,6 +291,7 @@ class InlineAdminFormSet:
                 if label is None:
                     label = label_for_field(field_name, self.opts.model, self.opts)
                 yield {
+                    'name': field_name,
                     'label': label,
                     'widget': form_field.widget,
                     'required': form_field.required,

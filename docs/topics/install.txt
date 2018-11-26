@@ -140,18 +140,18 @@ Installing an official release with ``pip``
 
 This is the recommended way to install Django.
 
-1. Install pip_. The easiest is to use the `standalone pip installer`_. If your
+#. Install pip_. The easiest is to use the `standalone pip installer`_. If your
    distribution already has ``pip`` installed, you might need to update it if
    it's outdated. If it's outdated, you'll know because installation won't
    work.
 
-2. Take a look at virtualenv_ and virtualenvwrapper_. These tools provide
+#. Take a look at virtualenv_ and virtualenvwrapper_. These tools provide
    isolated Python environments, which are more practical than installing
    packages systemwide. They also allow installing packages without
    administrator privileges. The :doc:`contributing tutorial
    </intro/contributing>` walks through how to create a virtualenv.
 
-3. After you've created and activated a virtual environment, enter the command
+#. After you've created and activated a virtual environment, enter the command
    ``pip install Django`` at the shell prompt.
 
 .. _pip: https://pip.pypa.io/
@@ -191,10 +191,10 @@ Installing the development version
 If you'd like to be able to update your Django code occasionally with the
 latest bug fixes and improvements, follow these instructions:
 
-1. Make sure that you have Git_ installed and that you can run its commands
+#. Make sure that you have Git_ installed and that you can run its commands
    from a shell. (Enter ``git help`` at a shell prompt to test this.)
 
-2. Check out Django's main development branch like so:
+#. Check out Django's main development branch like so:
 
    .. console::
 
@@ -202,12 +202,12 @@ latest bug fixes and improvements, follow these instructions:
 
    This will create a directory ``django`` in your current directory.
 
-3. Make sure that the Python interpreter can load Django's code. The most
+#. Make sure that the Python interpreter can load Django's code. The most
    convenient way to do this is to use virtualenv_, virtualenvwrapper_, and
    pip_. The :doc:`contributing tutorial </intro/contributing>` walks through
    how to create a virtualenv.
 
-4. After setting up and activating the virtualenv, run the following command:
+#. After setting up and activating the virtualenv, run the following command:
 
    .. console::
 

@@ -23,6 +23,9 @@ class Command(BaseCommand):
             help='Nominates a database to introspect. Defaults to using the "default" database.',
         )
         parser.add_argument(
+            '--include-partitions', action='store_true', help='Also output models for partition tables.',
+        )
+        parser.add_argument(
             '--include-views', action='store_true', help='Also output models for database views.',
         )
 
@@ -55,12 +58,15 @@ class Command(BaseCommand):
             yield 'from %s import models' % self.db_module
             known_models = []
             table_info = connection.introspection.get_table_list(cursor)
-            tables_to_introspect = (
-                options['table'] or
-                sorted(info.name for info in table_info if options['include_views'] or info.type == 't')
-            )
 
-            for table_name in tables_to_introspect:
+            # Determine types of tables and/or views to be introspected.
+            types = {'t'}
+            if options['include_partitions']:
+                types.add('p')
+            if options['include_views']:
+                types.add('v')
+
+            for table_name in (options['table'] or sorted(info.name for info in table_info if info.type in types)):
                 if table_name_filter is not None and callable(table_name_filter):
                     if not table_name_filter(table_name):
                         continue
@@ -160,7 +166,8 @@ class Command(BaseCommand):
                         field_desc += '  # ' + ' '.join(comment_notes)
                     yield '    %s' % field_desc
                 is_view = any(info.name == table_name and info.type == 'v' for info in table_info)
-                for meta_line in self.get_meta(table_name, constraints, column_to_field_name, is_view):
+                is_partition = any(info.name == table_name and info.type == 'p' for info in table_info)
+                for meta_line in self.get_meta(table_name, constraints, column_to_field_name, is_view, is_partition):
                     yield meta_line
 
     def normalize_col_name(self, col_name, used_column_names, is_relation):
@@ -257,7 +264,7 @@ class Command(BaseCommand):
 
         return field_type, field_params, field_notes
 
-    def get_meta(self, table_name, constraints, column_to_field_name, is_view):
+    def get_meta(self, table_name, constraints, column_to_field_name, is_view, is_partition):
         """
         Return a sequence comprising the lines of code necessary
         to construct the inner Meta class for the model corresponding
@@ -273,7 +280,12 @@ class Command(BaseCommand):
                 columns = [x for x in columns if x is not None]
                 if len(columns) > 1:
                     unique_together.append(str(tuple(column_to_field_name[c] for c in columns)))
-        managed_comment = "  # Created from a view. Don't remove." if is_view else ""
+        if is_view:
+            managed_comment = "  # Created from a view. Don't remove."
+        elif is_partition:
+            managed_comment = "  # Created from a partition. Don't remove."
+        else:
+            managed_comment = ''
         meta = ['']
         if has_unsupported_constraint:
             meta.append('    # A unique constraint could not be introspected.')

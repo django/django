@@ -85,13 +85,27 @@ class TestInline(TestDataMixin, TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(Fashionista.objects.filter(person__firstname='Imelda')), 1)
 
+    def test_tabular_inline_column_css_class(self):
+        """
+        Field names are included in the context to output a field-specific
+        CSS class name in the column headers.
+        """
+        response = self.client.get(reverse('admin:admin_inlines_poll_add'))
+        text_field, call_me_field = list(response.context['inline_admin_formset'].fields())
+        # Editable field.
+        self.assertEqual(text_field['name'], 'text')
+        self.assertContains(response, '<th class="column-text required">')
+        # Read-only field.
+        self.assertEqual(call_me_field['name'], 'call_me')
+        self.assertContains(response, '<th class="column-call_me">')
+
     def test_custom_form_tabular_inline_label(self):
         """
         A model form with a form field specified (TitleForm.title1) should have
         its label rendered in the tabular inline.
         """
         response = self.client.get(reverse('admin:admin_inlines_titlecollection_add'))
-        self.assertContains(response, '<th class="required">Title1</th>', html=True)
+        self.assertContains(response, '<th class="column-title1 required">Title1</th>', html=True)
 
     def test_custom_form_tabular_inline_overridden_label(self):
         """
@@ -101,7 +115,7 @@ class TestInline(TestDataMixin, TestCase):
         response = self.client.get(reverse('admin:admin_inlines_someparentmodel_add'))
         field = list(response.context['inline_admin_formset'].fields())[0]
         self.assertEqual(field['label'], 'new label')
-        self.assertContains(response, '<th class="required">New label</th>', html=True)
+        self.assertContains(response, '<th class="column-name required">New label</th>', html=True)
 
     def test_tabular_non_field_errors(self):
         """
@@ -710,7 +724,7 @@ class TestInlinePermissions(TestCase):
             html=True
         )
         # TabularInline
-        self.assertContains(response, '<th class="required">Dummy</th>', html=True)
+        self.assertContains(response, '<th class="column-dummy required">Dummy</th>', html=True)
         self.assertContains(
             response,
             '<input type="number" name="inner2_set-2-0-dummy" value="%s" '
@@ -781,7 +795,7 @@ class TestInlinePermissions(TestCase):
         )
         self.assertContains(response, 'id="id_inner2_set-0-DELETE"')
         # TabularInline
-        self.assertContains(response, '<th class="required">Dummy</th>', html=True)
+        self.assertContains(response, '<th class="column-dummy required">Dummy</th>', html=True)
         self.assertContains(
             response,
             '<input type="number" name="inner2_set-2-0-dummy" value="%s" '

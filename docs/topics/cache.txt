@@ -788,9 +788,16 @@ Accessing the cache
 Basic usage
 -----------
 
-The basic interface is ``set(key, value, timeout)`` and ``get(key)``::
+.. currentmodule:: django.core.caches
+
+The basic interface is:
+
+.. method:: cache.set(key, value, timeout=DEFAULT_TIMEOUT, version=None)
 
     >>> cache.set('my_key', 'hello, world!', 30)
+
+.. method:: cache.get(key, default=None, version=None)
+
     >>> cache.get('my_key')
     'hello, world!'
 
@@ -818,6 +825,8 @@ return if the object doesn't exist in the cache::
     >>> cache.get('my_key', 'has expired')
     'has expired'
 
+.. method:: cache.add(key, value, timeout=DEFAULT_TIMEOUT, version=None)
+
 To add a key only if it doesn't already exist, use the ``add()`` method.
 It takes the same parameters as ``set()``, but it will not attempt to
 update the cache if the key specified is already present::
@@ -830,6 +839,8 @@ update the cache if the key specified is already present::
 If you need to know whether ``add()`` stored a value in the cache, you can
 check the return value. It will return ``True`` if the value was stored,
 ``False`` otherwise.
+
+.. method:: cache.get_or_set(key, default, timeout=DEFAULT_TIMEOUT, version=None)
 
 If you want to get a key's value or set a value if the key isn't in the cache,
 there is the ``get_or_set()`` method. It takes the same parameters as ``get()``
@@ -846,6 +857,8 @@ You can also pass any callable as a *default* value::
     >>> cache.get_or_set('some-timestamp-key', datetime.datetime.now)
     datetime.datetime(2014, 12, 11, 0, 15, 49, 457920)
 
+.. method:: cache.get_many(keys, version=None)
+
 There's also a ``get_many()`` interface that only hits the cache once.
 ``get_many()`` returns a dictionary with all the keys you asked for that
 actually exist in the cache (and haven't expired)::
@@ -855,6 +868,8 @@ actually exist in the cache (and haven't expired)::
     >>> cache.set('c', 3)
     >>> cache.get_many(['a', 'b', 'c'])
     {'a': 1, 'b': 2, 'c': 3}
+
+.. method:: cache.set_many(dict, timeout)
 
 To set multiple values more efficiently, use ``set_many()`` to pass a dictionary
 of key-value pairs::
@@ -868,21 +883,31 @@ Like ``cache.set()``, ``set_many()`` takes an optional ``timeout`` parameter.
 On supported backends (memcached), ``set_many()`` returns a list of keys that
 failed to be inserted.
 
+.. method:: cache.delete(key, version=None)
+
 You can delete keys explicitly with ``delete()``. This is an easy way of
 clearing the cache for a particular object::
 
     >>> cache.delete('a')
+
+.. method:: cache.delete_many(keys, version=None)
 
 If you want to clear a bunch of keys at once, ``delete_many()`` can take a list
 of keys to be cleared::
 
     >>> cache.delete_many(['a', 'b', 'c'])
 
+.. method:: cache.clear()
+
 Finally, if you want to delete all the keys in the cache, use
 ``cache.clear()``.  Be careful with this; ``clear()`` will remove *everything*
 from the cache, not just the keys set by your application. ::
 
     >>> cache.clear()
+
+.. method:: cache.touch(key, timeout=DEFAULT_TIMEOUT, version=None)
+
+.. versionadded:: 2.1
 
 ``cache.touch()`` sets a new expiration for a key. For example, to update a key
 to expire 10 seconds from now::
@@ -896,9 +921,8 @@ Like other methods, the ``timeout`` argument is optional and defaults to the
 ``touch()`` returns ``True`` if the key was successfully touched, ``False``
 otherwise.
 
-.. versionchanged:: 2.1
-
-    The ``cache.touch()`` method was added.
+.. method:: cache.incr(key, delta=1, version=None)
+.. method:: cache.decr(key, delta=1, version=None)
 
 You can also increment or decrement a key that already exists using the
 ``incr()`` or ``decr()`` methods, respectively. By default, the existing cache
@@ -925,6 +949,7 @@ nonexistent cache key.::
     However, if the backend doesn't natively provide an increment/decrement
     operation, it will be implemented using a two-step retrieve/update.
 
+.. method:: cache.close()
 
 You can close the connection to your cache with ``close()`` if implemented by
 the cache backend.

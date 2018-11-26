@@ -58,6 +58,11 @@ class LogMiddleware(BaseMiddleware):
         return response
 
 
+class NoTemplateResponseMiddleware(BaseMiddleware):
+    def process_template_response(self, request, response):
+        return None
+
+
 class NotFoundMiddleware(BaseMiddleware):
     def __call__(self, request):
         raise Http404('not found')

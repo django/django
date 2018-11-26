@@ -2140,6 +2140,37 @@ class SubqueryTests(TestCase):
         )
 
 
+@skipUnlessDBFeature('allow_sliced_subqueries_with_in')
+class QuerySetBitwiseOperationTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        school = School.objects.create()
+        cls.room_1 = Classroom.objects.create(school=school, has_blackboard=False, name='Room 1')
+        cls.room_2 = Classroom.objects.create(school=school, has_blackboard=True, name='Room 2')
+        cls.room_3 = Classroom.objects.create(school=school, has_blackboard=True, name='Room 3')
+        cls.room_4 = Classroom.objects.create(school=school, has_blackboard=False, name='Room 4')
+
+    def test_or_with_rhs_slice(self):
+        qs1 = Classroom.objects.filter(has_blackboard=True)
+        qs2 = Classroom.objects.filter(has_blackboard=False)[:1]
+        self.assertCountEqual(qs1 | qs2, [self.room_1, self.room_2, self.room_3])
+
+    def test_or_with_lhs_slice(self):
+        qs1 = Classroom.objects.filter(has_blackboard=True)[:1]
+        qs2 = Classroom.objects.filter(has_blackboard=False)
+        self.assertCountEqual(qs1 | qs2, [self.room_1, self.room_2, self.room_4])
+
+    def test_or_with_both_slice(self):
+        qs1 = Classroom.objects.filter(has_blackboard=False)[:1]
+        qs2 = Classroom.objects.filter(has_blackboard=True)[:1]
+        self.assertCountEqual(qs1 | qs2, [self.room_1, self.room_2])
+
+    def test_or_with_both_slice_and_ordering(self):
+        qs1 = Classroom.objects.filter(has_blackboard=False).order_by('-pk')[:1]
+        qs2 = Classroom.objects.filter(has_blackboard=True).order_by('-name')[:1]
+        self.assertCountEqual(qs1 | qs2, [self.room_3, self.room_4])
+
+
 class CloneTests(TestCase):
 
     def test_evaluated_queryset_as_argument(self):

@@ -285,6 +285,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         ])
         context = {
             'rendered_widget': self.widget.render(name, value, attrs),
+            'is_hidden': self.is_hidden,
             'name': name,
             'url_params': url_params,
             'model': rel_opts.verbose_name,

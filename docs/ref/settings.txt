@@ -842,6 +842,20 @@ This is an Oracle-specific setting.
 The password to use when connecting to the Oracle database that will be used
 when running tests. If not provided, Django will generate a random password.
 
+.. setting:: TEST_ORACLE_MANAGED_FILES
+
+``ORACLE_MANAGED_FILES``
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 2.2
+
+Default: ``False``
+
+This is an Oracle-specific setting.
+
+If set to ``True``, Oracle Managed Files (OMF) tablespaces will be used.
+:setting:`DATAFILE` and :setting:`DATAFILE_TMP` will be ignored.
+
 .. setting:: TEST_TBLSPACE
 
 ``TBLSPACE``

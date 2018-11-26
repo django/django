@@ -200,8 +200,6 @@ class BaseDatabaseFeatures:
     # If NULL is implied on columns without needing to be explicitly specified
     implied_column_null = False
 
-    uppercases_column_names = False
-
     # Does the backend support "select for update" queries with limit (and offset)?
     supports_select_for_update_with_limit = True
 

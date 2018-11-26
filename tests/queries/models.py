@@ -591,6 +591,7 @@ class MyObject(models.Model):
 
 class Order(models.Model):
     id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=12, null=True, default='')
 
     class Meta:
         ordering = ('pk',)

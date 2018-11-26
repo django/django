@@ -24,9 +24,9 @@ MRO is an acronym for Method Resolution Order.
 
     **Method Flowchart**
 
-    1. :meth:`dispatch()`
-    2. :meth:`http_method_not_allowed()`
-    3. :meth:`options()`
+    #. :meth:`dispatch()`
+    #. :meth:`http_method_not_allowed()`
+    #. :meth:`options()`
 
     **Example views.py**::
 
@@ -123,9 +123,9 @@ MRO is an acronym for Method Resolution Order.
 
     **Method Flowchart**
 
-    1. :meth:`~django.views.generic.base.View.dispatch()`
-    2. :meth:`~django.views.generic.base.View.http_method_not_allowed()`
-    3. :meth:`~django.views.generic.base.ContextMixin.get_context_data()`
+    #. :meth:`~django.views.generic.base.View.dispatch()`
+    #. :meth:`~django.views.generic.base.View.http_method_not_allowed()`
+    #. :meth:`~django.views.generic.base.ContextMixin.get_context_data()`
 
     **Example views.py**::
 
@@ -184,9 +184,9 @@ MRO is an acronym for Method Resolution Order.
 
     **Method Flowchart**
 
-    1. :meth:`~django.views.generic.base.View.dispatch()`
-    2. :meth:`~django.views.generic.base.View.http_method_not_allowed()`
-    3. :meth:`get_redirect_url()`
+    #. :meth:`~django.views.generic.base.View.dispatch()`
+    #. :meth:`~django.views.generic.base.View.http_method_not_allowed()`
+    #. :meth:`get_redirect_url()`
 
     **Example views.py**::
 

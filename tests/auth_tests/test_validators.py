@@ -202,6 +202,11 @@ class CommonPasswordValidatorTest(TestCase):
         self.assertEqual(cm.exception.messages, [expected_error])
         self.assertEqual(cm.exception.error_list[0].code, 'password_too_common')
 
+    def test_validate_django_supplied_file(self):
+        validator = CommonPasswordValidator()
+        for password in validator.passwords:
+            self.assertEqual(password, password.lower())
+
     def test_help_text(self):
         self.assertEqual(
             CommonPasswordValidator().get_help_text(),

@@ -1860,7 +1860,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(response, '<a href="/test_admin/admin9/admin_views/article/" class="closelink">Close</a>')
 
     def test_change_view_post_without_object_change_permission(self):
-        """A POST redirectS to changelist without modifications."""
+        """A POST redirects to changelist without modifications."""
         change_dict = {
             'title': 'Ikke fordømt',
             'content': '<p>edited article</p>',
