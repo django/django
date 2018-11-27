@@ -16,6 +16,11 @@ These functions are described in more detail in the `PostgreSQL docs
         >>> SomeModel.objects.aggregate(arr=ArrayAgg('somefield'))
         {'arr': [0, 1, 2]}
 
+.. admonition:: Common aggregate options
+
+    All aggregates have the :ref:`filter <aggregate-filter>` keyword
+    argument.
+
 General-purpose aggregation functions
 =====================================
 

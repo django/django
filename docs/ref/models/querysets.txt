@@ -3315,6 +3315,8 @@ of the return value
     ``output_field`` if all fields are of the same type. Otherwise, you
     must provide the ``output_field`` yourself.
 
+.. _aggregate-filter:
+
 ``filter``
 ~~~~~~~~~~
 
