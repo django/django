@@ -1067,9 +1067,9 @@ subclass::
     slug (e.g. substituting dashes for spaces; lowercasing ASCII letters; and
     removing various English stop words such as 'a', 'an', 'as', and similar).
 
-    Fields are prepopulated on add forms but not on change forms. It's usually
-    undesired that slugs change after an object is created (which would cause
-    an object's URL to change if the slug is used in it).
+    Prepopulated fields aren't modified by JavaScript after a value has been
+    saved. It's usually undesired that slugs change (which would cause an
+    object's URL to change if the slug is used in it).
 
     ``prepopulated_fields`` doesn't accept ``DateTimeField``, ``ForeignKey``,
     ``OneToOneField``, and ``ManyToManyField`` fields.
