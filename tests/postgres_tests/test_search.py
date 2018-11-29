@@ -276,12 +276,24 @@ class TestCombinations(GrailTestData, PostgreSQLTestCase):
         searched = Line.objects.filter(character=self.minstrel, dialogue__search=~SearchQuery('kneecaps'))
         self.assertCountEqual(searched, [self.verse0, self.verse2])
 
-    def test_query_config_mismatch(self):
-        with self.assertRaisesMessage(TypeError, "SearchQuery configs don't match."):
-            Line.objects.filter(
-                dialogue__search=SearchQuery('kneecaps', config='german') |
+    def test_combine_different_configs(self):
+        searched = Line.objects.filter(
+            dialogue__search=(
+                SearchQuery('cadeau', config='french') |
                 SearchQuery('nostrils', config='english')
             )
+        )
+        self.assertCountEqual(searched, [self.french, self.verse2])
+
+    @skipUnlessDBFeature('has_phraseto_tsquery')
+    def test_combine_raw_phrase(self):
+        searched = Line.objects.filter(
+            dialogue__search=(
+                SearchQuery('burn:*', search_type='raw', config='simple') |
+                SearchQuery('rode forth from Camelot', search_type='phrase')
+            )
+        )
+        self.assertCountEqual(searched, [self.verse0, self.verse1, self.verse2])
 
     def test_query_combined_mismatch(self):
         msg = "SearchQuery can only be combined with other SearchQuerys, got"
