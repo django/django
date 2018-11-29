@@ -7,7 +7,7 @@ import operator
 import warnings
 from collections import OrderedDict, namedtuple
 from functools import lru_cache
-from itertools import chain
+from itertools import chain, islice
 
 from django.conf import settings
 from django.core import exceptions
@@ -338,7 +338,18 @@ class QuerySet:
     ####################################
 
     def _iterator(self, use_chunked_fetch, chunk_size):
-        yield from self._iterable_class(self, chunked_fetch=use_chunked_fetch, chunk_size=chunk_size)
+        iterable = self._iterable_class(self, chunked_fetch=use_chunked_fetch, chunk_size=chunk_size)
+        if not self._prefetch_related_lookups:
+            yield from iterable
+            return
+
+        iterator = iter(iterable)
+        while True:
+            results = list(islice(iterator, chunk_size))
+            if not results:
+                break
+            prefetch_related_objects(results, *self._prefetch_related_lookups)
+            yield from iter(results)
 
     def iterator(self, chunk_size=2000):
         """

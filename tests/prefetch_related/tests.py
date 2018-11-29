@@ -282,6 +282,20 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
         sql = queries[-1]['sql']
         self.assertWhereContains(sql, self.author1.id)
 
+    def test_m2m_forward_iterator(self):
+        with self.assertNumQueries(2):
+            lists = [list(b.authors.all()) for b in Book.objects.prefetch_related('authors').iterator()]
+
+        normal_lists = [list(b.authors.all()) for b in Book.objects.all()]
+        self.assertEqual(lists, normal_lists)
+
+    def test_m2m_forward_iterator_with_multiple_chunks(self):
+        with self.assertNumQueries(3):
+            lists = [list(b.authors.all()) for b in Book.objects.prefetch_related('authors').iterator(chunk_size=2)]
+
+        normal_lists = [list(b.authors.all()) for b in Book.objects.all()]
+        self.assertEqual(lists, normal_lists)
+
 
 class RawQuerySetTests(TestDataMixin, TestCase):
     def test_basic(self):
