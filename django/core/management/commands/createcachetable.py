@@ -56,7 +56,7 @@ class Command(BaseCommand):
 
         fields = (
             # "key" is a reserved word in MySQL, so use "cache_key" instead.
-            models.CharField(name='cache_key', max_length=255, unique=True, primary_key=True),
+            models.CharField(name='cache_key', max_length=128, unique=True, primary_key=True),
             models.TextField(name='value'),
             models.DateTimeField(name='expires', db_index=True),
         )
