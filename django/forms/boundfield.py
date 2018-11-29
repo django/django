@@ -2,6 +2,7 @@ import datetime
 
 from django.forms.utils import flatatt, pretty_name
 from django.forms.widgets import Textarea, TextInput
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, format_html, html_safe
 from django.utils.safestring import mark_safe
@@ -143,6 +144,7 @@ class BoundField:
         # Only add the suffix if the label does not end in punctuation.
         # Translators: If found as last label character, these punctuation
         # characters will prevent the default label_suffix to be appended to the label
+        contents = force_text(contents)
         if label_suffix and contents and contents[-1] not in _(':?.!'):
             contents = format_html('{}{}', contents, label_suffix)
         widget = self.field.widget
