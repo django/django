@@ -20,6 +20,7 @@ from django.http import QueryDict
 from django.template import Context, Template
 from django.test import SimpleTestCase
 from django.utils.datastructures import MultiValueDict
+from django.utils.functional import lazy
 from django.utils.safestring import mark_safe
 
 
@@ -3065,6 +3066,28 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         form = SomeForm()
         self.assertHTMLEqual(form['custom'].label_tag(), '<label for="custom_id_custom">Custom:</label>')
         self.assertHTMLEqual(form['empty'].label_tag(), '<label>Empty:</label>')
+
+    def test_boundfield_label_tag_performance(self):
+        counter = 0
+
+        def my_field_label():
+            nonlocal counter
+            counter += 1
+            return 'a field label'
+
+        lazy_field_label_callable = lazy(my_field_label, str)
+
+        class SomeForm(Form):
+            field = CharField(label=lazy_field_label_callable())
+
+        form = SomeForm({})
+        field = form.visible_fields()[0]
+        # Sanity check:
+        self.assertEqual(counter, 0)
+
+        # Check we only evaluate the string once
+        self.assertIn('a field label', field.label_tag())
+        self.assertEqual(counter, 1)
 
     def test_boundfield_empty_label(self):
         class SomeForm(Form):

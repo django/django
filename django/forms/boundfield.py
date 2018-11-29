@@ -137,6 +137,7 @@ class BoundField:
         label_suffix overrides the form's label_suffix.
         """
         contents = contents or self.label
+        contents = str(contents)  # Evaluate lazy strings (just once)
         if label_suffix is None:
             label_suffix = (self.field.label_suffix if self.field.label_suffix is not None
                             else self.form.label_suffix)
