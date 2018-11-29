@@ -153,7 +153,7 @@ class MultipleFieldsTest(GrailTestData, PostgreSQLTestCase):
         searched = Line.objects.annotate(
             search=SearchVector('scene__setting', 'dialogue'),
         ).filter(search='bedemir')
-        self.assertEqual(set(searched), {self.bedemir0, self.bedemir1, self.crowd, self.witch, self.duck})
+        self.assertCountEqual(searched, [self.bedemir0, self.bedemir1, self.crowd, self.witch, self.duck])
 
     def test_search_with_non_text(self):
         searched = Line.objects.annotate(
@@ -186,7 +186,7 @@ class MultipleFieldsTest(GrailTestData, PostgreSQLTestCase):
     def test_raw_search(self):
         line_qs = Line.objects.annotate(search=SearchVector('dialogue'))
         searched = line_qs.filter(search=SearchQuery('Robin', search_type='raw'))
-        self.assertEqual(set(searched), {self.verse0, self.verse1})
+        self.assertCountEqual(searched, [self.verse0, self.verse1])
         searched = line_qs.filter(search=SearchQuery("Robin & !'Camelot'", search_type='raw'))
         self.assertSequenceEqual(searched, [self.verse1])
 
@@ -233,7 +233,7 @@ class TestCombinations(GrailTestData, PostgreSQLTestCase):
         searched = Line.objects.annotate(
             search=SearchVector('scene__setting') + SearchVector('character__name'),
         ).filter(search='bedemir')
-        self.assertEqual(set(searched), {self.bedemir0, self.bedemir1, self.crowd, self.witch, self.duck})
+        self.assertCountEqual(searched, [self.bedemir0, self.bedemir1, self.crowd, self.witch, self.duck])
 
     def test_vector_add_multi(self):
         searched = Line.objects.annotate(
@@ -243,7 +243,7 @@ class TestCombinations(GrailTestData, PostgreSQLTestCase):
                 SearchVector('dialogue')
             ),
         ).filter(search='bedemir')
-        self.assertEqual(set(searched), {self.bedemir0, self.bedemir1, self.crowd, self.witch, self.duck})
+        self.assertCountEqual(searched, [self.bedemir0, self.bedemir1, self.crowd, self.witch, self.duck])
 
     def test_query_and(self):
         searched = Line.objects.annotate(
@@ -264,17 +264,17 @@ class TestCombinations(GrailTestData, PostgreSQLTestCase):
 
     def test_query_or(self):
         searched = Line.objects.filter(dialogue__search=SearchQuery('kneecaps') | SearchQuery('nostrils'))
-        self.assertEqual(set(searched), {self.verse1, self.verse2})
+        self.assertCountEqual(searched, [self.verse1, self.verse2])
 
     def test_query_multiple_or(self):
         searched = Line.objects.filter(
             dialogue__search=SearchQuery('kneecaps') | SearchQuery('nostrils') | SearchQuery('Sir Robin')
         )
-        self.assertEqual(set(searched), {self.verse1, self.verse2, self.verse0})
+        self.assertCountEqual(searched, [self.verse1, self.verse2, self.verse0])
 
     def test_query_invert(self):
         searched = Line.objects.filter(character=self.minstrel, dialogue__search=~SearchQuery('kneecaps'))
-        self.assertEqual(set(searched), {self.verse0, self.verse2})
+        self.assertCountEqual(searched, [self.verse0, self.verse2])
 
     def test_query_config_mismatch(self):
         with self.assertRaisesMessage(TypeError, "SearchQuery configs don't match."):
