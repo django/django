@@ -3,7 +3,7 @@ import sys
 
 from django.test import SimpleTestCase
 from django.utils import text
-from django.utils.functional import lazystr
+from django.utils.functional import lazy, lazystr
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy, override
 
@@ -242,3 +242,24 @@ class TestUtilsText(SimpleTestCase):
         )
         with override('fr'):
             self.assertEqual('Ajout de article «\xa0My first try\xa0».', s)
+
+    def test_capfirst(self):
+        self.assertEqual(text.capfirst('hello there'), 'Hello there')
+
+    def test_capfirst_falsy(self):
+        self.assertIs(text.capfirst(None), None)
+        self.assertEqual(text.capfirst(''), '')
+
+    def test_capfirst_lazy(self):
+        counter = 0
+
+        def a_callable():
+            nonlocal counter
+            counter += 1
+            return 'some text'
+
+        lazy_callable = lazy(a_callable, str)
+        lazy_value = lazy_callable()
+        self.assertEqual(counter, 0)
+        self.assertEqual(text.capfirst(lazy_value), 'Some text')
+        self.assertEqual(counter, 1)

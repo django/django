@@ -11,7 +11,11 @@ from django.utils.translation import gettext as _, gettext_lazy, pgettext
 @keep_lazy_text
 def capfirst(x):
     """Capitalize the first letter of a string."""
-    return x and str(x)[0].upper() + str(x)[1:]
+    if x is None:
+        return None
+    else:
+        x = str(x)  # evaluate lazy strings (just once)
+        return x and x[0].upper() + x[1:]
 
 
 # Set up regular expressions
