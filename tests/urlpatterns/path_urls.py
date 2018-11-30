@@ -10,6 +10,6 @@ urlpatterns = [
     path('articles/<int:year>/<int:month>/<int:day>/', views.empty_view, name='articles-year-month-day'),
     path('users/', views.empty_view, name='users'),
     path('users/<id>/', views.empty_view, name='user-with-id'),
-    path('included_urls/', include('urlpatterns_reverse.included_urls')),
+    path('included_urls/', include('urlpatterns.included_urls')),
     path('<lang>/<path:url>/', views.empty_view, name='lang-and-path'),
 ]
