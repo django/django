@@ -2291,7 +2291,7 @@ class UUIDField(Field):
     default_error_messages = {
         'invalid': _("'%(value)s' is not a valid UUID."),
     }
-    description = 'Universally unique identifier'
+    description = _('Universally unique identifier')
     empty_strings_allowed = False
 
     def __init__(self, verbose_name=None, **kwargs):
