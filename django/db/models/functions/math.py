@@ -55,10 +55,12 @@ class ATan2(OutputFieldMixin, Func):
     arity = 2
 
     def as_sqlite(self, compiler, connection, **extra_context):
-        if not getattr(connection.ops, 'spatialite', False) or connection.ops.spatial_version < (4, 3, 0):
+        if not getattr(connection.ops, 'spatialite', False) or not (
+            (4, 3, 0) <= connection.ops.spatial_version < (5, 0, 0)
+        ):
             return self.as_sql(compiler, connection)
         # This function is usually ATan2(y, x), returning the inverse tangent
-        # of y / x, but it's ATan2(x, y) on SpatiaLite 4.3+.
+        # of y / x, but it's ATan2(x, y) on SpatiaLite >= 4.3.0, < 5.0.0.
         # Cast integers to float to avoid inconsistent/buggy behavior if the
         # arguments are mixed between integer and float or decimal.
         # https://www.gaia-gis.it/fossil/libspatialite/tktview?name=0f72cca3a2
