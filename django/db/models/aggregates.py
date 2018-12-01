@@ -4,7 +4,9 @@ Classes to represent the definitions of aggregate functions.
 from django.core.exceptions import FieldError
 from django.db.models.expressions import Case, Func, Star, When
 from django.db.models.fields import IntegerField
-from django.db.models.functions.mixins import NumericOutputFieldMixin
+from django.db.models.functions.mixins import (
+    FixDurationInputMixin, NumericOutputFieldMixin,
+)
 
 __all__ = [
     'Aggregate', 'Avg', 'Count', 'Max', 'Min', 'StdDev', 'Sum', 'Variance',
@@ -94,24 +96,9 @@ class Aggregate(Func):
         return options
 
 
-class Avg(NumericOutputFieldMixin, Aggregate):
+class Avg(FixDurationInputMixin, NumericOutputFieldMixin, Aggregate):
     function = 'AVG'
     name = 'Avg'
-
-    def as_mysql(self, compiler, connection, **extra_context):
-        sql, params = super().as_sql(compiler, connection, **extra_context)
-        if self.output_field.get_internal_type() == 'DurationField':
-            sql = 'CAST(%s as SIGNED)' % sql
-        return sql, params
-
-    def as_oracle(self, compiler, connection, **extra_context):
-        if self.output_field.get_internal_type() == 'DurationField':
-            expression = self.get_source_expressions()[0]
-            from django.db.backends.oracle.functions import IntervalToSeconds, SecondsToInterval
-            return compiler.compile(
-                SecondsToInterval(Avg(IntervalToSeconds(expression), filter=self.filter))
-            )
-        return super().as_sql(compiler, connection, **extra_context)
 
 
 class Count(Aggregate):
@@ -152,24 +139,9 @@ class StdDev(NumericOutputFieldMixin, Aggregate):
         return {**super()._get_repr_options(), 'sample': self.function == 'STDDEV_SAMP'}
 
 
-class Sum(Aggregate):
+class Sum(FixDurationInputMixin, Aggregate):
     function = 'SUM'
     name = 'Sum'
-
-    def as_mysql(self, compiler, connection, **extra_context):
-        sql, params = super().as_sql(compiler, connection, **extra_context)
-        if self.output_field.get_internal_type() == 'DurationField':
-            sql = 'CAST(%s as SIGNED)' % sql
-        return sql, params
-
-    def as_oracle(self, compiler, connection, **extra_context):
-        if self.output_field.get_internal_type() == 'DurationField':
-            expression = self.get_source_expressions()[0]
-            from django.db.backends.oracle.functions import IntervalToSeconds, SecondsToInterval
-            return compiler.compile(
-                SecondsToInterval(Sum(IntervalToSeconds(expression)))
-            )
-        return super().as_sql(compiler, connection, **extra_context)
 
 
 class Variance(NumericOutputFieldMixin, Aggregate):
