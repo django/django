@@ -865,15 +865,15 @@ class AggregateTestCase(TestCase):
 
     def test_avg_decimal_field(self):
         v = Book.objects.filter(rating=4).aggregate(avg_price=(Avg('price')))['avg_price']
-        self.assertIsInstance(v, float)
-        self.assertEqual(v, Approximate(47.39, places=2))
+        self.assertIsInstance(v, Decimal)
+        self.assertEqual(v, Approximate(Decimal('47.39'), places=2))
 
     def test_order_of_precedence(self):
         p1 = Book.objects.filter(rating=4).aggregate(avg_price=(Avg('price') + 2) * 3)
-        self.assertEqual(p1, {'avg_price': Approximate(148.18, places=2)})
+        self.assertEqual(p1, {'avg_price': Approximate(Decimal('148.18'), places=2)})
 
         p2 = Book.objects.filter(rating=4).aggregate(avg_price=Avg('price') + 2 * 3)
-        self.assertEqual(p2, {'avg_price': Approximate(53.39, places=2)})
+        self.assertEqual(p2, {'avg_price': Approximate(Decimal('53.39'), places=2)})
 
     def test_combine_different_types(self):
         msg = 'Expression contains mixed types. You must set output_field.'
@@ -1087,7 +1087,7 @@ class AggregateTestCase(TestCase):
                 return super().as_sql(compiler, connection, function='MAX', **extra_context)
 
         qs = Publisher.objects.annotate(
-            price_or_median=Greatest(Avg('book__rating'), Avg('book__price'))
+            price_or_median=Greatest(Avg('book__rating', output_field=DecimalField()), Avg('book__price'))
         ).filter(price_or_median__gte=F('num_awards')).order_by('num_awards')
         self.assertQuerysetEqual(
             qs, [1, 3, 7, 9], lambda v: v.num_awards)

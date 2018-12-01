@@ -3336,14 +3336,14 @@ by the aggregate.
 ``Avg``
 ~~~~~~~
 
-.. class:: Avg(expression, output_field=FloatField(), filter=None, **extra)
+.. class:: Avg(expression, output_field=None, filter=None, **extra)
 
     Returns the mean value of the given expression, which must be numeric
     unless you specify a different ``output_field``.
 
     * Default alias: ``<field>__avg``
-    * Return type: ``float`` (or the type of whatever ``output_field`` is
-      specified)
+    * Return type: ``float`` if input is ``int``, otherwise same as input
+      field, or ``output_field`` if supplied
 
 ``Count``
 ~~~~~~~~~

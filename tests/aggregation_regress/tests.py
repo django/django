@@ -401,7 +401,7 @@ class AggregationTests(TestCase):
                 When(pages__lt=400, then='discount_price'),
                 output_field=DecimalField()
             )))['test'],
-            22.27, places=2
+            Decimal('22.27'), places=2
         )
 
     def test_distinct_conditional_aggregate(self):
@@ -1041,7 +1041,7 @@ class AggregationTests(TestCase):
         books = Book.objects.values_list("publisher__name").annotate(
             Count("id"), Avg("price"), Avg("authors__age"), avg_pgs=Avg("pages")
         ).order_by("-publisher__name")
-        self.assertEqual(books[0], ('Sams', 1, 23.09, 45.0, 528.0))
+        self.assertEqual(books[0], ('Sams', 1, Decimal('23.09'), 45.0, 528.0))
 
     def test_annotation_disjunction(self):
         qs = Book.objects.annotate(n_authors=Count("authors")).filter(

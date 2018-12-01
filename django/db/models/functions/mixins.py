@@ -1,6 +1,6 @@
 import sys
 
-from django.db.models.fields import DecimalField, FloatField
+from django.db.models.fields import DecimalField, FloatField, IntegerField
 from django.db.models.functions import Cast
 
 
@@ -23,5 +23,9 @@ class FixDecimalInputMixin:
 class NumericOutputFieldMixin:
 
     def _resolve_output_field(self):
-        has_decimals = any(isinstance(s.output_field, DecimalField) for s in self.get_source_expressions())
-        return DecimalField() if has_decimals else FloatField()
+        source_expressions = self.get_source_expressions()
+        if any(isinstance(s.output_field, DecimalField) for s in source_expressions):
+            return DecimalField()
+        if any(isinstance(s.output_field, IntegerField) for s in source_expressions):
+            return FloatField()
+        return super()._resolve_output_field() if source_expressions else FloatField()

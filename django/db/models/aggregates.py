@@ -3,7 +3,8 @@ Classes to represent the definitions of aggregate functions.
 """
 from django.core.exceptions import FieldError
 from django.db.models.expressions import Case, Func, Star, When
-from django.db.models.fields import DecimalField, FloatField, IntegerField
+from django.db.models.fields import FloatField, IntegerField
+from django.db.models.functions.mixins import NumericOutputFieldMixin
 
 __all__ = [
     'Aggregate', 'Avg', 'Count', 'Max', 'Min', 'StdDev', 'Sum', 'Variance',
@@ -93,15 +94,9 @@ class Aggregate(Func):
         return options
 
 
-class Avg(Aggregate):
+class Avg(NumericOutputFieldMixin, Aggregate):
     function = 'AVG'
     name = 'Avg'
-
-    def _resolve_output_field(self):
-        source_field = self.get_source_fields()[0]
-        if isinstance(source_field, (IntegerField, DecimalField)):
-            return FloatField()
-        return super()._resolve_output_field()
 
     def as_mysql(self, compiler, connection, **extra_context):
         sql, params = super().as_sql(compiler, connection, **extra_context)
