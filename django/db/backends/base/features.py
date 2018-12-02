@@ -226,6 +226,7 @@ class BaseDatabaseFeatures:
     supports_select_intersection = True
     supports_select_difference = True
     supports_slicing_ordering_in_compound = False
+    supports_parentheses_in_compound = True
 
     # Does the database support SQL 2003 FILTER (WHERE ...) in aggregate
     # expressions?

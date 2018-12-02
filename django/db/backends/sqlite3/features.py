@@ -37,6 +37,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_partial_indexes = Database.version_info >= (3, 8, 0)
     # Is "ALTER TABLE ... RENAME COLUMN" supported?
     can_alter_table_rename_column = Database.sqlite_version_info >= (3, 25, 0)
+    supports_parentheses_in_compound = False
 
     @cached_property
     def supports_stddev(self):

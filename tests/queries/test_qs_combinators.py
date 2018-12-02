@@ -214,3 +214,9 @@ class QuerySetSetOperationTests(TestCase):
             list(qs1.union(qs2).order_by('num'))
         # switched order, now 'exists' again:
         list(qs2.union(qs1).order_by('num'))
+
+    @skipUnlessDBFeature('supports_select_difference', 'supports_select_intersection')
+    def test_qs_with_subcompound_qs(self):
+        qs1 = Number.objects.all()
+        qs2 = Number.objects.intersection(Number.objects.filter(num__gt=1))
+        self.assertEqual(qs1.difference(qs2).count(), 2)
