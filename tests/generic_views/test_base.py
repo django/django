@@ -1,5 +1,4 @@
 import time
-import unittest
 
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
@@ -65,7 +64,7 @@ class InstanceView(View):
         return self
 
 
-class ViewTest(unittest.TestCase):
+class ViewTest(SimpleTestCase):
     rf = RequestFactory()
 
     def _assert_simple(self, response):
@@ -76,14 +75,16 @@ class ViewTest(unittest.TestCase):
         """
         A view can't be accidentally instantiated before deployment
         """
-        with self.assertRaises(AttributeError):
+        msg = 'This method is available only on the class, not on instances.'
+        with self.assertRaisesMessage(AttributeError, msg):
             SimpleView(key='value').as_view()
 
     def test_no_init_args(self):
         """
         A view can't be accidentally instantiated before deployment
         """
-        with self.assertRaises(TypeError):
+        msg = 'as_view() takes 1 positional argument but 2 were given'
+        with self.assertRaisesMessage(TypeError, msg):
             SimpleView.as_view('value')
 
     def test_pathological_http_method(self):
@@ -134,15 +135,24 @@ class ViewTest(unittest.TestCase):
         View arguments must be predefined on the class and can't
         be named like a HTTP method.
         """
+        msg = (
+            "You tried to pass in the %s method name as a keyword argument "
+            "to SimpleView(). Don't do that."
+        )
         # Check each of the allowed method names
         for method in SimpleView.http_method_names:
-            with self.assertRaises(TypeError):
+            with self.assertRaisesMessage(TypeError, msg % method):
                 SimpleView.as_view(**{method: 'value'})
 
         # Check the case view argument is ok if predefined on the class...
         CustomizableView.as_view(parameter="value")
         # ...but raises errors otherwise.
-        with self.assertRaises(TypeError):
+        msg = (
+            "CustomizableView() received an invalid keyword 'foobar'. "
+            "as_view only accepts arguments that are already attributes of "
+            "the class."
+        )
+        with self.assertRaisesMessage(TypeError, msg):
             CustomizableView.as_view(foobar="value")
 
     def test_calling_more_than_once(self):
@@ -466,7 +476,7 @@ class RedirectViewTest(SimpleTestCase):
         self.assertEqual(response.status_code, 410)
 
 
-class GetContextDataTest(unittest.TestCase):
+class GetContextDataTest(SimpleTestCase):
 
     def test_get_context_data_super(self):
         test_view = views.CustomContextView()
@@ -495,7 +505,7 @@ class GetContextDataTest(unittest.TestCase):
         self.assertEqual(context['object'], test_view.object)
 
 
-class UseMultipleObjectMixinTest(unittest.TestCase):
+class UseMultipleObjectMixinTest(SimpleTestCase):
     rf = RequestFactory()
 
     def test_use_queryset_from_view(self):
@@ -515,7 +525,7 @@ class UseMultipleObjectMixinTest(unittest.TestCase):
         self.assertEqual(context['object_list'], queryset)
 
 
-class SingleObjectTemplateResponseMixinTest(unittest.TestCase):
+class SingleObjectTemplateResponseMixinTest(SimpleTestCase):
 
     def test_template_mixin_without_template(self):
         """
@@ -524,5 +534,9 @@ class SingleObjectTemplateResponseMixinTest(unittest.TestCase):
         TemplateDoesNotExist.
         """
         view = views.TemplateResponseWithoutTemplate()
-        with self.assertRaises(ImproperlyConfigured):
+        msg = (
+            "TemplateResponseMixin requires either a definition of "
+            "'template_name' or an implementation of 'get_template_names()'"
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             view.get_template_names()
