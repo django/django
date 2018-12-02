@@ -1,4 +1,4 @@
-from django.db.models import Func, IntegerField, Transform, Value, fields
+from django.db.models import Func, IntegerField, Transform, Value
 from django.db.models.functions import Coalesce
 
 
@@ -124,7 +124,7 @@ class Length(Transform):
     """Return the number of characters in the expression."""
     function = 'LENGTH'
     lookup_name = 'length'
-    output_field = fields.IntegerField()
+    output_field = IntegerField()
 
     def as_mysql(self, compiler, connection, **extra_context):
         return super().as_sql(compiler, connection, function='CHAR_LENGTH', **extra_context)
@@ -207,7 +207,7 @@ class StrIndex(Func):
     """
     function = 'INSTR'
     arity = 2
-    output_field = fields.IntegerField()
+    output_field = IntegerField()
 
     def as_postgresql(self, compiler, connection, **extra_context):
         return super().as_sql(compiler, connection, function='STRPOS', **extra_context)
