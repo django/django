@@ -271,7 +271,8 @@ class MigrationExecutor:
         if migration.replaces:
             for app_label, name in migration.replaces:
                 self.recorder.record_unapplied(app_label, name)
-            self.recorder.record_unapplied(migration.app_label, migration.name) # Now this guy himself can reocord_unapplied, therefore migrations will be in consistent state. 
+            # Now this guy himself can reocord_unapplied, therefore migrations will be in consistent state
+            self.recorder.record_unapplied(migration.app_label, migration.name)
         else:
             self.recorder.record_unapplied(migration.app_label, migration.name)
         # Report progress
