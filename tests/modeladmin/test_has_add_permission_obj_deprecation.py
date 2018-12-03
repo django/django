@@ -89,6 +89,10 @@ class ModelAdminTests(TestCase):
     def setUp(self):
         self.site = AdminSite()
         self.request = MockRequest()
+        self.request.POST = {
+            'song_set-TOTAL_FORMS': 4,
+            'song_set-INITIAL_FORMS': 1,
+        }
         self.request.user = self.MockAddUser()
         self.ma = BandAdmin(Band, self.site)
 
