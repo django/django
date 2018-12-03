@@ -22,3 +22,7 @@ Bugfixes
 
 * Fixed admin view-only change form crash when using
   ``ModelAdmin.prepopulated_fields`` (:ticket:`29929`).
+
+* Fixed "Please correct the errors below" error message when editing an object
+  in the admin if the user only has the "view" permission on inlines
+  (:ticket:`29930`).
