@@ -2,7 +2,7 @@
 Django 2.1.4 release notes
 ==========================
 
-*Expected December 3, 2018*
+*December 3, 2018*
 
 Django 2.1.4 fixes several bugs in 2.1.3.
 
