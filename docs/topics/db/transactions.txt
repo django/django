@@ -131,7 +131,6 @@ Django provides a single API to control database transactions.
 
         from django.db import IntegrityError, transaction
 
-        @transaction.atomic
         def viewfunc(request):
             create_parent()
 
