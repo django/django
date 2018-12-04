@@ -18,8 +18,48 @@ how to write new tests.
 Running the unit tests
 ======================
 
-Quickstart
-----------
+Quickstart with Docker
+----------------------
+
+First, `download and install Docker <https://www.docker.com/get-started>`__.
+If you are using Linux you will also need to install `docker-compose`_.
+
+Second, `fork Django on GitHub <https://github.com/django/django/fork>`__.
+
+Next, clone your fork and run the SQLite tests::
+
+  $ git clone git@github.com:YourGitHubName/django.git django-repo
+  $ cd django-repo
+  $ docker-compose run sqlite
+
+You can run the test suite across many different databases::
+
+  $ docker-compose run postgres
+  $ docker-compose run mysql
+  $ docker-compose run mariadb
+
+By default these commands will run the entire test suite, which may take a
+while. You can run a specific set of tests using the first argument::
+
+  $ docker-compose run postgres queries.test_explain.ExplainTests
+
+You can see more options by running::
+
+  $ docker-compose run sqlite --help
+
+By default the test suite runs with the lowest Python and database version
+that Django currently supports. You can specify specific versions by using
+environment variables::
+
+  $ PYTHON_VERSION=3.7 docker-compose run sqlite
+  $ POSTGRES_VERSION=9.6 docker-compose run postgres
+  $ PYTHON_VERSION=3.6 MYSQL_VERSION=8 docker-compose run mysql
+
+.. _docker-compose: https://docs.docker.com/compose/install/#install-compose
+
+
+Quickstart without Docker
+-------------------------
 
 First, `fork Django on GitHub <https://github.com/django/django/fork>`__.
 

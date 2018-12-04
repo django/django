@@ -1,0 +1,154 @@
+version: "2.3"
+
+x-base: &base
+  image: django-ci:${PYTHON_VERSION}
+  build:
+    context: .
+    dockerfile: docker/Dockerfile
+    args:
+      - PYTHON_VERSION=${PYTHON_VERSION}
+  volumes:
+    - .:/django/
+  entrypoint: bash -c "wait-for-it.sh -s -t 20 $${WAIT_FOR} -- python tests/runtests.py $$@" --
+
+x-postgres-base: &postgres-base
+  environment:
+    - POSTGRES_USER=django
+    - POSTGRES_PASSWORD=django
+    - POSTGRES_DB=django
+  # Set a few options to speed up postgresql tests.
+  command: -c fsync=off -c synchronous_commit=off -c full_page_writes=off
+  tmpfs:
+    - /var/lib/postgresql
+
+services:
+  sqlite:
+    <<: *base
+    environment:
+      - DJANGO_SETTINGS_MODULE=docker_settings.test_sqlite
+    entrypoint: python tests/runtests.py
+    depends_on:
+      - memcached
+      - memcached2
+
+  sqlite-gis:
+    <<: *base
+    entrypoint: python tests/runtests.py
+    environment:
+      - DJANGO_SETTINGS_MODULE=docker_settings.test_sqlite_gis
+
+  postgres:
+    <<: *base
+    environment:
+      - DJANGO_SETTINGS_MODULE=docker_settings.test_postgres
+      - WAIT_FOR=postgres-db:5432
+    depends_on:
+      - postgres-db
+      - memcached
+      - memcached2
+  postgres-db:
+    <<: *postgres-base
+    image: postgres:${POSTGRES_VERSION}-alpine
+
+  postgres-gis:
+    <<: *base
+    environment:
+      - DJANGO_SETTINGS_MODULE=docker_settings.test_postgres_gis
+      - WAIT_FOR=postgres-gis-db:5432
+    depends_on:
+      - postgres-gis-db
+  postgres-gis-db:
+    <<: *postgres-base
+    build:
+      dockerfile: docker/Dockerfile-postgis
+      context: .
+      args:
+        - POSTGRES_VERSION=${POSTGRES_VERSION}
+        - POSTGIS_VERSION=${POSTGIS_VERSION}
+
+  mysql:
+    <<: *base
+    environment:
+      - DJANGO_SETTINGS_MODULE=docker_settings.test_mysql
+      - WAIT_FOR=mysql-db:3306
+    depends_on:
+      - mysql-db
+      - memcached
+      - memcached2
+  mysql-db: &mysql_base
+    image: mysql:${MYSQL_VERSION}
+    entrypoint: ['/entrypoint.sh', '--default-authentication-plugin=mysql_native_password']
+    tmpfs:
+      - /var/lib/mysql
+    environment:
+      - MYSQL_USER=django
+      - MYSQL_PASSWORD=django
+      - MYSQL_DATABASE=django
+      - MYSQL_ALLOW_EMPTY_PASSWORD=1
+
+  mysql-gis:
+    <<: *base
+    environment:
+      - DJANGO_SETTINGS_MODULE=docker_settings.test_mysql_gis
+      - WAIT_FOR=mysql-gis-db:3306
+    depends_on:
+      - mysql-gis-db
+  mysql-gis-db:
+    <<: *mysql_base
+    volumes:
+      - /var/lib/mysql
+
+  mariadb:
+    <<: *base
+    environment:
+      - DJANGO_SETTINGS_MODULE=docker_settings.test_mariadb
+      - WAIT_FOR=mariadb-db:3306
+    depends_on:
+      - mariadb-db
+      - memcached
+      - memcached2
+  mariadb-db:
+    image: mariadb:${MARIADB_VERSION}
+    tmpfs:
+      - /var/lib/mysql
+    environment:
+      - MYSQL_USER=django
+      - MYSQL_PASSWORD=django
+      - MYSQL_DATABASE=django
+      - MYSQL_ALLOW_EMPTY_PASSWORD=1
+
+  memcached: &memcached
+    image: memcached:alpine
+
+  memcached2:
+    <<: *memcached
+
+  flake8:
+    <<: *base
+    entrypoint: flake8
+
+  # Browser tests
+  chrome:
+    <<: *base
+    command: --selenium=chrome --selenium-hub=http://chrome-browser:4444/wd/hub
+    environment:
+      - WAIT_FOR=chrome-browser:4444
+    depends_on:
+      - chrome-browser
+  chrome-browser:
+    image: selenium/standalone-chrome
+    volumes:
+      - /dev/shm:/dev/shm
+
+  # Firefox tests fail on master
+  firefox:
+    <<: *base
+    command: --selenium=firefox --selenium-hub=http://firefox-browser:4444/wd/hub
+    environment:
+      - WAIT_FOR=firefox-browser:4444
+    depends_on:
+      - firefox-browser
+  firefox-browser:
+    image: selenium/standalone-firefox
+    volumes:
+      - /dev/shm:/dev/shm
