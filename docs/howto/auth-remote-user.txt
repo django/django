@@ -30,12 +30,15 @@ Configuration
 First, you must add the
 :class:`django.contrib.auth.middleware.RemoteUserMiddleware` to the
 :setting:`MIDDLEWARE` setting **after** the
-:class:`django.contrib.auth.middleware.AuthenticationMiddleware`::
+:class:`django.contrib.auth.middleware.AuthenticationMiddleware` and
+**before** :class:`django.middleware.csrf.CsrfViewMiddleware` ::
 
     MIDDLEWARE = [
         '...',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.auth.middleware.RemoteUserMiddleware',
+        '...',
+        'django.middleware.csrf.CsrfViewMiddleware',
         '...',
     ]
 
