@@ -381,8 +381,7 @@ Python 3. In order to use MySQLdb under Python 3, you'll have to install
 mysqlclient
 ~~~~~~~~~~~
 
-Django requires `mysqlclient`_ 1.3.3 or later. mysqlclient should mostly behave
-the same as MySQLdb.
+Django supports `mysqlclient`_ 1.3.3 through 1.3.13.
 
 MySQL Connector/Python
 ~~~~~~~~~~~~~~~~~~~~~~
