@@ -777,11 +777,6 @@ the database state between tests if you don't have transactions). You can set
 this to ``False`` to speed up creation time if you don't have any test classes
 with :ref:`serialized_rollback=True <test-case-serialized-rollback>`.
 
-Don't set this to ``False`` if you want to use :option:`test --keepdb`
-and your test suite contains :class:`~django.test.TransactionTestCase` or
-doesn't support transactions, as this in-memory JSON string is used to restore
-the initial data migrations in these situations.
-
 .. setting:: TEST_TEMPLATE
 
 ``TEMPLATE``

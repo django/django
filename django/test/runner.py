@@ -11,7 +11,7 @@ from io import StringIO
 
 from django.core.management import call_command
 from django.db import connections
-from django.test import SimpleTestCase, TestCase, TransactionTestCase
+from django.test import SimpleTestCase, TestCase
 from django.test.utils import (
     setup_databases as _setup_databases, setup_test_environment,
     teardown_databases as _teardown_databases, teardown_test_environment,
@@ -399,7 +399,7 @@ class DiscoverRunner:
     parallel_test_suite = ParallelTestSuite
     test_runner = unittest.TextTestRunner
     test_loader = unittest.defaultTestLoader
-    reorder_by = (TestCase, TransactionTestCase, SimpleTestCase)
+    reorder_by = (TestCase, SimpleTestCase)
 
     def __init__(self, pattern=None, top_level=None, verbosity=1,
                  interactive=True, failfast=False, keepdb=False,
@@ -637,27 +637,6 @@ def is_discoverable(label):
     return os.path.isdir(os.path.abspath(label))
 
 
-def reorder_postprocess(reordered_suite):
-    """
-    To make TransactionTestCases initialize their data properly, they must know
-    if the next TransactionTestCase needs initial data migrations serialized in
-    the connection. Initialize _next_serialized_rollback attribute depending on
-    the serialized_rollback option present in the next test class in the suite.
-    If the next test has no serialized_rollback attribute, it means there
-    aren't any more TransactionTestCases.
-    """
-    # Filter out skipped tests.
-    active_tests = [
-        test for test in reordered_suite._tests
-        if not getattr(test, '__unittest_skip__', False)
-    ]
-    for previous_test, next_test in zip(active_tests[:-1], active_tests[1:]):
-        next_serialized_rollback = getattr(next_test, 'serialized_rollback', None)
-        if next_serialized_rollback is not None:
-            previous_test._next_serialized_rollback = next_serialized_rollback
-    return reordered_suite
-
-
 def reorder_suite(suite, classes, reverse=False):
     """
     Reorder a test suite by test type.
@@ -677,7 +656,7 @@ def reorder_suite(suite, classes, reverse=False):
     reordered_suite = suite_class()
     for i in range(class_count + 1):
         reordered_suite.addTests(bins[i])
-    return reorder_postprocess(reordered_suite)
+    return reordered_suite
 
 
 def partition_suite_by_type(suite, classes, bins, reverse=False):
