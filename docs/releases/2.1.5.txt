@@ -10,4 +10,4 @@ Django 2.1.5 fixes several bugs in 2.1.4.
 Bugfixes
 ========
 
-* ...
+* Fixed compatibility with mysqlclient 1.3.14 (:ticket:`30013`).
