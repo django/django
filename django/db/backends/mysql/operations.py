@@ -132,10 +132,10 @@ class DatabaseOperations(BaseDatabaseOperations):
         return [(None, ("NULL", [], False))]
 
     def last_executed_query(self, cursor, sql, params):
-        # With MySQLdb, cursor objects have an (undocumented) "_last_executed"
+        # With MySQLdb, cursor objects have an (undocumented) "_executed"
         # attribute where the exact query sent to the database is saved.
         # See MySQLdb/cursors.py in the source distribution.
-        return force_text(getattr(cursor, '_last_executed', None), errors='replace')
+        return force_text(getattr(cursor, '_executed', None), errors='replace')
 
     def no_limit_value(self):
         # 2**64 - 1, as recommended by the MySQL documentation
