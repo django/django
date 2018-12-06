@@ -397,6 +397,9 @@ class ExceptionReporter:
         while exc_value:
             exceptions.append(exc_value)
             exc_value = explicit_or_implicit_cause(exc_value)
+            if exc_value in exceptions:
+                # Avoid infinite loop if there's a cyclic reference (#29393).
+                break
 
         frames = []
         # No exceptions were supplied to ExceptionReporter
