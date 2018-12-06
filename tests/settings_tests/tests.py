@@ -1,6 +1,7 @@
 import os
 import sys
 import unittest
+from collections import namedtuple
 from types import ModuleType
 from unittest import mock
 
@@ -12,6 +13,7 @@ from django.test import (
     override_settings, signals,
 )
 from django.test.utils import requires_tz_support
+from django.urls import clear_script_prefix, set_script_prefix
 
 
 @modify_settings(ITEMS={
@@ -544,3 +546,176 @@ class OverrideSettingsIsolationOnExceptionTests(SimpleTestCase):
         signals.setting_changed.disconnect(self.receiver)
         # This call shouldn't raise any errors.
         decorated_function()
+
+
+ScriptNameTestCase = namedtuple(
+    'ScriptNameTestCase', (
+        'script_name',
+        'initial_static_url',
+        'final_static_url',
+        'initial_media_url',
+        'final_media_url',))
+
+
+script_name_test_cases = (
+
+    # SCRIPT_NAME ends with no slash, settings start with slashes; will prefix
+    ScriptNameTestCase(
+        script_name='/somesubpath',
+        initial_static_url='/static/',
+        final_static_url='/somesubpath/static/',
+        initial_media_url='/media/',
+        final_media_url='/somesubpath/media/',),
+
+    # SCRIPT_NAME ends with no slash, settings start with no slashes; will prefix
+    ScriptNameTestCase(
+        script_name='/somesubpath',
+        initial_static_url='static/',
+        final_static_url='/somesubpath/static/',
+        initial_media_url='media/',
+        final_media_url='/somesubpath/media/',),
+
+    # SCRIPT_NAME ends with slash, settings start with slashes; will prefix
+    ScriptNameTestCase(
+        script_name='/somesubpath/',
+        initial_static_url='/static/',
+        final_static_url='/somesubpath/static/',
+        initial_media_url='/media/',
+        final_media_url='/somesubpath/media/',),
+
+    # SCRIPT_NAME ends with slash, settings start with no slashes; will prefix
+    ScriptNameTestCase(
+        script_name='/somesubpath/',
+        initial_static_url='static/',
+        final_static_url='/somesubpath/static/',
+        initial_media_url='media/',
+        final_media_url='/somesubpath/media/',),
+
+    # A valid URL will receive no prefix
+    ScriptNameTestCase(
+        script_name='/somesubpath/',
+        initial_static_url='http://myhost.com/static/',
+        final_static_url='http://myhost.com/static/',
+        initial_media_url='http://myhost.com/media/',
+        final_media_url='http://myhost.com/media/',),
+
+    # An invalid URL will receive a prefix
+    ScriptNameTestCase(
+        script_name='/somesubpath/',
+        initial_static_url='htp://myhost.com/static/',
+        final_static_url='/somesubpath/htp://myhost.com/static/',
+        initial_media_url='htp://myhost.com/media/',
+        final_media_url='/somesubpath/htp://myhost.com/media/',),
+
+    # Settings already have prefix so no change expected
+    ScriptNameTestCase(
+        script_name='/somesubpath/',
+        initial_static_url='/somesubpath/static/',
+        final_static_url='/somesubpath/static/',
+        initial_media_url='/somesubpath/media/',
+        final_media_url='/somesubpath/media/',),
+
+    # Settings identical to SCRIPT_NAME so prefixation occurs; strange but
+    # consistent.
+    ScriptNameTestCase(
+        script_name='/somesubpath/',
+        initial_static_url='/somesubpath/',
+        final_static_url='/somesubpath/somesubpath/',
+        initial_media_url='/somesubpath/',
+        final_media_url='/somesubpath/somesubpath/',),
+
+    # Empty string settings should be used if we want to ensure that
+    # SCRIPT_NAME is identical to the setting.
+    ScriptNameTestCase(
+        script_name='/somesubpath/',
+        initial_static_url='',
+        final_static_url='/somesubpath/',
+        initial_media_url='',
+        final_media_url='/somesubpath/',),
+
+    # ``None`` values for the settings are just returned as is.
+    ScriptNameTestCase(
+        script_name='/somesubpath/',
+        initial_static_url=None,
+        final_static_url=None,
+        initial_media_url=None,
+        final_media_url=None,),
+
+    # SCRIPT_NAME not set so no prefixation occurs
+    ScriptNameTestCase(
+        script_name=None,
+        initial_static_url='/static/',
+        final_static_url='/static/',
+        initial_media_url='/media/',
+        final_media_url='/media/',),
+
+    # SCRIPT_NAME is empty string: no prefixation
+    ScriptNameTestCase(
+        script_name='',
+        initial_static_url='/static/',
+        final_static_url='/static/',
+        initial_media_url='/media/',
+        final_media_url='/media/',),
+
+    # SCRIPT_NAME is forward slash: no prefixation
+    ScriptNameTestCase(
+        script_name='/',
+        initial_static_url='/static/',
+        final_static_url='/static/',
+        initial_media_url='/media/',
+        final_media_url='/media/',),
+
+)
+
+
+def set_script_name(val):
+    clear_script_prefix()
+    if val is not None:
+        set_script_prefix(val)
+
+
+class AddScriptPrefixTest(SimpleTestCase):
+    """
+    Test that the SCRIPT_NAME request header is prefixed to the STATIC_URL and
+    MEDIA_URL settings values in the correct manner and in the expected
+    scenarios.
+    """
+
+    def setUp(self):
+        clear_script_prefix()
+
+    def tearDown(self):
+        clear_script_prefix()
+
+    def test_add_script_prefix(self):
+        """Perform all of the tests encoded in ``script_name_test_cases``."""
+        for case in script_name_test_cases:
+            s = LazySettings()
+            s.configure(
+                STATIC_URL=case.initial_static_url,
+                MEDIA_URL=case.initial_media_url,)
+            set_script_name(case.script_name)
+            self.assertEqual(s.STATIC_URL, case.final_static_url)
+            self.assertEqual(s.MEDIA_URL, case.final_media_url)
+
+    def test_script_prefix_irrelevant(self):
+        """
+        Confirm that SCRIPT_NAME has no effect on settings attributes that
+        are irrelevant to it.
+        """
+        test_settings = {
+            'FOO': [1, 2, 4],
+            'BAR': 5.7,
+            'BAZ': 'baz',
+            'OOF': None,
+        }
+        for func in (
+                lambda: set_script_name('some/path'),
+                lambda: set_script_name('/'),
+                lambda: set_script_name(''),
+                lambda: set_script_name(None),):
+            s = LazySettings()
+            s.configure(**test_settings)
+            func()
+            for key, val in test_settings.items():
+                self.assertEqual(getattr(s, key), val)

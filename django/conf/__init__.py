@@ -15,7 +15,8 @@ from pathlib import Path
 
 import django
 from django.conf import global_settings
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.validators import URLValidator
 from django.utils.deprecation import (
     RemovedInDjango30Warning, RemovedInDjango31Warning,
 )
@@ -28,6 +29,32 @@ FILE_CHARSET_DEPRECATED_MSG = (
     'The FILE_CHARSET setting is deprecated. Starting with Django 3.1, all '
     'files read from disk must be UTF-8 encoded.'
 )
+
+
+def add_script_prefix(value):
+    """
+    Prefix header value SCRIPT_NAME to ``value`` under certain circumstances.
+
+    Useful for when the app is being served at a subpath and manually prefixing
+    that subpath to STATIC_URL and STATIC_ROOT in settings is inconvenient
+    (i.e., a deployment concern). Refs #25598.
+    """
+    try:
+        URLValidator()(value)
+        return value
+    except (ValidationError, AttributeError):
+        pass
+    from django.urls import get_script_prefix  # circular dependency if top-level import
+    prefix = get_script_prefix()
+    if not prefix or prefix == '/':
+        return value
+    # try to detect if the prefix is already prefixed appropriately.
+    try:
+        if value.startswith(prefix) and value != prefix:
+            return value
+    except AttributeError:
+        return value
+    return os.path.join(prefix, value.lstrip('/'))
 
 
 class LazySettings(LazyObject):
@@ -130,6 +157,14 @@ class LazySettings(LazyObject):
                 stacklevel=2,
             )
         return self.__getattr__('FILE_CHARSET')
+
+    @property
+    def STATIC_URL(self):
+        return add_script_prefix(self.__getattr__('STATIC_URL'))
+
+    @property
+    def MEDIA_URL(self):
+        return add_script_prefix(self.__getattr__('MEDIA_URL'))
 
 
 class Settings:
