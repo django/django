@@ -18,3 +18,7 @@ Bugfixes
 
 * Prevented SQLite schema alterations while foreign key checks are enabled to
   avoid the possibility of schema corruption (:ticket:`30023`).
+
+* Fixed a regression in Django 2.1.4 (which enabled keep-alive connections)
+  where request body data isn't properly consumed for such connections
+  (:ticket:`30015`).
