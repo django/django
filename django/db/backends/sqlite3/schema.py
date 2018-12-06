@@ -21,10 +21,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Some SQLite schema alterations need foreign key constraints to be
         # disabled. Enforce it here for the duration of the transaction.
         self.connection.disable_constraint_checking()
+        self.connection.cursor().execute('PRAGMA legacy_alter_table = ON')
         return super().__enter__()
 
     def __exit__(self, exc_type, exc_value, traceback):
         super().__exit__(exc_type, exc_value, traceback)
+        self.connection.cursor().execute('PRAGMA legacy_alter_table = OFF')
         self.connection.enable_constraint_checking()
 
     def quote_value(self, value):
