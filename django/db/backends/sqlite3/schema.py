@@ -24,6 +24,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             c.execute('PRAGMA foreign_keys')
             self._initial_pragma_fk = c.fetchone()[0]
             c.execute('PRAGMA foreign_keys = 0')
+            c.execute('PRAGMA legacy_alter_table = ON')
         return super(DatabaseSchemaEditor, self).__enter__()
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -31,6 +32,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         with self.connection.cursor() as c:
             # Restore initial FK setting - PRAGMA values can't be parametrized
             c.execute('PRAGMA foreign_keys = %s' % int(self._initial_pragma_fk))
+            c.execute('PRAGMA legacy_alter_table = OFF')
 
     def quote_value(self, value):
         # The backend "mostly works" without this function and there are use

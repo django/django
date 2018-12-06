@@ -13,3 +13,7 @@ Bugfixes
   ``has_keys``, or ``has_any_keys`` lookup on
   :class:`~django.contrib.postgres.fields.JSONField`, if the right or left hand
   side of an expression is a key transform (:ticket:`30826`).
+
+* Fixed a schema corruption issue on SQLite 3.26+. You might have to drop and
+  rebuild your SQLite database if you applied a migration while using an older
+  version of Django with SQLite 3.26 or later (:ticket:`29182`).
