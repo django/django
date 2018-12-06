@@ -14,6 +14,7 @@ import sys
 from wsgiref import simple_server
 
 from django.core.exceptions import ImproperlyConfigured
+from django.core.handlers.wsgi import LimitedStream
 from django.core.wsgi import get_wsgi_application
 from django.utils.module_loading import import_string
 
@@ -80,6 +81,20 @@ class ThreadedWSGIServer(socketserver.ThreadingMixIn, WSGIServer):
 class ServerHandler(simple_server.ServerHandler):
     http_version = '1.1'
 
+    def __init__(self, stdin, stdout, stderr, environ, **kwargs):
+        """
+        Setup a limited stream, so we can discard unread request data
+        at the end of the request. Django already uses `LimitedStream`
+        in `WSGIRequest` but it shouldn't discard the data since the
+        upstream servers usually do this. Hence we fix this only for
+        our testserver/runserver.
+        """
+        try:
+            content_length = int(environ.get('CONTENT_LENGTH'))
+        except (ValueError, TypeError):
+            content_length = 0
+        super().__init__(LimitedStream(stdin, content_length), stdout, stderr, environ, **kwargs)
+
     def cleanup_headers(self):
         super().cleanup_headers()
         # HTTP/1.1 requires us to support persistent connections, so
@@ -91,6 +106,10 @@ class ServerHandler(simple_server.ServerHandler):
         # if the application sent the header.
         if self.headers.get('Connection') == 'close':
             self.request_handler.close_connection = True
+
+    def close(self):
+        self.get_stdin()._read_limited()
+        super().close()
 
     def handle_error(self):
         # Ignore broken pipe errors, otherwise pass on
