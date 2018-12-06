@@ -15,7 +15,8 @@ from pathlib import Path
 
 import django
 from django.conf import global_settings
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.validators import URLValidator
 from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import LazyObject, empty
 
@@ -109,6 +110,26 @@ class LazySettings(LazyObject):
             setattr(holder, name, value)
         self._wrapped = holder
 
+    @staticmethod
+    def _add_script_prefix(value):
+        """
+        Add SCRIPT_NAME prefix to relative paths.
+
+        Useful when the app is being served at a subpath and manually prefixing
+        subpath to STATIC_URL and MEDIA_URL in settings is inconvenient.
+        """
+        # Don't apply prefix to valid URLs.
+        try:
+            URLValidator()(value)
+            return value
+        except (ValidationError, AttributeError):
+            pass
+        # Don't apply prefix to absolute paths.
+        if value.startswith('/'):
+            return value
+        from django.urls import get_script_prefix
+        return '%s%s' % (get_script_prefix(), value)
+
     @property
     def configured(self):
         """Return True if the settings have already been configured."""
@@ -127,6 +148,14 @@ class LazySettings(LazyObject):
                 stacklevel=2,
             )
         return self.__getattr__('PASSWORD_RESET_TIMEOUT_DAYS')
+
+    @property
+    def STATIC_URL(self):
+        return self._add_script_prefix(self.__getattr__('STATIC_URL'))
+
+    @property
+    def MEDIA_URL(self):
+        return self._add_script_prefix(self.__getattr__('MEDIA_URL'))
 
 
 class Settings:

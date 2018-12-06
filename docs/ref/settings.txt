@@ -1989,6 +1989,13 @@ Example: ``"http://media.example.com/"``
     :setting:`MEDIA_URL` and :setting:`STATIC_URL` must have different
     values. See :setting:`MEDIA_ROOT` for more details.
 
+.. note::
+
+    If :setting:`MEDIA_URL` is a relative path, then it will be prefixed by the
+    server-provided value of ``SCRIPT_NAME`` (or ``/`` if not set). This makes
+    it easier to serve a Django application in a subpath without adding an
+    extra configuration to the settings.
+
 .. setting:: MIDDLEWARE
 
 ``MIDDLEWARE``
@@ -3305,6 +3312,13 @@ It must end in a slash if set to a non-empty value.
 You may need to :ref:`configure these files to be served in development
 <serving-static-files-in-development>` and will definitely need to do so
 :doc:`in production </howto/static-files/deployment>`.
+
+.. note::
+
+    If :setting:`STATIC_URL` is a relative path, then it will be prefixed by
+    the server-provided value of ``SCRIPT_NAME`` (or ``/`` if not set). This
+    makes it easier to serve a Django application in a subpath without adding
+    an extra configuration to the settings.
 
 .. setting:: STATICFILES_DIRS
 

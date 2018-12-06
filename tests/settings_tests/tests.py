@@ -12,6 +12,7 @@ from django.test import (
     override_settings, signals,
 )
 from django.test.utils import requires_tz_support
+from django.urls import clear_script_prefix, set_script_prefix
 
 
 @modify_settings(ITEMS={
@@ -567,3 +568,51 @@ class OverrideSettingsIsolationOnExceptionTests(SimpleTestCase):
         signals.setting_changed.disconnect(self.receiver)
         # This call shouldn't raise any errors.
         decorated_function()
+
+
+class MediaURLStaticURLPrefixTest(SimpleTestCase):
+    def set_script_name(self, val):
+        clear_script_prefix()
+        if val is not None:
+            set_script_prefix(val)
+
+    def test_not_prefixed(self):
+        # Don't add SCRIPT_NAME prefix to valid URLs, absolute paths or None.
+        tests = (
+            '/path/',
+            'http://myhost.com/path/',
+            None,
+        )
+        for setting in ('MEDIA_URL', 'STATIC_URL'):
+            for path in tests:
+                new_settings = {setting: path}
+                with self.settings(**new_settings):
+                    for script_name in ['/somesubpath', '/somesubpath/', '/', '', None]:
+                        with self.subTest(script_name=script_name, **new_settings):
+                            try:
+                                self.set_script_name(script_name)
+                                self.assertEqual(getattr(settings, setting), path)
+                            finally:
+                                clear_script_prefix()
+
+    def test_add_script_name_prefix(self):
+        tests = (
+            # Relative paths.
+            ('/somesubpath', 'path/', '/somesubpath/path/'),
+            ('/somesubpath/', 'path/', '/somesubpath/path/'),
+            ('/', 'path/', '/path/'),
+            # Invalid URLs.
+            ('/somesubpath/', 'htp://myhost.com/path/', '/somesubpath/htp://myhost.com/path/'),
+            # Blank settings.
+            ('/somesubpath/', '', '/somesubpath/'),
+        )
+        for setting in ('MEDIA_URL', 'STATIC_URL'):
+            for script_name, path, expected_path in tests:
+                new_settings = {setting: path}
+                with self.settings(**new_settings):
+                    with self.subTest(script_name=script_name, **new_settings):
+                        try:
+                            self.set_script_name(script_name)
+                            self.assertEqual(getattr(settings, setting), expected_path)
+                        finally:
+                            clear_script_prefix()
