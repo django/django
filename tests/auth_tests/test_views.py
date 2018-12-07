@@ -319,7 +319,7 @@ class PasswordResetTest(AuthViewsTestCase):
         ]
     )
     def test_confirm_login_post_reset_custom_backend(self):
-        # This backend is specified in the url().
+        # This backend is specified in the URL pattern.
         backend = 'django.contrib.auth.backends.AllowAllUsersModelBackend'
         url, path = self._test_confirm_start()
         path = path.replace('/reset/', '/reset/post_reset_login_custom_backend/')

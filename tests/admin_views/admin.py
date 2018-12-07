@@ -5,7 +5,6 @@ from io import StringIO
 from wsgiref.util import FileWrapper
 
 from django import forms
-from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin import BooleanFieldListFilter
 from django.contrib.admin.views.main import ChangeList
@@ -17,6 +16,7 @@ from django.core.mail import EmailMessage
 from django.db import models
 from django.forms.models import BaseModelFormSet
 from django.http import HttpResponse, StreamingHttpResponse
+from django.urls import path
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
@@ -704,7 +704,7 @@ class ReportAdmin(admin.ModelAdmin):
 
     def get_urls(self):
         # Corner case: Don't call parent implementation
-        return [url(r'^extra/$', self.extra, name='cable_extra')]
+        return [path('extra/', self.extra, name='cable_extra')]
 
 
 class CustomTemplateBooleanFieldListFilter(BooleanFieldListFilter):

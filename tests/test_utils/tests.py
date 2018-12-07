@@ -5,7 +5,6 @@ from io import StringIO
 from unittest import mock
 
 from django.conf import settings
-from django.conf.urls import url
 from django.contrib.staticfiles.finders import get_finder, get_finders
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.storage import default_storage
@@ -22,7 +21,7 @@ from django.test.utils import (
     CaptureQueriesContext, TestContextDecorator, isolate_apps,
     override_settings, setup_test_environment,
 )
-from django.urls import NoReverseMatch, reverse
+from django.urls import NoReverseMatch, path, reverse
 
 from .models import Car, Person, PossessedCar
 from .views import empty_response
@@ -962,11 +961,11 @@ class AssertURLEqualTests(SimpleTestCase):
 
 
 class FirstUrls:
-    urlpatterns = [url(r'first/$', empty_response, name='first')]
+    urlpatterns = [path('first/', empty_response, name='first')]
 
 
 class SecondUrls:
-    urlpatterns = [url(r'second/$', empty_response, name='second')]
+    urlpatterns = [path('second/', empty_response, name='second')]
 
 
 class SetupTestEnvironmentTests(SimpleTestCase):

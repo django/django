@@ -162,7 +162,7 @@ class SetLanguageTests(TestCase):
         """
         The set_language view decodes the HTTP_REFERER URL.
         """
-        # The url() & view must exist for this to work as a regression test.
+        # The URL & view must exist for this to work as a regression test.
         self.assertEqual(reverse('with_parameter', kwargs={'parameter': 'x'}), '/test-setlang/x/')
         lang_code = self._get_inactive_language_code()
         encoded_url = '/test-setlang/%C3%A4/'  # (%C3%A4 decodes to ä)
