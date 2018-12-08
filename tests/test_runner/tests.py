@@ -10,6 +10,7 @@ from django import db
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
+from django.core.management.base import SystemCheckError
 from django.test import (
     TestCase, TransactionTestCase, skipUnlessDBFeature, testcases,
 )
@@ -201,8 +202,9 @@ class Ticket17477RegressionTests(AdminScriptTestCase):
         self.assertNoOutput(err)
 
 
-class Sqlite3InMemoryTestDbs(TestCase):
+class Sqlite3InMemoryTestDbs(TransactionTestCase):
     multi_db = True
+    available_apps = ['test_runner']
 
     @unittest.skipUnless(all(db.connections[conn].vendor == 'sqlite' for conn in db.connections),
                          "This is an sqlite-specific issue")
