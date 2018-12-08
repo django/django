@@ -25,12 +25,12 @@ class SchemaIndexesTests(TestCase):
         """
         Index names should be deterministic.
         """
-        with connection.schema_editor() as editor:
-            index_name = editor._create_index_name(
-                table_name=Article._meta.db_table,
-                column_names=("c1",),
-                suffix="123",
-            )
+        editor = connection.schema_editor()
+        index_name = editor._create_index_name(
+            table_name=Article._meta.db_table,
+            column_names=("c1",),
+            suffix="123",
+        )
         self.assertEqual(index_name, "indexes_article_c1_a52bd80b123")
 
     def test_index_name(self):
@@ -41,12 +41,12 @@ class SchemaIndexesTests(TestCase):
             * Include a deterministic hash.
         """
         long_name = 'l%sng' % ('o' * 100)
-        with connection.schema_editor() as editor:
-            index_name = editor._create_index_name(
-                table_name=Article._meta.db_table,
-                column_names=('c1', 'c2', long_name),
-                suffix='ix',
-            )
+        editor = connection.schema_editor()
+        index_name = editor._create_index_name(
+            table_name=Article._meta.db_table,
+            column_names=('c1', 'c2', long_name),
+            suffix='ix',
+        )
         expected = {
             'mysql': 'indexes_article_c1_c2_looooooooooooooooooo_255179b2ix',
             'oracle': 'indexes_a_c1_c2_loo_255179b2ix',

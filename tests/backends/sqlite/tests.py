@@ -2,7 +2,7 @@ import re
 import threading
 import unittest
 
-from django.db import connection
+from django.db import connection, transaction
 from django.db.models import Avg, StdDev, Sum, Variance
 from django.db.models.fields import CharField
 from django.db.utils import NotSupportedError
@@ -15,22 +15,6 @@ from ..models import Author, Item, Object, Square
 @unittest.skipUnless(connection.vendor == 'sqlite', 'SQLite tests')
 class Tests(TestCase):
     longMessage = True
-
-    def test_autoincrement(self):
-        """
-        auto_increment fields are created with the AUTOINCREMENT keyword
-        in order to be monotonically increasing (#10164).
-        """
-        with connection.schema_editor(collect_sql=True) as editor:
-            editor.create_model(Square)
-            statements = editor.collected_sql
-        match = re.search('"id" ([^,]+),', statements[0])
-        self.assertIsNotNone(match)
-        self.assertEqual(
-            'integer NOT NULL PRIMARY KEY AUTOINCREMENT',
-            match.group(1),
-            'Wrong SQL used to create an auto-increment column on SQLite'
-        )
 
     def test_aggregation(self):
         """
@@ -81,6 +65,52 @@ class Tests(TestCase):
 class SchemaTests(TransactionTestCase):
 
     available_apps = ['backends']
+
+    def test_autoincrement(self):
+        """
+        auto_increment fields are created with the AUTOINCREMENT keyword
+        in order to be monotonically increasing (#10164).
+        """
+        with connection.schema_editor(collect_sql=True) as editor:
+            editor.create_model(Square)
+            statements = editor.collected_sql
+        match = re.search('"id" ([^,]+),', statements[0])
+        self.assertIsNotNone(match)
+        self.assertEqual(
+            'integer NOT NULL PRIMARY KEY AUTOINCREMENT',
+            match.group(1),
+            'Wrong SQL used to create an auto-increment column on SQLite'
+        )
+
+    def test_disable_constraint_checking_failure_disallowed(self):
+        """
+        SQLite schema editor is not usable within an outer transaction if
+        foreign key constraint checks are not disabled beforehand.
+        """
+        msg = (
+            'SQLite schema editor cannot be used while foreign key '
+            'constraint checks are enabled. Make sure to disable them '
+            'before entering a transaction.atomic() context because '
+            'SQLite3 does not support disabling them in the middle of '
+            'a multi-statement transaction.'
+        )
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            with transaction.atomic(), connection.schema_editor(atomic=True):
+                pass
+
+    def test_constraint_checks_disabled_atomic_allowed(self):
+        """
+        SQLite3 schema editor is usable within an outer transaction as long as
+        foreign key constraints checks are disabled beforehand.
+        """
+        def constraint_checks_enabled():
+            with connection.cursor() as cursor:
+                return bool(cursor.execute('PRAGMA foreign_keys').fetchone()[0])
+        with connection.constraint_checks_disabled(), transaction.atomic():
+            with connection.schema_editor(atomic=True):
+                self.assertFalse(constraint_checks_enabled())
+            self.assertFalse(constraint_checks_enabled())
+        self.assertTrue(constraint_checks_enabled())
 
     def test_field_rename_inside_atomic_block(self):
         """

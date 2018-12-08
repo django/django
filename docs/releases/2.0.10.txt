@@ -16,3 +16,6 @@ Bugfixes
 * Fixed a schema corruption issue on SQLite 3.26+. You might have to drop and
   rebuild your SQLite database if you applied a migration while using an older
   version of Django with SQLite 3.26 or later (:ticket:`29182`).
+
+* Prevented SQLite schema alterations while foreign key checks are enabled to
+  avoid the possibility of schema corruption (:ticket:`30023`).
