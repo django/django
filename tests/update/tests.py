@@ -165,7 +165,11 @@ class AdvancedTests(TestCase):
         self.assertEqual(qs.update(another_value=F('alias')), 3)
         # Update where aggregation annotation is used in update parameters
         qs = DataPoint.objects.annotate(max=Max('value'))
-        with self.assertRaisesMessage(FieldError, 'Aggregate functions are not allowed in this query'):
+        msg = (
+            'Aggregate functions are not allowed in this query '
+            '(another_value=Max(Col(update_datapoint, update.DataPoint.value))).'
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             qs.update(another_value=F('max'))
 
     def test_update_annotated_multi_table_queryset(self):
@@ -185,5 +189,9 @@ class AdvancedTests(TestCase):
         # self.assertEqual(updated, 1)
         # Update where aggregation annotation is used in update parameters
         qs = RelatedPoint.objects.annotate(max=Max('data__value'))
-        with self.assertRaisesMessage(FieldError, 'Aggregate functions are not allowed in this query'):
+        msg = (
+            'Aggregate functions are not allowed in this query '
+            '(name=Max(Col(update_datapoint, update.DataPoint.value))).'
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             qs.update(name=F('max'))
