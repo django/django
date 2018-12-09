@@ -64,3 +64,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def allow_sliced_subqueries_with_in(self):
         return self.has_fetch_offset_support
+
+    @cached_property
+    def supports_slicing_ordering_in_compound(self):
+        return self.has_fetch_offset_support
