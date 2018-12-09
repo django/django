@@ -12,7 +12,12 @@ from django.utils.http import (
 )
 
 
-class URLEncodeTests(unittest.TestCase):
+class URLEncodeTests(SimpleTestCase):
+    cannot_encode_none_msg = (
+        'Cannot encode None in a query string. Did you mean to pass an '
+        'empty string or omit the value?'
+    )
+
     def test_tuples(self):
         self.assertEqual(urlencode((('a', 1), ('b', 2), ('c', 3))), 'a=1&b=2&c=3')
 
@@ -64,6 +69,20 @@ class URLEncodeTests(unittest.TestCase):
 
         self.assertEqual(urlencode({'a': gen()}, doseq=True), 'a=0&a=1')
         self.assertEqual(urlencode({'a': gen()}, doseq=False), 'a=%5B%270%27%2C+%271%27%5D')
+
+    def test_none(self):
+        with self.assertRaisesMessage(TypeError, self.cannot_encode_none_msg):
+            urlencode({'a': None})
+
+    def test_none_in_sequence(self):
+        with self.assertRaisesMessage(TypeError, self.cannot_encode_none_msg):
+            urlencode({'a': [None]}, doseq=True)
+
+    def test_none_in_generator(self):
+        def gen():
+            yield None
+        with self.assertRaisesMessage(TypeError, self.cannot_encode_none_msg):
+            urlencode({'a': gen()}, doseq=True)
 
 
 class Base36IntTests(SimpleTestCase):
