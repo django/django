@@ -1,0 +1,23 @@
+2.1.6 Release Notes
+===================
+
+Channels 2.1.6 is another bugfix release in the 2.1 series.
+
+
+Bugfixes & Small Changes
+------------------------
+
+* HttpCommunicator now extracts query strings correctly from its provided
+  arguments
+
+* AsyncHttpConsumer provides channel layer attributes following the same
+  conventions as other consumer classes
+
+* Prevent late-Daphne import errors where importing ``daphne.server`` didn't
+  work due to a bad linter fix.
+
+
+Backwards Incompatible Changes
+------------------------------
+
+None.

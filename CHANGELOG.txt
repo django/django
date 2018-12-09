@@ -1,6 +1,15 @@
 Full release notes, with more details and upgrade information, are available at:
 https://channels.readthedocs.io/en/latest/releases
 
+2.1.6 (2018-12-08)
+------------------
+
+* HttpCommunicator now extracts query strings correctly
+
+* AsyncHttpConsumer provides channel layer attributes
+
+* Prevent late-Daphne import errors
+
 
 2.1.5 (2018-10-22)
 ------------------
