@@ -432,6 +432,7 @@ Miscellaneous
   renders ``<option>`` values of ``unknown``, ``true``, and ``false`` instead
   of ``1``, ``2``, and ``3``. For backwards compatibility, the old values are
   still accepted as data.
+
 * :attr:`Group.name <django.contrib.auth.models.Group.name>` ``max_length``
   is increased from 80 to 150 characters.
 
