@@ -584,6 +584,35 @@ class WriterTests(SimpleTestCase):
             result['custom_migration_operations'].more_operations.TestOperation
         )
 
+    def test_sorted_dependencies(self):
+        """
+        #30029 - Tests ordering of dependencies.
+        """
+
+        migration = type("Migration", (migrations.Migration,), {
+            "operations": [
+                migrations.AddField("mymodel", "myfield", models.DateTimeField(
+                    default=datetime.datetime(2012, 1, 1, 1, 1, tzinfo=utc),
+                )),
+            ],
+            "dependencies": [
+                ("testapp09", "0005_fifth"),
+                ("testapp03", "0003_third"),
+                ("testapp10", "0006_sixth"),
+                ("testapp05", "0001_initial"),
+                ("testapp02", "0002_second"),
+                ("testapp06", "0002_second"),
+                ("testapp08", "0004_fourth"),
+                ("testapp07", "0003_third"),
+                ("testapp04", "0002_second"),
+                ("testapp01", "0001_initial"),
+            ],
+        })
+        unsorted_output = MigrationWriter(migration, no_timestamp=True).as_string()
+        migration.dependencies = sorted(migration.dependencies)
+        sorted_output = MigrationWriter(migration, no_timestamp=True).as_string()
+        self.assertEqual(unsorted_output, sorted_output)
+
     def test_sorted_imports(self):
         """
         #24155 - Tests ordering of imports.
