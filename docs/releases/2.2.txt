@@ -194,6 +194,10 @@ Management Commands
 * On Oracle, :djadmin:`dbshell` is wrapped with ``rlwrap``, if available.
   ``rlwrap`` provides a command history and editing of keyboard input.
 
+* The new :option:`makemigrations --no-header` option avoids writing header
+  comments in generated migration file(s). This option is also available for
+  :djadmin:`squashmigrations`.
+
 Migrations
 ~~~~~~~~~~
 
