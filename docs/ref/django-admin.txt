@@ -776,6 +776,16 @@ Enables fixing of migration conflicts.
 Allows naming the generated migration(s) instead of using a generated name. The
 name must be a valid Python :ref:`identifier <python:identifiers>`.
 
+.. django-admin-option:: --no-version
+
+Does not write the Django version to the header comment in the generated
+migration file(s).
+
+.. django-admin-option:: --no-timestamp
+
+Does not write the current date and time to the header comment in the generated
+migration file(s).
+
 .. django-admin-option:: --check
 
 Makes ``makemigrations`` exit with a non-zero status when model changes without
@@ -1155,6 +1165,16 @@ Suppresses all user prompts.
 
 Sets the name of the squashed migration. When omitted, the name is based on the
 first and last migration, with ``_squashed_`` in between.
+
+.. django-admin-option:: --no-version
+
+Does not write the Django version to the header comment in the squashed
+migration file.
+
+.. django-admin-option:: --no-timestamp
+
+Does not write the current date and time to the header comment in the squashed
+migration file.
 
 ``startapp``
 ------------

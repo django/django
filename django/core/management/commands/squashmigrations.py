@@ -37,6 +37,14 @@ class Command(BaseCommand):
             '--squashed-name',
             help='Sets the name of the new squashed migration.',
         )
+        parser.add_argument(
+            '--no-version', action='store_true',
+            help="Do not write the Django version to the squashed migration's header comment.",
+        )
+        parser.add_argument(
+            '--no-timestamp', action='store_true',
+            help="Do not write the current date and time to the squashed migration's header comment.",
+        )
 
     def handle(self, **options):
 
@@ -47,6 +55,9 @@ class Command(BaseCommand):
         migration_name = options['migration_name']
         no_optimize = options['no_optimize']
         squashed_name = options['squashed_name']
+        no_version = options['no_version']
+        no_timestamp = options['no_timestamp']
+
         # Validate app_label.
         try:
             apps.get_app_config(app_label)
@@ -178,7 +189,7 @@ class Command(BaseCommand):
             new_migration.initial = True
 
         # Write out the new migration file
-        writer = MigrationWriter(new_migration)
+        writer = MigrationWriter(new_migration, no_version, no_timestamp)
         with open(writer.path, "w", encoding='utf-8') as fh:
             fh.write(writer.as_string())
 
