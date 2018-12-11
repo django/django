@@ -958,8 +958,12 @@ class BaseInlineFormSet(BaseModelFormSet):
             kwargs = {
                 'label': getattr(form.fields.get(name), 'label', capfirst(self.fk.verbose_name))
             }
-            if self.fk.remote_field.field_name != self.fk.remote_field.model._meta.pk.name:
-                kwargs['to_field'] = self.fk.remote_field.field_name
+
+        # The InlineForeignKeyField assumes that the foreign key relation is
+        # based on the parent model's pk. If this isn't the case, set to_field
+        # to correctly resolve the initial form value.
+        if self.fk.remote_field.field_name != self.fk.remote_field.model._meta.pk.name:
+            kwargs['to_field'] = self.fk.remote_field.field_name
 
         # If we're adding a new object, ignore a parent's auto-generated key
         # as it will be regenerated on the save request.
