@@ -44,15 +44,18 @@ def add_script_prefix(value):
         return value
     except (ValidationError, AttributeError):
         pass
+    try:
+        value = value.strip()
+    except AttributeError:
+        return value
+    if value.startswith('/'):
+        return value
     from django.urls import get_script_prefix  # circular dependency if top-level import
     prefix = get_script_prefix()
     if not prefix or prefix == '/':
         return value
     # try to detect if the prefix is already prefixed appropriately.
-    try:
-        if value.startswith(prefix) and value != prefix:
-            return value
-    except AttributeError:
+    if value.startswith(prefix) and value != prefix:
         return value
     return os.path.join(prefix, value.lstrip('/'))
 

@@ -559,15 +559,15 @@ ScriptNameTestCase = namedtuple(
 
 script_name_test_cases = (
 
-    # SCRIPT_NAME ends with no slash, settings start with slashes; will prefix
+    # SCRIPT_NAME ends with no slash, settings start with slashes; will NOT prefix
     ScriptNameTestCase(
         script_name='/somesubpath',
         initial_static_url='/static/',
-        final_static_url='/somesubpath/static/',
+        final_static_url='/static/',
         initial_media_url='/media/',
-        final_media_url='/somesubpath/media/',),
+        final_media_url='/media/',),
 
-    # SCRIPT_NAME ends with no slash, settings start with no slashes; will prefix
+    # SCRIPT_NAME ends with no slash, settings start with no slashes; WILL prefix
     ScriptNameTestCase(
         script_name='/somesubpath',
         initial_static_url='static/',
@@ -575,15 +575,15 @@ script_name_test_cases = (
         initial_media_url='media/',
         final_media_url='/somesubpath/media/',),
 
-    # SCRIPT_NAME ends with slash, settings start with slashes; will prefix
+    # SCRIPT_NAME ends with slash, settings start with slashes; will NOT prefix
     ScriptNameTestCase(
         script_name='/somesubpath/',
         initial_static_url='/static/',
-        final_static_url='/somesubpath/static/',
+        final_static_url='/static/',
         initial_media_url='/media/',
-        final_media_url='/somesubpath/media/',),
+        final_media_url='/media/',),
 
-    # SCRIPT_NAME ends with slash, settings start with no slashes; will prefix
+    # SCRIPT_NAME ends with slash, settings start with no slashes; WILL prefix
     ScriptNameTestCase(
         script_name='/somesubpath/',
         initial_static_url='static/',
@@ -615,13 +615,21 @@ script_name_test_cases = (
         initial_media_url='/somesubpath/media/',
         final_media_url='/somesubpath/media/',),
 
+    # Settings lacking slash prefix and already having prefix---no change expected
+    ScriptNameTestCase(
+        script_name='somesubpath/',
+        initial_static_url='somesubpath/static/',
+        final_static_url='somesubpath/static/',
+        initial_media_url='somesubpath/media/',
+        final_media_url='somesubpath/media/',),
+
     # Settings identical to SCRIPT_NAME so prefixation occurs; strange but
     # consistent.
     ScriptNameTestCase(
         script_name='/somesubpath/',
-        initial_static_url='/somesubpath/',
+        initial_static_url='somesubpath/',
         final_static_url='/somesubpath/somesubpath/',
-        initial_media_url='/somesubpath/',
+        initial_media_url='somesubpath/',
         final_media_url='/somesubpath/somesubpath/',),
 
     # Empty string settings should be used if we want to ensure that
@@ -644,26 +652,26 @@ script_name_test_cases = (
     # SCRIPT_NAME not set so no prefixation occurs
     ScriptNameTestCase(
         script_name=None,
-        initial_static_url='/static/',
-        final_static_url='/static/',
-        initial_media_url='/media/',
-        final_media_url='/media/',),
+        initial_static_url='static/',
+        final_static_url='static/',
+        initial_media_url='media/',
+        final_media_url='media/',),
 
     # SCRIPT_NAME is empty string: no prefixation
     ScriptNameTestCase(
         script_name='',
-        initial_static_url='/static/',
-        final_static_url='/static/',
-        initial_media_url='/media/',
-        final_media_url='/media/',),
+        initial_static_url='static/',
+        final_static_url='static/',
+        initial_media_url='media/',
+        final_media_url='media/',),
 
     # SCRIPT_NAME is forward slash: no prefixation
     ScriptNameTestCase(
         script_name='/',
-        initial_static_url='/static/',
-        final_static_url='/static/',
-        initial_media_url='/media/',
-        final_media_url='/media/',),
+        initial_static_url='static/',
+        final_static_url='static/',
+        initial_media_url='media/',
+        final_media_url='media/',),
 
 )
 
