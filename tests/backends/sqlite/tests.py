@@ -121,8 +121,8 @@ class SchemaTests(TransactionTestCase):
         new_field.set_attributes_from_name('renamed')
         msg = (
             "Renaming the 'backends_author'.'name' column while in a "
-            "transaction is not supported on SQLite because it would break "
-            "referential integrity. Try adding `atomic = False` to the "
+            "transaction is not supported on SQLite < 3.26 because it would "
+            "break referential integrity. Try adding `atomic = False` to the "
             "Migration class."
         )
         with self.assertRaisesMessage(NotSupportedError, msg):
@@ -136,7 +136,7 @@ class SchemaTests(TransactionTestCase):
         """
         msg = (
             "Renaming the 'backends_author' table while in a transaction is "
-            "not supported on SQLite because it would break referential "
+            "not supported on SQLite < 3.26 because it would break referential "
             "integrity. Try adding `atomic = False` to the Migration class."
         )
         with self.assertRaisesMessage(NotSupportedError, msg):
