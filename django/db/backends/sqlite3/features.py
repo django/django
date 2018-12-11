@@ -25,7 +25,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_transactions = True
     atomic_transactions = False
     can_rollback_ddl = True
-    supports_atomic_references_rename = False
+    supports_atomic_references_rename = Database.version_info >= (3, 26, 0)
     supports_paramstyle_pyformat = False
     supports_sequence_reset = False
     can_clone_databases = True

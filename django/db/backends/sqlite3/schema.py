@@ -27,13 +27,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 'SQLite3 does not support disabling them in the middle of '
                 'a multi-statement transaction.'
             )
-        self.connection.cursor().execute('PRAGMA legacy_alter_table = ON')
         return super().__enter__()
 
     def __exit__(self, exc_type, exc_value, traceback):
         super().__exit__(exc_type, exc_value, traceback)
         self.connection.check_constraints()
-        self.connection.cursor().execute('PRAGMA legacy_alter_table = OFF')
         self.connection.enable_constraint_checking()
 
     def quote_value(self, value):
@@ -84,11 +82,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         return False
 
     def alter_db_table(self, model, old_db_table, new_db_table, disable_constraints=True):
-        if disable_constraints and self._is_referenced_by_fk_constraint(old_db_table):
+        if (not self.connection.features.supports_atomic_references_rename and
+                disable_constraints and self._is_referenced_by_fk_constraint(old_db_table)):
             if self.connection.in_atomic_block:
                 raise NotSupportedError((
                     'Renaming the %r table while in a transaction is not '
-                    'supported on SQLite because it would break referential '
+                    'supported on SQLite < 3.26 because it would break referential '
                     'integrity. Try adding `atomic = False` to the Migration class.'
                 ) % old_db_table)
             self.connection.enable_constraint_checking()
@@ -102,11 +101,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         table_name = model._meta.db_table
         _, old_column_name = old_field.get_attname_column()
         if (new_field.name != old_field_name and
+                not self.connection.features.supports_atomic_references_rename and
                 self._is_referenced_by_fk_constraint(table_name, old_column_name, ignore_self=True)):
             if self.connection.in_atomic_block:
                 raise NotSupportedError((
                     'Renaming the %r.%r column while in a transaction is not '
-                    'supported on SQLite because it would break referential '
+                    'supported on SQLite < 3.26 because it would break referential '
                     'integrity. Try adding `atomic = False` to the Migration class.'
                 ) % (model._meta.db_table, old_field_name))
             with atomic(self.connection.alias):
