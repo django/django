@@ -1,5 +1,6 @@
 import inspect
 import types
+from collections import defaultdict
 from itertools import chain
 
 from django.apps import apps
@@ -8,12 +9,15 @@ from django.core.checks import Error, Tags, register
 
 @register(Tags.models)
 def check_all_models(app_configs=None, **kwargs):
+    db_table_models = defaultdict(list)
     errors = []
     if app_configs is None:
         models = apps.get_models()
     else:
         models = chain.from_iterable(app_config.get_models() for app_config in app_configs)
     for model in models:
+        if model._meta.managed and not model._meta.proxy:
+            db_table_models[model._meta.db_table].append(model._meta.label)
         if not inspect.ismethod(model.check):
             errors.append(
                 Error(
@@ -25,6 +29,16 @@ def check_all_models(app_configs=None, **kwargs):
             )
         else:
             errors.extend(model.check(**kwargs))
+    for db_table, model_labels in db_table_models.items():
+        if len(model_labels) != 1:
+            errors.append(
+                Error(
+                    "db_table '%s' is used by multiple models: %s."
+                    % (db_table, ', '.join(db_table_models[db_table])),
+                    obj=db_table,
+                    id='models.E028',
+                )
+            )
     return errors
 
 

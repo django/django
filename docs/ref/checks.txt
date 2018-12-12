@@ -302,6 +302,8 @@ Models
 * **models.E026**: The model cannot have more than one field with
   ``primary_key=True``.
 * **models.W027**: ``<database>`` does not support check constraints.
+* **models.E028**: ``db_table`` ``<db_table>`` is used by multiple models:
+  ``<model list>``.
 
 Security
 --------
