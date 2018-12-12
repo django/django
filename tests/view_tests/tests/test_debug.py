@@ -21,7 +21,7 @@ from django.utils.safestring import mark_safe
 from django.utils.version import PY36
 from django.views.debug import (
     CLEANSED_SUBSTITUTE, CallableSettingWrapper, ExceptionReporter,
-    cleanse_setting, technical_500_response,
+    ExceptionReporterFilter, cleanse_setting, technical_500_response,
 )
 
 from ..views import (
@@ -613,6 +613,40 @@ class ExceptionReporterTests(SimpleTestCase):
 
         text = reporter.get_traceback_text()
         self.assertIn('USER: [unable to retrieve the current user]', text)
+
+    def test_get_safe_request_meta(self):
+        rf = RequestFactory()
+        sensitive_keys = ('SECRET_KEY', 'PASSWORD', 'API_KEY', 'AUTH_TOKEN')
+        for key in sensitive_keys:
+            request = rf.get('/test_view/', **{key: 'value-that-should-be-redacted'})
+            reporter = ExceptionReporter(request, None, None, None)
+            with self.subTest(key=key):
+                self.assertEqual(reporter.filter.get_safe_request_meta(request)[key], CLEANSED_SUBSTITUTE)
+
+    def test_sensitive_request_meta_redacted(self):
+        sensitive_data = {'some-key': 'a-value-that-should-be-redacted'}
+        try:
+            request = self.rf.get('/test_view/', **sensitive_data)
+            raise ValueError("Raise an error to make a stacktrace.")
+        except ValueError:
+            exc_type, exc_value, tb = sys.exc_info()
+        reporter = ExceptionReporter(request, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        self.assertInHTML(
+            '<tr><td>some-key</td><td class="code"><pre>'
+            '&#39;********************&#39;</pre></td></tr>',
+            html
+        )
+
+    def test_get_base_request_meta(self):
+        rf = RequestFactory()
+        sensitive_keys = ('SECRET_KEY', 'PASSWORD', 'API_KEY', 'AUTH_TOKEN')
+        for key in sensitive_keys:
+            request = rf.get('/test_view/', **{key: 'base-value'})
+            setattr(request, 'exception_reporter_filter', ExceptionReporterFilter())
+            reporter = ExceptionReporter(request, None, None, None)
+            with self.subTest(key=key):
+                self.assertEqual(reporter.filter.get_safe_request_meta(request)[key], 'base-value')
 
 
 class PlainTextReportTests(SimpleTestCase):

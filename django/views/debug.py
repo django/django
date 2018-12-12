@@ -112,6 +112,9 @@ class ExceptionReporterFilter:
     contain lenient default behaviors.
     """
 
+    def get_safe_request_meta(self, request):
+        return {} if request is None else request.META
+
     def get_post_parameters(self, request):
         if request is None:
             return {}
@@ -150,6 +153,11 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
                 if param in multivaluedict:
                     multivaluedict[param] = CLEANSED_SUBSTITUTE
         return multivaluedict
+
+    def get_safe_request_meta(self, request):
+        """Return a dictionary of request.META with sensitive values redacted."""
+        has_meta = hasattr(request, 'META')
+        return {k: cleanse_setting(k, v) for k, v in request.META.items()} if has_meta else {}
 
     def get_post_parameters(self, request):
         """
@@ -302,6 +310,7 @@ class ExceptionReporter:
             'frames': frames,
             'request': self.request,
             'user_str': user_str,
+            'filtered_META_items': list(self.filter.get_safe_request_meta(self.request).items()),
             'filtered_POST_items': list(self.filter.get_post_parameters(self.request).items()),
             'settings': get_safe_settings(),
             'sys_executable': sys.executable,
