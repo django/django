@@ -138,12 +138,18 @@ exception raised, each `traceback frame`_’s local variables, and the
 
 However, sometimes certain types of information may be too sensitive and thus
 may not be appropriate to be kept track of, for example a user's password or
-credit card number. So in addition to filtering out settings that appear to be
-sensitive as described in the :setting:`DEBUG` documentation, Django offers a
-set of function decorators to help you control which information should be
-filtered out of error reports in a production environment (that is, where
-:setting:`DEBUG` is set to ``False``): :func:`sensitive_variables` and
-:func:`sensitive_post_parameters`.
+an API token. Django cleanses sensitive data from settings and
+:attr:`.HttpRequest.META` as described in the :setting:`DEBUG` documentation.
+
+If there is other sensitive information you would like to cleanse, such as a
+credit card number, Django offers a set of function decorators to help you
+control information which should be filtered out of error reports in a
+production environment (that is, where :setting:`DEBUG` is set to ``False``):
+:func:`sensitive_variables` and :func:`sensitive_post_parameters`.
+
+.. versionchanged:: 3.0
+
+    Cleansing of ``request.META`` was added.
 
 .. _`full traceback`: https://en.wikipedia.org/wiki/Stack_trace
 .. _`traceback frame`: https://en.wikipedia.org/wiki/Stack_frame
@@ -263,23 +269,42 @@ Your custom filter class needs to inherit from
 :class:`django.views.debug.SafeExceptionReporterFilter` and may override the
 following methods:
 
-.. class:: SafeExceptionReporterFilter
+.. class:: SafeExceptionReporterFilter(cleansed_substitute=DEFAULT_CLEANSED_SUBSTITUTE, hidden_settings=DEFAULT_HIDDEN_SETTINGS)
+
+.. versionadded:: 3.0
+
+    * ``cleansed_substitute``: The value to replace sensitive values with. Defaults to '********************'.
+    * ``hidden_settings``: Defaults to match any keys containing the following strings:
+        * API
+        * TOKEN
+        * KEY
+        * SECRET
+        * PASS
+        * SIGNATURE
 
 .. method:: SafeExceptionReporterFilter.is_active(request)
 
     Returns ``True`` to activate the filtering operated in the other methods.
     By default the filter is active if :setting:`DEBUG` is ``False``.
 
+.. versionadded:: 3.0
+
+    .. method:: SafeExceptionReporterFilter.get_safe_request_meta(request)
+
+        Returns the filtered dictionary of META parameters. It replaces
+        the values of sensitive parameters with the value of the
+        ``cleansed_substitute`` attribute.
+
 .. method:: SafeExceptionReporterFilter.get_post_parameters(request)
 
-    Returns the filtered dictionary of POST parameters. By default it replaces
-    the values of sensitive parameters with stars (`**********`).
+    Returns the filtered dictionary of POST parameters. It replaces the values
+    of sensitive parameters with the value of the ``cleansed_substitute`` attribute.
 
 .. method:: SafeExceptionReporterFilter.get_traceback_frame_variables(request, tb_frame)
 
     Returns the filtered dictionary of local variables for the given traceback
-    frame. By default it replaces the values of sensitive variables with stars
-    (`**********`).
+    frame. It replaces the values of sensitive parameters with the value of the
+    ``cleansed_substitute`` attribute.
 
 .. seealso::
 

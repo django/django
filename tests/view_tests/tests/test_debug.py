@@ -20,9 +20,9 @@ from django.urls import path, reverse
 from django.utils.functional import SimpleLazyObject
 from django.utils.safestring import mark_safe
 from django.views.debug import (
-    CLEANSED_SUBSTITUTE, CallableSettingWrapper, ExceptionReporter,
-    Path as DebugPath, cleanse_setting, default_urlconf,
-    technical_404_response, technical_500_response,
+    CallableSettingWrapper, ExceptionReporter, ExceptionReporterFilter,
+    Path as DebugPath, default_urlconf, technical_404_response,
+    technical_500_response,
 )
 
 from ..views import (
@@ -677,6 +677,43 @@ class ExceptionReporterTests(SimpleTestCase):
             reporter.get_traceback_text()
             m.assert_called_once_with(encoding='utf-8')
 
+    def test_get_safe_request_meta(self):
+        rf = RequestFactory()
+        sensitive_keys = ('SECRET_KEY', 'PASSWORD', 'API_KEY', 'AUTH_TOKEN')
+        for key in sensitive_keys:
+            request = rf.get('/test_view/', **{key: 'value-that-should-be-redacted'})
+            reporter = ExceptionReporter(request, None, None, None)
+            with self.subTest(key=key):
+                self.assertEqual(
+                    reporter.filter.get_safe_request_meta(request)[key],
+                    reporter.filter.CLEANSED_SUBSTITUTE
+                )
+
+    def test_sensitive_request_meta_redacted(self):
+        sensitive_data = {'some-key': 'a-value-that-should-be-redacted'}
+        try:
+            request = self.rf.get('/test_view/', **sensitive_data)
+            raise ValueError("Raise an error to make a stacktrace.")
+        except ValueError:
+            exc_type, exc_value, tb = sys.exc_info()
+        reporter = ExceptionReporter(request, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        self.assertInHTML(
+            '<tr><td>some-key</td><td class="code"><pre>'
+            '&#39;********************&#39;</pre></td></tr>',
+            html
+        )
+
+    def test_get_base_request_meta(self):
+        rf = RequestFactory()
+        sensitive_keys = ('SECRET_KEY', 'PASSWORD', 'API_KEY', 'AUTH_TOKEN')
+        for key in sensitive_keys:
+            request = rf.get('/test_view/', **{key: 'base-value'})
+            setattr(request, 'exception_reporter_filter', ExceptionReporterFilter())
+            reporter = ExceptionReporter(request, None, None, None)
+            with self.subTest(key=key):
+                self.assertEqual(reporter.filter.get_safe_request_meta(request)[key], 'base-value')
+
 
 class PlainTextReportTests(SimpleTestCase):
     rf = RequestFactory()
@@ -1209,16 +1246,29 @@ class AjaxResponseExceptionReporterFilter(ExceptionReportTestMixin, LoggingCaptu
         self.assertEqual(response['Content-Type'], 'text/plain; charset=utf-8')
 
 
-class HelperFunctionTests(SimpleTestCase):
+class ExceptionReporterFilterMethodTests(SimpleTestCase):
+
+    reporter_filter = ExceptionReporterFilter()
 
     def test_cleanse_setting_basic(self):
-        self.assertEqual(cleanse_setting('TEST', 'TEST'), 'TEST')
-        self.assertEqual(cleanse_setting('PASSWORD', 'super_secret'), CLEANSED_SUBSTITUTE)
+        self.assertEqual(ExceptionReporterFilterMethodTests.reporter_filter.cleanse_setting('TEST', 'TEST'), 'TEST')
+        self.assertEqual(
+            ExceptionReporterFilterMethodTests.reporter_filter.cleanse_setting('PASSWORD', 'super_secret'),
+            ExceptionReporterFilterMethodTests.reporter_filter.CLEANSED_SUBSTITUTE
+        )
 
     def test_cleanse_setting_ignore_case(self):
-        self.assertEqual(cleanse_setting('password', 'super_secret'), CLEANSED_SUBSTITUTE)
+        self.assertEqual(
+            ExceptionReporterFilterMethodTests.reporter_filter.cleanse_setting('password', 'super_secret'),
+            ExceptionReporterFilterMethodTests.reporter_filter.CLEANSED_SUBSTITUTE
+        )
 
     def test_cleanse_setting_recurses_in_dictionary(self):
         initial = {'login': 'cooper', 'password': 'secret'}
-        expected = {'login': 'cooper', 'password': CLEANSED_SUBSTITUTE}
-        self.assertEqual(cleanse_setting('SETTING_NAME', initial), expected)
+        expected = {
+            'login': 'cooper', 'password': ExceptionReporterFilterMethodTests.reporter_filter.CLEANSED_SUBSTITUTE
+        }
+        self.assertEqual(
+            ExceptionReporterFilterMethodTests.reporter_filter.cleanse_setting('SETTING_NAME', initial),
+            expected
+        )
