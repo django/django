@@ -278,6 +278,8 @@ class HttpDateProcessingTests(unittest.TestCase):
         dates = (
             ('Tuesday, 31-Dec-%s 08:49:37 GMT' % (year + 50), datetime(2000 + year + 50, 12, 31, 8, 49, 37)),
             ('Monday, 10-Nov-%s 18:49:37 GMT' % (year + 52), datetime(1900 + year + 52, 11, 10, 18, 49, 37)),
+            # 31-Dec-18 will be interpreted as 2118 around the year 2068.
+            ('Wednesday, 31-Dec-%s 18:49:37 GMT' % (year + 51), datetime(1900 + year + 51, 12, 31, 18, 49, 37)),
         )
         for rfc850str, rfc850date in dates:
             with self.subTest(string=rfc850str):

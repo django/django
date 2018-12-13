@@ -163,7 +163,9 @@ def parse_http_date(date):
     try:
         year = int(m.group('year'))
         if year < 100:
-            if year < 70:
+            current_year = datetime.date.today().year - 2000  # 2018 -> 18
+            # parsing done in reference to current year as in RFC7231
+            if year <= current_year + 50:
                 year += 2000
             else:
                 year += 1900
