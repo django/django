@@ -29,6 +29,9 @@ details on these changes.
 * ``django.contrib.staticfiles.storage.CachedStaticFilesStorage`` will be
   removed.
 
+* ``RemoteUserBackend.configure_user()`` will require ``request`` as the first
+  positional argument.
+
 .. _deprecation-removed-in-3.0:
 
 3.0

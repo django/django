@@ -55,7 +55,8 @@ Minor features
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The ``HttpRequest`` is now passed as the first positional argument to
+  :meth:`.RemoteUserBackend.configure_user`, if it accepts it.
 
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -505,3 +506,7 @@ Miscellaneous
 * ``django.contrib.staticfiles.storage.CachedStaticFilesStorage`` is
   deprecated due to the intractable problems that is has. Use
   :class:`.ManifestStaticFilesStorage` or a third-party cloud storage instead.
+
+* :meth:`.RemoteUserBackend.configure_user` is now passed ``request`` as the
+  first positional argument, if it accepts it. Support for overrides that don't
+  accept it will be removed in Django 3.1.

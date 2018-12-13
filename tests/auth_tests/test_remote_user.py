@@ -15,6 +15,7 @@ class RemoteUserTest(TestCase):
     middleware = 'django.contrib.auth.middleware.RemoteUserMiddleware'
     backend = 'django.contrib.auth.backends.RemoteUserBackend'
     header = 'REMOTE_USER'
+    email_header = 'REMOTE_EMAIL'
 
     # Usernames to be passed in REMOTE_USER for the test_known_user test case.
     known_user = 'knownuser'
@@ -192,11 +193,11 @@ class CustomRemoteUserBackend(RemoteUserBackend):
         """
         return username.split('@')[0]
 
-    def configure_user(self, user):
+    def configure_user(self, request, user):
         """
-        Sets user's email address.
+        Sets user's email address using the email specified in an HTTP header.
         """
-        user.email = 'user@example.com'
+        user.email = request.META.get(RemoteUserTest.email_header, '')
         user.save()
         return user
 
@@ -224,9 +225,17 @@ class RemoteUserCustomTest(RemoteUserTest):
 
     def test_unknown_user(self):
         """
-        The unknown user created should be configured with an email address.
+        The unknown user created should be configured with an email address
+        provided in the request header.
         """
-        super().test_unknown_user()
+        num_users = User.objects.count()
+        response = self.client.get('/remote_user/', **{
+            self.header: 'newuser',
+            self.email_header: 'user@example.com',
+        })
+        self.assertEqual(response.context['user'].username, 'newuser')
+        self.assertEqual(response.context['user'].email, 'user@example.com')
+        self.assertEqual(User.objects.count(), num_users + 1)
         newuser = User.objects.get(username='newuser')
         self.assertEqual(newuser.email, 'user@example.com')
 
