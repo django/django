@@ -271,7 +271,7 @@ class MigrationExecutor:
         if migration.replaces:
             for app_label, name in migration.replaces:
                 self.recorder.record_unapplied(app_label, name)
-            # Now this squash migration himself can reocord_unapplied, 
+            # Now this squash migration himself can reocord_unapplied,
             # therefore migrations will be in consistent state
             self.recorder.record_unapplied(migration.app_label, migration.name)
         else:
