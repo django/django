@@ -265,6 +265,11 @@ Tests
 * The new :setting:`ORACLE_MANAGED_FILES <TEST_ORACLE_MANAGED_FILES>` test
   database setting allows using Oracle Managed Files (OMF) tablespaces.
 
+* Deferrable database constraints are now checked at the end of each
+  :class:`~django.test.TestCase` test on SQLite 3.20+ as well. These checks
+  were previously skipped on SQLite because they required expensive table
+  introspection before version 3.20 introduced native support.
+
 URLs
 ~~~~
 
