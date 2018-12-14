@@ -357,8 +357,8 @@ of this in a bit.
 :func:`~django.urls.path` argument: ``kwargs``
 ----------------------------------------------
 
-Arbitrary keyword arguments can be passed in a dictionary to the target view. We
-aren't going to use this feature of Django in the tutorial.
+Arbitrary keyword arguments can be passed in a dictionary to the target view. Keyword
+arguments can be seen in the 'polls' directory: name='index'.
 
 :func:`~django.urls.path` argument: ``name``
 --------------------------------------------
