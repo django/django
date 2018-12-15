@@ -524,13 +524,13 @@ input[type=button][disabled].default {
     text-align: left;
     background: #79aec8;
     color: #fff;
+    text-transform: uppercase;
 }
 
 .module caption,
 .inline-group h2 {
     font-size: 12px;
     letter-spacing: 0.5px;
-    text-transform: uppercase;
 }
 
 .module table {
