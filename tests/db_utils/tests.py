@@ -21,6 +21,27 @@ class ConnectionHandlerTests(SimpleTestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             conns[DEFAULT_DB_ALIAS].ensure_connection()
 
+    def test_connection_handler_empty_default_database(self):
+        """Empty default database setting defaults to the dummy backend."""
+        DATABASES = {DEFAULT_DB_ALIAS: {}}
+        conns = ConnectionHandler(DATABASES)
+        self.assertEqual(conns[DEFAULT_DB_ALIAS].settings_dict['ENGINE'], 'django.db.backends.dummy')
+        msg = (
+            'settings.DATABASES is improperly configured. Please supply the '
+            'ENGINE value. Check settings documentation for more details.'
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            conns[DEFAULT_DB_ALIAS].ensure_connection()
+
+    def test_connection_handler_no_default_database(self):
+        """Working with a non-default db when no default one was set raises an appropriate error."""
+        otherdb = 'otherdb'
+        DATABASES = {otherdb: {}}
+        conns = ConnectionHandler(DATABASES)
+        msg = "You must define a '%s' database" % DEFAULT_DB_ALIAS
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            conns[otherdb].ensure_connection()
+
 
 class DatabaseErrorWrapperTests(TestCase):
 
