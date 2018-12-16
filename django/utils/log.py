@@ -1,5 +1,6 @@
 import logging
 import logging.config  # needed when logging_config doesn't start with logging.config
+import logging.handlers
 from copy import copy
 
 from django.conf import settings
@@ -71,9 +72,44 @@ def configure_logging(logging_config, logging_settings):
 
         logging.config.dictConfig(DEFAULT_LOGGING)
 
+        for handler_name, handler_info in logging_settings.get('handlers', {}).items():
+            if 'logging.handlers.SocketHandler' == handler_info.get('class', ''):
+                handler_info['class'] = 'django.utils.log.PicklableRequestSocketHandler'
+
         # ... then invoke it with the logging settings
         if logging_settings:
             logging_config_func(logging_settings)
+
+
+class PicklableRequestSocketHandler(logging.handlers.SocketHandler):
+    """A log handler that except the information that cannot be pickled from the request
+
+    Since the logging.handlers.SocketHandler allows picklable data,
+    if the request is passed as the instance variable of the log record,
+    only picklable data will be extracted and be pickled.
+    """
+
+    picklable_keys = ['COOKIES', 'POST', 'GET', 'user', 'path', 'content_type', 'method', 'path_info']
+
+    def _make_picklable_request_dict(self, request):
+        picklable_request_dict = {}
+        picklable_request_dict['META'] = {
+            k: request.META[k]
+            for k, v in request.META.items() if isinstance(v, (int, str, bool))
+        }
+        for k in self.picklable_keys:
+            picklable_request_dict[k] =getattr(request, k, None)
+        return picklable_request_dict
+
+    def emit(self, record):
+        try:
+            request = getattr(record, 'request', None)
+            if request:
+                picklable_request_dict = self._make_picklable_request_dict(request)
+                record.request = picklable_request_dict
+            super().emit(record)
+        except Exception:
+            self.handleError(record)
 
 
 class AdminEmailHandler(logging.Handler):
@@ -140,6 +176,7 @@ class CallbackFilter(logging.Filter):
     takes the record-to-be-logged as its only parameter) to decide whether to
     log a record.
     """
+
     def __init__(self, callback):
         self.callback = callback
 
