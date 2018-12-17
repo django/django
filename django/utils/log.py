@@ -66,15 +66,22 @@ DEFAULT_LOGGING = {
 
 
 def configure_logging(logging_config, logging_settings):
+    def _replace_socket_handler(settings):
+        SOCKET_HANDLER = 'logging.handlers.SocketHandler'
+        PICKLABLE_SOCKET_HANDLER = 'django.utils.log.PicklableRequestSocketHandler'
+
+        if logging_config == 'logging.config.dictConfig':
+            for handler_name, handler_info in settings.get('handlers', {}).items():
+                if SOCKET_HANDLER == handler_info.get('class', ''):
+                    handler_info['class'] = PICKLABLE_SOCKET_HANDLER
+        elif logging_config == 'logging.config.fileConfig':
+            settings = settings.replace(SOCKET_HANDLER, PICKLABLE_SOCKET_HANDLER)
+        return settings
+
     if logging_config:
         # First find the logging configuration function ...
         logging_config_func = import_string(logging_config)
-
-        logging.config.dictConfig(DEFAULT_LOGGING)
-
-        for handler_name, handler_info in logging_settings.get('handlers', {}).items():
-            if 'logging.handlers.SocketHandler' == handler_info.get('class', ''):
-                handler_info['class'] = 'django.utils.log.PicklableRequestSocketHandler'
+        logging_settings = _replace_socket_handler(logging_settings)
 
         # ... then invoke it with the logging settings
         if logging_settings:
