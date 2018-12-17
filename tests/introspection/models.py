@@ -41,15 +41,15 @@ class Article(models.Model):
     response_to = models.ForeignKey('self', models.SET_NULL, null=True)
     unmanaged_reporters = models.ManyToManyField(Reporter, through='ArticleReporter', related_name='+')
 
-    def __str__(self):
-        return self.headline
-
     class Meta:
         ordering = ('headline',)
         index_together = [
             ["headline", "pub_date"],
             ['headline', 'response_to', 'pub_date', 'reporter'],
         ]
+
+    def __str__(self):
+        return self.headline
 
 
 class ArticleReporter(models.Model):

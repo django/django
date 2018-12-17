@@ -23,6 +23,9 @@ class OracleGeometryColumns(models.Model):
         db_table = 'USER_SDO_GEOM_METADATA'
         managed = False
 
+    def __str__(self):
+        return '%s - %s (SRID: %s)' % (self.table_name, self.column_name, self.srid)
+
     @classmethod
     def table_name_col(cls):
         """
@@ -38,9 +41,6 @@ class OracleGeometryColumns(models.Model):
         geometry column.
         """
         return 'column_name'
-
-    def __str__(self):
-        return '%s - %s (SRID: %s)' % (self.table_name, self.column_name, self.srid)
 
 
 class OracleSpatialRefSys(models.Model, SpatialRefSysMixin):
