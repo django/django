@@ -278,12 +278,12 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         not in the SRID of the field. Specifically, this routine will
         substitute in the ST_Transform() function call.
         """
-        tranform_func = self.spatial_function_name('Transform')
+        transform_func = self.spatial_function_name('Transform')
         if hasattr(value, 'as_sql'):
             if value.field.srid == f.srid:
                 placeholder = '%s'
             else:
-                placeholder = '%s(%%s, %s)' % (tranform_func, f.srid)
+                placeholder = '%s(%%s, %s)' % (transform_func, f.srid)
             return placeholder
 
         # Get the srid for this object
@@ -297,7 +297,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         if value_srid is None or value_srid == f.srid:
             placeholder = '%s'
         else:
-            placeholder = '%s(%%s, %s)' % (tranform_func, f.srid)
+            placeholder = '%s(%%s, %s)' % (transform_func, f.srid)
 
         return placeholder
 
