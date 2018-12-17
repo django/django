@@ -98,7 +98,7 @@ class PicklableRequestSocketHandler(logging.handlers.SocketHandler):
             for k, v in request.META.items() if isinstance(v, (int, str, bool))
         }
         for k in self.picklable_keys:
-            picklable_request_dict[k] =getattr(request, k, None)
+            picklable_request_dict[k] = getattr(request, k, None)
         return picklable_request_dict
 
     def emit(self, record):
