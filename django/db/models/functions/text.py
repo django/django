@@ -1,5 +1,7 @@
-from django.db.models import Func, IntegerField, Transform, Value
+from django.db.models.expressions import Func, Value
+from django.db.models.fields import IntegerField
 from django.db.models.functions import Coalesce
+from django.db.models.lookups import Transform
 
 
 class BytesToCharFieldConversionMixin:

@@ -1,12 +1,12 @@
 from datetime import datetime
 
 from django.conf import settings
-from django.db.models import (
-    DateField, DateTimeField, DurationField, Field, Func, IntegerField,
-    TimeField, Transform,
+from django.db.models.expressions import Func
+from django.db.models.fields import (
+    DateField, DateTimeField, DurationField, Field, IntegerField, TimeField,
 )
 from django.db.models.lookups import (
-    YearExact, YearGt, YearGte, YearLt, YearLte,
+    Transform, YearExact, YearGt, YearGte, YearLt, YearLte,
 )
 from django.utils import timezone
 

@@ -1,5 +1,5 @@
 """Database functions that do comparisons or type conversions."""
-from django.db.models import Func
+from django.db.models.expressions import Func
 
 
 class Cast(Func):
