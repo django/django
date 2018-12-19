@@ -1130,7 +1130,7 @@ class AggregationTests(TestCase):
 
         self.assertEqual(
             Book.objects.aggregate(StdDev('price')),
-            {'price__stddev': Approximate(24.16, 2)}
+            {'price__stddev': Approximate(Decimal('24.16'), 2)}
         )
 
         self.assertEqual(
@@ -1145,7 +1145,7 @@ class AggregationTests(TestCase):
 
         self.assertEqual(
             Book.objects.aggregate(StdDev('price', sample=True)),
-            {'price__stddev': Approximate(26.46, 1)}
+            {'price__stddev': Approximate(Decimal('26.46'), 1)}
         )
 
         self.assertEqual(

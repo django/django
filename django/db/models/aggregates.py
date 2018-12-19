@@ -141,9 +141,8 @@ class Min(Aggregate):
     name = 'Min'
 
 
-class StdDev(Aggregate):
+class StdDev(NumericOutputFieldMixin, Aggregate):
     name = 'StdDev'
-    output_field = FloatField()
 
     def __init__(self, expression, sample=False, **extra):
         self.function = 'STDDEV_SAMP' if sample else 'STDDEV_POP'

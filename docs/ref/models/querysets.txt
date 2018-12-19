@@ -3387,12 +3387,13 @@ by the aggregate.
 ``StdDev``
 ~~~~~~~~~~
 
-.. class:: StdDev(expression, sample=False, filter=None, **extra)
+.. class:: StdDev(expression, output_field=None, sample=False, filter=None, **extra)
 
     Returns the standard deviation of the data in the provided expression.
 
     * Default alias: ``<field>__stddev``
-    * Return type: ``float``
+    * Return type: ``float`` if input is ``int``, otherwise same as input
+      field, or ``output_field`` if supplied
 
     Has one optional argument:
 
