@@ -1116,7 +1116,6 @@ class AggregationTests(TestCase):
             lambda b: (b.name, b.authorCount)
         )
 
-    @skipUnlessDBFeature('supports_stddev')
     def test_stddev(self):
         self.assertEqual(
             Book.objects.aggregate(StdDev('pages')),

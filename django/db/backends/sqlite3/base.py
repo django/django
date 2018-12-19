@@ -7,6 +7,7 @@ import functools
 import math
 import operator
 import re
+import statistics
 import warnings
 from itertools import chain
 from sqlite3 import dbapi2 as Database
@@ -47,6 +48,14 @@ def none_guard(func):
     def wrapper(*args, **kwargs):
         return None if None in args else func(*args, **kwargs)
     return wrapper
+
+
+def list_aggregate(function):
+    """
+    Return an aggregate class that accumulates values in a list and applies
+    the provided function to the data.
+    """
+    return type('ListAggregate', (list,), {'finalize': function, 'step': list.append})
 
 
 Database.register_converter("bool", b'1'.__eq__)
@@ -210,6 +219,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function('SIN', 1, none_guard(math.sin))
         conn.create_function('SQRT', 1, none_guard(math.sqrt))
         conn.create_function('TAN', 1, none_guard(math.tan))
+        conn.create_aggregate('STDDEV_POP', 1, list_aggregate(statistics.pstdev))
+        conn.create_aggregate('STDDEV_SAMP', 1, list_aggregate(statistics.stdev))
+        conn.create_aggregate('VAR_POP', 1, list_aggregate(statistics.pvariance))
+        conn.create_aggregate('VAR_SAMP', 1, list_aggregate(statistics.variance))
         conn.execute('PRAGMA foreign_keys = ON')
         return conn
 

@@ -340,7 +340,6 @@ class BackendTestCase(TransactionTestCase):
 
     def test_cached_db_features(self):
         self.assertIn(connection.features.supports_transactions, (True, False))
-        self.assertIn(connection.features.supports_stddev, (True, False))
         self.assertIn(connection.features.can_introspect_foreign_keys, (True, False))
 
     def test_duplicate_table_error(self):

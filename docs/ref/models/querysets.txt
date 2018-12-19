@@ -3400,12 +3400,9 @@ by the aggregate.
         By default, ``StdDev`` returns the population standard deviation. However,
         if ``sample=True``, the return value will be the sample standard deviation.
 
-    .. admonition:: SQLite
+    .. versionchanged:: 2.2
 
-        SQLite doesn't provide ``StdDev`` out of the box. An implementation
-        is available as an extension module for SQLite. Consult the `SQLite
-        documentation`_ for instructions on obtaining and installing this
-        extension.
+        SQLite support was added.
 
 ``Sum``
 ~~~~~~~
@@ -3434,14 +3431,9 @@ by the aggregate.
         By default, ``Variance`` returns the population variance. However,
         if ``sample=True``, the return value will be the sample variance.
 
-    .. admonition:: SQLite
+    .. versionchanged:: 2.2
 
-        SQLite doesn't provide ``Variance`` out of the box. An implementation
-        is available as an extension module for SQLite. Consult the `SQLite
-        documentation`_ for instructions on obtaining and installing this
-        extension.
-
-.. _SQLite documentation: https://www.sqlite.org/contrib
+        SQLite support was added.
 
 Query-related tools
 ===================

@@ -235,6 +235,9 @@ Models
   ``Model.delete()``. This improves the performance of autocommit by reducing
   the number of database round trips.
 
+* Added SQLite support for the :class:`~django.db.models.StdDev` and
+  :class:`~django.db.models.Variance` functions.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
