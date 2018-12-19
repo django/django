@@ -180,6 +180,9 @@ class Settings:
             os.environ['TZ'] = self.TIME_ZONE
             time.tzset()
 
+    def __dir__(self):
+        return list(self.__dict__)
+
     def is_overridden(self, setting):
         return setting in self._explicit_settings
 
