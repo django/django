@@ -1160,7 +1160,7 @@ class AggregationTests(TestCase):
 
         self.assertEqual(
             Book.objects.aggregate(Variance('price')),
-            {'price__variance': Approximate(583.77, 1)}
+            {'price__variance': Approximate(Decimal('583.77'), 1)}
         )
 
         self.assertEqual(
@@ -1175,7 +1175,7 @@ class AggregationTests(TestCase):
 
         self.assertEqual(
             Book.objects.aggregate(Variance('price', sample=True)),
-            {'price__variance': Approximate(700.53, 2)}
+            {'price__variance': Approximate(Decimal('700.53'), 2)}
         )
 
     def test_filtering_by_annotation_name(self):

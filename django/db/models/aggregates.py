@@ -3,7 +3,7 @@ Classes to represent the definitions of aggregate functions.
 """
 from django.core.exceptions import FieldError
 from django.db.models.expressions import Case, Func, Star, When
-from django.db.models.fields import FloatField, IntegerField
+from django.db.models.fields import IntegerField
 from django.db.models.functions.mixins import NumericOutputFieldMixin
 
 __all__ = [
@@ -172,9 +172,8 @@ class Sum(Aggregate):
         return super().as_sql(compiler, connection, **extra_context)
 
 
-class Variance(Aggregate):
+class Variance(NumericOutputFieldMixin, Aggregate):
     name = 'Variance'
-    output_field = FloatField()
 
     def __init__(self, expression, sample=False, **extra):
         self.function = 'VAR_SAMP' if sample else 'VAR_POP'

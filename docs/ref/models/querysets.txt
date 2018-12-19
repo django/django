@@ -3419,12 +3419,13 @@ by the aggregate.
 ``Variance``
 ~~~~~~~~~~~~
 
-.. class:: Variance(expression, sample=False, filter=None, **extra)
+.. class:: Variance(expression, output_field=None, sample=False, filter=None, **extra)
 
     Returns the variance of the data in the provided expression.
 
     * Default alias: ``<field>__variance``
-    * Return type: ``float``
+    * Return type: ``float`` if input is ``int``, otherwise same as input
+      field, or ``output_field`` if supplied
 
     Has one optional argument:
 

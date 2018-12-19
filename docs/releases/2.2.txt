@@ -493,9 +493,9 @@ Miscellaneous
 
 * :djadmin:`runserver` no longer supports `pyinotify` (replaced by Watchman).
 
-* The :class:`~django.db.models.Avg` and :class:`~django.db.models.StdDev`
-  aggregate functions now return a ``Decimal`` instead of a ``float`` when the
-  input is ``Decimal``.
+* The :class:`~django.db.models.Avg`, :class:`~django.db.models.StdDev`, and
+  :class:`~django.db.models.Variance` aggregate functions now return a
+  ``Decimal`` instead of a ``float`` when the input is ``Decimal``.
 
 .. _deprecated-features-2.2:
 
