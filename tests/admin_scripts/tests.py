@@ -106,6 +106,25 @@ class AdminScriptTestCase(SimpleTestCase):
         if os.path.isdir(cache_name):
             shutil.rmtree(cache_name)
 
+    def write_configured_settings(self, extra='', args=''):
+        template = os.path.join(
+            os.path.dirname(__file__), 'configured_settings_manage.py-tpl')
+        destination = os.path.join(
+            os.path.dirname(__file__), 'configured_settings_manage.py')
+        shutil.copyfile(template, destination)
+
+        with open(destination, 'r') as fp:
+            contents = fp.read()
+        contents = contents.replace('{{ extra }}', extra)
+        contents = contents.replace('{{ args }}', args)
+        with open(destination, 'w') as fp:
+            fp.write(contents)
+
+    def remove_configured_settings(self):
+        path = os.path.join(
+            os.path.dirname(__file__), 'configured_settings_manage.py')
+        os.remove(path)
+
     def _ext_backend_paths(self):
         """
         Returns the paths for any external backend packages.
@@ -166,20 +185,26 @@ class AdminScriptTestCase(SimpleTestCase):
             except OSError:
                 pass
 
+        configured_settings_file = os.path.join(
+            os.path.dirname(__file__), 'configured_settings_manage.py')
+        conf_dir = os.path.dirname(conf.__file__)
+        if configured_settings and not os.path.isfile(configured_settings_file):
+            self.write_configured_settings()
+            self.addCleanup(self.remove_configured_settings)
         template_manage_py = (
-            os.path.join(os.path.dirname(__file__), 'configured_settings_manage.py')
-            if configured_settings else
-            os.path.join(os.path.dirname(conf.__file__), 'project_template', 'manage.py-tpl')
+            configured_settings_file if configured_settings else
+            os.path.join(conf_dir, 'project_template', 'manage.py-tpl')
         )
         test_manage_py = os.path.join(self.test_dir, 'manage.py')
         shutil.copyfile(template_manage_py, test_manage_py)
 
-        with open(test_manage_py, 'r') as fp:
-            manage_py_contents = fp.read()
-        manage_py_contents = manage_py_contents.replace(
-            "{{ project_name }}", "test_project")
-        with open(test_manage_py, 'w') as fp:
-            fp.write(manage_py_contents)
+        if not configured_settings:
+            with open(test_manage_py, 'r') as fp:
+                manage_py_contents = fp.read()
+            manage_py_contents = manage_py_contents.replace(
+                "{{ project_name }}", "test_project")
+            with open(test_manage_py, 'w') as fp:
+                fp.write(manage_py_contents)
         self.addCleanup(safe_remove, test_manage_py)
 
         return self.run_test('./manage.py', args, settings_file)
@@ -2234,11 +2259,28 @@ class DiffSettings(AdminScriptTestCase):
         self.assertOutput(out, "FOO = 'bar'  ###")
 
     def test_settings_configured(self):
+        self.write_configured_settings(args='DEBUG=True')
+        self.addCleanup(self.remove_configured_settings)
         out, err = self.run_manage(['diffsettings'], configured_settings=True)
         self.assertNoOutput(err)
         self.assertOutput(out, 'DEBUG = True')
 
     def test_dynamic_settings_configured(self):
+        self.write_configured_settings(
+            extra='''class Settings:
+    def __init__(self):
+        from django.conf import global_settings
+        self.default_settings = global_settings
+
+    def __getattr__(self, name):
+        if name == 'FOO':
+            return 'bar'
+        return getattr(self.default_settings, name)
+
+    def __dir__(self):
+        return super().__dir__() + dir(self.default_settings) + ['FOO']''',
+            args='Settings()')
+        self.addCleanup(self.remove_configured_settings)
         out, err = self.run_manage(['diffsettings'], configured_settings=True)
         self.assertNoOutput(err)
         self.assertOutput(out, "FOO = 'bar'  ###")
