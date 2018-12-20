@@ -83,11 +83,10 @@ class ServerHandler(simple_server.ServerHandler):
 
     def __init__(self, stdin, stdout, stderr, environ, **kwargs):
         """
-        Setup a limited stream, so we can discard unread request data
-        at the end of the request. Django already uses `LimitedStream`
-        in `WSGIRequest` but it shouldn't discard the data since the
-        upstream servers usually do this. Hence we fix this only for
-        our testserver/runserver.
+        Use a LimitedStream so that unread request data will be ignored at
+        the end of the request. WSGIRequest uses a LimitedStream but it
+        shouldn't discard the data since the upstream servers usually do this.
+        This fix applies only for testserver/runserver.
         """
         try:
             content_length = int(environ.get('CONTENT_LENGTH'))
@@ -97,13 +96,13 @@ class ServerHandler(simple_server.ServerHandler):
 
     def cleanup_headers(self):
         super().cleanup_headers()
-        # HTTP/1.1 requires us to support persistent connections, so
-        # explicitly send close if we do not know the content length to
-        # prevent clients from reusing the connection.
+        # HTTP/1.1 requires support for persistent connections. Send 'close' if
+        # the content length is unknown to prevent clients from reusing the
+        # connection.
         if 'Content-Length' not in self.headers:
             self.headers['Connection'] = 'close'
-        # Mark the connection for closing if we set it as such above or
-        # if the application sent the header.
+        # Mark the connection for closing if it's set as such above or if the
+        # application sent the header.
         if self.headers.get('Connection') == 'close':
             self.request_handler.close_connection = True
 
