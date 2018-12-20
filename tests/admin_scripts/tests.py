@@ -2238,6 +2238,11 @@ class DiffSettings(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertOutput(out, 'DEBUG = True')
 
+    def test_dynamic_settings_configured(self):
+        out, err = self.run_manage(['diffsettings'], configured_settings=True)
+        self.assertNoOutput(err)
+        self.assertOutput(out, "FOO = 'bar'  ###")
+
     def test_all(self):
         """The all option also shows settings with the default value."""
         self.write_settings('settings_to_diff.py', sdict={'STATIC_URL': 'None'})
