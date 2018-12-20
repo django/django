@@ -76,7 +76,7 @@ rather opaque. Even when it's your own code, you will sometimes find yourself
 poking around in it trying to find out what exactly it's doing.
 
 Tests change that; they light up your code from the inside, and when something
-goes wrong, they focus light on the part that has gone wrong - *even if you
+goes wrong, they focus right on the part that has gone wrong - *even if you
 hadn't even realized it had gone wrong*.
 
 Tests make your code more attractive
