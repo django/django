@@ -76,6 +76,7 @@ class Command(BaseCommand):
         use_natural_primary_keys = options['use_natural_primary_keys']
         use_base_manager = options['use_base_manager']
         pks = options['primary_keys']
+        ensure_ascii = options['ensure_ascii']
 
         if pks:
             primary_keys = [pk.strip() for pk in pks.split(',')]
@@ -183,7 +184,7 @@ class Command(BaseCommand):
                     use_natural_foreign_keys=use_natural_foreign_keys,
                     use_natural_primary_keys=use_natural_primary_keys,
                     stream=stream or self.stdout, progress_output=progress_output,
-                    object_count=object_count,
+                    object_count=object_count, ensure_ascii=ensure_ascii,
                 )
             finally:
                 if stream:
