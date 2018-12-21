@@ -273,9 +273,10 @@ Tests
   database setting allows using Oracle Managed Files (OMF) tablespaces.
 
 * Deferrable database constraints are now checked at the end of each
-  :class:`~django.test.TestCase` test on SQLite 3.20+ as well. These checks
-  were previously skipped on SQLite because they required expensive table
-  introspection before version 3.20 introduced native support.
+  :class:`~django.test.TestCase` test on SQLite 3.20+, just like on other
+  backends that support deferrable constraints. These checks aren't implemented
+  for older versions of SQLite because they would require expensive table
+  introspection there.
 
 URLs
 ~~~~
@@ -447,6 +448,9 @@ Miscellaneous
 
 * :attr:`Group.name <django.contrib.auth.models.Group.name>` ``max_length``
   is increased from 80 to 150 characters.
+
+* Tests that violate deferrable database constraints now error when run on
+  SQLite 3.20+, just like on other backends that support such constraints.
 
 .. _deprecated-features-2.2:
 
