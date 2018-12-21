@@ -6,7 +6,9 @@ from django.db import connection, transaction
 from django.db.models import Avg, StdDev, Sum, Variance
 from django.db.models.fields import CharField
 from django.db.utils import NotSupportedError
-from django.test import TestCase, TransactionTestCase, override_settings
+from django.test import (
+    TestCase, TransactionTestCase, override_settings, skipIfDBFeature,
+)
 from django.test.utils import isolate_apps
 
 from ..models import Author, Item, Object, Square
@@ -112,6 +114,7 @@ class SchemaTests(TransactionTestCase):
             self.assertFalse(constraint_checks_enabled())
         self.assertTrue(constraint_checks_enabled())
 
+    @skipIfDBFeature('supports_atomic_references_rename')
     def test_field_rename_inside_atomic_block(self):
         """
         NotImplementedError is raised when a model field rename is attempted
@@ -129,6 +132,7 @@ class SchemaTests(TransactionTestCase):
             with connection.schema_editor(atomic=True) as editor:
                 editor.alter_field(Author, Author._meta.get_field('name'), new_field)
 
+    @skipIfDBFeature('supports_atomic_references_rename')
     def test_table_rename_inside_atomic_block(self):
         """
         NotImplementedError is raised when a table rename is attempted inside
