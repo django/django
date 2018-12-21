@@ -16,6 +16,7 @@ from django.test import TransactionTestCase, override_settings
 class ContentTypeOperationsTests(TransactionTestCase):
     available_apps = [
         'contenttypes_tests',
+        'django.contrib.auth',
         'django.contrib.contenttypes',
     ]
 
