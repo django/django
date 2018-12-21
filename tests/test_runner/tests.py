@@ -10,10 +10,7 @@ from django import db
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
-from django.core.management.base import SystemCheckError
-from django.test import (
-    TestCase, TransactionTestCase, skipUnlessDBFeature, testcases,
-)
+from django.test import TransactionTestCase, skipUnlessDBFeature, testcases
 from django.test.runner import DiscoverRunner
 from django.test.testcases import connections_support_transactions
 from django.test.utils import dependency_ordered
