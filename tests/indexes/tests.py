@@ -9,6 +9,7 @@ from django.db.models.query_utils import Q
 from django.test import (
     TestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
 )
+from django.test.utils import override_settings
 from django.utils import timezone
 
 from .models import (
@@ -237,8 +238,11 @@ class SchemaIndexesMySQLTests(TransactionTestCase):
 
 
 @skipUnlessDBFeature('supports_partial_indexes')
-class PartialIndexTests(TestCase):
+# SQLite doesn't support timezone-aware datetimes when USE_TZ is False.
+@override_settings(USE_TZ=True)
+class PartialIndexTests(TransactionTestCase):
     # Schema editor is used to create the index to test that it works.
+    available_apps = ['indexes']
 
     def test_partial_index(self):
         with connection.schema_editor() as editor:
@@ -263,6 +267,7 @@ class PartialIndexTests(TestCase):
             self.assertIn(index.name, connection.introspection.get_constraints(
                 cursor=connection.cursor(), table_name=Article._meta.db_table,
             ))
+            editor.remove_index(index=index, model=Article)
 
     def test_integer_restriction_partial(self):
         with connection.schema_editor() as editor:
@@ -279,6 +284,7 @@ class PartialIndexTests(TestCase):
             self.assertIn(index.name, connection.introspection.get_constraints(
                 cursor=connection.cursor(), table_name=Article._meta.db_table,
             ))
+            editor.remove_index(index=index, model=Article)
 
     def test_boolean_restriction_partial(self):
         with connection.schema_editor() as editor:
@@ -295,6 +301,7 @@ class PartialIndexTests(TestCase):
             self.assertIn(index.name, connection.introspection.get_constraints(
                 cursor=connection.cursor(), table_name=Article._meta.db_table,
             ))
+            editor.remove_index(index=index, model=Article)
 
     def test_multiple_conditions(self):
         with connection.schema_editor() as editor:
@@ -323,6 +330,7 @@ class PartialIndexTests(TestCase):
             self.assertIn(index.name, connection.introspection.get_constraints(
                 cursor=connection.cursor(), table_name=Article._meta.db_table,
             ))
+            editor.remove_index(index=index, model=Article)
 
     def test_is_null_condition(self):
         with connection.schema_editor() as editor:
@@ -339,3 +347,4 @@ class PartialIndexTests(TestCase):
             self.assertIn(index.name, connection.introspection.get_constraints(
                 cursor=connection.cursor(), table_name=Article._meta.db_table,
             ))
+            editor.remove_index(index=index, model=Article)
