@@ -285,7 +285,8 @@ Django 3.0, we're removing these APIs at this time.
 Miscellaneous
 -------------
 
-* ...
+* ``ContentType.__str__()`` now includes the model's ``app_label`` to
+  disambiguate model's with the same name in different apps.
 
 .. _deprecated-features-3.0:
 

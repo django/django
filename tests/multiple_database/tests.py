@@ -840,8 +840,8 @@ class QueryTestCase(TestCase):
 
         # Set a foreign key with an object from a different database
         msg = (
-            'Cannot assign "<ContentType: book>": the current database router '
-            'prevents this relation.'
+            'Cannot assign "<ContentType: multiple_database | book>": the '
+            'current database router prevents this relation.'
         )
         with self.assertRaisesMessage(ValueError, msg):
             review1.content_object = dive
