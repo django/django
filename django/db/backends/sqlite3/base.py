@@ -1,5 +1,5 @@
 """
-SQLite3 backend for the sqlite3 module in the standard library.
+SQLite backend for the sqlite3 module in the standard library.
 """
 import datetime
 import decimal

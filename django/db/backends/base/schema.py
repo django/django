@@ -300,7 +300,7 @@ class BaseDatabaseSchemaEditor:
         # Prevent using [] as params, in the case a literal '%' is used in the definition
         self.execute(sql, params or None)
 
-        # Add any field index and index_together's (deferred as SQLite3 _remake_table needs it)
+        # Add any field index and index_together's (deferred as SQLite _remake_table needs it)
         self.deferred_sql.extend(self._model_indexes_sql(model))
 
         # Make M2M tables

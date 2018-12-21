@@ -24,7 +24,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 'SQLite schema editor cannot be used while foreign key '
                 'constraint checks are enabled. Make sure to disable them '
                 'before entering a transaction.atomic() context because '
-                'SQLite3 does not support disabling them in the middle of '
+                'SQLite does not support disabling them in the middle of '
                 'a multi-statement transaction.'
             )
         return super().__enter__()
