@@ -199,6 +199,10 @@ class ContentTypesTests(TestCase):
         ct_fetched = ContentType.objects.get_for_id(ct.pk)
         self.assertIsNone(ct_fetched.model_class())
 
+    def test_str(self):
+        ct = ContentType.objects.get(app_label='contenttypes_tests', model='site')
+        self.assertEqual(str(ct), 'site')
+
 
 class TestRouter:
     def db_for_read(self, model, **hints):
