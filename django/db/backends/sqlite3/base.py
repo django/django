@@ -267,7 +267,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         determine if rows with invalid references were entered while constraint
         checks were off.
         """
-        if Database.sqlite_version_info >= (3, 20, 0):
+        if self.features.supports_pragma_foreign_key_check:
             with self.cursor() as cursor:
                 if table_names is None:
                     violations = self.cursor().execute('PRAGMA foreign_key_check').fetchall()

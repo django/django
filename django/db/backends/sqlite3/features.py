@@ -40,7 +40,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_parentheses_in_compound = False
     # Deferred constraint checks can be emulated on SQLite < 3.20 but not in a
     # reasonably performant way.
-    can_defer_constraint_checks = Database.sqlite_version_info >= (3, 20, 0)
+    supports_pragma_foreign_key_check = Database.sqlite_version_info >= (3, 20, 0)
+    can_defer_constraint_checks = supports_pragma_foreign_key_check
 
     @cached_property
     def supports_stddev(self):
