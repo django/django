@@ -58,6 +58,11 @@ def subclass_exception(name, bases, module, attached_to):
     })
 
 
+def _has_contribute_to_class(value):
+    # Only call contribute_to_class() if it's bound.
+    return not inspect.isclass(value) and hasattr(value, 'contribute_to_class')
+
+
 class ModelBase(type):
     """Metaclass for all models."""
     def __new__(cls, name, bases, attrs, **kwargs):
@@ -75,8 +80,15 @@ class ModelBase(type):
         classcell = attrs.pop('__classcell__', None)
         if classcell is not None:
             new_attrs['__classcell__'] = classcell
-        new_class = super_new(cls, name, bases, new_attrs, **kwargs)
         attr_meta = attrs.pop('Meta', None)
+        # Pass all attrs without a (Django-specific) contribute_to_class()
+        # method to type.__new__() so that they're properly initialized
+        # (i.e. __set_name__()).
+        for obj_name, obj in list(attrs.items()):
+            if not _has_contribute_to_class(obj):
+                new_attrs[obj_name] = attrs.pop(obj_name)
+        new_class = super_new(cls, name, bases, new_attrs, **kwargs)
+
         abstract = getattr(attr_meta, 'abstract', False)
         meta = attr_meta or getattr(new_class, 'Meta', None)
         base_meta = getattr(new_class, '_meta', None)
@@ -300,8 +312,7 @@ class ModelBase(type):
         return new_class
 
     def add_to_class(cls, name, value):
-        # We should call the contribute_to_class method only if it's bound
-        if not inspect.isclass(value) and hasattr(value, 'contribute_to_class'):
+        if _has_contribute_to_class(value):
             value.contribute_to_class(cls, name)
         else:
             setattr(cls, name, value)
