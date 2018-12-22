@@ -159,6 +159,27 @@ class DatabaseOperations(BaseDatabaseOperations):
         return -1
 
     def sql_flush(self, style, tables, sequences, allow_cascade=False):
+        if tables and allow_cascade:
+            # Simulate TRUNCATE CASCADE by recursively collecting the tables
+            # referencing the tables to be flushed.
+            query = """
+            WITH tables AS (
+                %s
+                UNION
+                SELECT sqlite_master.name
+                FROM sqlite_master
+                JOIN tables ON (
+                    sql REGEXP %%s || tables.name || %%s
+                )
+            ) SELECT name FROM tables;
+            """ % ' UNION '.join("SELECT '%s' name" % table for table in tables)
+            params = (
+                r'(?i)\s+references\s+("|\')?',
+                r'("|\')?\s*\(',
+            )
+            with self.connection.cursor() as cursor:
+                results = cursor.execute(query, params)
+                tables = [row[0] for row in results.fetchall()]
         sql = ['%s %s %s;' % (
             style.SQL_KEYWORD('DELETE'),
             style.SQL_KEYWORD('FROM'),
@@ -167,12 +188,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         # Note: No requirement for reset of auto-incremented indices (cf. other
         # sql_flush() implementations). Just return SQL at this point
         return sql
-
-    def execute_sql_flush(self, using, sql_list):
-        # To prevent possible violation of foreign key constraints, deactivate
-        # constraints outside of the transaction created in super().
-        with self.connection.constraint_checks_disabled():
-            super().execute_sql_flush(using, sql_list)
 
     def adapt_datetimefield_value(self, value):
         if value is None:
