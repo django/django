@@ -455,13 +455,8 @@ class BackendTestCase(TransactionTestCase):
             connection.init_connection_state()
 
 
-# We don't make these tests conditional because that means we would need to
-# check and differentiate between:
-# * MySQL+InnoDB, MySQL+MYISAM (something we currently can't do).
-# * if sqlite3 (if/once we get #14204 fixed) has referential integrity turned
-#   on or not, something that would be controlled by runtime support and user
-#   preference.
-# verify if its type is django.database.db.IntegrityError.
+# These tests aren't conditional because it would require differentiating
+# between MySQL+InnoDB and MySQL+MYISAM (something we currently can't do).
 class FkConstraintsTests(TransactionTestCase):
 
     available_apps = ['backends']
