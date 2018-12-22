@@ -931,7 +931,14 @@ class BaseDatabaseSchemaEditor:
             using=using,
             columns=self._index_columns(table, columns, col_suffixes, opclasses),
             extra=tablespace_sql,
-            condition=condition,
+            condition=(' WHERE ' + condition) if condition else '',
+        )
+
+    def _delete_index_sql(self, model, name):
+        return Statement(
+            self.sql_delete_index,
+            table=Table(model._meta.db_table, self.quote_name),
+            name=self.quote_name(name),
         )
 
     def _index_columns(self, table, columns, col_suffixes, opclasses):
