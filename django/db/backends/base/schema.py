@@ -287,7 +287,7 @@ class BaseDatabaseSchemaEditor:
         for fields in model._meta.unique_together:
             columns = [model._meta.get_field(field).column for field in fields]
             self.deferred_sql.append(self._create_unique_sql(model, columns))
-        constraints = [check.full_constraint_sql(model, self) for check in model._meta.constraints]
+        constraints = [check.constraint_sql(model, self) for check in model._meta.constraints]
         # Make the table
         sql = self.sql_create_table % {
             "table": self.quote_name(model._meta.db_table),
@@ -746,18 +746,8 @@ class BaseDatabaseSchemaEditor:
                     self.execute(self._create_fk_sql(rel.related_model, rel.field, "_fk"))
         # Does it have check constraints we need to add?
         if old_db_params['check'] != new_db_params['check'] and new_db_params['check']:
-            constraint = self.sql_constraint % {
-                'name': self.quote_name(
-                    self._create_index_name(model._meta.db_table, [new_field.column], suffix='_check'),
-                ),
-                'constraint': self.sql_check_constraint % new_db_params,
-            }
-            self.execute(
-                self.sql_create_constraint % {
-                    'table': self.quote_name(model._meta.db_table),
-                    'constraint': constraint,
-                }
-            )
+            constraint_name = self._create_index_name(model._meta.db_table, [new_field.column], suffix='_check')
+            self.execute(self._create_check_sql(model, constraint_name, new_db_params['check']))
         # Drop the default if we need to
         # (Django usually does not use in-database defaults)
         if needs_database_default:
@@ -1021,6 +1011,16 @@ class BaseDatabaseSchemaEditor:
         )
         return self._create_constraint_sql(table, name, constraint)
 
+    def _unique_sql(self, fields, name):
+        constraint = self.sql_unique_constraint % {
+            'columns': ', '.join(map(self.quote_name, fields)),
+        }
+
+        return self.sql_constraint % {
+            'name': self.quote_name(name),
+            'constraint': constraint,
+        }
+
     def _create_unique_sql(self, model, columns, name=None):
         def create_unique_name(*args, **kwargs):
             return self.quote_name(self._create_index_name(*args, **kwargs))
@@ -1042,6 +1042,24 @@ class BaseDatabaseSchemaEditor:
             )
         constraint = Statement(self.sql_unique_constraint, columns=columns)
         return self._create_constraint_sql(table, name, constraint)
+
+    def _delete_unique_sql(self, model, name):
+        return self._delete_constraint_sql(self.sql_delete_unique, model, name)
+
+    def _check_sql(self, name, check):
+        return self.sql_constraint % {
+            'name': self.quote_name(name),
+            'constraint': self.sql_check_constraint % {'check': check},
+        }
+
+    def _create_check_sql(self, model, name, check):
+        return Statement(self.sql_create_constraint,
+            table=Table(model._meta.db_table, self.quote_name),
+            constraint=self._check_sql(name, check),
+        )
+
+    def _delete_check_sql(self, model, name):
+        return self._delete_constraint_sql(self.sql_delete_constraint, model, name)
 
     def _delete_constraint_sql(self, template, model, name):
         return template % {
