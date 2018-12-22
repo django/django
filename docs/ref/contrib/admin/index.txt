@@ -973,7 +973,8 @@ subclass::
       instead of listing all users.
 
       Or you can filter out objects with an empty (or non-empty) field value
-      using ``EmptyFieldListFilter``::
+      using ``EmptyFieldListFilter`` with the filter adapting the notion of
+      emptiness according to the field's attributes::
 
           class BookAdmin(admin.ModelAdmin):
               list_filter = (

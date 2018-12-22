@@ -424,24 +424,30 @@ class RelatedOnlyFieldListFilter(RelatedFieldListFilter):
 
 class EmptyFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
-        self.lookup_kwarg = '%s__empty' % field_path
+        self.lookup_kwarg = '%s__isempty' % field_path
         self.lookup_val = params.get(self.lookup_kwarg)
         super().__init__(field, request, params, model, model_admin, field_path)
 
     def queryset(self, request, queryset):
-        if not self.used_parameters or self.lookup_kwarg not in self.used_parameters:
+        if self.lookup_kwarg not in self.used_parameters:
             return queryset
 
-        del (self.used_parameters[self.lookup_kwarg])
-        empty = True if self.lookup_val == '1' else False
+        if self.lookup_val not in ('0', '1'):
+            raise IncorrectLookupParameters(
+                'Incorrect lookup value %s provided for parameter %s'
+                % (self.lookup_val, self.lookup_kwarg)
+            )
 
-        if not self.field.empty_strings_allowed:
-            self.used_parameters['%s__isnull' % self.field_path] = empty
-            return super().queryset(request, queryset)
+        query_filter = {}
 
-        # Special case for fields allowing empty strings
-        lookup_condition = models.Q(**{'%s__isnull' % self.field_path: True}) | models.Q(**{self.field_path: ''})
-        if empty:
+        if self.field.empty_strings_allowed:
+            query_filter[self.field_path] = ''
+        if self.field.null:  # Allow null value
+            query_filter['%s__isnull' % self.field_path] = True
+
+        lookup_condition = models.Q(**query_filter, _connector=models.Q.OR)
+
+        if self.lookup_val == '1':
             return queryset.filter(lookup_condition)
         return queryset.exclude(lookup_condition)
 
@@ -454,12 +460,7 @@ class EmptyFieldListFilter(FieldListFilter):
                 ('1', _('Empty')),
                 ('0', _('Not empty'))):
             yield {
-                'selected':
-                    self.lookup_val == lookup,
-                'query_string':
-                    changelist.get_query_string({
-                        self.lookup_kwarg: lookup,
-                    }),
-                'display':
-                    title,
+                'selected': self.lookup_val == lookup,
+                'query_string': changelist.get_query_string({self.lookup_kwarg: lookup}),
+                'display': title,
             }
