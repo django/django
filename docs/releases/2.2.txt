@@ -336,6 +336,14 @@ backends.
   ``DatabaseIntrospection.get_constraints()`` returns must be normalized by
   ``identifier_converter()``.
 
+* Several ``SchemaEditor`` methods added:
+
+  * added ``_create_primary_key_sql`` and ``_delete_primary_key_sql``
+  * added ``_delete_index_sql`` (as pair to ``_create_index_sql``)
+  * added ``_delete_unique_sql`` (as pair to ``_create_unique_sql``)
+  * added ``_delete_fk_sql`` (as pair to ``_create_fk_sql``)
+  * added ``_create_check_sql`` and ``_delete_check_sql``
+
 Admin actions are no longer collected from base ``ModelAdmin`` classes
 ----------------------------------------------------------------------
 
