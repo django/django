@@ -422,7 +422,7 @@ class BaseDatabaseSchemaEditor:
         # Check constraints can go on the column SQL here
         db_params = field.db_parameters(connection=self.connection)
         if db_params['check']:
-            definition += " CHECK (%s)" % db_params['check']
+            definition += " " + self.sql_check_constraint % db_params['check']
         # Build the SQL and run it
         sql = self.sql_create_column % {
             "table": self.quote_name(model._meta.db_table),
