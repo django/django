@@ -240,14 +240,13 @@ class Ticket17477RegressionTests(AdminScriptTestCase):
         self.assertNoOutput(err)
 
 
-class Sqlite3InMemoryTestDbs(TransactionTestCase):
+class SQLiteInMemoryTestDbs(TransactionTestCase):
     multi_db = True
     available_apps = ['test_runner']
 
     @unittest.skipUnless(all(db.connections[conn].vendor == 'sqlite' for conn in db.connections),
                          "This is an sqlite-specific issue")
     def test_transaction_support(self):
-        """Ticket #16329: sqlite3 in-memory test databases"""
         for option_key, option_value in (
                 ('NAME', ':memory:'), ('TEST', {'NAME': ':memory:'})):
             tested_connections = db.ConnectionHandler({

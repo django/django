@@ -113,7 +113,7 @@ class BulkCreateTests(TestCase):
             Country.objects.bulk_create([valid_country, invalid_country])
 
     def test_batch_same_vals(self):
-        # Sqlite had a problem where all the same-valued models were
+        # SQLite had a problem where all the same-valued models were
         # collapsed to one insert.
         Restaurant.objects.bulk_create([
             Restaurant(name='foo') for i in range(0, 2)

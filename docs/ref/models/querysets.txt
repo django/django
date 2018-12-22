@@ -3403,7 +3403,7 @@ by the aggregate.
     .. admonition:: SQLite
 
         SQLite doesn't provide ``StdDev`` out of the box. An implementation
-        is available as an extension module for SQLite. Consult the `SQlite
+        is available as an extension module for SQLite. Consult the `SQLite
         documentation`_ for instructions on obtaining and installing this
         extension.
 
@@ -3437,7 +3437,7 @@ by the aggregate.
     .. admonition:: SQLite
 
         SQLite doesn't provide ``Variance`` out of the box. An implementation
-        is available as an extension module for SQLite. Consult the `SQlite
+        is available as an extension module for SQLite. Consult the `SQLite
         documentation`_ for instructions on obtaining and installing this
         extension.
 

@@ -116,7 +116,7 @@ Homebrew
 --------
 
 `Homebrew`_ handles all the SpatiaLite related packages on your behalf,
-including SQLite3, SpatiaLite, PROJ, and GEOS. Install them like this::
+including SQLite, SpatiaLite, PROJ, and GEOS. Install them like this::
 
     $ brew update
     $ brew install spatialite-tools

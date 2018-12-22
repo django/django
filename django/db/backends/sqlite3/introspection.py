@@ -289,7 +289,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         # Get the index info
         cursor.execute("PRAGMA index_list(%s)" % self.connection.ops.quote_name(table_name))
         for row in cursor.fetchall():
-            # Sqlite3 3.8.9+ has 5 columns, however older versions only give 3
+            # SQLite 3.8.9+ has 5 columns, however older versions only give 3
             # columns. Discard last 2 columns if there.
             number, index, unique = row[:3]
             # Get the index info for that index
