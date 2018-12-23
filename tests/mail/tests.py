@@ -1527,7 +1527,12 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         backend.connection = True
         backend.open = lambda: None
         email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'])
-        self.assertEqual(backend.send_messages([email]), None)
+        self.assertEqual(backend.send_messages([email]), 0)
+
+    def test_send_messages_empty_list(self):
+        backend = smtp.EmailBackend()
+        backend.connection = True
+        self.assertEqual(backend.send_messages([]), 0)
 
     def test_send_messages_zero_sent(self):
         """A message isn't sent if it doesn't have any recipients."""
