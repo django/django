@@ -45,6 +45,11 @@ class LazySettings(LazyObject):
     The user can manually configure settings prior to using them. Otherwise,
     Django uses the settings module pointed to by DJANGO_SETTINGS_MODULE.
     """
+    settings_class = None
+
+    def get_settings_class(self):
+        return self.settings_class or Settings
+
     def _setup(self, name=None):
         """
         Load the settings module pointed to by the environment variable. This
@@ -60,7 +65,7 @@ class LazySettings(LazyObject):
                 "or call settings.configure() before accessing settings."
                 % (desc, ENVIRONMENT_VARIABLE))
 
-        self._wrapped = Settings(settings_module)
+        self._wrapped = self.get_settings_class()(settings_module)
 
     def __repr__(self):
         # Hardcode the class name as otherwise it yields 'Settings'.
@@ -157,6 +162,8 @@ class Settings:
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
 
+        self.handle_service_urls()
+
         if not self.SECRET_KEY:
             raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
 
@@ -183,6 +190,38 @@ class Settings:
             'cls': self.__class__.__name__,
             'settings_module': self.SETTINGS_MODULE,
         }
+
+    def register_custom_service_urls(self):
+        from django.apps.config import AppConfig
+
+        modules = []
+        for app in self.INSTALLED_APPS:
+            config = AppConfig.create(app)
+            dotted_path = '{}.service_urls'.format(config.name)
+            if importlib.util.find_spec(dotted_path):
+                modules.append(importlib.import_module(dotted_path))
+
+        return modules
+
+    def handle_service_urls(self):
+        from . import service_urls
+
+        modules = self.register_custom_service_urls()
+
+        setattr(self, 'DATABASES', service_urls.db.parse(self.DATABASES))
+        setattr(self, 'CACHES', service_urls.cache.parse(self.CACHES))
+
+        # preserve EMAIL_BACKEND backward compatibility
+        if service_urls.email.validate(self.EMAIL_BACKEND):
+            for k, v in service_urls.email.parse(self.EMAIL_BACKEND).items():
+                setting = 'EMAIL_{}'.format('BACKEND' if k == 'ENGINE' else k)
+                setattr(self, setting, v)
+                self._explicit_settings.add(setting)
+
+        for module in modules:
+            update = getattr(module, 'update', None)
+            if update:
+                update(self)
 
 
 class UserSettingsHolder:
