@@ -11,10 +11,10 @@ from django.db.utils import NotSupportedError
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     sql_delete_table = "DROP TABLE %(table)s"
+    sql_create_fk = None
     sql_create_inline_fk = "REFERENCES %(to_table)s (%(to_column)s) DEFERRABLE INITIALLY DEFERRED"
     sql_create_unique = "CREATE UNIQUE INDEX %(name)s ON %(table)s (%(columns)s)"
     sql_delete_unique = "DROP INDEX %(name)s"
-    sql_foreign_key_constraint = None
 
     def __enter__(self):
         # Some SQLite schema alterations need foreign key constraints to be

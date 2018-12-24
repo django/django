@@ -2147,23 +2147,17 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(model, get_field(unique=True), field, strict=True)
             self.assertNotIn(expected_constraint_name, self.get_constraints(model._meta.db_table))
 
-            if editor.sql_foreign_key_constraint:
+            if editor.sql_create_fk:
                 constraint_name = 'CamelCaseFKConstraint'
                 expected_constraint_name = identifier_converter(constraint_name)
-                fk_sql = editor.sql_foreign_key_constraint % {
-                    "column": editor.quote_name(column),
-                    "to_table": editor.quote_name(table),
-                    "to_column": editor.quote_name(model._meta.auto_field.column),
-                    "deferrable": connection.ops.deferrable_sql(),
-                }
-                constraint_sql = editor.sql_constraint % {
-                    "name": editor.quote_name(constraint_name),
-                    "constraint": fk_sql,
-                }
                 editor.execute(
-                    editor.sql_create_constraint % {
+                    editor.sql_create_fk % {
                         "table": editor.quote_name(table),
-                        "constraint": constraint_sql,
+                        "name": editor.quote_name(constraint_name),
+                        "column": editor.quote_name(column),
+                        "to_table": editor.quote_name(table),
+                        "to_column": editor.quote_name(model._meta.auto_field.column),
+                        "deferrable": connection.ops.deferrable_sql(),
                     }
                 )
                 self.assertIn(expected_constraint_name, self.get_constraints(model._meta.db_table))

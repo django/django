@@ -61,18 +61,21 @@ class BaseDatabaseSchemaEditor:
     sql_rename_column = "ALTER TABLE %(table)s RENAME COLUMN %(old_column)s TO %(new_column)s"
     sql_update_with_default = "UPDATE %(table)s SET %(column)s = %(default)s WHERE %(column)s IS NULL"
 
-    sql_foreign_key_constraint = "FOREIGN KEY (%(column)s) REFERENCES %(to_table)s (%(to_column)s)%(deferrable)s"
     sql_unique_constraint = "UNIQUE (%(columns)s)"
     sql_check_constraint = "CHECK (%(check)s)"
-    sql_create_constraint = "ALTER TABLE %(table)s ADD %(constraint)s"
     sql_delete_constraint = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
     sql_constraint = "CONSTRAINT %(name)s %(constraint)s"
 
+    sql_create_check = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s CHECK (%(check)s)"
     sql_delete_check = sql_delete_constraint
 
-    sql_create_unique = None
+    sql_create_unique = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s UNIQUE (%(columns)s)"
     sql_delete_unique = sql_delete_constraint
 
+    sql_create_fk = (
+        "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s FOREIGN KEY (%(column)s) "
+        "REFERENCES %(to_table)s (%(to_column)s)%(deferrable)s"
+    )
     sql_create_inline_fk = None
     sql_delete_fk = sql_delete_constraint
 
@@ -424,7 +427,7 @@ class BaseDatabaseSchemaEditor:
         # Check constraints can go on the column SQL here
         db_params = field.db_parameters(connection=self.connection)
         if db_params['check']:
-            definition += " " + self.sql_check_constraint % db_params['check']
+            definition += " " + self.sql_check_constraint % db_params
         # Build the SQL and run it
         sql = self.sql_create_column % {
             "table": self.quote_name(model._meta.db_table),
@@ -975,10 +978,6 @@ class BaseDatabaseSchemaEditor:
             "type": new_type,
         }
 
-    def _create_constraint_sql(self, table, name, constraint):
-        constraint = Statement(self.sql_constraint, name=name, constraint=constraint)
-        return Statement(self.sql_create_constraint, table=table, constraint=constraint)
-
     def _create_fk_sql(self, model, field, suffix):
         def create_fk_name(*args, **kwargs):
             return self.quote_name(self._create_index_name(*args, **kwargs))
@@ -996,14 +995,15 @@ class BaseDatabaseSchemaEditor:
         to_table = Table(field.target_field.model._meta.db_table, self.quote_name)
         to_column = Columns(field.target_field.model._meta.db_table, [field.target_field.column], self.quote_name)
         deferrable = self.connection.ops.deferrable_sql()
-        constraint = Statement(
-            self.sql_foreign_key_constraint,
+        return Statement(
+            self.sql_create_fk,
+            table=table,
+            name=name,
             column=column,
             to_table=to_table,
             to_column=to_column,
             deferrable=deferrable,
         )
-        return self._create_constraint_sql(table, name, constraint)
 
     def _delete_fk_sql(self, model, name):
         return self._delete_constraint_sql(self.sql_delete_fk, model, name)
@@ -1012,7 +1012,6 @@ class BaseDatabaseSchemaEditor:
         constraint = self.sql_unique_constraint % {
             'columns': ', '.join(map(self.quote_name, fields)),
         }
-
         return self.sql_constraint % {
             'name': self.quote_name(name),
             'constraint': constraint,
@@ -1028,17 +1027,12 @@ class BaseDatabaseSchemaEditor:
         else:
             name = self.quote_name(name)
         columns = Columns(table, columns, self.quote_name)
-        if self.sql_create_unique:
-            # Some databases use a different syntax for unique constraint
-            # creation.
-            return Statement(
-                self.sql_create_unique,
-                table=table,
-                name=name,
-                columns=columns,
-            )
-        constraint = Statement(self.sql_unique_constraint, columns=columns)
-        return self._create_constraint_sql(table, name, constraint)
+        return Statement(
+            self.sql_create_unique,
+            table=table,
+            name=name,
+            columns=columns,
+        )
 
     def _delete_unique_sql(self, model, name):
         return self._delete_constraint_sql(self.sql_delete_unique, model, name)
@@ -1050,9 +1044,11 @@ class BaseDatabaseSchemaEditor:
         }
 
     def _create_check_sql(self, model, name, check):
-        return Statement(self.sql_create_constraint,
+        return Statement(
+            self.sql_create_check,
             table=Table(model._meta.db_table, self.quote_name),
-            constraint=self._check_sql(name, check),
+            name=self.quote_name(name),
+            check=check,
         )
 
     def _delete_check_sql(self, model, name):
