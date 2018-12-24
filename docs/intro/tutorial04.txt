@@ -290,7 +290,8 @@ views and use Django's generic views instead. To do so, open the
 
 
     def vote(request, question_id):
-        ... # same as above, no changes needed.
+        ... # same as above but the redirect part.
+        return redirect('polls:results', pk=question.id)
 
 We're using two generic views here:
 :class:`~django.views.generic.list.ListView` and
