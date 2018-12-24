@@ -285,7 +285,7 @@ class InspectDBTestCase(TestCase):
 
 
 class InspectDBTransactionalTests(TransactionTestCase):
-    available_apps = None
+    available_apps = ['inspectdb']
 
     def test_include_views(self):
         """inspectdb --include-views creates models for database views."""
