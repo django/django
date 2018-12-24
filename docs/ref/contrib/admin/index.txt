@@ -991,7 +991,7 @@ subclass::
         The ``FieldListFilter`` API is considered internal and might be
         changed.
 
-      .. versionadded:: 2.1
+      .. versionadded:: 2.2
 
           The ability to specify a title with a field name was added.
 
