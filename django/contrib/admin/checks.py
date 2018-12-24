@@ -820,7 +820,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
         elif isinstance(item, (tuple, list)):
             # item is option #2
             field, second_param = item
-            if not isinstance(second_param, str) and not issubclass(second_param, FieldListFilter):
+            if not isinstance(second_param, str) and not _issubclass(second_param, FieldListFilter):
                 return must_be("a string or subclass of 'FieldListFilter'", option='%s[1]' % label,
                                obj=obj, id='admin.E115')
             else:

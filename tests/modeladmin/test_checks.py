@@ -646,13 +646,13 @@ class ListFilterTests(CheckTestCase):
             'admin.E113'
         )
 
-    def test_not_callable(self):
+    def test_not_str_and_not_callable(self):
         class TestModelAdmin(ModelAdmin):
             list_filter = [[42, 42]]
 
         self.assertIsInvalid(
             TestModelAdmin, ValidationTestModel,
-            "The value of 'list_filter[0][1]' must inherit from 'FieldListFilter'.",
+            "The value of 'list_filter[0][1]' must be a string or subclass of 'FieldListFilter'.",
             'admin.E115'
         )
 

@@ -1484,6 +1484,7 @@ class ListFiltersTests(TestCase):
         A field filter with a title provided to override default title.
         """
         request = self.request_factory.get('/')
+        request.user = self.alfred
 
         modeladmin = BookmarkAdminGenericRelation(Bookmark, site)
         changelist = modeladmin.get_changelist_instance(request)

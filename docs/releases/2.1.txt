@@ -83,12 +83,6 @@ Minor features
 
 * :meth:`.InlineModelAdmin.has_add_permission` is now passed the parent object
   as the second positional argument, ``obj``.
-* In :attr:`ModelAdmin.list_filter <django.contrib.admin.ModelAdmin.list_filter>`
-  you can now provide a title along with a field name which will be used in place
-  of the default title.
-
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Admin actions may now :ref:`specify permissions <admin-action-permissions>`
   to limit their availability to certain users.
