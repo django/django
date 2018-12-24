@@ -1059,10 +1059,11 @@ class BaseDatabaseSchemaEditor:
         return self._delete_constraint_sql(self.sql_delete_check, model, name)
 
     def _delete_constraint_sql(self, template, model, name):
-        return template % {
-            "table": self.quote_name(model._meta.db_table),
-            "name": self.quote_name(name),
-        }
+        return Statement(
+            template,
+            table=Table(model._meta.db_table, self.quote_name),
+            name=self.quote_name(name),
+        )
 
     def _constraint_names(self, model, column_names=None, unique=None,
                           primary_key=None, index=None, foreign_key=None,
