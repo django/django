@@ -558,6 +558,21 @@ class BaseModelAdminChecks:
             try:
                 obj.model._meta.get_field(field_name)
             except FieldDoesNotExist:
+                attr = getattr(obj, field_name, None)
+                if attr is not None and callable(attr):  # Check field name in admin methods
+                    if hasattr(attr, 'admin_order_field'):
+                        return []
+                    else:
+                        return [
+                            checks.Error(
+                                "The value of 'ordering' refers to '%s', which is an 'admin method' "
+                                "and the method doesn't have 'admin_order_field' attribute" % field_name,
+                                hint="Add 'admin_order_field' attribute to 'admin method'",
+                                obj=obj.__class__,
+                                id='admin.E041',
+                            )
+                        ]
+
                 return refer_to_missing_field(field=field_name, option=label, obj=obj, id='admin.E033')
             else:
                 return []

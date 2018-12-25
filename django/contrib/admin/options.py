@@ -333,7 +333,27 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         """
         Hook for specifying field ordering.
         """
-        return self.ordering or ()  # otherwise we might try to *None, which is bad ;)
+        if self.ordering:
+            ordering = []
+            for ordering_item in self.ordering:
+                if isinstance(ordering_item, str):
+                    prefix = ''
+                    if ordering_item.startswith('-'):
+                        ordering_item = ordering_item[1:]
+                        prefix = '-'
+                    try:
+                        self.model._meta.get_field(ordering_item)
+                    except FieldDoesNotExist:
+                        try:  # Convert admin method to field name
+                            attr = getattr(self, ordering_item)
+                            ordering_item = attr.admin_order_field
+                        except AttributeError:
+                            pass
+                    ordering_item = prefix + ordering_item
+                ordering.append(ordering_item)
+            return ordering
+        else:
+            return ()  # otherwise we might try to *None, which is bad ;)
 
     def get_readonly_fields(self, request, obj=None):
         """

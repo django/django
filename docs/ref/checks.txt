@@ -540,6 +540,10 @@ with the admin site:
   referenced by ``<modeladmin>.autocomplete_fields``.
 * **admin.E040**: ``<modeladmin>`` must define ``search_fields``, because
   it's referenced by ``<other_modeladmin>.autocomplete_fields``.
+* **admin.E041**: The value of ``ordering`` refers to ``<field name>``, which
+  is an ``admin method`` and the method doesn't have ``admin_order_field``
+  attribute.
+
 
 ``ModelAdmin``
 ~~~~~~~~~~~~~~

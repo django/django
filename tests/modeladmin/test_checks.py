@@ -900,6 +900,51 @@ class OrderingCheckTests(CheckTestCase):
 
         self.assertIsValid(TestModelAdmin, ValidationTestModel)
 
+    def test_admin_method(self):
+        class TestModelAdmin(ModelAdmin):
+            ordering = ('test_method', )
+
+            def test_method(self, obj):
+                return 'test'
+
+            test_method.admin_order_field = 'name'
+        self.assertIsValid(TestModelAdmin, ValidationTestModel)
+
+        # Descending
+        class TestModelAdmin(ModelAdmin):
+            ordering = ('-test_method', )
+
+            def test_method(self, obj):
+                return 'test'
+            test_method.admin_order_field = 'name'
+        self.assertIsValid(TestModelAdmin, ValidationTestModel)
+
+        # Without method
+        class TestModelAdmin(ModelAdmin):
+            ordering = ('test_method', )
+
+        self.assertIsInvalid(
+            TestModelAdmin, ValidationTestModel,
+            "The value of 'ordering[0]' refers to 'test_method', which is not "
+            "an attribute of 'modeladmin.ValidationTestModel'.",
+            'admin.E033'
+        )
+
+        # Without admin_order_field
+        class TestModelAdmin(ModelAdmin):
+            ordering = ('test_method', )
+
+            def test_method(self, obj):
+                return 'test'
+
+        self.assertIsInvalid(
+            TestModelAdmin, ValidationTestModel,
+            "The value of 'ordering' refers to 'test_method', which is an "
+            "'admin method' and the method doesn't have 'admin_order_field' attribute",
+            'admin.E041',
+            hint="Add 'admin_order_field' attribute to 'admin method'",
+        )
+
 
 class ListSelectRelatedCheckTests(CheckTestCase):
 

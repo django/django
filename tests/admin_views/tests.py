@@ -122,6 +122,7 @@ class AdminViewBasicTestCase(TestCase):
         cls.chap2 = Chapter.objects.create(title='Chapter 2', content='[ insert contents here ]', book=cls.b1)
         cls.chap3 = Chapter.objects.create(title='Chapter 1', content='[ insert contents here ]', book=cls.b2)
         cls.chap4 = Chapter.objects.create(title='Chapter 2', content='[ insert contents here ]', book=cls.b2)
+        cls.chap5 = Chapter.objects.create(title='Chapter 3', content='[ insert contents here ]', book=cls.b2)
         cls.cx1 = ChapterXtra1.objects.create(chap=cls.chap1, xtra='ChapterXtra1 1')
         cls.cx2 = ChapterXtra1.objects.create(chap=cls.chap3, xtra='ChapterXtra1 2')
         Actor.objects.create(name='Palin', age=27)
@@ -486,6 +487,18 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
         response = self.client.get(reverse('admin:admin_views_podcast_changelist'), {})
         self.assertContentBefore(response, link1, link2)
+
+    def test_change_list_sorting_based_on_admin_method(self):
+        # Test ordering by admin method
+        link1 = reverse('admin6:admin_views_book_change', args=(self.b1.pk,))
+        link2 = reverse('admin6:admin_views_book_change', args=(self.b2.pk,))
+        response = self.client.get(reverse('admin6:admin_views_book_changelist'), {})
+        self.assertContentBefore(response, link1, link2)
+
+        link1 = reverse('admin9:admin_views_book_change', args=(self.b1.pk,))
+        link2 = reverse('admin9:admin_views_book_change', args=(self.b2.pk,))
+        response = self.client.get(reverse('admin9:admin_views_book_changelist'), {})
+        self.assertContentBefore(response, link2, link1)
 
     def test_multiple_sort_same_field(self):
         # The changelist displays the correct columns if two columns correspond

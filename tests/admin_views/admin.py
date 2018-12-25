@@ -15,6 +15,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.core.mail import EmailMessage
 from django.db import models
+from django.db.models import Count
 from django.forms.models import BaseModelFormSet
 from django.http import HttpResponse, StreamingHttpResponse
 from django.utils.html import format_html
@@ -1128,11 +1129,25 @@ class ColorAdmin6(admin.ModelAdmin):
         return ()
 
 
+class BookAdmin6(admin.ModelAdmin):
+    list_display = ('name', 'chapter_count')
+    ordering = ('chapter_count', )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.annotate(_chapter_count=Count('chapter'))
+
+    def chapter_count(self, obj):
+        return obj._chapter_count
+    chapter_count.admin_order_field = '_chapter_count'
+
+
 site6 = admin.AdminSite(name='admin6')
 site6.register(Article, ArticleAdmin6)
 site6.register(Actor, ActorAdmin6)
 site6.register(Chapter, ChapterAdmin6)
 site6.register(Color, ColorAdmin6)
+site6.register(Book, BookAdmin6)
 
 
 class ArticleAdmin9(admin.ModelAdmin):
@@ -1141,8 +1156,22 @@ class ArticleAdmin9(admin.ModelAdmin):
         return obj is None
 
 
+class BookAdmin9(admin.ModelAdmin):
+    list_display = ('name', 'chapter_count')
+    ordering = ('-chapter_count', )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.annotate(_chapter_count=Count('chapter'))
+
+    def chapter_count(self, obj):
+        return obj._chapter_count
+    chapter_count.admin_order_field = '_chapter_count'
+
+
 site9 = admin.AdminSite(name='admin9')
 site9.register(Article, ArticleAdmin9)
+site9.register(Book, BookAdmin9)
 
 
 class ArticleAdmin10(admin.ModelAdmin):
