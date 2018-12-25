@@ -1,6 +1,7 @@
 import datetime
 import re
 import uuid
+from functools import lru_cache
 
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
@@ -315,7 +316,7 @@ END;
     def return_insert_id(self):
         return "RETURNING %s INTO %%s", (InsertIdVar(),)
 
-    def _foreign_key_constraints(self, table_name, recursive=False):
+    def __foreign_key_constraints(self, table_name, recursive):
         with self.connection.cursor() as cursor:
             if recursive:
                 cursor.execute("""
@@ -347,6 +348,12 @@ END;
                         AND cons.table_name = UPPER(%s)
                 """, (table_name,))
             return cursor.fetchall()
+
+    @cached_property
+    def _foreign_key_constraints(self):
+        # 512 is large enough to fit the ~330 tables (as of this writing) in
+        # Django's test suite.
+        return lru_cache(maxsize=512)(self.__foreign_key_constraints)
 
     def sql_flush(self, style, tables, sequences, allow_cascade=False):
         if tables:
