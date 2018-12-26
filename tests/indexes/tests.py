@@ -303,6 +303,7 @@ class PartialIndexTests(TransactionTestCase):
             ))
             editor.remove_index(index=index, model=Article)
 
+    @skipUnlessDBFeature('supports_functions_in_partial_indexes')
     def test_multiple_conditions(self):
         with connection.schema_editor() as editor:
             index = Index(

@@ -39,3 +39,4 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     # reasonably performant way.
     supports_pragma_foreign_key_check = Database.sqlite_version_info >= (3, 20, 0)
     can_defer_constraint_checks = supports_pragma_foreign_key_check
+    supports_functions_in_partial_indexes = Database.sqlite_version_info >= (3, 15, 0)
