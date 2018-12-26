@@ -275,6 +275,7 @@ class BaseDatabaseFeatures:
 
     # Does the backend support partial indexes (CREATE INDEX ... WHERE ...)?
     supports_partial_indexes = True
+    supports_functions_in_partial_indexes = True
 
     def __init__(self, connection):
         self.connection = connection
