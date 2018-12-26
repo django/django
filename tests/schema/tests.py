@@ -1455,14 +1455,14 @@ class SchemaTests(TransactionTestCase):
 
     @isolate_apps('schema')
     def test_m2m_rename_field_in_target_model(self):
-        class TagM2MTest(Model):
+        class LocalTagM2MTest(Model):
             title = CharField(max_length=255)
 
             class Meta:
                 app_label = 'schema'
 
         class LocalM2M(Model):
-            tags = ManyToManyField(TagM2MTest)
+            tags = ManyToManyField(LocalTagM2MTest)
 
             class Meta:
                 app_label = 'schema'
@@ -1470,18 +1470,19 @@ class SchemaTests(TransactionTestCase):
         # Create the tables.
         with connection.schema_editor() as editor:
             editor.create_model(LocalM2M)
-            editor.create_model(TagM2MTest)
+            editor.create_model(LocalTagM2MTest)
+        self.isolated_local_models = [LocalM2M, LocalTagM2MTest]
         # Ensure the m2m table is there.
         self.assertEqual(len(self.column_classes(LocalM2M)), 1)
-        # Alter a field in TagM2MTest.
-        old_field = TagM2MTest._meta.get_field('title')
+        # Alter a field in LocalTagM2MTest.
+        old_field = LocalTagM2MTest._meta.get_field('title')
         new_field = CharField(max_length=254)
-        new_field.contribute_to_class(TagM2MTest, 'title1')
+        new_field.contribute_to_class(LocalTagM2MTest, 'title1')
         # @isolate_apps() and inner models are needed to have the model
         # relations populated, otherwise this doesn't act as a regression test.
         self.assertEqual(len(new_field.model._meta.related_objects), 1)
         with connection.schema_editor() as editor:
-            editor.alter_field(TagM2MTest, old_field, new_field, strict=True)
+            editor.alter_field(LocalTagM2MTest, old_field, new_field, strict=True)
         # Ensure the m2m table is still there.
         self.assertEqual(len(self.column_classes(LocalM2M)), 1)
 
