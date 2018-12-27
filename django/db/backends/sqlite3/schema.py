@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.apps.registry import Apps
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.ddl_references import Statement
+from django.db.models import UniqueConstraint
 from django.db.transaction import atomic
 from django.db.utils import NotSupportedError
 
@@ -398,7 +399,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         self.delete_model(old_field.remote_field.through)
 
     def add_constraint(self, model, constraint):
-        self._remake_table(model)
+        if isinstance(constraint, UniqueConstraint) and constraint.condition:
+            super().add_constraint(model, constraint)
+        else:
+            self._remake_table(model)
 
     def remove_constraint(self, model, constraint):
-        self._remake_table(model)
+        if isinstance(constraint, UniqueConstraint) and constraint.condition:
+            super().remove_constraint(model, constraint)
+        else:
+            self._remake_table(model)

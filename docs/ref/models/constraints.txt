@@ -69,3 +69,17 @@ date.
 .. attribute:: UniqueConstraint.name
 
 The name of the constraint.
+
+``condition``
+-------------
+
+.. attribute:: UniqueConstraint.condition
+
+A :class:`Q` object that specifies the condition you want the constraint to
+enforce.
+
+For example, ``UniqueConstraint(fields=['user'], condition=Q(status='DRAFT')``
+ensures that each user only has one draft.
+
+These conditions have the same database restrictions as
+:attr:`Index.condition`.

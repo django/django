@@ -1,3 +1,4 @@
+from django.db.models.query_utils import Q
 from django.db.models.sql.query import Query
 
 __all__ = ['CheckConstraint', 'UniqueConstraint']
@@ -66,34 +67,55 @@ class CheckConstraint(BaseConstraint):
 
 
 class UniqueConstraint(BaseConstraint):
-    def __init__(self, *, fields, name):
+    def __init__(self, *, fields, name, condition=None):
         if not fields:
             raise ValueError('At least one field is required to define a unique constraint.')
+        if not isinstance(condition, (type(None), Q)):
+            raise ValueError('UniqueConstraint.condition must be a Q instance.')
         self.fields = tuple(fields)
+        self.condition = condition
         super().__init__(name)
+
+    def _get_condition_sql(self, model, schema_editor):
+        if self.condition is None:
+            return None
+        query = Query(model=model)
+        where = query.build_where(self.condition)
+        compiler = query.get_compiler(connection=schema_editor.connection)
+        sql, params = where.as_sql(compiler, schema_editor.connection)
+        return sql % tuple(schema_editor.quote_value(p) for p in params)
 
     def constraint_sql(self, model, schema_editor):
         fields = [model._meta.get_field(field_name).column for field_name in self.fields]
-        return schema_editor._unique_sql(fields, self.name)
+        condition = self._get_condition_sql(model, schema_editor)
+        return schema_editor._unique_sql(model, fields, self.name, condition=condition)
 
     def create_sql(self, model, schema_editor):
         fields = [model._meta.get_field(field_name).column for field_name in self.fields]
-        return schema_editor._create_unique_sql(model, fields, self.name)
+        condition = self._get_condition_sql(model, schema_editor)
+        return schema_editor._create_unique_sql(model, fields, self.name, condition=condition)
 
     def remove_sql(self, model, schema_editor):
-        return schema_editor._delete_unique_sql(model, self.name)
+        condition = self._get_condition_sql(model, schema_editor)
+        return schema_editor._delete_unique_sql(model, self.name, condition=condition)
 
     def __repr__(self):
-        return '<%s: fields=%r name=%r>' % (self.__class__.__name__, self.fields, self.name)
+        return '<%s: fields=%r name=%r%s>' % (
+            self.__class__.__name__, self.fields, self.name,
+            '' if self.condition is None else ' condition=%s' % self.condition,
+        )
 
     def __eq__(self, other):
         return (
             isinstance(other, UniqueConstraint) and
             self.name == other.name and
-            self.fields == other.fields
+            self.fields == other.fields and
+            self.condition == other.condition
         )
 
     def deconstruct(self):
         path, args, kwargs = super().deconstruct()
         kwargs['fields'] = self.fields
+        if self.condition:
+            kwargs['condition'] = self.condition
         return path, args, kwargs

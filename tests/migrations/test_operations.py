@@ -501,6 +501,51 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[1], [])
         self.assertEqual(definition[2]['options']['constraints'], [check_constraint])
 
+    def test_create_model_with_partial_unique_constraint(self):
+        partial_unique_constraint = models.UniqueConstraint(
+            fields=['pink'],
+            condition=models.Q(weight__gt=5),
+            name='test_constraint_pony_pink_for_weight_gt_5_uniq',
+        )
+        operation = migrations.CreateModel(
+            'Pony',
+            [
+                ('id', models.AutoField(primary_key=True)),
+                ('pink', models.IntegerField(default=3)),
+                ('weight', models.FloatField()),
+            ],
+            options={'constraints': [partial_unique_constraint]},
+        )
+        # Test the state alteration
+        project_state = ProjectState()
+        new_state = project_state.clone()
+        operation.state_forwards('test_crmo', new_state)
+        self.assertEqual(len(new_state.models['test_crmo', 'pony'].options['constraints']), 1)
+        # Test database alteration
+        self.assertTableNotExists('test_crmo_pony')
+        with connection.schema_editor() as editor:
+            operation.database_forwards('test_crmo', editor, project_state, new_state)
+        self.assertTableExists('test_crmo_pony')
+        # Test constraint works
+        Pony = new_state.apps.get_model('test_crmo', 'Pony')
+        Pony.objects.create(pink=1, weight=4.0)
+        Pony.objects.create(pink=1, weight=4.0)
+        Pony.objects.create(pink=1, weight=6.0)
+        if connection.features.supports_partial_indexes:
+            with self.assertRaises(IntegrityError):
+                Pony.objects.create(pink=1, weight=7.0)
+        else:
+            Pony.objects.create(pink=1, weight=7.0)
+        # Test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards('test_crmo', editor, new_state, project_state)
+        self.assertTableNotExists('test_crmo_pony')
+        # Test deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], 'CreateModel')
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2]['options']['constraints'], [partial_unique_constraint])
+
     def test_create_model_managers(self):
         """
         The managers on a model are set.
@@ -1853,6 +1898,92 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[0], "RemoveConstraint")
         self.assertEqual(definition[1], [])
         self.assertEqual(definition[2], {'model_name': "Pony", 'name': "test_remove_constraint_pony_pink_gt_2"})
+
+    def test_add_partial_unique_constraint(self):
+        project_state = self.set_up_test_model('test_addpartialuniqueconstraint')
+        partial_unique_constraint = models.UniqueConstraint(
+            fields=['pink'],
+            condition=models.Q(weight__gt=5),
+            name='test_constraint_pony_pink_for_weight_gt_5_uniq',
+        )
+        operation = migrations.AddConstraint('Pony', partial_unique_constraint)
+        self.assertEqual(
+            operation.describe(),
+            'Create constraint test_constraint_pony_pink_for_weight_gt_5_uniq '
+            'on model Pony'
+        )
+        # Test the state alteration
+        new_state = project_state.clone()
+        operation.state_forwards('test_addpartialuniqueconstraint', new_state)
+        self.assertEqual(len(new_state.models['test_addpartialuniqueconstraint', 'pony'].options['constraints']), 1)
+        Pony = new_state.apps.get_model('test_addpartialuniqueconstraint', 'Pony')
+        self.assertEqual(len(Pony._meta.constraints), 1)
+        # Test the database alteration
+        with connection.schema_editor() as editor:
+            operation.database_forwards('test_addpartialuniqueconstraint', editor, project_state, new_state)
+        # Test constraint works
+        Pony.objects.create(pink=1, weight=4.0)
+        Pony.objects.create(pink=1, weight=4.0)
+        Pony.objects.create(pink=1, weight=6.0)
+        if connection.features.supports_partial_indexes:
+            with self.assertRaises(IntegrityError), transaction.atomic():
+                Pony.objects.create(pink=1, weight=7.0)
+        else:
+            Pony.objects.create(pink=1, weight=7.0)
+        # Test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards('test_addpartialuniqueconstraint', editor, new_state, project_state)
+        # Test constraint doesn't work
+        Pony.objects.create(pink=1, weight=7.0)
+        # Test deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], 'AddConstraint')
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2], {'model_name': 'Pony', 'constraint': partial_unique_constraint})
+
+    def test_remove_partial_unique_constraint(self):
+        project_state = self.set_up_test_model('test_removepartialuniqueconstraint', constraints=[
+            models.UniqueConstraint(
+                fields=['pink'],
+                condition=models.Q(weight__gt=5),
+                name='test_constraint_pony_pink_for_weight_gt_5_uniq',
+            ),
+        ])
+        gt_operation = migrations.RemoveConstraint('Pony', 'test_constraint_pony_pink_for_weight_gt_5_uniq')
+        self.assertEqual(
+            gt_operation.describe(), 'Remove constraint test_constraint_pony_pink_for_weight_gt_5_uniq from model Pony'
+        )
+        # Test state alteration
+        new_state = project_state.clone()
+        gt_operation.state_forwards('test_removepartialuniqueconstraint', new_state)
+        self.assertEqual(len(new_state.models['test_removepartialuniqueconstraint', 'pony'].options['constraints']), 0)
+        Pony = new_state.apps.get_model('test_removepartialuniqueconstraint', 'Pony')
+        self.assertEqual(len(Pony._meta.constraints), 0)
+        # Test database alteration
+        with connection.schema_editor() as editor:
+            gt_operation.database_forwards('test_removepartialuniqueconstraint', editor, project_state, new_state)
+        # Test constraint doesn't work
+        Pony.objects.create(pink=1, weight=4.0)
+        Pony.objects.create(pink=1, weight=4.0)
+        Pony.objects.create(pink=1, weight=6.0)
+        Pony.objects.create(pink=1, weight=7.0).delete()
+        # Test reversal
+        with connection.schema_editor() as editor:
+            gt_operation.database_backwards('test_removepartialuniqueconstraint', editor, new_state, project_state)
+        # Test constraint works
+        if connection.features.supports_partial_indexes:
+            with self.assertRaises(IntegrityError), transaction.atomic():
+                Pony.objects.create(pink=1, weight=7.0)
+        else:
+            Pony.objects.create(pink=1, weight=7.0)
+        # Test deconstruction
+        definition = gt_operation.deconstruct()
+        self.assertEqual(definition[0], 'RemoveConstraint')
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2], {
+            'model_name': 'Pony',
+            'name': 'test_constraint_pony_pink_for_weight_gt_5_uniq',
+        })
 
     def test_alter_model_options(self):
         """

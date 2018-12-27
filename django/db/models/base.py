@@ -1009,6 +1009,8 @@ class Model(metaclass=ModelBase):
         for model_class, model_constraints in constraints:
             for constraint in model_constraints:
                 if (isinstance(constraint, UniqueConstraint) and
+                        # Partial unique constraints can't be validated.
+                        constraint.condition is None and
                         not any(name in exclude for name in constraint.fields)):
                     unique_checks.append((model_class, constraint.fields))
 

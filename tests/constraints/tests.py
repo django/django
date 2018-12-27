@@ -83,7 +83,10 @@ class CheckConstraintTests(TestCase):
 class UniqueConstraintTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.p1 = Product.objects.create(name='p1')
+        cls.p1, cls.p2 = Product.objects.bulk_create([
+            Product(name='p1', color='red'),
+            Product(name='p2'),
+        ])
 
     def test_eq(self):
         self.assertEqual(
@@ -100,6 +103,29 @@ class UniqueConstraintTests(TestCase):
         )
         self.assertNotEqual(models.UniqueConstraint(fields=['foo', 'bar'], name='unique'), 1)
 
+    def test_eq_with_condition(self):
+        self.assertEqual(
+            models.UniqueConstraint(
+                fields=['foo', 'bar'], name='unique',
+                condition=models.Q(foo=models.F('bar'))
+            ),
+            models.UniqueConstraint(
+                fields=['foo', 'bar'], name='unique',
+                condition=models.Q(foo=models.F('bar'))),
+        )
+        self.assertNotEqual(
+            models.UniqueConstraint(
+                fields=['foo', 'bar'],
+                name='unique',
+                condition=models.Q(foo=models.F('bar'))
+            ),
+            models.UniqueConstraint(
+                fields=['foo', 'bar'],
+                name='unique',
+                condition=models.Q(foo=models.F('baz'))
+            ),
+        )
+
     def test_repr(self):
         fields = ['foo', 'bar']
         name = 'unique_fields'
@@ -107,6 +133,18 @@ class UniqueConstraintTests(TestCase):
         self.assertEqual(
             repr(constraint),
             "<UniqueConstraint: fields=('foo', 'bar') name='unique_fields'>",
+        )
+
+    def test_repr_with_condition(self):
+        constraint = models.UniqueConstraint(
+            fields=['foo', 'bar'],
+            name='unique_fields',
+            condition=models.Q(foo=models.F('bar')),
+        )
+        self.assertEqual(
+            repr(constraint),
+            "<UniqueConstraint: fields=('foo', 'bar') name='unique_fields' "
+            "condition=(AND: ('foo', F(bar)))>",
         )
 
     def test_deconstruction(self):
@@ -118,15 +156,34 @@ class UniqueConstraintTests(TestCase):
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {'fields': tuple(fields), 'name': name})
 
+    def test_deconstruction_with_condition(self):
+        fields = ['foo', 'bar']
+        name = 'unique_fields'
+        condition = models.Q(foo=models.F('bar'))
+        constraint = models.UniqueConstraint(fields=fields, name=name, condition=condition)
+        path, args, kwargs = constraint.deconstruct()
+        self.assertEqual(path, 'django.db.models.UniqueConstraint')
+        self.assertEqual(args, ())
+        self.assertEqual(kwargs, {'fields': tuple(fields), 'name': name, 'condition': condition})
+
     def test_database_constraint(self):
         with self.assertRaises(IntegrityError):
-            Product.objects.create(name=self.p1.name)
+            Product.objects.create(name=self.p1.name, color=self.p1.color)
 
     def test_model_validation(self):
-        with self.assertRaisesMessage(ValidationError, 'Product with this Name already exists.'):
-            Product(name=self.p1.name).validate_unique()
+        with self.assertRaisesMessage(ValidationError, 'Product with this Name and Color already exists.'):
+            Product(name=self.p1.name, color=self.p1.color).validate_unique()
+
+    def test_model_validation_with_condition(self):
+        """Partial unique constraints are ignored by Model.validate_unique()."""
+        Product(name=self.p1.name, color='blue').validate_unique()
+        Product(name=self.p2.name).validate_unique()
 
     def test_name(self):
         constraints = get_constraints(Product._meta.db_table)
-        expected_name = 'unique_name'
+        expected_name = 'name_color_uniq'
         self.assertIn(expected_name, constraints)
+
+    def test_condition_must_be_q(self):
+        with self.assertRaisesMessage(ValueError, 'UniqueConstraint.condition must be a Q instance.'):
+            models.UniqueConstraint(name='uniq', fields=['name'], condition='invalid')
