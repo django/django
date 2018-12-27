@@ -91,20 +91,31 @@ def urlencode(query, doseq=False):
         query = query.items()
     query_params = []
     for key, value in query:
-        if isinstance(value, (str, bytes)):
+        if value is None:
+            raise TypeError(
+                'Cannot encode None in a query string. Did you mean to pass '
+                'an empty string or omit the value?'
+            )
+        elif isinstance(value, (str, bytes)):
             query_val = value
         else:
             try:
-                iter(value)
+                itr = iter(value)
             except TypeError:
                 query_val = value
             else:
                 # Consume generators and iterators, even when doseq=True, to
                 # work around https://bugs.python.org/issue31706.
-                query_val = [
-                    item if isinstance(item, bytes) else str(item)
-                    for item in value
-                ]
+                query_val = []
+                for item in itr:
+                    if item is None:
+                        raise TypeError(
+                            'Cannot encode None in a query string. Did you '
+                            'mean to pass an empty string or omit the value?'
+                        )
+                    elif not isinstance(item, bytes):
+                        item = str(item)
+                    query_val.append(item)
         query_params.append((key, query_val))
     return original_urlencode(query_params, doseq)
 

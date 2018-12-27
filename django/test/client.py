@@ -192,7 +192,12 @@ def encode_multipart(boundary, data):
     # file, or a *list* of form values and/or files. Remember that HTTP field
     # names can be duplicated!
     for (key, value) in data.items():
-        if is_file(value):
+        if value is None:
+            raise TypeError(
+                'Cannot encode None as POST data. Did you mean to pass an '
+                'empty string or omit the value?'
+            )
+        elif is_file(value):
             lines.extend(encode_file(boundary, key, value))
         elif not isinstance(value, str) and is_iterable(value):
             for item in value:

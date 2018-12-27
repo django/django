@@ -59,6 +59,14 @@ class ClientTest(TestCase):
         response = self.client.get('/get_view/?var=1\ufffd')
         self.assertEqual(response.context['var'], '1\ufffd')
 
+    def test_get_data_none(self):
+        msg = (
+            'Cannot encode None in a query string. Did you mean to pass an '
+            'empty string or omit the value?'
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            self.client.get('/get_view/', {'value': None})
+
     def test_get_post_view(self):
         "GET a view that normally expects POSTs"
         response = self.client.get('/post_view/', {})
@@ -91,6 +99,14 @@ class ClientTest(TestCase):
         self.assertEqual(response.context['data'], '37')
         self.assertEqual(response.templates[0].name, 'POST Template')
         self.assertContains(response, 'Data received')
+
+    def test_post_data_none(self):
+        msg = (
+            'Cannot encode None as POST data. Did you mean to pass an empty '
+            'string or omit the value?'
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            self.client.post('/post_view/', {'value': None})
 
     def test_json_serialization(self):
         """The test client serializes JSON data."""

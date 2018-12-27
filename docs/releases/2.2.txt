@@ -457,6 +457,11 @@ Miscellaneous
 * Tests that violate deferrable database constraints now error when run on
   SQLite 3.20+, just like on other backends that support such constraints.
 
+* To catch usage mistakes, the test :class:`~django.test.Client` and
+  :func:`django.utils.http.urlencode` now raise ``TypeError`` if ``None`` is
+  passed as a value to encode because ``None`` can't be encoded in GET and POST
+  data. Either pass an empty string or omit the value.
+
 .. _deprecated-features-2.2:
 
 Features deprecated in 2.2
