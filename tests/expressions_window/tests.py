@@ -4,7 +4,7 @@ from unittest import skipIf, skipUnless
 from django.core.exceptions import FieldError
 from django.db import NotSupportedError, connection
 from django.db.models import (
-    F, RowRange, Value, ValueRange, Window, WindowFrame,
+    F, OuterRef, RowRange, Subquery, Value, ValueRange, Window, WindowFrame,
 )
 from django.db.models.aggregates import Avg, Max, Min, Sum
 from django.db.models.functions import (
@@ -583,6 +583,35 @@ class WindowFunctionTests(TestCase):
             ('Smith', 'Sales', 55000, datetime.date(2007, 6, 1), 148000),
             ('Brown', 'Sales', 53000, datetime.date(2009, 9, 1), 148000)
         ], transform=lambda row: (row.name, row.department, row.salary, row.hire_date, row.sum))
+
+    def test_subquery_row_range_rank(self):
+        qs = Employee.objects.annotate(
+            highest_avg_salary_date=Subquery(
+                Employee.objects.filter(
+                    department=OuterRef('department'),
+                ).annotate(
+                    avg_salary=Window(
+                        expression=Avg('salary'),
+                        order_by=[F('hire_date').asc()],
+                        frame=RowRange(start=-1, end=1),
+                    ),
+                ).order_by('-avg_salary', '-hire_date').values('hire_date')[:1],
+            ),
+        ).order_by('department', 'name')
+        self.assertQuerysetEqual(qs, [
+            ('Adams', 'Accounting', datetime.date(2005, 11, 1)),
+            ('Jenson', 'Accounting', datetime.date(2005, 11, 1)),
+            ('Jones', 'Accounting', datetime.date(2005, 11, 1)),
+            ('Williams', 'Accounting', datetime.date(2005, 11, 1)),
+            ('Moore', 'IT', datetime.date(2013, 8, 1)),
+            ('Wilkinson', 'IT', datetime.date(2013, 8, 1)),
+            ('Johnson', 'Management', datetime.date(2005, 7, 1)),
+            ('Miller', 'Management', datetime.date(2005, 7, 1)),
+            ('Johnson', 'Marketing', datetime.date(2012, 3, 1)),
+            ('Smith', 'Marketing', datetime.date(2012, 3, 1)),
+            ('Brown', 'Sales', datetime.date(2009, 9, 1)),
+            ('Smith', 'Sales', datetime.date(2009, 9, 1)),
+        ], transform=lambda row: (row.name, row.department, row.highest_avg_salary_date))
 
     def test_row_range_rank(self):
         """
