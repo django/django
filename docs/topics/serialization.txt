@@ -165,7 +165,7 @@ Identifier  Information
 ==========  ==============================================================
 
 .. _json: http://json.org/
-.. _PyYAML: http://www.pyyaml.org/
+.. _PyYAML: https://pyyaml.org/
 
 XML
 ---
