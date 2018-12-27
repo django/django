@@ -404,6 +404,12 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.unique_together
 
+    .. admonition:: Use :class:`.UniqueConstraint` with the :attr:`~Options.constraints` option instead.
+
+        :class:`.UniqueConstraint` provides more functionality than
+        ``unique_together``. ``unique_together`` may be deprecated in the
+        future.
+
     Sets of field names that, taken together, must be unique::
 
         unique_together = (("driver", "restaurant"),)
