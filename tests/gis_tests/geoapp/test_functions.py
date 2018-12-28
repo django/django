@@ -10,8 +10,7 @@ from django.contrib.gis.geos import (
 from django.contrib.gis.measure import Area
 from django.db import NotSupportedError, connection
 from django.db.models import Sum
-from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
-from django.utils.deprecation import RemovedInDjango30Warning
+from django.test import TestCase, skipUnlessDBFeature
 
 from ..utils import FuncTestMixin, mysql, oracle, postgis, spatialite
 from .models import City, Country, CountryWebMercator, State, Track
@@ -229,21 +228,6 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         State.objects.create(name='Foo', poly=Polygon(*rings))
         st = State.objects.annotate(force_polygon_cw=functions.ForcePolygonCW('poly')).get(name='Foo')
         self.assertEqual(rhr_rings, st.force_polygon_cw.coords)
-
-    @skipUnlessDBFeature("has_ForceRHR_function")
-    @ignore_warnings(category=RemovedInDjango30Warning)
-    def test_force_rhr(self):
-        rings = (
-            ((0, 0), (5, 0), (0, 5), (0, 0)),
-            ((1, 1), (1, 3), (3, 1), (1, 1)),
-        )
-        rhr_rings = (
-            ((0, 0), (0, 5), (5, 0), (0, 0)),
-            ((1, 1), (3, 1), (1, 3), (1, 1)),
-        )
-        State.objects.create(name='Foo', poly=Polygon(*rings))
-        st = State.objects.annotate(force_rhr=functions.ForceRHR('poly')).get(name='Foo')
-        self.assertEqual(rhr_rings, st.force_rhr.coords)
 
     @skipUnlessDBFeature("has_GeoHash_function")
     def test_geohash(self):

@@ -1,4 +1,3 @@
-import warnings
 from decimal import Decimal
 
 from django.contrib.gis.db.models.fields import BaseSpatialField, GeometryField
@@ -11,7 +10,6 @@ from django.db.models import (
 from django.db.models.expressions import Func, Value
 from django.db.models.functions import Cast
 from django.db.utils import NotSupportedError
-from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.functional import cached_property
 
 NUMERIC_TYPES = (int, float, Decimal)
@@ -282,17 +280,6 @@ class Envelope(GeomOutputGeoFunc):
 
 class ForcePolygonCW(GeomOutputGeoFunc):
     arity = 1
-
-
-class ForceRHR(GeomOutputGeoFunc):
-    arity = 1
-
-    def __init__(self, *args, **kwargs):
-        warnings.warn(
-            'ForceRHR is deprecated in favor of ForcePolygonCW.',
-            RemovedInDjango30Warning, stacklevel=2,
-        )
-        super().__init__(*args, **kwargs)
 
 
 class GeoHash(GeoFunc):

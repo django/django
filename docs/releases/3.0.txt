@@ -253,4 +253,4 @@ to remove usage of these features.
 See :ref:`deprecated-features-2.1` for details on these changes, including how
 to remove usage of these features.
 
-* ...
+* The ``ForceRHR`` GIS function is removed.
