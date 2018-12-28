@@ -23,12 +23,12 @@ class Author(models.Model):
     first_name = models.CharField(max_length=30, db_column='firstname')
     last_name = models.CharField(max_length=30, db_column='last')
 
-    def __str__(self):
-        return '%s %s' % (self.first_name, self.last_name)
-
     class Meta:
         db_table = 'my_author_table'
         ordering = ('last_name', 'first_name')
+
+    def __str__(self):
+        return '%s %s' % (self.first_name, self.last_name)
 
 
 class Article(models.Model):
@@ -43,8 +43,8 @@ class Article(models.Model):
         null=True,
     )
 
-    def __str__(self):
-        return self.headline
-
     class Meta:
         ordering = ('headline',)
+
+    def __str__(self):
+        return self.headline

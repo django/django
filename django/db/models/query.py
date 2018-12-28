@@ -540,10 +540,10 @@ class QuerySet:
             params = self._extract_model_params(defaults, **kwargs)
             return self._create_object_from_params(kwargs, params)
 
-    def update_or_create(self, defaults=None, **kwargs):
+    def update_or_create(self, defaults=None, condition=None, **kwargs):
         """
         Look up an object with the given kwargs, updating one with defaults
-        if it exists, otherwise create a new one.
+        if it exists and matches the condition, otherwise create a new one.
         Return a tuple (object, created), where created is a boolean
         specifying whether an object was created.
         """
@@ -552,6 +552,9 @@ class QuerySet:
         with transaction.atomic(using=self.db):
             try:
                 obj = self.select_for_update().get(**kwargs)
+
+                if condition and not condition(obj):
+                    return obj, False
             except self.model.DoesNotExist:
                 params = self._extract_model_params(defaults, **kwargs)
                 # Lock the row so that a concurrent update is blocked until

@@ -21,6 +21,15 @@ class SpatialiteGeometryColumns(models.Model):
         db_table = 'geometry_columns'
         managed = False
 
+    def __str__(self):
+        return '%s.%s - %dD %s field (SRID: %d)' % (
+            self.f_table_name,
+            self.f_geometry_column,
+            self.coord_dimension,
+            self.type,
+            self.srid,
+        )
+
     @classmethod
     def table_name_col(cls):
         """
@@ -37,11 +46,6 @@ class SpatialiteGeometryColumns(models.Model):
         """
         return 'f_geometry_column'
 
-    def __str__(self):
-        return "%s.%s - %dD %s field (SRID: %d)" % \
-               (self.f_table_name, self.f_geometry_column,
-                self.coord_dimension, self.type, self.srid)
-
 
 class SpatialiteSpatialRefSys(models.Model, SpatialRefSysMixin):
     """
@@ -54,11 +58,11 @@ class SpatialiteSpatialRefSys(models.Model, SpatialRefSysMixin):
     proj4text = models.CharField(max_length=2048)
     srtext = models.CharField(max_length=2048)
 
-    @property
-    def wkt(self):
-        return self.srtext
-
     class Meta:
         app_label = 'gis'
         db_table = 'spatial_ref_sys'
         managed = False
+
+    @property
+    def wkt(self):
+        return self.srtext

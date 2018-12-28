@@ -80,12 +80,12 @@ class Chapter(models.Model):
     content = models.TextField()
     book = models.ForeignKey(Book, models.CASCADE)
 
-    def __str__(self):
-        return self.title
-
     class Meta:
         # Use a utf-8 bytestring to ensure it works (see #11710)
         verbose_name = '¿Chapter?'
+
+    def __str__(self):
+        return self.title
 
 
 class ChapterXtra1(models.Model):

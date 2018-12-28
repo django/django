@@ -15,11 +15,11 @@ class Author(models.Model):
     favorite_authors = models.ManyToManyField(
         'self', through='FavoriteAuthors', symmetrical=False, related_name='favors_me')
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         ordering = ['id']
+
+    def __str__(self):
+        return self.name
 
 
 class AuthorWithAge(Author):
@@ -50,11 +50,11 @@ class Book(models.Model):
     title = models.CharField(max_length=255)
     authors = models.ManyToManyField(Author, related_name='books')
 
-    def __str__(self):
-        return self.title
-
     class Meta:
         ordering = ['id']
+
+    def __str__(self):
+        return self.title
 
 
 class BookWithYear(Book):
@@ -78,11 +78,11 @@ class Reader(models.Model):
     name = models.CharField(max_length=50)
     books_read = models.ManyToManyField(Book, related_name='read_by')
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         ordering = ['id']
+
+    def __str__(self):
+        return self.name
 
 
 class BookReview(models.Model):
@@ -122,11 +122,11 @@ class Teacher(models.Model):
     objects = TeacherManager()
     objects_custom = TeacherQuerySet.as_manager()
 
-    def __str__(self):
-        return "%s (%s)" % (self.name, ", ".join(q.name for q in self.qualifications.all()))
-
     class Meta:
         ordering = ['id']
+
+    def __str__(self):
+        return "%s (%s)" % (self.name, ", ".join(q.name for q in self.qualifications.all()))
 
 
 class Department(models.Model):
@@ -165,11 +165,11 @@ class TaggedItem(models.Model):
     favorite_fkey = models.CharField(max_length=64, null=True)
     favorite = GenericForeignKey('favorite_ct', 'favorite_fkey')
 
-    def __str__(self):
-        return self.tag
-
     class Meta:
         ordering = ['id']
+
+    def __str__(self):
+        return self.tag
 
 
 class Bookmark(models.Model):
@@ -243,11 +243,11 @@ class Employee(models.Model):
     name = models.CharField(max_length=50)
     boss = models.ForeignKey('self', models.SET_NULL, null=True, related_name='serfs')
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         ordering = ['id']
+
+    def __str__(self):
+        return self.name
 
 
 # Ticket #19607
@@ -275,11 +275,11 @@ class Author2(models.Model):
     first_book = models.ForeignKey('Book', models.CASCADE, related_name='first_time_authors+')
     favorite_books = models.ManyToManyField('Book', related_name='+')
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         ordering = ['id']
+
+    def __str__(self):
+        return self.name
 
 
 # Models for many-to-many with UUID pk test:
