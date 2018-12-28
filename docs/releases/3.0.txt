@@ -236,7 +236,7 @@ in Django 3.0.
 See :ref:`deprecated-features-2.0` for details on these changes, including how
 to remove usage of these features.
 
-* ...
+* The ``django.db.backends.postgresql_psycopg2`` module is removed.
 
 See :ref:`deprecated-features-2.1` for details on these changes, including how
 to remove usage of these features.
