@@ -238,6 +238,8 @@ to remove usage of these features.
 
 * The ``django.db.backends.postgresql_psycopg2`` module is removed.
 
+* ``django.shortcuts.render_to_response()`` is removed.
+
 See :ref:`deprecated-features-2.1` for details on these changes, including how
 to remove usage of these features.
 

@@ -81,17 +81,6 @@ This example is equivalent to::
         c = {'foo': 'bar'}
         return HttpResponse(t.render(c, request), content_type='application/xhtml+xml')
 
-``render_to_response()``
-========================
-
-.. function:: render_to_response(template_name, context=None, content_type=None, status=None, using=None)
-
-   .. deprecated:: 2.0
-
-   This function preceded the introduction of :func:`render` and works
-   similarly except that it doesn't make the ``request`` available in the
-   response.
-
 ``redirect()``
 ==============
 
