@@ -256,3 +256,7 @@ to remove usage of these features.
 * The ``ForceRHR`` GIS function is removed.
 
 * ``django.utils.http.cookie_date()`` is removed.
+
+* The ``staticfiles`` and ``admin_static`` template tag libraries are removed.
+
+* ``django.contrib.staticfiles.templatetags.staticfiles.static()`` is removed.
