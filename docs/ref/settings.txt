@@ -371,8 +371,6 @@ its own CSRF cookie.
 ``CSRF_COOKIE_SAMESITE``
 ------------------------
 
-.. versionadded:: 2.1
-
 Default: ``'Lax'``
 
 The value of the `SameSite`_ flag on the CSRF cookie. This flag prevents the
@@ -3049,8 +3047,6 @@ its own session cookie.
 
 ``SESSION_COOKIE_SAMESITE``
 ---------------------------
-
-.. versionadded:: 2.1
 
 Default: ``'Lax'``
 

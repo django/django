@@ -1778,10 +1778,6 @@ language choice in the user's session. It also saves the language choice in a
 cookie that is named ``django_language`` by default. (The name can be changed
 through the :setting:`LANGUAGE_COOKIE_NAME` setting.)
 
-.. versionchanged:: 2.1
-
-    In older versions, the cookie is only set if session support isn't enabled.
-
 After setting the language choice, Django looks for a ``next`` parameter in the
 ``POST`` or ``GET`` data. If that is found and Django considers it to be a safe
 URL (i.e. it doesn't point to a different host and uses a safe scheme), a
@@ -2097,10 +2093,6 @@ be named using :term:`locale name` notation. E.g. ``de``, ``pt_BR``, ``es_AR``,
 etc. Untranslated strings for territorial language variants use the translations
 of the generic language. For example, untranslated ``pt_BR`` strings use ``pt``
 translations.
-
-.. versionchanged:: 2.1
-
-    Fallback to the generic language as described above was added.
 
 This way, you can write applications that include their own translations, and
 you can override base translations in your project. Or, you can just build

@@ -577,12 +577,6 @@ To query for missing keys, use the ``isnull`` lookup::
     >>> Dog.objects.filter(data__owner__isnull=True)
     <QuerySet [<Dog: Shep>]>
 
-.. versionchanged:: 2.1
-
-    In older versions, using ``None`` as a  lookup value matches objects that
-    don't have the key rather than objects that have the key with a ``None``
-    value.
-
 .. warning::
 
     Since any string could be a key in a JSON object, any lookup other than

@@ -128,10 +128,6 @@ Use the ``django.test.Client`` class to make requests.
     The ``json_encoder`` argument allows setting a custom JSON encoder for
     the JSON serialization that's described in :meth:`post`.
 
-    .. versionchanged:: 2.1
-
-        The ``json_encoder`` argument was added.
-
     Once you have a ``Client`` instance, you can call any of the following
     methods:
 
@@ -220,12 +216,6 @@ Use the ``django.test.Client`` class to make requests.
         and can be overridden by providing a ``json_encoder`` argument to
         :class:`Client`. This serialization also happens for :meth:`put`,
         :meth:`patch`, and :meth:`delete` requests.
-
-        .. versionchanged:: 2.1
-
-            The JSON serialization described above was added. In older versions,
-            you can call :func:`json.dumps` on ``data`` before passing it to
-            ``post()`` to achieve the same thing.
 
         .. versionchanged:: 2.2
 
@@ -1449,8 +1439,6 @@ your test suite.
 .. method:: SimpleTestCase.assertWarnsMessage(expected_warning, expected_message, callable, *args, **kwargs)
             SimpleTestCase.assertWarnsMessage(expected_warning, expected_message)
 
-    .. versionadded:: 2.1
-
     Analogous to :meth:`SimpleTestCase.assertRaisesMessage` but for
     :meth:`~unittest.TestCase.assertWarnsRegex` instead of
     :meth:`~unittest.TestCase.assertRaisesRegex`.
@@ -1754,12 +1742,6 @@ class. Given::
 
 ``SampleTestCaseChild.test`` will be labeled with ``'slow'``, ``'core'``,
 ``'bar'``, and ``'foo'``.
-
-.. versionchanged:: 2.1
-
-   In older versions, tagged tests don't inherit tags from classes, and
-   tagged subclasses don't inherit tags from superclasses. For example,
-   ``SampleTestCaseChild.test`` is labeled only with ``'bar'``.
 
 Then you can choose which tests to run. For example, to run only fast tests:
 

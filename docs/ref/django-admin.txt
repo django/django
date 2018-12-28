@@ -432,8 +432,6 @@ Only support for PostgreSQL is implemented.
 
 .. django-admin-option:: --include-views
 
-.. versionadded:: 2.1
-
 If this option is provided, models are also created for database views.
 
 ``loaddata``

@@ -1128,8 +1128,6 @@ functions without the ``u``.
 
 .. function:: get_supported_language_variant(lang_code, strict=False)
 
-    .. versionadded:: 2.1
-
     Returns ``lang_code`` if it's in the :setting:`LANGUAGES` setting, possibly
     selecting a more generic variant. For example, ``'es'`` is returned if
     ``lang_code`` is ``'es-ar'`` and ``'es'`` is in :setting:`LANGUAGES` but

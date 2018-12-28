@@ -157,8 +157,6 @@ application and imports it.
 
     .. attribute:: default_site
 
-        .. versionadded:: 2.1
-
         A dotted import path to the default admin site's class or to a callable
         that returns a site instance. Defaults to
         ``'django.contrib.admin.sites.AdminSite'``. See
@@ -754,10 +752,6 @@ subclass::
                   return self.first_name + ' ' + self.last_name
               full_name.admin_order_field = Concat('first_name', Value(' '), 'last_name')
 
-      .. versionadded:: 2.1
-
-          Support for expressions in ``admin_order_field`` was added.
-
     * Elements of ``list_display`` can also be properties. Please note however,
       that due to the way properties work in Python, setting
       ``short_description`` on a property is only possible when using the
@@ -1279,10 +1273,6 @@ subclass::
     searching with :lookup:`exact` only works with a single search word since
     two or more words can't all be an exact match unless all words are the same.
 
-    .. versionadded:: 2.1
-
-        The ability to specify a field lookup was added.
-
     Some (older) shortcuts for specifying a field lookup are also available.
     You can prefix a field in ``search_fields`` with the following characters
     and it's equivalent to adding ``__<lookup>`` to the field:
@@ -1312,8 +1302,6 @@ subclass::
     large number of rows.
 
 .. attribute:: ModelAdmin.sortable_by
-
-    .. versionadded:: 2.1
 
     By default, the change list page allows sorting by all model fields (and
     callables that have the ``admin_order_field`` property) specified in
@@ -1432,8 +1420,6 @@ templates used by the :class:`ModelAdmin` views:
     :meth:`.Model.delete`.
 
 .. method:: ModelAdmin.delete_queryset(request, queryset)
-
-    .. versionadded:: 2.1
 
     The ``delete_queryset()`` method is given the ``HttpRequest`` and a
     ``QuerySet`` of objects to be deleted. Override this method to customize
@@ -1594,8 +1580,6 @@ templates used by the :class:`ModelAdmin` views:
     :attr:`~ModelAdmin.search_fields` attribute.
 
 .. method:: ModelAdmin.get_sortable_by(request)
-
-    .. versionadded:: 2.1
 
     The ``get_sortable_by()`` method is passed the ``HttpRequest`` and is
     expected to return a collection (e.g. ``list``, ``tuple``, or ``set``) of
@@ -1884,8 +1868,6 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.has_view_permission(request, obj=None)
 
-    .. versionadded:: 2.1
-
     Should return ``True`` if viewing ``obj`` is permitted, ``False`` otherwise.
     If obj is ``None``, should return ``True`` or ``False`` to indicate whether
     viewing of objects of this type is permitted in general (e.g., ``False``
@@ -2009,8 +1991,6 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.get_deleted_objects(objs, request)
 
-    .. versionadded:: 2.1
-
     A hook for customizing the deletion process of the :meth:`delete_view` and
     the "delete selected" :doc:`action <actions>`.
 
@@ -2127,10 +2107,6 @@ To avoid conflicts with user-supplied scripts or libraries, Django's jQuery
 (version 3.3.1) is namespaced as ``django.jQuery``. If you want to use jQuery
 in your own admin JavaScript without including a second copy, you can use the
 ``django.jQuery`` object on changelist and add/edit views.
-
-.. versionchanged:: 2.1
-
-    jQuery was upgraded from 2.2.3 to 3.3.1.
 
 The :class:`ModelAdmin` class requires jQuery by default, so there is no need
 to add jQuery to your ``ModelAdmin``’s list of media resources unless you have
@@ -2410,12 +2386,6 @@ The ``InlineModelAdmin`` class adds or customizes:
     Should return ``True`` if adding an inline object is permitted, ``False``
     otherwise. ``obj`` is the parent object being edited or ``None`` when
     adding a new parent.
-
-    .. versionchanged:: 2.1
-
-        The ``obj`` argument was added. During the deprecation period, it may
-        also be ``None`` if third-party calls to ``has_add_permission()`` don't
-        provide it.
 
 .. method:: InlineModelAdmin.has_change_permission(request, obj=None)
 
@@ -2726,13 +2696,6 @@ app or per model. The following can:
 * ``search_form.html``
 * ``submit_line.html``
 
-.. versionchanged:: 2.1
-
-    The ability to override the ``actions.html``, ``change_form_object_tools.html``,
-    ``change_list_object_tools.html``, ``change_list_results.html``,
-    ``date_hierarchy.html``, ``pagination.html``, ``prepopulated_fields_js.html``,
-    ``search_form.html``, and ``submit_line.html`` templates was added.
-
 For those templates that cannot be overridden in this way, you may still
 override them for your entire project. Just place the new version in your
 ``templates/admin`` directory. This is particularly useful to create custom 404
@@ -2966,8 +2929,6 @@ put ``'django.contrib.admin.apps.SimpleAdminConfig'`` instead of
 
 Overriding the default admin site
 ---------------------------------
-
-.. versionadded:: 2.1
 
 You can override the default ``django.contrib.admin.site`` by setting the
 :attr:`~.SimpleAdminConfig.default_site` attribute of a custom ``AppConfig``

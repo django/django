@@ -823,12 +823,6 @@ access with an HTTP 403 Forbidden response. Anonymous users are redirected to
 the login page or shown an HTTP 403 Forbidden response, depending on the
 :attr:`~django.contrib.auth.mixins.AccessMixin.raise_exception` attribute.
 
-.. versionchanged:: 2.1
-
-    In older versions, authenticated users who lacked permissions were
-    redirected to the login page (which resulted in a loop) instead of
-    receiving an HTTP 403 Forbidden response.
-
 .. class:: AccessMixin
 
     .. attribute:: login_url

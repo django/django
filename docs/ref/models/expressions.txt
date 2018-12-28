@@ -17,10 +17,6 @@ Django supports negation, addition, subtraction, multiplication, division,
 modulo arithmetic, and the power operator on query expressions, using Python
 constants, variables, and even other expressions.
 
-.. versionchanged:: 2.1
-
-    Support for negation was added.
-
 Some examples
 =============
 

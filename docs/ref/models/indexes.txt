@@ -40,10 +40,6 @@ For example ``Index(fields=['headline', '-pub_date'])`` would create SQL with
 ``(headline, pub_date DESC)``. Index ordering isn't supported on MySQL. In that
 case, a descending index is created as a normal index.
 
-.. versionchanged:: 2.1
-
-    Older versions don't accept a tuple.
-
 ``name``
 --------
 

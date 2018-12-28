@@ -1793,8 +1793,6 @@ If ``value`` is the list ``['a', 'b', 'c']``, the output will be the string
 ``json_script``
 ---------------
 
-.. versionadded:: 2.1
-
 Safely outputs a Python object as JSON, wrapped in a ``<script>`` tag, ready
 for use with JavaScript.
 

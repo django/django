@@ -487,8 +487,6 @@ Topological Methods
 
 .. method:: GEOSGeometry.buffer_with_style(width, quadsegs=8, end_cap_style=1, join_style=1, mitre_limit=5.0)
 
-    .. versionadded:: 2.1
-
     Same as :meth:`buffer`, but allows customizing the style of the buffer.
 
     * ``end_cap_style`` can be round (``1``), flat (``2``), or square (``3``).

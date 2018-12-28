@@ -318,8 +318,6 @@ Methods
 
 .. method:: HttpRequest.get_full_path_info()
 
-    .. versionadded:: 2.1
-
     Like :meth:`get_full_path`, but uses :attr:`path_info` instead of
     :attr:`path`.
 
@@ -815,10 +813,6 @@ Methods
       isn't supported by all browsers, so it's not a replacement for Django's
       CSRF protection, but rather a defense in depth measure.
 
-    .. versionchanged:: 2.1
-
-        The ``samesite`` argument was added.
-
     .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
     .. _SameSite: https://www.owasp.org/index.php/SameSite
 
@@ -1107,12 +1101,6 @@ Attributes
     headers are automatically set when they can be guessed from contents of
     ``open_file``.
 
-    .. versionadded:: 2.1
-
-        The ``as_attachment`` and ``filename`` keywords argument were added.
-        Also, ``FileResponse`` sets the ``Content`` headers if it can guess
-        them.
-
 .. _wsgi.file_wrapper: https://www.python.org/dev/peps/pep-3333/#optional-platform-specific-file-handling
 
 ``FileResponse`` accepts any file-like object with binary content, for example
@@ -1127,8 +1115,6 @@ Methods
 -------
 
 .. method:: FileResponse.set_headers(open_file)
-
-    .. versionadded:: 2.1
 
     This method is automatically called during the response initialization and
     set various headers (``Content-Length``, ``Content-Type``, and

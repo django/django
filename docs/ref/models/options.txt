@@ -325,10 +325,6 @@ Django quotes column and table names behind the scenes.
     before the model is created by :djadmin:`migrate` in order to prevent any
     omitted permissions from being created.
 
-    .. versionchanged:: 2.1
-
-        The ``view`` permission was added.
-
 ``proxy``
 ---------
 

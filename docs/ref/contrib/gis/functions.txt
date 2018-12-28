@@ -283,8 +283,6 @@ representing the bounding box of the geometry.
 
 .. class:: ForcePolygonCW(expression, **extra)
 
-.. versionadded:: 2.1
-
 *Availability*: `PostGIS <https://postgis.net/docs/ST_ForcePolygonCW.html>`__,
 SpatiaLite
 
