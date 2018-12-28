@@ -1,5 +1,4 @@
 import collections
-import functools
 import re
 import warnings
 from itertools import chain
@@ -14,10 +13,7 @@ from django.db.models.sql.constants import (
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError, NotSupportedError
-from django.utils.deprecation import (
-    RemovedInDjango30Warning, RemovedInDjango31Warning,
-)
-from django.utils.inspect import func_supports_parameter
+from django.utils.deprecation import RemovedInDjango31Warning
 
 FORCE = object()
 
@@ -1015,20 +1011,7 @@ class SQLCompiler:
                 backend_converters = self.connection.ops.get_db_converters(expression)
                 field_converters = expression.get_db_converters(self.connection)
                 if backend_converters or field_converters:
-                    convs = []
-                    for conv in (backend_converters + field_converters):
-                        if func_supports_parameter(conv, 'context'):
-                            warnings.warn(
-                                'Remove the context parameter from %s.%s(). Support for it '
-                                'will be removed in Django 3.0.' % (
-                                    conv.__self__.__class__.__name__,
-                                    conv.__name__,
-                                ),
-                                RemovedInDjango30Warning,
-                            )
-                            conv = functools.partial(conv, context={})
-                        convs.append(conv)
-                    converters[i] = (convs, expression)
+                    converters[i] = (backend_converters + field_converters, expression)
         return converters
 
     def apply_converters(self, rows, converters):

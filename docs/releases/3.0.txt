@@ -244,6 +244,9 @@ to remove usage of these features.
 
 * ``HttpRequest.xreadlines()`` is removed.
 
+* Support for the ``context`` argument of ``Field.from_db_value()`` and
+  ``Expression.convert_value()`` is removed.
+
 See :ref:`deprecated-features-2.1` for details on these changes, including how
 to remove usage of these features.
 
