@@ -3,6 +3,7 @@ The main QuerySet implementation. This provides the public API for the ORM.
 """
 
 import copy
+import inspect
 import operator
 import warnings
 from collections import OrderedDict, namedtuple
@@ -549,6 +550,13 @@ class QuerySet:
         """
         defaults = defaults or {}
         self._for_write = True
+
+        # Check if condition is callable and has one input param
+        # otherwise add it to kwargs and pass to model get
+        if not(callable(condition) and len(inspect.signature(condition).parameters) == 1):
+            kwargs['condition'] = condition
+            condition = None
+
         with transaction.atomic(using=self.db):
             try:
                 obj = self.select_for_update().get(**kwargs)
