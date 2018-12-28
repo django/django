@@ -164,10 +164,8 @@ USE_L10N = False
 # notifications and other various emails.
 MANAGERS = ADMINS
 
-# Default content type and charset to use for all HttpResponse objects, if a
-# MIME type isn't manually specified. These are used to construct the
-# Content-Type header.
-DEFAULT_CONTENT_TYPE = 'text/html'
+# Default charset to use for all HttpResponse objects, if a MIME type isn't
+# manually specified. It's used to construct the Content-Type header.
 DEFAULT_CHARSET = 'utf-8'
 
 # Encoding of files read from disk (template and initial SQL files).

@@ -47,7 +47,7 @@ def page_not_found(request, exception, template_name=ERROR_404_TEMPLATE_NAME):
     try:
         template = loader.get_template(template_name)
         body = template.render(context, request)
-        content_type = None             # Django will use DEFAULT_CONTENT_TYPE
+        content_type = None             # Django will use 'text/html'.
     except TemplateDoesNotExist:
         if template_name != ERROR_404_TEMPLATE_NAME:
             # Reraise if it's a missing custom template.

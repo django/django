@@ -240,6 +240,8 @@ to remove usage of these features.
 
 * ``django.shortcuts.render_to_response()`` is removed.
 
+* The ``DEFAULT_CONTENT_TYPE`` setting is removed.
+
 See :ref:`deprecated-features-2.1` for details on these changes, including how
 to remove usage of these features.
 

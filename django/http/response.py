@@ -57,8 +57,7 @@ class HttpResponseBase:
         self._reason_phrase = reason
         self._charset = charset
         if content_type is None:
-            content_type = '%s; charset=%s' % (settings.DEFAULT_CONTENT_TYPE,
-                                               self.charset)
+            content_type = 'text/html; charset=%s' % self.charset
         self['Content-Type'] = content_type
 
     @property
@@ -427,7 +426,7 @@ class FileResponse(StreamingHttpResponse):
         elif hasattr(filelike, 'getbuffer'):
             self['Content-Length'] = filelike.getbuffer().nbytes
 
-        if self.get('Content-Type', '').startswith(settings.DEFAULT_CONTENT_TYPE):
+        if self.get('Content-Type', '').startswith('text/html'):
             if filename:
                 content_type, encoding = mimetypes.guess_type(filename)
                 # Encoding isn't set to prevent browsers from automatically

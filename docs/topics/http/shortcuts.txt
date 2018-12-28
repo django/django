@@ -46,8 +46,8 @@ Optional arguments
     view will call it just before rendering the template.
 
 ``content_type``
-    The MIME type to use for the resulting document. Defaults to the value of
-    the :setting:`DEFAULT_CONTENT_TYPE` setting.
+    The MIME type to use for the resulting document. Defaults to
+    ``'text/html'``.
 
 ``status``
     The status code for the response. Defaults to ``200``.

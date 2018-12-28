@@ -1195,24 +1195,7 @@ See also :setting:`NUMBER_GROUPING`, :setting:`THOUSAND_SEPARATOR` and
 Default: ``'utf-8'``
 
 Default charset to use for all ``HttpResponse`` objects, if a MIME type isn't
-manually specified. Used with :setting:`DEFAULT_CONTENT_TYPE` to construct the
-``Content-Type`` header.
-
-.. setting:: DEFAULT_CONTENT_TYPE
-
-``DEFAULT_CONTENT_TYPE``
-------------------------
-
-Default: ``'text/html'``
-
-Default content type to use for all ``HttpResponse`` objects, if a MIME type
-isn't manually specified. Used with :setting:`DEFAULT_CHARSET` to construct
-the ``Content-Type`` header.
-
-.. deprecated:: 2.0
-
-    This setting is deprecated because it doesn't interact well with
-    third-party apps and is obsolete since HTML5 has mostly superseded XHTML.
+manually specified. Used when constructing the ``Content-Type`` header.
 
 .. setting:: DEFAULT_EXCEPTION_REPORTER_FILTER
 
@@ -3436,7 +3419,6 @@ HTTP
 * :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE`
 * :setting:`DATA_UPLOAD_MAX_NUMBER_FIELDS`
 * :setting:`DEFAULT_CHARSET`
-* :setting:`DEFAULT_CONTENT_TYPE`
 * :setting:`DISALLOWED_USER_AGENTS`
 * :setting:`FORCE_SCRIPT_NAME`
 * :setting:`INTERNAL_IPS`
