@@ -1,0 +1,244 @@
+============================================
+Django 3.0 release notes - UNDER DEVELOPMENT
+============================================
+
+*Expected December 2019*
+
+Welcome to Django 3.0!
+
+These release notes cover the :ref:`new features <whats-new-3.0>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-3.0>` you'll
+want to be aware of when upgrading from Django 2.2 or earlier. We've
+:ref:`dropped some features<removed-features-3.0>` that have reached the end of
+their deprecation cycle, and we've :ref:`begun the deprecation process for
+some features <deprecated-features-3.0>`.
+
+See the :doc:`/howto/upgrade-version` guide if you're updating an existing
+project.
+
+Python compatibility
+====================
+
+Django 3.0 supports Python 3.6, 3.7, and 3.8. We **highly recommend** and only
+officially support the latest release of each series.
+
+The Django 2.2.x series is the last to support Python 3.5.
+
+Third-party library support for older version of Django
+=======================================================
+
+Following the release of Django 3.0, we suggest that third-party app authors
+drop support for all versions of Django prior to 2.2. At that time, you should
+be able to run your package's tests using ``python -Wd`` so that deprecation
+warnings appear. After making the deprecation warning fixes, your app should be
+compatible with Django 3.0.
+
+.. _whats-new-3.0:
+
+What's new in Django 3.0
+========================
+
+Minor features
+--------------
+
+:mod:`django.contrib.admin`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.admindocs`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.auth`
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.contenttypes`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.messages`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.postgres`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.redirects`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sessions`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sitemaps`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sites`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.staticfiles`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.syndication`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Cache
+~~~~~
+
+* ...
+
+CSRF
+~~~~
+
+* ...
+
+Email
+~~~~~
+
+* ...
+
+File Storage
+~~~~~~~~~~~~
+
+* ...
+
+File Uploads
+~~~~~~~~~~~~
+
+* ...
+
+
+Forms
+~~~~~
+
+* ...
+
+Generic Views
+~~~~~~~~~~~~~
+
+* ...
+
+Internationalization
+~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Management Commands
+~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Migrations
+~~~~~~~~~~
+
+* ...
+
+Models
+~~~~~~
+
+* ...
+
+Requests and Responses
+~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Serialization
+~~~~~~~~~~~~~
+
+* ...
+
+Signals
+~~~~~~~
+
+* ...
+
+Templates
+~~~~~~~~~
+
+* ...
+
+Tests
+~~~~~
+
+* ...
+
+URLs
+~~~~
+
+* ...
+
+Validators
+~~~~~~~~~~
+
+* ...
+
+.. _backwards-incompatible-3.0:
+
+Backwards incompatible changes in 3.0
+=====================================
+
+Database backend API
+--------------------
+
+This section describes changes that may be needed in third-party database
+backends.
+
+* ...
+
+Miscellaneous
+-------------
+
+* ...
+
+.. _deprecated-features-3.0:
+
+Features deprecated in 3.0
+==========================
+
+Miscellaneous
+-------------
+
+* ...
+
+.. _removed-features-3.0:
+
+Features removed in 3.0
+=======================
+
+These features have reached the end of their deprecation cycle and are removed
+in Django 3.0.
+
+See :ref:`deprecated-features-2.0` for details on these changes, including how
+to remove usage of these features.
+
+* ...
+
+See :ref:`deprecated-features-2.1` for details on these changes, including how
+to remove usage of these features.
+
+* ...
