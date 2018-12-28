@@ -25,7 +25,6 @@ from django.db.models.query_utils import FilteredRelation, InvalidQuery, Q
 from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE
 from django.db.utils import NotSupportedError
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.functional import cached_property, partition
 from django.utils.version import get_version
 
@@ -607,22 +606,12 @@ class QuerySet:
                 ))
         return params
 
-    def _earliest(self, *fields, field_name=None):
+    def _earliest(self, *fields):
         """
         Return the earliest object according to fields (if given) or by the
         model's Meta.get_latest_by.
         """
-        if fields and field_name is not None:
-            raise ValueError('Cannot use both positional arguments and the field_name keyword argument.')
-
-        if field_name is not None:
-            warnings.warn(
-                'The field_name keyword argument to earliest() and latest() '
-                'is deprecated in favor of passing positional arguments.',
-                RemovedInDjango30Warning,
-            )
-            order_by = (field_name,)
-        elif fields:
+        if fields:
             order_by = fields
         else:
             order_by = getattr(self.model._meta, 'get_latest_by')
@@ -642,11 +631,11 @@ class QuerySet:
         obj.query.add_ordering(*order_by)
         return obj.get()
 
-    def earliest(self, *fields, field_name=None):
-        return self._earliest(*fields, field_name=field_name)
+    def earliest(self, *fields):
+        return self._earliest(*fields)
 
-    def latest(self, *fields, field_name=None):
-        return self.reverse()._earliest(*fields, field_name=field_name)
+    def latest(self, *fields):
+        return self.reverse()._earliest(*fields)
 
     def first(self):
         """Return the first object of a query or None if no match is found."""
