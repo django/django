@@ -242,6 +242,8 @@ to remove usage of these features.
 
 * The ``DEFAULT_CONTENT_TYPE`` setting is removed.
 
+* ``HttpRequest.xreadlines()`` is removed.
+
 See :ref:`deprecated-features-2.1` for details on these changes, including how
 to remove usage of these features.
 

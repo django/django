@@ -1,6 +1,5 @@
 import copy
 import re
-import warnings
 from io import BytesIO
 from itertools import chain
 from urllib.parse import quote, urlencode, urljoin, urlsplit
@@ -15,7 +14,6 @@ from django.http.multipartparser import MultiPartParser, MultiPartParserError
 from django.utils.datastructures import (
     CaseInsensitiveMapping, ImmutableList, MultiValueDict,
 )
-from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.encoding import escape_uri_path, iri_to_uri
 from django.utils.functional import cached_property
 from django.utils.http import is_same_domain, limited_parse_qsl
@@ -353,13 +351,6 @@ class HttpRequest:
 
     def __iter__(self):
         return iter(self.readline, b'')
-
-    def xreadlines(self):
-        warnings.warn(
-            'HttpRequest.xreadlines() is deprecated in favor of iterating the '
-            'request.', RemovedInDjango30Warning, stacklevel=2,
-        )
-        yield from self
 
     def readlines(self):
         return list(self)
