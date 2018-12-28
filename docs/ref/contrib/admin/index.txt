@@ -972,9 +972,13 @@ subclass::
       limit the ``list_filter`` choices to the users who have written a book
       instead of listing all users.
 
-      Or you can filter out objects with an empty (or non-empty) field value
-      using ``EmptyFieldListFilter`` with the filter adapting the notion of
-      emptiness according to the field's attributes::
+      .. versionadded:: 2.2
+
+          A new filter ``EmptyFieldListFilter`` was added.
+
+      You can filter empty values using ``EmptyFieldListFilter``, letting
+      the filter determine what 'empty' means according to the field's
+      attributes::
 
           class BookAdmin(admin.ModelAdmin):
               list_filter = (

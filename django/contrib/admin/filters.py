@@ -438,14 +438,11 @@ class EmptyFieldListFilter(FieldListFilter):
                 % (self.lookup_val, self.lookup_kwarg)
             )
 
-        query_filter = {}
-
+        lookup_condition = models.Q()
         if self.field.empty_strings_allowed:
-            query_filter[self.field_path] = ''
-        if self.field.null:  # Allow null value
-            query_filter['%s__isnull' % self.field_path] = True
-
-        lookup_condition = models.Q(**query_filter, _connector=models.Q.OR)
+            lookup_condition |= models.Q(**{self.field_path: ''})
+        if self.field.null:
+            lookup_condition |= models.Q(**{'%s__isnull' % self.field_path: True})
 
         if self.lookup_val == '1':
             return queryset.filter(lookup_condition)

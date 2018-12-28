@@ -1276,7 +1276,7 @@ class ListFiltersTests(TestCase):
         changelist = modeladmin.get_changelist_instance(request)
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertListEqual(list(queryset), [self.guitar_book])
+        self.assertCountEqual(queryset, [self.guitar_book])
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][0]
         self.assertEqual(filterspec.title, 'Verbose Author')
@@ -1290,7 +1290,7 @@ class ListFiltersTests(TestCase):
         changelist = modeladmin.get_changelist_instance(request)
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertListEqual(list(queryset), [self.django_book, self.bio_book, self.djangonaut_book])
+        self.assertCountEqual(queryset, [self.django_book, self.bio_book, self.djangonaut_book])
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][0]
         self.assertEqual(filterspec.title, 'Verbose Author')
@@ -1304,7 +1304,7 @@ class ListFiltersTests(TestCase):
         changelist = modeladmin.get_changelist_instance(request)
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertListEqual(list(queryset), [self.django_book, self.bio_book, self.djangonaut_book])
+        self.assertCountEqual(queryset, [self.django_book, self.bio_book, self.djangonaut_book])
 
         # Not empty Field (allowing empty strings)
         request = self.request_factory.get('/', {'description__isempty': '0'})
@@ -1312,7 +1312,7 @@ class ListFiltersTests(TestCase):
         changelist = modeladmin.get_changelist_instance(request)
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertListEqual(list(queryset), [self.guitar_book])
+        self.assertCountEqual(queryset, [self.guitar_book])
 
         # Invalid parameter, an exception is raised
         request = self.request_factory.get('/', {'description__isempty': 42})
@@ -1327,4 +1327,4 @@ class ListFiltersTests(TestCase):
         changelist = modeladmin.get_changelist_instance(request)
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertListEqual(list(queryset), [self.jack, self.john])
+        self.assertCountEqual(queryset, [self.jack, self.john])
