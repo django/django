@@ -293,16 +293,21 @@ Methods
 
     Example: ``"/minfo/music/bands/the_beatles/?print=true"``
 
-.. method:: HttpRequest.build_absolute_uri(location)
+.. method:: HttpRequest.build_absolute_uri(location=None)
 
     Returns the absolute URI form of ``location``. If no location is provided,
     the location will be set to ``request.get_full_path()``.
 
     If the location is already an absolute URI, it will not be altered.
     Otherwise the absolute URI is built using the server variables available in
-    this request.
+    this request. For example:
 
-    Example: ``"https://example.com/music/bands/the_beatles/?print=true"``
+    >>> request.build_absolute_uri()
+    'https://example.com/music/bands/the_beatles/?print=true'
+    >>> request.build_absolute_uri('/bands/')
+    'https://example.com/bands/'
+    >>> request.build_absolute_uri('https://example2.com/bands/')
+    'https://example2.com/bands/'
 
     .. note::
 
