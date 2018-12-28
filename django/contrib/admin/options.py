@@ -45,7 +45,6 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.html import format_html
 from django.utils.http import urlencode
-from django.utils.inspect import get_func_args
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst, format_lazy, get_text_list
 from django.utils.translation import gettext as _, ngettext
@@ -587,12 +586,11 @@ class ModelAdmin(BaseModelAdmin):
         for inline_class in self.inlines:
             inline = inline_class(self.model, self.admin_site)
             if request:
-                inline_has_add_permission = inline._has_add_permission(request, obj)
                 if not (inline.has_view_or_change_permission(request, obj) or
-                        inline_has_add_permission or
+                        inline.has_add_permission(request, obj) or
                         inline.has_delete_permission(request, obj)):
                     continue
-                if not inline_has_add_permission:
+                if not inline.has_add_permission(request, obj):
                     inline.max_num = 0
             inline_instances.append(inline)
 
@@ -1475,7 +1473,7 @@ class ModelAdmin(BaseModelAdmin):
         for inline, formset in zip(inline_instances, formsets):
             fieldsets = list(inline.get_fieldsets(request, obj))
             readonly = list(inline.get_readonly_fields(request, obj))
-            has_add_permission = inline._has_add_permission(request, obj)
+            has_add_permission = inline.has_add_permission(request, obj)
             has_change_permission = inline.has_change_permission(request, obj)
             has_delete_permission = inline.has_delete_permission(request, obj)
             has_view_permission = inline.has_view_permission(request, obj)
@@ -2011,11 +2009,6 @@ class InlineModelAdmin(BaseModelAdmin):
             js.append('collapse%s.js' % extra)
         return forms.Media(js=['admin/js/%s' % url for url in js])
 
-    def _has_add_permission(self, request, obj):
-        # RemovedInDjango30Warning: obj will be a required argument.
-        args = get_func_args(self.has_add_permission)
-        return self.has_add_permission(request, obj) if 'obj' in args else self.has_add_permission(request)
-
     def get_extra(self, request, obj=None, **kwargs):
         """Hook for customizing the number of extra inline forms."""
         return self.extra
@@ -2061,7 +2054,7 @@ class InlineModelAdmin(BaseModelAdmin):
 
         base_model_form = defaults['form']
         can_change = self.has_change_permission(request, obj) if request else True
-        can_add = self._has_add_permission(request, obj) if request else True
+        can_add = self.has_add_permission(request, obj) if request else True
 
         class DeleteProtectedModelForm(base_model_form):
 
@@ -2126,8 +2119,7 @@ class InlineModelAdmin(BaseModelAdmin):
             queryset = queryset.none()
         return queryset
 
-    def has_add_permission(self, request, obj=None):
-        # RemovedInDjango31Warning: obj becomes a mandatory argument.
+    def has_add_permission(self, request, obj):
         if self.opts.auto_created:
             # We're checking the rights to an auto-created intermediate model,
             # which doesn't have its own individual permissions. The user needs
