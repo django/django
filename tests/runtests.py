@@ -19,7 +19,7 @@ from django.test.runner import default_test_processes
 from django.test.selenium import SeleniumTestCaseBase
 from django.test.utils import get_runner
 from django.utils.deprecation import (
-    RemovedInDjango30Warning, RemovedInDjango31Warning,
+    RemovedInDjango31Warning, RemovedInDjango40Warning,
 )
 from django.utils.log import DEFAULT_LOGGING
 
@@ -32,7 +32,7 @@ else:
     warnings.filterwarnings('ignore', r'\(1003, *', category=MySQLdb.Warning)
 
 # Make deprecation warnings errors to ensure no usage of deprecated features.
-warnings.simplefilter("error", RemovedInDjango30Warning)
+warnings.simplefilter("error", RemovedInDjango40Warning)
 warnings.simplefilter('error', RemovedInDjango31Warning)
 # Make runtime warning errors to ensure no usage of error prone patterns.
 warnings.simplefilter("error", RuntimeWarning)
