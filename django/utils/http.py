@@ -3,7 +3,6 @@ import calendar
 import datetime
 import re
 import unicodedata
-import warnings
 from binascii import Error as BinasciiError
 from email.utils import formatdate
 from urllib.parse import (
@@ -14,7 +13,6 @@ from urllib.parse import (
 
 from django.core.exceptions import TooManyFieldsSent
 from django.utils.datastructures import MultiValueDict
-from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.functional import keep_lazy_text
 
 # based on RFC 7232, Appendix C
@@ -118,25 +116,6 @@ def urlencode(query, doseq=False):
                     query_val.append(item)
         query_params.append((key, query_val))
     return original_urlencode(query_params, doseq)
-
-
-def cookie_date(epoch_seconds=None):
-    """
-    Format the time to ensure compatibility with Netscape's cookie standard.
-
-    `epoch_seconds` is a floating point number expressed in seconds since the
-    epoch, in UTC - such as that outputted by time.time(). If set to None, it
-    defaults to the current time.
-
-    Output a string in the format 'Wdy, DD-Mon-YYYY HH:MM:SS GMT'.
-    """
-    warnings.warn(
-        'cookie_date() is deprecated in favor of http_date(), which follows '
-        'the format of the latest RFC.',
-        RemovedInDjango30Warning, stacklevel=2,
-    )
-    rfcdate = formatdate(epoch_seconds)
-    return '%s-%s-%s GMT' % (rfcdate[:7], rfcdate[8:11], rfcdate[12:25])
 
 
 def http_date(epoch_seconds=None):
