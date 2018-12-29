@@ -155,6 +155,18 @@ class UserManagerTestCase(TestCase):
         for char in password:
             self.assertIn(char, allowed_chars)
 
+    def test_create_user_no_email(self):
+        user = User.objects.create_user('user')
+        self.assertEqual(user.email, "")
+        self.assertEqual(user.username, 'user')
+        self.assertFalse(user.has_usable_password())
+
+    def test_create_super_user_no_email(self):
+        user = User.objects.create_superuser('user')
+        self.assertEqual(user.email, "")
+        self.assertEqual(user.username, 'user')
+        self.assertFalse(user.has_usable_password())
+
 
 class AbstractBaseUserTests(SimpleTestCase):
 
