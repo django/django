@@ -338,8 +338,26 @@ class BaseValidator:
 
 
 @deconstructible
-class MaxValueValidator(BaseValidator):
+class InclusiveMaxValueValidator(BaseValidator):
     message = _('Ensure this value is less than or equal to %(limit_value)s.')
+    code = 'max_value'
+
+    def compare(self, a, b):
+        return a >= b
+
+
+@deconstructible
+class InclusiveMinValueValidator(BaseValidator):
+    message = _('Ensure this value is greater than or equal to %(limit_value)s.')
+    code = 'min_value'
+
+    def compare(self, a, b):
+        return a <= b
+
+    
+@deconstructible
+class ExclusiveMaxValueValidator(BaseValidator):
+    message = _('Ensure this value is less than %(limit_value)s.')
     code = 'max_value'
 
     def compare(self, a, b):
@@ -347,13 +365,16 @@ class MaxValueValidator(BaseValidator):
 
 
 @deconstructible
-class MinValueValidator(BaseValidator):
-    message = _('Ensure this value is greater than or equal to %(limit_value)s.')
+class ExclusiveMinValueValidator(BaseValidator):
+    message = _('Ensure this value is greater than %(limit_value)s.')
     code = 'min_value'
 
     def compare(self, a, b):
         return a < b
 
+    
+MaxValueValidator = ExclusiveMaxValueValidator
+MinValueValidator = ExclusiveMinValueValidator
 
 @deconstructible
 class MinLengthValidator(BaseValidator):
