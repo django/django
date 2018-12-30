@@ -607,10 +607,10 @@ class QuerySet:
                 ))
         return params
 
-    def _earliest_or_latest(self, *fields, field_name=None):
+    def _earliest(self, *fields, field_name=None):
         """
-        Return the latest object, according to the model's
-        'get_latest_by' option or optional given field_name.
+        Return the earliest object according to fields (if given) or by the
+        model's Meta.get_latest_by.
         """
         if fields and field_name is not None:
             raise ValueError('Cannot use both positional arguments and the field_name keyword argument.')
@@ -643,10 +643,10 @@ class QuerySet:
         return obj.get()
 
     def earliest(self, *fields, field_name=None):
-        return self._earliest_or_latest(*fields, field_name=field_name)
+        return self._earliest(*fields, field_name=field_name)
 
     def latest(self, *fields, field_name=None):
-        return self.reverse()._earliest_or_latest(*fields, field_name=field_name)
+        return self.reverse()._earliest(*fields, field_name=field_name)
 
     def first(self):
         """Return the first object of a query or None if no match is found."""
