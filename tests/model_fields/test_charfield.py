@@ -28,8 +28,20 @@ class TestCharField(TestCase):
         p.refresh_from_db()
         self.assertEqual(p.title, 'Smile 😀')
 
+    def test_assignment_from_choice_enum(self):
+        class Choices(str, models.ChoiceEnum):
+            C = 'Carnival!'
+            F = 'Festival!'
+        p = Post.objects.create(title=Choices.C, body=Choices.F)
+        p.refresh_from_db()
+        self.assertEqual(p.title, 'Carnival!')
+
 
 class ValidationTests(SimpleTestCase):
+
+    class CharChoices(str, models.ChoiceEnum):
+        C = 'c', 'C'
+        D = 'd'
 
     def test_charfield_raises_error_on_empty_string(self):
         f = models.CharField()
@@ -48,6 +60,15 @@ class ValidationTests(SimpleTestCase):
         f = models.CharField(choices=[('a', 'A'), ('b', 'B')])
         with self.assertRaises(ValidationError):
             f.clean('not a', None)
+
+    def test_charfield_with_choices_cleans_valid_choice_from_enum(self):
+        f = models.CharField(max_length=1, choices=self.CharChoices.choices)
+        self.assertEqual('c', f.clean('c', None))
+
+    def test_charfield_with_choices_raises_error_on_invalid_choice_from_enum(self):
+        f = models.CharField(max_length=1, choices=self.CharChoices.choices)
+        with self.assertRaises(ValidationError):
+            f.clean('a', None)
 
     def test_charfield_raises_error_on_empty_input(self):
         f = models.CharField(null=False)

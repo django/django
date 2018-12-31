@@ -167,6 +167,9 @@ class PositiveIntegerFieldTests(IntegerFieldTests):
 
 class ValidationTests(SimpleTestCase):
 
+    class Choices(models.ChoiceIntEnum):
+        A = 1
+
     def test_integerfield_cleans_valid_string(self):
         f = models.IntegerField()
         self.assertEqual(f.clean('2', None), 2)
@@ -200,3 +203,14 @@ class ValidationTests(SimpleTestCase):
         f = models.IntegerField(choices=((1, 1),))
         with self.assertRaises(ValidationError):
             f.clean('0', None)
+
+    def test_integerfield_with_choices_cleans_valid_choice_from_enum(self):
+        f = models.IntegerField(choices=self.Choices.choices)
+        self.assertEqual(1, f.clean('1', None))
+
+    def test_charfield_with_choices_raises_error_on_invalid_choice_from_enum(self):
+        f = models.IntegerField(choices=self.Choices.choices)
+        with self.assertRaises(ValidationError):
+            f.clean('A', None)
+        with self.assertRaises(ValidationError):
+            f.clean('3', None)

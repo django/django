@@ -263,6 +263,9 @@ Models
 * Allowed symmetrical intermediate table for self-referential
   :class:`~django.db.models.ManyToManyField`.
 
+* Added the ``ChoiceEnum`` and ``ChoiceIntEnum`` helpers for defining field
+  :attr:`~django.db.models.Field.choices`.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
