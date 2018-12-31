@@ -1,3 +1,5 @@
+from urllib.parse import quote
+
 from django.http import (
     HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound,
     HttpResponseServerError,
@@ -22,7 +24,8 @@ def page_not_found(request, exception, template_name=ERROR_404_TEMPLATE_NAME):
     Templates: :template:`404.html`
     Context:
         request_path
-            The path of the requested URL (e.g., '/app/pages/bad_page/')
+            The path of the requested URL (e.g., '/app/pages/bad_page/'). It's
+            quoted to prevent a content injection attack.
         exception
             The message from the exception which triggered the 404 (if one was
             supplied), or the exception class name
@@ -38,7 +41,7 @@ def page_not_found(request, exception, template_name=ERROR_404_TEMPLATE_NAME):
         if isinstance(message, str):
             exception_repr = message
     context = {
-        'request_path': request.path,
+        'request_path': quote(request.path),
         'exception': exception_repr,
     }
     try:
@@ -51,7 +54,7 @@ def page_not_found(request, exception, template_name=ERROR_404_TEMPLATE_NAME):
             raise
         template = Engine().from_string(
             '<h1>Not Found</h1>'
-            '<p>The requested URL {{ request_path }} was not found on this server.</p>')
+            '<p>The requested resource was not found on this server.</p>')
         body = template.render(Context(context))
         content_type = 'text/html'
     return HttpResponseNotFound(body, content_type=content_type)
