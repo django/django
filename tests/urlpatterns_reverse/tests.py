@@ -1064,7 +1064,7 @@ class ErrorHandlerResolutionTests(SimpleTestCase):
                 self.assertEqual(self.callable_resolver.resolve_error_handler(code), handler)
 
 
-@override_settings(ROOT_URLCONF='urlpatterns_reverse.urls_without_full_import')
+@override_settings(ROOT_URLCONF='urlpatterns_reverse.urls_without_handlers')
 class DefaultErrorHandlerTests(SimpleTestCase):
 
     def test_default_handler(self):
