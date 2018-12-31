@@ -22,3 +22,7 @@ Bugfixes
 * Fixed a regression in Django 2.1.4 (which enabled keep-alive connections)
   where request body data isn't properly consumed for such connections
   (:ticket:`30015`).
+
+* Fixed a regression in Django 2.1.4 where
+  ``InlineModelAdmin.has_change_permission()`` is incorrectly called with a
+  non-``None`` ``obj`` argument during an object add (:ticket:`30050`).
