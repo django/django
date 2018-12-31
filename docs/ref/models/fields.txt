@@ -94,6 +94,7 @@ and the second element is the human-readable name. For example::
         ('SO', 'Sophomore'),
         ('JR', 'Junior'),
         ('SR', 'Senior'),
+        ('GR', 'Graduate'),
     ]
 
 Generally, it's best to define choices inside a model class, and to
@@ -106,11 +107,13 @@ define a suitably-named constant for each value::
         SOPHOMORE = 'SO'
         JUNIOR = 'JR'
         SENIOR = 'SR'
+        GRADUATE = 'GR'
         YEAR_IN_SCHOOL_CHOICES = [
             (FRESHMAN, 'Freshman'),
             (SOPHOMORE, 'Sophomore'),
             (JUNIOR, 'Junior'),
             (SENIOR, 'Senior'),
+            (GRADUATE, 'Graduate'),
         ]
         year_in_school = models.CharField(
             max_length=2,
@@ -119,13 +122,102 @@ define a suitably-named constant for each value::
         )
 
         def is_upperclass(self):
-            return self.year_in_school in (self.JUNIOR, self.SENIOR)
+            return self.year_in_school in {self.JUNIOR, self.SENIOR}
 
 Though you can define a choices list outside of a model class and then
 refer to it, defining the choices and names for each choice inside the
 model class keeps all of that information with the class that uses it,
 and makes the choices easy to reference (e.g, ``Student.SOPHOMORE``
 will work anywhere that the ``Student`` model has been imported).
+
+In addition, Django provides enumeration types that you can subclass to define
+choices in a concise way::
+
+    from django.utils.translation import gettext_lazy as _
+
+    class Student(models.Model):
+
+        class YearInSchool(models.TextChoices):
+            FRESHMAN = 'FR', _('Freshman')
+            SOPHOMORE = 'SO', _('Sophomore')
+            JUNIOR = 'JR', _('Junior')
+            SENIOR = 'SR', _('Senior')
+            GRADUATE = 'GR', _('Graduate')
+
+        year_in_school = models.CharField(
+            max_length=2,
+            choices=YearInSchool.choices,
+            default=YearInSchool.FRESHMAN,
+        )
+
+        def is_upperclass(self):
+            return self.year_in_school in {YearInSchool.JUNIOR, YearInSchool.SENIOR}
+
+These work similar to :mod:`enum` from Python's standard library, but with some
+modifications:
+
+* Instead of values in the ``enum``, Django uses ``(value, label)`` tuples. The
+  ``label`` can be a lazy translatable string. If a tuple is not provided, the
+  label is automatically generated from the member name.
+* ``.label`` property is added on values, to return the label specified.
+* Number of custom properties are added to the enumeration classes --
+  ``.choices``, ``.labels``, ``.values``, and ``.names`` -- to make it easier
+  to access lists of those separate parts of the enumeration. Use ``.choices``
+  as a suitable value to pass to :attr:`~Field.choices` in a field definition.
+* The use of :func:`enum.unique()` is enforced to ensure that values cannot be
+  defined multiple times. This is unlikely to be expected in choices for a
+  field.
+
+Note that ``YearInSchool.SENIOR``, ``YearInSchool['SENIOR']``,
+``YearInSchool('SR')`` work as expected, while ``YearInSchool.SENIOR.label`` is
+a translatable string.
+
+If you don't need to have the human-readable names translated, you can have
+them inferred from the member name (replacing underscores to spaces and using
+title-case)::
+
+    class YearInSchool(models.TextChoices):
+        FRESHMAN = 'FR'
+        SOPHOMORE = 'SO'
+        JUNIOR = 'JR'
+        SENIOR = 'SR'
+        GRADUATE = 'GR'
+
+Since the case where the enum values need to be integers is extremely common,
+Django provides a ``IntegerChoices`` class. For example::
+
+    class Card(models.Model):
+
+        class Suit(models.IntegerChoices):
+            DIAMOND = 1
+            SPADE = 2
+            HEART = 3
+            CLUB = 4
+
+        suit = models.IntegerField(choices=Suit.choices)
+
+It is also possible to make use of the `Enum Functional API
+<https://docs.python.org/3/library/enum.html#functional-api>`_ with the caveat
+that labels are automatically generated as highlighted above::
+
+    >>> MedalType = models.TextChoices('MedalType', 'GOLD SILVER BRONZE')
+    >>> MedalType.choices
+    [('GOLD', 'Gold'), ('SILVER', 'Silver'), ('BRONZE', 'Bronze')]
+    >>> Place = models.IntegerChoices('Place', 'FIRST SECOND THIRD')
+    >>> Place.choices
+    [(1, 'First'), (2, 'Second'), (3, 'Third')]
+
+If you require support for a concrete data type other than ``int`` or ``str``,
+you can subclass ``Choices`` and the required concrete data type, e.g.
+:class:``datetime.date`` for use with :class:`~django.db.models.DateField`::
+
+    class MoonLandings(datetime.date, models.Choices):
+        APOLLO_11 = 1969, 7, 20, 'Apollo 11 (Eagle)'
+        APOLLO_12 = 1969, 11, 19, 'Apollo 12 (Intrepid)'
+        APOLLO_14 = 1971, 2, 5, 'Apollo 14 (Antares)'
+        APOLLO_15 = 1971, 7, 30, 'Apollo 15 (Falcon)'
+        APOLLO_16 = 1972, 4, 21, 'Apollo 16 (Orion)'
+        APOLLO_17 = 1972, 12, 11, 'Apollo 17 (Challenger)'
 
 You can also collect your available choices into named groups that can
 be used for organizational purposes::
@@ -148,7 +240,8 @@ The first element in each tuple is the name to apply to the group. The
 second element is an iterable of 2-tuples, with each 2-tuple containing
 a value and a human-readable name for an option. Grouped options may be
 combined with ungrouped options within a single list (such as the
-`unknown` option in this example).
+`unknown` option in this example). Grouping is not supported by the custom
+enumeration types for managing choices.
 
 For each model field that has :attr:`~Field.choices` set, Django will add a
 method to retrieve the human-readable name for the field's current value. See
@@ -169,7 +262,19 @@ Unless :attr:`blank=False<Field.blank>` is set on the field along with a
 with the select box. To override this behavior, add a tuple to ``choices``
 containing ``None``; e.g. ``(None, 'Your String For Display')``.
 Alternatively, you can use an empty string instead of ``None`` where this makes
-sense - such as on a :class:`~django.db.models.CharField`.
+sense - such as on a :class:`~django.db.models.CharField`. To change the label
+when using one of the custom enumeration types, set the ``__empty__`` attribute
+on the class::
+
+    class Answer(models.IntegerChoices):
+        NO = 0, _('No')
+        YES = 1, _('Yes')
+
+        __empty__ = _('(Unknown)')
+
+.. versionadded:: 3.0
+
+   The ``TextChoices``, ``IntegerChoices``, and ``Choices`` classes were added.
 
 ``db_column``
 -------------

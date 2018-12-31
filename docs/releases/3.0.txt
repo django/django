@@ -81,6 +81,18 @@ Expressions that outputs :class:`~django.db.models.BooleanField` may now be
 used directly in ``QuerySet`` filters, without having to first annotate and
 then filter against the annotation.
 
+Enumerations for model field choices
+------------------------------------
+
+Custom enumeration types ``TextChoices``, ``IntegerChoices``, and ``Choices``
+are now available as a way to define :attr:`.Field.choices`. ``TextChoices``
+and ``IntegerChoices`` types are provided for text and integer fields. The
+``Choices`` class allows defining a compatible enumeration for other concrete
+data types. These custom enumeration types support human-readable labels that
+can be translated and accessed via a property on the enumeration or its
+members. See :ref:`Field.choices documentation <field-choices>` for more
+details and examples.
+
 Minor features
 --------------
 

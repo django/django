@@ -46,6 +46,11 @@ class BaseSimpleSerializer(BaseSerializer):
         return repr(self.value), set()
 
 
+class ChoicesSerializer(BaseSerializer):
+    def serialize(self):
+        return serializer_factory(self.value.value).serialize()
+
+
 class DateTimeSerializer(BaseSerializer):
     """For datetime.*, except datetime.datetime."""
     def serialize(self):
@@ -279,6 +284,7 @@ class Serializer:
         set: SetSerializer,
         tuple: TupleSerializer,
         dict: DictionarySerializer,
+        models.Choices: ChoicesSerializer,
         enum.Enum: EnumSerializer,
         datetime.datetime: DatetimeDatetimeSerializer,
         (datetime.date, datetime.timedelta, datetime.time): DateTimeSerializer,
