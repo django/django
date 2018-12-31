@@ -1,6 +1,4 @@
-# A URLs file that doesn't use the default
-# from django.conf.urls import *
-# import pattern.
+# A URLconf that doesn't define any handlerXXX.
 from django.conf.urls import url
 
 from .views import bad_view, empty_view
