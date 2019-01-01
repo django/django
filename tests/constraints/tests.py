@@ -18,6 +18,18 @@ class BaseConstraintTests(SimpleTestCase):
         with self.assertRaisesMessage(NotImplementedError, msg):
             c.constraint_sql(None, None)
 
+    def test_create_sql(self):
+        c = BaseConstraint('name')
+        msg = 'This method must be implemented by a subclass.'
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            c.create_sql(None, None)
+
+    def test_remove_sql(self):
+        c = BaseConstraint('name')
+        msg = 'This method must be implemented by a subclass.'
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            c.remove_sql(None, None)
+
 
 class CheckConstraintTests(TestCase):
     def test_repr(self):

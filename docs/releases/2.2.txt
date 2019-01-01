@@ -322,19 +322,21 @@ backends.
 * Third party database backends must implement support for partial indexes or
   set ``DatabaseFeatures.supports_partial_indexes`` to ``False``.
 
-* Several ``SchemaEditor`` attributes are changed:
-
-  * ``sql_create_check`` is replaced with ``sql_create_constraint``.
-  * ``sql_delete_check`` is replaced with ``sql_delete_constraint``.
-  * ``sql_create_fk`` is replaced with ``sql_foreign_key_constraint``,
-    ``sql_constraint``, and ``sql_create_constraint``.
-
 * ``DatabaseIntrospection.table_name_converter()`` and
   ``column_name_converter()`` are removed. Third party database backends may
   need to instead implement ``DatabaseIntrospection.identifier_converter()``.
   In that case, the constraint names that
   ``DatabaseIntrospection.get_constraints()`` returns must be normalized by
   ``identifier_converter()``.
+
+* SQL generation for indexes is moved from :class:`~django.db.models.Index` to
+  ``SchemaEditor`` and these ``SchemaEditor`` methods are added:
+
+  * ``_create_primary_key_sql()`` and ``_delete_primary_key_sql()``
+  * ``_delete_index_sql()`` (to pair with ``_create_index_sql()``)
+  * ``_delete_unique_sql`` (to pair with ``_create_unique_sql()``)
+  * ``_delete_fk_sql()`` (to pair with ``_create_fk_sql()``)
+  * ``_create_check_sql()`` and ``_delete_check_sql()``
 
 Admin actions are no longer collected from base ``ModelAdmin`` classes
 ----------------------------------------------------------------------
