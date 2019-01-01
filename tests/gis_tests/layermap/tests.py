@@ -261,13 +261,13 @@ class LayerMapTest(TestCase):
 
     def test_model_inheritance(self):
         "Tests LayerMapping on inherited models.  See #12093."
-        icity_mapping = {'name': 'Name',
-                         'population': 'Population',
-                         'density': 'Density',
-                         'point': 'POINT',
-                         'dt': 'Created',
-                         }
-
+        icity_mapping = {
+            'name': 'Name',
+            'population': 'Population',
+            'density': 'Density',
+            'point': 'POINT',
+            'dt': 'Created',
+        }
         # Parent model has geometry field.
         lm1 = LayerMapping(ICity1, city_shp, icity_mapping)
         lm1.save()

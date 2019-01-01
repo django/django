@@ -163,10 +163,10 @@ class IntrospectionTests(TransactionTestCase):
     def test_get_key_columns(self):
         with connection.cursor() as cursor:
             key_columns = connection.introspection.get_key_columns(cursor, Article._meta.db_table)
-        self.assertEqual(
-            set(key_columns),
-            {('reporter_id', Reporter._meta.db_table, 'id'),
-             ('response_to_id', Article._meta.db_table, 'id')})
+        self.assertEqual(set(key_columns), {
+            ('reporter_id', Reporter._meta.db_table, 'id'),
+            ('response_to_id', Article._meta.db_table, 'id'),
+        })
 
     def test_get_primary_key_column(self):
         with connection.cursor() as cursor:

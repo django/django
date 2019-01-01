@@ -32,9 +32,7 @@ class OrderedSetTests(SimpleTestCase):
 class MultiValueDictTests(SimpleTestCase):
 
     def test_multivaluedict(self):
-        d = MultiValueDict({'name': ['Adrian', 'Simon'],
-                            'position': ['Developer']})
-
+        d = MultiValueDict({'name': ['Adrian', 'Simon'], 'position': ['Developer']})
         self.assertEqual(d['name'], 'Simon')
         self.assertEqual(d.get('name'), 'Simon')
         self.assertEqual(d.getlist('name'), ['Adrian', 'Simon'])
@@ -42,22 +40,17 @@ class MultiValueDictTests(SimpleTestCase):
             sorted(d.items()),
             [('name', 'Simon'), ('position', 'Developer')]
         )
-
         self.assertEqual(
             sorted(d.lists()),
             [('name', ['Adrian', 'Simon']), ('position', ['Developer'])]
         )
-
         with self.assertRaises(MultiValueDictKeyError) as cm:
             d.__getitem__('lastname')
         self.assertEqual(str(cm.exception), "'lastname'")
-
         self.assertIsNone(d.get('lastname'))
         self.assertEqual(d.get('lastname', 'nonexistent'), 'nonexistent')
         self.assertEqual(d.getlist('lastname'), [])
-        self.assertEqual(d.getlist('doesnotexist', ['Adrian', 'Simon']),
-                         ['Adrian', 'Simon'])
-
+        self.assertEqual(d.getlist('doesnotexist', ['Adrian', 'Simon']), ['Adrian', 'Simon'])
         d.setlist('lastname', ['Holovaty', 'Willison'])
         self.assertEqual(d.getlist('lastname'), ['Holovaty', 'Willison'])
         self.assertEqual(sorted(d.values()), ['Developer', 'Simon', 'Willison'])

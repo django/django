@@ -730,16 +730,20 @@ class RelatedPrepopulatedInline1(admin.StackedInline):
     model = RelatedPrepopulated
     extra = 1
     autocomplete_fields = ['fk', 'm2m']
-    prepopulated_fields = {'slug1': ['name', 'pubdate'],
-                           'slug2': ['status', 'name']}
+    prepopulated_fields = {
+        'slug1': ['name', 'pubdate'],
+        'slug2': ['status', 'name'],
+    }
 
 
 class RelatedPrepopulatedInline2(admin.TabularInline):
     model = RelatedPrepopulated
     extra = 1
     autocomplete_fields = ['fk', 'm2m']
-    prepopulated_fields = {'slug1': ['name', 'pubdate'],
-                           'slug2': ['status', 'name']}
+    prepopulated_fields = {
+        'slug1': ['name', 'pubdate'],
+        'slug2': ['status', 'name'],
+    }
 
 
 class RelatedPrepopulatedInline3(admin.TabularInline):

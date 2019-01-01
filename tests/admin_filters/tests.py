@@ -322,8 +322,10 @@ class ListFiltersTests(TestCase):
         request.user = self.alfred
         changelist = modeladmin.get_changelist(request)
 
-        request = self.request_factory.get('/', {'date_registered__gte': self.today,
-                                                 'date_registered__lt': self.tomorrow})
+        request = self.request_factory.get('/', {
+            'date_registered__gte': self.today,
+            'date_registered__lt': self.tomorrow},
+        )
         request.user = self.alfred
         changelist = modeladmin.get_changelist_instance(request)
 
@@ -344,8 +346,10 @@ class ListFiltersTests(TestCase):
             )
         )
 
-        request = self.request_factory.get('/', {'date_registered__gte': self.today.replace(day=1),
-                                                 'date_registered__lt': self.next_month})
+        request = self.request_factory.get('/', {
+            'date_registered__gte': self.today.replace(day=1),
+            'date_registered__lt': self.next_month},
+        )
         request.user = self.alfred
         changelist = modeladmin.get_changelist_instance(request)
 
@@ -370,8 +374,10 @@ class ListFiltersTests(TestCase):
             )
         )
 
-        request = self.request_factory.get('/', {'date_registered__gte': self.today.replace(month=1, day=1),
-                                                 'date_registered__lt': self.next_year})
+        request = self.request_factory.get('/', {
+            'date_registered__gte': self.today.replace(month=1, day=1),
+            'date_registered__lt': self.next_year},
+        )
         request.user = self.alfred
         changelist = modeladmin.get_changelist_instance(request)
 

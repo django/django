@@ -537,9 +537,10 @@ format=%(message)s
         self.temp_file = NamedTemporaryFile()
         self.temp_file.write(logging_conf.encode())
         self.temp_file.flush()
-        sdict = {'LOGGING_CONFIG': '"logging.config.fileConfig"',
-                 'LOGGING': 'r"%s"' % self.temp_file.name}
-        self.write_settings('settings.py', sdict=sdict)
+        self.write_settings('settings.py', sdict={
+            'LOGGING_CONFIG': '"logging.config.fileConfig"',
+            'LOGGING': 'r"%s"' % self.temp_file.name,
+        })
 
     def tearDown(self):
         self.temp_file.close()

@@ -1650,11 +1650,12 @@ class AdminViewPermissionsTest(TestCase):
 
     def test_add_view(self):
         """Test add view restricts access and actually adds items."""
-        add_dict = {'title': 'Døm ikke',
-                    'content': '<p>great article</p>',
-                    'date_0': '2008-03-18', 'date_1': '10:54:39',
-                    'section': self.s1.pk}
-
+        add_dict = {
+            'title': 'Døm ikke',
+            'content': '<p>great article</p>',
+            'date_0': '2008-03-18', 'date_1': '10:54:39',
+            'section': self.s1.pk,
+        }
         # Change User should not have access to add articles
         self.client.force_login(self.changeuser)
         # make sure the view removes test cookie
@@ -1754,10 +1755,12 @@ class AdminViewPermissionsTest(TestCase):
 
     def test_change_view(self):
         """Change view should restrict access and allow users to edit items."""
-        change_dict = {'title': 'Ikke fordømt',
-                       'content': '<p>edited article</p>',
-                       'date_0': '2008-03-18', 'date_1': '10:54:39',
-                       'section': self.s1.pk}
+        change_dict = {
+            'title': 'Ikke fordømt',
+            'content': '<p>edited article</p>',
+            'date_0': '2008-03-18', 'date_1': '10:54:39',
+            'section': self.s1.pk,
+        }
         article_change_url = reverse('admin:admin_views_article_change', args=(self.a1.pk,))
         article_changelist_url = reverse('admin:admin_views_article_changelist')
 
@@ -6023,15 +6026,16 @@ class AdminViewOnSiteTests(TestCase):
         # The form validation should fail because 'some_required_info' is
         # not included on the parent form, and the family_name of the parent
         # does not match that of the child
-        post_data = {"family_name": "Test1",
-                     "dependentchild_set-TOTAL_FORMS": "1",
-                     "dependentchild_set-INITIAL_FORMS": "0",
-                     "dependentchild_set-MAX_NUM_FORMS": "1",
-                     "dependentchild_set-0-id": "",
-                     "dependentchild_set-0-parent": "",
-                     "dependentchild_set-0-family_name": "Test2"}
-        response = self.client.post(reverse('admin:admin_views_parentwithdependentchildren_add'),
-                                    post_data)
+        post_data = {
+            'family_name': 'Test1',
+            'dependentchild_set-TOTAL_FORMS': '1',
+            'dependentchild_set-INITIAL_FORMS': '0',
+            'dependentchild_set-MAX_NUM_FORMS': '1',
+            'dependentchild_set-0-id': '',
+            'dependentchild_set-0-parent': '',
+            'dependentchild_set-0-family_name': 'Test2',
+        }
+        response = self.client.post(reverse('admin:admin_views_parentwithdependentchildren_add'), post_data)
         self.assertFormError(response, 'adminform', 'some_required_info', ['This field is required.'])
         msg = "The form 'adminform' in context 0 does not contain the non-field error 'Error'"
         with self.assertRaisesMessage(AssertionError, msg):
@@ -6050,18 +6054,19 @@ class AdminViewOnSiteTests(TestCase):
         Verifying that if the parent form fails validation, the inlines also
         run validation even if validation is contingent on parent form data
         """
-        pwdc = ParentWithDependentChildren.objects.create(some_required_info=6,
-                                                          family_name="Test1")
+        pwdc = ParentWithDependentChildren.objects.create(some_required_info=6, family_name='Test1')
         # The form validation should fail because 'some_required_info' is
         # not included on the parent form, and the family_name of the parent
         # does not match that of the child
-        post_data = {"family_name": "Test2",
-                     "dependentchild_set-TOTAL_FORMS": "1",
-                     "dependentchild_set-INITIAL_FORMS": "0",
-                     "dependentchild_set-MAX_NUM_FORMS": "1",
-                     "dependentchild_set-0-id": "",
-                     "dependentchild_set-0-parent": str(pwdc.id),
-                     "dependentchild_set-0-family_name": "Test1"}
+        post_data = {
+            'family_name': 'Test2',
+            'dependentchild_set-TOTAL_FORMS': '1',
+            'dependentchild_set-INITIAL_FORMS': '0',
+            'dependentchild_set-MAX_NUM_FORMS': '1',
+            'dependentchild_set-0-id': '',
+            'dependentchild_set-0-parent': str(pwdc.id),
+            'dependentchild_set-0-family_name': 'Test1',
+        }
         response = self.client.post(
             reverse('admin:admin_views_parentwithdependentchildren_change', args=(pwdc.id,)), post_data
         )
