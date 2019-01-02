@@ -159,6 +159,12 @@ class StdDev(Aggregate):
 class Sum(Aggregate):
     function = 'SUM'
     name = 'Sum'
+    template = '%(function)s(%(distinct)s%(expressions)s)'
+
+    def __init__(self, expression, distinct=False, **kwargs):
+        super().__init__(
+            expression, distinct='DISTINCT ' if distinct else '', **kwargs
+        )
 
     def as_mysql(self, compiler, connection, **extra_context):
         sql, params = super().as_sql(compiler, connection, **extra_context)
