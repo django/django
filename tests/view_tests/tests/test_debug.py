@@ -728,14 +728,14 @@ class PlainTextReportTests(SimpleTestCase):
 
 
 class ExceptionReportTestMixin:
-
     # Mixin used in the ExceptionReporterFilterTests and
     # AjaxResponseExceptionReporterFilter tests below
-
-    breakfast_data = {'sausage-key': 'sausage-value',
-                      'baked-beans-key': 'baked-beans-value',
-                      'hash-brown-key': 'hash-brown-value',
-                      'bacon-key': 'bacon-value'}
+    breakfast_data = {
+        'sausage-key': 'sausage-value',
+        'baked-beans-key': 'baked-beans-value',
+        'hash-brown-key': 'hash-brown-value',
+        'bacon-key': 'bacon-value',
+    }
 
     def verify_unsafe_response(self, view, check_for_vars=True,
                                check_for_POST_params=True):

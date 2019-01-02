@@ -365,15 +365,17 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         if oracle:
             # SELECT SDO_UTIL.TO_WKTGEOMETRY(SDO_GEOM.SDO_POINTONSURFACE(GEOAPP_COUNTRY.MPOLY, 0.05))
             # FROM GEOAPP_COUNTRY;
-            ref = {'New Zealand': fromstr('POINT (174.616364 -36.100861)', srid=4326),
-                   'Texas': fromstr('POINT (-103.002434 36.500397)', srid=4326),
-                   }
+            ref = {
+                'New Zealand': fromstr('POINT (174.616364 -36.100861)', srid=4326),
+                'Texas': fromstr('POINT (-103.002434 36.500397)', srid=4326),
+            }
         else:
             # Using GEOSGeometry to compute the reference point on surface values
             # -- since PostGIS also uses GEOS these should be the same.
-            ref = {'New Zealand': Country.objects.get(name='New Zealand').mpoly.point_on_surface,
-                   'Texas': Country.objects.get(name='Texas').mpoly.point_on_surface
-                   }
+            ref = {
+                'New Zealand': Country.objects.get(name='New Zealand').mpoly.point_on_surface,
+                'Texas': Country.objects.get(name='Texas').mpoly.point_on_surface
+            }
 
         qs = Country.objects.annotate(point_on_surface=functions.PointOnSurface('mpoly'))
         for country in qs:

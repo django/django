@@ -2872,8 +2872,14 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         self.assertEqual(form.errors, {'name': ['bad value not allowed']})
         form = NameForm(data={'name': ['should be overly', 'long for the field names']})
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors, {'name': ['Ensure this value has at most 10 characters (it has 16).',
-                                                'Ensure this value has at most 10 characters (it has 24).']})
+        self.assertEqual(
+            form.errors, {
+                'name': [
+                    'Ensure this value has at most 10 characters (it has 16).',
+                    'Ensure this value has at most 10 characters (it has 24).',
+                ],
+            }
+        )
         form = NameForm(data={'name': ['fname', 'lname']})
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data, {'name': 'fname lname'})

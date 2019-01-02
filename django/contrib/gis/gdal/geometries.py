@@ -696,19 +696,20 @@ class MultiPolygon(GeometryCollection):
 
 
 # Class mapping dictionary (using the OGRwkbGeometryType as the key)
-GEO_CLASSES = {1: Point,
-               2: LineString,
-               3: Polygon,
-               4: MultiPoint,
-               5: MultiLineString,
-               6: MultiPolygon,
-               7: GeometryCollection,
-               101: LinearRing,
-               1 + OGRGeomType.wkb25bit: Point,
-               2 + OGRGeomType.wkb25bit: LineString,
-               3 + OGRGeomType.wkb25bit: Polygon,
-               4 + OGRGeomType.wkb25bit: MultiPoint,
-               5 + OGRGeomType.wkb25bit: MultiLineString,
-               6 + OGRGeomType.wkb25bit: MultiPolygon,
-               7 + OGRGeomType.wkb25bit: GeometryCollection,
-               }
+GEO_CLASSES = {
+    1: Point,
+    2: LineString,
+    3: Polygon,
+    4: MultiPoint,
+    5: MultiLineString,
+    6: MultiPolygon,
+    7: GeometryCollection,
+    101: LinearRing,
+    1 + OGRGeomType.wkb25bit: Point,
+    2 + OGRGeomType.wkb25bit: LineString,
+    3 + OGRGeomType.wkb25bit: Polygon,
+    4 + OGRGeomType.wkb25bit: MultiPoint,
+    5 + OGRGeomType.wkb25bit: MultiLineString,
+    6 + OGRGeomType.wkb25bit: MultiPolygon,
+    7 + OGRGeomType.wkb25bit: GeometryCollection,
+}

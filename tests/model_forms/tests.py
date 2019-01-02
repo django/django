@@ -1297,9 +1297,11 @@ class ModelFormBasicTests(TestCase):
 
     def test_basic_creation(self):
         self.assertEqual(Category.objects.count(), 0)
-        f = BaseCategoryForm({'name': 'Entertainment',
-                              'slug': 'entertainment',
-                              'url': 'entertainment'})
+        f = BaseCategoryForm({
+            'name': 'Entertainment',
+            'slug': 'entertainment',
+            'url': 'entertainment',
+        })
         self.assertTrue(f.is_valid())
         self.assertEqual(f.cleaned_data['name'], 'Entertainment')
         self.assertEqual(f.cleaned_data['slug'], 'entertainment')
@@ -1712,15 +1714,23 @@ class ModelMultipleChoiceFieldTests(TestCase):
         person1 = Writer.objects.create(name="Person 1")
         person2 = Writer.objects.create(name="Person 2")
 
-        form = WriterForm(initial={'persons': [person1, person2]},
-                          data={'initial-persons': [str(person1.pk), str(person2.pk)],
-                                'persons': [str(person1.pk), str(person2.pk)]})
+        form = WriterForm(
+            initial={'persons': [person1, person2]},
+            data={
+                'initial-persons': [str(person1.pk), str(person2.pk)],
+                'persons': [str(person1.pk), str(person2.pk)],
+            },
+        )
         self.assertTrue(form.is_valid())
         self.assertFalse(form.has_changed())
 
-        form = WriterForm(initial={'persons': [person1, person2]},
-                          data={'initial-persons': [str(person1.pk), str(person2.pk)],
-                                'persons': [str(person2.pk)]})
+        form = WriterForm(
+            initial={'persons': [person1, person2]},
+            data={
+                'initial-persons': [str(person1.pk), str(person2.pk)],
+                'persons': [str(person2.pk)],
+            },
+        )
         self.assertTrue(form.is_valid())
         self.assertTrue(form.has_changed())
 

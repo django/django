@@ -53,15 +53,19 @@ class DumpDataAssertMixin:
                          use_base_manager=False, exclude_list=[], primary_keys=''):
         new_io = StringIO()
         filename = filename and os.path.join(tempfile.gettempdir(), filename)
-        management.call_command('dumpdata', *args, **{'format': format,
-                                                      'stdout': new_io,
-                                                      'stderr': new_io,
-                                                      'output': filename,
-                                                      'use_natural_foreign_keys': natural_foreign_keys,
-                                                      'use_natural_primary_keys': natural_primary_keys,
-                                                      'use_base_manager': use_base_manager,
-                                                      'exclude': exclude_list,
-                                                      'primary_keys': primary_keys})
+        management.call_command(
+            'dumpdata',
+            *args,
+            format=format,
+            stdout=new_io,
+            stderr=new_io,
+            output=filename,
+            use_natural_foreign_keys=natural_foreign_keys,
+            use_natural_primary_keys=natural_primary_keys,
+            use_base_manager=use_base_manager,
+            exclude=exclude_list,
+            primary_keys=primary_keys,
+        )
         if filename:
             with open(filename, "r") as f:
                 command_output = f.read()

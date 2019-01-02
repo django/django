@@ -323,9 +323,13 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         )
 
     def test_unicode_headers(self):
-        email = EmailMessage("Gżegżółka", "Content", "from@example.com", ["to@example.com"],
-                             headers={"Sender": '"Firstname Sürname" <sender@example.com>',
-                                      "Comments": 'My Sürname is non-ASCII'})
+        email = EmailMessage(
+            'Gżegżółka', 'Content', 'from@example.com', ['to@example.com'],
+            headers={
+                'Sender': '"Firstname Sürname" <sender@example.com>',
+                'Comments': 'My Sürname is non-ASCII',
+            },
+        )
         message = email.message()
         self.assertEqual(message['Subject'], '=?utf-8?b?R8W8ZWfFvMOzxYJrYQ==?=')
         self.assertEqual(message['Sender'], '=?utf-8?q?Firstname_S=C3=BCrname?= <sender@example.com>')

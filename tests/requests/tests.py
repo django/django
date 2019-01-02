@@ -238,10 +238,12 @@ class RequestsTests(SimpleTestCase):
 
     def test_stream(self):
         payload = FakePayload('name=value')
-        request = WSGIRequest({'REQUEST_METHOD': 'POST',
-                               'CONTENT_TYPE': 'application/x-www-form-urlencoded',
-                               'CONTENT_LENGTH': len(payload),
-                               'wsgi.input': payload})
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'application/x-www-form-urlencoded',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload},
+        )
         self.assertEqual(request.read(), b'name=value')
 
     def test_read_after_value(self):
@@ -250,10 +252,12 @@ class RequestsTests(SimpleTestCase):
         POST or body.
         """
         payload = FakePayload('name=value')
-        request = WSGIRequest({'REQUEST_METHOD': 'POST',
-                               'CONTENT_TYPE': 'application/x-www-form-urlencoded',
-                               'CONTENT_LENGTH': len(payload),
-                               'wsgi.input': payload})
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'application/x-www-form-urlencoded',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload,
+        })
         self.assertEqual(request.POST, {'name': ['value']})
         self.assertEqual(request.body, b'name=value')
         self.assertEqual(request.read(), b'name=value')
@@ -264,10 +268,12 @@ class RequestsTests(SimpleTestCase):
         from request.
         """
         payload = FakePayload('name=value')
-        request = WSGIRequest({'REQUEST_METHOD': 'POST',
-                               'CONTENT_TYPE': 'application/x-www-form-urlencoded',
-                               'CONTENT_LENGTH': len(payload),
-                               'wsgi.input': payload})
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'application/x-www-form-urlencoded',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload,
+        })
         self.assertEqual(request.read(2), b'na')
         with self.assertRaises(RawPostDataException):
             request.body
@@ -310,10 +316,12 @@ class RequestsTests(SimpleTestCase):
             'value',
             '--boundary--'
             '']))
-        request = WSGIRequest({'REQUEST_METHOD': 'POST',
-                               'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
-                               'CONTENT_LENGTH': len(payload),
-                               'wsgi.input': payload})
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload,
+        })
         self.assertEqual(request.POST, {'name': ['value']})
         with self.assertRaises(RawPostDataException):
             request.body
@@ -334,10 +342,12 @@ class RequestsTests(SimpleTestCase):
             b'--boundary--'
             b''])
         payload = FakePayload(payload_data)
-        request = WSGIRequest({'REQUEST_METHOD': 'POST',
-                               'CONTENT_TYPE': 'multipart/related; boundary=boundary',
-                               'CONTENT_LENGTH': len(payload),
-                               'wsgi.input': payload})
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'multipart/related; boundary=boundary',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload,
+        })
         self.assertEqual(request.POST, {})
         self.assertEqual(request.body, payload_data)
 
@@ -356,18 +366,22 @@ class RequestsTests(SimpleTestCase):
             'value',
             '--boundary--'
             '']))
-        request = WSGIRequest({'REQUEST_METHOD': 'POST',
-                               'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
-                               'CONTENT_LENGTH': 0,
-                               'wsgi.input': payload})
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
+            'CONTENT_LENGTH': 0,
+            'wsgi.input': payload,
+        })
         self.assertEqual(request.POST, {})
 
     def test_POST_binary_only(self):
         payload = b'\r\n\x01\x00\x00\x00ab\x00\x00\xcd\xcc,@'
-        environ = {'REQUEST_METHOD': 'POST',
-                   'CONTENT_TYPE': 'application/octet-stream',
-                   'CONTENT_LENGTH': len(payload),
-                   'wsgi.input': BytesIO(payload)}
+        environ = {
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'application/octet-stream',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': BytesIO(payload),
+        }
         request = WSGIRequest(environ)
         self.assertEqual(request.POST, {})
         self.assertEqual(request.FILES, {})
@@ -382,10 +396,12 @@ class RequestsTests(SimpleTestCase):
 
     def test_read_by_lines(self):
         payload = FakePayload('name=value')
-        request = WSGIRequest({'REQUEST_METHOD': 'POST',
-                               'CONTENT_TYPE': 'application/x-www-form-urlencoded',
-                               'CONTENT_LENGTH': len(payload),
-                               'wsgi.input': payload})
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'application/x-www-form-urlencoded',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload,
+        })
         self.assertEqual(list(request), [b'name=value'])
 
     def test_POST_after_body_read(self):
@@ -393,10 +409,12 @@ class RequestsTests(SimpleTestCase):
         POST should be populated even if body is read first
         """
         payload = FakePayload('name=value')
-        request = WSGIRequest({'REQUEST_METHOD': 'POST',
-                               'CONTENT_TYPE': 'application/x-www-form-urlencoded',
-                               'CONTENT_LENGTH': len(payload),
-                               'wsgi.input': payload})
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'application/x-www-form-urlencoded',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload,
+        })
         request.body  # evaluate
         self.assertEqual(request.POST, {'name': ['value']})
 
@@ -406,10 +424,12 @@ class RequestsTests(SimpleTestCase):
         the stream is read second.
         """
         payload = FakePayload('name=value')
-        request = WSGIRequest({'REQUEST_METHOD': 'POST',
-                               'CONTENT_TYPE': 'application/x-www-form-urlencoded',
-                               'CONTENT_LENGTH': len(payload),
-                               'wsgi.input': payload})
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'application/x-www-form-urlencoded',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload,
+        })
         request.body  # evaluate
         self.assertEqual(request.read(1), b'n')
         self.assertEqual(request.POST, {'name': ['value']})
@@ -426,10 +446,12 @@ class RequestsTests(SimpleTestCase):
             'value',
             '--boundary--'
             '']))
-        request = WSGIRequest({'REQUEST_METHOD': 'POST',
-                               'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
-                               'CONTENT_LENGTH': len(payload),
-                               'wsgi.input': payload})
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload,
+        })
         request.body  # evaluate
         # Consume enough data to mess up the parsing:
         self.assertEqual(request.read(13), b'--boundary\r\nC')
@@ -464,11 +486,12 @@ class RequestsTests(SimpleTestCase):
                 raise IOError("kaboom!")
 
         payload = b'name=value'
-        request = WSGIRequest({'REQUEST_METHOD': 'POST',
-                               'CONTENT_TYPE': 'application/x-www-form-urlencoded',
-                               'CONTENT_LENGTH': len(payload),
-                               'wsgi.input': ExplodingBytesIO(payload)})
-
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'application/x-www-form-urlencoded',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': ExplodingBytesIO(payload),
+        })
         with self.assertRaises(UnreadablePostError):
             request.body
 
@@ -504,11 +527,12 @@ class RequestsTests(SimpleTestCase):
                 raise IOError("kaboom!")
 
         payload = b'x'
-        request = WSGIRequest({'REQUEST_METHOD': 'POST',
-                               'CONTENT_TYPE': 'multipart/form-data; boundary=foo_',
-                               'CONTENT_LENGTH': len(payload),
-                               'wsgi.input': ExplodingBytesIO(payload)})
-
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'multipart/form-data; boundary=foo_',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': ExplodingBytesIO(payload),
+        })
         with self.assertRaises(UnreadablePostError):
             request.FILES
 
