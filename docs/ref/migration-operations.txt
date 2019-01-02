@@ -413,7 +413,7 @@ if ``atomic=True`` is passed to the ``RunPython`` operation.
 A highly specialized operation that let you mix and match the database
 (schema-changing) and state (autodetector-powering) aspects of operations.
 
-It accepts two list of operations, and when asked to apply state will use the
+It accepts two lists of operations, and when asked to apply state will use the
 state list, and when asked to apply changes to the database will use the database
 list. Do not use this operation unless you're very sure you know what you're doing.
 
