@@ -595,7 +595,7 @@ class WindowFunctionTests(TestCase):
                         order_by=[F('hire_date').asc()],
                         frame=RowRange(start=-1, end=1),
                     ),
-                ).order_by('-avg_salary', '-hire_date').values('hire_date')[:1],
+                ).order_by('-avg_salary', 'hire_date').values('hire_date')[:1],
             ),
         ).order_by('department', 'name')
         self.assertQuerysetEqual(qs, [
@@ -603,14 +603,14 @@ class WindowFunctionTests(TestCase):
             ('Jenson', 'Accounting', datetime.date(2005, 11, 1)),
             ('Jones', 'Accounting', datetime.date(2005, 11, 1)),
             ('Williams', 'Accounting', datetime.date(2005, 11, 1)),
-            ('Moore', 'IT', datetime.date(2013, 8, 1)),
-            ('Wilkinson', 'IT', datetime.date(2013, 8, 1)),
-            ('Johnson', 'Management', datetime.date(2005, 7, 1)),
-            ('Miller', 'Management', datetime.date(2005, 7, 1)),
-            ('Johnson', 'Marketing', datetime.date(2012, 3, 1)),
-            ('Smith', 'Marketing', datetime.date(2012, 3, 1)),
-            ('Brown', 'Sales', datetime.date(2009, 9, 1)),
-            ('Smith', 'Sales', datetime.date(2009, 9, 1)),
+            ('Moore', 'IT', datetime.date(2011, 3, 1)),
+            ('Wilkinson', 'IT', datetime.date(2011, 3, 1)),
+            ('Johnson', 'Management', datetime.date(2005, 6, 1)),
+            ('Miller', 'Management', datetime.date(2005, 6, 1)),
+            ('Johnson', 'Marketing', datetime.date(2009, 10, 1)),
+            ('Smith', 'Marketing', datetime.date(2009, 10, 1)),
+            ('Brown', 'Sales', datetime.date(2007, 6, 1)),
+            ('Smith', 'Sales', datetime.date(2007, 6, 1)),
         ], transform=lambda row: (row.name, row.department, row.highest_avg_salary_date))
 
     def test_row_range_rank(self):
