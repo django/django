@@ -50,12 +50,28 @@ class Whiz(models.Model):
     c = models.IntegerField(choices=CHOICES, null=True)
 
 
+class WhizDelayed(models.Model):
+    c = models.IntegerField(choices=(), null=True)
+
+
+# Contrived way of adding choices later.
+WhizDelayed._meta.get_field('c').choices = Whiz.CHOICES
+
+
 class WhizIter(models.Model):
     c = models.IntegerField(choices=iter(Whiz.CHOICES), null=True)
 
 
 class WhizIterEmpty(models.Model):
     c = models.CharField(choices=iter(()), blank=True, max_length=1)
+
+
+class Choiceful(models.Model):
+    no_choices = models.IntegerField(null=True)
+    empty_choices = models.IntegerField(choices=(), null=True)
+    with_choices = models.IntegerField(choices=[(1, 'A')], null=True)
+    empty_choices_bool = models.BooleanField(choices=())
+    empty_choices_text = models.TextField(choices=())
 
 
 class BigD(models.Model):

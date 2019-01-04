@@ -153,7 +153,7 @@ class Field(RegisterLookupMixin):
         self.unique_for_year = unique_for_year
         if isinstance(choices, collections.abc.Iterator):
             choices = list(choices)
-        self.choices = choices or []
+        self.choices = choices
         self.help_text = help_text
         self.db_index = db_index
         self.db_column = db_column
@@ -443,7 +443,7 @@ class Field(RegisterLookupMixin):
             "unique_for_date": None,
             "unique_for_month": None,
             "unique_for_year": None,
-            "choices": [],
+            "choices": None,
             "help_text": '',
             "db_column": None,
             "db_tablespace": None,
@@ -598,7 +598,7 @@ class Field(RegisterLookupMixin):
             # Skip validation for non-editable fields.
             return
 
-        if self.choices and value not in self.empty_values:
+        if self.choices is not None and value not in self.empty_values:
             for option_key, option_value in self.choices:
                 if isinstance(option_value, (list, tuple)):
                     # This is an optgroup, so look inside the group for
@@ -742,7 +742,7 @@ class Field(RegisterLookupMixin):
             # such fields can't be deferred (we don't have a check for this).
             if not getattr(cls, self.attname, None):
                 setattr(cls, self.attname, DeferredAttribute(self.attname))
-        if self.choices:
+        if self.choices is not None:
             setattr(cls, 'get_%s_display' % self.name,
                     partialmethod(cls._get_FIELD_display, field=self))
 
@@ -812,7 +812,7 @@ class Field(RegisterLookupMixin):
         Return choices with a default blank choices included, for use
         as <select> choices for this field.
         """
-        if self.choices:
+        if self.choices is not None:
             choices = list(self.choices)
             if include_blank:
                 blank_defined = any(choice in ('', None) for choice, _ in self.flatchoices)
@@ -840,6 +840,8 @@ class Field(RegisterLookupMixin):
 
     def _get_flatchoices(self):
         """Flattened version of choices tuple."""
+        if self.choices is None:
+            return []
         flat = []
         for choice, value in self.choices:
             if isinstance(value, (list, tuple)):
@@ -865,7 +867,7 @@ class Field(RegisterLookupMixin):
                 defaults['show_hidden_initial'] = True
             else:
                 defaults['initial'] = self.get_default()
-        if self.choices:
+        if self.choices is not None:
             # Fields with choices get special treatment.
             include_blank = (self.blank or
                              not (self.has_default() or 'initial' in kwargs))
@@ -1018,7 +1020,7 @@ class BooleanField(Field):
         return self.to_python(value)
 
     def formfield(self, **kwargs):
-        if self.choices:
+        if self.choices is not None:
             include_blank = not (self.has_default() or 'initial' in kwargs)
             defaults = {'choices': self.get_choices(include_blank=include_blank)}
         else:
@@ -2080,7 +2082,7 @@ class TextField(Field):
         # the value in the form field (to pass into widget for example).
         return super().formfield(**{
             'max_length': self.max_length,
-            **({} if self.choices else {'widget': forms.Textarea}),
+            **({} if self.choices is not None else {'widget': forms.Textarea}),
             **kwargs,
         })
 
