@@ -1,4 +1,5 @@
 import unittest
+import pymysql
 
 from django.db import connection
 from django.test import TestCase
@@ -8,6 +9,7 @@ from django.test import TestCase
 class SchemaEditorTests(TestCase):
     def test_quote_value(self):
         import MySQLdb
+        pymysql.install_as_MySQLdb()
         editor = connection.schema_editor()
         tested_values = [
             ('string', "'string'"),

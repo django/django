@@ -9,6 +9,7 @@ import subprocess
 import sys
 import tempfile
 import warnings
+import pymysql
 
 import django
 from django.apps import apps
@@ -23,6 +24,7 @@ from django.utils.deprecation import (
 )
 from django.utils.log import DEFAULT_LOGGING
 
+pymysql.install_as_MySQLdb()
 try:
     import MySQLdb
 except ImportError:

@@ -6,6 +6,7 @@ from django.db.backends.mysql.introspection import DatabaseIntrospection
 
 pymysql.install_as_MySQLdb()
 
+
 class MySQLIntrospection(DatabaseIntrospection):
     # Updating the data_types_reverse dictionary with the appropriate
     # type for Geometry fields.

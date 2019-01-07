@@ -5,6 +5,7 @@ from django.db.models import NOT_PROVIDED
 
 pymysql.install_as_MySQLdb()
 
+
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     sql_rename_table = "RENAME TABLE %(old_table)s TO %(new_table)s"
