@@ -1,4 +1,5 @@
 import unittest
+
 import pymysql
 
 from django.db import connection
