@@ -1,6 +1,9 @@
+import pymysql
+
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.models import NOT_PROVIDED
 
+pymysql.install_as_MySQLdb()
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 

@@ -5,12 +5,15 @@ Requires mysqlclient: https://pypi.org/project/mysqlclient/
 """
 import re
 
+import pymysql
+
 from django.core.exceptions import ImproperlyConfigured
 from django.db import utils
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.utils.functional import cached_property
 
+pymysql.install_as_MySQLdb()
 try:
     import MySQLdb as Database
 except ImportError as err:
