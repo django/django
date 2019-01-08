@@ -1,0 +1,12 @@
+==========================
+Django 2.1.6 release notes
+==========================
+
+*Expected February 1, 2019*
+
+Django 2.1.6 several bugs in 2.1.5.
+
+Bugfixes
+========
+
+* ...
