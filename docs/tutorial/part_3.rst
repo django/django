@@ -12,7 +12,7 @@ The ``ChatConsumer`` that we have written is currently synchronous. Synchronous
 consumers are convenient because they can call regular synchronous I/O functions
 such as those that access Django models without writing special code. However
 asynchronous consumers can provide a higher level of performance since they
-don't need create additional threads when handling requests.
+don't need to create additional threads when handling requests.
 
 ``ChatConsumer`` only uses async-native libraries (Channels and the channel layer)
 and in particular it does not access synchronous Django models. Therefore it can
