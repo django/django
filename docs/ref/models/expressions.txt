@@ -373,7 +373,7 @@ some complex computations::
 
 The ``Aggregate`` API is as follows:
 
-.. class:: Aggregate(*expressions, output_field=None, filter=None, **extra)
+.. class:: Aggregate(*expressions, output_field=None, distinct=False, filter=None, **extra)
 
     .. attribute:: template
 
@@ -392,6 +392,14 @@ The ``Aggregate`` API is as follows:
         Defaults to ``True`` since most aggregate functions can be used as the
         source expression in :class:`~django.db.models.expressions.Window`.
 
+    .. attribute:: allow_distinct
+
+        .. versionadded:: 2.2
+
+        A class attribute determining whether or not this aggregate function
+        allows passing a ``distinct`` keyword argument. If set to ``False``
+        (default), ``TypeError`` is raised if ``distinct=True`` is passed.
+
 The ``expressions`` positional arguments can include expressions or the names
 of model fields. They will be converted to a string and used as the
 ``expressions`` placeholder within the ``template``.
@@ -409,12 +417,21 @@ should define the desired ``output_field``. For example, adding an
 ``IntegerField()`` and a ``FloatField()`` together should probably have
 ``output_field=FloatField()`` defined.
 
+The ``distinct`` argument determines whether or not the aggregate function
+should be invoked for each distinct value of ``expressions`` (or set of
+values, for multiple ``expressions``). The argument is only supported on
+aggregates that have :attr:`~Aggregate.allow_distinct` set to ``True``.
+
 The ``filter`` argument takes a :class:`Q object <django.db.models.Q>` that's
 used to filter the rows that are aggregated. See :ref:`conditional-aggregation`
 and :ref:`filtering-on-annotations` for example usage.
 
 The ``**extra`` kwargs are ``key=value`` pairs that can be interpolated
 into the ``template`` attribute.
+
+.. versionadded:: 2.2
+
+    The ``allow_distinct`` attribute and ``distinct`` argument were added.
 
 Creating your own Aggregate Functions
 -------------------------------------

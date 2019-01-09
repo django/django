@@ -57,6 +57,11 @@ class DatabaseOperations(BaseDatabaseOperations):
                             'aggregations on date/time fields in sqlite3 '
                             'since date/time is saved as text.'
                         )
+        if isinstance(expression, aggregates.Aggregate) and len(expression.source_expressions) > 1:
+            raise utils.NotSupportedError(
+                "SQLite doesn't support DISTINCT on aggregate functions "
+                "accepting multiple arguments."
+            )
 
     def date_extract_sql(self, lookup_type, field_name):
         """
