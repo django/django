@@ -10,8 +10,18 @@ from django.test import SimpleTestCase, TestCase
 class ConnectionHandlerTests(SimpleTestCase):
 
     def test_connection_handler_no_databases(self):
-        """Empty DATABASES setting defaults to the dummy backend."""
-        DATABASES = {}
+        """
+        Empty DATABASES and empty 'default' settings default to the dummy
+        backend.
+        """
+        for DATABASES in (
+            {},  # Empty DATABASES setting.
+            {'default': {}},  # Empty 'default' database.
+        ):
+            with self.subTest(DATABASES=DATABASES):
+                self.assertImproperlyConfigured(DATABASES)
+
+    def assertImproperlyConfigured(self, DATABASES):
         conns = ConnectionHandler(DATABASES)
         self.assertEqual(conns[DEFAULT_DB_ALIAS].settings_dict['ENGINE'], 'django.db.backends.dummy')
         msg = (
