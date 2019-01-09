@@ -1,12 +1,12 @@
 from datetime import datetime
 
 from django.conf import settings
-from django.db.models import (
-    DateField, DateTimeField, DurationField, Field, Func, IntegerField,
-    TimeField, Transform, fields,
+from django.db.models.expressions import Func
+from django.db.models.fields import (
+    DateField, DateTimeField, DurationField, Field, IntegerField, TimeField,
 )
 from django.db.models.lookups import (
-    YearExact, YearGt, YearGte, YearLt, YearLte,
+    Transform, YearExact, YearGt, YearGte, YearLt, YearLte,
 )
 from django.utils import timezone
 
@@ -157,7 +157,7 @@ ExtractIsoYear.register_lookup(YearLte)
 
 class Now(Func):
     template = 'CURRENT_TIMESTAMP'
-    output_field = fields.DateTimeField()
+    output_field = DateTimeField()
 
     def as_postgresql(self, compiler, connection, **extra_context):
         # PostgreSQL's CURRENT_TIMESTAMP means "the time at the start of the

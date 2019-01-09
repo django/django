@@ -1,4 +1,5 @@
-from django.db.models import FloatField, Func, IntegerField
+from django.db.models.expressions import Func
+from django.db.models.fields import FloatField, IntegerField
 
 __all__ = [
     'CumeDist', 'DenseRank', 'FirstValue', 'Lag', 'LastValue', 'Lead',

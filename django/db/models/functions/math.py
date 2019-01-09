@@ -1,10 +1,10 @@
 import math
 import sys
 
-from django.db.models import (
-    DecimalField, FloatField, Func, IntegerField, Transform,
-)
+from django.db.models.expressions import Func
+from django.db.models.fields import DecimalField, FloatField, IntegerField
 from django.db.models.functions import Cast
+from django.db.models.lookups import Transform
 
 
 class DecimalInputMixin:
