@@ -69,7 +69,7 @@ Fields
 
     .. attribute:: user_permissions
 
-         Many-to-many relationship to :class:`~django.contrib.auth.models.Permission`
+        Many-to-many relationship to :class:`~django.contrib.auth.models.Permission`
 
     .. attribute:: is_staff
 
@@ -482,7 +482,6 @@ backends, see the :ref:`Other authentication sources section
 <authentication-backends>` of the :doc:`User authentication guide
 </topics/auth/index>`.
 
-
 Available authentication backends
 ---------------------------------
 
@@ -566,14 +565,14 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
 .. class:: AllowAllUsersModelBackend
 
-   Same as :class:`ModelBackend` except that it doesn't reject inactive users
-   because :meth:`~ModelBackend.user_can_authenticate` always returns ``True``.
+    Same as :class:`ModelBackend` except that it doesn't reject inactive users
+    because :meth:`~ModelBackend.user_can_authenticate` always returns ``True``.
 
-   When using this backend, you'll likely want to customize the
-   :class:`~django.contrib.auth.forms.AuthenticationForm` used by the
-   :class:`~django.contrib.auth.views.LoginView` by overriding the
-   :meth:`~django.contrib.auth.forms.AuthenticationForm.confirm_login_allowed`
-   method as it rejects inactive users.
+    When using this backend, you'll likely want to customize the
+    :class:`~django.contrib.auth.forms.AuthenticationForm` used by the
+    :class:`~django.contrib.auth.views.LoginView` by overriding the
+    :meth:`~django.contrib.auth.forms.AuthenticationForm.confirm_login_allowed`
+    method as it rejects inactive users.
 
 .. class:: RemoteUserBackend
 
@@ -608,16 +607,16 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
     .. method:: clean_username(username)
 
-       Performs any cleaning on the ``username`` (e.g. stripping LDAP DN
-       information) prior to using it to get or create a user object. Returns
-       the cleaned username.
+        Performs any cleaning on the ``username`` (e.g. stripping LDAP DN
+        information) prior to using it to get or create a user object. Returns
+        the cleaned username.
 
     .. method:: configure_user(user)
 
-       Configures a newly created user.  This method is called immediately
-       after a new user is created, and can be used to perform custom setup
-       actions, such as setting the user's groups based on attributes in an
-       LDAP directory. Returns the user object.
+        Configures a newly created user.  This method is called immediately
+        after a new user is created, and can be used to perform custom setup
+        actions, such as setting the user's groups based on attributes in an
+        LDAP directory. Returns the user object.
 
     .. method:: user_can_authenticate()
 
@@ -629,9 +628,9 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
 .. class:: AllowAllUsersRemoteUserBackend
 
-   Same as :class:`RemoteUserBackend` except that it doesn't reject inactive
-   users because :attr:`~RemoteUserBackend.user_can_authenticate` always
-   returns ``True``.
+    Same as :class:`RemoteUserBackend` except that it doesn't reject inactive
+    users because :attr:`~RemoteUserBackend.user_can_authenticate` always
+    returns ``True``.
 
 Utility functions
 =================
