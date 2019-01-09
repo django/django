@@ -235,11 +235,7 @@ class BaseModelAdminChecks:
                     id='admin.E006',
                 )
             ]
-
-        return list(chain.from_iterable(
-            self._check_field_spec(obj, field_name, 'fields')
-            for field_name in obj.fields
-        ))
+        return []
 
     def _check_fieldsets(self, obj):
         """ Check that fieldsets is properly formatted and doesn't contain
@@ -286,51 +282,7 @@ class BaseModelAdminChecks:
                     id='admin.E012',
                 )
             ]
-        return list(chain.from_iterable(
-            self._check_field_spec(obj, fieldset_fields, '%s[1]["fields"]' % label)
-            for fieldset_fields in fieldset[1]['fields']
-        ))
-
-    def _check_field_spec(self, obj, fields, label):
-        """ `fields` should be an item of `fields` or an item of
-        fieldset[1]['fields'] for any `fieldset` in `fieldsets`. It should be a
-        field name or a tuple of field names. """
-
-        if isinstance(fields, tuple):
-            return list(chain.from_iterable(
-                self._check_field_spec_item(obj, field_name, "%s[%d]" % (label, index))
-                for index, field_name in enumerate(fields)
-            ))
-        else:
-            return self._check_field_spec_item(obj, fields, label)
-
-    def _check_field_spec_item(self, obj, field_name, label):
-        if field_name in obj.readonly_fields:
-            # Stuff can be put in fields that isn't actually a model field if
-            # it's in readonly_fields, readonly_fields will handle the
-            # validation of such things.
-            return []
-        else:
-            try:
-                field = obj.model._meta.get_field(field_name)
-            except FieldDoesNotExist:
-                # If we can't find a field on the model that matches, it could
-                # be an extra field on the form.
-                return []
-            else:
-                if (isinstance(field, models.ManyToManyField) and
-                        not field.remote_field.through._meta.auto_created):
-                    return [
-                        checks.Error(
-                            "The value of '%s' cannot include the ManyToManyField '%s', "
-                            "because that field manually specifies a relationship model."
-                            % (label, field_name),
-                            obj=obj.__class__,
-                            id='admin.E013',
-                        )
-                    ]
-                else:
-                    return []
+        return []
 
     def _check_exclude(self, obj):
         """ Check that exclude is a sequence without duplicates. """

@@ -144,11 +144,23 @@ class Student(models.Model):
 
 class School(models.Model):
     name = models.CharField(max_length=255)
-    students = models.ManyToManyField(Student, related_name='current_schools')
-    alumni = models.ManyToManyField(Student, related_name='previous_schools')
+    students = models.ManyToManyField(Student, related_name='current_schools', through='CurrentStudentSchool')
+    alumni = models.ManyToManyField(Student, related_name='previous_schools', through='PreviousStudentSchool')
 
     def __str__(self):
         return self.name
+
+
+class CurrentStudentSchool(models.Model):
+    student = models.ForeignKey(Student, models.CASCADE)
+    school = models.ForeignKey(School, models.CASCADE)
+    extra_info = models.CharField(max_length=10)
+
+
+class PreviousStudentSchool(models.Model):
+    student = models.ForeignKey(Student, models.CASCADE)
+    school = models.ForeignKey(School, models.CASCADE)
+    extra_info = models.CharField(max_length=10)
 
 
 class Profile(models.Model):
