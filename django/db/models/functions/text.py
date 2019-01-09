@@ -185,6 +185,25 @@ class Replace(Func):
         super().__init__(expression, text, replacement, **extra)
 
 
+class Reverse(Transform):
+    function = 'REVERSE'
+    lookup_name = 'reverse'
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        # REVERSE in Oracle is undocumented and doesn't support multi-byte
+        # strings. Use a special subquery instead.
+        return super().as_sql(
+            compiler, connection,
+            template=(
+                '(SELECT LISTAGG(s) WITHIN GROUP (ORDER BY n DESC) FROM '
+                '(SELECT LEVEL n, SUBSTR(%(expressions)s, LEVEL, 1) s '
+                'FROM DUAL CONNECT BY LEVEL <= LENGTH(%(expressions)s)) '
+                'GROUP BY %(expressions)s)'
+            ),
+            **extra_context
+        )
+
+
 class Right(Left):
     function = 'RIGHT'
 

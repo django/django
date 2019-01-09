@@ -215,6 +215,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function('POWER', 2, none_guard(operator.pow))
         conn.create_function('RADIANS', 1, none_guard(math.radians))
         conn.create_function('REPEAT', 2, none_guard(operator.mul))
+        conn.create_function('REVERSE', 1, none_guard(lambda x: x[::-1]))
         conn.create_function('RPAD', 3, _sqlite_rpad)
         conn.create_function('SIN', 1, none_guard(math.sin))
         conn.create_function('SQRT', 1, none_guard(math.sqrt))

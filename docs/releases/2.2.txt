@@ -221,10 +221,9 @@ Models
 
 * Added support for partial indexes (:attr:`.Index.condition`).
 
-* Added many :ref:`math database functions <math-functions>`.
-
-* The new :class:`~django.db.models.functions.NullIf` database function
-  returns ``None`` if the two expressions are equal.
+* Added the :class:`~django.db.models.functions.NullIf` and
+  :class:`~django.db.models.functions.Reverse` database functions, as well as
+  many :ref:`math database functions <math-functions>`.
 
 * Setting the new ``ignore_conflicts`` parameter of
   :meth:`.QuerySet.bulk_create` to ``True`` tells the database to ignore

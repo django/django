@@ -1377,6 +1377,27 @@ Usage example::
     >>> Author.objects.values('name')
     <QuerySet [{'name': 'Margareth Johnson'}, {'name': 'Margareth Smith'}]>
 
+``Reverse``
+-----------
+
+.. class:: Reverse(expression, **extra)
+
+.. versionadded:: 2.2
+
+Accepts a single text field or expression and returns the characters of that
+expression in reverse order.
+
+It can also be registered as a transform as described in :class:`Length`. The
+default lookup name is ``reverse``.
+
+Usage example::
+
+    >>> from django.db.models.functions import Reverse
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.annotate(backward=Reverse('name')).get()
+    >>> print(author.backward)
+    htimS teragraM
+
 ``Right``
 ---------
 
