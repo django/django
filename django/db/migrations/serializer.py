@@ -9,6 +9,7 @@ import re
 import types
 import uuid
 
+from django.conf import SettingsReference
 from django.db import models
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
@@ -271,7 +272,6 @@ class UUIDSerializer(BaseSerializer):
 
 
 def serializer_factory(value):
-    from django.db.migrations.writer import SettingsReference
     if isinstance(value, Promise):
         value = str(value)
     elif isinstance(value, LazyObject):

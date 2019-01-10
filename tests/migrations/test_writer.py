@@ -12,12 +12,10 @@ import custom_migration_operations.more_operations
 import custom_migration_operations.operations
 
 from django import get_version
-from django.conf import settings
+from django.conf import SettingsReference, settings
 from django.core.validators import EmailValidator, RegexValidator
 from django.db import migrations, models
-from django.db.migrations.writer import (
-    MigrationWriter, OperationWriter, SettingsReference,
-)
+from django.db.migrations.writer import MigrationWriter, OperationWriter
 from django.test import SimpleTestCase
 from django.utils.deconstruct import deconstructible
 from django.utils.functional import SimpleLazyObject

@@ -4,26 +4,14 @@ from importlib import import_module
 
 from django import get_version
 from django.apps import apps
+# SettingsReference imported for backwards compatibility in Django 2.2.
+from django.conf import SettingsReference  # NOQA
 from django.db import migrations
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.serializer import serializer_factory
 from django.utils.inspect import get_func_args
 from django.utils.module_loading import module_dir
 from django.utils.timezone import now
-
-
-class SettingsReference(str):
-    """
-    Special subclass of string which actually references a current settings
-    value. It's treated as the value in memory, but serializes out to a
-    settings.NAME attribute reference.
-    """
-
-    def __new__(self, value, setting_name):
-        return str.__new__(self, value)
-
-    def __init__(self, value, setting_name):
-        self.setting_name = setting_name
 
 
 class OperationWriter:
