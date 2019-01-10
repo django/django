@@ -2,7 +2,7 @@ import os
 import sys
 from distutils.sysconfig import get_python_lib
 
-from setuptools import find_packages, setup
+import setuptools
 
 CURRENT_PYTHON = sys.version_info[:2]
 REQUIRED_PYTHON = (3, 5)
@@ -66,7 +66,7 @@ def read(fname):
         return f.read()
 
 
-setup(
+setuptools.setup(
     name='Django',
     version=version,
     python_requires='>={}.{}'.format(*REQUIRED_PYTHON),
@@ -77,7 +77,7 @@ setup(
                  'rapid development and clean, pragmatic design.'),
     long_description=read('README.rst'),
     license='BSD',
-    packages=find_packages(exclude=EXCLUDE_FROM_PACKAGES),
+    packages=setuptools.find_packages(exclude=EXCLUDE_FROM_PACKAGES),
     include_package_data=True,
     scripts=['django/bin/django-admin.py'],
     entry_points={'console_scripts': [
