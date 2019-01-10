@@ -292,7 +292,7 @@ class BaseDatabaseSchemaEditor:
         for fields in model._meta.unique_together:
             columns = [model._meta.get_field(field).column for field in fields]
             self.deferred_sql.append(self._create_unique_sql(model, columns))
-        constraints = [check.constraint_sql(model, self) for check in model._meta.constraints]
+        constraints = [constraint.constraint_sql(model, self) for constraint in model._meta.constraints]
         # Make the table
         sql = self.sql_create_table % {
             "table": self.quote_name(model._meta.db_table),
