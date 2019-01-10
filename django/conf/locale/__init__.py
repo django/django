@@ -248,6 +248,12 @@ LANG_INFO = {
         'name': 'Hungarian',
         'name_local': 'Magyar',
     },
+    'hy': {
+        'bidi': False,
+        'code': 'hy',
+        'name': 'Armenian',
+        'name_local': 'հայերեն',
+    },
     'ia': {
         'bidi': False,
         'code': 'ia',
