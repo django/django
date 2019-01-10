@@ -110,11 +110,10 @@ Minor features
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* The ``ping_google`` management command now accepts the --site-domain and
-  --use-http options. ``-d --site-domain`` indicates the site domain to be used
-  if ``django.contrib.sites`` is not used.  ``--use-http`` indicates the
-  use of ``http`` instead of ``https`` scheme.  All URLs were ``http``
-  in previous versions.
+* The :option:`ping_google --site-domain` and
+  :option:`ping_google --use-http` options are added.  The first option allows
+  passing the site domain to be used if ``django.contrib.sites`` is not used.
+  The second option allows using ``http`` instead of ``https`` scheme.
 
 :mod:`django.contrib.sites`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

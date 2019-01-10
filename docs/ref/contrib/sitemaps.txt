@@ -548,12 +548,16 @@ ping Google using the ``ping_google`` management command::
 
 The management command accepts the following optional arguments:
 
-    * ``-d --site-domain``, If you are not using ``django.contrib.sites``, use this
-        to pass your site's domain (e.g., ``example.com``)
+.. django-admin-option:: --site-domain SITE_DOMAIN
 
-    * ``--use-http``, A boolean to indicate to use ``http://`` scheme instead of
-        ``https://``. Defaults to ``False``.
+.. versionadded:: 2.2
 
-    .. versionadded:: 2.2
+Specifies the site domain to be used if ``django.contrib.sites`` is not used.
+Defaults to current site's domain.
 
-    Arguments ``--site-domain`` and ``--use-http`` were added.
+.. django-admin-option:: --use-http
+
+.. versionadded:: 2.2
+
+Specifies the usage of ``http://`` scheme instead of ``https://``. Defaults to
+``False``.

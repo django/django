@@ -1599,14 +1599,6 @@ Can be run as a cron job or directly to clean out expired sessions.
 This command is only available if the :doc:`Sitemaps framework
 </ref/contrib/sitemaps>` (``django.contrib.sitemaps``) is installed.
 
-.. django-admin-option:: --site-domain SITE_DOMAIN
-
-Specifies the site domain to be used if ``django.contrib.sites`` is not used. Defaults to current site's domain.
-
-.. django-admin-option:: --use-http
-
-Specifies the usage of ``http://`` scheme instead of ``https://``. Defaults to ``False``.
-
 Please refer to its :djadmin:`description <ping_google>` in the Sitemaps
 documentation.
 
