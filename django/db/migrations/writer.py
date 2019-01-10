@@ -8,7 +8,7 @@ from django.apps import apps
 from django.conf import SettingsReference  # NOQA
 from django.db import migrations
 from django.db.migrations.loader import MigrationLoader
-from django.db.migrations.serializer import serializer_factory
+from django.db.migrations.serializer import Serializer, serializer_factory
 from django.utils.inspect import get_func_args
 from django.utils.module_loading import module_dir
 from django.utils.timezone import now
@@ -269,6 +269,14 @@ class MigrationWriter:
     @classmethod
     def serialize(cls, value):
         return serializer_factory(value).serialize()
+
+    @classmethod
+    def register_serializer(cls, type_, serializer):
+        Serializer.register(type_, serializer)
+
+    @classmethod
+    def unregister_serializer(cls, type_):
+        Serializer.unregister(type_)
 
 
 MIGRATION_HEADER_TEMPLATE = """\

@@ -211,6 +211,9 @@ Migrations
 
 * ``NoneType`` can now be serialized in migrations.
 
+* You can now :ref:`register custom serializers <custom-migration-serializers>`
+  for migrations.
+
 Models
 ~~~~~~
 

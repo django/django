@@ -697,6 +697,35 @@ Django cannot serialize:
 - Arbitrary class instances (e.g. ``MyClass(4.3, 5.7)``)
 - Lambdas
 
+.. _custom-migration-serializers:
+
+Custom serializers
+------------------
+
+.. versionadded:: 2.2
+
+You can serialize other types by writing a custom serializer. For example, if
+Django didn't serialize :class:`~decimal.Decimal` by default, you could do
+this::
+
+    from decimal import Decimal
+
+    from django.db.migrations.serializer import BaseSerializer
+    from django.db.migrations.writer import MigrationWriter
+
+    class DecimalSerializer(BaseSerializer):
+        def serialize(self):
+            return repr(self.value), {'from decimal import Decimal'}
+
+    MigrationWriter.register_serializer(Decimal, DecimalSerializer)
+
+The first argument of ``MigrationWriter.register_serializer()`` is a type or
+iterable of types that should use the serializer.
+
+The ``serialize()`` method of your serializer must return a string of how the
+value should appear in migrations and a set of any imports that are needed in
+the migration.
+
 .. _custom-deconstruct-method:
 
 Adding a ``deconstruct()`` method

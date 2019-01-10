@@ -15,6 +15,7 @@ from django import get_version
 from django.conf import SettingsReference, settings
 from django.core.validators import EmailValidator, RegexValidator
 from django.db import migrations, models
+from django.db.migrations.serializer import BaseSerializer
 from django.db.migrations.writer import MigrationWriter, OperationWriter
 from django.test import SimpleTestCase
 from django.utils.deconstruct import deconstructible
@@ -653,3 +654,18 @@ class WriterTests(SimpleTestCase):
 
         string = MigrationWriter.serialize(models.CharField(default=DeconstructibleInstances))[0]
         self.assertEqual(string, "models.CharField(default=migrations.test_writer.DeconstructibleInstances)")
+
+    def test_register_serializer(self):
+        class ComplexSerializer(BaseSerializer):
+            def serialize(self):
+                return 'complex(%r)' % self.value, {}
+
+        MigrationWriter.register_serializer(complex, ComplexSerializer)
+        self.assertSerializedEqual(complex(1, 2))
+        MigrationWriter.unregister_serializer(complex)
+        with self.assertRaisesMessage(ValueError, 'Cannot serialize: (1+2j)'):
+            self.assertSerializedEqual(complex(1, 2))
+
+    def test_register_non_serializer(self):
+        with self.assertRaisesMessage(ValueError, "'TestModel1' must inherit from 'BaseSerializer'."):
+            MigrationWriter.register_serializer(complex, TestModel1)
