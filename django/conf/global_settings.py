@@ -89,6 +89,7 @@ LANGUAGES = [
     ('hr', gettext_noop('Croatian')),
     ('hsb', gettext_noop('Upper Sorbian')),
     ('hu', gettext_noop('Hungarian')),
+    ('hy', gettext_noop('Armenian')),
     ('ia', gettext_noop('Interlingua')),
     ('id', gettext_noop('Indonesian')),
     ('io', gettext_noop('Ido')),
