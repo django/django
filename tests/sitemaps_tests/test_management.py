@@ -10,8 +10,14 @@ class PingGoogleTests(SitemapTestsBase):
 
     def test_default(self, ping_google_func):
         call_command('ping_google')
-        ping_google_func.assert_called_with(sitemap_url=None)
+        ping_google_func.assert_called_with(sitemap_url=None, use_http=False, site_domain=None)
 
-    def test_arg(self, ping_google_func):
+    def test_args(self, ping_google_func):
         call_command('ping_google', 'foo.xml')
-        ping_google_func.assert_called_with(sitemap_url='foo.xml')
+        ping_google_func.assert_called_with(sitemap_url='foo.xml', use_http=False, site_domain=None)
+        call_command('ping_google', 'foo.xml', '--use-http')
+        ping_google_func.assert_called_with(sitemap_url='foo.xml', use_http=False, site_domain=None)
+        call_command('ping_google', 'foo.xml', '-d', 'google.com')
+        ping_google_func.assert_called_with(sitemap_url='foo.xml', use_http=False, site_domain='google.com')
+        call_command('ping_google', 'foo.xml', '--site-domain', 'google.com')
+        ping_google_func.assert_called_with(sitemap_url='foo.xml', use_http=False, site_domain='google.com')

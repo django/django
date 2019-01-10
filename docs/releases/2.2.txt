@@ -110,7 +110,11 @@ Minor features
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The ``ping_google`` management command now accepts the --site-domain and
+  --use-http options. ``-d --site-domain`` indicates the site domain to be used
+  if ``django.contrib.sites`` is not used.  ``--use-http`` indicates the
+  use of ``http`` instead of ``https`` scheme.  All URLs were ``http``
+  in previous versions.
 
 :mod:`django.contrib.sites`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -426,6 +430,9 @@ Miscellaneous
 * To improve readability, the ``UUIDField`` form field now displays values with
   dashes, e.g. ``550e8400-e29b-41d4-a716-446655440000`` instead of
   ``550e8400e29b41d4a716446655440000``.
+
+* The ``ping_google`` management command now uses ``https`` scheme by default.
+  All URLs were ``http`` in previous versions.
 
 * On SQLite, ``PositiveIntegerField`` and ``PositiveSmallIntegerField`` now
   include a check constraint to prevent negative values in the database. If you
