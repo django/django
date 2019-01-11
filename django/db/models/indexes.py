@@ -57,7 +57,7 @@ class Index:
 
     def _get_condition_sql(self, model, schema_editor):
         if self.condition is None:
-            return ''
+            return None
         query = Query(model=model)
         query.add_q(self.condition)
         compiler = query.get_compiler(connection=schema_editor.connection)
