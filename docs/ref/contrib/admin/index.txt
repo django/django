@@ -2413,7 +2413,9 @@ The ``InlineModelAdmin`` class adds or customizes:
 
     .. versionchanged:: 2.1
 
-        The ``obj`` argument was added.
+        The ``obj`` argument was added. During the deprecation period, it may
+        also be ``None`` if third-party calls to ``has_add_permission()`` don't
+        provide it.
 
 .. method:: InlineModelAdmin.has_change_permission(request, obj=None)
 
