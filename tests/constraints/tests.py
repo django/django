@@ -32,6 +32,23 @@ class BaseConstraintTests(SimpleTestCase):
 
 
 class CheckConstraintTests(TestCase):
+    def test_eq(self):
+        check1 = models.Q(price__gt=models.F('discounted_price'))
+        check2 = models.Q(price__lt=models.F('discounted_price'))
+        self.assertEqual(
+            models.CheckConstraint(check=check1, name='price'),
+            models.CheckConstraint(check=check1, name='price'),
+        )
+        self.assertNotEqual(
+            models.CheckConstraint(check=check1, name='price'),
+            models.CheckConstraint(check=check1, name='price2'),
+        )
+        self.assertNotEqual(
+            models.CheckConstraint(check=check1, name='price'),
+            models.CheckConstraint(check=check2, name='price'),
+        )
+        self.assertNotEqual(models.CheckConstraint(check=check1, name='price'), 1)
+
     def test_repr(self):
         check = models.Q(price__gt=models.F('discounted_price'))
         name = 'price_gt_discounted_price'
@@ -67,6 +84,21 @@ class UniqueConstraintTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.p1 = Product.objects.create(name='p1')
+
+    def test_eq(self):
+        self.assertEqual(
+            models.UniqueConstraint(fields=['foo', 'bar'], name='unique'),
+            models.UniqueConstraint(fields=['foo', 'bar'], name='unique'),
+        )
+        self.assertNotEqual(
+            models.UniqueConstraint(fields=['foo', 'bar'], name='unique'),
+            models.UniqueConstraint(fields=['foo', 'bar'], name='unique2'),
+        )
+        self.assertNotEqual(
+            models.UniqueConstraint(fields=['foo', 'bar'], name='unique'),
+            models.UniqueConstraint(fields=['foo', 'baz'], name='unique'),
+        )
+        self.assertNotEqual(models.UniqueConstraint(fields=['foo', 'bar'], name='unique'), 1)
 
     def test_repr(self):
         fields = ['foo', 'bar']
