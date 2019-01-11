@@ -204,7 +204,6 @@ msgid "yesterday"
 msgstr "igår"
 
 #, python-format
-msgctxt "naturaltime"
 msgid "%(delta)s ago"
 msgstr "%(delta)s sedan"
 
