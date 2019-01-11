@@ -87,6 +87,31 @@ the :doc:`tutorial</intro/tutorial01>` and was added to
 
 .. _custom-commands-options:
 
+Using additional files
+======================
+
+If your command needs additional files you can define it as a package.
+For example::
+
+    polls/
+        __init__.py
+        models.py
+        management/
+            commands/
+                closepoll/
+                    __init__.py
+                    some_data
+        tests.py
+        views.py
+
+In this structure command should be defined in the ``__init__.py`` in the
+same way as ``closepoll.py``.
+
+.. versionadded:: 2.2
+
+    Packages support was added. Older versions of Django
+    work only with modules.
+
 Accepting optional arguments
 ============================
 

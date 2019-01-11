@@ -228,6 +228,12 @@ class CommandTests(SimpleTestCase):
         parser = BaseCommand().create_parser('prog_name', 'subcommand', epilog=epilog)
         self.assertEqual(parser.epilog, epilog)
 
+    def test_call_command_stored_as_package(self):
+        """Checks that commands stored as packages are detected"""
+        out = StringIO()
+        management.call_command('package_command', stdout=out)
+        self.assertIn("I've been called from a package.", out.getvalue())
+
 
 class CommandRunTests(AdminScriptTestCase):
     """

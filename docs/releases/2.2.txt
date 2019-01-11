@@ -203,6 +203,10 @@ Management Commands
   comments in generated migration file(s). This option is also available for
   :djadmin:`squashmigrations`.
 
+* The function ``find_commands`` from :mod:`~django.core.management` module
+  now does not ignore packages. This change allows developers to define
+  custom management commands as packages (only modules were allowed before).
+
 Migrations
 ~~~~~~~~~~
 

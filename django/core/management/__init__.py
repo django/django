@@ -24,7 +24,7 @@ def find_commands(management_dir):
     """
     command_dir = os.path.join(management_dir, 'commands')
     return [name for _, name, is_pkg in pkgutil.iter_modules([command_dir])
-            if not is_pkg and not name.startswith('_')]
+            if not name.startswith('_')]
 
 
 def load_command_class(app_name, name):
