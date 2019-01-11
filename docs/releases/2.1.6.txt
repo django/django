@@ -9,4 +9,6 @@ Django 2.1.6 several bugs in 2.1.5.
 Bugfixes
 ========
 
-* ...
+* Made the ``obj`` argument of ``InlineModelAdmin.has_add_permission()``
+  optional to restore backwards compatibility with third-party code that
+  doesn't provide it (:ticket:`30097`).
