@@ -2236,7 +2236,7 @@ class DiffSettings(AdminScriptTestCase):
     def test_settings_configured(self):
         out, err = self.run_manage(['diffsettings'], configured_settings=True)
         self.assertNoOutput(err)
-        self.assertOutput(out, 'DEBUG = True')
+        self.assertOutput(out, 'CUSTOM = 1  ###\nDEBUG = True')
 
     def test_all(self):
         """The all option also shows settings with the default value."""
