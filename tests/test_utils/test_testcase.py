@@ -1,4 +1,4 @@
-from django.db import IntegrityError, transaction
+from django.db import IntegrityError, connections, transaction
 from django.test import TestCase, skipUnlessDBFeature
 
 from .models import Car, PossessedCar
@@ -18,6 +18,17 @@ class TestTestCase(TestCase):
             car.delete()
         finally:
             self._rollback_atomics = rollback_atomics
+
+    def test_disallowed_database_connection(self):
+        message = (
+            "Database connections to 'other' are not allowed in this test. "
+            "Add 'other' to test_utils.test_testcase.TestTestCase.databases to "
+            "ensure proper test isolation and silence this failure."
+        )
+        with self.assertRaisesMessage(AssertionError, message):
+            connections['other'].connect()
+        with self.assertRaisesMessage(AssertionError, message):
+            connections['other'].temporary_connection()
 
     def test_disallowed_database_queries(self):
         message = (

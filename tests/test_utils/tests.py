@@ -1159,11 +1159,24 @@ class TestBadSetUpTestData(TestCase):
 
 
 class DisallowedDatabaseQueriesTests(SimpleTestCase):
+    def test_disallowed_database_connections(self):
+        expected_message = (
+            "Database connections to 'default' are not allowed in SimpleTestCase "
+            "subclasses. Either subclass TestCase or TransactionTestCase to "
+            "ensure proper test isolation or add 'default' to "
+            "test_utils.tests.DisallowedDatabaseQueriesTests.databases to "
+            "silence this failure."
+        )
+        with self.assertRaisesMessage(AssertionError, expected_message):
+            connection.connect()
+        with self.assertRaisesMessage(AssertionError, expected_message):
+            connection.temporary_connection()
+
     def test_disallowed_database_queries(self):
         expected_message = (
-            "Database queries are not allowed in SimpleTestCase subclasses. "
-            "Either subclass TestCase or TransactionTestCase to ensure proper "
-            "test isolation or add 'default' to "
+            "Database queries to 'default' are not allowed in SimpleTestCase "
+            "subclasses. Either subclass TestCase or TransactionTestCase to "
+            "ensure proper test isolation or add 'default' to "
             "test_utils.tests.DisallowedDatabaseQueriesTests.databases to "
             "silence this failure."
         )
@@ -1172,9 +1185,9 @@ class DisallowedDatabaseQueriesTests(SimpleTestCase):
 
     def test_disallowed_database_chunked_cursor_queries(self):
         expected_message = (
-            "Database queries are not allowed in SimpleTestCase subclasses. "
-            "Either subclass TestCase or TransactionTestCase to ensure proper "
-            "test isolation or add 'default' to "
+            "Database queries to 'default' are not allowed in SimpleTestCase "
+            "subclasses. Either subclass TestCase or TransactionTestCase to "
+            "ensure proper test isolation or add 'default' to "
             "test_utils.tests.DisallowedDatabaseQueriesTests.databases to "
             "silence this failure."
         )
