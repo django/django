@@ -581,7 +581,7 @@ class ForcedTimeZoneDatabaseTests(TransactionTestCase):
 
 @skipUnlessDBFeature('supports_timezones')
 @override_settings(TIME_ZONE='Africa/Nairobi', USE_TZ=True)
-class UnsupportedTimeZoneDatabaseTests(SimpleTestCase):
+class UnsupportedTimeZoneDatabaseTests(TestCase):
 
     def test_time_zone_parameter_not_supported_if_database_supports_timezone(self):
         connections.databases['tz'] = connections.databases['default'].copy()

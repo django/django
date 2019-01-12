@@ -1,13 +1,13 @@
 from django.conf import settings
 from django.db import connection, models
 from django.db.models.query_utils import Q
-from django.test import SimpleTestCase, skipUnlessDBFeature
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 
 from .models import Book, ChildModel1, ChildModel2
 
 
-class IndexesTests(SimpleTestCase):
+class SimpleIndexesTests(SimpleTestCase):
 
     def test_suffix(self):
         self.assertEqual(models.Index.suffix, 'idx')
@@ -155,6 +155,9 @@ class IndexesTests(SimpleTestCase):
         self.assertEqual(index_names, ['model_index_name_440998_idx'])
         index_names = [index.name for index in ChildModel2._meta.indexes]
         self.assertEqual(index_names, ['model_index_name_b6c374_idx'])
+
+
+class IndexesTests(TestCase):
 
     @skipUnlessDBFeature('supports_tablespaces')
     def test_db_tablespace(self):

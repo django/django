@@ -29,15 +29,14 @@ from .views import empty_response
 
 
 class SkippingTestCase(SimpleTestCase):
-    def _assert_skipping(self, func, expected_exc):
-        # We cannot simply use assertRaises because a SkipTest exception will go unnoticed
+    def _assert_skipping(self, func, expected_exc, msg=None):
         try:
-            func()
-        except expected_exc:
-            pass
-        except Exception as e:
-            self.fail("No %s exception should have been raised for %s." % (
-                e.__class__.__name__, func.__name__))
+            if msg is not None:
+                self.assertRaisesMessage(expected_exc, msg, func)
+            else:
+                self.assertRaises(expected_exc, func)
+        except unittest.SkipTest:
+            self.fail('%s should not result in a skipped test.' % func.__name__)
 
     def test_skip_unless_db_feature(self):
         """
@@ -64,6 +63,20 @@ class SkippingTestCase(SimpleTestCase):
         self._assert_skipping(test_func2, unittest.SkipTest)
         self._assert_skipping(test_func3, ValueError)
         self._assert_skipping(test_func4, unittest.SkipTest)
+
+        class SkipTestCase(SimpleTestCase):
+            @skipUnlessDBFeature('missing')
+            def test_foo(self):
+                pass
+
+        self._assert_skipping(
+            SkipTestCase('test_foo').test_foo,
+            ValueError,
+            "skipUnlessDBFeature cannot be used on test_foo (test_utils.tests."
+            "SkippingTestCase.test_skip_unless_db_feature.<locals>.SkipTestCase) "
+            "as SkippingTestCase.test_skip_unless_db_feature.<locals>.SkipTestCase "
+            "doesn't allow queries against the 'default' database."
+        )
 
     def test_skip_if_db_feature(self):
         """
@@ -95,17 +108,31 @@ class SkippingTestCase(SimpleTestCase):
         self._assert_skipping(test_func4, unittest.SkipTest)
         self._assert_skipping(test_func5, ValueError)
 
+        class SkipTestCase(SimpleTestCase):
+            @skipIfDBFeature('missing')
+            def test_foo(self):
+                pass
 
-class SkippingClassTestCase(SimpleTestCase):
+        self._assert_skipping(
+            SkipTestCase('test_foo').test_foo,
+            ValueError,
+            "skipIfDBFeature cannot be used on test_foo (test_utils.tests."
+            "SkippingTestCase.test_skip_if_db_feature.<locals>.SkipTestCase) "
+            "as SkippingTestCase.test_skip_if_db_feature.<locals>.SkipTestCase "
+            "doesn't allow queries against the 'default' database."
+        )
+
+
+class SkippingClassTestCase(TestCase):
     def test_skip_class_unless_db_feature(self):
         @skipUnlessDBFeature("__class__")
-        class NotSkippedTests(unittest.TestCase):
+        class NotSkippedTests(TestCase):
             def test_dummy(self):
                 return
 
         @skipUnlessDBFeature("missing")
         @skipIfDBFeature("__class__")
-        class SkippedTests(unittest.TestCase):
+        class SkippedTests(TestCase):
             def test_will_be_skipped(self):
                 self.fail("We should never arrive here.")
 
@@ -119,12 +146,33 @@ class SkippingClassTestCase(SimpleTestCase):
             test_suite.addTest(SkippedTests('test_will_be_skipped'))
             test_suite.addTest(SkippedTestsSubclass('test_will_be_skipped'))
         except unittest.SkipTest:
-            self.fail("SkipTest should not be raised at this stage")
+            self.fail('SkipTest should not be raised here.')
         result = unittest.TextTestRunner(stream=StringIO()).run(test_suite)
         self.assertEqual(result.testsRun, 3)
         self.assertEqual(len(result.skipped), 2)
         self.assertEqual(result.skipped[0][1], 'Database has feature(s) __class__')
         self.assertEqual(result.skipped[1][1], 'Database has feature(s) __class__')
+
+    def test_missing_default_databases(self):
+        @skipIfDBFeature('missing')
+        class MissingDatabases(SimpleTestCase):
+            def test_assertion_error(self):
+                pass
+
+        suite = unittest.TestSuite()
+        try:
+            suite.addTest(MissingDatabases('test_assertion_error'))
+        except unittest.SkipTest:
+            self.fail("SkipTest should not be raised at this stage")
+        runner = unittest.TextTestRunner(stream=StringIO())
+        msg = (
+            "skipIfDBFeature cannot be used on <class 'test_utils.tests."
+            "SkippingClassTestCase.test_missing_default_databases.<locals>."
+            "MissingDatabases'> as it doesn't allow queries against the "
+            "'default' database."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            runner.run(suite)
 
 
 @override_settings(ROOT_URLCONF='test_utils.urls')

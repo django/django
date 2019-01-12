@@ -2,7 +2,7 @@ import unittest
 
 from django.core.checks import Error, Warning as DjangoWarning
 from django.db import connection, models
-from django.test import SimpleTestCase, skipIfDBFeature
+from django.test import SimpleTestCase, TestCase, skipIfDBFeature
 from django.test.utils import isolate_apps, override_settings
 from django.utils.functional import lazy
 from django.utils.timezone import now
@@ -680,7 +680,7 @@ class TimeFieldTests(SimpleTestCase):
 
 
 @isolate_apps('invalid_models_tests')
-class TextFieldTests(SimpleTestCase):
+class TextFieldTests(TestCase):
 
     @skipIfDBFeature('supports_index_on_text_field')
     def test_max_length_warning(self):
