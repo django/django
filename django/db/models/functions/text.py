@@ -67,10 +67,9 @@ class ConcatPair(Func):
     def coalesce(self):
         # null on either side results in null for expression, wrap with coalesce
         c = self.copy()
-        expressions = [
+        c.set_source_expressions([
             Coalesce(expression, Value('')) for expression in c.get_source_expressions()
-        ]
-        c.set_source_expressions(expressions)
+        ])
         return c
 
 
