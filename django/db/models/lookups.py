@@ -487,13 +487,21 @@ class YearLookup(Lookup):
         return bounds
 
 
-class YearComparisonLookup(YearLookup):
+class YearComparisonLookup(YearLookup, BuiltinLookup):
     def as_sql(self, compiler, connection):
         # We will need to skip the extract part and instead go
         # directly with the originating field, that is self.lhs.lhs.
         lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
         rhs_sql, rhs_params = self.process_rhs(compiler, connection)
         rhs_sql = self.get_rhs_op(connection, rhs_sql)
+        try:
+            # Check that rhs_params[0] exists (IndexError),
+            # it isn't None (TypeError), and is a number (ValueError)
+            int(rhs_params[0])
+        except (IndexError, TypeError, ValueError):
+            # Can't determine the bounds before executing the query, so skip
+            # optimizations by falling back to a standard exact comparison.
+            return super().as_sql(compiler, connection)
         start, finish = self.year_lookup_bounds(connection, rhs_params[0])
         params.append(self.get_bound(start, finish))
         return '%s %s' % (lhs_sql, rhs_sql), params

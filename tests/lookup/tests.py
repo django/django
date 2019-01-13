@@ -5,6 +5,7 @@ from operator import attrgetter
 
 from django.core.exceptions import FieldError
 from django.db import connection
+from django.db.models import OuterRef, Subquery
 from django.db.models.functions import Substr
 from django.test import TestCase, skipUnlessDBFeature
 
@@ -333,6 +334,7 @@ class LookupTests(TestCase):
                 'author_id': self.au2.id,
                 'headline': 'Article 5',
                 'pub_date': datetime(2005, 8, 1, 9, 0),
+                'year': 2005,
                 'slug': 'a5',
             }],
         )
@@ -925,3 +927,27 @@ class LookupTests(TestCase):
         field = query.model._meta.get_field('nulled_text_field')
         self.assertIsInstance(query.build_lookup(['isnull_none_rhs'], field, None), IsNullWithNoneAsRHS)
         self.assertTrue(Season.objects.filter(pk=season.pk, nulled_text_field__isnull_none_rhs=True))
+
+    def test_outerref_in_dates(self):
+        self.au3 = Author.objects.create(
+            name='Author 3',
+            alias='a3',
+            date=datetime(2000, 1, 1)
+        )
+        self.a8 = Article.objects.create(
+            headline='Article 8',
+            pub_date=datetime(2005, 8, 27),
+            author=self.au3,
+            slug='a8',
+        )
+        dates = Author.objects.filter(date__year__gte=OuterRef('year'))
+        dates_subq = Subquery(dates.values('id'))
+        years = Article.objects.filter(author__in=dates_subq)
+        self.assertQuerysetEqual(
+            years,
+            ['<Article: Article 1>', '<Article: Article 2>',
+             '<Article: Article 3>', '<Article: Article 4>',
+             '<Article: Article 5>', '<Article: Article 6>',
+             '<Article: Article 7>'],
+            ordered=False
+        )

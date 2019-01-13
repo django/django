@@ -3,6 +3,7 @@ The lookup API
 
 This demonstrates features of the database API.
 """
+import datetime
 
 from django.db import models
 from django.db.models.lookups import IsNull
@@ -19,6 +20,7 @@ class Alarm(models.Model):
 class Author(models.Model):
     name = models.CharField(max_length=100)
     alias = models.CharField(max_length=50, null=True, blank=True)
+    date = models.DateField(default=datetime.datetime(2010, 1, 1))
 
     class Meta:
         ordering = ('name',)
@@ -27,6 +29,7 @@ class Author(models.Model):
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateTimeField()
+    year = models.IntegerField(default=2005)
     author = models.ForeignKey(Author, models.SET_NULL, blank=True, null=True)
     slug = models.SlugField(unique=True, blank=True, null=True)
 
