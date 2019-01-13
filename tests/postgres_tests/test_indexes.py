@@ -30,7 +30,6 @@ class IndexTestMixin:
         self.assertEqual(kwargs, {'fields': ['title'], 'name': 'test_title_%s' % self.index_class.suffix})
 
 
-@skipUnlessDBFeature('has_brin_index_support')
 class BrinIndexTests(IndexTestMixin, PostgreSQLSimpleTestCase):
     index_class = BrinIndex
 
