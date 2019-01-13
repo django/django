@@ -114,11 +114,11 @@ class Left(Func):
     def get_substr(self):
         return Substr(self.source_expressions[0], Value(1), self.source_expressions[1])
 
-    def use_substr(self, compiler, connection, **extra_context):
+    def as_oracle(self, compiler, connection, **extra_context):
         return self.get_substr().as_oracle(compiler, connection, **extra_context)
 
-    as_oracle = use_substr
-    as_sqlite = use_substr
+    def as_sqlite(self, compiler, connection, **extra_context):
+        return self.get_substr().as_sqlite(compiler, connection, **extra_context)
 
 
 class Length(Transform):
