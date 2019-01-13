@@ -4,7 +4,7 @@ from django.http import (
     HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound,
     HttpResponseServerError,
 )
-from django.template import Context, Engine, TemplateDoesNotExist, loader
+from django.template import TemplateDoesNotExist, loader
 from django.views.decorators.csrf import requires_csrf_token
 
 ERROR_404_TEMPLATE_NAME = '404.html'
@@ -40,11 +40,11 @@ def page_not_found(request, exception, template_name=ERROR_404_TEMPLATE_NAME):
     else:
         if isinstance(message, str):
             exception_repr = message
-    context = {
-        'request_path': quote(request.path),
-        'exception': exception_repr,
-    }
     try:
+        context = {
+            'request_path': quote(request.path),
+            'exception': exception_repr,
+        }
         template = loader.get_template(template_name)
         body = template.render(context, request)
         content_type = None             # Django will use DEFAULT_CONTENT_TYPE
@@ -52,10 +52,9 @@ def page_not_found(request, exception, template_name=ERROR_404_TEMPLATE_NAME):
         if template_name != ERROR_404_TEMPLATE_NAME:
             # Reraise if it's a missing custom template.
             raise
-        template = Engine().from_string(
-            '<h1>Not Found</h1>'
-            '<p>The requested resource was not found on this server.</p>')
-        body = template.render(Context(context))
+        body = (
+            b'<h1>Not Found</h1>'
+            b'<p>The requested resource was not found on this server.</p>')
         content_type = 'text/html'
     return HttpResponseNotFound(body, content_type=content_type)
 
