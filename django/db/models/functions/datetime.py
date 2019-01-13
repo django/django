@@ -285,7 +285,7 @@ class TruncTime(TruncBase):
     output_field = TimeField()
 
     def as_sql(self, compiler, connection):
-        # Cast to date rather than truncate to date.
+        # Cast to time rather than truncate to time.
         lhs, lhs_params = compiler.compile(self.lhs)
         tzname = timezone.get_current_timezone_name() if settings.USE_TZ else None
         sql = connection.ops.datetime_cast_time_sql(lhs, tzname)
