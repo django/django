@@ -994,6 +994,7 @@ class Subquery(Expression):
     query which will be resolved when it is applied to that query.
     """
     template = '(%(subquery)s)'
+    contains_aggregate = False
 
     def __init__(self, queryset, output_field=None, **extra):
         self.queryset = queryset
