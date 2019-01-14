@@ -229,6 +229,7 @@ dependencies:
 *  Pillow_
 *  PyYAML_
 *  pytz_ (required)
+*  pywatchman_
 *  setuptools_
 *  memcached_, plus a :ref:`supported Python binding <memcached>`
 *  gettext_ (:ref:`gettext_on_windows`)
@@ -258,6 +259,9 @@ and install the Geospatial libraries</ref/contrib/gis/install/index>`.
 Each of these dependencies is optional. If you're missing any of them, the
 associated tests will be skipped.
 
+To run some of the autoreload tests, you'll need to install the Watchman_
+service.
+
 .. _argon2-cffi: https://pypi.org/project/argon2_cffi/
 .. _bcrypt: https://pypi.org/project/bcrypt/
 .. _docutils: https://pypi.org/project/docutils/
@@ -267,12 +271,14 @@ associated tests will be skipped.
 .. _Pillow: https://pypi.org/project/Pillow/
 .. _PyYAML: https://pyyaml.org/wiki/PyYAML
 .. _pytz: https://pypi.org/project/pytz/
+.. _pywatchman: https://pypi.org/project/pywatchman/
 .. _setuptools: https://pypi.org/project/setuptools/
 .. _memcached: https://memcached.org/
 .. _gettext: https://www.gnu.org/software/gettext/manual/gettext.html
 .. _selenium: https://pypi.org/project/selenium/
 .. _sqlparse: https://pypi.org/project/sqlparse/
 .. _pip requirements files: https://pip.pypa.io/en/latest/user_guide/#requirements-files
+.. _Watchman: https://facebook.github.io/watchman/
 
 Code coverage
 -------------

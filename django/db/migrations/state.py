@@ -264,9 +264,11 @@ class StateApps(Apps):
         app_configs = [AppConfigStub(label) for label in sorted([*real_apps, *app_labels])]
         super().__init__(app_configs)
 
-        # The lock gets in the way of copying as implemented in clone(), which
-        # is called whenever Django duplicates a StateApps before updating it.
+        # These locks get in the way of copying as implemented in clone(),
+        # which is called whenever Django duplicates a StateApps before
+        # updating it.
         self._lock = None
+        self.ready_event = None
 
         self.render_multiple([*models.values(), *self.real_models])
 
