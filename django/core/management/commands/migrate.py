@@ -215,15 +215,13 @@ class Command(BaseCommand):
                 )
                 changes = autodetector.changes(graph=executor.loader.graph)
                 if changes:
-                    self.stdout.write(self.style.NOTICE(
+                    raise CommandError(
                         "  Your models have changes that are not yet reflected "
                         "in a migration, and so won't be applied."
-                    ))
-                    self.stdout.write(self.style.NOTICE(
                         "  Run 'manage.py makemigrations' to make new "
                         "migrations, and then re-run 'manage.py migrate' to "
                         "apply them."
-                    ))
+                    )
             fake = False
             fake_initial = False
         else:
