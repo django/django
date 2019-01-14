@@ -313,8 +313,8 @@ app will still work.
     You should always use ``include()`` when you include other URL patterns.
     ``admin.site.urls`` is the only exception to this.
 
-You have now wired an ``index`` view into the URLconf. Lets verify it's
-working, run the following command:
+You have now wired an ``index`` view into the URLconf. Verify it's working with
+the following command:
 
 .. console::
 
