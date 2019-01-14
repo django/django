@@ -339,8 +339,9 @@ class SQLCompiler:
         seen = set()
 
         for expr, is_ref in order_by:
+            resolved = expr.resolve_expression(self.query, allow_joins=True, reuse=None)
             if self.query.combinator:
-                src = expr.get_source_expressions()[0]
+                src = resolved.get_source_expressions()[0]
                 # Relabel order by columns to raw numbers if this is a combined
                 # query; necessary since the columns can't be referenced by the
                 # fully qualified name and the simple column names may collide.
@@ -350,12 +351,10 @@ class SQLCompiler:
                     elif col_alias:
                         continue
                     if src == sel_expr:
-                        expr.set_source_expressions([RawSQL('%d' % (idx + 1), ())])
+                        resolved.set_source_expressions([RawSQL('%d' % (idx + 1), ())])
                         break
                 else:
                     raise DatabaseError('ORDER BY term does not match any column in the result set.')
-            resolved = expr.resolve_expression(
-                self.query, allow_joins=True, reuse=None)
             sql, params = self.compile(resolved)
             # Don't add the same column twice, but the order direction is
             # not taken into account so we strip it. When this entire method
