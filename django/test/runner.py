@@ -66,9 +66,9 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
             self.stream.writeln(self.separator1)
             self.stream.writeln("%s: %s" % (flavour, self.getDescription(test)))
             self.stream.writeln(self.separator2)
-            self.stream.writeln("%s" % err)
+            self.stream.writeln(err)
             self.stream.writeln(self.separator2)
-            self.stream.writeln("%s" % sql_debug)
+            self.stream.writeln(sql_debug)
 
 
 class RemoteTestResult:
