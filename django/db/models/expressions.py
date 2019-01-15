@@ -807,7 +807,7 @@ class Ref(Expression):
         return self
 
     def as_sql(self, compiler, connection):
-        return "%s" % connection.ops.quote_name(self.refs), []
+        return connection.ops.quote_name(self.refs), []
 
     def get_group_by_cols(self):
         return [self]

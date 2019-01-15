@@ -1410,7 +1410,7 @@ class ManyToManyField(RelatedField):
                 opts = model._meta.auto_created._meta
                 clashing_obj = '%s.%s' % (opts.label, _get_field_name(model))
             else:
-                clashing_obj = '%s' % model._meta.label
+                clashing_obj = model._meta.label
             return [
                 checks.Error(
                     "The field's intermediary table '%s' clashes with the "
