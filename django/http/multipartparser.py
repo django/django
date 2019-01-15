@@ -7,6 +7,7 @@ file upload handlers for processing.
 import base64
 import binascii
 import cgi
+import collections
 from urllib.parse import unquote
 
 from django.conf import settings
@@ -565,9 +566,7 @@ def exhaust(stream_or_iterable):
         iterator = iter(stream_or_iterable)
     except TypeError:
         iterator = ChunkIter(stream_or_iterable, 16384)
-
-    for __ in iterator:
-        pass
+    collections.deque(iterator, maxlen=0)  # consume iterator quickly.
 
 
 def parse_boundary_stream(stream, max_header_size):
