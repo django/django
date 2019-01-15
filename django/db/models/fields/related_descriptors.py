@@ -967,7 +967,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 # If this is a symmetrical m2m relation to self, add the mirror
                 # entry in the m2m table. `through_defaults` aren't used here
                 # because of the system check error fields.E332: Many-to-many
-                # fields with intermediate tables mus not be symmetrical.
+                # fields with intermediate tables must not be symmetrical.
                 if self.symmetrical:
                     self._add_items(self.target_field_name, self.source_field_name, *objs)
         add.alters_data = True
@@ -1024,14 +1024,14 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     self.add(*new_objs, through_defaults=through_defaults)
         set.alters_data = True
 
-        def create(self, through_defaults=None, **kwargs):
+        def create(self, *, through_defaults=None, **kwargs):
             db = router.db_for_write(self.instance.__class__, instance=self.instance)
             new_obj = super(ManyRelatedManager, self.db_manager(db)).create(**kwargs)
             self.add(new_obj, through_defaults=through_defaults)
             return new_obj
         create.alters_data = True
 
-        def get_or_create(self, through_defaults=None, **kwargs):
+        def get_or_create(self, *, through_defaults=None, **kwargs):
             db = router.db_for_write(self.instance.__class__, instance=self.instance)
             obj, created = super(ManyRelatedManager, self.db_manager(db)).get_or_create(**kwargs)
             # We only need to add() if created because if we got an object back
@@ -1041,7 +1041,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             return obj, created
         get_or_create.alters_data = True
 
-        def update_or_create(self, through_defaults=None, **kwargs):
+        def update_or_create(self, *, through_defaults=None, **kwargs):
             db = router.db_for_write(self.instance.__class__, instance=self.instance)
             obj, created = super(ManyRelatedManager, self.db_manager(db)).update_or_create(**kwargs)
             # We only need to add() if created because if we got an object back
@@ -1105,10 +1105,10 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
 
                     # Add the ones that aren't there already
                     self.through._default_manager.using(db).bulk_create([
-                        self.through(**dict(through_defaults, **{
+                        self.through(**{**through_defaults, **{
                             '%s_id' % source_field_name: self.related_val[0],
                             '%s_id' % target_field_name: obj_id,
-                        }))
+                        }})
                         for obj_id in new_ids
                     ])
 
