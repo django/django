@@ -22,6 +22,24 @@ class OperationTestBase(MigrationTestBase):
     Common functions to help test operations.
     """
 
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls._initial_table_names = frozenset(connection.introspection.table_names())
+
+    def tearDown(self):
+        self.cleanup_test_tables()
+        super().tearDown()
+
+    def cleanup_test_tables(self):
+        table_names = frozenset(connection.introspection.table_names()) - self._initial_table_names
+        with connection.schema_editor() as editor:
+            with connection.constraint_checks_disabled():
+                for table_name in table_names:
+                    editor.execute(editor.sql_delete_table % {
+                        'table': editor.quote_name(table_name),
+                    })
+
     def apply_operations(self, app_label, project_state, operations, atomic=True):
         migration = Migration('name', app_label)
         migration.operations = operations
@@ -51,26 +69,6 @@ class OperationTestBase(MigrationTestBase):
         """
         Creates a test model state and database table.
         """
-        # Delete the tables if they already exist
-        table_names = [
-            # Start with ManyToMany tables
-            '_pony_stables', '_pony_vans',
-            # Then standard model tables
-            '_pony', '_stable', '_van',
-        ]
-        tables = [(app_label + table_name) for table_name in table_names]
-        with connection.cursor() as cursor:
-            table_names = connection.introspection.table_names(cursor)
-            connection.disable_constraint_checking()
-            sql_delete_table = connection.schema_editor().sql_delete_table
-            with transaction.atomic():
-                for table in tables:
-                    if table in table_names:
-                        cursor.execute(sql_delete_table % {
-                            "table": connection.ops.quote_name(table),
-                        })
-            connection.enable_constraint_checking()
-
         # Make the "current" state
         model_options = {
             "swappable": "TEST_SWAP_MODEL",
