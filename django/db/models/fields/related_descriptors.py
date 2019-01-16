@@ -1105,10 +1105,10 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
 
                     # Add the ones that aren't there already
                     self.through._default_manager.using(db).bulk_create([
-                        self.through(**{**through_defaults, **{
+                        self.through(**through_defaults, **{
                             '%s_id' % source_field_name: self.related_val[0],
                             '%s_id' % target_field_name: obj_id,
-                        }})
+                        })
                         for obj_id in new_ids
                     ])
 
