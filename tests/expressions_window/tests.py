@@ -536,8 +536,7 @@ class WindowFunctionTests(TestCase):
             ('Brown', 53000, 'Sales', datetime.date(2009, 9, 1), 108000),
         ], transform=lambda row: (row.name, row.salary, row.department, row.hire_date, row.sum))
 
-    @skipIf(connection.vendor == 'postgresql', 'n following/preceding not supported by PostgreSQL')
-    @skipIf(connection.vendor == 'sqlite', 'n following/preceding not supported by SQLite')
+    @skipUnlessDBFeature('supports_frame_range_fixed_distance')
     def test_range_n_preceding_and_following(self):
         qs = Employee.objects.annotate(sum=Window(
             expression=Sum('salary'),
