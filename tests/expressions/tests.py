@@ -5,7 +5,7 @@ import uuid
 from copy import deepcopy
 
 from django.core.exceptions import FieldError
-from django.db import DatabaseError, connection, models, transaction
+from django.db import DatabaseError, connection, models
 from django.db.models import CharField, Q, TimeField, UUIDField
 from django.db.models.aggregates import (
     Avg, Count, Max, Min, StdDev, Sum, Variance,
@@ -237,12 +237,11 @@ class BasicExpressionsTests(TestCase):
             "foo",
         )
 
-        with transaction.atomic():
-            msg = "Joined field references are not permitted in this query"
-            with self.assertRaisesMessage(FieldError, msg):
-                Company.objects.exclude(
-                    ceo__firstname=F('point_of_contact__firstname')
-                ).update(name=F('point_of_contact__lastname'))
+        msg = "Joined field references are not permitted in this query"
+        with self.assertRaisesMessage(FieldError, msg):
+            Company.objects.exclude(
+                ceo__firstname=F('point_of_contact__firstname')
+            ).update(name=F('point_of_contact__lastname'))
 
     def test_object_update(self):
         # F expressions can be used to update attributes on single objects
