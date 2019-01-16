@@ -24,8 +24,8 @@ from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import Approximate
 
 from .models import (
-    UUID, UUIDPK, Company, Employee, Experiment, Number, Result, SimulationRun,
-    Time,
+    UUID, UUIDPK, Company, Employee, Experiment, Number, RemoteEmployee,
+    Result, SimulationRun, Time,
 )
 
 
@@ -284,6 +284,11 @@ class BasicExpressionsTests(TestCase):
         msg = 'Joined field references are not permitted in this query'
         with self.assertRaisesMessage(FieldError, msg):
             test_gmbh.save()
+
+    def test_update_inherited_field_value(self):
+        msg = 'Joined field references are not permitted in this query'
+        with self.assertRaisesMessage(FieldError, msg):
+            RemoteEmployee.objects.update(adjusted_salary=F('salary') * 5)
 
     def test_object_update_unsaved_objects(self):
         # F expressions cannot be used to update attributes on objects which do
