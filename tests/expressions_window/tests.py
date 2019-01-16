@@ -537,6 +537,7 @@ class WindowFunctionTests(TestCase):
         ], transform=lambda row: (row.name, row.salary, row.department, row.hire_date, row.sum))
 
     @skipIf(connection.vendor == 'postgresql', 'n following/preceding not supported by PostgreSQL')
+    @skipIf(connection.vendor == 'sqlite', 'n following/preceding not supported by SQLite')
     def test_range_n_preceding_and_following(self):
         qs = Employee.objects.annotate(sum=Window(
             expression=Sum('salary'),
@@ -584,6 +585,10 @@ class WindowFunctionTests(TestCase):
             ('Brown', 'Sales', 53000, datetime.date(2009, 9, 1), 148000)
         ], transform=lambda row: (row.name, row.department, row.salary, row.hire_date, row.sum))
 
+    @skipIf(
+        connection.vendor == 'sqlite' and connection.Database.sqlite_version_info < (3, 27),
+        'Nondeterministic failure on SQLite < 3.27.'
+    )
     def test_subquery_row_range_rank(self):
         qs = Employee.objects.annotate(
             highest_avg_salary_date=Subquery(
