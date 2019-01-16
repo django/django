@@ -262,6 +262,20 @@ The permission can then be assigned to a
 attribute or to a :class:`~django.contrib.auth.models.Group` via its
 ``permissions`` attribute.
 
+.. admonition:: Proxy models need their own content type
+
+    If you want to create :ref:`permissions for a proxy model
+    <proxy-models-permissions-topic>`, pass ``for_concrete_model=False`` to
+    :meth:`.ContentTypeManager.get_for_model` to get the appropriate
+    ``ContentType``::
+
+        content_type = ContentType.objects.get_for_model(BlogPostProxy, for_concrete_model=False)
+
+    .. versionchanged:: 2.2
+
+        In older versions, proxy models use the content type of the concrete
+        model.
+
 Permission caching
 ------------------
 
@@ -302,6 +316,44 @@ the user from the database. For example::
         user.has_perm('myapp.change_blogpost')  # True
 
         ...
+
+.. _proxy-models-permissions-topic:
+
+Proxy models
+------------
+
+Proxy models work exactly the same way as concrete models. Permissions are
+created using the own content type of the proxy model. Proxy models don't
+inherit the permissions of the concrete model they subclass::
+
+    class Person(models.Model):
+        class Meta:
+            permissions = (('can_eat_pizzas', 'Can eat pizzas'),)
+
+    class Student(Person):
+        class Meta:
+            proxy = True
+            permissions = (('can_deliver_pizzas', 'Can deliver pizzas'),)
+
+    >>> # Fetch the content type for the proxy model.
+    >>> content_type = ContentType.objects.get_for_model(Student, for_concrete_model=False)
+    >>> student_permissions = Permission.objects.filter(content_type=content_type)
+    >>> [p.codename for p in student_permissions]
+    ['add_student', 'change_student', 'delete_student', 'view_student',
+    'can_deliver_pizzas']
+    >>> for permission in student_permissions:
+    ...     user.user_permissions.add(permission)
+    >>> user.has_perm('app.add_person')
+    False
+    >>> user.has_perm('app.can_eat_pizzas')
+    False
+    >>> user.has_perms(('app.add_student', 'app.can_deliver_pizzas'))
+    True
+
+.. versionchanged:: 2.2
+
+    In older versions, permissions for proxy models use the content type of
+    the concrete model rather than content type of the proxy model.
 
 .. _auth-web-requests:
 

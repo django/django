@@ -439,6 +439,28 @@ Use this instead::
 
         alias = property(operator.attrgetter('base'))
 
+Permissions for proxy models
+----------------------------
+
+:ref:`Permissions for proxy models <proxy-models-permissions-topic>` are now
+created using the content type of the proxy model rather than the content type
+of the concrete model. A migration will update existing permissions when you
+run :djadmin:`migrate`.
+
+In the admin, the change is transparent for proxy models having the same
+``app_label`` as their concrete model. However, in older versions, users with
+permissions for a proxy model with a *different* ``app_label`` than its
+concrete model couldn't access the model in the admin. That's now fixed, but
+you might want to audit the permissions assignments for such proxy models
+(``[add|view|change|delete]_myproxy``) prior to upgrading to ensure the new
+access is appropriate.
+
+Finally, proxy model permission strings must be updated to use their own
+``app_label``. For example, for ``app.MyProxyModel`` inheriting from
+``other_app.ConcreteModel``, update
+``user.has_perm('other_app.add_myproxymodel')`` to
+``user.has_perm('app.add_myproxymodel')``.
+
 Miscellaneous
 -------------
 
