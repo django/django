@@ -798,7 +798,7 @@ class ModelAdminPermissionTests(SimpleTestCase):
         self.assertIsInstance(inline_instances[0], ConcertInline)
 
     def test_inline_has_add_permission_without_obj(self):
-        # This test will be removed in Django 3.1 when `obj` becomes a required
+        # This test will be removed in Django 3.0 when `obj` becomes a required
         # argument of has_add_permission() (#27991).
         class ConcertInline(TabularInline):
             model = Concert
