@@ -1777,7 +1777,7 @@ class Model(metaclass=ModelBase):
 
 # ORDERING METHODS #########################
 
-def method_set_order(self, ordered_obj, id_list, using=None):
+def _method_set_order(self, ordered_obj, id_list, using=None):
     if using is None:
         using = DEFAULT_DB_ALIAS
     order_wrt = ordered_obj._meta.order_with_respect_to
@@ -1789,7 +1789,7 @@ def method_set_order(self, ordered_obj, id_list, using=None):
             ordered_obj.objects.filter(pk=j, **filter_args).update(_order=i)
 
 
-def method_get_order(self, ordered_obj):
+def _method_get_order(self, ordered_obj):
     order_wrt = ordered_obj._meta.order_with_respect_to
     filter_args = order_wrt.get_forward_related_filter(self)
     pk_name = ordered_obj._meta.pk.name
@@ -1800,12 +1800,12 @@ def make_foreign_order_accessors(model, related_model):
     setattr(
         related_model,
         'get_%s_order' % model.__name__.lower(),
-        partialmethod(method_get_order, model)
+        partialmethod(_method_get_order, model)
     )
     setattr(
         related_model,
         'set_%s_order' % model.__name__.lower(),
-        partialmethod(method_set_order, model)
+        partialmethod(_method_set_order, model)
     )
 
 ########
