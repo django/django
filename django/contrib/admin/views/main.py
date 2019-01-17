@@ -273,8 +273,8 @@ class ChangeList:
         First check the get_ordering() method in model admin, then check
         the object's default ordering. Then, any manually-specified ordering
         from the query string overrides anything. Finally, a deterministic
-        order is guaranteed by ensuring the primary key is used as the last
-        ordering field.
+        order is guaranteed by calling _get_deterministic_ordering() with the
+        constructed ordering.
         """
         params = self.params
         ordering = list(self.model_admin.get_ordering(request) or self._get_default_ordering())
@@ -303,15 +303,60 @@ class ChangeList:
         # Add the given query's ordering fields, if any.
         ordering.extend(queryset.query.order_by)
 
-        # Ensure that the primary key is systematically present in the list of
-        # ordering fields so we can guarantee a deterministic order across all
-        # database backends.
-        pk_name = self.lookup_opts.pk.name
-        if {'pk', '-pk', pk_name, '-' + pk_name}.isdisjoint(ordering):
-            # The two sets do not intersect, meaning the pk isn't present. So
-            # we add it.
-            ordering.append('-pk')
+        return self._get_deterministic_ordering(ordering)
 
+    def _get_deterministic_ordering(self, ordering):
+        """
+        Ensure a deterministic order across all database backends. Search for a
+        single field or unique together set of fields providing a total
+        ordering. If these are missing, augment the ordering with a descendant
+        primary key.
+        """
+        ordering = list(ordering)
+        ordering_fields = set()
+        total_ordering_fields = {'pk'} | {
+            field.attname for field in self.lookup_opts.fields
+            if field.unique and not field.null
+        }
+        for part in ordering:
+            # Search for single field providing a total ordering.
+            field_name = None
+            if isinstance(part, str):
+                field_name = part.lstrip('-')
+            elif isinstance(part, F):
+                field_name = part.name
+            elif isinstance(part, OrderBy) and isinstance(part.expression, F):
+                field_name = part.expression.name
+            if field_name:
+                # Normalize attname references by using get_field().
+                try:
+                    field = self.lookup_opts.get_field(field_name)
+                except FieldDoesNotExist:
+                    # Could be "?" for random ordering or a related field
+                    # lookup. Skip this part of introspection for now.
+                    continue
+                # Ordering by a related field name orders by the referenced
+                # model's ordering. Skip this part of introspection for now.
+                if field.remote_field and field_name == field.name:
+                    continue
+                if field.attname in total_ordering_fields:
+                    break
+                ordering_fields.add(field.attname)
+        else:
+            # No single total ordering field, try unique_together.
+            for field_names in self.lookup_opts.unique_together:
+                # Normalize attname references by using get_field().
+                fields = [self.lookup_opts.get_field(field_name) for field_name in field_names]
+                # Composite unique constraints containing a nullable column
+                # cannot ensure total ordering.
+                if any(field.null for field in fields):
+                    continue
+                if ordering_fields.issuperset(field.attname for field in fields):
+                    break
+            else:
+                # If no set of unique fields is present in the ordering, rely
+                # on the primary key to provide total ordering.
+                ordering.append('-pk')
         return ordering
 
     def get_ordering_field_columns(self):
