@@ -10,7 +10,7 @@ layer underneath, running Django itself in a synchronous mode but handling
 connections and sockets asynchronously, and giving you the choice to write
 in either style.
 
-To get started understanding how Channels works, read our :doc:`introduction`,
+To get started understanding Channels, read our :doc:`introduction`,
 which will walk through how things work. If you're upgrading from Channels 1,
 take a look at :doc:`one-to-two` to get an overview of the changes; things
 are substantially different.
