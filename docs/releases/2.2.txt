@@ -47,21 +47,11 @@ Minor features
 * Added a CSS class to the column headers of
   :class:`~django.contrib.admin.TabularInline`.
 
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The ``HttpRequest`` is now passed as the first positional argument to
   :meth:`.RemoteUserBackend.configure_user`, if it accepts it.
-
-:mod:`django.contrib.contenttypes`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -71,11 +61,6 @@ Minor features
 
 * Added SpatiaLite support for the :lookup:`coveredby` and :lookup:`covers`
   lookups.
-
-:mod:`django.contrib.messages`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -97,72 +82,16 @@ Minor features
   :class:`~django.contrib.postgres.search.SearchQuery` allows searching for
   a phrase or raw expression.
 
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sessions`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sitemaps`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sites`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.staticfiles`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Added path matching to the :option:`collectstatic --ignore` option so that
   patterns like ``/vendor/*.js`` can be used.
 
-:mod:`django.contrib.syndication`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Cache
-~~~~~
-
-* ...
-
-CSRF
-~~~~
-
-* ...
-
 Database backends
 ~~~~~~~~~~~~~~~~~
 
 * Added result streaming for :meth:`.QuerySet.iterator` on SQLite.
-
-Email
-~~~~~
-
-* ...
-
-File Storage
-~~~~~~~~~~~~
-
-* ...
-
-File Uploads
-~~~~~~~~~~~~
-
-* ...
-
-
-Forms
-~~~~~
-
-* ...
 
 Generic Views
 ~~~~~~~~~~~~~
@@ -276,16 +205,6 @@ Serialization
   references <natural-keys-and-forward-references>` by passing
   ``handle_forward_references=True`` to ``serializers.deserialize()``.
   Additionally, :djadmin:`loaddata` handles forward references automatically.
-
-Signals
-~~~~~~~
-
-* ...
-
-Templates
-~~~~~~~~~
-
-* ...
 
 Tests
 ~~~~~
