@@ -2128,7 +2128,7 @@ class InlineModelAdmin(BaseModelAdmin):
         return queryset
 
     def has_add_permission(self, request, obj=None):
-        # RemovedInDjango31Warning: obj becomes a mandatory argument.
+        # RemovedInDjango30Warning: obj becomes a mandatory argument.
         if self.opts.auto_created:
             # We're checking the rights to an auto-created intermediate model,
             # which doesn't have its own individual permissions. The user needs
