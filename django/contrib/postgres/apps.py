@@ -5,7 +5,6 @@ from psycopg2.extras import (
 from django.apps import AppConfig
 from django.db import connections
 from django.db.backends.signals import connection_created
-from django.db.migrations.writer import MigrationWriter
 from django.db.models import CharField, TextField
 from django.test.signals import setting_changed
 from django.utils.translation import gettext_lazy as _
@@ -22,6 +21,7 @@ def uninstall_if_needed(setting, value, enter, **kwargs):
     Undo the effects of PostgresConfig.ready() when django.contrib.postgres
     is "uninstalled" by override_settings().
     """
+    from django.db.migrations.writer import MigrationWriter
     if not enter and setting == 'INSTALLED_APPS' and 'django.contrib.postgres' not in set(value):
         connection_created.disconnect(register_type_handlers)
         CharField._unregister_lookup(Unaccent)
@@ -42,6 +42,7 @@ class PostgresConfig(AppConfig):
     verbose_name = _('PostgreSQL extensions')
 
     def ready(self):
+        from django.db.migrations.writer import MigrationWriter
         setting_changed.connect(uninstall_if_needed)
         # Connections may already exist before we are called.
         for conn in connections.all():
