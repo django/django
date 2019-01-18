@@ -5,6 +5,7 @@ to load templates from them in order, caching the result.
 
 import hashlib
 
+from django.conf import settings
 from django.template import TemplateDoesNotExist
 from django.template.backends.django import copy_exception
 
@@ -40,6 +41,9 @@ class Loader(BaseLoader):
         memory leak. Thus, unraised copies of the exceptions are cached and
         copies of those copies are raised after they're fetched from the cache.
         """
+        if settings.DEBUG:
+            return super().get_template(template_name, skip)
+
         key = self.cache_key(template_name, skip)
         cached = self.get_template_cache.get(key)
         if cached:

@@ -93,6 +93,11 @@ class CachedLoaderTests(SimpleTestCase):
         """
         self.assertEqual(self.engine.template_loaders[0].cache_key(lazystr('template.html'), []), 'template.html')
 
+    @override_settings(DEBUG=True)
+    def test_debug_does_not_cache(self):
+        self.engine.get_template('index.html')
+        self.assertEqual(self.engine.template_loaders[0].get_template_cache, {})
+
 
 class FileSystemLoaderTests(SimpleTestCase):
 

@@ -180,7 +180,8 @@ Signals
 Templates
 ~~~~~~~~~
 
-* ...
+* The :ref:`cached template loader<template-loaders>` no longer caches
+  templates when ``DEBUG=True``.
 
 Tests
 ~~~~~
