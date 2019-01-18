@@ -78,8 +78,8 @@ class UserCreationForm(forms.ModelForm):
     )
     password2 = forms.CharField(
         label=_("Password confirmation"),
-        widget=forms.PasswordInput,
         strip=False,
+        widget=forms.PasswordInput,
         help_text=_("Enter the same password as before, for verification."),
     )
 
