@@ -2123,7 +2123,7 @@ and Oracle which have restrictions on the number of variables used in a query.
 ``count()``
 ~~~~~~~~~~~
 
-.. method:: count()
+.. method:: count(**kwargs)
 
 Returns an integer representing the number of objects in the database matching
 the ``QuerySet``.
@@ -2134,7 +2134,7 @@ Example::
     Entry.objects.count()
 
     # Returns the number of entries whose headline contains 'Lennon'
-    Entry.objects.filter(headline__contains='Lennon').count()
+    Entry.objects.count(headline__contains='Lennon')
 
 A ``count()`` call performs a ``SELECT COUNT(*)`` behind the scenes, so you
 should always use ``count()`` rather than loading all of the record into Python
@@ -2145,6 +2145,10 @@ Note that if you want the number of items in a ``QuerySet`` and are also
 retrieving model instances from it (for example, by iterating over it), it's
 probably more efficient to use ``len(queryset)`` which won't cause an extra
 database query like ``count()`` would.
+
+As a short-hand, if lookup parameters are supplied (``**kwargs``), then the
+lookup parameters will be passed to :meth:`filter()` before performing the
+database query.
 
 ``in_bulk()``
 ~~~~~~~~~~~~~
@@ -2366,7 +2370,7 @@ Aggregation </topics/db/aggregation>`.
 ``exists()``
 ~~~~~~~~~~~~
 
-.. method:: exists()
+.. method:: exists(**kwargs)
 
 Returns ``True`` if the :class:`.QuerySet` contains any results, and ``False``
 if not. This tries to perform the query in the simplest and fastest way
@@ -2381,7 +2385,7 @@ The most efficient method of finding whether a model with a unique field
 (e.g. ``primary_key``) is a member of a :class:`.QuerySet` is::
 
     entry = Entry.objects.get(pk=123)
-    if some_queryset.filter(pk=entry.pk).exists():
+    if some_queryset.exists(pk=entry.pk):
         print("Entry contained in queryset")
 
 Which will be faster than the following which requires evaluating and iterating
@@ -2408,6 +2412,10 @@ that it will be at some point, then using ``some_queryset.exists()`` will do
 more overall work (one query for the existence check plus an extra one to later
 retrieve the results) than simply using ``bool(some_queryset)``, which
 retrieves the results and then checks if any were returned.
+
+As a short-hand, if lookup parameters are supplied (``**kwargs``), then the
+lookup parameters will be passed to :meth:`filter()` before performing the
+database query.
 
 ``update()``
 ~~~~~~~~~~~~
