@@ -5,7 +5,9 @@ from django.db.models import Index
 from django.db.utils import DatabaseError
 from django.test import TransactionTestCase, skipUnlessDBFeature
 
-from .models import Article, ArticleReporter, City, District, Reporter
+from .models import (
+    Article, ArticleReporter, CharFieldPk, City, District, Reporter,
+)
 
 
 class IntrospectionTests(TransactionTestCase):
@@ -142,6 +144,12 @@ class IntrospectionTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.add_field(Article, body)
         self.assertEqual(relations, expected_relations)
+
+    @skipUnless(connection.vendor == 'sqlite', "This is an sqlite-specific issue")
+    def test_get_field_type_auto_field(self):
+        with connection.cursor() as cursor:
+            desc = connection.introspection.get_table_description(cursor, CharFieldPk._meta.db_table)
+        self.assertEqual([datatype(r[1], r) for r in desc][0], 'CharField')
 
     @skipUnless(connection.vendor == 'sqlite', "This is an sqlite-specific issue")
     def test_get_relations_alt_format(self):
