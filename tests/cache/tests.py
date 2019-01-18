@@ -1277,6 +1277,7 @@ for _cache_params in settings.CACHES.values():
 
 MemcachedCache_params = configured_caches.get('django.core.cache.backends.memcached.MemcachedCache')
 PyLibMCCache_params = configured_caches.get('django.core.cache.backends.memcached.PyLibMCCache')
+PyMemcacheCache_params = configured_caches.get('django.core.cache.backends.memcached.PyMemcacheCache')
 
 # The memcached backends don't support cull-related options like `MAX_ENTRIES`.
 memcached_excluded_caches = {'cull', 'zero_cull'}
@@ -1457,6 +1458,36 @@ class PyLibMCCacheTests(BaseMemcachedTests, TestCase):
             settings = {'default': {'BACKEND': backend, 'LOCATION': location}}
             with self.subTest(location), self.settings(CACHES=settings):
                 self.assertEqual(cache.client_servers, [expected])
+
+
+@unittest.skipUnless(PyMemcacheCache_params, 'PyMemcacheCache backend not configured')
+@override_settings(CACHES=caches_setting_for_tests(
+    base=PyMemcacheCache_params,
+    exclude=memcached_excluded_caches,
+))
+class PyMemcacheCacheTests(BaseMemcachedTests, TestCase):
+    base_params = PyMemcacheCache_params
+
+    def test_pymemcache_highest_pickle_version(self):
+        self.assertEqual(
+            cache._cache.default_kwargs['serde']._serialize_func.keywords['pickle_version'],
+            pickle.HIGHEST_PROTOCOL,
+        )
+        for cache_key in settings.CACHES:
+            for client_key, client in caches[cache_key]._cache.clients.items():
+                with self.subTest(cache_key=cache_key, server=client_key):
+                    self.assertEqual(
+                        client.serde._serialize_func.keywords['pickle_version'],
+                        pickle.HIGHEST_PROTOCOL,
+                    )
+
+    @override_settings(CACHES=caches_setting_for_tests(
+        base=PyMemcacheCache_params,
+        exclude=memcached_excluded_caches,
+        OPTIONS={'no_delay': True},
+    ))
+    def test_pymemcache_options(self):
+        self.assertIs(cache._cache.default_kwargs['no_delay'], True)
 
 
 @override_settings(CACHES=caches_setting_for_tests(

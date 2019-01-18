@@ -77,17 +77,19 @@ database or filesystem usage.
 
 After installing Memcached itself, you'll need to install a Memcached
 binding. There are several Python Memcached bindings available; the
-two most common are `python-memcached`_ and `pylibmc`_.
+three most common are `python-memcached`_, `pylibmc`_, and `pymemcache`_.
 
 .. _`python-memcached`: https://pypi.org/project/python-memcached/
 .. _`pylibmc`: https://pypi.org/project/pylibmc/
+.. _`pymemcache`: https://pypi.org/project/pymemcache/
 
 To use Memcached with Django:
 
 * Set :setting:`BACKEND <CACHES-BACKEND>` to
-  ``django.core.cache.backends.memcached.MemcachedCache`` or
-  ``django.core.cache.backends.memcached.PyLibMCCache`` (depending
-  on your chosen memcached binding)
+  ``django.core.cache.backends.memcached.MemcachedCache``,
+  ``django.core.cache.backends.memcached.PyLibMCCache``, or
+  ``django.core.cache.backends.memcached.PyMemcacheCache`` (depending on your
+  chosen memcached binding)
 
 * Set :setting:`LOCATION <CACHES-LOCATION>` to ``ip:port`` values,
   where ``ip`` is the IP address of the Memcached daemon and ``port`` is the
@@ -158,6 +160,10 @@ Without a doubt, *none* of the Django caching backends should be used for
 permanent storage -- they're all intended to be solutions for caching, not
 storage -- but we point this out here because memory-based caching is
 particularly temporary.
+
+.. versionchanged:: 3.2
+
+    The ``PyMemcacheCache`` backend was added.
 
 .. _database-caching:
 
@@ -462,6 +468,24 @@ the binary protocol, SASL authentication, and the ``ketama`` behavior mode::
                 'behaviors': {
                     'ketama': True,
                 }
+            }
+        }
+    }
+
+Here's an example configuration for a ``pymemcache`` based backend that enables
+client pooling (which may improve performance by keeping clients connected),
+treats memcache/network errors as cache misses, and sets the ``TCP_NODELAY``
+flag on the connection's socket::
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+            'LOCATION': '127.0.0.1:11211',
+            'OPTIONS': {
+                'no_delay': True,
+                'ignore_exc': True,
+                'max_pool_size': 4,
+                'use_pooling': True,
             }
         }
     }
