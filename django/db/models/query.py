@@ -377,7 +377,7 @@ class QuerySet:
                 raise TypeError("%s is not an aggregate expression" % alias)
         return query.get_aggregation(self.db, kwargs)
 
-    def count(self):
+    def count(self, *args, **kwargs):
         """
         Perform a SELECT COUNT() and return the number of records as an
         integer.
@@ -385,10 +385,14 @@ class QuerySet:
         If the QuerySet is already fully cached, return the length of the
         cached results set to avoid multiple SELECT COUNT(*) calls.
         """
-        if self._result_cache is not None:
-            return len(self._result_cache)
+        queryset = self
+        if args or kwargs:
+            queryset = self.filter(*args, **kwargs)
 
-        return self.query.get_count(using=self.db)
+        if queryset._result_cache is not None:
+            return len(queryset._result_cache)
+
+        return queryset.query.get_count(using=queryset.db)
 
     def get(self, *args, **kwargs):
         """
@@ -750,10 +754,15 @@ class QuerySet:
     _update.alters_data = True
     _update.queryset_only = False
 
-    def exists(self):
-        if self._result_cache is None:
-            return self.query.has_results(using=self.db)
-        return bool(self._result_cache)
+    def exists(self, *args, **kwargs):
+        queryset = self
+        if args or kwargs:
+            queryset = queryset.filter(*args, **kwargs)
+
+        if queryset._result_cache is None:
+            return queryset.query.has_results(using=self.db)
+
+        return bool(queryset._result_cache)
 
     def _prefetch_related_objects(self):
         # This method can only be called once the result cache has been filled.

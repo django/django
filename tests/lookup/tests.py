@@ -128,6 +128,7 @@ class LookupTests(TestCase):
         # count() returns the number of objects matching search criteria.
         self.assertEqual(Article.objects.count(), 7)
         self.assertEqual(Article.objects.filter(pub_date__exact=datetime(2005, 7, 27)).count(), 3)
+        self.assertEqual(Article.objects.count(pub_date__exact=datetime(2005, 7, 27)), 3)
         self.assertEqual(Article.objects.filter(headline__startswith='Blah blah').count(), 0)
 
         # count() should respect sliced query sets.

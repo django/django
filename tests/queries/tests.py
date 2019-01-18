@@ -2023,6 +2023,11 @@ class ExistsSql(TestCase):
         self.assertTrue(Article.objects.distinct('name')[1:2].exists())
         self.assertFalse(Article.objects.distinct('name')[2:3].exists())
 
+    def test_exists_with_extra_filter(self):
+        Article.objects.create(name='one', created=datetime.datetime.now())
+        self.assertTrue(Article.objects.exists(name='one'))
+        self.assertFalse(Article.objects.exists(name='three'))
+
 
 class QuerysetOrderedTests(unittest.TestCase):
     """
