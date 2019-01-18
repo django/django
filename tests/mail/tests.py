@@ -1211,10 +1211,7 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
 
     def __init__(self, *args, **kwargs):
         threading.Thread.__init__(self)
-        # New kwarg added in Python 3.5; default switching to False in 3.6.
-        # Setting a value only silences a deprecation warning in Python 3.5.
-        kwargs['decode_data'] = True
-        smtpd.SMTPServer.__init__(self, *args, **kwargs)
+        smtpd.SMTPServer.__init__(self, *args, decode_data=True, **kwargs)
         self._sink = []
         self.active = False
         self.active_lock = threading.Lock()

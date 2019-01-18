@@ -22,7 +22,6 @@ from django.utils.deconstruct import deconstructible
 from django.utils.functional import SimpleLazyObject
 from django.utils.timezone import get_default_timezone, get_fixed_timezone, utc
 from django.utils.translation import gettext_lazy as _
-from django.utils.version import PY36
 
 from .models import FoodManager, FoodQuerySet
 
@@ -413,10 +412,7 @@ class WriterTests(SimpleTestCase):
         # Test a string regex with flag
         validator = RegexValidator(r'^[0-9]+$', flags=re.S)
         string = MigrationWriter.serialize(validator)[0]
-        if PY36:
-            self.assertEqual(string, "django.core.validators.RegexValidator('^[0-9]+$', flags=re.RegexFlag(16))")
-        else:
-            self.assertEqual(string, "django.core.validators.RegexValidator('^[0-9]+$', flags=16)")
+        self.assertEqual(string, "django.core.validators.RegexValidator('^[0-9]+$', flags=re.RegexFlag(16))")
         self.serialize_round_trip(validator)
 
         # Test message and code

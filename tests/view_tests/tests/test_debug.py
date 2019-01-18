@@ -17,7 +17,6 @@ from django.test.utils import LoggingCaptureMixin
 from django.urls import path, reverse
 from django.utils.functional import SimpleLazyObject
 from django.utils.safestring import mark_safe
-from django.utils.version import PY36
 from django.views.debug import (
     CLEANSED_SUBSTITUTE, CallableSettingWrapper, ExceptionReporter,
     cleanse_setting, technical_500_response,
@@ -515,7 +514,7 @@ class ExceptionReporterTests(SimpleTestCase):
             exc_type, exc_value, tb = sys.exc_info()
         reporter = ExceptionReporter(request, exc_type, exc_value, tb)
         html = reporter.get_traceback_html()
-        self.assertInHTML('<h1>%sError at /test_view/</h1>' % ('ModuleNotFound' if PY36 else 'Import'), html)
+        self.assertInHTML('<h1>ModuleNotFoundError at /test_view/</h1>', html)
 
     def test_ignore_traceback_evaluation_exceptions(self):
         """

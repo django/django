@@ -32,7 +32,6 @@ from django.db.migrations.recorder import MigrationRecorder
 from django.test import (
     LiveServerTestCase, SimpleTestCase, TestCase, override_settings,
 )
-from django.utils.version import PY36
 
 custom_templates_dir = os.path.join(os.path.dirname(__file__), 'custom_templates')
 
@@ -1145,7 +1144,7 @@ class ManageCheck(AdminScriptTestCase):
         args = ['check']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, 'ModuleNotFoundError' if PY36 else 'ImportError')
+        self.assertOutput(err, 'ModuleNotFoundError')
         self.assertOutput(err, 'No module named')
         self.assertOutput(err, 'admin_scriptz')
 

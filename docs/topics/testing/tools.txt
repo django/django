@@ -1329,23 +1329,6 @@ The decorator can also be applied to test case classes::
     decorator. For a given class, :func:`~django.test.modify_settings` is
     always applied after :func:`~django.test.override_settings`.
 
-.. admonition:: Considerations with Python 3.5
-
-    If using Python 3.5 (or older, if using an older version of Django), avoid
-    mixing  ``remove`` with ``append`` and ``prepend`` in
-    :func:`~django.test.modify_settings`. In some cases it matters whether a
-    value is first added and then removed or vice versa, and dictionary key
-    order isn't preserved until Python 3.6. Instead, apply the decorator twice
-    to guarantee the order of operations. For example, to ensure that
-    ``SessionMiddleware`` appears first in ``MIDDLEWARE``::
-
-        @modify_settings(MIDDLEWARE={
-            'remove': ['django.contrib.sessions.middleware.SessionMiddleware'],
-        )
-        @modify_settings(MIDDLEWARE={
-            'prepend': ['django.contrib.sessions.middleware.SessionMiddleware'],
-        })
-
 .. warning::
 
     The settings file contains some settings that are only consulted during
