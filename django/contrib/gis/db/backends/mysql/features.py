@@ -12,7 +12,7 @@ class DatabaseFeatures(BaseSpatialFeatures, MySQLDatabaseFeatures):
     supports_length_geodetic = False
     supports_area_geodetic = False
     supports_transform = False
-    supports_real_shape_operations = False
+    supports_real_shape_operations = True
     supports_null_geometries = False
     supports_num_points_poly = False
 
