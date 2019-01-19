@@ -226,11 +226,9 @@ class SchemaIndexesMySQLTests(TransactionTestCase):
                 new_field.set_attributes_from_name('new_foreign_key')
                 editor.add_field(ArticleTranslation, new_field)
                 field_created = True
-                self.assertEqual([str(statement) for statement in editor.deferred_sql], [
-                    'ALTER TABLE `indexes_articletranslation` '
-                    'ADD CONSTRAINT `indexes_articletrans_new_foreign_key_id_d27a9146_fk_indexes_a` '
-                    'FOREIGN KEY (`new_foreign_key_id`) REFERENCES `indexes_article` (`id`)'
-                ])
+                # No deferred SQL. The FK constraint is included in the
+                # statement to add the field.
+                self.assertFalse(editor.deferred_sql)
         finally:
             if field_created:
                 with connection.schema_editor() as editor:
