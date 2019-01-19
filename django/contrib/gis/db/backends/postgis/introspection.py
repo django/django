@@ -2,10 +2,6 @@ from django.contrib.gis.gdal import OGRGeomType
 from django.db.backends.postgresql.introspection import DatabaseIntrospection
 
 
-class GeoIntrospectionError(Exception):
-    pass
-
-
 class PostGISIntrospection(DatabaseIntrospection):
     # Reverse dictionary for PostGIS geometry types not populated until
     # introspection is actually performed.
@@ -65,33 +61,22 @@ class PostGISIntrospection(DatabaseIntrospection):
         metadata tables to determine the geometry type.
         """
         with self.connection.cursor() as cursor:
-            try:
-                # First seeing if this geometry column is in the `geometry_columns`
-                cursor.execute('SELECT "coord_dimension", "srid", "type" '
-                               'FROM "geometry_columns" '
-                               'WHERE "f_table_name"=%s AND "f_geometry_column"=%s',
-                               (table_name, geo_col))
-                row = cursor.fetchone()
-                if not row:
-                    raise GeoIntrospectionError
-            except GeoIntrospectionError:
-                cursor.execute('SELECT "coord_dimension", "srid", "type" '
-                               'FROM "geography_columns" '
-                               'WHERE "f_table_name"=%s AND "f_geography_column"=%s',
-                               (table_name, geo_col))
-                row = cursor.fetchone()
-
+            cursor.execute("""
+                SELECT t.coord_dimension, t.srid, t.type FROM (
+                    SELECT * FROM geometry_columns
+                    UNION ALL
+                    SELECT * FROM geography_columns
+                ) AS t WHERE t.f_table_name = %s AND t.f_geometry_column = %s
+            """, (table_name, geo_col))
+            row = cursor.fetchone()
             if not row:
                 raise Exception('Could not find a geometry or geography column for "%s"."%s"' %
                                 (table_name, geo_col))
-
+            dim, srid, field_type = row
             # OGRGeomType does not require GDAL and makes it easy to convert
             # from OGC geom type name to Django field.
-            field_type = OGRGeomType(row[2]).django
-
+            field_type = OGRGeomType(field_type).django
             # Getting any GeometryField keyword arguments that are not the default.
-            dim = row[0]
-            srid = row[1]
             field_params = {}
             if srid != 4326:
                 field_params['srid'] = srid
