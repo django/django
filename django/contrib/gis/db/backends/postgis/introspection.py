@@ -53,7 +53,7 @@ class PostGISIntrospection(DatabaseIntrospection):
             self.data_types_reverse.update(self.postgis_types_reverse)
         return super().get_field_type(data_type, description)
 
-    def get_geometry_type(self, table_name, geo_col):
+    def get_geometry_type(self, table_name, description):
         """
         The geometry type OID used by PostGIS does not indicate the particular
         type of field that a geometry column is (e.g., whether it's a
@@ -67,11 +67,11 @@ class PostGISIntrospection(DatabaseIntrospection):
                     UNION ALL
                     SELECT * FROM geography_columns
                 ) AS t WHERE t.f_table_name = %s AND t.f_geometry_column = %s
-            """, (table_name, geo_col))
+            """, (table_name, description.name))
             row = cursor.fetchone()
             if not row:
                 raise Exception('Could not find a geometry or geography column for "%s"."%s"' %
-                                (table_name, geo_col))
+                                (table_name, description.name))
             dim, srid, field_type = row
             # OGRGeomType does not require GDAL and makes it easy to convert
             # from OGC geom type name to Django field.

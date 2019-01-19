@@ -10,7 +10,7 @@ class MySQLIntrospection(DatabaseIntrospection):
     data_types_reverse = DatabaseIntrospection.data_types_reverse.copy()
     data_types_reverse[FIELD_TYPE.GEOMETRY] = 'GeometryField'
 
-    def get_geometry_type(self, table_name, geo_col):
+    def get_geometry_type(self, table_name, description):
         with self.connection.cursor() as cursor:
             # In order to get the specific geometry type of the field,
             # we introspect on the table definition using `DESCRIBE`.
@@ -19,7 +19,7 @@ class MySQLIntrospection(DatabaseIntrospection):
             # Increment over description info until we get to the geometry
             # column.
             for column, typ, null, key, default, extra in cursor.fetchall():
-                if column == geo_col:
+                if column == description.name:
                     # Using OGRGeomType to convert from OGC name to Django field.
                     # MySQL does not support 3D or SRIDs, so the field params
                     # are empty.

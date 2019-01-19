@@ -208,7 +208,8 @@ Database backend API
 This section describes changes that may be needed in third-party database
 backends.
 
-* ...
+* The second argument of ``DatabaseIntrospection.get_geometry_type()`` is now
+  the row description instead of the column name.
 
 Miscellaneous
 -------------
