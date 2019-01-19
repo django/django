@@ -241,12 +241,6 @@ class Command(BaseCommand):
             field_type = 'TextField'
             field_notes.append('This field type is a guess.')
 
-        # This is a hook for data_types_reverse to return a tuple of
-        # (field_type, field_params_dict).
-        if type(field_type) is tuple:
-            field_type, new_params = field_type
-            field_params.update(new_params)
-
         # Add max_length for all CharFields.
         if field_type == 'CharField' and row.internal_size:
             field_params['max_length'] = int(row.internal_size)

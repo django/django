@@ -211,6 +211,8 @@ backends.
 * The second argument of ``DatabaseIntrospection.get_geometry_type()`` is now
   the row description instead of the column name.
 
+* ``DatabaseIntrospection.get_field_type()`` may no longer return tuples.
+
 Miscellaneous
 -------------
 
