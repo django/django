@@ -9,6 +9,7 @@ import sys
 import threading
 import time
 import traceback
+import weakref
 from collections import defaultdict
 from pathlib import Path
 from types import ModuleType
@@ -98,7 +99,7 @@ def iter_all_python_module_files():
     # This ensures cached results are returned in the usual case that modules
     # aren't loaded on the fly.
     modules_view = sorted(list(sys.modules.items()), key=lambda i: i[0])
-    modules = tuple(m[1] for m in modules_view)
+    modules = tuple(m[1] for m in modules_view if not isinstance(m[1], weakref.ProxyTypes))
     return iter_modules_and_files(modules, frozenset(_error_files))
 
 
