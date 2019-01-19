@@ -580,7 +580,7 @@ def run_with_reloader(main_func, *args, **kwargs):
             try:
                 WatchmanReloader.check_availability()
             except WatchmanUnavailable as e:
-                logger.info('Watchman unavailable: %s.', e)
+                logger.info('Watchman unavailable: %s', e)
             exit_code = restart_with_reloader()
             sys.exit(exit_code)
     except KeyboardInterrupt:
