@@ -1,7 +1,9 @@
 from django.contrib.postgres.signals import (
     get_citext_oids, get_hstore_oids, register_type_handlers,
 )
+from django.db.migrations import AddIndex
 from django.db.migrations.operations.base import Operation
+from django.db.utils import NotSupportedError
 
 
 class CreateExtension(Operation):
@@ -75,3 +77,44 @@ class UnaccentExtension(CreateExtension):
 
     def __init__(self):
         self.name = 'unaccent'
+
+
+class CreateIndexConcurrently(AddIndex):
+    """Create an index using Postgres's CREATE INDEX CONCURRENTLY syntax."""
+
+    create_index_sql = 'CREATE INDEX CONCURRENTLY %(index_name)s ON %(table)s (%(columns)s)'
+    delete_index_sql = 'DROP INDEX CONCURRENTLY %(index_name)s'
+
+    def describe(self):
+        return super().describe().replace('Create', 'Concurrently create')
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        self._ensure_not_in_transaction(schema_editor)
+
+        model = from_state.apps.get_model(app_label, self.model_name)
+        fields = [model._meta.get_field(name) for name in self.index.fields]
+        column_names = [field.get_attname_column()[1] for field in fields]
+
+        sql = self.create_index_sql % {
+            'index_name': self.index.name,
+            'table': model._meta.db_table,
+            'columns': ', '.join(column_names)
+        }
+
+        schema_editor.execute(sql)
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        self._ensure_not_in_transaction(schema_editor)
+
+        sql = self.delete_index_sql % {
+            'index_name': self.index.name
+        }
+
+        schema_editor.execute(sql)
+
+    def _ensure_not_in_transaction(self, schema_editor):
+        if schema_editor.connection.in_atomic_block:
+            raise NotSupportedError(
+                'The %s operation cannot be executed inside a transaction '
+                '(set atomic = False on the migration).' % self.__class__.__name__
+            )
