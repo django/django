@@ -196,8 +196,6 @@ class InMemoryChannelLayer(BaseChannelLayer):
     In-memory channel layer implementation
     """
 
-    local_poll_interval = 0.01
-
     def __init__(
         self,
         expiry=60,
