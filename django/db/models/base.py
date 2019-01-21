@@ -392,6 +392,11 @@ class ModelState:
 
 
 class Model(metaclass=ModelBase):
+    def __new__(_cls, *args, **kwargs):
+        obj = super().__new__(_cls)
+        # Set up the storage for instance state
+        obj._state = ModelState()
+        return obj
 
     def __init__(self, *args, **kwargs):
         # Alias some things as locals to avoid repeat global lookups
@@ -401,9 +406,6 @@ class Model(metaclass=ModelBase):
         _DEFERRED = DEFERRED
 
         pre_init.send(sender=cls, args=args, kwargs=kwargs)
-
-        # Set up the storage for instance state
-        self._state = ModelState()
 
         # There is a rather weird disparity here; if kwargs, it's set, then args
         # overrides it. It should be one or the other; don't duplicate the work
@@ -505,9 +507,11 @@ class Model(metaclass=ModelBase):
                 next(values_iter) if f.attname in field_names else DEFERRED
                 for f in cls._meta.concrete_fields
             ]
-        new = cls(*values)
+
+        new = cls.__new__(cls)
         new._state.adding = False
         new._state.db = db
+        new.__init__(*values)
         return new
 
     def __repr__(self):
