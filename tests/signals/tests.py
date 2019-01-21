@@ -366,9 +366,13 @@ class ModelStateTests(TestCase):
             import copy
             self.instance = copy.deepcopy(instance)
 
+        def disconnect():
+            signals.post_init.disconnect(post_signal, sender=Book)
+
         signals.post_init.connect(post_signal, sender=Book)
+        self.addCleanup(disconnect)
+
         Book.objects.using('other').get(pk=1)
         self.assertFalse(self.instance._state.adding)
         self.assertEqual(self.instance._state.db, 'other')
         self.assertEqual(self.instance._state.db, self.instance.authors.get()._state.db)
-        signals.post_init.disconnect(post_signal, sender=Book)
