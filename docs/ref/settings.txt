@@ -403,6 +403,12 @@ Storing the CSRF token in a cookie (Django's default) is safe, but storing it
 in the session is common practice in other web frameworks and therefore
 sometimes demanded by security auditors.
 
+Since the :ref:`default error views <error-views>` require the CSRF token,
+:class:`~django.contrib.sessions.middleware.SessionMiddleware` must appear in
+:setting:`MIDDLEWARE` before any middleware that may raise an exception to
+trigger an error view (such as :exc:`~django.core.exceptions.PermissionDenied`)
+if you're using ``CSRF_USE_SESSIONS``. See :ref:`middleware-ordering`.
+
 .. setting:: CSRF_FAILURE_VIEW
 
 ``CSRF_FAILURE_VIEW``
