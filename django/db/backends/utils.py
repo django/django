@@ -75,13 +75,26 @@ class CursorWrapper:
             executor = functools.partial(wrapper, executor)
         return executor(sql, params, many, context)
 
+    def _valid_param(self, param):
+        if isinstance(param, str) and len(param.split('\x00')) > 1:
+            param = param.replace('\x00', '')
+        return param
+
+    def _ensure_params(self, params):
+        if isinstance(params, dict):
+            return {k: self._valid_param(v) for k, v in params.items()}
+        params_list = [self._valid_param(v) for v in params]
+        if isinstance(params, tuple):
+            return tuple(params_list)
+        return params_list
+
     def _execute(self, sql, params, *ignored_wrapper_args):
         self.db.validate_no_broken_transaction()
         with self.db.wrap_database_errors:
             if params is None:
                 return self.cursor.execute(sql)
             else:
-                return self.cursor.execute(sql, params)
+                return self.cursor.execute(sql, self._ensure_params(params))
 
     def _executemany(self, sql, param_list, *ignored_wrapper_args):
         self.db.validate_no_broken_transaction()

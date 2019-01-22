@@ -149,6 +149,11 @@ class Tests(TestCase):
         b = self._select(a)
         self.assertEqual(a[0], b[0])
 
+    def test_select_null_character(self):
+        a = 'abcd\x00cdefg'
+        b = self._select(a)
+        self.assertEqual('abcdcdefg', b)
+
     def test_lookup_cast(self):
         from django.db.backends.postgresql.operations import DatabaseOperations
         do = DatabaseOperations(connection=None)
