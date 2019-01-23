@@ -2,11 +2,13 @@ import os
 import subprocess
 import sys
 
-from tests.postgres_tests import PostgreSQLSimpleTestCase
+from . import PostgreSQLSimpleTestCase
 
 
 class PostgresIntegrationTests(PostgreSQLSimpleTestCase):
     def test_check(self):
+        old_cwd = os.getcwd()
+        self.addCleanup(lambda: os.chdir(old_cwd))
         os.chdir(os.path.dirname(__file__))
         result = subprocess.run(
             [sys.executable, '-m', 'django', 'check', '--settings', 'integration_settings'],
