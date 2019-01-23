@@ -255,18 +255,16 @@ back, depending on whether the query succeeded.
 be initially turned off. Django overrides this default and turns autocommit
 on.
 
-To avoid this, you can :ref:`deactivate the transaction management
-<deactivate-transaction-management>`, but it isn't recommended.
+To avoid this, you can :ref:`set autocommit to False
+<setting-autocommit-false>`, but it isn't recommended.
 
-.. _deactivate-transaction-management:
+.. _setting-autocommit-false:
 
-Deactivating transaction management
------------------------------------
+Setting autocommit to False
+---------------------------
 
-You can totally disable Django's transaction management for a given database
-by setting :setting:`AUTOCOMMIT <DATABASE-AUTOCOMMIT>` to ``False`` in its
-configuration. If you do this, Django won't enable autocommit, and won't
-perform any commits. You'll get the regular behavior of the underlying
+Setting :setting:`AUTOCOMMIT <DATABASE-AUTOCOMMIT>` to ``False`` won't perform
+any *automatic* commits and you'll get the regular behavior of the underlying
 database library.
 
 This requires you to commit explicitly every transaction, even those started

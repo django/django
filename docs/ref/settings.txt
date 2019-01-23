@@ -517,8 +517,8 @@ Set this to ``True`` to wrap each view in a transaction on this database. See
 
 Default: ``True``
 
-Set this to ``False`` if you want to :ref:`disable Django's transaction
-management <deactivate-transaction-management>` and implement your own.
+Set this to ``False`` if you want to :ref:`take the resposibility to handle
+commits and rollbacks <setting-autocommit-false>` yourself.
 
 .. setting:: DATABASE-ENGINE
 
