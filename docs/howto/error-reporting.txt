@@ -140,10 +140,11 @@ However, sometimes certain types of information may be too sensitive and thus
 may not be appropriate to be kept track of, for example a user's password or
 credit card number. So in addition to filtering out settings that appear to be
 sensitive as described in the :setting:`DEBUG` documentation, Django offers a
-set of function decorators to help you control which information should be
-filtered out of error reports in a production environment (that is, where
-:setting:`DEBUG` is set to ``False``): :func:`sensitive_variables` and
-:func:`sensitive_post_parameters`.
+set of function decorators and settings to help you control which information
+should be filtered out of error reports in a production environment (that is,
+where :setting:`DEBUG` is set to ``False``): :func:`sensitive_variables`,
+:func:`sensitive_post_parameters`, :setting:`SAFE_EXCEPTION_REPORTER_FILTER_COOKIES`,
+and :setting:`SAFE_EXCEPTION_REPORTER_FILTER_ALL_COOKIES`,
 
 .. _`full traceback`: https://en.wikipedia.org/wiki/Stack_trace
 .. _`traceback frame`: https://en.wikipedia.org/wiki/Stack_frame
@@ -228,6 +229,31 @@ filtered out of error reports in a production environment (that is, where
     ``user_change_password`` in the ``auth`` admin) to prevent the leaking of
     sensitive information such as user passwords.
 
+.. setting:: SAFE_EXCEPTION_REPORTER_FILTER_COOKIES
+
+``SAFE_EXCEPTION_REPORTER_FILTER_COOKIES``
+------------------------------------------
+
+Default: ``[]``
+
+A list that specifies that which sensitive cookies will be replaced
+with stars (**********) in default error reporter filter
+:class:`django.views.debug.SafeExceptionReporterFilter`.
+:setting:`SAFE_EXCEPTION_REPORTER_FILTER_COOKIES` will be ignored
+when :setting:`SAFE_EXCEPTION_REPORTER_FILTER_ALL_COOKIES` is set to True
+
+
+.. setting:: SAFE_EXCEPTION_REPORTER_FILTER_ALL_COOKIES
+
+``SAFE_EXCEPTION_REPORTER_FILTER_ALL_COOKIES``
+----------------------------------------------
+
+Default: ``False``
+
+A boolean that specifies whether to replaces all of the cookies
+with stars (**********) or not in default error reporter filter
+:class:`django.views.debug.SafeExceptionReporterFilter`.
+
 .. _custom-error-reports:
 
 Custom error reports
@@ -273,6 +299,11 @@ following methods:
 .. method:: SafeExceptionReporterFilter.get_post_parameters(request)
 
     Returns the filtered dictionary of POST parameters. By default it replaces
+    the values of sensitive parameters with stars (`**********`).
+
+.. method:: SafeExceptionReporterFilter.get_cookies(request)
+
+    Returns the filtered dictionary of COOKIES. By default it replaces
     the values of sensitive parameters with stars (`**********`).
 
 .. method:: SafeExceptionReporterFilter.get_traceback_frame_variables(request, tb_frame)

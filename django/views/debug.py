@@ -113,13 +113,13 @@ class ExceptionReporterFilter:
     """
 
     def get_post_parameters(self, request):
-        if request is None:
-            return {}
-        else:
-            return request.POST
+        return {} if request is None else request.POST
 
     def get_traceback_frame_variables(self, request, tb_frame):
         return list(tb_frame.f_locals.items())
+
+    def get_cookies(self, request):
+        return {} if request is None else request.COOKIES
 
 
 class SafeExceptionReporterFilter(ExceptionReporterFilter):
@@ -151,6 +151,19 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
                     multivaluedict[param] = CLEANSED_SUBSTITUTE
         return multivaluedict
 
+    def _clean_parameters(self, sensitive_parameters, cleansed):
+        if sensitive_parameters == '__ALL__':
+            # Cleanse all parameters.
+            for k in cleansed:
+                cleansed[k] = CLEANSED_SUBSTITUTE
+        else:
+            # Cleanse only the specified parameters.
+            for param in sensitive_parameters:
+                if param in cleansed:
+                    cleansed[param] = CLEANSED_SUBSTITUTE
+
+        return cleansed
+
     def get_post_parameters(self, request):
         """
         Replace the values of POST parameters marked as sensitive with
@@ -158,23 +171,31 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
         """
         if request is None:
             return {}
-        else:
-            sensitive_post_parameters = getattr(request, 'sensitive_post_parameters', [])
-            if self.is_active(request) and sensitive_post_parameters:
-                cleansed = request.POST.copy()
-                if sensitive_post_parameters == '__ALL__':
-                    # Cleanse all parameters.
-                    for k in cleansed:
-                        cleansed[k] = CLEANSED_SUBSTITUTE
-                    return cleansed
-                else:
-                    # Cleanse only the specified parameters.
-                    for param in sensitive_post_parameters:
-                        if param in cleansed:
-                            cleansed[param] = CLEANSED_SUBSTITUTE
-                    return cleansed
-            else:
-                return request.POST
+
+        sensitive_post_parameters = getattr(request, 'sensitive_post_parameters', [])
+        if self.is_active(request) and sensitive_post_parameters:
+            cleansed = request.POST.copy()
+            return self._clean_parameters(sensitive_post_parameters, cleansed)
+
+        return request.POST
+
+    def get_cookies(self, request):
+        """
+        Replace the values of COOKIES parameters marked as sensitive with
+        stars (*********).
+        """
+        if request is None:
+            return {}
+
+        sensitive_cookies = getattr(settings, 'SAFE_EXCEPTION_REPORTER_FILTER_COOKIES', [])
+        if getattr(settings, 'SAFE_EXCEPTION_REPORTER_FILTER_ALL_COOKIES', False):
+            sensitive_cookies = '__ALL__'
+
+        if self.is_active(request) and sensitive_cookies:
+            cleansed = request.COOKIES.copy()
+            return self._clean_parameters(sensitive_cookies, cleansed)
+
+        return request.COOKIES
 
     def cleanse_special_types(self, request, value):
         try:
@@ -312,11 +333,11 @@ class ExceptionReporter:
             'template_info': self.template_info,
             'template_does_not_exist': self.template_does_not_exist,
             'postmortem': self.postmortem,
+            'filtered_COOKIES_items': list(self.filter.get_cookies(self.request).items()),
         }
         if self.request is not None:
             c['request_GET_items'] = self.request.GET.items()
             c['request_FILES_items'] = self.request.FILES.items()
-            c['request_COOKIES_items'] = self.request.COOKIES.items()
         # Check whether exception info is available
         if self.exc_type:
             c['exception_type'] = self.exc_type.__name__

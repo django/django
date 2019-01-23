@@ -583,6 +583,31 @@ class ExceptionReporterTests(SimpleTestCase):
         html = reporter.get_traceback_html()
         self.assertInHTML('<td>items</td><td class="code"><pre>&#39;Oops&#39;</pre></td>', html)
 
+    def _test_cookies(self, expected_values):
+        rf = RequestFactory()
+        rf.cookies['cookie1'] = 'value1'
+        rf.cookies['cookie2'] = 'value2'
+        request = rf.get('/test_view/')
+        reporter = ExceptionReporter(request, None, None, None)
+        cookies = reporter.get_traceback_data()['filtered_COOKIES_items']
+        for key, value in cookies:
+            self.assertEqual(value, expected_values[key])
+
+    @override_settings(DEBUG=False)
+    def test_dont_filter_cookies(self):
+        expected_values = {'cookie1': 'value1', 'cookie2': 'value2'}
+        self._test_cookies(expected_values)
+
+    @override_settings(DEBUG=False, SAFE_EXCEPTION_REPORTER_FILTER_COOKIES=['cookie1'])
+    def test_filter_selected_cookies(self):
+        expected_values = {'cookie1': '********************', 'cookie2': 'value2'}
+        self._test_cookies(expected_values)
+
+    @override_settings(DEBUG=False, SAFE_EXCEPTION_REPORTER_FILTER_ALL_COOKIES=True)
+    def test_filter_all_cookies(self):
+        expected_values = {'cookie1': '********************', 'cookie2': '********************'}
+        self._test_cookies(expected_values)
+
     def test_exception_fetching_user(self):
         """
         The error page can be rendered if the current user can't be retrieved
