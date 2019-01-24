@@ -81,16 +81,20 @@ query string and uses that::
             self.inner = inner
 
         def __call__(self, scope):
+
+            # Close old database connections to prevent usage of timed out connections
+            close_old_connections()
+
             # Look up user from query string (you should also do things like
             # check it's a valid user ID, or if scope["user"] is already populated)
             user = User.objects.get(id=int(scope["query_string"]))
-            close_old_connections()
+
             # Return the inner application directly and let it run everything else
             return self.inner(dict(scope, user=user))
 
 .. warning::
 
-    Right now you will need to call ``close_old_connections()`` after any
+    Right now you will need to call ``close_old_connections()`` before any
     database code you call inside a middleware's scope-setup method to ensure
     you don't leak idle database connections. We hope to call this automatically
     in future versions of Channels.
