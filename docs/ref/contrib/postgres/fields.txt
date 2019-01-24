@@ -265,6 +265,11 @@ transform do not change. For example::
     :ref:`setup the citext extension <create-postgresql-extensions>` in
     PostgreSQL before the first ``CreateModel`` migration operation.
 
+    If you're using an :class:`~django.contrib.postgres.fields.ArrayField`
+    of ``CIText`` fields, you must add ``'django.contrib.postgres'`` in your
+    :setting:`INSTALLED_APPS`, otherwise field values will appear as strings
+    like ``'{thoughts,django}'``.
+
     Several fields that use the mixin are provided:
 
 .. class:: CICharField(**options)
