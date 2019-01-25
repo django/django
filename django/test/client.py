@@ -76,7 +76,7 @@ class FakePayload:
 
     def write(self, content):
         if self.read_started:
-            raise ValueError("Unable to write a payload after he's been read")
+            raise ValueError("Unable to write a payload after it's been read")
         content = force_bytes(content)
         self.__content.write(content)
         self.__len += len(content)
