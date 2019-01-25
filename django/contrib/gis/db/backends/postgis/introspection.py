@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django.contrib.gis.gdal import OGRGeomType
 from django.db.backends.postgresql.introspection import DatabaseIntrospection
 
@@ -50,7 +52,7 @@ class PostGISIntrospection(DatabaseIntrospection):
             # from OGC geom type name to Django field.
             field_type = OGRGeomType(field_type).django
             # Getting any GeometryField keyword arguments that are not the default.
-            field_params = {}
+            field_params = OrderedDict()
             if self.postgis_oid_lookup.get(description.type_code) == 'geography':
                 field_params['geography'] = True
             if srid != 4326:
