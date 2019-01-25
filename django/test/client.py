@@ -440,9 +440,10 @@ class Client(RequestFactory):
     contexts and templates produced by a view, rather than the
     HTML rendered to the end-user.
     """
-    def __init__(self, enforce_csrf_checks=False, **defaults):
+    def __init__(self, enforce_csrf_checks=False, raise_request_exception=True, **defaults):
         super().__init__(**defaults)
         self.handler = ClientHandler(enforce_csrf_checks)
+        self.raise_request_exception = raise_request_exception
         self.exc_info = None
 
     def store_exc_info(self, **kwargs):
@@ -497,10 +498,12 @@ class Client(RequestFactory):
             # exception data, then re-raise the signalled exception.
             # Also make sure that the signalled exception is cleared from
             # the local cache!
+            response.exc_info = self.exc_info
             if self.exc_info:
                 _, exc_value, _ = self.exc_info
                 self.exc_info = None
-                raise exc_value
+                if self.raise_request_exception:
+                    raise exc_value
 
             # Save the client and request that stimulated the response.
             response.client = self
