@@ -3,7 +3,9 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 import pytest
+from django.core.exceptions import RequestDataTooBig
 from django.http import HttpResponse
+from django.test import override_settings
 
 from asgiref.testing import ApplicationCommunicator
 from channels.consumer import AsyncConsumer
@@ -155,7 +157,6 @@ class RequestTests(unittest.TestCase):
         self.assertEqual(request.read(), b"twothree")
 
     def test_script_name(self):
-
         request = AsgiRequest(
             {
                 "http_version": "1.1",
@@ -167,6 +168,19 @@ class RequestTests(unittest.TestCase):
         )
 
         self.assertEqual(request.path, "/path/to/test/")
+
+    def test_size_exceeded(self):
+        with override_settings(DATA_UPLOAD_MAX_MEMORY_SIZE=1):
+            with pytest.raises(RequestDataTooBig):
+                AsgiRequest(
+                    {
+                        "http_version": "1.1",
+                        "method": "PUT",
+                        "path": "/",
+                        "headers": {"host": b"example.com", "content-length": b"1000"},
+                    },
+                    b"",
+                )
 
 
 ### Handler tests
