@@ -73,7 +73,10 @@ class Command(BaseCommand):
         self._raw_ipv6 = False
         if not options['addrport']:
             self.addr = ''
-            self.port = self.default_port
+            try:
+                self.port = settings.DEV_PORT
+            except:
+                self.port = self.default_port
         else:
             m = re.match(naiveip_re, options['addrport'])
             if m is None:
