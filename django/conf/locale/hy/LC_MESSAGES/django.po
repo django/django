@@ -1214,7 +1214,7 @@ msgid ""
 msgstr ""
 
 msgid "The install worked successfully! Congratulations!"
-msgstr ""
+msgstr "Տեղադրման գործընթացը հաջողությամբ ավարտվեց: Շնորհավորում ենք:"
 
 #, python-format
 msgid ""
@@ -1228,7 +1228,7 @@ msgid "Django Documentation"
 msgstr ""
 
 msgid "Topics, references, &amp; how-to's"
-msgstr ""
+msgstr "Թեմաներ, հղումներ, &amp; ինչպես"
 
 msgid "Tutorial: A Polling App"
 msgstr ""
