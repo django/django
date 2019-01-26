@@ -72,7 +72,7 @@ OpenLayers.Projection.addTransform("EPSG:4326", "EPSG:3857", OpenLayers.Layer.Sp
     {{ module }}.deleteFeatures();
     document.getElementById('{{ id }}').value = '';
     {% localize off %}
-    {{ module }}.map.setCenter(new OpenLayers.LonLat({{ default_lon }}, {{ default_lat }}), {{ default_zoom }});
+    {{ module }}.map.setCenter(new OpenLayers.LonLat({{ default_lon|safe }}, {{ default_lat|safe }}), {{ default_zoom|safe }});
     {% endlocalize %}
 };
 // Add Select control
@@ -144,7 +144,7 @@ OpenLayers.Projection.addTransform("EPSG:4326", "EPSG:3857", OpenLayers.Layer.Sp
         }
     } else {
         {% localize off %}
-        {{ module }}.map.setCenter(new OpenLayers.LonLat({{ default_lon }}, {{ default_lat }}), {{ default_zoom }});
+        {{ module }}.map.setCenter(new OpenLayers.LonLat({{ default_lon|safe }}, {{ default_lat|safe }}), {{ default_zoom|safe }});
         {% endlocalize %}
     }
     // This allows editing of the geographic fields -- the modified WKT is
