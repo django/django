@@ -1439,7 +1439,7 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
     def test_creates_cache_dir_if_nonexistent(self):
         os.rmdir(self.dirname)
         cache.set('foo', 'bar')
-        os.path.exists(self.dirname)
+        self.assertTrue(os.path.exists(self.dirname))
 
     def test_get_ignores_enoent(self):
         cache.set('foo', 'bar')
