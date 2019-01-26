@@ -39,3 +39,6 @@ msgid "%s result"
 msgid_plural "%s results"
 msgstr[0] "%s Resultat"
 msgstr[1] "%s Resultate"
+
+msgid "Image"
+msgstr "Bild"
