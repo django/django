@@ -30,6 +30,13 @@
     </script>
   </p>
 
+  <p id="ngettext_onnonplural">
+      <!-- The po file only contains the non plural "Image" string. -->
+      <script type="text/javascript">
+          document.write(interpolate(ngettext("Image", "Images", 5), [1]));
+      </script>
+  </p>
+
   <p id="pgettext">
     <script type="text/javascript">
     document.write(pgettext("verb", "May"));
