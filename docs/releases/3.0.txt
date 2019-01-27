@@ -150,7 +150,8 @@ Internationalization
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :option:`compilemessages --ignore` option allows ignoring specific
+  directories when searching for ``.po`` files to compile.
 
 Migrations
 ~~~~~~~~~~
