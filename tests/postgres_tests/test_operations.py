@@ -1,10 +1,10 @@
 import unittest
 
+from tests.migrations.test_base import OperationTestBase
+
 from django.db import connection, models
 from django.db.utils import NotSupportedError
 from django.test import modify_settings
-
-from tests.migrations.test_base import OperationTestBase
 
 try:
     from django.contrib.postgres.operations import CreateIndexConcurrently
