@@ -38,7 +38,7 @@ class ExtractingStringsWithPercentSigns(POFileAssertionMixin, FrenchTestCase):
 
     def setUp(self):
         super().setUp()
-        with open(self.PO_FILE, 'r') as fp:
+        with open(self.PO_FILE) as fp:
             self.po_contents = fp.read()
 
     def test_trans_tag_with_percent_symbol_at_the_end(self):

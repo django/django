@@ -104,7 +104,7 @@ class BuildFile:
             return
 
         encoding = settings.FILE_CHARSET if self.command.settings_available else 'utf-8'
-        with open(self.path, 'r', encoding=encoding) as fp:
+        with open(self.path, encoding=encoding) as fp:
             src_data = fp.read()
 
         if self.domain == 'djangojs':
@@ -635,7 +635,7 @@ class Command(BaseCommand):
                 elif self.verbosity > 0:
                     self.stdout.write(errors)
         else:
-            with open(potfile, 'r', encoding='utf-8') as fp:
+            with open(potfile, encoding='utf-8') as fp:
                 msgs = fp.read()
             if not self.invoked_for_django:
                 msgs = self.copy_plural_forms(msgs, locale)
@@ -669,7 +669,7 @@ class Command(BaseCommand):
         for domain in domains:
             django_po = os.path.join(django_dir, 'conf', 'locale', locale, 'LC_MESSAGES', '%s.po' % domain)
             if os.path.exists(django_po):
-                with open(django_po, 'r', encoding='utf-8') as fp:
+                with open(django_po, encoding='utf-8') as fp:
                     m = plural_forms_re.search(fp.read())
                 if m:
                     plural_form_line = m.group('value')

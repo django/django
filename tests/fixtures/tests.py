@@ -67,7 +67,7 @@ class DumpDataAssertMixin:
             primary_keys=primary_keys,
         )
         if filename:
-            with open(filename, "r") as f:
+            with open(filename) as f:
                 command_output = f.read()
             os.remove(filename)
         else:
@@ -699,7 +699,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         fixture_json = os.path.join(tests_dir, 'fixtures', 'fixture1.json')
         fixture_xml = os.path.join(tests_dir, 'fixtures', 'fixture3.xml')
 
-        with mock.patch('django.core.management.commands.loaddata.sys.stdin', open(fixture_json, 'r')):
+        with mock.patch('django.core.management.commands.loaddata.sys.stdin', open(fixture_json)):
             management.call_command('loaddata', '--format=json', '-', verbosity=0)
             self.assertEqual(Article.objects.count(), 2)
             self.assertQuerysetEqual(Article.objects.all(), [
@@ -707,7 +707,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
                 '<Article: Poker has no place on ESPN>',
             ])
 
-        with mock.patch('django.core.management.commands.loaddata.sys.stdin', open(fixture_xml, 'r')):
+        with mock.patch('django.core.management.commands.loaddata.sys.stdin', open(fixture_xml)):
             management.call_command('loaddata', '--format=xml', '-', verbosity=0)
             self.assertEqual(Article.objects.count(), 3)
             self.assertQuerysetEqual(Article.objects.all(), [
