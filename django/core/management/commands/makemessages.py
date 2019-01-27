@@ -1,4 +1,3 @@
-import fnmatch
 import glob
 import os
 import re
@@ -12,7 +11,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.files.temp import NamedTemporaryFile
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import (
-    find_command, handle_extensions, popen_wrapper,
+    find_command, handle_extensions, is_ignored_path, popen_wrapper,
 )
 from django.utils.encoding import DEFAULT_LOCALE_ENCODING
 from django.utils.functional import cached_property
@@ -454,35 +453,13 @@ class Command(BaseCommand):
         Get all files in the given root. Also check that there is a matching
         locale dir for each file.
         """
-        def is_ignored(path, ignore_patterns):
-            """
-            Check if the given path should be ignored or not.
-            """
-            filename = os.path.basename(path)
-
-            def ignore(pattern):
-                return fnmatch.fnmatchcase(filename, pattern) or fnmatch.fnmatchcase(path, pattern)
-
-            return any(ignore(pattern) for pattern in ignore_patterns)
-
-        ignore_patterns = [os.path.normcase(p) for p in self.ignore_patterns]
-        dir_suffixes = {'%s*' % path_sep for path_sep in {'/', os.sep}}
-        norm_patterns = []
-        for p in ignore_patterns:
-            for dir_suffix in dir_suffixes:
-                if p.endswith(dir_suffix):
-                    norm_patterns.append(p[:-len(dir_suffix)])
-                    break
-            else:
-                norm_patterns.append(p)
-
         all_files = []
         ignored_roots = []
         if self.settings_available:
             ignored_roots = [os.path.normpath(p) for p in (settings.MEDIA_ROOT, settings.STATIC_ROOT) if p]
         for dirpath, dirnames, filenames in os.walk(root, topdown=True, followlinks=self.symlinks):
             for dirname in dirnames[:]:
-                if (is_ignored(os.path.normpath(os.path.join(dirpath, dirname)), norm_patterns) or
+                if (is_ignored_path(os.path.normpath(os.path.join(dirpath, dirname)), self.ignore_patterns) or
                         os.path.join(os.path.abspath(dirpath), dirname) in ignored_roots):
                     dirnames.remove(dirname)
                     if self.verbosity > 1:
@@ -493,7 +470,7 @@ class Command(BaseCommand):
             for filename in filenames:
                 file_path = os.path.normpath(os.path.join(dirpath, filename))
                 file_ext = os.path.splitext(filename)[1]
-                if file_ext not in self.extensions or is_ignored(file_path, self.ignore_patterns):
+                if file_ext not in self.extensions or is_ignored_path(file_path, self.ignore_patterns):
                     if self.verbosity > 1:
                         self.stdout.write('ignoring file %s in %s\n' % (filename, dirpath))
                 else:

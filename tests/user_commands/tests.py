@@ -8,7 +8,8 @@ from django.apps import apps
 from django.core import management
 from django.core.management import BaseCommand, CommandError, find_commands
 from django.core.management.utils import (
-    find_command, get_random_secret_key, popen_wrapper,
+    find_command, get_random_secret_key, is_ignored_path,
+    normalize_path_patterns, popen_wrapper,
 )
 from django.db import connection
 from django.test import SimpleTestCase, override_settings
@@ -268,3 +269,25 @@ class UtilsTests(SimpleTestCase):
         self.assertEqual(len(key), 50)
         for char in key:
             self.assertIn(char, 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)')
+
+    def test_is_ignored_path_true(self):
+        patterns = (
+            ['foo/bar/baz'],
+            ['baz'],
+            ['foo/bar/baz'],
+            ['*/baz'],
+            ['*'],
+            ['b?z'],
+            ['[abc]az'],
+            ['*/ba[!z]/baz'],
+        )
+        for ignore_patterns in patterns:
+            with self.subTest(ignore_patterns=ignore_patterns):
+                self.assertIs(is_ignored_path('foo/bar/baz', ignore_patterns=ignore_patterns), True)
+
+    def test_is_ignored_path_false(self):
+        self.assertIs(is_ignored_path('foo/bar/baz', ignore_patterns=['foo/bar/bat', 'bar', 'flub/blub']), False)
+
+    def test_normalize_path_patterns_truncates_wildcard_base(self):
+        expected = [os.path.normcase(p) for p in ['foo/bar', 'bar/*/']]
+        self.assertEqual(normalize_path_patterns(['foo/bar/*', 'bar/*/']), expected)
