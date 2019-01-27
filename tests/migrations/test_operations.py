@@ -1,6 +1,3 @@
-import unittest
-
-from django.contrib.postgres.operations import CreateIndexConcurrently
 from django.core.exceptions import FieldDoesNotExist
 from django.db import connection, migrations, models, transaction
 from django.db.migrations.migration import Migration
@@ -9,167 +6,15 @@ from django.db.migrations.operations.fields import FieldOperation
 from django.db.migrations.state import ModelState, ProjectState
 from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import atomic
-from django.db.utils import IntegrityError, NotSupportedError
+from django.db.utils import IntegrityError
 from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
 
 from .models import FoodManager, FoodQuerySet, UnicodeModel
-from .test_base import MigrationTestBase
+from .test_base import OperationTestBase
 
 
 class Mixin:
     pass
-
-
-class OperationTestBase(MigrationTestBase):
-    """
-    Common functions to help test operations.
-    """
-
-    def apply_operations(self, app_label, project_state, operations, atomic=True):
-        migration = Migration('name', app_label)
-        migration.operations = operations
-        with connection.schema_editor(atomic=atomic) as editor:
-            return migration.apply(project_state, editor)
-
-    def unapply_operations(self, app_label, project_state, operations, atomic=True):
-        migration = Migration('name', app_label)
-        migration.operations = operations
-        with connection.schema_editor(atomic=atomic) as editor:
-            return migration.unapply(project_state, editor)
-
-    def make_test_state(self, app_label, operation, **kwargs):
-        """
-        Makes a test state using set_up_test_model and returns the
-        original state and the state after the migration is applied.
-        """
-        project_state = self.set_up_test_model(app_label, **kwargs)
-        new_state = project_state.clone()
-        operation.state_forwards(app_label, new_state)
-        return project_state, new_state
-
-    def set_up_test_model(
-            self, app_label, second_model=False, third_model=False, index=False, multicol_index=False,
-            related_model=False, mti_model=False, proxy_model=False, manager_model=False,
-            unique_together=False, options=False, db_table=None, index_together=False, constraints=None):
-        """
-        Creates a test model state and database table.
-        """
-        # Delete the tables if they already exist
-        table_names = [
-            # Start with ManyToMany tables
-            '_pony_stables', '_pony_vans',
-            # Then standard model tables
-            '_pony', '_stable', '_van',
-        ]
-        tables = [(app_label + table_name) for table_name in table_names]
-        with connection.cursor() as cursor:
-            table_names = connection.introspection.table_names(cursor)
-            connection.disable_constraint_checking()
-            sql_delete_table = connection.schema_editor().sql_delete_table
-            with transaction.atomic():
-                for table in tables:
-                    if table in table_names:
-                        cursor.execute(sql_delete_table % {
-                            "table": connection.ops.quote_name(table),
-                        })
-            connection.enable_constraint_checking()
-
-        # Make the "current" state
-        model_options = {
-            "swappable": "TEST_SWAP_MODEL",
-            "index_together": [["weight", "pink"]] if index_together else [],
-            "unique_together": [["pink", "weight"]] if unique_together else [],
-        }
-        if options:
-            model_options["permissions"] = [("can_groom", "Can groom")]
-        if db_table:
-            model_options["db_table"] = db_table
-        operations = [migrations.CreateModel(
-            "Pony",
-            [
-                ("id", models.AutoField(primary_key=True)),
-                ("pink", models.IntegerField(default=3)),
-                ("weight", models.FloatField()),
-            ],
-            options=model_options,
-        )]
-        if index:
-            operations.append(migrations.AddIndex(
-                "Pony",
-                models.Index(fields=["pink"], name="pony_pink_idx")
-            ))
-        if multicol_index:
-            operations.append(migrations.AddIndex(
-                "Pony",
-                models.Index(fields=["pink", "weight"], name="pony_test_idx")
-            ))
-        if constraints:
-            for constraint in constraints:
-                operations.append(migrations.AddConstraint(
-                    "Pony",
-                    constraint,
-                ))
-        if second_model:
-            operations.append(migrations.CreateModel(
-                "Stable",
-                [
-                    ("id", models.AutoField(primary_key=True)),
-                ]
-            ))
-        if third_model:
-            operations.append(migrations.CreateModel(
-                "Van",
-                [
-                    ("id", models.AutoField(primary_key=True)),
-                ]
-            ))
-        if related_model:
-            operations.append(migrations.CreateModel(
-                "Rider",
-                [
-                    ("id", models.AutoField(primary_key=True)),
-                    ("pony", models.ForeignKey("Pony", models.CASCADE)),
-                    ("friend", models.ForeignKey("self", models.CASCADE))
-                ],
-            ))
-        if mti_model:
-            operations.append(migrations.CreateModel(
-                "ShetlandPony",
-                fields=[
-                    ('pony_ptr', models.OneToOneField(
-                        'Pony',
-                        models.CASCADE,
-                        auto_created=True,
-                        parent_link=True,
-                        primary_key=True,
-                        to_field='id',
-                        serialize=False,
-                    )),
-                    ("cuteness", models.IntegerField(default=1)),
-                ],
-                bases=['%s.Pony' % app_label],
-            ))
-        if proxy_model:
-            operations.append(migrations.CreateModel(
-                "ProxyPony",
-                fields=[],
-                options={"proxy": True},
-                bases=['%s.Pony' % app_label],
-            ))
-        if manager_model:
-            operations.append(migrations.CreateModel(
-                "Food",
-                fields=[
-                    ("id", models.AutoField(primary_key=True)),
-                ],
-                managers=[
-                    ("food_qs", FoodQuerySet.as_manager()),
-                    ("food_mgr", FoodManager("a", "b")),
-                    ("food_mgr_kwargs", FoodManager("x", "y", 3, 4)),
-                ]
-            ))
-
-        return self.apply_operations(app_label, ProjectState(), operations)
 
 
 class OperationTests(OperationTestBase):
@@ -2956,57 +2801,3 @@ class FieldOperationTests(SimpleTestCase):
         self.assertIs(operation.references_field('Through', 'whatever'), False)
         self.assertIs(operation.references_field('Through', 'first'), True)
         self.assertIs(operation.references_field('Through', 'second'), True)
-
-
-@unittest.skipUnless(connection.vendor == 'postgresql', 'CreateIndexConcurrently is PostgreSQL-specific')
-class CreateIndexConcurrentlyTests(OperationTestBase):
-    def test_create_index_concurrently_requires_name(self):
-        with self.assertRaisesRegex(ValueError, 'require a name argument'):
-            CreateIndexConcurrently('Pony', models.Index(fields=['pink']))
-
-    def test_create_index_concurrently_description(self):
-        operation = CreateIndexConcurrently('Pony', models.Index(fields=['pink'], name='pony_pink_idx'))
-        self.assertEqual(
-            operation.describe(),
-            'Concurrently create index pony_pink_idx on field(s) pink of model Pony'
-        )
-
-    def test_create_index_concurrently_requires_atomic_false(self):
-        app_label = 'test_pgcicraf'
-
-        project_state = self.set_up_test_model(app_label)
-        new_state = project_state.clone()
-
-        operation = CreateIndexConcurrently('Pony', models.Index(fields=['pink'], name='pony_pink_idx'))
-
-        with self.assertRaisesRegex(NotSupportedError, r'cannot be executed inside a transaction'):
-            with connection.schema_editor(atomic=True) as editor:
-                operation.database_forwards(app_label, editor, project_state, new_state)
-
-    def test_create_index_concurrently(self):
-        app_label = 'test_pgcic'
-
-        project_state = self.set_up_test_model(app_label)
-        new_state = project_state.clone()
-
-        operation = CreateIndexConcurrently('Pony', models.Index(fields=['pink'], name='pony_pink_idx'))
-        operation.state_forwards(app_label, new_state)
-        self.assertEqual(len(new_state.models[app_label, 'pony'].options['indexes']), 1)
-
-        definition = operation.deconstruct()
-        self.assertEqual(definition[0], 'CreateIndexConcurrently')
-        self.assertEqual(definition[1], [])
-        self.assertEqual(definition[2], {
-            'model_name': 'Pony',
-            'index': models.Index(fields=['pink'], name='pony_pink_idx')
-        })
-
-        with connection.schema_editor(atomic=False) as editor:
-            operation.database_forwards(app_label, editor, project_state, new_state)
-
-        self.assertIndexExists('%s_pony' % app_label, ['pink'])
-
-        with connection.schema_editor(atomic=False) as editor:
-            operation.database_backwards(app_label, editor, project_state, new_state)
-
-        self.assertIndexNotExists('%s_pony' % app_label, ['pink'])
