@@ -58,6 +58,13 @@ def list_aggregate(function):
     return type('ListAggregate', (list,), {'finalize': function, 'step': list.append})
 
 
+def check_sqlite_version():
+    if Database.sqlite_version_info < (3, 8, 3):
+        raise ImproperlyConfigured('SQLite 3.8.3 or later is required (found %s).' % Database.sqlite_version)
+
+
+check_sqlite_version()
+
 Database.register_converter("bool", b'1'.__eq__)
 Database.register_converter("time", decoder(parse_time))
 Database.register_converter("datetime", decoder(parse_datetime))

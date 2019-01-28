@@ -1,8 +1,12 @@
 import re
 import threading
 import unittest
+from sqlite3 import dbapi2
+from unittest import mock
 
+from django.core.exceptions import ImproperlyConfigured
 from django.db import connection, transaction
+from django.db.backends.sqlite3.base import check_sqlite_version
 from django.db.models import Avg, StdDev, Sum, Variance
 from django.db.models.aggregates import Aggregate
 from django.db.models.fields import CharField
@@ -18,6 +22,13 @@ from ..models import Author, Item, Object, Square
 @unittest.skipUnless(connection.vendor == 'sqlite', 'SQLite tests')
 class Tests(TestCase):
     longMessage = True
+
+    def test_check_sqlite_version(self):
+        msg = 'SQLite 3.8.3 or later is required (found 3.8.2).'
+        with mock.patch.object(dbapi2, 'sqlite_version_info', (3, 8, 2)), \
+                mock.patch.object(dbapi2, 'sqlite_version', '3.8.2'), \
+                self.assertRaisesMessage(ImproperlyConfigured, msg):
+            check_sqlite_version()
 
     def test_aggregation(self):
         """
