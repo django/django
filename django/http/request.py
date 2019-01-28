@@ -22,7 +22,7 @@ RAISE_ERROR = object()
 host_validation_re = re.compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?$")
 
 
-class UnreadablePostError(IOError):
+class UnreadablePostError(OSError):
     pass
 
 
@@ -284,7 +284,7 @@ class HttpRequest:
 
             try:
                 self._body = self.read()
-            except IOError as e:
+            except OSError as e:
                 raise UnreadablePostError(*e.args) from e
             self._stream = BytesIO(self._body)
         return self._body
@@ -339,14 +339,14 @@ class HttpRequest:
         self._read_started = True
         try:
             return self._stream.read(*args, **kwargs)
-        except IOError as e:
+        except OSError as e:
             raise UnreadablePostError(*e.args) from e
 
     def readline(self, *args, **kwargs):
         self._read_started = True
         try:
             return self._stream.readline(*args, **kwargs)
-        except IOError as e:
+        except OSError as e:
             raise UnreadablePostError(*e.args) from e
 
     def __iter__(self):

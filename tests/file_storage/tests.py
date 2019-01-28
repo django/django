@@ -482,9 +482,9 @@ class FileStorageTests(SimpleTestCase):
         f1 = ContentFile('chunks fails')
 
         def failing_chunks():
-            raise IOError
+            raise OSError
         f1.chunks = failing_chunks
-        with self.assertRaises(IOError):
+        with self.assertRaises(OSError):
             self.storage.save('error.file', f1)
 
     def test_delete_no_name(self):

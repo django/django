@@ -1448,8 +1448,8 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
         self.assertEqual(cache.get('foo', 'baz'), 'baz')
 
     def test_get_does_not_ignore_non_filenotfound_exceptions(self):
-        with mock.patch('builtins.open', side_effect=IOError):
-            with self.assertRaises(IOError):
+        with mock.patch('builtins.open', side_effect=OSError):
+            with self.assertRaises(OSError):
                 cache.get('foo')
 
     def test_empty_cache_file_considered_expired(self):

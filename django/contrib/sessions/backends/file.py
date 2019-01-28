@@ -94,7 +94,7 @@ class SessionStore(SessionBase):
                     session_data = {}
                     self.delete()
                     self.create()
-        except (IOError, SuspiciousOperation):
+        except (OSError, SuspiciousOperation):
             self._session_key = None
         return session_data
 
@@ -166,7 +166,7 @@ class SessionStore(SessionBase):
             finally:
                 if not renamed:
                     os.unlink(output_file_name)
-        except (OSError, IOError, EOFError):
+        except (EOFError, OSError):
             pass
 
     def exists(self, session_key):

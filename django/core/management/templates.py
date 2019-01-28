@@ -257,7 +257,7 @@ class TemplateCommand(BaseCommand):
             self.stdout.write("Downloading %s\n" % display_url)
         try:
             the_path, info = urlretrieve(url, path.join(tempdir, filename))
-        except IOError as e:
+        except OSError as e:
             raise CommandError("couldn't download URL %s to %s: %s" %
                                (url, filename, e))
 
@@ -312,7 +312,7 @@ class TemplateCommand(BaseCommand):
         try:
             archive.extract(filename, tempdir)
             return tempdir
-        except (archive.ArchiveException, IOError) as e:
+        except (archive.ArchiveException, OSError) as e:
             raise CommandError("couldn't extract file %s to %s: %s" %
                                (filename, tempdir, e))
 

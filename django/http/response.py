@@ -251,13 +251,13 @@ class HttpResponseBase:
         signals.request_finished.send(sender=self._handler_class)
 
     def write(self, content):
-        raise IOError("This %s instance is not writable" % self.__class__.__name__)
+        raise OSError('This %s instance is not writable' % self.__class__.__name__)
 
     def flush(self):
         pass
 
     def tell(self):
-        raise IOError("This %s instance cannot tell its position" % self.__class__.__name__)
+        raise OSError('This %s instance cannot tell its position' % self.__class__.__name__)
 
     # These methods partially implement a stream-like object interface.
     # See https://docs.python.org/library/io.html#io.IOBase
@@ -272,7 +272,7 @@ class HttpResponseBase:
         return False
 
     def writelines(self, lines):
-        raise IOError("This %s instance is not writable" % self.__class__.__name__)
+        raise OSError('This %s instance is not writable' % self.__class__.__name__)
 
 
 class HttpResponse(HttpResponseBase):

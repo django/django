@@ -173,7 +173,7 @@ class CommonPasswordValidator:
         try:
             with gzip.open(str(password_list_path)) as f:
                 common_passwords_lines = f.read().decode().splitlines()
-        except IOError:
+        except OSError:
             with open(str(password_list_path)) as f:
                 common_passwords_lines = f.readlines()
 

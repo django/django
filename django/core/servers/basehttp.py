@@ -51,8 +51,8 @@ def get_internal_wsgi_application():
 
 
 def is_broken_pipe_error():
-    exc_type, exc_value = sys.exc_info()[:2]
-    return issubclass(exc_type, socket.error) and exc_value.args[0] == 32
+    exc_type, _, _ = sys.exc_info()
+    return issubclass(exc_type, BrokenPipeError)
 
 
 class WSGIServer(simple_server.WSGIServer):
@@ -171,7 +171,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
             self.handle_one_request()
         try:
             self.connection.shutdown(socket.SHUT_WR)
-        except (socket.error, AttributeError):
+        except (AttributeError, OSError):
             pass
 
     def handle_one_request(self):

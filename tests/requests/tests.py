@@ -479,11 +479,11 @@ class RequestsTests(SimpleTestCase):
     def test_POST_connection_error(self):
         """
         If wsgi.input.read() raises an exception while trying to read() the
-        POST, the exception should be identifiable (not a generic IOError).
+        POST, the exception is identifiable (not a generic OSError).
         """
         class ExplodingBytesIO(BytesIO):
             def read(self, len=0):
-                raise IOError("kaboom!")
+                raise OSError('kaboom!')
 
         payload = b'name=value'
         request = WSGIRequest({
@@ -520,11 +520,11 @@ class RequestsTests(SimpleTestCase):
     def test_FILES_connection_error(self):
         """
         If wsgi.input.read() raises an exception while trying to read() the
-        FILES, the exception should be identifiable (not a generic IOError).
+        FILES, the exception is identifiable (not a generic OSError).
         """
         class ExplodingBytesIO(BytesIO):
             def read(self, len=0):
-                raise IOError("kaboom!")
+                raise OSError('kaboom!')
 
         payload = b'x'
         request = WSGIRequest({

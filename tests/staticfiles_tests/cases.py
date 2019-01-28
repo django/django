@@ -23,7 +23,7 @@ class BaseStaticFilesMixin:
         )
 
     def assertFileNotFound(self, filepath):
-        with self.assertRaises(IOError):
+        with self.assertRaises(OSError):
             self._get_file(filepath)
 
     def render_template(self, template, **kwargs):

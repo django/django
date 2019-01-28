@@ -19,7 +19,7 @@ def is_writable(path):
     try:
         with open(path, 'a'):
             os.utime(path, None)
-    except (IOError, OSError):
+    except OSError:
         return False
     return True
 

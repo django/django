@@ -13,8 +13,7 @@ logger = logging.getLogger('django.contrib.gis')
 try:
     from django.conf import settings
     lib_path = settings.GDAL_LIBRARY_PATH
-except (AttributeError, EnvironmentError,
-        ImportError, ImproperlyConfigured):
+except (AttributeError, ImportError, ImproperlyConfigured, OSError):
     lib_path = None
 
 if lib_path:
