@@ -521,6 +521,7 @@ class HttpResponseNotAllowed(HttpResponse):
 class HttpResponseGone(HttpResponse):
     status_code = 410
     
+    
 class HttpResponseImATeapot(HttpResponse):
     status_code = 418
 
