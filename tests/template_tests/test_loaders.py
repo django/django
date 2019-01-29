@@ -195,7 +195,8 @@ class FileSystemLoaderTests(SimpleTestCase):
                     self.engine.get_template(tmpfile.name)
 
     def test_notafile_error(self):
-        with self.assertRaises(IsADirectoryError):
+        # Windows raises PermissionError when trying to open a directory.
+        with self.assertRaises(PermissionError if sys.platform.startswith('win') else IsADirectoryError):
             self.engine.get_template('first')
 
 
