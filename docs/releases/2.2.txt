@@ -450,8 +450,8 @@ Miscellaneous
   with migrations. This has been a documented restriction since migrations were
   added in Django 1.7, but it fails more reliably now. You'll see tests failing
   with errors like ``no such table: <app_label>_<model>``. This was observed
-  with several third-party apps that had tests models without migrations. You
-  must add migrations for such models.
+  with several third-party apps that had models in tests without migrations.
+  You must add migrations for such models.
 
 .. _deprecated-features-2.2:
 
