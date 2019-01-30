@@ -76,7 +76,7 @@ class IntrospectionTests(TransactionTestCase):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
         self.assertEqual(
-            [datatype(r[1], r) for r in desc],
+            [connection.introspection.get_field_type(r[1], r) for r in desc],
             [
                 'AutoField' if connection.features.can_introspect_autofield else 'IntegerField',
                 'CharField',
@@ -93,7 +93,7 @@ class IntrospectionTests(TransactionTestCase):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
         self.assertEqual(
-            [r[3] for r in desc if datatype(r[1], r) == 'CharField'],
+            [r[3] for r in desc if connection.introspection.get_field_type(r[1], r) == 'CharField'],
             [30, 30, 254]
         )
 
@@ -110,7 +110,10 @@ class IntrospectionTests(TransactionTestCase):
     def test_bigautofield(self):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, City._meta.db_table)
-        self.assertIn(connection.features.introspected_big_auto_field_type, [datatype(r[1], r) for r in desc])
+        self.assertIn(
+            connection.features.introspected_big_auto_field_type,
+            [connection.introspection.get_field_type(r[1], r) for r in desc],
+        )
 
     # Regression test for #9991 - 'real' types in postgres
     @skipUnlessDBFeature('has_real_datatype')
@@ -119,7 +122,7 @@ class IntrospectionTests(TransactionTestCase):
             cursor.execute("CREATE TABLE django_ixn_real_test_table (number REAL);")
             desc = connection.introspection.get_table_description(cursor, 'django_ixn_real_test_table')
             cursor.execute('DROP TABLE django_ixn_real_test_table;')
-        self.assertEqual(datatype(desc[0][1], desc[0]), 'FloatField')
+        self.assertEqual(connection.introspection.get_field_type(desc[0][1], desc[0]), 'FloatField')
 
     @skipUnlessDBFeature('can_introspect_foreign_keys')
     def test_get_relations(self):
@@ -208,12 +211,3 @@ class IntrospectionTests(TransactionTestCase):
                 self.assertEqual(val['orders'], ['ASC'] * len(val['columns']))
                 indexes_verified += 1
         self.assertEqual(indexes_verified, 4)
-
-
-def datatype(dbtype, description):
-    """Helper to convert a data type into a string."""
-    dt = connection.introspection.get_field_type(dbtype, description)
-    if type(dt) is tuple:
-        return dt[0]
-    else:
-        return dt

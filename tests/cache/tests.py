@@ -1439,7 +1439,7 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
     def test_creates_cache_dir_if_nonexistent(self):
         os.rmdir(self.dirname)
         cache.set('foo', 'bar')
-        os.path.exists(self.dirname)
+        self.assertTrue(os.path.exists(self.dirname))
 
     def test_get_ignores_enoent(self):
         cache.set('foo', 'bar')
@@ -1448,8 +1448,8 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
         self.assertEqual(cache.get('foo', 'baz'), 'baz')
 
     def test_get_does_not_ignore_non_filenotfound_exceptions(self):
-        with mock.patch('builtins.open', side_effect=IOError):
-            with self.assertRaises(IOError):
+        with mock.patch('builtins.open', side_effect=OSError):
+            with self.assertRaises(OSError):
                 cache.get('foo')
 
     def test_empty_cache_file_considered_expired(self):

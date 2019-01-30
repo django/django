@@ -150,7 +150,8 @@ Internationalization
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :option:`compilemessages --ignore` option allows ignoring specific
+  directories when searching for ``.po`` files to compile.
 
 Migrations
 ~~~~~~~~~~
@@ -208,7 +209,14 @@ Database backend API
 This section describes changes that may be needed in third-party database
 backends.
 
-* ...
+* The second argument of ``DatabaseIntrospection.get_geometry_type()`` is now
+  the row description instead of the column name.
+
+* ``DatabaseIntrospection.get_field_type()`` may no longer return tuples.
+
+* If the database can create foreign keys in the same SQL statement that adds a
+  field, add ``SchemaEditor.sql_create_column_inline_fk`` with the appropriate
+  SQL; otherwise, set ``DatabaseFeatures.can_create_inline_fk = False``.
 
 Miscellaneous
 -------------

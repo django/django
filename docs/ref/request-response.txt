@@ -167,7 +167,7 @@ All attributes should be considered read-only, unless stated otherwise.
     underscores in WSGI environment variables. It matches the behavior of
     Web servers like Nginx and Apache 2.4+.
 
-    :attr:`HttpRequest.headers` is a simpler way to access all HTTP-prefixd
+    :attr:`HttpRequest.headers` is a simpler way to access all HTTP-prefixed
     headers, plus ``CONTENT_LENGTH`` and ``CONTENT_TYPE``.
 
 .. attribute:: HttpRequest.headers

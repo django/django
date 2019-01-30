@@ -173,6 +173,17 @@ Example usage::
     django-admin compilemessages -x pt_BR
     django-admin compilemessages -x pt_BR -x fr
 
+.. django-admin-option:: --ignore PATTERN, -i PATTERN
+
+.. versionadded:: 3.0
+
+Ignores directories matching the given :mod:`glob`-style pattern. Use
+multiple times to ignore more.
+
+Example usage::
+
+    django-admin compilemessages --ignore=cache --ignore=outdated/*/locale
+
 ``createcachetable``
 --------------------
 

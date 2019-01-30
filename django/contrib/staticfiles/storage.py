@@ -93,7 +93,7 @@ class HashedFilesMixin:
                 raise ValueError("The file '%s' could not be found with %r." % (filename, self))
             try:
                 content = self.open(filename)
-            except IOError:
+            except OSError:
                 # Handle directory paths and fragments
                 return name
         try:
@@ -380,7 +380,7 @@ class ManifestFilesMixin(HashedFilesMixin):
         try:
             with self.open(self.manifest_name) as manifest:
                 return manifest.read().decode()
-        except IOError:
+        except OSError:
             return None
 
     def load_manifest(self):

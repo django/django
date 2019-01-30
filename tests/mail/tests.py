@@ -4,7 +4,6 @@ import mimetypes
 import os
 import shutil
 import smtpd
-import socket
 import sys
 import tempfile
 import threading
@@ -1570,7 +1569,7 @@ class SMTPBackendStoppedServerTests(SMTPBackendTestsBase):
         """
         A socket connection error is silenced with fail_silently=True.
         """
-        with self.assertRaises(socket.error):
+        with self.assertRaises(ConnectionError):
             self.backend.open()
         self.backend.fail_silently = True
         self.backend.open()

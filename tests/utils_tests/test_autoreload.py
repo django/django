@@ -6,6 +6,7 @@ import sys
 import tempfile
 import threading
 import time
+import weakref
 import zipfile
 from importlib import import_module
 from pathlib import Path
@@ -115,6 +116,13 @@ class TestIterModulesAndFiles(SimpleTestCase):
         with extend_sys_path(str(compiled_file.parent)):
             self.import_and_cleanup('test_compiled')
         self.assertFileFound(compiled_file)
+
+    def test_weakref_in_sys_module(self):
+        """iter_all_python_module_file() ignores weakref modules."""
+        time_proxy = weakref.proxy(time)
+        sys.modules['time_proxy'] = time_proxy
+        self.addCleanup(lambda: sys.modules.pop('time_proxy', None))
+        list(autoreload.iter_all_python_module_files())  # No crash.
 
 
 class TestCommonRoots(SimpleTestCase):

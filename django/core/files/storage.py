@@ -246,7 +246,7 @@ class FileSystemStorage(Storage):
                 # was created concurrently.
                 pass
         if not os.path.isdir(directory):
-            raise IOError("%s exists and is not a directory." % directory)
+            raise FileExistsError('%s exists and is not a directory.' % directory)
 
         # There's a potential race condition between get_available_name and
         # saving the file; it's possible that two threads might return the

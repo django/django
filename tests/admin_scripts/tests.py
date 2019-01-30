@@ -3,7 +3,6 @@ A series of tests to establish that the command-line management tools work as
 advertised - especially with regards to the handling of the
 DJANGO_SETTINGS_MODULE and default settings.py files.
 """
-import codecs
 import os
 import re
 import shutil
@@ -174,7 +173,7 @@ class AdminScriptTestCase(SimpleTestCase):
         test_manage_py = os.path.join(self.test_dir, 'manage.py')
         shutil.copyfile(template_manage_py, test_manage_py)
 
-        with open(test_manage_py, 'r') as fp:
+        with open(test_manage_py) as fp:
             manage_py_contents = fp.read()
         manage_py_contents = manage_py_contents.replace(
             "{{ project_name }}", "test_project")
@@ -608,7 +607,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         self.addCleanup(shutil.rmtree, app_path)
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(app_path))
-        with open(os.path.join(app_path, 'apps.py'), 'r') as f:
+        with open(os.path.join(app_path, 'apps.py')) as f:
             content = f.read()
             self.assertIn("class SettingsTestConfig(AppConfig)", content)
             self.assertIn("name = 'settings_test'", content)
@@ -632,7 +631,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         self.addCleanup(shutil.rmtree, app_path)
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(app_path))
-        with open(os.path.join(app_path, 'apps.py'), 'r', encoding='utf8') as f:
+        with open(os.path.join(app_path, 'apps.py'), encoding='utf8') as f:
             content = f.read()
             self.assertIn("class こんにちはConfig(AppConfig)", content)
             self.assertIn("name = 'こんにちは'", content)
@@ -2125,7 +2124,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         test_manage_py = os.path.join(testproject_dir, 'manage.py')
-        with open(test_manage_py, 'r') as fp:
+        with open(test_manage_py) as fp:
             content = fp.read()
             self.assertIn("project_name = 'another_project'", content)
             self.assertIn("project_directory = '%s'" % testproject_dir, content)
@@ -2147,7 +2146,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         test_manage_py = os.path.join(testproject_dir, 'additional_dir', 'extra.py')
-        with open(test_manage_py, 'r') as fp:
+        with open(test_manage_py) as fp:
             content = fp.read()
             self.assertIn("<&>", content)
 
@@ -2178,7 +2177,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         path = os.path.join(testproject_dir, 'ticket-18091-non-ascii-template.txt')
-        with codecs.open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             self.assertEqual(f.read().splitlines(False), [
                 'Some non-ASCII text for testing ticket #18091:',
                 'üäö €'])

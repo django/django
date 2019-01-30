@@ -148,7 +148,7 @@ class TemplateCommand(BaseCommand):
                 # Only render the Python files, as we don't want to
                 # accidentally render Django templates files
                 if new_path.endswith(extensions) or filename in extra_files:
-                    with open(old_path, 'r', encoding='utf-8') as template_file:
+                    with open(old_path, encoding='utf-8') as template_file:
                         content = template_file.read()
                     template = Engine().from_string(content)
                     content = template.render(context)
@@ -257,7 +257,7 @@ class TemplateCommand(BaseCommand):
             self.stdout.write("Downloading %s\n" % display_url)
         try:
             the_path, info = urlretrieve(url, path.join(tempdir, filename))
-        except IOError as e:
+        except OSError as e:
             raise CommandError("couldn't download URL %s to %s: %s" %
                                (url, filename, e))
 
@@ -312,7 +312,7 @@ class TemplateCommand(BaseCommand):
         try:
             archive.extract(filename, tempdir)
             return tempdir
-        except (archive.ArchiveException, IOError) as e:
+        except (archive.ArchiveException, OSError) as e:
             raise CommandError("couldn't extract file %s to %s: %s" %
                                (filename, tempdir, e))
 

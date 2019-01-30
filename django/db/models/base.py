@@ -1782,11 +1782,9 @@ def method_set_order(self, ordered_obj, id_list, using=None):
         using = DEFAULT_DB_ALIAS
     order_wrt = ordered_obj._meta.order_with_respect_to
     filter_args = order_wrt.get_forward_related_filter(self)
-    # FIXME: It would be nice if there was an "update many" version of update
-    # for situations like this.
-    with transaction.atomic(using=using, savepoint=False):
-        for i, j in enumerate(id_list):
-            ordered_obj.objects.filter(pk=j, **filter_args).update(_order=i)
+    ordered_obj.objects.db_manager(using).filter(**filter_args).bulk_update([
+        ordered_obj(pk=pk, _order=order) for order, pk in enumerate(id_list)
+    ], ['_order'])
 
 
 def method_get_order(self, ordered_obj):

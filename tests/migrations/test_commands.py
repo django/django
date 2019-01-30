@@ -771,7 +771,7 @@ class MakeMigrationsTests(MigrationTestBase):
             init_file = os.path.join(migration_dir, "__init__.py")
             self.assertTrue(os.path.exists(init_file))
 
-            with open(init_file, 'r') as fp:
+            with open(init_file) as fp:
                 content = fp.read()
             self.assertEqual(content, '')
 
@@ -779,7 +779,7 @@ class MakeMigrationsTests(MigrationTestBase):
             initial_file = os.path.join(migration_dir, "0001_initial.py")
             self.assertTrue(os.path.exists(initial_file))
 
-            with open(initial_file, 'r', encoding='utf-8') as fp:
+            with open(initial_file, encoding='utf-8') as fp:
                 content = fp.read()
                 self.assertIn('migrations.CreateModel', content)
                 self.assertIn('initial = True', content)
@@ -924,7 +924,7 @@ class MakeMigrationsTests(MigrationTestBase):
             initial_file = os.path.join(migration_dir, "0001_initial.py")
             self.assertTrue(os.path.exists(initial_file))
 
-            with open(initial_file, 'r', encoding='utf-8') as fp:
+            with open(initial_file, encoding='utf-8') as fp:
                 content = fp.read()
 
                 # Remove all whitespace to check for empty dependencies and operations
@@ -1335,7 +1335,7 @@ class MakeMigrationsTests(MigrationTestBase):
                 migration_file = os.path.join(migration_dir, "%s_%s.py" % (migration_count, migration_name))
                 # Check for existing migration file in migration folder
                 self.assertTrue(os.path.exists(migration_file))
-                with open(migration_file, "r", encoding="utf-8") as fp:
+                with open(migration_file, encoding='utf-8') as fp:
                     content = fp.read()
                     content = content.replace(" ", "")
                 return content
@@ -1455,7 +1455,7 @@ class SquashMigrationsTests(MigrationTestBase):
             call_command("squashmigrations", "migrations", "0002", interactive=False, verbosity=0)
 
             squashed_migration_file = os.path.join(migration_dir, "0001_squashed_0002_second.py")
-            with open(squashed_migration_file, "r", encoding="utf-8") as fp:
+            with open(squashed_migration_file, encoding='utf-8') as fp:
                 content = fp.read()
                 self.assertIn("initial = True", content)
 
@@ -1488,7 +1488,7 @@ class SquashMigrationsTests(MigrationTestBase):
                          interactive=False, verbosity=1, stdout=out)
 
             squashed_migration_file = os.path.join(migration_dir, "0002_second_squashed_0003_third.py")
-            with open(squashed_migration_file, "r", encoding="utf-8") as fp:
+            with open(squashed_migration_file, encoding='utf-8') as fp:
                 content = fp.read()
                 self.assertIn("        ('migrations', '0001_initial')", content)
                 self.assertNotIn("initial = True", content)

@@ -393,6 +393,7 @@ class SimpleTestCase(unittest.TestCase):
         """
         def normalize(url):
             """Sort the URL's query string parameters."""
+            url = str(url)  # Coerce reverse_lazy() URLs.
             scheme, netloc, path, params, query, fragment = urlparse(url)
             query_parts = sorted(parse_qsl(query))
             return urlunparse((scheme, netloc, path, params, urlencode(query_parts), fragment))

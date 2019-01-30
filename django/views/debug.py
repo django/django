@@ -357,7 +357,7 @@ class ExceptionReporter:
             try:
                 with open(filename, 'rb') as fp:
                     source = fp.read().splitlines()
-            except (OSError, IOError):
+            except OSError:
                 pass
         if source is None:
             return None, [], None, []

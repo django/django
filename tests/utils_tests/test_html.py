@@ -99,7 +99,7 @@ class TestUtilsHtml(SimpleTestCase):
         for filename in ('strip_tags1.html', 'strip_tags2.txt'):
             with self.subTest(filename=filename):
                 path = os.path.join(os.path.dirname(__file__), 'files', filename)
-                with open(path, 'r') as fp:
+                with open(path) as fp:
                     content = fp.read()
                     start = datetime.now()
                     stripped = strip_tags(content)

@@ -191,6 +191,10 @@ restrict to a single app. Restricting to a single app (either in
 a guarantee; any other apps that need to be used to get dependencies correct
 will be.
 
+Apps without migrations must not have relations (``ForeignKey``,
+``ManyToManyField``, etc.) to apps with migrations. Sometimes it may work, but
+it's not supported.
+
 .. _migration-files:
 
 Migration files

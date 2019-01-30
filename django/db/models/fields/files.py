@@ -141,7 +141,7 @@ class FileDescriptor:
 
     Assign a file object on assignment so you can do::
 
-        >>> with open('/path/to/hello.world', 'r') as f:
+        >>> with open('/path/to/hello.world') as f:
         ...     instance.file = File(f)
     """
     def __init__(self, field):

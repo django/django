@@ -194,10 +194,10 @@ class LiveServerPort(LiveServerBase):
         TestCase = type("TestCase", (LiveServerBase,), {})
         try:
             TestCase.setUpClass()
-        except socket.error as e:
+        except OSError as e:
             if e.errno == errno.EADDRINUSE:
                 # We're out of ports, LiveServerTestCase correctly fails with
-                # a socket error.
+                # an OSError.
                 return
             # Unexpected error.
             raise

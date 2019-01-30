@@ -867,7 +867,7 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
         for language_code, language_name in settings.LANGUAGES:
             try:
                 catalog = gettext.translation('djangojs', path, [language_code])
-            except IOError:
+            except OSError:
                 continue
             if month_string in catalog._catalog:
                 month_name = catalog._catalog[month_string]

@@ -35,7 +35,7 @@ def file_move_safe(old_file_name, new_file_name, chunk_size=1024 * 64, allow_ove
     If that fails, stream manually from one file to another in pure Python.
 
     If the destination file exists and ``allow_overwrite`` is ``False``, raise
-    ``IOError``.
+    ``FileExistsError``.
     """
     # There's no reason to move if we don't have to.
     if _samefile(old_file_name, new_file_name):
@@ -43,7 +43,7 @@ def file_move_safe(old_file_name, new_file_name, chunk_size=1024 * 64, allow_ove
 
     try:
         if not allow_overwrite and os.access(new_file_name, os.F_OK):
-            raise IOError("Destination file %s exists and allow_overwrite is False" % new_file_name)
+            raise FileExistsError('Destination file %s exists and allow_overwrite is False.' % new_file_name)
 
         os.rename(old_file_name, new_file_name)
         return
