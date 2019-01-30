@@ -126,7 +126,7 @@ class Envelope(object):
                 raise TypeError('Incorrect type of argument: %s' % str(type(args[0])))
         elif len(args) == 2:
             # An x and an y parameter were passed in
-                return self.expand_to_include((args[0], args[1], args[0], args[1]))
+            return self.expand_to_include((args[0], args[1], args[0], args[1]))
         elif len(args) == 4:
             # Individual parameters passed in.
             return self.expand_to_include(args)
