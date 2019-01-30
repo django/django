@@ -218,6 +218,10 @@ backends.
   field, add ``SchemaEditor.sql_create_column_inline_fk`` with the appropriate
   SQL; otherwise, set ``DatabaseFeatures.can_create_inline_fk = False``.
 
+* ``DatabaseFeatures.can_return_id_from_insert`` and
+  ``can_return_ids_from_bulk_insert`` are renamed to
+  ``can_return_columns_from_insert`` and ``can_return_rows_from_bulk_insert``.
+
 Miscellaneous
 -------------
 

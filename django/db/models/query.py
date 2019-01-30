@@ -431,11 +431,11 @@ class QuerySet:
         Insert each of the instances into the database. Do *not* call
         save() on each of the instances, do not send any pre/post_save
         signals, and do not set the primary key attribute if it is an
-        autoincrement field (except if features.can_return_ids_from_bulk_insert=True).
+        autoincrement field (except if features.can_return_rows_from_bulk_insert=True).
         Multi-table models are not supported.
         """
         # When you bulk insert you don't get the primary keys back (if it's an
-        # autoincrement, except if can_return_ids_from_bulk_insert=True), so
+        # autoincrement, except if can_return_rows_from_bulk_insert=True), so
         # you can't insert into the child tables which references this. There
         # are two workarounds:
         # 1) This could be implemented if you didn't have an autoincrement pk
@@ -471,7 +471,7 @@ class QuerySet:
             if objs_without_pk:
                 fields = [f for f in fields if not isinstance(f, AutoField)]
                 ids = self._batched_insert(objs_without_pk, fields, batch_size, ignore_conflicts=ignore_conflicts)
-                if connection.features.can_return_ids_from_bulk_insert and not ignore_conflicts:
+                if connection.features.can_return_rows_from_bulk_insert and not ignore_conflicts:
                     assert len(ids) == len(objs_without_pk)
                 for obj_without_pk, pk in zip(objs_without_pk, ids):
                     obj_without_pk.pk = pk
@@ -1185,7 +1185,7 @@ class QuerySet:
         ops = connections[self.db].ops
         batch_size = (batch_size or max(ops.bulk_batch_size(fields, objs), 1))
         inserted_ids = []
-        bulk_return = connections[self.db].features.can_return_ids_from_bulk_insert
+        bulk_return = connections[self.db].features.can_return_rows_from_bulk_insert
         for item in [objs[i:i + batch_size] for i in range(0, len(objs), batch_size)]:
             if bulk_return and not ignore_conflicts:
                 inserted_id = self._insert(

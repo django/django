@@ -1273,8 +1273,8 @@ class SQLInsertCompiler(SQLCompiler):
         ignore_conflicts_suffix_sql = self.connection.ops.ignore_conflicts_suffix_sql(
             ignore_conflicts=self.query.ignore_conflicts
         )
-        if self.return_id and self.connection.features.can_return_id_from_insert:
-            if self.connection.features.can_return_ids_from_bulk_insert:
+        if self.return_id and self.connection.features.can_return_columns_from_insert:
+            if self.connection.features.can_return_rows_from_bulk_insert:
                 result.append(self.connection.ops.bulk_insert_sql(fields, placeholder_rows))
                 params = param_rows
             else:
@@ -1307,7 +1307,7 @@ class SQLInsertCompiler(SQLCompiler):
     def execute_sql(self, return_id=False):
         assert not (
             return_id and len(self.query.objs) != 1 and
-            not self.connection.features.can_return_ids_from_bulk_insert
+            not self.connection.features.can_return_rows_from_bulk_insert
         )
         self.return_id = return_id
         with self.connection.cursor() as cursor:
@@ -1315,9 +1315,9 @@ class SQLInsertCompiler(SQLCompiler):
                 cursor.execute(sql, params)
             if not return_id:
                 return
-            if self.connection.features.can_return_ids_from_bulk_insert and len(self.query.objs) > 1:
+            if self.connection.features.can_return_rows_from_bulk_insert and len(self.query.objs) > 1:
                 return self.connection.ops.fetch_returned_insert_ids(cursor)
-            if self.connection.features.can_return_id_from_insert:
+            if self.connection.features.can_return_columns_from_insert:
                 assert len(self.query.objs) == 1
                 return self.connection.ops.fetch_returned_insert_id(cursor)
             return self.connection.ops.last_insert_id(

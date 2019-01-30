@@ -22,8 +22,8 @@ class BaseDatabaseFeatures:
     supports_partially_nullable_unique_constraints = True
 
     can_use_chunked_reads = True
-    can_return_id_from_insert = False
-    can_return_ids_from_bulk_insert = False
+    can_return_columns_from_insert = False
+    can_return_rows_from_bulk_insert = False
     has_bulk_insert = True
     uses_savepoints = True
     can_release_savepoints = False
