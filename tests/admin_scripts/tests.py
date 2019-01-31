@@ -48,8 +48,7 @@ class AdminScriptTestCase(SimpleTestCase):
             cls.__name__,
             'test_project',
         ))
-        if not os.path.exists(cls.test_dir):
-            os.makedirs(cls.test_dir)
+        os.makedirs(cls.test_dir)
         with open(os.path.join(cls.test_dir, '__init__.py'), 'w'):
             pass
 

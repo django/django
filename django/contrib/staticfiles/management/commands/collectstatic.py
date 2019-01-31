@@ -310,10 +310,7 @@ class Command(BaseCommand):
         else:
             self.log("Linking '%s'" % source_path, level=2)
             full_path = self.storage.path(prefixed_path)
-            try:
-                os.makedirs(os.path.dirname(full_path))
-            except OSError:
-                pass
+            os.makedirs(os.path.dirname(full_path), exist_ok=True)
             try:
                 if os.path.lexists(full_path):
                     os.unlink(full_path)

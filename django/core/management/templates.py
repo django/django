@@ -120,8 +120,7 @@ class TemplateCommand(BaseCommand):
             relative_dir = path_rest.replace(base_name, name)
             if relative_dir:
                 target_dir = path.join(top_dir, relative_dir)
-                if not path.exists(target_dir):
-                    os.mkdir(target_dir)
+                os.makedirs(target_dir, exist_ok=True)
 
             for dirname in dirs[:]:
                 if dirname.startswith('.') or dirname == '__pycache__':

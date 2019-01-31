@@ -113,11 +113,7 @@ class FileBasedCache(BaseCache):
             self._delete(fname)
 
     def _createdir(self):
-        if not os.path.exists(self._dir):
-            try:
-                os.makedirs(self._dir, 0o700)
-            except FileExistsError:
-                pass
+        os.makedirs(self._dir, 0o700, exist_ok=True)
 
     def _key_to_file(self, key, version=None):
         """
