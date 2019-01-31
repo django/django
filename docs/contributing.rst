@@ -81,6 +81,18 @@ Then, you can run the tests::
 
     pytest
 
+Also, there is a tox.ini file at the root of the repository. Example commands::
+
+   $ tox -l
+   py36-dj11
+   py36-dj20
+   py36-dj21
+   py37-dj11
+   py37-dj20
+   py37-dj21
+
+   # run the test with Python 3.7, on Django 2.2 and Django master branch
+   $ tox -e py37-dj21 && tox -e py37-djmaster
 
 Can you pay me for my time?
 ---------------------------
