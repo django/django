@@ -3481,7 +3481,7 @@ attribute:
 
     >>> prefetch = Prefetch('choice_set', queryset=voted_choices, to_attr='voted_choices')
     >>> Question.objects.prefetch_related(prefetch).get().voted_choices
-    <QuerySet [<Choice: The sky>]>
+    [<Choice: The sky>]
     >>> Question.objects.prefetch_related(prefetch).get().choice_set.all()
     <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
 
