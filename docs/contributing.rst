@@ -97,21 +97,5 @@ Also, there is a tox.ini file at the root of the repository. Example commands::
 Can you pay me for my time?
 ---------------------------
 
-Thanks to Mozilla, we have a reasonable budget to pay people for their time
-working on all of the above sorts of tasks and more. Generally, we'd prefer
-to fund larger projects (you can find these labelled as ``epic-project`` in the
-issues lists) to reduce the administrative overhead, but we're open to any
-proposal.
-
-If you're interested in working on something and being paid, you'll need to
-draw up a short proposal and get in touch with the committee, discuss the work
-and your history with open-source contribution (we strongly prefer that you have
-a proven track record on at least a few things) and the amount you'd like to be paid.
-
-If you're interested in working on one of these tasks, get in touch with
-Andrew Godwin (andrew@aeracode.org) as a first point of contact; he can help
-talk you through what's involved, and help judge/refine your proposal before
-it goes to the committee.
-
-Tasks not on any issues list can also be proposed; Andrew can help talk about them
-and if they would be sensible to do.
+Unfortunately, the Mozilla funds we previously had are exhausted, so we can
+no longer pay for contributions. Thanks to all who participated!
