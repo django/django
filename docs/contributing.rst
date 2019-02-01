@@ -94,8 +94,27 @@ Also, there is a tox.ini file at the root of the repository. Example commands::
    # run the test with Python 3.7, on Django 2.2 and Django master branch
    $ tox -e py37-dj21 && tox -e py37-djmaster
 
+
 Can you pay me for my time?
 ---------------------------
 
 Unfortunately, the Mozilla funds we previously had are exhausted, so we can
 no longer pay for contributions. Thanks to all who participated!
+
+
+How do I do a release?
+----------------------
+
+If you have commit access, a release involves the following steps:
+
+* Create a new entry in the CHANGELOG.txt file and summarise the changes
+* Create a new release page in the docs under ``docs/releases`` and add the
+  changelog there with more information where necessary
+* Add a link to the new release notes in ``docs/releases/index.rst``
+* Set the new version in ``__init__.py``
+* Roll all of these up into a single commit and tag it with the new version
+  number. Push the commit and tag, and Travis will automatically build and
+  release the new version to PyPI as long as all tests pass.
+
+The release process for ``channels-redis`` and ``daphne`` is similar, but
+they don't have the two steps in ``docs/``.
