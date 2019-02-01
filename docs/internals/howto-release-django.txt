@@ -179,9 +179,7 @@ OK, this is the fun part, where we actually push out a release!
    checkout security/1.5.x; git rebase stable/1.5.x``) and then switch back and
    do the merge. Make sure the commit message for each security fix explains
    that the commit is a security fix and that an announcement will follow
-   (`example security commit`__).
-
-   __ https://github.com/django/django/commit/3ef4bbf495cc6c061789132e3d50a8231a89406b
+   (:commit:`example security commit <bf39978a53f117ca02e9a0c78b76664a41a54745>`).
 
 #. For a feature release, remove the ``UNDER DEVELOPMENT`` header at the
    top of the release notes and add the release date on the next line. For a
