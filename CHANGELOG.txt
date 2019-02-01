@@ -1,6 +1,17 @@
 Full release notes, with more details and upgrade information, are available at:
 https://channels.readthedocs.io/en/latest/releases
 
+
+2.1.7 (2019-01-31)
+------------------
+
+* HTTP request body size limit is now enforced
+
+* database_sync_to_async now closes old connections before it runs code
+
+* Auth middleware closes old connections before it runs
+
+
 2.1.6 (2018-12-08)
 ------------------
 

@@ -1,0 +1,29 @@
+2.1.7 Release Notes
+===================
+
+Channels 2.1.7 is another bugfix release in the 2.1 series, and the last
+release (at least for a long while) with Andrew Godwin as the primary
+maintainer.
+
+Thanks to everyone who has used, supported, and contributed to Channels over
+the years, and I hope we can keep it going with community support for a good
+while longer.
+
+
+Bugfixes & Small Changes
+------------------------
+
+* HTTP request body size limit is now enforced (the one set by the
+  ``DATA_UPLOAD_MAX_MEMORY_SIZE`` setting)
+
+* ``database_sync_to_async`` now closes old connections before it runs code,
+  which should prevent some connection errors in long-running pages or tests.
+
+* The auth middleware closes old connections before it runs, to solve similar
+  old-connection issues.
+
+
+Backwards Incompatible Changes
+------------------------------
+
+None.
