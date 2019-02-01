@@ -282,7 +282,7 @@ MySQL notes
 Version support
 ---------------
 
-Django supports MySQL 5.5 and higher.
+Django supports MySQL 5.5.x - 5.7.x. MySQL 8 and later aren't supported.
 
 Django's ``inspectdb`` feature uses the ``information_schema`` database, which
 contains detailed data on all database schemas.
