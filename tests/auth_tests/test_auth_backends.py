@@ -1,8 +1,10 @@
+import sys
 from datetime import date
 from unittest import mock
 
 from django.contrib.auth import (
-    BACKEND_SESSION_KEY, SESSION_KEY, authenticate, get_user, signals,
+    BACKEND_SESSION_KEY, SESSION_KEY, _clean_credentials, authenticate,
+    get_user, signals,
 )
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import MD5PasswordHasher
@@ -11,8 +13,11 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.http import HttpRequest
 from django.test import (
-    SimpleTestCase, TestCase, modify_settings, override_settings,
+    RequestFactory, SimpleTestCase, TestCase, modify_settings,
+    override_settings,
 )
+from django.views.debug import technical_500_response
+from django.views.decorators.debug import sensitive_variables
 
 from .models import (
     CustomPermissionsUser, CustomUser, CustomUserWithoutIsActiveField,
@@ -588,6 +593,7 @@ class TypeErrorBackend:
     Always raises TypeError.
     """
 
+    @sensitive_variables('password')
     def authenticate(self, request, username=None, password=None):
         raise TypeError
 
@@ -608,6 +614,38 @@ class AuthenticateTests(TestCase):
         """A TypeError within a backend is propagated properly (#18171)."""
         with self.assertRaises(TypeError):
             authenticate(username='test', password='test')
+
+    @override_settings(AUTHENTICATION_BACKENDS=['auth_tests.test_auth_backends.TypeErrorBackend'])
+    def test_authenticate_sensitive_variables(self):
+        try:
+            authenticate(username='testusername', password='secret' + 'test')
+        except TypeError:
+            exc_info = sys.exc_info()
+        rf = RequestFactory()
+        response = technical_500_response(rf.get('/'), *exc_info)
+        self.assertNotContains(response, 'secret' + 'test', status_code=500)
+
+    def test_clean_credentials_sensitive_variables(self):
+        try:
+            # passing in a list to cause an exception
+            _clean_credentials([1, 'secret' + 'test'])
+        except TypeError:
+            exc_info = sys.exc_info()
+        rf = RequestFactory()
+        response = technical_500_response(rf.get('/'), *exc_info)
+        print(response.content.decode())
+        self.assertNotContains(response, 'secret' + 'test', status_code=500)
+
+    @override_settings(AUTHENTICATION_BACKENDS=['auth_tests.test_auth_backends.TypeErrorBackend'])
+    def test_password_not_in_error_traceback(self):
+        try:
+            authenticate(username='testusername', password='secret' + 'test')
+        except TypeError:
+            exc_info = sys.exc_info()
+        rf = RequestFactory()
+        response = technical_500_response(rf.get('/'), *exc_info)
+        self.assertContains(response, 'TypeErrorBackend', status_code=500)
+        self.assertNotContains(response, 'secret' + 'test', status_code=500)
 
     @override_settings(AUTHENTICATION_BACKENDS=(
         'auth_tests.test_auth_backends.SkippedBackend',
