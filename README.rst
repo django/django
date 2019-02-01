@@ -25,8 +25,8 @@ Channels is an official Django Project and as such has a deprecation policy.
 Details about what's deprecated or pending deprecation for each release is in
 the `release notes <http://channels.readthedocs.io/en/latest/releases/index.html>`_.
 
-Support can be obtained either here via issues, or in the ``#django-channels``
-channel on Freenode.
+Support can be obtained through several locations - see our
+`support docs <https://channels.readthedocs.io/en/latest/support.html>`_ for more.
 
 You can install channels from PyPI as the ``channels`` package.
 See our `installation <https://channels.readthedocs.io/en/latest/installation.html>`_
@@ -56,13 +56,9 @@ To report bugs or request new features, please open a new GitHub issue. For
 larger discussions, please post to the
 `django-developers mailing list <https://groups.google.com/d/forum/django-developers>`_.
 
-Django Core Shepherd: Andrew Godwin <andrew@aeracode.org>
-
-Maintenance team:
-
-* Andrew Godwin <andrew@aeracode.org>
-* Steven Davidson
-* Jeremy Spencer
+Maintenance is overseen by Carlton Gibson with help from others. It is a
+best-effort basis - we unfortunately can only dedicate guaranteed time to fixing
+security holes.
 
 If you are interested in joining the maintenance team, please
 `read more about contributing <https://channels.readthedocs.io/en/latest/contributing.html>`_
@@ -75,5 +71,5 @@ Other Projects
 The Channels project is made up of several packages; the others are:
 
 * `Daphne <https://github.com/django/daphne/>`_, the HTTP and Websocket termination server
-* `asgiref <https://github.com/django/asgiref/>`_, the base ASGI library/memory backend
 * `channels_redis <https://github.com/django/channels_redis/>`_, the Redis channel backend
+* `asgiref <https://github.com/django/asgiref/>`_, the base ASGI library/memory backend
