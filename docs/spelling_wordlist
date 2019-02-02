@@ -78,7 +78,6 @@ bpython
 Bronn
 bugfix
 bugfixes
-buildbot
 builtin
 builtins
 bulleted
@@ -209,8 +208,6 @@ fieldsets
 filename
 filenames
 filesystem
-filesystems
-Firesheep
 fk
 flatpage
 flatpages
@@ -349,7 +346,6 @@ macOS
 Magee
 Mako
 manouche
-Marczewski
 Marino
 MBR
 memcache
@@ -376,7 +372,6 @@ modelforms
 modelformset
 modwsgi
 monkeypatched
-mssql
 multi
 Multi
 multicolumn
@@ -435,7 +430,6 @@ parameterized
 params
 parens
 parsers
-Paweł
 pdf
 PEM
 perl
