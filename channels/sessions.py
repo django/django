@@ -10,9 +10,13 @@ from django.http.cookie import SimpleCookie
 from django.utils import timezone
 from django.utils.encoding import force_str
 from django.utils.functional import LazyObject
-from django.utils.http import cookie_date
 
 from channels.db import database_sync_to_async
+
+try:
+    from django.utils.http import http_date
+except ImportError:
+    from django.utils.http import cookie_date as http_date
 
 
 class CookieMiddleware:
@@ -87,7 +91,7 @@ class CookieMiddleware:
             cookies[key]["max-age"] = max_age
             # IE requires expires, so set it if hasn't been already.
             if not expires:
-                cookies[key]["expires"] = cookie_date(time.time() + max_age)
+                cookies[key]["expires"] = http_date(time.time() + max_age)
         if path is not None:
             cookies[key]["path"] = path
         if domain is not None:
@@ -215,7 +219,7 @@ class SessionMiddlewareInstance:
                         else:
                             max_age = self.scope["session"].get_expiry_age()
                             expires_time = time.time() + max_age
-                            expires = cookie_date(expires_time)
+                            expires = http_date(expires_time)
                         # Set the cookie
                         CookieMiddleware.set_cookie(
                             message,
