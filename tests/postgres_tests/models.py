@@ -3,8 +3,8 @@ from django.db import models
 
 from .fields import (
     ArrayField, BigIntegerRangeField, CICharField, CIEmailField, CITextField,
-    DateRangeField, DateTimeRangeField, DecimalRangeField, HStoreField,
-    IntegerRangeField, JSONField, SearchVectorField,
+    DateRangeField, DateTimeRangeField, DecimalRangeField, EnumField,
+    HStoreField, IntegerRangeField, JSONField, SearchVectorField,
 )
 
 
@@ -75,6 +75,10 @@ class OtherTypesArrayModel(PostgreSQLModel):
 class HStoreModel(PostgreSQLModel):
     field = HStoreField(blank=True, null=True)
     array_field = ArrayField(HStoreField(), null=True)
+
+
+class ArrayEnumModel(PostgreSQLModel):
+    array_of_enums = ArrayField(EnumField(max_length=20))
 
 
 class CharFieldModel(models.Model):

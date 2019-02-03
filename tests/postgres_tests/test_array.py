@@ -1,4 +1,5 @@
 import decimal
+import enum
 import json
 import unittest
 import uuid
@@ -16,9 +17,9 @@ from . import (
     PostgreSQLSimpleTestCase, PostgreSQLTestCase, PostgreSQLWidgetTestCase,
 )
 from .models import (
-    ArrayFieldSubclass, CharArrayModel, DateTimeArrayModel, IntegerArrayModel,
-    NestedIntegerArrayModel, NullableIntegerArrayModel, OtherTypesArrayModel,
-    PostgreSQLModel, Tag,
+    ArrayEnumModel, ArrayFieldSubclass, CharArrayModel, DateTimeArrayModel,
+    IntegerArrayModel, NestedIntegerArrayModel, NullableIntegerArrayModel,
+    OtherTypesArrayModel, PostgreSQLModel, Tag,
 )
 
 try:
@@ -355,6 +356,16 @@ class TestQuerying(PostgreSQLTestCase):
                 id__in=NullableIntegerArrayModel.objects.filter(field__len=3)
             ),
             [self.objs[3]]
+        )
+
+    def test_enum_lookup(self):
+        class TestEnum(enum.Enum):
+            VALUE_1 = 'value_1'
+
+        instance = ArrayEnumModel.objects.create(array_of_enums=[TestEnum.VALUE_1])
+        self.assertSequenceEqual(
+            ArrayEnumModel.objects.filter(array_of_enums__contains=[TestEnum.VALUE_1]),
+            [instance]
         )
 
     def test_unsupported_lookup(self):

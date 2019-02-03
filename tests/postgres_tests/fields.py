@@ -2,6 +2,8 @@
 Indirection layer for PostgreSQL-specific fields, so the tests don't fail when
 run with a backend other than PostgreSQL.
 """
+import enum
+
 from django.db import models
 
 try:
@@ -40,3 +42,8 @@ except ImportError:
     IntegerRangeField = models.Field
     JSONField = DummyJSONField
     SearchVectorField = models.Field
+
+
+class EnumField(models.CharField):
+    def get_prep_value(self, value):
+        return value.value if isinstance(value, enum.Enum) else value
