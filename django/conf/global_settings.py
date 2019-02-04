@@ -497,7 +497,7 @@ AUTH_USER_MODEL = 'auth.User'
 
 AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend']
 
-LOGIN_URL = '/accounts/login/'
+LOGIN_URL = 'login'
 
 LOGIN_REDIRECT_URL = '/accounts/profile/'
 
