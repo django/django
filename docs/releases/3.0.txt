@@ -222,6 +222,11 @@ backends.
   ``can_return_ids_from_bulk_insert`` are renamed to
   ``can_return_columns_from_insert`` and ``can_return_rows_from_bulk_insert``.
 
+:mod:`django.contrib.gis`
+-------------------------
+
+* Support for SpatiaLite 4.1 and 4.2 is removed.
+
 Miscellaneous
 -------------
 
