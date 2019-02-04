@@ -2798,6 +2798,9 @@ This setting also accepts :ref:`named URL patterns <naming-url-patterns>` which
 can be used to reduce configuration duplication since you don't have to define
 the URL in two places (``settings`` and URLconf).
 
+Setting ``LOGIN_URL`` to a named URL pattern also allows the login views to use
+:ref:`translated URLs <url-internationalization>`.
+
 .. setting:: LOGOUT_REDIRECT_URL
 
 ``LOGOUT_REDIRECT_URL``
