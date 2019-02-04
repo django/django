@@ -61,7 +61,7 @@ available from the ``django.contrib.postgres.indexes`` module.
 
     Provide an integer number of bytes to the gin_pending_list_limit_ parameter
     to tune the maximum size of the GIN pending list which is used when
-    ``fastupdate`` is enabled. This parameter requires PostgreSQL ≥ 9.5.
+    ``fastupdate`` is enabled.
 
     .. _GIN Fast Update Technique: https://www.postgresql.org/docs/current/static/gin-implementation.html#GIN-FAST-UPDATE
     .. _gin_pending_list_limit: https://www.postgresql.org/docs/current/static/runtime-config-client.html#GUC-GIN-PENDING-LIST-LIMIT

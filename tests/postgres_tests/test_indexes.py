@@ -205,7 +205,6 @@ class SchemaTests(PostgreSQLTestCase):
                 editor.remove_index(CharFieldModel, index)
             self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))
 
-    @skipUnlessDBFeature('has_gin_pending_list_limit')
     def test_gin_parameters(self):
         index_name = 'integer_array_gin_params'
         index = GinIndex(fields=['field'], name=index_name, fastupdate=True, gin_pending_list_limit=64)
@@ -218,17 +217,6 @@ class SchemaTests(PostgreSQLTestCase):
             editor.remove_index(IntegerArrayModel, index)
         self.assertNotIn(index_name, self.get_constraints(IntegerArrayModel._meta.db_table))
 
-    @mock.patch('django.db.backends.postgresql.features.DatabaseFeatures.has_gin_pending_list_limit', False)
-    def test_gin_parameters_exception(self):
-        index_name = 'gin_options_exception'
-        index = GinIndex(fields=['field'], name=index_name, gin_pending_list_limit=64)
-        msg = 'GIN option gin_pending_list_limit requires PostgreSQL 9.5+.'
-        with self.assertRaisesMessage(NotSupportedError, msg):
-            with connection.schema_editor() as editor:
-                editor.add_index(IntegerArrayModel, index)
-        self.assertNotIn(index_name, self.get_constraints(IntegerArrayModel._meta.db_table))
-
-    @skipUnlessDBFeature('has_brin_index_support')
     def test_brin_index(self):
         index_name = 'char_field_model_field_brin'
         index = BrinIndex(fields=['field'], name=index_name, pages_per_range=4)
@@ -241,7 +229,7 @@ class SchemaTests(PostgreSQLTestCase):
             editor.remove_index(CharFieldModel, index)
         self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))
 
-    @skipUnlessDBFeature('has_brin_index_support', 'has_brin_autosummarize')
+    @skipUnlessDBFeature('has_brin_autosummarize')
     def test_brin_parameters(self):
         index_name = 'char_field_brin_params'
         index = BrinIndex(fields=['field'], name=index_name, autosummarize=True)
@@ -254,16 +242,6 @@ class SchemaTests(PostgreSQLTestCase):
             editor.remove_index(CharFieldModel, index)
         self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))
 
-    def test_brin_index_not_supported(self):
-        index_name = 'brin_index_exception'
-        index = BrinIndex(fields=['field'], name=index_name)
-        with self.assertRaisesMessage(NotSupportedError, 'BRIN indexes require PostgreSQL 9.5+.'):
-            with mock.patch('django.db.backends.postgresql.features.DatabaseFeatures.has_brin_index_support', False):
-                with connection.schema_editor() as editor:
-                    editor.add_index(CharFieldModel, index)
-        self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))
-
-    @skipUnlessDBFeature('has_brin_index_support')
     def test_brin_autosummarize_not_supported(self):
         index_name = 'brin_options_exception'
         index = BrinIndex(fields=['field'], name=index_name, autosummarize=True)

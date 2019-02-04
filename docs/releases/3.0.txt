@@ -225,7 +225,15 @@ backends.
 :mod:`django.contrib.gis`
 -------------------------
 
+* Supported for PostGIS 2.1 is removed.
+
 * Support for SpatiaLite 4.1 and 4.2 is removed.
+
+Dropped support for PostgreSQL 9.4
+----------------------------------
+
+Upstream support for PostgreSQL 9.4 ends in December 2019. Django 3.0 supports
+PostgreSQL 9.5 and higher.
 
 Miscellaneous
 -------------

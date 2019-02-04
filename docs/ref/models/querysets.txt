@@ -2073,11 +2073,11 @@ The ``batch_size`` parameter controls how many objects are created in a single
 query. The default is to create all objects in one batch, except for SQLite
 where the default is such that at most 999 variables per query are used.
 
-On databases that support it (all except PostgreSQL < 9.5 and Oracle), setting
-the ``ignore_conflicts`` parameter to ``True`` tells the database to ignore
-failure to insert any rows that fail constraints such as duplicate unique
-values. Enabling this parameter disables setting the primary key on each model
-instance (if the database normally supports it).
+On databases that support it (all but Oracle), setting the ``ignore_conflicts``
+parameter to ``True`` tells the database to ignore failure to insert any rows
+that fail constraints such as duplicate unique values. Enabling this parameter
+disables setting the primary key on each model instance (if the database
+normally supports it).
 
 .. versionchanged:: 2.2
 
