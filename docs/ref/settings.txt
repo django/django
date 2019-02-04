@@ -2774,15 +2774,9 @@ The model to use to represent a User. See :ref:`auth-custom-user`.
 
 Default: ``'/accounts/profile/'``
 
-The URL where requests are redirected after login when the
-``contrib.auth.login`` view gets no ``next`` parameter.
-
-This is used by the :func:`~django.contrib.auth.decorators.login_required`
-decorator, for example.
-
-This setting also accepts :ref:`named URL patterns <naming-url-patterns>` which
-can be used to reduce configuration duplication since you don't have to define
-the URL in two places (``settings`` and URLconf).
+The URL or :ref:`named URL pattern <naming-url-patterns>` where requests are
+redirected after login when the :class:`~django.contrib.auth.views.LoginView`
+doesn't get a ``next`` GET parameter.
 
 .. setting:: LOGIN_URL
 
@@ -2791,12 +2785,11 @@ the URL in two places (``settings`` and URLconf).
 
 Default: ``'/accounts/login/'``
 
-The URL where requests are redirected for login, especially when using the
-:func:`~django.contrib.auth.decorators.login_required` decorator.
-
-This setting also accepts :ref:`named URL patterns <naming-url-patterns>` which
-can be used to reduce configuration duplication since you don't have to define
-the URL in two places (``settings`` and URLconf).
+The URL or :ref:`named URL pattern <naming-url-patterns>` where requests are
+redirected for login when using the
+:func:`~django.contrib.auth.decorators.login_required` decorator,
+:class:`~django.contrib.auth.mixins.LoginRequiredMixin`, or
+:class:`~django.contrib.auth.mixins.AccessMixin`.
 
 .. setting:: LOGOUT_REDIRECT_URL
 
@@ -2805,16 +2798,12 @@ the URL in two places (``settings`` and URLconf).
 
 Default: ``None``
 
-The URL where requests are redirected after a user logs out using
-:class:`~django.contrib.auth.views.LogoutView` (if the view doesn't get a
-``next_page`` argument).
+The URL or :ref:`named URL pattern <naming-url-patterns>` where requests are
+redirected after logout if :class:`~django.contrib.auth.views.LogoutView`
+doesn't have a ``next_page`` attribute.
 
 If ``None``, no redirect will be performed and the logout view will be
 rendered.
-
-This setting also accepts :ref:`named URL patterns <naming-url-patterns>` which
-can be used to reduce configuration duplication since you don't have to define
-the URL in two places (``settings`` and URLconf).
 
 .. setting:: PASSWORD_RESET_TIMEOUT_DAYS
 
