@@ -248,7 +248,11 @@ Features deprecated in 3.0
 Miscellaneous
 -------------
 
-* ...
+* ``django.utils.http.urlquote()``, ``urlquote_plus()``, ``urlunquote()``, and
+  ``urlunquote_plus()`` are deprecated in favor of the functions that they're
+  aliases for: :func:`urllib.parse.quote`, :func:`~urllib.parse.quote_plus`,
+  :func:`~urllib.parse.unquote`, and :func:`~urllib.parse.unquote_plus`.
+
 
 .. _removed-features-3.0:
 
