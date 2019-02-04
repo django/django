@@ -598,10 +598,6 @@ def compare_xml(want, got):
     return check_element(want_root, got_root)
 
 
-def str_prefix(s):
-    return s % {'_': ''}
-
-
 class CaptureQueriesContext:
     """
     Context manager that captures queries executed by the specified connection.
@@ -657,29 +653,6 @@ class ignore_warnings(TestContextDecorator):
 
     def disable(self):
         self.catch_warnings.__exit__(*sys.exc_info())
-
-
-@contextmanager
-def patch_logger(logger_name, log_level, log_kwargs=False):
-    """
-    Context manager that takes a named logger and the logging level
-    and provides a simple mock-like list of messages received.
-
-    Use unittest.assertLogs() if you only need Python 3 support. This
-    private API will be removed after Python 2 EOL in 2020 (#27753).
-    """
-    calls = []
-
-    def replacement(msg, *args, **kwargs):
-        call = msg % args
-        calls.append((call, kwargs) if log_kwargs else call)
-    logger = logging.getLogger(logger_name)
-    orig = getattr(logger, log_level)
-    setattr(logger, log_level, replacement)
-    try:
-        yield calls
-    finally:
-        setattr(logger, log_level, orig)
 
 
 # On OSes that don't provide tzset (Windows), we can't set the timezone

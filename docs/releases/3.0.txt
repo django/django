@@ -235,6 +235,22 @@ Dropped support for PostgreSQL 9.4
 Upstream support for PostgreSQL 9.4 ends in December 2019. Django 3.0 supports
 PostgreSQL 9.5 and higher.
 
+Removed private Python 2 compatibility APIs
+-------------------------------------------
+
+While Python 2 support was removed in Django 2.0, some private APIs weren't
+removed from Django so that third party apps could continue using them until
+the Python 2 end-of-life.
+
+Since we expect apps to drop Python 2 compatibility when adding support for
+Django 3.0, we're removing these APIs at this time.
+
+* ``django.test.utils.str_prefix()`` - Strings don't have 'u' prefixes in
+  Python 3.
+
+* ``django.test.utils.patch_logger()`` - Use
+  :meth:`unittest.TestCase.assertLogs` instead.
+
 Miscellaneous
 -------------
 
