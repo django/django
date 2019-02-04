@@ -668,7 +668,7 @@ Miscellaneous
   except that it also requires a ``request``.
 
 * The ``DEFAULT_CONTENT_TYPE`` setting is deprecated. It doesn't interact well
-  well with third-party apps and is obsolete since HTML5 has mostly superseded
+  with third-party apps and is obsolete since HTML5 has mostly superseded
   XHTML.
 
 * ``HttpRequest.xreadlines()`` is deprecated in favor of iterating over the
