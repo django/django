@@ -1,7 +1,5 @@
 "Functions that help with dynamically creating decorators for views."
 
-# For backwards compatibility in Django 2.0.
-from contextlib import ContextDecorator  # noqa
 from functools import partial, update_wrapper, wraps
 
 
