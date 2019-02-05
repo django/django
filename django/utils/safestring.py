@@ -18,7 +18,7 @@ class SafeData:
         return self
 
 
-class SafeText(str, SafeData):
+class SafeString(str, SafeData):
     """
     A str subclass that has been specifically marked as "safe" for HTML output
     purposes.
@@ -30,14 +30,14 @@ class SafeText(str, SafeData):
         """
         t = super().__add__(rhs)
         if isinstance(rhs, SafeData):
-            return SafeText(t)
+            return SafeString(t)
         return t
 
     def __str__(self):
         return self
 
 
-SafeString = SafeText
+SafeText = SafeString  # For backwards compatibility since Django 2.0.
 
 
 def _safety_decorator(safety_marker, func):
@@ -60,4 +60,4 @@ def mark_safe(s):
         return s
     if callable(s):
         return _safety_decorator(mark_safe, s)
-    return SafeText(s)
+    return SafeString(s)

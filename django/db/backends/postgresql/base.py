@@ -13,7 +13,7 @@ from django.db import connections
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.utils import DatabaseError as WrappedDatabaseError
 from django.utils.functional import cached_property
-from django.utils.safestring import SafeText
+from django.utils.safestring import SafeString
 from django.utils.version import get_version_tuple
 
 try:
@@ -44,7 +44,7 @@ from .operations import DatabaseOperations                  # NOQA isort:skip
 from .schema import DatabaseSchemaEditor                    # NOQA isort:skip
 from .utils import utc_tzinfo_factory                       # NOQA isort:skip
 
-psycopg2.extensions.register_adapter(SafeText, psycopg2.extensions.QuotedString)
+psycopg2.extensions.register_adapter(SafeString, psycopg2.extensions.QuotedString)
 psycopg2.extras.register_uuid()
 
 # Register support for inet[] manually so we don't have to handle the Inet()

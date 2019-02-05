@@ -28,7 +28,7 @@ from django.utils.formats import (
     localize_input, reset_format_cache, sanitize_separators, time_format,
 )
 from django.utils.numberformat import format as nformat
-from django.utils.safestring import SafeText, mark_safe
+from django.utils.safestring import SafeString, mark_safe
 from django.utils.translation import (
     LANGUAGE_SESSION_KEY, activate, check_for_language, deactivate,
     get_language, get_language_bidi, get_language_from_request,
@@ -287,10 +287,10 @@ class TranslationTests(SimpleTestCase):
         s1 = mark_safe('Password')
         s2 = mark_safe('May')
         with translation.override('de', deactivate=True):
-            self.assertIs(type(gettext(s1)), SafeText)
-            self.assertIs(type(pgettext('month name', s2)), SafeText)
-        self.assertEqual('aPassword', SafeText('a') + s1)
-        self.assertEqual('Passworda', s1 + SafeText('a'))
+            self.assertIs(type(gettext(s1)), SafeString)
+            self.assertIs(type(pgettext('month name', s2)), SafeString)
+        self.assertEqual('aPassword', SafeString('a') + s1)
+        self.assertEqual('Passworda', s1 + SafeString('a'))
         self.assertEqual('Passworda', s1 + mark_safe('a'))
         self.assertEqual('aPassword', mark_safe('a') + s1)
         self.assertEqual('as', mark_safe('a') + mark_safe('s'))
@@ -1532,7 +1532,7 @@ class TestModels(TestCase):
 
     def test_safestr(self):
         c = Company(cents_paid=12, products_delivered=1)
-        c.name = SafeText('Iñtërnâtiônàlizætiøn1')
+        c.name = SafeString('Iñtërnâtiônàlizætiøn1')
         c.save()
 
 

@@ -748,14 +748,8 @@ appropriate entities.
 
 .. class:: SafeString
 
-    A ``str`` subclass that has been specifically marked as "safe"
-    (requires no further escaping) for HTML output purposes. Alias of
-    :class:`SafeText`.
-
-.. class:: SafeText
-
-    A ``str`` subclass that has been specifically marked as "safe" for HTML
-    output purposes.
+    A ``str`` subclass that has been specifically marked as "safe" (requires no
+    further escaping) for HTML output purposes.
 
 .. function:: mark_safe(s)
 
@@ -774,7 +768,7 @@ appropriate entities.
         >>> mystr = '<b>Hello World</b>   '
         >>> mystr = mark_safe(mystr)
         >>> type(mystr)
-        <class 'django.utils.safestring.SafeText'>
+        <class 'django.utils.safestring.SafeString'>
 
         >>> mystr = mystr.strip()  # removing whitespace
         >>> type(mystr)

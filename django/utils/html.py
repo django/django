@@ -9,7 +9,7 @@ from urllib.parse import (
 
 from django.utils.functional import Promise, keep_lazy, keep_lazy_text
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
-from django.utils.safestring import SafeData, SafeText, mark_safe
+from django.utils.safestring import SafeData, SafeString, mark_safe
 from django.utils.text import normalize_newlines
 
 # Configuration for urlize() function.
@@ -33,7 +33,7 @@ _html_escapes = {
 }
 
 
-@keep_lazy(str, SafeText)
+@keep_lazy(str, SafeString)
 def escape(text):
     """
     Return the given text with ampersands, quotes and angle brackets encoded
@@ -65,7 +65,7 @@ _js_escapes = {
 _js_escapes.update((ord('%c' % z), '\\u%04X' % z) for z in range(32))
 
 
-@keep_lazy(str, SafeText)
+@keep_lazy(str, SafeString)
 def escapejs(value):
     """Hex encode characters for use in JavaScript strings."""
     return mark_safe(str(value).translate(_js_escapes))
@@ -372,7 +372,7 @@ def avoid_wrapping(value):
 def html_safe(klass):
     """
     A decorator that defines the __html__ method. This helps non-Django
-    templates to detect classes whose __str__ methods return SafeText.
+    templates to detect classes whose __str__ methods return SafeString.
     """
     if '__html__' in klass.__dict__:
         raise ValueError(
