@@ -496,13 +496,10 @@ class SymlinkExtractorTests(ExtractorTests):
         self.symlinked_dir = os.path.join(self.test_dir, 'templates_symlinked')
 
     def test_symlink(self):
-        if os.path.exists(self.symlinked_dir):
-            self.assertTrue(os.path.islink(self.symlinked_dir))
+        if symlinks_supported():
+            os.symlink(os.path.join(self.test_dir, 'templates'), self.symlinked_dir)
         else:
-            if symlinks_supported():
-                os.symlink(os.path.join(self.test_dir, 'templates'), self.symlinked_dir)
-            else:
-                self.skipTest("os.symlink() not available on this OS + Python version combination.")
+            self.skipTest("os.symlink() not available on this OS + Python version combination.")
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale=[LOCALE], verbosity=0, symlinks=True)
         self.assertTrue(os.path.exists(self.PO_FILE))
