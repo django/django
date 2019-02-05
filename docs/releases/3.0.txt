@@ -257,6 +257,11 @@ Django 3.0, we're removing these APIs at this time.
 * ``django.utils.decorators.available_attrs()`` - This function returns
   ``functools.WRAPPER_ASSIGNMENTS``.
 
+* ``django.utils._os.abspathu()`` - Alias of :func:`os.path.abspath`.
+
+* ``django.utils._os.upath()`` and ``npath()`` - These functions do nothing on
+  Python 3.
+
 Miscellaneous
 -------------
 
