@@ -191,15 +191,6 @@ The functions defined in this module share the following properties:
 .. module:: django.utils.encoding
    :synopsis: A series of helper functions to manage character encoding.
 
-.. function:: python_2_unicode_compatible
-
-    A decorator that defines ``__unicode__`` and ``__str__`` methods under
-    Python 2. Under Python 3 it does nothing.
-
-    To support Python 2 and 3 with a single code base, define a ``__str__``
-    method returning text (use ``six.text_type()`` if you're doing some
-    casting) and apply this decorator to the class.
-
 .. function:: smart_text(s, encoding='utf-8', strings_only=False, errors='strict')
 
     Returns a ``str`` object representing arbitrary object ``s``. Treats

@@ -783,7 +783,7 @@ If you rely on features added to ``simplejson`` after it became Python's
 
 The ``django.utils.encoding.StrAndUnicode`` mix-in has been deprecated.
 Define a ``__str__`` method and apply the
-:func:`~django.utils.encoding.python_2_unicode_compatible` decorator instead.
+``django.utils.encoding.python_2_unicode_compatible`` decorator instead.
 
 ``django.utils.itercompat.product``
 -----------------------------------

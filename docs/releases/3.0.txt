@@ -262,6 +262,12 @@ Django 3.0, we're removing these APIs at this time.
 * ``django.utils._os.upath()`` and ``npath()`` - These functions do nothing on
   Python 3.
 
+* ``django.utils.six`` - Remove usage of this vendored library or switch to
+  `six <https://pypi.org/project/six/>`_.
+
+* ``django.utils.encoding.python_2_unicode_compatible()`` - Alias of
+  ``six.python_2_unicode_compatible()``.
+
 Miscellaneous
 -------------
 
