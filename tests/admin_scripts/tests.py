@@ -128,7 +128,6 @@ class AdminScriptTestCase(SimpleTestCase):
 
         # Define a temporary environment for the subprocess
         test_environ = os.environ.copy()
-        old_cwd = os.getcwd()
 
         # Set the test environment
         if settings_file:
@@ -140,17 +139,12 @@ class AdminScriptTestCase(SimpleTestCase):
         test_environ['PYTHONPATH'] = os.pathsep.join(python_path)
         test_environ['PYTHONWARNINGS'] = ''
 
-        # Move to the test directory and run
-        os.chdir(self.test_dir)
-        out, err = subprocess.Popen(
+        return subprocess.Popen(
             [sys.executable, script] + args,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            cwd=self.test_dir,
             env=test_environ, universal_newlines=True,
         ).communicate()
-        # Move back to the old working directory
-        os.chdir(old_cwd)
-
-        return out, err
 
     def run_django_admin(self, args, settings_file=None):
         script_dir = os.path.abspath(os.path.join(os.path.dirname(django.__file__), 'bin'))
