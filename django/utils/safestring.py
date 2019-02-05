@@ -18,27 +18,6 @@ class SafeData:
         return self
 
 
-class SafeBytes(bytes, SafeData):
-    """
-    A bytes subclass that has been specifically marked as "safe" (requires no
-    further escaping) for HTML output purposes.
-
-    Kept in Django 2.0 for usage by apps supporting Python 2. Shouldn't be used
-    in Django anymore.
-    """
-    def __add__(self, rhs):
-        """
-        Concatenating a safe byte string with another safe byte string or safe
-        string is safe. Otherwise, the result is no longer safe.
-        """
-        t = super().__add__(rhs)
-        if isinstance(rhs, SafeText):
-            return SafeText(t)
-        elif isinstance(rhs, SafeBytes):
-            return SafeBytes(t)
-        return t
-
-
 class SafeText(str, SafeData):
     """
     A str subclass that has been specifically marked as "safe" for HTML output
