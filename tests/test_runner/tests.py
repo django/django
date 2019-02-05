@@ -155,13 +155,11 @@ class CustomTestRunnerOptionsSettingsTests(AdminScriptTestCase):
     through a settings file.
     """
     def setUp(self):
+        super().setUp()
         settings = {
             'TEST_RUNNER': '\'test_runner.runner.CustomOptionsTestRunner\'',
         }
         self.write_settings('settings.py', sdict=settings)
-
-    def tearDown(self):
-        self.remove_settings('settings.py')
 
     def test_default_options(self):
         args = ['test', '--settings=test_project.settings']
@@ -195,10 +193,8 @@ class CustomTestRunnerOptionsCmdlineTests(AdminScriptTestCase):
     using --testrunner.
     """
     def setUp(self):
+        super().setUp()
         self.write_settings('settings.py')
-
-    def tearDown(self):
-        self.remove_settings('settings.py')
 
     def test_testrunner_option(self):
         args = [
@@ -228,10 +224,8 @@ class CustomTestRunnerOptionsCmdlineTests(AdminScriptTestCase):
 
 class Ticket17477RegressionTests(AdminScriptTestCase):
     def setUp(self):
+        super().setUp()
         self.write_settings('settings.py')
-
-    def tearDown(self):
-        self.remove_settings('settings.py')
 
     def test_ticket_17477(self):
         """'manage.py help test' works after r16352."""

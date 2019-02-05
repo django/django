@@ -534,13 +534,11 @@ class ReverseLazySettingsTest(AdminScriptTestCase):
     import error.
     """
     def setUp(self):
+        super().setUp()
         self.write_settings(
             'settings.py',
             extra="from django.urls import reverse_lazy\nLOGIN_URL = reverse_lazy('login')",
         )
-
-    def tearDown(self):
-        self.remove_settings('settings.py')
 
     def test_lazy_in_settings(self):
         out, err = self.run_manage(['check'])
