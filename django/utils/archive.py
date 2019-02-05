@@ -220,5 +220,7 @@ extension_map = dict.fromkeys((
     '.tar',
     '.tar.bz2', '.tbz2', '.tbz', '.tz2',
     '.tar.gz', '.tgz', '.taz',
+    '.tar.lzma', '.tlz',
+    '.tar.xz', '.txz',
 ), TarArchive)
 extension_map['.zip'] = ZipArchive

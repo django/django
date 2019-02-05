@@ -250,6 +250,10 @@ Management Commands
 * The new :option:`--skip-checks` option skips running system checks prior to
   running the command.
 
+* The :option:`startapp --template` and :option:`startproject --template`
+  options now support templates stored in XZ archives (``.tar.xz``, ``.txz``)
+  and LZMA archives (``.tar.lzma``, ``.tlz``).
+
 Migrations
 ~~~~~~~~~~
 

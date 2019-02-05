@@ -1223,7 +1223,8 @@ For example::
 
 Provides the path to a directory with a custom app template file, or a path to
 an uncompressed archive (``.tar``) or a compressed archive (``.tar.gz``,
-``.tar.bz2``, ``.tgz``, ``.tbz2``, ``.zip``) containing the app template files.
+``.tar.bz2``, ``.tar.xz``, ``.tar.lzma``, ``.tgz``, ``.tbz2``, ``.txz``,
+``.tlz``, ``.zip``) containing the app template files.
 
 For example, this would look for an app template in the given directory when
 creating the ``myapp`` app::
@@ -1238,6 +1239,11 @@ For example, taking advantage of GitHub's feature to expose repositories as
 zip files, you can use a URL like::
 
     django-admin startapp --template=https://github.com/githubuser/django-app-template/archive/master.zip myapp
+
+.. versionchanged:: 3.0
+
+    Support for XZ archives (``.tar.xz``, ``.txz``) and LZMA archives
+    (``.tar.lzma``, ``.tlz``) was added.
 
 .. django-admin-option:: --extension EXTENSIONS, -e EXTENSIONS
 
