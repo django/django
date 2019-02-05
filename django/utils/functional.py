@@ -4,15 +4,6 @@ import operator
 from functools import total_ordering, wraps
 
 
-# You can't trivially replace this with `functools.partial` because this binds
-# to classes and returns bound instances, whereas functools.partial (on
-# CPython) is a type and its instances don't bind.
-def curry(_curried_func, *args, **kwargs):
-    def _curried(*moreargs, **morekwargs):
-        return _curried_func(*args, *moreargs, **{**kwargs, **morekwargs})
-    return _curried
-
-
 class cached_property:
     """
     Decorator that converts a method with a single self argument into a

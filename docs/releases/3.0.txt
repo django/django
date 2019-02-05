@@ -271,6 +271,9 @@ Django 3.0, we're removing these APIs at this time.
 * ``django.utils.encoding.python_2_unicode_compatible()`` - Alias of
   ``six.python_2_unicode_compatible()``.
 
+* ``django.utils.functional.curry()`` - Use :func:`functools.partial` or
+  :class:`functools.partialmethod`. See :commit:`5b1c389603a353625ae1603`.
+
 Miscellaneous
 -------------
 
