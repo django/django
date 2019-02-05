@@ -1,3 +1,4 @@
+import datetime
 import difflib
 import json
 import posixpath
@@ -868,6 +869,62 @@ class SimpleTestCase(unittest.TestCase):
             if result:
                 standardMsg = '%s == %s' % (safe_repr(xml1, True), safe_repr(xml2, True))
                 self.fail(self._formatMessage(msg, standardMsg))
+
+    def assertDateTimeEqual(self, date_time, other_date_time, date_time_format=None, other_date_time_format=None,
+                            override_checks=tuple()):
+        """
+        Assert that two Datetime are equal.
+        Default_format is '%Y-%m-%d
+        :param date_time: can be instance of str or datetime(date_time or date)
+        :param other_date_time: can be instance of str or datetime(date_time or date)
+        :param date_time_format: the datetime format as mentioned in python doc
+        :param other_date_time_format: the datetime format as mentioned in python doc
+        :param override_checks: override the fields that need not check
+        :return: None
+        """
+        self.assertTrue(isinstance(override_checks, list) or isinstance(override_checks, tuple))
+        self.assertTrue(
+            isinstance(date_time, str) or isinstance(date_time, datetime.date) or isinstance(
+                date_time, datetime.datetime
+            )
+        )
+        self.assertTrue(
+            isinstance(other_date_time, str) or isinstance(other_date_time, datetime.date) or isinstance(
+                other_date_time, datetime.datetime
+            )
+        )
+
+        date_attrs = ['year', 'month', 'day']
+        time_attrs = ['hour', 'minute', 'second', 'microsecond']
+
+        if (isinstance(date_time, datetime.date) and not isinstance(date_time, datetime.datetime)) or (isinstance(
+            other_date_time, datetime.date) and not isinstance(
+            other_date_time, datetime.datetime
+        )
+        ):
+            check_attrs = date_attrs
+        else:
+            check_attrs = date_attrs + time_attrs
+
+        default_format = "%Y-%m-%d"
+
+        if date_time_format is None:
+            date_time_format = default_format
+
+        if other_date_time_format is None:
+            other_date_time_format = default_format
+
+        if isinstance(date_time, str):
+            date_time = datetime.datetime.strptime(date_time, date_time_format)
+
+        if isinstance(other_date_time, str):
+            other_date_time = datetime.datetime.strptime(other_date_time, other_date_time_format)
+
+        for i in override_checks:
+            check_attrs.remove(i)
+
+        for attr in check_attrs:
+            self.assertEqual(getattr(date_time, attr), getattr(other_date_time, attr))
 
 
 class _TransactionTestCaseDatabasesDescriptor:
