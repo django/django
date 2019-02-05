@@ -37,7 +37,6 @@ class ExtractorTests(POFileAssertionMixin, RunInTmpDirMixin, SimpleTestCase):
     PO_FILE = 'locale/%s/LC_MESSAGES/django.po' % LOCALE
 
     def _run_makemessages(self, **options):
-        os.chdir(self.test_dir)
         out = StringIO()
         management.call_command('makemessages', locale=[LOCALE], verbosity=2, stdout=out, **options)
         output = out.getvalue()
@@ -500,7 +499,6 @@ class SymlinkExtractorTests(ExtractorTests):
             os.symlink(os.path.join(self.test_dir, 'templates'), self.symlinked_dir)
         else:
             self.skipTest("os.symlink() not available on this OS + Python version combination.")
-        os.chdir(self.test_dir)
         management.call_command('makemessages', locale=[LOCALE], verbosity=0, symlinks=True)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE) as fp:
