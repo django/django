@@ -1080,6 +1080,9 @@ class Subquery(Expression):
             clone.template = '%(subquery)s'
             return clone
         return self
+    
+    def get_group_by_cols(self):
+        return []
 
 
 class Exists(Subquery):
