@@ -8,7 +8,6 @@ import math
 import re
 import types
 import uuid
-from collections import OrderedDict
 
 from django.conf import SettingsReference
 from django.db import models
@@ -273,25 +272,26 @@ class UUIDSerializer(BaseSerializer):
 
 
 class Serializer:
-    _registry = OrderedDict([
-        (frozenset, FrozensetSerializer),
-        (list, SequenceSerializer),
-        (set, SetSerializer),
-        (tuple, TupleSerializer),
-        (dict, DictionarySerializer),
-        (enum.Enum, EnumSerializer),
-        (datetime.datetime, DatetimeDatetimeSerializer),
-        ((datetime.date, datetime.timedelta, datetime.time), DateTimeSerializer),
-        (SettingsReference, SettingsReferenceSerializer),
-        (float, FloatSerializer),
-        ((bool, int, type(None), bytes, str), BaseSimpleSerializer),
-        (decimal.Decimal, DecimalSerializer),
-        ((functools.partial, functools.partialmethod), FunctoolsPartialSerializer),
-        ((types.FunctionType, types.BuiltinFunctionType, types.MethodType), FunctionTypeSerializer),
-        (collections.abc.Iterable, IterableSerializer),
-        ((COMPILED_REGEX_TYPE, RegexObject), RegexSerializer),
-        (uuid.UUID, UUIDSerializer),
-    ])
+    _registry = {
+        # Some of these are order-dependent.
+        frozenset: FrozensetSerializer,
+        list: SequenceSerializer,
+        set: SetSerializer,
+        tuple: TupleSerializer,
+        dict: DictionarySerializer,
+        enum.Enum: EnumSerializer,
+        datetime.datetime: DatetimeDatetimeSerializer,
+        (datetime.date, datetime.timedelta, datetime.time): DateTimeSerializer,
+        SettingsReference: SettingsReferenceSerializer,
+        float: FloatSerializer,
+        (bool, int, type(None), bytes, str): BaseSimpleSerializer,
+        decimal.Decimal: DecimalSerializer,
+        (functools.partial, functools.partialmethod): FunctoolsPartialSerializer,
+        (types.FunctionType, types.BuiltinFunctionType, types.MethodType): FunctionTypeSerializer,
+        collections.abc.Iterable: IterableSerializer,
+        (COMPILED_REGEX_TYPE, RegexObject): RegexSerializer,
+        uuid.UUID: UUIDSerializer,
+    }
 
     @classmethod
     def register(cls, type_, serializer):

@@ -5,7 +5,6 @@ import os
 import re
 import sys
 import warnings
-from collections import OrderedDict
 from threading import local
 
 from django.apps import apps
@@ -385,9 +384,9 @@ def check_for_language(lang_code):
 @functools.lru_cache()
 def get_languages():
     """
-    Cache of settings.LANGUAGES in an OrderedDict for easy lookups by key.
+    Cache of settings.LANGUAGES in a dictionary for easy lookups by key.
     """
-    return OrderedDict(settings.LANGUAGES)
+    return dict(settings.LANGUAGES)
 
 
 @functools.lru_cache(maxsize=1000)

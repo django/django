@@ -5,7 +5,7 @@ The main QuerySet implementation. This provides the public API for the ORM.
 import copy
 import operator
 import warnings
-from collections import OrderedDict, namedtuple
+from collections import namedtuple
 from functools import lru_cache
 from itertools import chain
 
@@ -725,7 +725,7 @@ class QuerySet:
         query = self.query.chain(sql.UpdateQuery)
         query.add_update_values(kwargs)
         # Clear any annotations so that they won't be present in subqueries.
-        query._annotations = None
+        query.annotations = {}
         with transaction.mark_for_rollback_on_error(using=self.db):
             rows = query.get_compiler(self.db).execute_sql(CURSOR)
         self._result_cache = None
@@ -744,7 +744,7 @@ class QuerySet:
         query = self.query.chain(sql.UpdateQuery)
         query.add_update_fields(values)
         # Clear any annotations so that they won't be present in subqueries.
-        query._annotations = None
+        query.annotations = {}
         self._result_cache = None
         return query.get_compiler(self.db).execute_sql(CURSOR)
     _update.alters_data = True
@@ -1014,7 +1014,7 @@ class QuerySet:
         with extra data or aggregations.
         """
         self._validate_values_are_expressions(args + tuple(kwargs.values()), method_name='annotate')
-        annotations = OrderedDict()  # To preserve ordering of args
+        annotations = {}
         for arg in args:
             # The default_alias property may raise a TypeError.
             try:

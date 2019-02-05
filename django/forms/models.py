@@ -3,7 +3,6 @@ Helper functions for creating Form classes from Django models
 and database field objects.
 """
 
-from collections import OrderedDict
 from itertools import chain
 
 from django.core.exceptions import (
@@ -105,7 +104,7 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
                      labels=None, help_texts=None, error_messages=None,
                      field_classes=None, *, apply_limit_choices_to=True):
     """
-    Return an ``OrderedDict`` containing form fields for the given model.
+    Return a dictionary containing form fields for the given model.
 
     ``fields`` is an optional list of field names. If provided, return only the
     named fields.
@@ -134,7 +133,7 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
     ``apply_limit_choices_to`` is a boolean indicating if limit_choices_to
     should be applied to a field's queryset.
     """
-    field_list = []
+    field_dict = {}
     ignored = []
     opts = model._meta
     # Avoid circular import
@@ -178,15 +177,14 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
         if formfield:
             if apply_limit_choices_to:
                 apply_limit_choices_to_to_formfield(formfield)
-            field_list.append((f.name, formfield))
+            field_dict[f.name] = formfield
         else:
             ignored.append(f.name)
-    field_dict = OrderedDict(field_list)
     if fields:
-        field_dict = OrderedDict(
-            [(f, field_dict.get(f)) for f in fields
-                if ((not exclude) or (exclude and f not in exclude)) and (f not in ignored)]
-        )
+        field_dict = {
+            f: field_dict.get(f) for f in fields
+            if (not exclude or f not in exclude) and f not in ignored
+        }
     return field_dict
 
 

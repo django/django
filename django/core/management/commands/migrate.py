@@ -1,5 +1,4 @@
 import time
-from collections import OrderedDict
 from importlib import import_module
 
 from django.apps import apps
@@ -314,10 +313,10 @@ class Command(BaseCommand):
                 (opts.auto_created and converter(opts.auto_created._meta.db_table) in tables)
             )
 
-        manifest = OrderedDict(
-            (app_name, list(filter(model_installed, model_list)))
+        manifest = {
+            app_name: list(filter(model_installed, model_list))
             for app_name, model_list in all_models
-        )
+        }
 
         # Create the tables for each model
         if self.verbosity >= 1:

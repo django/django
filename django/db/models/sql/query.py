@@ -8,7 +8,7 @@ all about the internals of models in order to get the information it needs.
 """
 import difflib
 import functools
-from collections import Counter, OrderedDict, namedtuple
+from collections import Counter, namedtuple
 from collections.abc import Iterator, Mapping
 from itertools import chain, count, product
 from string import ascii_uppercase
@@ -152,7 +152,7 @@ class Query:
         # types they are. The key is the alias of the joined table (possibly
         # the table name) and the value is a Join-like object (see
         # sql.datastructures.Join for more information).
-        self.alias_map = OrderedDict()
+        self.alias_map = {}
         # Sometimes the query contains references to aliases in outer queries (as
         # a result of split_exclude). Correct alias quoting needs to know these
         # aliases too.
@@ -199,10 +199,7 @@ class Query:
         self.values_select = ()
 
         # SQL annotation-related attributes
-        # The _annotations will be an OrderedDict when used. Due to the cost
-        # of creating OrderedDict this attribute is created lazily (in
-        # self.annotations property).
-        self._annotations = None  # Maps alias -> Annotation Expression
+        self.annotations = {}  # Maps alias -> Annotation Expression
         self.annotation_select_mask = None
         self._annotation_select_cache = None
 
@@ -213,9 +210,7 @@ class Query:
 
         # These are for extensions. The contents are more or less appended
         # verbatim to the appropriate clause.
-        # The _extra attribute is an OrderedDict, lazily created similarly to
-        # .annotations
-        self._extra = None  # Maps col_alias -> (col_sql, params).
+        self.extra = {}  # Maps col_alias -> (col_sql, params).
         self.extra_select_mask = None
         self._extra_select_cache = None
 
@@ -232,18 +227,6 @@ class Query:
         self.explain_query = False
         self.explain_format = None
         self.explain_options = {}
-
-    @property
-    def extra(self):
-        if self._extra is None:
-            self._extra = OrderedDict()
-        return self._extra
-
-    @property
-    def annotations(self):
-        if self._annotations is None:
-            self._annotations = OrderedDict()
-        return self._annotations
 
     @property
     def has_select_fields(self):
@@ -311,7 +294,7 @@ class Query:
         obj.external_aliases = self.external_aliases.copy()
         obj.table_map = self.table_map.copy()
         obj.where = self.where.clone()
-        obj._annotations = self._annotations.copy() if self._annotations is not None else None
+        obj.annotations = self.annotations.copy()
         if self.annotation_select_mask is None:
             obj.annotation_select_mask = None
         else:
@@ -322,7 +305,7 @@ class Query:
         # It will get re-populated in the cloned queryset the next time it's
         # used.
         obj._annotation_select_cache = None
-        obj._extra = self._extra.copy() if self._extra is not None else None
+        obj.extra = self.extra.copy()
         if self.extra_select_mask is None:
             obj.extra_select_mask = None
         else:
@@ -479,7 +462,7 @@ class Query:
             outer_query = self
             self.select = ()
             self.default_cols = False
-            self._extra = {}
+            self.extra = {}
 
         outer_query.clear_ordering(True)
         outer_query.clear_limits()
@@ -613,7 +596,7 @@ class Query:
             # It would be nice to be able to handle this, but the queries don't
             # really make sense (or return consistent value sets). Not worth
             # the extra complexity when you can write a real query instead.
-            if self._extra and rhs._extra:
+            if self.extra and rhs.extra:
                 raise ValueError("When merging querysets using 'or', you cannot have extra(select=…) on both sides.")
         self.extra.update(rhs.extra)
         extra_select_mask = set()
@@ -825,9 +808,9 @@ class Query:
         if isinstance(self.group_by, tuple):
             self.group_by = tuple([col.relabeled_clone(change_map) for col in self.group_by])
         self.select = tuple([col.relabeled_clone(change_map) for col in self.select])
-        self._annotations = self._annotations and OrderedDict(
-            (key, col.relabeled_clone(change_map)) for key, col in self._annotations.items()
-        )
+        self.annotations = self.annotations and {
+            key: col.relabeled_clone(change_map) for key, col in self.annotations.items()
+        }
 
         # 2. Rename the alias in the internal table/alias datastructures.
         for old_alias, new_alias in change_map.items():
@@ -887,11 +870,10 @@ class Query:
                 )
         self.subq_aliases = self.subq_aliases.union([self.alias_prefix])
         outer_query.subq_aliases = outer_query.subq_aliases.union(self.subq_aliases)
-        change_map = OrderedDict()
-        for pos, alias in enumerate(self.alias_map):
-            new_alias = '%s%d' % (self.alias_prefix, pos)
-            change_map[alias] = new_alias
-        self.change_aliases(change_map)
+        self.change_aliases({
+            alias: '%s%d' % (self.alias_prefix, pos)
+            for pos, alias in enumerate(self.alias_map)
+        })
 
     def get_initial_alias(self):
         """
@@ -1042,7 +1024,7 @@ class Query:
         Solve the lookup type from the lookup (e.g.: 'foobar__id__icontains').
         """
         lookup_splitted = lookup.split(LOOKUP_SEP)
-        if self._annotations:
+        if self.annotations:
             expression, expression_lookups = refs_expression(lookup_splitted, self.annotations)
             if expression:
                 return expression_lookups, (), expression
@@ -1867,7 +1849,7 @@ class Query:
             # dictionary with their parameters in 'select_params' so that
             # subsequent updates to the select dictionary also adjust the
             # parameters appropriately.
-            select_pairs = OrderedDict()
+            select_pairs = {}
             if select_params:
                 param_iter = iter(select_params)
             else:
@@ -1881,7 +1863,6 @@ class Query:
                         entry_params.append(next(param_iter))
                     pos = entry.find("%s", pos + 2)
                 select_pairs[name] = (entry, entry_params)
-            # This is order preserving, since self.extra_select is an OrderedDict.
             self.extra.update(select_pairs)
         if where or params:
             self.where.add(ExtraWhere(where, params), AND)
@@ -1998,7 +1979,7 @@ class Query:
             field_names = []
             extra_names = []
             annotation_names = []
-            if not self._extra and not self._annotations:
+            if not self.extra and not self.annotations:
                 # Shortcut - if there are no extra or annotations, then
                 # the values() clause must be just field names.
                 field_names = list(fields)
@@ -2022,18 +2003,18 @@ class Query:
     @property
     def annotation_select(self):
         """
-        Return the OrderedDict of aggregate columns that are not masked and
+        Return the dictionary of aggregate columns that are not masked and
         should be used in the SELECT clause. Cache this result for performance.
         """
         if self._annotation_select_cache is not None:
             return self._annotation_select_cache
-        elif not self._annotations:
+        elif not self.annotations:
             return {}
         elif self.annotation_select_mask is not None:
-            self._annotation_select_cache = OrderedDict(
-                (k, v) for k, v in self.annotations.items()
+            self._annotation_select_cache = {
+                k: v for k, v in self.annotations.items()
                 if k in self.annotation_select_mask
-            )
+            }
             return self._annotation_select_cache
         else:
             return self.annotations
@@ -2042,13 +2023,13 @@ class Query:
     def extra_select(self):
         if self._extra_select_cache is not None:
             return self._extra_select_cache
-        if not self._extra:
+        if not self.extra:
             return {}
         elif self.extra_select_mask is not None:
-            self._extra_select_cache = OrderedDict(
-                (k, v) for k, v in self.extra.items()
+            self._extra_select_cache = {
+                k: v for k, v in self.extra.items()
                 if k in self.extra_select_mask
-            )
+            }
             return self._extra_select_cache
         else:
             return self.extra

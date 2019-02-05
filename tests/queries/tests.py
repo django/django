@@ -1,7 +1,6 @@
 import datetime
 import pickle
 import unittest
-from collections import OrderedDict
 from operator import attrgetter
 
 from django.core.exceptions import EmptyResultSet, FieldError
@@ -542,31 +541,6 @@ class Queries1Tests(TestCase):
         self.assertSequenceEqual(ExtraInfo.objects.values('note_id'), [{'note_id': 1}, {'note_id': 2}])
         # ...or use the field name.
         self.assertSequenceEqual(ExtraInfo.objects.values('note'), [{'note': 1}, {'note': 2}])
-
-    def test_ticket2902(self):
-        # Parameters can be given to extra_select, *if* you use an OrderedDict.
-
-        # (First we need to know which order the keys fall in "naturally" on
-        # your system, so we can put things in the wrong way around from
-        # normal. A normal dict would thus fail.)
-        s = [('a', '%s'), ('b', '%s')]
-        params = ['one', 'two']
-        if list({'a': 1, 'b': 2}) == ['a', 'b']:
-            s.reverse()
-            params.reverse()
-
-        d = Item.objects.extra(select=OrderedDict(s), select_params=params).values('a', 'b')[0]
-        self.assertEqual(d, {'a': 'one', 'b': 'two'})
-
-        # Order by the number of tags attached to an item.
-        qs = (
-            Item.objects
-            .extra(select={
-                'count': 'select count(*) from queries_item_tags where queries_item_tags.item_id = queries_item.id'
-            })
-            .order_by('-count')
-        )
-        self.assertEqual([o.count for o in qs], [2, 2, 1, 0])
 
     def test_ticket6154(self):
         # Multiple filter statements are joined using "AND" all the time.
@@ -2249,9 +2223,7 @@ class ValuesQuerysetTests(TestCase):
 
     def test_extra_values(self):
         # testing for ticket 14930 issues
-        qs = Number.objects.extra(select=OrderedDict([('value_plus_x', 'num+%s'),
-                                                     ('value_minus_x', 'num-%s')]),
-                                  select_params=(1, 2))
+        qs = Number.objects.extra(select={'value_plus_x': 'num+%s', 'value_minus_x': 'num-%s'}, select_params=(1, 2))
         qs = qs.order_by('value_minus_x')
         qs = qs.values('num')
         self.assertSequenceEqual(qs, [{'num': 72}])
@@ -2295,9 +2267,7 @@ class ValuesQuerysetTests(TestCase):
 
     def test_extra_multiple_select_params_values_order_by(self):
         # testing for 23259 issue
-        qs = Number.objects.extra(select=OrderedDict([('value_plus_x', 'num+%s'),
-                                                     ('value_minus_x', 'num-%s')]),
-                                  select_params=(72, 72))
+        qs = Number.objects.extra(select={'value_plus_x': 'num+%s', 'value_minus_x': 'num-%s'}, select_params=(72, 72))
         qs = qs.order_by('value_minus_x')
         qs = qs.filter(num=1)
         qs = qs.values('num')

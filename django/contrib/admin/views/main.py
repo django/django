@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from datetime import datetime, timedelta
 
 from django.conf import settings
@@ -361,12 +360,12 @@ class ChangeList:
 
     def get_ordering_field_columns(self):
         """
-        Return an OrderedDict of ordering field column numbers and asc/desc.
+        Return a dictionary of ordering field column numbers and asc/desc.
         """
         # We must cope with more than one column having the same underlying sort
         # field, so we base things on column numbers.
         ordering = self._get_default_ordering()
-        ordering_fields = OrderedDict()
+        ordering_fields = {}
         if ORDER_VAR not in self.params:
             # for ordering specified on ModelAdmin or model Meta, we don't know
             # the right column numbers absolutely, because there might be more

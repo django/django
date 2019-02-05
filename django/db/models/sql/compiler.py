@@ -317,7 +317,7 @@ class SQLCompiler:
                     ), False))
                 continue
 
-            if not self.query._extra or col not in self.query._extra:
+            if not self.query.extra or col not in self.query.extra:
                 # 'col' is of the form 'field' or 'field1__field2' or
                 # '-field1__field2__field', etc.
                 order_by.extend(self.find_ordering_name(
@@ -1438,7 +1438,7 @@ class SQLUpdateCompiler(SQLCompiler):
         query = self.query.chain(klass=Query)
         query.select_related = False
         query.clear_ordering(True)
-        query._extra = {}
+        query.extra = {}
         query.select = []
         query.add_fields([query.get_meta().pk.name])
         super().pre_sql_setup()

@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from datetime import date, datetime
 
 from django.conf.urls.i18n import i18n_patterns
@@ -102,27 +101,27 @@ fixed_lastmod__mixed_sitemaps = {
     'fixed-lastmod-mixed': FixedLastmodMixedSitemap,
 }
 
-sitemaps_lastmod_mixed_ascending = OrderedDict([
-    ('no-lastmod', EmptySitemap),
-    ('lastmod', FixedLastmodSitemap),
-])
+sitemaps_lastmod_mixed_ascending = {
+    'no-lastmod': EmptySitemap,
+    'lastmod': FixedLastmodSitemap,
+}
 
-sitemaps_lastmod_mixed_descending = OrderedDict([
-    ('lastmod', FixedLastmodSitemap),
-    ('no-lastmod', EmptySitemap),
-])
+sitemaps_lastmod_mixed_descending = {
+    'lastmod': FixedLastmodSitemap,
+    'no-lastmod': EmptySitemap,
+}
 
-sitemaps_lastmod_ascending = OrderedDict([
-    ('date', DateSiteMap),
-    ('datetime', FixedLastmodSitemap),
-    ('datetime-newer', FixedNewerLastmodSitemap),
-])
+sitemaps_lastmod_ascending = {
+    'date': DateSiteMap,
+    'datetime': FixedLastmodSitemap,
+    'datetime-newer': FixedNewerLastmodSitemap,
+}
 
-sitemaps_lastmod_descending = OrderedDict([
-    ('datetime-newer', FixedNewerLastmodSitemap),
-    ('datetime', FixedLastmodSitemap),
-    ('date', DateSiteMap),
-])
+sitemaps_lastmod_descending = {
+    'datetime-newer': FixedNewerLastmodSitemap,
+    'datetime': FixedLastmodSitemap,
+    'date': DateSiteMap,
+}
 
 generic_sitemaps = {
     'generic': GenericSitemap({'queryset': TestModel.objects.order_by('pk').all()}),

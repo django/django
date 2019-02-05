@@ -1,16 +1,14 @@
 import copy
-from collections import OrderedDict
 from collections.abc import Mapping
 
 
 class OrderedSet:
     """
     A set which keeps the ordering of the inserted items.
-    Currently backs onto OrderedDict.
     """
 
     def __init__(self, iterable=None):
-        self.dict = OrderedDict.fromkeys(iterable or ())
+        self.dict = dict.fromkeys(iterable or ())
 
     def add(self, item):
         self.dict[item] = None

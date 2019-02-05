@@ -1,4 +1,3 @@
-import collections
 import logging
 import re
 import sys
@@ -280,8 +279,7 @@ def get_unique_databases_and_mirrors(aliases=None):
                 if alias != DEFAULT_DB_ALIAS and connection.creation.test_db_signature() != default_sig:
                     dependencies[alias] = test_settings.get('DEPENDENCIES', [DEFAULT_DB_ALIAS])
 
-    test_databases = dependency_ordered(test_databases.items(), dependencies)
-    test_databases = collections.OrderedDict(test_databases)
+    test_databases = dict(dependency_ordered(test_databases.items(), dependencies))
     return test_databases, mirrored_aliases
 
 

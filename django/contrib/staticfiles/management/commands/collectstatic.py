@@ -1,5 +1,4 @@
 import os
-from collections import OrderedDict
 
 from django.apps import apps
 from django.contrib.staticfiles.finders import get_finders
@@ -100,7 +99,7 @@ class Command(BaseCommand):
         else:
             handler = self.copy_file
 
-        found_files = OrderedDict()
+        found_files = {}
         for finder in get_finders():
             for path, storage in finder.list(self.ignore_patterns):
                 # Prefix the relative path if the source storage contains it

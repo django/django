@@ -1363,17 +1363,14 @@ of the arguments is required, but you should use at least one of them.
 
   In some rare cases, you might wish to pass parameters to the SQL
   fragments in ``extra(select=...)``. For this purpose, use the
-  ``select_params`` parameter. Since ``select_params`` is a sequence and
-  the ``select`` attribute is a dictionary, some care is required so that
-  the parameters are matched up correctly with the extra select pieces.
-  In this situation, you should use a :class:`collections.OrderedDict` for
-  the ``select`` value, not just a normal Python dictionary.
+  ``select_params`` parameter.
 
   This will work, for example::
 
       Blog.objects.extra(
-          select=OrderedDict([('a', '%s'), ('b', '%s')]),
-          select_params=('one', 'two'))
+          select={'a': '%s', 'b': '%s'},
+          select_params=('one', 'two'),
+      )
 
   If you need to use a literal ``%s`` inside your select string, use
   the sequence ``%%s``.

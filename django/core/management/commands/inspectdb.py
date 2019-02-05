@@ -1,6 +1,5 @@
 import keyword
 import re
-from collections import OrderedDict
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
@@ -98,7 +97,7 @@ class Command(BaseCommand):
                 column_to_field_name = {}  # Maps column names to names of model fields
                 for row in table_description:
                     comment_notes = []  # Holds Field notes, to be displayed in a Python comment.
-                    extra_params = OrderedDict()  # Holds Field parameters such as 'db_column'.
+                    extra_params = {}  # Holds Field parameters such as 'db_column'.
                     column_name = row.name
                     is_relation = column_name in relations
 
@@ -232,7 +231,7 @@ class Command(BaseCommand):
         description, this routine will return the given field type name, as
         well as any additional keyword parameters and notes for the field.
         """
-        field_params = OrderedDict()
+        field_params = {}
         field_notes = []
 
         try:
