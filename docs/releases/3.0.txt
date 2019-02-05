@@ -292,6 +292,14 @@ Miscellaneous
 Features deprecated in 3.0
 ==========================
 
+``django.utils.encoding.force_text()`` and ``smart_text()``
+-----------------------------------------------------------
+
+The ``smart_text()`` and ``force_text()`` aliases (since Django 2.0) of
+``smart_str()`` and ``force_str()`` are deprecated. Ignore this deprecation if
+your code supports Python 2 as the behavior of ``smart_str()`` and
+``force_str()`` is different there.
+
 Miscellaneous
 -------------
 

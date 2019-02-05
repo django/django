@@ -1,9 +1,11 @@
 import codecs
 import datetime
 import locale
+import warnings
 from decimal import Decimal
 from urllib.parse import quote
 
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import Promise
 
 
@@ -97,8 +99,20 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
     return str(s).encode(encoding, errors)
 
 
-smart_text = smart_str
-force_text = force_str
+def smart_text(s, encoding='utf-8', strings_only=False, errors='strict'):
+    warnings.warn(
+        'smart_text() is deprecated in favor of smart_str().',
+        RemovedInDjango40Warning, stacklevel=2,
+    )
+    return smart_str(s, encoding, strings_only, errors)
+
+
+def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
+    warnings.warn(
+        'force_text() is deprecated in favor of force_str().',
+        RemovedInDjango40Warning, stacklevel=2,
+    )
+    return force_str(s, encoding, strings_only, errors)
 
 
 def iri_to_uri(iri):

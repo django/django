@@ -18,6 +18,8 @@ details on these changes.
 * ``django.utils.http.urlquote()``, ``urlquote_plus()``, ``urlunquote()``, and
   ``urlunquote_plus()`` will be removed.
 
+* ``django.utils.encoding.force_text()`` and ``smart_text()`` will be removed.
+
 .. _deprecation-removed-in-3.1:
 
 3.1
