@@ -234,9 +234,6 @@ class CommandRunTests(AdminScriptTestCase):
     """
     Tests that need to run by simulating the command line, not by call_command.
     """
-    def tearDown(self):
-        self.remove_settings('settings.py')
-
     def test_script_prefix_set_in_commands(self):
         self.write_settings('settings.py', apps=['user_commands'], sdict={
             'ROOT_URLCONF': '"user_commands.urls"',
