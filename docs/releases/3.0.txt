@@ -251,6 +251,9 @@ Django 3.0, we're removing these APIs at this time.
 * ``django.test.utils.patch_logger()`` - Use
   :meth:`unittest.TestCase.assertLogs` instead.
 
+* ``django.utils.lru_cache.lru_cache()`` - Alias of
+  :func:`functools.lru_cache`.
+
 Miscellaneous
 -------------
 
