@@ -1169,15 +1169,19 @@ class ModelChoiceField(ChoiceField):
         else:
             self.empty_label = empty_label
 
+        self.queryset = queryset
+        self.limit_choices_to = limit_choices_to   # limit the queryset later.
+        self.to_field_name = to_field_name
+
+        # prepare initial value
+        initial = self.prepare_value(initial)
+
         # Call Field instead of ChoiceField __init__() because we don't need
         # ChoiceField.__init__().
         Field.__init__(
             self, required=required, widget=widget, label=label,
             initial=initial, help_text=help_text, **kwargs
         )
-        self.queryset = queryset
-        self.limit_choices_to = limit_choices_to   # limit the queryset later.
-        self.to_field_name = to_field_name
 
     def get_limit_choices_to(self):
         """
