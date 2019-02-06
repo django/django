@@ -730,7 +730,7 @@ iterator. Your code must handle this.
 Oracle notes
 ============
 
-Django supports `Oracle Database Server`_ versions 12.1 and higher. Version
+Django supports `Oracle Database Server`_ versions 12.2 and higher. Version
 6.0 or higher of the `cx_Oracle`_ Python driver is required.
 
 .. _`Oracle Database Server`: https://www.oracle.com/
