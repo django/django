@@ -1484,7 +1484,7 @@ This value mirrors the functionality and caveats of the
 ``FILE_UPLOAD_PERMISSIONS``
 ---------------------------
 
-Default: ``None``
+Default: ``0o644``
 
 The numeric mode (i.e. ``0o644``) to set newly uploaded files to. For
 more information about what these modes mean, see the documentation for
@@ -1510,6 +1510,10 @@ when using the :djadmin:`collectstatic` management command. See
     ``0`` is very important: it indicates an octal number, which is the
     way that modes must be specified. If you try to use ``644``, you'll
     get totally incorrect behavior.
+
+.. versionchanged:: 3.0
+
+    In older versions, the default value is ``None``.
 
 .. setting:: FILE_UPLOAD_TEMP_DIR
 
