@@ -444,7 +444,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         registered_models = set()
         for model, admin in self.admin_site._registry.items():
             registered_models.add(model)
-            for inline in admin.inlines:
+            for inline in admin.get_inline_classes(request):
                 registered_models.add(inline.model)
 
         related_objects = (
@@ -581,9 +581,12 @@ class ModelAdmin(BaseModelAdmin):
     def __str__(self):
         return "%s.%s" % (self.model._meta.app_label, self.__class__.__name__)
 
+    def get_inline_classes(self, request, obj=None):
+        return self.inlines
+
     def get_inline_instances(self, request, obj=None):
         inline_instances = []
-        for inline_class in self.inlines:
+        for inline_class in self.get_inline_classes(request, obj):
             inline = inline_class(self.model, self.admin_site)
             if request:
                 if not (inline.has_view_or_change_permission(request, obj) or
