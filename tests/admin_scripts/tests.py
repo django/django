@@ -1893,16 +1893,17 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
     def test_invalid_project_name(self):
         "Make sure the startproject management command validates a project name"
         for bad_name in ('7testproject', '../testproject'):
-            args = ['startproject', bad_name]
-            testproject_dir = os.path.join(self.test_dir, bad_name)
+            with self.subTest(project_name=bad_name):
+                args = ['startproject', bad_name]
+                testproject_dir = os.path.join(self.test_dir, bad_name)
 
-            out, err = self.run_django_admin(args)
-            self.assertOutput(
-                err,
-                "Error: '%s' is not a valid project name. Please make "
-                "sure the name is a valid identifier." % bad_name
-            )
-            self.assertFalse(os.path.exists(testproject_dir))
+                out, err = self.run_django_admin(args)
+                self.assertOutput(
+                    err,
+                    "Error: '%s' is not a valid project name. Please make "
+                    "sure the name is a valid identifier." % bad_name
+                )
+                self.assertFalse(os.path.exists(testproject_dir))
 
     def test_importable_project_name(self):
         """
@@ -2095,16 +2096,17 @@ class StartApp(AdminScriptTestCase):
     def test_invalid_name(self):
         """startapp validates that app name is a valid Python identifier."""
         for bad_name in ('7testproject', '../testproject'):
-            args = ['startapp', bad_name]
-            testproject_dir = os.path.join(self.test_dir, bad_name)
+            with self.subTest(app_name=bad_name):
+                args = ['startapp', bad_name]
+                testproject_dir = os.path.join(self.test_dir, bad_name)
 
-            out, err = self.run_django_admin(args)
-            self.assertOutput(
-                err,
-                "CommandError: '{}' is not a valid app name. Please make "
-                "sure the name is a valid identifier.".format(bad_name)
-            )
-            self.assertFalse(os.path.exists(testproject_dir))
+                out, err = self.run_django_admin(args)
+                self.assertOutput(
+                    err,
+                    "CommandError: '{}' is not a valid app name. Please make "
+                    "sure the name is a valid identifier.".format(bad_name)
+                )
+                self.assertFalse(os.path.exists(testproject_dir))
 
     def test_importable_name(self):
         """
