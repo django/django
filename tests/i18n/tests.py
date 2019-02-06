@@ -23,6 +23,7 @@ from django.test import (
     RequestFactory, SimpleTestCase, TestCase, override_settings,
 )
 from django.utils import translation
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.formats import (
     date_format, get_format, get_format_modules, iter_format_modules, localize,
     localize_input, reset_format_cache, sanitize_separators, time_format,
@@ -34,7 +35,8 @@ from django.utils.translation import (
     get_language, get_language_bidi, get_language_from_request,
     get_language_info, gettext, gettext_lazy, ngettext, ngettext_lazy,
     npgettext, npgettext_lazy, pgettext, to_language, to_locale, trans_null,
-    trans_real, ugettext, ugettext_lazy, ungettext, ungettext_lazy,
+    trans_real, ugettext, ugettext_lazy, ugettext_noop, ungettext,
+    ungettext_lazy,
 )
 from django.utils.translation.reloader import (
     translation_file_changed, watch_for_translation_changes,
@@ -74,13 +76,39 @@ class TranslationTests(SimpleTestCase):
         """
         Pre-Django 2.0 aliases with u prefix are still available.
         """
-        self.assertEqual(ugettext("Image"), "Bild")
-        self.assertEqual(ugettext_lazy("Image"), gettext_lazy("Image"))
-        self.assertEqual(ungettext("%d year", "%d years", 0) % 0, "0 Jahre")
-        self.assertEqual(
-            ungettext_lazy("%d year", "%d years", 0) % 0,
-            ngettext_lazy("%d year", "%d years", 0) % 0,
+        msg = (
+            'django.utils.translation.ugettext_noop() is deprecated in favor '
+            'of django.utils.translation.gettext_noop().'
         )
+        with self.assertWarnsMessage(RemovedInDjango40Warning, msg):
+            self.assertEqual(ugettext_noop("Image"), "Image")
+        msg = (
+            'django.utils.translation.ugettext() is deprecated in favor of '
+            'django.utils.translation.gettext().'
+        )
+        with self.assertWarnsMessage(RemovedInDjango40Warning, msg):
+            self.assertEqual(ugettext("Image"), "Bild")
+        msg = (
+            'django.utils.translation.ugettext_lazy() is deprecated in favor '
+            'of django.utils.translation.gettext_lazy().'
+        )
+        with self.assertWarnsMessage(RemovedInDjango40Warning, msg):
+            self.assertEqual(ugettext_lazy("Image"), gettext_lazy("Image"))
+        msg = (
+            'django.utils.translation.ungettext() is deprecated in favor of '
+            'django.utils.translation.ngettext().'
+        )
+        with self.assertWarnsMessage(RemovedInDjango40Warning, msg):
+            self.assertEqual(ungettext("%d year", "%d years", 0) % 0, "0 Jahre")
+        msg = (
+            'django.utils.translation.ungettext_lazy() is deprecated in favor '
+            'of django.utils.translation.ngettext_lazy().'
+        )
+        with self.assertWarnsMessage(RemovedInDjango40Warning, msg):
+            self.assertEqual(
+                ungettext_lazy("%d year", "%d years", 0) % 0,
+                ngettext_lazy("%d year", "%d years", 0) % 0,
+            )
 
     @translation.override('fr')
     def test_plural(self):

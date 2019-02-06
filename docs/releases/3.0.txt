@@ -309,6 +309,14 @@ Miscellaneous
   aliases for: :func:`urllib.parse.quote`, :func:`~urllib.parse.quote_plus`,
   :func:`~urllib.parse.unquote`, and :func:`~urllib.parse.unquote_plus`.
 
+* ``django.utils.translation.ugettext()``, ``ugettext_lazy()``,
+  ``ugettext_noop()``, ``ungettext()``, and ``ungettext_lazy()`` are deprecated
+  in favor of the functions that they're aliases for:
+  :func:`django.utils.translation.gettext`,
+  :func:`~django.utils.translation.gettext_lazy`,
+  :func:`~django.utils.translation.gettext_noop`,
+  :func:`~django.utils.translation.ngettext`, and
+  :func:`~django.utils.translation.ngettext_lazy`.
 
 .. _removed-features-3.0:
 
