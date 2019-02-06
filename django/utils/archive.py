@@ -216,11 +216,9 @@ class ZipArchive(BaseArchive):
         self._archive.close()
 
 
-extension_map = {
-    '.tar': TarArchive,
-    '.tar.bz2': TarArchive,
-    '.tar.gz': TarArchive,
-    '.tgz': TarArchive,
-    '.tz2': TarArchive,
-    '.zip': ZipArchive,
-}
+extension_map = dict.fromkeys((
+    '.tar',
+    '.tar.bz2', '.tbz2', '.tbz', '.tz2',
+    '.tar.gz', '.tgz', '.taz',
+), TarArchive)
+extension_map['.zip'] = ZipArchive

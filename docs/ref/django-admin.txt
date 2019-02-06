@@ -1222,7 +1222,7 @@ For example::
 .. django-admin-option:: --template TEMPLATE
 
 Provides the path to a directory with a custom app template file or a path to a
-compressed file (``.tar.gz``, ``.tar.bz2``, ``.tgz``, ``.tbz``, ``.zip``)
+compressed file (``.tar.gz``, ``.tar.bz2``, ``.tgz``, ``.tbz2``, ``.zip``)
 containing the app template files.
 
 For example, this would look for an app template in the given directory when
