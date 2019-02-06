@@ -1126,6 +1126,10 @@ method::
     impractical when the number of entries increases. You should avoid using it
     for more than 100 items.
 
+    If using ``initial`` data on the field or form, use the same data that
+    would come in from a form submission (the model's primary key or the
+    field's :attr:`~.ForeignKey.to_field`) rather than a model instance.
+
     A single argument is required:
 
     .. attribute:: queryset
@@ -1223,6 +1227,11 @@ method::
     representing a many-to-many relation. As with :class:`ModelChoiceField`,
     you can use ``label_from_instance`` to customize the object
     representations.
+
+    If using ``initial`` data on the field or form, use the same data that
+    would come in from a form submission (a list of primary keys or the
+    field's :attr:`~.ForeignKey.to_field`) rather than a list of model
+    instances.
 
     A single argument is required:
 
