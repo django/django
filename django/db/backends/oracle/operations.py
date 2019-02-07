@@ -74,11 +74,11 @@ END;
         elif lookup_type == 'iso_year':
             return "TO_CHAR(%s, 'IYYY')" % field_name
         else:
-            # https://docs.oracle.com/database/121/SQLRF/functions067.htm#SQLRF00639
+            # https://docs.oracle.com/en/database/oracle/oracle-database/18/sqlrf/EXTRACT-datetime.html
             return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
 
     def date_trunc_sql(self, lookup_type, field_name):
-        # https://docs.oracle.com/database/121/SQLRF/functions271.htm#SQLRF52058
+        # https://docs.oracle.com/en/database/oracle/oracle-database/18/sqlrf/ROUND-and-TRUNC-Date-Functions.html
         if lookup_type in ('year', 'month'):
             return "TRUNC(%s, '%s')" % (field_name, lookup_type.upper())
         elif lookup_type == 'quarter':
@@ -118,7 +118,7 @@ END;
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
         field_name = self._convert_field_to_tz(field_name, tzname)
-        # https://docs.oracle.com/database/121/SQLRF/functions271.htm#SQLRF52058
+        # https://docs.oracle.com/en/database/oracle/oracle-database/18/sqlrf/ROUND-and-TRUNC-Date-Functions.html
         if lookup_type in ('year', 'month'):
             sql = "TRUNC(%s, '%s')" % (field_name, lookup_type.upper())
         elif lookup_type == 'quarter':

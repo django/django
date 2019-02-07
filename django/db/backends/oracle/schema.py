@@ -95,7 +95,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Add it
         self.add_field(model, new_temp_field)
         # Explicit data type conversion
-        # https://docs.oracle.com/database/121/SQLRF/sql_elements002.htm#SQLRF51054
+        # https://docs.oracle.com/en/database/oracle/oracle-database/18/sqlrf
+        # /Data-Type-Comparison-Rules.html#GUID-D0C5A47E-6F93-4C2D-9E49-4F2B86B359DD
         new_value = self.quote_name(old_field.column)
         old_type = old_field.db_type(self.connection)
         if re.match('^N?CLOB', old_type):
