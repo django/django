@@ -1,0 +1,7 @@
+============================
+Django 1.11.19 release notes
+============================
+
+*February 11, 2019*
+
+Django 1.11.19 fixes a security issue in 1.11.18.
