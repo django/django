@@ -94,6 +94,10 @@ Also, there is a tox.ini file at the root of the repository. Example commands::
    # run the test with Python 3.7, on Django 2.2 and Django master branch
    $ tox -e py37-dj21 && tox -e py37-djmaster
 
+Note that tox can also forward arguments to pytest. When using pdb with pytest,
+forward the ``-s`` option to pytest as such::
+
+   tox -e py37-dj21 -- -s
 
 Can you pay me for my time?
 ---------------------------
