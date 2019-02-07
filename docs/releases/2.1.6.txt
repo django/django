@@ -2,9 +2,9 @@
 Django 2.1.6 release notes
 ==========================
 
-*Expected February 1, 2019*
+*February 11, 2019*
 
-Django 2.1.6 several bugs in 2.1.5.
+Django 2.1.6 fixes a security issue and a bug in 2.1.5.
 
 Bugfixes
 ========
