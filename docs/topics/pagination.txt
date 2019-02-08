@@ -77,7 +77,7 @@ page::
 .. _using-paginator-in-view:
 
 Using ``Paginator`` in a view
-==============================
+=============================
 
 Here's a slightly more complex example using :class:`Paginator` in a view to
 paginate a queryset. We give both the view and the accompanying template to
