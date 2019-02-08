@@ -886,7 +886,7 @@ both as empty strings. Django will use a different connect descriptor depending
 on that choice.
 
 Threaded option
-----------------
+---------------
 
 If you plan to run Django in a multithreaded environment (e.g. Apache using the
 default MPM module on any modern operating system), then you **must** set
