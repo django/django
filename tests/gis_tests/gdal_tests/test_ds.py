@@ -3,7 +3,7 @@ import re
 from datetime import datetime
 
 from django.contrib.gis.gdal import (
-    GDAL_VERSION, DataSource, Envelope, GDALException, OGRGeometry,
+    DataSource, Envelope, GDALException, OGRGeometry,
 )
 from django.contrib.gis.gdal.field import (
     OFTDateTime, OFTInteger, OFTReal, OFTString,
@@ -38,7 +38,7 @@ ds_list = (
     ),
     TestDS(
         'test_vrt', ext='vrt', nfeat=3, nfld=3, geom='POINT', gtype='Point25D',
-        driver='OGR_VRT' if GDAL_VERSION >= (2, 0) else 'VRT',
+        driver='OGR_VRT',
         fields={
             'POINT_X': OFTString,
             'POINT_Y': OFTString,

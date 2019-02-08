@@ -229,6 +229,8 @@ backends.
 
 * Support for SpatiaLite 4.1 and 4.2 is removed.
 
+* Support for GDAL 1.11 is removed.
+
 Dropped support for PostgreSQL 9.4
 ----------------------------------
 

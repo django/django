@@ -74,7 +74,7 @@ class OGRInspectTest(SimpleTestCase):
             '',
             'class MyModel(models.Model):',
             '    float = models.FloatField()',
-            '    int = models.{}()'.format('BigIntegerField' if GDAL_VERSION >= (2, 0) else 'FloatField'),
+            '    int = models.BigIntegerField()',
             '    str = models.CharField(max_length=80)',
             '    geom = models.PolygonField(%s)' % self.expected_srid,
         ]
@@ -102,7 +102,7 @@ class OGRInspectTest(SimpleTestCase):
             '',
             'class City(models.Model):',
             '    name = models.CharField(max_length=80)',
-            '    population = models.{}()'.format('BigIntegerField' if GDAL_VERSION >= (2, 0) else 'FloatField'),
+            '    population = models.BigIntegerField()',
             '    density = models.FloatField()',
             '    created = models.DateField()',
             '    geom = models.PointField(%s)' % self.expected_srid,
