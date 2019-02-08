@@ -692,7 +692,7 @@ existing conversion code::
             return self.get_prep_value(value)
 
 Some general advice
---------------------
+-------------------
 
 Writing a custom field can be a tricky process, particularly if you're doing
 complex conversions between your Python types and your database and
@@ -731,7 +731,7 @@ told to use it. To do so, simply assign the new ``File`` subclass to the special
 ``attr_class`` attribute of the ``FileField`` subclass.
 
 A few suggestions
-------------------
+-----------------
 
 In addition to the above details, there are a few guidelines which can greatly
 improve the efficiency and readability of the field's code.
