@@ -20,7 +20,7 @@ def file_upload_view(request):
         # not the full path.
         if os.path.dirname(form_data['file_field'].name) != '':
             return HttpResponseServerError()
-        return HttpResponse('')
+        return HttpResponse()
     else:
         return HttpResponseServerError()
 
@@ -50,7 +50,7 @@ def file_upload_view_verify(request):
     obj = FileModel()
     obj.testfile.save(largefile.name, largefile)
 
-    return HttpResponse('')
+    return HttpResponse()
 
 
 def file_upload_unicode_name(request):
@@ -79,7 +79,7 @@ def file_upload_unicode_name(request):
     if response:
         return response
     else:
-        return HttpResponse('')
+        return HttpResponse()
 
 
 def file_upload_echo(request):
@@ -157,4 +157,4 @@ def file_upload_content_type_extra(request):
 def file_upload_fd_closing(request, access):
     if access == 't':
         request.FILES  # Trigger file parsing.
-    return HttpResponse('')
+    return HttpResponse()

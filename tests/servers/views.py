@@ -22,7 +22,7 @@ def model_view(request):
 def create_model_instance(request):
     person = Person(name='emily')
     person.save()
-    return HttpResponse('')
+    return HttpResponse()
 
 
 def environ_view(request):
