@@ -1251,12 +1251,12 @@ class Window(Expression):
         if self.order_by is not None:
             window_sql.append(' ORDER BY ')
             order_sql, order_params = compiler.compile(self.order_by)
-            window_sql.extend(''.join(order_sql))
+            window_sql.extend(order_sql)
             window_params.extend(order_params)
 
         if self.frame:
             frame_sql, frame_params = compiler.compile(self.frame)
-            window_sql.extend(' ' + frame_sql)
+            window_sql.append(' ' + frame_sql)
             window_params.extend(frame_params)
 
         params.extend(window_params)
