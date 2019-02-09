@@ -25,7 +25,7 @@ class VariableResolveLoggingTests(SimpleTestCase):
                 raise TestObject.SilentDoesNotExist("Attribute does not exist.")
 
             def __iter__(self):
-                return iter(attr for attr in dir(TestObject) if attr[:2] != "__")
+                return (attr for attr in dir(TestObject) if attr[:2] != "__")
 
             def __getitem__(self, item):
                 return self.__dict__[item]
