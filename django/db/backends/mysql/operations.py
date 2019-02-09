@@ -107,7 +107,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         except ValueError:
             sql = field_name
         else:
-            format_str = ''.join([f for f in format[:i]] + [f for f in format_def[i:]])
+            format_str = ''.join(format[:i] + format_def[i:])
             sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
         return sql
 

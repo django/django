@@ -160,7 +160,7 @@ class BaseForm:
                 "Key '%s' not found in '%s'. Choices are: %s." % (
                     name,
                     self.__class__.__name__,
-                    ', '.join(sorted(f for f in self.fields)),
+                    ', '.join(sorted(self.fields)),
                 )
             )
         if name not in self._bound_fields_cache:

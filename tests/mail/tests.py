@@ -844,8 +844,8 @@ class BaseEmailBackendTests(HeadersCheckMixin):
     def test_send_many(self):
         email1 = EmailMessage('Subject', 'Content1', 'from@example.com', ['to@example.com'])
         email2 = EmailMessage('Subject', 'Content2', 'from@example.com', ['to@example.com'])
-        # send_messages() may take a list or a generator.
-        emails_lists = ([email1, email2], (email for email in [email1, email2]))
+        # send_messages() may take a list or an iterator.
+        emails_lists = ([email1, email2], iter((email1, email2)))
         for emails_list in emails_lists:
             num_sent = mail.get_connection().send_messages(emails_list)
             self.assertEqual(num_sent, 2)
