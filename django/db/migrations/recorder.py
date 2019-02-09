@@ -7,6 +7,16 @@ from django.utils.timezone import now
 from .exceptions import MigrationSchemaMissing
 
 
+class AppliedMigration(tuple):
+    """
+    Tuple-like object to provide access to applied datetime.
+    """
+    def __new__(cls, iterable, applied=None):
+        instance = tuple.__new__(cls, iterable)
+        instance.applied = applied
+        return instance
+
+
 class MigrationRecorder:
     """
     Deal with storing migration records in the database.
@@ -71,7 +81,10 @@ class MigrationRecorder:
     def applied_migrations(self):
         """Return a set of (app, name) of applied migrations."""
         if self.has_table():
-            return {tuple(x) for x in self.migration_qs.values_list('app', 'name')}
+            return {
+                AppliedMigration([m.app, m.name], applied=m.applied)
+                for m in self.migration_qs.iterator()
+            }
         else:
             # If the django_migrations table doesn't exist, then no migrations
             # are applied.

@@ -250,6 +250,20 @@ class MigrateTests(MigrationTestBase):
             ' [ ] 0002_second\n',
             out.getvalue().lower()
         )
+
+        out = io.StringIO()
+        # Verify datetime shows for applied datetime
+        call_command("showmigrations", "migrations", stdout=out, verbosity=2, no_color=True)
+        applied = MigrationRecorder(connection).migration_qs.get(
+            app='migrations',
+            name='0001_initial',
+        ).applied
+        self.assertEqual(
+            'migrations\n'
+            ' [x] 0001_initial %s\n'
+            ' [ ] 0002_second\n' % applied,
+            out.getvalue().lower()
+        )
         # Cleanup by unmigrating everything
         call_command("migrate", "migrations", "zero", verbosity=0)
 
