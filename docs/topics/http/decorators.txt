@@ -4,7 +4,8 @@ View decorators
 
 .. module:: django.views.decorators.http
 
-Django provides several decorators that can be applied to views to support
+Django provides several :ref:`decorators <decorating-class-based-views>`
+that can be applied to views to support
 various HTTP features.
 
 Allowed HTTP methods
