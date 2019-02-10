@@ -225,7 +225,7 @@ backends.
 :mod:`django.contrib.gis`
 -------------------------
 
-* Supported for PostGIS 2.1 is removed.
+* Support for PostGIS 2.1 is removed.
 
 * Support for SpatiaLite 4.1 and 4.2 is removed.
 
