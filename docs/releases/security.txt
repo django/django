@@ -922,3 +922,17 @@ Versions affected
 * Django 2.1 :commit:`(patch) <64d2396e83aedba3fcc84ca40f23fbd22f0b9b5b>`
 * Django 2.0 :commit:`(patch) <9f4ed7c94c62e21644ef5115e393ac426b886f2e>`
 * Django 1.11 :commit:`(patch) <1cd00fcf52d089ef0fe03beabd05d59df8ea052a>`
+
+February 11, 2019 - :cve:`2019-6975`
+------------------------------------
+
+Memory exhaustion in ``django.utils.numberformat.format()``. `Full description
+<https://www.djangoproject.com/weblog/2019/feb/11/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 2.1 :commit:`(patch) <40cd19055773705301c3428ed5e08a036d2091f3>`
+* Django 2.0 :commit:`(patch <1f42f82566c9d2d73aff1c42790d6b1b243f7676>` and
+  :commit:`correction) <392e040647403fc8007708d52ce01d915b014849>`
+* Django 1.11 :commit:`(patch) <0bbb560183fabf0533289700845dafa94951f227>`
