@@ -484,7 +484,7 @@ Miscellaneous
   read from disk must be UTF-8 encoded.
 
 * ``django.contrib.staticfiles.storage.CachedStaticFilesStorage`` is
-  deprecated due to the intractable problems that is has. Use
+  deprecated due to the intractable problems that it has. Use
   :class:`.ManifestStaticFilesStorage` or a third-party cloud storage instead.
 
 * :meth:`.RemoteUserBackend.configure_user` is now passed ``request`` as the
