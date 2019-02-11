@@ -56,6 +56,18 @@ class Tests(unittest.TestCase):
                 self.assertIn('"IS_NICE" IN (0,1)', field.db_check(connection))
 
 
+# This class wraps the password and returns when it is converted to a string
+class PasswordWrapper(object):
+
+    def __init__(self, password):
+        self._password = str(password)
+        self.callcount = 0
+
+    def __str__(self):
+        self.callcount += 1
+        return self._password
+
+
 @unittest.skipUnless(connection.vendor == 'oracle', 'Oracle tests')
 class TransactionalTests(TransactionTestCase):
     available_apps = ['backends']
@@ -98,13 +110,6 @@ class TransactionalTests(TransactionTestCase):
             connection.settings_dict['PASSWORD'] = old_password
 
     def test_password_duck_typing(self):
-        class PasswordWrapper(object):
-            def __init__(self, password):
-                self._password = str(password)
-                self.callcount = 0
-            def __str__(self):
-                self.callcount += 1
-                return self._password
         old_password = connection.settings_dict['PASSWORD']
         wrapper = PasswordWrapper(old_password)
         connection.settings_dict['PASSWORD'] = wrapper
