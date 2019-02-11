@@ -514,7 +514,7 @@ fictional ``foobar`` template library::
 
         def from_string(self, template_code):
             try:
-              return Template(self.engine.from_string(template_code))
+                return Template(self.engine.from_string(template_code))
             except foobar.TemplateCompilationFailed as exc:
                 raise TemplateSyntaxError(exc.args)
 
