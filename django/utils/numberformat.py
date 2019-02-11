@@ -36,7 +36,7 @@ def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep='',
             # Format the coefficient.
             coefficient = format(
                 coefficient, decimal_sep, decimal_pos, grouping,
-                thousand_sep, force_grouping, use_l10n,
+                thousand_sep, force_grouping,
             )
             return '{}e{}'.format(coefficient, exponent)
         else:
