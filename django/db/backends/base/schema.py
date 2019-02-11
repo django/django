@@ -562,7 +562,11 @@ class BaseDatabaseSchemaEditor:
         # Has unique been removed?
         if old_field.unique and (not new_field.unique or self._field_became_primary_key(old_field, new_field)):
             # Find the unique constraint for this field
-            constraint_names = self._constraint_names(model, [old_field.column], unique=True, primary_key=False)
+            meta_constraint_names = {constraint.name for constraint in model._meta.constraints}
+            constraint_names = self._constraint_names(
+                model, [old_field.column], unique=True, primary_key=False,
+                exclude=meta_constraint_names,
+            )
             if strict and len(constraint_names) != 1:
                 raise ValueError("Found wrong number (%s) of unique constraints for %s.%s" % (
                     len(constraint_names),
@@ -612,7 +616,11 @@ class BaseDatabaseSchemaEditor:
                     self.execute(self._delete_index_sql(model, index_name))
         # Change check constraints?
         if old_db_params['check'] != new_db_params['check'] and old_db_params['check']:
-            constraint_names = self._constraint_names(model, [old_field.column], check=True)
+            meta_constraint_names = {constraint.name for constraint in model._meta.constraints}
+            constraint_names = self._constraint_names(
+                model, [old_field.column], check=True,
+                exclude=meta_constraint_names,
+            )
             if strict and len(constraint_names) != 1:
                 raise ValueError("Found wrong number (%s) of check constraints for %s.%s" % (
                     len(constraint_names),
@@ -1106,7 +1114,7 @@ class BaseDatabaseSchemaEditor:
 
     def _constraint_names(self, model, column_names=None, unique=None,
                           primary_key=None, index=None, foreign_key=None,
-                          check=None, type_=None):
+                          check=None, type_=None, exclude=None):
         """Return all constraint names matching the columns and conditions."""
         if column_names is not None:
             column_names = [
@@ -1130,7 +1138,8 @@ class BaseDatabaseSchemaEditor:
                     continue
                 if type_ is not None and infodict['type'] != type_:
                     continue
-                result.append(name)
+                if not exclude or name not in exclude:
+                    result.append(name)
         return result
 
     def _delete_primary_key(self, model, strict=False):
