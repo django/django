@@ -384,8 +384,13 @@ class BaseDatabaseSchemaEditor:
             self.execute(self._create_index_sql(model, fields, suffix="_idx"))
 
     def _delete_composed_index(self, model, fields, constraint_kwargs, sql):
+        meta_constraint_names = {constraint.name for constraint in model._meta.constraints}
+        meta_index_names = {constraint.name for constraint in model._meta.indexes}
         columns = [model._meta.get_field(field).column for field in fields]
-        constraint_names = self._constraint_names(model, columns, **constraint_kwargs)
+        constraint_names = self._constraint_names(
+            model, columns, exclude=meta_constraint_names | meta_index_names,
+            **constraint_kwargs
+        )
         if len(constraint_names) != 1:
             raise ValueError("Found wrong number (%s) of constraints for %s(%s)" % (
                 len(constraint_names),
@@ -607,13 +612,15 @@ class BaseDatabaseSchemaEditor:
             meta_index_names = {index.name for index in model._meta.indexes}
             # Retrieve only BTREE indexes since this is what's created with
             # db_index=True.
-            index_names = self._constraint_names(model, [old_field.column], index=True, type_=Index.suffix)
+            index_names = self._constraint_names(
+                model, [old_field.column], index=True, type_=Index.suffix,
+                exclude=meta_index_names,
+            )
             for index_name in index_names:
-                if index_name not in meta_index_names:
-                    # The only way to check if an index was created with
-                    # db_index=True or with Index(['field'], name='foo')
-                    # is to look at its name (refs #28053).
-                    self.execute(self._delete_index_sql(model, index_name))
+                # The only way to check if an index was created with
+                # db_index=True or with Index(['field'], name='foo')
+                # is to look at its name (refs #28053).
+                self.execute(self._delete_index_sql(model, index_name))
         # Change check constraints?
         if old_db_params['check'] != new_db_params['check'] and old_db_params['check']:
             meta_constraint_names = {constraint.name for constraint in model._meta.constraints}
