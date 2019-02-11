@@ -153,11 +153,11 @@ class TestSysPathDirectories(SimpleTestCase):
         self.assertIn(self.file.parent, paths)
 
     def test_sys_paths_non_existing(self):
-        nonexistant_file = Path(self.directory.name) / 'does_not_exist'
-        with extend_sys_path(str(nonexistant_file)):
+        nonexistent_file = Path(self.directory.name) / 'does_not_exist'
+        with extend_sys_path(str(nonexistent_file)):
             paths = list(autoreload.sys_path_directories())
-        self.assertNotIn(nonexistant_file, paths)
-        self.assertNotIn(nonexistant_file.parent, paths)
+        self.assertNotIn(nonexistent_file, paths)
+        self.assertNotIn(nonexistent_file.parent, paths)
 
     def test_sys_paths_absolute(self):
         paths = list(autoreload.sys_path_directories())
@@ -325,7 +325,7 @@ class ReloaderTests(SimpleTestCase):
         self._tempdir = tempfile.TemporaryDirectory()
         self.tempdir = Path(self._tempdir.name).resolve().absolute()
         self.existing_file = self.ensure_file(self.tempdir / 'test.py')
-        self.nonexistant_file = (self.tempdir / 'does_not_exist.py').absolute()
+        self.nonexistent_file = (self.tempdir / 'does_not_exist.py').absolute()
         self.reloader = self.RELOADER_CLS()
 
     def tearDown(self):
@@ -370,23 +370,23 @@ class IntegrationTests:
 
     @mock.patch('django.utils.autoreload.BaseReloader.notify_file_changed')
     @mock.patch('django.utils.autoreload.iter_all_python_module_files', return_value=frozenset())
-    def test_nonexistant_file(self, mocked_modules, notify_mock):
-        self.reloader.watch_file(self.nonexistant_file)
+    def test_nonexistent_file(self, mocked_modules, notify_mock):
+        self.reloader.watch_file(self.nonexistent_file)
         with self.tick_twice():
-            self.ensure_file(self.nonexistant_file)
+            self.ensure_file(self.nonexistent_file)
         self.assertEqual(notify_mock.call_count, 1)
-        self.assertCountEqual(notify_mock.call_args[0], [self.nonexistant_file])
+        self.assertCountEqual(notify_mock.call_args[0], [self.nonexistent_file])
 
     @mock.patch('django.utils.autoreload.BaseReloader.notify_file_changed')
     @mock.patch('django.utils.autoreload.iter_all_python_module_files', return_value=frozenset())
-    def test_nonexistant_file_in_non_existing_directory(self, mocked_modules, notify_mock):
+    def test_nonexistent_file_in_non_existing_directory(self, mocked_modules, notify_mock):
         non_existing_directory = self.tempdir / 'non_existing_dir'
-        nonexistant_file = non_existing_directory / 'test'
-        self.reloader.watch_file(nonexistant_file)
+        nonexistent_file = non_existing_directory / 'test'
+        self.reloader.watch_file(nonexistent_file)
         with self.tick_twice():
-            self.ensure_file(nonexistant_file)
+            self.ensure_file(nonexistent_file)
         self.assertEqual(notify_mock.call_count, 1)
-        self.assertCountEqual(notify_mock.call_args[0], [nonexistant_file])
+        self.assertCountEqual(notify_mock.call_args[0], [nonexistent_file])
 
     @mock.patch('django.utils.autoreload.BaseReloader.notify_file_changed')
     @mock.patch('django.utils.autoreload.iter_all_python_module_files', return_value=frozenset())
@@ -403,13 +403,13 @@ class IntegrationTests:
     @mock.patch('django.utils.autoreload.iter_all_python_module_files', return_value=frozenset())
     def test_glob_non_existing_directory(self, mocked_modules, notify_mock):
         non_existing_directory = self.tempdir / 'does_not_exist'
-        nonexistant_file = non_existing_directory / 'test.py'
+        nonexistent_file = non_existing_directory / 'test.py'
         self.reloader.watch_dir(non_existing_directory, '*.py')
         with self.tick_twice():
-            self.ensure_file(nonexistant_file)
-            self.set_mtime(nonexistant_file, time.time())
+            self.ensure_file(nonexistent_file)
+            self.set_mtime(nonexistent_file, time.time())
         self.assertEqual(notify_mock.call_count, 1)
-        self.assertCountEqual(notify_mock.call_args[0], [nonexistant_file])
+        self.assertCountEqual(notify_mock.call_args[0], [nonexistent_file])
 
     @mock.patch('django.utils.autoreload.BaseReloader.notify_file_changed')
     @mock.patch('django.utils.autoreload.iter_all_python_module_files', return_value=frozenset())
@@ -640,7 +640,7 @@ class StatReloaderTests(ReloaderTests, IntegrationTests):
         self.reloader.SLEEP_TIME = 0.01
 
     def test_snapshot_files_ignores_missing_files(self):
-        with mock.patch.object(self.reloader, 'watched_files', return_value=[self.nonexistant_file]):
+        with mock.patch.object(self.reloader, 'watched_files', return_value=[self.nonexistent_file]):
             self.assertEqual(dict(self.reloader.snapshot_files()), {})
 
     def test_snapshot_files_updates(self):
@@ -661,13 +661,13 @@ class StatReloaderTests(ReloaderTests, IntegrationTests):
             notifier.assert_not_called()
 
     def test_fires_when_created(self):
-        with mock.patch.object(self.reloader, 'watched_files', return_value=[self.nonexistant_file]), \
+        with mock.patch.object(self.reloader, 'watched_files', return_value=[self.nonexistent_file]), \
                 mock.patch.object(self.reloader, 'notify_file_changed') as notifier:
-            self.nonexistant_file.touch()
-            mtime = self.nonexistant_file.stat().st_mtime
+            self.nonexistent_file.touch()
+            mtime = self.nonexistent_file.stat().st_mtime
             second_snapshot = self.reloader.loop_files({}, mtime - 1)
-            self.assertCountEqual(second_snapshot.keys(), [self.nonexistant_file])
-            notifier.assert_called_once_with(self.nonexistant_file)
+            self.assertCountEqual(second_snapshot.keys(), [self.nonexistent_file])
+            notifier.assert_called_once_with(self.nonexistent_file)
 
     def test_fires_with_changes(self):
         with mock.patch.object(self.reloader, 'watched_files', return_value=[self.existing_file]), \

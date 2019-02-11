@@ -1535,7 +1535,7 @@ class SquashMigrationsTests(MigrationTestBase):
 class AppLabelErrorTests(TestCase):
     """
     This class inherits TestCase because MigrationTestBase uses
-    `availabe_apps = ['migrations']` which means that it's the only installed
+    `available_apps = ['migrations']` which means that it's the only installed
     app. 'django.contrib.auth' must be in INSTALLED_APPS for some of these
     tests.
     """
