@@ -56,6 +56,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_ignore_conflicts = False
     max_query_params = 2**16 - 1
     supports_partial_indexes = False
+    allows_multiple_constraints_on_same_fields = False
 
     @cached_property
     def has_fetch_offset_support(self):
