@@ -372,6 +372,17 @@ Oracle                      ``SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT(poly, 0.05
 *Availability*: `PostGIS <https://postgis.net/docs/ST_Overlaps.html>`__,
 Oracle, MySQL, SpatiaLite, PGRaster (Bilateral)
 
+Tests if the geometry field spatially overlaps the lookup geometry.
+
+==========  ============================
+Backend     SQL Equivalent
+==========  ============================
+PostGIS     ``ST_Overlaps(poly, geom)``
+Oracle      ``SDO_OVERLAPS(poly, geom)``
+MySQL       ``MBROverlaps(poly, geom)``
+SpatiaLite  ``Overlaps(poly, geom)``
+==========  ============================
+
 .. fieldlookup:: relate
 
 ``relate``
