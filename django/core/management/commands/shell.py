@@ -15,7 +15,7 @@ class Command(BaseCommand):
     )
 
     requires_system_checks = False
-    shells = ['ipython', 'bpython', 'python']
+    shells = ['ipython', 'bpython', 'python', 'pt_python']
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -39,6 +39,10 @@ class Command(BaseCommand):
         import bpython
         bpython.embed()
 
+    def pt_python(self, options):
+        import ptpython
+        ptpython.repl.embed()
+        
     def python(self, options):
         import code
         # Set up a dictionary to serve as the environment for the shell, so
