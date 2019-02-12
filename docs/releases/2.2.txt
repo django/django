@@ -345,9 +345,9 @@ In usage like::
 
         alias = base
 
-``alias`` is not cached. Such usage now raises ``TypeError: Cannot assign the
-same cached_property to two different names ('base' and 'alias').`` on Python
-3.6 and later.
+``alias`` is not cached. Where the problem can be detected (Python 3.6 and
+later), such usage now raises ``TypeError: Cannot assign the same
+cached_property to two different names ('base' and 'alias').``
 
 Use this instead::
 
