@@ -402,6 +402,7 @@ class RequestFactory:
         parsed = urlparse(str(path))  # path can be lazy
         data = force_bytes(data, settings.DEFAULT_CHARSET)
         r = {
+            'HTTP_ACCEPT_LANGUAGE': os.environ.get('LANG', '*'),
             'PATH_INFO': self._get_path(parsed),
             'REQUEST_METHOD': method,
             'SERVER_PORT': '443' if secure else '80',
