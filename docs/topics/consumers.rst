@@ -328,7 +328,7 @@ primitives to implement a HTTP endpoint::
         async def handle(self, body):
             await asyncio.sleep(10)
             await self.send_response(200, b"Your response bytes", headers=[
-                ("Content-Type", "text/plain"),
+                (b"Content-Type", b"text/plain"),
             ])
 
 You are expected to implement your own ``handle`` method. The
@@ -352,7 +352,7 @@ be explained in detail later::
     class LongPollConsumer(AsyncHttpConsumer):
         async def handle(self, body):
             await self.send_headers(headers=[
-                ("Content-Type", "application/json"),
+                (b"Content-Type", b"application/json"),
             ])
             # Headers are only sent after the first body event.
             # Set "more_body" to tell the interface server to not
@@ -372,9 +372,9 @@ Of course you can also use those primitives to implement a HTTP endpoint for
     class ServerSentEventsConsumer(AsyncHttpConsumer):
         async def handle(self, body):
             await self.send_headers(headers=[
-                ("Cache-Control", "no-cache"),
-                ("Content-Type", "text/event-stream"),
-                ("Transfer-Encoding", "chunked"),
+                (b"Cache-Control", b"no-cache"),
+                (b"Content-Type", b"text/event-stream"),
+                (b"Transfer-Encoding", b"chunked"),
             ])
             while True:
                 payload = "data: %s\n\n" % datetime.now().isoformat()

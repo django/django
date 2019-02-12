@@ -18,7 +18,7 @@ async def test_async_http_consumer():
             await self.send_response(
                 200,
                 json.dumps({"value": data["value"]}).encode("utf-8"),
-                headers={"Content-Type": "application/json"},
+                headers={b"Content-Type": b"application/json"},
             )
 
     # Open a connection
@@ -31,4 +31,4 @@ async def test_async_http_consumer():
     response = await communicator.get_response()
     assert response["body"] == b'{"value": 42}'
     assert response["status"] == 200
-    assert response["headers"] == [("Content-Type", "application/json")]
+    assert response["headers"] == [(b"Content-Type", b"application/json")]
