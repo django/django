@@ -56,6 +56,18 @@ class Tests(unittest.TestCase):
                 self.assertIn('"IS_NICE" IN (0,1)', field.db_check(connection))
 
 
+# This class wraps the password and returns when it is converted to a string
+class PasswordWrapper(object):
+
+    def __init__(self, password):
+        self._password = str(password)
+        self.callcount = 0
+
+    def __str__(self):
+        self.callcount += 1
+        return self._password
+
+
 @unittest.skipUnless(connection.vendor == 'oracle', 'Oracle tests')
 class TransactionalTests(TransactionTestCase):
     available_apps = ['backends']
@@ -94,5 +106,18 @@ class TransactionalTests(TransactionTestCase):
             # Database exception: "ORA-01017: invalid username/password" is
             # expected.
             self.assertIn('ORA-01017', context.exception.args[0].message)
+        finally:
+            connection.settings_dict['PASSWORD'] = old_password
+
+    def test_password_duck_typing(self):
+        old_password = connection.settings_dict['PASSWORD']
+        wrapper = PasswordWrapper(old_password)
+        connection.settings_dict['PASSWORD'] = wrapper
+        try:
+            cursor = connection.cursor()
+            answers = [row for row in cursor.execute('SELECT 2+1 FROM DUAL')]
+            self.assertEqual(len(answers), 1)
+            self.assertEqual(answers[0][0], 3)
+            self.assertEqual(wrapper.callcount, 1)
         finally:
             connection.settings_dict['PASSWORD'] = old_password
