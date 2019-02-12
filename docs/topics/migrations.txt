@@ -135,8 +135,8 @@ database to make sure they work as expected::
     Operations to perform:
       Apply all migrations: books
     Running migrations:
-      Rendering model states… DONE
-      Applying books.0003_auto… OK
+      Rendering model states... DONE
+      Applying books.0003_auto... OK
 
 Once the migration is applied, commit the migration and the models change
 to your version control system as a single commit - that way, when other

@@ -262,7 +262,7 @@ class Command(BaseCommand):
             if action == "apply_start":
                 if compute_time:
                     self.start = time.time()
-                self.stdout.write("  Applying %s…" % migration, ending="")
+                self.stdout.write("  Applying %s..." % migration, ending="")
                 self.stdout.flush()
             elif action == "apply_success":
                 elapsed = " (%.3fs)" % (time.time() - self.start) if compute_time else ""
@@ -273,7 +273,7 @@ class Command(BaseCommand):
             elif action == "unapply_start":
                 if compute_time:
                     self.start = time.time()
-                self.stdout.write("  Unapplying %s…" % migration, ending="")
+                self.stdout.write("  Unapplying %s..." % migration, ending="")
                 self.stdout.flush()
             elif action == "unapply_success":
                 elapsed = " (%.3fs)" % (time.time() - self.start) if compute_time else ""
@@ -284,7 +284,7 @@ class Command(BaseCommand):
             elif action == "render_start":
                 if compute_time:
                     self.start = time.time()
-                self.stdout.write("  Rendering model states…", ending="")
+                self.stdout.write("  Rendering model states...", ending="")
                 self.stdout.flush()
             elif action == "render_success":
                 elapsed = " (%.3fs)" % (time.time() - self.start) if compute_time else ""
@@ -320,7 +320,7 @@ class Command(BaseCommand):
 
         # Create the tables for each model
         if self.verbosity >= 1:
-            self.stdout.write("  Creating tables…\n")
+            self.stdout.write("  Creating tables...\n")
         with connection.schema_editor() as editor:
             for app_name, model_list in manifest.items():
                 for model in model_list:
@@ -337,7 +337,7 @@ class Command(BaseCommand):
 
             # Deferred SQL is executed when exiting the editor's context.
             if self.verbosity >= 1:
-                self.stdout.write("    Running deferred SQL…\n")
+                self.stdout.write("    Running deferred SQL...\n")
 
     @staticmethod
     def describe_operation(operation, backwards):

@@ -131,7 +131,7 @@ You'll see the following output on the command line:
 
 .. parsed-literal::
 
-    Performing system checks…
+    Performing system checks...
 
     System check identified no issues (0 silenced).
 
