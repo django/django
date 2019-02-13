@@ -203,7 +203,7 @@ In the terminal, we can run our test:
 
 and you'll see something like::
 
-    Creating test database for alias 'default'…
+    Creating test database for alias 'default'...
     System check identified no issues (0 silenced).
     F
     ======================================================================
@@ -218,7 +218,7 @@ and you'll see something like::
     Ran 1 test in 0.001s
 
     FAILED (failures=1)
-    Destroying test database for alias 'default'…
+    Destroying test database for alias 'default'...
 
 What happened is this:
 
@@ -257,14 +257,14 @@ past:
 
 and run the test again::
 
-    Creating test database for alias 'default'…
+    Creating test database for alias 'default'...
     System check identified no issues (0 silenced).
     .
     ----------------------------------------------------------------------
     Ran 1 test in 0.001s
 
     OK
-    Destroying test database for alias 'default'…
+    Destroying test database for alias 'default'...
 
 After identifying a bug, we wrote a test that exposes it and corrected the bug
 in the code so our test passes.
