@@ -279,7 +279,7 @@ When you run your tests, you'll see a number of messages as the test runner
 prepares itself. You can control the level of detail of these messages with the
 ``verbosity`` option on the command line::
 
-    Creating test database…
+    Creating test database...
     Creating table myapp_animal
     Creating table myapp_mineral
 

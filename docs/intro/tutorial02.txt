@@ -338,8 +338,8 @@ Now, run :djadmin:`migrate` again to create those model tables in your database:
     Operations to perform:
       Apply all migrations: admin, auth, contenttypes, polls, sessions
     Running migrations:
-      Rendering model states… DONE
-      Applying polls.0001_initial… OK
+      Rendering model states... DONE
+      Applying polls.0001_initial... OK
 
 The :djadmin:`migrate` command takes all the migrations that haven't been
 applied (Django tracks which ones are applied using a special table in your
