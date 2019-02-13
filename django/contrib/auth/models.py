@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from .validators import UnicodeUsernameValidator
 
 
-def update_last_login(sender, user, **kwargs):
+def update_last_login(user, **kwargs):
     """
     A signal receiver which updates the last_login date for
     the user logging in.
