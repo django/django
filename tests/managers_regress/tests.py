@@ -567,7 +567,7 @@ class TestManagerDeprecations(TestCase):
             warnings.simplefilter('always', RemovedInDjango20Warning)
 
             class MyModel(ConcreteParentWithoutManager):
-                    pass
+                pass
             self.assertEqual(len(warns), 0)
 
         # Should create 'objects' (set as default) and warn that
