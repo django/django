@@ -277,7 +277,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     return self.__class__(
                         {**self.settings_dict, 'NAME': connection.settings_dict['NAME']},
                         alias=self.alias,
-                        allow_thread_sharing=False,
                     )
         return nodb_connection
 
