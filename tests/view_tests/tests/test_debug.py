@@ -20,8 +20,8 @@ from django.utils.functional import SimpleLazyObject
 from django.utils.safestring import mark_safe
 from django.utils.version import PY36
 from django.views.debug import (
-    CLEANSED_SUBSTITUTE, CallableSettingWrapper, ExceptionReporter,
-    ExceptionReporterFilter, cleanse_setting, technical_500_response,
+    CallableSettingWrapper, ExceptionReporter,
+    ExceptionReporterFilter, technical_500_response,
 )
 
 from ..views import (
@@ -621,7 +621,10 @@ class ExceptionReporterTests(SimpleTestCase):
             request = rf.get('/test_view/', **{key: 'value-that-should-be-redacted'})
             reporter = ExceptionReporter(request, None, None, None)
             with self.subTest(key=key):
-                self.assertEqual(reporter.filter.get_safe_request_meta(request)[key], CLEANSED_SUBSTITUTE)
+                self.assertEqual(
+                    reporter.filter.get_safe_request_meta(request)[key],
+                    reporter.filter.CLEANSED_SUBSTITUTE
+                )
 
     def test_sensitive_request_meta_redacted(self):
         sensitive_data = {'some-key': 'a-value-that-should-be-redacted'}
@@ -1180,16 +1183,29 @@ class AjaxResponseExceptionReporterFilter(ExceptionReportTestMixin, LoggingCaptu
         self.assertEqual(response['Content-Type'], 'text/plain; charset=utf-8')
 
 
-class HelperFunctionTests(SimpleTestCase):
+class ExceptionReporterFilterMethodTests(SimpleTestCase):
+
+    reporter_filter = ExceptionReporterFilter()
 
     def test_cleanse_setting_basic(self):
-        self.assertEqual(cleanse_setting('TEST', 'TEST'), 'TEST')
-        self.assertEqual(cleanse_setting('PASSWORD', 'super_secret'), CLEANSED_SUBSTITUTE)
+        self.assertEqual(ExceptionReporterFilterMethodTests.reporter_filter.cleanse_setting('TEST', 'TEST'), 'TEST')
+        self.assertEqual(
+            ExceptionReporterFilterMethodTests.reporter_filter.cleanse_setting('PASSWORD', 'super_secret'),
+            ExceptionReporterFilterMethodTests.reporter_filter.CLEANSED_SUBSTITUTE
+        )
 
     def test_cleanse_setting_ignore_case(self):
-        self.assertEqual(cleanse_setting('password', 'super_secret'), CLEANSED_SUBSTITUTE)
+        self.assertEqual(
+            ExceptionReporterFilterMethodTests.reporter_filter.cleanse_setting('password', 'super_secret'),
+            ExceptionReporterFilterMethodTests.reporter_filter.CLEANSED_SUBSTITUTE
+        )
 
     def test_cleanse_setting_recurses_in_dictionary(self):
         initial = {'login': 'cooper', 'password': 'secret'}
-        expected = {'login': 'cooper', 'password': CLEANSED_SUBSTITUTE}
-        self.assertEqual(cleanse_setting('SETTING_NAME', initial), expected)
+        expected = {
+            'login': 'cooper', 'password': ExceptionReporterFilterMethodTests.reporter_filter.CLEANSED_SUBSTITUTE
+        }
+        self.assertEqual(
+            ExceptionReporterFilterMethodTests.reporter_filter.cleanse_setting('SETTING_NAME', initial),
+            expected
+        )
