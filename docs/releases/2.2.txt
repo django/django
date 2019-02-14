@@ -286,6 +286,9 @@ backends.
   * ``_delete_fk_sql()`` (to pair with ``_create_fk_sql()``)
   * ``_create_check_sql()`` and ``_delete_check_sql()``
 
+* The third argument of ``DatabaseWrapper.__init__()``,
+  ``allow_thread_sharing``, is removed.
+
 Admin actions are no longer collected from base ``ModelAdmin`` classes
 ----------------------------------------------------------------------
 

@@ -64,6 +64,9 @@ class StaticLiveServerChecks(LiveServerBase):
             # app without having set the required STATIC_URL setting.")
             pass
         finally:
+            # Use del to avoid decrementing the database thread sharing count a
+            # second time.
+            del cls.server_thread
             super().tearDownClass()
 
     def test_test_test(self):
