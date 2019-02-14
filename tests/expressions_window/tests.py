@@ -670,7 +670,12 @@ class WindowFunctionTests(TestCase):
 
     def test_fail_update(self):
         """Window expressions can't be used in an UPDATE statement."""
-        msg = 'Window expressions are not allowed in this query'
+        msg = (
+            'Window expressions are not allowed in this query (salary=<Window: '
+            'Max(Col(expressions_window_employee, expressions_window.Employee.salary)) '
+            'OVER (PARTITION BY Col(expressions_window_employee, '
+            'expressions_window.Employee.department))>).'
+        )
         with self.assertRaisesMessage(FieldError, msg):
             Employee.objects.filter(department='Management').update(
                 salary=Window(expression=Max('salary'), partition_by='department'),
@@ -678,7 +683,10 @@ class WindowFunctionTests(TestCase):
 
     def test_fail_insert(self):
         """Window expressions can't be used in an INSERT statement."""
-        msg = 'Window expressions are not allowed in this query'
+        msg = (
+            'Window expressions are not allowed in this query (salary=<Window: '
+            'Sum(Value(10000), order_by=OrderBy(F(pk), descending=False)) OVER ()'
+        )
         with self.assertRaisesMessage(FieldError, msg):
             Employee.objects.create(
                 name='Jameson', department='Management', hire_date=datetime.date(2007, 7, 1),
