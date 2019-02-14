@@ -273,8 +273,9 @@ following methods:
 
 .. versionadded:: 3.0
 
-    * ``cleansed_substitute``: Defaults to '********************'
-    * ``hidden_settings``: Defaults to match any of the following keys:
+    * ``cleansed_substitute``: The value to replace sensitive values with.
+    Defaults to '********************'
+    * ``hidden_settings``: Defaults to match any keys containing the following strings:
         * API
         * TOKEN
         * KEY
@@ -291,19 +292,20 @@ following methods:
 
     .. method:: SafeExceptionReporterFilter.get_safe_request_meta(request)
 
-        Returns the filtered dictionary of META parameters. By default it replaces
-        the values of sensitive parameters with stars (`**********`).
+        Returns the filtered dictionary of META parameters. It replaces
+        the values of sensitive parameters with the value of the
+        ``cleansed_substitute`` attribute.
 
 .. method:: SafeExceptionReporterFilter.get_post_parameters(request)
 
-    Returns the filtered dictionary of POST parameters. By default it replaces
-    the values of sensitive parameters with stars (`**********`).
+    Returns the filtered dictionary of POST parameters. It replaces the values
+    of sensitive parameters with the value of the ``cleansed_substitute`` attribute.
 
 .. method:: SafeExceptionReporterFilter.get_traceback_frame_variables(request, tb_frame)
 
     Returns the filtered dictionary of local variables for the given traceback
-    frame. By default it replaces the values of sensitive variables with stars
-    (`**********`).
+    frame. It replaces the values of sensitive parameters with the value of the
+    ``cleansed_substitute`` attribute.
 
 .. seealso::
 
