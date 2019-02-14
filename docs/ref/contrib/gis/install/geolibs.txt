@@ -53,11 +53,6 @@ install, directly or by dependency, the required geospatial libraries:
 
     $ sudo apt-get install binutils libproj-dev gdal-bin
 
-Optional packages to consider:
-
-* ``libgeoip1``: for :doc:`GeoIP <../geoip2>` support
-* ``python-gdal`` for GDAL's own Python bindings -- includes interfaces for raster manipulation
-
 Please also consult platform-specific instructions if you are on :ref:`macos`
 or :ref:`windows`.
 
