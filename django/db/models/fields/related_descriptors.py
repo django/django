@@ -1110,14 +1110,20 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                             model=self.model, pk_set=missing_target_ids, using=db,
                         )
 
-                    # Add the ones that aren't there already
+                    # Add the ones that aren't there already. Conflicts can be
+                    # ignored when the intermediary model is auto-created as
+                    # the only possible collision is on the (sid_id, tid_id)
+                    # tuple. The same assertion doesn't hold for user-defined
+                    # intermediary models as they could have other fields
+                    # causing conflicts which must be surfaced.
+                    ignore_conflicts = self.through._meta.auto_created is not False
                     self.through._default_manager.using(db).bulk_create([
                         self.through(**through_defaults, **{
                             '%s_id' % source_field_name: self.related_val[0],
                             '%s_id' % target_field_name: target_id,
                         })
                         for target_id in missing_target_ids
-                    ])
+                    ], ignore_conflicts=ignore_conflicts)
 
                     if self.reverse or source_field_name == self.source_field_name:
                         # Don't send the signal when we are inserting the

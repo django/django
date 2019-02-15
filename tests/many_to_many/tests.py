@@ -117,6 +117,16 @@ class ManyToManyTests(TestCase):
             ]
         )
 
+    @skipUnlessDBFeature('supports_ignore_conflicts')
+    def test_add_ignore_conflicts(self):
+        manager_cls = self.a1.publications.__class__
+        # Simulate a race condition between the missing ids retrieval and
+        # the bulk insertion attempt.
+        missing_target_ids = {self.p1.id}
+        with mock.patch.object(manager_cls, '_get_missing_target_ids', return_value=missing_target_ids) as mocked:
+            self.a1.publications.add(self.p1)
+        mocked.assert_called_once()
+
     def test_related_sets(self):
         # Article objects have access to their related Publication objects.
         self.assertQuerysetEqual(self.a1.publications.all(), ['<Publication: The Python Journal>'])
