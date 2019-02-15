@@ -40,7 +40,7 @@ class UnrecognizedArchiveFormat(ArchiveException):
     """
 
 
-def extract(path, to_path=''):
+def extract(path, to_path):
     """
     Unpack the tar or zip file at the specified path to the directory
     specified by to_path.
@@ -83,7 +83,7 @@ class Archive:
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
-    def extract(self, to_path=''):
+    def extract(self, to_path):
         self._archive.extract(to_path)
 
     def list(self):

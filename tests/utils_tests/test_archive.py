@@ -33,12 +33,6 @@ class ArchiveTester:
             archive.extract(self.tmpdir)
         self.check_files(self.tmpdir)
 
-    def test_extract_method_no_to_path(self):
-        os.chdir(self.tmpdir)
-        with Archive(self.archive_path) as archive:
-            archive.extract()
-        self.check_files(self.tmpdir)
-
     def test_extract_function(self):
         extract(self.archive_path, self.tmpdir)
         self.check_files(self.tmpdir)
@@ -57,11 +51,6 @@ class ArchiveTester:
 
     def test_extract_function_with_leadpath(self):
         extract(self.archive_lead_path, self.tmpdir)
-        self.check_files(self.tmpdir)
-
-    def test_extract_function_no_to_path(self):
-        os.chdir(self.tmpdir)
-        extract(self.archive_path)
         self.check_files(self.tmpdir)
 
     def check_files(self, tmpdir):
