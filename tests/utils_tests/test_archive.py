@@ -5,7 +5,7 @@ import sys
 import tempfile
 import unittest
 
-from django.utils.archive import Archive, extract
+from django.utils.archive import extract
 
 TEST_DIR = os.path.join(os.path.dirname(__file__), 'archives')
 
@@ -27,11 +27,6 @@ class ArchiveTester:
 
     def tearDown(self):
         os.chdir(self.old_cwd)
-
-    def test_extract_method(self):
-        with Archive(self.archive) as archive:
-            archive.extract(self.tmpdir)
-        self.check_files(self.tmpdir)
 
     def test_extract_function(self):
         extract(self.archive_path, self.tmpdir)
