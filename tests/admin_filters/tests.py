@@ -8,6 +8,7 @@ from django.contrib.admin import (
     EmptyFieldListFilter,
     FieldListFilter,
     ModelAdmin,
+    RelatedFieldListFilter,
     RelatedOnlyFieldListFilter,
     SimpleListFilter,
     site,
@@ -216,6 +217,27 @@ class BookAdminRelatedOnlyFilter(ModelAdmin):
         ("employee__department", RelatedOnlyFieldListFilter),
     )
     ordering = ("-id",)
+
+
+class RelatedFieldListNotIsNullFilter(RelatedFieldListFilter):
+    def has_output(self):
+        return super().has_output() + 1
+
+    def choices(self, changelist):
+        yield from super().choices(changelist)
+        yield {
+            'selected': self.lookup_val_isnull == 'False',
+            'query_string': changelist.get_query_string(
+                {self.lookup_kwarg_isnull: 'False'}, [self.lookup_kwarg]
+            ),
+            'display': 'not_isnull',
+        }
+
+
+class BookAdminRelatedFilterIsNotNull(ModelAdmin):
+    list_filter = (
+        ('author', RelatedFieldListNotIsNullFilter),
+    )
 
 
 class DecadeFilterBookAdmin(ModelAdmin):
@@ -2010,6 +2032,23 @@ class ListFiltersTests(TestCase):
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
         self.assertEqual(list(queryset), [jane])
+
+    def test_relatedonlyfieldlistfilter_not_isnull(self):
+        modeladmin = BookAdminRelatedFilterIsNotNull(Book, site)
+
+        request = self.request_factory.get('/', {'author__isnull': 'False'})
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+
+        # Make sure that only actual authors are present in author's list filter
+        filterspec = changelist.get_filters(request)[0][0]
+        choices = list(filterspec.choices(changelist))
+        self.assertEqual(choices[-1]['display'], 'not_isnull')
+        self.assertIs(choices[-1]['selected'], True)
+        self.assertEqual(choices[-1]['query_string'], '?author__isnull=False')
+
+        self.assertIs(choices[-2]['selected'], False)
+        self.assertEqual(choices[-2]['query_string'], '?author__isnull=True')
 
 
 class FacetsMixinTests(SimpleTestCase):
