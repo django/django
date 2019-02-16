@@ -226,7 +226,7 @@ class RelatedFieldListNotIsNullFilter(RelatedFieldListFilter):
     def choices(self, changelist):
         yield from super().choices(changelist)
         yield {
-            'selected': self.lookup_val_isnull == 'False',
+            'selected': self.lookup_val_isnull is False,
             'query_string': changelist.get_query_string(
                 {self.lookup_kwarg_isnull: 'False'}, [self.lookup_kwarg]
             ),
