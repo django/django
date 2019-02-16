@@ -179,7 +179,8 @@ class BaseDatabaseOperations:
         statement into a table that has an auto-incrementing ID, return the
         newly created ID.
         """
-        return cursor.fetchone()[0]
+        results = cursor.fetchone()
+        return results[0] if isinstance(results, tuple) else None
 
     def field_cast_sql(self, db_type, internal_type):
         """
