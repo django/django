@@ -214,7 +214,7 @@ class RelatedFieldListFilter(FieldListFilter):
             }
         if self.include_empty_choice:
             yield {
-                'selected': self.lookup_val_isnull == 'True',
+                'selected': bool(self.lookup_val_isnull),
                 'query_string': changelist.get_query_string({self.lookup_kwarg_isnull: 'True'}, [self.lookup_kwarg]),
                 'display': self.empty_value_display,
             }
@@ -287,7 +287,7 @@ class ChoicesFieldListFilter(FieldListFilter):
             }
         if none_title:
             yield {
-                'selected': self.lookup_val_isnull == 'True',
+                'selected': bool(self.lookup_val_isnull),
                 'query_string': changelist.get_query_string({self.lookup_kwarg_isnull: 'True'}, [self.lookup_kwarg]),
                 'display': none_title,
             }
@@ -407,7 +407,7 @@ class AllValuesFieldListFilter(FieldListFilter):
             }
         if include_none:
             yield {
-                'selected': self.lookup_val_isnull == 'True',
+                'selected': bool(self.lookup_val_isnull),
                 'query_string': changelist.get_query_string({self.lookup_kwarg_isnull: 'True'}, [self.lookup_kwarg]),
                 'display': self.empty_value_display,
             }
