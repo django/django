@@ -7,6 +7,7 @@ certain test -- e.g. being a DateField or ForeignKey.
 """
 import datetime
 
+from django import forms
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.utils import (
     get_model_from_relation, prepare_lookup_value, reverse_field_path,
@@ -57,6 +58,12 @@ class ListFilter:
         request's query string and that will be used by this filter.
         """
         raise NotImplementedError('subclasses of ListFilter must provide an expected_parameters() method')
+
+    def clean_params(self, params):
+        """
+        Return True if some choices would be output for this filter.
+        """
+        return params
 
 
 class SimpleListFilter(ListFilter):
@@ -159,13 +166,31 @@ class FieldListFilter(ListFilter):
                 return list_filter_class(field, request, params, model, model_admin, field_path=field_path)
 
 
-class RelatedFieldListFilter(FieldListFilter):
+class CleanParamsWithFormListFilterMixin:
+    def clean_params(self, params):
+        class _Form(forms.Form):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                for field in params:
+                    if '__isnull' in field:
+                        self.fields[field] = forms.NullBooleanField(required=False)
+                    else:
+                        self.fields[field] = forms.CharField(required=False, empty_value=None)
+
+        form = _Form(params)
+        form.is_valid()
+
+        return form.cleaned_data
+
+
+class RelatedFieldListFilter(CleanParamsWithFormListFilterMixin, FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         other_model = get_model_from_relation(field)
         self.lookup_kwarg = '%s__%s__exact' % (field_path, field.target_field.name)
         self.lookup_kwarg_isnull = '%s__isnull' % field_path
-        self.lookup_val = params.get(self.lookup_kwarg)
-        self.lookup_val_isnull = params.get(self.lookup_kwarg_isnull)
+        cleaned_params = self.clean_params(params)
+        self.lookup_val = cleaned_params.get(self.lookup_kwarg)
+        self.lookup_val_isnull = cleaned_params.get(self.lookup_kwarg_isnull)
         super().__init__(field, request, params, model, model_admin, field_path)
         self.lookup_choices = self.field_choices(field, request, model_admin)
         if hasattr(field, 'verbose_name'):
