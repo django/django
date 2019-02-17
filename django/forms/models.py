@@ -8,6 +8,7 @@ from itertools import chain
 from django.core.exceptions import (
     NON_FIELD_ERRORS, FieldError, ImproperlyConfigured, ValidationError,
 )
+from django.db import models
 from django.forms.fields import ChoiceField, Field
 from django.forms.forms import BaseForm, DeclarativeFieldsMetaclass
 from django.forms.formsets import BaseFormSet, formset_factory
@@ -1166,6 +1167,10 @@ class ModelChoiceField(ChoiceField):
             self.empty_label = None
         else:
             self.empty_label = empty_label
+
+        # Keep only pk of initial it is a model instance
+        if isinstance(initial, models.Model):
+            initial = getattr(initial, to_field_name or 'pk')
 
         # Call Field instead of ChoiceField __init__() because we don't need
         # ChoiceField.__init__().
