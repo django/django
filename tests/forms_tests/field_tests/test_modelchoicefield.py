@@ -1,4 +1,4 @@
-from django.forms import ModelChoiceField, Form
+from django.forms import Form, ModelChoiceField
 from django.test import TestCase
 
 from ..models import ChoiceOptionModel
