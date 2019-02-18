@@ -124,7 +124,7 @@ class Command(BaseCommand):
             for parent in sorted(node.parents):
                 out.append("%s.%s" % parent.key)
             if out:
-                return " … (%s)" % ", ".join(out)
+                return " ... (%s)" % ", ".join(out)
             return ""
 
         for node in plan:

@@ -46,7 +46,6 @@ from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
 from django.contrib.gis.gdal.error import GDALException, SRSException
 from django.contrib.gis.gdal.geomtype import OGRGeomType
-from django.contrib.gis.gdal.libgdal import GDAL_VERSION
 from django.contrib.gis.gdal.prototypes import geom as capi, srs as srs_api
 from django.contrib.gis.gdal.srs import CoordTransform, SpatialReference
 from django.contrib.gis.geometry import hex_regex, json_regex, wkt_regex
@@ -140,14 +139,7 @@ class OGRGeometry(GDALBase):
 
     @staticmethod
     def _from_json(geom_input):
-        ptr = capi.from_json(geom_input)
-        if GDAL_VERSION < (2, 0):
-            try:
-                capi.get_geom_srs(ptr)
-            except SRSException:
-                srs = SpatialReference(4326)
-                capi.assign_srs(ptr, srs.ptr)
-        return ptr
+        return capi.from_json(geom_input)
 
     @classmethod
     def from_bbox(cls, bbox):

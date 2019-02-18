@@ -41,7 +41,7 @@ class MigrateTests(MigrationTestBase):
         call_command('migrate', 'migrations', '0001', verbosity=1, stdout=stdout, no_color=True)
         stdout = stdout.getvalue()
         self.assertIn('Target specific migration: 0001_initial, from migrations', stdout)
-        self.assertIn('Applying migrations.0001_initial… OK', stdout)
+        self.assertIn('Applying migrations.0001_initial... OK', stdout)
         # The correct tables exist
         self.assertTableExists("migrations_author")
         self.assertTableExists("migrations_tribble")
@@ -57,7 +57,7 @@ class MigrateTests(MigrationTestBase):
         call_command('migrate', 'migrations', 'zero', verbosity=1, stdout=stdout, no_color=True)
         stdout = stdout.getvalue()
         self.assertIn('Unapply all migrations: migrations', stdout)
-        self.assertIn('Unapplying migrations.0002_second… OK', stdout)
+        self.assertIn('Unapplying migrations.0002_second... OK', stdout)
         # Tables are gone
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_tribble")
@@ -157,7 +157,7 @@ class MigrateTests(MigrationTestBase):
             call_command("migrate", "migrations", "0001", fake_initial=True, stdout=out, verbosity=1)
             call_command("migrate", "migrations", "0001", fake_initial=True, verbosity=0, database="other")
         self.assertIn(
-            "migrations.0001_initial… faked",
+            "migrations.0001_initial... faked",
             out.getvalue().lower()
         )
         # Run migrations all the way
@@ -208,8 +208,8 @@ class MigrateTests(MigrationTestBase):
         with mock.patch('django.core.management.color.supports_color', lambda *args: False):
             call_command("migrate", "migrations", "0002", fake_initial=True, stdout=out, verbosity=1)
         value = out.getvalue().lower()
-        self.assertIn("migrations.0001_initial… faked", value)
-        self.assertIn("migrations.0002_second… faked", value)
+        self.assertIn("migrations.0001_initial... faked", value)
+        self.assertIn("migrations.0002_second... faked", value)
         # Fake an apply
         call_command("migrate", "migrations", fake=True, verbosity=0)
         # Unmigrate everything
@@ -271,8 +271,8 @@ class MigrateTests(MigrationTestBase):
         call_command("showmigrations", format='plan', stdout=out, verbosity=2)
         self.assertEqual(
             "[ ]  migrations.0001_initial\n"
-            "[ ]  migrations.0003_third … (migrations.0001_initial)\n"
-            "[ ]  migrations.0002_second … (migrations.0001_initial, migrations.0003_third)\n",
+            "[ ]  migrations.0003_third ... (migrations.0001_initial)\n"
+            "[ ]  migrations.0002_second ... (migrations.0001_initial, migrations.0003_third)\n",
             out.getvalue().lower()
         )
         call_command("migrate", "migrations", "0003", verbosity=0)
@@ -290,8 +290,8 @@ class MigrateTests(MigrationTestBase):
         call_command("showmigrations", format='plan', stdout=out, verbosity=2)
         self.assertEqual(
             "[x]  migrations.0001_initial\n"
-            "[x]  migrations.0003_third … (migrations.0001_initial)\n"
-            "[ ]  migrations.0002_second … (migrations.0001_initial, migrations.0003_third)\n",
+            "[x]  migrations.0003_third ... (migrations.0001_initial)\n"
+            "[ ]  migrations.0002_second ... (migrations.0001_initial, migrations.0003_third)\n",
             out.getvalue().lower()
         )
 
@@ -410,10 +410,10 @@ class MigrateTests(MigrationTestBase):
         call_command("showmigrations", format='plan', stdout=out, verbosity=2)
         self.assertEqual(
             "[ ]  migrations.1_auto\n"
-            "[ ]  migrations.2_auto … (migrations.1_auto)\n"
-            "[ ]  migrations.3_squashed_5 … (migrations.2_auto)\n"
-            "[ ]  migrations.6_auto … (migrations.3_squashed_5)\n"
-            "[ ]  migrations.7_auto … (migrations.6_auto)\n",
+            "[ ]  migrations.2_auto ... (migrations.1_auto)\n"
+            "[ ]  migrations.3_squashed_5 ... (migrations.2_auto)\n"
+            "[ ]  migrations.6_auto ... (migrations.3_squashed_5)\n"
+            "[ ]  migrations.7_auto ... (migrations.6_auto)\n",
             out.getvalue().lower()
         )
 
@@ -434,10 +434,10 @@ class MigrateTests(MigrationTestBase):
         call_command("showmigrations", format='plan', stdout=out, verbosity=2)
         self.assertEqual(
             "[x]  migrations.1_auto\n"
-            "[x]  migrations.2_auto … (migrations.1_auto)\n"
-            "[x]  migrations.3_squashed_5 … (migrations.2_auto)\n"
-            "[ ]  migrations.6_auto … (migrations.3_squashed_5)\n"
-            "[ ]  migrations.7_auto … (migrations.6_auto)\n",
+            "[x]  migrations.2_auto ... (migrations.1_auto)\n"
+            "[x]  migrations.3_squashed_5 ... (migrations.2_auto)\n"
+            "[ ]  migrations.6_auto ... (migrations.3_squashed_5)\n"
+            "[ ]  migrations.7_auto ... (migrations.6_auto)\n",
             out.getvalue().lower()
         )
 
@@ -659,7 +659,7 @@ class MigrateTests(MigrationTestBase):
             self.assertGreater(len(execute.mock_calls), 2)
         stdout = stdout.getvalue()
         self.assertIn('Synchronize unmigrated apps: unmigrated_app_syncdb', stdout)
-        self.assertIn('Creating tables…', stdout)
+        self.assertIn('Creating tables...', stdout)
         table_name = truncate_name('unmigrated_app_syncdb_classroom', connection.ops.max_name_length())
         self.assertIn('Creating table %s' % table_name, stdout)
 
@@ -1535,7 +1535,7 @@ class SquashMigrationsTests(MigrationTestBase):
 class AppLabelErrorTests(TestCase):
     """
     This class inherits TestCase because MigrationTestBase uses
-    `availabe_apps = ['migrations']` which means that it's the only installed
+    `available_apps = ['migrations']` which means that it's the only installed
     app. 'django.contrib.auth' must be in INSTALLED_APPS for some of these
     tests.
     """

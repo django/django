@@ -4,7 +4,6 @@ import os
 import posixpath
 import re
 import warnings
-from collections import OrderedDict
 from urllib.parse import unquote, urldefrag, urlsplit, urlunsplit
 
 from django.conf import settings
@@ -59,7 +58,7 @@ class HashedFilesMixin:
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._patterns = OrderedDict()
+        self._patterns = {}
         self.hashed_files = {}
         for extension, patterns in self.patterns:
             for pattern in patterns:
@@ -208,7 +207,7 @@ class HashedFilesMixin:
 
     def post_process(self, paths, dry_run=False, **options):
         """
-        Post process the given OrderedDict of files (called from collectstatic).
+        Post process the given dictionary of files (called from collectstatic).
 
         Processing is actually two separate operations:
 
@@ -225,7 +224,7 @@ class HashedFilesMixin:
             return
 
         # where to store the new paths
-        hashed_files = OrderedDict()
+        hashed_files = {}
 
         # build a list of adjustable files
         adjustable_paths = [
@@ -386,20 +385,20 @@ class ManifestFilesMixin(HashedFilesMixin):
     def load_manifest(self):
         content = self.read_manifest()
         if content is None:
-            return OrderedDict()
+            return {}
         try:
-            stored = json.loads(content, object_pairs_hook=OrderedDict)
+            stored = json.loads(content)
         except json.JSONDecodeError:
             pass
         else:
             version = stored.get('version')
             if version == '1.0':
-                return stored.get('paths', OrderedDict())
+                return stored.get('paths', {})
         raise ValueError("Couldn't load manifest '%s' (version %s)" %
                          (self.manifest_name, self.manifest_version))
 
     def post_process(self, *args, **kwargs):
-        self.hashed_files = OrderedDict()
+        self.hashed_files = {}
         yield from super().post_process(*args, **kwargs)
         self.save_manifest()
 

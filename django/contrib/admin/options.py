@@ -2,7 +2,6 @@ import copy
 import json
 import operator
 import re
-from collections import OrderedDict
 from functools import partial, reduce, update_wrapper
 from urllib.parse import quote as urlquote
 
@@ -682,10 +681,7 @@ class ModelAdmin(BaseModelAdmin):
         exclude = exclude or None
 
         # Remove declared form fields which are in readonly_fields.
-        new_attrs = OrderedDict.fromkeys(
-            f for f in readonly_fields
-            if f in self.form.declared_fields
-        )
+        new_attrs = dict.fromkeys(f for f in readonly_fields if f in self.form.declared_fields)
         form = type(self.form.__name__, (self.form,), new_attrs)
 
         defaults = {
@@ -886,13 +882,9 @@ class ModelAdmin(BaseModelAdmin):
         # If self.actions is set to None that means actions are disabled on
         # this page.
         if self.actions is None or IS_POPUP_VAR in request.GET:
-            return OrderedDict()
+            return {}
         actions = self._filter_actions_by_permissions(request, self._get_base_actions())
-        # Convert the actions into an OrderedDict keyed by name.
-        return OrderedDict(
-            (name, (func, name, desc))
-            for func, name, desc in actions
-        )
+        return {name: (func, name, desc) for func, name, desc in actions}
 
     def get_action_choices(self, request, default_choices=BLANK_CHOICE_DASH):
         """

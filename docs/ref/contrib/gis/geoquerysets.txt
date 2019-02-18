@@ -148,9 +148,14 @@ Backend     SQL Equivalent
 ==========  ============================
 PostGIS     ``ST_Contains(poly, geom)``
 Oracle      ``SDO_CONTAINS(poly, geom)``
-MySQL       ``MBRContains(poly, geom)``
+MySQL       ``ST_Contains(poly, geom)``
 SpatiaLite  ``Contains(poly, geom)``
 ==========  ============================
+
+.. versionchanged:: 3.0
+
+    In older versions, MySQL uses ``MBRContains`` and operates only on bounding
+    boxes.
 
 .. fieldlookup:: contains_properly
 
@@ -233,7 +238,7 @@ SpatiaLite  ``Covers(poly, geom)``
 -----------
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_Crosses.html>`__,
-SpatiaLite, PGRaster (Conversion)
+MySQL, SpatiaLite, PGRaster (Conversion)
 
 Tests if the geometry field spatially crosses the lookup geometry.
 
@@ -245,8 +250,13 @@ Example::
 Backend     SQL Equivalent
 ==========  ==========================
 PostGIS     ``ST_Crosses(poly, geom)``
+MySQL       ``ST_Crosses(poly, geom)``
 SpatiaLite  ``Crosses(poly, geom)``
 ==========  ==========================
+
+.. versionchanged:: 3.0
+
+    MySQL support was added.
 
 .. fieldlookup:: disjoint
 
@@ -267,9 +277,14 @@ Backend     SQL Equivalent
 ==========  =================================================
 PostGIS     ``ST_Disjoint(poly, geom)``
 Oracle      ``SDO_GEOM.RELATE(poly, 'DISJOINT', geom, 0.05)``
-MySQL       ``MBRDisjoint(poly, geom)``
+MySQL       ``ST_Disjoint(poly, geom)``
 SpatiaLite  ``Disjoint(poly, geom)``
 ==========  =================================================
+
+.. versionchanged:: 3.0
+
+    In older versions, MySQL uses ``MBRDisjoint`` and operates only on bounding
+    boxes.
 
 .. fieldlookup:: equals
 
@@ -290,9 +305,14 @@ Backend     SQL Equivalent
 ==========  =================================================
 PostGIS     ``ST_Equals(poly, geom)``
 Oracle      ``SDO_EQUAL(poly, geom)``
-MySQL       ``MBREquals(poly, geom)``
+MySQL       ``ST_Equals(poly, geom)``
 SpatiaLite  ``Equals(poly, geom)``
 ==========  =================================================
+
+.. versionchanged:: 3.0
+
+    In older versions, MySQL uses ``MBREquals`` and operates only on bounding
+    boxes.
 
 .. fieldlookup:: exact
 .. fieldlookup:: same_as
@@ -303,8 +323,8 @@ SpatiaLite  ``Equals(poly, geom)``
 *Availability*: `PostGIS <https://postgis.net/docs/ST_Geometry_Same.html>`__,
 Oracle, MySQL, SpatiaLite, PGRaster (Bilateral)
 
-Tests if the geometry field is "equal" to the lookup geometry. On Oracle and
-SpatiaLite it tests spatial equality, while on MySQL and PostGIS it tests
+Tests if the geometry field is "equal" to the lookup geometry. On Oracle,
+MySQL, and SpatiaLite, it tests spatial equality, while on PostGIS it tests
 equality of bounding boxes.
 
 Example::
@@ -316,9 +336,14 @@ Backend     SQL Equivalent
 ==========  =================================================
 PostGIS     ``poly ~= geom``
 Oracle      ``SDO_EQUAL(poly, geom)``
-MySQL       ``MBREquals(poly, geom)``
+MySQL       ``ST_Equals(poly, geom)``
 SpatiaLite  ``Equals(poly, geom)``
 ==========  =================================================
+
+.. versionchanged:: 3.0
+
+    In older versions, MySQL uses ``MBREquals`` and operates only on bounding
+    boxes.
 
 .. fieldlookup:: intersects
 
@@ -339,9 +364,14 @@ Backend     SQL Equivalent
 ==========  =================================================
 PostGIS     ``ST_Intersects(poly, geom)``
 Oracle      ``SDO_OVERLAPBDYINTERSECT(poly, geom)``
-MySQL       ``MBRIntersects(poly, geom)``
+MySQL       ``ST_Intersects(poly, geom)``
 SpatiaLite  ``Intersects(poly, geom)``
 ==========  =================================================
+
+.. versionchanged:: 3.0
+
+    In older versions, MySQL uses ``MBRIntersects`` and operates only on
+    bounding boxes.
 
 .. fieldlookup:: isvalid
 
@@ -371,6 +401,22 @@ Oracle                      ``SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT(poly, 0.05
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_Overlaps.html>`__,
 Oracle, MySQL, SpatiaLite, PGRaster (Bilateral)
+
+Tests if the geometry field spatially overlaps the lookup geometry.
+
+==========  ============================
+Backend     SQL Equivalent
+==========  ============================
+PostGIS     ``ST_Overlaps(poly, geom)``
+Oracle      ``SDO_OVERLAPS(poly, geom)``
+MySQL       ``ST_Overlaps(poly, geom)``
+SpatiaLite  ``Overlaps(poly, geom)``
+==========  ============================
+
+.. versionchanged:: 3.0
+
+    In older versions, MySQL uses ``MBROverlaps`` and operates only on bounding
+    boxes.
 
 .. fieldlookup:: relate
 
@@ -453,10 +499,15 @@ Example::
 Backend     SQL Equivalent
 ==========  ==========================
 PostGIS     ``ST_Touches(poly, geom)``
-MySQL       ``MBRTouches(poly, geom)``
+MySQL       ``ST_Touches(poly, geom)``
 Oracle      ``SDO_TOUCH(poly, geom)``
 SpatiaLite  ``Touches(poly, geom)``
 ==========  ==========================
+
+.. versionchanged:: 3.0
+
+    In older versions, MySQL uses ``MBRTouches`` and operates only on bounding
+    boxes.
 
 .. fieldlookup:: within
 
@@ -476,10 +527,15 @@ Example::
 Backend     SQL Equivalent
 ==========  ==========================
 PostGIS     ``ST_Within(poly, geom)``
-MySQL       ``MBRWithin(poly, geom)``
+MySQL       ``ST_Within(poly, geom)``
 Oracle      ``SDO_INSIDE(poly, geom)``
 SpatiaLite  ``Within(poly, geom)``
 ==========  ==========================
+
+.. versionchanged:: 3.0
+
+    In older versions, MySQL uses ``MBRWithin`` and operates only on bounding
+    boxes.
 
 .. fieldlookup:: left
 
@@ -788,7 +844,8 @@ Keyword Argument       Description
                        details.
 =====================  =====================================================
 
-__ https://docs.oracle.com/database/121/SPATL/GUID-3BD00273-E74F-4830-9444-A3BB15AA0AC4.htm#SPATL466
+__ https://docs.oracle.com/en/database/oracle/oracle-database/18/spatl/
+   spatial-concepts.html#GUID-CE10AB14-D5EA-43BA-A647-DAC9EEF41EE6
 
 Example::
 
@@ -885,5 +942,8 @@ Example::
 
 .. rubric:: Footnotes
 .. [#fnde9im] *See* `OpenGIS Simple Feature Specification For SQL <http://www.opengis.org/docs/99-049.pdf>`_, at Ch. 2.1.13.2, p. 2-13 (The Dimensionally Extended Nine-Intersection Model).
-.. [#fnsdorelate] *See* `SDO_RELATE documentation <https://docs.oracle.com/database/121/SPATL/sdo_relate.htm#SPATL1039>`_, from the Oracle Spatial and Graph Developer's Guide.
+.. [#fnsdorelate] *See* `SDO_RELATE documentation <https://docs.oracle.com/en/
+   database/oracle/oracle-database/18/spatl/spatial-operators-reference.html#
+   GUID-97C17C18-F05E-49B4-BE11-E89B972E2A02>`_, from the Oracle Spatial and
+   Graph Developer's Guide.
 .. [#fncovers] For an explanation of this routine, read `Quirks of the "Contains" Spatial Predicate <https://lin-ear-th-inking.blogspot.com/2007/06/subtleties-of-ogc-covers-spatial.html>`_ by Martin Davis (a PostGIS developer).

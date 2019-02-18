@@ -210,8 +210,7 @@ class Command(BaseCommand):
                     # Write the migrations file to the disk.
                     migrations_directory = os.path.dirname(writer.path)
                     if not directory_created.get(app_label):
-                        if not os.path.isdir(migrations_directory):
-                            os.mkdir(migrations_directory)
+                        os.makedirs(migrations_directory, exist_ok=True)
                         init_path = os.path.join(migrations_directory, "__init__.py")
                         if not os.path.isfile(init_path):
                             open(init_path, "w").close()

@@ -789,7 +789,9 @@ object. If it's ``None``, Django uses the :ref:`current time zone
 
     .. _pytz: http://pytz.sourceforge.net/
     .. _Time Zones: https://www.postgresql.org/docs/current/static/datatype-datetime.html#DATATYPE-TIMEZONES
-    .. _Choosing a Time Zone File: https://docs.oracle.com/database/121/NLSPG/ch4datetime.htm#NLSPG258
+    .. _Choosing a Time Zone File: https://docs.oracle.com/en/database/oracle/
+       oracle-database/18/nlspg/datetime-data-types-and-time-zone-support.html
+       #GUID-805AB986-DE12-4FEA-AF56-5AABCD2132DF
     .. _mysql_tzinfo_to_sql: https://dev.mysql.com/doc/refman/en/mysql-tzinfo-to-sql.html
 
 ``none()``
@@ -1363,17 +1365,14 @@ of the arguments is required, but you should use at least one of them.
 
   In some rare cases, you might wish to pass parameters to the SQL
   fragments in ``extra(select=...)``. For this purpose, use the
-  ``select_params`` parameter. Since ``select_params`` is a sequence and
-  the ``select`` attribute is a dictionary, some care is required so that
-  the parameters are matched up correctly with the extra select pieces.
-  In this situation, you should use a :class:`collections.OrderedDict` for
-  the ``select`` value, not just a normal Python dictionary.
+  ``select_params`` parameter.
 
   This will work, for example::
 
       Blog.objects.extra(
-          select=OrderedDict([('a', '%s'), ('b', '%s')]),
-          select_params=('one', 'two'))
+          select={'a': '%s', 'b': '%s'},
+          select_params=('one', 'two'),
+      )
 
   If you need to use a literal ``%s`` inside your select string, use
   the sequence ``%%s``.
@@ -2073,11 +2072,11 @@ The ``batch_size`` parameter controls how many objects are created in a single
 query. The default is to create all objects in one batch, except for SQLite
 where the default is such that at most 999 variables per query are used.
 
-On databases that support it (all except PostgreSQL < 9.5 and Oracle), setting
-the ``ignore_conflicts`` parameter to ``True`` tells the database to ignore
-failure to insert any rows that fail constraints such as duplicate unique
-values. Enabling this parameter disables setting the primary key on each model
-instance (if the database normally supports it).
+On databases that support it (all but Oracle), setting the ``ignore_conflicts``
+parameter to ``True`` tells the database to ignore failure to insert any rows
+that fail constraints such as duplicate unique values. Enabling this parameter
+disables setting the primary key on each model instance (if the database
+normally supports it).
 
 .. versionchanged:: 2.2
 
@@ -3481,7 +3480,7 @@ attribute:
 
     >>> prefetch = Prefetch('choice_set', queryset=voted_choices, to_attr='voted_choices')
     >>> Question.objects.prefetch_related(prefetch).get().voted_choices
-    <QuerySet [<Choice: The sky>]>
+    [<Choice: The sky>]
     >>> Question.objects.prefetch_related(prefetch).get().choice_set.all()
     <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
 

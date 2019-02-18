@@ -1,7 +1,6 @@
 import json
 
 from django.db.models.expressions import F, Value
-from django.test.testcases import skipUnlessDBFeature
 from django.test.utils import Approximate
 
 from . import PostgreSQLTestCase
@@ -184,12 +183,10 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         )
         self.assertEqual(values, {'arrayagg': [0, 1, 0, 2]})
 
-    @skipUnlessDBFeature('has_jsonb_agg')
     def test_json_agg(self):
         values = AggregateTestModel.objects.aggregate(jsonagg=JSONBAgg('char_field'))
         self.assertEqual(values, {'jsonagg': ['Foo1', 'Foo2', 'Foo4', 'Foo3']})
 
-    @skipUnlessDBFeature('has_jsonb_agg')
     def test_json_agg_empty(self):
         values = AggregateTestModel.objects.none().aggregate(jsonagg=JSONBAgg('integer_field'))
         self.assertEqual(values, json.loads('{"jsonagg": []}'))

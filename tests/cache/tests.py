@@ -274,6 +274,11 @@ class BaseCacheTests:
         cache.set("key", "value")
         self.assertEqual(cache.get("key"), "value")
 
+    def test_default_used_when_none_is_set(self):
+        """If None is cached, get() returns it instead of the default."""
+        cache.set('key_default_none', None)
+        self.assertIsNone(cache.get('key_default_none', default='default'))
+
     def test_add(self):
         # A key can be added to a cache
         cache.add("addkey1", "value")
@@ -1364,6 +1369,14 @@ class MemcachedCacheTests(BaseMemcachedTests, TestCase):
     ))
     def test_memcached_options(self):
         self.assertEqual(cache._cache.server_max_value_length, 9999)
+
+    def test_default_used_when_none_is_set(self):
+        """
+        python-memcached doesn't support default in get() so this test
+        overrides the one in BaseCacheTests.
+        """
+        cache.set('key_default_none', None)
+        self.assertEqual(cache.get('key_default_none', default='default'), 'default')
 
 
 @unittest.skipUnless(PyLibMCCache_params, "PyLibMCCache backend not configured")

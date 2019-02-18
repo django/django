@@ -198,7 +198,7 @@ class ConversionExceptionTests(SimpleTestCase):
         with self.assertRaises(Resolver404):
             resolve('/dynamic/abc/')
 
-    def test_resolve_type_error_propogates(self):
+    def test_resolve_type_error_propagates(self):
         @DynamicConverter.register_to_python
         def raises_type_error(value):
             raise TypeError('This type error propagates.')

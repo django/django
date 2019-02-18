@@ -168,7 +168,7 @@ class CaseInsensitiveMappingTests(SimpleTestCase):
             CaseInsensitiveMapping([(1, '2')])
 
     def test_list(self):
-        self.assertEqual(sorted(list(self.dict1)), sorted(['Accept', 'content-type']))
+        self.assertEqual(list(self.dict1), ['Accept', 'content-type'])
 
     def test_dict(self):
         self.assertEqual(dict(self.dict1), {'Accept': 'application/json', 'content-type': 'text/html'})

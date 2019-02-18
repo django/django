@@ -69,6 +69,26 @@ class Invalid(models.Model):
     point = models.PointField()
 
 
+class HasNulls(models.Model):
+    uuid = models.UUIDField(primary_key=True, editable=False)
+    geom = models.PolygonField(srid=4326, blank=True, null=True)
+    datetime = models.DateTimeField(blank=True, null=True)
+    integer = models.IntegerField(blank=True, null=True)
+    num = models.FloatField(blank=True, null=True)
+    boolean = models.BooleanField(blank=True, null=True)
+    name = models.CharField(blank=True, null=True, max_length=20)
+
+
+class DoesNotAllowNulls(models.Model):
+    uuid = models.UUIDField(primary_key=True, editable=False)
+    geom = models.PolygonField(srid=4326)
+    datetime = models.DateTimeField()
+    integer = models.IntegerField()
+    num = models.FloatField()
+    boolean = models.BooleanField()
+    name = models.CharField(max_length=20)
+
+
 # Mapping dictionaries for the models above.
 co_mapping = {
     'name': 'Name',
@@ -94,4 +114,14 @@ inter_mapping = {
     'name': 'Name',
     'length': 'Length',
     'path': 'LINESTRING',
+}
+
+has_nulls_mapping = {
+    'geom': 'POLYGON',
+    'uuid': 'uuid',
+    'datetime': 'datetime',
+    'name': 'name',
+    'integer': 'integer',
+    'num': 'num',
+    'boolean': 'boolean',
 }

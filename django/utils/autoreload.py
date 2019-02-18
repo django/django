@@ -98,8 +98,8 @@ def iter_all_python_module_files():
     # modules based on the module name and pass it to iter_modules_and_files().
     # This ensures cached results are returned in the usual case that modules
     # aren't loaded on the fly.
-    modules_view = sorted(list(sys.modules.items()), key=lambda i: i[0])
-    modules = tuple(m[1] for m in modules_view if not isinstance(m[1], weakref.ProxyTypes))
+    keys = sorted(sys.modules)
+    modules = tuple(m for m in map(sys.modules.__getitem__, keys) if not isinstance(m, weakref.ProxyTypes))
     return iter_modules_and_files(modules, frozenset(_error_files))
 
 

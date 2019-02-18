@@ -2,7 +2,7 @@ import functools
 import os
 import pkgutil
 import sys
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from difflib import get_close_matches
 from importlib import import_module
 
@@ -339,8 +339,8 @@ class ManagementUtility:
                     # The exception will be raised later in the child process
                     # started by the autoreloader. Pretend it didn't happen by
                     # loading an empty list of applications.
-                    apps.all_models = defaultdict(OrderedDict)
-                    apps.app_configs = OrderedDict()
+                    apps.all_models = defaultdict(dict)
+                    apps.app_configs = {}
                     apps.apps_ready = apps.models_ready = apps.ready = True
 
                     # Remove options not compatible with the built-in runserver

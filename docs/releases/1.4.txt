@@ -378,7 +378,7 @@ Translating URL patterns
 Django can now look for a language prefix in the URLpattern when using the new
 :func:`~django.conf.urls.i18n.i18n_patterns` helper function.
 It's also now possible to define translatable URL patterns using
-:func:`~django.utils.translation.ugettext_lazy`. See
+``django.utils.translation.ugettext_lazy()``. See
 :ref:`url-internationalization` for more information about the language prefix
 and how to internationalize URL patterns.
 

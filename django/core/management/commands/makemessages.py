@@ -356,8 +356,7 @@ class Command(BaseCommand):
                 self.locale_paths.append(os.path.abspath('locale'))
             if self.locale_paths:
                 self.default_locale_path = self.locale_paths[0]
-                if not os.path.exists(self.default_locale_path):
-                    os.makedirs(self.default_locale_path)
+                os.makedirs(self.default_locale_path, exist_ok=True)
 
         # Build locale list
         looks_like_locale = re.compile(r'[a-z]{2}')
@@ -598,8 +597,7 @@ class Command(BaseCommand):
         Use msgmerge and msgattrib GNU gettext utilities.
         """
         basedir = os.path.join(os.path.dirname(potfile), locale, 'LC_MESSAGES')
-        if not os.path.isdir(basedir):
-            os.makedirs(basedir)
+        os.makedirs(basedir, exist_ok=True)
         pofile = os.path.join(basedir, '%s.po' % self.domain)
 
         if os.path.exists(pofile):

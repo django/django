@@ -20,7 +20,7 @@ def file_upload_view(request):
         # not the full path.
         if os.path.dirname(form_data['file_field'].name) != '':
             return HttpResponseServerError()
-        return HttpResponse('')
+        return HttpResponse()
     else:
         return HttpResponseServerError()
 
@@ -50,36 +50,19 @@ def file_upload_view_verify(request):
     obj = FileModel()
     obj.testfile.save(largefile.name, largefile)
 
-    return HttpResponse('')
+    return HttpResponse()
 
 
 def file_upload_unicode_name(request):
-
     # Check to see if unicode name came through properly.
     if not request.FILES['file_unicode'].name.endswith(UNICODE_FILENAME):
         return HttpResponseServerError()
-
-    response = None
-
     # Check to make sure the exotic characters are preserved even
     # through file save.
     uni_named_file = request.FILES['file_unicode']
-    obj = FileModel.objects.create(testfile=uni_named_file)
+    FileModel.objects.create(testfile=uni_named_file)
     full_name = '%s/%s' % (UPLOAD_TO, uni_named_file.name)
-    if not os.path.exists(full_name):
-        response = HttpResponseServerError()
-
-    # Cleanup the object with its exotic file name immediately.
-    # (shutil.rmtree used elsewhere in the tests to clean up the
-    # upload directory has been seen to choke on unicode
-    # filenames on Windows.)
-    obj.delete()
-    os.unlink(full_name)
-
-    if response:
-        return response
-    else:
-        return HttpResponse('')
+    return HttpResponse() if os.path.exists(full_name) else HttpResponseServerError()
 
 
 def file_upload_echo(request):
@@ -157,4 +140,4 @@ def file_upload_content_type_extra(request):
 def file_upload_fd_closing(request, access):
     if access == 't':
         request.FILES  # Trigger file parsing.
-    return HttpResponse('')
+    return HttpResponse()

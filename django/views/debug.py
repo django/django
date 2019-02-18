@@ -11,7 +11,7 @@ from django.template.defaultfilters import pprint
 from django.urls import Resolver404, resolve
 from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.module_loading import import_string
 from django.utils.version import get_docs_version
 
@@ -280,7 +280,7 @@ class ExceptionReporter:
             end = getattr(self.exc_value, 'end', None)
             if start is not None and end is not None:
                 unicode_str = self.exc_value.args[1]
-                unicode_hint = force_text(
+                unicode_hint = force_str(
                     unicode_str[max(start - 5, 0):min(end + 5, len(unicode_str))],
                     'ascii', errors='replace'
                 )
@@ -397,6 +397,9 @@ class ExceptionReporter:
         while exc_value:
             exceptions.append(exc_value)
             exc_value = explicit_or_implicit_cause(exc_value)
+            if exc_value in exceptions:
+                # Avoid infinite loop if there's a cyclic reference (#29393).
+                break
 
         frames = []
         # No exceptions were supplied to ExceptionReporter

@@ -1,5 +1,5 @@
 import datetime
-from unittest import skipIf, skipUnless
+from unittest import mock, skipIf, skipUnless
 
 from django.core.exceptions import FieldError
 from django.db import NotSupportedError, connection
@@ -536,7 +536,7 @@ class WindowFunctionTests(TestCase):
             ('Brown', 53000, 'Sales', datetime.date(2009, 9, 1), 108000),
         ], transform=lambda row: (row.name, row.salary, row.department, row.hire_date, row.sum))
 
-    @skipIf(connection.vendor == 'postgresql', 'n following/preceding not supported by PostgreSQL')
+    @skipUnlessDBFeature('supports_frame_range_fixed_distance')
     def test_range_n_preceding_and_following(self):
         qs = Employee.objects.annotate(sum=Window(
             expression=Sum('salary'),
@@ -584,6 +584,10 @@ class WindowFunctionTests(TestCase):
             ('Brown', 'Sales', 53000, datetime.date(2009, 9, 1), 148000)
         ], transform=lambda row: (row.name, row.department, row.salary, row.hire_date, row.sum))
 
+    @skipIf(
+        connection.vendor == 'sqlite' and connection.Database.sqlite_version_info < (3, 27),
+        'Nondeterministic failure on SQLite < 3.27.'
+    )
     def test_subquery_row_range_rank(self):
         qs = Employee.objects.annotate(
             highest_avg_salary_date=Subquery(
@@ -666,7 +670,12 @@ class WindowFunctionTests(TestCase):
 
     def test_fail_update(self):
         """Window expressions can't be used in an UPDATE statement."""
-        msg = 'Window expressions are not allowed in this query'
+        msg = (
+            'Window expressions are not allowed in this query (salary=<Window: '
+            'Max(Col(expressions_window_employee, expressions_window.Employee.salary)) '
+            'OVER (PARTITION BY Col(expressions_window_employee, '
+            'expressions_window.Employee.department))>).'
+        )
         with self.assertRaisesMessage(FieldError, msg):
             Employee.objects.filter(department='Management').update(
                 salary=Window(expression=Max('salary'), partition_by='department'),
@@ -674,7 +683,10 @@ class WindowFunctionTests(TestCase):
 
     def test_fail_insert(self):
         """Window expressions can't be used in an INSERT statement."""
-        msg = 'Window expressions are not allowed in this query'
+        msg = (
+            'Window expressions are not allowed in this query (salary=<Window: '
+            'Sum(Value(10000), order_by=OrderBy(F(pk), descending=False)) OVER ()'
+        )
         with self.assertRaisesMessage(FieldError, msg):
             Employee.objects.create(
                 name='Jameson', department='Management', hire_date=datetime.date(2007, 7, 1),
@@ -815,6 +827,12 @@ class NonQueryWindowTests(SimpleTestCase):
         msg = 'Window is disallowed in the filter clause'
         with self.assertRaisesMessage(NotSupportedError, msg):
             Employee.objects.annotate(dense_rank=Window(expression=DenseRank())).filter(dense_rank__gte=1)
+
+    def test_unsupported_backend(self):
+        msg = 'This backend does not support window expressions.'
+        with mock.patch.object(connection.features, 'supports_over_clause', False):
+            with self.assertRaisesMessage(NotSupportedError, msg):
+                Employee.objects.annotate(dense_rank=Window(expression=DenseRank())).get()
 
     def test_invalid_order_by(self):
         msg = 'order_by must be either an Expression or a sequence of expressions'

@@ -151,13 +151,6 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
             'BoundingCircle': 'ST_MinimumBoundingCircle',
             'NumPoints': 'ST_NPoints',
         }
-        if self.spatial_version < (2, 2, 0):
-            function_names.update({
-                'DistanceSphere': 'ST_distance_sphere',
-                'DistanceSpheroid': 'ST_distance_spheroid',
-                'LengthSpheroid': 'ST_length_spheroid',
-                'MemSize': 'ST_mem_size',
-            })
         if self.spatial_version < (2, 4, 0):
             function_names['ForcePolygonCW'] = 'ST_ForceRHR'
         return function_names
@@ -185,7 +178,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
                 raise ImproperlyConfigured(
                     'Cannot determine PostGIS version for database "%s" '
                     'using command "SELECT postgis_lib_version()". '
-                    'GeoDjango requires at least PostGIS version 2.1. '
+                    'GeoDjango requires at least PostGIS version 2.2. '
                     'Was the database created from a spatial database '
                     'template?' % self.connection.settings_dict['NAME']
                 )

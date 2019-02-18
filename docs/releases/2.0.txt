@@ -237,9 +237,9 @@ Models
   finds the starting index of a string inside another string.
 
 * On Oracle, ``AutoField`` and ``BigAutoField`` are now created as `identity
-  columns`_.
-
-  .. _`identity columns`: https://docs.oracle.com/database/121/DRDAA/migr_tools_feat.htm#DRDAA109
+  columns <https://docs.oracle.com/en/database/oracle/oracle-database/18/drdaa/
+  intro-to-tools-and-products-supporting-migraiton.html#GUID-14E4817B-F3BC-4D99
+  -B471-A0ACDC303CC9>`__.
 
 * The new ``chunk_size`` parameter of :meth:`.QuerySet.iterator` controls the
   number of rows fetched by the Python database client when streaming results
@@ -668,7 +668,7 @@ Miscellaneous
   except that it also requires a ``request``.
 
 * The ``DEFAULT_CONTENT_TYPE`` setting is deprecated. It doesn't interact well
-  well with third-party apps and is obsolete since HTML5 has mostly superseded
+  with third-party apps and is obsolete since HTML5 has mostly superseded
   XHTML.
 
 * ``HttpRequest.xreadlines()`` is deprecated in favor of iterating over the

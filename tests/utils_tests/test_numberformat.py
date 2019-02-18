@@ -80,6 +80,25 @@ class TestNumberFormat(SimpleTestCase):
         )
         self.assertEqual(nformat(Decimal('3.'), '.'), '3')
         self.assertEqual(nformat(Decimal('3.0'), '.'), '3.0')
+        # Very large & small numbers.
+        tests = [
+            ('9e9999', None, '9e+9999'),
+            ('9e9999', 3, '9.000e+9999'),
+            ('9e201', None, '9e+201'),
+            ('9e200', None, '9e+200'),
+            ('1.2345e999', 2, '1.23e+999'),
+            ('9e-999', None, '9e-999'),
+            ('1e-7', 8, '0.00000010'),
+            ('1e-8', 8, '0.00000001'),
+            ('1e-9', 8, '0.00000000'),
+            ('1e-10', 8, '0.00000000'),
+            ('1e-11', 8, '0.00000000'),
+            ('1' + ('0' * 300), 3, '1.000e+300'),
+            ('0.{}1234'.format('0' * 299), 3, '1.234e-300'),
+        ]
+        for value, decimal_pos, expected_value in tests:
+            with self.subTest(value=value):
+                self.assertEqual(nformat(Decimal(value), '.', decimal_pos), expected_value)
 
     def test_decimal_subclass(self):
         class EuroDecimal(Decimal):

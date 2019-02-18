@@ -22,8 +22,8 @@ class BaseDatabaseFeatures:
     supports_partially_nullable_unique_constraints = True
 
     can_use_chunked_reads = True
-    can_return_id_from_insert = False
-    can_return_ids_from_bulk_insert = False
+    can_return_columns_from_insert = False
+    can_return_rows_from_bulk_insert = False
     has_bulk_insert = True
     uses_savepoints = True
     can_release_savepoints = False
@@ -160,10 +160,6 @@ class BaseDatabaseFeatures:
     # Support for the DISTINCT ON clause
     can_distinct_on_fields = False
 
-    # Does the backend decide to commit before SAVEPOINT statements
-    # when autocommit is disabled? https://bugs.python.org/issue8145#msg109965
-    autocommits_when_autocommit_is_off = False
-
     # Does the backend prevent running SQL queries in broken transactions?
     atomic_transactions = True
 
@@ -243,6 +239,7 @@ class BaseDatabaseFeatures:
 
     # Does the backend support window expressions (expression OVER (...))?
     supports_over_clause = False
+    supports_frame_range_fixed_distance = False
 
     # Does the backend support CAST with precision?
     supports_cast_with_precision = True

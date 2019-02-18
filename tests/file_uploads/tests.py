@@ -29,8 +29,7 @@ class FileUploadTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        if not os.path.isdir(MEDIA_ROOT):
-            os.makedirs(MEDIA_ROOT)
+        os.makedirs(MEDIA_ROOT, exist_ok=True)
 
     @classmethod
     def tearDownClass(cls):
@@ -528,8 +527,7 @@ class DirectoryCreationTests(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        if not os.path.isdir(MEDIA_ROOT):
-            os.makedirs(MEDIA_ROOT)
+        os.makedirs(MEDIA_ROOT, exist_ok=True)
 
     @classmethod
     def tearDownClass(cls):

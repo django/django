@@ -166,7 +166,7 @@ def replace_named_groups(pattern):
     for start, end, group_name in named_group_indices:
         # Handle nested parentheses, e.g. '^(?P<a>(x|y))/b'.
         unmatched_open_brackets, prev_char = 1, None
-        for idx, val in enumerate(list(pattern[end:])):
+        for idx, val in enumerate(pattern[end:]):
             # If brackets are balanced, the end of the string for the current
             # named capture group pattern has been reached.
             if unmatched_open_brackets == 0:
@@ -200,7 +200,7 @@ def replace_unnamed_groups(pattern):
     for start in unnamed_group_indices:
         # Handle nested parentheses, e.g. '^b/((x|y)\w+)$'.
         unmatched_open_brackets, prev_char = 1, None
-        for idx, val in enumerate(list(pattern[start + 1:])):
+        for idx, val in enumerate(pattern[start + 1:]):
             if unmatched_open_brackets == 0:
                 group_indices.append((start, start + 1 + idx))
                 break

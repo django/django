@@ -531,7 +531,7 @@ class LookupTests(TestCase):
         self.assertQuerysetEqual(Article.objects.filter(headline__startswith='Article').none(), [])
         self.assertEqual(Article.objects.none().count(), 0)
         self.assertEqual(Article.objects.none().update(headline="This should not take effect"), 0)
-        self.assertQuerysetEqual([article for article in Article.objects.none().iterator()], [])
+        self.assertQuerysetEqual(Article.objects.none().iterator(), [])
 
     def test_in(self):
         # using __in with an empty list should return an empty query set

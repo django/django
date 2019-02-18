@@ -9,9 +9,8 @@ class InsertIdVar:
     as a parameter, in order to receive the id of the row created by an
     insert statement.
     """
-
     def bind_parameter(self, cursor):
-        param = cursor.cursor.var(Database.NUMBER)
+        param = cursor.cursor.var(int)
         cursor._insert_id_var = param
         return param
 

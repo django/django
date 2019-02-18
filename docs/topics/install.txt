@@ -151,8 +151,11 @@ This is the recommended way to install Django.
    administrator privileges. The :doc:`contributing tutorial
    </intro/contributing>` walks through how to create a virtualenv.
 
-#. After you've created and activated a virtual environment, enter the command
-   ``pip install Django`` at the shell prompt.
+#. After you've created and activated a virtual environment, enter the command:
+
+   .. console::
+
+        $ pip install Django
 
 .. _pip: https://pip.pypa.io/
 .. _virtualenv: https://virtualenv.pypa.io/

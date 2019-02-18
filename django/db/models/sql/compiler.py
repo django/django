@@ -317,7 +317,7 @@ class SQLCompiler:
                     ), False))
                 continue
 
-            if not self.query._extra or col not in self.query._extra:
+            if not self.query.extra or col not in self.query.extra:
                 # 'col' is of the form 'field' or 'field1__field2' or
                 # '-field1__field2__field', etc.
                 order_by.extend(self.find_ordering_name(
@@ -1191,9 +1191,15 @@ class SQLInsertCompiler(SQLCompiler):
                     'can only be used to update, not to insert.' % (value, field)
                 )
             if value.contains_aggregate:
-                raise FieldError("Aggregate functions are not allowed in this query")
+                raise FieldError(
+                    'Aggregate functions are not allowed in this query '
+                    '(%s=%r).' % (field.name, value)
+                )
             if value.contains_over_clause:
-                raise FieldError('Window expressions are not allowed in this query.')
+                raise FieldError(
+                    'Window expressions are not allowed in this query (%s=%r).'
+                    % (field.name, value)
+                )
         else:
             value = field.get_db_prep_save(value, connection=self.connection)
         return value
@@ -1273,8 +1279,8 @@ class SQLInsertCompiler(SQLCompiler):
         ignore_conflicts_suffix_sql = self.connection.ops.ignore_conflicts_suffix_sql(
             ignore_conflicts=self.query.ignore_conflicts
         )
-        if self.return_id and self.connection.features.can_return_id_from_insert:
-            if self.connection.features.can_return_ids_from_bulk_insert:
+        if self.return_id and self.connection.features.can_return_columns_from_insert:
+            if self.connection.features.can_return_rows_from_bulk_insert:
                 result.append(self.connection.ops.bulk_insert_sql(fields, placeholder_rows))
                 params = param_rows
             else:
@@ -1307,7 +1313,7 @@ class SQLInsertCompiler(SQLCompiler):
     def execute_sql(self, return_id=False):
         assert not (
             return_id and len(self.query.objs) != 1 and
-            not self.connection.features.can_return_ids_from_bulk_insert
+            not self.connection.features.can_return_rows_from_bulk_insert
         )
         self.return_id = return_id
         with self.connection.cursor() as cursor:
@@ -1315,9 +1321,9 @@ class SQLInsertCompiler(SQLCompiler):
                 cursor.execute(sql, params)
             if not return_id:
                 return
-            if self.connection.features.can_return_ids_from_bulk_insert and len(self.query.objs) > 1:
+            if self.connection.features.can_return_rows_from_bulk_insert and len(self.query.objs) > 1:
                 return self.connection.ops.fetch_returned_insert_ids(cursor)
-            if self.connection.features.can_return_id_from_insert:
+            if self.connection.features.can_return_columns_from_insert:
                 assert len(self.query.objs) == 1
                 return self.connection.ops.fetch_returned_insert_id(cursor)
             return self.connection.ops.last_insert_id(
@@ -1356,9 +1362,15 @@ class SQLUpdateCompiler(SQLCompiler):
             if hasattr(val, 'resolve_expression'):
                 val = val.resolve_expression(self.query, allow_joins=False, for_save=True)
                 if val.contains_aggregate:
-                    raise FieldError("Aggregate functions are not allowed in this query")
+                    raise FieldError(
+                        'Aggregate functions are not allowed in this query '
+                        '(%s=%r).' % (field.name, val)
+                    )
                 if val.contains_over_clause:
-                    raise FieldError('Window expressions are not allowed in this query.')
+                    raise FieldError(
+                        'Window expressions are not allowed in this query '
+                        '(%s=%r).' % (field.name, val)
+                    )
             elif hasattr(val, 'prepare_database_save'):
                 if field.remote_field:
                     val = field.get_db_prep_save(
@@ -1438,7 +1450,7 @@ class SQLUpdateCompiler(SQLCompiler):
         query = self.query.chain(klass=Query)
         query.select_related = False
         query.clear_ordering(True)
-        query._extra = {}
+        query.extra = {}
         query.select = []
         query.add_fields([query.get_meta().pk.name])
         super().pre_sql_setup()

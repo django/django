@@ -16,7 +16,7 @@ from pathlib import Path
 
 from django.conf import settings
 from django.core.mail.utils import DNS_NAME
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 # Don't BASE64-encode UTF-8 messages so that we avoid unwanted attention from
 # some spam filters.
@@ -375,7 +375,7 @@ class EmailMessage:
             elif not isinstance(content, Message):
                 # For compatibility with existing code, parse the message
                 # into an email.Message object if it is not one already.
-                content = message_from_string(force_text(content))
+                content = message_from_string(force_str(content))
 
             attachment = SafeMIMEMessage(content, subtype)
         else:

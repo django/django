@@ -1,7 +1,7 @@
 import copy
 import inspect
 from bisect import bisect
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 
 from django.apps import apps
 from django.conf import settings
@@ -117,7 +117,7 @@ class Options:
         # concrete models, the concrete_model is always the class itself.
         self.concrete_model = None
         self.swappable = None
-        self.parents = OrderedDict()
+        self.parents = {}
         self.auto_created = False
 
         # List of all lookups defined in ForeignKey 'limit_choices_to' options

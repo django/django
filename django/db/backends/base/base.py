@@ -1,4 +1,5 @@
 import copy
+import threading
 import time
 import warnings
 from collections import deque
@@ -43,8 +44,7 @@ class BaseDatabaseWrapper:
 
     queries_limit = 9000
 
-    def __init__(self, settings_dict, alias=DEFAULT_DB_ALIAS,
-                 allow_thread_sharing=False):
+    def __init__(self, settings_dict, alias=DEFAULT_DB_ALIAS):
         # Connection related attributes.
         # The underlying database connection.
         self.connection = None
@@ -80,7 +80,8 @@ class BaseDatabaseWrapper:
         self.errors_occurred = False
 
         # Thread-safety related attributes.
-        self.allow_thread_sharing = allow_thread_sharing
+        self._thread_sharing_lock = threading.Lock()
+        self._thread_sharing_count = 0
         self._thread_ident = _thread.get_ident()
 
         # A list of no-argument functions to run when the transaction commits.
@@ -515,12 +516,27 @@ class BaseDatabaseWrapper:
 
     # ##### Thread safety handling #####
 
+    @property
+    def allow_thread_sharing(self):
+        with self._thread_sharing_lock:
+            return self._thread_sharing_count > 0
+
+    def inc_thread_sharing(self):
+        with self._thread_sharing_lock:
+            self._thread_sharing_count += 1
+
+    def dec_thread_sharing(self):
+        with self._thread_sharing_lock:
+            if self._thread_sharing_count <= 0:
+                raise RuntimeError('Cannot decrement the thread sharing count below zero.')
+            self._thread_sharing_count -= 1
+
     def validate_thread_sharing(self):
         """
         Validate that the connection isn't accessed by another thread than the
         one which originally created it, unless the connection was explicitly
-        authorized to be shared between threads (via the `allow_thread_sharing`
-        property). Raise an exception if the validation fails.
+        authorized to be shared between threads (via the `inc_thread_sharing()`
+        method). Raise an exception if the validation fails.
         """
         if not (self.allow_thread_sharing or self._thread_ident == _thread.get_ident()):
             raise DatabaseError(
@@ -589,11 +605,7 @@ class BaseDatabaseWrapper:
         potential child threads while (or after) the test database is destroyed.
         Refs #10868, #17786, #16969.
         """
-        return self.__class__(
-            {**self.settings_dict, 'NAME': None},
-            alias=NO_DB_ALIAS,
-            allow_thread_sharing=False,
-        )
+        return self.__class__({**self.settings_dict, 'NAME': None}, alias=NO_DB_ALIAS)
 
     def schema_editor(self, *args, **kwargs):
         """
@@ -635,7 +647,7 @@ class BaseDatabaseWrapper:
         finally:
             self.execute_wrappers.pop()
 
-    def copy(self, alias=None, allow_thread_sharing=None):
+    def copy(self, alias=None):
         """
         Return a copy of this connection.
 
@@ -644,6 +656,4 @@ class BaseDatabaseWrapper:
         settings_dict = copy.deepcopy(self.settings_dict)
         if alias is None:
             alias = self.alias
-        if allow_thread_sharing is None:
-            allow_thread_sharing = self.allow_thread_sharing
-        return type(self)(settings_dict, alias, allow_thread_sharing)
+        return type(self)(settings_dict, alias)

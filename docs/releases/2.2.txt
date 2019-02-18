@@ -286,6 +286,9 @@ backends.
   * ``_delete_fk_sql()`` (to pair with ``_create_fk_sql()``)
   * ``_create_check_sql()`` and ``_delete_check_sql()``
 
+* The third argument of ``DatabaseWrapper.__init__()``,
+  ``allow_thread_sharing``, is removed.
+
 Admin actions are no longer collected from base ``ModelAdmin`` classes
 ----------------------------------------------------------------------
 
@@ -345,9 +348,9 @@ In usage like::
 
         alias = base
 
-``alias`` is not cached. Such usage now raises ``TypeError: Cannot assign the
-same cached_property to two different names ('base' and 'alias').`` on Python
-3.6 and later.
+``alias`` is not cached. Where the problem can be detected (Python 3.6 and
+later), such usage now raises ``TypeError: Cannot assign the same
+cached_property to two different names ('base' and 'alias').``
 
 Use this instead::
 
@@ -484,7 +487,7 @@ Miscellaneous
   read from disk must be UTF-8 encoded.
 
 * ``django.contrib.staticfiles.storage.CachedStaticFilesStorage`` is
-  deprecated due to the intractable problems that is has. Use
+  deprecated due to the intractable problems that it has. Use
   :class:`.ManifestStaticFilesStorage` or a third-party cloud storage instead.
 
 * :meth:`.RemoteUserBackend.configure_user` is now passed ``request`` as the

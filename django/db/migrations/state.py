@@ -1,5 +1,4 @@
 import copy
-from collections import OrderedDict
 from contextlib import contextmanager
 
 from django.apps import AppConfig
@@ -334,7 +333,7 @@ class StateApps(Apps):
         if app_label not in self.app_configs:
             self.app_configs[app_label] = AppConfigStub(app_label)
             self.app_configs[app_label].apps = self
-            self.app_configs[app_label].models = OrderedDict()
+            self.app_configs[app_label].models = {}
         self.app_configs[app_label].models[model._meta.model_name] = model
         self.do_pending_operations(model)
         self.clear_cache()

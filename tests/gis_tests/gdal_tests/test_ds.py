@@ -1,10 +1,13 @@
 import os
 import re
+from datetime import datetime
 
 from django.contrib.gis.gdal import (
-    GDAL_VERSION, DataSource, Envelope, GDALException, OGRGeometry,
+    DataSource, Envelope, GDALException, OGRGeometry,
 )
-from django.contrib.gis.gdal.field import OFTInteger, OFTReal, OFTString
+from django.contrib.gis.gdal.field import (
+    OFTDateTime, OFTInteger, OFTReal, OFTString,
+)
 from django.test import SimpleTestCase
 
 from ..test_data import TEST_DATA, TestDS, get_ds_file
@@ -16,6 +19,8 @@ wgs_84_wkt = (
 )
 # Using a regex because of small differences depending on GDAL versions.
 wgs_84_wkt_regex = r'^GEOGCS\["(GCS_)?WGS[ _](19)?84".*$'
+
+datetime_format = '%Y-%m-%dT%H:%M:%S'
 
 # List of acceptable data sources.
 ds_list = (
@@ -33,7 +38,7 @@ ds_list = (
     ),
     TestDS(
         'test_vrt', ext='vrt', nfeat=3, nfld=3, geom='POINT', gtype='Point25D',
-        driver='OGR_VRT' if GDAL_VERSION >= (2, 0) else 'VRT',
+        driver='OGR_VRT',
         fields={
             'POINT_X': OFTString,
             'POINT_Y': OFTString,
@@ -53,7 +58,37 @@ ds_list = (
         fields={'float': OFTReal, 'int': OFTInteger, 'str': OFTString},
         extent=(-1.01513, -0.558245, 0.161876, 0.839637),  # Got extent from QGIS
         srs_wkt=wgs_84_wkt,
-    )
+    ),
+    TestDS(
+        'has_nulls', nfeat=3, nfld=6, geom='POLYGON', gtype=3,
+        driver='GeoJSON', ext='geojson',
+        fields={
+            'uuid': OFTString,
+            'name': OFTString,
+            'num': OFTReal,
+            'integer': OFTInteger,
+            'datetime': OFTDateTime,
+            'boolean': OFTInteger,
+        },
+        extent=(-75.274200, 39.846504, -74.959717, 40.119040),  # Got extent from QGIS
+        field_values={
+            'uuid': [
+                '1378c26f-cbe6-44b0-929f-eb330d4991f5',
+                'fa2ba67c-a135-4338-b924-a9622b5d869f',
+                '4494c1f3-55ab-4256-b365-12115cb388d5',
+            ],
+            'name': ['Philadelphia', None, 'north'],
+            'num': [1.001, None, 0.0],
+            'integer': [5, None, 8],
+            'boolean': [True, None, False],
+            'datetime': [
+                datetime.strptime('1994-08-14T11:32:14', datetime_format),
+                None,
+                datetime.strptime('2018-11-29T03:02:52', datetime_format),
+            ]
+        },
+        fids=range(3),
+    ),
 )
 
 bad_ds = (TestDS('foo'),)

@@ -1037,6 +1037,17 @@ subclass::
     If you need to specify a dynamic order (for example depending on user or
     language) you can implement a :meth:`~ModelAdmin.get_ordering` method.
 
+    .. admonition:: Performance considerations with ordering and sorting
+
+        To ensure a deterministic ordering of results, the changelist adds
+        ``pk`` to the ordering if it can't find a single or unique together set
+        of fields that provide total ordering.
+
+        For example, if the default ordering is by a non-unique ``name`` field,
+        then the changelist is sorted by ``name`` and ``pk``. This could
+        perform poorly if you have a lot of rows and don't have an index on
+        ``name`` and ``pk``.
+
 .. attribute:: ModelAdmin.paginator
 
     The paginator class to be used for pagination. By default,

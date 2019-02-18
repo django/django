@@ -90,7 +90,7 @@ General-purpose aggregation functions
 
 .. class:: JSONBAgg(expressions, filter=None, **extra)
 
-    Returns the input values as a ``JSON`` array. Requires PostgreSQL ≥ 9.5.
+    Returns the input values as a ``JSON`` array.
 
 ``StringAgg``
 -------------

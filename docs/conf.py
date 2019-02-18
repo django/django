@@ -44,6 +44,7 @@ extensions = [
 ]
 
 extlinks = {
+    'commit': ('https://github.com/django/django/commit/%s', ''),
     'cve': ('https://nvd.nist.gov/view/vuln/detail?vulnId=%s', 'CVE-'),
     'ticket': ('https://code.djangoproject.com/ticket/%s', '#'),
 }

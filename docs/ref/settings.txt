@@ -403,6 +403,12 @@ Storing the CSRF token in a cookie (Django's default) is safe, but storing it
 in the session is common practice in other web frameworks and therefore
 sometimes demanded by security auditors.
 
+Since the :ref:`default error views <error-views>` require the CSRF token,
+:class:`~django.contrib.sessions.middleware.SessionMiddleware` must appear in
+:setting:`MIDDLEWARE` before any middleware that may raise an exception to
+trigger an error view (such as :exc:`~django.core.exceptions.PermissionDenied`)
+if you're using ``CSRF_USE_SESSIONS``. See :ref:`middleware-ordering`.
+
 .. setting:: CSRF_FAILURE_VIEW
 
 ``CSRF_FAILURE_VIEW``
@@ -1478,7 +1484,7 @@ This value mirrors the functionality and caveats of the
 ``FILE_UPLOAD_PERMISSIONS``
 ---------------------------
 
-Default: ``None``
+Default: ``0o644``
 
 The numeric mode (i.e. ``0o644``) to set newly uploaded files to. For
 more information about what these modes mean, see the documentation for
@@ -1504,6 +1510,10 @@ when using the :djadmin:`collectstatic` management command. See
     ``0`` is very important: it indicates an octal number, which is the
     way that modes must be specified. If you try to use ``644``, you'll
     get totally incorrect behavior.
+
+.. versionchanged:: 3.0
+
+    In older versions, the default value is ``None``.
 
 .. setting:: FILE_UPLOAD_TEMP_DIR
 
@@ -2073,7 +2083,7 @@ unpredictable value.
 randomly-generated ``SECRET_KEY`` to each new project.
 
 Uses of the key shouldn't assume that it's text or bytes. Every use should go
-through :func:`~django.utils.encoding.force_text` or
+through :func:`~django.utils.encoding.force_str` or
 :func:`~django.utils.encoding.force_bytes` to convert it to the desired type.
 
 Django will refuse to start if :setting:`SECRET_KEY` is not set.
@@ -2768,15 +2778,9 @@ The model to use to represent a User. See :ref:`auth-custom-user`.
 
 Default: ``'/accounts/profile/'``
 
-The URL where requests are redirected after login when the
-``contrib.auth.login`` view gets no ``next`` parameter.
-
-This is used by the :func:`~django.contrib.auth.decorators.login_required`
-decorator, for example.
-
-This setting also accepts :ref:`named URL patterns <naming-url-patterns>` which
-can be used to reduce configuration duplication since you don't have to define
-the URL in two places (``settings`` and URLconf).
+The URL or :ref:`named URL pattern <naming-url-patterns>` where requests are
+redirected after login when the :class:`~django.contrib.auth.views.LoginView`
+doesn't get a ``next`` GET parameter.
 
 .. setting:: LOGIN_URL
 
@@ -2785,12 +2789,11 @@ the URL in two places (``settings`` and URLconf).
 
 Default: ``'/accounts/login/'``
 
-The URL where requests are redirected for login, especially when using the
-:func:`~django.contrib.auth.decorators.login_required` decorator.
-
-This setting also accepts :ref:`named URL patterns <naming-url-patterns>` which
-can be used to reduce configuration duplication since you don't have to define
-the URL in two places (``settings`` and URLconf).
+The URL or :ref:`named URL pattern <naming-url-patterns>` where requests are
+redirected for login when using the
+:func:`~django.contrib.auth.decorators.login_required` decorator,
+:class:`~django.contrib.auth.mixins.LoginRequiredMixin`, or
+:class:`~django.contrib.auth.mixins.AccessMixin`.
 
 .. setting:: LOGOUT_REDIRECT_URL
 
@@ -2799,16 +2802,12 @@ the URL in two places (``settings`` and URLconf).
 
 Default: ``None``
 
-The URL where requests are redirected after a user logs out using
-:class:`~django.contrib.auth.views.LogoutView` (if the view doesn't get a
-``next_page`` argument).
+The URL or :ref:`named URL pattern <naming-url-patterns>` where requests are
+redirected after logout if :class:`~django.contrib.auth.views.LogoutView`
+doesn't have a ``next_page`` attribute.
 
 If ``None``, no redirect will be performed and the logout view will be
 rendered.
-
-This setting also accepts :ref:`named URL patterns <naming-url-patterns>` which
-can be used to reduce configuration duplication since you don't have to define
-the URL in two places (``settings`` and URLconf).
 
 .. setting:: PASSWORD_RESET_TIMEOUT_DAYS
 

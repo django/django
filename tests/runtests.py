@@ -234,7 +234,7 @@ def teardown(state):
     # Discard the multiprocessing.util finalizer that tries to remove a
     # temporary directory that's already removed by this script's
     # atexit.register(shutil.rmtree, TMPDIR) handler. Prevents
-    # FileNotFoundError at the end of a test run on Python 3.6+ (#27890).
+    # FileNotFoundError at the end of a test run (#27890).
     from multiprocessing.util import _finalizer_registry
     _finalizer_registry.pop((-100, 0), None)
 

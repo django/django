@@ -157,8 +157,8 @@ class TarArchive(BaseArchive):
                 name = self.split_leading_dir(name)[1]
             filename = os.path.join(to_path, name)
             if member.isdir():
-                if filename and not os.path.exists(filename):
-                    os.makedirs(filename)
+                if filename:
+                    os.makedirs(filename, exist_ok=True)
             else:
                 try:
                     extracted = self._archive.extractfile(member)
@@ -169,8 +169,8 @@ class TarArchive(BaseArchive):
                           (name, member.name, exc))
                 else:
                     dirname = os.path.dirname(filename)
-                    if dirname and not os.path.exists(dirname):
-                        os.makedirs(dirname)
+                    if dirname:
+                        os.makedirs(dirname, exist_ok=True)
                     with open(filename, 'wb') as outfile:
                         shutil.copyfileobj(extracted, outfile)
                         self._copy_permissions(member.mode, filename)
@@ -199,14 +199,13 @@ class ZipArchive(BaseArchive):
             if leading:
                 name = self.split_leading_dir(name)[1]
             filename = os.path.join(to_path, name)
-            dirname = os.path.dirname(filename)
-            if dirname and not os.path.exists(dirname):
-                os.makedirs(dirname)
             if filename.endswith(('/', '\\')):
                 # A directory
-                if not os.path.exists(filename):
-                    os.makedirs(filename)
+                os.makedirs(filename, exist_ok=True)
             else:
+                dirname = os.path.dirname(filename)
+                if dirname:
+                    os.makedirs(dirname, exist_ok=True)
                 with open(filename, 'wb') as outfile:
                     outfile.write(data)
                 # Convert ZipInfo.external_attr to mode

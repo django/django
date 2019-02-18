@@ -5,14 +5,10 @@
 ``django-admin`` is Django's command-line utility for administrative tasks.
 This document outlines all it can do.
 
-In addition, ``manage.py`` is automatically created in each Django project.
-``manage.py`` does the same thing as ``django-admin`` but takes care of a few
-things for you:
-
-* It puts your project's package on ``sys.path``.
-
-* It sets the :envvar:`DJANGO_SETTINGS_MODULE` environment variable so that
-  it points to your project's ``settings.py`` file.
+In addition, ``manage.py`` is automatically created in each Django project. It
+does the same thing as ``django-admin`` but also sets the
+:envvar:`DJANGO_SETTINGS_MODULE` environment variable so that it points to your
+project's ``settings.py`` file.
 
 The ``django-admin`` script should be on your system path if you installed
 Django via its ``setup.py`` utility. If it's not on your path, you can find it

@@ -5,7 +5,7 @@ The main QuerySet implementation. This provides the public API for the ORM.
 import copy
 import operator
 import warnings
-from collections import OrderedDict, namedtuple
+from collections import namedtuple
 from functools import lru_cache
 from itertools import chain
 
@@ -248,7 +248,7 @@ class QuerySet:
     def __repr__(self):
         data = list(self[:REPR_OUTPUT_SIZE + 1])
         if len(data) > REPR_OUTPUT_SIZE:
-            data[-1] = "…(remaining elements truncated)…"
+            data[-1] = "...(remaining elements truncated)..."
         return '<%s %r>' % (self.__class__.__name__, data)
 
     def __len__(self):
@@ -431,11 +431,11 @@ class QuerySet:
         Insert each of the instances into the database. Do *not* call
         save() on each of the instances, do not send any pre/post_save
         signals, and do not set the primary key attribute if it is an
-        autoincrement field (except if features.can_return_ids_from_bulk_insert=True).
+        autoincrement field (except if features.can_return_rows_from_bulk_insert=True).
         Multi-table models are not supported.
         """
         # When you bulk insert you don't get the primary keys back (if it's an
-        # autoincrement, except if can_return_ids_from_bulk_insert=True), so
+        # autoincrement, except if can_return_rows_from_bulk_insert=True), so
         # you can't insert into the child tables which references this. There
         # are two workarounds:
         # 1) This could be implemented if you didn't have an autoincrement pk
@@ -471,7 +471,7 @@ class QuerySet:
             if objs_without_pk:
                 fields = [f for f in fields if not isinstance(f, AutoField)]
                 ids = self._batched_insert(objs_without_pk, fields, batch_size, ignore_conflicts=ignore_conflicts)
-                if connection.features.can_return_ids_from_bulk_insert and not ignore_conflicts:
+                if connection.features.can_return_rows_from_bulk_insert and not ignore_conflicts:
                     assert len(ids) == len(objs_without_pk)
                 for obj_without_pk, pk in zip(objs_without_pk, ids):
                     obj_without_pk.pk = pk
@@ -725,7 +725,7 @@ class QuerySet:
         query = self.query.chain(sql.UpdateQuery)
         query.add_update_values(kwargs)
         # Clear any annotations so that they won't be present in subqueries.
-        query._annotations = None
+        query.annotations = {}
         with transaction.mark_for_rollback_on_error(using=self.db):
             rows = query.get_compiler(self.db).execute_sql(CURSOR)
         self._result_cache = None
@@ -744,7 +744,7 @@ class QuerySet:
         query = self.query.chain(sql.UpdateQuery)
         query.add_update_fields(values)
         # Clear any annotations so that they won't be present in subqueries.
-        query._annotations = None
+        query.annotations = {}
         self._result_cache = None
         return query.get_compiler(self.db).execute_sql(CURSOR)
     _update.alters_data = True
@@ -1014,7 +1014,7 @@ class QuerySet:
         with extra data or aggregations.
         """
         self._validate_values_are_expressions(args + tuple(kwargs.values()), method_name='annotate')
-        annotations = OrderedDict()  # To preserve ordering of args
+        annotations = {}
         for arg in args:
             # The default_alias property may raise a TypeError.
             try:
@@ -1185,7 +1185,7 @@ class QuerySet:
         ops = connections[self.db].ops
         batch_size = (batch_size or max(ops.bulk_batch_size(fields, objs), 1))
         inserted_ids = []
-        bulk_return = connections[self.db].features.can_return_ids_from_bulk_insert
+        bulk_return = connections[self.db].features.can_return_rows_from_bulk_insert
         for item in [objs[i:i + batch_size] for i in range(0, len(objs), batch_size)]:
             if bulk_return and not ignore_conflicts:
                 inserted_id = self._insert(
