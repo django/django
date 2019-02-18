@@ -219,6 +219,60 @@ class RTrim(Transform):
     lookup_name = 'rtrim'
 
 
+class SHA1(Transform):
+    function = 'SHA1'
+    lookup_name = 'sha1'
+
+    def as_oracle(self, compiler, connection, **extra_content):
+        return super().as_sql(
+            compiler,
+            connection,
+            template=(
+                "LOWER(RAWTOHEX(STANDARD_HASH(UTL_I18N.STRING_TO_RAW("
+                "%(expressions)s, 'AL32UTF8'), '%(function)s')))"
+            ),
+            **extra_content,
+        )
+
+    def as_postgresql(self, compiler, connection, **extra_content):
+        # Note that the digest() function requires the pgcrypto extension.
+        return super().as_sql(
+            compiler,
+            connection,
+            template="ENCODE(DIGEST((%(expressions)s), '%(function)s'), 'hex')",
+            function=self.function.lower(),
+            **extra_content,
+        )
+
+
+class SHA224(SHA1):  # FIXME: Not supported on Oracle?
+    function = 'SHA224'
+    lookup_name = 'sha224'
+
+    def as_mysql(self, compiler, connection, **extra_content):
+        return super().as_sql(
+            compiler,
+            connection,
+            template='SHA2(%%(expressions)s, %d)' % int(self.function[3:]),
+            **extra_content,
+        )
+
+
+class SHA256(SHA224):
+    function = 'SHA256'
+    lookup_name = 'sha256'
+
+
+class SHA384(SHA224):
+    function = 'SHA384'
+    lookup_name = 'sha384'
+
+
+class SHA512(SHA224):
+    function = 'SHA512'
+    lookup_name = 'sha512'
+
+
 class StrIndex(Func):
     """
     Return a positive integer corresponding to the 1-indexed position of the

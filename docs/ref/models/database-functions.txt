@@ -1413,6 +1413,131 @@ side.
 Similar to :class:`~django.db.models.functions.Trim`, but removes only trailing
 spaces.
 
+``SHA1``
+--------
+
+.. class:: SHA1(expression, **extra)
+
+Accepts a single text field or expression and returns the SHA1 hash for the
+string.
+
+It can also be registered as a transform as described in :class:`Length`.
+
+Usage example::
+
+    >>> from django.db.models.functions import SHA1
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.annotate(name_sha1=SHA1('name')).get()
+    >>> print(author.name_sha1)
+    b87efd8a6c991c390be5a68e8a7945a7851c7e5c
+
+.. admonition:: Support for PostgreSQL
+
+    To use this function on PostgreSQL, you need to activate the `pgcrypto
+    extension <https://www.postgresql.org/docs/current/pgcrypto.html>`_.
+    The :class:`~django.contrib.postgres.operations.CryptoExtension` migration
+    operation can be used to install it.
+
+``SHA224``
+----------
+
+.. class:: SHA224(expression, **extra)
+
+Accepts a single text field or expression and returns the SHA224 hash for the
+string.
+
+It can also be registered as a transform as described in :class:`Length`.
+
+Usage example::
+
+    >>> from django.db.models.functions import SHA224
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.annotate(name_sha224=SHA224('name')).get()
+    >>> print(author.name_sha224)
+    9b076d8136e939c491a9015417ab6e42e991d759eedad2b10951f601
+
+.. admonition:: Support for PostgreSQL
+
+    To use this function on PostgreSQL, you need to activate the `pgcrypto
+    extension <https://www.postgresql.org/docs/current/pgcrypto.html>`_.
+    The :class:`~django.contrib.postgres.operations.CryptoExtension` migration
+    operation can be used to install it.
+
+``SHA256``
+----------
+
+.. class:: SHA256(expression, **extra)
+
+Accepts a single text field or expression and returns the SHA256 hash for the
+string.
+
+It can also be registered as a transform as described in :class:`Length`.
+
+Usage example::
+
+    >>> from django.db.models.functions import SHA256
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.annotate(name_sha256=SHA256('name')).get()
+    >>> print(author.name_sha256)
+    4ea50dce252159b6b3758318d3b46f72e800cddffb8df42f03dd6505c9777f1b
+
+.. admonition:: Support for PostgreSQL
+
+    To use this function on PostgreSQL, you need to activate the `pgcrypto
+    extension <https://www.postgresql.org/docs/current/pgcrypto.html>`_.
+    The :class:`~django.contrib.postgres.operations.CryptoExtension` migration
+    operation can be used to install it.
+
+``SHA384``
+----------
+
+.. class:: SHA384(expression, **extra)
+
+Accepts a single text field or expression and returns the SHA384 hash for the
+string.
+
+It can also be registered as a transform as described in :class:`Length`.
+
+Usage example::
+
+    >>> from django.db.models.functions import SHA384
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.annotate(name_sha384=SHA384('name')).get()
+    >>> print(author.name_sha384)
+    cd67f2b3a2b03180ce2e05abeef5352793314851f312a2cd89281e18443ac6c6a9329a0b67117a76893d327be9b4c1f8
+
+.. admonition:: Support for PostgreSQL
+
+    To use this function on PostgreSQL, you need to activate the `pgcrypto
+    extension <https://www.postgresql.org/docs/current/pgcrypto.html>`_.
+    The :class:`~django.contrib.postgres.operations.CryptoExtension` migration
+    operation can be used to install it.
+
+``SHA512``
+----------
+
+.. class:: SHA512(expression, **extra)
+
+Accepts a single text field or expression and returns the SHA512 hash for the
+string.
+
+It can also be registered as a transform as described in :class:`Length`.
+
+Usage example::
+
+    >>> from django.db.models.functions import SHA512
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.annotate(name_sha512=SHA512('name')).get()
+    >>> print(author.name_sha512)
+    c7a9243aec1e3488f7fe4836996a23f95409bc37f9945b6febd9b1413dd05bafcef96bdac6ab83f70690c662ee38c45137c408d7e67a75383e03a42458f9236a
+
+.. admonition:: Support for PostgreSQL
+
+    To use this function on PostgreSQL, you need to activate the `pgcrypto
+    extension <https://www.postgresql.org/docs/current/pgcrypto.html>`_.
+    The :class:`~django.contrib.postgres.operations.CryptoExtension` migration
+    operation can be used to install it.
+
 ``StrIndex``
 ------------
 
