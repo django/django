@@ -1303,6 +1303,26 @@ Usage example::
 Similar to :class:`~django.db.models.functions.Trim`, but removes only leading
 spaces.
 
+``MD5``
+-------
+
+.. class:: MD5(expression, **extra)
+
+.. versionadded:: 3.0
+
+Accepts a single text field or expression and returns the MD5 hash of the
+string.
+
+It can also be registered as a transform as described in :class:`Length`.
+
+Usage example::
+
+    >>> from django.db.models.functions import MD5
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.annotate(name_md5=MD5('name')).get()
+    >>> print(author.name_md5)
+    749fb689816b2db85f5b169c2055b247
+
 ``Ord``
 -------
 

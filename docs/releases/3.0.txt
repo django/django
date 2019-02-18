@@ -162,7 +162,7 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* Added the :class:`~django.db.models.functions.MD5` database function.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~

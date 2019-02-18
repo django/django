@@ -150,6 +150,22 @@ class LTrim(Transform):
     lookup_name = 'ltrim'
 
 
+class MD5(Transform):
+    function = 'MD5'
+    lookup_name = 'md5'
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        return super().as_sql(
+            compiler,
+            connection,
+            template=(
+                "LOWER(RAWTOHEX(STANDARD_HASH(UTL_I18N.STRING_TO_RAW("
+                "%(expressions)s, 'AL32UTF8'), '%(function)s')))"
+            ),
+            **extra_context,
+        )
+
+
 class Ord(Transform):
     function = 'ASCII'
     lookup_name = 'ord'
