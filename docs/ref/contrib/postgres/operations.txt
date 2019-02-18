@@ -98,3 +98,25 @@ run the query ``CREATE EXTENSION IF NOT EXISTS hstore;``.
 .. class:: UnaccentExtension()
 
     Installs the ``unaccent`` extension.
+
+.. _create-index-concurrently:
+
+Creating indexes concurrently
+=============================
+
+Since version 8.2, PostgreSQL supports a non-standard ``CONCURRENTLY`` option
+on ``CREATE INDEX`` to add indexes without locking out writes. This option is
+useful for adding an index to a live production database.
+
+.. class:: CreateIndexConcurrently(model_name, index)
+
+    .. versionadded:: 3.0
+
+    Like :class:`~django.db.migrations.operations.AddIndex`, creates an index
+    in the database table for the model with ``model_name``, but with the
+    ``CONCURRENTLY`` option in PostgreSQL. ``index`` is an instance of the
+    :class:`~django.db.models.Index` class.
+
+    Note that the ``CONCURRENTLY`` option is not supported inside a
+    transaction; so this operation will raise an exception unless it is being
+    executed as part of a :ref:`non-atomic migration <non-atomic-migrations>`.
