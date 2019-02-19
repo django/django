@@ -120,3 +120,11 @@ useful for adding an index to a live production database.
     Note that the ``CONCURRENTLY`` option is not supported inside a
     transaction; so this operation will raise an exception unless it is being
     executed as part of a :ref:`non-atomic migration <non-atomic-migrations>`.
+
+.. class:: RemoveIndexConcurrently(model_name, name)
+
+    .. versionadded:: 3.0
+
+    Like :class:`~django.db.migrations.operations.RemoveIndex`, removes the
+    index named ``name`` from the model with ``model_name``, but with the
+    ``CONCURRENTLY`` option in PostgreSQL.

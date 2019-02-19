@@ -76,7 +76,9 @@ Minor features
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The new :class:`~django.contrib.postgres.operations.AddIndexConcurrently`
-  class allows for creating indexes with PostgreSQL's ``CONCURRENTLY`` option.
+  and :class:`~django.contrib.postgres.operations.RemoveIndexConcurrently`
+  classes allo for creating and dropping indexes with PostgreSQL's
+  ``CONCURRENTLY`` option.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
