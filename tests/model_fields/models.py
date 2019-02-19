@@ -344,7 +344,7 @@ class AllFieldsModel(models.Model):
     fo = ForeignObject(
         'self',
         on_delete=models.CASCADE,
-        from_fields=['abstract_non_concrete_id'],
+        from_fields=['positive_integer'],
         to_fields=['id'],
         related_name='reverse'
     )
