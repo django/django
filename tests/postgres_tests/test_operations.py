@@ -8,6 +8,7 @@ from django.test import modify_settings
 
 try:
     from django.contrib.postgres.operations import CreateIndexConcurrently
+    from django.contrib.postgres.indexes import BrinIndex
 except ImportError:
     pass
 
@@ -60,6 +61,30 @@ class CreateIndexConcurrentlyTests(OperationTestBase):
             operation.database_forwards(app_label, editor, project_state, new_state)
 
         self.assertIndexExists('%s_pony' % app_label, ['pink'])
+
+        with connection.schema_editor(atomic=False) as editor:
+            operation.database_backwards(app_label, editor, project_state, new_state)
+
+        self.assertIndexNotExists('%s_pony' % app_label, ['pink'])
+
+    def test_create_brin_index_concurrently(self):
+        """
+        The CreateIndexConcurrently operation should support all index types.
+
+        Verify that the operation properly handles the creation of a BRIN index
+        as a spot check, ensuring it does not always use the default (B-tree).
+        """
+        app_label = 'test_pgcbic'
+
+        project_state = self.set_up_test_model(app_label)
+        new_state = project_state.clone()
+
+        operation = CreateIndexConcurrently('Pony', BrinIndex(fields=['pink'], name='pony_pink_brin_idx'))
+
+        with connection.schema_editor(atomic=False) as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+
+        self.assertIndexExists('%s_pony' % app_label, ['pink'], index_type='brin')
 
         with connection.schema_editor(atomic=False) as editor:
             operation.database_backwards(app_label, editor, project_state, new_state)

@@ -82,34 +82,21 @@ class UnaccentExtension(CreateExtension):
 class CreateIndexConcurrently(AddIndex):
     """Create an index using Postgres's CREATE INDEX CONCURRENTLY syntax."""
 
-    create_index_sql = 'CREATE INDEX CONCURRENTLY %(index_name)s ON %(table)s (%(columns)s)'
-    delete_index_sql = 'DROP INDEX CONCURRENTLY %(index_name)s'
-
     def describe(self):
         return super().describe().replace('Create', 'Concurrently create')
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         self._ensure_not_in_transaction(schema_editor)
 
-        model = from_state.apps.get_model(app_label, self.model_name)
-        fields = [model._meta.get_field(name) for name in self.index.fields]
-        column_names = [field.get_attname_column()[1] for field in fields]
-
-        sql = self.create_index_sql % {
-            'index_name': self.index.name,
-            'table': model._meta.db_table,
-            'columns': ', '.join(column_names)
-        }
-
+        model = to_state.apps.get_model(app_label, self.model_name)
+        sql = str(self.index.create_sql(model, schema_editor)).replace('CREATE INDEX', 'CREATE INDEX CONCURRENTLY')
         schema_editor.execute(sql)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         self._ensure_not_in_transaction(schema_editor)
 
-        sql = self.delete_index_sql % {
-            'index_name': self.index.name
-        }
-
+        model = to_state.apps.get_model(app_label, self.model_name)
+        sql = str(self.index.remove_sql(model, schema_editor)).replace('DROP INDEX', 'DROP INDEX CONCURRENTLY')
         schema_editor.execute(sql)
 
     def _ensure_not_in_transaction(self, schema_editor):
