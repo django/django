@@ -97,7 +97,7 @@ class AddIndexConcurrently(AddIndex):
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         self._ensure_not_in_transaction(schema_editor)
 
-        model = to_state.apps.get_model(app_label, self.model_name)
+        model = from_state.apps.get_model(app_label, self.model_name)
         sql = re.sub('^DROP INDEX', 'DROP INDEX CONCURRENTLY', str(self.index.remove_sql(model, schema_editor)))
         schema_editor.execute(sql)
 

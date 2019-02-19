@@ -63,7 +63,7 @@ class AddIndexConcurrentlyTests(OperationTestBase):
         self.assertIndexExists('%s_pony' % app_label, ['pink'])
 
         with connection.schema_editor(atomic=False) as editor:
-            operation.database_backwards(app_label, editor, project_state, new_state)
+            operation.database_backwards(app_label, editor, new_state, project_state)
 
         self.assertIndexNotExists('%s_pony' % app_label, ['pink'])
 
@@ -87,7 +87,7 @@ class AddIndexConcurrentlyTests(OperationTestBase):
         self.assertIndexExists('%s_pony' % app_label, ['pink'], index_type='brin')
 
         with connection.schema_editor(atomic=False) as editor:
-            operation.database_backwards(app_label, editor, project_state, new_state)
+            operation.database_backwards(app_label, editor, new_state, project_state)
 
         self.assertIndexNotExists('%s_pony' % app_label, ['pink'])
 
