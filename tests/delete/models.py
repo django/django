@@ -126,3 +126,20 @@ class Base(models.Model):
 
 class RelToBase(models.Model):
     base = models.ForeignKey(Base, models.DO_NOTHING)
+
+
+class Origin(models.Model):
+    pass
+
+
+class Referrer(models.Model):
+    origin = models.ForeignKey(Origin, models.CASCADE)
+    unique_field = models.IntegerField(unique=True)
+    large_field = models.TextField()
+
+
+class SecondReferrer(models.Model):
+    referrer = models.ForeignKey(Referrer, models.CASCADE)
+    other_referrer = models.ForeignKey(
+        Referrer, models.CASCADE, to_field='unique_field', related_name='+'
+    )
