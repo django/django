@@ -108,7 +108,7 @@ Since version 8.2, PostgreSQL supports a non-standard ``CONCURRENTLY`` option
 on ``CREATE INDEX`` to add indexes without locking out writes. This option is
 useful for adding an index to a live production database.
 
-.. class:: CreateIndexConcurrently(model_name, index)
+.. class:: AddIndexConcurrently(model_name, index)
 
     .. versionadded:: 3.0
 

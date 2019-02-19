@@ -81,7 +81,7 @@ class UnaccentExtension(CreateExtension):
         self.name = 'unaccent'
 
 
-class CreateIndexConcurrently(AddIndex):
+class AddIndexConcurrently(AddIndex):
     """Create an index using Postgres's CREATE INDEX CONCURRENTLY syntax."""
 
     def describe(self):
