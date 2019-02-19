@@ -1,3 +1,5 @@
+import re
+
 from django.contrib.postgres.signals import (
     get_citext_oids, get_hstore_oids, register_type_handlers,
 )
@@ -83,20 +85,20 @@ class CreateIndexConcurrently(AddIndex):
     """Create an index using Postgres's CREATE INDEX CONCURRENTLY syntax."""
 
     def describe(self):
-        return super().describe().replace('Create', 'Concurrently create')
+        return re.sub(r'^Create', 'Concurrently create', super().describe())
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         self._ensure_not_in_transaction(schema_editor)
 
         model = to_state.apps.get_model(app_label, self.model_name)
-        sql = str(self.index.create_sql(model, schema_editor)).replace('CREATE INDEX', 'CREATE INDEX CONCURRENTLY')
+        sql = re.sub('^CREATE INDEX', 'CREATE INDEX CONCURRENTLY', str(self.index.create_sql(model, schema_editor)))
         schema_editor.execute(sql)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         self._ensure_not_in_transaction(schema_editor)
 
         model = to_state.apps.get_model(app_label, self.model_name)
-        sql = str(self.index.remove_sql(model, schema_editor)).replace('DROP INDEX', 'DROP INDEX CONCURRENTLY')
+        sql = re.sub('^DROP INDEX', 'DROP INDEX CONCURRENTLY', str(self.index.remove_sql(model, schema_editor)))
         schema_editor.execute(sql)
 
     def _ensure_not_in_transaction(self, schema_editor):
