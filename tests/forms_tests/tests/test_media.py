@@ -25,8 +25,8 @@ class FormsMediaTestCase(SimpleTestCase):
         )
         self.assertEqual(
             repr(m),
-            "Media(css={'all': ('path/to/css1', '/path/to/css2')}, "
-            "js=('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3'))"
+            "Media(css={'all': ['path/to/css1', '/path/to/css2']}, "
+            "js=['/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3'])"
         )
 
         class Foo:
@@ -149,6 +149,15 @@ class FormsMediaTestCase(SimpleTestCase):
 
         w4 = MyWidget4()
         self.assertEqual(str(w4.media), """<link href="/path/to/css1" type="text/css" media="all" rel="stylesheet">
+<script type="text/javascript" src="/path/to/js1"></script>""")
+
+        # same de-duplication test applied directly to a Media object, to confirm that the de-duplication doesn't
+        # only happen at the point of merging two or more media objects
+        media4 = Media(
+            css={'all': ('/path/to/css1', '/path/to/css1')},
+            js=('/path/to/js1', '/path/to/js1')
+        )
+        self.assertEqual(str(media4), """<link href="/path/to/css1" type="text/css" media="all" rel="stylesheet">
 <script type="text/javascript" src="/path/to/js1"></script>""")
 
     def test_media_property(self):
@@ -571,3 +580,33 @@ class FormsMediaTestCase(SimpleTestCase):
         # was never specified.
         merged = widget3 + form1 + form2
         self.assertEqual(merged._css, {'screen': ['a.css', 'b.css'], 'all': ['c.css']})
+
+    def test_merge_js_three_way_non_pairwise(self):
+        """
+        A three-way merge which is not handled by the strategy of deferring merges
+        until the call to _js and then merging lists pairwise at that point (#30179).
+        Merging the first two lists would create an intermediate result that puts
+        color-picker.js before text-editor.js, which contradicts the third list.
+        Instead, the merge needs to take all three lists into account simultaneously.
+        """
+        widget1 = Media(js=['color-picker.js'])
+        widget2 = Media(js=['text-editor.js'])
+        widget3 = Media(js=['text-editor.js', 'text-editor-extras.js', 'color-picker.js'])
+        merged = widget1 + widget2 + widget3
+        self.assertEqual(merged._js, ['text-editor.js', 'text-editor-extras.js', 'color-picker.js'])
+
+        # A trickier example - the merge should prefer to place 'c' before 'b' and 'g' before 'h'
+        # to preserve the original order. The preference 'c'->'b' should be overridden by widget3's
+        # media, but 'g'->'h' should survive in the final ordering
+        widget1 = Media(js=['a', 'c', 'f', 'g', 'k'])
+        widget2 = Media(js=['a', 'b', 'f', 'h', 'k'])
+        widget3 = Media(js=['b', 'c', 'f', 'k'])
+        merged = widget1 + widget2 + widget3
+        self.assertEqual(merged._js, ['a', 'b', 'c', 'f', 'g', 'h', 'k'])
+
+    def test_merge_css_three_way_non_pairwise(self):
+        widget1 = Media(css={'screen': ['c.css'], 'all': ['d.css', 'e.css']})
+        widget2 = Media(css={'screen': ['a.css']})
+        widget3 = Media(css={'screen': ['a.css', 'b.css', 'c.css'], 'all': ['e.css']})
+        merged = widget1 + widget2 + widget3
+        self.assertEqual(merged._css, {'screen': ['a.css', 'b.css', 'c.css'], 'all': ['d.css', 'e.css']})

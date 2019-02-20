@@ -2,6 +2,7 @@
 HTML Widget classes
 """
 
+import collections
 import copy
 import datetime
 import re
@@ -59,22 +60,24 @@ class Media:
 
     @property
     def _css(self):
-        css = self._css_lists[0]
-        # filter(None, ...) avoids calling merge with empty dicts.
-        for obj in filter(None, self._css_lists[1:]):
-            css = {
-                medium: self.merge(css.get(medium, []), obj.get(medium, []))
-                for medium in css.keys() | obj.keys()
-            }
-        return css
+        # transform self._css_lists (a list of dicts, each mapping a medium to a list of files)
+        # into a single dict, mapping a medium to a list of lists of files
+        css_lists_by_medium = collections.defaultdict(list)
+        for sub_dict in self._css_lists:
+            for medium, css_list in sub_dict.items():
+                if css_list:
+                    css_lists_by_medium[medium].append(css_list)
+
+        return {
+            medium: self.merge(*css_lists)
+            for medium, css_lists in css_lists_by_medium.items()
+        }
 
     @property
     def _js(self):
-        js = self._js_lists[0]
         # filter(None, ...) avoids calling merge() with empty lists.
-        for obj in filter(None, self._js_lists[1:]):
-            js = self.merge(js, obj)
-        return js
+        js_lists = filter(None, self._js_lists)
+        return self.merge(*js_lists)
 
     def render(self):
         return mark_safe('\n'.join(chain.from_iterable(getattr(self, 'render_' + name)() for name in MEDIA_TYPES)))
@@ -115,9 +118,9 @@ class Media:
         raise KeyError('Unknown media type "%s"' % name)
 
     @staticmethod
-    def merge(list_1, list_2):
+    def merge(*sublists):
         """
-        Merge two lists while trying to keep the relative order of the elements.
+        Merge several lists while trying to keep the relative order of the elements.
         Warn if the lists have the same two elements in a different relative
         order.
 
@@ -125,29 +128,96 @@ class Media:
         in a certain order. In JavaScript you may not be able to reference a
         global or in CSS you might want to override a style.
         """
-        # Start with a copy of list_1.
-        combined_list = list(list_1)
-        last_insert_index = len(list_1)
-        # Walk list_2 in reverse, inserting each element into combined_list if
-        # it doesn't already exist.
-        for path in reversed(list_2):
-            try:
-                # Does path already exist in the list?
-                index = combined_list.index(path)
-            except ValueError:
-                # Add path to combined_list since it doesn't exist.
-                combined_list.insert(last_insert_index, path)
+
+        # Build the following data structures from the items in the sublists:
+        # 1) a de-duplicated list of items in order of first appearance
+        unchosen_items = []
+        # 2) a dict mapping each item to its dependencies - i.e. the items that appear
+        #    immediately before it in some sublist
+        requires = collections.defaultdict(list)
+        # 3) a dict mapping each item to its dependents - i.e. the items that appear
+        #    immediately after it in some sublist
+        required_by = collections.defaultdict(list)
+
+        for sublist in sublists:
+            last_item = None
+            sublist_seen_items = set()
+
+            for (i, item) in enumerate(sublist):
+                if item in sublist_seen_items:
+                    # Skip items that are duplicated within the same sublist,
+                    # rather than treating them as dependencies of themselves
+                    continue
+
+                sublist_seen_items.add(item)
+
+                if item not in unchosen_items:
+                    unchosen_items.append(item)
+
+                if i > 0:
+                    # Add last_item to item's dependencies if not already present
+                    if last_item not in requires[item]:
+                        requires[item].append(last_item)
+                    # Add item to last_item's dependents if not already present
+                    if item not in required_by[last_item]:
+                        required_by[last_item].append(item)
+
+                last_item = item
+
+        result = []
+
+        # Maintain a queue of items visited while backtracking to find an item with
+        # no dependencies
+        visited_items = []
+
+        while visited_items or unchosen_items:
+            if visited_items:
+                current_item = visited_items.pop()
             else:
-                if index > last_insert_index:
+                current_item = unchosen_items[0]
+
+            # Backtrack until we find an item with no dependencies
+            while True:
+                current_item_requires = requires[current_item]
+                if not current_item_requires:
+                    break
+
+                # Follow the first dependency in the list
+                next_item = current_item_requires[0]
+                if current_item in visited_items:
+                    # If current item is already on the 'visited' list,
+                    # we've followed a cycle of dependencies
                     warnings.warn(
                         'Detected duplicate Media files in an opposite order:\n'
-                        '%s\n%s' % (combined_list[last_insert_index], combined_list[index]),
+                        '%s\n%s' % (current_item, next_item),
                         MediaOrderConflictWarning,
                     )
-                # path already exists in the list. Update last_insert_index so
-                # that the following elements are inserted in front of this one.
-                last_insert_index = index
-        return combined_list
+                    visited_items.remove(current_item)
+                    break
+
+                visited_items.append(current_item)
+                current_item = next_item
+
+            # current_item is now either an item with no dependencies,
+            # or part of a dependency cycle, so can be chosen as the next
+            # item in the result
+            result.append(current_item)
+
+            # Remove current_item from unchosen items
+            unchosen_items.remove(current_item)
+            # Remove current_item from the dependency list of all its dependents
+            current_item_required_by = required_by[current_item]
+            for dependent in current_item_required_by:
+                requires[dependent].remove(current_item)
+            # Remove current_item from the dependent list of all its dependencies
+            for dependency in current_item_requires:
+                required_by[dependency].remove(current_item)
+
+            # Remove current_item from the dependencies and dependents dicts
+            del(requires[current_item])
+            del(required_by[current_item])
+
+        return result
 
     def __add__(self, other):
         combined = Media()
