@@ -195,7 +195,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return connection
 
     def ensure_timezone(self):
-        if not self.is_usable():
+        if self.connection is None:
             return False
         conn_timezone_name = self.connection.get_parameter_status('TimeZone')
         timezone_name = self.timezone_name
@@ -208,7 +208,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def init_connection_state(self):
         self.connection.set_client_encoding('UTF8')
 
-        self.ensure_connection()
         timezone_changed = self.ensure_timezone()
         if timezone_changed:
             # Commit after setting the time zone (see #17062)
@@ -248,8 +247,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.cursor().execute('SET CONSTRAINTS ALL DEFERRED')
 
     def is_usable(self):
-        if self.connection is None:
-            return False
         try:
             # Use a psycopg cursor directly, bypassing Django's utilities.
             self.connection.cursor().execute("SELECT 1")
