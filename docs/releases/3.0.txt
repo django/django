@@ -187,7 +187,13 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* The new test :class:`~django.test.Client` argument
+  ``raise_request_exception`` allows controlling whether or not exceptions
+  raised during the request should also be raised in the test. The value
+  defaults to ``True`` for backwards compatibility. If it is ``False`` and an
+  exception occurs, the test client will return a 500 response with the
+  attribute :attr:`~django.test.Response.exc_info`, a tuple providing
+  information of the exception that occurred.
 
 URLs
 ~~~~

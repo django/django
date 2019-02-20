@@ -128,6 +128,14 @@ Use the ``django.test.Client`` class to make requests.
     The ``json_encoder`` argument allows setting a custom JSON encoder for
     the JSON serialization that's described in :meth:`post`.
 
+    The ``raise_request_exception`` argument allows controlling whether or not
+    exceptions raised during the request should also be raised in the test.
+    Defaults to ``True``.
+
+    .. versionadded:: 3.0
+
+        The ``raise_request_exception`` argument was added.
+
     Once you have a ``Client`` instance, you can call any of the following
     methods:
 
@@ -476,6 +484,23 @@ Specifically, a ``Response`` object has the following attributes:
             :attr:`~django.template.response.SimpleTemplateResponse.context_data`
             may be a suitable alternative on responses with that attribute.
 
+    .. attribute:: exc_info
+
+        .. versionadded:: 3.0
+
+        A tuple of three values that provides information about the unhandled
+        exception, if any, that occurred during the view.
+
+        The values are (type, value, traceback), the same as returned by
+        Python's :func:`sys.exc_info`. Their meanings are:
+
+        - *type*: The type of the exception.
+        - *value*: The exception instance.
+        - *traceback*: A traceback object which encapsulates the call stack at
+          the point where the exception originally occurred.
+
+        If no exception occurred, then ``exc_info`` will be ``None``.
+
     .. method:: json(**kwargs)
 
         The body of the response, parsed as JSON. Extra keyword arguments are
@@ -544,9 +569,10 @@ content type of a response using ``response['Content-Type']``.
 Exceptions
 ----------
 
-If you point the test client at a view that raises an exception, that exception
-will be visible in the test case. You can then use a standard ``try ... except``
-block or :meth:`~unittest.TestCase.assertRaises` to test for exceptions.
+If you point the test client at a view that raises an exception and
+``Client.raise_request_exception`` is ``True``, that exception will be visible
+in the test case. You can then use a standard ``try ... except`` block or
+:meth:`~unittest.TestCase.assertRaises` to test for exceptions.
 
 The only exceptions that are not visible to the test client are
 :class:`~django.http.Http404`,
@@ -554,6 +580,11 @@ The only exceptions that are not visible to the test client are
 :class:`~django.core.exceptions.SuspiciousOperation`. Django catches these
 exceptions internally and converts them into the appropriate HTTP response
 codes. In these cases, you can check ``response.status_code`` in your test.
+
+If ``Client.raise_request_exception`` is ``False``, the test client will return a
+500 response as would be returned to a browser. The response has the attribute
+:attr:`~Response.exc_info` to provide information about the unhandled
+exception.
 
 Persistent state
 ----------------
