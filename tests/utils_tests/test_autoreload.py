@@ -16,7 +16,7 @@ from django.apps.registry import Apps
 from django.test import SimpleTestCase
 from django.test.utils import extend_sys_path
 from django.utils import autoreload
-from django.utils.autoreload import WatchmanUnavailable
+from django.utils.autoreload import ReloaderUnavailable
 
 
 class TestIterModulesAndFiles(SimpleTestCase):
@@ -172,12 +172,15 @@ class TestSysPathDirectories(SimpleTestCase):
 class GetReloaderTests(SimpleTestCase):
     @mock.patch('django.utils.autoreload.WatchmanReloader')
     def test_watchman_unavailable(self, mocked_watchman):
-        mocked_watchman.check_availability.side_effect = WatchmanUnavailable
-        self.assertIsInstance(autoreload.get_reloader(), autoreload.StatReloader)
+        mocked_watchman.check_availability.side_effect = ReloaderUnavailable
+        self.assertIsInstance(
+            autoreload.get_reloader(),
+            (autoreload.PyInotifyReloader, autoreload.StatReloader)
+        )
 
     @mock.patch.object(autoreload.WatchmanReloader, 'check_availability')
     def test_watchman_available(self, mocked_available):
-        # If WatchmanUnavailable isn't raised, Watchman will be chosen.
+        # If ReloaderUnavailable isn't raised, Watchman will be chosen.
         mocked_available.return_value = None
         result = autoreload.get_reloader()
         self.assertIsInstance(result, autoreload.WatchmanReloader)
@@ -217,7 +220,7 @@ class StartDjangoTests(SimpleTestCase):
         mocked_stat.should_stop.return_value = True
         fake_reloader = mock.MagicMock()
         fake_reloader.should_stop = False
-        fake_reloader.run.side_effect = autoreload.WatchmanUnavailable()
+        fake_reloader.run.side_effect = autoreload.ReloaderUnavailable()
 
         autoreload.start_django(fake_reloader, lambda: None)
         self.assertEqual(mocked_stat.call_count, 1)
@@ -541,7 +544,7 @@ class BaseReloaderTests(ReloaderTests):
 def skip_unless_watchman_available():
     try:
         autoreload.WatchmanReloader.check_availability()
-    except WatchmanUnavailable as e:
+    except ReloaderUnavailable as e:
         return skip('Watchman unavailable: %s' % e)
     return lambda func: func
 
@@ -597,25 +600,25 @@ class WatchmanReloaderTests(ReloaderTests, IntegrationTests):
     def test_check_server_status_raises_error(self):
         with mock.patch.object(self.reloader.client, 'query') as mocked_query:
             mocked_query.side_effect = Exception()
-            with self.assertRaises(autoreload.WatchmanUnavailable):
+            with self.assertRaises(ReloaderUnavailable):
                 self.reloader.check_server_status()
 
     @mock.patch('pywatchman.client')
     def test_check_availability(self, mocked_client):
         mocked_client().capabilityCheck.side_effect = Exception()
-        with self.assertRaisesMessage(WatchmanUnavailable, 'Cannot connect to the watchman service'):
+        with self.assertRaisesMessage(ReloaderUnavailable, 'Cannot connect to the watchman service'):
             self.RELOADER_CLS.check_availability()
 
     @mock.patch('pywatchman.client')
     def test_check_availability_lower_version(self, mocked_client):
         mocked_client().capabilityCheck.return_value = {'version': '4.8.10'}
-        with self.assertRaisesMessage(WatchmanUnavailable, 'Watchman 4.9 or later is required.'):
+        with self.assertRaisesMessage(ReloaderUnavailable, 'Watchman 4.9 or later is required.'):
             self.RELOADER_CLS.check_availability()
 
     def test_pywatchman_not_available(self):
         with mock.patch.object(autoreload, 'pywatchman') as mocked:
             mocked.__bool__.return_value = False
-            with self.assertRaisesMessage(WatchmanUnavailable, 'pywatchman not installed.'):
+            with self.assertRaisesMessage(ReloaderUnavailable, 'pywatchman not installed.'):
                 self.RELOADER_CLS.check_availability()
 
     def test_update_watches_raises_exceptions(self):

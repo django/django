@@ -45,6 +45,11 @@ try:
 except ImportError:
     pywatchman = None
 
+try:
+    import pyinotify
+except ImportError:
+    pyinotify = None
+
 
 def check_errors(fn):
     @functools.wraps(fn)
@@ -358,7 +363,66 @@ class StatReloader(BaseReloader):
         return True
 
 
-class WatchmanUnavailable(RuntimeError):
+class PyInotifyReloader(BaseReloader):
+    def __init__(self):
+        notify_file_changed = self.notify_file_changed
+
+        class EventHandler(pyinotify.ProcessEvent):
+            def process_default(self, event):
+                notify_file_changed(Path(event.path))
+
+        super().__init__()
+        self.wm = pyinotify.WatchManager()
+        self.notifier = pyinotify.Notifier(self.wm, EventHandler())
+        self._watched_files = set()
+
+    @classmethod
+    def check_availability(cls):
+        available = False
+        try:
+            import pyinotify
+
+            fd = pyinotify.INotifyWrapper.create().inotify_init()
+            if fd >= 0:
+                available = True
+                os.close(fd)
+        except ImportError:
+            pass
+        if not available:
+            raise ReloaderUnavailable('Pyinotify is not installed or not functional on your system')
+
+    def update_watches(self, sender=None, **kwargs):
+        if sender and getattr(sender, 'handles_files', False):
+            # No need to update watches when request serves files.
+            # (sender is supposed to be a django.core.handlers.BaseHandler subclass)
+            return
+        mask = (
+            pyinotify.IN_MODIFY |
+            pyinotify.IN_DELETE |
+            pyinotify.IN_ATTRIB |
+            pyinotify.IN_MOVED_FROM |
+            pyinotify.IN_MOVED_TO |
+            pyinotify.IN_CREATE |
+            pyinotify.IN_DELETE_SELF |
+            pyinotify.IN_MOVE_SELF
+        )
+        for path in self.watched_files():
+            if path not in self._watched_files:
+                self.wm.add_watch(str(path), mask)
+                self._watched_files.add(path)
+
+    def tick(self):
+        request_finished.connect(self.update_watches)
+        self.update_watches()
+        while True:
+            self.notifier.check_events(timeout=None)
+            self.notifier.read_events()
+            self.notifier.process_events()
+            self.notifier.stop()
+            yield
+
+
+class ReloaderUnavailable(RuntimeError):
     pass
 
 
@@ -521,34 +585,36 @@ class WatchmanReloader(BaseReloader):
         try:
             self.client.query('version')
         except Exception:
-            raise WatchmanUnavailable(str(inner_ex)) from inner_ex
+            raise ReloaderUnavailable(str(inner_ex)) from inner_ex
         return True
 
     @classmethod
     def check_availability(cls):
         if not pywatchman:
-            raise WatchmanUnavailable('pywatchman not installed.')
+            raise ReloaderUnavailable('pywatchman not installed.')
         client = pywatchman.client(timeout=0.01)
         try:
             result = client.capabilityCheck()
         except Exception:
             # The service is down?
-            raise WatchmanUnavailable('Cannot connect to the watchman service.')
+            raise ReloaderUnavailable('Cannot connect to the watchman service.')
         version = get_version_tuple(result['version'])
         # Watchman 4.9 includes multiple improvements to watching project
         # directories as well as case insensitive filesystems.
         logger.debug('Watchman version %s', version)
         if version < (4, 9):
-            raise WatchmanUnavailable('Watchman 4.9 or later is required.')
+            raise ReloaderUnavailable('Watchman 4.9 or later is required.')
 
 
 def get_reloader():
     """Return the most suitable reloader for this environment."""
-    try:
-        WatchmanReloader.check_availability()
-    except WatchmanUnavailable:
-        return StatReloader()
-    return WatchmanReloader()
+    for reloader_class in [WatchmanReloader, PyInotifyReloader, StatReloader]:
+        try:
+            reloader_class.check_availability()
+        except ReloaderUnavailable as e:
+            logger.info('Reloader unavailable: %s', e)
+            continue
+        return reloader_class()
 
 
 def start_django(reloader, main_func, *args, **kwargs):
@@ -562,11 +628,11 @@ def start_django(reloader, main_func, *args, **kwargs):
     while not reloader.should_stop:
         try:
             reloader.run(django_main_thread)
-        except WatchmanUnavailable as ex:
-            # It's possible that the watchman service shuts down or otherwise
-            # becomes unavailable. In that case, use the StatReloader.
+        except ReloaderUnavailable as ex:
+            # It's possible that the current reloader becomes unavailable
+            # (service shutdown, …). In that case, use the fallback StatReloader.
             reloader = StatReloader()
-            logger.error('Error connecting to Watchman: %s', ex)
+            logger.error('Reloader error: %s', ex)
             logger.info('Watching for file changes with %s', reloader.__class__.__name__)
 
 
@@ -578,10 +644,6 @@ def run_with_reloader(main_func, *args, **kwargs):
             logger.info('Watching for file changes with %s', reloader.__class__.__name__)
             start_django(reloader, main_func, *args, **kwargs)
         else:
-            try:
-                WatchmanReloader.check_availability()
-            except WatchmanUnavailable as e:
-                logger.info('Watchman unavailable: %s', e)
             exit_code = restart_with_reloader()
             sys.exit(exit_code)
     except KeyboardInterrupt:
