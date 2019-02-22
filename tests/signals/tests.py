@@ -280,6 +280,14 @@ class SignalTests(BaseSignalSetup, TestCase):
         signals.pre_init.disconnect(callback)
         ref.assert_not_called()
 
+    def test_model_pre_init_from_db(self):
+        def receiver(instance, **kwargs):
+            self.assertIsNotNone(instance._state)
+
+        person = Person.objects.create()
+        signals.post_init.connect(receiver, sender=Person)
+        Person.objects.get(pk=person.pk)
+
 
 class LazyModelRefTests(BaseSignalSetup, SimpleTestCase):
     def setUp(self):
@@ -351,28 +359,3 @@ class LazyModelRefTests(BaseSignalSetup, SimpleTestCase):
         apps2 = Apps()
         signals.post_init.connect(self.receiver, sender=Book, apps=apps2)
         self.assertEqual(list(apps2._pending_operations), [])
-
-
-class ModelStateTests(TestCase):
-    databases = ['default', 'other']
-
-    def setUp(self):
-        a1 = Author.objects.using('other').create(id=1)
-        b1 = Book.objects.using('other').create(id=1)
-        b1.authors.set([a1])
-
-    def test_model_state(self):
-        def post_signal(instance, **kwargs):
-            import copy
-            self.instance = copy.deepcopy(instance)
-
-        def disconnect():
-            signals.post_init.disconnect(post_signal, sender=Book)
-
-        signals.post_init.connect(post_signal, sender=Book)
-        self.addCleanup(disconnect)
-
-        Book.objects.using('other').get(pk=1)
-        self.assertFalse(self.instance._state.adding)
-        self.assertEqual(self.instance._state.db, 'other')
-        self.assertEqual(self.instance._state.db, self.instance.authors.get()._state.db)
