@@ -129,10 +129,10 @@ class AdminScriptTestCase(SimpleTestCase):
         script_dir = os.path.abspath(os.path.join(os.path.dirname(django.__file__), 'bin'))
         return self.run_test(os.path.join(script_dir, 'django-admin.py'), args, settings_file)
 
-    def run_manage(self, args, settings_file=None, configured_settings=False):
+    def run_manage(self, args, settings_file=None, manage_py=None):
         template_manage_py = (
-            os.path.join(os.path.dirname(__file__), 'configured_settings_manage.py')
-            if configured_settings else
+            os.path.join(os.path.dirname(__file__), manage_py)
+            if manage_py else
             os.path.join(os.path.dirname(conf.__file__), 'project_template', 'manage.py-tpl')
         )
         test_manage_py = os.path.join(self.test_dir, 'manage.py')
@@ -2139,11 +2139,21 @@ class DiffSettings(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "FOO = 'bar'  ###")
+        # Attributes from django.conf.Settings don't appear.
+        self.assertNotInOutput(out, 'is_overridden = ')
 
     def test_settings_configured(self):
-        out, err = self.run_manage(['diffsettings'], configured_settings=True)
+        out, err = self.run_manage(['diffsettings'], manage_py='configured_settings_manage.py')
         self.assertNoOutput(err)
         self.assertOutput(out, 'CUSTOM = 1  ###\nDEBUG = True')
+        # Attributes from django.conf.UserSettingsHolder don't appear.
+        self.assertNotInOutput(out, 'default_settings = ')
+
+    def test_dynamic_settings_configured(self):
+        # Custom default settings appear.
+        out, err = self.run_manage(['diffsettings'], manage_py='configured_dynamic_settings_manage.py')
+        self.assertNoOutput(err)
+        self.assertOutput(out, "FOO = 'bar'  ###")
 
     def test_all(self):
         """The all option also shows settings with the default value."""
