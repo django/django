@@ -893,8 +893,27 @@ class CityInlineAdmin(admin.TabularInline):
     view_on_site = False
 
 
+class StateAdminForm(forms.ModelForm):
+    nolabel_form_field = forms.BooleanField(required=False)
+
+    class Meta:
+        model = State
+        fields = '__all__'
+        labels = {"name": "State name (from form's Meta.labels)"}
+
+    @property
+    def changed_data(self):
+        data = super().changed_data
+        if data:
+            # Add arbitrary name to changed_data to test
+            # change message construction.
+            return data + ['not_a_form_field']
+        return data
+
+
 class StateAdmin(admin.ModelAdmin):
     inlines = [CityInlineAdmin]
+    form = StateAdminForm
 
 
 class RestaurantInlineAdmin(admin.TabularInline):
