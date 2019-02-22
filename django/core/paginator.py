@@ -34,7 +34,7 @@ class Paginator:
         self.per_page = int(per_page)
         self.orphans = int(orphans)
         self.allow_empty_first_page = allow_empty_first_page
-        self.object_list_ids = object_list.values('id')
+        self.object_list_ids = object_list.values('uuid')
 
     def validate_number(self, number):
         """Validate the given 1-based page number."""
