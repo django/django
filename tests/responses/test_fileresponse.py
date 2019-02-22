@@ -14,12 +14,21 @@ class FileResponseTests(SimpleTestCase):
         response = FileResponse(open(__file__, 'rb'))
         self.assertEqual(response['Content-Length'], str(os.path.getsize(__file__)))
         self.assertIn(response['Content-Type'], ['text/x-python', 'text/plain'])
+        self.assertEqual(response['Content-Disposition'], 'inline; filename="test_fileresponse.py"')
         response.close()
 
     def test_file_from_buffer_response(self):
         response = FileResponse(io.BytesIO(b'binary content'))
         self.assertEqual(response['Content-Length'], '14')
         self.assertEqual(response['Content-Type'], 'application/octet-stream')
+        self.assertFalse(response.has_header('Content-Disposition'))
+        self.assertEqual(list(response), [b'binary content'])
+
+    def test_file_from_buffer_unnamed_attachment(self):
+        response = FileResponse(io.BytesIO(b'binary content'), as_attachment=True)
+        self.assertEqual(response['Content-Length'], '14')
+        self.assertEqual(response['Content-Type'], 'application/octet-stream')
+        self.assertEqual(response['Content-Disposition'], 'attachment')
         self.assertEqual(list(response), [b'binary content'])
 
     @skipIf(sys.platform == 'win32', "Named pipes are Unix-only.")

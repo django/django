@@ -436,15 +436,17 @@ class FileResponse(StreamingHttpResponse):
             else:
                 self['Content-Type'] = 'application/octet-stream'
 
-        if self.as_attachment:
-            filename = self.filename or os.path.basename(filename)
-            if filename:
-                try:
-                    filename.encode('ascii')
-                    file_expr = 'filename="{}"'.format(filename)
-                except UnicodeEncodeError:
-                    file_expr = "filename*=utf-8''{}".format(quote(filename))
-                self['Content-Disposition'] = 'attachment; {}'.format(file_expr)
+        filename = self.filename or os.path.basename(filename)
+        if filename:
+            disposition = 'attachment' if self.as_attachment else 'inline'
+            try:
+                filename.encode('ascii')
+                file_expr = 'filename="{}"'.format(filename)
+            except UnicodeEncodeError:
+                file_expr = "filename*=utf-8''{}".format(quote(filename))
+            self['Content-Disposition'] = '{}; {}'.format(disposition, file_expr)
+        elif self.as_attachment:
+            self['Content-Disposition'] = 'attachment'
 
 
 class HttpResponseRedirectBase(HttpResponse):
