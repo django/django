@@ -47,3 +47,4 @@ m2m_changed = ModelSignal(use_caching=True)
 
 pre_migrate = Signal()
 post_migrate = Signal()
+post_operation = Signal()

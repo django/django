@@ -530,6 +530,60 @@ For example, you could register a callback in an
     when settings are overridden) and such signals should be connected for each
     new ``AppConfig`` instance.
 
+``post_operation``
+------------------
+
+.. data:: django.db.models.signals.post_operation
+   :module:
+
+Sent every time an operation is applied during the :djadmin:`migrate` commands.
+
+Handlers can inject operations by returning an array of operations. To prevent
+infinite recursion, it is recommended to only return operations that are
+subclasses of existing :mod:`~django.db.migrations.operations`.
+
+Injected operations are executed in the order the apps are listed
+in ``INSTALLED_APPS`` and the handlers are registered within each app.
+
+Arguments sent with this signal:
+
+``operation``
+    The ``Operation`` instance being applied. Its class is the sender the
+    handler is connected to.
+
+``migration``
+    The ``Migration`` instance of the migration currently being applied the
+    ``operation`` is part of.
+
+``from_state``
+    Clone of the ``ProjectState`` instance before the ``operation`` is applied.
+
+``to_state``
+    Clone of the ``ProjectState`` instance after the ``operation`` is applied.
+
+For example, you could register a callback in an
+:class:`~django.apps.AppConfig` like this::
+
+    from django.apps import AppConfig
+    from django.db.migrations.operations import CreateModel
+    from django.db.models.signals import post_operation
+
+    from my_app.operations import CreateLogEntry
+
+    def inject_create_model_log_operation(operation, migration, **kwargs):
+        return [
+            CreateLogEntry(migration.app_label, operation.name),
+        ]
+
+    class MyAppConfig(AppConfig):
+        ...
+
+        def ready(self):
+            post_operation.connect(
+                inject_create_model_log_operation,
+                sender=CreateModel,
+            )
+
 Request/response signals
 ========================
 
