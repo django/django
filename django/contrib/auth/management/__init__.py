@@ -8,7 +8,8 @@ from django.apps import apps as global_apps
 from django.contrib.auth import get_permission_codename
 from django.contrib.contenttypes.management import create_contenttypes
 from django.core import exceptions
-from django.db import DEFAULT_DB_ALIAS, router
+from django.db import DEFAULT_DB_ALIAS, migrations, router
+from django.db.utils import OperationalError
 
 
 def _get_all_permissions(opts):
@@ -84,6 +85,62 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
     if verbosity >= 2:
         for perm in perms:
             print("Adding permission '%s'" % perm)
+
+
+class CreatePermission(migrations.RunPython):
+    def __init__(self, app_label, model, codename, name):
+        self.app_label = app_label
+        self.model = model
+        self.codename = codename
+        self.name = name
+        super().__init__(self.create_forward, self.noop)
+
+    def create_forward(self, apps, schema_editor):
+        try:
+            ContentType = apps.get_model('contenttypes', 'ContentType')
+            Permission = apps.get_model('auth', 'Permission')
+        except LookupError:
+            return
+
+        db = schema_editor.connection.alias
+        if not router.allow_migrate_model(db, Permission):
+            return
+
+        try:
+            content_type = ContentType.objects.get_by_natural_key(self.app_label, self.model)
+            Permission.objects.using(db).get_or_create(
+                content_type=content_type,
+                codename=self.codename,
+                name=self.name,
+            )
+        except OperationalError:
+            # We are trying to create a permission before all the migrations for
+            # ContentType and Permission are applied.
+            # TODO: Register post_migrate(defer_permission_creation)?
+            pass
+
+
+def inject_create_permissions(migration, operation, from_state, model_name):
+    if ('auth', 'permission') not in from_state.models:
+        return
+
+    Model = global_apps.get_model(migration.app_label, model_name)
+    opts = Model._meta
+
+    for codename, name in _get_all_permissions(opts):
+        yield CreatePermission(migration.app_label, model_name, codename, name)
+
+
+def inject_create_permissions_for_created_contenttype(migration, operation, from_state, **kwargs):
+    return inject_create_permissions(migration, operation, from_state, operation.model)
+
+
+def inject_create_permissions_for_renamed_contenttype(migration, operation, from_state, **kwargs):
+    return inject_create_permissions(migration, operation, from_state, operation.new_model)
+
+
+def inject_create_permissions_for_altered_model(migration, operation, from_state, **kwargs):
+    return inject_create_permissions(migration, operation, from_state, operation.name)
 
 
 def get_system_username():
