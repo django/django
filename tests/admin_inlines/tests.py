@@ -497,10 +497,10 @@ class TestInlineMedia(TestDataMixin, TestCase):
             response.context['inline_admin_formsets'][0].media._js,
             [
                 'admin/js/vendor/jquery/jquery.min.js',
-                'admin/js/jquery.init.js',
-                'admin/js/inlines.min.js',
                 'my_awesome_inline_scripts.js',
                 'custom_number.js',
+                'admin/js/jquery.init.js',
+                'admin/js/inlines.min.js',
             ]
         )
         self.assertContains(response, 'my_awesome_inline_scripts.js')
