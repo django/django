@@ -259,6 +259,14 @@ Internationalization
   language cookies. The default values of these settings preserve the previous
   behavior.
 
+Logging
+~~~~~~~
+
+* The new ``reporter_class`` parameter of
+  :class:`~django.utils.log.AdminEmailHandler` allows providing an
+  ``django.views.debug.ExceptionReporter`` subclass to customize the traceback
+  text sent to site :setting:`ADMINS` when :setting:`DEBUG` is ``False``.
+
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 

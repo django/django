@@ -595,7 +595,7 @@ Handlers
 Django provides one log handler in addition to those provided by the
 Python logging module.
 
-.. class:: AdminEmailHandler(include_html=False, email_backend=None)
+.. class:: AdminEmailHandler(include_html=False, email_backend=None, reporter_class=None)
 
     This handler sends an email to the site :setting:`ADMINS` for each log
     message it receives.
@@ -651,6 +651,26 @@ Python logging module.
 
     By default, an instance of the email backend specified in
     :setting:`EMAIL_BACKEND` will be used.
+
+    The ``reporter_class`` argument of ``AdminEmailHandler`` allows providing
+    an ``django.views.debug.ExceptionReporter`` subclass to customize the
+    traceback text sent in the email body. You provide a string import path to
+    the class you wish to use, like this:
+
+    .. code-block:: python
+
+        'handlers': {
+            'mail_admins': {
+                'level': 'ERROR',
+                'class': 'django.utils.log.AdminEmailHandler',
+                'include_html': True,
+                'reporter_class': 'somepackage.error_reporter.CustomErrorReporter'
+            }
+        },
+
+    .. versionadded:: 3.0
+
+        The ``reporter_class`` argument was added.
 
     .. method:: send_mail(subject, message, *args, **kwargs)
 
