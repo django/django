@@ -1,3 +1,7 @@
+class CyclicDependencyError(ValueError):
+    pass
+
+
 def topological_sort_as_sets(dependency_graph):
     """
     Variation of Kahn's algorithm (1962) that returns sets.
@@ -13,7 +17,7 @@ def topological_sort_as_sets(dependency_graph):
         current = {node for node, deps in todo.items() if not deps}
 
         if not current:
-            raise ValueError('Cyclic dependency in graph: {}'.format(
+            raise CyclicDependencyError('Cyclic dependency in graph: {}'.format(
                 ', '.join(repr(x) for x in todo.items())))
 
         yield current
