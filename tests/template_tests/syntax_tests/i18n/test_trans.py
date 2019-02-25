@@ -7,8 +7,8 @@ from django.utils import translation
 from django.utils.safestring import mark_safe
 from django.utils.translation import trans_real
 
-from ...utils import setup
 from .base import MultipleLocaleActivationTestCase, extended_locale_paths
+from ...utils import setup
 
 
 class I18nTransTagTests(SimpleTestCase):

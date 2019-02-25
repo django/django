@@ -5,8 +5,8 @@ from django.contrib.gis.shortcuts import render_to_kmz
 from django.db.models import Count, Min
 from django.test import TestCase, skipUnlessDBFeature
 
-from ..utils import no_oracle
 from .models import City, PennsylvaniaCity, State, Truth
+from ..utils import no_oracle
 
 
 class GeoRegressionTests(TestCase):
