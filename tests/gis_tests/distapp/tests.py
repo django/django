@@ -9,12 +9,12 @@ from django.db import NotSupportedError, connection
 from django.db.models import F, Q
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
-from ..utils import (
-    FuncTestMixin, mysql, no_oracle, oracle, postgis, spatialite,
-)
 from .models import (
     AustraliaCity, CensusZipcode, Interstate, SouthTexasCity, SouthTexasCityFt,
     SouthTexasInterstate, SouthTexasZipcode,
+)
+from ..utils import (
+    FuncTestMixin, mysql, no_oracle, oracle, postgis, spatialite,
 )
 
 

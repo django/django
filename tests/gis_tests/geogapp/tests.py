@@ -11,8 +11,8 @@ from django.db import NotSupportedError, connection
 from django.db.models.functions import Cast
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
-from ..utils import FuncTestMixin, oracle, postgis, spatialite
 from .models import City, County, Zipcode
+from ..utils import FuncTestMixin, oracle, postgis, spatialite
 
 
 class GeographyTest(TestCase):

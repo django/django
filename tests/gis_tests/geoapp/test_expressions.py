@@ -6,8 +6,8 @@ from django.db import connection
 from django.db.models import Count, Min
 from django.test import TestCase, skipUnlessDBFeature
 
-from ..utils import postgis
 from .models import City, ManyPointModel, MultiFields
+from ..utils import postgis
 
 
 class GeoExpressionsTests(TestCase):

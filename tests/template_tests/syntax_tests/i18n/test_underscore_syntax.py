@@ -2,8 +2,8 @@ from django.template import Context, Template
 from django.test import SimpleTestCase
 from django.utils import translation
 
-from ...utils import setup
 from .base import MultipleLocaleActivationTestCase
+from ...utils import setup
 
 
 class MultipleLocaleActivationTests(MultipleLocaleActivationTestCase):

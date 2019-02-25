@@ -4,8 +4,8 @@ from django.template.defaultfilters import timesince_filter
 from django.test import SimpleTestCase
 from django.test.utils import requires_tz_support
 
-from ..utils import setup
 from .timezone_utils import TimezoneTestCase
+from ..utils import setup
 
 
 class TimesinceTests(TimezoneTestCase):
