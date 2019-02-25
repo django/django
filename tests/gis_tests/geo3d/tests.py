@@ -8,11 +8,11 @@ from django.contrib.gis.db.models.functions import (
 from django.contrib.gis.geos import GEOSGeometry, LineString, Point, Polygon
 from django.test import TestCase, skipUnlessDBFeature
 
-from ..utils import FuncTestMixin
 from .models import (
     City3D, Interstate2D, Interstate3D, InterstateProj2D, InterstateProj3D,
     MultiPoint3D, Point2D, Point3D, Polygon2D, Polygon3D,
 )
+from ..utils import FuncTestMixin
 
 data_path = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'data'))
 city_file = os.path.join(data_path, 'cities', 'cities.shp')

@@ -13,8 +13,8 @@ from django.db.models import Sum
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.utils.deprecation import RemovedInDjango30Warning
 
-from ..utils import FuncTestMixin, mysql, oracle, postgis, spatialite
 from .models import City, Country, CountryWebMercator, State, Track
+from ..utils import FuncTestMixin, mysql, oracle, postgis, spatialite
 
 
 class GISFunctionsTests(FuncTestMixin, TestCase):
