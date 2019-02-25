@@ -5,10 +5,10 @@ from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import override_settings
 from django.utils import timezone
 
-from ..utils import no_oracle
 from .models import (
     Article, Author, Book, City, DirectoryEntry, Event, Location, Parcel,
 )
+from ..utils import no_oracle
 
 
 class RelatedGeoModelTest(TestCase):

@@ -8,9 +8,9 @@ from django.db.models import Field, IntegerField, Transform
 from django.db.models.lookups import Exact, In
 from django.utils.translation import gettext_lazy as _
 
-from ..utils import prefix_validation_error
 from .mixins import CheckFieldDefaultMixin
 from .utils import AttributeSetter
+from ..utils import prefix_validation_error
 
 __all__ = ['ArrayField']
 

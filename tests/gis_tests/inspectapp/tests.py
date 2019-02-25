@@ -9,9 +9,9 @@ from django.db import connection, connections
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import modify_settings
 
+from .models import AllOGRFields
 from ..test_data import TEST_DATA
 from ..utils import postgis
-from .models import AllOGRFields
 
 
 class InspectDbTests(TestCase):
