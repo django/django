@@ -1468,10 +1468,9 @@ Behind the scenes, Django creates an intermediary join table to represent the
 many-to-many relationship. By default, this table name is generated using the
 name of the many-to-many field and the name of the table for the model that
 contains it. Since some databases don't support table names above a certain
-length, these table names will be automatically truncated to 64 characters and a
-uniqueness hash will be used. This means you might see table names like
-``author_books_9cdf4``; this is perfectly normal.  You can manually provide the
-name of the join table using the :attr:`~ManyToManyField.db_table` option.
+length, these table names will be automatically truncated and a uniqueness hash
+will be used, e.g. ``author_books_9cdf``. You can manually provide the name of
+the join table using the :attr:`~ManyToManyField.db_table` option.
 
 .. _manytomany-arguments:
 
