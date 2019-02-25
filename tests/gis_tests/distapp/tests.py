@@ -12,11 +12,11 @@ from django.db.models import F, Q
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.utils.deprecation import RemovedInDjango20Warning
 
-from ..utils import no_oracle, oracle, postgis, spatialite
 from .models import (
     AustraliaCity, CensusZipcode, Interstate, SouthTexasCity, SouthTexasCityFt,
     SouthTexasInterstate, SouthTexasZipcode,
 )
+from ..utils import no_oracle, oracle, postgis, spatialite
 
 
 class DistanceTest(TestCase):

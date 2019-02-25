@@ -17,8 +17,8 @@ from django.test import (
 from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
 
-from ..utils import oracle, postgis, spatialite
 from .models import City, County, Zipcode
+from ..utils import oracle, postgis, spatialite
 
 
 class GeographyTest(TestCase):

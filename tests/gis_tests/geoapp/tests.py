@@ -15,11 +15,11 @@ from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 
-from ..utils import oracle, postgis, skipUnlessGISLookup, spatialite
 from .models import (
     City, Country, Feature, MinusOneSRID, NonConcreteModel, PennsylvaniaCity,
     State, Track,
 )
+from ..utils import oracle, postgis, skipUnlessGISLookup, spatialite
 
 
 class GeoModelTest(TestCase):

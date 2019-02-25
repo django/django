@@ -11,9 +11,9 @@ from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import modify_settings
 from django.utils.six import StringIO
 
+from .models import AllOGRFields
 from ..test_data import TEST_DATA
 from ..utils import postgis
-from .models import AllOGRFields
 
 
 class InspectDbTests(TestCase):
