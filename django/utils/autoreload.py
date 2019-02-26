@@ -578,10 +578,6 @@ def run_with_reloader(main_func, *args, **kwargs):
             logger.info('Watching for file changes with %s', reloader.__class__.__name__)
             start_django(reloader, main_func, *args, **kwargs)
         else:
-            try:
-                WatchmanReloader.check_availability()
-            except WatchmanUnavailable as e:
-                logger.info('Watchman unavailable: %s', e)
             exit_code = restart_with_reloader()
             sys.exit(exit_code)
     except KeyboardInterrupt:
