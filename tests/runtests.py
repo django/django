@@ -447,6 +447,10 @@ if __name__ == "__main__":
         help='A comma-separated list of browsers to run the Selenium tests against.',
     )
     parser.add_argument(
+        '--headless', action='store_true',
+        help='Run selenium tests in headless mode, if the browser supports the option.',
+    )
+    parser.add_argument(
         '--selenium-hub',
         help='A URL for a selenium hub instance to use in combination with --selenium.',
     )
@@ -506,6 +510,7 @@ if __name__ == "__main__":
         if options.selenium_hub:
             SeleniumTestCaseBase.selenium_hub = options.selenium_hub
             SeleniumTestCaseBase.external_host = options.external_host
+        SeleniumTestCaseBase.headless = options.headless
         SeleniumTestCaseBase.browsers = options.selenium
 
     if options.bisect:

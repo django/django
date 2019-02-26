@@ -230,6 +230,9 @@ See the `selenium.webdriver`_ package for the list of available browsers.
 Specifying ``--selenium`` automatically sets ``--tags=selenium`` to run only
 the tests that require selenium.
 
+Some browsers (e.g. Chrome or Firefox) support headless testing, which can be
+faster and more stable. Add the ``--headless`` option to enable this mode.
+
 .. _selenium.webdriver: https://github.com/SeleniumHQ/selenium/tree/master/py/selenium/webdriver
 
 .. _running-unit-tests-dependencies:
