@@ -6,6 +6,7 @@ import sys
 import tempfile
 import threading
 import time
+import types
 import weakref
 import zipfile
 from importlib import import_module
@@ -123,6 +124,11 @@ class TestIterModulesAndFiles(SimpleTestCase):
         sys.modules['time_proxy'] = time_proxy
         self.addCleanup(lambda: sys.modules.pop('time_proxy', None))
         list(autoreload.iter_all_python_module_files())  # No crash.
+
+    def test_module_without_spec(self):
+        module = types.ModuleType('test_module')
+        del module.__spec__
+        self.assertEqual(autoreload.iter_modules_and_files((module,), frozenset()), frozenset())
 
 
 class TestCommonRoots(SimpleTestCase):
