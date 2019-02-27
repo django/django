@@ -129,6 +129,14 @@ class SchemaTests(TransactionTestCase):
                 if c['index'] and len(c['columns']) == 1
             ]
 
+    def get_uniques(self, table):
+        with connection.cursor() as cursor:
+            return [
+                c['columns'][0]
+                for c in connection.introspection.get_constraints(cursor, table).values()
+                if c['unique'] and len(c['columns']) == 1
+            ]
+
     def get_constraints(self, table):
         """
         Get the constraints on a table using a new cursor.
@@ -1971,7 +1979,7 @@ class SchemaTests(TransactionTestCase):
             editor.add_field(Book, new_field3)
         self.assertIn(
             "slug",
-            self.get_indexes(Book._meta.db_table),
+            self.get_uniques(Book._meta.db_table),
         )
         # Remove the unique, check the index goes with it
         new_field4 = CharField(max_length=20, unique=False)
@@ -1980,7 +1988,7 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(BookWithSlug, new_field3, new_field4, strict=True)
         self.assertNotIn(
             "slug",
-            self.get_indexes(Book._meta.db_table),
+            self.get_uniques(Book._meta.db_table),
         )
 
     def test_text_field_with_db_index(self):
