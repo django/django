@@ -58,3 +58,21 @@ class ArticleReporter(models.Model):
 
     class Meta:
         managed = False
+
+
+class Comment(models.Model):
+    ref = models.UUIDField(unique=True)
+    article = models.ForeignKey(Article, models.CASCADE, db_index=True)
+    email = models.EmailField()
+    pub_date = models.DateTimeField()
+    up_votes = models.PositiveIntegerField()
+    body = models.TextField()
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(name='up_votes_gte_0_check', check=models.Q(up_votes__gte=0)),
+            models.UniqueConstraint(fields=['article', 'email', 'pub_date'], name='article_email_pub_date_uniq'),
+        ]
+        indexes = [
+            models.Index(fields=['email', 'pub_date'], name='email_pub_date_idx'),
+        ]
