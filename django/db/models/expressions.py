@@ -1082,6 +1082,11 @@ class Subquery(Expression):
             return clone
         return self
 
+    def get_group_by_cols(self, alias=None):
+        if alias:
+            return [Ref(alias, self)]
+        return []
+
 
 class Exists(Subquery):
     template = 'EXISTS(%(subquery)s)'
