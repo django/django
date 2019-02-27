@@ -255,7 +255,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                         'unique': True,
                         'columns': [],
                         'primary_key': False,
-                        'foreign_key': False,
+                        'foreign_key': None,
                         'check': False,
                         'index': False,
                     }
@@ -273,7 +273,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                         'columns': columns,
                         'primary_key': False,
                         'unique': False,
-                        'foreign_key': False,
+                        'foreign_key': None,
                         'index': False,
                     }
         # Get the index info
@@ -290,7 +290,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                         "columns": [],
                         "primary_key": False,
                         "unique": bool(unique),
-                        "foreign_key": False,
+                        "foreign_key": None,
                         "check": False,
                         "index": True,
                     }
@@ -320,7 +320,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 "columns": [pk_column],
                 "primary_key": True,
                 "unique": False,  # It's not actually a unique constraint.
-                "foreign_key": False,
+                "foreign_key": None,
                 "check": False,
                 "index": False,
             }
