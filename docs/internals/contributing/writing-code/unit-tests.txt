@@ -335,6 +335,21 @@ Run the ``locale`` command to confirm the change. Optionally, add those export
 commands to your shell's startup file (e.g. ``~/.bashrc`` for Bash) to avoid
 having to retype them.
 
+Running tests fails on OS X High Sierra and later
+-------------------------------------------------
+
+Due to some changes made in OS X High Sierra which affect how ``fork()`` is
+called, the tests may cause the Python interpreter to crash
+with the following error::
+
+
+    +[__NSPlaceholderDate initialize] may have been in progress in another thread when fork() was called.
+
+
+You can resolve this by configuring the shell to disable this check::
+
+    $ export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+
 Tests that only fail in combination
 -----------------------------------
 
