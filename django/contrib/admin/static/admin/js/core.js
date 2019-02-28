@@ -84,7 +84,7 @@ function findPosY(obj) {
     };
 
     Date.prototype.getTwoDigitMonth = function() {
-        return (this.getMonth() < 9) ? '0' + (this.getMonth() + 1) : (this.getMonth() + 1);
+        return (this.getMonth() < 10) ? '0' + this.getMonth() : this.getMonth();
     };
 
     Date.prototype.getTwoDigitDate = function() {
