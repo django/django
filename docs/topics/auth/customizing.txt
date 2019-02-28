@@ -95,7 +95,7 @@ a set of optional permission related :ref:`authorization methods
 
 The ``get_user`` method takes a ``user_id`` -- which could be a username,
 database ID or whatever, but has to be the primary key of your user object --
-and returns a user object.
+and returns a user object or ``None``.
 
 The ``authenticate`` method takes a ``request`` argument and credentials as
 keyword arguments. Most of the time, it'll just look like this::
