@@ -1643,7 +1643,7 @@ class Model(metaclass=ModelBase):
         # Convert "-field" to "field".
         fields = ((f[1:] if f.startswith('-') else f) for f in fields)
 
-        # Separate related field and non related fields.
+        # Separate related fields and non-related fields.
         _fields = []
         related_fields = []
         for f in fields:
@@ -1667,7 +1667,7 @@ class Model(metaclass=ModelBase):
                         errors.append(
                             checks.Error(
                                 "'ordering' refers to the nonexistent field, "
-                                "related field or lookup '%s'." % field,
+                                "related field, or lookup '%s'." % field,
                                 obj=cls,
                                 id='models.E015',
                             )
@@ -1693,7 +1693,8 @@ class Model(metaclass=ModelBase):
         for invalid_field in invalid_fields:
             errors.append(
                 checks.Error(
-                    "'ordering' refers to the nonexistent field '%s'." % invalid_field,
+                    "'ordering' refers to the nonexistent field, related "
+                    "field, or lookup '%s'." % invalid_field,
                     obj=cls,
                     id='models.E015',
                 )
