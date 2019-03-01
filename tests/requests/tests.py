@@ -487,6 +487,17 @@ class RequestsTests(SimpleTestCase):
         with self.assertRaisesMessage(MultiPartParserError, 'Invalid boundary in multipart: None'):
             request.POST
 
+    def test_multipart_non_ascii_content_type(self):
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'multipart/form-data; boundary = \xe0',
+            'CONTENT_LENGTH': 0,
+            'wsgi.input': FakePayload(),
+        })
+        msg = 'Invalid non-ASCII Content-Type in multipart: multipart/form-data; boundary = à'
+        with self.assertRaisesMessage(MultiPartParserError, msg):
+            request.POST
+
     def test_POST_connection_error(self):
         """
         If wsgi.input.read() raises an exception while trying to read() the
