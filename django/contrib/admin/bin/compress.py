@@ -49,7 +49,9 @@ Compiler library and Java version 6 or later."""
         to_compress = file_path.expanduser()
         if to_compress.exists():
             to_compress_min = to_compress.with_suffix('.min.js')
-            cmd = "java -jar %s --js %s --js_output_file %s" % (compiler, to_compress, to_compress_min)
+            cmd = "java -jar %s --rewrite_polyfills=false --js %s --js_output_file %s" % (
+                compiler, to_compress, to_compress_min,
+            )
             if options.verbose:
                 sys.stdout.write("Running: %s\n" % cmd)
             subprocess.call(cmd.split())
