@@ -5,9 +5,10 @@ from django.core.checks import Error, Warning
 from django.core.checks.model_checks import _check_lazy_references
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connection, connections, models
+from django.db.models.functions import Lower
 from django.db.models.signals import post_init
 from django.test import SimpleTestCase
-from django.test.utils import isolate_apps, override_settings
+from django.test.utils import isolate_apps, override_settings, register_lookup
 
 
 def get_max_column_name_length():
@@ -664,6 +665,89 @@ class OtherModelTests(SimpleTestCase):
                 id='models.E015',
             )
         ])
+
+    def test_ordering_pointing_to_missing_related_field(self):
+        class Model(models.Model):
+            test = models.IntegerField()
+
+            class Meta:
+                ordering = ('missing_related__id',)
+
+        self.assertEqual(Model.check(), [
+            Error(
+                "'ordering' refers to the nonexistent field, related field "
+                "or lookup 'missing_related__id'.",
+                obj=Model,
+                id='models.E015',
+            )
+        ])
+
+    def test_ordering_pointing_to_missing_related_model_field(self):
+        class Parent(models.Model):
+            pass
+
+        class Child(models.Model):
+            parent = models.ForeignKey(Parent, models.CASCADE)
+
+            class Meta:
+                ordering = ('parent__missing_field',)
+
+        self.assertEqual(Child.check(), [
+            Error(
+                "'ordering' refers to the nonexistent field, related field "
+                "or lookup 'parent__missing_field'.",
+                obj=Child,
+                id='models.E015',
+            )
+        ])
+
+    def test_ordering_pointing_to_non_related_field(self):
+        class Child(models.Model):
+            parent = models.IntegerField()
+
+            class Meta:
+                ordering = ('parent__missing_field',)
+
+        self.assertEqual(Child.check(), [
+            Error(
+                "'ordering' refers to the nonexistent field, related field "
+                "or lookup 'parent__missing_field'.",
+                obj=Child,
+                id='models.E015',
+            )
+        ])
+
+    def test_ordering_pointing_to_two_related_model_field(self):
+        class Parent2(models.Model):
+            pass
+
+        class Parent1(models.Model):
+            parent2 = models.ForeignKey(Parent2, models.CASCADE)
+
+        class Child(models.Model):
+            parent1 = models.ForeignKey(Parent1, models.CASCADE)
+
+            class Meta:
+                ordering = ('parent1__parent2__missing_field',)
+
+        self.assertEqual(Child.check(), [
+            Error(
+                "'ordering' refers to the nonexistent field, related field "
+                "or lookup 'parent1__parent2__missing_field'.",
+                obj=Child,
+                id='models.E015',
+            )
+        ])
+
+    def test_ordering_allows_registered_lookups(self):
+        class Model(models.Model):
+            test = models.CharField(max_length=100)
+
+            class Meta:
+                ordering = ('test__lower',)
+
+        with register_lookup(models.CharField, Lower):
+            self.assertEqual(Model.check(), [])
 
     def test_ordering_pointing_to_foreignkey_field(self):
         class Parent(models.Model):

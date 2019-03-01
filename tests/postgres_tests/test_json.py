@@ -19,6 +19,15 @@ except ImportError:
     pass
 
 
+class TestModelMetaOrdering(PostgreSQLTestCase):
+    def test_ordering_by_json_field_value(self):
+        class TestJSONModel(JSONModel):
+            class Meta:
+                ordering = ['field__value']
+
+        self.assertEqual(TestJSONModel.check(), [])
+
+
 class TestSaveLoad(PostgreSQLTestCase):
     def test_null(self):
         instance = JSONModel()
