@@ -632,7 +632,8 @@ class OtherModelTests(SimpleTestCase):
 
         self.assertEqual(Model.check(), [
             Error(
-                "'ordering' refers to the nonexistent field 'relation'.",
+                "'ordering' refers to the nonexistent field, related field, "
+                "or lookup 'relation'.",
                 obj=Model,
                 id='models.E015',
             ),
@@ -645,7 +646,8 @@ class OtherModelTests(SimpleTestCase):
 
         self.assertEqual(Model.check(), [
             Error(
-                "'ordering' refers to the nonexistent field 'missing_field'.",
+                "'ordering' refers to the nonexistent field, related field, "
+                "or lookup 'missing_field'.",
                 obj=Model,
                 id='models.E015',
             )
@@ -660,7 +662,8 @@ class OtherModelTests(SimpleTestCase):
 
         self.assertEqual(Model.check(), [
             Error(
-                "'ordering' refers to the nonexistent field 'missing_fk_field_id'.",
+                "'ordering' refers to the nonexistent field, related field, "
+                "or lookup 'missing_fk_field_id'.",
                 obj=Model,
                 id='models.E015',
             )
@@ -675,7 +678,7 @@ class OtherModelTests(SimpleTestCase):
 
         self.assertEqual(Model.check(), [
             Error(
-                "'ordering' refers to the nonexistent field, related field "
+                "'ordering' refers to the nonexistent field, related field, "
                 "or lookup 'missing_related__id'.",
                 obj=Model,
                 id='models.E015',
@@ -694,7 +697,7 @@ class OtherModelTests(SimpleTestCase):
 
         self.assertEqual(Child.check(), [
             Error(
-                "'ordering' refers to the nonexistent field, related field "
+                "'ordering' refers to the nonexistent field, related field, "
                 "or lookup 'parent__missing_field'.",
                 obj=Child,
                 id='models.E015',
@@ -710,7 +713,7 @@ class OtherModelTests(SimpleTestCase):
 
         self.assertEqual(Child.check(), [
             Error(
-                "'ordering' refers to the nonexistent field, related field "
+                "'ordering' refers to the nonexistent field, related field, "
                 "or lookup 'parent__missing_field'.",
                 obj=Child,
                 id='models.E015',
@@ -732,7 +735,7 @@ class OtherModelTests(SimpleTestCase):
 
         self.assertEqual(Child.check(), [
             Error(
-                "'ordering' refers to the nonexistent field, related field "
+                "'ordering' refers to the nonexistent field, related field, "
                 "or lookup 'parent1__parent2__missing_field'.",
                 obj=Child,
                 id='models.E015',

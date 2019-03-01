@@ -19,7 +19,7 @@ except ImportError:
     pass
 
 
-class TestModelMetaOrdering(PostgreSQLTestCase):
+class TestModelMetaOrdering(PostgreSQLSimpleTestCase):
     def test_ordering_by_json_field_value(self):
         class TestJSONModel(JSONModel):
             class Meta:
