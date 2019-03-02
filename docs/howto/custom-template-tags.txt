@@ -364,6 +364,28 @@ Template filter code falls into one of two situations:
 
 .. _filters-timezones:
 
+Auto-escapeing with a decorator
+-------------------------------
+
+Using the :meth:`django.template.defaultfilters.autoescape_aware` decorator, filters can be made to
+automatically escape text based on the value of the autoescape parameter.
+If the filter's ``autoescape`` parameter is ``True``, the first argument
+will be escaped. Otherwise, it will be left as is.
+
+This is the equivalent of adding the following at the beginning of the filter:
+
+.. code-block:: python
+
+    if autoescape:
+        esc = conditional_escape
+    else:
+        esc = lambda x: x
+    text = esc(text)
+
+.. versionadded:: 2.3
+
+    ``autoescape_aware`` decorator
+
 Filters and time zones
 ----------------------
 
