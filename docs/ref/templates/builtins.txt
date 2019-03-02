@@ -2628,3 +2628,26 @@ template variable with the media prefix :setting:`MEDIA_URL`, e.g.::
 
 By storing the value in a data attribute, we ensure it's escaped appropriately
 if we want to use it in a JavaScript context.
+
+Template tag decorator reference
+================================
+
+.. decoratormethod:: django.template.defaultfilters.autoescape_aware()
+
+Escapes the first argument of a filter using
+:meth:`django.utils.html.conditional_escape()` the parameter ``autoescape``
+is ``True``.
+
+Equivalent of adding the following at the beginning of the filter:
+
+.. code-block:: python
+
+    if autoescape:
+        esc = conditional_escape
+    else:
+        esc = lambda x: x
+    text = esc(text)
+
+.. versionadded:: 2.3
+
+    ``autoescape_aware`` decorator

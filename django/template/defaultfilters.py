@@ -3,7 +3,8 @@ import random as random_module
 import re
 import types
 from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation
-from functools import wraps
+from functools import update_wrapper, wraps
+from inspect import signature
 from operator import itemgetter
 from pprint import pformat
 from urllib.parse import quote
@@ -28,9 +29,38 @@ from .library import Library
 register = Library()
 
 
+def autoescape_aware(func):
+    """
+    Decorator for filters which should escape automatically escape text based
+    on whether or not autoescape is True.
+    """
+    def _dec(*args, **kwargs):
+        args = list(args)
+        try:
+            autoescape = kwargs['autoescape']
+        # if value is not defined, get default value
+        except KeyError:
+            for k, v in signature(func).parameters.items():
+                if k == 'autoescape':
+                    autoescape = v.default
+                    break
+        if autoescape:
+            esc = conditional_escape
+        else:
+            def x(y):
+                return y
+            esc = x
+        args[0] = esc(args[0])
+        return func(*args, **kwargs)
+
+    _dec._decorated_function = getattr(func, '_decorated_function', func)
+
+    return update_wrapper(_dec, func)
+
 #######################
 # STRING DECORATOR    #
 #######################
+
 
 def stringfilter(func):
     """
@@ -422,6 +452,7 @@ def linebreaks_filter(value, autoescape=True):
 
 @register.filter(is_safe=True, needs_autoescape=True)
 @stringfilter
+@autoescape_aware
 def linebreaksbr(value, autoescape=True):
     """
     Convert all newlines in a piece of plain text to HTML line breaks
@@ -429,8 +460,8 @@ def linebreaksbr(value, autoescape=True):
     """
     autoescape = autoescape and not isinstance(value, SafeData)
     value = normalize_newlines(value)
-    if autoescape:
-        value = escape(value)
+    # if autoescape:
+    #     value = escape(value)
     return mark_safe(value.replace('\n', '<br>'))
 
 
