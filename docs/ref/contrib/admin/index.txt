@@ -1123,7 +1123,9 @@ subclass::
 
     Ordering and pagination of the results are controlled by the related
     ``ModelAdmin``'s :meth:`~ModelAdmin.get_ordering` and
-    :meth:`~ModelAdmin.get_paginator` methods.
+    :meth:`~ModelAdmin.get_paginator` methods. Customizing the ordering
+    specifically for the autocomplete results can be achieved by customizing
+    ``AutocompleteJsonView``.
 
     In the following example, ``ChoiceAdmin`` has an autocomplete field for the
     ``ForeignKey`` to the ``Question``. The results are filtered by the
@@ -2030,6 +2032,10 @@ templates used by the :class:`ModelAdmin` views:
 
 Other methods
 ~~~~~~~~~~~~~
+
+.. method:: ModelAdmin.autocomplete_view(request)
+
+    Django view for the page that shows the autocomplete results. See note below
 
 .. method:: ModelAdmin.add_view(request, form_url='', extra_context=None)
 
