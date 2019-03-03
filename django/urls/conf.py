@@ -19,7 +19,7 @@ def include(arg, namespace=None):
             if namespace:
                 raise ImproperlyConfigured(
                     'Cannot override the namespace for a dynamic module that '
-                    'provides a namespace.'
+                    'provides a namespace. Namespace specified: %s' % namespace
                 )
             raise ImproperlyConfigured(
                 'Passing a %d-tuple to include() is not supported. Pass a '
@@ -39,7 +39,7 @@ def include(arg, namespace=None):
             'Specifying a namespace in include() without providing an app_name '
             'is not supported. Set the app_name attribute in the included '
             'module, or pass a 2-tuple containing the list of patterns and '
-            'app_name instead.',
+            'app_name instead. Namespace specified: %s' % namespace,
         )
     namespace = namespace or app_name
     # Make sure the patterns can be iterated through (without this, some
