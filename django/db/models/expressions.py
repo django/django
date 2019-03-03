@@ -1053,6 +1053,10 @@ class Subquery(Expression):
             ] if x
         ]
 
+    def set_source_expressions(self, exprs):
+        if exprs:
+            raise FieldError('Related Field got invalid lookup: %s' % self._resolve_output_field().name)
+
     def relabeled_clone(self, change_map):
         clone = self.copy()
         clone.queryset.query = clone.queryset.query.relabeled_clone(change_map)

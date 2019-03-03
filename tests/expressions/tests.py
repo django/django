@@ -551,6 +551,25 @@ class BasicExpressionsTests(TestCase):
         )
         self.assertEqual(qs.get().float, 1.2)
 
+    def test_subquery_aggregate_annotation_within_case_statement(self):
+        Number.objects.create(integer=1000, float=1.2)
+        Employee.objects.create(salary=1000)
+        qs = Number.objects.annotate(
+            salary=Subquery(
+                Employee.objects.filter(
+                    salary=OuterRef('integer'),
+                ).values('salary')
+            ),
+        )
+        with self.assertRaisesMessage(FieldError, 'Related Field got invalid lookup: salary'):
+            qs = qs.aggregate(
+                salary_sum=Sum(Case(
+                    When(**{'salary': None}, then=Value(0)),
+                    default=Value(0),
+                    output_field=models.FloatField()
+                ))
+            ).get()
+
     def test_explicit_output_field(self):
         class FuncA(Func):
             output_field = models.CharField()
