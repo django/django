@@ -93,6 +93,11 @@ class Field(RegisterLookupMixin):
     # database level.
     empty_strings_allowed = True
     empty_values = list(validators.EMPTY_VALUES)
+    # If true, a separate instance of the field will be used in each
+    # subclass of the model to which it belongs. This only makes sense
+    # with virtual fields (and is only required by GenericRelation which
+    # relies on this).
+    clone_in_subclasses = False
 
     # These track each time a Field instance is created. Used to retain order.
     # The auto_creation_counter is used for fields that Django implicitly
@@ -718,7 +723,9 @@ class Field(RegisterLookupMixin):
 
     def set_attributes_from_name(self, name):
         self.name = self.name or name
-        self.attname, self.column = self.get_attname_column()
+        self.attname = self.get_attname()
+        self.column = self.get_column()
+
         self.concrete = self.column is not None
         if self.verbose_name is None and self.name:
             self.verbose_name = self.name.replace('_', ' ')
@@ -732,6 +739,7 @@ class Field(RegisterLookupMixin):
         """
         self.set_attributes_from_name(name)
         self.model = cls
+        cls._meta.add_field(self)  # might not needed
         if private_only:
             cls._meta.add_field(self, private=True)
         else:
@@ -756,10 +764,8 @@ class Field(RegisterLookupMixin):
     def get_attname(self):
         return self.name
 
-    def get_attname_column(self):
-        attname = self.get_attname()
-        column = self.db_column or attname
-        return attname, column
+    def get_column(self):
+        return self.db_column or self.attname
 
     def get_internal_type(self):
         return self.__class__.__name__
