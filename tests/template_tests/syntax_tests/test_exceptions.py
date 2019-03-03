@@ -1,8 +1,8 @@
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from django.test import SimpleTestCase
 
-from .test_extends import inheritance_templates
 from ..utils import setup
+from .test_extends import inheritance_templates
 
 
 class ExceptionsTests(SimpleTestCase):
