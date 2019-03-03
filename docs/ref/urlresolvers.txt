@@ -130,6 +130,15 @@ If the URL does not resolve, the function raises a
 
         The name of the URL pattern that matches the URL.
 
+    .. attribute:: ResolverMatch.route
+
+        .. versionadded:: 2.2
+
+        The route of the matching URL pattern.
+
+        For example, if ``path('users/<id>/', ...)`` is the matching pattern,
+        ``route`` will contain ``'users/<id>/'``.
+
     .. attribute:: ResolverMatch.app_name
 
         The application namespace for the URL pattern that matches the
@@ -176,7 +185,7 @@ view would raise a ``Http404`` error before redirecting to it::
 
     from urllib.parse import urlparse
     from django.urls import resolve
-    from django.http import HttpResponseRedirect, Http404
+    from django.http import Http404, HttpResponseRedirect
 
     def myview(request):
         next = request.META.get('HTTP_REFERER', None) or '/'

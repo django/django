@@ -1,5 +1,9 @@
+import inspect
+import warnings
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
+from django.utils.deprecation import RemovedInDjango31Warning
 
 UserModel = get_user_model()
 
@@ -75,26 +79,23 @@ class ModelBackend:
         if not user_obj.is_active or user_obj.is_anonymous or obj is not None:
             return set()
         if not hasattr(user_obj, '_perm_cache'):
-            user_obj._perm_cache = set()
-            user_obj._perm_cache.update(self.get_user_permissions(user_obj))
-            user_obj._perm_cache.update(self.get_group_permissions(user_obj))
+            user_obj._perm_cache = {
+                *self.get_user_permissions(user_obj),
+                *self.get_group_permissions(user_obj),
+            }
         return user_obj._perm_cache
 
     def has_perm(self, user_obj, perm, obj=None):
-        if not user_obj.is_active:
-            return False
-        return perm in self.get_all_permissions(user_obj, obj)
+        return user_obj.is_active and perm in self.get_all_permissions(user_obj, obj)
 
     def has_module_perms(self, user_obj, app_label):
         """
         Return True if user_obj has any permissions in the given app_label.
         """
-        if not user_obj.is_active:
-            return False
-        for perm in self.get_all_permissions(user_obj):
-            if perm[:perm.index('.')] == app_label:
-                return True
-        return False
+        return user_obj.is_active and any(
+            perm[:perm.index('.')] == app_label
+            for perm in self.get_all_permissions(user_obj)
+        )
 
     def get_user(self, user_id):
         try:
@@ -146,7 +147,17 @@ class RemoteUserBackend(ModelBackend):
                 UserModel.USERNAME_FIELD: username
             })
             if created:
-                user = self.configure_user(user)
+                args = (request, user)
+                try:
+                    inspect.getcallargs(self.configure_user, request, user)
+                except TypeError:
+                    args = (user,)
+                    warnings.warn(
+                        'Update %s.configure_user() to accept `request` as '
+                        'the first argument.'
+                        % self.__class__.__name__, RemovedInDjango31Warning
+                    )
+                user = self.configure_user(*args)
         else:
             try:
                 user = UserModel._default_manager.get_by_natural_key(username)
@@ -163,7 +174,7 @@ class RemoteUserBackend(ModelBackend):
         """
         return username
 
-    def configure_user(self, user):
+    def configure_user(self, request, user):
         """
         Configure a user after creation and return the updated user.
 

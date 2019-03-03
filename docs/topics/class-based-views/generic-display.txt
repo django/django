@@ -172,9 +172,9 @@ they're dealing with publishers here.
 
 Well, if you're dealing with a model object, this is already done for you. When
 you are dealing with an object or queryset, Django is able to populate the
-context using the lower cased version of the model class' name. This is
-provided in addition to the default ``object_list`` entry, but contains exactly
-the same data, i.e. ``publisher_list``.
+context using the lowercased version of the model class' name. This is provided
+in addition to the default ``object_list`` entry, but contains exactly the same
+data, i.e. ``publisher_list``.
 
 If this still isn't a good match, you can manually set the name of the
 context variable. The ``context_object_name`` attribute on a generic view
@@ -210,7 +210,7 @@ The default implementation simply adds the object being displayed to the
 template, but you can override it to send more::
 
     from django.views.generic import DetailView
-    from books.models import Publisher, Book
+    from books.models import Book, Publisher
 
     class PublisherDetail(DetailView):
 
@@ -409,8 +409,8 @@ custom view::
 Then we'd write our new view -- ``get_object`` is the method that retrieves the
 object -- so we simply override it and wrap the call::
 
-    from django.views.generic import DetailView
     from django.utils import timezone
+    from django.views.generic import DetailView
     from books.models import Author
 
     class AuthorDetailView(DetailView):
@@ -418,13 +418,11 @@ object -- so we simply override it and wrap the call::
         queryset = Author.objects.all()
 
         def get_object(self):
-            # Call the superclass
-            object = super().get_object()
+            obj = super().get_object()
             # Record the last accessed date
-            object.last_accessed = timezone.now()
-            object.save()
-            # Return the object
-            return object
+            obj.last_accessed = timezone.now()
+            obj.save()
+            return obj
 
 .. note::
 

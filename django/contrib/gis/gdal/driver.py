@@ -3,20 +3,20 @@ from ctypes import c_void_p
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.gdal.prototypes import ds as vcapi, raster as rcapi
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_bytes, force_str
 
 
 class Driver(GDALBase):
     """
     Wrap a GDAL/OGR Data Source Driver.
     For more information, see the C API source code:
-    http://www.gdal.org/gdal_8h.html - http://www.gdal.org/ogr__api_8h.html
+    https://www.gdal.org/gdal_8h.html - https://www.gdal.org/ogr__api_8h.html
     """
 
     # Case-insensitive aliases for some GDAL/OGR Drivers.
     # For a complete list of original driver names see
-    # http://www.gdal.org/ogr_formats.html (vector)
-    # http://www.gdal.org/formats_list.html (raster)
+    # https://www.gdal.org/ogr_formats.html (vector)
+    # https://www.gdal.org/formats_list.html (raster)
     _alias = {
         # vector
         'esri': 'ESRI Shapefile',
@@ -94,4 +94,4 @@ class Driver(GDALBase):
         """
         Return description/name string for this driver.
         """
-        return force_text(rcapi.get_driver_description(self.ptr))
+        return force_str(rcapi.get_driver_description(self.ptr))

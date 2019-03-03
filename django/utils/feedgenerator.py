@@ -19,63 +19,40 @@ Sample usage:
 ...     feed.write(fp, 'utf-8')
 
 For definitions of the different versions of RSS, see:
-http://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/02/04/incompatible-rss
+https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/02/04/incompatible-rss
 """
 import datetime
+import email
 from io import StringIO
 from urllib.parse import urlparse
 
-from django.utils import datetime_safe
 from django.utils.encoding import iri_to_uri
 from django.utils.timezone import utc
 from django.utils.xmlutils import SimplerXMLGenerator
 
 
 def rfc2822_date(date):
-    # We can't use strftime() because it produces locale-dependent results, so
-    # we have to map english month and day names manually
-    months = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',)
-    days = ('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun')
-    # Support datetime objects older than 1900
-    date = datetime_safe.new_datetime(date)
-    # Timezone aware formatting. email.utils.formatdate() isn't tz aware.
-    dow = days[date.weekday()]
-    month = months[date.month - 1]
-    time_str = date.strftime('%s, %%d %s %%Y %%H:%%M:%%S ' % (dow, month))
-    offset = date.utcoffset()
-    # Historically, this function assumes that naive datetimes are in UTC.
-    if offset is None:
-        return time_str + '-0000'
-    else:
-        timezone = (offset.days * 24 * 60) + (offset.seconds // 60)
-        hour, minute = divmod(timezone, 60)
-        return time_str + '%+03d%02d' % (hour, minute)
+    if not isinstance(date, datetime.datetime):
+        date = datetime.datetime.combine(date, datetime.time())
+    return email.utils.format_datetime(date)
 
 
 def rfc3339_date(date):
-    # Support datetime objects older than 1900
-    date = datetime_safe.new_datetime(date)
-    time_str = date.strftime('%Y-%m-%dT%H:%M:%S')
-    offset = date.utcoffset()
-    # Historically, this function assumes that naive datetimes are in UTC.
-    if offset is None:
-        return time_str + 'Z'
-    else:
-        timezone = (offset.days * 24 * 60) + (offset.seconds // 60)
-        hour, minute = divmod(timezone, 60)
-        return time_str + '%+03d:%02d' % (hour, minute)
+    if not isinstance(date, datetime.datetime):
+        date = datetime.datetime.combine(date, datetime.time())
+    return date.isoformat() + ('Z' if date.utcoffset() is None else '')
 
 
 def get_tag_uri(url, date):
     """
     Create a TagURI.
 
-    See http://web.archive.org/web/20110514113830/http://diveintomark.org/archives/2004/05/28/howto-atom-id
+    See https://web.archive.org/web/20110514113830/http://diveintomark.org/archives/2004/05/28/howto-atom-id
     """
     bits = urlparse(url)
     d = ''
     if date is not None:
-        d = ',%s' % datetime_safe.new_datetime(date).strftime('%Y-%m-%d')
+        d = ',%s' % date.strftime('%Y-%m-%d')
     return 'tag:%s%s:%s/%s' % (bits.hostname, d, bits.path, bits.fragment)
 
 
@@ -86,8 +63,7 @@ class SyndicationFeed:
                  feed_url=None, feed_copyright=None, feed_guid=None, ttl=None, **kwargs):
         def to_str(s):
             return str(s) if s is not None else s
-        if categories:
-            categories = [str(c) for c in categories]
+        categories = categories and [str(c) for c in categories]
         self.feed = {
             'title': to_str(title),
             'link': iri_to_uri(link),
@@ -102,8 +78,8 @@ class SyndicationFeed:
             'feed_copyright': to_str(feed_copyright),
             'id': feed_guid or link,
             'ttl': to_str(ttl),
+            **kwargs,
         }
-        self.feed.update(kwargs)
         self.items = []
 
     def add_item(self, title, link, description, author_email=None,
@@ -117,9 +93,8 @@ class SyndicationFeed:
         """
         def to_str(s):
             return str(s) if s is not None else s
-        if categories:
-            categories = [to_str(c) for c in categories]
-        item = {
+        categories = categories and [to_str(c) for c in categories]
+        self.items.append({
             'title': to_str(title),
             'link': iri_to_uri(link),
             'description': to_str(description),
@@ -135,9 +110,8 @@ class SyndicationFeed:
             'categories': categories or (),
             'item_copyright': to_str(item_copyright),
             'ttl': to_str(ttl),
-        }
-        item.update(kwargs)
-        self.items.append(item)
+            **kwargs,
+        })
 
     def num_items(self):
         return len(self.items)
@@ -224,8 +198,10 @@ class RssFeed(SyndicationFeed):
         handler.endElement("rss")
 
     def rss_attributes(self):
-        return {"version": self._version,
-                "xmlns:atom": "http://www.w3.org/2005/Atom"}
+        return {
+            'version': self._version,
+            'xmlns:atom': 'http://www.w3.org/2005/Atom',
+        }
 
     def write_items(self, handler):
         for item in self.items:
@@ -264,7 +240,7 @@ class RssUserland091Feed(RssFeed):
 
 
 class Rss201rev2Feed(RssFeed):
-    # Spec: http://blogs.law.harvard.edu/tech/rss
+    # Spec: https://cyber.harvard.edu/rss/rss.html
     _version = "2.0"
 
     def add_item_elements(self, handler, item):

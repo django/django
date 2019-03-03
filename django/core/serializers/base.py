@@ -3,7 +3,10 @@ Module for abstract serializer/unserializer base classes.
 """
 from io import StringIO
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
+
+DEFER_FIELD = object()
 
 
 class SerializerDoesNotExist(KeyError):
@@ -26,6 +29,13 @@ class DeserializationError(Exception):
         explanatory message.
         """
         return cls("%s: (%s:pk=%s) field_value was '%s'" % (original_exc, model, fk, field_value))
+
+
+class M2MDeserializationError(Exception):
+    """Something bad happened during deserialization of a ManyToManyField."""
+    def __init__(self, original_exc, pk):
+        self.original_exc = original_exc
+        self.pk = pk
 
 
 class ProgressBar:
@@ -82,8 +92,16 @@ class Serializer:
             # Use the concrete parent class' _meta instead of the object's _meta
             # This is to avoid local_fields problems for proxy models. Refs #17717.
             concrete_model = obj._meta.concrete_model
+            # When using natural primary keys, retrieve the pk field of the
+            # parent for multi-table inheritance child models. That field must
+            # be serialized, otherwise deserialization isn't possible.
+            if self.use_natural_primary_keys:
+                pk = concrete_model._meta.pk
+                pk_parent = pk if pk.remote_field and pk.remote_field.parent_link else None
+            else:
+                pk_parent = None
             for field in concrete_model._meta.local_fields:
-                if field.serialize:
+                if field.serialize or field is pk_parent:
                     if field.remote_field is None:
                         if self.selected_fields is None or field.attname in self.selected_fields:
                             self.handle_field(obj, field)
@@ -96,8 +114,7 @@ class Serializer:
                         self.handle_m2m_field(obj, field)
             self.end_object(obj)
             progress_bar.update(count)
-            if self.first:
-                self.first = False
+            self.first = self.first and False
         self.end_serialization()
         return self.getvalue()
 
@@ -171,7 +188,7 @@ class Deserializer:
         return self
 
     def __next__(self):
-        """Iteration iterface -- return the next item in the stream"""
+        """Iteration interface -- return the next item in the stream"""
         raise NotImplementedError('subclasses of Deserializer must provide a __next__() method')
 
 
@@ -187,9 +204,10 @@ class DeserializedObject:
     (and not touch the many-to-many stuff.)
     """
 
-    def __init__(self, obj, m2m_data=None):
+    def __init__(self, obj, m2m_data=None, deferred_fields=None):
         self.object = obj
         self.m2m_data = m2m_data
+        self.deferred_fields = deferred_fields
 
     def __repr__(self):
         return "<%s: %s(pk=%s)>" % (
@@ -211,6 +229,25 @@ class DeserializedObject:
         # the m2m data twice.
         self.m2m_data = None
 
+    def save_deferred_fields(self, using=None):
+        self.m2m_data = {}
+        for field, field_value in self.deferred_fields.items():
+            opts = self.object._meta
+            label = opts.app_label + '.' + opts.model_name
+            if isinstance(field.remote_field, models.ManyToManyRel):
+                try:
+                    values = deserialize_m2m_values(field, field_value, using, handle_forward_references=False)
+                except M2MDeserializationError as e:
+                    raise DeserializationError.WithData(e.original_exc, label, self.object.pk, e.pk)
+                self.m2m_data[field.name] = values
+            elif isinstance(field.remote_field, models.ManyToOneRel):
+                try:
+                    value = deserialize_fk_value(field, field_value, using, handle_forward_references=False)
+                except Exception as e:
+                    raise DeserializationError.WithData(e, label, self.object.pk, field_value)
+                setattr(self.object, field.attname, value)
+        self.save()
+
 
 def build_instance(Model, data, db):
     """
@@ -219,12 +256,63 @@ def build_instance(Model, data, db):
     If the model instance doesn't have a primary key and the model supports
     natural keys, try to retrieve it from the database.
     """
-    obj = Model(**data)
-    if (obj.pk is None and hasattr(Model, 'natural_key') and
-            hasattr(Model._default_manager, 'get_by_natural_key')):
-        natural_key = obj.natural_key()
+    default_manager = Model._meta.default_manager
+    pk = data.get(Model._meta.pk.name)
+    if (pk is None and hasattr(default_manager, 'get_by_natural_key') and
+            hasattr(Model, 'natural_key')):
+        natural_key = Model(**data).natural_key()
         try:
-            obj.pk = Model._default_manager.db_manager(db).get_by_natural_key(*natural_key).pk
+            data[Model._meta.pk.attname] = Model._meta.pk.to_python(
+                default_manager.db_manager(db).get_by_natural_key(*natural_key).pk
+            )
         except Model.DoesNotExist:
             pass
-    return obj
+    return Model(**data)
+
+
+def deserialize_m2m_values(field, field_value, using, handle_forward_references):
+    model = field.remote_field.model
+    if hasattr(model._default_manager, 'get_by_natural_key'):
+        def m2m_convert(value):
+            if hasattr(value, '__iter__') and not isinstance(value, str):
+                return model._default_manager.db_manager(using).get_by_natural_key(*value).pk
+            else:
+                return model._meta.pk.to_python(value)
+    else:
+        def m2m_convert(v):
+            return model._meta.pk.to_python(v)
+
+    try:
+        values = []
+        for pk in field_value:
+            values.append(m2m_convert(pk))
+        return values
+    except Exception as e:
+        if isinstance(e, ObjectDoesNotExist) and handle_forward_references:
+            return DEFER_FIELD
+        else:
+            raise M2MDeserializationError(e, pk)
+
+
+def deserialize_fk_value(field, field_value, using, handle_forward_references):
+    if field_value is None:
+        return None
+    model = field.remote_field.model
+    default_manager = model._default_manager
+    field_name = field.remote_field.field_name
+    if (hasattr(default_manager, 'get_by_natural_key') and
+            hasattr(field_value, '__iter__') and not isinstance(field_value, str)):
+        try:
+            obj = default_manager.db_manager(using).get_by_natural_key(*field_value)
+        except ObjectDoesNotExist:
+            if handle_forward_references:
+                return DEFER_FIELD
+            else:
+                raise
+        value = getattr(obj, field_name)
+        # If this is a natural foreign key to an object that has a FK/O2O as
+        # the foreign key, use the FK value.
+        if model._meta.pk.remote_field:
+            value = value.pk
+        return value
+    return model._meta.get_field(field_name).to_python(field_value)

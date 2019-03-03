@@ -12,9 +12,9 @@ from django.contrib.gis.gdal.prototypes.generation import (
 )
 
 # For more detail about c function names and definitions see
-# http://gdal.org/gdal_8h.html
-# http://gdal.org/gdalwarper_8h.html
-# http://www.gdal.org/gdal__utils_8h.html
+# https://gdal.org/gdal_8h.html
+# https://gdal.org/gdalwarper_8h.html
+# https://www.gdal.org/gdal__utils_8h.html
 
 # Prepare partial functions that use cpl error codes
 void_output = partial(void_output, cpl=True)
@@ -51,10 +51,7 @@ set_ds_geotransform = void_output(std_call('GDALSetGeoTransform'), [c_void_p, PO
 
 get_ds_metadata = chararray_output(std_call('GDALGetMetadata'), [c_void_p, c_char_p], errcheck=False)
 set_ds_metadata = void_output(std_call('GDALSetMetadata'), [c_void_p, POINTER(c_char_p), c_char_p])
-if GDAL_VERSION >= (1, 11):
-    get_ds_metadata_domain_list = chararray_output(std_call('GDALGetMetadataDomainList'), [c_void_p], errcheck=False)
-else:
-    get_ds_metadata_domain_list = None
+get_ds_metadata_domain_list = chararray_output(std_call('GDALGetMetadataDomainList'), [c_void_p], errcheck=False)
 get_ds_metadata_item = const_string_output(std_call('GDALGetMetadataItem'), [c_void_p, c_char_p, c_char_p])
 set_ds_metadata_item = const_string_output(std_call('GDALSetMetadataItem'), [c_void_p, c_char_p, c_char_p, c_char_p])
 free_dsl = void_output(std_call('CSLDestroy'), [POINTER(c_char_p)], errcheck=False)
@@ -105,7 +102,7 @@ auto_create_warped_vrt = voidptr_output(
 )
 
 # Create VSI gdal raster files from in-memory buffers.
-# http://gdal.org/cpl__vsi_8h.html
+# https://gdal.org/cpl__vsi_8h.html
 create_vsi_file_from_mem_buffer = voidptr_output(std_call('VSIFileFromMemBuffer'), [c_char_p, c_void_p, c_int, c_int])
 get_mem_buffer_from_vsi_file = voidptr_output(std_call('VSIGetMemFileBuffer'), [c_char_p, POINTER(c_int), c_bool])
 unlink_vsi_file = int_output(std_call('VSIUnlink'), [c_char_p])

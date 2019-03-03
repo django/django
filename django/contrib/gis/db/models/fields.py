@@ -167,6 +167,8 @@ class BaseSpatialField(Field):
 
     def get_prep_value(self, value):
         obj = super().get_prep_value(value)
+        if obj is None:
+            return None
         # When the input is not a geometry or raster, attempt to construct one
         # from the given string input.
         if isinstance(obj, GEOSGeometry):
@@ -241,23 +243,27 @@ class GeometryField(BaseSpatialField):
             kwargs['dim'] = self.dim
         if self.geography is not False:
             kwargs['geography'] = self.geography
+        if self._extent != (-180.0, -90.0, 180.0, 90.0):
+            kwargs['extent'] = self._extent
+        if self._tolerance != 0.05:
+            kwargs['tolerance'] = self._tolerance
         return name, path, args, kwargs
 
     def contribute_to_class(self, cls, name, **kwargs):
         super().contribute_to_class(cls, name, **kwargs)
 
         # Setup for lazy-instantiated Geometry object.
-        setattr(cls, self.attname, SpatialProxy(GEOSGeometry, self))
+        setattr(cls, self.attname, SpatialProxy(self.geom_class or GEOSGeometry, self, load_func=GEOSGeometry))
 
     def formfield(self, **kwargs):
-        defaults = {'form_class': self.form_class,
-                    'geom_type': self.geom_type,
-                    'srid': self.srid,
-                    }
-        defaults.update(kwargs)
-        if (self.dim > 2 and 'widget' not in kwargs and
-                not getattr(defaults['form_class'].widget, 'supports_3d', False)):
-            defaults['widget'] = forms.Textarea
+        defaults = {
+            'form_class': self.form_class,
+            'geom_type': self.geom_type,
+            'srid': self.srid,
+            **kwargs,
+        }
+        if self.dim > 2 and not getattr(defaults['form_class'].widget, 'supports_3d', False):
+            defaults.setdefault('widget', forms.Textarea)
         return super().formfield(**defaults)
 
     def select_format(self, compiler, sql, params):
@@ -266,8 +272,7 @@ class GeometryField(BaseSpatialField):
         of the spatial backend. For example, Oracle and MySQL require custom
         selection formats in order to retrieve geometries in OGC WKB.
         """
-        select = compiler.connection.ops.select
-        return select % sql if select else sql, params
+        return compiler.connection.ops.select % sql, params
 
 
 # The OpenGIS Geometry Type Fields
@@ -368,7 +373,7 @@ class RasterField(BaseSpatialField):
             band_index = int(name)
             return type(
                 'SpecificRasterBandTransform',
-                (RasterBandTransform, ),
+                (RasterBandTransform,),
                 {'band_index': band_index}
             )
         except ValueError:

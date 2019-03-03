@@ -1,6 +1,5 @@
 import keyword
 import re
-from collections import OrderedDict
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
@@ -10,17 +9,23 @@ from django.db.models.constants import LOOKUP_SEP
 class Command(BaseCommand):
     help = "Introspects the database tables in the given database and outputs a Django model module."
     requires_system_checks = False
-    stealth_options = ('table_name_filter', )
+    stealth_options = ('table_name_filter',)
     db_module = 'django.db'
 
     def add_arguments(self, parser):
         parser.add_argument(
-            'table', action='store', nargs='*', type=str,
+            'table', nargs='*', type=str,
             help='Selects what tables or views should be introspected.',
         )
         parser.add_argument(
-            '--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
+            '--database', default=DEFAULT_DB_ALIAS,
             help='Nominates a database to introspect. Defaults to using the "default" database.',
+        )
+        parser.add_argument(
+            '--include-partitions', action='store_true', help='Also output models for partition tables.',
+        )
+        parser.add_argument(
+            '--include-views', action='store_true', help='Also output models for database views.',
         )
 
     def handle(self, **options):
@@ -38,9 +43,6 @@ class Command(BaseCommand):
         def table2model(table_name):
             return re.sub(r'[^a-zA-Z0-9]', '', table_name.title())
 
-        def strip_prefix(s):
-            return s[1:] if s.startswith("u'") else s
-
         with connection.cursor() as cursor:
             yield "# This is an auto-generated Django model module."
             yield "# You'll have to do the following manually to clean this up:"
@@ -54,9 +56,16 @@ class Command(BaseCommand):
             yield "# Feel free to rename the models, but don't rename db_table values or field names."
             yield 'from %s import models' % self.db_module
             known_models = []
-            tables_to_introspect = options['table'] or connection.introspection.table_names(cursor)
+            table_info = connection.introspection.get_table_list(cursor)
 
-            for table_name in tables_to_introspect:
+            # Determine types of tables and/or views to be introspected.
+            types = {'t'}
+            if options['include_partitions']:
+                types.add('p')
+            if options['include_views']:
+                types.add('v')
+
+            for table_name in (options['table'] or sorted(info.name for info in table_info if info.type in types)):
                 if table_name_filter is not None and callable(table_name_filter):
                     if not table_name_filter(table_name):
                         continue
@@ -88,8 +97,8 @@ class Command(BaseCommand):
                 column_to_field_name = {}  # Maps column names to names of model fields
                 for row in table_description:
                     comment_notes = []  # Holds Field notes, to be displayed in a Python comment.
-                    extra_params = OrderedDict()  # Holds Field parameters such as 'db_column'.
-                    column_name = row[0]
+                    extra_params = {}  # Holds Field parameters such as 'db_column'.
+                    column_name = row.name
                     is_relation = column_name in relations
 
                     att_name, params, notes = self.normalize_col_name(
@@ -134,12 +143,9 @@ class Command(BaseCommand):
 
                     # Add 'null' and 'blank', if the 'null_ok' flag was present in the
                     # table description.
-                    if row[6]:  # If it's NULL...
-                        if field_type == 'BooleanField(':
-                            field_type = 'NullBooleanField('
-                        else:
-                            extra_params['blank'] = True
-                            extra_params['null'] = True
+                    if row.null_ok:  # If it's NULL...
+                        extra_params['blank'] = True
+                        extra_params['null'] = True
 
                     field_desc = '%s = %s%s' % (
                         att_name,
@@ -153,14 +159,14 @@ class Command(BaseCommand):
                     if extra_params:
                         if not field_desc.endswith('('):
                             field_desc += ', '
-                        field_desc += ', '.join(
-                            '%s=%s' % (k, strip_prefix(repr(v)))
-                            for k, v in extra_params.items())
+                        field_desc += ', '.join('%s=%r' % (k, v) for k, v in extra_params.items())
                     field_desc += ')'
                     if comment_notes:
                         field_desc += '  # ' + ' '.join(comment_notes)
                     yield '    %s' % field_desc
-                for meta_line in self.get_meta(table_name, constraints, column_to_field_name):
+                is_view = any(info.name == table_name and info.type == 'v' for info in table_info)
+                is_partition = any(info.name == table_name and info.type == 'p' for info in table_info)
+                for meta_line in self.get_meta(table_name, constraints, column_to_field_name, is_view, is_partition):
                     yield meta_line
 
     def normalize_col_name(self, col_name, used_column_names, is_relation):
@@ -225,57 +231,62 @@ class Command(BaseCommand):
         description, this routine will return the given field type name, as
         well as any additional keyword parameters and notes for the field.
         """
-        field_params = OrderedDict()
+        field_params = {}
         field_notes = []
 
         try:
-            field_type = connection.introspection.get_field_type(row[1], row)
+            field_type = connection.introspection.get_field_type(row.type_code, row)
         except KeyError:
             field_type = 'TextField'
             field_notes.append('This field type is a guess.')
 
-        # This is a hook for data_types_reverse to return a tuple of
-        # (field_type, field_params_dict).
-        if type(field_type) is tuple:
-            field_type, new_params = field_type
-            field_params.update(new_params)
-
         # Add max_length for all CharFields.
-        if field_type == 'CharField' and row[3]:
-            field_params['max_length'] = int(row[3])
+        if field_type == 'CharField' and row.internal_size:
+            field_params['max_length'] = int(row.internal_size)
 
         if field_type == 'DecimalField':
-            if row[4] is None or row[5] is None:
+            if row.precision is None or row.scale is None:
                 field_notes.append(
                     'max_digits and decimal_places have been guessed, as this '
                     'database handles decimal fields as float')
-                field_params['max_digits'] = row[4] if row[4] is not None else 10
-                field_params['decimal_places'] = row[5] if row[5] is not None else 5
+                field_params['max_digits'] = row.precision if row.precision is not None else 10
+                field_params['decimal_places'] = row.scale if row.scale is not None else 5
             else:
-                field_params['max_digits'] = row[4]
-                field_params['decimal_places'] = row[5]
+                field_params['max_digits'] = row.precision
+                field_params['decimal_places'] = row.scale
 
         return field_type, field_params, field_notes
 
-    def get_meta(self, table_name, constraints, column_to_field_name):
+    def get_meta(self, table_name, constraints, column_to_field_name, is_view, is_partition):
         """
         Return a sequence comprising the lines of code necessary
         to construct the inner Meta class for the model corresponding
         to the given database table name.
         """
         unique_together = []
-        for index, params in constraints.items():
+        has_unsupported_constraint = False
+        for params in constraints.values():
             if params['unique']:
                 columns = params['columns']
+                if None in columns:
+                    has_unsupported_constraint = True
+                columns = [x for x in columns if x is not None]
                 if len(columns) > 1:
-                    # we do not want to include the u"" or u'' prefix
-                    # so we build the string rather than interpolate the tuple
-                    tup = '(' + ', '.join("'%s'" % column_to_field_name[c] for c in columns) + ')'
-                    unique_together.append(tup)
-        meta = ["",
-                "    class Meta:",
-                "        managed = False",
-                "        db_table = '%s'" % table_name]
+                    unique_together.append(str(tuple(column_to_field_name[c] for c in columns)))
+        if is_view:
+            managed_comment = "  # Created from a view. Don't remove."
+        elif is_partition:
+            managed_comment = "  # Created from a partition. Don't remove."
+        else:
+            managed_comment = ''
+        meta = ['']
+        if has_unsupported_constraint:
+            meta.append('    # A unique constraint could not be introspected.')
+        meta += [
+            '    class Meta:',
+            '        managed = False%s' % managed_comment,
+            '        db_table = %r' % table_name
+        ]
         if unique_together:
             tup = '(' + ', '.join(unique_together) + ',)'
             meta += ["        unique_together = %s" % tup]

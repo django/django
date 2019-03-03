@@ -40,7 +40,7 @@ invalidating caches.
 This functionality from the `django-transaction-hooks`_ package has been
 integrated into Django.
 
-.. _django-transaction-hooks: https://pypi.python.org/pypi/django-transaction-hooks
+.. _django-transaction-hooks: https://pypi.org/project/django-transaction-hooks/
 
 Password validation
 -------------------
@@ -755,7 +755,7 @@ followed by a call to ``add()``. This caused needlessly large data changes and
 prevented using the :data:`~django.db.models.signals.m2m_changed` signal to
 track individual changes in many-to-many relations.
 
-Direct assignment now relies on the the new
+Direct assignment now relies on the new
 :meth:`~django.db.models.fields.related.RelatedManager.set` method on related
 managers which by default only processes changes between the existing related
 set and the one that's newly assigned. The previous behavior can be restored by
@@ -1264,8 +1264,8 @@ attribute (as below). If the ``app_name`` is set in this new way, the
 ``namespace`` argument is no longer required. It will default to the value of
 ``app_name``. For example, the URL patterns in the tutorial are changed from:
 
-.. snippet::
-    :filename: mysite/urls.py
+.. code-block:: python
+    :caption: mysite/urls.py
 
     urlpatterns = [
         url(r'^polls/', include('polls.urls', namespace="polls")),
@@ -1274,16 +1274,16 @@ attribute (as below). If the ``app_name`` is set in this new way, the
 
 to:
 
-.. snippet::
-    :filename: mysite/urls.py
+.. code-block:: python
+    :caption: mysite/urls.py
 
     urlpatterns = [
         url(r'^polls/', include('polls.urls')),  # 'namespace="polls"' removed
         ...
     ]
 
-.. snippet::
-    :filename: polls/urls.py
+.. code-block:: python
+    :caption: polls/urls.py
 
     app_name = 'polls'  # added
     urlpatterns = [...]
@@ -1292,8 +1292,8 @@ This change also means that the old way of including an ``AdminSite`` instance
 is deprecated. Instead, pass ``admin.site.urls`` directly to
 :func:`~django.conf.urls.url()`:
 
-.. snippet::
-    :filename: urls.py
+.. code-block:: python
+    :caption: urls.py
 
     from django.conf.urls import url
     from django.contrib import admin

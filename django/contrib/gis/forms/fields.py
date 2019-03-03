@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.gis.gdal import GDALException
 from django.contrib.gis.geos import GEOSException, GEOSGeometry
 from django.utils.translation import gettext_lazy as _
 
@@ -35,9 +36,17 @@ class GeometryField(forms.Field):
             return None
 
         if not isinstance(value, GEOSGeometry):
-            try:
-                value = GEOSGeometry(value)
-            except (GEOSException, ValueError, TypeError):
+            if hasattr(self.widget, 'deserialize'):
+                try:
+                    value = self.widget.deserialize(value)
+                except GDALException:
+                    value = None
+            else:
+                try:
+                    value = GEOSGeometry(value)
+                except (GEOSException, ValueError, TypeError):
+                    value = None
+            if value is None:
                 raise forms.ValidationError(self.error_messages['invalid_geom'], code='invalid_geom')
 
         # Try to set the srid

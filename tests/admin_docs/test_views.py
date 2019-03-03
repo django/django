@@ -28,7 +28,7 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         self.client.logout()
         response = self.client.get(reverse('django-admindocs-docroot'), follow=True)
         # Should display the login screen
-        self.assertContains(response, '<input type="hidden" name="next" value="/admindocs/" />', html=True)
+        self.assertContains(response, '<input type="hidden" name="next" value="/admindocs/">', html=True)
 
     def test_bookmarklets(self):
         response = self.client.get(reverse('django-admindocs-bookmarklets'))
@@ -51,6 +51,12 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         )
         self.assertContains(response, 'Views by namespace test')
         self.assertContains(response, 'Name: <code>test:func</code>.')
+        self.assertContains(
+            response,
+            '<h3><a href="/admindocs/views/admin_docs.views.XViewCallableObject/">'
+            '/xview/callable_object_without_xview/</a></h3>',
+            html=True,
+        )
 
     def test_view_index_with_method(self):
         """
@@ -202,6 +208,10 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
         """
         self.assertContains(self.response, "<td>baz, rox, *some_args, **some_kwargs</td>")
 
+    def test_instance_of_property_methods_are_displayed(self):
+        """Model properties are displayed as fields."""
+        self.assertContains(self.response, '<td>a_property</td>')
+
     def test_method_data_types(self):
         company = Company.objects.create(name="Django")
         person = Person.objects.create(first_name="Human", last_name="User", company=company)
@@ -293,6 +303,16 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
     def test_model_detail_title(self):
         self.assertContains(self.response, '<h1>admin_docs.Person</h1>', html=True)
 
+    def test_app_not_found(self):
+        response = self.client.get(reverse('django-admindocs-models-detail', args=['doesnotexist', 'Person']))
+        self.assertEqual(response.context['exception'], "App 'doesnotexist' not found")
+        self.assertEqual(response.status_code, 404)
+
+    def test_model_not_found(self):
+        response = self.client.get(reverse('django-admindocs-models-detail', args=['admin_docs', 'doesnotexist']))
+        self.assertEqual(response.context['exception'], "Model 'doesnotexist' not found in app 'admin_docs'")
+        self.assertEqual(response.status_code, 404)
+
 
 class CustomField(models.Field):
     description = "A custom field type"
@@ -303,9 +323,6 @@ class DescriptionLackingField(models.Field):
 
 
 class TestFieldType(unittest.TestCase):
-    def setUp(self):
-        pass
-
     def test_field_name(self):
         with self.assertRaises(AttributeError):
             views.get_readable_field_data_type("NotAField")

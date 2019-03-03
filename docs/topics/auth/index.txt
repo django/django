@@ -44,6 +44,7 @@ of these common problems have been implemented in third-party packages:
 * Password strength checking
 * Throttling of login attempts
 * Authentication against third-parties (OAuth, for example)
+* Object-level permissions
 
 Installation
 ============
@@ -62,9 +63,9 @@ startproject <startproject>`, these consist of two items listed in your
 
 and these items in your :setting:`MIDDLEWARE` setting:
 
-1. :class:`~django.contrib.sessions.middleware.SessionMiddleware` manages
+#. :class:`~django.contrib.sessions.middleware.SessionMiddleware` manages
    :doc:`sessions </topics/http/sessions>` across requests.
-2. :class:`~django.contrib.auth.middleware.AuthenticationMiddleware` associates
+#. :class:`~django.contrib.auth.middleware.AuthenticationMiddleware` associates
    users with requests using sessions.
 
 With these settings in place, running the command ``manage.py migrate`` creates

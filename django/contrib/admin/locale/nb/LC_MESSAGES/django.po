@@ -3,18 +3,19 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jensadne <jensadne@pvv.ntnu.no>, 2013-2014
-# Jon <jon@funkbit.no>, 2015-2016
-# Jon <jon@funkbit.no>, 2013
-# Jon <jon@funkbit.no>, 2011,2013
+# Jon <jon@kolonial.no>, 2015-2016
+# Jon <jon@kolonial.no>, 2017-2018
+# Jon <jon@kolonial.no>, 2013
+# Jon <jon@kolonial.no>, 2011,2013
 # Sigurd Gartmann <sigurdga-transifex@sigurdga.no>, 2012
 # Tommy Strand <transifex@ireality.no>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-07-27 09:07+0000\n"
-"Last-Translator: Jon <jon@funkbit.no>\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-07-30 11:34+0000\n"
+"Last-Translator: Jon <jon@kolonial.no>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/django/django/"
 "language/nb/)\n"
 "MIME-Version: 1.0\n"
@@ -92,6 +93,15 @@ msgstr "Legg til ny %(verbose_name)s"
 
 msgid "Remove"
 msgstr "Fjern"
+
+msgid "Addition"
+msgstr "Tillegg"
+
+msgid "Change"
+msgstr "Endre"
+
+msgid "Deletion"
+msgstr "Sletting"
 
 msgid "action time"
 msgstr "tid for handling"
@@ -171,9 +181,11 @@ msgstr ""
 "Hold nede «Control», eller «Command» på en Mac, for å velge mer enn en."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr "{name} \"{obj}\" ble lagt til. Du kan redigere videre nedenfor."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" ble lagt til."
+
+msgid "You may edit it again below."
+msgstr "Du kan endre det igjen nedenfor."
 
 #, python-brace-format
 msgid ""
@@ -182,13 +194,14 @@ msgid ""
 msgstr "{name} \"{obj}\" ble lagt til. Du kan legge til en ny {name} nedenfor."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} \"{obj}\" ble lagt til."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr "{name} \"{obj}\" ble endret. Du kan redigere videre nedenfor."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr "{name} \"{obj}\" ble lagt til. Du kan redigere videre nedenfor."
 
 #, python-brace-format
 msgid ""
@@ -215,8 +228,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s «%(obj)s» ble slettet."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "%(name)s-objekt med primærnøkkelen %(key)r finnes ikke."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "%(name)s med ID \"%(key)s\" eksisterer ikke. Kanskje det ble slettet?"
 
 #, python-format
 msgid "Add %s"
@@ -225,6 +238,10 @@ msgstr "Legg til ny %s"
 #, python-format
 msgid "Change %s"
 msgstr "Endre %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Se %s"
 
 msgid "Database error"
 msgstr "Databasefeil"
@@ -334,7 +351,7 @@ msgid "Change password"
 msgstr "Endre passord"
 
 msgid "Please correct the error below."
-msgstr "Vennligst korriger feilene under."
+msgstr "Vennligst korriger feilen under."
 
 msgid "Please correct the errors below."
 msgstr "Vennligst korriger feilene under."
@@ -445,8 +462,8 @@ msgstr ""
 "Er du sikker på vil slette det valgte %(objects_name)s? De følgende "
 "objektene og deres relaterte objekter vil bli slettet:"
 
-msgid "Change"
-msgstr "Endre"
+msgid "View"
+msgstr "Se"
 
 msgid "Delete?"
 msgstr "Slette?"
@@ -465,8 +482,8 @@ msgstr "Modeller i %(name)s-applikasjonen"
 msgid "Add"
 msgstr "Legg til"
 
-msgid "You don't have permission to edit anything."
-msgstr "Du har ikke rettigheter til å redigere noe."
+msgid "You don't have permission to view or edit anything."
+msgstr "Du har ikke tillatelse til å vise eller endre noe."
 
 msgid "Recent actions"
 msgstr "Siste handlinger"
@@ -529,6 +546,10 @@ msgid "Change selected %(model)s"
 msgstr "Endre valgt %(model)s"
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr "Se valgte %(model)s"
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr "Legg til ny %(model)s"
 
@@ -557,6 +578,12 @@ msgstr "Lagre og legg til ny"
 
 msgid "Save and continue editing"
 msgstr "Lagre og fortsett å redigere"
+
+msgid "Save and view"
+msgstr "Lagre og se"
+
+msgid "Close"
+msgstr "Lukk"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Takk for i dag."
@@ -667,6 +694,10 @@ msgstr "Velg %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Velg %s du ønsker å endre"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Velg %s å se"
 
 msgid "Date:"
 msgstr "Dato:"

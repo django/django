@@ -148,7 +148,7 @@ by a name. This name is used to identify the logger for configuration
 purposes.
 
 By convention, the logger name is usually ``__name__``, the name of
-the python module that contains the logger. This allows you to filter
+the Python module that contains the logger. This allows you to filter
 and handle logging calls on a per-module basis. However, if you have
 some other way of organizing your logging messages, you can provide
 any dot-separated name to identify your logger::
@@ -299,10 +299,12 @@ Finally, here's an example of a fairly complex logging setup::
         'disable_existing_loggers': False,
         'formatters': {
             'verbose': {
-                'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+                'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+                'style': '{',
             },
             'simple': {
-                'format': '%(levelname)s %(message)s'
+                'format': '{levelname} {message}',
+                'style': '{',
             },
         },
         'filters': {
@@ -377,13 +379,13 @@ This logging configuration does the following things:
 
 * Defines two handlers:
 
-  * ``console``, a StreamHandler, which will print any ``INFO``
-    (or higher) message to stderr. This handler uses the ``simple`` output
-    format.
+  * ``console``, a :class:`~logging.StreamHandler`, which prints any ``INFO``
+    (or higher) message to ``sys.stderr``. This handler uses the ``simple``
+    output format.
 
-  * ``mail_admins``, an AdminEmailHandler, which will email any
-    ``ERROR`` (or higher) message to the site admins. This handler uses
-    the ``special`` filter.
+  * ``mail_admins``, an :class:`AdminEmailHandler`, which emails any ``ERROR``
+    (or higher) message to the site :setting:`ADMINS`. This handler uses the
+    ``special`` filter.
 
 * Configures three loggers:
 
@@ -427,8 +429,8 @@ configuration process for :ref:`Django's default logging
 <default-logging-configuration>`. Here's an example that disables Django's
 logging configuration and then manually configures logging:
 
-.. snippet::
-    :filename: settings.py
+.. code-block:: python
+    :caption: settings.py
 
     LOGGING_CONFIG = None
 
@@ -466,7 +468,8 @@ posted using this name but instead using one of the loggers below.
 
 Log messages related to the handling of requests. 5XX responses are
 raised as ``ERROR`` messages; 4XX responses are raised as ``WARNING``
-messages.
+messages. Requests that are logged to the ``django.security`` logger aren't
+logged to ``django.request``.
 
 Messages to this logger have the following extra context:
 
@@ -585,7 +588,7 @@ Python logging module.
 
 .. class:: AdminEmailHandler(include_html=False, email_backend=None)
 
-    This handler sends an email to the site admins for each log
+    This handler sends an email to the site :setting:`ADMINS` for each log
     message it receives.
 
     If the log record contains a ``request`` attribute, the full details
@@ -646,7 +649,7 @@ Python logging module.
         subclass the :class:`~django.utils.log.AdminEmailHandler` class and
         override this method.
 
-.. _Sentry: https://pypi.python.org/pypi/sentry
+.. _Sentry: https://pypi.org/project/sentry/
 
 Filters
 -------
@@ -742,6 +745,11 @@ Independent of the value of :setting:`DEBUG`:
 
 * The :ref:`django-server-logger` logger sends messages at the ``INFO`` level
   or higher to the console.
+
+All loggers except :ref:`django-server-logger` propagate logging to their
+parents, up to the root ``django`` logger. The ``console`` and ``mail_admins``
+handlers are attached to the root logger to provide the behavior described
+above.
 
 See also :ref:`Configuring logging <configuring-logging>` to learn how you can
 complement or replace this default logging configuration.

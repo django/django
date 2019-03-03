@@ -1,10 +1,10 @@
 import os
-import unittest
 from unittest import mock, skipUnless
 
 from django.conf import settings
 from django.contrib.gis.geoip2 import HAS_GEOIP2
 from django.contrib.gis.geos import GEOSGeometry
+from django.test import SimpleTestCase
 
 if HAS_GEOIP2:
     from django.contrib.gis.geoip2 import GeoIP2, GeoIP2Exception
@@ -18,7 +18,7 @@ if HAS_GEOIP2:
     HAS_GEOIP2 and getattr(settings, "GEOIP_PATH", None),
     "GeoIP is required along with the GEOIP_PATH setting."
 )
-class GeoIPTest(unittest.TestCase):
+class GeoIPTest(SimpleTestCase):
     addr = '128.249.1.1'
     fqdn = 'tmc.edu'
 
@@ -52,6 +52,12 @@ class GeoIPTest(unittest.TestCase):
                 e = TypeError
             with self.assertRaises(e):
                 GeoIP2(bad, 0)
+
+    def test_no_database_file(self):
+        invalid_path = os.path.join(os.path.dirname(__file__), 'data')
+        msg = 'Could not load a database from %s.' % invalid_path
+        with self.assertRaisesMessage(GeoIP2Exception, msg):
+            GeoIP2(invalid_path)
 
     def test02_bad_query(self):
         "GeoIP query parameter checking."
@@ -121,26 +127,12 @@ class GeoIPTest(unittest.TestCase):
             self.assertEqual('Houston', d['city'])
             self.assertEqual('TX', d['region'])
             self.assertEqual('America/Chicago', d['time_zone'])
-
             geom = g.geos(query)
             self.assertIsInstance(geom, GEOSGeometry)
-            lon, lat = (-95.4010, 29.7079)
-            lat_lon = g.lat_lon(query)
-            lat_lon = (lat_lon[1], lat_lon[0])
-            for tup in (geom.tuple, g.coords(query), g.lon_lat(query), lat_lon):
-                self.assertAlmostEqual(lon, tup[0], 4)
-                self.assertAlmostEqual(lat, tup[1], 4)
 
-    @mock.patch('socket.gethostbyname')
-    def test05_unicode_response(self, gethostbyname):
-        "GeoIP strings should be properly encoded (#16553)."
-        gethostbyname.return_value = '194.27.42.76'
-        g = GeoIP2()
-        d = g.city("nigde.edu.tr")
-        self.assertEqual('Niğde', d['city'])
-        d = g.country('200.26.205.1')
-        # Some databases have only unaccented countries
-        self.assertIn(d['country_name'], ('Curaçao', 'Curacao'))
+            for e1, e2 in (geom.tuple, g.coords(query), g.lon_lat(query), g.lat_lon(query)):
+                self.assertIsInstance(e1, float)
+                self.assertIsInstance(e2, float)
 
     def test06_ipv6_query(self):
         "GeoIP can lookup IPv6 addresses."

@@ -107,8 +107,7 @@ class Engine:
 
     def find_template_loader(self, loader):
         if isinstance(loader, (tuple, list)):
-            args = list(loader[1:])
-            loader = loader[0]
+            loader, *args = loader
         else:
             args = []
 

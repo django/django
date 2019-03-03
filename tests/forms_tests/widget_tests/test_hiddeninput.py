@@ -7,7 +7,7 @@ class HiddenInputTest(WidgetTest):
     widget = HiddenInput()
 
     def test_render(self):
-        self.check_html(self.widget, 'email', '', html='<input type="hidden" name="email" />')
+        self.check_html(self.widget, 'email', '', html='<input type="hidden" name="email">')
 
     def test_use_required_attribute(self):
         # Always False to avoid browser validation on inputs hidden from the

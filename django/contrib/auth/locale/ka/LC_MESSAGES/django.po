@@ -3,13 +3,14 @@
 # Translators:
 # André Bouatchidzé <a@anbz.net>, 2013-2015
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Tornike Beradze <beradze@europe.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 08:38+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2018-02-07 12:11+0000\n"
+"Last-Translator: Tornike Beradze <beradze@europe.com>\n"
 "Language-Team: Georgian (http://www.transifex.com/django/django/language/"
 "ka/)\n"
 "MIME-Version: 1.0\n"
@@ -63,13 +64,14 @@ msgid "Password confirmation"
 msgstr "პაროლის დამოწმება"
 
 msgid "Enter the same password as before, for verification."
-msgstr ""
+msgstr "გაიმეორეთ იგივე პაროლი ვერიფიკაციისთვის."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
+"მომხმარებლის პაროლი პირდაპ არ ინახება ბაზაში, ამიტომ მისი ნახვა შეუძლებელია, "
+"მაგრამ შეგიძლიათ შეცვალოთ <a href=\"{}\">ამ ფორმით</a>."
 
 #, python-format
 msgid ""
@@ -116,7 +118,7 @@ msgid "variety"
 msgstr ""
 
 msgid "version"
-msgstr ""
+msgstr "ვერსია"
 
 msgid "memory cost"
 msgstr ""
@@ -125,7 +127,7 @@ msgid "time cost"
 msgstr ""
 
 msgid "parallelism"
-msgstr ""
+msgstr "პარალელიზმი"
 
 msgid "work factor"
 msgstr "სამუშაო ფაქტორი"
@@ -137,7 +139,7 @@ msgid "name"
 msgstr "სახელი"
 
 msgid "content type"
-msgstr ""
+msgstr "კონტენტის ტიპი"
 
 msgid "codename"
 msgstr "კოდური სახელი"
@@ -180,6 +182,7 @@ msgstr "მომხმარებლის სახელი"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
+"აუცილებელი. 150 სიმბოლ ან ნაკლები. მხოლოდ ასოები, ციფრები ან @/./+/-/_ ."
 
 msgid "A user with that username already exists."
 msgstr "მომხმარებელი ამ სახელით უკვე არსებობს."
@@ -227,30 +230,32 @@ msgid_plural ""
 "This password is too short. It must contain at least %(min_length)d "
 "characters."
 msgstr[0] ""
+"პაროლი ძალიან მოკლეა. მინიმუმ %(min_length)dსიმბოლოს უნდა შეიცავდეს."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
 msgstr[0] ""
+"პაროლი ძალიან მოკლეა. მინიმუმ %(min_length)d სიმბოლოს უნდა შეიცავდეს."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
-msgstr ""
+msgstr "პაროლი ძალიან გავს %(verbose_name)s."
 
 msgid "Your password can't be too similar to your other personal information."
-msgstr ""
+msgstr "პაროლი ძალიან გავს თქვენს პერსონალურ ინფორმაციას."
 
 msgid "This password is too common."
-msgstr ""
+msgstr "ეს პაროლი ხშირად გამოიყენება."
 
 msgid "Your password can't be a commonly used password."
-msgstr ""
+msgstr "თქვენი პაროლი არ უნდა იყოს ხშირად გამოყენებადი."
 
 msgid "This password is entirely numeric."
-msgstr ""
+msgstr "პაროლი მხოლოდ ციფრებისგან შედგება."
 
 msgid "Your password can't be entirely numeric."
-msgstr ""
+msgstr "თქვენი პაროლი არ შეიძლება შეიცავდეს მხოლოდ ციფრებს."
 
 #, python-format
 msgid "Password reset on %(site_name)s"

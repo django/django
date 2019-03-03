@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-25 23:02+0000\n"
+"PO-Revision-Date: 2017-11-17 08:33+0000\n"
 "Last-Translator: Venelin Stoykov <vkstoykov@gmail.com>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/django/django/language/"
 "bg/)\n"
@@ -527,7 +527,7 @@ msgid "Save"
 msgstr "Запис"
 
 msgid "Popup closing..."
-msgstr ""
+msgstr "Затваряне на изкачащ прозорец..."
 
 #, python-format
 msgid "Change selected %(model)s"

@@ -3,7 +3,6 @@ Utilities for XML generation/parsing.
 """
 
 import re
-from collections import OrderedDict
 from xml.sax.saxutils import XMLGenerator
 
 
@@ -24,11 +23,11 @@ class SimplerXMLGenerator(XMLGenerator):
     def characters(self, content):
         if content and re.search(r'[\x00-\x08\x0B-\x0C\x0E-\x1F]', content):
             # Fail loudly when content has control chars (unsupported in XML 1.0)
-            # See http://www.w3.org/International/questions/qa-controls
+            # See https://www.w3.org/International/questions/qa-controls
             raise UnserializableContentError("Control characters are not supported in XML 1.0")
         XMLGenerator.characters(self, content)
 
     def startElement(self, name, attrs):
         # Sort attrs for a deterministic output.
-        sorted_attrs = OrderedDict(sorted(attrs.items())) if attrs else attrs
+        sorted_attrs = dict(sorted(attrs.items())) if attrs else attrs
         super().startElement(name, sorted_attrs)

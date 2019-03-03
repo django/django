@@ -123,7 +123,7 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
         else:
             super().remove_field(model, field)
 
-    def alter_db_table(self, model, old_db_table, new_db_table):
+    def alter_db_table(self, model, old_db_table, new_db_table, disable_constraints=True):
         from django.contrib.gis.db.models.fields import GeometryField
         # Remove geometry-ness from temp table
         for field in model._meta.local_fields:
@@ -135,7 +135,7 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
                     }
                 )
         # Alter table
-        super().alter_db_table(model, old_db_table, new_db_table)
+        super().alter_db_table(model, old_db_table, new_db_table, disable_constraints)
         # Repoint any straggler names
         for geom_table in self.geometry_tables:
             try:

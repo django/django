@@ -4,7 +4,9 @@ from itertools import takewhile
 
 from django.apps import apps
 from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import (
+    BaseCommand, CommandError, no_translations,
+)
 from django.db import DEFAULT_DB_ALIAS, connections, router
 from django.db.migrations import Migration
 from django.db.migrations.autodetector import MigrationAutodetector
@@ -27,15 +29,15 @@ class Command(BaseCommand):
             help='Specify the app label(s) to create migrations for.',
         )
         parser.add_argument(
-            '--dry-run', action='store_true', dest='dry_run',
+            '--dry-run', action='store_true',
             help="Just show what migrations would be made; don't actually write them.",
         )
         parser.add_argument(
-            '--merge', action='store_true', dest='merge',
+            '--merge', action='store_true',
             help="Enable fixing of migration conflicts.",
         )
         parser.add_argument(
-            '--empty', action='store_true', dest='empty',
+            '--empty', action='store_true',
             help="Create an empty migration.",
         )
         parser.add_argument(
@@ -43,14 +45,19 @@ class Command(BaseCommand):
             help='Tells Django to NOT prompt the user for input of any kind.',
         )
         parser.add_argument(
-            '-n', '--name', action='store', dest='name', default=None,
+            '-n', '--name',
             help="Use this name for migration file(s).",
+        )
+        parser.add_argument(
+            '--no-header', action='store_false', dest='include_header',
+            help='Do not add header comments to new migration file(s).',
         )
         parser.add_argument(
             '--check', action='store_true', dest='check_changes',
             help='Exit with a non-zero status if model changes are missing migrations.',
         )
 
+    @no_translations
     def handle(self, *app_labels, **options):
         self.verbosity = options['verbosity']
         self.interactive = options['interactive']
@@ -58,19 +65,21 @@ class Command(BaseCommand):
         self.merge = options['merge']
         self.empty = options['empty']
         self.migration_name = options['name']
+        if self.migration_name and not self.migration_name.isidentifier():
+            raise CommandError('The migration name must be a valid Python identifier.')
+        self.include_header = options['include_header']
         check_changes = options['check_changes']
 
         # Make sure the app they asked for exists
         app_labels = set(app_labels)
-        bad_app_labels = set()
+        has_bad_labels = False
         for app_label in app_labels:
             try:
                 apps.get_app_config(app_label)
-            except LookupError:
-                bad_app_labels.add(app_label)
-        if bad_app_labels:
-            for app_label in bad_app_labels:
-                self.stderr.write("App '%s' could not be found. Is it in INSTALLED_APPS?" % app_label)
+            except LookupError as err:
+                self.stderr.write(str(err))
+                has_bad_labels = True
+        if has_bad_labels:
             sys.exit(2)
 
         # Load the current graph state. Pass in None for the connection so
@@ -162,10 +171,11 @@ class Command(BaseCommand):
         if not changes:
             # No changes? Tell them.
             if self.verbosity >= 1:
-                if len(app_labels) == 1:
-                    self.stdout.write("No changes detected in app '%s'" % app_labels.pop())
-                elif len(app_labels) > 1:
-                    self.stdout.write("No changes detected in apps '%s'" % ("', '".join(app_labels)))
+                if app_labels:
+                    if len(app_labels) == 1:
+                        self.stdout.write("No changes detected in app '%s'" % app_labels.pop())
+                    else:
+                        self.stdout.write("No changes detected in apps '%s'" % ("', '".join(app_labels)))
                 else:
                     self.stdout.write("No changes detected")
         else:
@@ -183,7 +193,7 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.MIGRATE_HEADING("Migrations for '%s':" % app_label) + "\n")
             for migration in app_migrations:
                 # Describe the migration
-                writer = MigrationWriter(migration)
+                writer = MigrationWriter(migration, self.include_header)
                 if self.verbosity >= 1:
                     # Display a relative path if it's below the current working
                     # directory, or an absolute path otherwise.
@@ -200,8 +210,7 @@ class Command(BaseCommand):
                     # Write the migrations file to the disk.
                     migrations_directory = os.path.dirname(writer.path)
                     if not directory_created.get(app_label):
-                        if not os.path.isdir(migrations_directory):
-                            os.mkdir(migrations_directory)
+                        os.makedirs(migrations_directory, exist_ok=True)
                         init_path = os.path.join(migrations_directory, "__init__.py")
                         if not os.path.isfile(init_path):
                             open(init_path, "w").close()
@@ -275,7 +284,7 @@ class Command(BaseCommand):
                     biggest_number = max(x for x in numbers if x is not None)
                 except ValueError:
                     biggest_number = 1
-                subclass = type("Migration", (Migration, ), {
+                subclass = type("Migration", (Migration,), {
                     "dependencies": [(app_label, migration.name) for migration in merge_migrations],
                 })
                 migration_name = "%04i_%s" % (
@@ -283,7 +292,7 @@ class Command(BaseCommand):
                     self.migration_name or ("merge_%s" % get_migration_name_timestamp())
                 )
                 new_migration = subclass(migration_name, app_label)
-                writer = MigrationWriter(new_migration)
+                writer = MigrationWriter(new_migration, self.include_header)
 
                 if not self.dry_run:
                     # Write the merge migrations file to the disk

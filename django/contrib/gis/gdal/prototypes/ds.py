@@ -8,8 +8,8 @@ from ctypes import POINTER, c_char_p, c_double, c_int, c_long, c_void_p
 from django.contrib.gis.gdal.envelope import OGREnvelope
 from django.contrib.gis.gdal.libgdal import GDAL_VERSION, lgdal
 from django.contrib.gis.gdal.prototypes.generation import (
-    const_string_output, double_output, geom_output, int64_output, int_output,
-    srs_output, void_output, voidptr_output,
+    bool_output, const_string_output, double_output, geom_output, int64_output,
+    int_output, srs_output, void_output, voidptr_output,
 )
 
 c_int_p = POINTER(c_int)  # shortcut type
@@ -68,8 +68,11 @@ get_field_as_datetime = int_output(
 )
 get_field_as_double = double_output(lgdal.OGR_F_GetFieldAsDouble, [c_void_p, c_int])
 get_field_as_integer = int_output(lgdal.OGR_F_GetFieldAsInteger, [c_void_p, c_int])
-if GDAL_VERSION >= (2, 0):
-    get_field_as_integer64 = int64_output(lgdal.OGR_F_GetFieldAsInteger64, [c_void_p, c_int])
+get_field_as_integer64 = int64_output(lgdal.OGR_F_GetFieldAsInteger64, [c_void_p, c_int])
+if GDAL_VERSION >= (2, 2):
+    is_field_set = bool_output(lgdal.OGR_F_IsFieldSetAndNotNull, [c_void_p, c_int])
+else:
+    is_field_set = bool_output(lgdal.OGR_F_IsFieldSet, [c_void_p, c_int])
 get_field_as_string = const_string_output(lgdal.OGR_F_GetFieldAsString, [c_void_p, c_int])
 get_field_index = int_output(lgdal.OGR_F_GetFieldIndex, [c_void_p, c_char_p])
 

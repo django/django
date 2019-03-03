@@ -1,7 +1,9 @@
 from django.apps import apps
 from django.conf import settings
 from django.db import connection
-from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
+from django.test import (
+    TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
+)
 
 from .models.tablespaces import (
     Article, ArticleRef, Authors, Reviewers, Scientist, ScientistRef,
@@ -21,7 +23,8 @@ def sql_for_index(model):
 # We can't test the DEFAULT_TABLESPACE and DEFAULT_INDEX_TABLESPACE settings
 # because they're evaluated when the model class is defined. As a consequence,
 # @override_settings doesn't work, and the tests depend
-class TablespacesTests(TestCase):
+class TablespacesTests(TransactionTestCase):
+    available_apps = ['model_options']
 
     def setUp(self):
         # The unmanaged models need to be removed after the test in order to

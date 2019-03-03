@@ -32,7 +32,6 @@ from django.http import HttpResponse
 from django.test import (
     RequestFactory, TestCase, ignore_warnings, override_settings,
 )
-from django.test.utils import patch_logger
 from django.utils import timezone
 
 from .models import SessionStore as CustomDatabaseSession
@@ -312,12 +311,11 @@ class SessionTestsMixin:
         self.assertEqual(self.session.decode(encoded), data)
 
     def test_decode_failure_logged_to_security(self):
-        bad_encode = base64.b64encode(b'flaskdj:alkdjf')
-        with patch_logger('django.security.SuspiciousSession', 'warning') as calls:
+        bad_encode = base64.b64encode(b'flaskdj:alkdjf').decode('ascii')
+        with self.assertLogs('django.security.SuspiciousSession', 'WARNING') as cm:
             self.assertEqual({}, self.session.decode(bad_encode))
-            # check that the failed decode is logged
-            self.assertEqual(len(calls), 1)
-            self.assertIn('corrupted', calls[0])
+        # The failed decode is logged.
+        self.assertIn('corrupted', cm.output[0])
 
     def test_actual_expiry(self):
         # this doesn't work with JSONSerializer (serializing timedelta)
@@ -523,7 +521,8 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         shutil.rmtree(self.temp_session_store)
 
     @override_settings(
-        SESSION_FILE_PATH="/if/this/directory/exists/you/have/a/weird/computer")
+        SESSION_FILE_PATH='/if/this/directory/exists/you/have/a/weird/computer',
+    )
     def test_configuration_check(self):
         del self.backend._storage_path
         # Make sure the file backend checks for a good storage dir
@@ -533,7 +532,7 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
     def test_invalid_key_backslash(self):
         # Ensure we don't allow directory-traversal.
         # This is tested directly on _key_to_file, as load() will swallow
-        # a SuspiciousOperation in the same way as an IOError - by creating
+        # a SuspiciousOperation in the same way as an OSError - by creating
         # a new session, making it unclear whether the slashes were detected.
         with self.assertRaises(InvalidSessionKey):
             self.backend()._key_to_file("a\\b\\c")
@@ -626,10 +625,11 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
 
 
 class SessionMiddlewareTests(TestCase):
+    request_factory = RequestFactory()
 
     @override_settings(SESSION_COOKIE_SECURE=True)
     def test_secure_session_cookie(self):
-        request = RequestFactory().get('/')
+        request = self.request_factory.get('/')
         response = HttpResponse('Session test')
         middleware = SessionMiddleware()
 
@@ -643,7 +643,7 @@ class SessionMiddlewareTests(TestCase):
 
     @override_settings(SESSION_COOKIE_HTTPONLY=True)
     def test_httponly_session_cookie(self):
-        request = RequestFactory().get('/')
+        request = self.request_factory.get('/')
         response = HttpResponse('Session test')
         middleware = SessionMiddleware()
 
@@ -659,9 +659,19 @@ class SessionMiddlewareTests(TestCase):
             str(response.cookies[settings.SESSION_COOKIE_NAME])
         )
 
+    @override_settings(SESSION_COOKIE_SAMESITE='Strict')
+    def test_samesite_session_cookie(self):
+        request = self.request_factory.get('/')
+        response = HttpResponse()
+        middleware = SessionMiddleware()
+        middleware.process_request(request)
+        request.session['hello'] = 'world'
+        response = middleware.process_response(request, response)
+        self.assertEqual(response.cookies[settings.SESSION_COOKIE_NAME]['samesite'], 'Strict')
+
     @override_settings(SESSION_COOKIE_HTTPONLY=False)
     def test_no_httponly_session_cookie(self):
-        request = RequestFactory().get('/')
+        request = self.request_factory.get('/')
         response = HttpResponse('Session test')
         middleware = SessionMiddleware()
 
@@ -678,7 +688,7 @@ class SessionMiddlewareTests(TestCase):
         )
 
     def test_session_save_on_500(self):
-        request = RequestFactory().get('/')
+        request = self.request_factory.get('/')
         response = HttpResponse('Horrible error')
         response.status_code = 500
         middleware = SessionMiddleware()
@@ -695,7 +705,7 @@ class SessionMiddlewareTests(TestCase):
 
     def test_session_update_error_redirect(self):
         path = '/foo/'
-        request = RequestFactory().get(path)
+        request = self.request_factory.get(path)
         response = HttpResponse()
         middleware = SessionMiddleware()
 
@@ -714,7 +724,7 @@ class SessionMiddlewareTests(TestCase):
             middleware.process_response(request, response)
 
     def test_session_delete_on_end(self):
-        request = RequestFactory().get('/')
+        request = self.request_factory.get('/')
         response = HttpResponse('Session test')
         middleware = SessionMiddleware()
 
@@ -730,9 +740,9 @@ class SessionMiddlewareTests(TestCase):
 
         # The cookie was deleted, not recreated.
         # A deleted cookie header looks like:
-        #  Set-Cookie: sessionid=; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/
+        #  Set-Cookie: sessionid=; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; Path=/
         self.assertEqual(
-            'Set-Cookie: {}=""; expires=Thu, 01-Jan-1970 00:00:00 GMT; '
+            'Set-Cookie: {}=""; expires=Thu, 01 Jan 1970 00:00:00 GMT; '
             'Max-Age=0; Path=/'.format(
                 settings.SESSION_COOKIE_NAME,
             ),
@@ -741,7 +751,7 @@ class SessionMiddlewareTests(TestCase):
 
     @override_settings(SESSION_COOKIE_DOMAIN='.example.local', SESSION_COOKIE_PATH='/example/')
     def test_session_delete_on_end_with_custom_domain_and_path(self):
-        request = RequestFactory().get('/')
+        request = self.request_factory.get('/')
         response = HttpResponse('Session test')
         middleware = SessionMiddleware()
 
@@ -758,18 +768,18 @@ class SessionMiddlewareTests(TestCase):
         # The cookie was deleted, not recreated.
         # A deleted cookie header with a custom domain and path looks like:
         #  Set-Cookie: sessionid=; Domain=.example.local;
-        #              expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0;
+        #              expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0;
         #              Path=/example/
         self.assertEqual(
             'Set-Cookie: {}=""; Domain=.example.local; expires=Thu, '
-            '01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/example/'.format(
+            '01 Jan 1970 00:00:00 GMT; Max-Age=0; Path=/example/'.format(
                 settings.SESSION_COOKIE_NAME,
             ),
             str(response.cookies[settings.SESSION_COOKIE_NAME])
         )
 
     def test_flush_empty_without_session_cookie_doesnt_set_cookie(self):
-        request = RequestFactory().get('/')
+        request = self.request_factory.get('/')
         response = HttpResponse('Session test')
         middleware = SessionMiddleware()
 
@@ -790,7 +800,7 @@ class SessionMiddlewareTests(TestCase):
         If a session is emptied of data but still has a key, it should still
         be updated.
         """
-        request = RequestFactory().get('/')
+        request = self.request_factory.get('/')
         response = HttpResponse('Session test')
         middleware = SessionMiddleware()
 

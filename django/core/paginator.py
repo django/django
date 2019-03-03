@@ -1,8 +1,11 @@
-import collections
+import collections.abc
+import inspect
 import warnings
 from math import ceil
 
+from django.utils.deprecation import RemovedInDjango31Warning
 from django.utils.functional import cached_property
+from django.utils.inspect import method_has_no_args
 from django.utils.translation import gettext_lazy as _
 
 
@@ -35,6 +38,8 @@ class Paginator:
     def validate_number(self, number):
         """Validate the given 1-based page number."""
         try:
+            if isinstance(number, float) and not number.is_integer():
+                raise ValueError
             number = int(number)
         except (TypeError, ValueError):
             raise PageNotAnInteger(_('That page number is not an integer'))
@@ -81,13 +86,10 @@ class Paginator:
     @cached_property
     def count(self):
         """Return the total number of objects, across all pages."""
-        try:
-            return self.object_list.count()
-        except (AttributeError, TypeError):
-            # AttributeError if object_list has no count() method.
-            # TypeError if object_list.count() requires arguments
-            # (i.e. is of type list).
-            return len(self.object_list)
+        c = getattr(self.object_list, 'count', None)
+        if callable(c) and not inspect.isbuiltin(c) and method_has_no_args(c):
+            return c()
+        return len(self.object_list)
 
     @cached_property
     def num_pages(self):
@@ -124,10 +126,17 @@ class Paginator:
             )
 
 
-QuerySetPaginator = Paginator   # For backwards-compatibility.
+class QuerySetPaginator(Paginator):
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            'The QuerySetPaginator alias of Paginator is deprecated.',
+            RemovedInDjango31Warning, stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
 
 
-class Page(collections.Sequence):
+class Page(collections.abc.Sequence):
 
     def __init__(self, object_list, number, paginator):
         self.object_list = object_list

@@ -1,9 +1,10 @@
 from datetime import datetime
 from operator import attrgetter
 
-from django.db.models import F
+from django.db.models import Count, DateTimeField, F, Max, OuterRef, Subquery
 from django.db.models.functions import Upper
 from django.test import TestCase
+from django.utils.deprecation import RemovedInDjango31Warning
 
 from .models import Article, Author, OrderedByFArticle, Reference
 
@@ -136,6 +137,27 @@ class OrderingTests(TestCase):
         self.assertQuerysetEqualReversible(
             Article.objects.order_by(Upper("author__name").desc(nulls_first=True), 'headline'),
             [self.a1, self.a2, self.a4, self.a3],
+        )
+
+    def test_orders_nulls_first_on_filtered_subquery(self):
+        Article.objects.filter(headline='Article 1').update(author=self.author_1)
+        Article.objects.filter(headline='Article 2').update(author=self.author_1)
+        Article.objects.filter(headline='Article 4').update(author=self.author_2)
+        Author.objects.filter(name__isnull=True).delete()
+        author_3 = Author.objects.create(name='Name 3')
+        article_subquery = Article.objects.filter(
+            author=OuterRef('pk'),
+            headline__icontains='Article',
+        ).order_by().values('author').annotate(
+            last_date=Max('pub_date'),
+        ).values('last_date')
+        self.assertQuerysetEqualReversible(
+            Author.objects.annotate(
+                last_date=Subquery(article_subquery, output_field=DateTimeField())
+            ).order_by(
+                F('last_date').asc(nulls_first=True)
+            ).distinct(),
+            [author_3, self.author_1, self.author_2],
         )
 
     def test_stop_slicing(self):
@@ -382,3 +404,11 @@ class OrderingTests(TestCase):
             articles, ['Article 1', 'Article 4', 'Article 3', 'Article 2'],
             attrgetter('headline')
         )
+
+    def test_deprecated_values_annotate(self):
+        msg = (
+            "Article QuerySet won't use Meta.ordering in Django 3.1. Add "
+            ".order_by('-pub_date', 'headline') to retain the current query."
+        )
+        with self.assertRaisesMessage(RemovedInDjango31Warning, msg):
+            list(Article.objects.values('author').annotate(Count('headline')))

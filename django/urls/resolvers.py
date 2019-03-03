@@ -1,23 +1,24 @@
 """
 This module converts requested URLs to callback view functions.
 
-RegexURLResolver is the main class here. Its resolve() method takes a URL (as
+URLResolver is the main class here. Its resolve() method takes a URL (as
 a string) and returns a ResolverMatch object which provides access to all
 attributes of the resolved URL match.
 """
 import functools
+import inspect
 import re
 import threading
 from importlib import import_module
 from urllib.parse import quote
 
 from django.conf import settings
-from django.core.checks import Warning
+from django.core.checks import Error, Warning
 from django.core.checks.urls import check_resolver
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.datastructures import MultiValueDict
 from django.utils.functional import cached_property
-from django.utils.http import RFC3986_SUBDELIMS
+from django.utils.http import RFC3986_SUBDELIMS, escape_leading_slashes
 from django.utils.regex_helper import normalize
 from django.utils.translation import get_language
 
@@ -27,11 +28,12 @@ from .utils import get_callable
 
 
 class ResolverMatch:
-    def __init__(self, func, args, kwargs, url_name=None, app_names=None, namespaces=None):
+    def __init__(self, func, args, kwargs, url_name=None, app_names=None, namespaces=None, route=None):
         self.func = func
         self.args = args
         self.kwargs = kwargs
         self.url_name = url_name
+        self.route = route
 
         # If a URLRegexResolver doesn't have a namespace or app_name, it passes
         # in an empty value.
@@ -54,9 +56,9 @@ class ResolverMatch:
         return (self.func, self.args, self.kwargs)[index]
 
     def __repr__(self):
-        return "ResolverMatch(func=%s, args=%s, kwargs=%s, url_name=%s, app_names=%s, namespaces=%s)" % (
+        return "ResolverMatch(func=%s, args=%s, kwargs=%s, url_name=%s, app_names=%s, namespaces=%s, route=%s)" % (
             self._func_path, self.args, self.kwargs, self.url_name,
-            self.app_names, self.namespaces,
+            self.app_names, self.namespaces, self.route,
         )
 
 
@@ -68,11 +70,13 @@ def get_resolver(urlconf=None):
 
 
 @functools.lru_cache(maxsize=None)
-def get_ns_resolver(ns_pattern, resolver):
+def get_ns_resolver(ns_pattern, resolver, converters):
     # Build a namespaced resolver for the given parent URLconf pattern.
     # This makes it possible to have captured parameters in the parent
     # URLconf pattern.
-    ns_resolver = URLResolver(RegexPattern(ns_pattern), resolver.url_patterns)
+    pattern = RegexPattern(ns_pattern)
+    pattern.converters = dict(converters)
+    ns_resolver = URLResolver(pattern, resolver.url_patterns)
     return URLResolver(RegexPattern(r'^/'), [ns_resolver])
 
 
@@ -182,7 +186,7 @@ class RegexPattern(CheckURLMixin):
             )
 
     def __str__(self):
-        return self._regex
+        return str(self._regex)
 
 
 _PATH_PARAMETER_COMPONENT_RE = re.compile(
@@ -255,13 +259,22 @@ class RoutePattern(CheckURLMixin):
         return None
 
     def check(self):
-        return self._check_pattern_startswith_slash()
+        warnings = self._check_pattern_startswith_slash()
+        route = self._route
+        if '(?P<' in route or route.startswith('^') or route.endswith('$'):
+            warnings.append(Warning(
+                "Your URL pattern {} has a route that contains '(?P<', begins "
+                "with a '^', or ends with a '$'. This was likely an oversight "
+                "when migrating to django.urls.path().".format(self.describe()),
+                id='2_0.W001',
+            ))
+        return warnings
 
     def _compile(self, route):
         return re.compile(_route_to_regex(route, self._is_endpoint)[0])
 
     def __str__(self):
-        return self._route
+        return str(self._route)
 
 
 class LocalePrefixPattern:
@@ -333,7 +346,7 @@ class URLPattern:
             new_path, args, kwargs = match
             # Pass any extra_kwargs as **kwargs.
             kwargs.update(self.default_args)
-            return ResolverMatch(self.callback, args, kwargs, self.pattern.name)
+            return ResolverMatch(self.callback, args, kwargs, self.pattern.name, route=str(self.pattern))
 
     @cached_property
     def lookup_str(self):
@@ -370,7 +383,7 @@ class URLResolver:
         self._local = threading.local()
 
     def __repr__(self):
-        if isinstance(self.urlconf_name, list) and len(self.urlconf_name):
+        if isinstance(self.urlconf_name, list) and self.urlconf_name:
             # Don't bother to output the whole list, it can be huge
             urlconf_repr = '<%s list>' % self.urlconf_name[0].__class__.__name__
         else:
@@ -381,12 +394,33 @@ class URLResolver:
         )
 
     def check(self):
-        warnings = []
+        messages = []
         for pattern in self.url_patterns:
-            warnings.extend(check_resolver(pattern))
-        if not warnings:
-            warnings = self.pattern.check()
-        return warnings
+            messages.extend(check_resolver(pattern))
+        messages.extend(self._check_custom_error_handlers())
+        return messages or self.pattern.check()
+
+    def _check_custom_error_handlers(self):
+        messages = []
+        # All handlers take (request, exception) arguments except handler500
+        # which takes (request).
+        for status_code, num_parameters in [(400, 2), (403, 2), (404, 2), (500, 1)]:
+            handler, param_dict = self.resolve_error_handler(status_code)
+            signature = inspect.signature(handler)
+            args = [None] * num_parameters
+            try:
+                signature.bind(*args)
+            except TypeError:
+                msg = (
+                    "The custom handler{status_code} view '{path}' does not "
+                    "take the correct number of arguments ({args})."
+                ).format(
+                    status_code=status_code,
+                    path=handler.__module__ + '.' + handler.__qualname__,
+                    args='request, exception' if num_parameters == 2 else 'request',
+                )
+                messages.append(Error(msg, id='urls.E007'))
+        return messages
 
     def _populate(self):
         # Short-circuit if called recursively in this thread to prevent
@@ -431,11 +465,13 @@ class URLResolver:
                                     (
                                         new_matches,
                                         p_pattern + pat,
-                                        dict(defaults, **url_pattern.default_kwargs),
-                                        dict(self.pattern.converters, **converters)
+                                        {**defaults, **url_pattern.default_kwargs},
+                                        {**self.pattern.converters, **url_pattern.pattern.converters, **converters}
                                     )
                                 )
                         for namespace, (prefix, sub_pattern) in url_pattern.namespace_dict.items():
+                            current_converters = url_pattern.pattern.converters
+                            sub_pattern.pattern.converters.update(current_converters)
                             namespaces[namespace] = (p_pattern + prefix, sub_pattern)
                         for app_name, namespace_list in url_pattern.app_dict.items():
                             apps.setdefault(app_name, []).extend(namespace_list)
@@ -468,6 +504,15 @@ class URLResolver:
             self._populate()
         return self._app_dict[language_code]
 
+    @staticmethod
+    def _join_route(route1, route2):
+        """Join two routes, without the starting ^ in the second route."""
+        if not route1:
+            return route2
+        if route2.startswith('^'):
+            route2 = route2[1:]
+        return route1 + route2
+
     def _is_callback(self, name):
         if not self._populated:
             self._populate()
@@ -491,7 +536,7 @@ class URLResolver:
                 else:
                     if sub_match:
                         # Merge captured arguments in match with submatch
-                        sub_match_dict = dict(kwargs, **self.default_kwargs)
+                        sub_match_dict = {**kwargs, **self.default_kwargs}
                         # Update the sub_match_dict with the kwargs from the sub_match.
                         sub_match_dict.update(sub_match.kwargs)
                         # If there are *any* named groups, ignore all non-named groups.
@@ -499,6 +544,7 @@ class URLResolver:
                         sub_match_args = sub_match.args
                         if not sub_match_dict:
                             sub_match_args = args + sub_match.args
+                        current_route = '' if isinstance(pattern, URLPattern) else str(pattern.pattern)
                         return ResolverMatch(
                             sub_match.func,
                             sub_match_args,
@@ -506,6 +552,7 @@ class URLResolver:
                             sub_match.url_name,
                             [self.app_name] + sub_match.app_names,
                             [self.namespace] + sub_match.namespaces,
+                            self._join_route(current_route, sub_match.route),
                         )
                     tried.append([pattern])
             raise Resolver404({'tried': tried, 'path': new_path})
@@ -563,12 +610,7 @@ class URLResolver:
                 else:
                     if set(kwargs).symmetric_difference(params).difference(defaults):
                         continue
-                    matches = True
-                    for k, v in defaults.items():
-                        if kwargs.get(k, v) != v:
-                            matches = False
-                            break
-                    if not matches:
+                    if any(kwargs.get(k, v) != v for k, v in defaults.items()):
                         continue
                     candidate_subs = kwargs
                 # Convert the candidate subs to text using Converter.to_url().
@@ -588,9 +630,7 @@ class URLResolver:
                     # safe characters from `pchar` definition of RFC 3986
                     url = quote(candidate_pat % text_candidate_subs, safe=RFC3986_SUBDELIMS + '/~:@')
                     # Don't allow construction of scheme relative urls.
-                    if url.startswith('//'):
-                        url = '/%%2F%s' % url[2:]
-                    return url
+                    return escape_leading_slashes(url)
         # lookup_view can be URL name or callable, but callables are not
         # friendly in error messages.
         m = getattr(lookup_view, '__module__', None)

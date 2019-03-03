@@ -9,12 +9,12 @@ from django.db import NotSupportedError, connection
 from django.db.models import F, Q
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
-from ..utils import (
-    FuncTestMixin, mysql, no_oracle, oracle, postgis, spatialite,
-)
 from .models import (
     AustraliaCity, CensusZipcode, Interstate, SouthTexasCity, SouthTexasCityFt,
     SouthTexasInterstate, SouthTexasZipcode,
+)
+from ..utils import (
+    FuncTestMixin, mysql, no_oracle, oracle, postgis, spatialite,
 )
 
 
@@ -81,11 +81,7 @@ class DistanceTest(TestCase):
         # Now performing the `dwithin` queries on a geodetic coordinate system.
         for dist in au_dists:
             with self.subTest(dist=dist):
-                if isinstance(dist, D) and not oracle:
-                    type_error = True
-                else:
-                    type_error = False
-
+                type_error = isinstance(dist, D) and not oracle
                 if isinstance(dist, tuple):
                     if oracle or spatialite:
                         # Result in meters

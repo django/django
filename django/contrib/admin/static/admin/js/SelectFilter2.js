@@ -164,15 +164,9 @@ Requires jQuery, core.js, and SelectBox.js.
 
             if (!is_stacked) {
                 // In horizontal mode, give the same height to the two boxes.
-                var j_from_box = $(from_box);
-                var j_to_box = $(to_box);
-                var resize_filters = function() { j_to_box.height($(filter_p).outerHeight() + j_from_box.outerHeight()); };
-                if (j_from_box.outerHeight() > 0) {
-                    resize_filters(); // This fieldset is already open. Resize now.
-                } else {
-                    // This fieldset is probably collapsed. Wait for its 'show' event.
-                    j_to_box.closest('fieldset').one('show.fieldset', resize_filters);
-                }
+                var j_from_box = $('#' + field_id + '_from');
+                var j_to_box = $('#' + field_id + '_to');
+                j_to_box.height($(filter_p).outerHeight() + j_from_box.outerHeight());
             }
 
             // Initial icon refresh

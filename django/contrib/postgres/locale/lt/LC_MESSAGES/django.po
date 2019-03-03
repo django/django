@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Matas Dailyda <matas@dailyda.com>, 2015-2017
+# Matas Dailyda <matas@dailyda.com>, 2015-2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-30 14:07+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 08:24+0000\n"
 "Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/django/django/language/"
 "lt/)\n"
@@ -15,15 +15,16 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: lt\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
-"%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < "
+"11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? "
+"1 : n % 1 != 0 ? 2: 3);\n"
 
 msgid "PostgreSQL extensions"
 msgstr "PostgreSQL plėtiniai"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
-msgstr "Masyve nevalidus %(nth)s elementas: "
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "%(nth)s elementų masyve yra nevalidžių:"
 
 msgid "Nested arrays must have the same length."
 msgstr "Iterpti vienas į kitą masyvai turi būti vienodo ilgio."
@@ -85,6 +86,9 @@ msgstr[1] ""
 msgstr[2] ""
 "Sąrašas turi %(show_value)d elementų. Sąrašas neturėtų turėti daugiau "
 "elementų nei %(limit_value)d."
+msgstr[3] ""
+"Sąrašas turi %(show_value)d elementų. Sąrašas neturėtų turėti daugiau "
+"elementų nei %(limit_value)d."
 
 #, python-format
 msgid ""
@@ -100,6 +104,9 @@ msgstr[1] ""
 "Sąrašas turi %(show_value)d elementus. Sąrašas turėtų turėti daugiau "
 "elementų nei %(limit_value)d."
 msgstr[2] ""
+"Sąrašas turi %(show_value)d elementų. Sąrašas turėtų turėti daugiau elementų "
+"nei %(limit_value)d."
+msgstr[3] ""
 "Sąrašas turi %(show_value)d elementų. Sąrašas turėtų turėti daugiau elementų "
 "nei %(limit_value)d."
 

@@ -7,6 +7,7 @@ from django.core.mail import mail_managers
 from django.http import HttpResponsePermanentRedirect
 from django.urls import is_valid_path
 from django.utils.deprecation import MiddlewareMixin
+from django.utils.http import escape_leading_slashes
 
 
 class CommonMiddleware(MiddlewareMixin):
@@ -79,6 +80,8 @@ class CommonMiddleware(MiddlewareMixin):
         POST, PUT, or PATCH.
         """
         new_path = request.get_full_path(force_append_slash=True)
+        # Prevent construction of scheme relative urls.
+        new_path = escape_leading_slashes(new_path)
         if settings.DEBUG and request.method in ('POST', 'PUT', 'PATCH'):
             raise RuntimeError(
                 "You called this URL via %(method)s, but the URL doesn't end "
@@ -94,8 +97,6 @@ class CommonMiddleware(MiddlewareMixin):
 
     def process_response(self, request, response):
         """
-        Calculate the ETag, if needed.
-
         When the status code of the response is 404, it may redirect to a path
         with an appended slash if should_redirect_with_slash() returns True.
         """
@@ -132,7 +133,8 @@ class BrokenLinkEmailsMiddleware(MiddlewareMixin):
                     ),
                     "Referrer: %s\nRequested URL: %s\nUser agent: %s\n"
                     "IP address: %s\n" % (referer, path, ua, ip),
-                    fail_silently=True)
+                    fail_silently=True,
+                )
         return response
 
     def is_internal_request(self, domain, referer):

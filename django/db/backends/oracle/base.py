@@ -1,18 +1,19 @@
 """
 Oracle database backend for Django.
 
-Requires cx_Oracle: http://cx-oracle.sourceforge.net/
+Requires cx_Oracle: https://oracle.github.io/python-cx_Oracle/
 """
 import datetime
 import decimal
 import os
 import platform
+from contextlib import contextmanager
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import utils
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_bytes, force_str
 from django.utils.functional import cached_property
 
 
@@ -56,6 +57,24 @@ from .operations import DatabaseOperations                  # NOQA isort:skip
 from .schema import DatabaseSchemaEditor                    # NOQA isort:skip
 from .utils import Oracle_datetime                          # NOQA isort:skip
 from .validation import DatabaseValidation                  # NOQA isort:skip
+
+
+@contextmanager
+def wrap_oracle_errors():
+    try:
+        yield
+    except Database.DatabaseError as e:
+        # cx_Oracle raises a cx_Oracle.DatabaseError exception with the
+        # following attributes and values:
+        #  code = 2091
+        #  message = 'ORA-02091: transaction rolled back
+        #            'ORA-02291: integrity constraint (TEST_DJANGOTEST.SYS
+        #               _C00102056) violated - parent key not found'
+        # Convert that case to Django's IntegrityError exception.
+        x = e.args[0]
+        if hasattr(x, 'code') and hasattr(x, 'message') and x.code == 2091 and 'ORA-02291' in x.message:
+            raise utils.IntegrityError(*tuple(e.args))
+        raise
 
 
 class _UninitializedOperatorsDescriptor:
@@ -136,21 +155,21 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'iendswith': "LIKE UPPER(TRANSLATE(%s USING NCHAR_CS)) ESCAPE TRANSLATE('\\' USING NCHAR_CS)",
     }
 
-    _likec_operators = _standard_operators.copy()
-    _likec_operators.update({
+    _likec_operators = {
+        **_standard_operators,
         'contains': "LIKEC %s ESCAPE '\\'",
         'icontains': "LIKEC UPPER(%s) ESCAPE '\\'",
         'startswith': "LIKEC %s ESCAPE '\\'",
         'endswith': "LIKEC %s ESCAPE '\\'",
         'istartswith': "LIKEC UPPER(%s) ESCAPE '\\'",
         'iendswith': "LIKEC UPPER(%s) ESCAPE '\\'",
-    })
+    }
 
     # The patterns below are used to generate SQL pattern lookup clauses when
     # the right-hand side of the lookup isn't a raw string (it might be an expression
     # or the result of a bilateral transformation).
-    # In those cases, special characters for LIKE operators (e.g. \, *, _) should be
-    # escaped on database side.
+    # In those cases, special characters for LIKE operators (e.g. \, %, _)
+    # should be escaped on the database side.
     #
     # Note: we use str.format() here for readability as '%' is used as a wildcard for
     # the LIKE operator.
@@ -183,20 +202,18 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         use_returning_into = self.settings_dict["OPTIONS"].get('use_returning_into', True)
-        self.features.can_return_id_from_insert = use_returning_into
+        self.features.can_return_columns_from_insert = use_returning_into
 
-    def _connect_string(self):
+    def _dsn(self):
         settings_dict = self.settings_dict
         if not settings_dict['HOST'].strip():
             settings_dict['HOST'] = 'localhost'
         if settings_dict['PORT']:
-            dsn = Database.makedsn(settings_dict['HOST'],
-                                   int(settings_dict['PORT']),
-                                   settings_dict['NAME'])
-        else:
-            dsn = settings_dict['NAME']
-        return "%s/%s@%s" % (settings_dict['USER'],
-                             settings_dict['PASSWORD'], dsn)
+            return Database.makedsn(settings_dict['HOST'], int(settings_dict['PORT']), settings_dict['NAME'])
+        return settings_dict['NAME']
+
+    def _connect_string(self):
+        return '%s/\\"%s\\"@%s' % (self.settings_dict['USER'], self.settings_dict['PASSWORD'], self._dsn())
 
     def get_connection_params(self):
         conn_params = self.settings_dict['OPTIONS'].copy()
@@ -205,7 +222,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return conn_params
 
     def get_new_connection(self, conn_params):
-        return Database.connect(self._connect_string(), **conn_params)
+        return Database.connect(
+            user=self.settings_dict['USER'],
+            password=self.settings_dict['PASSWORD'],
+            dsn=self._dsn(),
+            **conn_params,
+        )
 
     def init_connection_state(self):
         cursor = self.create_cursor()
@@ -252,21 +274,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def _commit(self):
         if self.connection is not None:
-            try:
+            with wrap_oracle_errors():
                 return self.connection.commit()
-            except Database.DatabaseError as e:
-                # cx_Oracle raises a cx_Oracle.DatabaseError exception
-                # with the following attributes and values:
-                #  code = 2091
-                #  message = 'ORA-02091: transaction rolled back
-                #            'ORA-02291: integrity constraint (TEST_DJANGOTEST.SYS
-                #               _C00102056) violated - parent key not found'
-                # We convert that particular case to our IntegrityError exception
-                x = e.args[0]
-                if hasattr(x, 'code') and hasattr(x, 'message') \
-                   and x.code == 2091 and 'ORA-02291' in x.message:
-                    raise utils.IntegrityError(*tuple(e.args))
-                raise
 
     # Oracle doesn't support releasing savepoints. But we fake them when query
     # logging is enabled to keep query counts consistent with other backends.
@@ -298,16 +307,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             return True
 
     @cached_property
-    def oracle_full_version(self):
-        with self.temporary_connection():
-            return self.connection.version
-
-    @cached_property
     def oracle_version(self):
-        try:
-            return int(self.oracle_full_version.split('.')[0])
-        except ValueError:
-            return None
+        with self.temporary_connection():
+            return tuple(int(x) for x in self.connection.version.split('.'))
 
 
 class OracleParam:
@@ -340,7 +342,7 @@ class OracleParam:
         else:
             # To transmit to the database, we need Unicode if supported
             # To get size right, we must consider bytes.
-            self.force_bytes = force_text(param, cursor.charset, strings_only)
+            self.force_bytes = force_str(param, cursor.charset, strings_only)
             if isinstance(self.force_bytes, str):
                 # We could optimize by only converting up to 4000 bytes here
                 string_size = len(force_bytes(param, cursor.charset, strings_only))
@@ -350,6 +352,8 @@ class OracleParam:
         elif string_size > 4000:
             # Mark any string param greater than 4000 characters as a CLOB.
             self.input_size = Database.CLOB
+        elif isinstance(param, datetime.datetime):
+            self.input_size = Database.TIMESTAMP
         else:
             self.input_size = None
 
@@ -383,21 +387,24 @@ class FormatStylePlaceholderCursor:
     Django uses "format" (e.g. '%s') style placeholders, but Oracle uses ":var"
     style. This fixes it -- but note that if you want to use a literal "%s" in
     a query, you'll need to use "%%s".
-
-    We also do automatic conversion between Unicode on the Python side and
-    UTF-8 -- for talking to Oracle -- in here.
     """
     charset = 'utf-8'
 
     def __init__(self, connection):
         self.cursor = connection.cursor()
         self.cursor.outputtypehandler = self._output_type_handler
-        # The default for cx_Oracle < 5.3 is 50.
-        self.cursor.arraysize = 100
 
     @staticmethod
     def _output_number_converter(value):
         return decimal.Decimal(value) if '.' in value else int(value)
+
+    @staticmethod
+    def _get_decimal_converter(precision, scale):
+        if scale == 0:
+            return int
+        context = decimal.Context(prec=precision)
+        quantize_value = decimal.Decimal(1).scaleb(-scale)
+        return lambda v: decimal.Decimal(v).quantize(quantize_value, context=context)
 
     @staticmethod
     def _output_type_handler(cursor, name, defaultType, length, precision, scale):
@@ -419,7 +426,7 @@ class FormatStylePlaceholderCursor:
             elif precision > 0:
                 # NUMBER(p,s) column: decimal-precision fixed point.
                 # This comes from IntegerField and DecimalField columns.
-                outconverter = int if scale == 0 else decimal.Decimal
+                outconverter = FormatStylePlaceholderCursor._get_decimal_converter(precision, scale)
             else:
                 # No type information. This normally comes from a
                 # mathematical expression in the SELECT list. Guess int
@@ -446,7 +453,8 @@ class FormatStylePlaceholderCursor:
                 for k, value in params.items():
                     if value.input_size:
                         sizes[k] = value.input_size
-            self.setinputsizes(**sizes)
+            if sizes:
+                self.setinputsizes(**sizes)
         else:
             # It's not a list of dicts; it's a list of sequences
             sizes = [None] * len(params_list[0])
@@ -454,7 +462,8 @@ class FormatStylePlaceholderCursor:
                 for i, value in enumerate(params):
                     if value.input_size:
                         sizes[i] = value.input_size
-            self.setinputsizes(*sizes)
+            if sizes:
+                self.setinputsizes(*sizes)
 
     def _param_generator(self, params):
         # Try dict handling; if that fails, treat as sequence
@@ -476,7 +485,7 @@ class FormatStylePlaceholderCursor:
             # Handle params as dict
             args = {k: ":%s" % k for k in params}
             query = query % args
-        elif unify_by_values and len(params) > 0:
+        elif unify_by_values and params:
             # Handle params as a dict with unified query parameters by their
             # values. It can be used only in single query execute() because
             # executemany() shares the formatted query with each of the params
@@ -497,7 +506,8 @@ class FormatStylePlaceholderCursor:
     def execute(self, query, params=None):
         query, params = self._fix_for_params(query, params, unify_by_values=True)
         self._guess_input_sizes([params])
-        return self.cursor.execute(query, self._param_generator(params))
+        with wrap_oracle_errors():
+            return self.cursor.execute(query, self._param_generator(params))
 
     def executemany(self, query, params=None):
         if not params:
@@ -510,15 +520,8 @@ class FormatStylePlaceholderCursor:
         # more than once, we can't make it lazy by using a generator
         formatted = [firstparams] + [self._format_params(p) for p in params_iter]
         self._guess_input_sizes(formatted)
-        return self.cursor.executemany(query, [self._param_generator(p) for p in formatted])
-
-    def fetchmany(self, size=None):
-        if size is None:
-            size = self.arraysize
-        return tuple(self.cursor.fetchmany(size))
-
-    def fetchall(self):
-        return tuple(self.cursor.fetchall())
+        with wrap_oracle_errors():
+            return self.cursor.executemany(query, [self._param_generator(p) for p in formatted])
 
     def close(self):
         try:

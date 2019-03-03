@@ -12,6 +12,7 @@ from django.contrib.auth.forms import (
 )
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect, QueryDict
 from django.shortcuts import resolve_url
 from django.urls import reverse_lazy
@@ -31,9 +32,7 @@ class SuccessURLAllowedHostsMixin:
     success_url_allowed_hosts = set()
 
     def get_success_url_allowed_hosts(self):
-        allowed_hosts = {self.request.get_host()}
-        allowed_hosts.update(self.success_url_allowed_hosts)
-        return allowed_hosts
+        return {self.request.get_host(), *self.success_url_allowed_hosts}
 
 
 class LoginView(SuccessURLAllowedHostsMixin, FormView):
@@ -98,9 +97,8 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
             self.redirect_field_name: self.get_redirect_url(),
             'site': current_site,
             'site_name': current_site.name,
+            **(self.extra_context or {})
         })
-        if self.extra_context is not None:
-            context.update(self.extra_context)
         return context
 
 
@@ -158,9 +156,8 @@ class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
             'site': current_site,
             'site_name': current_site.name,
             'title': _('Logged out'),
+            **(self.extra_context or {})
         })
-        if self.extra_context is not None:
-            context.update(self.extra_context)
         return context
 
 
@@ -168,9 +165,7 @@ def logout_then_login(request, login_url=None):
     """
     Log out the user if they are logged in. Then redirect to the login page.
     """
-    if not login_url:
-        login_url = settings.LOGIN_URL
-    login_url = resolve_url(login_url)
+    login_url = resolve_url(login_url or settings.LOGIN_URL)
     return LogoutView.as_view(next_page=login_url)(request)
 
 
@@ -201,9 +196,10 @@ class PasswordContextMixin:
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = self.title
-        if self.extra_context is not None:
-            context.update(self.extra_context)
+        context.update({
+            'title': self.title,
+            **(self.extra_context or {})
+        })
         return context
 
 
@@ -290,7 +286,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
             # urlsafe_base64_decode() decodes to bytestring
             uid = urlsafe_base64_decode(uidb64).decode()
             user = UserModel._default_manager.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
+        except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist, ValidationError):
             user = None
         return user
 

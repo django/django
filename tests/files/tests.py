@@ -206,6 +206,16 @@ class ContentFileTestCase(unittest.TestCase):
         with file.open() as f:
             self.assertEqual(f.read(), b'content')
 
+    def test_size_changing_after_writing(self):
+        """ContentFile.size changes after a write()."""
+        f = ContentFile('')
+        self.assertEqual(f.size, 0)
+        f.write('Test ')
+        f.write('string')
+        self.assertEqual(f.size, 11)
+        with f.open() as fh:
+            self.assertEqual(fh.read(), 'Test string')
+
 
 class InMemoryUploadedFileTests(unittest.TestCase):
     def test_open_resets_file_to_start_and_returns_context_manager(self):
@@ -244,7 +254,7 @@ class DimensionClosingBug(unittest.TestCase):
         """
         # We need to inject a modified open() builtin into the images module
         # that checks if the file was closed properly if the function is
-        # called with a filename instead of an file object.
+        # called with a filename instead of a file object.
         # get_image_dimensions will call our catching_open instead of the
         # regular builtin one.
 
@@ -333,14 +343,21 @@ class GetImageDimensionsTests(unittest.TestCase):
                 size = images.get_image_dimensions(fh)
                 self.assertEqual(size, (None, None))
 
+    def test_webp(self):
+        img_path = os.path.join(os.path.dirname(__file__), 'test.webp')
+        with open(img_path, 'rb') as fh:
+            size = images.get_image_dimensions(fh)
+        self.assertEqual(size, (540, 405))
+
 
 class FileMoveSafeTests(unittest.TestCase):
     def test_file_move_overwrite(self):
         handle_a, self.file_a = tempfile.mkstemp()
         handle_b, self.file_b = tempfile.mkstemp()
 
-        # file_move_safe should raise an IOError exception if destination file exists and allow_overwrite is False
-        with self.assertRaises(IOError):
+        # file_move_safe() raises OSError if the destination file exists and
+        # allow_overwrite is False.
+        with self.assertRaises(FileExistsError):
             file_move_safe(self.file_a, self.file_b, allow_overwrite=False)
 
         # should allow it and continue on if allow_overwrite is True

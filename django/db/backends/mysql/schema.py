@@ -16,7 +16,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_rename_column = "ALTER TABLE %(table)s CHANGE %(old_column)s %(new_column)s %(type)s"
 
     sql_delete_unique = "ALTER TABLE %(table)s DROP INDEX %(name)s"
-
+    sql_create_column_inline_fk = (
+        ', ADD CONSTRAINT %(name)s FOREIGN KEY (%(column)s) '
+        'REFERENCES %(to_table)s(%(to_column)s)'
+    )
     sql_delete_fk = "ALTER TABLE %(table)s DROP FOREIGN KEY %(name)s"
 
     sql_delete_index = "DROP INDEX %(name)s ON %(table)s"
@@ -24,10 +27,14 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_create_pk = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s PRIMARY KEY (%(columns)s)"
     sql_delete_pk = "ALTER TABLE %(table)s DROP PRIMARY KEY"
 
+    sql_create_index = 'CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s'
+
     def quote_value(self, value):
-        # Inner import to allow module to fail to load gracefully
-        import MySQLdb.converters
-        return MySQLdb.escape(value, MySQLdb.converters.conversions)
+        self.connection.ensure_connection()
+        quoted = self.connection.connection.escape(value, self.connection.connection.encoders)
+        if isinstance(value, str):
+            quoted = quoted.decode()
+        return quoted
 
     def _is_limited_data_type(self, field):
         db_type = field.db_type(self.connection)
@@ -61,9 +68,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 field.get_internal_type() == 'ForeignKey' and
                 field.db_constraint):
             return False
-        if self._is_limited_data_type(field):
-            return False
-        return create_index
+        return not self._is_limited_data_type(field) and create_index
 
     def _delete_composed_index(self, model, fields, *args):
         """

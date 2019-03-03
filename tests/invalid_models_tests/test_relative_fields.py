@@ -1,7 +1,9 @@
+from unittest import mock
+
 from django.core.checks import Error, Warning as DjangoWarning
-from django.db import models
+from django.db import connection, models
 from django.db.models.fields.related import ForeignObject
-from django.test.testcases import SimpleTestCase, skipIfDBFeature
+from django.test.testcases import SimpleTestCase
 from django.test.utils import isolate_apps, override_settings
 
 
@@ -501,13 +503,14 @@ class RelativeFieldTests(SimpleTestCase):
             ),
         ])
 
-    @skipIfDBFeature('interprets_empty_strings_as_nulls')
     def test_nullable_primary_key(self):
         class Model(models.Model):
             field = models.IntegerField(primary_key=True, null=True)
 
         field = Model._meta.get_field('field')
-        self.assertEqual(field.check(), [
+        with mock.patch.object(connection.features, 'interprets_empty_strings_as_nulls', False):
+            results = field.check()
+        self.assertEqual(results, [
             Error(
                 'Primary keys must not have null=True.',
                 hint='Set null=False on the field, or remove primary_key=True argument.',

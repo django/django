@@ -1,18 +1,18 @@
-from django.conf.urls import url
+from django.urls import path, re_path
 
 from . import views
 
 urlpatterns = [
-    url(r'^upload/$', views.file_upload_view),
-    url(r'^verify/$', views.file_upload_view_verify),
-    url(r'^unicode_name/$', views.file_upload_unicode_name),
-    url(r'^echo/$', views.file_upload_echo),
-    url(r'^echo_content_type_extra/$', views.file_upload_content_type_extra),
-    url(r'^echo_content/$', views.file_upload_echo_content),
-    url(r'^quota/$', views.file_upload_quota),
-    url(r'^quota/broken/$', views.file_upload_quota_broken),
-    url(r'^getlist_count/$', views.file_upload_getlist_count),
-    url(r'^upload_errors/$', views.file_upload_errors),
-    url(r'^filename_case/$', views.file_upload_filename_case_view),
-    url(r'^fd_closing/(?P<access>t|f)/$', views.file_upload_fd_closing),
+    path('upload/', views.file_upload_view),
+    path('verify/', views.file_upload_view_verify),
+    path('unicode_name/', views.file_upload_unicode_name),
+    path('echo/', views.file_upload_echo),
+    path('echo_content_type_extra/', views.file_upload_content_type_extra),
+    path('echo_content/', views.file_upload_echo_content),
+    path('quota/', views.file_upload_quota),
+    path('quota/broken/', views.file_upload_quota_broken),
+    path('getlist_count/', views.file_upload_getlist_count),
+    path('upload_errors/', views.file_upload_errors),
+    path('filename_case/', views.file_upload_filename_case_view),
+    re_path(r'^fd_closing/(?P<access>t|f)/$', views.file_upload_fd_closing),
 ]

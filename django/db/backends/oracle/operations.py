@@ -1,12 +1,15 @@
 import datetime
 import re
 import uuid
+from functools import lru_cache
 
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import strip_quotes, truncate_name
+from django.db.utils import DatabaseError
 from django.utils import timezone
 from django.utils.encoding import force_bytes
+from django.utils.functional import cached_property
 
 from .base import Database
 from .utils import BulkInsertMapper, InsertIdVar, Oracle_datetime
@@ -21,7 +24,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         'PositiveSmallIntegerField': (0, 99999999999),
         'PositiveIntegerField': (0, 99999999999),
     }
-    set_operators = dict(BaseDatabaseOperations.set_operators, difference='MINUS')
+    set_operators = {**BaseDatabaseOperations.set_operators, 'difference': 'MINUS'}
 
     # TODO: colorize this SQL code with style.SQL_KEYWORD(), etc.
     _sequence_reset_sql = """
@@ -50,13 +53,14 @@ END;
 
     # Oracle doesn't support string without precision; use the max string size.
     cast_char_field_without_max_length = 'NVARCHAR2(2000)'
+    cast_data_types = {
+        'AutoField': 'NUMBER(11)',
+        'BigAutoField': 'NUMBER(19)',
+        'TextField': cast_char_field_without_max_length,
+    }
 
     def cache_key_culling_sql(self):
-        return """
-            SELECT cache_key
-              FROM (SELECT cache_key, rank() OVER (ORDER BY cache_key) AS rank FROM %s)
-             WHERE rank = %%s + 1
-        """
+        return 'SELECT cache_key FROM %s ORDER BY cache_key OFFSET %%s ROWS FETCH FIRST 1 ROWS ONLY'
 
     def date_extract_sql(self, lookup_type, field_name):
         if lookup_type == 'week_day':
@@ -67,22 +71,20 @@ END;
             return "TO_CHAR(%s, 'IW')" % field_name
         elif lookup_type == 'quarter':
             return "TO_CHAR(%s, 'Q')" % field_name
+        elif lookup_type == 'iso_year':
+            return "TO_CHAR(%s, 'IYYY')" % field_name
         else:
-            # https://docs.oracle.com/database/121/SQLRF/functions067.htm#SQLRF00639
+            # https://docs.oracle.com/en/database/oracle/oracle-database/18/sqlrf/EXTRACT-datetime.html
             return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
 
-    def date_interval_sql(self, timedelta):
-        """
-        NUMTODSINTERVAL converts number to INTERVAL DAY TO SECOND literal.
-        """
-        return "NUMTODSINTERVAL(%06f, 'SECOND')" % timedelta.total_seconds()
-
     def date_trunc_sql(self, lookup_type, field_name):
-        # https://docs.oracle.com/database/121/SQLRF/functions271.htm#SQLRF52058
+        # https://docs.oracle.com/en/database/oracle/oracle-database/18/sqlrf/ROUND-and-TRUNC-Date-Functions.html
         if lookup_type in ('year', 'month'):
             return "TRUNC(%s, '%s')" % (field_name, lookup_type.upper())
         elif lookup_type == 'quarter':
             return "TRUNC(%s, 'Q')" % field_name
+        elif lookup_type == 'week':
+            return "TRUNC(%s, 'IW')" % field_name
         else:
             return "TRUNC(%s)" % field_name
 
@@ -116,11 +118,13 @@ END;
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
         field_name = self._convert_field_to_tz(field_name, tzname)
-        # https://docs.oracle.com/database/121/SQLRF/functions271.htm#SQLRF52058
+        # https://docs.oracle.com/en/database/oracle/oracle-database/18/sqlrf/ROUND-and-TRUNC-Date-Functions.html
         if lookup_type in ('year', 'month'):
             sql = "TRUNC(%s, '%s')" % (field_name, lookup_type.upper())
         elif lookup_type == 'quarter':
             sql = "TRUNC(%s, 'Q')" % field_name
+        elif lookup_type == 'week':
+            sql = "TRUNC(%s, 'IW')" % field_name
         elif lookup_type == 'day':
             sql = "TRUNC(%s)" % field_name
         elif lookup_type == 'hour':
@@ -153,7 +157,8 @@ END;
         elif internal_type in ['BooleanField', 'NullBooleanField']:
             converters.append(self.convert_booleanfield_value)
         elif internal_type == 'DateTimeField':
-            converters.append(self.convert_datetimefield_value)
+            if settings.USE_TZ:
+                converters.append(self.convert_datetimefield_value)
         elif internal_type == 'DateField':
             converters.append(self.convert_datefield_value)
         elif internal_type == 'TimeField':
@@ -192,8 +197,7 @@ END;
 
     def convert_datetimefield_value(self, value, expression, connection):
         if value is not None:
-            if settings.USE_TZ:
-                value = timezone.make_aware(value, self.connection.timezone)
+            value = timezone.make_aware(value, self.connection.timezone)
         return value
 
     def convert_datefield_value(self, value, expression, connection):
@@ -223,7 +227,16 @@ END;
         return " DEFERRABLE INITIALLY DEFERRED"
 
     def fetch_returned_insert_id(self, cursor):
-        return int(cursor._insert_id_var.getvalue())
+        value = cursor._insert_id_var.getvalue()
+        if value is None or value == []:
+            # cx_Oracle < 6.3 returns None, >= 6.3 returns empty list.
+            raise DatabaseError(
+                'The database did not return a new row id. Probably "ORA-1403: '
+                'no data found" was raised internally but was hidden by the '
+                'Oracle OCI library (see https://code.djangoproject.com/ticket/28859).'
+            )
+        # cx_Oracle < 7 returns value, >= 7 returns list with single value.
+        return value[0] if isinstance(value, list) else value
 
     def field_cast_sql(self, db_type, internal_type):
         if db_type and db_type.endswith('LOB'):
@@ -245,7 +258,7 @@ END;
         # https://cx-oracle.readthedocs.io/en/latest/cursor.html#Cursor.statement
         # The DB API definition does not define this attribute.
         statement = cursor.statement
-        # Unlike Psycopg's `query` and MySQLdb`'s `_last_executed`, CxOracle's
+        # Unlike Psycopg's `query` and MySQLdb`'s `_executed`, CxOracle's
         # `statement` doesn't contain the query parameters. refs #20010.
         return super().last_executed_query(cursor, statement, params)
 
@@ -302,13 +315,7 @@ END;
     def return_insert_id(self):
         return "RETURNING %s INTO %%s", (InsertIdVar(),)
 
-    def savepoint_create_sql(self, sid):
-        return "SAVEPOINT " + self.quote_name(sid)
-
-    def savepoint_rollback_sql(self, sid):
-        return "ROLLBACK TO SAVEPOINT " + self.quote_name(sid)
-
-    def _foreign_key_constraints(self, table_name, recursive=False):
+    def __foreign_key_constraints(self, table_name, recursive):
         with self.connection.cursor() as cursor:
             if recursive:
                 cursor.execute("""
@@ -340,6 +347,12 @@ END;
                         AND cons.table_name = UPPER(%s)
                 """, (table_name,))
             return cursor.fetchall()
+
+    @cached_property
+    def _foreign_key_constraints(self):
+        # 512 is large enough to fit the ~330 tables (as of this writing) in
+        # Django's test suite.
+        return lru_cache(maxsize=512)(self.__foreign_key_constraints)
 
     def sql_flush(self, style, tables, sequences, allow_cascade=False):
         if tables:
@@ -559,7 +572,7 @@ END;
         if internal_type == 'DateField':
             lhs_sql, lhs_params = lhs
             rhs_sql, rhs_params = rhs
-            return "NUMTODSINTERVAL(%s - %s, 'DAY')" % (lhs_sql, rhs_sql), lhs_params + rhs_params
+            return "NUMTODSINTERVAL(TO_NUMBER(%s - %s), 'DAY')" % (lhs_sql, rhs_sql), lhs_params + rhs_params
         return super().subtract_temporals(internal_type, lhs, rhs)
 
     def bulk_batch_size(self, fields, objs):

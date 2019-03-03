@@ -25,21 +25,22 @@ many projects they are typically the most commonly used views.
 
     **Method Flowchart**
 
-    1. :meth:`~django.views.generic.base.View.dispatch()`
-    2. :meth:`~django.views.generic.base.View.http_method_not_allowed()`
-    3. :meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names()`
-    4. :meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field()`
-    5. :meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset()`
-    6. :meth:`~django.views.generic.detail.SingleObjectMixin.get_object()`
-    7. :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_object_name()`
-    8. :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_data()`
-    9. ``get()``
-    10. :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response()`
+    #. :meth:`~django.views.generic.base.View.setup()`
+    #. :meth:`~django.views.generic.base.View.dispatch()`
+    #. :meth:`~django.views.generic.base.View.http_method_not_allowed()`
+    #. :meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names()`
+    #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field()`
+    #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset()`
+    #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_object()`
+    #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_object_name()`
+    #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_data()`
+    #. ``get()``
+    #. :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response()`
 
     **Example myapp/views.py**::
 
-        from django.views.generic.detail import DetailView
         from django.utils import timezone
+        from django.views.generic.detail import DetailView
 
         from articles.models import Article
 
@@ -95,26 +96,27 @@ many projects they are typically the most commonly used views.
 
     **Method Flowchart**
 
-    1. :meth:`~django.views.generic.base.View.dispatch()`
-    2. :meth:`~django.views.generic.base.View.http_method_not_allowed()`
-    3. :meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names()`
-    4. :meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset()`
-    5. :meth:`~django.views.generic.list.MultipleObjectMixin.get_context_object_name()`
-    6. :meth:`~django.views.generic.list.MultipleObjectMixin.get_context_data()`
-    7. ``get()``
-    8. :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response()`
-
+    #. :meth:`~django.views.generic.base.View.setup()`
+    #. :meth:`~django.views.generic.base.View.dispatch()`
+    #. :meth:`~django.views.generic.base.View.http_method_not_allowed()`
+    #. :meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names()`
+    #. :meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset()`
+    #. :meth:`~django.views.generic.list.MultipleObjectMixin.get_context_object_name()`
+    #. :meth:`~django.views.generic.list.MultipleObjectMixin.get_context_data()`
+    #. ``get()``
+    #. :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response()`
 
     **Example views.py**::
 
-        from django.views.generic.list import ListView
         from django.utils import timezone
+        from django.views.generic.list import ListView
 
         from articles.models import Article
 
         class ArticleListView(ListView):
 
             model = Article
+            paginate_by = 100  # if pagination is desired
 
             def get_context_data(self, **kwargs):
                 context = super().get_context_data(**kwargs)
@@ -143,6 +145,10 @@ many projects they are typically the most commonly used views.
             <li>No articles yet.</li>
         {% endfor %}
         </ul>
+
+    If you're using pagination, you can adapt the :ref:`example template from
+    the pagination docs <using-paginator-in-view>`. Change instances of
+    ``contacts`` in that example template to ``page_obj``.
 
 .. class:: django.views.generic.list.BaseListView
 

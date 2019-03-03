@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-06-12 13:17+0000\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
+"PO-Revision-Date: 2017-09-23 00:02+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Upper Sorbian (http://www.transifex.com/django/django/"
 "language/hsb/)\n"
@@ -103,6 +103,21 @@ msgstr ""
 "Sće akciju wubrał, a njejsće žane změny na jednotliwych polach přewjedł. "
 "Pytajće najskerje za tłóčatkom „Pósłać“ město tłóčatka „Składować“."
 
+msgid "Now"
+msgstr "Nětko"
+
+msgid "Midnight"
+msgstr "Połnóc"
+
+msgid "6 a.m."
+msgstr "6:00 hodź. dopołdnja"
+
+msgid "Noon"
+msgstr "připołdnjo"
+
+msgid "6 p.m."
+msgstr "6 hodź. popołdnju"
+
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
@@ -119,26 +134,11 @@ msgstr[1] "Kedźbu: Waš čas je wo %s hodźinje za serwerowym časom."
 msgstr[2] "Kedźbu: Waš čas je wo %s hodźiny za serwerowym časom."
 msgstr[3] "Kedźbu: Waš čas je wo %s hodźin za serwerowym časom."
 
-msgid "Now"
-msgstr "Nětko"
-
 msgid "Choose a Time"
 msgstr "Wubjerće čas"
 
 msgid "Choose a time"
 msgstr "Wubjerće čas"
-
-msgid "Midnight"
-msgstr "Połnóc"
-
-msgid "6 a.m."
-msgstr "6:00 hodź. dopołdnja"
-
-msgid "Noon"
-msgstr "připołdnjo"
-
-msgid "6 p.m."
-msgstr "6 hodź. popołdnju"
 
 msgid "Cancel"
 msgstr "Přetorhnyć"

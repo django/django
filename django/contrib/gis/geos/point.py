@@ -40,6 +40,12 @@ class Point(GEOSGeometry):
         #  createPoint factory.
         super().__init__(point, srid=srid)
 
+    def _to_pickle_wkb(self):
+        return None if self.empty else super()._to_pickle_wkb()
+
+    def _from_pickle_wkb(self, wkb):
+        return self._create_empty() if wkb is None else super()._from_pickle_wkb(wkb)
+
     def _ogr_ptr(self):
         return gdal.geometries.Point._create_empty() if self.empty else super()._ogr_ptr()
 

@@ -122,7 +122,7 @@ class UpdateQuery(Query):
                     'Cannot update model field %r (only non-relations and '
                     'foreign keys permitted).' % field
                 )
-            if model is not self.get_meta().model:
+            if model is not self.get_meta().concrete_model:
                 self.add_related_update(model, field, val)
                 continue
             values_seq.append((field, model, val))
@@ -169,10 +169,11 @@ class UpdateQuery(Query):
 class InsertQuery(Query):
     compiler = 'SQLInsertCompiler'
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, ignore_conflicts=False, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields = []
         self.objs = []
+        self.ignore_conflicts = ignore_conflicts
 
     def insert_values(self, fields, objs, raw=False):
         self.fields = fields

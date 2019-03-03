@@ -10,6 +10,15 @@ def regular(request):
     return HttpResponse(b"regular content")
 
 
+def no_response(request):
+    pass
+
+
+class NoResponse:
+    def __call__(self, request):
+        pass
+
+
 def streaming(request):
     return StreamingHttpResponse([b"streaming", b" ", b"content"])
 

@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.core.checks.messages import Warning
+from django.core.checks.messages import Error, Warning
 from django.core.checks.urls import (
     E006, check_url_config, check_url_namespaces_unique, check_url_settings,
     get_warning_for_invalid_pattern,
@@ -20,7 +20,7 @@ class CheckUrlConfigTests(SimpleTestCase):
 
     @override_settings(ROOT_URLCONF='check_framework.urls.warning_in_include')
     def test_check_resolver_recursive(self):
-        # The resolver is checked recursively (examining url()s in include()).
+        # The resolver is checked recursively (examining URL patterns in include()).
         result = check_url_config(None)
         self.assertEqual(len(result), 1)
         warning = result[0]
@@ -132,6 +132,58 @@ class CheckUrlConfigTests(SimpleTestCase):
     @override_settings(ROOT_URLCONF='check_framework.urls.unique_namespaces')
     def test_check_unique_namespaces(self):
         result = check_url_namespaces_unique(None)
+        self.assertEqual(result, [])
+
+
+class UpdatedToPathTests(SimpleTestCase):
+
+    @override_settings(ROOT_URLCONF='check_framework.urls.path_compatibility.contains_re_named_group')
+    def test_contains_re_named_group(self):
+        result = check_url_config(None)
+        self.assertEqual(len(result), 1)
+        warning = result[0]
+        self.assertEqual(warning.id, '2_0.W001')
+        expected_msg = "Your URL pattern '(?P<named-group>\\d+)' has a route"
+        self.assertIn(expected_msg, warning.msg)
+
+    @override_settings(ROOT_URLCONF='check_framework.urls.path_compatibility.beginning_with_caret')
+    def test_beginning_with_caret(self):
+        result = check_url_config(None)
+        self.assertEqual(len(result), 1)
+        warning = result[0]
+        self.assertEqual(warning.id, '2_0.W001')
+        expected_msg = "Your URL pattern '^beginning-with-caret' has a route"
+        self.assertIn(expected_msg, warning.msg)
+
+    @override_settings(ROOT_URLCONF='check_framework.urls.path_compatibility.ending_with_dollar')
+    def test_ending_with_dollar(self):
+        result = check_url_config(None)
+        self.assertEqual(len(result), 1)
+        warning = result[0]
+        self.assertEqual(warning.id, '2_0.W001')
+        expected_msg = "Your URL pattern 'ending-with-dollar$' has a route"
+        self.assertIn(expected_msg, warning.msg)
+
+
+class CheckCustomErrorHandlersTests(SimpleTestCase):
+
+    @override_settings(ROOT_URLCONF='check_framework.urls.bad_error_handlers')
+    def test_bad_handlers(self):
+        result = check_url_config(None)
+        self.assertEqual(len(result), 4)
+        for code, num_params, error in zip([400, 403, 404, 500], [2, 2, 2, 1], result):
+            with self.subTest('handler{}'.format(code)):
+                self.assertEqual(error, Error(
+                    "The custom handler{} view "
+                    "'check_framework.urls.bad_error_handlers.bad_handler' "
+                    "does not take the correct number of arguments (request{})."
+                    .format(code, ', exception' if num_params == 2 else ''),
+                    id='urls.E007',
+                ))
+
+    @override_settings(ROOT_URLCONF='check_framework.urls.good_error_handlers')
+    def test_good_handlers(self):
+        result = check_url_config(None)
         self.assertEqual(result, [])
 
 

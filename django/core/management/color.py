@@ -19,9 +19,7 @@ def supports_color():
 
     # isatty is not always implemented, #6223.
     is_a_tty = hasattr(sys.stdout, 'isatty') and sys.stdout.isatty()
-    if not supported_platform or not is_a_tty:
-        return False
-    return True
+    return supported_platform and is_a_tty
 
 
 class Style:
@@ -66,10 +64,10 @@ def no_style():
     return make_style('nocolor')
 
 
-def color_style():
+def color_style(force_color=False):
     """
     Return a Style object from the Django color scheme.
     """
-    if not supports_color():
+    if not force_color and not supports_color():
         return no_style()
     return make_style(os.environ.get('DJANGO_COLORS', ''))

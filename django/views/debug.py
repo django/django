@@ -11,7 +11,7 @@ from django.template.defaultfilters import pprint
 from django.urls import Resolver404, resolve
 from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.module_loading import import_string
 from django.utils.version import get_docs_version
 
@@ -164,7 +164,7 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
                 cleansed = request.POST.copy()
                 if sensitive_post_parameters == '__ALL__':
                     # Cleanse all parameters.
-                    for k, v in cleansed.items():
+                    for k in cleansed:
                         cleansed[k] = CLEANSED_SUBSTITUTE
                     return cleansed
                 else:
@@ -213,7 +213,7 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
         if self.is_active(request) and sensitive_variables:
             if sensitive_variables == '__ALL__':
                 # Cleanse all variables
-                for name, value in tb_frame.f_locals.items():
+                for name in tb_frame.f_locals:
                     cleansed[name] = CLEANSED_SUBSTITUTE
             else:
                 # Cleanse specified variables
@@ -269,7 +269,7 @@ class ExceptionReporter:
                     v = pprint(v)
                     # Trim large blobs of data
                     if len(v) > 4096:
-                        v = '%s... <trimmed %d bytes string>' % (v[0:4096], len(v))
+                        v = '%s… <trimmed %d bytes string>' % (v[0:4096], len(v))
                     frame_vars.append((k, v))
                 frame['vars'] = frame_vars
             frames[i] = frame
@@ -280,7 +280,7 @@ class ExceptionReporter:
             end = getattr(self.exc_value, 'end', None)
             if start is not None and end is not None:
                 unicode_str = self.exc_value.args[1]
-                unicode_hint = force_text(
+                unicode_hint = force_str(
                     unicode_str[max(start - 5, 0):min(end + 5, len(unicode_str))],
                     'ascii', errors='replace'
                 )
@@ -346,7 +346,7 @@ class ExceptionReporter:
         Return (pre_context_lineno, pre_context, context_line, post_context).
         """
         source = None
-        if loader is not None and hasattr(loader, "get_source"):
+        if hasattr(loader, 'get_source'):
             try:
                 source = loader.get_source(module_name)
             except ImportError:
@@ -357,7 +357,7 @@ class ExceptionReporter:
             try:
                 with open(filename, 'rb') as fp:
                     source = fp.read().splitlines()
-            except (OSError, IOError):
+            except OSError:
                 pass
         if source is None:
             return None, [], None, []
@@ -369,7 +369,7 @@ class ExceptionReporter:
             encoding = 'ascii'
             for line in source[:2]:
                 # File coding may be specified. Match pattern from PEP-263
-                # (http://www.python.org/dev/peps/pep-0263/)
+                # (https://www.python.org/dev/peps/pep-0263/)
                 match = re.search(br'coding[:=]\s*([-\w.]+)', line)
                 if match:
                     encoding = match.group(1).decode('ascii')
@@ -397,6 +397,9 @@ class ExceptionReporter:
         while exc_value:
             exceptions.append(exc_value)
             exc_value = explicit_or_implicit_cause(exc_value)
+            if exc_value in exceptions:
+                # Avoid infinite loop if there's a cyclic reference (#29393).
+                break
 
         frames = []
         # No exceptions were supplied to ExceptionReporter

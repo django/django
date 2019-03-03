@@ -4,15 +4,15 @@
 # Dariusz Paluch <taxido0@gmail.com>, 2015
 # Janusz Harkot <jh@blueice.pl>, 2015
 # Piotr Jakimiak <legolass71@gmail.com>, 2015
-# m_aciek <maciej.olko@gmail.com>, 2016-2017
+# m_aciek <maciej.olko@gmail.com>, 2016-2018
 # m_aciek <maciej.olko@gmail.com>, 2015
 # Tomasz Kajtoch <tomekkaj@tomekkaj.pl>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-20 11:07+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-19 00:04+0000\n"
 "Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -20,15 +20,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pl\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n"
-"%100<12 || n%100>=14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n"
+"%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n"
 "%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
 
 msgid "PostgreSQL extensions"
 msgstr "Rozszerzenia PostgreSQL"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
-msgstr "Element %(nth)s w tablicy nie przeszedł walidacji:"
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "%(nth)s. element w tablicy nie przeszedł walidacji:"
 
 msgid "Nested arrays must have the same length."
 msgstr "Zagnieżdżone tablice muszą mieć tę samą długość."

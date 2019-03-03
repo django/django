@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2017
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2018
 # M Asep Indrayana <me@drayanaindra.com>, 2015
 # oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2016
 # rodin <romihardiyanto@gmail.com>, 2016
@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-03-05 13:13+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-06-18 23:31+0000\n"
 "Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
@@ -25,8 +25,8 @@ msgid "PostgreSQL extensions"
 msgstr "Ekstensi PostgreSQL"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
-msgstr "Item %(nth)s di dalam array tidak divalidasi:"
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "Barang %(nth)s dalam larik tidak disahkan:"
 
 msgid "Nested arrays must have the same length."
 msgstr "Array bersaran harus mempunyai panjang yang sama."

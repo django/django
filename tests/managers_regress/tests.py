@@ -1,6 +1,6 @@
 from django.db import models
 from django.template import Context, Template
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import isolate_apps
 
 from .models import (
@@ -65,7 +65,7 @@ class ManagersRegressionTests(TestCase):
             AbstractBase3.objects.all()
 
     def test_custom_abstract_manager(self):
-        # Accessing the manager on an abstract model with an custom
+        # Accessing the manager on an abstract model with a custom
         # manager should raise an attribute error with an appropriate
         # message.
         msg = "Manager isn't available; AbstractBase2 is abstract"
@@ -160,7 +160,7 @@ class ManagersRegressionTests(TestCase):
 
 
 @isolate_apps('managers_regress')
-class TestManagerInheritance(TestCase):
+class TestManagerInheritance(SimpleTestCase):
     def test_implicit_inheritance(self):
         class CustomManager(models.Manager):
             pass

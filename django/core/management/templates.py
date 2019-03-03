@@ -2,10 +2,8 @@ import cgi
 import mimetypes
 import os
 import posixpath
-import re
 import shutil
 import stat
-import sys
 import tempfile
 from importlib import import_module
 from os import path
@@ -18,9 +16,6 @@ from django.core.management.utils import handle_extensions
 from django.template import Context, Engine
 from django.utils import archive
 from django.utils.version import get_docs_version
-
-_drive_re = re.compile('^([a-z]):', re.I)
-_url_drive_re = re.compile('^([a-z])[:|]', re.I)
 
 
 class TemplateCommand(BaseCommand):
@@ -37,9 +32,6 @@ class TemplateCommand(BaseCommand):
     requires_system_checks = False
     # The supported URL schemes
     url_schemes = ['http', 'https', 'ftp']
-    # Can't perform any active locale changes during this command, because
-    # setting might not be available at all.
-    leave_locale_alone = True
     # Rewrite the following suffixes when determining the target filename.
     rewrite_template_suffixes = (
         # Allow shipping invalid .py files without byte-compilation.
@@ -60,7 +52,7 @@ class TemplateCommand(BaseCommand):
         parser.add_argument(
             '--name', '-n', dest='files',
             action='append', default=[],
-            help='The file name(s) to render. Separate multiple extensions '
+            help='The file name(s) to render. Separate multiple file names '
                  'with commas, or use -n multiple times.'
         )
 
@@ -104,13 +96,14 @@ class TemplateCommand(BaseCommand):
         camel_case_name = 'camel_case_%s_name' % app_or_project
         camel_case_value = ''.join(x for x in name.title() if x != '_')
 
-        context = Context(dict(options, **{
+        context = Context({
+            **options,
             base_name: name,
             base_directory: top_dir,
             camel_case_name: camel_case_value,
             'docs_version': get_docs_version(),
             'django_version': django.__version__,
-        }), autoescape=False)
+        }, autoescape=False)
 
         # Setup a stub settings environment for template rendering
         if not settings.configured:
@@ -127,8 +120,7 @@ class TemplateCommand(BaseCommand):
             relative_dir = path_rest.replace(base_name, name)
             if relative_dir:
                 target_dir = path.join(top_dir, relative_dir)
-                if not path.exists(target_dir):
-                    os.mkdir(target_dir)
+                os.makedirs(target_dir, exist_ok=True)
 
             for dirname in dirs[:]:
                 if dirname.startswith('.') or dirname == '__pycache__':
@@ -155,7 +147,7 @@ class TemplateCommand(BaseCommand):
                 # Only render the Python files, as we don't want to
                 # accidentally render Django templates files
                 if new_path.endswith(extensions) or filename in extra_files:
-                    with open(old_path, 'r', encoding='utf-8') as template_file:
+                    with open(old_path, encoding='utf-8') as template_file:
                         content = template_file.read()
                     template = Engine().from_string(content)
                     content = template.render(context)
@@ -264,7 +256,7 @@ class TemplateCommand(BaseCommand):
             self.stdout.write("Downloading %s\n" % display_url)
         try:
             the_path, info = urlretrieve(url, path.join(tempdir, filename))
-        except IOError as e:
+        except OSError as e:
             raise CommandError("couldn't download URL %s to %s: %s" %
                                (url, filename, e))
 
@@ -319,7 +311,7 @@ class TemplateCommand(BaseCommand):
         try:
             archive.extract(filename, tempdir)
             return tempdir
-        except (archive.ArchiveException, IOError) as e:
+        except (archive.ArchiveException, OSError) as e:
             raise CommandError("couldn't extract file %s to %s: %s" %
                                (filename, tempdir, e))
 
@@ -335,9 +327,6 @@ class TemplateCommand(BaseCommand):
         Make sure that the file is writeable.
         Useful if our source is read-only.
         """
-        if sys.platform.startswith('java'):
-            # On Jython there is no os.access()
-            return
         if not os.access(filename, os.W_OK):
             st = os.stat(filename)
             new_permissions = stat.S_IMODE(st.st_mode) | stat.S_IWUSR

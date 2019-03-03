@@ -4,6 +4,7 @@ from functools import partial
 
 from django import forms
 from django.apps import apps
+from django.conf import SettingsReference
 from django.core import checks, exceptions
 from django.db import connection, router
 from django.db.backends import utils
@@ -95,24 +96,21 @@ class RelatedField(FieldCacheMixin, Field):
         return self.remote_field.model
 
     def check(self, **kwargs):
-        errors = super().check(**kwargs)
-        errors.extend(self._check_related_name_is_valid())
-        errors.extend(self._check_related_query_name_is_valid())
-        errors.extend(self._check_relation_model_exists())
-        errors.extend(self._check_referencing_to_swapped_model())
-        errors.extend(self._check_clashes())
-        return errors
+        return [
+            *super().check(**kwargs),
+            *self._check_related_name_is_valid(),
+            *self._check_related_query_name_is_valid(),
+            *self._check_relation_model_exists(),
+            *self._check_referencing_to_swapped_model(),
+            *self._check_clashes(),
+        ]
 
     def _check_related_name_is_valid(self):
         import keyword
         related_name = self.remote_field.related_name
         if related_name is None:
             return []
-        is_valid_id = True
-        if keyword.iskeyword(related_name):
-            is_valid_id = False
-        if not related_name.isidentifier():
-            is_valid_id = False
+        is_valid_id = not keyword.iskeyword(related_name) and related_name.isidentifier()
         if not (is_valid_id or related_name.endswith('+')):
             return [
                 checks.Error(
@@ -480,10 +478,11 @@ class ForeignObject(RelatedField):
         self.swappable = swappable
 
     def check(self, **kwargs):
-        errors = super().check(**kwargs)
-        errors.extend(self._check_to_fields_exist())
-        errors.extend(self._check_unique_target())
-        return errors
+        return [
+            *super().check(**kwargs),
+            *self._check_to_fields_exist(),
+            *self._check_unique_target(),
+        ]
 
     def _check_to_fields_exist(self):
         # Skip nonexistent models.
@@ -592,7 +591,6 @@ class ForeignObject(RelatedField):
                         % (kwargs['to'].setting_name, swappable_setting)
                     )
             # Set it
-            from django.db.migrations.writer import SettingsReference
             kwargs['to'] = SettingsReference(
                 kwargs['to'],
                 swappable_setting,
@@ -600,7 +598,7 @@ class ForeignObject(RelatedField):
         return name, path, args, kwargs
 
     def resolve_related_fields(self):
-        if len(self.from_fields) < 1 or len(self.from_fields) != len(self.to_fields):
+        if not self.from_fields or len(self.from_fields) != len(self.to_fields):
             raise ValueError('Foreign Object from and to fields must be the same non-zero length')
         if isinstance(self.remote_field.model, str):
             raise ValueError('Related model %r cannot be resolved' % self.remote_field.model)
@@ -808,18 +806,18 @@ class ForeignKey(ForeignObject):
             parent_link=parent_link,
             on_delete=on_delete,
         )
-
-        kwargs['db_index'] = kwargs.get('db_index', True)
+        kwargs.setdefault('db_index', True)
 
         super().__init__(to, on_delete, from_fields=['self'], to_fields=[to_field], **kwargs)
 
         self.db_constraint = db_constraint
 
     def check(self, **kwargs):
-        errors = super().check(**kwargs)
-        errors.extend(self._check_on_delete())
-        errors.extend(self._check_unique())
-        return errors
+        return [
+            *super().check(**kwargs),
+            *self._check_on_delete(),
+            *self._check_unique(),
+        ]
 
     def _check_on_delete(self):
         on_delete = getattr(self.remote_field, 'on_delete', None)
@@ -871,6 +869,9 @@ class ForeignKey(ForeignObject):
                 not to_meta or (to_meta.pk and self.remote_field.field_name != to_meta.pk.name)):
             kwargs['to_field'] = self.remote_field.field_name
         return name, path, args, kwargs
+
+    def to_python(self, value):
+        return self.target_field.to_python(value)
 
     @property
     def target_field(self):
@@ -948,13 +949,12 @@ class ForeignKey(ForeignObject):
             raise ValueError("Cannot create form field for %r yet, because "
                              "its related model %r has not been loaded yet" %
                              (self.name, self.remote_field.model))
-        defaults = {
+        return super().formfield(**{
             'form_class': forms.ModelChoiceField,
             'queryset': self.remote_field.model._default_manager.using(using),
             'to_field_name': self.remote_field.field_name,
-        }
-        defaults.update(kwargs)
-        return super().formfield(**defaults)
+            **kwargs,
+        })
 
     def db_check(self, connection):
         return []
@@ -977,7 +977,13 @@ class ForeignKey(ForeignObject):
         return converters
 
     def get_col(self, alias, output_field=None):
-        return super().get_col(alias, output_field or self.target_field)
+        if output_field is None:
+            output_field = self.target_field
+            while isinstance(output_field, ForeignKey):
+                output_field = output_field.target_field
+                if output_field is self:
+                    raise ValueError('Cannot resolve output_field.')
+        return super().get_col(alias, output_field)
 
 
 class OneToOneField(ForeignKey):
@@ -1132,12 +1138,13 @@ class ManyToManyField(RelatedField):
         self.swappable = swappable
 
     def check(self, **kwargs):
-        errors = super().check(**kwargs)
-        errors.extend(self._check_unique(**kwargs))
-        errors.extend(self._check_relationship_model(**kwargs))
-        errors.extend(self._check_ignored_options(**kwargs))
-        errors.extend(self._check_table_uniqueness(**kwargs))
-        return errors
+        return [
+            *super().check(**kwargs),
+            *self._check_unique(**kwargs),
+            *self._check_relationship_model(**kwargs),
+            *self._check_ignored_options(**kwargs),
+            *self._check_table_uniqueness(**kwargs),
+        ]
 
     def _check_unique(self, **kwargs):
         if self.unique:
@@ -1162,7 +1169,7 @@ class ManyToManyField(RelatedField):
                 )
             )
 
-        if len(self._validators) > 0:
+        if self._validators:
             warnings.append(
                 checks.Warning(
                     'ManyToManyField does not support validators.',
@@ -1403,7 +1410,7 @@ class ManyToManyField(RelatedField):
                 opts = model._meta.auto_created._meta
                 clashing_obj = '%s.%s' % (opts.label, _get_field_name(model))
             else:
-                clashing_obj = '%s' % model._meta.label
+                clashing_obj = model._meta.label
             return [
                 checks.Error(
                     "The field's intermediary table '%s' clashes with the "
@@ -1450,7 +1457,6 @@ class ManyToManyField(RelatedField):
                         "(%s and %s)" % (kwargs['to'].setting_name, swappable_setting)
                     )
 
-            from django.db.migrations.writer import SettingsReference
             kwargs['to'] = SettingsReference(
                 kwargs['to'],
                 swappable_setting,
@@ -1459,7 +1465,6 @@ class ManyToManyField(RelatedField):
 
     def _get_path_info(self, direct=False, filtered_relation=None):
         """Called by both direct and indirect m2m traversal."""
-        pathinfos = []
         int_model = self.remote_field.through
         linkfield1 = int_model._meta.get_field(self.m2m_field_name())
         linkfield2 = int_model._meta.get_field(self.m2m_reverse_field_name())
@@ -1482,10 +1487,7 @@ class ManyToManyField(RelatedField):
         else:
             intermediate_infos = join2_initial.get_path_from_parent(join1_final.model)
 
-        pathinfos.extend(join1infos)
-        pathinfos.extend(intermediate_infos)
-        pathinfos.extend(join2infos)
-        return pathinfos
+        return [*join1infos, *intermediate_infos, *join2infos]
 
     def get_path_info(self, filtered_relation=None):
         return self._get_path_info(direct=True, filtered_relation=filtered_relation)
@@ -1622,8 +1624,8 @@ class ManyToManyField(RelatedField):
         defaults = {
             'form_class': forms.ModelMultipleChoiceField,
             'queryset': self.remote_field.model._default_manager.using(using),
+            **kwargs,
         }
-        defaults.update(kwargs)
         # If initial is passed in, it's a list of related objects, but the
         # MultipleChoiceField takes a list of IDs.
         if defaults.get('initial') is not None:

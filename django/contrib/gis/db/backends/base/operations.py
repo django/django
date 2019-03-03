@@ -17,7 +17,7 @@ class BaseSpatialOperations:
     spatial_version = None
 
     # How the geometry column should be selected.
-    select = None
+    select = '%s'
 
     @cached_property
     def select_extent(self):
@@ -40,10 +40,10 @@ class BaseSpatialOperations:
     unsupported_functions = {
         'Area', 'AsGeoJSON', 'AsGML', 'AsKML', 'AsSVG', 'Azimuth',
         'BoundingCircle', 'Centroid', 'Difference', 'Distance', 'Envelope',
-        'ForceRHR', 'GeoHash', 'Intersection', 'IsValid', 'Length',
-        'LineLocatePoint', 'MakeValid', 'MemSize', 'NumGeometries',
-        'NumPoints', 'Perimeter', 'PointOnSurface', 'Reverse', 'Scale',
-        'SnapToGrid', 'SymDifference', 'Transform', 'Translate', 'Union',
+        'GeoHash', 'Intersection', 'IsValid', 'Length', 'LineLocatePoint',
+        'MakeValid', 'MemSize', 'NumGeometries', 'NumPoints', 'Perimeter',
+        'PointOnSurface', 'Reverse', 'Scale', 'SnapToGrid', 'SymDifference',
+        'Transform', 'Translate', 'Union',
     }
 
     # Constructors

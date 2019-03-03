@@ -9,9 +9,10 @@ from django.template.response import TemplateResponse
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
+from .admin import SubscriberAdmin
 from .forms import MediaActionForm
 from .models import (
-    Actor, Answer, ExternalSubscriber, Question, Subscriber,
+    Actor, Answer, Book, ExternalSubscriber, Question, Subscriber,
     UnchangeableObject,
 )
 
@@ -60,7 +61,18 @@ class AdminActionsTest(TestCase):
         self.client.post(reverse('admin:admin_views_subscriber_changelist'), delete_confirmation_data)
         self.assertEqual(Subscriber.objects.count(), 0)
 
-    @override_settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=True)
+    def test_default_delete_action_nonexistent_pk(self):
+        self.assertFalse(Subscriber.objects.filter(id=9998).exists())
+        action_data = {
+            ACTION_CHECKBOX_NAME: ['9998'],
+            'action': 'delete_selected',
+            'index': 0,
+        }
+        response = self.client.post(reverse('admin:admin_views_subscriber_changelist'), action_data)
+        self.assertContains(response, 'Are you sure you want to delete the selected subscribers?')
+        self.assertContains(response, '<ul></ul>', html=True)
+
+    @override_settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=True, NUMBER_GROUPING=3)
     def test_non_localized_pk(self):
         """
         If USE_THOUSAND_SEPARATOR is set, the ids for the objects selected for
@@ -127,6 +139,31 @@ class AdminActionsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         # The page doesn't display a link to the nonexistent change page.
         self.assertContains(response, '<li>Unchangeable object: %s</li>' % obj, 1, html=True)
+
+    def test_delete_queryset_hook(self):
+        delete_confirmation_data = {
+            ACTION_CHECKBOX_NAME: [self.s1.pk, self.s2.pk],
+            'action': 'delete_selected',
+            'post': 'yes',
+            'index': 0,
+        }
+        SubscriberAdmin.overridden = False
+        self.client.post(reverse('admin:admin_views_subscriber_changelist'), delete_confirmation_data)
+        # SubscriberAdmin.delete_queryset() sets overridden to True.
+        self.assertIs(SubscriberAdmin.overridden, True)
+        self.assertEqual(Subscriber.objects.all().count(), 0)
+
+    def test_delete_selected_uses_get_deleted_objects(self):
+        """The delete_selected action uses ModelAdmin.get_deleted_objects()."""
+        book = Book.objects.create(name='Test Book')
+        data = {
+            ACTION_CHECKBOX_NAME: [book.pk],
+            'action': 'delete_selected',
+            'index': 0,
+        }
+        response = self.client.post(reverse('admin2:admin_views_book_changelist'), data)
+        # BookAdmin.get_deleted_objects() returns custom text.
+        self.assertContains(response, 'a deletable object')
 
     def test_custom_function_mail_action(self):
         """A custom action may be defined in a function."""
@@ -373,15 +410,15 @@ class AdminActionsPermissionTests(TestCase):
     def setUpTestData(cls):
         cls.s1 = ExternalSubscriber.objects.create(name='John Doe', email='john@example.org')
         cls.s2 = Subscriber.objects.create(name='Max Mustermann', email='max@example.org')
-
-    def setUp(self):
-        self.user = User.objects.create_user(
+        cls.user = User.objects.create_user(
             username='user', password='secret', email='user@example.com',
             is_staff=True,
         )
-        self.client.force_login(self.user)
         permission = Permission.objects.get(codename='change_subscriber')
-        self.user.user_permissions.add(permission)
+        cls.user.user_permissions.add(permission)
+
+    def setUp(self):
+        self.client.force_login(self.user)
 
     def test_model_admin_no_delete_permission(self):
         """
@@ -392,8 +429,11 @@ class AdminActionsPermissionTests(TestCase):
             ACTION_CHECKBOX_NAME: [self.s1.pk],
             'action': 'delete_selected',
         }
-        response = self.client.post(reverse('admin:admin_views_subscriber_changelist'), action_data)
-        self.assertEqual(response.status_code, 403)
+        url = reverse('admin:admin_views_subscriber_changelist')
+        response = self.client.post(url, action_data)
+        self.assertRedirects(response, url, fetch_redirect_response=False)
+        response = self.client.get(response.url)
+        self.assertContains(response, 'No action selected.')
 
     def test_model_admin_no_delete_permission_externalsubscriber(self):
         """

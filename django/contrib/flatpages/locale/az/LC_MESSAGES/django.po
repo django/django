@@ -3,14 +3,15 @@
 # Translators:
 # Ali Ismayilov <ali@ismailov.info>, 2011
 # Dimitris Glezos <glezos@transifex.com>, 2012
+# Emin Mastizada <emin@linux.com>, 2018
 # Emin Mastizada <emin@linux.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 09:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2018-04-27 13:20+0000\n"
+"Last-Translator: Emin Mastizada <emin@linux.com>\n"
 "Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
 "az/)\n"
 "MIME-Version: 1.0\n"
@@ -79,7 +80,7 @@ msgstr ""
 "istifadəçilər bu səhifəni görə biləcəklər."
 
 msgid "sites"
-msgstr ""
+msgstr "saytlar"
 
 msgid "flat page"
 msgstr "adi səhifə"

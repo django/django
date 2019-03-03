@@ -1,13 +1,15 @@
-from django.conf.urls import url
+from django.urls import path
 
 from . import views
 
 urlpatterns = [
-    url(r'^example_view/$', views.example_view),
-    url(r'^model_view/$', views.model_view),
-    url(r'^create_model_instance/$', views.create_model_instance),
-    url(r'^environ_view/$', views.environ_view),
-    url(r'^subview_calling_view/$', views.subview_calling_view),
-    url(r'^subview/$', views.subview),
-    url(r'^check_model_instance_from_subview/$', views.check_model_instance_from_subview),
+    path('example_view/', views.example_view),
+    path('streaming_example_view/', views.streaming_example_view),
+    path('model_view/', views.model_view),
+    path('create_model_instance/', views.create_model_instance),
+    path('environ_view/', views.environ_view),
+    path('subview_calling_view/', views.subview_calling_view),
+    path('subview/', views.subview),
+    path('check_model_instance_from_subview/', views.check_model_instance_from_subview),
+    path('method_view/', views.method_view),
 ]

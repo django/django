@@ -9,7 +9,8 @@ from .models import Container, Event, Group, Happening, M2MModel
 
 
 class PickleabilityTestCase(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         Happening.objects.create()  # make sure the defaults are working (#20158)
 
     def assert_pickles(self, qs):
@@ -102,7 +103,7 @@ class PickleabilityTestCase(TestCase):
     def test_model_pickle_dynamic(self):
         class Meta:
             proxy = True
-        dynclass = type("DynamicEventSubclass", (Event, ), {'Meta': Meta, '__module__': Event.__module__})
+        dynclass = type("DynamicEventSubclass", (Event,), {'Meta': Meta, '__module__': Event.__module__})
         original = dynclass(pk=1)
         dumped = pickle.dumps(original)
         reloaded = pickle.loads(dumped)

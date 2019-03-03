@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Emin Mastizada <emin@linux.com>, 2018
 # Emin Mastizada <emin@linux.com>, 2015-2016
 # Metin Amiroff <amiroff@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-20 09:03+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-09-09 12:46+0000\n"
+"Last-Translator: Emin Mastizada <emin@linux.com>\n"
 "Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
 "az/)\n"
 "MIME-Version: 1.0\n"
@@ -159,6 +160,9 @@ msgstr "Yaponca"
 msgid "Georgian"
 msgstr "Gürcücə"
 
+msgid "Kabyle"
+msgstr "Kabile"
+
 msgid "Kazakh"
 msgstr "Qazax"
 
@@ -295,13 +299,13 @@ msgid "Syndication"
 msgstr "Sindikasiya"
 
 msgid "That page number is not an integer"
-msgstr ""
+msgstr "Səhifə nömrəsi rəqəm deyil"
 
 msgid "That page number is less than 1"
-msgstr ""
+msgstr "Səhifə nömrəsi 1-dən balacadır"
 
 msgid "That page contains no results"
-msgstr ""
+msgstr "Səhifədə nəticə yoxdur"
 
 msgid "Enter a valid value."
 msgstr "Düzgün qiymət daxil edin."
@@ -315,6 +319,7 @@ msgstr "Düzgün rəqəm daxil edin."
 msgid "Enter a valid email address."
 msgstr "Düzgün e-poçt ünvanı daxil edin."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -382,6 +387,9 @@ msgstr[1] ""
 "Bu dəyərin ən çox %(limit_value)d simvol olduğuna əmin olun (%(show_value)d "
 "var)"
 
+msgid "Enter a number."
+msgstr "Ədəd daxil edin."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -407,6 +415,11 @@ msgid ""
 "File extension '%(extension)s' is not allowed. Allowed extensions are: "
 "'%(allowed_extensions)s'."
 msgstr ""
+"'%(extension)s' fayl uzantısına icazə verilmir. İcazə verilən fayl "
+"uzantıları: '%(allowed_extensions)s'"
+
+msgid "Null characters are not allowed."
+msgstr "Null simvollara icazə verilmir."
 
 msgid "and"
 msgstr "və"
@@ -456,6 +469,10 @@ msgstr "Böyük (8 bayt) tam ədəd"
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' dəyəri True və ya False olmalıdır."
 
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "'%(value)s' dəyəri True, False və ya None olmalıdır."
+
 msgid "Boolean (Either True or False)"
 msgstr "Bul (ya Doğru, ya Yalan)"
 
@@ -471,15 +488,14 @@ msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
-"'%(value)s' dəyəri səhv tarix formatındadır. Bu İİİİ-AA-GG formatında "
-"olmalıdır."
+"'%(value)s' dəyəri səhv tarix formatındadır. Formatı YYYY-MM-DD olmalıdır."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
-"'%(value)s dəyəri düzgün formatdadır (İİİİ-AA-GG) amma bu xətalı tarixdir."
+"'%(value)s dəyəri düzgün formatdadır (YYYY-MM-DD) amma bu xətalı tarixdir."
 
 msgid "Date (without time)"
 msgstr "Tarix (saatsız)"
@@ -489,19 +505,23 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"'%(value)s' dəyərinin formatı səhvdir. Formatı YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"[TZ] olmalıdır."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
+"'%(value)s' dəyərinin formatı düzgündür (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) "
+"ancaq tarix səhvdir."
 
 msgid "Date (with time)"
 msgstr "Tarix (vaxt ilə)"
 
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
-msgstr ""
+msgstr "'%(value)s' dəyəri decimal rəqəm olmalıdır."
 
 msgid "Decimal number"
 msgstr "Rasional ədəd"
@@ -511,6 +531,8 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
 "uuuuuu] format."
 msgstr ""
+"'%(value)s' dəyərinin formatı səhvdir. Formatı [DD] [HH:[MM:]]ss[.uuuuuu] "
+"olmalıdır."
 
 msgid "Duration"
 msgstr "Müddət"
@@ -523,7 +545,7 @@ msgstr "Faylın ünvanı"
 
 #, python-format
 msgid "'%(value)s' value must be a float."
-msgstr ""
+msgstr "'%(value)s' dəyəri float olmalıdır."
 
 msgid "Floating point number"
 msgstr "Sürüşən vergüllü ədəd"
@@ -536,7 +558,7 @@ msgstr "IP ünvan"
 
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
-msgstr ""
+msgstr "'%(value)s' dəyəri None, True və ya False olmalıdır."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Bul (Ya Doğru, ya Yalan, ya da Heç nə)"
@@ -562,12 +584,15 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
+"'%(value)s' dəyərinin formatı səhvdir. Formatı HH:MM[:ss[.uuuuuu]] olmalıdır."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
+"'%(value)s' dəyəri düzgün formatdadır (HH:MM[:ss[.uuuuuu]]), ancaq vaxtı "
+"səhvdir."
 
 msgid "Time"
 msgstr "Vaxt"
@@ -576,7 +601,7 @@ msgid "URL"
 msgstr "URL"
 
 msgid "Raw binary data"
-msgstr ""
+msgstr "Düz ikili (binary) məlumat"
 
 #, python-format
 msgid "'%(value)s' is not a valid UUID."
@@ -590,7 +615,7 @@ msgstr "Şəkil"
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr ""
+msgstr "%(field)s dəyəri %(value)r olan %(model)s mövcud deyil."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Xarici açar (bağlı olduğu sahəyə uyğun tipi alır)"
@@ -600,11 +625,11 @@ msgstr "Birin-birə münasibət"
 
 #, python-format
 msgid "%(from)s-%(to)s relationship"
-msgstr ""
+msgstr "%(from)s-%(to)s əlaqəsi"
 
 #, python-format
 msgid "%(from)s-%(to)s relationships"
-msgstr ""
+msgstr "%(from)s-%(to)s əlaqələri"
 
 msgid "Many-to-many relationship"
 msgstr "Çoxun-çoxa münasibət"
@@ -621,9 +646,6 @@ msgstr "Bu sahə vacibdir."
 msgid "Enter a whole number."
 msgstr "Tam ədəd daxil edin."
 
-msgid "Enter a number."
-msgstr "Ədəd daxil edin."
-
 msgid "Enter a valid date."
 msgstr "Düzgün tarix daxil edin."
 
@@ -635,6 +657,10 @@ msgstr "Düzgün tarix/vaxt daxil edin."
 
 msgid "Enter a valid duration."
 msgstr "Keçərli müddət daxil edin."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Günlərin sayı {min_days} ilə {max_days} arasında olmalıdır."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Fayl göndərilməyib. Vərəqənin (\"form\") şifrələmə tipini yoxlayın."
@@ -650,7 +676,9 @@ msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr[0] ""
+"Bu fayl adının ən çox %(max)d simvol olduğuna əmin olun (%(length)d var)."
 msgstr[1] ""
+"Bu fayl adının ən çox %(max)d simvol olduğuna əmin olun (%(length)d var)."
 
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
@@ -685,7 +713,7 @@ msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(Gizli %(name)s sahəsi) %(error)s"
 
 msgid "ManagementForm data is missing or has been tampered with"
-msgstr ""
+msgstr "ManagementForm məlumatları əksikdir və ya korlanıb"
 
 #, python-format
 msgid "Please submit %d or fewer forms."
@@ -726,15 +754,15 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Aşağıda təkrarlanan qiymətlərə düzəliş edin."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "Xarici açar ana obyektin əsas açarı ilə üst-üstə düşmür."
+msgid "The inline value did not match the parent instance."
+msgstr "Sətiriçi dəyər ana nüsxəyə uyğun deyil."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Düzgün seçim edin. Bu seçim mümkün deyil."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" əsas açar üçün keçərli dəyər deyil."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "\"%(pk)s\" düzgün dəyər deyil."
 
 #, python-format
 msgid ""
@@ -1085,48 +1113,56 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
+"Bu HTTPS sayt səyyahınız tərəfindən 'Referer header' göndərilməsini tələb "
+"edir, amma göndərilmir. Bu başlıq səyyahınızın üçüncü biri tərəfindən hack-"
+"lənmədiyinə əmin olmaq üçün istifadə edilir."
 
 msgid ""
 "If you have configured your browser to disable 'Referer' headers, please re-"
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
 "origin' requests."
 msgstr ""
+"Əgər səyyahınızın 'Referer' başlığını göndərməsini söndürmüsünüzsə, lütfən "
+"bu sayt üçün, HTTPS əlaqələr üçün və ya 'same-origin' sorğular üçün aktiv "
+"edin."
+
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+"Əgər <meta name=\"referrer\" content=\"no-referrer\"> etiketini və ya "
+"'Referrer-Policy: no-referrer' başlığını işlədirsinizsə, lütfən silin. CSRF "
+"qoruma dəqiq yönləndirən yoxlaması üçün 'Referer' başlığını tələb edir. Əgər "
+"məxfilik üçün düşünürsünüzsə, üçüncü tərəf sayt keçidləri üçün <a rel="
+"\"noreferrer\" ...> kimi bir alternativ işlədin."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
+"Bu sayt formaları göndərmək üçün CSRF çərəzini işlədir. Bu çərəz "
+"səyyahınızın üçüncü biri tərəfindən hack-lənmədiyinə əmin olmaq üçün "
+"istifadə edilir. "
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for 'same-origin' requests."
 msgstr ""
+"Əgər səyyahınızda çərəzlər söndürülübsə, lütfən bu sayt və ya 'same-origin' "
+"sorğular üçün aktiv edin."
 
 msgid "More information is available with DEBUG=True."
 msgstr "Daha ətraflı məlumat DEBUG=True ilə mövcuddur."
 
-msgid "Welcome to Django"
-msgstr "Djangoya Xoş Gəldiniz"
-
-msgid "It worked!"
-msgstr "İşlədi!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "İlk Django ilə işləyən səhifəniz münasibəti ilə təbrik edirik."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-
 msgid "No year specified"
 msgstr "İl göstərilməyib"
+
+msgid "Date out of range"
+msgstr "Tarix aralığın xaricindədir"
 
 msgid "No month specified"
 msgstr "Ay göstərilməyib"
@@ -1178,3 +1214,47 @@ msgstr "\"%(path)s\" mövcud deyil"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "%(directory)s-nin indeksi"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django: tələsən mükəmməlləkçilər üçün Web framework."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Django %(version)s üçün <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/releases/\" target=\"_blank\" rel=\"noopener\">buraxılış "
+"qeydlərinə</a> baxın"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Quruluş uğurla tamamlandı! Təbriklər!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"Tənzimləmə faylınızda <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> və heç bir URL qurmadığınız üçün bu səhifəni görürsünüz."
+
+msgid "Django Documentation"
+msgstr "Django Sənədləri"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr "Mövzular, istinadlar və nümunələr"
+
+msgid "Tutorial: A Polling App"
+msgstr "Məşğələ: Səsvermə Tətbiqi"
+
+msgid "Get started with Django"
+msgstr "Django-ya başla"
+
+msgid "Django Community"
+msgstr "Django İcması"
+
+msgid "Connect, get help, or contribute"
+msgstr "Qoşul, kömək al və dəstək ol"

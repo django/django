@@ -8,15 +8,15 @@
 # Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
 # captain_m4l <qotsaman@gmail.com>, 2012
 # Mykola Zamkovoi <nickzam@gmail.com>, 2014
-# Oleksandr Bolotov <oleksandr.bolotov@gmail.com>, 2013
+# Alex Bolotov <oleksandr.bolotov@gmail.com>, 2013
 # Vitaliy Kozlovskyi <ubombi@gmail.com>, 2015
-# Zoriana Zaiats, 2016
+# Zoriana Zaiats, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-25 11:46+0000\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-11-08 15:37+0000\n"
 "Last-Translator: Zoriana Zaiats\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
@@ -76,12 +76,11 @@ msgstr "Введіть той же пароль, що і раніше, для п
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Відкритими паролі не зберігаються, тому немає можливості їх переглянути, але "
-"ви можете змінити пароль використовуючи <a href=\"../password/\">цю форму</"
-"a>."
+"Паролі не зберігаються у відкритому вигляді, тому немає можливості "
+"переглянути пароль цього користувача, але ви можете змінити пароль за "
+"допомогою <a href=\"{}\">цієї форми</a>."
 
 #, python-format
 msgid ""

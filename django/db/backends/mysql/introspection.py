@@ -3,12 +3,12 @@ from collections import namedtuple
 from MySQLdb.constants import FIELD_TYPE
 
 from django.db.backends.base.introspection import (
-    BaseDatabaseIntrospection, FieldInfo, TableInfo,
+    BaseDatabaseIntrospection, FieldInfo as BaseFieldInfo, TableInfo,
 )
 from django.db.models.indexes import Index
 from django.utils.datastructures import OrderedSet
 
-FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('extra', 'is_unsigned'))
+FieldInfo = namedtuple('FieldInfo', BaseFieldInfo._fields + ('extra', 'is_unsigned'))
 InfoLine = namedtuple('InfoLine', 'col_name data_type max_len num_prec num_scale extra column_default is_unsigned')
 
 
@@ -85,22 +85,17 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
         fields = []
         for line in cursor.description:
-            col_name = line[0]
-            fields.append(
-                FieldInfo(*(
-                    (col_name,) +
-                    line[1:3] +
-                    (
-                        to_int(field_info[col_name].max_len) or line[3],
-                        to_int(field_info[col_name].num_prec) or line[4],
-                        to_int(field_info[col_name].num_scale) or line[5],
-                        line[6],
-                        field_info[col_name].column_default,
-                        field_info[col_name].extra,
-                        field_info[col_name].is_unsigned,
-                    )
-                ))
-            )
+            info = field_info[line[0]]
+            fields.append(FieldInfo(
+                *line[:3],
+                to_int(info.max_len) or line[3],
+                to_int(info.num_prec) or line[4],
+                to_int(info.num_scale) or line[5],
+                line[6],
+                info.column_default,
+                info.extra,
+                info.is_unsigned,
+            ))
         return fields
 
     def get_sequences(self, cursor, table_name, table_fields=()):
@@ -165,6 +160,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             WHERE
                 kc.table_schema = DATABASE() AND
                 kc.table_name = %s
+            ORDER BY kc.`ordinal_position`
         """
         cursor.execute(name_query, [table_name])
         for constraint, column, ref_table, ref_column in cursor.fetchall():

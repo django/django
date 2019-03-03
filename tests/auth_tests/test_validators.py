@@ -11,8 +11,9 @@ from django.contrib.auth.password_validation import (
 )
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import isolate_apps
+from django.utils.html import conditional_escape
 
 
 @override_settings(AUTH_PASSWORD_VALIDATORS=[
@@ -21,7 +22,7 @@ from django.test.utils import isolate_apps
         'min_length': 12,
     }},
 ])
-class PasswordValidationTest(TestCase):
+class PasswordValidationTest(SimpleTestCase):
     def test_get_default_password_validators(self):
         validators = get_default_password_validators()
         self.assertEqual(len(validators), 2)
@@ -56,6 +57,18 @@ class PasswordValidationTest(TestCase):
     def test_password_changed(self):
         self.assertIsNone(password_changed('password'))
 
+    def test_password_changed_with_custom_validator(self):
+        class Validator:
+            def password_changed(self, password, user):
+                self.password = password
+                self.user = user
+
+        user = object()
+        validator = Validator()
+        password_changed('password', user=user, password_validators=(validator,))
+        self.assertIs(validator.user, user)
+        self.assertEqual(validator.password, 'password')
+
     def test_password_validators_help_texts(self):
         help_texts = password_validators_help_texts()
         self.assertEqual(len(help_texts), 2)
@@ -68,12 +81,21 @@ class PasswordValidationTest(TestCase):
         self.assertEqual(help_text.count('<li>'), 2)
         self.assertIn('12 characters', help_text)
 
+    def test_password_validators_help_text_html_escaping(self):
+        class AmpersandValidator:
+            def get_help_text(self):
+                return 'Must contain &'
+        help_text = password_validators_help_text_html([AmpersandValidator()])
+        self.assertEqual(help_text, '<ul><li>Must contain &amp;</li></ul>')
+        # help_text is marked safe and therefore unchanged by conditional_escape().
+        self.assertEqual(help_text, conditional_escape(help_text))
+
     @override_settings(AUTH_PASSWORD_VALIDATORS=[])
     def test_empty_password_validator_help_text_html(self):
         self.assertEqual(password_validators_help_text_html(), '')
 
 
-class MinimumLengthValidatorTest(TestCase):
+class MinimumLengthValidatorTest(SimpleTestCase):
     def test_validate(self):
         expected_error = "This password is too short. It must contain at least %d characters."
         self.assertIsNone(MinimumLengthValidator().validate('12345678'))
@@ -160,7 +182,7 @@ class UserAttributeSimilarityValidatorTest(TestCase):
         )
 
 
-class CommonPasswordValidatorTest(TestCase):
+class CommonPasswordValidatorTest(SimpleTestCase):
     def test_validate(self):
         expected_error = "This password is too common."
         self.assertIsNone(CommonPasswordValidator().validate('a-safe-password'))
@@ -180,6 +202,11 @@ class CommonPasswordValidatorTest(TestCase):
         self.assertEqual(cm.exception.messages, [expected_error])
         self.assertEqual(cm.exception.error_list[0].code, 'password_too_common')
 
+    def test_validate_django_supplied_file(self):
+        validator = CommonPasswordValidator()
+        for password in validator.passwords:
+            self.assertEqual(password, password.lower())
+
     def test_help_text(self):
         self.assertEqual(
             CommonPasswordValidator().get_help_text(),
@@ -187,7 +214,7 @@ class CommonPasswordValidatorTest(TestCase):
         )
 
 
-class NumericPasswordValidatorTest(TestCase):
+class NumericPasswordValidatorTest(SimpleTestCase):
     def test_validate(self):
         expected_error = "This password is entirely numeric."
         self.assertIsNone(NumericPasswordValidator().validate('a-safe-password'))
@@ -204,7 +231,7 @@ class NumericPasswordValidatorTest(TestCase):
         )
 
 
-class UsernameValidatorsTests(TestCase):
+class UsernameValidatorsTests(SimpleTestCase):
     def test_unicode_validator(self):
         valid_usernames = ['joe', 'René', 'ᴮᴵᴳᴮᴵᴿᴰ', 'أحمد']
         invalid_usernames = [

@@ -1,10 +1,11 @@
+import datetime
 import importlib
 import os
 import sys
 
 from django.apps import apps
 from django.db.models.fields import NOT_PROVIDED
-from django.utils import datetime_safe, timezone
+from django.utils import timezone
 
 from .loader import MigrationLoader
 
@@ -28,7 +29,7 @@ class MigrationQuestioner:
             return True
         # Otherwise, we look to see if it has a migrations module
         # without any Python files in it, apart from __init__.py.
-        # Apps from the new app template will have these; the python
+        # Apps from the new app template will have these; the Python
         # file check will ensure we skip South ones.
         try:
             app_config = apps.get_app_config(app_label)
@@ -43,12 +44,13 @@ class MigrationQuestioner:
         except ImportError:
             return self.defaults.get("ask_initial", False)
         else:
-            if hasattr(migrations_module, "__file__"):
+            # getattr() needed on PY36 and older (replace with attribute access).
+            if getattr(migrations_module, "__file__", None):
                 filenames = os.listdir(os.path.dirname(migrations_module.__file__))
             elif hasattr(migrations_module, "__path__"):
                 if len(migrations_module.__path__) > 1:
                     return False
-                filenames = os.listdir(migrations_module.__path__[0])
+                filenames = os.listdir(list(migrations_module.__path__)[0])
             return not any(x.endswith(".py") for x in filenames if x != "__init__.py")
 
     def ask_not_null_addition(self, field_name, model_name):
@@ -85,7 +87,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
         result = input("%s " % question)
         if not result and default is not None:
             return default
-        while len(result) < 1 or result[0].lower() not in "yn":
+        while not result or result[0].lower() not in "yn":
             result = input("Please answer yes or no: ")
         return result[0].lower() == "y"
 
@@ -134,7 +136,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                 sys.exit(1)
             else:
                 try:
-                    return eval(code, {}, {"datetime": datetime_safe, "timezone": timezone})
+                    return eval(code, {}, {'datetime': datetime, 'timezone': timezone})
                 except (SyntaxError, NameError) as e:
                     print("Invalid input: %s" % e)
 

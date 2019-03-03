@@ -65,7 +65,7 @@ Release cadence
 ===============
 
 Starting with Django 2.0, version numbers will use a loose form of `semantic
-versioning <http://semver.org/>`_ such that each version following an LTS will
+versioning <https://semver.org/>`_ such that each version following an LTS will
 bump to the next "dot zero" version. For example: 2.0, 2.1, 2.2 (LTS), 3.0,
 3.1, 3.2 (LTS), etc.
 
@@ -116,7 +116,7 @@ A more generic example:
   LTS to LTS upgrades).
 * Z.0: Drop deprecation shims added in Y.0 and Y.1.
 
-.. _backwards-compatibility-policy:
+.. _supported-versions-policy:
 
 Supported versions
 ==================

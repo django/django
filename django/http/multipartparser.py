@@ -7,6 +7,7 @@ file upload handlers for processing.
 import base64
 import binascii
 import cgi
+import collections
 from urllib.parse import unquote
 
 from django.conf import settings
@@ -17,7 +18,7 @@ from django.core.files.uploadhandler import (
     SkipFile, StopFutureHandlers, StopUpload,
 )
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.text import unescape_entities
 
 __all__ = ('MultiPartParser', 'MultiPartParserError', 'InputStreamExhausted')
@@ -66,10 +67,13 @@ class MultiPartParser:
             raise MultiPartParserError('Invalid Content-Type: %s' % content_type)
 
         # Parse the header to get the boundary to split the parts.
-        ctypes, opts = parse_header(content_type.encode('ascii'))
+        try:
+            ctypes, opts = parse_header(content_type.encode('ascii'))
+        except UnicodeEncodeError:
+            raise MultiPartParserError('Invalid non-ASCII Content-Type in multipart: %s' % force_str(content_type))
         boundary = opts.get('boundary')
         if not boundary or not cgi.valid_boundary(boundary):
-            raise MultiPartParserError('Invalid boundary in multipart: %s' % boundary.decode())
+            raise MultiPartParserError('Invalid boundary in multipart: %s' % force_str(boundary))
 
         # Content-Length should contain the length of the body we are about
         # to receive.
@@ -164,7 +168,7 @@ class MultiPartParser:
                 transfer_encoding = meta_data.get('content-transfer-encoding')
                 if transfer_encoding is not None:
                     transfer_encoding = transfer_encoding[0].strip()
-                field_name = force_text(field_name, encoding, errors='replace')
+                field_name = force_str(field_name, encoding, errors='replace')
 
                 if item_type == FIELD:
                     # Avoid storing more than DATA_UPLOAD_MAX_NUMBER_FIELDS.
@@ -199,12 +203,12 @@ class MultiPartParser:
                             num_bytes_read > settings.DATA_UPLOAD_MAX_MEMORY_SIZE):
                         raise RequestDataTooBig('Request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE.')
 
-                    self._post.appendlist(field_name, force_text(data, encoding, errors='replace'))
+                    self._post.appendlist(field_name, force_str(data, encoding, errors='replace'))
                 elif item_type == FILE:
                     # This is a file, use the handler...
                     file_name = disposition.get('filename')
                     if file_name:
-                        file_name = force_text(file_name, encoding, errors='replace')
+                        file_name = force_str(file_name, encoding, errors='replace')
                         file_name = self.IE_sanitize(unescape_entities(file_name))
                     if not file_name:
                         continue
@@ -277,11 +281,8 @@ class MultiPartParser:
             exhaust(self._input_data)
 
         # Signal that the upload has completed.
-        for handler in handlers:
-            retval = handler.upload_complete()
-            if retval:
-                break
-
+        # any() shortcircuits if a handler's upload_complete() returns a value.
+        any(handler.upload_complete() for handler in handlers)
         self._post._mutable = False
         return self._post, self._files
 
@@ -293,7 +294,7 @@ class MultiPartParser:
             file_obj = handler.file_complete(counters[i])
             if file_obj:
                 # If it returns a file object, then set the files dict.
-                self._files.appendlist(force_text(old_field_name, self._encoding, errors='replace'), file_obj)
+                self._files.appendlist(force_str(old_field_name, self._encoding, errors='replace'), file_obj)
                 break
 
     def IE_sanitize(self, filename):
@@ -568,9 +569,7 @@ def exhaust(stream_or_iterable):
         iterator = iter(stream_or_iterable)
     except TypeError:
         iterator = ChunkIter(stream_or_iterable, 16384)
-
-    for __ in iterator:
-        pass
+    collections.deque(iterator, maxlen=0)  # consume iterator quickly.
 
 
 def parse_boundary_stream(stream, max_header_size):

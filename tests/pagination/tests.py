@@ -1,18 +1,18 @@
-import unittest
 import warnings
 from datetime import datetime
 
 from django.core.paginator import (
-    EmptyPage, InvalidPage, PageNotAnInteger, Paginator,
+    EmptyPage, InvalidPage, PageNotAnInteger, Paginator, QuerySetPaginator,
     UnorderedObjectListWarning,
 )
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
+from django.utils.deprecation import RemovedInDjango31Warning
 
 from .custom import ValidAdjacentNumsPaginator
 from .models import Article
 
 
-class PaginationTests(unittest.TestCase):
+class PaginationTests(SimpleTestCase):
     """
     Tests for the Paginator and Page classes.
     """
@@ -120,6 +120,14 @@ class PaginationTests(unittest.TestCase):
             paginator.validate_number(None)
         with self.assertRaises(PageNotAnInteger):
             paginator.validate_number('x')
+        with self.assertRaises(PageNotAnInteger):
+            paginator.validate_number(1.2)
+
+    def test_float_integer_page(self):
+        paginator = Paginator([1, 2, 3], 2)
+        self.assertEqual(paginator.validate_number(1.0), 1)
+
+    def test_no_content_allow_empty_first_page(self):
         # With no content and allow_empty_first_page=True, 1 is a valid page number
         paginator = Paginator([], 2)
         self.assertEqual(paginator.validate_number(1), 1)
@@ -142,6 +150,22 @@ class PaginationTests(unittest.TestCase):
         self.assertEqual(42, paginator.count)
         self.assertEqual(5, paginator.num_pages)
         self.assertEqual([1, 2, 3, 4, 5], list(paginator.page_range))
+
+    def test_count_does_not_silence_attribute_error(self):
+        class AttributeErrorContainer:
+            def count(self):
+                raise AttributeError('abc')
+
+        with self.assertRaisesMessage(AttributeError, 'abc'):
+            Paginator(AttributeErrorContainer(), 10).count()
+
+    def test_count_does_not_silence_type_error(self):
+        class TypeErrorContainer:
+            def count(self):
+                raise TypeError('abc')
+
+        with self.assertRaisesMessage(TypeError, 'abc'):
+            Paginator(TypeErrorContainer(), 10).count()
 
     def check_indexes(self, params, page_num, indexes):
         """
@@ -274,12 +298,19 @@ class PaginationTests(unittest.TestCase):
         with self.assertRaises(EmptyPage):
             paginator.get_page(1)
 
+    def test_querysetpaginator_deprecation(self):
+        msg = 'The QuerySetPaginator alias of Paginator is deprecated.'
+        with self.assertWarnsMessage(RemovedInDjango31Warning, msg) as cm:
+            QuerySetPaginator([], 1)
+        self.assertEqual(cm.filename, __file__)
+
 
 class ModelPaginationTests(TestCase):
     """
     Test pagination with Django model instances
     """
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         # Prepare a list of objects for pagination.
         for x in range(1, 10):
             a = Article(headline='Article %s' % x, pub_date=datetime(2005, 7, 29))
@@ -351,34 +382,32 @@ class ModelPaginationTests(TestCase):
         self.assertIsInstance(p.object_list, list)
 
     def test_paginating_unordered_queryset_raises_warning(self):
-        with warnings.catch_warnings(record=True) as warns:
-            # Prevent the RuntimeWarning subclass from appearing as an
-            # exception due to the warnings.simplefilter() in runtests.py.
-            warnings.filterwarnings('always', category=UnorderedObjectListWarning)
-            Paginator(Article.objects.all(), 5)
-        self.assertEqual(len(warns), 1)
-        warning = warns[0]
-        self.assertEqual(str(warning.message), (
+        msg = (
             "Pagination may yield inconsistent results with an unordered "
             "object_list: <class 'pagination.models.Article'> QuerySet."
-        ))
+        )
+        with self.assertWarnsMessage(UnorderedObjectListWarning, msg) as cm:
+            Paginator(Article.objects.all(), 5)
         # The warning points at the Paginator caller (i.e. the stacklevel
         # is appropriate).
-        self.assertEqual(warning.filename, __file__)
+        self.assertEqual(cm.filename, __file__)
+
+    def test_paginating_empty_queryset_does_not_warn(self):
+        with warnings.catch_warnings(record=True) as recorded:
+            Paginator(Article.objects.none(), 5)
+        self.assertEqual(len(recorded), 0)
 
     def test_paginating_unordered_object_list_raises_warning(self):
         """
-        Unordered object list warning with an object that has an orderd
+        Unordered object list warning with an object that has an ordered
         attribute but not a model attribute.
         """
         class ObjectList:
             ordered = False
         object_list = ObjectList()
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.filterwarnings('always', category=UnorderedObjectListWarning)
-            Paginator(object_list, 5)
-        self.assertEqual(len(warns), 1)
-        self.assertEqual(str(warns[0].message), (
+        msg = (
             "Pagination may yield inconsistent results with an unordered "
             "object_list: {!r}.".format(object_list)
-        ))
+        )
+        with self.assertWarnsMessage(UnorderedObjectListWarning, msg):
+            Paginator(object_list, 5)

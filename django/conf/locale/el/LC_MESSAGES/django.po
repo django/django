@@ -2,10 +2,10 @@
 #
 # Translators:
 # Apostolis Bessas <mpessas+txc@transifex.com>, 2013
-# Dimitris Glezos <glezos@transifex.com>, 2011,2013
+# Dimitris Glezos <glezos@transifex.com>, 2011,2013,2017
 # Giannis Meletakis <meletakis@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Nick Mavrakis <mavrakis.n@gmail.com>, 2017
+# Nick Mavrakis <mavrakis.n@gmail.com>, 2017-2018
 # Nikolas Demiridis <nikolas@demiridis.gr>, 2014
 # Nick Mavrakis <mavrakis.n@gmail.com>, 2016
 # Pãnoș <panos.laganakos@gmail.com>, 2014
@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-21 10:58+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-09-22 10:11+0000\n"
 "Last-Translator: Nick Mavrakis <mavrakis.n@gmail.com>\n"
 "Language-Team: Greek (http://www.transifex.com/django/django/language/el/)\n"
 "MIME-Version: 1.0\n"
@@ -167,6 +167,9 @@ msgstr "Γιαπωνέζικα"
 
 msgid "Georgian"
 msgstr "Γεωργιανά"
+
+msgid "Kabyle"
+msgstr "Kabyle"
 
 msgid "Kazakh"
 msgstr "Καζακστά"
@@ -324,6 +327,7 @@ msgstr "Εισάγετε έναν έγκυρο ακέραιο."
 msgid "Enter a valid email address."
 msgstr "Εισάγετε μια έγκυρη διεύθυνση ηλ. ταχυδρομείου."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -391,6 +395,9 @@ msgstr[1] ""
 "Βεβαιωθείτε πως η τιμή έχει το πολύ %(limit_value)d χαρακτήρες (έχει "
 "%(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Εισάγετε έναν αριθμό."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -422,6 +429,9 @@ msgid ""
 msgstr ""
 "Η επέκταση '%(extension)s' του αρχείου δεν επιτρέπεται. Οι επιτρεπόμενες "
 "επεκτάσεις είναι: '%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
+msgstr "Δεν επιτρέπονται null (μηδενικοί) χαρακτήρες"
 
 msgid "and"
 msgstr "και"
@@ -470,6 +480,10 @@ msgstr "Μεγάλος ακέραιος - big integer (8 bytes)"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "Η τιμή '%(value)s' πρέπει να είναι είτε True ή False."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "Η τιμή '%(value)s' πρέπει να είναι True, False, ή None."
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolean (Είτε Αληθές ή Ψευδές)"
@@ -648,9 +662,6 @@ msgstr "Αυτό το πεδίο είναι απαραίτητο."
 msgid "Enter a whole number."
 msgstr "Εισάγετε έναν ακέραιο αριθμό."
 
-msgid "Enter a number."
-msgstr "Εισάγετε έναν αριθμό."
-
 msgid "Enter a valid date."
 msgstr "Εισάγετε μια έγκυρη ημερομηνία."
 
@@ -662,6 +673,10 @@ msgstr "Εισάγετε μια έγκυρη ημερομηνία/ώρα."
 
 msgid "Enter a valid duration."
 msgstr "Εισάγετε μια έγκυρη διάρκεια."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Ο αριθμός των ημερών πρέπει να είναι μεταξύ {min_days} και {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
@@ -762,10 +777,8 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Έχετε ξαναεισάγει την ίδια τιμη. Βεβαιωθείτε ότι είναι μοναδική."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr ""
-"Το inline foreign key δεν αντιστοιχεί με το primary κλειδί του γονικού "
-"object."
+msgid "The inline value did not match the parent instance."
+msgstr "Η τιμή δεν είναι ίση με την αντίστοιχη τιμή του γονικού object."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
@@ -773,8 +786,8 @@ msgstr ""
 "επιλογές."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "Το \"%(pk)s\" δεν είναι έγκυρη τιμή για πρωτεύων κλειδί"
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "Το \"%(pk)s\" δεν είναι έγκυρη τιμή."
 
 #, python-format
 msgid ""
@@ -1140,6 +1153,20 @@ msgstr ""
 "τις συνδέσεις HTTPS ή για τα 'same-origin' requests."
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+"Αν χρησιμοποιείτε την ετικέτα <meta name=\"referrer\" content=\"no-referrer"
+"\"> ή συμπεριλαμβάνετε την κεφαλίδα (header) 'Referrer-Policy: no-referrer', "
+"παρακαλούμε αφαιρέστε τα. Η προστασία CSRF απαιτεί την κεφαλίδα 'Referer' να "
+"κάνει αυστηρό έλεγχο στον referer. Αν κύριο μέλημα σας είναι η ιδιωτικότητα, "
+"σκεφτείτε να χρησιμοποιήσετε εναλλακτικές μεθόδους όπως <a rel=\"noreferrer"
+"\" ...> για συνδέσμους από άλλες ιστοσελίδες."
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1159,32 +1186,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "Περισσότερες πληροφορίες είναι διαθέσιμες με DEBUG=True."
 
-msgid "Welcome to Django"
-msgstr "Καλωσήρθατε στο Django"
-
-msgid "It worked!"
-msgstr "Δούλεψε!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Συγχαρητήρια στην πρώτη Django-τροφοδοτούμενη σελίδα σας."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-"Επόμενο βήμα, είναι να ξεκινήσετε την πρώτη σας εφαρμογή εκτελώντας την "
-"εντολή <code>python manage.py startapp [app_label]</code>."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Βλέπετε αυτό το μήνυμα επείδη έχετε <code>DEBUG = True</code> στο αρχείο "
-"settings του Django σας και δεν έχετε ρυθμίσει καμία URL. Στρωθείτε στην "
-"δουλειά!"
-
 msgid "No year specified"
 msgstr "Δεν έχει οριστεί χρονιά"
+
+msgid "Date out of range"
+msgstr "Ημερομηνία εκτός εύρους"
 
 msgid "No month specified"
 msgstr "Δεν έχει οριστεί μήνας"
@@ -1240,3 +1246,48 @@ msgstr "Το \"%(path)s\" δεν υπάρχει"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Ευρετήριο του %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django: το Web framework για τελειομανείς με προθεσμίες."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Δείτε τις <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/"
+"\" target=\"_blank\" rel=\"noopener\">σημειώσεις κυκλοφορίας</a> για το "
+"Django %(version)s"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Η εγκατάσταση δούλεψε με επιτυχία! Συγχαρητήρια!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"Βλέπετε αυτό το μήνυμα επειδή έχετε <a href=\"https://docs.djangoproject.com/"
+"en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> στο αρχείο settings και δεν έχετε ρυθμίσει κανένα URL στο "
+"αρχείο urls.py. Στρωθείτε στην δουλειά!"
+
+msgid "Django Documentation"
+msgstr "Εγχειρίδιο Django"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr "Θέματα, αναφορές &amp; \"πως να...\""
+
+msgid "Tutorial: A Polling App"
+msgstr "Εγχειρίδιο: Ένα App Ψηφοφορίας"
+
+msgid "Get started with Django"
+msgstr "Ξεκινήστε με το Django"
+
+msgid "Django Community"
+msgstr "Κοινότητα Django"
+
+msgid "Connect, get help, or contribute"
+msgstr "Συνδεθείτε, λάβετε βοήθεια, ή συνεισφέρετε"

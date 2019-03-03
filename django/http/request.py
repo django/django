@@ -1,6 +1,5 @@
 import copy
 import re
-import warnings
 from io import BytesIO
 from itertools import chain
 from urllib.parse import quote, urlencode, urljoin, urlsplit
@@ -12,16 +11,18 @@ from django.core.exceptions import (
 )
 from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser, MultiPartParserError
-from django.utils.datastructures import ImmutableList, MultiValueDict
-from django.utils.deprecation import RemovedInDjango30Warning
-from django.utils.encoding import escape_uri_path, force_bytes, iri_to_uri
+from django.utils.datastructures import (
+    CaseInsensitiveMapping, ImmutableList, MultiValueDict,
+)
+from django.utils.encoding import escape_uri_path, iri_to_uri
+from django.utils.functional import cached_property
 from django.utils.http import is_same_domain, limited_parse_qsl
 
 RAISE_ERROR = object()
 host_validation_re = re.compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?$")
 
 
-class UnreadablePostError(IOError):
+class UnreadablePostError(OSError):
     pass
 
 
@@ -56,7 +57,6 @@ class HttpRequest:
         self.path_info = ''
         self.method = None
         self.resolver_match = None
-        self._post_parse_error = False
         self.content_type = None
         self.content_params = None
 
@@ -64,6 +64,10 @@ class HttpRequest:
         if self.method is None or not self.get_full_path():
             return '<%s>' % self.__class__.__name__
         return '<%s: %s %r>' % (self.__class__.__name__, self.method, self.get_full_path())
+
+    @cached_property
+    def headers(self):
+        return HttpHeaders(self.META)
 
     def _get_raw_host(self):
         """
@@ -113,11 +117,17 @@ class HttpRequest:
         return str(port)
 
     def get_full_path(self, force_append_slash=False):
+        return self._get_full_path(self.path, force_append_slash)
+
+    def get_full_path_info(self, force_append_slash=False):
+        return self._get_full_path(self.path_info, force_append_slash)
+
+    def _get_full_path(self, path, force_append_slash):
         # RFC 3986 requires query string arguments to be in the ASCII range.
         # Rather than crash if this doesn't happen, we encode defensively.
         return '%s%s%s' % (
-            escape_uri_path(self.path),
-            '/' if force_append_slash and not self.path.endswith('/') else '',
+            escape_uri_path(path),
+            '/' if force_append_slash and not path.endswith('/') else '',
             ('?' + iri_to_uri(self.META.get('QUERY_STRING', ''))) if self.META.get('QUERY_STRING', '') else ''
         )
 
@@ -158,7 +168,7 @@ class HttpRequest:
     def build_absolute_uri(self, location=None):
         """
         Build an absolute URI from the location and the variables available in
-        this request. If no ``location`` is specified, bulid the absolute URI
+        this request. If no ``location`` is specified, build the absolute URI
         using request.get_full_path(). If the location is absolute, convert it
         to an RFC 3987 compliant URI and return it. If location is relative or
         is scheme-relative (i.e., ``//example.com/``), urljoin() it to a base
@@ -170,14 +180,27 @@ class HttpRequest:
             location = '//%s' % self.get_full_path()
         bits = urlsplit(location)
         if not (bits.scheme and bits.netloc):
-            current_uri = '{scheme}://{host}{path}'.format(scheme=self.scheme,
-                                                           host=self.get_host(),
-                                                           path=self.path)
-            # Join the constructed URL with the provided location, which will
-            # allow the provided ``location`` to apply query strings to the
-            # base path as well as override the host, if it begins with //
-            location = urljoin(current_uri, location)
+            # Handle the simple, most common case. If the location is absolute
+            # and a scheme or host (netloc) isn't provided, skip an expensive
+            # urljoin() as long as no path segments are '.' or '..'.
+            if (bits.path.startswith('/') and not bits.scheme and not bits.netloc and
+                    '/./' not in bits.path and '/../' not in bits.path):
+                # If location starts with '//' but has no netloc, reuse the
+                # schema and netloc from the current request. Strip the double
+                # slashes and continue as if it wasn't specified.
+                if location.startswith('//'):
+                    location = location[2:]
+                location = self._current_scheme_host + location
+            else:
+                # Join the constructed URL with the provided location, which
+                # allows the provided location to apply query strings to the
+                # base path.
+                location = urljoin(self._current_scheme_host + self.path, location)
         return iri_to_uri(location)
+
+    @cached_property
+    def _current_scheme_host(self):
+        return '{}://{}'.format(self.scheme, self.get_host())
 
     def _get_scheme(self):
         """
@@ -261,7 +284,7 @@ class HttpRequest:
 
             try:
                 self._body = self.read()
-            except IOError as e:
+            except OSError as e:
                 raise UnreadablePostError(*e.args) from e
             self._stream = BytesIO(self._body)
         return self._body
@@ -269,7 +292,6 @@ class HttpRequest:
     def _mark_post_parse_error(self):
         self._post = QueryDict()
         self._files = MultiValueDict()
-        self._post_parse_error = True
 
     def _load_post_and_files(self):
         """Populate self._post and self._files if the content-type is a form type"""
@@ -293,9 +315,6 @@ class HttpRequest:
                 # formatting the error the request handler might access
                 # self.POST, set self._post and self._file to prevent
                 # attempts to parse POST data again.
-                # Mark that an error occurred. This allows self.__repr__ to
-                # be explicit about it instead of simply representing an
-                # empty POST
                 self._mark_post_parse_error()
                 raise
         elif self.content_type == 'application/x-www-form-urlencoded':
@@ -320,32 +339,43 @@ class HttpRequest:
         self._read_started = True
         try:
             return self._stream.read(*args, **kwargs)
-        except IOError as e:
+        except OSError as e:
             raise UnreadablePostError(*e.args) from e
 
     def readline(self, *args, **kwargs):
         self._read_started = True
         try:
             return self._stream.readline(*args, **kwargs)
-        except IOError as e:
+        except OSError as e:
             raise UnreadablePostError(*e.args) from e
 
     def __iter__(self):
-        while True:
-            buf = self.readline()
-            if not buf:
-                break
-            yield buf
-
-    def xreadlines(self):
-        warnings.warn(
-            'HttpRequest.xreadlines() is deprecated in favor of iterating the '
-            'request.', RemovedInDjango30Warning, stacklevel=2,
-        )
-        yield from self
+        return iter(self.readline, b'')
 
     def readlines(self):
         return list(self)
+
+
+class HttpHeaders(CaseInsensitiveMapping):
+    HTTP_PREFIX = 'HTTP_'
+    # PEP 333 gives two headers which aren't prepended with HTTP_.
+    UNPREFIXED_HEADERS = {'CONTENT_TYPE', 'CONTENT_LENGTH'}
+
+    def __init__(self, environ):
+        headers = {}
+        for header, value in environ.items():
+            name = self.parse_header_name(header)
+            if name:
+                headers[name] = value
+        super().__init__(headers)
+
+    @classmethod
+    def parse_header_name(cls, header):
+        if header.startswith(cls.HTTP_PREFIX):
+            header = header[len(cls.HTTP_PREFIX):]
+        elif header not in cls.UNPREFIXED_HEADERS:
+            return None
+        return header.replace('_', '-').title()
 
 
 class QueryDict(MultiValueDict):
@@ -370,19 +400,17 @@ class QueryDict(MultiValueDict):
 
     def __init__(self, query_string=None, mutable=False, encoding=None):
         super().__init__()
-        if not encoding:
-            encoding = settings.DEFAULT_CHARSET
-        self.encoding = encoding
+        self.encoding = encoding or settings.DEFAULT_CHARSET
         query_string = query_string or ''
         parse_qsl_kwargs = {
             'keep_blank_values': True,
             'fields_limit': settings.DATA_UPLOAD_MAX_NUMBER_FIELDS,
-            'encoding': encoding,
+            'encoding': self.encoding,
         }
         if isinstance(query_string, bytes):
             # query_string normally contains URL-encoded data, a subset of ASCII.
             try:
-                query_string = query_string.decode(encoding)
+                query_string = query_string.decode(self.encoding)
             except UnicodeDecodeError:
                 # ... but some user agents are misbehaving :-(
                 query_string = query_string.decode('iso-8859-1')
@@ -493,7 +521,7 @@ class QueryDict(MultiValueDict):
         """
         output = []
         if safe:
-            safe = force_bytes(safe, self.encoding)
+            safe = safe.encode(self.encoding)
 
             def encode(k, v):
                 return '%s=%s' % ((quote(k, safe), quote(v, safe)))
@@ -501,14 +529,15 @@ class QueryDict(MultiValueDict):
             def encode(k, v):
                 return urlencode({k: v})
         for k, list_ in self.lists():
-            k = force_bytes(k, self.encoding)
-            output.extend(encode(k, force_bytes(v, self.encoding))
-                          for v in list_)
+            output.extend(
+                encode(k.encode(self.encoding), str(v).encode(self.encoding))
+                for v in list_
+            )
         return '&'.join(output)
 
 
 # It's neither necessary nor appropriate to use
-# django.utils.encoding.force_text for parsing URLs and form inputs. Thus,
+# django.utils.encoding.force_str() for parsing URLs and form inputs. Thus,
 # this slightly more restricted function, used by QueryDict.
 def bytes_to_text(s, encoding):
     """
@@ -528,7 +557,7 @@ def split_domain_port(host):
     """
     Return a (domain, port) tuple from a given host.
 
-    Returned domain is lower-cased. If the host is invalid, the domain will be
+    Returned domain is lowercased. If the host is invalid, the domain will be
     empty.
     """
     host = host.lower()
@@ -556,13 +585,9 @@ def validate_host(host, allowed_hosts):
     ``example.com`` and any subdomain), ``*`` matches anything, and anything
     else must match exactly.
 
-    Note: This function assumes that the given host is lower-cased and has
+    Note: This function assumes that the given host is lowercased and has
     already had the port, if any, stripped off.
 
     Return ``True`` for a valid host, ``False`` otherwise.
     """
-    for pattern in allowed_hosts:
-        if pattern == '*' or is_same_domain(host, pattern):
-            return True
-
-    return False
+    return any(pattern == '*' or is_same_domain(host, pattern) for pattern in allowed_hosts)

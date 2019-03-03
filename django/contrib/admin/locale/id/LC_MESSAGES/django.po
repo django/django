@@ -2,19 +2,19 @@
 #
 # Translators:
 # Claude Paroz <claude@2xlibre.net>, 2014
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2017
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2018
 # Jannis Leidel <jannis@leidel.info>, 2011
 # M Asep Indrayana <me@drayanaindra.com>, 2015
 # oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2016
 # rodin <romihardiyanto@gmail.com>, 2011-2013
-# rodin <romihardiyanto@gmail.com>, 2013-2016
+# rodin <romihardiyanto@gmail.com>, 2013-2017
 # Sutrisno Efendi <kangfend@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-03-05 13:15+0000\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-06-18 23:35+0000\n"
 "Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
@@ -92,6 +92,15 @@ msgstr "Tambahkan %(verbose_name)s lagi"
 
 msgid "Remove"
 msgstr "Hapus"
+
+msgid "Addition"
+msgstr "Tambahan"
+
+msgid "Change"
+msgstr "Ubah"
+
+msgid "Deletion"
+msgstr "Penghapusan"
 
 msgid "action time"
 msgstr "waktu aksi"
@@ -171,11 +180,11 @@ msgstr ""
 "Tekan \"Control\", atau \"Command\" pada Mac, untuk memilih lebih dari satu."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-"{name} \"{obj}\" telah berhasil ditambahkan. Anda dapat mengeditnya kembali "
-"di bawah."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" telah berhasil ditambahkan."
+
+msgid "You may edit it again below."
+msgstr "Anda dapat menyunting itu kembali dibawah."
 
 #, python-brace-format
 msgid ""
@@ -186,15 +195,18 @@ msgstr ""
 "lain di bawah."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} \"{obj}\" telah berhasil ditambahkan."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 " {name} \"{obj}\" telah berhasil diubah. Anda dapat mengeditnya kembali di "
 "bawah."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+"{name} \"{obj}\" telah berhasil ditambahkan. Anda dapat mengeditnya kembali "
+"di bawah."
 
 #, python-brace-format
 msgid ""
@@ -223,7 +235,7 @@ msgstr "%(name)s \"%(obj)s\" berhasil dihapus."
 
 #, python-format
 msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
-msgstr "%(name)s dengan ID \"%(key)s\" tidak ada. Mungkin itu telah dihapus?"
+msgstr "%(name)s dengan ID \"%(key)s\" tidak ada. Mungkin telah dihapus?"
 
 #, python-format
 msgid "Add %s"
@@ -232,6 +244,10 @@ msgstr "Tambahkan %s"
 #, python-format
 msgid "Change %s"
 msgstr "Ubah %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Melihat %s"
 
 msgid "Database error"
 msgstr "Galat basis data"
@@ -339,7 +355,7 @@ msgid "Change password"
 msgstr "Ganti sandi"
 
 msgid "Please correct the error below."
-msgstr "Perbaiki galat di bawah ini."
+msgstr "Harap perbaiki kesalahan dibawah."
 
 msgid "Please correct the errors below."
 msgstr "Perbaiki galat di bawah ini."
@@ -450,8 +466,8 @@ msgstr ""
 "Yakin akan menghapus %(objects_name)s terpilih? Semua objek berikut beserta "
 "objek terkait juga akan dihapus:"
 
-msgid "Change"
-msgstr "Ubah"
+msgid "View"
+msgstr "Tampilan"
 
 msgid "Delete?"
 msgstr "Hapus?"
@@ -470,8 +486,8 @@ msgstr "Model pada aplikasi %(name)s"
 msgid "Add"
 msgstr "Tambah"
 
-msgid "You don't have permission to edit anything."
-msgstr "Anda tidak memiliki izin untuk mengubah apapun."
+msgid "You don't have permission to view or edit anything."
+msgstr "Anda tidak mempunyai perizinan untuk melihat atau menyunting apapun."
 
 msgid "Recent actions"
 msgstr "Tindakan terbaru"
@@ -534,6 +550,10 @@ msgid "Change selected %(model)s"
 msgstr "Ubah %(model)s yang dipilih"
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr "Melihat%(model)sterpilih"
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr "Tambahkan %(model)s yang lain"
 
@@ -561,6 +581,12 @@ msgstr "Simpan dan tambahkan lagi"
 
 msgid "Save and continue editing"
 msgstr "Simpan dan terus mengedit"
+
+msgid "Save and view"
+msgstr "Simpan dan tampilkan"
+
+msgid "Close"
+msgstr "Tutup"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Terima kasih telah menggunakan situs ini hari ini."
@@ -672,6 +698,10 @@ msgstr "Pilih %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Pilih %s untuk diubah"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Pilih %s untuk melihat"
 
 msgid "Date:"
 msgstr "Tanggal:"

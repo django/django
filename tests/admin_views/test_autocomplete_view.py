@@ -1,7 +1,6 @@
 import json
 
 from django.contrib import admin
-from django.contrib.admin import site
 from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.views.autocomplete import AutocompleteJsonView
 from django.contrib.auth.models import Permission, User
@@ -18,6 +17,7 @@ PAGINATOR_SIZE = AutocompleteJsonView.paginate_by
 
 
 class AuthorAdmin(admin.ModelAdmin):
+    ordering = ['id']
     search_fields = ['id']
 
 
@@ -30,6 +30,7 @@ class BookAdmin(admin.ModelAdmin):
     inlines = [AuthorshipInline]
 
 
+site = admin.AdminSite(name='autocomplete_admin')
 site.register(Question, QuestionAdmin)
 site.register(Answer, AnswerAdmin)
 site.register(Author, AuthorAdmin)
@@ -39,7 +40,7 @@ site.register(Book, BookAdmin)
 class AutocompleteJsonViewTests(AdminViewBasicTestCase):
     as_view_args = {'model_admin': QuestionAdmin(Question, site)}
     factory = RequestFactory()
-    url = reverse_lazy('admin:admin_views_question_autocomplete')
+    url = reverse_lazy('autocomplete_admin:admin_views_question_autocomplete')
 
     @classmethod
     def setUpTestData(cls):
@@ -68,7 +69,7 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
         response = self.client.get(self.url, {'term': ''})
         self.assertEqual(response.status_code, 302)
 
-    def test_has_change_permission_required(self):
+    def test_has_view_or_change_permission_required(self):
         """
         Users require the change permission for the related model to the
         autocomplete view for it.
@@ -80,15 +81,17 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
         response = AutocompleteJsonView.as_view(**self.as_view_args)(request)
         self.assertEqual(response.status_code, 403)
         self.assertJSONEqual(response.content.decode('utf-8'), {'error': '403 Forbidden'})
-        # Add the change permission and retry.
-        p = Permission.objects.get(
-            content_type=ContentType.objects.get_for_model(Question),
-            codename='change_question',
-        )
-        self.user.user_permissions.add(p)
-        request.user = User.objects.get(pk=self.user.pk)
-        response = AutocompleteJsonView.as_view(**self.as_view_args)(request)
-        self.assertEqual(response.status_code, 200)
+        for permission in ('view', 'change'):
+            with self.subTest(permission=permission):
+                self.user.user_permissions.clear()
+                p = Permission.objects.get(
+                    content_type=ContentType.objects.get_for_model(Question),
+                    codename='%s_question' % permission,
+                )
+                self.user.user_permissions.add(p)
+                request.user = User.objects.get(pk=self.user.pk)
+                response = AutocompleteJsonView.as_view(**self.as_view_args)(request)
+                self.assertEqual(response.status_code, 200)
 
     def test_search_use_distinct(self):
         """
@@ -156,12 +159,12 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.superuser = User.objects.create_superuser(
             username='super', password='secret', email='super@example.com',
         )
-        self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
+        self.admin_login(username='super', password='secret', login_url=reverse('autocomplete_admin:index'))
 
     def test_select(self):
         from selenium.webdriver.common.keys import Keys
         from selenium.webdriver.support.ui import Select
-        self.selenium.get(self.live_server_url + reverse('admin:admin_views_answer_add'))
+        self.selenium.get(self.live_server_url + reverse('autocomplete_admin:admin_views_answer_add'))
         elem = self.selenium.find_element_by_css_selector('.select2-selection')
         elem.click()  # Open the autocomplete dropdown.
         results = self.selenium.find_element_by_css_selector('.select2-results')
@@ -196,7 +199,7 @@ class SeleniumTests(AdminSeleniumTestCase):
     def test_select_multiple(self):
         from selenium.webdriver.common.keys import Keys
         from selenium.webdriver.support.ui import Select
-        self.selenium.get(self.live_server_url + reverse('admin:admin_views_question_add'))
+        self.selenium.get(self.live_server_url + reverse('autocomplete_admin:admin_views_question_add'))
         elem = self.selenium.find_element_by_css_selector('.select2-selection')
         elem.click()  # Open the autocomplete dropdown.
         results = self.selenium.find_element_by_css_selector('.select2-results')
@@ -229,3 +232,23 @@ class SeleniumTests(AdminSeleniumTestCase):
         search.send_keys(Keys.RETURN)
         select = Select(self.selenium.find_element_by_id('id_related_questions'))
         self.assertEqual(len(select.all_selected_options), 2)
+
+    def test_inline_add_another_widgets(self):
+        def assertNoResults(row):
+            elem = row.find_element_by_css_selector('.select2-selection')
+            elem.click()  # Open the autocomplete dropdown.
+            results = self.selenium.find_element_by_css_selector('.select2-results')
+            self.assertTrue(results.is_displayed())
+            option = self.selenium.find_element_by_css_selector('.select2-results__option')
+            self.assertEqual(option.text, 'No results found')
+
+        # Autocomplete works in rows present when the page loads.
+        self.selenium.get(self.live_server_url + reverse('autocomplete_admin:admin_views_book_add'))
+        rows = self.selenium.find_elements_by_css_selector('.dynamic-authorship_set')
+        self.assertEqual(len(rows), 3)
+        assertNoResults(rows[0])
+        # Autocomplete works in rows added using the "Add another" button.
+        self.selenium.find_element_by_link_text('Add another Authorship').click()
+        rows = self.selenium.find_elements_by_css_selector('.dynamic-authorship_set')
+        self.assertEqual(len(rows), 4)
+        assertNoResults(rows[-1])

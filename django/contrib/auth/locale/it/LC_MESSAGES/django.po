@@ -8,13 +8,13 @@
 # Marco Bonetti, 2014
 # palmux <palmux@gmail.com>, 2015
 # Mattia Procopio <promat85@gmail.com>, 2015
-# Stefano Brentegani <sbrentegani@gmail.com>, 2015
+# Stefano Brentegani <sbrentegani@gmail.com>, 2015,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-06-18 09:50+0000\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-11-16 13:37+0000\n"
 "Last-Translator: palmux <palmux@gmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
@@ -73,12 +73,11 @@ msgstr "Inserisci la stessa password inserita sopra, come verifica."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Le password inserite non vengono conservate, quindi non c'è modo di vedere "
-"la password di questo utente, ma è possibile modificarla usando <a href=\"../"
-"password/\">questo modulo</a>."
+"Le password non vengono conservate nella forma originale, quindi non è "
+"possibile visualizzare la password di questo utente, ma è possibile "
+"cambiarla usando <a href=\"{}\">questo modulo</a>."
 
 #, python-format
 msgid ""

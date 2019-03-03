@@ -55,20 +55,13 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
 
     @staticmethod
     def _get_pk_values(serial_str):
-        ret_list = []
         serial_list = json.loads(serial_str)
-        for obj_dict in serial_list:
-            ret_list.append(obj_dict["pk"])
-        return ret_list
+        return [obj_dict['pk'] for obj_dict in serial_list]
 
     @staticmethod
     def _get_field_values(serial_str, field_name):
-        ret_list = []
         serial_list = json.loads(serial_str)
-        for obj_dict in serial_list:
-            if field_name in obj_dict["fields"]:
-                ret_list.append(obj_dict["fields"][field_name])
-        return ret_list
+        return [obj_dict['fields'][field_name] for obj_dict in serial_list if field_name in obj_dict['fields']]
 
     def test_indentation_whitespace(self):
         s = serializers.json.Serializer()

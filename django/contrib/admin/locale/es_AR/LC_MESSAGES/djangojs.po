@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-07-30 23:55+0000\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
+"PO-Revision-Date: 2017-09-23 18:54+0000\n"
 "Last-Translator: Ramiro Morales\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
 "language/es_AR/)\n"
@@ -101,6 +101,21 @@ msgstr ""
 "campos individuales. Es probable que lo que necesite usar en realidad sea el "
 "botón Ejecutar y no el botón Guardar."
 
+msgid "Now"
+msgstr "Ahora"
+
+msgid "Midnight"
+msgstr "Medianoche"
+
+msgid "6 a.m."
+msgstr "6 AM"
+
+msgid "Noon"
+msgstr "Mediodía"
+
+msgid "6 p.m."
+msgstr "6 PM"
+
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
@@ -121,26 +136,11 @@ msgstr[1] ""
 "Nota: Ud. se encuentra en una zona horaria que está %s horas atrasada "
 "respecto a la del servidor."
 
-msgid "Now"
-msgstr "Ahora"
-
 msgid "Choose a Time"
 msgstr "Seleccione una Hora"
 
 msgid "Choose a time"
 msgstr "Elija una hora"
-
-msgid "Midnight"
-msgstr "Medianoche"
-
-msgid "6 a.m."
-msgstr "6 AM"
-
-msgid "Noon"
-msgstr "Mediodía"
-
-msgid "6 p.m."
-msgstr "6 PM"
 
 msgid "Cancel"
 msgstr "Cancelar"

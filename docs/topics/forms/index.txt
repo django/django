@@ -148,9 +148,9 @@ Instantiating, processing, and rendering forms
 
 When rendering an object in Django, we generally:
 
-1. get hold of it in the view (fetch it from the database, for example)
-2. pass it to the template context
-3. expand it to HTML markup using template variables
+#. get hold of it in the view (fetch it from the database, for example)
+#. pass it to the template context
+#. expand it to HTML markup using template variables
 
 Rendering a form in a template involves nearly the same work as rendering any
 other kind of object, but there are some key differences.
@@ -226,8 +226,8 @@ The :class:`Form` class
 We already know what we want our HTML form to look like. Our starting point for
 it in Django is this:
 
-.. snippet::
-    :filename: forms.py
+.. code-block:: python
+    :caption: forms.py
 
     from django import forms
 
@@ -259,7 +259,7 @@ The whole form, when rendered for the first time, will look like:
 .. code-block:: html+django
 
     <label for="your_name">Your name: </label>
-    <input id="your_name" type="text" name="your_name" maxlength="100" required />
+    <input id="your_name" type="text" name="your_name" maxlength="100" required>
 
 Note that it **does not** include the ``<form>`` tags, or a submit button.
 We'll have to provide those ourselves in the template.
@@ -276,11 +276,11 @@ logic.
 To handle the form we need to instantiate it in the view for the URL where we
 want it to be published:
 
-.. snippet::
-    :filename: views.py
+.. code-block:: python
+    :caption: views.py
 
-    from django.shortcuts import render
     from django.http import HttpResponseRedirect
+    from django.shortcuts import render
 
     from .forms import NameForm
 
@@ -334,7 +334,7 @@ is:
     <form action="/your-name/" method="post">
         {% csrf_token %}
         {{ form }}
-        <input type="submit" value="Submit" />
+        <input type="submit" value="Submit">
     </form>
 
 All the form's fields and their attributes will be unpacked into HTML markup
@@ -370,9 +370,11 @@ ready to learn a bit more about the underlying machinery.
 More about Django :class:`Form` classes
 =======================================
 
-All form classes are created as subclasses of :class:`django.forms.Form`,
-including the :doc:`ModelForm </topics/forms/modelforms>`, which you encounter
-in Django's admin.
+All form classes are created as subclasses of either :class:`django.forms.Form`
+or :class:`django.forms.ModelForm`. You can think of ``ModelForm`` as a
+subclass of ``Form``. ``Form`` and ``ModelForm`` actually inherit common
+functionality from a (private) ``BaseForm`` class, but this implementation
+detail is rarely important.
 
 .. admonition:: Models and Forms
 
@@ -402,8 +404,8 @@ More on fields
 Consider a more useful form than our minimal example above, which we could use
 to implement "contact me" functionality on a personal website:
 
-.. snippet::
-    :filename: forms.py
+.. code-block:: python
+    :caption: forms.py
 
     from django import forms
 
@@ -451,8 +453,8 @@ values to a Python ``int`` and ``float`` respectively.
 
 Here's how the form data could be processed in the view that handles this form:
 
-.. snippet::
-    :filename: views.py
+.. code-block:: python
+    :caption: views.py
 
     from django.core.mail import send_mail
 
@@ -512,13 +514,13 @@ Here's the output of ``{{ form.as_p }}`` for our ``ContactForm`` instance:
 .. code-block:: html+django
 
     <p><label for="id_subject">Subject:</label>
-        <input id="id_subject" type="text" name="subject" maxlength="100" required /></p>
+        <input id="id_subject" type="text" name="subject" maxlength="100" required></p>
     <p><label for="id_message">Message:</label>
         <textarea name="message" id="id_message" required></textarea></p>
     <p><label for="id_sender">Sender:</label>
-        <input type="email" name="sender" id="id_sender" required /></p>
+        <input type="email" name="sender" id="id_sender" required></p>
     <p><label for="id_cc_myself">Cc myself:</label>
-        <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>
+        <input type="checkbox" name="cc_myself" id="id_cc_myself"></p>
 
 Note that each form field has an ID attribute set to ``id_<field-name>``, which
 is referenced by the accompanying label tag. This is important in ensuring that

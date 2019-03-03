@@ -14,12 +14,12 @@ Installation
 
 To install the redirects app, follow these steps:
 
-1. Ensure that the ``django.contrib.sites`` framework
+#. Ensure that the ``django.contrib.sites`` framework
    :ref:`is installed <enabling-the-sites-framework>`.
-2. Add ``'django.contrib.redirects'`` to your :setting:`INSTALLED_APPS` setting.
-3. Add ``'django.contrib.redirects.middleware.RedirectFallbackMiddleware'``
+#. Add ``'django.contrib.redirects'`` to your :setting:`INSTALLED_APPS` setting.
+#. Add ``'django.contrib.redirects.middleware.RedirectFallbackMiddleware'``
    to your :setting:`MIDDLEWARE` setting.
-4. Run the command :djadmin:`manage.py migrate <migrate>`.
+#. Run the command :djadmin:`manage.py migrate <migrate>`.
 
 How it works
 ============

@@ -51,10 +51,6 @@ Fields
         Optional (:attr:`blank=True <django.db.models.Field.blank>`). 150
         characters or fewer.
 
-        .. versionchanged:: 2.0
-
-            The ``max_length`` increased from 30 to 150 characters.
-
     .. attribute:: email
 
         Optional (:attr:`blank=True <django.db.models.Field.blank>`). Email
@@ -73,7 +69,7 @@ Fields
 
     .. attribute:: user_permissions
 
-         Many-to-many relationship to :class:`~django.contrib.auth.models.Permission`
+        Many-to-many relationship to :class:`~django.contrib.auth.models.Permission`
 
     .. attribute:: is_staff
 
@@ -378,8 +374,12 @@ Fields
 
     .. attribute:: name
 
-        Required. 80 characters or fewer. Any characters are permitted. Example:
-        ``'Awesome Users'``.
+        Required. 150 characters or fewer. Any characters are permitted.
+        Example: ``'Awesome Users'``.
+
+        .. versionchanged:: 2.2
+
+             The ``max_length`` increased from 80 to 150 characters.
 
     .. attribute:: permissions
 
@@ -474,7 +474,6 @@ backends, see the :ref:`Other authentication sources section
 <authentication-backends>` of the :doc:`User authentication guide
 </topics/auth/index>`.
 
-
 Available authentication backends
 ---------------------------------
 
@@ -545,7 +544,7 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         Returns whether the ``user_obj`` has any permissions on the app
         ``app_label``.
 
-    .. method:: ModelBackend.user_can_authenticate()
+    .. method:: user_can_authenticate()
 
         Returns whether the user is allowed to authenticate. To match the
         behavior of :class:`~django.contrib.auth.forms.AuthenticationForm`
@@ -558,14 +557,14 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
 .. class:: AllowAllUsersModelBackend
 
-   Same as :class:`ModelBackend` except that it doesn't reject inactive users
-   because :meth:`~ModelBackend.user_can_authenticate` always returns ``True``.
+    Same as :class:`ModelBackend` except that it doesn't reject inactive users
+    because :meth:`~ModelBackend.user_can_authenticate` always returns ``True``.
 
-   When using this backend, you'll likely want to customize the
-   :class:`~django.contrib.auth.forms.AuthenticationForm` used by the
-   :class:`~django.contrib.auth.views.LoginView` by overriding the
-   :meth:`~django.contrib.auth.forms.AuthenticationForm.confirm_login_allowed`
-   method as it rejects inactive users.
+    When using this backend, you'll likely want to customize the
+    :class:`~django.contrib.auth.forms.AuthenticationForm` used by the
+    :class:`~django.contrib.auth.views.LoginView` by overriding the
+    :meth:`~django.contrib.auth.forms.AuthenticationForm.confirm_login_allowed`
+    method as it rejects inactive users.
 
 .. class:: RemoteUserBackend
 
@@ -578,51 +577,61 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
     If you need more control, you can create your own authentication backend
     that inherits from this class and override these attributes or methods:
 
-.. attribute:: RemoteUserBackend.create_unknown_user
+    .. attribute:: create_unknown_user
 
-    ``True`` or ``False``. Determines whether or not a user object is created
-    if not already in the database  Defaults to ``True``.
+        ``True`` or ``False``. Determines whether or not a user object is
+        created if not already in the database  Defaults to ``True``.
 
-.. method:: RemoteUserBackend.authenticate(request, remote_user)
+    .. method:: authenticate(request, remote_user)
 
-    The username passed as ``remote_user`` is considered trusted. This method
-    simply returns the user object with the given username, creating a new
-    user object if :attr:`~RemoteUserBackend.create_unknown_user` is ``True``.
+        The username passed as ``remote_user`` is considered trusted. This
+        method simply returns the user object with the given username, creating
+        a new user object if :attr:`~RemoteUserBackend.create_unknown_user` is
+        ``True``.
 
-    Returns ``None`` if :attr:`~RemoteUserBackend.create_unknown_user` is
-    ``False`` and a ``User`` object with the given username is not found in the
-    database.
+        Returns ``None`` if :attr:`~RemoteUserBackend.create_unknown_user` is
+        ``False`` and a ``User`` object with the given username is not found in
+        the database.
 
-    ``request`` is an :class:`~django.http.HttpRequest` and may be ``None`` if
-    it wasn't provided to :func:`~django.contrib.auth.authenticate` (which
-    passes it on to the backend).
+        ``request`` is an :class:`~django.http.HttpRequest` and may be ``None``
+        if it wasn't provided to :func:`~django.contrib.auth.authenticate`
+        (which passes it on to the backend).
 
-.. method:: RemoteUserBackend.clean_username(username)
+    .. method:: clean_username(username)
 
-   Performs any cleaning on the ``username`` (e.g. stripping LDAP DN
-   information) prior to using it to get or create a user object. Returns the
-   cleaned username.
+        Performs any cleaning on the ``username`` (e.g. stripping LDAP DN
+        information) prior to using it to get or create a user object. Returns
+        the cleaned username.
 
-.. method:: RemoteUserBackend.configure_user(user)
+    .. method:: configure_user(request, user)
 
-   Configures a newly created user.  This method is called immediately after a
-   new user is created, and can be used to perform custom setup actions, such
-   as setting the user's groups based on attributes in an LDAP directory.
-   Returns the user object.
+        Configures a newly created user.  This method is called immediately
+        after a new user is created, and can be used to perform custom setup
+        actions, such as setting the user's groups based on attributes in an
+        LDAP directory. Returns the user object.
 
-.. method:: RemoteUserBackend.user_can_authenticate()
+        ``request`` is an :class:`~django.http.HttpRequest` and may be ``None``
+        if it wasn't provided to :func:`~django.contrib.auth.authenticate`
+        (which passes it on to the backend).
 
-    Returns whether the user is allowed to authenticate. This method returns
-    ``False`` for users with :attr:`is_active=False
-    <django.contrib.auth.models.User.is_active>`. Custom user models that don't
-    have an :attr:`~django.contrib.auth.models.CustomUser.is_active` field are
-    allowed.
+        .. versionchanged:: 2.2
+
+            The ``request`` argument was added. Support for method overrides
+            that don't accept it will be removed in Django 3.1.
+
+    .. method:: user_can_authenticate()
+
+        Returns whether the user is allowed to authenticate. This method
+        returns ``False`` for users with :attr:`is_active=False
+        <django.contrib.auth.models.User.is_active>`. Custom user models that
+        don't have an :attr:`~django.contrib.auth.models.CustomUser.is_active`
+        field are allowed.
 
 .. class:: AllowAllUsersRemoteUserBackend
 
-   Same as :class:`RemoteUserBackend` except that it doesn't reject inactive
-   users because :attr:`~RemoteUserBackend.user_can_authenticate` always
-   returns ``True``.
+    Same as :class:`RemoteUserBackend` except that it doesn't reject inactive
+    users because :attr:`~RemoteUserBackend.user_can_authenticate` always
+    returns ``True``.
 
 Utility functions
 =================

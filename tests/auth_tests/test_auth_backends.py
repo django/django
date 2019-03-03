@@ -339,9 +339,7 @@ class SimpleRowlevelBackend:
         return False
 
     def has_module_perms(self, user, app_label):
-        if not user.is_anonymous and not user.is_active:
-            return False
-        return app_label == "app1"
+        return (user.is_anonymous or user.is_active) and app_label == 'app1'
 
     def get_all_permissions(self, user, obj=None):
         if not obj:
@@ -378,10 +376,11 @@ class RowlevelBackendTest(TestCase):
     Tests for auth backend that supports object level permissions
     """
 
-    def setUp(self):
-        self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
-        self.user2 = User.objects.create_user('test2', 'test2@example.com', 'test')
-        self.user3 = User.objects.create_user('test3', 'test3@example.com', 'test')
+    @classmethod
+    def setUpTestData(cls):
+        cls.user1 = User.objects.create_user('test', 'test@example.com', 'test')
+        cls.user2 = User.objects.create_user('test2', 'test2@example.com', 'test')
+        cls.user3 = User.objects.create_user('test3', 'test3@example.com', 'test')
 
     def tearDown(self):
         # The get_group_permissions test messes with ContentTypes, which will
@@ -441,8 +440,9 @@ class NoBackendsTest(TestCase):
     """
     An appropriate error is raised if no auth backends are provided.
     """
-    def setUp(self):
-        self.user = User.objects.create_user('test', 'test@example.com', 'test')
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user('test', 'test@example.com', 'test')
 
     def test_raises_exception(self):
         msg = (
@@ -459,10 +459,11 @@ class InActiveUserBackendTest(TestCase):
     Tests for an inactive user
     """
 
-    def setUp(self):
-        self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
-        self.user1.is_active = False
-        self.user1.save()
+    @classmethod
+    def setUpTestData(cls):
+        cls.user1 = User.objects.create_user('test', 'test@example.com', 'test')
+        cls.user1.is_active = False
+        cls.user1.save()
 
     def test_has_perm(self):
         self.assertIs(self.user1.has_perm('perm', TestObj()), False)
@@ -494,8 +495,11 @@ class PermissionDeniedBackendTest(TestCase):
     """
     backend = 'auth_tests.test_auth_backends.PermissionDeniedBackend'
 
+    @classmethod
+    def setUpTestData(cls):
+        cls.user1 = User.objects.create_user('test', 'test@example.com', 'test')
+
     def setUp(self):
-        self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
         self.user_login_failed = []
         signals.user_login_failed.connect(self.user_login_failed_listener)
 
@@ -549,8 +553,9 @@ class ChangedBackendSettingsTest(TestCase):
     TEST_PASSWORD = 'test_password'
     TEST_EMAIL = 'test@example.com'
 
-    def setUp(self):
-        User.objects.create_user(self.TEST_USERNAME, self.TEST_EMAIL, self.TEST_PASSWORD)
+    @classmethod
+    def setUpTestData(cls):
+        User.objects.create_user(cls.TEST_USERNAME, cls.TEST_EMAIL, cls.TEST_PASSWORD)
 
     @override_settings(AUTHENTICATION_BACKENDS=[backend])
     def test_changed_backend_settings(self):
@@ -561,8 +566,8 @@ class ChangedBackendSettingsTest(TestCase):
         # Get a session for the test user
         self.assertTrue(self.client.login(
             username=self.TEST_USERNAME,
-            password=self.TEST_PASSWORD)
-        )
+            password=self.TEST_PASSWORD,
+        ))
         # Prepare a request object
         request = HttpRequest()
         request.session = self.client.session
@@ -594,8 +599,9 @@ class SkippedBackend:
 
 
 class AuthenticateTests(TestCase):
-    def setUp(self):
-        self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
+    @classmethod
+    def setUpTestData(cls):
+        cls.user1 = User.objects.create_user('test', 'test@example.com', 'test')
 
     @override_settings(AUTHENTICATION_BACKENDS=['auth_tests.test_auth_backends.TypeErrorBackend'])
     def test_type_error_raised(self):
@@ -620,8 +626,11 @@ class ImproperlyConfiguredUserModelTest(TestCase):
     An exception from within get_user_model() is propagated and doesn't
     raise an UnboundLocalError (#21439).
     """
+    @classmethod
+    def setUpTestData(cls):
+        cls.user1 = User.objects.create_user('test', 'test@example.com', 'test')
+
     def setUp(self):
-        self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
         self.client.login(username='test', password='test')
 
     @override_settings(AUTH_USER_MODEL='thismodel.doesntexist')
@@ -696,6 +705,15 @@ class SelectingBackendTests(TestCase):
         )
         with self.assertRaisesMessage(ValueError, expected_message):
             self.client._login(user)
+
+    def test_non_string_backend(self):
+        user = User.objects.create_user(self.username, 'email', self.password)
+        expected_message = (
+            'backend must be a dotted import path string (got '
+            '<class \'django.contrib.auth.backends.ModelBackend\'>).'
+        )
+        with self.assertRaisesMessage(TypeError, expected_message):
+            self.client._login(user, backend=ModelBackend)
 
     @override_settings(AUTHENTICATION_BACKENDS=[backend, other_backend])
     def test_backend_path_login_with_explicit_backends(self):

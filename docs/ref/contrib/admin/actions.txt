@@ -27,8 +27,9 @@ models. For example, here's the user module from Django's built-in
     has an important caveat: your model's ``delete()`` method will not be
     called.
 
-    If you wish to override this behavior, simply write a custom action which
-    accomplishes deletion in your preferred manner -- for example, by calling
+    If you wish to override this behavior, you can override
+    :meth:`.ModelAdmin.delete_queryset` or write a custom action which does
+    deletion in your preferred manner -- for example, by calling
     ``Model.delete()`` for each of the selected items.
 
     For more background on bulk deletion, see the documentation on :ref:`object
@@ -219,8 +220,8 @@ example, you might write a simple export function that uses Django's
 :doc:`serialization functions </topics/serialization>` to dump some selected
 objects as JSON::
 
-    from django.http import HttpResponse
     from django.core import serializers
+    from django.http import HttpResponse
 
     def export_as_json(modeladmin, request, queryset):
         response = HttpResponse(content_type="application/json")
@@ -342,10 +343,8 @@ Conditionally enabling or disabling actions
     This returns a dictionary of actions allowed. The keys are action names, and
     the values are ``(function, name, short_description)`` tuples.
 
-    Most of the time you'll use this method to conditionally remove actions from
-    the list gathered by the superclass. For example, if I only wanted users
-    whose names begin with 'J' to be able to delete objects in bulk, I could do
-    the following::
+    For example, if you only want users whose names begin with 'J' to be able
+    to delete objects in bulk::
 
         class MyModelAdmin(admin.ModelAdmin):
             ...
@@ -356,3 +355,50 @@ Conditionally enabling or disabling actions
                     if 'delete_selected' in actions:
                         del actions['delete_selected']
                 return actions
+
+.. _admin-action-permissions:
+
+Setting permissions for actions
+-------------------------------
+
+Actions may limit their availability to users with specific permissions by
+setting an ``allowed_permissions`` attribute on the action function::
+
+    def make_published(modeladmin, request, queryset):
+        queryset.update(status='p')
+    make_published.allowed_permissions = ('change',)
+
+The ``make_published()`` action will only be available to users that pass the
+:meth:`.ModelAdmin.has_change_permission` check.
+
+If ``allowed_permissions`` has more than one permission, the action will be
+available as long as the user passes at least one of the checks.
+
+Available values for ``allowed_permissions`` and the corresponding method
+checks are:
+
+- ``'add'``: :meth:`.ModelAdmin.has_add_permission`
+- ``'change'``: :meth:`.ModelAdmin.has_change_permission`
+- ``'delete'``: :meth:`.ModelAdmin.has_delete_permission`
+- ``'view'``: :meth:`.ModelAdmin.has_view_permission`
+
+You can specify any other value as long as you implement a corresponding
+``has_<value>_permission(self, request)`` method on the ``ModelAdmin``.
+
+For example::
+
+    from django.contrib import admin
+    from django.contrib.auth import get_permission_codename
+
+    class ArticleAdmin(admin.ModelAdmin):
+        actions = ['make_published']
+
+        def make_published(self, request, queryset):
+            queryset.update(status='p')
+        make_published.allowed_permissions = ('publish',)
+
+        def has_publish_permission(self, request):
+            """Does the user have the publish permission?"""
+            opts = self.opts
+            codename = get_permission_codename('publish', opts)
+            return request.user.has_perm('%s.%s' % (opts.app_label, codename))

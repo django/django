@@ -1,11 +1,11 @@
 """
 A second, custom AdminSite -- see tests.CustomAdminSiteTests.
 """
-from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.http import HttpResponse
+from django.urls import path
 
 from . import admin as base_admin, forms, models
 
@@ -25,7 +25,7 @@ class Admin2(admin.AdminSite):
 
     def get_urls(self):
         return [
-            url(r'^my_view/$', self.admin_view(self.my_view), name='my_view'),
+            path('my_view/', self.admin_view(self.my_view), name='my_view'),
         ] + super().get_urls()
 
     def my_view(self, request):
@@ -46,9 +46,15 @@ class CustomPwdTemplateUserAdmin(UserAdmin):
     change_user_password_template = ['admin/auth/user/change_password.html']  # a list, to test fix for #18697
 
 
+class BookAdmin(admin.ModelAdmin):
+    def get_deleted_objects(self, objs, request):
+        return ['a deletable object'], {'books': 1}, set(), []
+
+
 site = Admin2(name="admin2")
 
 site.register(models.Article, base_admin.ArticleAdmin)
+site.register(models.Book, BookAdmin)
 site.register(models.Section, inlines=[base_admin.ArticleInline], search_fields=['name'])
 site.register(models.Thing, base_admin.ThingAdmin)
 site.register(models.Fabric, base_admin.FabricAdmin)

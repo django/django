@@ -3,12 +3,10 @@ import decimal
 import functools
 import hashlib
 import logging
-import re
 from time import time
 
 from django.conf import settings
 from django.db.utils import NotSupportedError
-from django.utils.encoding import force_bytes
 from django.utils.timezone import utc
 
 logger = logging.getLogger('django.db.backends')
@@ -160,15 +158,11 @@ def typecast_timestamp(s):  # does NOT store time zone information
     if ' ' not in s:
         return typecast_date(s)
     d, t = s.split()
-    # Extract timezone information, if it exists. Currently it's ignored.
+    # Remove timezone information.
     if '-' in t:
-        t, tz = t.split('-', 1)
-        tz = '-' + tz
+        t, _ = t.split('-', 1)
     elif '+' in t:
-        t, tz = t.split('+', 1)
-        tz = '+' + tz
-    else:
-        tz = ''
+        t, _ = t.split('+', 1)
     dates = d.split('-')
     times = t.split(':')
     seconds = times[2]
@@ -188,26 +182,46 @@ def typecast_timestamp(s):  # does NOT store time zone information
 # Converters from Python to database (string) #
 ###############################################
 
-def rev_typecast_decimal(d):
-    if d is None:
-        return None
-    return str(d)
-
-
-def truncate_name(name, length=None, hash_len=4):
+def split_identifier(identifier):
     """
-    Shorten a string to a repeatable mangled version with the given length.
-    If a quote stripped name contains a username, e.g. USERNAME"."TABLE,
+    Split a SQL identifier into a two element tuple of (namespace, name).
+
+    The identifier could be a table, column, or sequence name might be prefixed
+    by a namespace.
+    """
+    try:
+        namespace, name = identifier.split('"."')
+    except ValueError:
+        namespace, name = '', identifier
+    return namespace.strip('"'), name.strip('"')
+
+
+def truncate_name(identifier, length=None, hash_len=4):
+    """
+    Shorten a SQL identifier to a repeatable mangled version with the given
+    length.
+
+    If a quote stripped name contains a namespace, e.g. USERNAME"."TABLE,
     truncate the table portion only.
     """
-    match = re.match(r'([^"]+)"\."([^"]+)', name)
-    table_name = match.group(2) if match else name
+    namespace, name = split_identifier(identifier)
 
-    if length is None or len(table_name) <= length:
-        return name
+    if length is None or len(name) <= length:
+        return identifier
 
-    hsh = hashlib.md5(force_bytes(table_name)).hexdigest()[:hash_len]
-    return '%s%s%s' % (match.group(1) + '"."' if match else '', table_name[:length - hash_len], hsh)
+    digest = names_digest(name, length=hash_len)
+    return '%s%s%s' % ('%s"."' % namespace if namespace else '', name[:length - hash_len], digest)
+
+
+def names_digest(*args, length):
+    """
+    Generate a 32-bit digest of a set of arguments that can be used to shorten
+    identifying names.
+    """
+    h = hashlib.md5()
+    for arg in args:
+        h.update(arg.encode())
+    return h.hexdigest()[:length]
 
 
 def format_number(value, max_digits, decimal_places):
@@ -217,18 +231,14 @@ def format_number(value, max_digits, decimal_places):
     """
     if value is None:
         return None
-    if isinstance(value, decimal.Decimal):
-        context = decimal.getcontext().copy()
-        if max_digits is not None:
-            context.prec = max_digits
-        if decimal_places is not None:
-            value = value.quantize(decimal.Decimal(".1") ** decimal_places, context=context)
-        else:
-            context.traps[decimal.Rounded] = 1
-            value = context.create_decimal(value)
-        return "{:f}".format(value)
+    context = decimal.getcontext().copy()
+    if max_digits is not None:
+        context.prec = max_digits
     if decimal_places is not None:
-        return "%.*f" % (decimal_places, value)
+        value = value.quantize(decimal.Decimal(1).scaleb(-decimal_places), context=context)
+    else:
+        context.traps[decimal.Rounded] = 1
+        value = context.create_decimal(value)
     return "{:f}".format(value)
 
 

@@ -2,13 +2,13 @@ import datetime
 import decimal
 from importlib import import_module
 
+import sqlparse
+
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.db import NotSupportedError, transaction
 from django.db.backends import utils
 from django.utils import timezone
-from django.utils.dateparse import parse_duration
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 
 class BaseDatabaseOperations:
@@ -45,6 +45,9 @@ class BaseDatabaseOperations:
     UNBOUNDED_PRECEDING = 'UNBOUNDED ' + PRECEDING
     UNBOUNDED_FOLLOWING = 'UNBOUNDED ' + FOLLOWING
     CURRENT_ROW = 'CURRENT ROW'
+
+    # Prefix for EXPLAIN queries, or None EXPLAIN isn't supported.
+    explain_prefix = None
 
     def __init__(self, connection):
         self.connection = connection
@@ -159,7 +162,7 @@ class BaseDatabaseOperations:
         """
         return ''
 
-    def distinct_sql(self, fields):
+    def distinct_sql(self, fields, params):
         """
         Return an SQL DISTINCT clause which removes duplicate rows from the
         result set. If any fields are given, only check the given fields for
@@ -168,7 +171,7 @@ class BaseDatabaseOperations:
         if fields:
             raise NotSupportedError('DISTINCT ON fields is not supported by this database backend')
         else:
-            return 'DISTINCT'
+            return ['DISTINCT'], []
 
     def fetch_returned_insert_id(self, cursor):
         """
@@ -232,7 +235,7 @@ class BaseDatabaseOperations:
         """
         # Convert params to contain string values.
         def to_string(s):
-            return force_text(s, strings_only=True, errors='replace')
+            return force_str(s, strings_only=True, errors='replace')
         if isinstance(params, (list, tuple)):
             u_params = tuple(to_string(val) for val in params)
         elif params is None:
@@ -296,16 +299,10 @@ class BaseDatabaseOperations:
         cursor.execute() call and PEP 249 doesn't talk about this use case,
         the default implementation is conservative.
         """
-        try:
-            import sqlparse
-        except ImportError:
-            raise ImproperlyConfigured(
-                "sqlparse is required if you don't split your SQL "
-                "statements manually."
-            )
-        else:
-            return [sqlparse.format(statement, strip_comments=True)
-                    for statement in sqlparse.split(sql) if statement]
+        return [
+            sqlparse.format(statement, strip_comments=True)
+            for statement in sqlparse.split(sql) if statement
+        ]
 
     def process_clob(self, value):
         """
@@ -568,9 +565,7 @@ class BaseDatabaseOperations:
 
     def convert_durationfield_value(self, value, expression, connection):
         if value is not None:
-            value = str(decimal.Decimal(value) / decimal.Decimal(1000000))
-            value = parse_duration(value)
-        return value
+            return datetime.timedelta(0, 0, value)
 
     def check_expression_support(self, expression):
         """
@@ -655,3 +650,24 @@ class BaseDatabaseOperations:
 
     def window_frame_range_start_end(self, start=None, end=None):
         return self.window_frame_rows_start_end(start, end)
+
+    def explain_query_prefix(self, format=None, **options):
+        if not self.connection.features.supports_explaining_query_execution:
+            raise NotSupportedError('This backend does not support explaining query execution.')
+        if format:
+            supported_formats = self.connection.features.supported_explain_formats
+            normalized_format = format.upper()
+            if normalized_format not in supported_formats:
+                msg = '%s is not a recognized format.' % normalized_format
+                if supported_formats:
+                    msg += ' Allowed formats: %s' % ', '.join(sorted(supported_formats))
+                raise ValueError(msg)
+        if options:
+            raise ValueError('Unknown options: %s' % ', '.join(sorted(options.keys())))
+        return self.explain_prefix
+
+    def insert_statement(self, ignore_conflicts=False):
+        return 'INSERT INTO'
+
+    def ignore_conflicts_suffix_sql(self, ignore_conflicts=None):
+        return ''

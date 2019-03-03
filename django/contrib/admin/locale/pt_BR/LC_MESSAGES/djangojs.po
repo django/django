@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-06-28 23:30+0000\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
+"PO-Revision-Date: 2017-09-23 18:54+0000\n"
 "Last-Translator: Tarsis Azevedo <tarsis.azevedo@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
@@ -102,26 +102,8 @@ msgstr ""
 "Você selecionou uma ação, e você não fez alterações em campos individuais. "
 "Você provavelmente está procurando o botão Ir ao invés do botão Salvar."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Nota: Você está %s hora à frente do horário do servidor."
-msgstr[1] "Nota: Você está %s horas à frente do horário do servidor."
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Nota: Você está %s hora atrás do tempo do servidor."
-msgstr[1] "Nota: Você está %s horas atrás do horário do servidor."
-
 msgid "Now"
 msgstr "Agora"
-
-msgid "Choose a Time"
-msgstr "Escolha um horário"
-
-msgid "Choose a time"
-msgstr "Escolha uma hora"
 
 msgid "Midnight"
 msgstr "Meia-noite"
@@ -134,6 +116,24 @@ msgstr "Meio-dia"
 
 msgid "6 p.m."
 msgstr "6 da tarde"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Nota: Você está %s hora à frente do horário do servidor."
+msgstr[1] "Nota: Você está %s horas à frente do horário do servidor."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Nota: Você está %s hora atrás do tempo do servidor."
+msgstr[1] "Nota: Você está %s horas atrás do horário do servidor."
+
+msgid "Choose a Time"
+msgstr "Escolha um horário"
+
+msgid "Choose a time"
+msgstr "Escolha uma hora"
 
 msgid "Cancel"
 msgstr "Cancelar"

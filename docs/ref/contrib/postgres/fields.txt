@@ -53,8 +53,8 @@ may be a good choice for the :ref:`range fields <range-fields>` and
         It is possible to nest array fields - you can specify an instance of
         ``ArrayField`` as the ``base_field``. For example::
 
-            from django.db import models
             from django.contrib.postgres.fields import ArrayField
+            from django.db import models
 
             class ChessBoard(models.Model):
                 board = ArrayField(
@@ -109,8 +109,8 @@ Querying ``ArrayField``
 There are a number of custom lookups and transforms for :class:`ArrayField`.
 We will use the following example model::
 
-    from django.db import models
     from django.contrib.postgres.fields import ArrayField
+    from django.db import models
 
     class Post(models.Model):
         name = models.CharField(max_length=200)
@@ -265,6 +265,11 @@ transform do not change. For example::
     :ref:`setup the citext extension <create-postgresql-extensions>` in
     PostgreSQL before the first ``CreateModel`` migration operation.
 
+    If you're using an :class:`~django.contrib.postgres.fields.ArrayField`
+    of ``CIText`` fields, you must add ``'django.contrib.postgres'`` in your
+    :setting:`INSTALLED_APPS`, otherwise field values will appear as strings
+    like ``'{thoughts,django}'``.
+
     Several fields that use the mixin are provided:
 
 .. class:: CICharField(**options)
@@ -292,8 +297,8 @@ transform do not change. For example::
 
     To use this field, you'll need to:
 
-    1. Add ``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS`.
-    2. :ref:`Setup the hstore extension <create-postgresql-extensions>` in
+    #. Add ``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS`.
+    #. :ref:`Setup the hstore extension <create-postgresql-extensions>` in
        PostgreSQL.
 
     You'll see an error like ``can't adapt type 'dict'`` if you skip the first
@@ -544,7 +549,7 @@ name::
     ...         }],
     ...     },
     ... })
-    >>> Dog.objects.create(name='Meg', data={'breed': 'collie'})
+    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': None})
 
     >>> Dog.objects.filter(data__breed='collie')
     <QuerySet [<Dog: Meg>]>
@@ -565,6 +570,17 @@ the :lookup:`jsonfield.contains` lookup instead.
 
 If only one key or index is used, the SQL operator ``->`` is used. If multiple
 operators are used then the ``#>`` operator is used.
+
+To query for ``null`` in JSON data, use ``None`` as a value::
+
+    >>> Dog.objects.filter(data__owner=None)
+    <QuerySet [<Dog: Meg>]>
+
+To query for missing keys, use the ``isnull`` lookup::
+
+    >>> Dog.objects.create(name='Shep', data={'breed': 'collie'})
+    >>> Dog.objects.filter(data__owner__isnull=True)
+    <QuerySet [<Dog: Shep>]>
 
 .. warning::
 
@@ -604,7 +620,7 @@ start and end timestamps of an event, or the range of ages an activity is
 suitable for.
 
 All of the range fields translate to :ref:`psycopg2 Range objects
-<psycopg2:adapt-range>` in python, but also accept tuples as input if no bounds
+<psycopg2:adapt-range>` in Python, but also accept tuples as input if no bounds
 information is necessary. The default is lower bound included, upper bound
 excluded; that is, ``[)``.
 
@@ -636,6 +652,18 @@ excluded; that is, ``[)``.
     returns a range in a canonical form that includes the lower bound and
     excludes the upper bound; that is ``[)``.
 
+``DecimalRangeField``
+---------------------
+
+.. class:: DecimalRangeField(**options)
+
+    .. versionadded:: 2.2
+
+    Stores a range of floating point values. Based on a
+    :class:`~django.db.models.DecimalField`. Represented by a ``numrange`` in
+    the database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in
+    Python.
+
 ``FloatRangeField``
 -------------------
 
@@ -644,6 +672,10 @@ excluded; that is, ``[)``.
     Stores a range of floating point values. Based on a
     :class:`~django.db.models.FloatField`. Represented by a ``numrange`` in the
     database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in Python.
+
+    .. deprecated:: 2.2
+
+        Use :class:`DecimalRangeField` instead.
 
 ``DateTimeRangeField``
 ----------------------

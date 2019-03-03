@@ -1,20 +1,21 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# András Veres-Szentkirályi, 2016
+# Akos Zsolt Hochrein <hoch.akos@gmail.com>, 2018
+# András Veres-Szentkirályi, 2016-2018
 # Attila Nagy <>, 2012
 # Dóra Szendrei <szendrgigi@gmail.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
-# János Péter Ronkay <transifex2@hangya.net>, 2011-2012,2014
+# János R (Hangya), 2011-2012,2014
 # Máté Őry <orymate@iit.bme.hu>, 2013
 # Szilveszter Farkas <szilveszter.farkas@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-03-24 11:22+0000\n"
-"Last-Translator: Dóra Szendrei <szendrgigi@gmail.com>\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-26 09:24+0000\n"
+"Last-Translator: Akos Zsolt Hochrein <hoch.akos@gmail.com>\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
@@ -163,6 +164,9 @@ msgstr "Japán"
 
 msgid "Georgian"
 msgstr "Grúz"
+
+msgid "Kabyle"
+msgstr "Kabil"
 
 msgid "Kazakh"
 msgstr "Kazak"
@@ -320,6 +324,7 @@ msgstr "Adjon meg egy érvényes számot."
 msgid "Enter a valid email address."
 msgstr "Írjon be egy érvényes e-mail címet."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -387,6 +392,9 @@ msgstr[1] ""
 "Bizonyosodjon meg arról, hogy ez az érték legfeljebb %(limit_value)d "
 "karaktert tartalmaz (jelenlegi hossza: %(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Adj meg egy számot."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -420,6 +428,9 @@ msgid ""
 msgstr ""
 "'%(extension)s' kiterjesztés nem engedélyezett. Az engedélyezett "
 "kiterjesztések a következők: '%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
+msgstr "Null karakterek használata nem megengedett."
 
 msgid "and"
 msgstr "és"
@@ -468,6 +479,10 @@ msgstr "Nagy egész szám (8 bájtos)"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' érték csak igaz (True) vagy hamis (False) lehet."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "'%(value)s' értéknek True, False vagy None-nak kell lennie."
 
 msgid "Boolean (Either True or False)"
 msgstr "Logikai (True vagy False)"
@@ -646,9 +661,6 @@ msgstr "Ennek a mezőnek a megadása kötelező."
 msgid "Enter a whole number."
 msgstr "Adjon meg egy egész számot."
 
-msgid "Enter a number."
-msgstr "Adj meg egy számot."
-
 msgid "Enter a valid date."
 msgstr "Adjon meg egy érvényes dátumot."
 
@@ -660,6 +672,10 @@ msgstr "Adjon meg egy érvényes dátumot/időt."
 
 msgid "Enter a valid duration."
 msgstr "Adjon meg egy érvényes időtartamot."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "A napok számának {min_days} és {max_days} közé kell esnie."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Nem küldött el fájlt. Ellenőrizze a kódolás típusát az űrlapon."
@@ -757,10 +773,8 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Javítsa az alábbi duplikált értékeket."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr ""
-"A beágyazott idegen kulcs nem egyezik meg a szülő példány elsődleges "
-"kulcsával."
+msgid "The inline value did not match the parent instance."
+msgstr "A beágyazott érték nem egyezik meg a szülő példányéval."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
@@ -768,8 +782,8 @@ msgstr ""
 "között."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" egy érvénytelen elsődleges kulcs érték."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "\"%(pk)s\" egy érvénytelen érték."
 
 #, python-format
 msgid ""
@@ -1135,6 +1149,19 @@ msgstr ""
 "származó kérésekre."
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+"Ha a <meta name=\"referrer\" content=\"no-referrer\"> taget használod vagy "
+"'Referrer-Policy: no-referrer' fejlécet állítottál be, távolítsd el őket. A "
+"CSRF védelemnek szüksége van a 'Referer' fejlécre a szigorú referer "
+"ellenőrzéshez. Ha adatvédelmi okokból döntöttél így, a külső oldalakra "
+"mutató linkeknél egy használható alternatíva az <a rel=\"noreferrer\" ...>."
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1153,32 +1180,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "További információ DEBUG=True beállítással érhető el."
 
-msgid "Welcome to Django"
-msgstr "Üdvözli a Django"
-
-msgid "It worked!"
-msgstr "Működik!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Gratulálunk az első Django alapú oldalhoz!"
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-"Következő lépésként indítsa el az első appot a <code>python manage.py "
-"startapp [app_label]</code> paranccsal."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Azért jelenik meg ez az üzenet, mert a <code>DEBUG = True</code> szerepel a "
-"Django settings fájlban, és még nem került beállításra egy URL sem. Jó "
-"munkát!"
-
 msgid "No year specified"
 msgstr "Nincs év megadva"
+
+msgid "Date out of range"
+msgstr "A dátum a megengedett tartományon kívül esik."
 
 msgid "No month specified"
 msgstr "Nincs hónap megadva"
@@ -1231,3 +1237,49 @@ msgstr "\"%(path)s\" nem létezik"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "A %(directory)s könyvtár tartalma"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr ""
+"Django: webes keretrendszer azoknak, akiknek a tökéletesség határidőre kell."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"A Django %(version)s <a href=\"https://docs.djangoproject.com/en/%(version)s/"
+"releases/\" target=\"_blank\" rel=\"noopener\">kiadási megjegyzéseinek</a> "
+"megtekintése"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "A telepítés sikeresen végződött! Gratulálunk!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"Azért látod ezt az oldalt, mert a <a href=\"https://docs.djangoproject.com/"
+"en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> szerepel a settings fájlban, és még nem került beállításra "
+"egy URL sem."
+
+msgid "Django Documentation"
+msgstr "Django Dokumentáció"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr "Témakörök, hivatkozások &amp; hogyanok"
+
+msgid "Tutorial: A Polling App"
+msgstr "Gyakorlat: egy szavazó app"
+
+msgid "Get started with Django"
+msgstr "Első lépések a Djangóval"
+
+msgid "Django Community"
+msgstr "Django Közösség"
+
+msgid "Connect, get help, or contribute"
+msgstr "Lépj kapcsolatba, kérj segítséget, vagy járulj hozzá"

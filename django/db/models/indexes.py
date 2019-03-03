@@ -1,6 +1,6 @@
-import hashlib
-
-from django.utils.encoding import force_bytes
+from django.db.backends.utils import names_digest, split_identifier
+from django.db.models.query_utils import Q
+from django.db.models.sql import Query
 
 __all__ = ['Index']
 
@@ -11,12 +11,22 @@ class Index:
     # cross-database compatibility with Oracle)
     max_name_length = 30
 
-    def __init__(self, *, fields=[], name=None, db_tablespace=None):
-        if not isinstance(fields, list):
-            raise ValueError('Index.fields must be a list.')
+    def __init__(self, *, fields=(), name=None, db_tablespace=None, opclasses=(), condition=None):
+        if opclasses and not name:
+            raise ValueError('An index must be named to use opclasses.')
+        if not isinstance(condition, (type(None), Q)):
+            raise ValueError('Index.condition must be a Q instance.')
+        if condition and not name:
+            raise ValueError('An index must be named to use condition.')
+        if not isinstance(fields, (list, tuple)):
+            raise ValueError('Index.fields must be a list or tuple.')
+        if not isinstance(opclasses, (list, tuple)):
+            raise ValueError('Index.opclasses must be a list or tuple.')
+        if opclasses and len(fields) != len(opclasses):
+            raise ValueError('Index.fields and Index.opclasses must have the same number of elements.')
         if not fields:
             raise ValueError('At least one field is required to define an index.')
-        self.fields = fields
+        self.fields = list(fields)
         # A list of 2-tuple with the field name and ordering ('' or 'DESC').
         self.fields_orders = [
             (field_name[1:], 'DESC') if field_name.startswith('-') else (field_name, '')
@@ -30,6 +40,8 @@ class Index:
             if errors:
                 raise ValueError(errors)
         self.db_tablespace = db_tablespace
+        self.opclasses = opclasses
+        self.condition = condition
 
     def check_name(self):
         errors = []
@@ -43,20 +55,29 @@ class Index:
             self.name = 'D%s' % self.name[1:]
         return errors
 
+    def _get_condition_sql(self, model, schema_editor):
+        if self.condition is None:
+            return None
+        query = Query(model=model)
+        query.add_q(self.condition)
+        compiler = query.get_compiler(connection=schema_editor.connection)
+        # Only the WhereNode is of interest for the partial index.
+        sql, params = query.where.as_sql(compiler=compiler, connection=schema_editor.connection)
+        # BaseDatabaseSchemaEditor does the same map on the params, but since
+        # it's handled outside of that class, the work is done here.
+        return sql % tuple(map(schema_editor.quote_value, params))
+
     def create_sql(self, model, schema_editor, using=''):
         fields = [model._meta.get_field(field_name) for field_name, _ in self.fields_orders]
         col_suffixes = [order[1] for order in self.fields_orders]
+        condition = self._get_condition_sql(model, schema_editor)
         return schema_editor._create_index_sql(
             model, fields, name=self.name, using=using, db_tablespace=self.db_tablespace,
-            col_suffixes=col_suffixes,
+            col_suffixes=col_suffixes, opclasses=self.opclasses, condition=condition,
         )
 
     def remove_sql(self, model, schema_editor):
-        quote_name = schema_editor.quote_name
-        return schema_editor.sql_delete_index % {
-            'table': quote_name(model._meta.db_table),
-            'name': quote_name(self.name),
-        }
+        return schema_editor._delete_index_sql(model, self.name)
 
     def deconstruct(self):
         path = '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
@@ -64,23 +85,16 @@ class Index:
         kwargs = {'fields': self.fields, 'name': self.name}
         if self.db_tablespace is not None:
             kwargs['db_tablespace'] = self.db_tablespace
+        if self.opclasses:
+            kwargs['opclasses'] = self.opclasses
+        if self.condition:
+            kwargs['condition'] = self.condition
         return (path, (), kwargs)
 
     def clone(self):
         """Create a copy of this Index."""
-        path, args, kwargs = self.deconstruct()
-        return self.__class__(*args, **kwargs)
-
-    @staticmethod
-    def _hash_generator(*args):
-        """
-        Generate a 32-bit digest of a set of arguments that can be used to
-        shorten identifying names.
-        """
-        h = hashlib.md5()
-        for arg in args:
-            h.update(force_bytes(arg))
-        return h.hexdigest()[:6]
+        _, _, kwargs = self.deconstruct()
+        return self.__class__(**kwargs)
 
     def set_name_with_model(self, model):
         """
@@ -90,7 +104,7 @@ class Index:
         (8 chars) and unique hash + suffix (10 chars). Each part is made to
         fit its size by truncating the excess length.
         """
-        table_name = model._meta.db_table
+        _, table_name = split_identifier(model._meta.db_table)
         column_names = [model._meta.get_field(field_name).column for field_name, order in self.fields_orders]
         column_names_with_order = [
             (('-%s' if order else '%s') % column_name)
@@ -102,7 +116,7 @@ class Index:
         self.name = '%s_%s_%s' % (
             table_name[:11],
             column_names[0][:7],
-            '%s_%s' % (self._hash_generator(*hash_data), self.suffix),
+            '%s_%s' % (names_digest(*hash_data, length=6), self.suffix),
         )
         assert len(self.name) <= self.max_name_length, (
             'Index too long for multiple database support. Is self.suffix '
@@ -111,7 +125,10 @@ class Index:
         self.check_name()
 
     def __repr__(self):
-        return "<%s: fields='%s'>" % (self.__class__.__name__, ', '.join(self.fields))
+        return "<%s: fields='%s'%s>" % (
+            self.__class__.__name__, ', '.join(self.fields),
+            '' if self.condition is None else ', condition=%s' % self.condition,
+        )
 
     def __eq__(self, other):
         return (self.__class__ == other.__class__) and (self.deconstruct() == other.deconstruct())

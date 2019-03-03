@@ -90,12 +90,12 @@ In addition to the default environments, ``tox`` supports running unit tests
 for other versions of Python and other database backends. Since Django's test
 suite doesn't bundle a settings file for database backends other than SQLite,
 however, you must :ref:`create and provide your own test settings
-<running-unit-tests-settings>`. For example, to run the tests on Python 3.5
+<running-unit-tests-settings>`. For example, to run the tests on Python 3.7
 using PostgreSQL::
 
-    $ tox -e py35-postgres -- --settings=my_postgres_settings
+    $ tox -e py37-postgres -- --settings=my_postgres_settings
 
-This command sets up a Python 3.5 virtual environment, installs Django's
+This command sets up a Python 3.7 virtual environment, installs Django's
 test suite dependencies (including those for PostgreSQL), and calls
 ``runtests.py`` with the supplied arguments (in this case,
 ``--settings=my_postgres_settings``).
@@ -229,11 +229,12 @@ dependencies:
 *  Pillow_
 *  PyYAML_
 *  pytz_ (required)
+*  pywatchman_
 *  setuptools_
 *  memcached_, plus a :ref:`supported Python binding <memcached>`
 *  gettext_ (:ref:`gettext_on_windows`)
 *  selenium_
-*  sqlparse_
+*  sqlparse_ (required)
 
 You can find these dependencies in `pip requirements files`_ inside the
 ``tests/requirements`` directory of the Django source tree and install them
@@ -258,21 +259,26 @@ and install the Geospatial libraries</ref/contrib/gis/install/index>`.
 Each of these dependencies is optional. If you're missing any of them, the
 associated tests will be skipped.
 
-.. _argon2-cffi: https://pypi.python.org/pypi/argon2_cffi
-.. _bcrypt: https://pypi.python.org/pypi/bcrypt
-.. _docutils: https://pypi.python.org/pypi/docutils
-.. _geoip2: https://pypi.python.org/pypi/geoip2
-.. _jinja2: https://pypi.python.org/pypi/jinja2
-.. _numpy: https://pypi.python.org/pypi/numpy
-.. _Pillow: https://pypi.python.org/pypi/Pillow/
-.. _PyYAML: http://pyyaml.org/wiki/PyYAML
-.. _pytz: https://pypi.python.org/pypi/pytz/
-.. _setuptools: https://pypi.python.org/pypi/setuptools/
-.. _memcached: http://memcached.org/
+To run some of the autoreload tests, you'll need to install the Watchman_
+service.
+
+.. _argon2-cffi: https://pypi.org/project/argon2_cffi/
+.. _bcrypt: https://pypi.org/project/bcrypt/
+.. _docutils: https://pypi.org/project/docutils/
+.. _geoip2: https://pypi.org/project/geoip2/
+.. _jinja2: https://pypi.org/project/jinja2/
+.. _numpy: https://pypi.org/project/numpy/
+.. _Pillow: https://pypi.org/project/Pillow/
+.. _PyYAML: https://pyyaml.org/wiki/PyYAML
+.. _pytz: https://pypi.org/project/pytz/
+.. _pywatchman: https://pypi.org/project/pywatchman/
+.. _setuptools: https://pypi.org/project/setuptools/
+.. _memcached: https://memcached.org/
 .. _gettext: https://www.gnu.org/software/gettext/manual/gettext.html
-.. _selenium: https://pypi.python.org/pypi/selenium
-.. _sqlparse: https://pypi.python.org/pypi/sqlparse
+.. _selenium: https://pypi.org/project/selenium/
+.. _sqlparse: https://pypi.org/project/sqlparse/
 .. _pip requirements files: https://pip.pypa.io/en/latest/user_guide/#requirements-files
+.. _Watchman: https://facebook.github.io/watchman/
 
 Code coverage
 -------------
@@ -446,8 +452,8 @@ Since this pattern involves a lot of boilerplate, Django provides the
     :func:`~django.test.utils.isolate_apps` instances are correctly
     installed, you should pass the set of targeted ``app_label`` as arguments:
 
-    .. snippet::
-        :filename: tests/app_label/tests.py
+    .. code-block:: python
+        :caption: tests/app_label/tests.py
 
         from django.db import models
         from django.test import SimpleTestCase

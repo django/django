@@ -1,27 +1,29 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# bbstuntman <Bbstuntman@gmail.com>, 2017
+# Topolino_Hackerino <claudiu.andrei.roman@gmail.com>, 2017
 # Carlo Miron <C8E@miron.it>, 2011
 # Carlo Miron <C8E@miron.it>, 2014
+# Carlo Miron <C8E@miron.it>, 2018
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Flavio Curella <flavio.curella@gmail.com>, 2013,2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Themis Savvidis <themhs@gmail.com>, 2013
 # Luciano De Falco Alfano, 2016
 # Marco Bonetti, 2014
+# Mirco Grillo <mirco.grillomg@gmail.com>, 2018
 # Nicola Larosa <transifex@teknico.net>, 2013
 # palmux <palmux@gmail.com>, 2014-2015,2017
 # Mattia Procopio <promat85@gmail.com>, 2015
 # Riccardo Magliocchetti <riccardo.magliocchetti@gmail.com>, 2017
-# Stefano Brentegani <sbrentegani@gmail.com>, 2014-2016
+# Stefano Brentegani <sbrentegani@gmail.com>, 2014-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-03-31 10:55+0000\n"
-"Last-Translator: palmux <palmux@gmail.com>\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-07-30 21:04+0000\n"
+"Last-Translator: Carlo Miron <C8E@miron.it>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -170,6 +172,9 @@ msgstr "Giapponese"
 
 msgid "Georgian"
 msgstr "Georgiano"
+
+msgid "Kabyle"
+msgstr "Cabilo"
 
 msgid "Kazakh"
 msgstr "Kazako"
@@ -327,6 +332,7 @@ msgstr "Inserire un numero intero valido."
 msgid "Enter a valid email address."
 msgstr "Inserisci un indirizzo email valido."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -393,6 +399,9 @@ msgstr[1] ""
 "Assicurati che questo valore non contenga più di %(limit_value)d caratteri "
 "(ne ha %(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Inserisci un numero."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -421,6 +430,9 @@ msgid ""
 msgstr ""
 "Il file con estensione '%(extension)s' non e' permesso. Le estensioni "
 "permesse sono: '%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
+msgstr "I caratteri null non sono ammessi."
 
 msgid "and"
 msgstr "e"
@@ -468,6 +480,10 @@ msgstr "Intero grande (8 byte)"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "Il valore '%(value)s' deve essere True oppure False."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "Il valore di %(value)s deve essere True, False o None"
 
 msgid "Boolean (Either True or False)"
 msgstr "Booleano (Vero o Falso)"
@@ -645,9 +661,6 @@ msgstr "Questo campo è obbligatorio."
 msgid "Enter a whole number."
 msgstr "Inserisci un numero intero."
 
-msgid "Enter a number."
-msgstr "Inserisci un numero."
-
 msgid "Enter a valid date."
 msgstr "Inserisci una data valida."
 
@@ -659,6 +672,10 @@ msgstr "Inserisci una data/ora valida."
 
 msgid "Enter a valid duration."
 msgstr "Inserisci una durata valida."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Il numero di giorni deve essere compreso tra {min_days} e {max_days}"
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Non è stato inviato alcun file. Verifica il tipo di codifica sul form."
@@ -754,9 +771,8 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Si prega di correggere i dati duplicati qui sotto."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr ""
-"La foreign key inline non concorda con la chiave primaria dell'istanza padre."
+msgid "The inline value did not match the parent instance."
+msgstr "Il valore inline non corrisponde all'istanza padre."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
@@ -764,8 +780,8 @@ msgstr ""
 "disponibili."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" non è un valore valido per una chiave primaria."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "\"%(pk)s\" non è un valore valido."
 
 #, python-format
 msgid ""
@@ -1131,6 +1147,19 @@ msgstr ""
 "per le connessioni HTTPS, o per le connessioni \"same-origin\"."
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+"Se usi il tag <meta name=\"referrer\" content=\"no-referrer\"> o includi "
+"header 'Referrer-Policy: no-referrer', per favore rimuovili. Per la "
+"protezione CSRF è necessario eseguire un controllo rigoroso sull'header "
+"'Referer'. Se ti preoccupano le ricadute sulla privacy, puoi ricorrere ad "
+"alternative come <a rel=\"noreferrer\" ...> per i link a siti di terze parti."
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1149,32 +1178,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "Maggiorni informazioni sono disponibili con DEBUG=True"
 
-msgid "Welcome to Django"
-msgstr "Benvenuti in Django"
-
-msgid "It worked!"
-msgstr "Ha funzionato!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Congratulazioni per la tua prima pagina Django-powered."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-"Ora, crea la tua prima app eseguendo <code>python manage.py startapp "
-"[nome_app]</code>"
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Stai ricevendo questo messaggio perchè nel tuo file di configurazione di "
-"Django è presente <code>DEBUG = True</code> e non hai ancora configurato "
-"alcun URL. Al lavoro!"
-
 msgid "No year specified"
 msgstr "Anno non specificato"
+
+msgid "Date out of range"
+msgstr "Data al di fuori dell'intervallo"
 
 msgid "No month specified"
 msgstr "Mese non specificato"
@@ -1226,3 +1234,48 @@ msgstr "\"%(path)s\" non esiste"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Indice di %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django: il framework Web per i perfezionisti con delle scadenze."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Leggi le <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">note di rilascio</a> per Django "
+"%(version)s"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Installazione completata con successo! Congratulazioni!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"Stai vedendo questa pagina perché hai impostato <a href=\"https://docs."
+"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel="
+"\"noopener\">DEBUG=True</a> nel tuo file di configurazione e non hai "
+"configurato nessun URL."
+
+msgid "Django Documentation"
+msgstr "Documentazione di Django"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr "Temi, riferimenti, &amp; guide"
+
+msgid "Tutorial: A Polling App"
+msgstr "Tutorial: un'app per sondaggi"
+
+msgid "Get started with Django"
+msgstr "Iniziare con Django"
+
+msgid "Django Community"
+msgstr "La Community di Django"
+
+msgid "Connect, get help, or contribute"
+msgstr "Connettiti, chiedi aiuto, o contribuisci."

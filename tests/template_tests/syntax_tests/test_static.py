@@ -1,6 +1,7 @@
 from urllib.parse import urljoin
 
 from django.conf import settings
+from django.template import TemplateSyntaxError
 from django.test import SimpleTestCase, override_settings
 
 from ..utils import setup
@@ -32,6 +33,12 @@ class StaticTagTests(SimpleTestCase):
         output = self.engine.render_to_string('static-prefixtag04')
         self.assertEqual(output, settings.MEDIA_URL)
 
+    @setup({'t': '{% load static %}{% get_media_prefix ad media_prefix %}{{ media_prefix }}'})
+    def test_static_prefixtag_without_as(self):
+        msg = "First argument in 'get_media_prefix' must be 'as'"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('t')
+
     @setup({'static-statictag01': '{% load static %}{% static "admin/base.css" %}'})
     def test_static_statictag01(self):
         output = self.engine.render_to_string('static-statictag01')
@@ -56,3 +63,9 @@ class StaticTagTests(SimpleTestCase):
     def test_static_quotes_urls(self):
         output = self.engine.render_to_string('static-statictag05')
         self.assertEqual(output, urljoin(settings.STATIC_URL, '/static/special%3Fchars%26quoted.html'))
+
+    @setup({'t': '{% load static %}{% static %}'})
+    def test_static_statictag_without_path(self):
+        msg = "'static' takes at least one argument (path to file)"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('t')

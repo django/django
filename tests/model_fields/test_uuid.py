@@ -64,10 +64,27 @@ class TestMethods(SimpleTestCase):
     def test_to_python(self):
         self.assertIsNone(models.UUIDField().to_python(None))
 
+    def test_to_python_int_values(self):
+        self.assertEqual(
+            models.UUIDField().to_python(0),
+            uuid.UUID('00000000-0000-0000-0000-000000000000')
+        )
+        # Works for integers less than 128 bits.
+        self.assertEqual(
+            models.UUIDField().to_python((2 ** 128) - 1),
+            uuid.UUID('ffffffff-ffff-ffff-ffff-ffffffffffff')
+        )
+
+    def test_to_python_int_too_large(self):
+        # Fails for integers larger than 128 bits.
+        with self.assertRaises(exceptions.ValidationError):
+            models.UUIDField().to_python(2 ** 128)
+
 
 class TestQuerying(TestCase):
-    def setUp(self):
-        self.objs = [
+    @classmethod
+    def setUpTestData(cls):
+        cls.objs = [
             NullableUUIDModel.objects.create(field=uuid.uuid4()),
             NullableUUIDModel.objects.create(field='550e8400e29b41d4a716446655440000'),
             NullableUUIDModel.objects.create(field=None),
@@ -170,8 +187,12 @@ class TestAsPrimaryKey(TestCase):
         self.assertEqual(r.uuid_fk, u2)
 
     def test_two_level_foreign_keys(self):
+        gc = UUIDGrandchild()
         # exercises ForeignKey.get_db_prep_value()
-        UUIDGrandchild().save()
+        gc.save()
+        self.assertIsInstance(gc.uuidchild_ptr_id, uuid.UUID)
+        gc.refresh_from_db()
+        self.assertIsInstance(gc.uuidchild_ptr_id, uuid.UUID)
 
 
 class TestAsPrimaryKeyTransactionTests(TransactionTestCase):

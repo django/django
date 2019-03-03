@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-11-01 13:44+0000\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
+"PO-Revision-Date: 2017-09-23 18:54+0000\n"
 "Last-Translator: rodin <romihardiyanto@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
@@ -101,24 +101,8 @@ msgstr ""
 "Anda telah memilih sebuah aksi, tetapi belum mengubah bidang apapun. "
 "Kemungkinan Anda mencari tombol Buka dan bukan tombol Simpan."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Catatan: Waktu Anda lebih cepat %s jam dibandingkan waktu server."
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Catatan: Waktu Anda lebih lambat %s jam dibandingkan waktu server."
-
 msgid "Now"
 msgstr "Sekarang"
-
-msgid "Choose a Time"
-msgstr "Pilih Waktu"
-
-msgid "Choose a time"
-msgstr "Pilih waktu"
 
 msgid "Midnight"
 msgstr "Tengah malam"
@@ -131,6 +115,22 @@ msgstr "Siang"
 
 msgid "6 p.m."
 msgstr "18.00"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Catatan: Waktu Anda lebih cepat %s jam dibandingkan waktu server."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Catatan: Waktu Anda lebih lambat %s jam dibandingkan waktu server."
+
+msgid "Choose a Time"
+msgstr "Pilih Waktu"
+
+msgid "Choose a time"
+msgstr "Pilih waktu"
 
 msgid "Cancel"
 msgstr "Batal"

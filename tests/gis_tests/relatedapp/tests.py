@@ -5,10 +5,10 @@ from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import override_settings
 from django.utils import timezone
 
-from ..utils import no_oracle
 from .models import (
     Article, Author, Book, City, DirectoryEntry, Event, Location, Parcel,
 )
+from ..utils import no_oracle
 
 
 class RelatedGeoModelTest(TestCase):
@@ -32,7 +32,8 @@ class RelatedGeoModelTest(TestCase):
                 nm, st, lon, lat = ref
                 self.assertEqual(nm, c.name)
                 self.assertEqual(st, c.state)
-                self.assertEqual(Point(lon, lat, srid=c.location.point.srid), c.location.point)
+                self.assertAlmostEqual(lon, c.location.point.x, 6)
+                self.assertAlmostEqual(lat, c.location.point.y, 6)
 
     @skipUnlessDBFeature("supports_extent_aggr")
     def test_related_extent_aggregate(self):

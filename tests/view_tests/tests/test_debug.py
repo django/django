@@ -4,22 +4,20 @@ import os
 import re
 import sys
 import tempfile
+import threading
 from io import StringIO
 from pathlib import Path
 
-from django.conf.urls import url
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import DatabaseError, connection
 from django.shortcuts import render
 from django.template import TemplateDoesNotExist
 from django.test import RequestFactory, SimpleTestCase, override_settings
-from django.test.utils import LoggingCaptureMixin, patch_logger
-from django.urls import reverse
-from django.utils.encoding import force_bytes
+from django.test.utils import LoggingCaptureMixin
+from django.urls import path, reverse
 from django.utils.functional import SimpleLazyObject
 from django.utils.safestring import mark_safe
-from django.utils.version import PY36
 from django.views.debug import (
     CLEANSED_SUBSTITUTE, CallableSettingWrapper, ExceptionReporter,
     cleanse_setting, technical_500_response,
@@ -39,7 +37,7 @@ class User:
 
 
 class WithoutEmptyPathUrls:
-    urlpatterns = [url(r'url/$', index_page, name='url')]
+    urlpatterns = [path('url/', index_page, name='url')]
 
 
 class CallableSettingWrapperTests(SimpleTestCase):
@@ -58,22 +56,25 @@ class CallableSettingWrapperTests(SimpleTestCase):
 
 
 @override_settings(DEBUG=True, ROOT_URLCONF='view_tests.urls')
-class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
+class DebugViewTests(SimpleTestCase):
 
     def test_files(self):
-        response = self.client.get('/raises/')
+        with self.assertLogs('django.request', 'ERROR'):
+            response = self.client.get('/raises/')
         self.assertEqual(response.status_code, 500)
 
         data = {
             'file_data.txt': SimpleUploadedFile('file_data.txt', b'haha'),
         }
-        response = self.client.post('/raises/', data)
+        with self.assertLogs('django.request', 'ERROR'):
+            response = self.client.post('/raises/', data)
         self.assertContains(response, 'file_data.txt', status_code=500)
         self.assertNotContains(response, 'haha', status_code=500)
 
     def test_400(self):
         # When DEBUG=True, technical_500_template() is called.
-        response = self.client.get('/raises400/')
+        with self.assertLogs('django.security', 'WARNING'):
+            response = self.client.get('/raises400/')
         self.assertContains(response, '<div class="context" id="', status_code=400)
 
     # Ensure no 403.html template exists to test the default case.
@@ -103,9 +104,6 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
     def test_404(self):
         response = self.client.get('/raises404/')
         self.assertEqual(response.status_code, 404)
-
-    def test_raised_404(self):
-        response = self.client.get('/views/raises404/')
         self.assertContains(response, "<code>not-in-urls</code>, didn't match", status_code=404)
 
     def test_404_not_in_urls(self):
@@ -126,12 +124,12 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
         self.assertContains(response, "The empty path didn't match any of these.", status_code=404)
 
     def test_technical_404(self):
-        response = self.client.get('/views/technical404/')
+        response = self.client.get('/technical404/')
         self.assertContains(response, "Raised by:", status_code=404)
         self.assertContains(response, "view_tests.views.technical404", status_code=404)
 
     def test_classbased_technical_404(self):
-        response = self.client.get('/views/classbased404/')
+        response = self.client.get('/classbased404/')
         self.assertContains(response, "Raised by:", status_code=404)
         self.assertContains(response, "view_tests.views.Http404View", status_code=404)
 
@@ -140,7 +138,8 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
         Numeric IDs and fancy traceback context blocks line numbers shouldn't be localized.
         """
         with self.settings(DEBUG=True, USE_L10N=True):
-            response = self.client.get('/raises500/')
+            with self.assertLogs('django.request', 'ERROR'):
+                response = self.client.get('/raises500/')
             # We look for a HTML fragment of the form
             # '<div class="context" id="c38123208">', not '<div class="context" id="c38,123,208"'
             self.assertContains(response, '<div class="context" id="', status_code=500)
@@ -153,15 +152,16 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
             )
 
     def test_template_exceptions(self):
-        try:
-            self.client.get(reverse('template_exception'))
-        except Exception:
-            raising_loc = inspect.trace()[-1][-2][0].strip()
-            self.assertNotEqual(
-                raising_loc.find("raise Exception('boom')"), -1,
-                "Failed to find 'raise Exception' in last frame of "
-                "traceback, instead found: %s" % raising_loc
-            )
+        with self.assertLogs('django.request', 'ERROR'):
+            try:
+                self.client.get(reverse('template_exception'))
+            except Exception:
+                raising_loc = inspect.trace()[-1][-2][0].strip()
+                self.assertNotEqual(
+                    raising_loc.find("raise Exception('boom')"), -1,
+                    "Failed to find 'raise Exception' in last frame of "
+                    "traceback, instead found: %s" % raising_loc
+                )
 
     def test_template_loader_postmortem(self):
         """Tests for not existing file"""
@@ -172,7 +172,7 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
             with override_settings(TEMPLATES=[{
                 'BACKEND': 'django.template.backends.django.DjangoTemplates',
                 'DIRS': [tempdir],
-            }]):
+            }]), self.assertLogs('django.request', 'ERROR'):
                 response = self.client.get(reverse('raises_template_does_not_exist', kwargs={"path": template_name}))
             self.assertContains(response, "%s (Source does not exist)" % template_path, status_code=500, count=2)
             # Assert as HTML.
@@ -188,8 +188,9 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
         """
         Make sure if you don't specify a template, the debug view doesn't blow up.
         """
-        with self.assertRaises(TemplateDoesNotExist):
-            self.client.get('/render_no_template/')
+        with self.assertLogs('django.request', 'ERROR'):
+            with self.assertRaises(TemplateDoesNotExist):
+                self.client.get('/render_no_template/')
 
     @override_settings(ROOT_URLCONF='view_tests.default_urls')
     def test_default_urlconf_template(self):
@@ -224,7 +225,7 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
 
 class DebugViewQueriesAllowedTests(SimpleTestCase):
     # May need a query to initialize MySQL connection
-    allow_database_queries = True
+    databases = {'default'}
 
     def test_handle_db_exception(self):
         """
@@ -254,9 +255,9 @@ class NonDjangoTemplatesDebugViewTests(SimpleTestCase):
 
     def test_400(self):
         # When DEBUG=True, technical_500_template() is called.
-        with patch_logger('django.security.SuspiciousOperation', 'error'):
+        with self.assertLogs('django.security', 'WARNING'):
             response = self.client.get('/raises400/')
-            self.assertContains(response, '<div class="context" id="', status_code=400)
+        self.assertContains(response, '<div class="context" id="', status_code=400)
 
     def test_403(self):
         response = self.client.get('/raises403/')
@@ -269,7 +270,8 @@ class NonDjangoTemplatesDebugViewTests(SimpleTestCase):
     def test_template_not_found_error(self):
         # Raises a TemplateDoesNotExist exception and shows the debug view.
         url = reverse('raises_template_does_not_exist', kwargs={"path": "notfound.html"})
-        response = self.client.get(url)
+        with self.assertLogs('django.request', 'ERROR'):
+            response = self.client.get(url)
         self.assertContains(response, '<div class="context" id="', status_code=500)
 
 
@@ -325,7 +327,7 @@ class ExceptionReporterTests(SimpleTestCase):
 
         for newline in ['\n', '\r\n', '\r']:
             fd, filename = tempfile.mkstemp(text=False)
-            os.write(fd, force_bytes(newline.join(LINES) + newline))
+            os.write(fd, (newline.join(LINES) + newline).encode())
             os.close(fd)
 
             try:
@@ -401,6 +403,44 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertIn('generated in funcName', html)
         text = reporter.get_traceback_text()
         self.assertIn('"generated" in funcName', text)
+
+    def test_reporting_frames_for_cyclic_reference(self):
+        try:
+            def test_func():
+                try:
+                    raise RuntimeError('outer') from RuntimeError('inner')
+                except RuntimeError as exc:
+                    raise exc.__cause__
+            test_func()
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+        request = self.rf.get('/test_view/')
+        reporter = ExceptionReporter(request, exc_type, exc_value, tb)
+
+        def generate_traceback_frames(*args, **kwargs):
+            nonlocal tb_frames
+            tb_frames = reporter.get_traceback_frames()
+
+        tb_frames = None
+        tb_generator = threading.Thread(target=generate_traceback_frames, daemon=True)
+        tb_generator.start()
+        tb_generator.join(timeout=5)
+        if tb_generator.is_alive():
+            # tb_generator is a daemon that runs until the main thread/process
+            # exits. This is resource heavy when running the full test suite.
+            # Setting the following values to None makes
+            # reporter.get_traceback_frames() exit early.
+            exc_value.__traceback__ = exc_value.__context__ = exc_value.__cause__ = None
+            tb_generator.join()
+            self.fail('Cyclic reference in Exception Reporter.get_traceback_frames()')
+        if tb_frames is None:
+            # can happen if the thread generating traceback got killed
+            # or exception while generating the traceback
+            self.fail('Traceback generation failed')
+        last_frame = tb_frames[-1]
+        self.assertIn('raise exc.__cause__', last_frame['context_line'])
+        self.assertEqual(last_frame['filename'], __file__)
+        self.assertEqual(last_frame['function'], 'test_func')
 
     def test_request_and_message(self):
         "A message can be provided in addition to a request"
@@ -513,7 +553,7 @@ class ExceptionReporterTests(SimpleTestCase):
             exc_type, exc_value, tb = sys.exc_info()
         reporter = ExceptionReporter(request, exc_type, exc_value, tb)
         html = reporter.get_traceback_html()
-        self.assertInHTML('<h1>%sError at /test_view/</h1>' % ('ModuleNotFound' if PY36 else 'Import'), html)
+        self.assertInHTML('<h1>ModuleNotFoundError at /test_view/</h1>', html)
 
     def test_ignore_traceback_evaluation_exceptions(self):
         """
@@ -726,14 +766,14 @@ class PlainTextReportTests(SimpleTestCase):
 
 
 class ExceptionReportTestMixin:
-
     # Mixin used in the ExceptionReporterFilterTests and
     # AjaxResponseExceptionReporterFilter tests below
-
-    breakfast_data = {'sausage-key': 'sausage-value',
-                      'baked-beans-key': 'baked-beans-value',
-                      'hash-brown-key': 'hash-brown-value',
-                      'bacon-key': 'bacon-value'}
+    breakfast_data = {
+        'sausage-key': 'sausage-value',
+        'baked-beans-key': 'baked-beans-value',
+        'hash-brown-key': 'hash-brown-value',
+        'bacon-key': 'bacon-value',
+    }
 
     def verify_unsafe_response(self, view, check_for_vars=True,
                                check_for_POST_params=True):
@@ -769,7 +809,7 @@ class ExceptionReportTestMixin:
             self.assertContains(response, 'sauce', status_code=500)
             self.assertNotContains(response, 'worcestershire', status_code=500)
         if check_for_POST_params:
-            for k, v in self.breakfast_data.items():
+            for k in self.breakfast_data:
                 # All POST parameters' names are shown.
                 self.assertContains(response, k, status_code=500)
             # Non-sensitive POST parameters' values are shown.
@@ -858,7 +898,7 @@ class ExceptionReportTestMixin:
             self.assertNotIn('worcestershire', body_html)
 
             if check_for_POST_params:
-                for k, v in self.breakfast_data.items():
+                for k in self.breakfast_data:
                     # All POST parameters' names are shown.
                     self.assertIn(k, body_plain)
                 # Non-sensitive POST parameters' values are shown.

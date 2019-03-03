@@ -44,8 +44,9 @@ class UserAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
         (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
-        (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser',
-                                       'groups', 'user_permissions')}),
+        (_('Permissions'), {
+            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+        }),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
     add_fieldsets = (
@@ -88,10 +89,8 @@ class UserAdmin(admin.ModelAdmin):
         ] + super().get_urls()
 
     def lookup_allowed(self, lookup, value):
-        # See #20078: we don't want to allow any lookups involving passwords.
-        if lookup.startswith('password'):
-            return False
-        return super().lookup_allowed(lookup, value)
+        # Don't allow lookups involving passwords.
+        return not lookup.startswith('password') and super().lookup_allowed(lookup, value)
 
     @sensitive_post_parameters_m
     @csrf_protect_m
@@ -128,9 +127,9 @@ class UserAdmin(admin.ModelAdmin):
 
     @sensitive_post_parameters_m
     def user_change_password(self, request, id, form_url=''):
-        if not self.has_change_permission(request):
-            raise PermissionDenied
         user = self.get_object(request, unquote(id))
+        if not self.has_change_permission(request, user):
+            raise PermissionDenied
         if user is None:
             raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {
                 'name': self.model._meta.verbose_name,
@@ -177,8 +176,8 @@ class UserAdmin(admin.ModelAdmin):
             'original': user,
             'save_as': False,
             'show_save': True,
+            **self.admin_site.each_context(request),
         }
-        context.update(self.admin_site.each_context(request))
 
         request.current_app = self.admin_site.name
 

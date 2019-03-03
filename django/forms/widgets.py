@@ -6,16 +6,21 @@ import copy
 import datetime
 import re
 import warnings
+from collections import defaultdict
 from itertools import chain
 
 from django.conf import settings
 from django.forms.utils import to_current_timezone
 from django.templatetags.static import static
 from django.utils import datetime_safe, formats
+from django.utils.datastructures import OrderedSet
 from django.utils.dates import MONTHS
 from django.utils.formats import get_format
 from django.utils.html import format_html, html_safe
 from django.utils.safestring import mark_safe
+from django.utils.topological_sort import (
+    CyclicDependencyError, stable_topological_sort,
+)
 from django.utils.translation import gettext_lazy as _
 
 from .renderers import get_default_renderer
@@ -48,14 +53,26 @@ class Media:
                 css = {}
             if js is None:
                 js = []
-        self._css = css
-        self._js = js
+        self._css_lists = [css]
+        self._js_lists = [js]
 
     def __repr__(self):
         return 'Media(css=%r, js=%r)' % (self._css, self._js)
 
     def __str__(self):
         return self.render()
+
+    @property
+    def _css(self):
+        css = defaultdict(list)
+        for css_list in self._css_lists:
+            for medium, sublist in css_list.items():
+                css[medium].append(sublist)
+        return {medium: self.merge(*lists) for medium, lists in css.items()}
+
+    @property
+    def _js(self):
+        return self.merge(*self._js_lists)
 
     def render(self):
         return mark_safe('\n'.join(chain.from_iterable(getattr(self, 'render_' + name)() for name in MEDIA_TYPES)))
@@ -74,7 +91,7 @@ class Media:
         media = sorted(self._css)
         return chain.from_iterable([
             format_html(
-                '<link href="{}" type="text/css" media="{}" rel="stylesheet" />',
+                '<link href="{}" type="text/css" media="{}" rel="stylesheet">',
                 self.absolute_path(path), medium
             ) for path in self._css[medium]
         ] for medium in media)
@@ -96,47 +113,42 @@ class Media:
         raise KeyError('Unknown media type "%s"' % name)
 
     @staticmethod
-    def merge(list_1, list_2):
+    def merge(*lists):
         """
-        Merge two lists while trying to keep the relative order of the elements.
-        Warn if the lists have the same two elements in a different relative
-        order.
+        Merge lists while trying to keep the relative order of the elements.
+        Warn if the lists have the same elements in a different relative order.
 
         For static assets it can be important to have them included in the DOM
         in a certain order. In JavaScript you may not be able to reference a
         global or in CSS you might want to override a style.
         """
-        # Start with a copy of list_1.
-        combined_list = list(list_1)
-        last_insert_index = len(list_1)
-        # Walk list_2 in reverse, inserting each element into combined_list if
-        # it doesn't already exist.
-        for path in reversed(list_2):
-            try:
-                # Does path already exist in the list?
-                index = combined_list.index(path)
-            except ValueError:
-                # Add path to combined_list since it doesn't exist.
-                combined_list.insert(last_insert_index, path)
-            else:
-                if index > last_insert_index:
-                    warnings.warn(
-                        'Detected duplicate Media files in an opposite order:\n'
-                        '%s\n%s' % (combined_list[last_insert_index], combined_list[index]),
-                        MediaOrderConflictWarning,
-                    )
-                # path already exists in the list. Update last_insert_index so
-                # that the following elements are inserted in front of this one.
-                last_insert_index = index
-        return combined_list
+        dependency_graph = defaultdict(set)
+        all_items = OrderedSet()
+        for list_ in filter(None, lists):
+            head = list_[0]
+            # The first items depend on nothing but have to be part of the
+            # dependency graph to be included in the result.
+            dependency_graph.setdefault(head, set())
+            for item in list_:
+                all_items.add(item)
+                # No self dependencies
+                if head != item:
+                    dependency_graph[item].add(head)
+                head = item
+        try:
+            return stable_topological_sort(all_items, dependency_graph)
+        except CyclicDependencyError:
+            warnings.warn(
+                'Detected duplicate Media files in an opposite order: {}'.format(
+                    ', '.join(repr(l) for l in lists)
+                ), MediaOrderConflictWarning,
+            )
+            return list(all_items)
 
     def __add__(self, other):
         combined = Media()
-        combined._js = self.merge(self._js, other._js)
-        combined._css = {
-            medium: self.merge(self._css.get(medium, []), other._css.get(medium, []))
-            for medium in self._css.keys() | other._css.keys()
-        }
+        combined._css_lists = self._css_lists + other._css_lists
+        combined._js_lists = self._js_lists + other._js_lists
         return combined
 
 
@@ -161,10 +173,8 @@ def media_property(cls):
                     for medium in extend:
                         m = m + base[medium]
                 return m + Media(definition)
-            else:
-                return Media(definition)
-        else:
-            return base
+            return Media(definition)
+        return base
     return property(_media)
 
 
@@ -188,10 +198,7 @@ class Widget(metaclass=MediaDefiningClass):
     supports_microseconds = True
 
     def __init__(self, attrs=None):
-        if attrs is not None:
-            self.attrs = attrs.copy()
-        else:
-            self.attrs = {}
+        self.attrs = {} if attrs is None else attrs.copy()
 
     def __deepcopy__(self, memo):
         obj = copy.copy(self)
@@ -241,10 +248,7 @@ class Widget(metaclass=MediaDefiningClass):
 
     def build_attrs(self, base_attrs, extra_attrs=None):
         """Build an attribute dictionary."""
-        attrs = base_attrs.copy()
-        if extra_attrs is not None:
-            attrs.update(extra_attrs)
-        return attrs
+        return {**base_attrs, **(extra_attrs or {})}
 
     def value_from_datadict(self, data, files, name):
         """
@@ -474,7 +478,7 @@ class DateTimeBaseInput(TextInput):
 
     def __init__(self, attrs=None, format=None):
         super().__init__(attrs)
-        self.format = format if format else None
+        self.format = format or None
 
     def format_value(self, value):
         return formats.localize_input(value, self.format or formats.get_format(self.format_key)[0])
@@ -602,8 +606,7 @@ class ChoiceWidget(Widget):
                     str(subvalue) in value and
                     (not has_selected or self.allow_multiple_selected)
                 )
-                if selected and not has_selected:
-                    has_selected = True
+                has_selected |= selected
                 subgroup.append(self.create_option(
                     name, subvalue, sublabel, selected, index,
                     subindex=subindex, attrs=attrs,
@@ -630,12 +633,12 @@ class ChoiceWidget(Widget):
             'attrs': option_attrs,
             'type': self.input_type,
             'template_name': self.option_template_name,
+            'wrap_label': True,
         }
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         context['widget']['optgroups'] = self.optgroups(name, context['widget']['value'], attrs)
-        context['wrap_label'] = True
         return context
 
     def id_for_label(self, id_, index='0'):
@@ -658,6 +661,8 @@ class ChoiceWidget(Widget):
 
     def format_value(self, value):
         """Return selected values as a list."""
+        if value is None and self.allow_multiple_selected:
+            return []
         if not isinstance(value, (tuple, list)):
             value = [value]
         return [str(v) if v is not None else '' for v in value]
@@ -674,14 +679,14 @@ class Select(ChoiceWidget):
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         if self.allow_multiple_selected:
-            context['widget']['attrs']['multiple'] = 'multiple'
+            context['widget']['attrs']['multiple'] = True
         return context
 
     @staticmethod
     def _choice_has_empty_value(choice):
         """Return True if the choice's value is empty string or None."""
         value, _ = choice
-        return (isinstance(value, str) and not bool(value)) or value is None
+        return value is None or value == ''
 
     def use_required_attribute(self, initial):
         """
@@ -703,27 +708,35 @@ class NullBooleanSelect(Select):
     """
     def __init__(self, attrs=None):
         choices = (
-            ('1', _('Unknown')),
-            ('2', _('Yes')),
-            ('3', _('No')),
+            ('unknown', _('Unknown')),
+            ('true', _('Yes')),
+            ('false', _('No')),
         )
         super().__init__(attrs, choices)
 
     def format_value(self, value):
         try:
-            return {True: '2', False: '3', '2': '2', '3': '3'}[value]
+            return {
+                True: 'true', False: 'false',
+                'true': 'true', 'false': 'false',
+                # For backwards compatibility with Django < 2.2.
+                '2': 'true', '3': 'false',
+            }[value]
         except KeyError:
-            return '1'
+            return 'unknown'
 
     def value_from_datadict(self, data, files, name):
         value = data.get(name)
         return {
-            '2': True,
             True: True,
             'True': True,
-            '3': False,
             'False': False,
             False: False,
+            'true': True,
+            'false': False,
+            # For backwards compatibility with Django < 2.2.
+            '2': True,
+            '3': False,
         }.get(value)
 
 
@@ -892,7 +905,7 @@ class SplitDateTimeWidget(MultiWidget):
     def decompress(self, value):
         if value:
             value = to_current_timezone(value)
-            return [value.date(), value.time().replace(microsecond=0)]
+            return [value.date(), value.time()]
         return [None, None]
 
 
@@ -915,7 +928,7 @@ class SelectDateWidget(Widget):
     This also serves as an example of a Widget that has more than one HTML
     element and hence implements value_from_datadict.
     """
-    none_value = (0, '---')
+    none_value = ('', '---')
     month_field = '%s_month'
     day_field = '%s_day'
     year_field = '%s_year'
@@ -945,12 +958,12 @@ class SelectDateWidget(Widget):
             if not len(empty_label) == 3:
                 raise ValueError('empty_label list/tuple must have 3 elements.')
 
-            self.year_none_value = (0, empty_label[0])
-            self.month_none_value = (0, empty_label[1])
-            self.day_none_value = (0, empty_label[2])
+            self.year_none_value = ('', empty_label[0])
+            self.month_none_value = ('', empty_label[1])
+            self.day_none_value = ('', empty_label[2])
         else:
             if empty_label is not None:
-                self.none_value = (0, empty_label)
+                self.none_value = ('', empty_label)
 
             self.year_none_value = self.none_value
             self.month_none_value = self.none_value
@@ -962,35 +975,29 @@ class SelectDateWidget(Widget):
         year_choices = [(i, str(i)) for i in self.years]
         if not self.is_required:
             year_choices.insert(0, self.year_none_value)
-        year_attrs = context['widget']['attrs'].copy()
         year_name = self.year_field % name
-        year_attrs['id'] = 'id_%s' % year_name
         date_context['year'] = self.select_widget(attrs, choices=year_choices).get_context(
             name=year_name,
             value=context['widget']['value']['year'],
-            attrs=year_attrs,
+            attrs={**context['widget']['attrs'], 'id': 'id_%s' % year_name},
         )
         month_choices = list(self.months.items())
         if not self.is_required:
             month_choices.insert(0, self.month_none_value)
-        month_attrs = context['widget']['attrs'].copy()
         month_name = self.month_field % name
-        month_attrs['id'] = 'id_%s' % month_name
         date_context['month'] = self.select_widget(attrs, choices=month_choices).get_context(
             name=month_name,
             value=context['widget']['value']['month'],
-            attrs=month_attrs,
+            attrs={**context['widget']['attrs'], 'id': 'id_%s' % month_name},
         )
         day_choices = [(i, i) for i in range(1, 32)]
         if not self.is_required:
             day_choices.insert(0, self.day_none_value)
-        day_attrs = context['widget']['attrs'].copy()
         day_name = self.day_field % name
-        day_attrs['id'] = 'id_%s' % day_name
         date_context['day'] = self.select_widget(attrs, choices=day_choices,).get_context(
             name=day_name,
             value=context['widget']['value']['day'],
-            attrs=day_attrs,
+            attrs={**context['widget']['attrs'], 'id': 'id_%s' % day_name},
         )
         subwidgets = []
         for field in self._parse_date_fmt():
@@ -1008,7 +1015,12 @@ class SelectDateWidget(Widget):
         if isinstance(value, (datetime.date, datetime.datetime)):
             year, month, day = value.year, value.month, value.day
         elif isinstance(value, str):
-            if settings.USE_L10N:
+            match = self.date_re.match(value)
+            if match:
+                # Convert any zeros in the date to empty strings to match the
+                # empty option value.
+                year, month, day = [int(val) or '' for val in match.groups()]
+            elif settings.USE_L10N:
                 input_format = get_format('DATE_INPUT_FORMATS')[0]
                 try:
                     d = datetime.datetime.strptime(value, input_format)
@@ -1016,9 +1028,6 @@ class SelectDateWidget(Widget):
                     pass
                 else:
                     year, month, day = d.year, d.month, d.day
-            match = self.date_re.match(value)
-            if match:
-                year, month, day = [int(val) for val in match.groups()]
         return {'year': year, 'month': month, 'day': day}
 
     @staticmethod
@@ -1046,20 +1055,21 @@ class SelectDateWidget(Widget):
         y = data.get(self.year_field % name)
         m = data.get(self.month_field % name)
         d = data.get(self.day_field % name)
-        if y == m == d == "0":
+        if y == m == d == '':
             return None
-        if y and m and d:
+        if y is not None and m is not None and d is not None:
             if settings.USE_L10N:
                 input_format = get_format('DATE_INPUT_FORMATS')[0]
                 try:
                     date_value = datetime.date(int(y), int(m), int(d))
                 except ValueError:
-                    return '%s-%s-%s' % (y, m, d)
+                    pass
                 else:
                     date_value = datetime_safe.new_date(date_value)
                     return date_value.strftime(input_format)
-            else:
-                return '%s-%s-%s' % (y, m, d)
+            # Return pseudo-ISO dates with zeros for any unselected values,
+            # e.g. '2017-0-23'.
+            return '%s-%s-%s' % (y or 0, m or 0, d or 0)
         return data.get(name)
 
     def value_omitted_from_data(self, data, files, name):

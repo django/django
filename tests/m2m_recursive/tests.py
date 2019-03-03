@@ -6,17 +6,18 @@ from .models import Person
 
 
 class RecursiveM2MTests(TestCase):
-    def setUp(self):
-        self.a, self.b, self.c, self.d = [
+    @classmethod
+    def setUpTestData(cls):
+        cls.a, cls.b, cls.c, cls.d = [
             Person.objects.create(name=name)
             for name in ["Anne", "Bill", "Chuck", "David"]
         ]
 
         # Anne is friends with Bill and Chuck
-        self.a.friends.add(self.b, self.c)
+        cls.a.friends.add(cls.b, cls.c)
 
         # David is friends with Anne and Chuck - add in reverse direction
-        self.d.friends.add(self.a, self.c)
+        cls.d.friends.add(cls.a, cls.c)
 
     def test_recursive_m2m_all(self):
         # Who is friends with Anne?

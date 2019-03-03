@@ -27,7 +27,7 @@ How to use it
 
 To take advantage of CSRF protection in your views, follow these steps:
 
-1. The CSRF middleware is activated by default in the :setting:`MIDDLEWARE`
+#. The CSRF middleware is activated by default in the :setting:`MIDDLEWARE`
    setting. If you override that setting, remember that
    ``'django.middleware.csrf.CsrfViewMiddleware'`` should come before any view
    middleware that assume that CSRF attacks have been dealt with.
@@ -36,17 +36,17 @@ To take advantage of CSRF protection in your views, follow these steps:
    :func:`~django.views.decorators.csrf.csrf_protect` on particular views
    you want to protect (see below).
 
-2. In any template that uses a POST form, use the :ttag:`csrf_token` tag inside
+#. In any template that uses a POST form, use the :ttag:`csrf_token` tag inside
    the ``<form>`` element if the form is for an internal URL, e.g.:
 
    .. code-block:: html+django
 
-       <form action="" method="post">{% csrf_token %}
+       <form method="post">{% csrf_token %}
 
    This should not be done for POST forms that target external URLs, since
    that would cause the CSRF token to be leaked, leading to a vulnerability.
 
-3. In the corresponding view functions, ensure that
+#. In the corresponding view functions, ensure that
    :class:`~django.template.RequestContext` is used to render the response so
    that ``{% csrf_token %}`` will work properly. If you're using the
    :func:`~django.shortcuts.render` function, generic views, or contrib apps,
@@ -60,26 +60,25 @@ AJAX
 While the above method can be used for AJAX POST requests, it has some
 inconveniences: you have to remember to pass the CSRF token in as POST data with
 every POST request. For this reason, there is an alternative method: on each
-XMLHttpRequest, set a custom ``X-CSRFToken`` header to the value of the CSRF
-token. This is often easier, because many JavaScript frameworks provide hooks
-that allow headers to be set on every request.
+XMLHttpRequest, set a custom ``X-CSRFToken`` header (as specified by the
+:setting:`CSRF_HEADER_NAME` setting) to the value of the CSRF token. This is
+often easier because many JavaScript frameworks provide hooks that allow
+headers to be set on every request.
 
 First, you must get the CSRF token. How to do that depends on whether or not
-the :setting:`CSRF_USE_SESSIONS` setting is enabled.
+the :setting:`CSRF_USE_SESSIONS` and :setting:`CSRF_COOKIE_HTTPONLY` settings
+are enabled.
 
-Acquiring the token if :setting:`CSRF_USE_SESSIONS` is ``False``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _acquiring-csrf-token-from-cookie:
+
+Acquiring the token if :setting:`CSRF_USE_SESSIONS` and :setting:`CSRF_COOKIE_HTTPONLY` are ``False``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The recommended source for the token is the ``csrftoken`` cookie, which will be
 set if you've enabled CSRF protection for your views as outlined above.
 
-.. note::
-
-    The CSRF token cookie is named ``csrftoken`` by default, but you can control
-    the cookie name via the :setting:`CSRF_COOKIE_NAME` setting.
-
-    The CSRF header name is ``HTTP_X_CSRFTOKEN`` by default, but you can
-    customize it using the :setting:`CSRF_HEADER_NAME` setting.
+The CSRF token cookie is named ``csrftoken`` by default, but you can control
+the cookie name via the :setting:`CSRF_COOKIE_NAME` setting.
 
 Acquiring the token is straightforward:
 
@@ -126,11 +125,14 @@ The above code could be simplified by using the `JavaScript Cookie library
     Django provides a view decorator which forces setting of the cookie:
     :func:`~django.views.decorators.csrf.ensure_csrf_cookie`.
 
-Acquiring the token if :setting:`CSRF_USE_SESSIONS` is ``True``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _acquiring-csrf-token-from-html:
 
-If you activate :setting:`CSRF_USE_SESSIONS`, you must include the CSRF token
-in your HTML and read the token from the DOM with JavaScript:
+Acquiring the token if :setting:`CSRF_USE_SESSIONS` or :setting:`CSRF_COOKIE_HTTPONLY` is ``True``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you activate :setting:`CSRF_USE_SESSIONS` or
+:setting:`CSRF_COOKIE_HTTPONLY`, you must include the CSRF token in your HTML
+and read the token from the DOM with JavaScript:
 
 .. code-block:: html+django
 
@@ -179,7 +181,7 @@ to ``{% csrf_token %}`` in the Django template language. For example:
 
 .. code-block:: html+jinja
 
-    <form action="" method="post">{{ csrf_input }}
+    <form method="post">{{ csrf_input }}
 
 The decorator method
 --------------------
@@ -202,8 +204,8 @@ both is fine, and will incur minimal overhead.
 
     Usage::
 
-        from django.views.decorators.csrf import csrf_protect
         from django.shortcuts import render
+        from django.views.decorators.csrf import csrf_protect
 
         @csrf_protect
         def my_view(request):
@@ -239,7 +241,7 @@ How it works
 
 The CSRF protection is based on the following things:
 
-1. A CSRF cookie that is based on a random secret value, which other sites
+#. A CSRF cookie that is based on a random secret value, which other sites
    will not have access to.
 
    This cookie is set by ``CsrfViewMiddleware``. It is sent with every
@@ -253,7 +255,7 @@ The CSRF protection is based on the following things:
    For security reasons, the value of the secret is changed each time a
    user logs in.
 
-2. A hidden form field with the name 'csrfmiddlewaretoken' present in all
+#. A hidden form field with the name 'csrfmiddlewaretoken' present in all
    outgoing POST forms. The value of this field is, again, the value of the
    secret, with a salt which is both added to it and used to scramble it. The
    salt is regenerated on every call to ``get_token()`` so that the form field
@@ -261,7 +263,7 @@ The CSRF protection is based on the following things:
 
    This part is done by the template tag.
 
-3. For all incoming requests that are not using HTTP GET, HEAD, OPTIONS or
+#. For all incoming requests that are not using HTTP GET, HEAD, OPTIONS or
    TRACE, a CSRF cookie must be present, and the 'csrfmiddlewaretoken' field
    must be present and correct. If it isn't, the user will get a 403 error.
 
@@ -272,7 +274,7 @@ The CSRF protection is based on the following things:
 
    This check is done by ``CsrfViewMiddleware``.
 
-4. In addition, for HTTPS requests, strict referer checking is done by
+#. In addition, for HTTPS requests, strict referer checking is done by
    ``CsrfViewMiddleware``. This means that even if a subdomain can set or
    modify cookies on your domain, it can't force a user to post to your
    application since that request won't come from your own exact domain.
@@ -400,8 +402,8 @@ class-based views<decorating-class-based-views>`.
     This decorator marks a view as being exempt from the protection ensured by
     the middleware. Example::
 
-        from django.views.decorators.csrf import csrf_exempt
         from django.http import HttpResponse
+        from django.views.decorators.csrf import csrf_exempt
 
         @csrf_exempt
         def my_view(request):
@@ -417,8 +419,8 @@ class-based views<decorating-class-based-views>`.
 
     Example::
 
-        from django.views.decorators.csrf import requires_csrf_token
         from django.shortcuts import render
+        from django.views.decorators.csrf import requires_csrf_token
 
         @requires_csrf_token
         def my_view(request):
@@ -513,6 +515,7 @@ A number of settings can be used to control Django's CSRF behavior:
 * :setting:`CSRF_COOKIE_HTTPONLY`
 * :setting:`CSRF_COOKIE_NAME`
 * :setting:`CSRF_COOKIE_PATH`
+* :setting:`CSRF_COOKIE_SAMESITE`
 * :setting:`CSRF_COOKIE_SECURE`
 * :setting:`CSRF_FAILURE_VIEW`
 * :setting:`CSRF_HEADER_NAME`
@@ -550,4 +553,4 @@ Why might a user encounter a CSRF validation failure after logging in?
 For security reasons, CSRF tokens are rotated each time a user logs in. Any
 page with a form generated before a login will have an old, invalid CSRF token
 and need to be reloaded. This might happen if a user uses the back button after
-a login or if they log in in a different browser tab.
+a login or if they log in a different browser tab.

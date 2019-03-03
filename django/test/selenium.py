@@ -3,6 +3,7 @@ import unittest
 from contextlib import contextmanager
 
 from django.test import LiveServerTestCase, tag
+from django.utils.decorators import classproperty
 from django.utils.module_loading import import_string
 from django.utils.text import capfirst
 
@@ -10,6 +11,10 @@ from django.utils.text import capfirst
 class SeleniumTestCaseBase(type(LiveServerTestCase)):
     # List of browsers to dynamically create test classes for.
     browsers = []
+    # A selenium hub URL to test against.
+    selenium_hub = None
+    # The external host Selenium Hub can reach.
+    external_host = None
     # Sentinel value to differentiate browser-specific instances.
     browser = None
 
@@ -29,6 +34,10 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
             # either duplicate tests or prevent pickling of its instances.
             first_browser = test_class.browsers[0]
             test_class.browser = first_browser
+            # Listen on an external interface if using a selenium hub.
+            host = test_class.host if not test_class.selenium_hub else '0.0.0.0'
+            test_class.host = host
+            test_class.external_host = cls.external_host
             # Create subclasses for each of the remaining browsers and expose
             # them through the test's module namespace.
             module = sys.modules[test_class.__module__]
@@ -37,7 +46,12 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
                     cls,
                     "%s%s" % (capfirst(browser), name),
                     (test_class,),
-                    {'browser': browser, '__module__': test_class.__module__}
+                    {
+                        'browser': browser,
+                        'host': host,
+                        'external_host': cls.external_host,
+                        '__module__': test_class.__module__,
+                    }
                 )
                 setattr(module, browser_test_class.__name__, browser_test_class)
             return test_class
@@ -48,13 +62,33 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
     def import_webdriver(cls, browser):
         return import_string("selenium.webdriver.%s.webdriver.WebDriver" % browser)
 
+    @classmethod
+    def get_capability(cls, browser):
+        from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+        return getattr(DesiredCapabilities, browser.upper())
+
     def create_webdriver(self):
+        if self.selenium_hub:
+            from selenium import webdriver
+            return webdriver.Remote(
+                command_executor=self.selenium_hub,
+                desired_capabilities=self.get_capability(self.browser),
+            )
         return self.import_webdriver(self.browser)()
 
 
 @tag('selenium')
 class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
     implicit_wait = 10
+    external_host = None
+
+    @classproperty
+    def live_server_url(cls):
+        return 'http://%s:%s' % (cls.external_host or cls.host, cls.server_thread.port)
+
+    @classproperty
+    def allowed_host(cls):
+        return cls.external_host or cls.host
 
     @classmethod
     def setUpClass(cls):

@@ -1,15 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Emin Mastizada <emin@linux.com>, 2018
 # Emin Mastizada <emin@linux.com>, 2016
 # Konul Allahverdiyeva <english.koni@gmail.com>, 2016
+# Zulfugar Ismayilzadeh <zulfuqar.ismayilzada@gmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-08-31 10:37+0000\n"
-"Last-Translator: Konul Allahverdiyeva <english.koni@gmail.com>\n"
+"POT-Creation-Date: 2018-05-21 14:16-0300\n"
+"PO-Revision-Date: 2018-09-09 12:44+0000\n"
+"Last-Translator: Emin Mastizada <emin@linux.com>\n"
 "Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
 "az/)\n"
 "MIME-Version: 1.0\n"
@@ -86,6 +88,15 @@ msgstr "Daha bir %(verbose_name)s əlavə et"
 
 msgid "Remove"
 msgstr "Yığışdır"
+
+msgid "Addition"
+msgstr "Əlavə"
+
+msgid "Change"
+msgstr "Dəyiş"
+
+msgid "Deletion"
+msgstr "Silmə"
 
 msgid "action time"
 msgstr "əməliyyat vaxtı"
@@ -166,11 +177,11 @@ msgstr ""
 "basılı tutun."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-"{name} \"{obj}\" uğurla əlavə edildi. Bunu təkrar aşağıdan dəyişdirə "
-"bilərsiz."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" uğurla əlavə edildi."
+
+msgid "You may edit it again below."
+msgstr "Bunu aşağıda təkrar redaktə edə bilərsiz."
 
 #, python-brace-format
 msgid ""
@@ -181,14 +192,17 @@ msgstr ""
 "bilərsiz."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} \"{obj}\" uğurla əlavə edildi."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 "{name} \"{obj}\" uğurla dəyişdirildi. Təkrar aşağıdan dəyişdirə bilərsiz."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+"{name} \"{obj}\" uğurla əlavə edildi. Bunu təkrar aşağıdan dəyişdirə "
+"bilərsiz."
 
 #, python-brace-format
 msgid ""
@@ -217,8 +231,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" uğurla silindi."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "%(key)r əsas açarı ilə %(name)s mövcud deyil."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "\"%(key)s\" id nömrəli %(name)s mövcud deyil. Çox güman ki, silinib?"
 
 #, python-format
 msgid "Add %s"
@@ -227,6 +241,10 @@ msgstr "%s əlavə et"
 #, python-format
 msgid "Change %s"
 msgstr "%s dəyiş"
+
+#, python-format
+msgid "View %s"
+msgstr "%s gör"
 
 msgid "Database error"
 msgstr "Bazada xəta"
@@ -336,9 +354,7 @@ msgid "Change password"
 msgstr "Parolu dəyiş"
 
 msgid "Please correct the error below."
-msgstr ""
-"one: Aşağıdakı səhvi düzəltməyi xahiş edirik.\n"
-"other: Aşağıdakı səhvləri düzəltməyi xahiş edirik."
+msgstr "Lütfən aşağıdakı xətanı düzəldin."
 
 msgid "Please correct the errors below."
 msgstr "Lütfən aşağıdakı səhvləri düzəldin."
@@ -449,8 +465,8 @@ msgstr ""
 "Seçdiyiniz %(objects_name)s obyektini silməkdə əminsiniz? Aşağıdakı bütün "
 "obyektlər və ona bağlı digər obyektlər də silinəcək:"
 
-msgid "Change"
-msgstr "Dəyiş"
+msgid "View"
+msgstr "Gör"
 
 msgid "Delete?"
 msgstr "Silək?"
@@ -469,8 +485,8 @@ msgstr "%(name)s proqramındakı modellər"
 msgid "Add"
 msgstr "Əlavə et"
 
-msgid "You don't have permission to edit anything."
-msgstr "Üzrlər, amma sizin nəyisə dəyişməyə səlahiyyətiniz çatmır."
+msgid "You don't have permission to view or edit anything."
+msgstr "Heç nəyi görmə və ya redaktə etmə icazəniz yoxdur."
 
 msgid "Recent actions"
 msgstr "Son əməliyyatlar"
@@ -533,6 +549,10 @@ msgid "Change selected %(model)s"
 msgstr "Seçilmiş %(model)s dəyişdir"
 
 #, python-format
+msgid "View selected %(model)s"
+msgstr "Seçilən %(model)s gör"
+
+#, python-format
 msgid "Add another %(model)s"
 msgstr "Başqa %(model)s əlavə et"
 
@@ -561,6 +581,12 @@ msgstr "Yadda saxla və yenisini əlavə et"
 
 msgid "Save and continue editing"
 msgstr "Yadda saxla və redaktəyə davam et"
+
+msgid "Save and view"
+msgstr "Saxla və gör"
+
+msgid "Close"
+msgstr "Qapat"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Sayt ilə səmərəli vaxt keçirdiyiniz üçün təşəkkür."
@@ -669,6 +695,10 @@ msgstr "%s seç"
 #, python-format
 msgid "Select %s to change"
 msgstr "%s dəyişmək üçün seç"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Görmək üçün %s seçin"
 
 msgid "Date:"
 msgstr "Tarix:"

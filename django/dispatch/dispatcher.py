@@ -106,10 +106,7 @@ class Signal:
 
         with self.lock:
             self._clear_dead_receivers()
-            for r_key, _ in self.receivers:
-                if r_key == lookup_key:
-                    break
-            else:
+            if not any(r_key == lookup_key for r_key, _ in self.receivers):
                 self.receivers.append((lookup_key, receiver))
             self.sender_receivers_cache.clear()
 
@@ -185,7 +182,7 @@ class Signal:
         Arguments:
 
             sender
-                The sender of the signal. Can be any python object (normally one
+                The sender of the signal. Can be any Python object (normally one
                 registered with a connect if you actually want something to
                 occur).
 
@@ -218,12 +215,10 @@ class Signal:
         # Note: caller is assumed to hold self.lock.
         if self._dead_receivers:
             self._dead_receivers = False
-            new_receivers = []
-            for r in self.receivers:
-                if isinstance(r[1], weakref.ReferenceType) and r[1]() is None:
-                    continue
-                new_receivers.append(r)
-            self.receivers = new_receivers
+            self.receivers = [
+                r for r in self.receivers
+                if not(isinstance(r[1], weakref.ReferenceType) and r[1]() is None)
+            ]
 
     def _live_receivers(self, sender):
         """

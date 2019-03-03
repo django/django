@@ -1,3 +1,4 @@
+from django.db import connection
 from django.test import modify_settings
 
 from . import PostgreSQLTestCase
@@ -9,11 +10,12 @@ class UnaccentTest(PostgreSQLTestCase):
 
     Model = CharFieldModel
 
-    def setUp(self):
-        self.Model.objects.bulk_create([
-            self.Model(field="àéÖ"),
-            self.Model(field="aeO"),
-            self.Model(field="aeo"),
+    @classmethod
+    def setUpTestData(cls):
+        cls.Model.objects.bulk_create([
+            cls.Model(field="àéÖ"),
+            cls.Model(field="aeO"),
+            cls.Model(field="aeo"),
         ])
 
     def test_unaccent(self):
@@ -41,6 +43,24 @@ class UnaccentTest(PostgreSQLTestCase):
             transform=lambda instance: instance.field,
             ordered=False
         )
+
+    def test_unaccent_with_conforming_strings_off(self):
+        """SQL is valid when standard_conforming_strings is off."""
+        with connection.cursor() as cursor:
+            cursor.execute('SHOW standard_conforming_strings')
+            disable_conforming_strings = cursor.fetchall()[0][0] == 'on'
+            if disable_conforming_strings:
+                cursor.execute('SET standard_conforming_strings TO off')
+            try:
+                self.assertQuerysetEqual(
+                    self.Model.objects.filter(field__unaccent__endswith='éÖ'),
+                    ['àéÖ', 'aeO'],
+                    transform=lambda instance: instance.field,
+                    ordered=False,
+                )
+            finally:
+                if disable_conforming_strings:
+                    cursor.execute('SET standard_conforming_strings TO on')
 
     def test_unaccent_accentuated_needle(self):
         self.assertQuerysetEqual(

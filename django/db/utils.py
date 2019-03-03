@@ -1,6 +1,6 @@
-import os
 import pkgutil
 from importlib import import_module
+from pathlib import Path
 from threading import local
 
 from django.conf import settings
@@ -111,7 +111,7 @@ def load_backend(backend_name):
     except ImportError as e_user:
         # The database backend wasn't found. Display a helpful error message
         # listing all built-in database backends.
-        backend_dir = os.path.join(os.path.dirname(__file__), 'backends')
+        backend_dir = str(Path(__file__).parent / 'backends')
         builtin_backends = [
             name for _, name, ispkg in pkgutil.iter_modules([backend_dir])
             if ispkg and name not in {'base', 'dummy', 'postgresql_psycopg2'}
@@ -151,11 +151,10 @@ class ConnectionHandler:
                     'ENGINE': 'django.db.backends.dummy',
                 },
             }
+        if DEFAULT_DB_ALIAS not in self._databases:
+            raise ImproperlyConfigured("You must define a '%s' database." % DEFAULT_DB_ALIAS)
         if self._databases[DEFAULT_DB_ALIAS] == {}:
             self._databases[DEFAULT_DB_ALIAS]['ENGINE'] = 'django.db.backends.dummy'
-
-        if DEFAULT_DB_ALIAS not in self._databases:
-            raise ImproperlyConfigured("You must define a '%s' database" % DEFAULT_DB_ALIAS)
         return self._databases
 
     def ensure_defaults(self, alias):

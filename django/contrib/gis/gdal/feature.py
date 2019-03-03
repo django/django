@@ -3,11 +3,11 @@ from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.gdal.field import Field
 from django.contrib.gis.gdal.geometries import OGRGeometry, OGRGeomType
 from django.contrib.gis.gdal.prototypes import ds as capi, geom as geom_api
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_bytes, force_str
 
 
 # For more information, see the OGR C API source code:
-#  http://www.gdal.org/ogr__api_8h.html
+#  https://www.gdal.org/ogr__api_8h.html
 #
 # The OGR_F_* routines are relevant here.
 class Feature(GDALBase):
@@ -67,7 +67,7 @@ class Feature(GDALBase):
     def layer_name(self):
         "Return the name of the layer for the feature."
         name = capi.get_feat_name(self._layer._ldefn)
-        return force_text(name, self.encoding, strings_only=True)
+        return force_str(name, self.encoding, strings_only=True)
 
     @property
     def num_fields(self):
@@ -78,7 +78,7 @@ class Feature(GDALBase):
     def fields(self):
         "Return a list of fields in the Feature."
         return [
-            force_text(
+            force_str(
                 capi.get_field_name(capi.get_field_defn(self._layer._ldefn, i)),
                 self.encoding,
                 strings_only=True
@@ -94,7 +94,7 @@ class Feature(GDALBase):
 
     @property
     def geom_type(self):
-        "Return the OGR Geometry Type for this Feture."
+        "Return the OGR Geometry Type for this Feature."
         return OGRGeomType(capi.get_fd_geom_type(self._layer._ldefn))
 
     # #### Feature Methods ####

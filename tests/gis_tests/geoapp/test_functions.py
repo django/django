@@ -12,8 +12,8 @@ from django.db import NotSupportedError, connection
 from django.db.models import Sum
 from django.test import TestCase, skipUnlessDBFeature
 
-from ..utils import FuncTestMixin, mysql, oracle, postgis, spatialite
 from .models import City, Country, CountryWebMercator, State, Track
+from ..utils import FuncTestMixin, mysql, oracle, postgis, spatialite
 
 
 class GISFunctionsTests(FuncTestMixin, TestCase):
@@ -213,10 +213,10 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
     def test_envelope(self):
         countries = Country.objects.annotate(envelope=functions.Envelope('mpoly'))
         for country in countries:
-            self.assertIsInstance(country.envelope, Polygon)
+            self.assertTrue(country.envelope.equals(country.mpoly.envelope))
 
-    @skipUnlessDBFeature("has_ForceRHR_function")
-    def test_force_rhr(self):
+    @skipUnlessDBFeature("has_ForcePolygonCW_function")
+    def test_force_polygon_cw(self):
         rings = (
             ((0, 0), (5, 0), (0, 5), (0, 0)),
             ((1, 1), (1, 3), (3, 1), (1, 1)),
@@ -226,8 +226,8 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             ((1, 1), (3, 1), (1, 3), (1, 1)),
         )
         State.objects.create(name='Foo', poly=Polygon(*rings))
-        st = State.objects.annotate(force_rhr=functions.ForceRHR('poly')).get(name='Foo')
-        self.assertEqual(rhr_rings, st.force_rhr.coords)
+        st = State.objects.annotate(force_polygon_cw=functions.ForcePolygonCW('poly')).get(name='Foo')
+        self.assertEqual(rhr_rings, st.force_polygon_cw.coords)
 
     @skipUnlessDBFeature("has_GeoHash_function")
     def test_geohash(self):
@@ -349,15 +349,17 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         if oracle:
             # SELECT SDO_UTIL.TO_WKTGEOMETRY(SDO_GEOM.SDO_POINTONSURFACE(GEOAPP_COUNTRY.MPOLY, 0.05))
             # FROM GEOAPP_COUNTRY;
-            ref = {'New Zealand': fromstr('POINT (174.616364 -36.100861)', srid=4326),
-                   'Texas': fromstr('POINT (-103.002434 36.500397)', srid=4326),
-                   }
+            ref = {
+                'New Zealand': fromstr('POINT (174.616364 -36.100861)', srid=4326),
+                'Texas': fromstr('POINT (-103.002434 36.500397)', srid=4326),
+            }
         else:
             # Using GEOSGeometry to compute the reference point on surface values
             # -- since PostGIS also uses GEOS these should be the same.
-            ref = {'New Zealand': Country.objects.get(name='New Zealand').mpoly.point_on_surface,
-                   'Texas': Country.objects.get(name='Texas').mpoly.point_on_surface
-                   }
+            ref = {
+                'New Zealand': Country.objects.get(name='New Zealand').mpoly.point_on_surface,
+                'Texas': Country.objects.get(name='Texas').mpoly.point_on_surface
+            }
 
         qs = Country.objects.annotate(point_on_surface=functions.PointOnSurface('mpoly'))
         for country in qs:

@@ -4,27 +4,38 @@ import operator
 from functools import total_ordering, wraps
 
 
-# You can't trivially replace this with `functools.partial` because this binds
-# to classes and returns bound instances, whereas functools.partial (on
-# CPython) is a type and its instances don't bind.
-def curry(_curried_func, *args, **kwargs):
-    def _curried(*moreargs, **morekwargs):
-        return _curried_func(*(args + moreargs), **dict(kwargs, **morekwargs))
-    return _curried
-
-
 class cached_property:
     """
     Decorator that converts a method with a single self argument into a
     property cached on the instance.
 
-    Optional ``name`` argument allows you to make cached properties of other
-    methods. (e.g.  url = cached_property(get_absolute_url, name='url') )
+    A cached property can be made out of an existing method:
+    (e.g. ``url = cached_property(get_absolute_url)``).
+    The optional ``name`` argument is obsolete as of Python 3.6 and will be
+    deprecated in Django 4.0 (#30127).
     """
+    name = None
+
+    @staticmethod
+    def func(instance):
+        raise TypeError(
+            'Cannot use cached_property instance without calling '
+            '__set_name__() on it.'
+        )
+
     def __init__(self, func, name=None):
-        self.func = func
+        self.real_func = func
         self.__doc__ = getattr(func, '__doc__')
-        self.name = name or func.__name__
+
+    def __set_name__(self, owner, name):
+        if self.name is None:
+            self.name = name
+            self.func = self.real_func
+        elif name != self.name:
+            raise TypeError(
+                "Cannot assign the same cached_property to two different names "
+                "(%r and %r)." % (self.name, name)
+            )
 
     def __get__(self, instance, cls=None):
         """
@@ -190,12 +201,9 @@ def keep_lazy(*resultclasses):
 
         @wraps(func)
         def wrapper(*args, **kwargs):
-            for arg in itertools.chain(args, kwargs.values()):
-                if isinstance(arg, Promise):
-                    break
-            else:
-                return func(*args, **kwargs)
-            return lazy_func(*args, **kwargs)
+            if any(isinstance(arg, Promise) for arg in itertools.chain(args, kwargs.values())):
+                return lazy_func(*args, **kwargs)
+            return func(*args, **kwargs)
         return wrapper
     return decorator
 
@@ -307,6 +315,8 @@ class LazyObject:
     # care about this (especially in equality tests)
     __class__ = property(new_method_proxy(operator.attrgetter("__class__")))
     __eq__ = new_method_proxy(operator.eq)
+    __lt__ = new_method_proxy(operator.lt)
+    __gt__ = new_method_proxy(operator.gt)
     __ne__ = new_method_proxy(operator.ne)
     __hash__ = new_method_proxy(hash)
 

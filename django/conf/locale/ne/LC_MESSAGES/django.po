@@ -3,15 +3,15 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2014
 # Paras Nath Chaudhary <opnchaudhary@gmail.com>, 2012
-# Sagar Chalise <chalisesagar@gmail.com>, 2011-2012,2015
+# Sagar Chalise <chalisesagar@gmail.com>, 2011-2012,2015,2018
 # Sagar Chalise <chalisesagar@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-20 09:03+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-09-29 06:13+0000\n"
+"Last-Translator: Sagar Chalise <chalisesagar@gmail.com>\n"
 "Language-Team: Nepali (http://www.transifex.com/django/django/language/ne/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -160,6 +160,9 @@ msgstr "जापनिज"
 msgid "Georgian"
 msgstr "जर्जीयन"
 
+msgid "Kabyle"
+msgstr "कबायल"
+
 msgid "Kazakh"
 msgstr "कजाक"
 
@@ -167,7 +170,7 @@ msgid "Khmer"
 msgstr "ख्मेर"
 
 msgid "Kannada"
-msgstr "कन्नडा"
+msgstr "कन्नड"
 
 msgid "Korean"
 msgstr "कोरियाली"
@@ -296,13 +299,13 @@ msgid "Syndication"
 msgstr "सिन्डिकेसन"
 
 msgid "That page number is not an integer"
-msgstr ""
+msgstr "पृष्ठ नं अंक होइन ।"
 
 msgid "That page number is less than 1"
-msgstr ""
+msgstr "पृष्ठ नं १ भन्दा कम भयो ।"
 
 msgid "That page contains no results"
-msgstr ""
+msgstr "पृष्ठमा नतिजा छैन ।"
 
 msgid "Enter a valid value."
 msgstr "उपयुक्त मान राख्नुहोस ।"
@@ -316,6 +319,7 @@ msgstr "उपयुक्त अंक राख्नुहोस ।"
 msgid "Enter a valid email address."
 msgstr "सही ई-मेल ठेगाना राख्नु होस ।"
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "अक्षर, अंक, _  र - भएका 'स्लग' मात्र हाल्नुहोस ।"
@@ -377,6 +381,9 @@ msgstr[1] ""
 "यो मान बढिमा पनि %(limit_value)d अक्षरहरु छ भन्ने निश्चित गर्नुहोस । (यसमा "
 "%(show_value)d छ ।)"
 
+msgid "Enter a number."
+msgstr "संख्या राख्नुहोस ।"
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -402,6 +409,10 @@ msgid ""
 "File extension '%(extension)s' is not allowed. Allowed extensions are: "
 "'%(allowed_extensions)s'."
 msgstr ""
+"'%(extension)s' फाइलको अनुमति छैन। अनुमति भएका फाइलहरू: '%(allowed_extensions)s'"
+
+msgid "Null characters are not allowed."
+msgstr "शून्य मान अनुमति छैन।"
 
 msgid "and"
 msgstr "र"
@@ -449,6 +460,10 @@ msgstr "ठूलो (८ बाइटको) अंक"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "%(value)s' को मान True अथवा False हुनुपर्दछ ।."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "'%(value)s' को मान True, False अथवा None हुनुपर्दछ ।"
 
 msgid "Boolean (Either True or False)"
 msgstr "बुलियन (True अथवा False)"
@@ -612,9 +627,6 @@ msgstr "यो फाँट अनिवार्य छ ।"
 msgid "Enter a whole number."
 msgstr "संख्या राख्नुहोस ।"
 
-msgid "Enter a number."
-msgstr "संख्या राख्नुहोस ।"
-
 msgid "Enter a valid date."
 msgstr "उपयुक्त मिति राख्नुहोस ।"
 
@@ -626,6 +638,10 @@ msgstr "उपयुक्त मिति/समय राख्नुहोस
 
 msgid "Enter a valid duration."
 msgstr "उपयुक्त अवधि राख्नुहोस ।"
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "दिन गन्ती {min_days} र {max_days} बीचमा हुनु पर्छ । "
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "कुनै फाईल पेश गरिएको छैन । फारममा ईनकोडिङको प्रकार जाँच गर्नुहोस । "
@@ -718,15 +734,15 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "कृपया तलका दोहोरिइका मानहरु सच्याउनुहोस ।"
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "भित्रि फोरेन की र अभिभावक प्राइमरी की मिलेन ।"
+msgid "The inline value did not match the parent instance."
+msgstr ""
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "उपयुक्त विकल्प छान्नुहोस ।  छानिएको विकल्प प्रस्तावित विकल्प होइन ।"
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\"  प्राइमरी  कि का  लागि मान्य छैन ।"
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "'%(pk)s' उपयुक्त मान होइन ।"
 
 #, python-format
 msgid ""
@@ -1083,6 +1099,14 @@ msgid ""
 msgstr ""
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1096,29 +1120,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "DEBUG=True ले ज्यादा सुचना प्रदान गर्दछ ।"
 
-msgid "Welcome to Django"
-msgstr "Django स्वागत गर्दछ ।"
-
-msgid "It worked!"
-msgstr "कार्य सफल !"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Django ले बनाइएको प्रथम वेब पृष्ठको लागी तपाईँलाई शुभकामना ।"
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"सेटिङमा <code>DEBUG = True</code> राख्नाले यो सूचना देखी राख्नु भएको छ । अगाडि बढ्नु "
-"होस ।"
-
 msgid "No year specified"
 msgstr "साल तोकिएको छैन ।"
+
+msgid "Date out of range"
+msgstr "मिति मिलेन ।"
 
 msgid "No month specified"
 msgstr "महिना तोकिएको छैन ।"
@@ -1170,3 +1176,41 @@ msgstr "\"%(path)s\" नभएको पाइयो ।"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "%(directory)s को सूची"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr ""
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "बधाई छ । स्थापना भएको छ ।"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+
+msgid "Django Documentation"
+msgstr "ज्याङ्गो दस्तावेज ।"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr "शीर्षक,  सन्दर्भ तथा तरिकाहरू"
+
+msgid "Tutorial: A Polling App"
+msgstr "मतदान एप उदाहरण "
+
+msgid "Get started with Django"
+msgstr "ज्याङ्गो सुरु गर्नु होस ।"
+
+msgid "Django Community"
+msgstr "ज्याङ्गो समुदाय"
+
+msgid "Connect, get help, or contribute"
+msgstr "सहयोग अथवा योगदान गरी जोडिनु होस"

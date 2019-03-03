@@ -32,7 +32,7 @@ that, you need to :meth:`~Model.save()`.
     signature as any change may prevent the model instance from being saved.
     Rather than overriding ``__init__``, try using one of these approaches:
 
-    1. Add a classmethod on the model class::
+    #. Add a classmethod on the model class::
 
         from django.db import models
 
@@ -47,7 +47,7 @@ that, you need to :meth:`~Model.save()`.
 
         book = Book.create("Pride and Prejudice")
 
-    2. Add a method on a custom manager (usually preferred)::
+    #. Add a method on a custom manager (usually preferred)::
 
         class BookManager(models.Manager):
             def create_book(self, title):
@@ -135,14 +135,9 @@ If you need to reload a model's values from the database, you can use the
 ``refresh_from_db()`` method. When this method is called without arguments the
 following is done:
 
-1. All non-deferred fields of the model are updated to the values currently
+#. All non-deferred fields of the model are updated to the values currently
    present in the database.
-2. The previously loaded related instances for which the relation's value is no
-   longer valid are removed from the reloaded instance. For example, if you have
-   a foreign key from the reloaded instance to another model with name
-   ``Author``, then if ``obj.author_id != obj.author.id``, ``obj.author`` will
-   be thrown away, and when next accessed it will be reloaded with the value of
-   ``obj.author_id``.
+#. Any cached relations are cleared from the reloaded instance.
 
 Only fields of the model are reloaded from the database. Other
 database-dependent values such as annotations aren't reloaded. Any
@@ -282,7 +277,7 @@ will be stored in a special error dictionary key,
 :data:`~django.core.exceptions.NON_FIELD_ERRORS`. This key is used for errors
 that are tied to the entire model instead of to a specific field::
 
-    from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
+    from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
     try:
         article.full_clean()
     except ValidationError as e:
@@ -669,7 +664,7 @@ For example::
     # Primary keys compared
     MyModel(id=1) == MyModel(id=1)
     MyModel(id=1) != MyModel(id=2)
-    # Primay keys are None
+    # Primary keys are None
     MyModel(id=None) != MyModel(id=None)
     # Same instance
     instance = MyModel(id=None)

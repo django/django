@@ -98,7 +98,7 @@ can then look it up in the database. There are a variety of third-party
 libraries which are designed to help with this process.
 
 .. _Elastic: https://www.elastic.co/
-.. _Solr: http://lucene.apache.org/solr/
+.. _Solr: https://lucene.apache.org/solr/
 
 PostgreSQL support
 ~~~~~~~~~~~~~~~~~~

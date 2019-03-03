@@ -1,9 +1,14 @@
 import re
+from collections import namedtuple
+
+import sqlparse
 
 from django.db.backends.base.introspection import (
-    BaseDatabaseIntrospection, FieldInfo, TableInfo,
+    BaseDatabaseIntrospection, FieldInfo as BaseFieldInfo, TableInfo,
 )
 from django.db.models.indexes import Index
+
+FieldInfo = namedtuple('FieldInfo', BaseFieldInfo._fields + ('pk',))
 
 field_size_re = re.compile(r'^\s*(?:var)?char\s*\(\s*(\d+)\s*\)\s*$')
 
@@ -35,6 +40,7 @@ class FlexibleFieldLookupDict:
         'real': 'FloatField',
         'text': 'TextField',
         'char': 'CharField',
+        'varchar': 'CharField',
         'blob': 'BinaryField',
         'date': 'DateField',
         'datetime': 'DateTimeField',
@@ -42,18 +48,20 @@ class FlexibleFieldLookupDict:
     }
 
     def __getitem__(self, key):
-        key = key.lower()
-        try:
-            return self.base_data_types_reverse[key]
-        except KeyError:
-            size = get_field_size(key)
-            if size is not None:
-                return ('CharField', {'max_length': size})
-            raise KeyError
+        key = key.lower().split('(', 1)[0].strip()
+        return self.base_data_types_reverse[key]
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
     data_types_reverse = FlexibleFieldLookupDict()
+
+    def get_field_type(self, data_type, description):
+        field_type = super().get_field_type(data_type, description)
+        if description.pk and field_type in {'BigIntegerField', 'IntegerField'}:
+            # No support for BigAutoField as SQLite treats all integer primary
+            # keys as signed 64-bit integers.
+            return 'AutoField'
+        return field_type
 
     def get_table_list(self, cursor):
         """Return a list of table and view names in the current database."""
@@ -70,17 +78,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         Return a description of the table with the DB-API cursor.description
         interface.
         """
+        cursor.execute('PRAGMA table_info(%s)' % self.connection.ops.quote_name(table_name))
         return [
             FieldInfo(
-                info['name'],
-                info['type'],
-                None,
-                info['size'],
-                None,
-                None,
-                info['null_ok'],
-                info['default'],
-            ) for info in self._table_info(cursor, table_name)
+                name, data_type, None, get_field_size(data_type), None, None,
+                not notnull, default, pk == 1,
+            )
+            for cid, name, data_type, notnull, default, pk in cursor.fetchall()
         ]
 
     def get_sequences(self, cursor, table_name, table_fields=()):
@@ -96,13 +100,16 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         relations = {}
 
         # Schema for this table
-        cursor.execute("SELECT sql FROM sqlite_master WHERE tbl_name = %s AND type = %s", [table_name, "table"])
-        try:
-            results = cursor.fetchone()[0].strip()
-        except TypeError:
+        cursor.execute(
+            "SELECT sql, type FROM sqlite_master "
+            "WHERE tbl_name = %s AND type IN ('table', 'view')",
+            [table_name]
+        )
+        create_sql, table_type = cursor.fetchone()
+        if table_type == 'view':
             # It might be a view, then no results will be returned
             return relations
-        results = results[results.index('(') + 1:results.rindex(')')]
+        results = create_sql[create_sql.index('(') + 1:create_sql.rindex(')')]
 
         # Walk through and look for references to other tables. SQLite doesn't
         # really have enforced references, but since it echoes out the SQL used
@@ -174,30 +181,87 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     def get_primary_key_column(self, cursor, table_name):
         """Return the column name of the primary key for the given table."""
         # Don't use PRAGMA because that causes issues with some transactions
-        cursor.execute("SELECT sql FROM sqlite_master WHERE tbl_name = %s AND type = %s", [table_name, "table"])
+        cursor.execute(
+            "SELECT sql, type FROM sqlite_master "
+            "WHERE tbl_name = %s AND type IN ('table', 'view')",
+            [table_name]
+        )
         row = cursor.fetchone()
         if row is None:
             raise ValueError("Table %s does not exist" % table_name)
-        results = row[0].strip()
-        results = results[results.index('(') + 1:results.rindex(')')]
-        for field_desc in results.split(','):
+        create_sql, table_type = row
+        if table_type == 'view':
+            # Views don't have a primary key.
+            return None
+        fields_sql = create_sql[create_sql.index('(') + 1:create_sql.rindex(')')]
+        for field_desc in fields_sql.split(','):
             field_desc = field_desc.strip()
-            m = re.search('"(.*)".*PRIMARY KEY( AUTOINCREMENT)?', field_desc)
+            m = re.match(r'(?:(?:["`\[])(.*)(?:["`\]])|(\w+)).*PRIMARY KEY.*', field_desc)
             if m:
-                return m.groups()[0]
+                return m.group(1) if m.group(1) else m.group(2)
         return None
 
-    def _table_info(self, cursor, name):
-        cursor.execute('PRAGMA table_info(%s)' % self.connection.ops.quote_name(name))
-        # cid, name, type, notnull, default_value, pk
-        return [{
-            'name': field[1],
-            'type': field[2],
-            'size': get_field_size(field[2]),
-            'null_ok': not field[3],
-            'default': field[4],
-            'pk': field[5],  # undocumented
-        } for field in cursor.fetchall()]
+    def _get_foreign_key_constraints(self, cursor, table_name):
+        constraints = {}
+        cursor.execute('PRAGMA foreign_key_list(%s)' % self.connection.ops.quote_name(table_name))
+        for row in cursor.fetchall():
+            # Remaining on_update/on_delete/match values are of no interest.
+            id_, _, table, from_, to = row[:5]
+            constraints['fk_%d' % id_] = {
+                'columns': [from_],
+                'primary_key': False,
+                'unique': False,
+                'foreign_key': (table, to),
+                'check': False,
+                'index': False,
+            }
+        return constraints
+
+    def _parse_table_constraints(self, sql):
+        # Check constraint parsing is based of SQLite syntax diagram.
+        # https://www.sqlite.org/syntaxdiagrams.html#table-constraint
+        def next_ttype(ttype):
+            for token in tokens:
+                if token.ttype == ttype:
+                    return token
+
+        statement = sqlparse.parse(sql)[0]
+        constraints = {}
+        tokens = statement.flatten()
+        for token in tokens:
+            name = None
+            if token.match(sqlparse.tokens.Keyword, 'CONSTRAINT'):
+                # Table constraint
+                name_token = next_ttype(sqlparse.tokens.Literal.String.Symbol)
+                name = name_token.value[1:-1]
+                token = next_ttype(sqlparse.tokens.Keyword)
+            if token.match(sqlparse.tokens.Keyword, 'UNIQUE'):
+                constraints[name] = {
+                    'unique': True,
+                    'columns': [],
+                    'primary_key': False,
+                    'foreign_key': None,
+                    'check': False,
+                    'index': False,
+                }
+            if token.match(sqlparse.tokens.Keyword, 'CHECK'):
+                # Column check constraint
+                if name is None:
+                    column_token = next_ttype(sqlparse.tokens.Literal.String.Symbol)
+                    column = column_token.value[1:-1]
+                    name = '__check__%s' % column
+                    columns = [column]
+                else:
+                    columns = []
+                constraints[name] = {
+                    'check': True,
+                    'columns': columns,
+                    'primary_key': False,
+                    'unique': False,
+                    'foreign_key': None,
+                    'index': False,
+                }
+        return constraints
 
     def get_constraints(self, cursor, table_name):
         """
@@ -205,10 +269,23 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         one or more columns.
         """
         constraints = {}
+        # Find inline check constraints.
+        try:
+            table_schema = cursor.execute(
+                "SELECT sql FROM sqlite_master WHERE type='table' and name=%s" % (
+                    self.connection.ops.quote_name(table_name),
+                )
+            ).fetchone()[0]
+        except TypeError:
+            # table_name is a view.
+            pass
+        else:
+            constraints.update(self._parse_table_constraints(table_schema))
+
         # Get the index info
         cursor.execute("PRAGMA index_list(%s)" % self.connection.ops.quote_name(table_name))
         for row in cursor.fetchall():
-            # Sqlite3 3.8.9+ has 5 columns, however older versions only give 3
+            # SQLite 3.8.9+ has 5 columns, however older versions only give 3
             # columns. Discard last 2 columns if there.
             number, index, unique = row[:3]
             # Get the index info for that index
@@ -219,7 +296,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                         "columns": [],
                         "primary_key": False,
                         "unique": bool(unique),
-                        "foreign_key": False,
+                        "foreign_key": None,
                         "check": False,
                         "index": True,
                     }
@@ -249,21 +326,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 "columns": [pk_column],
                 "primary_key": True,
                 "unique": False,  # It's not actually a unique constraint.
-                "foreign_key": False,
+                "foreign_key": None,
                 "check": False,
                 "index": False,
             }
-        # Get foreign keys
-        cursor.execute('PRAGMA foreign_key_list(%s)' % self.connection.ops.quote_name(table_name))
-        for row in cursor.fetchall():
-            # Remaining on_update/on_delete/match values are of no interest here
-            id_, seq, table, from_, to = row[:5]
-            constraints['fk_%d' % id_] = {
-                'columns': [from_],
-                'primary_key': False,
-                'unique': False,
-                'foreign_key': (table, to),
-                'check': False,
-                'index': False,
-            }
+        constraints.update(self._get_foreign_key_constraints(cursor, table_name))
         return constraints

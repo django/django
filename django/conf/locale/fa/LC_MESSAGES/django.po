@@ -5,6 +5,7 @@
 # Arash Fazeli <a.fazeli@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Mazdak Badakhshan <geraneum@gmail.com>, 2014
+# MJafar Mashhadi <raindigital2007@gmail.com>, 2018
 # Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>, 2013
 # Pouya Abbassi, 2016
 # Reza Mohammadi <reza@teeleh.ir>, 2013-2016
@@ -14,16 +15,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-20 09:03+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-06-23 23:00+0000\n"
+"Last-Translator: MJafar Mashhadi <raindigital2007@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: fa\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 msgid "Afrikaans"
 msgstr "آفریکانس"
@@ -166,6 +167,9 @@ msgstr "ژاپنی"
 msgid "Georgian"
 msgstr "گرجی"
 
+msgid "Kabyle"
+msgstr ""
+
 msgid "Kazakh"
 msgstr "قزاقستان"
 
@@ -302,13 +306,13 @@ msgid "Syndication"
 msgstr "پیوند"
 
 msgid "That page number is not an integer"
-msgstr ""
+msgstr "شمارهٔ صفحه باید یک عدد باشد"
 
 msgid "That page number is less than 1"
-msgstr ""
+msgstr "شمارهٔ صفحه باید بزرگتر از ۱ باشد"
 
 msgid "That page contains no results"
-msgstr ""
+msgstr "این صفحه خالی از اطلاعات است"
 
 msgid "Enter a valid value."
 msgstr "یک مقدار معتبر وارد کنید."
@@ -322,6 +326,7 @@ msgstr "یک عدد معتبر وارد کنید."
 msgid "Enter a valid email address."
 msgstr "یک ایمیل آدرس معتبر وارد کنید."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "یک 'slug' معتبر شامل حروف، ارقام، خط زیر و یا خط تیره وارد کنید."
@@ -365,6 +370,9 @@ msgid_plural ""
 msgstr[0] ""
 "طول این مقدار باید حداقل %(limit_value)d کاراکتر باشد (طولش %(show_value)d "
 "است)."
+msgstr[1] ""
+"طول این مقدار باید حداقل %(limit_value)d کاراکتر باشد (طولش %(show_value)d "
+"است)."
 
 #, python-format
 msgid ""
@@ -376,16 +384,24 @@ msgid_plural ""
 msgstr[0] ""
 "طول این مقدار باید حداکثر %(limit_value)d کاراکتر باشد (طولش %(show_value)d "
 "است)."
+msgstr[1] ""
+"طول این مقدار باید حداکثر %(limit_value)d کاراکتر باشد (طولش %(show_value)d "
+"است)."
+
+msgid "Enter a number."
+msgstr "یک عدد وارد کنید."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
 msgstr[0] "نباید در مجموع بیش از %(max)s رقم داشته باشد."
+msgstr[1] "نباید در مجموع بیش از %(max)s رقم داشته باشد."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
 msgstr[0] "نباید بیش از %(max)s رقم اعشار داشته باشد."
+msgstr[1] "نباید بیش از %(max)s رقم اعشار داشته باشد."
 
 #, python-format
 msgid ""
@@ -393,11 +409,17 @@ msgid ""
 msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] "نباید بیش از %(max)s رقم قبل ممیز داشته باشد."
+msgstr[1] "نباید بیش از %(max)s رقم قبل ممیز داشته باشد."
 
 #, python-format
 msgid ""
 "File extension '%(extension)s' is not allowed. Allowed extensions are: "
 "'%(allowed_extensions)s'."
+msgstr ""
+"استفاده از پرونده با پسوند '%(extension)s' مجاز نیست. پسوند‌های مجاز عبارتند "
+"از: '%(allowed_extensions)s'"
+
+msgid "Null characters are not allowed."
 msgstr ""
 
 msgid "and"
@@ -446,6 +468,10 @@ msgstr "بزرگ (8 بایت) عدد صحیح"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "مقدار «%(value)s» باید یا True باشد و یا False."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "مقدار «%(value)s» باید یا None باشد یا True و یا False."
 
 msgid "Boolean (Either True or False)"
 msgstr "بولی (درست یا غلط)"
@@ -623,9 +649,6 @@ msgstr "این فیلد لازم است."
 msgid "Enter a whole number."
 msgstr "به طور کامل یک عدد وارد کنید."
 
-msgid "Enter a number."
-msgstr "یک عدد وارد کنید."
-
 msgid "Enter a valid date."
 msgstr "یک تاریخ معتبر وارد کنید."
 
@@ -637,6 +660,10 @@ msgstr "یک تاریخ/زمان معتبر وارد کنید."
 
 msgid "Enter a valid duration."
 msgstr "یک بازهٔ زمانی معتبر وارد کنید."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr ""
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "پرونده‌ای ارسال نشده است. نوع کدگذاری فرم را بررسی کنید."
@@ -652,6 +679,8 @@ msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr[0] ""
+"طول عنوان پرونده باید حداقل %(max)d کاراکتر باشد (طولش %(length)d است)."
+msgstr[1] ""
 "طول عنوان پرونده باید حداقل %(max)d کاراکتر باشد (طولش %(length)d است)."
 
 msgid "Please either submit a file or check the clear checkbox, not both."
@@ -692,11 +721,13 @@ msgstr "اطلاعات ManagementForm ناقص است و یا دستکاری ش�
 msgid "Please submit %d or fewer forms."
 msgid_plural "Please submit %d or fewer forms."
 msgstr[0] "لطفاً %d یا کمتر فرم بفرستید."
+msgstr[1] "لطفاً %d یا کمتر فرم بفرستید."
 
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
 msgstr[0] "لطفاً %d یا بیشتر فرم بفرستید."
+msgstr[1] "لطفاً %d یا بیشتر فرم بفرستید."
 
 msgid "Order"
 msgstr "ترتیب:"
@@ -723,15 +754,15 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "لطفا مقدار تکراری را اصلاح کنید."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "کلید های درون خطی خارجی با هم مطابقت ندارند ."
+msgid "The inline value did not match the parent instance."
+msgstr ""
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "یک گزینهٔ معتبر انتخاب کنید. آن گزینه از گزینه‌های موجود نیست."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "‏«‎%(pk)s» مقدار معتبری برای کلید اصلی نیست."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -766,6 +797,7 @@ msgstr "بله،خیر،شاید"
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d بایت"
+msgstr[1] "%(size)d بایت"
 
 #, python-format
 msgid "%s KB"
@@ -1034,31 +1066,37 @@ msgstr "،"
 msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] "%d سال"
+msgstr[1] "%d سال"
 
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] "%d ماه"
+msgstr[1] "%d ماه"
 
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
 msgstr[0] "%d هفته"
+msgstr[1] "%d هفته"
 
 #, python-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d روز"
+msgstr[1] "%d روز"
 
 #, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "%d ساعت"
+msgstr[1] "%d ساعت"
 
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d دقیقه"
+msgstr[1] "%d دقیقه"
 
 msgid "0 minutes"
 msgstr "0 دقیقه"
@@ -1075,27 +1113,36 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"شما این پیغام را میبینید چون این سایتِ HTTPS نیازمند یک «تیتر ارجاع» برای "
-"ارسال به بروزر شماست، ولی هیچ چیزی ارسال نشده است. این تیتر به دلایل امنیتی "
-"مورد نیاز است، برای اینکه از هایجک نشدن بروزر اطمینان حاصل شود."
+"شما این پیام را می‌بینید چون این سایتِ HTTPS نیازمند یک «تیتر ارجاع (Referer "
+"header)» برای ارسال به مرورگر شماست اما هیچ چیزی ارسال نشده است. این تیتر "
+"برای امنیت شما با حصول اطمینان از اینکه کنترل مرورگرتان به دست شخص ثالثی "
+"نیفتاده باشد ضروری است."
 
 msgid ""
 "If you have configured your browser to disable 'Referer' headers, please re-"
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
 "origin' requests."
 msgstr ""
-"اگر بزوزر خود را برای غیر فعال کردن تیترهای «ارجاع» تنظیم کرده‌اید، لطفا "
-"مجددا این ویژگی را فعال کنید، حداقل برای این وبسایت، یا برای اتصالات HTTPS، "
-"یا برای درخواستهایی با «مبدا یکسان»."
+"اگر تیترهای «ارجاع (Referer)» را در مرورگرتان غیرفعال کرده‌اید، لطفاً مجدداً "
+"این ویژگی را فعال کنید، حداقل برای این وبسایت، یا برای اتصالات HTTPS، یا "
+"برای درخواستهایی با «مبدا یکسان (same-origin)»."
+
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
-"شما این پیغام را میبینید چون این سایت نیازمند کوکی «جعل درخواست میان وبگاهی» "
-"در زمان ارائه ی فورم میباشد. این کوکی‌ها برای مسائل امنیتی ضروری هستند، برای "
-"اطمینان از اینکه بروزر شما توسط شخص ثالثی هایجک نشده باشد."
+"شما این پیام را میبینید چون این سایت نیازمند کوکی «جعل درخواست میان وبگاهی "
+"(CSRF)» است. این کوکی برای امنیت شما ضروری است. با این کوکی می‌توانیم از "
+"اینکه شخص ثالثی کنترل مرورگرتان را به دست نگرفته است اطمینان پیدا کنیم."
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
@@ -1107,29 +1154,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "اطلاعات بیشتر با DEBUG=True ارائه خواهد شد."
 
-msgid "Welcome to Django"
-msgstr "به Django خوش آمدید"
-
-msgid "It worked!"
-msgstr "کار کرد!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "تبریک فراوان بابت اولین صفحهٔ Djangoای‌تان."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"شما این پیغام را میبینید چون <code>DEBUG = True</code> در فایل تنظیمات جنگو "
-"تنیظم شده و هیچ URLـی تنظیم نکرده اید. به کار خود ادامه دهید."
-
 msgid "No year specified"
 msgstr "هیچ سالی مشخص نشده است"
+
+msgid "Date out of range"
+msgstr "تاریخ غیرمجاز است"
 
 msgid "No month specified"
 msgstr "هیچ ماهی مشخص نشده است"
@@ -1181,3 +1210,41 @@ msgstr "\"%(path)s\" وجود ندارد"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "فهرست %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr ""
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+
+msgid "The install worked successfully! Congratulations!"
+msgstr ""
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+
+msgid "Django Documentation"
+msgstr "مستندات جنگو"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr ""
+
+msgid "Tutorial: A Polling App"
+msgstr "آموزش گام به گام: برنامکی برای رأی‌گیری"
+
+msgid "Get started with Django"
+msgstr "شروع به کار با جنگو"
+
+msgid "Django Community"
+msgstr "جامعهٔ جنگو"
+
+msgid "Connect, get help, or contribute"
+msgstr ""

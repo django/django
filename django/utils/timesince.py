@@ -5,17 +5,26 @@ from django.utils.html import avoid_wrapping
 from django.utils.timezone import is_aware, utc
 from django.utils.translation import gettext, ngettext_lazy
 
+TIME_STRINGS = {
+    'year': ngettext_lazy('%d year', '%d years'),
+    'month': ngettext_lazy('%d month', '%d months'),
+    'week': ngettext_lazy('%d week', '%d weeks'),
+    'day': ngettext_lazy('%d day', '%d days'),
+    'hour': ngettext_lazy('%d hour', '%d hours'),
+    'minute': ngettext_lazy('%d minute', '%d minutes'),
+}
+
 TIMESINCE_CHUNKS = (
-    (60 * 60 * 24 * 365, ngettext_lazy('%d year', '%d years')),
-    (60 * 60 * 24 * 30, ngettext_lazy('%d month', '%d months')),
-    (60 * 60 * 24 * 7, ngettext_lazy('%d week', '%d weeks')),
-    (60 * 60 * 24, ngettext_lazy('%d day', '%d days')),
-    (60 * 60, ngettext_lazy('%d hour', '%d hours')),
-    (60, ngettext_lazy('%d minute', '%d minutes'))
+    (60 * 60 * 24 * 365, 'year'),
+    (60 * 60 * 24 * 30, 'month'),
+    (60 * 60 * 24 * 7, 'week'),
+    (60 * 60 * 24, 'day'),
+    (60 * 60, 'hour'),
+    (60, 'minute'),
 )
 
 
-def timesince(d, now=None, reversed=False):
+def timesince(d, now=None, reversed=False, time_strings=None):
     """
     Take two datetime objects and return the time between d and now as a nicely
     formatted string, e.g. "10 minutes". If d occurs after now, return
@@ -26,17 +35,22 @@ def timesince(d, now=None, reversed=False):
     displayed.  For example, "2 weeks, 3 days" and "1 year, 3 months" are
     possible outputs, but "2 weeks, 3 hours" and "1 year, 5 days" are not.
 
+    `time_strings` is an optional dict of strings to replace the default
+    TIME_STRINGS dict.
+
     Adapted from
-    http://web.archive.org/web/20060617175230/http://blog.natbat.co.uk/archive/2003/Jun/14/time_since
+    https://web.archive.org/web/20060617175230/http://blog.natbat.co.uk/archive/2003/Jun/14/time_since
     """
+    if time_strings is None:
+        time_strings = TIME_STRINGS
+
     # Convert datetime.date to datetime.datetime for comparison.
     if not isinstance(d, datetime.datetime):
         d = datetime.datetime(d.year, d.month, d.day)
     if now and not isinstance(now, datetime.datetime):
         now = datetime.datetime(now.year, now.month, now.day)
 
-    if not now:
-        now = datetime.datetime.now(utc if is_aware(d) else None)
+    now = now or datetime.datetime.now(utc if is_aware(d) else None)
 
     if reversed:
         d, now = now, d
@@ -60,18 +74,18 @@ def timesince(d, now=None, reversed=False):
         count = since // seconds
         if count != 0:
             break
-    result = avoid_wrapping(name % count)
+    result = avoid_wrapping(time_strings[name] % count)
     if i + 1 < len(TIMESINCE_CHUNKS):
         # Now get the second item
         seconds2, name2 = TIMESINCE_CHUNKS[i + 1]
         count2 = (since - (seconds * count)) // seconds2
         if count2 != 0:
-            result += gettext(', ') + avoid_wrapping(name2 % count2)
+            result += gettext(', ') + avoid_wrapping(time_strings[name2] % count2)
     return result
 
 
-def timeuntil(d, now=None):
+def timeuntil(d, now=None, time_strings=None):
     """
     Like timesince, but return a string measuring the time until the given time.
     """
-    return timesince(d, now, reversed=True)
+    return timesince(d, now, reversed=True, time_strings=time_strings)

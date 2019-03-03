@@ -4,10 +4,7 @@ import unicodedata
 from gzip import GzipFile
 from io import BytesIO
 
-from django.utils.functional import (
-    SimpleLazyObject, keep_lazy, keep_lazy_text, lazy,
-)
-from django.utils.safestring import SafeText, mark_safe
+from django.utils.functional import SimpleLazyObject, keep_lazy_text, lazy
 from django.utils.translation import gettext as _, gettext_lazy, pgettext
 
 
@@ -20,7 +17,7 @@ def capfirst(x):
 # Set up regular expressions
 re_words = re.compile(r'<.*?>|((?:\w[-\w]*|&.*?;)+)', re.S)
 re_chars = re.compile(r'<.*?>|(.)', re.S)
-re_tag = re.compile(r'<(/)?([^ ]+?)(?:(\s*/)| .*?)?>', re.S)
+re_tag = re.compile(r'<(/)?(\S+?)(?:(\s*/)|\s.*?)?>', re.S)
 re_newlines = re.compile(r'\r\n|\r')  # Used in normalize_newlines
 re_camel_case = re.compile(r'(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))')
 
@@ -67,7 +64,7 @@ class Truncator(SimpleLazyObject):
         if truncate is None:
             truncate = pgettext(
                 'String to return when truncating text',
-                '%(truncated_text)s...')
+                '%(truncated_text)s…')
         if '%(truncated_text)s' in truncate:
             return truncate % {'truncated_text': text}
         # The truncation text didn't contain the %(truncated_text)s string
@@ -84,8 +81,7 @@ class Truncator(SimpleLazyObject):
         of characters.
 
         `truncate` specifies what should be used to notify that the string has
-        been truncated, defaulting to a translatable string of an ellipsis
-        (...).
+        been truncated, defaulting to a translatable string of an ellipsis.
         """
         self._setup()
         length = int(num)
@@ -126,7 +122,7 @@ class Truncator(SimpleLazyObject):
         """
         Truncate a string after a certain number of words. `truncate` specifies
         what should be used to notify that the string has been truncated,
-        defaulting to ellipsis (...).
+        defaulting to ellipsis.
         """
         self._setup()
         length = int(num)
@@ -247,7 +243,7 @@ def get_text_list(list_, last_word=gettext_lazy('or')):
     >>> get_text_list([])
     ''
     """
-    if len(list_) == 0:
+    if not list_:
         return ''
     if len(list_) == 1:
         return str(list_[0])
@@ -284,25 +280,12 @@ def compress_string(s):
     return zbuf.getvalue()
 
 
-class StreamingBuffer:
-    def __init__(self):
-        self.vals = []
-
-    def write(self, val):
-        self.vals.append(val)
-
+class StreamingBuffer(BytesIO):
     def read(self):
-        if not self.vals:
-            return b''
-        ret = b''.join(self.vals)
-        self.vals = []
+        ret = self.getvalue()
+        self.seek(0)
+        self.truncate()
         return ret
-
-    def flush(self):
-        return
-
-    def close(self):
-        return
 
 
 # Like compress_string, but for iterators of strings.
@@ -399,7 +382,7 @@ def unescape_string_literal(s):
     return s[1:-1].replace(r'\%s' % quote, quote).replace(r'\\', '\\')
 
 
-@keep_lazy(str, SafeText)
+@keep_lazy_text
 def slugify(value, allow_unicode=False):
     """
     Convert to ASCII if 'allow_unicode' is False. Convert spaces to hyphens.
@@ -412,12 +395,12 @@ def slugify(value, allow_unicode=False):
     else:
         value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
     value = re.sub(r'[^\w\s-]', '', value).strip().lower()
-    return mark_safe(re.sub(r'[-\s]+', '-', value))
+    return re.sub(r'[-\s]+', '-', value)
 
 
 def camel_case_to_spaces(value):
     """
-    Split CamelCase and convert to lower case. Strip surrounding whitespace.
+    Split CamelCase and convert to lowercase. Strip surrounding whitespace.
     """
     return re_camel_case.sub(r' \1', value).strip().lower()
 

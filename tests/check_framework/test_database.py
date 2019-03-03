@@ -8,7 +8,7 @@ from django.test import TestCase
 
 
 class DatabaseCheckTests(TestCase):
-    multi_db = True
+    databases = {'default', 'other'}
 
     @property
     def func(self):

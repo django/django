@@ -11,7 +11,7 @@ in RSS/Atom feeds formatted according to either the `Simple GeoRSS`__ or
 Django's, please consult :doc:`Django's syndication documentation
 </ref/contrib/syndication>` for details on general usage.
 
-.. _W3C Geo: http://www.w3.org/2003/01/geo/
+.. _W3C Geo: https://www.w3.org/2003/01/geo/
 
 __ http://georss.org/simple.html
 

@@ -290,13 +290,13 @@ Static files
 Static files, which by definition are not dynamic, make an excellent target for
 optimization gains.
 
-:class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By taking advantage of web browsers' caching abilities, you can
 eliminate network hits entirely for a given file after the initial download.
 
-:class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage` appends a
+:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` appends a
 content-dependent tag to the filenames of :doc:`static files
 </ref/contrib/staticfiles>` to make it safe for browsers to cache them
 long-term without missing future changes - when a file changes, so will the
@@ -410,15 +410,15 @@ performance gains for your application to outweigh the potential risks.
 
 With these caveats in mind, you should be aware of:
 
-`PyPy <http://pypy.org/>`_
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+`PyPy <https://pypy.org/>`_
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`PyPy <http://pypy.org/>`_ is an implementation of Python in Python itself (the
-'standard' Python implementation is in C). PyPy can offer substantial
+`PyPy <https://pypy.org/>`_ is an implementation of Python in Python itself
+(the 'standard' Python implementation is in C). PyPy can offer substantial
 performance gains, typically for heavyweight applications.
 
 A key aim of the PyPy project is `compatibility
-<http://pypy.org/compat.html>`_ with existing Python APIs and libraries.
+<https://pypy.org/compat.html>`_ with existing Python APIs and libraries.
 Django is compatible, but you will need to check the compatibility of other
 libraries you rely on.
 

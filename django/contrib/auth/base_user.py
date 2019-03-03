@@ -59,21 +59,21 @@ class AbstractBaseUser(models.Model):
     class Meta:
         abstract = True
 
-    def get_username(self):
-        "Return the identifying username for this User"
-        return getattr(self, self.USERNAME_FIELD)
-
     def __str__(self):
         return self.get_username()
-
-    def clean(self):
-        setattr(self, self.USERNAME_FIELD, self.normalize_username(self.get_username()))
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         if self._password is not None:
             password_validation.password_changed(self._password, self)
             self._password = None
+
+    def get_username(self):
+        """Return the username for this User."""
+        return getattr(self, self.USERNAME_FIELD)
+
+    def clean(self):
+        setattr(self, self.USERNAME_FIELD, self.normalize_username(self.get_username()))
 
     def natural_key(self):
         return (self.get_username(),)
@@ -115,6 +115,9 @@ class AbstractBaseUser(models.Model):
         self.password = make_password(None)
 
     def has_usable_password(self):
+        """
+        Return False if set_unusable_password() has been called for this user.
+        """
         return is_password_usable(self.password)
 
     def get_session_auth_hash(self):
@@ -133,4 +136,4 @@ class AbstractBaseUser(models.Model):
 
     @classmethod
     def normalize_username(cls, username):
-        return unicodedata.normalize('NFKC', username) if username else username
+        return unicodedata.normalize('NFKC', username) if isinstance(username, str) else username

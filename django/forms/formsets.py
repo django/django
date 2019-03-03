@@ -427,18 +427,23 @@ def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
     # limit is simply max_num + DEFAULT_MAX_NUM (which is 2*DEFAULT_MAX_NUM
     # if max_num is None in the first place)
     absolute_max = max_num + DEFAULT_MAX_NUM
-    attrs = {'form': form, 'extra': extra,
-             'can_order': can_order, 'can_delete': can_delete,
-             'min_num': min_num, 'max_num': max_num,
-             'absolute_max': absolute_max, 'validate_min': validate_min,
-             'validate_max': validate_max}
+    attrs = {
+        'form': form,
+        'extra': extra,
+        'can_order': can_order,
+        'can_delete': can_delete,
+        'min_num': min_num,
+        'max_num': max_num,
+        'absolute_max': absolute_max,
+        'validate_min': validate_min,
+        'validate_max': validate_max,
+    }
     return type(form.__name__ + 'FormSet', (formset,), attrs)
 
 
 def all_valid(formsets):
-    """Return True if every formset in formsets is valid."""
+    """Validate every formset and return True if all are valid."""
     valid = True
     for formset in formsets:
-        if not formset.is_valid():
-            valid = False
+        valid &= formset.is_valid()
     return valid

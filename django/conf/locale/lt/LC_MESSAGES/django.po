@@ -4,7 +4,7 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kostas <tamosiunas@gmail.com>, 2011
 # lauris <lauris@runbox.com>, 2011
-# Matas Dailyda <matas@dailyda.com>, 2015-2017
+# Matas Dailyda <matas@dailyda.com>, 2015-2018
 # naktinis <naktinis@gmail.com>, 2012
 # Nikolajus Krauklis <nikolajus@gmail.com>, 2013
 # Povilas Balzaravičius <pavvka@gmail.com>, 2011-2012
@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-30 14:06+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 08:24+0000\n"
 "Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/django/django/language/"
 "lt/)\n"
@@ -23,8 +23,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: lt\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
-"%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < "
+"11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? "
+"1 : n % 1 != 0 ? 2: 3);\n"
 
 msgid "Afrikaans"
 msgstr "Afrikiečių"
@@ -166,6 +167,9 @@ msgstr "Japonų"
 
 msgid "Georgian"
 msgstr "Gruzinų"
+
+msgid "Kabyle"
+msgstr "Kabilų"
 
 msgid "Kazakh"
 msgstr "Kazachų"
@@ -323,6 +327,7 @@ msgstr "Įveskite tinkamą sveikąjį skaičių."
 msgid "Enter a valid email address."
 msgstr "Įveskite teisingą el. pašto adresą."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -378,6 +383,9 @@ msgstr[1] ""
 msgstr[2] ""
 "Įsitikinkite, kad reikšmė sudaryta iš nemažiau kaip %(limit_value)d ženklų "
 "(dabartinis ilgis %(show_value)d)."
+msgstr[3] ""
+"Įsitikinkite, kad reikšmė sudaryta iš nemažiau kaip %(limit_value)d ženklų "
+"(dabartinis ilgis %(show_value)d)."
 
 #, python-format
 msgid ""
@@ -395,6 +403,12 @@ msgstr[1] ""
 msgstr[2] ""
 "Įsitikinkite, kad reikšmė sudaryta iš nedaugiau kaip %(limit_value)d ženklų "
 "(dabartinis ilgis %(show_value)d)."
+msgstr[3] ""
+"Įsitikinkite, kad reikšmė sudaryta iš nedaugiau kaip %(limit_value)d ženklų "
+"(dabartinis ilgis %(show_value)d)."
+
+msgid "Enter a number."
+msgstr "Įveskite skaičių."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
@@ -402,6 +416,7 @@ msgid_plural "Ensure that there are no more than %(max)s digits in total."
 msgstr[0] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmuo."
 msgstr[1] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenys."
 msgstr[2] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenų."
+msgstr[3] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenų."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
@@ -409,6 +424,7 @@ msgid_plural "Ensure that there are no more than %(max)s decimal places."
 msgstr[0] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmuo po kablelio."
 msgstr[1] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenys po kablelio."
 msgstr[2] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenų po kablelio."
+msgstr[3] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenų po kablelio."
 
 #, python-format
 msgid ""
@@ -420,6 +436,8 @@ msgstr[1] ""
 "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenys prieš kablelį."
 msgstr[2] ""
 "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenų prieš kablelį."
+msgstr[3] ""
+"Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenų prieš kablelį."
 
 #, python-format
 msgid ""
@@ -428,6 +446,9 @@ msgid ""
 msgstr ""
 "Bylos tipas '%(extension)s' negalimas. Galimi tipai yra: "
 "'%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
+msgstr "Nuliniai simboliai neleidžiami."
 
 msgid "and"
 msgstr "ir"
@@ -475,6 +496,10 @@ msgstr "Didelis (8 baitų) sveikas skaičius"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' reikšmė turi būti arba True, arba False."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "'%(value)s' reikšmė turi būti True, False, arba None."
 
 msgid "Boolean (Either True or False)"
 msgstr "Loginė reikšmė (Tiesa arba Netiesa)"
@@ -652,9 +677,6 @@ msgstr "Šis laukas yra privalomas."
 msgid "Enter a whole number."
 msgstr "Įveskite pilną skaičių."
 
-msgid "Enter a number."
-msgstr "Įveskite skaičių."
-
 msgid "Enter a valid date."
 msgstr "Įveskite tinkamą datą."
 
@@ -666,6 +688,10 @@ msgstr "Įveskite tinkamą datą/laiką."
 
 msgid "Enter a valid duration."
 msgstr "Įveskite tinkamą trukmę."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Dienų skaičius turi būti tarp {min_days} ir {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Nebuvo nurodytas failas. Patikrinkite formos koduotę."
@@ -687,6 +713,9 @@ msgstr[1] ""
 "Įsitikinkite, kad failo pavadinimas sudarytas iš nedaugiau kaip %(max)d "
 "ženklų (dabartinis ilgis %(length)d)."
 msgstr[2] ""
+"Įsitikinkite, kad failo pavadinimas sudarytas iš nedaugiau kaip %(max)d "
+"ženklų (dabartinis ilgis %(length)d)."
+msgstr[3] ""
 "Įsitikinkite, kad failo pavadinimas sudarytas iš nedaugiau kaip %(max)d "
 "ženklų (dabartinis ilgis %(length)d)."
 
@@ -730,6 +759,7 @@ msgid_plural "Please submit %d or fewer forms."
 msgstr[0] "Prašome pateikti %d arba mažiau formų."
 msgstr[1] "Prašome pateikti %d arba mažiau formų."
 msgstr[2] "Prašome pateikti %d arba mažiau formų."
+msgstr[3] "Prašome pateikti %d arba mažiau formų."
 
 #, python-format
 msgid "Please submit %d or more forms."
@@ -737,6 +767,7 @@ msgid_plural "Please submit %d or more forms."
 msgstr[0] "Prašome pateikti %d arba daugiau formų."
 msgstr[1] "Prašome pateikti %d arba daugiau formų."
 msgstr[2] "Prašome pateikti %d arba daugiau formų."
+msgstr[3] "Prašome pateikti %d arba daugiau formų."
 
 msgid "Order"
 msgstr "Nurodyti"
@@ -765,15 +796,15 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Pataisykite žemiau esančias pasikartojančias reikšmes."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "Išorinis raktas neatitinka tėvinio objekto pirminio rakto."
+msgid "The inline value did not match the parent instance."
+msgstr "Reikšmė nesutapo su pirminiu objektu."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Pasirinkite tinkamą reikšmę. Parinkta reikšmė nėra galima."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" nėra pirminiam raktui tinkama reikšmė."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "\"%(pk)s\" nėra tinkama reikšmė."
 
 #, python-format
 msgid ""
@@ -810,6 +841,7 @@ msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d baitas"
 msgstr[1] "%(size)d baitai"
 msgstr[2] "%(size)d baitai"
+msgstr[3] "%(size)d baitai"
 
 #, python-format
 msgid "%s KB"
@@ -1080,6 +1112,7 @@ msgid_plural "%d years"
 msgstr[0] "%d metas"
 msgstr[1] "%d metai"
 msgstr[2] "%d metų"
+msgstr[3] "%d metų"
 
 #, python-format
 msgid "%d month"
@@ -1087,6 +1120,7 @@ msgid_plural "%d months"
 msgstr[0] "%d mėnuo"
 msgstr[1] "%d mėnesiai"
 msgstr[2] "%d mėnesių"
+msgstr[3] "%d mėnesių"
 
 #, python-format
 msgid "%d week"
@@ -1094,6 +1128,7 @@ msgid_plural "%d weeks"
 msgstr[0] "%d savaitė"
 msgstr[1] "%d savaitės"
 msgstr[2] "%d savaičių"
+msgstr[3] "%d savaičių"
 
 #, python-format
 msgid "%d day"
@@ -1101,6 +1136,7 @@ msgid_plural "%d days"
 msgstr[0] "%d diena"
 msgstr[1] "%d dienos"
 msgstr[2] "%d dienų"
+msgstr[3] "%d dienų"
 
 #, python-format
 msgid "%d hour"
@@ -1108,6 +1144,7 @@ msgid_plural "%d hours"
 msgstr[0] "%d valanda"
 msgstr[1] "%d valandos"
 msgstr[2] "%d valandų"
+msgstr[3] "%d valandų"
 
 #, python-format
 msgid "%d minute"
@@ -1115,6 +1152,7 @@ msgid_plural "%d minutes"
 msgstr[0] "%d minutė"
 msgstr[1] "%d minutės"
 msgstr[2] "%d minučių"
+msgstr[3] "%d minučių"
 
 msgid "0 minutes"
 msgstr "0 minučių"
@@ -1146,6 +1184,19 @@ msgstr ""
 "užklausoms."
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+"Jei naudojate <meta name=\"referrer\" content=\"no-referrer\"> žymeną "
+"pridedate 'Referrer-Policy: no-referrer' antraštę, prašome juo panaikinti. "
+"CSRF apsauga reikalauja 'Referer' antraštės vykdyti griežtą patikrinimą. Jei "
+"esate susirūpinę privatumu, naudokite tokias alternatyvas nuorodoms į "
+"išorinius tinklalapius kaip <a rel=\"noreferrer\" ...>."
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1164,31 +1215,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "Gauti daugiau informacijos galima su DEBUG=True nustatymu."
 
-msgid "Welcome to Django"
-msgstr "Sveiki, tai Django"
-
-msgid "It worked!"
-msgstr "Suveikė!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Sveikiname Jus su Jūsų pirmuoju Django tinklalapiu."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-"Toliau, pradėkite pirmą savo aplikaciją paleisdami <code>python manage.py "
-"startapp [app_label]</code>."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Jūs matote šią žinutę dėl to kad Django nustatymų faile įvesta <code>DEBUG = "
-"True</code> ir Jūs nenustatėte jokių URL'ų."
-
 msgid "No year specified"
 msgstr "Nenurodyti metai"
+
+msgid "Date out of range"
+msgstr "Data išeina iš ribų"
 
 msgid "No month specified"
 msgstr "Nenurodytas mėnuo"
@@ -1241,3 +1272,47 @@ msgstr "\"%(path)s\" neegzistuoja"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "%(directory)s indeksas"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django: Žiniatinklio karkasas perfekcionistams su terminais."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Žiūrėti Django %(version)s <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/releases/\" target=\"_blank\" rel=\"noopener\">išleidimo "
+"pastabas</a>"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Diegimas pavyko! Sveikiname!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"Jūs matote šią žinutę dėl to kad Django nustatymų faile įvesta <a href="
+"\"https://docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" target="
+"\"_blank\" rel=\"noopener\">DEBUG = True</a> ir Jūs nenustatėte jokių URL'ų."
+
+msgid "Django Documentation"
+msgstr "Django dokumentacija"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr "Temos, nuorodos ir &amp; kaip tai padaryti"
+
+msgid "Tutorial: A Polling App"
+msgstr "Pamoka: Apklausos aplikacija"
+
+msgid "Get started with Django"
+msgstr "Pradėti su Django"
+
+msgid "Django Community"
+msgstr "Django Bendrija"
+
+msgid "Connect, get help, or contribute"
+msgstr "Prisijunk, gauk pagalbą arba prisidėk"

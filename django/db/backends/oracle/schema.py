@@ -1,11 +1,9 @@
-import binascii
 import copy
 import datetime
 import re
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.utils import DatabaseError
-from django.utils.encoding import force_text
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -17,7 +15,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_alter_column_default = "MODIFY %(column)s DEFAULT %(default)s"
     sql_alter_column_no_default = "MODIFY %(column)s DEFAULT NULL"
     sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"
+    sql_create_column_inline_fk = 'CONSTRAINT %(name)s REFERENCES %(to_table)s(%(to_column)s)%(deferrable)s'
     sql_delete_table = "DROP TABLE %(table)s CASCADE CONSTRAINTS"
+    sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s"
 
     def quote_value(self, value):
         if isinstance(value, (datetime.date, datetime.time, datetime.datetime)):
@@ -25,7 +25,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         elif isinstance(value, str):
             return "'%s'" % value.replace("\'", "\'\'")
         elif isinstance(value, (bytes, bytearray, memoryview)):
-            return "'%s'" % force_text(binascii.hexlify(value))
+            return "'%s'" % value.hex()
         elif isinstance(value, bool):
             return "1" if value else "0"
         else:
@@ -95,7 +95,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Add it
         self.add_field(model, new_temp_field)
         # Explicit data type conversion
-        # https://docs.oracle.com/database/121/SQLRF/sql_elements002.htm#SQLRF51054
+        # https://docs.oracle.com/en/database/oracle/oracle-database/18/sqlrf
+        # /Data-Type-Comparison-Rules.html#GUID-D0C5A47E-6F93-4C2D-9E49-4F2B86B359DD
         new_value = self.quote_name(old_field.column)
         old_type = old_field.db_type(self.connection)
         if re.match('^N?CLOB', old_type):
@@ -145,6 +146,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         if db_type is not None and db_type.lower() in self.connection._limited_data_types:
             return False
         return create_index
+
+    def _unique_should_be_added(self, old_field, new_field):
+        return (
+            super()._unique_should_be_added(old_field, new_field) and
+            not self._field_became_primary_key(old_field, new_field)
+        )
 
     def _is_identity_column(self, table_name, column_name):
         with self.connection.cursor() as cursor:

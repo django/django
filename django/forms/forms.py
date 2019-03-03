@@ -3,7 +3,6 @@ Form classes
 """
 
 import copy
-from collections import OrderedDict
 
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 # BoundField is imported for backwards compatibility in Django 1.9
@@ -31,12 +30,12 @@ class DeclarativeFieldsMetaclass(MediaDefiningClass):
             if isinstance(value, Field):
                 current_fields.append((key, value))
                 attrs.pop(key)
-        attrs['declared_fields'] = OrderedDict(current_fields)
+        attrs['declared_fields'] = dict(current_fields)
 
         new_class = super(DeclarativeFieldsMetaclass, mcs).__new__(mcs, name, bases, attrs)
 
         # Walk through the MRO.
-        declared_fields = OrderedDict()
+        declared_fields = {}
         for base in reversed(new_class.__mro__):
             # Collect fields from base class.
             if hasattr(base, 'declared_fields'):
@@ -51,11 +50,6 @@ class DeclarativeFieldsMetaclass(MediaDefiningClass):
         new_class.declared_fields = declared_fields
 
         return new_class
-
-    @classmethod
-    def __prepare__(metacls, name, bases, **kwds):
-        # Remember the order in which form fields are defined.
-        return OrderedDict()
 
 
 @html_safe
@@ -99,6 +93,12 @@ class BaseForm:
         if use_required_attribute is not None:
             self.use_required_attribute = use_required_attribute
 
+        if self.empty_permitted and self.use_required_attribute:
+            raise ValueError(
+                'The empty_permitted and use_required_attribute arguments may '
+                'not both be True.'
+            )
+
         # Initialize form renderer. Use a global default if not specified
         # either as an argument or as self.default_renderer.
         if renderer is None:
@@ -123,7 +123,7 @@ class BaseForm:
         """
         if field_order is None:
             return
-        fields = OrderedDict()
+        fields = {}
         for key in field_order:
             try:
                 fields[key] = self.fields.pop(key)
@@ -139,7 +139,7 @@ class BaseForm:
         if self._errors is None:
             is_valid = "Unknown"
         else:
-            is_valid = self.is_bound and not bool(self._errors)
+            is_valid = self.is_bound and not self._errors
         return '<%(cls)s bound=%(bound)s, valid=%(valid)s, fields=(%(fields)s)>' % {
             'cls': self.__class__.__name__,
             'bound': self.is_bound,
@@ -160,7 +160,7 @@ class BaseForm:
                 "Key '%s' not found in '%s'. Choices are: %s." % (
                     name,
                     self.__class__.__name__,
-                    ', '.join(sorted(f for f in self.fields)),
+                    ', '.join(sorted(self.fields)),
                 )
             )
         if name not in self._bound_fields_cache:
@@ -199,8 +199,7 @@ class BaseForm:
         for name, field in self.fields.items():
             html_class_attr = ''
             bf = self[name]
-            # Escape and cache in local variable.
-            bf_errors = self.error_class([conditional_escape(error) for error in bf.errors])
+            bf_errors = self.error_class(bf.errors)
             if bf.is_hidden:
                 if bf_errors:
                     top_errors.extend(
@@ -275,8 +274,9 @@ class BaseForm:
             normal_row='<tr%(html_class_attr)s><th>%(label)s</th><td>%(errors)s%(field)s%(help_text)s</td></tr>',
             error_row='<tr><td colspan="2">%s</td></tr>',
             row_ender='</td></tr>',
-            help_text_html='<br /><span class="helptext">%s</span>',
-            errors_on_separate_row=False)
+            help_text_html='<br><span class="helptext">%s</span>',
+            errors_on_separate_row=False,
+        )
 
     def as_ul(self):
         "Return this form rendered as HTML <li>s -- excluding the <ul></ul>."
@@ -285,7 +285,8 @@ class BaseForm:
             error_row='<li>%s</li>',
             row_ender='</li>',
             help_text_html=' <span class="helptext">%s</span>',
-            errors_on_separate_row=False)
+            errors_on_separate_row=False,
+        )
 
     def as_p(self):
         "Return this form rendered as HTML <p>s."
@@ -294,7 +295,8 @@ class BaseForm:
             error_row='%s',
             row_ender='</p>',
             help_text_html=' <span class="helptext">%s</span>',
-            errors_on_separate_row=True)
+            errors_on_separate_row=True,
+        )
 
     def non_field_errors(self):
         """
@@ -352,13 +354,10 @@ class BaseForm:
                 del self.cleaned_data[field]
 
     def has_error(self, field, code=None):
-        if code is None:
-            return field in self.errors
-        if field in self.errors:
-            for error in self.errors.as_data()[field]:
-                if error.code == code:
-                    return True
-        return False
+        return field in self.errors and (
+            code is None or
+            any(error.code == code for error in self.errors.as_data()[field])
+        )
 
     def full_clean(self):
         """
@@ -465,10 +464,7 @@ class BaseForm:
         Return True if the form needs to be multipart-encoded, i.e. it has
         FileInput, or False otherwise.
         """
-        for field in self.fields.values():
-            if field.widget.needs_multipart_form:
-                return True
-        return False
+        return any(field.widget.needs_multipart_form for field in self.fields.values())
 
     def hidden_fields(self):
         """

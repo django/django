@@ -3,8 +3,8 @@ from django.template import (
 )
 from django.test import SimpleTestCase
 
-from ..utils import setup
 from .test_basic import basic_templates
+from ..utils import setup
 
 include_fail_templates = {
     'include-fail1': '{% load bad_tag %}{% badtag %}',
@@ -181,6 +181,15 @@ class IncludeTagTests(SimpleTestCase):
         template = self.engine.get_template('include-error10')
         with self.assertRaises(TemplateSyntaxError):
             template.render(context)
+
+    @setup({'include_empty': '{% include %}'})
+    def test_include_empty(self):
+        msg = (
+            "'include' tag takes at least one argument: the name of the "
+            "template to be included."
+        )
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.get_template('include_empty')
 
 
 class IncludeTests(SimpleTestCase):

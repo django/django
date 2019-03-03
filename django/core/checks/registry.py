@@ -15,6 +15,7 @@ class Tags:
     security = 'security'
     signals = 'signals'
     templates = 'templates'
+    translation = 'translation'
     urls = 'urls'
 
 
@@ -40,11 +41,9 @@ class CheckRegistry:
             # or
             registry.register(my_check, 'mytag', 'anothertag')
         """
-        kwargs.setdefault('deploy', False)
-
         def inner(check):
             check.tags = tags
-            checks = self.deployment_checks if kwargs['deploy'] else self.registered_checks
+            checks = self.deployment_checks if kwargs.get('deploy') else self.registered_checks
             checks.add(check)
             return check
 
@@ -52,7 +51,7 @@ class CheckRegistry:
             return inner(check)
         else:
             if check:
-                tags += (check, )
+                tags += (check,)
             return inner
 
     def run_checks(self, app_configs=None, tags=None, include_deployment_checks=False):

@@ -62,10 +62,7 @@ class TestGeom(TestObj):
             self.coords = tuplize(coords)
         if centroid:
             self.centroid = tuple(centroid)
-        if ext_ring_cs:
-            ext_ring_cs = tuplize(ext_ring_cs)
-        self.ext_ring_cs = ext_ring_cs
-
+        self.ext_ring_cs = ext_ring_cs and tuplize(ext_ring_cs)
         super().__init__(**kwargs)
 
 

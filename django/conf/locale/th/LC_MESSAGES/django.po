@@ -3,7 +3,8 @@
 # Translators:
 # Abhabongse Janthong, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Kowit Charoenratchatabhan <kowit.s.c@gmail.com>, 2014
+# Kowit Charoenratchatabhan <kowit.s.c@gmail.com>, 2014,2018
+# Naowal Siripatana <naowalzaza@gmail.com>, 2017
 # sipp11 <sipp11@mycapsules.com>, 2014
 # Suteepat Damrongyingsupab <tianissimo@hotmail.com>, 2011-2012
 # Suteepat Damrongyingsupab <tianissimo@hotmail.com>, 2013
@@ -12,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-20 09:03+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 00:21+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Thai (http://www.transifex.com/django/django/language/th/)\n"
 "MIME-Version: 1.0\n"
@@ -163,6 +164,9 @@ msgstr "ญี่ปุ่น"
 msgid "Georgian"
 msgstr "จอร์เจีย"
 
+msgid "Kabyle"
+msgstr ""
+
 msgid "Kazakh"
 msgstr "คาซัค"
 
@@ -287,7 +291,7 @@ msgid "Traditional Chinese"
 msgstr "จีนตัวเต็ม"
 
 msgid "Messages"
-msgstr ""
+msgstr "ข้อความ"
 
 msgid "Site Maps"
 msgstr ""
@@ -299,10 +303,10 @@ msgid "Syndication"
 msgstr ""
 
 msgid "That page number is not an integer"
-msgstr ""
+msgstr "หมายเลขหน้าดังกล่าวไม่ใช่จำนวนเต็ม"
 
 msgid "That page number is less than 1"
-msgstr ""
+msgstr "หมายเลขหน้าดังกล่าวมีค่าน้อยกว่า 1"
 
 msgid "That page contains no results"
 msgstr ""
@@ -319,6 +323,7 @@ msgstr ""
 msgid "Enter a valid email address."
 msgstr "ป้อนที่อยู่อีเมลที่ถูกต้อง"
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "ใส่ 'slug' ประกอปด้วย ตัวหนังสือ ตัวเลข เครื่องหมายขีดล่าง หรือ  เครื่องหมายขีด"
@@ -370,6 +375,9 @@ msgid_plural ""
 "%(show_value)d)."
 msgstr[0] ""
 
+msgid "Enter a number."
+msgstr "กรอกหมายเลข"
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -391,6 +399,9 @@ msgstr[0] ""
 msgid ""
 "File extension '%(extension)s' is not allowed. Allowed extensions are: "
 "'%(allowed_extensions)s'."
+msgstr ""
+
+msgid "Null characters are not allowed."
 msgstr ""
 
 msgid "and"
@@ -430,13 +441,17 @@ msgstr "จำนวนเต็ม"
 
 #, python-format
 msgid "'%(value)s' value must be an integer."
-msgstr ""
+msgstr "ค่าของ %(value)s ต้องเป็น integer"
 
 msgid "Big (8 byte) integer"
 msgstr "จำนวนเต็ม (8 byte)"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
+msgstr "ค่าของ %(value)s ต้องเป็น True หรือ False อย่างใดอย่างหนึ่ง"
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
 msgstr ""
 
 msgid "Boolean (Either True or False)"
@@ -493,7 +508,7 @@ msgid ""
 msgstr ""
 
 msgid "Duration"
-msgstr ""
+msgstr "ช่วงเวลา"
 
 msgid "Email address"
 msgstr "อีเมล"
@@ -602,9 +617,6 @@ msgstr "ฟิลด์นี้จำเป็น"
 msgid "Enter a whole number."
 msgstr "กรอกหมายเลข"
 
-msgid "Enter a number."
-msgstr "กรอกหมายเลข"
-
 msgid "Enter a valid date."
 msgstr "กรุณาใส่วัน"
 
@@ -615,6 +627,10 @@ msgid "Enter a valid date/time."
 msgstr "กรุณาใส่วันเวลา"
 
 msgid "Enter a valid duration."
+msgstr "ใส่ระยะเวลาที่ถูกต้อง"
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
 msgstr ""
 
 msgid "No file was submitted. Check the encoding type on the form."
@@ -651,7 +667,7 @@ msgid "Enter a complete value."
 msgstr ""
 
 msgid "Enter a valid UUID."
-msgstr ""
+msgstr "ใส่ UUID ที่ถูกต้อง"
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
@@ -699,14 +715,14 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "โปรดแก้ไขค่าที่ซ้ำซ้อนด้านล่าง"
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "Foreign key ไม่สัมพันธ์กับ parent primary key"
+msgid "The inline value did not match the parent instance."
+msgstr ""
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "เลือกตัวเลือกที่ถูกต้อง. ตัวเลือกนั้นไม่สามารถเลือกได้."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
+msgid "\"%(pk)s\" is not a valid value."
 msgstr ""
 
 #, python-format
@@ -1040,7 +1056,7 @@ msgid "0 minutes"
 msgstr "0 นาที"
 
 msgid "Forbidden"
-msgstr ""
+msgstr "หวงห้าม"
 
 msgid "CSRF verification failed. Request aborted."
 msgstr ""
@@ -1059,6 +1075,14 @@ msgid ""
 msgstr ""
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1072,27 +1096,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr ""
 
-msgid "Welcome to Django"
-msgstr ""
-
-msgid "It worked!"
-msgstr ""
-
-msgid "Congratulations on your first Django-powered page."
-msgstr ""
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-
 msgid "No year specified"
 msgstr "ไม่ระบุปี"
+
+msgid "Date out of range"
+msgstr ""
 
 msgid "No month specified"
 msgstr "ไม่ระบุเดือน"
@@ -1144,3 +1152,41 @@ msgstr "\"%(path)s\" ไม่มีอยู่"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "ดัชนีของ %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr ""
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+
+msgid "The install worked successfully! Congratulations!"
+msgstr ""
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+
+msgid "Django Documentation"
+msgstr ""
+
+msgid "Topics, references, &amp; how-to's"
+msgstr ""
+
+msgid "Tutorial: A Polling App"
+msgstr ""
+
+msgid "Get started with Django"
+msgstr "เริ่มต้นกับ Django"
+
+msgid "Django Community"
+msgstr "ชุมชน Django"
+
+msgid "Connect, get help, or contribute"
+msgstr ""

@@ -9,7 +9,7 @@ GeoDjango provides some specialized form fields and widgets in order to visually
 display and edit geolocalized data on a map. By default, they use
 `OpenLayers`_-powered maps, with a base WMS layer provided by `NASA`_.
 
-.. _OpenLayers: http://openlayers.org/
+.. _OpenLayers: https://openlayers.org/
 .. _NASA: https://earthdata.nasa.gov/
 
 Field arguments
@@ -158,7 +158,7 @@ Widget classes
     ``OpenLayers.js`` file `tailored to your needs`_ in the ``js`` property of
     the inner ``Media`` class (see :ref:`assets-as-a-static-definition`).
 
-    .. _tailored to your needs: http://openlayers.org/en/latest/doc/tutorials/custom-builds.html
+    .. _tailored to your needs: https://openlayers.org/en/latest/doc/tutorials/custom-builds.html
 
 ``OSMWidget``
 
@@ -178,8 +178,6 @@ Widget classes
         respectively, which is a location in eastern France.
 
     .. attribute:: default_zoom
-
-        .. versionadded:: 2.0
 
         The default map zoom is ``12``.
 

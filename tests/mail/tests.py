@@ -4,11 +4,10 @@ import mimetypes
 import os
 import shutil
 import smtpd
-import socket
 import sys
 import tempfile
 import threading
-from email import message_from_binary_file, message_from_bytes
+from email import charset, message_from_binary_file, message_from_bytes
 from email.header import Header
 from email.mime.text import MIMEText
 from email.utils import parseaddr
@@ -25,7 +24,6 @@ from django.core.mail.backends import console, dummy, filebased, locmem, smtp
 from django.core.mail.message import BadHeaderError, sanitize_address
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import requires_tz_support
-from django.utils.encoding import force_bytes, force_text
 from django.utils.translation import gettext_lazy
 
 
@@ -85,6 +83,10 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertEqual(message['From'], 'from@example.com')
         self.assertEqual(message['To'], 'to@example.com, other@example.com')
 
+    def test_header_omitted_for_no_to_recipients(self):
+        message = EmailMessage('Subject', 'Content', 'from@example.com', cc=['cc@example.com']).message()
+        self.assertNotIn('To', message)
+
     def test_recipients_with_empty_strings(self):
         """
         Empty strings in various recipient arguments are always stripped
@@ -131,6 +133,20 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             email.recipients(),
             ['to@example.com', 'other@example.com', 'cc@example.com', 'cc.other@example.com', 'bcc@example.com']
         )
+
+    def test_cc_headers(self):
+        message = EmailMessage(
+            'Subject', 'Content', 'bounce@example.com', ['to@example.com'],
+            cc=['foo@example.com'], headers={'Cc': 'override@example.com'},
+        ).message()
+        self.assertEqual(message['Cc'], 'override@example.com')
+
+    def test_cc_in_headers_only(self):
+        message = EmailMessage(
+            'Subject', 'Content', 'bounce@example.com', ['to@example.com'],
+            headers={'Cc': 'foo@example.com'},
+        ).message()
+        self.assertEqual(message['Cc'], 'foo@example.com')
 
     def test_reply_to(self):
         email = EmailMessage(
@@ -243,6 +259,13 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertEqual(message['To'], 'list-subscriber@example.com, list-subscriber2@example.com')
         self.assertEqual(email.to, ['list-subscriber@example.com', 'list-subscriber2@example.com'])
 
+    def test_to_in_headers_only(self):
+        message = EmailMessage(
+            'Subject', 'Content', 'bounce@example.com',
+            headers={'To': 'to@example.com'},
+        ).message()
+        self.assertEqual(message['To'], 'to@example.com')
+
     def test_reply_to_header(self):
         """
         Specifying 'Reply-To' in headers should override reply_to.
@@ -253,6 +276,13 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         )
         message = email.message()
         self.assertEqual(message['Reply-To'], 'override@example.com')
+
+    def test_reply_to_in_headers_only(self):
+        message = EmailMessage(
+            'Subject', 'Content', 'from@example.com', ['to@example.com'],
+            headers={'Reply-To': 'reply_to@example.com'},
+        ).message()
+        self.assertEqual(message['Reply-To'], 'reply_to@example.com')
 
     def test_multiple_message_call(self):
         """
@@ -292,9 +322,13 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         )
 
     def test_unicode_headers(self):
-        email = EmailMessage("Gżegżółka", "Content", "from@example.com", ["to@example.com"],
-                             headers={"Sender": '"Firstname Sürname" <sender@example.com>',
-                                      "Comments": 'My Sürname is non-ASCII'})
+        email = EmailMessage(
+            'Gżegżółka', 'Content', 'from@example.com', ['to@example.com'],
+            headers={
+                'Sender': '"Firstname Sürname" <sender@example.com>',
+                'Comments': 'My Sürname is non-ASCII',
+            },
+        )
         message = email.message()
         self.assertEqual(message['Subject'], '=?utf-8?b?R8W8ZWfFvMOzxYJrYQ==?=')
         self.assertEqual(message['Sender'], '=?utf-8?q?Firstname_S=C3=BCrname?= <sender@example.com>')
@@ -325,6 +359,11 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         msg.attach_alternative(html_content, 'text/html')
         msg.attach('example.txt', 'Text file content', 'text/plain')
         self.assertIn(html_content, msg.message().as_string())
+
+    def test_none_body(self):
+        msg = EmailMessage('subject', None, 'from@example.com', ['to@example.com'])
+        self.assertEqual(msg.body, '')
+        self.assertEqual(msg.message().get_payload(), '')
 
     def test_encoding(self):
         """
@@ -650,6 +689,21 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         # The child message header is not base64 encoded
         self.assertIn('Child Subject', parent_s)
 
+    def test_custom_utf8_encoding(self):
+        """A UTF-8 charset with a custom body encoding is respected."""
+        body = 'Body with latin characters: àáä.'
+        msg = EmailMessage('Subject', body, 'bounce@example.com', ['to@example.com'])
+        encoding = charset.Charset('utf-8')
+        encoding.body_encoding = charset.QP
+        msg.encoding = encoding
+        message = msg.message()
+        self.assertMessageHasHeaders(message, {
+            ('MIME-Version', '1.0'),
+            ('Content-Type', 'text/plain; charset="utf-8"'),
+            ('Content-Transfer-Encoding', 'quoted-printable'),
+        })
+        self.assertEqual(message.get_payload(), encoding.body_encode(body))
+
     def test_sanitize_address(self):
         """
         Email addresses are properly sanitized.
@@ -768,7 +822,7 @@ class BaseEmailBackendTests(HeadersCheckMixin):
         self.assertEqual(num_sent, 1)
         message = self.get_the_message()
         self.assertEqual(message["subject"], '=?utf-8?q?Ch=C3=A8re_maman?=')
-        self.assertEqual(force_text(message.get_payload(decode=True)), 'Je t\'aime très fort')
+        self.assertEqual(message.get_payload(decode=True).decode(), 'Je t\'aime très fort')
 
     def test_send_long_lines(self):
         """
@@ -790,8 +844,8 @@ class BaseEmailBackendTests(HeadersCheckMixin):
     def test_send_many(self):
         email1 = EmailMessage('Subject', 'Content1', 'from@example.com', ['to@example.com'])
         email2 = EmailMessage('Subject', 'Content2', 'from@example.com', ['to@example.com'])
-        # send_messages() may take a list or a generator.
-        emails_lists = ([email1, email2], (email for email in [email1, email2]))
+        # send_messages() may take a list or an iterator.
+        emails_lists = ([email1, email2], iter((email1, email2)))
         for emails_list in emails_lists:
             num_sent = mail.get_connection().send_messages(emails_list)
             self.assertEqual(num_sent, 2)
@@ -1051,7 +1105,7 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
         messages = []
         for filename in os.listdir(self.tmp_dir):
             with open(os.path.join(self.tmp_dir, filename), 'rb') as fp:
-                session = fp.read().split(force_bytes('\n' + ('-' * 79) + '\n', encoding='ascii'))
+                session = fp.read().split(b'\n' + (b'-' * 79) + b'\n')
             messages.extend(message_from_bytes(m) for m in session if m)
         return messages
 
@@ -1108,7 +1162,7 @@ class ConsoleBackendTests(BaseEmailBackendTests, SimpleTestCase):
 
     def get_mailbox_content(self):
         messages = self.stream.getvalue().split('\n' + ('-' * 79) + '\n')
-        return [message_from_bytes(force_bytes(m)) for m in messages if m]
+        return [message_from_bytes(m.encode()) for m in messages if m]
 
     def test_console_stream_kwarg(self):
         """
@@ -1117,7 +1171,7 @@ class ConsoleBackendTests(BaseEmailBackendTests, SimpleTestCase):
         s = StringIO()
         connection = mail.get_connection('django.core.mail.backends.console.EmailBackend', stream=s)
         send_mail('Subject', 'Content', 'from@example.com', ['to@example.com'], connection=connection)
-        message = force_bytes(s.getvalue().split('\n' + ('-' * 79) + '\n')[0])
+        message = s.getvalue().split('\n' + ('-' * 79) + '\n')[0].encode()
         self.assertMessageHasHeaders(message, {
             ('MIME-Version', '1.0'),
             ('Content-Type', 'text/plain; charset="utf-8"'),
@@ -1157,10 +1211,7 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
 
     def __init__(self, *args, **kwargs):
         threading.Thread.__init__(self)
-        # New kwarg added in Python 3.5; default switching to False in 3.6.
-        # Setting a value only silences a deprecation warning in Python 3.5.
-        kwargs['decode_data'] = True
-        smtpd.SMTPServer.__init__(self, *args, **kwargs)
+        smtpd.SMTPServer.__init__(self, *args, decode_data=True, **kwargs)
         self._sink = []
         self.active = False
         self.active_lock = threading.Lock()
@@ -1264,7 +1315,8 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
 
     @override_settings(
         EMAIL_HOST_USER="not empty username",
-        EMAIL_HOST_PASSWORD="not empty password")
+        EMAIL_HOST_PASSWORD='not empty password',
+    )
     def test_email_authentication_use_settings(self):
         backend = smtp.EmailBackend()
         self.assertEqual(backend.username, 'not empty username')
@@ -1272,7 +1324,8 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
 
     @override_settings(
         EMAIL_HOST_USER="not empty username",
-        EMAIL_HOST_PASSWORD="not empty password")
+        EMAIL_HOST_PASSWORD='not empty password',
+    )
     def test_email_authentication_override_settings(self):
         backend = smtp.EmailBackend(username='username', password='password')
         self.assertEqual(backend.username, 'username')
@@ -1280,7 +1333,8 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
 
     @override_settings(
         EMAIL_HOST_USER="not empty username",
-        EMAIL_HOST_PASSWORD="not empty password")
+        EMAIL_HOST_PASSWORD='not empty password',
+    )
     def test_email_disabled_authentication(self):
         backend = smtp.EmailBackend(username='', password='')
         self.assertEqual(backend.username, '')
@@ -1302,10 +1356,16 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         open() returns whether it opened a connection.
         """
         backend = smtp.EmailBackend(username='', password='')
-        self.assertFalse(backend.connection)
+        self.assertIsNone(backend.connection)
         opened = backend.open()
         backend.close()
-        self.assertTrue(opened)
+        self.assertIs(opened, True)
+
+    def test_reopen_connection(self):
+        backend = smtp.EmailBackend()
+        # Simulate an already open connection.
+        backend.connection = True
+        self.assertIs(backend.open(), False)
 
     def test_server_login(self):
         """
@@ -1333,6 +1393,14 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
     def test_email_tls_default_disabled(self):
         backend = smtp.EmailBackend()
         self.assertFalse(backend.use_tls)
+
+    def test_ssl_tls_mutually_exclusive(self):
+        msg = (
+            'EMAIL_USE_TLS/EMAIL_USE_SSL are mutually exclusive, so only set '
+            'one of those settings to True.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            smtp.EmailBackend(use_ssl=True, use_tls=True)
 
     @override_settings(EMAIL_USE_SSL=True)
     def test_email_ssl_use_settings(self):
@@ -1459,7 +1527,20 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         backend.connection = True
         backend.open = lambda: None
         email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'])
-        self.assertEqual(backend.send_messages([email]), None)
+        self.assertEqual(backend.send_messages([email]), 0)
+
+    def test_send_messages_empty_list(self):
+        backend = smtp.EmailBackend()
+        backend.connection = True
+        self.assertEqual(backend.send_messages([]), 0)
+
+    def test_send_messages_zero_sent(self):
+        """A message isn't sent if it doesn't have any recipients."""
+        backend = smtp.EmailBackend()
+        backend.connection = True
+        email = EmailMessage('Subject', 'Content', 'from@example.com', to=[])
+        sent = backend.send_messages([email])
+        self.assertEqual(sent, 0)
 
 
 class SMTPBackendStoppedServerTests(SMTPBackendTestsBase):
@@ -1485,7 +1566,7 @@ class SMTPBackendStoppedServerTests(SMTPBackendTestsBase):
         """
         A socket connection error is silenced with fail_silently=True.
         """
-        with self.assertRaises(socket.error):
+        with self.assertRaises(ConnectionError):
             self.backend.open()
         self.backend.fail_silently = True
         self.backend.open()

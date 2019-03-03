@@ -1,17 +1,23 @@
 import unittest
 from datetime import datetime
 
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
 from django.utils.datastructures import MultiValueDict
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.http import (
-    base36_to_int, cookie_date, http_date, int_to_base36, is_safe_url,
-    is_same_domain, parse_etags, parse_http_date, quote_etag, urlencode,
-    urlquote, urlquote_plus, urlsafe_base64_decode, urlsafe_base64_encode,
-    urlunquote, urlunquote_plus,
+    base36_to_int, escape_leading_slashes, http_date, int_to_base36,
+    is_safe_url, is_same_domain, parse_etags, parse_http_date, quote_etag,
+    urlencode, urlquote, urlquote_plus, urlsafe_base64_decode,
+    urlsafe_base64_encode, urlunquote, urlunquote_plus,
 )
 
 
-class URLEncodeTests(unittest.TestCase):
+class URLEncodeTests(SimpleTestCase):
+    cannot_encode_none_msg = (
+        'Cannot encode None in a query string. Did you mean to pass an '
+        'empty string or omit the value?'
+    )
+
     def test_tuples(self):
         self.assertEqual(urlencode((('a', 1), ('b', 2), ('c', 3))), 'a=1&b=2&c=3')
 
@@ -63,6 +69,20 @@ class URLEncodeTests(unittest.TestCase):
 
         self.assertEqual(urlencode({'a': gen()}, doseq=True), 'a=0&a=1')
         self.assertEqual(urlencode({'a': gen()}, doseq=False), 'a=%5B%270%27%2C+%271%27%5D')
+
+    def test_none(self):
+        with self.assertRaisesMessage(TypeError, self.cannot_encode_none_msg):
+            urlencode({'a': None})
+
+    def test_none_in_sequence(self):
+        with self.assertRaisesMessage(TypeError, self.cannot_encode_none_msg):
+            urlencode({'a': [None]}, doseq=True)
+
+    def test_none_in_generator(self):
+        def gen():
+            yield None
+        with self.assertRaisesMessage(TypeError, self.cannot_encode_none_msg):
+            urlencode({'a': gen()}, doseq=True)
 
 
 class Base36IntTests(SimpleTestCase):
@@ -160,9 +180,13 @@ class IsSafeURLTests(unittest.TestCase):
 
     def test_no_allowed_hosts(self):
         # A path without host is allowed.
-        self.assertIs(is_safe_url('/confirm/me@example.com'), True)
+        self.assertIs(is_safe_url('/confirm/me@example.com', allowed_hosts=None), True)
         # Basic auth without host is not allowed.
-        self.assertIs(is_safe_url(r'http://testserver\@example.com'), False)
+        self.assertIs(is_safe_url(r'http://testserver\@example.com', allowed_hosts=None), False)
+
+    def test_allowed_hosts_str(self):
+        self.assertIs(is_safe_url('http://good.com/good', allowed_hosts='good.com'), True)
+        self.assertIs(is_safe_url('http://good.co/evil', allowed_hosts='good.com'), False)
 
     def test_secure_param_https_urls(self):
         secure_urls = (
@@ -193,6 +217,7 @@ class URLSafeBase64Tests(unittest.TestCase):
         self.assertEqual(bytestring, decoded)
 
 
+@ignore_warnings(category=RemovedInDjango40Warning)
 class URLQuoteTests(unittest.TestCase):
     def test_quote(self):
         self.assertEqual(urlquote('Paris & Orl\xe9ans'), 'Paris%20%26%20Orl%C3%A9ans')
@@ -228,6 +253,7 @@ class IsSameDomainTests(unittest.TestCase):
             ('example2.com', 'example.com'),
             ('foo.example.com', 'example.com'),
             ('example.com:9999', 'example.com:8888'),
+            ('foo.example.com:8888', ''),
         ):
             self.assertIs(is_same_domain(*pair), False)
 
@@ -254,10 +280,6 @@ class HttpDateProcessingTests(unittest.TestCase):
         t = 1167616461.0
         self.assertEqual(http_date(t), 'Mon, 01 Jan 2007 01:54:21 GMT')
 
-    def test_cookie_date(self):
-        t = 1167616461.0
-        self.assertEqual(cookie_date(t), 'Mon, 01-Jan-2007 01:54:21 GMT')
-
     def test_parsing_rfc1123(self):
         parsed = parse_http_date('Sun, 06 Nov 1994 08:49:37 GMT')
         self.assertEqual(datetime.utcfromtimestamp(parsed), datetime(1994, 11, 6, 8, 49, 37))
@@ -269,3 +291,18 @@ class HttpDateProcessingTests(unittest.TestCase):
     def test_parsing_asctime(self):
         parsed = parse_http_date('Sun Nov  6 08:49:37 1994')
         self.assertEqual(datetime.utcfromtimestamp(parsed), datetime(1994, 11, 6, 8, 49, 37))
+
+    def test_parsing_year_less_than_70(self):
+        parsed = parse_http_date('Sun Nov  6 08:49:37 0050')
+        self.assertEqual(datetime.utcfromtimestamp(parsed), datetime(2050, 11, 6, 8, 49, 37))
+
+
+class EscapeLeadingSlashesTests(unittest.TestCase):
+    def test(self):
+        tests = (
+            ('//example.com', '/%2Fexample.com'),
+            ('//', '/%2F'),
+        )
+        for url, expected in tests:
+            with self.subTest(url=url):
+                self.assertEqual(escape_leading_slashes(url), expected)

@@ -3,8 +3,8 @@ Customizing authentication in Django
 ====================================
 
 The authentication that comes with Django is good enough for most common cases,
-but you may have needs not met by the out-of-the-box defaults. To customize
-authentication to your projects needs involves understanding what points of the
+but you may have needs not met by the out-of-the-box defaults. Customizing
+authentication in your projects requires understanding what points of the
 provided system are extensible or replaceable. This document provides details
 about how the auth system can be customized.
 
@@ -95,7 +95,7 @@ a set of optional permission related :ref:`authorization methods
 
 The ``get_user`` method takes a ``user_id`` -- which could be a username,
 database ID or whatever, but has to be the primary key of your user object --
-and returns a user object.
+and returns a user object or ``None``.
 
 The ``authenticate`` method takes a ``request`` argument and credentials as
 keyword arguments. Most of the time, it'll just look like this::
@@ -273,14 +273,13 @@ Custom permissions
 To create custom permissions for a given model object, use the ``permissions``
 :ref:`model Meta attribute <meta-options>`.
 
-This example Task model creates three custom permissions, i.e., actions users
-can or cannot do with Task instances, specific to your application::
+This example ``Task`` model creates two custom permissions, i.e., actions users
+can or cannot do with ``Task`` instances, specific to your application::
 
     class Task(models.Model):
         ...
         class Meta:
             permissions = (
-                ("view_task", "Can see available tasks"),
                 ("change_task_status", "Can change the status of tasks"),
                 ("close_task", "Can remove a task by setting its status as closed"),
             )
@@ -289,11 +288,11 @@ The only thing this does is create those extra permissions when you run
 :djadmin:`manage.py migrate <migrate>` (the function that creates permissions
 is connected to the :data:`~django.db.models.signals.post_migrate` signal).
 Your code is in charge of checking the value of these permissions when a user
-is trying to access the functionality provided by the application (viewing
-tasks, changing the status of tasks, closing tasks.) Continuing the above
-example, the following checks if a user may view tasks::
+is trying to access the functionality provided by the application (changing the
+status of tasks or closing tasks.) Continuing the above example, the following
+checks if a user may close tasks::
 
-    user.has_perm('app.view_task')
+    user.has_perm('app.close_task')
 
 .. _extending-user:
 
@@ -348,7 +347,7 @@ add it to a ``UserAdmin`` class which is registered with the
 
     # Define a new User admin
     class UserAdmin(BaseUserAdmin):
-        inlines = (EmployeeInline, )
+        inlines = (EmployeeInline,)
 
     # Re-register UserAdmin
     admin.site.unregister(User)
@@ -560,13 +559,6 @@ password resets. You must then provide some key implementation details:
                 ...
                 USERNAME_FIELD = 'identifier'
 
-        :attr:`USERNAME_FIELD` now supports
-        :class:`~django.db.models.ForeignKey`\s. Since there is no way to pass
-        model instances during the :djadmin:`createsuperuser` prompt, expect the
-        user to enter the value of :attr:`~django.db.models.ForeignKey.to_field`
-        value (the :attr:`~django.db.models.Field.primary_key` by default) of an
-        existing instance.
-
     .. attribute:: EMAIL_FIELD
 
         A string describing the name of the email field on the ``User`` model.
@@ -600,13 +592,6 @@ password resets. You must then provide some key implementation details:
             model, but should *not* contain the ``USERNAME_FIELD`` or
             ``password`` as these fields will always be prompted for.
 
-        :attr:`REQUIRED_FIELDS` now supports
-        :class:`~django.db.models.ForeignKey`\s. Since there is no way to pass
-        model instances during the :djadmin:`createsuperuser` prompt, expect the
-        user to enter the value of :attr:`~django.db.models.ForeignKey.to_field`
-        value (the :attr:`~django.db.models.Field.primary_key` by default) of an
-        existing instance.
-
     .. attribute:: is_active
 
         A boolean attribute that indicates whether the user is considered
@@ -627,12 +612,6 @@ password resets. You must then provide some key implementation details:
         Optional. A short, informal identifier for the user such as their
         first name. If implemented, this replaces the username in the greeting
         to the user in the header of :mod:`django.contrib.admin`.
-
-    .. versionchanged:: 2.0
-
-        In older versions, subclasses are required to implement
-        ``get_short_name()`` and ``get_full_name()`` as ``AbstractBaseUser``
-        has implementations that raise ``NotImplementedError``.
 
     .. admonition:: Importing ``AbstractBaseUser``
 
@@ -735,6 +714,9 @@ The following attributes and methods are available on any subclass of
         :meth:`.BaseUserManager.normalize_email`. If you override this method,
         be sure to call ``super()`` to retain the normalization.
 
+Writing a manager for a custom user model
+-----------------------------------------
+
 You should also define a custom manager for your user model. If your user model
 defines ``username``, ``email``, ``is_staff``, ``is_active``, ``is_superuser``,
 ``last_login``, and ``date_joined`` fields the same as Django's default user,
@@ -769,6 +751,11 @@ providing two additional methods:
 
         Unlike ``create_user()``, ``create_superuser()`` *must* require the
         caller to provide a password.
+
+For a :class:`~.ForeignKey` in :attr:`.USERNAME_FIELD` or
+:attr:`.REQUIRED_FIELDS`, these methods receive the value of the
+:attr:`~.ForeignKey.to_field` (the :attr:`~django.db.models.Field.primary_key`
+by default) of an existing instance.
 
 :class:`~django.contrib.auth.models.BaseUserManager` provides the following
 utility methods:
@@ -932,8 +919,9 @@ methods and attributes:
 
         Returns ``True`` if the user has the specified permission, where
         ``perm`` is in the format ``"<app label>.<permission codename>"`` (see
-        :ref:`permissions <topic-authorization>`). If the user is inactive, this method will
-        always return ``False``.
+        :ref:`permissions <topic-authorization>`). If :attr:`.User.is_active`
+        and :attr:`~.User.is_superuser` are both ``True``, this method always
+        returns ``True``.
 
         If ``obj`` is passed in, this method won't check for a permission for
         the model, but for this specific object.
@@ -942,8 +930,9 @@ methods and attributes:
 
         Returns ``True`` if the user has each of the specified permissions,
         where each perm is in the format
-        ``"<app label>.<permission codename>"``. If the user is inactive,
-        this method will always return ``False``.
+        ``"<app label>.<permission codename>"``. If :attr:`.User.is_active` and
+        :attr:`~.User.is_superuser` are both ``True``, this method always
+        returns ``True``.
 
         If ``obj`` is passed in, this method won't check for permissions for
         the model, but for the specific object.
@@ -951,8 +940,9 @@ methods and attributes:
     .. method:: models.PermissionsMixin.has_module_perms(package_name)
 
         Returns ``True`` if the user has any permissions in the given package
-        (the Django app label). If the user is inactive, this method will
-        always return ``False``.
+        (the Django app label). If :attr:`.User.is_active` and
+        :attr:`~.User.is_superuser` are both ``True``, this method always
+        returns ``True``.
 
 .. admonition:: ``PermissionsMixin`` and ``ModelBackend``
 

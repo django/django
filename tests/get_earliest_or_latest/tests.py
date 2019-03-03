@@ -1,4 +1,3 @@
-import warnings
 from datetime import datetime
 
 from django.test import TestCase
@@ -82,11 +81,6 @@ class EarliestOrLatestTests(TestCase):
         Article.objects.model._meta.get_latest_by = ('pub_date', 'expire_date')
         self.assertEqual(Article.objects.filter(pub_date=datetime(2005, 7, 28)).earliest(), a4)
 
-    def test_earliest_fields_and_field_name(self):
-        msg = 'Cannot use both positional arguments and the field_name keyword argument.'
-        with self.assertRaisesMessage(ValueError, msg):
-            Article.objects.earliest('pub_date', field_name='expire_date')
-
     def test_latest(self):
         # Because no Articles exist yet, latest() raises ArticleDoesNotExist.
         with self.assertRaises(Article.DoesNotExist):
@@ -149,11 +143,6 @@ class EarliestOrLatestTests(TestCase):
         Article.objects.model._meta.get_latest_by = ('pub_date', 'expire_date')
         self.assertEqual(Article.objects.filter(pub_date=datetime(2005, 7, 27)).latest(), a3)
 
-    def test_latest_fields_and_field_name(self):
-        msg = 'Cannot use both positional arguments and the field_name keyword argument.'
-        with self.assertRaisesMessage(ValueError, msg):
-            Article.objects.latest('pub_date', field_name='expire_date')
-
     def test_latest_manual(self):
         # You can still use latest() with a model that doesn't have
         # "get_latest_by" set -- just pass in the field name manually.
@@ -166,19 +155,6 @@ class EarliestOrLatestTests(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             Person.objects.latest()
         self.assertEqual(Person.objects.latest("birthday"), p2)
-
-    def test_field_name_kwarg_deprecation(self):
-        Person.objects.create(name='Deprecator', birthday=datetime(1950, 1, 1))
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')
-            Person.objects.latest(field_name='birthday')
-
-        self.assertEqual(len(warns), 1)
-        self.assertEqual(
-            str(warns[0].message),
-            'The field_name keyword argument to earliest() and latest() '
-            'is deprecated in favor of passing positional arguments.',
-        )
 
 
 class TestFirstLast(TestCase):

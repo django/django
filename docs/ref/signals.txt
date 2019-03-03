@@ -547,7 +547,7 @@ This signal is sent whenever Django encounters an exception while processing an 
 Arguments sent with this signal:
 
 ``sender``
-    The handler class, as above.
+    Unused (always ``None``).
 
 ``request``
     The :class:`~django.http.HttpRequest` object.

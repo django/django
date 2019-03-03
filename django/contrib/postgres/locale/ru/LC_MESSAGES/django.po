@@ -1,17 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Eugene MechanisM <eugene@mechanism.pro>, 2016
+# Eugene <eugene.mechanism@gmail.com>, 2016
 # eXtractor <evg.kirov@gmail.com>, 2015
 # Kirill Gagarski <gagarin.gtn@gmail.com>, 2015
-# Vasiliy Anikin <anikin.vasya@gmail.com>, 2017
-# Алексей Борискин <sun.void@gmail.com>, 2015-2017
+# Вася Аникин <anikin.vasya@gmail.com>, 2017
+# Алексей Борискин <sun.void@gmail.com>, 2015-2018
+# Дмитрий Шатера <mr.bobsans@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-04-08 15:22+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-07-27 11:04+0000\n"
 "Last-Translator: Алексей Борискин <sun.void@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
@@ -27,8 +28,8 @@ msgid "PostgreSQL extensions"
 msgstr "Расширения PostgreSQL"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
-msgstr "Элемент %(nth)s в массиве не прошёл проверку:"
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "Элемент %(nth)s массива не прошёл проверку:"
 
 msgid "Nested arrays must have the same length."
 msgstr "Вложенные массивы должны иметь одинаковую длину."

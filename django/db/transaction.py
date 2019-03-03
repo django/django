@@ -1,4 +1,4 @@
-from contextlib import ContextDecorator
+from contextlib import ContextDecorator, contextmanager
 
 from django.db import (
     DEFAULT_DB_ALIAS, DatabaseError, Error, ProgrammingError, connections,
@@ -92,6 +92,34 @@ def set_rollback(rollback, using=None):
     return get_connection(using).set_rollback(rollback)
 
 
+@contextmanager
+def mark_for_rollback_on_error(using=None):
+    """
+    Internal low-level utility to mark a transaction as "needs rollback" when
+    an exception is raised while not enforcing the enclosed block to be in a
+    transaction. This is needed by Model.save() and friends to avoid starting a
+    transaction when in autocommit mode and a single query is executed.
+
+    It's equivalent to:
+
+        connection = get_connection(using)
+        if connection.get_autocommit():
+            yield
+        else:
+            with transaction.atomic(using=using, savepoint=False):
+                yield
+
+    but it uses low-level utilities to avoid performance overhead.
+    """
+    try:
+        yield
+    except Exception:
+        connection = get_connection(using)
+        if connection.in_atomic_block:
+            connection.needs_rollback = True
+        raise
+
+
 def on_commit(func, using=None):
     """
     Register `func` to be called when the current transaction is committed.
@@ -145,14 +173,6 @@ class Atomic(ContextDecorator):
             connection.commit_on_exit = True
             connection.needs_rollback = False
             if not connection.get_autocommit():
-                # Some database adapters (namely sqlite3) don't handle
-                # transactions and savepoints properly when autocommit is off.
-                # Turning autocommit back on isn't an option; it would trigger
-                # a premature commit. Give up if that happens.
-                if connection.features.autocommits_when_autocommit_is_off:
-                    raise TransactionManagementError(
-                        "Your database backend doesn't behave properly when "
-                        "autocommit is off. Turn it on before using 'atomic'.")
                 # Pretend we're already in an atomic block to bypass the code
                 # that disables autocommit to enter a transaction, and make a
                 # note to deal with this case in __exit__.

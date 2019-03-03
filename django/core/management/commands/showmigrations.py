@@ -1,4 +1,7 @@
-from django.core.management.base import BaseCommand, CommandError
+import sys
+
+from django.apps import apps
+from django.core.management.base import BaseCommand
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.migrations.loader import MigrationLoader
 
@@ -12,7 +15,7 @@ class Command(BaseCommand):
             help='App labels of applications to limit the output to.',
         )
         parser.add_argument(
-            '--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
+            '--database', default=DEFAULT_DB_ALIAS,
             help='Nominates a database to synchronize. Defaults to the "default" database.',
         )
 
@@ -45,12 +48,15 @@ class Command(BaseCommand):
             return self.show_list(connection, options['app_label'])
 
     def _validate_app_names(self, loader, app_names):
-        invalid_apps = []
+        has_bad_names = False
         for app_name in app_names:
-            if app_name not in loader.migrated_apps:
-                invalid_apps.append(app_name)
-        if invalid_apps:
-            raise CommandError('No migrations present for: %s' % (', '.join(sorted(invalid_apps))))
+            try:
+                apps.get_app_config(app_name)
+            except LookupError as err:
+                self.stderr.write(str(err))
+                has_bad_names = True
+        if has_bad_names:
+            sys.exit(2)
 
     def show_list(self, connection, app_names=None):
         """
@@ -129,3 +135,5 @@ class Command(BaseCommand):
                 self.stdout.write("[X]  %s.%s%s" % (node.key[0], node.key[1], deps))
             else:
                 self.stdout.write("[ ]  %s.%s%s" % (node.key[0], node.key[1], deps))
+        if not plan:
+            self.stdout.write('(no migrations)', self.style.ERROR)

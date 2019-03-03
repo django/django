@@ -22,22 +22,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         1083: 'TimeField',
         1114: 'DateTimeField',
         1184: 'DateTimeField',
+        1186: 'DurationField',
         1266: 'TimeField',
         1700: 'DecimalField',
         2950: 'UUIDField',
     }
 
     ignored_tables = []
-
-    _get_indexes_query = """
-        SELECT attr.attname, idx.indkey, idx.indisunique, idx.indisprimary
-        FROM pg_catalog.pg_class c, pg_catalog.pg_class c2,
-            pg_catalog.pg_index idx, pg_catalog.pg_attribute attr
-        WHERE c.oid = idx.indrelid
-            AND idx.indexrelid = c2.oid
-            AND attr.attrelid = c.oid
-            AND attr.attnum = idx.indkey[0]
-            AND c.relname = %s"""
 
     def get_field_type(self, data_type, description):
         field_type = super().get_field_type(data_type, description)
@@ -51,41 +42,49 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     def get_table_list(self, cursor):
         """Return a list of table and view names in the current database."""
         cursor.execute("""
-            SELECT c.relname, c.relkind
+            SELECT c.relname,
+            CASE WHEN {} THEN 'p' WHEN c.relkind IN ('m', 'v') THEN 'v' ELSE 't' END
             FROM pg_catalog.pg_class c
             LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
-            WHERE c.relkind IN ('r', 'v')
+            WHERE c.relkind IN ('f', 'm', 'p', 'r', 'v')
                 AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
-                AND pg_catalog.pg_table_is_visible(c.oid)""")
-        return [TableInfo(row[0], {'r': 't', 'v': 'v'}.get(row[1]))
-                for row in cursor.fetchall()
-                if row[0] not in self.ignored_tables]
+                AND pg_catalog.pg_table_is_visible(c.oid)
+        """.format('c.relispartition' if self.connection.features.supports_table_partitions else 'FALSE'))
+        return [TableInfo(*row) for row in cursor.fetchall() if row[0] not in self.ignored_tables]
 
     def get_table_description(self, cursor, table_name):
         """
         Return a description of the table with the DB-API cursor.description
         interface.
         """
-        # As cursor.description does not return reliably the nullable property,
-        # we have to query the information_schema (#7783)
+        # Query the pg_catalog tables as cursor.description does not reliably
+        # return the nullable property and information_schema.columns does not
+        # contain details of materialized views.
         cursor.execute("""
-            SELECT column_name, is_nullable, column_default
-            FROM information_schema.columns
-            WHERE table_name = %s""", [table_name])
+            SELECT
+                a.attname AS column_name,
+                NOT (a.attnotnull OR (t.typtype = 'd' AND t.typnotnull)) AS is_nullable,
+                pg_get_expr(ad.adbin, ad.adrelid) AS column_default
+            FROM pg_attribute a
+            LEFT JOIN pg_attrdef ad ON a.attrelid = ad.adrelid AND a.attnum = ad.adnum
+            JOIN pg_type t ON a.atttypid = t.oid
+            JOIN pg_class c ON a.attrelid = c.oid
+            JOIN pg_namespace n ON c.relnamespace = n.oid
+            WHERE c.relkind IN ('f', 'm', 'p', 'r', 'v')
+                AND c.relname = %s
+                AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
+                AND pg_catalog.pg_table_is_visible(c.oid)
+        """, [table_name])
         field_map = {line[0]: line[1:] for line in cursor.fetchall()}
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
-        return [
-            FieldInfo(*(line[0:6] + (field_map[line.name][0] == 'YES', field_map[line.name][1])))
-            for line in cursor.description
-        ]
+        return [FieldInfo(*line[0:6], *field_map[line.name]) for line in cursor.description]
 
     def get_sequences(self, cursor, table_name, table_fields=()):
-        sequences = []
         cursor.execute("""
             SELECT s.relname as sequence_name, col.attname
             FROM pg_class s
                 JOIN pg_namespace sn ON sn.oid = s.relnamespace
-                JOIN pg_depend d ON d.refobjid = s.oid AND d.refclassid='pg_class'::regclass
+                JOIN pg_depend d ON d.refobjid = s.oid AND d.refclassid = 'pg_class'::regclass
                 JOIN pg_attrdef ad ON ad.oid = d.objid AND d.classid = 'pg_attrdef'::regclass
                 JOIN pg_attribute col ON col.attrelid = ad.adrelid AND col.attnum = ad.adnum
                 JOIN pg_class tbl ON tbl.oid = ad.adrelid
@@ -95,9 +94,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
               AND n.nspname = 'public'
               AND tbl.relname = %s
         """, [table_name])
-        for row in cursor.fetchall():
-            sequences.append({'name': row[0], 'table': table_name, 'column': row[1]})
-        return sequences
+        return [
+            {'name': row[0], 'table': table_name, 'column': row[1]}
+            for row in cursor.fetchall()
+        ]
 
     def get_relations(self, cursor, table_name):
         """
@@ -111,15 +111,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             LEFT JOIN pg_class c2 ON con.confrelid = c2.oid
             LEFT JOIN pg_attribute a1 ON c1.oid = a1.attrelid AND a1.attnum = con.conkey[1]
             LEFT JOIN pg_attribute a2 ON c2.oid = a2.attrelid AND a2.attnum = con.confkey[1]
-            WHERE c1.relname = %s
-                AND con.contype = 'f'""", [table_name])
-        relations = {}
-        for row in cursor.fetchall():
-            relations[row[1]] = (row[2], row[0])
-        return relations
+            WHERE c1.relname = %s AND con.contype = 'f'
+        """, [table_name])
+        return {row[1]: (row[2], row[0]) for row in cursor.fetchall()}
 
     def get_key_columns(self, cursor, table_name):
-        key_columns = []
         cursor.execute("""
             SELECT kcu.column_name, ccu.table_name AS referenced_table, ccu.column_name AS referenced_column
             FROM information_schema.constraint_column_usage ccu
@@ -131,9 +127,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 ON ccu.constraint_catalog = tc.constraint_catalog
                     AND ccu.constraint_schema = tc.constraint_schema
                     AND ccu.constraint_name = tc.constraint_name
-            WHERE kcu.table_name = %s AND tc.constraint_type = 'FOREIGN KEY'""", [table_name])
-        key_columns.extend(cursor.fetchall())
-        return key_columns
+            WHERE kcu.table_name = %s AND tc.constraint_type = 'FOREIGN KEY'
+        """, [table_name])
+        return cursor.fetchall()
 
     def get_constraints(self, cursor, table_name):
         """
@@ -210,6 +206,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """, [table_name])
         for index, columns, unique, primary, orders, type_, definition, options in cursor.fetchall():
             if index not in constraints:
+                basic_index = type_ == 'btree' and not index.endswith('_btree') and options is None
                 constraints[index] = {
                     "columns": columns if columns != [None] else [],
                     "orders": orders if orders != [None] else [],
@@ -218,7 +215,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     "foreign_key": None,
                     "check": False,
                     "index": True,
-                    "type": Index.suffix if type_ == 'btree' else type_,
+                    "type": Index.suffix if basic_index else type_,
                     "definition": definition,
                     "options": options,
                 }

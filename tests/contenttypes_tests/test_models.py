@@ -1,13 +1,9 @@
 from django.contrib.contenttypes.models import ContentType, ContentTypeManager
-from django.contrib.contenttypes.views import shortcut
-from django.contrib.sites.shortcuts import get_current_site
-from django.http import Http404, HttpRequest
+from django.db import models
 from django.test import TestCase, override_settings
+from django.test.utils import isolate_apps
 
-from .models import (
-    Author, ConcreteModel, FooWithBrokenAbsoluteUrl, FooWithoutUrl, FooWithUrl,
-    ProxyModel,
-)
+from .models import Author, ConcreteModel, FooWithUrl, ProxyModel
 
 
 class ContentTypesTests(TestCase):
@@ -93,6 +89,20 @@ class ContentTypesTests(TestCase):
             FooWithUrl: ContentType.objects.get_for_model(FooWithUrl),
         })
 
+    @isolate_apps('contenttypes_tests')
+    def test_get_for_model_create_contenttype(self):
+        """
+        ContentTypeManager.get_for_model() creates the corresponding content
+        type if it doesn't exist in the database.
+        """
+        class ModelCreatedOnTheFly(models.Model):
+            name = models.CharField()
+
+        ct = ContentType.objects.get_for_model(ModelCreatedOnTheFly)
+        self.assertEqual(ct.app_label, 'contenttypes_tests')
+        self.assertEqual(ct.model, 'modelcreatedonthefly')
+        self.assertEqual(str(ct), 'modelcreatedonthefly')
+
     def test_get_for_concrete_model(self):
         """
         Make sure the `for_concrete_model` kwarg correctly works
@@ -172,64 +182,6 @@ class ContentTypesTests(TestCase):
         with self.assertNumQueries(0):
             other_manager.get_for_model(ContentType)
 
-    @override_settings(ALLOWED_HOSTS=['example.com'])
-    def test_shortcut_view(self):
-        """
-        The shortcut view (used for the admin "view on site" functionality)
-        returns a complete URL regardless of whether the sites framework is
-        installed.
-        """
-        request = HttpRequest()
-        request.META = {
-            "SERVER_NAME": "Example.com",
-            "SERVER_PORT": "80",
-        }
-        user_ct = ContentType.objects.get_for_model(FooWithUrl)
-        obj = FooWithUrl.objects.create(name="john")
-
-        with self.modify_settings(INSTALLED_APPS={'append': 'django.contrib.sites'}):
-            response = shortcut(request, user_ct.id, obj.id)
-            self.assertEqual(
-                "http://%s/users/john/" % get_current_site(request).domain,
-                response._headers.get("location")[1]
-            )
-
-        with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'}):
-            response = shortcut(request, user_ct.id, obj.id)
-            self.assertEqual("http://Example.com/users/john/", response._headers.get("location")[1])
-
-    def test_shortcut_view_without_get_absolute_url(self):
-        """
-        The shortcut view (used for the admin "view on site" functionality)
-        returns 404 when get_absolute_url is not defined.
-        """
-        request = HttpRequest()
-        request.META = {
-            "SERVER_NAME": "Example.com",
-            "SERVER_PORT": "80",
-        }
-        user_ct = ContentType.objects.get_for_model(FooWithoutUrl)
-        obj = FooWithoutUrl.objects.create(name="john")
-
-        with self.assertRaises(Http404):
-            shortcut(request, user_ct.id, obj.id)
-
-    def test_shortcut_view_with_broken_get_absolute_url(self):
-        """
-        The shortcut view does not catch an AttributeError raised by
-        the model's get_absolute_url() method (#8997).
-        """
-        request = HttpRequest()
-        request.META = {
-            "SERVER_NAME": "Example.com",
-            "SERVER_PORT": "80",
-        }
-        user_ct = ContentType.objects.get_for_model(FooWithBrokenAbsoluteUrl)
-        obj = FooWithBrokenAbsoluteUrl.objects.create(name="john")
-
-        with self.assertRaises(AttributeError):
-            shortcut(request, user_ct.id, obj.id)
-
     def test_missing_model(self):
         """
         Displaying content types in admin (or anywhere) doesn't break on
@@ -247,6 +199,18 @@ class ContentTypesTests(TestCase):
         ct_fetched = ContentType.objects.get_for_id(ct.pk)
         self.assertIsNone(ct_fetched.model_class())
 
+    def test_str(self):
+        ct = ContentType.objects.get(app_label='contenttypes_tests', model='site')
+        self.assertEqual(str(ct), 'contenttypes_tests | site')
+
+    def test_app_labeled_name(self):
+        ct = ContentType.objects.get(app_label='contenttypes_tests', model='site')
+        self.assertEqual(ct.app_labeled_name, 'contenttypes_tests | site')
+
+    def test_app_labeled_name_unknown_model(self):
+        ct = ContentType(app_label='contenttypes_tests', model='unknown')
+        self.assertEqual(ct.app_labeled_name, 'unknown')
+
 
 class TestRouter:
     def db_for_read(self, model, **hints):
@@ -258,7 +222,7 @@ class TestRouter:
 
 @override_settings(DATABASE_ROUTERS=[TestRouter()])
 class ContentTypesMultidbTests(TestCase):
-    multi_db = True
+    databases = {'default', 'other'}
 
     def test_multidb(self):
         """

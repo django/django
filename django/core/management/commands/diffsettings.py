@@ -1,9 +1,9 @@
 from django.core.management.base import BaseCommand
 
 
-def module_to_dict(module, omittable=lambda k: k.startswith('_')):
+def module_to_dict(module, omittable=lambda k: k.startswith('_') or not k.isupper()):
     """Convert a module namespace to a Python dictionary."""
-    return {k: repr(v) for k, v in module.__dict__.items() if not omittable(k)}
+    return {k: repr(getattr(module, k)) for k in dir(module) if not omittable(k)}
 
 
 class Command(BaseCommand):
@@ -14,21 +14,21 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--all', action='store_true', dest='all',
+            '--all', action='store_true',
             help=(
                 'Display all settings, regardless of their value. In "hash" '
                 'mode, default values are prefixed by "###".'
             ),
         )
         parser.add_argument(
-            '--default', dest='default', metavar='MODULE', default=None,
+            '--default', metavar='MODULE',
             help=(
                 "The settings module to compare the current settings against. Leave empty to "
                 "compare against Django's default settings."
             ),
         )
         parser.add_argument(
-            '--output', default='hash', choices=('hash', 'unified'), dest='output',
+            '--output', default='hash', choices=('hash', 'unified'),
             help=(
                 "Selects the output format. 'hash' mode displays each changed "
                 "setting, with the settings that don't appear in the defaults "
@@ -42,7 +42,8 @@ class Command(BaseCommand):
         from django.conf import settings, Settings, global_settings
 
         # Because settings are imported lazily, we need to explicitly load them.
-        settings._setup()
+        if not settings.configured:
+            settings._setup()
 
         user_settings = module_to_dict(settings._wrapped)
         default = options['default']

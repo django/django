@@ -66,6 +66,11 @@ class AuthorList(generic.ListView):
     queryset = Author.objects.all()
 
 
+class AuthorListGetQuerysetReturnsNone(AuthorList):
+    def get_queryset(self):
+        return None
+
+
 class BookList(generic.ListView):
     model = Book
 
@@ -288,6 +293,10 @@ class BookSigningDayArchive(BookSigningConfig, generic.DayArchiveView):
 
 class BookSigningTodayArchive(BookSigningConfig, generic.TodayArchiveView):
     pass
+
+
+class BookArchiveWithoutDateField(generic.ArchiveIndexView):
+    queryset = Book.objects.all()
 
 
 class BookSigningDetail(BookSigningConfig, generic.DateDetailView):

@@ -43,6 +43,7 @@ class Permission(models.Model):
         - The "change" permission limits a user's ability to view the change
           list, view the "change" form and change an object.
         - The "delete" permission limits the ability to delete an object.
+        - The "view" permission limits the ability to view an object.
 
     Permissions are set globally per type of object, not per specific object
     instance. It is possible to say "Mary may change news stories," but it's
@@ -50,8 +51,7 @@ class Permission(models.Model):
     ones she created herself" or "Mary may only change news stories that have a
     certain status or publication date."
 
-    Three basic permissions -- add, change and delete -- are automatically
-    created for each Django model.
+    The permissions listed above are automatically created for each model.
     """
     name = models.CharField(_('name'), max_length=255)
     content_type = models.ForeignKey(
@@ -60,6 +60,7 @@ class Permission(models.Model):
         verbose_name=_('content type'),
     )
     codename = models.CharField(_('codename'), max_length=100)
+
     objects = PermissionManager()
 
     class Meta:
@@ -70,11 +71,7 @@ class Permission(models.Model):
                     'codename')
 
     def __str__(self):
-        return "%s | %s | %s" % (
-            self.content_type.app_label,
-            self.content_type,
-            self.name,
-        )
+        return '%s | %s' % (self.content_type, self.name)
 
     def natural_key(self):
         return (self.codename,) + self.content_type.natural_key()
@@ -108,7 +105,7 @@ class Group(models.Model):
     members-only portion of your site, or sending them members-only email
     messages.
     """
-    name = models.CharField(_('name'), max_length=80, unique=True)
+    name = models.CharField(_('name'), max_length=150, unique=True)
     permissions = models.ManyToManyField(
         Permission,
         verbose_name=_('permissions'),
@@ -276,7 +273,7 @@ class PermissionsMixin(models.Model):
     def has_module_perms(self, app_label):
         """
         Return True if the user has any permissions in the given app label.
-        Use simlar logic as has_perm(), above.
+        Use similar logic as has_perm(), above.
         """
         # Active superusers have all permissions.
         if self.is_active and self.is_superuser:
@@ -358,7 +355,7 @@ class User(AbstractUser):
     Users within the Django authentication system are represented by this
     model.
 
-    Username, password and email are required. Other fields are optional.
+    Username and password are required. Other fields are optional.
     """
     class Meta(AbstractUser.Meta):
         swappable = 'AUTH_USER_MODEL'
@@ -382,6 +379,9 @@ class AnonymousUser:
 
     def __hash__(self):
         return 1  # instances always return the same hash value
+
+    def __int__(self):
+        raise TypeError('Cannot cast AnonymousUser to int. Are you trying to use it in place of User?')
 
     def save(self):
         raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
@@ -413,10 +413,7 @@ class AnonymousUser:
         return _user_has_perm(self, perm, obj=obj)
 
     def has_perms(self, perm_list, obj=None):
-        for perm in perm_list:
-            if not self.has_perm(perm, obj):
-                return False
-        return True
+        return all(self.has_perm(perm, obj) for perm in perm_list)
 
     def has_module_perms(self, module):
         return _user_has_module_perms(self, module)

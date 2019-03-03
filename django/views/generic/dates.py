@@ -267,7 +267,7 @@ class DateMixin:
         if self.uses_datetime_field:
             value = datetime.datetime.combine(value, datetime.time.min)
             if settings.USE_TZ:
-                value = timezone.make_aware(value, timezone.get_current_timezone())
+                value = timezone.make_aware(value)
         return value
 
     def _make_single_date_lookup(self, date):
@@ -333,7 +333,7 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
         if not allow_empty:
             # When pagination is enabled, it's better to do a cheap query
             # than to load the unpaginated queryset in memory.
-            is_empty = len(qs) == 0 if paginate_by is None else not qs.exists()
+            is_empty = not qs if paginate_by is None else not qs.exists()
             if is_empty:
                 raise Http404(_("No %(verbose_name_plural)s available") % {
                     'verbose_name_plural': qs.model._meta.verbose_name_plural,
@@ -485,10 +485,14 @@ class BaseWeekArchiveView(YearMixin, WeekMixin, BaseDateListView):
 
         date_field = self.get_date_field()
         week_format = self.get_week_format()
-        week_start = {
-            '%W': '1',
-            '%U': '0',
-        }[week_format]
+        week_choices = {'%W': '1', '%U': '0'}
+        try:
+            week_start = week_choices[week_format]
+        except KeyError:
+            raise ValueError('Unknown week format %r. Choices are: %s' % (
+                week_format,
+                ', '.join(sorted(week_choices)),
+            ))
         date = _date_from_string(year, self.get_year_format(),
                                  week_start, '%w',
                                  week, week_format)

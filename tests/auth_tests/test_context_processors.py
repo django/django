@@ -10,14 +10,10 @@ from .settings import AUTH_MIDDLEWARE, AUTH_TEMPLATES
 
 class MockUser:
     def has_module_perms(self, perm):
-        if perm == 'mockapp':
-            return True
-        return False
+        return perm == 'mockapp'
 
     def has_perm(self, perm):
-        if perm == 'mockapp.someperm':
-            return True
-        return False
+        return perm == 'mockapp.someperm'
 
 
 class PermWrapperTests(SimpleTestCase):

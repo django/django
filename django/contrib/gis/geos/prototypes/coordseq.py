@@ -49,7 +49,7 @@ class CsOperation(GEOSFuncFactory):
         else:
             argtypes = [CS_PTR, c_uint, dbl_param]
 
-        super().__init__(*args, **dict(kwargs, errcheck=errcheck, argtypes=argtypes))
+        super().__init__(*args, **{**kwargs, 'errcheck': errcheck, 'argtypes': argtypes})
 
 
 class CsOutput(GEOSFuncFactory):

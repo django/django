@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-08-16 13:54+0000\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
+"PO-Revision-Date: 2017-09-23 18:54+0000\n"
 "Last-Translator: Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: fa\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #, javascript-format
 msgid "Available %s"
@@ -77,6 +77,7 @@ msgstr "برای حذف یکجای همهٔ %sی انتخاب شده کلیک ک
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] " %(sel)s از %(cnt)s انتخاب شده‌اند"
+msgstr[1] " %(sel)s از %(cnt)s انتخاب شده‌اند"
 
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
@@ -102,24 +103,8 @@ msgstr ""
 "شما عملی را انجام داده اید، ولی تغییری انجام نداده اید. احتمالا دنبال کلید "
 "Go به جای Save میگردید."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "توجه: شما %s ساعت از زمان سرور جلو هستید."
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "توجه: شما %s ساعت از زمان سرور عقب هستید."
-
 msgid "Now"
 msgstr "اکنون"
-
-msgid "Choose a Time"
-msgstr "یک زمان انتخاب کنید"
-
-msgid "Choose a time"
-msgstr "یک زمان انتخاب کنید"
 
 msgid "Midnight"
 msgstr "نیمه‌شب"
@@ -132,6 +117,24 @@ msgstr "ظهر"
 
 msgid "6 p.m."
 msgstr "۶ بعدازظهر"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "توجه: شما %s ساعت از زمان سرور جلو هستید."
+msgstr[1] "توجه: شما %s ساعت از زمان سرور جلو هستید."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "توجه: شما %s ساعت از زمان سرور عقب هستید."
+msgstr[1] "توجه: شما %s ساعت از زمان سرور عقب هستید."
+
+msgid "Choose a Time"
+msgstr "یک زمان انتخاب کنید"
+
+msgid "Choose a time"
+msgstr "یک زمان انتخاب کنید"
 
 msgid "Cancel"
 msgstr "انصراف"

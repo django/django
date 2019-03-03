@@ -6,16 +6,18 @@ from admin_scripts.tests import AdminScriptTestCase
 
 from django.conf import settings
 from django.core import mail
+from django.core.exceptions import PermissionDenied
 from django.core.files.temp import NamedTemporaryFile
 from django.core.management import color
-from django.db import connection
+from django.http.multipartparser import MultiPartParserError
 from django.test import RequestFactory, SimpleTestCase, override_settings
-from django.test.utils import LoggingCaptureMixin, patch_logger
+from django.test.utils import LoggingCaptureMixin
 from django.utils.log import (
     DEFAULT_LOGGING, AdminEmailHandler, CallbackFilter, RequireDebugFalse,
     RequireDebugTrue, ServerFormatter,
 )
 
+from . import views
 from .logconfig import MyEmailBackend
 
 # logging config prior to using filter with mail_admins
@@ -107,16 +109,95 @@ class DefaultLoggingTests(SetupDefaultLoggingMixin, LoggingCaptureMixin, SimpleT
         self.assertEqual(self.logger_output.getvalue(), '')
 
 
+class LoggingAssertionMixin:
+
+    def assertLogsRequest(self, url, level, msg, status_code, logger='django.request', exc_class=None):
+        with self.assertLogs(logger, level) as cm:
+            try:
+                self.client.get(url)
+            except views.UncaughtException:
+                pass
+            self.assertEqual(
+                len(cm.records), 1,
+                "Wrong number of calls for logger %r in %r level." % (logger, level)
+            )
+            record = cm.records[0]
+            self.assertEqual(record.getMessage(), msg)
+            self.assertEqual(record.status_code, status_code)
+            if exc_class:
+                self.assertIsNotNone(record.exc_info)
+                self.assertEqual(record.exc_info[0], exc_class)
+
+
 @override_settings(DEBUG=True, ROOT_URLCONF='logging_tests.urls')
-class HandlerLoggingTests(SetupDefaultLoggingMixin, LoggingCaptureMixin, SimpleTestCase):
+class HandlerLoggingTests(SetupDefaultLoggingMixin, LoggingAssertionMixin, LoggingCaptureMixin, SimpleTestCase):
 
     def test_page_found_no_warning(self):
         self.client.get('/innocent/')
         self.assertEqual(self.logger_output.getvalue(), '')
 
+    def test_redirect_no_warning(self):
+        self.client.get('/redirect/')
+        self.assertEqual(self.logger_output.getvalue(), '')
+
     def test_page_not_found_warning(self):
-        self.client.get('/does_not_exist/')
-        self.assertEqual(self.logger_output.getvalue(), 'Not Found: /does_not_exist/\n')
+        self.assertLogsRequest(
+            url='/does_not_exist/',
+            level='WARNING',
+            status_code=404,
+            msg='Not Found: /does_not_exist/',
+        )
+
+    def test_page_not_found_raised(self):
+        self.assertLogsRequest(
+            url='/does_not_exist_raised/',
+            level='WARNING',
+            status_code=404,
+            msg='Not Found: /does_not_exist_raised/',
+        )
+
+    def test_uncaught_exception(self):
+        self.assertLogsRequest(
+            url='/uncaught_exception/',
+            level='ERROR',
+            status_code=500,
+            msg='Internal Server Error: /uncaught_exception/',
+            exc_class=views.UncaughtException,
+        )
+
+    def test_internal_server_error(self):
+        self.assertLogsRequest(
+            url='/internal_server_error/',
+            level='ERROR',
+            status_code=500,
+            msg='Internal Server Error: /internal_server_error/',
+        )
+
+    def test_internal_server_error_599(self):
+        self.assertLogsRequest(
+            url='/internal_server_error/?status=599',
+            level='ERROR',
+            status_code=599,
+            msg='Unknown Status Code: /internal_server_error/',
+        )
+
+    def test_permission_denied(self):
+        self.assertLogsRequest(
+            url='/permission_denied/',
+            level='WARNING',
+            status_code=403,
+            msg='Forbidden (Permission denied): /permission_denied/',
+            exc_class=PermissionDenied,
+        )
+
+    def test_multi_part_parser_error(self):
+        self.assertLogsRequest(
+            url='/multi_part_parser_error/',
+            level='WARNING',
+            status_code=400,
+            msg='Bad request (Unable to parse request body): /multi_part_parser_error/',
+            exc_class=MultiPartParserError,
+        )
 
 
 @override_settings(
@@ -165,6 +246,7 @@ class CallbackFilterTest(SimpleTestCase):
 
 class AdminEmailHandlerTest(SimpleTestCase):
     logger = logging.getLogger('django')
+    request_factory = RequestFactory()
 
     def get_admin_email_handler(self, logger):
         # AdminEmailHandler does not get filtered out
@@ -226,8 +308,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
         orig_filters = admin_email_handler.filters
         try:
             admin_email_handler.filters = []
-            rf = RequestFactory()
-            request = rf.get('/')
+            request = self.request_factory.get('/')
             self.logger.error(
                 message, token1, token2,
                 extra={
@@ -307,9 +388,8 @@ class AdminEmailHandlerTest(SimpleTestCase):
         """
         handler = self.get_admin_email_handler(self.logger)
         record = self.logger.makeRecord('name', logging.ERROR, 'function', 'lno', 'message', None, None)
-        rf = RequestFactory()
         url_path = '/º'
-        record.request = rf.get(url_path)
+        record.request = self.request_factory.get(url_path)
         handler.emit(record)
         self.assertEqual(len(mail.outbox), 1)
         msg = mail.outbox[0]
@@ -359,6 +439,7 @@ class SettingsConfigTest(AdminScriptTestCase):
     a circular import error.
     """
     def setUp(self):
+        super().setUp()
         log_config = """{
     'version': 1,
     'handlers': {
@@ -369,9 +450,6 @@ class SettingsConfigTest(AdminScriptTestCase):
     }
 }"""
         self.write_settings('settings.py', sdict={'LOGGING': log_config})
-
-    def tearDown(self):
-        self.remove_settings('settings.py')
 
     def test_circular_dependency(self):
         # validate is just an example command to trigger settings configuration
@@ -391,8 +469,10 @@ class SetupConfigureLogging(SimpleTestCase):
     """
     Calling django.setup() initializes the logging configuration.
     """
-    @override_settings(LOGGING_CONFIG='logging_tests.tests.dictConfig',
-                       LOGGING=OLD_LOGGING)
+    @override_settings(
+        LOGGING_CONFIG='logging_tests.tests.dictConfig',
+        LOGGING=OLD_LOGGING,
+    )
     def test_configure_initializes_logging(self):
         from django import setup
         setup()
@@ -400,19 +480,25 @@ class SetupConfigureLogging(SimpleTestCase):
 
 
 @override_settings(DEBUG=True, ROOT_URLCONF='logging_tests.urls')
-class SecurityLoggerTest(SimpleTestCase):
+class SecurityLoggerTest(LoggingAssertionMixin, SimpleTestCase):
 
     def test_suspicious_operation_creates_log_message(self):
-        with patch_logger('django.security.SuspiciousOperation', 'error') as calls:
-            self.client.get('/suspicious/')
-            self.assertEqual(len(calls), 1)
-            self.assertEqual(calls[0], 'dubious')
+        self.assertLogsRequest(
+            url='/suspicious/',
+            level='ERROR',
+            msg='dubious',
+            status_code=400,
+            logger='django.security.SuspiciousOperation',
+        )
 
     def test_suspicious_operation_uses_sublogger(self):
-        with patch_logger('django.security.DisallowedHost', 'error') as calls:
-            self.client.get('/suspicious_spec/')
-            self.assertEqual(len(calls), 1)
-            self.assertEqual(calls[0], 'dubious')
+        self.assertLogsRequest(
+            url='/suspicious_spec/',
+            level='ERROR',
+            msg='dubious',
+            status_code=400,
+            logger='django.security.DisallowedHost',
+        )
 
     @override_settings(
         ADMINS=[('admin', 'admin@example.com')],
@@ -430,6 +516,7 @@ class SettingsCustomLoggingTest(AdminScriptTestCase):
     callable in LOGGING_CONFIG (i.e., logging.config.fileConfig).
     """
     def setUp(self):
+        super().setUp()
         logging_conf = """
 [loggers]
 keys=root
@@ -449,38 +536,18 @@ format=%(message)s
         self.temp_file = NamedTemporaryFile()
         self.temp_file.write(logging_conf.encode())
         self.temp_file.flush()
-        sdict = {'LOGGING_CONFIG': '"logging.config.fileConfig"',
-                 'LOGGING': 'r"%s"' % self.temp_file.name}
-        self.write_settings('settings.py', sdict=sdict)
+        self.write_settings('settings.py', sdict={
+            'LOGGING_CONFIG': '"logging.config.fileConfig"',
+            'LOGGING': 'r"%s"' % self.temp_file.name,
+        })
 
     def tearDown(self):
         self.temp_file.close()
-        self.remove_settings('settings.py')
 
     def test_custom_logging(self):
         out, err = self.run_manage(['check'])
         self.assertNoOutput(err)
         self.assertOutput(out, "System check identified no issues (0 silenced).")
-
-
-class SchemaLoggerTests(SimpleTestCase):
-
-    def test_extra_args(self):
-        editor = connection.schema_editor(collect_sql=True)
-        sql = "SELECT * FROM foo WHERE id in (%s, %s)"
-        params = [42, 1337]
-        with patch_logger('django.db.backends.schema', 'debug', log_kwargs=True) as logger:
-            editor.execute(sql, params)
-        self.assertEqual(
-            logger,
-            [(
-                'SELECT * FROM foo WHERE id in (%s, %s); (params [42, 1337])',
-                {'extra': {
-                    'sql': 'SELECT * FROM foo WHERE id in (%s, %s)',
-                    'params': [42, 1337],
-                }},
-            )]
-        )
 
 
 class LogFormattersTests(SimpleTestCase):

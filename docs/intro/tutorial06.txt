@@ -56,8 +56,8 @@ reference the path for templates.
 
 Put the following code in that stylesheet (``polls/static/polls/style.css``):
 
-.. snippet:: css
-    :filename: polls/static/polls/style.css
+.. code-block:: css
+    :caption: polls/static/polls/style.css
 
     li a {
         color: green;
@@ -65,18 +65,26 @@ Put the following code in that stylesheet (``polls/static/polls/style.css``):
 
 Next, add the following at the top of ``polls/templates/polls/index.html``:
 
-.. snippet:: html+django
-    :filename: polls/templates/polls/index.html
+.. code-block:: html+django
+    :caption: polls/templates/polls/index.html
 
     {% load static %}
 
-    <link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}">
 
 The ``{% static %}`` template tag generates the absolute URL of static files.
 
-That's all you need to do for development. Reload
-``http://localhost:8000/polls/`` and you should see that the question links are
-green (Django style!) which means that your stylesheet was properly loaded.
+That's all you need to do for development.
+
+Start the server (or restart it if it's already running):
+
+.. console::
+
+    $ python manage.py runserver
+
+Reload ``http://localhost:8000/polls/`` and you should see that the question
+links are green (Django style!) which means that your stylesheet was properly
+loaded.
 
 Adding a background-image
 =========================
@@ -88,15 +96,15 @@ called ``background.gif``. In other words, put your image in
 
 Then, add to your stylesheet (``polls/static/polls/style.css``):
 
-.. snippet:: css
-    :filename: polls/static/polls/style.css
+.. code-block:: css
+    :caption: polls/static/polls/style.css
 
     body {
-        background: white url("images/background.gif") no-repeat right bottom;
+        background: white url("images/background.gif") no-repeat;
     }
 
 Reload ``http://localhost:8000/polls/`` and you should see the background
-loaded in the bottom right of the screen.
+loaded in the top left of the screen.
 
 .. warning::
 

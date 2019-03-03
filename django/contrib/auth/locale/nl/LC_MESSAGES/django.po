@@ -10,15 +10,15 @@
 # jaap3 <jaap.roes@gmail.com>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeffrey Gelens <jeffrey@noppo.pro>, 2011-2012
-# Sander Steffann <sander@steffann.nl>, 2015
+# Sander Steffann <inactive+steffann@transifex.com>, 2015
 # Tino de Bruijn <tinodb@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-10-12 17:44+0000\n"
-"Last-Translator: Evelijn Saaltink <evelijnsaaltink@gmail.com>\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-09-24 14:24+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -75,12 +75,8 @@ msgstr "Vul  ter verificatie nogmaals het wachtwoord in."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Wachtwoorden worden niet als tekst opgeslagen. Er is geen mogelijkheid het "
-"wachtwoord van een gebruiker te zien.  Het wachtwoord kan wel worden "
-"aangepast met <a href=\"../password/\">dit formulier</a>."
 
 #, python-format
 msgid ""

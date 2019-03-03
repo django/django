@@ -36,8 +36,8 @@ basic apps`_ project. [#]_
     Proceed through the tutorial sections sequentially for step-by-step
     instructions.
 
-.. _OGC: http://www.opengeospatial.org/
-.. _world borders: http://thematicmapping.org/downloads/world_borders.php
+.. _OGC: https://www.opengeospatial.org/
+.. _world borders: https://thematicmapping.org/downloads/world_borders.php
 .. _GeoDjango basic apps: https://code.google.com/p/geodjango-basic-apps/
 
 Setting Up
@@ -58,14 +58,14 @@ Create a New Project
 Use the standard ``django-admin`` script to create a project called
 ``geodjango``:
 
-.. code-block:: console
+.. console::
 
     $ django-admin startproject geodjango
 
 This will initialize a new project. Now, create a ``world`` Django application
 within the ``geodjango`` project:
 
-.. code-block:: console
+.. console::
 
     $ cd geodjango
     $ python manage.py startapp world
@@ -111,11 +111,11 @@ The world borders data is available in this `zip file`__.  Create a ``data``
 directory in the ``world`` application, download the world borders data, and
 unzip. On GNU/Linux platforms, use the following commands:
 
-.. code-block:: console
+.. console::
 
     $ mkdir world/data
     $ cd world/data
-    $ wget http://thematicmapping.org/downloads/TM_WORLD_BORDERS-0.3.zip
+    $ wget https://thematicmapping.org/downloads/TM_WORLD_BORDERS-0.3.zip
     $ unzip TM_WORLD_BORDERS-0.3.zip
     $ cd ../..
 
@@ -131,7 +131,7 @@ extensions:
 * ``.prj``: Contains the spatial reference information for the geographic
   data stored in the shapefile.
 
-__ http://thematicmapping.org/downloads/TM_WORLD_BORDERS-0.3.zip
+__ https://thematicmapping.org/downloads/TM_WORLD_BORDERS-0.3.zip
 __ https://en.wikipedia.org/wiki/Shapefile
 
 Use ``ogrinfo`` to examine spatial data
@@ -140,7 +140,7 @@ Use ``ogrinfo`` to examine spatial data
 The GDAL ``ogrinfo`` utility allows examining the metadata of shapefiles or
 other vector data sources:
 
-.. code-block:: console
+.. console::
 
     $ ogrinfo world/data/TM_WORLD_BORDERS-0.3.shp
     INFO: Open of `world/data/TM_WORLD_BORDERS-0.3.shp'
@@ -151,7 +151,7 @@ other vector data sources:
 layer contains polygon data.  To find out more, we'll specify the layer name
 and use the ``-so`` option to get only the important summary information:
 
-.. code-block:: console
+.. console::
 
     $ ogrinfo -so world/data/TM_WORLD_BORDERS-0.3.shp TM_WORLD_BORDERS-0.3
     INFO: Open of `world/data/TM_WORLD_BORDERS-0.3.shp'
@@ -235,7 +235,7 @@ Run ``migrate``
 After defining your model, you need to sync it with the database. First,
 create a database migration:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py makemigrations
     Migrations for 'world':
@@ -245,13 +245,13 @@ create a database migration:
 Let's look at the SQL that will generate the table for the ``WorldBorder``
 model:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py sqlmigrate world 0001
 
 This command should produce the following output:
 
-.. code-block:: sql
+.. console::
 
     BEGIN;
     --
@@ -279,7 +279,7 @@ This command should produce the following output:
 If this looks correct, run :djadmin:`migrate` to create this table in the
 database:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py migrate
     Operations to perform:
@@ -302,7 +302,7 @@ besides the tools included within GeoDjango, you may also use the following:
 * `shp2pgsql`_: This utility included with PostGIS imports ESRI shapefiles into
   PostGIS.
 
-.. _ogr2ogr: http://www.gdal.org/ogr2ogr.html
+.. _ogr2ogr: https://www.gdal.org/ogr2ogr.html
 .. _shp2pgsql: https://postgis.net/docs/using_postgis_dbmanagement.html#shp2pgsql_usage
 
 .. _gdalinterface:
@@ -316,7 +316,7 @@ library that can work with all the vector data sources that OGR supports.
 
 First, invoke the Django shell:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py shell
 
@@ -457,10 +457,7 @@ with the following code::
     )
 
     def run(verbose=True):
-        lm = LayerMapping(
-            WorldBorder, world_shp, world_mapping,
-            transform=False, encoding='iso-8859-1',
-        )
+        lm = LayerMapping(WorldBorder, world_shp, world_mapping, transform=False)
         lm.save(strict=True, verbose=verbose)
 
 A few notes about what's going on:
@@ -477,13 +474,10 @@ A few notes about what's going on:
   the script will still work.
 * The ``transform`` keyword is set to ``False`` because the data in the
   shapefile does not need to be converted -- it's already in WGS84 (SRID=4326).
-* The ``encoding`` keyword is set to the character encoding of the string
-  values in the shapefile. This ensures that string values are read and saved
-  correctly from their original encoding system.
 
 Afterwards, invoke the Django shell from the ``geodjango`` project directory:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py shell
 
@@ -505,7 +499,7 @@ and generates a model definition and ``LayerMapping`` dictionary automatically.
 
 The general usage of the command goes as follows:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py ogrinspect [options] <data_source> <model_name> [options]
 
@@ -516,7 +510,7 @@ be used to further define how the model is generated.
 For example, the following command nearly reproduces the ``WorldBorder`` model
 and mapping dictionary created above, automatically:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py ogrinspect world/data/TM_WORLD_BORDERS-0.3.shp WorldBorder \
         --srid=4326 --mapping --multi
@@ -576,7 +570,7 @@ GeoDjango adds spatial lookups to the Django ORM.  For example, you
 can find the country in the ``WorldBorder`` table that contains
 a particular point.  First, fire up the management shell:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py shell
 
@@ -620,7 +614,7 @@ example, coordinates will be expressed in `EPSG SRID 32140`__,
 a coordinate system specific to south Texas **only** and in units of
 **meters**, not degrees::
 
-    >>> from django.contrib.gis.geos import Point, GEOSGeometry
+    >>> from django.contrib.gis.geos import GEOSGeometry, Point
     >>> pnt = Point(954158.1, 4215137.1, srid=32140)
 
 Note that ``pnt`` may also be constructed with EWKT, an "extended" form of
@@ -645,16 +639,21 @@ of abstraction::
 
 __ http://spatialreference.org/ref/epsg/32140/
 
+.. _gis-raw-sql:
+
 .. admonition:: Raw queries
 
-    When using :doc:`raw queries </topics/db/sql>`, you should generally wrap
-    your geometry fields with the ``asText()`` SQL function (or ``ST_AsText``
-    for PostGIS) so that the field value will be recognized by GEOS::
+    When using :doc:`raw queries </topics/db/sql>`, you must wrap your geometry
+    fields so that the field value can be recognized by GEOS::
 
-        City.objects.raw('SELECT id, name, asText(point) from myapp_city')
+        from django.db import connection
+        # or if you're querying a non-default database:
+        from django.db import connections
+        connection = connections['your_gis_db_alias']
 
-    This is not absolutely required by PostGIS, but generally you should only
-    use raw queries when you know exactly what you are doing.
+        City.objects.raw('SELECT id, name, %s as point from myapp_city' % (connection.ops.select % 'point'))
+
+    You should only use raw queries when you know exactly what you're doing.
 
 Lazy Geometries
 ---------------
@@ -717,7 +716,7 @@ Let's dive right in.  Create a file called ``admin.py`` inside the
 Next, edit your ``urls.py`` in the ``geodjango`` application folder as follows::
 
     from django.contrib.gis import admin
-    from django.urls import path, include
+    from django.urls import include, path
 
     urlpatterns = [
         path('admin/', admin.site.urls),
@@ -725,25 +724,25 @@ Next, edit your ``urls.py`` in the ``geodjango`` application folder as follows::
 
 Create an admin user:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py createsuperuser
 
 Next, start up the Django development server:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py runserver
 
 Finally, browse to ``http://localhost:8000/admin/``, and log in with the user
 you just created. Browse to any of the ``WorldBorder`` entries -- the borders
-may be edited by clicking on a polygon and dragging the vertexes to the desired
+may be edited by clicking on a polygon and dragging the vertices to the desired
 position.
 
-.. _OpenLayers: http://openlayers.org/
+.. _OpenLayers: https://openlayers.org/
 .. _Open Street Map: https://www.openstreetmap.org/
 .. _Vector Map Level 0: http://earth-info.nga.mil/publications/vmap0.html
-.. _OSGeo: http://www.osgeo.org
+.. _OSGeo: https://www.osgeo.org/
 
 .. _osmgeoadmin-intro:
 
@@ -767,11 +766,11 @@ option class in your ``admin.py`` file::
 .. rubric:: Footnotes
 
 .. [#] Special thanks to Bjørn Sandvik of `thematicmapping.org
-       <http://thematicmapping.org>`_ for providing and maintaining this
+       <https://thematicmapping.org/>`_ for providing and maintaining this
        dataset.
 .. [#] GeoDjango basic apps was written by Dane Springmeyer, Josh Livni, and
        Christopher Schmidt.
 .. [#] This point is the `University of Houston Law Center
        <https://www.law.uh.edu/>`_.
 .. [#] Open Geospatial Consortium, Inc., `OpenGIS Simple Feature Specification
-       For SQL <http://www.opengeospatial.org/standards/sfs>`_.
+       For SQL <https://www.opengeospatial.org/standards/sfs>`_.
