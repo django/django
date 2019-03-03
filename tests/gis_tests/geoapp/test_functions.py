@@ -11,8 +11,8 @@ from django.db.models import Sum
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
 
-from .models import City, Country, CountryWebMercator, State, Track
 from ..utils import mysql, oracle, postgis, spatialite
+from .models import City, Country, CountryWebMercator, State, Track
 
 
 class GISFunctionsTests(TestCase):

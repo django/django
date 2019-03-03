@@ -11,8 +11,8 @@ from django.contrib.gis.shortcuts import numpy
 from django.db.models import Q
 from django.test import TransactionTestCase, skipUnlessDBFeature
 
-from .models import RasterModel, RasterRelatedModel
 from ..data.rasters.textrasters import JSON_RASTER
+from .models import RasterModel, RasterRelatedModel
 
 
 @skipUnlessDBFeature('supports_raster')

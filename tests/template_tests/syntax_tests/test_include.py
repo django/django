@@ -6,8 +6,8 @@ from django.template import (
 from django.test import SimpleTestCase, ignore_warnings
 from django.utils.deprecation import RemovedInDjango21Warning
 
-from .test_basic import basic_templates
 from ..utils import setup
+from .test_basic import basic_templates
 
 include_fail_templates = {
     'include-fail1': '{% load bad_tag %}{% badtag %}',

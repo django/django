@@ -4,8 +4,8 @@ from django.contrib.gis.db.models import GeometryField, Value, functions
 from django.contrib.gis.geos import Point, Polygon
 from django.test import TestCase, skipUnlessDBFeature
 
-from .models import City
 from ..utils import postgis
+from .models import City
 
 
 class GeoExpressionsTests(TestCase):

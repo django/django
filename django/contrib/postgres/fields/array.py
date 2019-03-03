@@ -9,8 +9,8 @@ from django.db.models.lookups import Exact, In
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
-from .utils import AttributeSetter
 from ..utils import prefix_validation_error
+from .utils import AttributeSetter
 
 __all__ = ['ArrayField']
 
