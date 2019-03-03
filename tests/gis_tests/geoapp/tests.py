@@ -12,12 +12,12 @@ from django.core.management import call_command
 from django.db import NotSupportedError, connection
 from django.test import TestCase, skipUnlessDBFeature
 
+from ..utils import (
+    mysql, no_oracle, oracle, postgis, skipUnlessGISLookup, spatialite,
+)
 from .models import (
     City, Country, Feature, MinusOneSRID, NonConcreteModel, PennsylvaniaCity,
     State, Track,
-)
-from ..utils import (
-    mysql, no_oracle, oracle, postgis, skipUnlessGISLookup, spatialite,
 )
 
 
