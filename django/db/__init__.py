@@ -1,4 +1,5 @@
 from django.core import signals
+from django.db.models.fields.virtual import VirtualField
 from django.db.utils import (
     DEFAULT_DB_ALIAS, DJANGO_VERSION_PICKLE_KEY, ConnectionHandler,
     ConnectionRouter, DatabaseError, DataError, Error, IntegrityError,
@@ -10,7 +11,7 @@ __all__ = [
     'connection', 'connections', 'router', 'DatabaseError', 'IntegrityError',
     'InternalError', 'ProgrammingError', 'DataError', 'NotSupportedError',
     'Error', 'InterfaceError', 'OperationalError', 'DEFAULT_DB_ALIAS',
-    'DJANGO_VERSION_PICKLE_KEY',
+    'DJANGO_VERSION_PICKLE_KEY', 'VirtualField',
 ]
 
 connections = ConnectionHandler()
