@@ -1927,7 +1927,7 @@ class ModelAdmin(BaseModelAdmin):
             formset_params = {
                 'instance': obj,
                 'prefix': prefix,
-                'queryset': inline.get_queryset(request),
+                'queryset': inline.get_queryset_with_parent_obj(request, obj),
             }
             if request.method == 'POST':
                 formset_params.update({
@@ -2110,6 +2110,9 @@ class InlineModelAdmin(BaseModelAdmin):
         if not self.has_view_or_change_permission(request):
             queryset = queryset.none()
         return queryset
+
+    def get_queryset_with_parent_obj(self, request, obj):
+        return self.get_queryset(request)
 
     def has_add_permission(self, request, obj):
         if self.opts.auto_created:
