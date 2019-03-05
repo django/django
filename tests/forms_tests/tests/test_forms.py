@@ -3671,27 +3671,10 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         self.assertTrue(f.is_valid())
         self.assertEqual(f.cleaned_data, {'data': 'xyzzy'})
 
-    def test_data_multi_value_dict(self):
+    def test_empty_data_files_multi_value_dict(self):
         p = Person()
-
-        self.assertEqual(p.data.getlist(None), [])
-
-        p.data.setlistdefault('first_name')
-        self.assertEqual(p.data.getlist('first_name'), [])
-
-        p.data.setlist('first_name', ['John', 'Winston'])
-        self.assertEqual(p.data.getlist('first_name'), ['John', 'Winston'])
-
-    def test_files_multi_value_dict(self):
-        p = Person()
-
-        self.assertEqual(p.files.getlist(None), [])
-
-        p.files.setlistdefault('file1')
-        self.assertEqual(p.files.getlist('file1'), [])
-
-        p.files.setlist('file1', ['resume.txt', 'resume1.txt'])
-        self.assertEqual(p.files.getlist('file1'), ['resume.txt', 'resume1.txt'])
+        self.assertIsInstance(p.data, MultiValueDict)
+        self.assertIsInstance(p.files, MultiValueDict)
 
 
 class CustomRenderer(DjangoTemplates):
