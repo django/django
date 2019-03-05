@@ -15,6 +15,7 @@ from django.forms.models import (
 )
 from django.template import engines
 from django.template.backends.django import DjangoTemplates
+from django.utils.module_loading import import_string
 
 
 def _issubclass(cls, classinfo):
@@ -26,6 +27,23 @@ def _issubclass(cls, classinfo):
         return issubclass(cls, classinfo)
     except TypeError:
         return False
+
+
+def _contains_subclass(class_path, candidate_paths):
+    """
+    Return whether or not a dotted class path (or a subclass of that class) is
+    found in a list of candidate paths.
+    """
+    cls = import_string(class_path)
+    for path in candidate_paths:
+        try:
+            candidate_cls = import_string(path)
+        except ImportError:
+            # ImportErrors are raised elsewhere.
+            continue
+        if _issubclass(candidate_cls, cls):
+            return True
+    return False
 
 
 def check_admin_app(app_configs, **kwargs):
@@ -72,8 +90,7 @@ def check_dependencies(**kwargs):
     else:
         if ('django.contrib.auth.context_processors.auth'
                 not in django_templates_instance.context_processors and
-                'django.contrib.auth.backends.ModelBackend'
-                in settings.AUTHENTICATION_BACKENDS):
+                _contains_subclass('django.contrib.auth.backends.ModelBackend', settings.AUTHENTICATION_BACKENDS)):
             errors.append(checks.Error(
                 "'django.contrib.auth.context_processors.auth' must be "
                 "enabled in DjangoTemplates (TEMPLATES) if using the default "
@@ -88,15 +105,14 @@ def check_dependencies(**kwargs):
                 "the admin application.",
                 id='admin.E404',
             ))
-    if ('django.contrib.auth.middleware.AuthenticationMiddleware'
-            not in settings.MIDDLEWARE):
+
+    if not _contains_subclass('django.contrib.auth.middleware.AuthenticationMiddleware', settings.MIDDLEWARE):
         errors.append(checks.Error(
             "'django.contrib.auth.middleware.AuthenticationMiddleware' must "
             "be in MIDDLEWARE in order to use the admin application.",
             id='admin.E408',
         ))
-    if ('django.contrib.messages.middleware.MessageMiddleware'
-            not in settings.MIDDLEWARE):
+    if not _contains_subclass('django.contrib.messages.middleware.MessageMiddleware', settings.MIDDLEWARE):
         errors.append(checks.Error(
             "'django.contrib.messages.middleware.MessageMiddleware' must "
             "be in MIDDLEWARE in order to use the admin application.",
