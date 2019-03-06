@@ -1002,70 +1002,28 @@ class Subquery(Expression):
         self.extra = extra
         super().__init__(output_field)
 
+    def get_source_expressions(self):
+        return [self.query]
+
+    def set_source_expressions(self, exprs):
+        self.query = exprs[0]
+
     def _resolve_output_field(self):
-        if len(self.query.select) == 1:
-            return self.query.select[0].field
-        return super()._resolve_output_field()
+        return self.query.output_field
 
     def copy(self):
         clone = super().copy()
         clone.query = clone.query.clone()
         return clone
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        clone = self.copy()
-        clone.is_summary = summarize
-        clone.query.bump_prefix(query)
-
-        # Need to recursively resolve these.
-        def resolve_all(child):
-            if hasattr(child, 'children'):
-                [resolve_all(_child) for _child in child.children]
-            if hasattr(child, 'rhs'):
-                child.rhs = resolve(child.rhs)
-
-        def resolve(child):
-            if hasattr(child, 'resolve_expression'):
-                resolved = child.resolve_expression(
-                    query=query, allow_joins=allow_joins, reuse=reuse,
-                    summarize=summarize, for_save=for_save,
-                )
-                # Add table alias to the parent query's aliases to prevent
-                # quoting.
-                if hasattr(resolved, 'alias') and resolved.alias != resolved.target.model._meta.db_table:
-                    clone.query.external_aliases.add(resolved.alias)
-                return resolved
-            return child
-
-        resolve_all(clone.query.where)
-
-        for key, value in clone.query.annotations.items():
-            if isinstance(value, Subquery):
-                clone.query.annotations[key] = resolve(value)
-
-        return clone
-
-    def get_source_expressions(self):
-        return [
-            x for x in [
-                getattr(expr, 'lhs', None)
-                for expr in self.query.where.children
-            ] if x
-        ]
-
-    def relabeled_clone(self, change_map):
-        clone = self.copy()
-        clone.query = clone.query.relabeled_clone(change_map)
-        clone.query.external_aliases.update(
-            alias for alias in change_map.values()
-            if alias not in clone.query.alias_map
-        )
-        return clone
+    @property
+    def external_aliases(self):
+        return self.query.external_aliases
 
     def as_sql(self, compiler, connection, template=None, **extra_context):
         connection.ops.check_expression_support(self)
         template_params = {**self.extra, **extra_context}
-        template_params['subquery'], sql_params = self.query.get_compiler(connection=connection).as_sql()
+        template_params['subquery'], sql_params = self.query.as_sql(compiler, connection)
 
         template = template or template_params.get('template', self.template)
         sql = template % template_params

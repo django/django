@@ -402,7 +402,7 @@ class Queries1Tests(TestCase):
 
     def test_avoid_infinite_loop_on_too_many_subqueries(self):
         x = Tag.objects.filter(pk=1)
-        local_recursion_limit = 127
+        local_recursion_limit = 67
         msg = 'Maximum recursion depth exceeded: too many subqueries.'
         with self.assertRaisesMessage(RuntimeError, msg):
             for i in range(local_recursion_limit * 2):

@@ -21,7 +21,7 @@ from django.core.exceptions import (
 from django.db import DEFAULT_DB_ALIAS, NotSupportedError, connections
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import Col, F, Ref, SimpleCol
+from django.db.models.expressions import BaseExpression, Col, F, Ref, SimpleCol
 from django.db.models.fields import Field
 from django.db.models.fields.related_lookups import MultiColSource
 from django.db.models.lookups import Lookup
@@ -139,7 +139,7 @@ class RawQuery:
         self.cursor.execute(self.sql, params)
 
 
-class Query:
+class Query(BaseExpression):
     """A single SQL query."""
 
     alias_prefix = 'T'
@@ -230,6 +230,13 @@ class Query:
         self.explain_query = False
         self.explain_format = None
         self.explain_options = {}
+
+    @property
+    def output_field(self):
+        if len(self.select) == 1:
+            return self.select[0].field
+        elif len(self.annotation_select) == 1:
+            return next(iter(self.annotation_select.values())).output_field
 
     @property
     def has_select_fields(self):
@@ -862,7 +869,7 @@ class Query:
             # No clashes between self and outer query should be possible.
             return
 
-        local_recursion_limit = 127  # explicitly avoid infinite loop
+        local_recursion_limit = 67  # explicitly avoid infinite loop
         for pos, prefix in enumerate(prefix_gen()):
             if prefix not in self.subq_aliases:
                 self.alias_prefix = prefix
@@ -997,6 +1004,21 @@ class Query:
                 not self.distinct_fields and
                 not self.select_for_update):
             clone.clear_ordering(True)
+        clone.where.resolve_expression(query, *args, **kwargs)
+        for key, value in clone.annotations.items():
+            resolved = value.resolve_expression(query, *args, **kwargs)
+            if hasattr(resolved, 'external_aliases'):
+                resolved.external_aliases.update(clone.alias_map)
+            clone.annotations[key] = resolved
+        # Outer query's aliases are considered external.
+        clone.external_aliases.update(
+            alias for alias, table in query.alias_map.items()
+            if (
+                isinstance(table, Join) and table.join_field.related_model._meta.db_table != alias
+            ) or (
+                isinstance(table, BaseTable) and table.table_name != table.table_alias
+            )
+        )
         return clone
 
     def as_sql(self, compiler, connection):

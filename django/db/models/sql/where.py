@@ -183,8 +183,23 @@ class WhereNode(tree.Node):
     def is_summary(self):
         return any(child.is_summary for child in self.children)
 
+    @staticmethod
+    def _resolve_rhs(rhs, query, *args, **kwargs):
+        if hasattr(rhs, 'resolve_expression'):
+            rhs = rhs.resolve_expression(query, *args, **kwargs)
+        return rhs
+
+    @classmethod
+    def _resolve_node(cls, node, query, *args, **kwargs):
+        if hasattr(node, 'children'):
+            for child in node.children:
+                cls._resolve_node(child, query, *args, **kwargs)
+        if hasattr(node, 'rhs'):
+            node.rhs = cls._resolve_rhs(node.rhs, query, *args, **kwargs)
+
     def resolve_expression(self, *args, **kwargs):
         clone = self.clone()
+        clone._resolve_node(clone, *args, **kwargs)
         clone.resolved = True
         return clone
 
