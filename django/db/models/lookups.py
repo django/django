@@ -89,8 +89,7 @@ class Lookup:
             value = self.apply_bilateral_transforms(value)
             value = value.resolve_expression(compiler.query)
         if hasattr(value, 'as_sql'):
-            sql, params = compiler.compile(value)
-            return '(' + sql + ')', params
+            return compiler.compile(value)
         else:
             return self.get_db_prep_lookup(value, connection)
 

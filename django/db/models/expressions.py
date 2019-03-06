@@ -1023,22 +1023,12 @@ class Subquery(Expression):
     def as_sql(self, compiler, connection, template=None, **extra_context):
         connection.ops.check_expression_support(self)
         template_params = {**self.extra, **extra_context}
-        template_params['subquery'], sql_params = self.query.as_sql(compiler, connection)
+        subquery_sql, sql_params = self.query.as_sql(compiler, connection)
+        template_params['subquery'] = subquery_sql[1:-1]
 
         template = template or template_params.get('template', self.template)
         sql = template % template_params
         return sql, sql_params
-
-    def _prepare(self, output_field):
-        # This method will only be called if this instance is the "rhs" in an
-        # expression: the wrapping () must be removed (as the expression that
-        # contains this will provide them). SQLite evaluates ((subquery))
-        # differently than the other databases.
-        if self.template == '(%(subquery)s)':
-            clone = self.copy()
-            clone.template = '%(subquery)s'
-            return clone
-        return self
 
     def get_group_by_cols(self, alias=None):
         if alias:

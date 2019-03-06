@@ -5,7 +5,7 @@ from itertools import chain
 
 from django.core.exceptions import EmptyResultSet, FieldError
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import OrderBy, Random, RawSQL, Ref, Subquery
+from django.db.models.expressions import OrderBy, Random, RawSQL, Ref
 from django.db.models.query_utils import QueryWrapper, select_related_descend
 from django.db.models.sql.constants import (
     CURSOR, GET_ITERATOR_CHUNK_SIZE, MULTI, NO_RESULTS, ORDER_DIR, SINGLE,
@@ -126,11 +126,6 @@ class SQLCompiler:
 
         for expr in expressions:
             sql, params = self.compile(expr)
-            if isinstance(expr, Subquery) and not sql.startswith('('):
-                # Subquery expression from HAVING clause may not contain
-                # wrapping () because they could be removed when a subquery is
-                # the "rhs" in an expression (see Subquery._prepare()).
-                sql = '(%s)' % sql
             if (sql, tuple(params)) not in seen:
                 result.append((sql, params))
                 seen.add((sql, tuple(params)))

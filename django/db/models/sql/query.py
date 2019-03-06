@@ -1022,7 +1022,10 @@ class Query(BaseExpression):
         return clone
 
     def as_sql(self, compiler, connection):
-        return self.get_compiler(connection=connection).as_sql()
+        sql, params = self.get_compiler(connection=connection).as_sql()
+        if self.subquery:
+            sql = '(%s)' % sql
+        return sql, params
 
     def resolve_lookup_value(self, value, can_reuse, allow_joins, simple_col):
         if hasattr(value, 'resolve_expression'):
