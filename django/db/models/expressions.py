@@ -998,24 +998,24 @@ class Subquery(Expression):
     contains_aggregate = False
 
     def __init__(self, queryset, output_field=None, **extra):
-        self.queryset = queryset
+        self.query = queryset.query
         self.extra = extra
         super().__init__(output_field)
 
     def _resolve_output_field(self):
-        if len(self.queryset.query.select) == 1:
-            return self.queryset.query.select[0].field
+        if len(self.query.select) == 1:
+            return self.query.select[0].field
         return super()._resolve_output_field()
 
     def copy(self):
         clone = super().copy()
-        clone.queryset = clone.queryset.all()
+        clone.query = clone.query.clone()
         return clone
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         clone = self.copy()
         clone.is_summary = summarize
-        clone.queryset.query.bump_prefix(query)
+        clone.query.bump_prefix(query)
 
         # Need to recursively resolve these.
         def resolve_all(child):
@@ -1033,15 +1033,15 @@ class Subquery(Expression):
                 # Add table alias to the parent query's aliases to prevent
                 # quoting.
                 if hasattr(resolved, 'alias') and resolved.alias != resolved.target.model._meta.db_table:
-                    clone.queryset.query.external_aliases.add(resolved.alias)
+                    clone.query.external_aliases.add(resolved.alias)
                 return resolved
             return child
 
-        resolve_all(clone.queryset.query.where)
+        resolve_all(clone.query.where)
 
-        for key, value in clone.queryset.query.annotations.items():
+        for key, value in clone.query.annotations.items():
             if isinstance(value, Subquery):
-                clone.queryset.query.annotations[key] = resolve(value)
+                clone.query.annotations[key] = resolve(value)
 
         return clone
 
@@ -1049,23 +1049,23 @@ class Subquery(Expression):
         return [
             x for x in [
                 getattr(expr, 'lhs', None)
-                for expr in self.queryset.query.where.children
+                for expr in self.query.where.children
             ] if x
         ]
 
     def relabeled_clone(self, change_map):
         clone = self.copy()
-        clone.queryset.query = clone.queryset.query.relabeled_clone(change_map)
-        clone.queryset.query.external_aliases.update(
+        clone.query = clone.query.relabeled_clone(change_map)
+        clone.query.external_aliases.update(
             alias for alias in change_map.values()
-            if alias not in clone.queryset.query.alias_map
+            if alias not in clone.query.alias_map
         )
         return clone
 
     def as_sql(self, compiler, connection, template=None, **extra_context):
         connection.ops.check_expression_support(self)
         template_params = {**self.extra, **extra_context}
-        template_params['subquery'], sql_params = self.queryset.query.get_compiler(connection=connection).as_sql()
+        template_params['subquery'], sql_params = self.query.get_compiler(connection=connection).as_sql()
 
         template = template or template_params.get('template', self.template)
         sql = template % template_params
@@ -1092,18 +1092,17 @@ class Exists(Subquery):
     template = 'EXISTS(%(subquery)s)'
     output_field = fields.BooleanField()
 
-    def __init__(self, *args, negated=False, **kwargs):
-        self.negated = negated
-        super().__init__(*args, **kwargs)
-
-    def __invert__(self):
-        return type(self)(self.queryset, negated=(not self.negated), **self.extra)
-
-    def resolve_expression(self, query=None, *args, **kwargs):
+    def __init__(self, queryset, negated=False, **kwargs):
         # As a performance optimization, remove ordering since EXISTS doesn't
         # care about it, just whether or not a row matches.
-        self.queryset = self.queryset.order_by()
-        return super().resolve_expression(query, *args, **kwargs)
+        queryset = queryset.order_by()
+        self.negated = negated
+        super().__init__(queryset, **kwargs)
+
+    def __invert__(self):
+        clone = self.copy()
+        clone.negated = not self.negated
+        return clone
 
     def as_sql(self, compiler, connection, template=None, **extra_context):
         sql, params = super().as_sql(compiler, connection, template, **extra_context)
