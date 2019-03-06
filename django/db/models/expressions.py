@@ -245,10 +245,6 @@ class BaseExpression:
         ])
         return c
 
-    def _prepare(self, field):
-        """Hook used by Lookup.get_prep_lookup() to do custom preparation."""
-        return self
-
     @property
     def field(self):
         return self.output_field
@@ -537,9 +533,6 @@ class ResolvedOuterRef(F):
             'only be used in a subquery.'
         )
 
-    def _prepare(self, output_field=None):
-        return self
-
     def relabeled_clone(self, relabels):
         return self
 
@@ -550,9 +543,6 @@ class OuterRef(F):
         if isinstance(self.name, self.__class__):
             return self.name
         return ResolvedOuterRef(self.name)
-
-    def _prepare(self, output_field=None):
-        return self
 
 
 class Func(SQLiteNumericMixin, Expression):

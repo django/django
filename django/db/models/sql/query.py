@@ -271,9 +271,6 @@ class Query(BaseExpression):
         memo[id(self)] = result
         return result
 
-    def _prepare(self, field):
-        return self
-
     def get_compiler(self, using=None, connection=None):
         if using is None and connection is None:
             raise ValueError("Need either using or connection")
