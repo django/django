@@ -536,7 +536,13 @@ class MigrateTests(MigrationTestBase):
         index_op_desc_unique_together = output.find('-- alter unique_together')
         index_tx_end = output.find(connection.ops.end_transaction_sql().lower())
 
-        self.assertGreater(index_tx_start, -1, "Transaction start not found")
+        if connection.features.can_rollback_ddl:
+            self.assertGreater(index_tx_start, -1, "Transaction start not found")
+            self.assertGreater(
+                index_tx_end, index_op_desc_unique_together,
+                "Transaction end not found or found before operation description (unique_together)"
+            )
+
         self.assertGreater(
             index_op_desc_author, index_tx_start,
             "Operation description (author) not found or found before transaction start"
@@ -552,10 +558,6 @@ class MigrateTests(MigrationTestBase):
         self.assertGreater(
             index_op_desc_unique_together, index_op_desc_tribble,
             "Operation description (unique_together) not found or found before operation description (tribble)"
-        )
-        self.assertGreater(
-            index_tx_end, index_op_desc_unique_together,
-            "Transaction end not found or found before operation description (unique_together)"
         )
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
@@ -577,7 +579,12 @@ class MigrateTests(MigrationTestBase):
         index_drop_table = output.rfind('drop table')
         index_tx_end = output.find(connection.ops.end_transaction_sql().lower())
 
-        self.assertGreater(index_tx_start, -1, "Transaction start not found")
+        if connection.features.can_rollback_ddl:
+            self.assertGreater(index_tx_start, -1, "Transaction start not found")
+            self.assertGreater(
+                index_tx_end, index_op_desc_unique_together,
+                "Transaction end not found or found before DROP TABLE"
+            )
         self.assertGreater(
             index_op_desc_unique_together, index_tx_start,
             "Operation description (unique_together) not found or found before transaction start"
@@ -595,10 +602,6 @@ class MigrateTests(MigrationTestBase):
             index_drop_table, index_op_desc_author,
             "DROP TABLE not found or found before operation description (author)"
         )
-        self.assertGreater(
-            index_tx_end, index_op_desc_unique_together,
-            "Transaction end not found or found before DROP TABLE"
-        )
 
         # Cleanup by unmigrating everything
         call_command("migrate", "migrations", "zero", verbosity=0)
@@ -614,6 +617,22 @@ class MigrateTests(MigrationTestBase):
         queries = [q.strip() for q in output.splitlines()]
         if connection.ops.start_transaction_sql():
             self.assertNotIn(connection.ops.start_transaction_sql().lower(), queries)
+        self.assertNotIn(connection.ops.end_transaction_sql().lower(), queries)
+
+    @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations'})
+    def test_sqlmigrate_for_non_transactional_databases(self):
+        """
+        Transaction wrappers aren't shown for databases that don't support
+        transactional DDL.
+        """
+        out = io.StringIO()
+        with mock.patch.object(connection.features, 'can_rollback_ddl', False):
+            call_command('sqlmigrate', 'migrations', '0001', stdout=out)
+        output = out.getvalue().lower()
+        queries = [q.strip() for q in output.splitlines()]
+        start_transaction_sql = connection.ops.start_transaction_sql()
+        if start_transaction_sql:
+            self.assertNotIn(start_transaction_sql.lower(), queries)
         self.assertNotIn(connection.ops.end_transaction_sql().lower(), queries)
 
     @override_settings(
