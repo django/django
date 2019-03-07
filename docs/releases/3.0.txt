@@ -238,6 +238,9 @@ Tests
   attribute :attr:`~django.test.Response.exc_info`, a tuple providing
   information of the exception that occurred.
 
+* Tests and test cases to run can be selected by test name pattern using the
+  new :option:`test -k` option.
+
 URLs
 ~~~~
 
@@ -359,6 +362,9 @@ Miscellaneous
 * :func:`django.utils.html.escape` now uses :func:`html.escape` to escape HTML.
   This converts ``'`` to ``&#x27;`` instead of the previous equivalent decimal
   code ``&#39;``.
+
+* The ``django-admin test -k`` option now works as the :option:`unittest
+  -k<unittest.-k>` option rather than as a shortcut for ``--keepdb``.
 
 .. _deprecated-features-3.0:
 

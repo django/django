@@ -28,6 +28,7 @@ else:
         RemovedInDjango31Warning, RemovedInDjango40Warning,
     )
     from django.utils.log import DEFAULT_LOGGING
+    from django.utils.version import PY37
 
 try:
     import MySQLdb
@@ -271,7 +272,8 @@ class ActionSelenium(argparse.Action):
 
 
 def django_tests(verbosity, interactive, failfast, keepdb, reverse,
-                 test_labels, debug_sql, parallel, tags, exclude_tags):
+                 test_labels, debug_sql, parallel, tags, exclude_tags,
+                 test_name_patterns):
     state = setup(verbosity, test_labels, parallel)
     extra_tests = []
 
@@ -290,6 +292,7 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
         parallel=actual_test_processes(parallel),
         tags=tags,
         exclude_tags=exclude_tags,
+        test_name_patterns=test_name_patterns,
     )
     failures = test_runner.run_tests(
         test_labels or get_installed(),
@@ -416,7 +419,7 @@ if __name__ == "__main__":
         help='Tells Django to stop running the test suite after first failed test.',
     )
     parser.add_argument(
-        '-k', '--keepdb', action='store_true',
+        '--keepdb', action='store_true',
         help='Tells Django to preserve the test database between runs.',
     )
     parser.add_argument(
@@ -469,6 +472,14 @@ if __name__ == "__main__":
         '--exclude-tag', dest='exclude_tags', action='append',
         help='Do not run tests with the specified tag. Can be used multiple times.',
     )
+    if PY37:
+        parser.add_argument(
+            '-k', dest='test_name_patterns', action='append',
+            help=(
+                'Only run test methods and classes matching test name pattern. '
+                'Same as unittest -k option. Can be used multiple times.'
+            ),
+        )
 
     options = parser.parse_args()
 
@@ -507,6 +518,7 @@ if __name__ == "__main__":
             options.keepdb, options.reverse, options.modules,
             options.debug_sql, options.parallel, options.tags,
             options.exclude_tags,
+            getattr(options, 'test_name_patterns', None),
         )
         if failures:
             sys.exit(1)

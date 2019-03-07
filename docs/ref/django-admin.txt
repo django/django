@@ -1360,7 +1360,7 @@ The ``test`` command receives options on behalf of the specified
 :option:`--testrunner`. These are the options of the default test runner:
 :class:`~django.test.runner.DiscoverRunner`.
 
-.. django-admin-option:: --keepdb, -k
+.. django-admin-option:: --keepdb
 
 Preserves the test database between test runs. This has the advantage of
 skipping both the create and destroy actions which can greatly decrease the
@@ -1437,6 +1437,18 @@ May be specified multiple times and combined with :option:`test --exclude-tag`.
 
 Excludes tests :ref:`marked with the specified tags <topics-tagging-tests>`.
 May be specified multiple times and combined with :option:`test --tag`.
+
+.. django-admin-option:: -k TEST_NAME_PATTERNS
+
+.. versionadded:: 3.0
+
+Runs test methods and classes matching test name patterns, in the same way as
+:option:`unittest's -k option<unittest.-k>`. Can be specified multiple times.
+
+.. admonition:: Python 3.7 and later
+
+    This feature is only available for Python 3.7 and later.
+
 
 ``testserver``
 --------------

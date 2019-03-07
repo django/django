@@ -17,6 +17,7 @@ from django.test.utils import (
     teardown_databases as _teardown_databases, teardown_test_environment,
 )
 from django.utils.datastructures import OrderedSet
+from django.utils.version import PY37
 
 try:
     import tblib.pickling_support
@@ -407,7 +408,7 @@ class DiscoverRunner:
     def __init__(self, pattern=None, top_level=None, verbosity=1,
                  interactive=True, failfast=False, keepdb=False,
                  reverse=False, debug_mode=False, debug_sql=False, parallel=0,
-                 tags=None, exclude_tags=None, **kwargs):
+                 tags=None, exclude_tags=None, test_name_patterns=None, **kwargs):
 
         self.pattern = pattern
         self.top_level = top_level
@@ -421,6 +422,14 @@ class DiscoverRunner:
         self.parallel = parallel
         self.tags = set(tags or [])
         self.exclude_tags = set(exclude_tags or [])
+        self.test_name_patterns = None
+        if test_name_patterns:
+            # unittest does not export the _convert_select_pattern function
+            # that converts command-line arguments to patterns.
+            self.test_name_patterns = {
+                pattern if '*' in pattern else '*%s*' % pattern
+                for pattern in test_name_patterns
+            }
 
     @classmethod
     def add_arguments(cls, parser):
@@ -433,7 +442,7 @@ class DiscoverRunner:
             help='The test matching pattern. Defaults to test*.py.',
         )
         parser.add_argument(
-            '-k', '--keepdb', action='store_true',
+            '--keepdb', action='store_true',
             help='Preserves the test DB between runs.'
         )
         parser.add_argument(
@@ -461,6 +470,15 @@ class DiscoverRunner:
             '--exclude-tag', action='append', dest='exclude_tags',
             help='Do not run tests with the specified tag. Can be used multiple times.',
         )
+        if PY37:
+            parser.add_argument(
+                '-k', action='append', dest='test_name_patterns',
+                help=(
+                    'Only run test methods and classes that match the pattern '
+                    'or substring. Can be used multiple times. Same as '
+                    'unittest -k option.'
+                ),
+            )
 
     def setup_test_environment(self, **kwargs):
         setup_test_environment(debug=self.debug_mode)
@@ -470,6 +488,7 @@ class DiscoverRunner:
         suite = self.test_suite()
         test_labels = test_labels or ['.']
         extra_tests = extra_tests or []
+        self.test_loader.testNamePatterns = self.test_name_patterns
 
         discover_kwargs = {}
         if self.pattern is not None:

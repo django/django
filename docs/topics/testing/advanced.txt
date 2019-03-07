@@ -424,7 +424,7 @@ behavior. This class defines the ``run_tests()`` entry point, plus a
 selection of other methods that are used to by ``run_tests()`` to set up,
 execute and tear down the test suite.
 
-.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=False, keepdb=False, reverse=False, debug_mode=False, debug_sql=False, **kwargs)
+.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=False, keepdb=False, reverse=False, debug_mode=False, debug_sql=False, test_name_patterns=None, **kwargs)
 
     ``DiscoverRunner`` will search for tests in any file matching ``pattern``.
 
@@ -462,6 +462,9 @@ execute and tear down the test suite.
     logged to the :ref:`django.db.backends logger <django-db-logger>` as well
     as the traceback. If ``verbosity`` is ``2``, then queries in all tests are
     output.
+
+    ``test_name_patterns`` can be used to specify a set of patterns for
+    filtering test methods and classes by their names.
 
     Django may, from time to time, extend the capabilities of the test runner
     by adding new arguments. The ``**kwargs`` declaration allows for this
