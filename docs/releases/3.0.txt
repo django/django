@@ -154,6 +154,9 @@ Management Commands
 * The new :option:`compilemessages --ignore` option allows ignoring specific
   directories when searching for ``.po`` files to compile.
 
+* :option:`showmigrations --list` now shows the applied datetimes when
+  ``--verbosity`` is 2 and above.
+
 Migrations
 ~~~~~~~~~~
 
