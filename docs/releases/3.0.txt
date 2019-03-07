@@ -164,6 +164,10 @@ Models
 
 * Added the :class:`~django.db.models.functions.MD5` database function.
 
+* The new ``is_dst``  parameter of the
+  :class:`~django.db.models.functions.Trunc` database functions determines the
+  treatment of nonexistent and ambiguous datetimes.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
