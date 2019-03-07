@@ -1836,6 +1836,25 @@ Here's a sample settings file::
         ('en', _('English')),
     ]
 
+.. setting:: LANGUAGES_BIDI
+
+``LANGUAGES_BIDI``
+------------------
+
+Default: A list of all language codes from the :setting:`LANGUAGES` setting
+that are written right-to-left. You can see the current list of these languages
+by looking in ``django/conf/global_settings.py`` (or view the `online
+source`_).
+
+.. _online source: https://github.com/django/django/blob/master/django/conf/global_settings.py
+
+
+The list contains :term:`language codes<language code>` for languages that are
+written right-to-left.
+
+Generally, the default value should suffice. Only set this setting if you want
+to restrict language selection to a subset of the Django-provided languages.
+
 .. setting:: LOCALE_PATHS
 
 ``LOCALE_PATHS``
@@ -3396,6 +3415,7 @@ Globalization (``i18n``/``l10n``)
 * :setting:`LANGUAGE_COOKIE_NAME`
 * :setting:`LANGUAGE_COOKIE_PATH`
 * :setting:`LANGUAGES`
+* :setting:`LANGUAGES_BIDI`
 * :setting:`LOCALE_PATHS`
 * :setting:`MONTH_DAY_FORMAT`
 * :setting:`NUMBER_GROUPING`
