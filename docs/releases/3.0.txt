@@ -370,7 +370,7 @@ to remove usage of these features.
 * Support for the ``context`` argument of ``Field.from_db_value()`` and
   ``Expression.convert_value()`` is removed.
 
-* The ``field_name`` keyword argument of ``QuerySet.earliest()` and
+* The ``field_name`` keyword argument of ``QuerySet.earliest()`` and
   ``latest()`` is removed.
 
 See :ref:`deprecated-features-2.1` for details on these changes, including how
