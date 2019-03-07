@@ -440,7 +440,7 @@ Translation
 The following checks are performed on your translation configuration:
 
 * **translation.E001**: You have provided an invalid value for the
-  :setting:`LANGUAGE_CODE` setting.
+  :setting:`LANGUAGE_CODE` setting: ``<value>``.
 
 URLs
 ----

@@ -1,5 +1,6 @@
-from django.core.checks.translation import E001, check_setting_language_code
-from django.test import SimpleTestCase, override_settings
+from django.core.checks import Error
+from django.core.checks.translation import check_setting_language_code
+from django.test import SimpleTestCase
 
 
 class TranslationCheckTests(SimpleTestCase):
@@ -22,6 +23,9 @@ class TranslationCheckTests(SimpleTestCase):
 
     def test_invalid_language_code(self):
         tags = (
+            None,              # invalid type: None.
+            123,               # invalid type: int.
+            b'en',             # invalid type: bytes.
             'eü',              # non-latin characters.
             'en_US',           # locale format.
             'en--us',          # empty subtag.
@@ -33,9 +37,9 @@ class TranslationCheckTests(SimpleTestCase):
             # FIXME: The following should be invalid:
             # 'sr@latin',      # locale instead of language tag.
         )
+        msg = 'You have provided an invalid value for the LANGUAGE_CODE setting: %s.'
         for tag in tags:
-            with self.subTest(tag), override_settings(LANGUAGE_CODE=tag):
-                result = check_setting_language_code(None)
-                self.assertEqual(result, [E001])
-                self.assertEqual(result[0].id, 'translation.E001')
-                self.assertEqual(result[0].msg, 'You have provided an invalid value for the LANGUAGE_CODE setting.')
+            with self.subTest(tag), self.settings(LANGUAGE_CODE=tag):
+                self.assertEqual(check_setting_language_code(None), [
+                    Error(msg % tag, id='translation.E001'),
+                ])
