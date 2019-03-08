@@ -2776,6 +2776,12 @@ class ExcludeTests(TestCase):
             employment__title__in=('Engineer', 'Developer')).distinct().order_by('name')
         self.assertSequenceEqual(alex_nontech_employers, [google, intel, microsoft])
 
+    def test_exclude_reverse_fk_field_ref(self):
+        tag = Tag.objects.create()
+        Note.objects.create(tag=tag, note='note')
+        annotation = Annotation.objects.create(name='annotation', tag=tag)
+        self.assertEqual(Annotation.objects.exclude(tag__note__note=F('name')).get(), annotation)
+
 
 class ExcludeTest17600(TestCase):
     """

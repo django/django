@@ -21,7 +21,9 @@ from django.core.exceptions import (
 from django.db import DEFAULT_DB_ALIAS, NotSupportedError, connections
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import BaseExpression, Col, F, Ref, SimpleCol
+from django.db.models.expressions import (
+    BaseExpression, Col, F, OuterRef, Ref, SimpleCol,
+)
 from django.db.models.fields import Field
 from django.db.models.fields.related_lookups import MultiColSource
 from django.db.models.lookups import Lookup
@@ -1639,6 +1641,9 @@ class Query(BaseExpression):
         saner null handling, and is easier for the backend's optimizer to
         handle.
         """
+        filter_lhs, filter_rhs = filter_expr
+        if isinstance(filter_rhs, F):
+            filter_expr = (filter_lhs, OuterRef(filter_rhs.name))
         # Generate the inner query.
         query = Query(self.model)
         query.add_filter(filter_expr)
