@@ -409,11 +409,11 @@ class Query(BaseExpression):
         if not self.annotation_select:
             return {}
         has_limit = self.low_mark != 0 or self.high_mark is not None
-        has_existing_annotations = any(
+        existing_annotations = [
             annotation for alias, annotation
             in self.annotations.items()
             if alias not in added_aggregate_names
-        )
+        ]
         # Decide if we need to use a subquery.
         #
         # Existing annotations would cause incorrect results as get_aggregation()
@@ -425,13 +425,14 @@ class Query(BaseExpression):
         # those operations must be done in a subquery so that the query
         # aggregates on the limit and/or distinct results instead of applying
         # the distinct and limit after the aggregation.
-        if (isinstance(self.group_by, tuple) or has_limit or has_existing_annotations or
+        if (isinstance(self.group_by, tuple) or has_limit or existing_annotations or
                 self.distinct or self.combinator):
             from django.db.models.sql.subqueries import AggregateQuery
             outer_query = AggregateQuery(self.model)
             inner_query = self.clone()
             inner_query.select_for_update = False
             inner_query.select_related = False
+            inner_query.set_annotation_mask(self.annotation_select)
             if not has_limit and not self.distinct_fields:
                 # Queries with distinct_fields need ordering and when a limit
                 # is applied we must take the slice from the ordered query.
@@ -443,7 +444,11 @@ class Query(BaseExpression):
                 # query is grouped by the main model's primary key. However,
                 # clearing the select clause can alter results if distinct is
                 # used.
-                if inner_query.default_cols and has_existing_annotations:
+                has_existing_aggregate_annotations = any(
+                    annotation for annotation in existing_annotations
+                    if getattr(annotation, 'contains_aggregate', True)
+                )
+                if inner_query.default_cols and has_existing_aggregate_annotations:
                     inner_query.group_by = (self.model._meta.pk.get_col(inner_query.get_initial_alias()),)
                 inner_query.default_cols = False
 
@@ -453,10 +458,12 @@ class Query(BaseExpression):
             # and move them to the outer AggregateQuery.
             col_cnt = 0
             for alias, expression in list(inner_query.annotation_select.items()):
+                annotation_select_mask = inner_query.annotation_select_mask
                 if expression.is_summary:
                     expression, col_cnt = inner_query.rewrite_cols(expression, col_cnt)
                     outer_query.annotations[alias] = expression.relabeled_clone(relabels)
                     del inner_query.annotations[alias]
+                    annotation_select_mask.remove(alias)
                 # Make sure the annotation_select wont use cached results.
                 inner_query.set_annotation_mask(inner_query.annotation_select_mask)
             if inner_query.select == () and not inner_query.default_cols and not inner_query.annotation_select_mask:
