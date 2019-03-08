@@ -8,7 +8,24 @@ from django.utils.deprecation import RemovedInDjango31Warning
 UserModel = get_user_model()
 
 
-class ModelBackend:
+class BaseBackend:
+    def authenticate(self, request, **kwargs):
+        return None
+
+    def get_user(self, user_id):
+        return None
+
+    def get_group_permissions(self, user_obj, obj=None):
+        return set()
+
+    def get_all_permissions(self, user_obj, obj=None):
+        return self.get_group_permissions(user_obj, obj=obj)
+
+    def has_perm(self, user_obj, perm, obj=None):
+        return perm in self.get_all_permissions(user_obj, obj=obj)
+
+
+class ModelBackend(BaseBackend):
     """
     Authenticates against settings.AUTH_USER_MODEL.
     """
@@ -86,7 +103,7 @@ class ModelBackend:
         return user_obj._perm_cache
 
     def has_perm(self, user_obj, perm, obj=None):
-        return user_obj.is_active and perm in self.get_all_permissions(user_obj, obj)
+        return user_obj.is_active and super().has_perm(user_obj, perm, obj=obj)
 
     def has_module_perms(self, user_obj, app_label):
         """

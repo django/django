@@ -460,6 +460,27 @@ Available authentication backends
 
 The following backends are available in :mod:`django.contrib.auth.backends`:
 
+.. class:: BaseBackend
+
+    .. versionadded:: 3.0
+
+    A base class that provides default implementations for all required
+    methods. By default, it will reject any user and provide no permissions.
+
+    .. method:: get_group_permissions(user_obj, obj=None)
+
+        Returns an empty set.
+
+    .. method:: get_all_permissions(user_obj, obj=None)
+
+        Uses :meth:`get_group_permissions` to get the set of permission strings
+        the ``user_obj`` has.
+
+    .. method:: has_perm(user_obj, perm, obj=None)
+
+        Uses :meth:`get_all_permissions` to check if ``user_obj`` has the
+        permission string ``perm``.
+
 .. class:: ModelBackend
 
     This is the default authentication backend used by Django.  It

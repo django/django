@@ -4,7 +4,7 @@ from unittest import mock
 from django.contrib.auth import (
     BACKEND_SESSION_KEY, SESSION_KEY, authenticate, get_user, signals,
 )
-from django.contrib.auth.backends import ModelBackend
+from django.contrib.auth.backends import BaseBackend, ModelBackend
 from django.contrib.auth.hashers import MD5PasswordHasher
 from django.contrib.auth.models import AnonymousUser, Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
@@ -18,6 +18,28 @@ from .models import (
     CustomPermissionsUser, CustomUser, CustomUserWithoutIsActiveField,
     ExtensionUser, UUIDUser,
 )
+
+
+class SimpleBackend(BaseBackend):
+    def get_group_permissions(self, user_obj, obj=None):
+        return ['group_perm']
+
+
+@override_settings(AUTHENTICATION_BACKENDS=['auth_tests.test_auth_backends.SimpleBackend'])
+class BaseBackendTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user('test', 'test@example.com', 'test')
+
+    def test_get_group_permissions(self):
+        self.assertEqual(self.user.get_group_permissions(), {'group_perm'})
+
+    def test_get_all_permissions(self):
+        self.assertEqual(self.user.get_all_permissions(), {'group_perm'})
+
+    def test_has_perm(self):
+        self.assertIs(self.user.has_perm('group_perm'), True)
+        self.assertIs(self.user.has_perm('other_perm', TestObj()), False)
 
 
 class CountingMD5PasswordHasher(MD5PasswordHasher):

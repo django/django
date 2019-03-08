@@ -100,14 +100,18 @@ and returns a user object or ``None``.
 The ``authenticate`` method takes a ``request`` argument and credentials as
 keyword arguments. Most of the time, it'll just look like this::
 
-    class MyBackend:
+    from django.contrib.auth.backends import BaseBackend
+
+    class MyBackend(BaseBackend):
         def authenticate(self, request, username=None, password=None):
             # Check the username/password and return a user.
             ...
 
 But it could also authenticate a token, like so::
 
-    class MyBackend:
+    from django.contrib.auth.backends import BaseBackend
+
+    class MyBackend(BaseBackend):
         def authenticate(self, request, token=None):
             # Check the token and return a user.
             ...
@@ -132,10 +136,11 @@ variable defined in your ``settings.py`` file and creates a Django ``User``
 object the first time a user authenticates::
 
     from django.conf import settings
+    from django.contrib.auth.backends import BaseBackend
     from django.contrib.auth.hashers import check_password
     from django.contrib.auth.models import User
 
-    class SettingsBackend:
+    class SettingsBackend(BaseBackend):
         """
         Authenticate against the settings ADMIN_LOGIN and ADMIN_PASSWORD.
 
@@ -190,11 +195,11 @@ exception in :meth:`~django.contrib.auth.models.User.has_perm()` or
 :meth:`~django.contrib.auth.models.User.has_module_perms()`, the authorization
 will immediately fail and Django won't check the backends that follow.
 
-The simple backend above could implement permissions for the magic admin
-fairly simply::
+A backend could implement permissions for the magic admin fairly simply::
 
-    class SettingsBackend:
-        ...
+    from django.contrib.auth.backends import BaseBackend
+
+    class MagicAdminBackend(BaseBackend):
         def has_perm(self, user_obj, perm, obj=None):
             return user_obj.username == settings.ADMIN_LOGIN
 
@@ -205,10 +210,7 @@ all take the user object, which may be an anonymous user, as an argument.
 
 A full authorization implementation can be found in the ``ModelBackend`` class
 in :source:`django/contrib/auth/backends.py`, which is the default backend and
-queries the ``auth_permission`` table most of the time. If you wish to provide
-custom behavior for only part of the backend API, you can take advantage of
-Python inheritance and subclass ``ModelBackend`` instead of implementing the
-complete API in a custom backend.
+queries the ``auth_permission`` table most of the time.
 
 .. _anonymous_auth:
 

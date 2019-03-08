@@ -69,6 +69,9 @@ Minor features
   :class:`~django.contrib.auth.views.PasswordResetConfirmView` allows specifying
   a token parameter displayed as a component of password reset URLs.
 
+* Added :class:`~django.contrib.auth.backends.BaseBackend` class to ease
+  customization of authentication backends.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
