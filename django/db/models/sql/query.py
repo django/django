@@ -22,7 +22,7 @@ from django.db import DEFAULT_DB_ALIAS, NotSupportedError, connections
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import (
-    BaseExpression, Col, F, OuterRef, Ref, SimpleCol,
+    BaseExpression, Col, F, OuterRef, Ref, SimpleCol, Subquery,
 )
 from django.db.models.fields import Field
 from django.db.models.fields.related_lookups import MultiColSource
@@ -382,7 +382,7 @@ class Query(BaseExpression):
                 # before the contains_aggregate/is_summary condition below.
                 new_expr, col_cnt = self.rewrite_cols(expr, col_cnt)
                 new_exprs.append(new_expr)
-            elif isinstance(expr, Col) or (expr.contains_aggregate and not expr.is_summary):
+            elif isinstance(expr, (Col, Subquery)) or (expr.contains_aggregate and not expr.is_summary):
                 # Reference to column. Make sure the referenced column
                 # is selected.
                 col_cnt += 1

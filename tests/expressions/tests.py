@@ -551,6 +551,19 @@ class BasicExpressionsTests(TestCase):
         )
         self.assertEqual(qs.get().float, 1.2)
 
+    @skipUnlessDBFeature('supports_subqueries_in_group_by')
+    def test_aggregate_subquery_annotation(self):
+        aggregate = Company.objects.annotate(
+            ceo_salary=Subquery(
+                Employee.objects.filter(
+                    id=OuterRef('ceo_id'),
+                ).values('salary')
+            ),
+        ).aggregate(
+            ceo_salary_gt_20=Count('pk', filter=Q(ceo_salary__gt=20)),
+        )
+        self.assertEqual(aggregate, {'ceo_salary_gt_20': 1})
+
     def test_explicit_output_field(self):
         class FuncA(Func):
             output_field = models.CharField()
