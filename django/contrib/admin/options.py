@@ -1125,7 +1125,7 @@ class ModelAdmin(BaseModelAdmin):
             'has_delete_permission': self.has_delete_permission(request, obj),
             'has_editable_inline_admin_formsets': has_editable_inline_admin_formsets,
             'has_file_field': context['adminform'].form.is_multipart() or any(
-                admin_formset.formset.form().is_multipart()
+                admin_formset.formset.is_multipart()
                 for admin_formset in context['inline_admin_formsets']
             ),
             'has_absolute_url': view_on_site_url is not None,
