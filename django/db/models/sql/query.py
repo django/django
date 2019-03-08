@@ -383,12 +383,16 @@ class Query(BaseExpression):
                 new_expr, col_cnt = self.rewrite_cols(expr, col_cnt)
                 new_exprs.append(new_expr)
             elif isinstance(expr, (Col, Subquery)) or (expr.contains_aggregate and not expr.is_summary):
-                # Reference to column. Make sure the referenced column
-                # is selected.
-                col_cnt += 1
-                col_alias = '__col%d' % col_cnt
-                self.annotations[col_alias] = expr
-                self.append_annotation_mask([col_alias])
+                # Reference to column, subquery, or another aggregate. Make
+                # sure the expression is selected and reuse its alias if so.
+                for col_alias, selected_annotation in self.annotation_select.items():
+                    if selected_annotation == expr:
+                        break
+                else:
+                    col_cnt += 1
+                    col_alias = '__col%d' % col_cnt
+                    self.annotations[col_alias] = expr
+                    self.append_annotation_mask([col_alias])
                 new_exprs.append(Ref(col_alias, expr))
             else:
                 # Some other expression not referencing database values
