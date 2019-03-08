@@ -156,8 +156,8 @@ a static file. All other URLs will be served using mod_wsgi:
     Alias /robots.txt /path/to/mysite.com/static/robots.txt
     Alias /favicon.ico /path/to/mysite.com/static/favicon.ico
 
-    Alias /media/ /path/to/mysite.com/media/
-    Alias /static/ /path/to/mysite.com/static/
+    Alias /media /path/to/mysite.com/media/
+    Alias /static /path/to/mysite.com/static/
 
     <Directory /path/to/mysite.com/static>
     Require all granted
