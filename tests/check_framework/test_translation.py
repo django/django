@@ -28,7 +28,7 @@ class TranslationCheckTests(SimpleTestCase):
             '-en',             # leading separator.
             'en-',             # trailing separator.
             'en-US.UTF-8',     # language tag w/ locale encoding.
-            'en_US.UTF-8',     # locale format - languate w/ region and encoding.
+            'en_US.UTF-8',     # locale format - language w/ region and encoding.
             'ca_ES@valencia',  # locale format - language w/ region and variant.
             # FIXME: The following should be invalid:
             # 'sr@latin',      # locale instead of language tag.
