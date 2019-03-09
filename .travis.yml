@@ -1,4 +1,4 @@
-sudo: false
+dist: xenial
 
 language: python
 
@@ -29,12 +29,8 @@ jobs:
   include:
     - python: "3.7"
       env: DJANGO="Django>=2.0,<2.1"
-      dist: xenial
-      sudo: required
     - python: "3.7"
       env: DJANGO="Django>=2.1,<2.2"
-      dist: xenial
-      sudo: required
 
     - stage: lint
       install: pip install -U -e .[tests] black pyflakes isort
