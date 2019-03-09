@@ -249,10 +249,10 @@ END;
 
     def limit_offset_sql(self, low_mark, high_mark):
         fetch, offset = self._get_limit_offset_params(low_mark, high_mark)
-        return '%s%s' % (
-            (' OFFSET %d ROWS' % offset) if offset else '',
-            (' FETCH FIRST %d ROWS ONLY' % fetch) if fetch else '',
-        )
+        return ' '.join(sql for sql in (
+            ('OFFSET %d ROWS' % offset) if offset else None,
+            ('FETCH FIRST %d ROWS ONLY' % fetch) if fetch else None,
+        ) if sql)
 
     def last_executed_query(self, cursor, sql, params):
         # https://cx-oracle.readthedocs.io/en/latest/cursor.html#Cursor.statement
