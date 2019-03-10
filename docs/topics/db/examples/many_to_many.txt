@@ -2,7 +2,7 @@
 Many-to-many relationships
 ==========================
 
-.. highlight:: pycon
+.. highlight:: python
 
 To define a many-to-many relationship, use
 :class:`~django.db.models.ManyToManyField`.
