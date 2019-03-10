@@ -51,7 +51,7 @@ class LazySettings(LazyObject):
                 "or call settings.configure() before accessing settings."
                 % (desc, ENVIRONMENT_VARIABLE))
 
-        self._wrapped = Settings(settings_module)
+        self._set_wrapped_settings(Settings(settings_module))
 
     def __repr__(self):
         # Hardcode the class name as otherwise it yields 'Settings'.
@@ -98,7 +98,10 @@ class LazySettings(LazyObject):
             if not name.isupper():
                 raise TypeError('Setting %r must be uppercase.' % name)
             setattr(holder, name, value)
-        self._wrapped = holder
+        self._set_wrapped_settings(holder)
+
+    def _set_wrapped_settings(self, settings):
+        self._wrapped = settings
 
     @property
     def configured(self):
