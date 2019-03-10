@@ -265,6 +265,17 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         form = UserCreationForm()
         self.assertEqual(form.fields['username'].widget.attrs.get('autocapitalize'), 'none')
 
+    def test_html_autocomplete_attributes(self):
+        form = UserCreationForm()
+        tests = (
+            ('username', 'username'),
+            ('password1', 'new-password'),
+            ('password2', 'new-password'),
+        )
+        for field_name, autocomplete in tests:
+            with self.subTest(field_name=field_name, autocomplete=autocomplete):
+                self.assertEqual(form.fields[field_name].widget.attrs['autocomplete'], autocomplete)
+
 
 # To verify that the login form rejects inactive users, use an authentication
 # backend that allows them.
@@ -492,6 +503,16 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         self.assertEqual(error.code, 'invalid_login')
         self.assertEqual(error.params, {'username': 'username'})
 
+    def test_html_autocomplete_attributes(self):
+        form = AuthenticationForm()
+        tests = (
+            ('username', 'username'),
+            ('password', 'current-password'),
+        )
+        for field_name, autocomplete in tests:
+            with self.subTest(field_name=field_name, autocomplete=autocomplete):
+                self.assertEqual(form.fields[field_name].widget.attrs['autocomplete'], autocomplete)
+
 
 class SetPasswordFormTest(TestDataMixin, TestCase):
 
@@ -572,6 +593,16 @@ class SetPasswordFormTest(TestDataMixin, TestCase):
             for french_text in french_help_texts:
                 self.assertIn(french_text, html)
 
+    def test_html_autocomplete_attributes(self):
+        form = SetPasswordForm(self.u1)
+        tests = (
+            ('new_password1', 'new-password'),
+            ('new_password2', 'new-password'),
+        )
+        for field_name, autocomplete in tests:
+            with self.subTest(field_name=field_name, autocomplete=autocomplete):
+                self.assertEqual(form.fields[field_name].widget.attrs['autocomplete'], autocomplete)
+
 
 class PasswordChangeFormTest(TestDataMixin, TestCase):
 
@@ -632,6 +663,11 @@ class PasswordChangeFormTest(TestDataMixin, TestCase):
         self.assertEqual(form.cleaned_data['old_password'], data['old_password'])
         self.assertEqual(form.cleaned_data['new_password1'], data['new_password1'])
         self.assertEqual(form.cleaned_data['new_password2'], data['new_password2'])
+
+    def test_html_autocomplete_attributes(self):
+        user = User.objects.get(username='testclient')
+        form = PasswordChangeForm(user)
+        self.assertEqual(form.fields['old_password'].widget.attrs['autocomplete'], 'current-password')
 
 
 class UserChangeFormTest(TestDataMixin, TestCase):
@@ -916,6 +952,10 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to, [email])
 
+    def test_html_autocomplete_attributes(self):
+        form = PasswordResetForm()
+        self.assertEqual(form.fields['email'].widget.attrs['autocomplete'], 'email')
+
 
 class ReadOnlyPasswordHashTest(SimpleTestCase):
 
@@ -997,3 +1037,14 @@ class AdminPasswordChangeFormTest(TestDataMixin, TestCase):
         form2 = AdminPasswordChangeForm(user, {'password1': 'test', 'password2': ''})
         self.assertEqual(form2.errors['password2'], required_error)
         self.assertNotIn('password1', form2.errors)
+
+    def test_html_autocomplete_attributes(self):
+        user = User.objects.get(username='testclient')
+        form = AdminPasswordChangeForm(user)
+        tests = (
+            ('password1', 'new-password'),
+            ('password2', 'new-password'),
+        )
+        for field_name, autocomplete in tests:
+            with self.subTest(field_name=field_name, autocomplete=autocomplete):
+                self.assertEqual(form.fields[field_name].widget.attrs['autocomplete'], autocomplete)
