@@ -19,7 +19,6 @@ from django.core.signals import (
 )
 from django.db import close_old_connections
 from django.http import HttpRequest, QueryDict, SimpleCookie
-from django.template import TemplateDoesNotExist
 from django.test import signals
 from django.test.utils import ContextList
 from django.urls import resolve
@@ -482,17 +481,7 @@ class Client(RequestFactory):
         exception_uid = "request-exception-%s" % id(request)
         got_request_exception.connect(self.store_exc_info, dispatch_uid=exception_uid)
         try:
-            try:
-                response = self.handler(environ)
-            except TemplateDoesNotExist as e:
-                # If the view raises an exception, Django will attempt to show
-                # the 500.html template. If that template is not available,
-                # we should ignore the error in favor of re-raising the
-                # underlying exception that caused the 500 error. Any other
-                # template found to be missing during view error handling
-                # should be reported as-is.
-                if e.args != ('500.html',):
-                    raise
+            response = self.handler(environ)
 
             # Look for a signalled exception, clear the current context
             # exception data, then re-raise the signalled exception.
