@@ -482,45 +482,36 @@ class Client(RequestFactory):
         got_request_exception.connect(self.store_exc_info, dispatch_uid=exception_uid)
         try:
             response = self.handler(environ)
-
-            # Look for a signalled exception, clear the current context
-            # exception data, then re-raise the signalled exception.
-            # Also make sure that the signalled exception is cleared from
-            # the local cache!
-            response.exc_info = self.exc_info
-            if self.exc_info:
-                _, exc_value, _ = self.exc_info
-                self.exc_info = None
-                if self.raise_request_exception:
-                    raise exc_value
-
-            # Save the client and request that stimulated the response.
-            response.client = self
-            response.request = request
-
-            # Add any rendered template detail to the response.
-            response.templates = data.get("templates", [])
-            response.context = data.get("context")
-
-            response.json = partial(self._parse_json, response)
-
-            # Attach the ResolverMatch instance to the response
-            response.resolver_match = SimpleLazyObject(lambda: resolve(request['PATH_INFO']))
-
-            # Flatten a single context. Not really necessary anymore thanks to
-            # the __getattr__ flattening in ContextList, but has some edge-case
-            # backwards-compatibility implications.
-            if response.context and len(response.context) == 1:
-                response.context = response.context[0]
-
-            # Update persistent cookie data.
-            if response.cookies:
-                self.cookies.update(response.cookies)
-
-            return response
         finally:
             signals.template_rendered.disconnect(dispatch_uid=signal_uid)
             got_request_exception.disconnect(dispatch_uid=exception_uid)
+        # Look for a signaled exception, clear the current context exception
+        # data, then re-raise the signaled exception. Also clear the signaled
+        # exception from the local cache.
+        response.exc_info = self.exc_info
+        if self.exc_info:
+            _, exc_value, _ = self.exc_info
+            self.exc_info = None
+            if self.raise_request_exception:
+                raise exc_value
+        # Save the client and request that stimulated the response.
+        response.client = self
+        response.request = request
+        # Add any rendered template detail to the response.
+        response.templates = data.get('templates', [])
+        response.context = data.get('context')
+        response.json = partial(self._parse_json, response)
+        # Attach the ResolverMatch instance to the response.
+        response.resolver_match = SimpleLazyObject(lambda: resolve(request['PATH_INFO']))
+        # Flatten a single context. Not really necessary anymore thanks to the
+        # __getattr__ flattening in ContextList, but has some edge case
+        # backwards compatibility implications.
+        if response.context and len(response.context) == 1:
+            response.context = response.context[0]
+        # Update persistent cookie data.
+        if response.cookies:
+            self.cookies.update(response.cookies)
+        return response
 
     def get(self, path, data=None, follow=False, secure=False, **extra):
         """Request a response from the server using GET."""
