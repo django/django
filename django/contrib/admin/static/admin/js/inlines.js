@@ -166,12 +166,10 @@
             // instantiate a new SelectFilter instance for it.
             if (typeof SelectFilter !== 'undefined') {
                 $('.selectfilter').each(function(index, value) {
-                    var namearr = value.name.split('-');
-                    SelectFilter.init(value.id, namearr[namearr.length - 1], false);
+                    SelectFilter.init(value.id, $(this).data('fieldName'), false);
                 });
                 $('.selectfilterstacked').each(function(index, value) {
-                    var namearr = value.name.split('-');
-                    SelectFilter.init(value.id, namearr[namearr.length - 1], true);
+                    SelectFilter.init(value.id, $(this).data('fieldName'), true);
                 });
             }
         };
@@ -233,12 +231,10 @@
             // If any SelectFilter widgets were added, instantiate a new instance.
             if (typeof SelectFilter !== "undefined") {
                 $(".selectfilter").each(function(index, value) {
-                    var namearr = value.name.split('-');
-                    SelectFilter.init(value.id, namearr[namearr.length - 1], false);
+                    SelectFilter.init(value.id, $(this).data('fieldName'), false);
                 });
                 $(".selectfilterstacked").each(function(index, value) {
-                    var namearr = value.name.split('-');
-                    SelectFilter.init(value.id, namearr[namearr.length - 1], true);
+                    SelectFilter.init(value.id, $(this).data('fieldName'), true);
                 });
             }
         };
