@@ -22,7 +22,7 @@ from django.db import DEFAULT_DB_ALIAS, NotSupportedError, connections
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import (
-    BaseExpression, Col, F, OuterRef, Ref, SimpleCol, Subquery,
+    BaseExpression, Col, F, OuterRef, Ref, SimpleCol,
 )
 from django.db.models.fields import Field
 from django.db.models.fields.related_lookups import MultiColSource
@@ -382,22 +382,26 @@ class Query(BaseExpression):
                 # before the contains_aggregate/is_summary condition below.
                 new_expr, col_cnt = self.rewrite_cols(expr, col_cnt)
                 new_exprs.append(new_expr)
-            elif isinstance(expr, (Col, Subquery)) or (expr.contains_aggregate and not expr.is_summary):
-                # Reference to column, subquery, or another aggregate. Make
-                # sure the expression is selected and reuse its alias if so.
+            else:
+                # Reuse aliases of expressions already selected in subquery.
                 for col_alias, selected_annotation in self.annotation_select.items():
                     if selected_annotation == expr:
+                        new_expr = Ref(col_alias, expr)
                         break
                 else:
-                    col_cnt += 1
-                    col_alias = '__col%d' % col_cnt
-                    self.annotations[col_alias] = expr
-                    self.append_annotation_mask([col_alias])
-                new_exprs.append(Ref(col_alias, expr))
-            else:
-                # Some other expression not referencing database values
-                # directly. Its subexpression might contain Cols.
-                new_expr, col_cnt = self.rewrite_cols(expr, col_cnt)
+                    # An expression that is not selected the subquery.
+                    if isinstance(expr, Col) or (expr.contains_aggregate and not expr.is_summary):
+                        # Reference column or another aggregate. Select it
+                        # under a non-conflicting alias.
+                        col_cnt += 1
+                        col_alias = '__col%d' % col_cnt
+                        self.annotations[col_alias] = expr
+                        self.append_annotation_mask([col_alias])
+                        new_expr = Ref(col_alias, expr)
+                    else:
+                        # Some other expression not referencing database values
+                        # directly. Its subexpression might contain Cols.
+                        new_expr, col_cnt = self.rewrite_cols(expr, col_cnt)
                 new_exprs.append(new_expr)
         annotation.set_source_expressions(new_exprs)
         return annotation, col_cnt
