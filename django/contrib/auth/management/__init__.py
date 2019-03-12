@@ -28,9 +28,86 @@ def _get_builtin_permissions(opts):
     for action in opts.default_permissions:
         perms.append((
             get_permission_codename(action, opts),
-            'Can %s %s' % (action, opts.verbose_name_raw)
+            _get_builtin_permission_name(action, opts),
         ))
     return perms
+
+
+def _get_builtin_permission_name(action, opts):
+    return 'Can %s %s' % (action, opts.verbose_name_raw)
+
+
+class RenamePermission(migrations.RunPython):
+    def __init__(self, app_label, old_codename, old_name, new_codename, new_name):
+        self.app_label = app_label
+        self.old_codename = old_codename
+        self.old_name = old_name
+        self.new_codename = new_codename
+        self.new_name = new_name
+        super().__init__(self.rename_forward, self.rename_backward)
+
+    def _rename(self, apps, schema_editor, old_codename, old_name, new_codename, new_name):
+        Permission = apps.get_model('auth', 'Permission')
+        db = schema_editor.connection.alias
+        if not router.allow_migrate_model(db, Permission):
+            return
+
+        try:
+            permission = Permission.objects.db_manager(db).get(
+                content_type__app_label=self.app_label,
+                codename=old_codename,
+            )
+        except Permission.DoesNotExist:
+            pass
+        else:
+            permission.codename = new_codename
+            permission.name = new_name
+            permission.save(update_fields={'codename', 'name'})
+
+    def rename_forward(self, apps, schema_editor):
+        self._rename(apps, schema_editor, self.old_codename, self.old_name, self.new_codename, self.new_name)
+
+    def rename_backward(self, apps, schema_editor):
+        self._rename(apps, schema_editor, self.new_codename, self.new_name, self.old_codename, self.old_name)
+
+
+def inject_rename_default_permissions_for_renamed_model(migration, operation, from_state, to_state, **kwargs):
+    # Determine whether or not the Permission model is available.
+    if ('auth', 'permission') not in from_state.models:
+        return
+
+    RenamedModel = to_state.apps.get_model(migration.app_label, operation.new_name)
+    Model = from_state.apps.get_model(migration.app_label, operation.old_name)
+    renamed_opts = RenamedModel._meta
+    opts = Model._meta
+
+    for action in renamed_opts.default_permissions:
+        new_codename = get_permission_codename(action, renamed_opts)
+        old_codename = get_permission_codename(action, opts)
+        new_name = _get_builtin_permission_name(action, renamed_opts)
+        old_name = _get_builtin_permission_name(action, opts)
+        yield RenamePermission(migration.app_label, old_codename, old_name, new_codename, new_name)
+
+
+def inject_rename_permissions_for_altered_verbose_name(migration, operation, from_state, to_state, **kwargs):
+    # Determine whether or not the Permission model is available.
+    if ('auth', 'permission') not in from_state.models:
+        return
+
+    if "verbose_name" not in operation.options:
+        return
+
+    AlteredModel = to_state.apps.get_model(migration.app_label, operation.name)
+    Model = from_state.apps.get_model(migration.app_label, operation.name)
+    altered_opts = AlteredModel._meta
+    opts = Model._meta
+
+    for action in altered_opts.default_permissions:
+        new_codename = get_permission_codename(action, altered_opts)
+        new_name = _get_builtin_permission_name(action, altered_opts)
+        old_codename = get_permission_codename(action, opts)
+        old_name = _get_builtin_permission_name(action, opts)
+        yield RenamePermission(migration.app_label, old_codename, old_name, new_codename, new_name)
 
 
 def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_DB_ALIAS, apps=global_apps, **kwargs):
@@ -107,7 +184,7 @@ class CreatePermission(migrations.RunPython):
             return
 
         try:
-            content_type = ContentType.objects.get_by_natural_key(self.app_label, self.model)
+            content_type = ContentType.objects.get_for_model(self.model, for_concrete_model=False)
             Permission.objects.using(db).get_or_create(
                 content_type=content_type,
                 codename=self.codename,
@@ -115,32 +192,63 @@ class CreatePermission(migrations.RunPython):
             )
         except OperationalError:
             # We are trying to create a permission before all the migrations for
-            # ContentType and Permission are applied.
-            # TODO: Register post_migrate(defer_permission_creation)?
+            # ContentType and Permission are applied. It will be created via
+            # the post_migrate signal.
             pass
 
 
-def inject_create_permissions(migration, operation, from_state, model_name):
+def inject_create_permissions(migration, operation, from_state, to_state, model_name):
     if ('auth', 'permission') not in from_state.models:
         return
 
-    Model = global_apps.get_model(migration.app_label, model_name)
+    Model = to_state.apps.get_model(migration.app_label, model_name)
     opts = Model._meta
 
     for codename, name in _get_all_permissions(opts):
-        yield CreatePermission(migration.app_label, model_name, codename, name)
+        yield CreatePermission(migration.app_label, Model, codename, name)
 
 
-def inject_create_permissions_for_created_contenttype(migration, operation, from_state, **kwargs):
-    return inject_create_permissions(migration, operation, from_state, operation.model)
+def inject_create_permissions_for_created_contenttype(migration, operation, from_state, to_state, **kwargs):
+    return inject_create_permissions(migration, operation, from_state, to_state, operation.model)
 
 
-def inject_create_permissions_for_renamed_contenttype(migration, operation, from_state, **kwargs):
-    return inject_create_permissions(migration, operation, from_state, operation.new_model)
+def inject_create_permissions_for_renamed_contenttype(migration, operation, from_state, to_state, **kwargs):
+    return inject_create_permissions(migration, operation, from_state, to_state, operation.new_model)
 
 
-def inject_create_permissions_for_altered_model(migration, operation, from_state, **kwargs):
-    return inject_create_permissions(migration, operation, from_state, operation.name)
+def inject_create_or_rename_permissions_for_altered_permissions(migration, operation, from_state, to_state, **kwargs):
+    """
+    Unaltered permissions are ignored, only create new permissions for altered or
+    new permissions.
+    """
+    if ('auth', 'permission') not in from_state.models:
+        return
+
+    # Create permissions only for the permissions in the operation
+    if "permissions" not in operation.options and "default_permissions" not in operation.options:
+        return
+
+    FromModel = from_state.apps.get_model(migration.app_label, operation.name)
+    from_opts = FromModel._meta
+    from_permissions = dict(_get_all_permissions(from_opts))
+
+    ToModel = to_state.apps.get_model(migration.app_label, operation.name)
+    to_opts = ToModel._meta
+    to_permissions = _get_all_permissions(to_opts)
+
+    for to_codename, to_name in to_permissions:
+        from_name = from_permissions.get(to_codename)
+        # Permission hasn't been altered
+        if from_name == to_name:
+            continue
+
+        # New permission
+        if from_name is None:
+            yield CreatePermission(migration.app_label, ToModel, to_codename, to_name)
+        else:
+            # Altered name
+            print(to_codename, from_name, to_codename, to_name)
+            yield RenamePermission(migration.app_label, to_codename, from_name, to_codename, to_name)
 
 
 def get_system_username():
