@@ -55,9 +55,18 @@ class ModelChoiceFieldTests(TestCase):
         with self.assertRaisesMessage(ValidationError, msg):
             f.clean(c4.id)
 
+    def test_clean_model_instance(self):
+        f = forms.ModelChoiceField(Category.objects.all())
+        self.assertEqual(f.clean(self.c1), self.c1)
+        # An instance of incorrect model.
+        msg = "['Select a valid choice. That choice is not one of the available choices.']"
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean(Book.objects.create())
+
     def test_clean_to_field_name(self):
         f = forms.ModelChoiceField(Category.objects.all(), to_field_name='slug')
         self.assertEqual(f.clean(self.c1.slug), self.c1)
+        self.assertEqual(f.clean(self.c1), self.c1)
 
     def test_choices(self):
         f = forms.ModelChoiceField(Category.objects.filter(pk=self.c1.id), required=False)
@@ -193,6 +202,16 @@ class ModelChoiceFieldTests(TestCase):
     def test_disabled_modelchoicefield_has_changed(self):
         field = forms.ModelChoiceField(Author.objects.all(), disabled=True)
         self.assertIs(field.has_changed('x', 'y'), False)
+
+    def test_disabled_modelchoicefield_initial_model_instance(self):
+        class ModelChoiceForm(forms.Form):
+            categories = forms.ModelChoiceField(
+                Category.objects.all(),
+                disabled=True,
+                initial=self.c1,
+            )
+
+        self.assertTrue(ModelChoiceForm(data={'categories': self.c1.pk}).is_valid())
 
     def test_disabled_multiplemodelchoicefield(self):
         class ArticleForm(forms.ModelForm):
