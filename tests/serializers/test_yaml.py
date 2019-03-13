@@ -115,7 +115,9 @@ class YamlSerializerTestCase(SerializersTestBase, TestCase):
     author: %(author_pk)s
     headline: Poker has no place on ESPN
     pub_date: 2006-06-16 11:00:00
-    categories: [%(first_category_pk)s, %(second_category_pk)s]
+    categories:""" + (
+        ' [%(first_category_pk)s, %(second_category_pk)s]' if yaml.__version__ < '5.1'
+        else '\n    - %(first_category_pk)s\n    - %(second_category_pk)s') + """
     meta_data: []
 """
 
