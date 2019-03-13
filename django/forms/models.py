@@ -1248,6 +1248,8 @@ class ModelChoiceField(ChoiceField):
             return None
         try:
             key = self.to_field_name or 'pk'
+            if isinstance(value, self.queryset.model):
+                value = getattr(value, key)
             value = self.queryset.get(**{key: value})
         except (ValueError, TypeError, self.queryset.model.DoesNotExist):
             raise ValidationError(self.error_messages['invalid_choice'], code='invalid_choice')
