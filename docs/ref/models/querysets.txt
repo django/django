@@ -371,6 +371,15 @@ query will be ordered by ``pub_date`` and not ``headline``::
 
     Entry.objects.order_by('headline').order_by('pub_date')
 
+.. note::
+
+    When ordering a field (or an annotation) that includes nulls, the database
+    may choose to put nulls at the start or end of the queryset.  To influence
+    this, use an :class:`~django.db.models.F` expression and provide either
+    `nulls_first=True` or `nulls_last=True` in the `asc` or `desc` methods::
+
+        Entry.objects.order_by(models.F('pub_date).asc(nulls_first=True))
+
 .. warning::
 
     Ordering is not a free operation. Each field you add to the ordering
