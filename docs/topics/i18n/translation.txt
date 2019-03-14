@@ -2137,5 +2137,5 @@ This behavior appears because :setting:`LOGIN_URL` is by default set to ``'/acco
 the default login page.
 
 To overcome this you need to override :setting:`LOGIN_URL` to something that depends on the current language.
-For example declare ``LOGIN_URL='login''`` in your settings.py.
+For example declare ``LOGIN_URL='login'`` in your settings.py.
 
