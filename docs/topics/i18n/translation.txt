@@ -2124,3 +2124,18 @@ aware of certain limitations:
   but the original strings. For example, an English user visiting a site with
   :setting:`LANGUAGE_CODE` set to Spanish and original strings written in
   Russian will see Russian text rather than Spanish.
+  
+Using Django translation together with the Django authentication system
+-----------------------------------------------------------------------
+
+Using translation together with the Django authentication system works out of the box.
+However, unwanted behavior might occur for redirecting to the login page.
+In particular, a request to a view that is only visible for authorized users is redirected 
+to the default login page and not the language specific login page. 
+
+This behavior appears because :setting:`LOGIN_URL` is by default set to ``'/accounts/login/'`` which is
+the default login page.
+
+To overcome this you need to override :setting:`LOGIN_URL` to something that depends on the current language.
+For example declare ``LOGIN_URL='login''`` in your settings.py.
+
