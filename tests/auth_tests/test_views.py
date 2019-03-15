@@ -854,7 +854,7 @@ class LoginRedirectAuthenticatedUser(AuthViewsTestCase):
         self.login()
         msg = (
             "Redirection loop for authenticated user detected. Check that "
-            "your LOGIN_REDIRECT_URL doesn't point to a login page"
+            "your LOGIN_REDIRECT_URL doesn't point to a login page."
         )
         with self.settings(LOGIN_REDIRECT_URL=self.do_redirect_url):
             with self.assertRaisesMessage(ValueError, msg):

@@ -829,8 +829,9 @@ class ClientTest(TestCase):
 
     def test_response_raises_multi_arg_exception(self):
         """A request may raise an exception with more than one required arg."""
-        with self.assertRaises(TwoArgException):
+        with self.assertRaises(TwoArgException) as cm:
             self.client.get('/two_arg_exception/')
+        self.assertEqual(cm.exception.args, ('one', 'two'))
 
     def test_uploading_temp_file(self):
         with tempfile.TemporaryFile() as test_file:
