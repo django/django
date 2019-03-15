@@ -63,7 +63,8 @@ class ManyToManyTests(TestCase):
         )
 
         # Adding an object of the wrong type raises TypeError
-        with self.assertRaisesMessage(TypeError, "'Publication' instance expected, got <Article"):
+        msg = "'Publication' instance expected, got <Article: Django lets you create Web apps easily>"
+        with self.assertRaisesMessage(TypeError, msg):
             with transaction.atomic():
                 a6.publications.add(a5)
 

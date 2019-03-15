@@ -286,7 +286,7 @@ class TestRaiseLastException(SimpleTestCase):
             exc_info = sys.exc_info()
 
         with mock.patch('django.utils.autoreload._exception', exc_info):
-            with self.assertRaises(MyException, msg='Test Message'):
+            with self.assertRaisesMessage(MyException, 'Test Message'):
                 autoreload.raise_last_exception()
 
 
