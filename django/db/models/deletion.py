@@ -136,8 +136,7 @@ class Collector:
         else:
             return False
         if (signals.pre_delete.has_listeners(model) or
-                signals.post_delete.has_listeners(model) or
-                signals.m2m_changed.has_listeners(model)):
+                signals.post_delete.has_listeners(model)):
             return False
         # The use of from_field comes from the need to avoid cascade back to
         # parent when parent delete is cascading to child.
