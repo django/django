@@ -177,6 +177,8 @@ def setup(verbosity, test_labels, parallel):
         'fields.W342',  # ForeignKey(unique=True) -> OneToOneField
     ]
 
+    settings.DEBUG_PROPAGATE_EXCEPTIONS = None  # RemovedInDjango40Warning
+
     # Load all the ALWAYS_INSTALLED_APPS.
     django.setup()
 

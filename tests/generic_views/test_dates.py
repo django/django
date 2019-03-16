@@ -84,8 +84,8 @@ class ArchiveIndexViewTests(TestDataMixin, TestCase):
             'BookArchive is missing a QuerySet. Define BookArchive.model, '
             'BookArchive.queryset, or override BookArchive.get_queryset().'
         )
-        with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            self.client.get('/dates/books/invalid/')
+        response = self.client.get('/dates/books/invalid/')
+        self.assertRequestRaises(response, ImproperlyConfigured, msg)
 
     def test_archive_view_by_month(self):
         res = self.client.get('/dates/books/by_month/')
@@ -158,8 +158,8 @@ class ArchiveIndexViewTests(TestDataMixin, TestCase):
 
     def test_archive_view_without_date_field(self):
         msg = 'BookArchiveWithoutDateField.date_field is required.'
-        with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            self.client.get('/dates/books/without_date_field/')
+        response = self.client.get('/dates/books/without_date_field/')
+        self.assertRequestRaises(response, ImproperlyConfigured, msg)
 
 
 @override_settings(ROOT_URLCONF='generic_views.urls')
@@ -288,8 +288,9 @@ class YearArchiveViewTests(TestDataMixin, TestCase):
         BaseDateListView.get().
         """
         BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0))
-        with self.assertRaisesMessage(TypeError, 'context must be a dict rather than MagicMock.'):
-            self.client.get('/dates/booksignings/2008/')
+        msg = 'context must be a dict rather than MagicMock.'
+        response = self.client.get('/dates/booksignings/2008/')
+        self.assertRequestRaises(response, TypeError, msg)
         args, kwargs = mock.call_args
         # These are context values from get_dated_items().
         self.assertEqual(kwargs['year'], datetime.date(2008, 1, 1))
@@ -298,8 +299,8 @@ class YearArchiveViewTests(TestDataMixin, TestCase):
 
     def test_get_dated_items_not_implemented(self):
         msg = 'A DateView must provide an implementation of get_dated_items()'
-        with self.assertRaisesMessage(NotImplementedError, msg):
-            self.client.get('/BaseDateListViewTest/')
+        response = self.client.get('/BaseDateListViewTest/')
+        self.assertRequestRaises(response, NotImplementedError, msg)
 
 
 @override_settings(ROOT_URLCONF='generic_views.urls')
@@ -539,8 +540,9 @@ class WeekArchiveViewTests(TestDataMixin, TestCase):
         self.assertEqual(res.context['week'], datetime.date(2008, 9, 29))
 
     def test_unknown_week_format(self):
-        with self.assertRaisesMessage(ValueError, "Unknown week format '%T'. Choices are: %U, %W"):
-            self.client.get('/dates/books/2008/week/39/unknown_week_format/')
+        msg = "Unknown week format '%T'. Choices are: %U, %W"
+        response = self.client.get('/dates/books/2008/week/39/unknown_week_format/')
+        self.assertRequestRaises(response, ValueError, msg)
 
     def test_datetime_week_view(self):
         BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0))
@@ -727,8 +729,8 @@ class DateDetailViewTests(TestDataMixin, TestCase):
             'Generic detail view BookDetail must be called with either an '
             'object pk or a slug in the URLconf.'
         )
-        with self.assertRaisesMessage(AttributeError, msg):
-            self.client.get("/dates/books/2008/oct/01/nopk/")
+        response = self.client.get('/dates/books/2008/oct/01/nopk/')
+        self.assertRequestRaises(response, AttributeError, msg)
 
     def test_get_object_custom_queryset(self):
         """

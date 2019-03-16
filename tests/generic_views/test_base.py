@@ -313,8 +313,8 @@ class TemplateViewTest(SimpleTestCase):
             "TemplateResponseMixin requires either a definition of "
             "'template_name' or an implementation of 'get_template_names()'"
         )
-        with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            self.client.get('/template/no_template/')
+        response = self.client.get('/template/no_template/')
+        self.assertRequestRaises(response, ImproperlyConfigured, msg)
 
     @require_jinja2
     def test_template_engine(self):

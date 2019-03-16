@@ -854,15 +854,16 @@ class ExceptionTests(TestDataMixin, TestCase):
 
         login = self.client.login(username='testclient', password='password')
         self.assertTrue(login, 'Could not log in')
-        with self.assertRaises(CustomTestException):
-            self.client.get("/staff_only/")
+        response = self.client.get('/staff_only/')
+        self.assertRequestRaises(response, CustomTestException)
 
         # At this point, an exception has been raised, and should be cleared.
 
         # This next operation should be successful; if it isn't we have a problem.
         login = self.client.login(username='staff', password='password')
         self.assertTrue(login, 'Could not log in')
-        self.client.get("/staff_only/")
+        response = self.client.get('/staff_only/')
+        self.assertIsNone(response.exc_info)
 
 
 @override_settings(ROOT_URLCONF='test_client_regress.urls')
@@ -874,8 +875,8 @@ class TemplateExceptionTests(SimpleTestCase):
     }])
     def test_bad_404_template(self):
         "Errors found when rendering 404 error templates are re-raised"
-        with self.assertRaises(TemplateSyntaxError):
-            self.client.get("/no_such_view/")
+        response = self.client.get("/no_such_view/")
+        self.assertRequestRaises(response, TemplateSyntaxError)
 
 
 # We need two different tests to check URLconf substitution -  one to check

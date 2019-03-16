@@ -857,12 +857,12 @@ class LoginRedirectAuthenticatedUser(AuthViewsTestCase):
             "your LOGIN_REDIRECT_URL doesn't point to a login page."
         )
         with self.settings(LOGIN_REDIRECT_URL=self.do_redirect_url):
-            with self.assertRaisesMessage(ValueError, msg):
-                self.client.get(self.do_redirect_url)
+            response = self.client.get(self.do_redirect_url)
+            self.assertRequestRaises(response, ValueError, msg)
 
             url = self.do_redirect_url + '?bla=2'
-            with self.assertRaisesMessage(ValueError, msg):
-                self.client.get(url)
+            response = self.client.get(url)
+            self.assertRequestRaises(response, ValueError, msg)
 
     def test_permission_required_not_logged_in(self):
         # Not logged in ...

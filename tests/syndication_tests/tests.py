@@ -185,12 +185,12 @@ class SyndicationFeedTest(FeedTestCase):
             self.assertEqual(len(enclosures), 1)
 
     def test_rss2_multiple_enclosures(self):
-        with self.assertRaisesMessage(
-            ValueError,
+        msg = (
             "RSS feed items may only have one enclosure, see "
             "http://www.rssboard.org/rss-profile#element-channel-item-enclosure"
-        ):
-            self.client.get('/syndication/rss2/multiple-enclosure/')
+        )
+        response = self.client.get('/syndication/rss2/multiple-enclosure/')
+        self.assertRequestRaises(response, ValueError, msg)
 
     def test_rss091_feed(self):
         """
@@ -456,8 +456,8 @@ class SyndicationFeedTest(FeedTestCase):
             'Give your Article class a get_absolute_url() method, or define '
             'an item_link() method in your Feed class.'
         )
-        with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            self.client.get('/syndication/articles/')
+        response = self.client.get('/syndication/articles/')
+        self.assertRequestRaises(response, ImproperlyConfigured, msg)
 
     def test_template_feed(self):
         """

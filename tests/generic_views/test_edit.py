@@ -164,8 +164,11 @@ class CreateViewTests(TestCase):
             'No URL to redirect to.  Either provide a url or define a '
             'get_absolute_url method on the Model.'
         )
-        with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            self.client.post('/edit/authors/create/naive/', {'name': 'Randall Munroe', 'slug': 'randall-munroe'})
+        response = self.client.post(
+            '/edit/authors/create/naive/',
+            {'name': 'Randall Munroe', 'slug': 'randall-munroe'},
+        )
+        self.assertRequestRaises(response, ImproperlyConfigured, msg)
 
     def test_create_restricted(self):
         res = self.client.post(
@@ -308,11 +311,11 @@ class UpdateViewTests(TestCase):
             'No URL to redirect to.  Either provide a url or define a '
             'get_absolute_url method on the Model.'
         )
-        with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            self.client.post(
-                '/edit/author/%d/update/naive/' % self.author.pk,
-                {'name': 'Randall Munroe (author of xkcd)', 'slug': 'randall-munroe'}
-            )
+        response = self.client.post(
+            '/edit/author/%d/update/naive/' % self.author.pk,
+            {'name': 'Randall Munroe (author of xkcd)', 'slug': 'randall-munroe'}
+        )
+        self.assertRequestRaises(response, ImproperlyConfigured, msg)
 
     def test_update_get_object(self):
         res = self.client.get('/edit/author/update/')
@@ -392,5 +395,5 @@ class DeleteViewTests(TestCase):
 
     def test_delete_without_redirect(self):
         msg = 'No URL to redirect to. Provide a success_url.'
-        with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            self.client.post('/edit/author/%d/delete/naive/' % self.author.pk)
+        response = self.client.post('/edit/author/%d/delete/naive/' % self.author.pk)
+        self.assertRequestRaises(response, ImproperlyConfigured, msg)

@@ -194,13 +194,12 @@ Templates
 Tests
 ~~~~~
 
-* The new test :class:`~django.test.Client` argument
-  ``raise_request_exception`` allows controlling whether or not exceptions
-  raised during the request should also be raised in the test. The value
-  defaults to ``True`` for backwards compatibility. If it is ``False`` and an
-  exception occurs, the test client will return a 500 response with the
-  attribute :attr:`~django.test.Response.exc_info`, a tuple providing
-  information of the exception that occurred.
+* If an exception is raised during a test client request, the attribute
+  :attr:`~django.test.Response.exc_info` is assigned a tuple providing
+  information of the exception.
+
+* The new :meth:`.SimpleTestCase.assertRequestRaises` asserts that an exception
+  was raised during a test client request.
 
 URLs
 ~~~~
@@ -354,6 +353,12 @@ Miscellaneous
   :func:`django.views.i18n.set_language` will stop setting the user's language
   in the session in Django 4.0. Since Django 2.1, the language is always stored
   in the :setting:`LANGUAGE_COOKIE_NAME` cookie.
+
+* Raising exceptions during test client requests is deprecated and will stop in
+  Django 4.0. To continue raising the exception, set
+  :setting:`DEBUG_PROPAGATE_EXCEPTIONS` to ``True``. To use the new behavior
+  and silence the deprecation warning during tests, set the setting to
+  ``None``.
 
 .. _removed-features-3.0:
 

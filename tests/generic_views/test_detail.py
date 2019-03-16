@@ -46,8 +46,8 @@ class DetailViewTest(TestCase):
         self.assertEqual(res.status_code, 404)
 
     def test_detail_object_does_not_exist(self):
-        with self.assertRaises(ObjectDoesNotExist):
-            self.client.get('/detail/doesnotexist/1/')
+        response = self.client.get('/detail/doesnotexist/1/')
+        self.assertRequestRaises(response, ObjectDoesNotExist)
 
     def test_detail_by_custom_pk(self):
         res = self.client.get('/detail/author/bycustompk/%s/' % self.author1.pk)
@@ -171,16 +171,16 @@ class DetailViewTest(TestCase):
         self.assertEqual(form_context_data['author'], self.author1)
 
     def test_invalid_url(self):
-        with self.assertRaises(AttributeError):
-            self.client.get('/detail/author/invalid/url/')
+        response = self.client.get('/detail/author/invalid/url/')
+        self.assertRequestRaises(response, AttributeError)
 
     def test_invalid_queryset(self):
         msg = (
             'AuthorDetail is missing a QuerySet. Define AuthorDetail.model, '
             'AuthorDetail.queryset, or override AuthorDetail.get_queryset().'
         )
-        with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            self.client.get('/detail/author/invalid/qs/')
+        response = self.client.get('/detail/author/invalid/qs/')
+        self.assertRequestRaises(response, ImproperlyConfigured, msg)
 
     def test_non_model_object_with_meta(self):
         res = self.client.get('/detail/nonmodel/1/')

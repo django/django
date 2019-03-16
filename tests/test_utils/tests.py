@@ -1346,3 +1346,48 @@ class TestContextDecoratorTests(SimpleTestCase):
         with self.assertRaisesMessage(NotImplementedError, 'reraised'):
             decorated_test_class.setUp()
         self.assertTrue(mock_disable.called)
+
+
+@override_settings(ROOT_URLCONF='test_utils.urls')
+class AssertRequestRaisesTests(SimpleTestCase):
+    def test_without_expected_message(self):
+        response = self.client.get('/test_utils/broken_view/')
+        self.assertRequestRaises(response, KeyError)
+
+    def test_with_expected_message(self):
+        expected_message = "'foo'"
+        response = self.client.get('/test_utils/broken_view/')
+        self.assertRequestRaises(response, KeyError, expected_message)
+
+    def test_with_partial_expected_message(self):
+        expected_message = 'fo'
+        response = self.client.get('/test_utils/broken_view/')
+        self.assertRequestRaises(response, KeyError, expected_message)
+
+    def test_with_parent_type(self):
+        response = self.client.get('/test_utils/broken_view/')
+        self.assertRequestRaises(response, LookupError)
+
+    def test_no_exception(self):
+        response = self.client.get('/test_utils/no_template_used/')
+        msg = 'No exception occurred during the request.'
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertRequestRaises(response, Exception)
+
+    def test_wrong_type(self):
+        response = self.client.get('/test_utils/broken_view/')
+        msg = "<class 'KeyError'> is not a subclass of <class 'TypeError'>"
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertRequestRaises(response, TypeError)
+
+    def test_wrong_message(self):
+        expected_message = "'bar'"
+        response = self.client.get('/test_utils/broken_view/')
+        msg = '"\'bar\'" not found in "\'foo\'"'
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertRequestRaises(response, KeyError, expected_message)
+
+    def test_custom_message(self):
+        response = self.client.get('/test_utils/no_template_used/')
+        with self.assertRaisesMessage(AssertionError, "Custom exception message"):
+            self.assertRequestRaises(response, Exception, msg="Custom exception message")

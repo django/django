@@ -204,16 +204,16 @@ class ListViewTests(TestCase):
             'AuthorList is missing a QuerySet. Define AuthorList.model, '
             'AuthorList.queryset, or override AuthorList.get_queryset().'
         )
-        with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            self.client.get('/list/authors/invalid/')
+        response = self.client.get('/list/authors/invalid/')
+        self.assertRequestRaises(response, ImproperlyConfigured, msg)
 
     def test_invalid_get_queryset(self):
         msg = (
             "AuthorListGetQuerysetReturnsNone requires either a 'template_name' "
             "attribute or a get_queryset() method that returns a QuerySet."
         )
-        with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            self.client.get('/list/authors/get_queryset/')
+        response = self.client.get('/list/authors/get_queryset/')
+        self.assertRequestRaises(response, ImproperlyConfigured, msg)
 
     def test_paginated_list_view_does_not_load_entire_table(self):
         # Regression test for #17535

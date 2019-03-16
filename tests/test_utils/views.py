@@ -17,3 +17,9 @@ def no_template_used(request):
 
 def empty_response(request):
     return HttpResponse()
+
+
+def broken_view(request):
+    d = {}
+    # KeyError: 'foo'
+    d['foo']

@@ -3,6 +3,7 @@ import mimetypes
 import os
 import re
 import sys
+import warnings
 from copy import copy
 from functools import partial
 from http import HTTPStatus
@@ -22,6 +23,7 @@ from django.http import HttpRequest, QueryDict, SimpleCookie
 from django.test import signals
 from django.test.utils import ContextList
 from django.urls import resolve
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.encoding import force_bytes
 from django.utils.functional import SimpleLazyObject
 from django.utils.http import urlencode
@@ -439,10 +441,9 @@ class Client(RequestFactory):
     contexts and templates produced by a view, rather than the
     HTML rendered to the end-user.
     """
-    def __init__(self, enforce_csrf_checks=False, raise_request_exception=True, **defaults):
+    def __init__(self, enforce_csrf_checks=False, **defaults):
         super().__init__(**defaults)
         self.handler = ClientHandler(enforce_csrf_checks)
-        self.raise_request_exception = raise_request_exception
         self.exc_info = None
 
     def store_exc_info(self, **kwargs):
@@ -492,7 +493,16 @@ class Client(RequestFactory):
         if self.exc_info:
             _, exc_value, _ = self.exc_info
             self.exc_info = None
-            if self.raise_request_exception:
+            if settings.DEBUG_PROPAGATE_EXCEPTIONS is not None:
+                warnings.warn(
+                    'Raising exceptions during test client requests is '
+                    'deprecated. To continue raising the exception, set the '
+                    'setting DEBUG_PROPAGATE_EXCEPTIONS to True. To silence '
+                    'this warning, set it to None. The exception can continue '
+                    'to be tested by inspecting response.exc_info or by using '
+                    'SimpleTestCase.assertRequestRaises().',
+                    RemovedInDjango40Warning,
+                )
                 raise exc_value
         # Save the client and request that stimulated the response.
         response.client = self

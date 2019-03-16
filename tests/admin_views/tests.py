@@ -890,8 +890,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         Refs: #16655, #18593, and #18747
         """
         Simple.objects.create()
-        with self.assertRaises(AttributeError):
-            self.client.get(reverse('admin:admin_views_simple_changelist'))
+        response = self.client.get(reverse('admin:admin_views_simple_changelist'))
+        self.assertRequestRaises(response, AttributeError)
 
     def test_changelist_with_no_change_url(self):
         """

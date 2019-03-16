@@ -128,14 +128,6 @@ Use the ``django.test.Client`` class to make requests.
     The ``json_encoder`` argument allows setting a custom JSON encoder for
     the JSON serialization that's described in :meth:`post`.
 
-    The ``raise_request_exception`` argument allows controlling whether or not
-    exceptions raised during the request should also be raised in the test.
-    Defaults to ``True``.
-
-    .. versionadded:: 3.0
-
-        The ``raise_request_exception`` argument was added.
-
     Once you have a ``Client`` instance, you can call any of the following
     methods:
 
@@ -569,10 +561,16 @@ content type of a response using ``response['Content-Type']``.
 Exceptions
 ----------
 
-If you point the test client at a view that raises an exception and
-``Client.raise_request_exception`` is ``True``, that exception will be visible
-in the test case. You can then use a standard ``try ... except`` block or
-:meth:`~unittest.TestCase.assertRaises` to test for exceptions.
+.. deprecated:: 3.0
+
+This following behavior is deprecated and will be removed in Django 4.0. To
+continue raising exceptions in tests, set :setting:`DEBUG_PROPAGATE_EXCEPTIONS`
+to ``True``.
+
+If you point the test client at a view that raises an exception that exception
+will be visible in the test case. You can then use a standard ``try ...
+except`` block or :meth:`~unittest.TestCase.assertRaises` to test for
+exceptions.
 
 The only exceptions that are not visible to the test client are
 :class:`~django.http.Http404`,
@@ -581,7 +579,7 @@ The only exceptions that are not visible to the test client are
 exceptions internally and converts them into the appropriate HTTP response
 codes. In these cases, you can check ``response.status_code`` in your test.
 
-If ``Client.raise_request_exception`` is ``False``, the test client will return a
+If ``DEBUG_PROPAGATE_EXCEPTIONS`` is ``None``, the test client will return a
 500 response as would be returned to a browser. The response has the attribute
 :attr:`~Response.exc_info` to provide information about the unhandled
 exception.
@@ -1677,6 +1675,17 @@ your test suite.
     See :meth:`~SimpleTestCase.assertJSONEqual` for further details.
 
     Output in case of error can be customized with the ``msg`` argument.
+
+.. method:: SimpleTestCase.assertRequestRaises(response, expected_exception, expected_message=None, msg=None)
+
+   .. versionadded:: 3.0
+
+   Asserts that an exception was raised during a test client request::
+
+        response = self.client.get('/broken-view/')
+        self.assertRequestException(response, NameError, "name 'foo' is not defined")
+
+   Output in case of error can be customized with the ``msg`` argument.
 
 .. method:: TransactionTestCase.assertQuerysetEqual(qs, values, transform=repr, ordered=True, msg=None)
 

@@ -62,8 +62,8 @@ class MiddlewareTests(SimpleTestCase):
             "NoTemplateResponseMiddleware.process_template_response didn't "
             "return an HttpResponse object. It returned None instead."
         )
-        with self.assertRaisesMessage(ValueError, msg):
-            self.client.get('/middleware_exceptions/template_response/')
+        response = self.client.get('/middleware_exceptions/template_response/')
+        self.assertRequestRaises(response, ValueError, msg)
 
     @override_settings(MIDDLEWARE=['middleware_exceptions.middleware.LogMiddleware'])
     def test_view_exception_converted_before_middleware(self):

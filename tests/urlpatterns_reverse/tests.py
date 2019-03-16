@@ -1001,8 +1001,8 @@ class RequestURLconfTests(SimpleTestCase):
             "Reverse for 'outer' not found. 'outer' is not a valid view "
             "function or pattern name."
         )
-        with self.assertRaisesMessage(NoReverseMatch, msg):
-            self.client.get('/second_test/')
+        response = self.client.get('/second_test/')
+        self.assertRequestRaises(response, NoReverseMatch, msg)
 
     @override_settings(
         MIDDLEWARE=[
@@ -1074,8 +1074,8 @@ class DefaultErrorHandlerTests(SimpleTestCase):
         self.assertEqual(response.status_code, 404)
 
         msg = "I don't think I'm getting good value for this view"
-        with self.assertRaisesMessage(ValueError, msg):
-            self.client.get('/bad_view/')
+        response = self.client.get('/bad_view/')
+        self.assertRequestRaises(response, ValueError, msg)
 
 
 @override_settings(ROOT_URLCONF=None)
@@ -1088,8 +1088,8 @@ class NoRootUrlConfTests(SimpleTestCase):
             "in it. If you see valid patterns in the file then the issue is "
             "probably caused by a circular import."
         )
-        with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            self.client.get('/test/me/')
+        response = self.client.get('/test/me/')
+        self.assertRequestRaises(response, ImproperlyConfigured, msg)
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.namespace_urls')

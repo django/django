@@ -869,6 +869,27 @@ class SimpleTestCase(unittest.TestCase):
                 standardMsg = '%s == %s' % (safe_repr(xml1, True), safe_repr(xml2, True))
                 self.fail(self._formatMessage(msg, standardMsg))
 
+    def assertRequestRaises(self, response, expected_exception, expected_message=None, msg=None):
+        """Assert that an exception was raised during a test client request."""
+        try:
+            self.assertIsNotNone(
+                response.exc_info,
+                msg='No exception occurred during the request.'
+            )
+            self.assertEqual(response.status_code, 500)
+            exc_type, exc_value, _ = response.exc_info
+            self.assertTrue(
+                issubclass(exc_type, expected_exception),
+                msg='%r is not a subclass of %r.' % (exc_type, expected_exception)
+            )
+            self.assertIsInstance(exc_value, expected_exception)
+            if expected_message is not None:
+                self.assertIn(expected_message, str(exc_value))
+        except AssertionError as e:
+            if msg is None:
+                raise
+            raise AssertionError(msg) from e
+
 
 class _TransactionTestCaseDatabasesDescriptor:
     """Descriptor for TransactionTestCase.multi_db deprecation."""

@@ -189,8 +189,8 @@ class DebugViewTests(SimpleTestCase):
         Make sure if you don't specify a template, the debug view doesn't blow up.
         """
         with self.assertLogs('django.request', 'ERROR'):
-            with self.assertRaises(TemplateDoesNotExist):
-                self.client.get('/render_no_template/')
+            response = self.client.get('/render_no_template/')
+            self.assertRequestRaises(response, TemplateDoesNotExist)
 
     @override_settings(ROOT_URLCONF='view_tests.default_urls')
     def test_default_urlconf_template(self):

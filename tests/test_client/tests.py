@@ -754,14 +754,14 @@ class ClientTest(TestCase):
         with self.assertRaisesMessage(ImportError, 'nonexistent'):
             self.test_session_modifying_view()
 
+    @override_settings(DEBUG_PROPAGATE_EXCEPTIONS=True)
     def test_view_with_exception(self):
         "Request a page that is known to throw an error"
         with self.assertRaises(KeyError):
             self.client.get("/broken_view/")
 
     def test_exc_info(self):
-        client = Client(raise_request_exception=False)
-        response = client.get("/broken_view/")
+        response = self.client.get('/broken_view/')
         self.assertEqual(response.status_code, 500)
         exc_type, exc_value, exc_traceback = response.exc_info
         self.assertIs(exc_type, KeyError)
@@ -824,14 +824,15 @@ class ClientTest(TestCase):
         A nested test client request shouldn't clobber exception signals from
         the outer client request.
         """
-        with self.assertRaisesMessage(Exception, 'exception message'):
-            self.client.get('/nesting_exception_view/')
+        response = self.client.get('/nesting_exception_view/')
+        self.assertRequestRaises(response, Exception, 'exception message')
 
     def test_response_raises_multi_arg_exception(self):
         """A request may raise an exception with more than one required arg."""
-        with self.assertRaises(TwoArgException) as cm:
-            self.client.get('/two_arg_exception/')
-        self.assertEqual(cm.exception.args, ('one', 'two'))
+        response = self.client.get('/two_arg_exception/')
+        self.assertRequestRaises(response, TwoArgException)
+        _, exc_value, _ = response.exc_info
+        self.assertEqual(exc_value.args, ('one', 'two'))
 
     def test_uploading_temp_file(self):
         with tempfile.TemporaryFile() as test_file:

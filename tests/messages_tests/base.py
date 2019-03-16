@@ -235,8 +235,8 @@ class BaseTests:
         reverse('show_message')
         for level in ('debug', 'info', 'success', 'warning', 'error'):
             add_url = reverse('add_message', args=(level,))
-            with self.assertRaises(MessageFailure):
-                self.client.post(add_url, data, follow=True)
+            response = self.client.post(add_url, data, follow=True)
+            self.assertRequestRaises(response, MessageFailure)
 
     @modify_settings(
         INSTALLED_APPS={'remove': 'django.contrib.messages'},
