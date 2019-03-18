@@ -2052,6 +2052,19 @@ class Query:
         else:
             return self.extra
 
+    def is_alias_available_remove_from_joins(self, lookup_tables, trimmed_paths):
+        """
+        Before unref_alias, check whether the alias is in all_paths list as a auxiliary table.
+        """
+        _itself = self.alias_map[lookup_tables[trimmed_paths]]
+        try:
+            _before = self.alias_map[lookup_tables[trimmed_paths - 1]]
+            _next = self.alias_map[lookup_tables[trimmed_paths + 1]]
+        except IndexError:
+            return True
+        return not (_before.table_alias == _itself.parent_alias and
+                    _next.parent_alias == _itself.table_alias)
+
     def trim_start(self, names_with_path):
         """
         Trim joins from the start of the join path. The candidates for trim
@@ -2102,7 +2115,8 @@ class Query:
         if self.alias_map[lookup_tables[trimmed_paths + 1]].join_type != LOUTER:
             select_fields = [r[0] for r in join_field.related_fields]
             select_alias = lookup_tables[trimmed_paths + 1]
-            self.unref_alias(lookup_tables[trimmed_paths])
+            if self.is_alias_available_remove_from_joins(lookup_tables, trimmed_paths):
+                self.unref_alias(lookup_tables[trimmed_paths])
             extra_restriction = join_field.get_extra_restriction(
                 self.where_class, None, lookup_tables[trimmed_paths + 1])
             if extra_restriction:
