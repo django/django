@@ -795,6 +795,26 @@ class SessionMiddlewareTests(TestCase):
         # The session is accessed so "Vary: Cookie" should be set.
         self.assertEqual(response['Vary'], 'Cookie')
 
+    def test_invalid_session_caching_with_vary_header(self):
+        """
+        If invalid session (i.e. an empty session) is passed via cookie,
+        then SessionMiddleware have to delete the cookie and set
+        Vary: Cookie, to prevent receiving that delete-session-cookie by
+        all subsequent authentication requests.
+        """
+        request = RequestFactory().get('/')
+        response = HttpResponse()
+        middleware = SessionMiddleware()
+
+        middleware.process_request(request)
+
+        request.COOKIES[settings.SESSION_COOKIE_NAME] = '42'
+
+        middleware.process_response(request, response)
+
+        self.assertIn('Vary', response)
+        self.assertIn('Cookie', response['Vary'])
+
     def test_empty_session_saved(self):
         """
         If a session is emptied of data but still has a key, it should still
