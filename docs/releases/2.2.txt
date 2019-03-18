@@ -384,6 +384,20 @@ Finally, proxy model permission strings must be updated to use their own
 ``user.has_perm('other_app.add_myproxymodel')`` to
 ``user.has_perm('app.add_myproxymodel')``.
 
+Merging of form ``Media`` assets
+--------------------------------
+
+Form ``Media`` assets are now merged using a topological sort algorithm, as the
+old pairwise merging algorithm is insufficient for some cases. CSS and
+JavaScript files which don't include their dependencies may now be sorted
+incorrectly (where the old algorithm produced results correctly by
+coincidence).
+
+Audit all ``Media`` classes for any missing dependencies. For example,
+widgets depending on ``django.jQuery`` must specify
+``js=['admin/js/jquery.init.js', ...]`` when :ref:`declaring form media assets
+<assets-as-a-static-definition>`.
+
 Miscellaneous
 -------------
 
