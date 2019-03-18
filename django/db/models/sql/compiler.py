@@ -161,8 +161,10 @@ class SQLCompiler:
                 }
                 expressions = [pk] + [
                     expr for expr in expressions
-                    if expr in having or (
-                        getattr(expr, 'alias', None) is not None and expr.alias not in pk_aliases
+                    if expr in having and not (
+                        getattr(expr, 'alias', None) is None or
+                        expr.alias in pk_aliases or
+                        isinstance(expr, Subquery)
                     )
                 ]
         elif self.connection.features.allows_group_by_selected_pks:
@@ -178,7 +180,10 @@ class SQLCompiler:
             }
             aliases = {expr.alias for expr in pks}
             expressions = [
-                expr for expr in expressions if expr in pks or getattr(expr, 'alias', None) not in aliases
+                expr for expr in expressions if expr in pks and not (
+                    getattr(expr, 'alias', None) in aliases or
+                    isinstance(expr, Subquery)
+                )
             ]
         return expressions
 
