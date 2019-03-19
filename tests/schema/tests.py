@@ -4,6 +4,7 @@ import unittest
 from copy import copy
 from unittest import mock
 
+from django.core.management.color import no_style
 from django.db import (
     DatabaseError, IntegrityError, OperationalError, connection,
 )
@@ -1102,6 +1103,28 @@ class SchemaTests(TransactionTestCase):
         # field which drops the id sequence, at least on PostgreSQL.
         Author.objects.create(name='Foo')
         Author.objects.create(name='Bar')
+
+    def test_alter_autofield_pk_to_bigautofield_pk_sequence_owner(self):
+        """
+        Converting an implicit PK to BigAutoField(primary_key=True) should keep
+        a sequence owner on PostgreSQL.
+        """
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        old_field = Author._meta.get_field('id')
+        new_field = BigAutoField(primary_key=True)
+        new_field.set_attributes_from_name('id')
+        new_field.model = Author
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, old_field, new_field, strict=True)
+
+        Author.objects.create(name='Foo', pk=1)
+        with connection.cursor() as cursor:
+            sequence_reset_sqls = connection.ops.sequence_reset_sql(no_style(), [Author])
+            if sequence_reset_sqls:
+                cursor.execute(sequence_reset_sqls[0])
+        # Fail on PostgreSQL if sequence is missing an owner.
+        self.assertIsNotNone(Author.objects.create(name='Bar'))
 
     def test_alter_int_pk_to_autofield_pk(self):
         """
