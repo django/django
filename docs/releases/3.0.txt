@@ -366,6 +366,9 @@ Miscellaneous
   in the session in Django 4.0. Since Django 2.1, the language is always stored
   in the :setting:`LANGUAGE_COOKIE_NAME` cookie.
 
+* ``alias=None`` is added to the signature of
+  :meth:`.Expression.get_group_by_cols`.
+
 .. _removed-features-3.0:
 
 Features removed in 3.0

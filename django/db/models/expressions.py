@@ -332,7 +332,7 @@ class BaseExpression:
     def copy(self):
         return copy.copy(self)
 
-    def get_group_by_cols(self):
+    def get_group_by_cols(self, alias=None):
         if not self.contains_aggregate:
             return [self]
         cols = []
@@ -669,7 +669,7 @@ class Value(Expression):
         c.for_save = for_save
         return c
 
-    def get_group_by_cols(self):
+    def get_group_by_cols(self, alias=None):
         return []
 
 
@@ -694,7 +694,7 @@ class RawSQL(Expression):
     def as_sql(self, compiler, connection):
         return '(%s)' % self.sql, self.params
 
-    def get_group_by_cols(self):
+    def get_group_by_cols(self, alias=None):
         return [self]
 
 
@@ -737,7 +737,7 @@ class Col(Expression):
     def relabeled_clone(self, relabels):
         return self.__class__(relabels.get(self.alias, self.alias), self.target, self.output_field)
 
-    def get_group_by_cols(self):
+    def get_group_by_cols(self, alias=None):
         return [self]
 
     def get_db_converters(self, connection):
@@ -769,7 +769,7 @@ class SimpleCol(Expression):
         qn = compiler.quote_name_unless_alias
         return qn(self.target.column), []
 
-    def get_group_by_cols(self):
+    def get_group_by_cols(self, alias=None):
         return [self]
 
     def get_db_converters(self, connection):
@@ -810,7 +810,7 @@ class Ref(Expression):
     def as_sql(self, compiler, connection):
         return connection.ops.quote_name(self.refs), []
 
-    def get_group_by_cols(self):
+    def get_group_by_cols(self, alias=None):
         return [self]
 
 
@@ -905,7 +905,7 @@ class When(Expression):
         template = template or self.template
         return template % template_params, sql_params
 
-    def get_group_by_cols(self):
+    def get_group_by_cols(self, alias=None):
         # This is not a complete expression and cannot be used in GROUP BY.
         cols = []
         for source in self.get_source_expressions():
@@ -1171,7 +1171,7 @@ class OrderBy(BaseExpression):
             template = 'IF(ISNULL(%(expression)s),0,1), %(expression)s %(ordering)s '
         return self.as_sql(compiler, connection, template=template)
 
-    def get_group_by_cols(self):
+    def get_group_by_cols(self, alias=None):
         cols = []
         for source in self.get_source_expressions():
             cols.extend(source.get_group_by_cols())
@@ -1281,7 +1281,7 @@ class Window(Expression):
     def __repr__(self):
         return '<%s: %s>' % (self.__class__.__name__, self)
 
-    def get_group_by_cols(self):
+    def get_group_by_cols(self, alias=None):
         return []
 
 
@@ -1317,7 +1317,7 @@ class WindowFrame(Expression):
     def __repr__(self):
         return '<%s: %s>' % (self.__class__.__name__, self)
 
-    def get_group_by_cols(self):
+    def get_group_by_cols(self, alias=None):
         return []
 
     def __str__(self):

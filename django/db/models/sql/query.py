@@ -8,6 +8,8 @@ all about the internals of models in order to get the information it needs.
 """
 import difflib
 import functools
+import inspect
+import warnings
 from collections import Counter, namedtuple
 from collections.abc import Iterator, Mapping
 from itertools import chain, count, product
@@ -35,6 +37,7 @@ from django.db.models.sql.datastructures import (
 from django.db.models.sql.where import (
     AND, OR, ExtraWhere, NothingNode, WhereNode,
 )
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import cached_property
 from django.utils.tree import Node
 
@@ -1818,9 +1821,20 @@ class Query:
         """
         group_by = list(self.select)
         if self.annotation_select:
-            for annotation in self.annotation_select.values():
-                for col in annotation.get_group_by_cols():
-                    group_by.append(col)
+            for alias, annotation in self.annotation_select.items():
+                try:
+                    inspect.getcallargs(annotation.get_group_by_cols, alias=alias)
+                except TypeError:
+                    annotation_class = annotation.__class__
+                    msg = (
+                        '`alias=None` must be added to the signature of '
+                        '%s.%s.get_group_by_cols().'
+                    ) % (annotation_class.__module__, annotation_class.__qualname__)
+                    warnings.warn(msg, category=RemovedInDjango40Warning)
+                    group_by_cols = annotation.get_group_by_cols()
+                else:
+                    group_by_cols = annotation.get_group_by_cols(alias=alias)
+                group_by.extend(group_by_cols)
         self.group_by = tuple(group_by)
 
     def add_select_related(self, fields):

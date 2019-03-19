@@ -104,7 +104,7 @@ class Lookup:
             new.rhs = new.rhs.relabeled_clone(relabels)
         return new
 
-    def get_group_by_cols(self):
+    def get_group_by_cols(self, alias=None):
         cols = self.lhs.get_group_by_cols()
         if hasattr(self.rhs, 'get_group_by_cols'):
             cols.extend(self.rhs.get_group_by_cols())
