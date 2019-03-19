@@ -264,6 +264,8 @@ class ChangeList:
                 attr = getattr(self.model_admin, field_name)
             else:
                 attr = getattr(self.model, field_name)
+            if isinstance(attr, property) and hasattr(attr, 'fget'):
+                attr = attr.fget
             return getattr(attr, 'admin_order_field', None)
 
     def get_ordering(self, request, queryset):

@@ -754,8 +754,9 @@ subclass::
 
     * Elements of ``list_display`` can also be properties. Please note however,
       that due to the way properties work in Python, setting
-      ``short_description`` on a property is only possible when using the
-      ``property()`` function and **not** with the ``@property`` decorator.
+      ``short_description`` or ``admin_order_field`` on a property is only
+      possible when using the ``property()`` function and **not** with the
+      ``@property`` decorator.
 
       For example::
 
@@ -766,6 +767,7 @@ subclass::
               def my_property(self):
                   return self.first_name + ' ' + self.last_name
               my_property.short_description = "Full name of the person"
+              my_property.admin_order_field = 'last_name'
 
               full_name = property(my_property)
 
