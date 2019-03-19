@@ -47,6 +47,10 @@ Minor features
 * Added support for the ``admin_order_field`` attribute on properties in
   :attr:`.ModelAdmin.list_display`.
 
+* The new :meth:`ModelAdmin.get_inlines()
+  <django.contrib.admin.ModelAdmin.get_inlines>` method allows specifying the
+  inlines based on the request or model instance.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

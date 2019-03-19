@@ -1627,6 +1627,16 @@ templates used by the :class:`ModelAdmin` views:
     instances of the classes defined in :attr:`inlines` or you might encounter
     a "Bad Request" error when adding related objects.
 
+.. method:: ModelAdmin.get_inlines(request, obj)
+
+    .. versionadded:: 3.0
+
+    The ``get_inlines`` method is given the ``HttpRequest`` and the
+    ``obj`` being edited (or ``None`` on an add form) and is expected to return
+    an iterable of inlines. You can override this method to dynamically add
+    inlines based on the request or model instance instead of specifying them
+    in :attr:`ModelAdmin.inlines`.
+
 .. method:: ModelAdmin.get_urls()
 
     The ``get_urls`` method on a ``ModelAdmin`` returns the URLs to be used for
