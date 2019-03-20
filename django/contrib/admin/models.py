@@ -9,16 +9,6 @@ from django.utils import timezone
 from django.utils.text import get_text_list
 from django.utils.translation import gettext, gettext_lazy as _
 
-ADDITION = 1
-CHANGE = 2
-DELETION = 3
-
-ACTION_FLAG_CHOICES = (
-    (ADDITION, _('Addition')),
-    (CHANGE, _('Change')),
-    (DELETION, _('Deletion')),
-)
-
 
 class LogEntryManager(models.Manager):
     use_in_migrations = True
@@ -37,6 +27,14 @@ class LogEntryManager(models.Manager):
 
 
 class LogEntry(models.Model):
+    ADDITION = 1
+    CHANGE = 2
+    DELETION = 3
+    ACTION_FLAG_CHOICES = (
+        (ADDITION, _('Addition')),
+        (CHANGE, _('Change')),
+        (DELETION, _('Deletion')),
+    )
     action_time = models.DateTimeField(
         _('action time'),
         default=timezone.now,
