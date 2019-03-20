@@ -10,9 +10,9 @@ from .math import (
     Mod, Pi, Power, Radians, Round, Sin, Sqrt, Tan,
 )
 from .text import (
-    MD5, Chr, Concat, ConcatPair, Left, Length, Lower, LPad, LTrim, Ord,
-    Repeat, Replace, Reverse, Right, RPad, RTrim, StrIndex, Substr, Trim,
-    Upper,
+    MD5, SHA1, SHA224, SHA256, SHA384, SHA512, Chr, Concat, ConcatPair, Left,
+    Length, Lower, LPad, LTrim, Ord, Repeat, Replace, Reverse, Right, RPad,
+    RTrim, StrIndex, Substr, Trim, Upper,
 )
 from .window import (
     CumeDist, DenseRank, FirstValue, Lag, LastValue, Lead, NthValue, Ntile,
@@ -34,9 +34,10 @@ __all__ = [
     'Exp', 'Floor', 'Ln', 'Log', 'Mod', 'Pi', 'Power', 'Radians', 'Round',
     'Sin', 'Sqrt', 'Tan',
     # text
-    'MD5', 'Chr', 'Concat', 'ConcatPair', 'Left', 'Length', 'Lower', 'LPad',
-    'LTrim', 'Ord', 'Repeat', 'Replace', 'Reverse', 'Right', 'RPad', 'RTrim',
-    'StrIndex', 'Substr', 'Trim', 'Upper',
+    'MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA384', 'SHA512', 'Chr', 'Concat',
+    'ConcatPair', 'Left', 'Length', 'Lower', 'LPad', 'LTrim', 'Ord', 'Repeat',
+    'Replace', 'Reverse', 'Right', 'RPad', 'RTrim', 'StrIndex', 'Substr',
+    'Trim', 'Upper',
     # window
     'CumeDist', 'DenseRank', 'FirstValue', 'Lag', 'LastValue', 'Lead',
     'NthValue', 'Ntile', 'PercentRank', 'Rank', 'RowNumber',

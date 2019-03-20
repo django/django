@@ -168,7 +168,12 @@ Migrations
 Models
 ~~~~~~
 
-* Added the :class:`~django.db.models.functions.MD5` database function.
+* Added hash database functions :class:`~django.db.models.functions.MD5`,
+  :class:`~django.db.models.functions.SHA1`,
+  :class:`~django.db.models.functions.SHA224`,
+  :class:`~django.db.models.functions.SHA256`,
+  :class:`~django.db.models.functions.SHA384`, and
+  :class:`~django.db.models.functions.SHA512`.
 
 * The new ``is_dst``  parameter of the
   :class:`~django.db.models.functions.Trunc` database functions determines the

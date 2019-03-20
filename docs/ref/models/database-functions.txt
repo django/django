@@ -1441,6 +1441,41 @@ side.
 Similar to :class:`~django.db.models.functions.Trim`, but removes only trailing
 spaces.
 
+``SHA1``, ``SHA224``, ``SHA256``, ``SHA384``, and ``SHA512``
+------------------------------------------------------------
+
+.. class:: SHA1(expression, **extra)
+.. class:: SHA224(expression, **extra)
+.. class:: SHA256(expression, **extra)
+.. class:: SHA384(expression, **extra)
+.. class:: SHA512(expression, **extra)
+
+.. versionadded:: 3.0
+
+Accepts a single text field or expression and returns the particular hash of
+the string.
+
+They can also be registered as transforms as described in :class:`Length`.
+
+Usage example::
+
+    >>> from django.db.models.functions import SHA1
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.annotate(name_sha1=SHA1('name')).get()
+    >>> print(author.name_sha1)
+    b87efd8a6c991c390be5a68e8a7945a7851c7e5c
+
+.. admonition:: PostgreSQL
+
+    The `pgcrypto extension <https://www.postgresql.org/docs/current/static/
+    pgcrypto.html>`_ must be installed. You can use the
+    :class:`~django.contrib.postgres.operations.CryptoExtension` migration
+    operation to install it.
+
+.. admonition:: Oracle
+
+    Oracle doesn't support the ``SHA224`` function.
+
 ``StrIndex``
 ------------
 
