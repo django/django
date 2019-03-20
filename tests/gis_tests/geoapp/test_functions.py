@@ -240,6 +240,21 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         self.assertEqual(ref_hash, h1.geohash[:len(ref_hash)])
         self.assertEqual(ref_hash[:5], h2.geohash)
 
+    @skipUnlessDBFeature('has_GeometryDistance_function')
+    def test_geometry_distance(self):
+        point = Point(-90, 40, srid=4326)
+        qs = City.objects.annotate(distance=functions.GeometryDistance('point', point)).order_by('distance')
+        self.assertEqual([city.distance for city in qs], [
+            2.99091995527296,
+            5.33507274054713,
+            9.33852187483721,
+            9.91769193646233,
+            11.556465744884,
+            14.713098433352,
+            34.3635252198568,
+            276.987855073372,
+        ])
+
     @skipUnlessDBFeature("has_Intersection_function")
     def test_intersection(self):
         geom = Point(5, 23, srid=4326)

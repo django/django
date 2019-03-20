@@ -67,6 +67,9 @@ Minor features
 * Allowed MySQL spatial lookup functions to operate on real geometries.
   Previous support was limited to bounding boxes.
 
+* Added the :class:`~django.contrib.gis.db.models.functions.GeometryDistance`
+  function, supported on PostGIS.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
