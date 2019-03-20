@@ -231,6 +231,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function('SHA256', 1, none_guard(lambda x: hashlib.sha256(x.encode()).hexdigest()))
         conn.create_function('SHA384', 1, none_guard(lambda x: hashlib.sha384(x.encode()).hexdigest()))
         conn.create_function('SHA512', 1, none_guard(lambda x: hashlib.sha512(x.encode()).hexdigest()))
+        conn.create_function('SIGN', 1, none_guard(lambda x: (x > 0) - (x < 0)))
         conn.create_function('SIN', 1, none_guard(math.sin))
         conn.create_function('SQRT', 1, none_guard(math.sqrt))
         conn.create_function('TAN', 1, none_guard(math.tan))

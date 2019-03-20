@@ -146,6 +146,11 @@ class Round(Transform):
     lookup_name = 'round'
 
 
+class Sign(Transform):
+    function = 'SIGN'
+    lookup_name = 'sign'
+
+
 class Sin(NumericOutputFieldMixin, Transform):
     function = 'SIN'
     lookup_name = 'sin'

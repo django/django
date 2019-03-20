@@ -178,6 +178,8 @@ Models
   :class:`~django.db.models.functions.SHA384`, and
   :class:`~django.db.models.functions.SHA512`.
 
+* Added the :class:`~django.db.models.functions.Sign` database function.
+
 * The new ``is_dst``  parameter of the
   :class:`~django.db.models.functions.Trunc` database functions determines the
   treatment of nonexistent and ambiguous datetimes.

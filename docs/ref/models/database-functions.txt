@@ -1099,6 +1099,31 @@ It can also be registered as a transform. For example::
     >>> # Get vectors whose round() is less than 20
     >>> vectors = Vector.objects.filter(x__round__lt=20, y__round__lt=20)
 
+``Sign``
+--------
+
+.. class:: Sign(expression, **extra)
+
+.. versionadded:: 3.0
+
+Returns the sign (-1, 0, 1) of a numeric field or expression.
+
+Usage example::
+
+    >>> from django.db.models.functions import Sign
+    >>> Vector.objects.create(x=5.4, y=-2.3)
+    >>> vector = Vector.objects.annotate(x_sign=Sign('x'), y_sign=Sign('y')).get()
+    >>> vector.x_sign, vector.y_sign
+    (1, -1)
+
+It can also be registered as a transform. For example::
+
+    >>> from django.db.models import FloatField
+    >>> from django.db.models.functions import Sign
+    >>> FloatField.register_lookup(Sign)
+    >>> # Get vectors whose signs of components are less than 0.
+    >>> vectors = Vector.objects.filter(x__sign__lt=0, y__sign__lt=0)
+
 ``Sin``
 -------
 
