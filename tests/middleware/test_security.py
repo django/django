@@ -255,3 +255,39 @@ class SecurityMiddlewareTest(SimpleTestCase):
         """
         response = self.process_response(headers={'Referrer-Policy': 'unsafe-url'})
         self.assertEqual(response['Referrer-Policy'], 'unsafe-url')
+
+    @override_settings(SECURE_PERMISSIONS_POLICY=None)
+    def test_permissions_policy_off(self):
+        """
+        With SECURE_PERMISSIONS_POLICY set to None, the middleware does not add
+        a "Permissions-Policy" header to the response.
+        """
+        self.assertNotIn('Permissions-Policy', self.process_response())
+
+    def test_permissions_policy_on(self):
+        """
+        With SECURE_PERMISSIONS_POLICY set to a valid value, the middleware
+        adds a "Permissions-Policy" header to the response.
+        """
+        tests = [
+            ({'geolocation': ['*']}, 'geolocation=(*)'),
+            ({'camera': ['*'], 'midi': ['*']}, 'camera=(*), midi=(*)'),
+            ({'battery': []}, "battery=()"),
+            ({'battery': ['self']}, "battery=(self)"),
+            ({'battery': ['self', 'https://example.com']}, 'battery=(self "https://example.com")'),
+            ({'fullscreen': ['https://example.com']}, 'fullscreen=("https://example.com")'),
+            ({'fullscreen': ['https://example.com:8000']}, 'fullscreen=("https://example.com:8000")'),
+        ]
+        tests.extend([({k: tuple(v) for k, v in a.items()}, b) for a, b in tests])
+        for value, expected in tests:
+            with self.subTest(value=value), override_settings(SECURE_PERMISSIONS_POLICY=value):
+                self.assertEqual(self.process_response()['Permissions-Policy'], expected)
+
+    @override_settings(SECURE_PERMISSIONS_POLICY={'geolocation': '*'})
+    def test_permissions_policy_already_present(self):
+        """
+        The middleware will not override a "Permissions-Policy" header already
+        present in the response.
+        """
+        response = self.process_response(headers={'Permissions-Policy': 'battery=()'})
+        self.assertEqual(response['Permissions-Policy'], 'battery=()')

@@ -19,6 +19,7 @@ class SecurityMiddleware(MiddlewareMixin):
         self.redirect_host = settings.SECURE_SSL_HOST
         self.redirect_exempt = [re.compile(r) for r in settings.SECURE_REDIRECT_EXEMPT]
         self.referrer_policy = settings.SECURE_REFERRER_POLICY
+        self.permissions_policy = settings.SECURE_PERMISSIONS_POLICY
 
     def process_request(self, request):
         path = request.path.lstrip("/")
@@ -52,6 +53,13 @@ class SecurityMiddleware(MiddlewareMixin):
             response.setdefault('Referrer-Policy', ','.join(
                 [v.strip() for v in self.referrer_policy.split(',')]
                 if isinstance(self.referrer_policy, str) else self.referrer_policy
+            ))
+
+        if self.permissions_policy:
+            response.setdefault('Permissions-Policy', ', '.join(
+                '%s=(%s)' % (directive, ' '.join(
+                    ('%s' if i in {'*', 'self'} else '"%s"') % i for i in allowlist
+                )) for directive, allowlist in self.permissions_policy.items()
             ))
 
         return response

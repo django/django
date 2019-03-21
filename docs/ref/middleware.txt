@@ -185,6 +185,7 @@ enabled or disabled with a setting.
 * :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS`
 * :setting:`SECURE_HSTS_PRELOAD`
 * :setting:`SECURE_HSTS_SECONDS`
+* :setting:`SECURE_PERMISSIONS_POLICY`
 * :setting:`SECURE_REDIRECT_EXEMPT`
 * :setting:`SECURE_REFERRER_POLICY`
 * :setting:`SECURE_SSL_HOST`
@@ -337,6 +338,19 @@ this setting are:
     comma-separated string can be used with :setting:`SECURE_REFERRER_POLICY`.
 
     __ https://w3c.github.io/webappsec-referrer-policy/#unknown-policy-values
+
+.. _permissions-policy:
+
+Permissions Policy
+~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 3.2
+
+Some browsers have the ability to accept hints about whether they should allow
+or deny the use of certain browser features by a site via `the Permissions-Policy
+header`__.
+
+__ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy
 
 .. _x-content-type-options:
 

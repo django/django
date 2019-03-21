@@ -464,3 +464,64 @@ class CheckReferrerPolicyTest(SimpleTestCase):
     )
     def test_with_invalid_referrer_policy(self):
         self.assertEqual(base.check_referrer_policy(None), [base.E023])
+
+
+class CheckPermissionsPolicyTest(SimpleTestCase):
+    @override_settings(
+        MIDDLEWARE=['django.middleware.security.SecurityMiddleware'],
+        SECURE_PERMISSIONS_POLICY=None,
+    )
+    def test_no_permissions_policy(self):
+        """
+        Warn if SECURE_PERMISSIONS_POLICY is None.
+        """
+        self.assertEqual(base.check_permissions_policy(None), [base.W024])
+
+    @override_settings(MIDDLEWARE=[], SECURE_PERMISSIONS_POLICY=None)
+    def test_no_permissions_policy_no_middleware(self):
+        """
+        Don't warn if SECURE_PERMISSIONS_POLICY is None and SecurityMiddleware
+        isn't in MIDDLEWARE.
+        """
+        self.assertEqual(base.check_permissions_policy(None), [])
+
+    @override_settings(MIDDLEWARE=['django.middleware.security.SecurityMiddleware'])
+    def test_with_permissions_policy(self):
+        tests = [
+            {'fullscreen': []},
+            {'fullscreen': ['*']},
+            {'fullscreen': ['self']},
+            {'fullscreen': ['https://example.com']},
+            {'fullscreen': ['https://example.com:8000']},
+            {'fullscreen': ['self', 'https://example.com']},
+            {'fullscreen': ['http://example.com', 'https://example.com']},
+            {'fullscreen': ['https://example.com', 'scheme://custom']},
+            {'fullscreen': ['scheme://custom']},
+        ]
+        tests.extend([{k: tuple(v) for k, v in i.items()} for i in tests])
+        for value in tests:
+            with self.subTest(value=value), override_settings(SECURE_PERMISSIONS_POLICY=value):
+                self.assertEqual(base.check_permissions_policy(None), [])
+
+    @override_settings(MIDDLEWARE=['django.middleware.security.SecurityMiddleware'])
+    def test_with_invalid_permissions_policy(self):
+        tests = [
+            {'invalid-directive': []},
+            {'fullscreen': None},
+            {'fullscreen': True},
+            {'fullscreen': False},
+            {'fullscreen': 123},
+            {'fullscreen': b'invalid-allowlist'},
+            {'fullscreen': 'invalid-allowlist'},
+            {'fullscreen': '*'},
+            {'fullscreen': 'self'},
+            {'fullscreen': 'https://example.com'},
+            {'fullscreen': 'self https://example.com'},
+            {'fullscreen': ['*', None]},
+            # FIXME: Should the following be disallowed?
+            # {'fullscreen': ['*', 'self']},
+            # {'fullscreen': ['*', 'https://example.com']},
+        ]
+        for value in tests:
+            with self.subTest(value=value), override_settings(SECURE_PERMISSIONS_POLICY=value):
+                self.assertEqual(base.check_permissions_policy(None), [base.E025])

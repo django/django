@@ -1,7 +1,46 @@
+import re
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
 from .. import Error, Tags, Warning, register
+
+# XXX: Links to related information:
+#      - https://www.chromestatus.com/feature/5756689661820928
+#      - https://www.chromestatus.com/feature/5744681033924608
+DOCUMENT_POLICY_DIRECTIVES = {
+    'document-write', 'font-display-late-swap', 'layout-animations',
+    'legacy-image-formats', 'oversized-images', 'unoptimized-lossless-images',
+    'unoptimized-lossy-images', 'unsized-media',
+    # Other:
+    'force-load-at-top',
+}
+
+# XXX: Links to related information:
+#      - https://github.com/w3c/webappsec-permissions-policy/blob/master/features.md
+#      - https://developer.mozilla.org/en-US/docs/Web/HTTP/Feature_Policy
+#      - https://www.chromestatus.com/feature/5745992911552512
+PERMISSIONS_POLICY_DIRECTIVES = {
+    # Standardized Features:
+    'accelerometer', 'ambient-light-sensor', 'autoplay', 'battery', 'camera',
+    'cross-origin-isolated', 'display-capture', 'document-domain',
+    'encrypted-media', 'execution-while-not-rendered',
+    'execution-while-out-of-viewport', 'fullscreen', 'geolocation',
+    'gyroscope', 'magnetometer', 'microphone', 'midi', 'navigation-override',
+    'payment', 'picture-in-picture', 'publickey-credentials-get',
+    'screen-wake-lock', 'sync-xhr', 'usb', 'web-share', 'xr-spatial-tracking',
+    # Proposed Features:
+    'clipboard-read', 'clipboard-write', 'gamepad', 'speaker-selection',
+    # Experimental Features:
+    'conversion-measurement', 'focus-without-user-activation', 'hid',
+    'idle-detection', 'serial', 'sync-script', 'trust-token-redemption',
+    'vertical-scroll',
+    # Other:
+    'vibrate',
+    # Legacy:
+    'lazyload', 'loading-frame-default-eager', 'loading-image-default-eager',
+    'vr', 'wake-lock', 'webauthn',
+}
 
 REFERRER_POLICY_VALUES = {
     'no-referrer', 'no-referrer-when-downgrade', 'origin',
@@ -16,8 +55,8 @@ W001 = Warning(
     "You do not have 'django.middleware.security.SecurityMiddleware' "
     "in your MIDDLEWARE so the SECURE_HSTS_SECONDS, "
     "SECURE_CONTENT_TYPE_NOSNIFF, SECURE_BROWSER_XSS_FILTER, "
-    "SECURE_REFERRER_POLICY, and SECURE_SSL_REDIRECT settings will have no "
-    "effect.",
+    "SECURE_PERMISSIONS_POLICY, SECURE_REFERRER_POLICY, and "
+    "SECURE_SSL_REDIRECT settings will have no effect.",
     id='security.W001',
 )
 
@@ -114,6 +153,23 @@ E023 = Error(
     'You have set the SECURE_REFERRER_POLICY setting to an invalid value.',
     hint='Valid values are: {}.'.format(', '.join(sorted(REFERRER_POLICY_VALUES))),
     id='security.E023',
+)
+
+W024 = Warning(
+    'You have not set the SECURE_PERMISSIONS_POLICY setting. Without this, '
+    'your site will not send a Permissions-Policy header. You should consider '
+    'enabling this header to protect user privacy.',
+    id='security.W024',
+)
+
+E025 = Error(
+    'You have set the SECURE_PERMISSIONS_POLICY setting to an invalid value.',
+    hint=(
+        'Expected a dictionary with directives as keys and a list of strings '
+        'of allowed origins as values. Valid directives are: {}.'
+        .format(', '.join(sorted(PERMISSIONS_POLICY_DIRECTIVES)))
+    ),
+    id='security.E025',
 )
 
 E100 = Error(
@@ -232,6 +288,25 @@ def check_referrer_policy(app_configs, **kwargs):
             values = set(settings.SECURE_REFERRER_POLICY)
         if not values <= REFERRER_POLICY_VALUES:
             return [E023]
+    return []
+
+
+@register(Tags.security, deploy=True)
+def check_permissions_policy(app_configs, **kwargs):
+    if _security_middleware():
+        if settings.SECURE_PERMISSIONS_POLICY is None:
+            return [W024]
+        origin_regex = re.compile(r'^[A-Za-z][-+\.A-Za-z0-9]+://[-\.\w]+(?::\d+)?$', re.ASCII)
+        if (
+            not isinstance(settings.SECURE_PERMISSIONS_POLICY, dict) or
+            not PERMISSIONS_POLICY_DIRECTIVES.issuperset(settings.SECURE_PERMISSIONS_POLICY) or
+            not all(
+                isinstance(v, (list, tuple)) and all(
+                    (isinstance(i, str) and (i in {'*', 'self'} or origin_regex.match(i))) for i in v
+                ) for v in settings.SECURE_PERMISSIONS_POLICY.values()
+            )
+        ):
+            return [E025]
     return []
 
 

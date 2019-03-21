@@ -2318,6 +2318,19 @@ already have it.
     Setting this incorrectly can irreversibly (for some time) break your site.
     Read the :ref:`http-strict-transport-security` documentation first.
 
+.. setting:: SECURE_PERMISSIONS_POLICY
+
+``SECURE_PERMISSIONS_POLICY``
+-----------------------------
+
+.. versionadded:: 3.2
+
+Default: ``None``
+
+If configured, the :class:`~django.middleware.security.SecurityMiddleware` sets
+the :ref:`permissions-policy` header on all responses that do not already have
+it to the value provided.
+
 .. setting:: SECURE_PROXY_SSL_HEADER
 
 ``SECURE_PROXY_SSL_HEADER``
@@ -3634,6 +3647,7 @@ HTTP
   * :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS`
   * :setting:`SECURE_HSTS_PRELOAD`
   * :setting:`SECURE_HSTS_SECONDS`
+  * :setting:`SECURE_PERMISSIONS_POLICY`
   * :setting:`SECURE_PROXY_SSL_HEADER`
   * :setting:`SECURE_REDIRECT_EXEMPT`
   * :setting:`SECURE_REFERRER_POLICY`
