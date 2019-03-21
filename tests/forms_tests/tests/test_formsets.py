@@ -605,7 +605,7 @@ class FormsFormsetTestCase(SimpleTestCase):
             (OrderingMethodFormSet, '<input class="ordering" type="hidden" name="form-0-ORDER">'),
         )
         for formset_class, order_html in tests:
-            with self.subTest(formset_class=formset_class):
+            with self.subTest(formset_class=formset_class.__name__):
                 ArticleFormSet = formset_factory(ArticleForm, formset=formset_class, can_order=True)
                 formset = ArticleFormSet(auto_id=False)
                 self.assertHTMLEqual(
