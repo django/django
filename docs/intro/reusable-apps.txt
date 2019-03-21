@@ -256,7 +256,8 @@ this. For a small app like polls, this process isn't too difficult.
    new package, ``django-polls-0.1.tar.gz``.
 
 For more information on packaging, see Python's `Tutorial on Packaging and
-Distributing Projects <https://packaging.python.org/distributing/>`_.
+Distributing Projects
+<https://packaging.python.org/tutorials/packaging-projects/>`_.
 
 Using your own package
 ======================
@@ -300,7 +301,7 @@ the world! If this wasn't just an example, you could now:
 
 * Post the package on a public repository, such as `the Python Package Index
   (PyPI)`_. `packaging.python.org <https://packaging.python.org>`_ has `a good
-  tutorial <https://packaging.python.org/distributing/#uploading-your-project-to-pypi>`_
+  tutorial <https://packaging.python.org/tutorials/packaging-projects/#uploading-the-distribution-archives>`_
   for doing this.
 
 Installing Python packages with virtualenv
