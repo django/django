@@ -167,13 +167,13 @@ class TestQuerying(PostgreSQLTestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.objs = [
-            RangesModel.objects.create(ints=NumericRange(0, 10)),
-            RangesModel.objects.create(ints=NumericRange(5, 15)),
-            RangesModel.objects.create(ints=NumericRange(None, 0)),
-            RangesModel.objects.create(ints=NumericRange(empty=True)),
-            RangesModel.objects.create(ints=None),
-        ]
+        cls.objs = RangesModel.objects.bulk_create([
+            RangesModel(ints=NumericRange(0, 10)),
+            RangesModel(ints=NumericRange(5, 15)),
+            RangesModel(ints=NumericRange(None, 0)),
+            RangesModel(ints=NumericRange(empty=True)),
+            RangesModel(ints=None),
+        ])
 
     def test_exact(self):
         self.assertSequenceEqual(
