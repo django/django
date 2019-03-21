@@ -2319,6 +2319,19 @@ If a URL path matches a regular expression in this list, the request will not be
 redirected to HTTPS. If :setting:`SECURE_SSL_REDIRECT` is ``False``, this
 setting has no effect.
 
+.. setting:: SECURE_REFERRER_POLICY
+
+``SECURE_REFERRER_POLICY``
+--------------------------
+
+.. versionadded:: 3.0
+
+Default: ``None``
+
+If configured, the :class:`~django.middleware.security.SecurityMiddleware` sets
+the :ref:`referrer-policy` header on all responses that do not already have it
+to the value provided.
+
 .. setting:: SECURE_SSL_HOST
 
 ``SECURE_SSL_HOST``
@@ -3500,6 +3513,7 @@ HTTP
   * :setting:`SECURE_HSTS_SECONDS`
   * :setting:`SECURE_PROXY_SSL_HEADER`
   * :setting:`SECURE_REDIRECT_EXEMPT`
+  * :setting:`SECURE_REFERRER_POLICY`
   * :setting:`SECURE_SSL_HOST`
   * :setting:`SECURE_SSL_REDIRECT`
 * :setting:`SIGNING_BACKEND`

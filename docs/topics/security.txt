@@ -204,6 +204,15 @@ Additionally, Django requires you to explicitly enable support for the
 ``X-Forwarded-Host`` header (via the :setting:`USE_X_FORWARDED_HOST` setting)
 if your configuration requires it.
 
+Referrer policy
+===============
+
+Browsers use the ``Referer`` header as a way to send information to a site
+about how users got there. By setting a *Referrer Policy* you can help to
+protect the privacy of your users, restricting under which circumstances the
+``Referer`` header is set. See :ref:`the referrer policy section of the
+security middleware reference <referrer-policy>` for details.
+
 Session security
 ================
 

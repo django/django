@@ -342,7 +342,8 @@ The following checks are run if you use the :option:`check --deploy` option:
   :class:`django.middleware.security.SecurityMiddleware` in your
   :setting:`MIDDLEWARE` so the :setting:`SECURE_HSTS_SECONDS`,
   :setting:`SECURE_CONTENT_TYPE_NOSNIFF`, :setting:`SECURE_BROWSER_XSS_FILTER`,
-  and :setting:`SECURE_SSL_REDIRECT` settings will have no effect.
+  :setting:`SECURE_REFERRER_POLICY`, and :setting:`SECURE_SSL_REDIRECT`
+  settings will have no effect.
 * **security.W002**: You do not have
   :class:`django.middleware.clickjacking.XFrameOptionsMiddleware` in your
   :setting:`MIDDLEWARE`, so your pages will not be served with an
@@ -428,6 +429,11 @@ The following checks are run if you use the :option:`check --deploy` option:
 * **security.W021**: You have not set the
   :setting:`SECURE_HSTS_PRELOAD` setting to ``True``. Without this, your site
   cannot be submitted to the browser preload list.
+* **security.W022**: You have not set the :setting:`SECURE_REFERRER_POLICY`
+  setting. Without this, your site will not send a Referrer-Policy header. You
+  should consider enabling this header to protect user privacy.
+* **security.E023**: You have set the :setting:`SECURE_REFERRER_POLICY` setting
+  to an invalid value.
 
 Signals
 -------

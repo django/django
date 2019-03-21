@@ -380,6 +380,9 @@ Security
   :ref:`x-content-type-options` header on all responses that do not already
   have it.
 
+* :class:`~django.middleware.security.SecurityMiddleware` can now send the
+  :ref:`Referrer-Policy <referrer-policy>` header.
+
 Serialization
 ~~~~~~~~~~~~~
 

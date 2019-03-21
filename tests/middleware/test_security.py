@@ -222,3 +222,36 @@ class SecurityMiddlewareTest(SimpleTestCase):
         """
         ret = self.process_request("get", "/some/url")
         self.assertIsNone(ret)
+
+    @override_settings(SECURE_REFERRER_POLICY=None)
+    def test_referrer_policy_off(self):
+        """
+        With SECURE_REFERRER_POLICY set to None, the middleware does not add a
+        "Referrer-Policy" header to the response.
+        """
+        self.assertNotIn('Referrer-Policy', self.process_response())
+
+    def test_referrer_policy_on(self):
+        """
+        With SECURE_REFERRER_POLICY set to a valid value, the middleware adds a
+        "Referrer-Policy" header to the response.
+        """
+        tests = (
+            ('strict-origin', 'strict-origin'),
+            ('strict-origin,origin', 'strict-origin,origin'),
+            ('strict-origin, origin', 'strict-origin,origin'),
+            (['strict-origin', 'origin'], 'strict-origin,origin'),
+            (('strict-origin', 'origin'), 'strict-origin,origin'),
+        )
+        for value, expected in tests:
+            with self.subTest(value=value), override_settings(SECURE_REFERRER_POLICY=value):
+                self.assertEqual(self.process_response()['Referrer-Policy'], expected)
+
+    @override_settings(SECURE_REFERRER_POLICY='strict-origin')
+    def test_referrer_policy_already_present(self):
+        """
+        The middleware will not override a "Referrer-Policy" header already
+        present in the response.
+        """
+        response = self.process_response(headers={'Referrer-Policy': 'unsafe-url'})
+        self.assertEqual(response['Referrer-Policy'], 'unsafe-url')
