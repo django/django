@@ -5,7 +5,7 @@ from io import StringIO
 from django.apps import apps
 from django.conf import settings
 from django.core import serializers
-from django.db import router
+from django.db import router, transaction
 
 # The prefix to put on the default database name when creating
 # the test database.
@@ -129,8 +129,9 @@ class BaseDatabaseCreation:
         the serialize_db_to_string() method.
         """
         data = StringIO(data)
-        for obj in serializers.deserialize("json", data, using=self.connection.alias):
-            obj.save()
+        with transaction.atomic(using=self.connection.alias):
+            for obj in serializers.deserialize("json", data, using=self.connection.alias):
+                obj.save()
 
     def _get_database_display_str(self, verbosity, database_name):
         """
