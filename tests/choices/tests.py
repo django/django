@@ -20,3 +20,6 @@ class ChoicesTests(TestCase):
 
         a.gender = 'U'
         self.assertEqual(a.get_gender_display(), 'U')
+
+        # _get_FIELD_display() coerces lazy strings.
+        self.assertIsInstance(a.get_gender_display(), str)
