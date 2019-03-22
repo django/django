@@ -190,13 +190,6 @@ class BookAdminRelatedOnlyFilter(ModelAdmin):
     ordering = ('-id',)
 
 
-class BookAdminWithEmptyFieldListFilter(BookAdmin):
-    list_filter = (
-        ('author', EmptyFieldListFilter),
-        ('description', EmptyFieldListFilter),
-    )
-
-
 class DecadeFilterBookAdmin(ModelAdmin):
     list_filter = ('author', DecadeListFilterWithTitleAndParameter)
     ordering = ('-id',)
@@ -251,14 +244,27 @@ class DepartmentFilterDynamicValueBookAdmin(EmployeeAdmin):
     list_filter = [DepartmentListFilterLookupWithDynamicValue]
 
 
-class EmployeeAdminWithEmptyFieldListFilter(EmployeeAdmin):
+class BookmarkAdminGenericRelation(ModelAdmin):
+    list_filter = ['tags__tag']
+
+
+class BookAdminWithEmptyFieldListFilter(BookAdmin):
     list_filter = (
-        ('department', EmptyFieldListFilter),
+        ('author', EmptyFieldListFilter),
+        ('title', EmptyFieldListFilter),
     )
 
 
-class BookmarkAdminGenericRelation(ModelAdmin):
-    list_filter = ['tags__tag']
+class DepartmentAdminWithEmptyFieldListFilter(ModelAdmin):
+    list_filter = (
+        ('description', EmptyFieldListFilter),
+    )
+
+
+class EmployeeAdminWithEmptyFieldListFilter(ModelAdmin):
+    list_filter = (
+        ('department', EmptyFieldListFilter),
+    )
 
 
 class ListFiltersTests(TestCase):
@@ -299,7 +305,7 @@ class ListFiltersTests(TestCase):
         cls.guitar_book = Book.objects.create(
             title='Guitar for dummies', year=2002, is_best_seller=True,
             date_registered=cls.one_week_ago,
-            is_best_seller2=True, description='Guitar is fun but hard to learn',
+            is_best_seller2=True,
         )
         cls.guitar_book.contributors.set([cls.bob, cls.lisa])
 
@@ -1268,15 +1274,53 @@ class ListFiltersTests(TestCase):
         self.assertEqual(changelist.full_result_count, 4)
 
     def test_emptylistfieldfilter(self):
+
+        def _test_filter_return(modeladmin, filter, expected_result):
+            request = self.request_factory.get('/', filter)
+            request.user = self.alfred
+            changelist = modeladmin.get_changelist_instance(request)
+            # Make sure the correct queryset is returned
+            queryset = changelist.get_queryset(request)
+            self.assertCountEqual(queryset, expected_result)
+
+        modeladmin = EmployeeAdminWithEmptyFieldListFilter(Employee, site)
+
+        # Field that cannot be empty (no empty strings and no null value), no filtering is done
+        _test_filter_return(modeladmin, {'department__isempty': '1'}, [self.john, self.jack])
+
+        modeladmin = DepartmentAdminWithEmptyFieldListFilter(Department, site)
+        rh_department = Department.objects.create(code='RH')
+
+        # Empty Field: allowing null and empty strings
+        _test_filter_return(modeladmin, {'description__isempty': '1'}, [rh_department])
+
+        # Not empty Field:  allowing null and empty strings
+        _test_filter_return(modeladmin, {'description__isempty': '0'}, [self.dev, self.design])
+
+        # Invalid parameter, an exception is raised
+        with self.assertRaises(IncorrectLookupParameters):
+            _test_filter_return(modeladmin, {'description__isempty': 42}, [])
+
         modeladmin = BookAdminWithEmptyFieldListFilter(Book, site)
 
-        # Empty Field (not allowing empty string)
+        # Empty Field: allowing null but not allowing empty string
+        _test_filter_return(modeladmin, {'author__isempty': '1'}, [self.guitar_book])
+
+        # Not empty Field: allowing null but not allowing empty string
+        _test_filter_return(modeladmin, {'author__isempty': '0'},
+                            [self.django_book, self.bio_book, self.djangonaut_book])
+
+        # Empty field: allowing empty string but no null value
+        _test_filter_return(modeladmin, {'title__isempty': '1'}, [])
+
+        # Not empty field: allowing empty string but no null value
+        _test_filter_return(modeladmin, {'title__isempty': '0'},
+                            [self.django_book, self.bio_book, self.djangonaut_book, self.guitar_book])
+
+        # Check if the right filter is selected
         request = self.request_factory.get('/', {'author__isempty': '1'})
         request.user = self.alfred
         changelist = modeladmin.get_changelist_instance(request)
-        # Make sure the correct queryset is returned
-        queryset = changelist.get_queryset(request)
-        self.assertCountEqual(queryset, [self.guitar_book])
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][0]
         self.assertEqual(filterspec.title, 'Verbose Author')
@@ -1284,7 +1328,6 @@ class ListFiltersTests(TestCase):
         self.assertIs(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?author__isempty=1')
 
-        # Not empty Field (not allowing empty string)
         request = self.request_factory.get('/', {'author__isempty': '0'})
         request.user = self.alfred
         changelist = modeladmin.get_changelist_instance(request)
@@ -1297,34 +1340,3 @@ class ListFiltersTests(TestCase):
         choice = select_by(filterspec.choices(changelist), "display", "Not empty")
         self.assertIs(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?author__isempty=0')
-
-        # Empty Field (allowing empty strings)
-        request = self.request_factory.get('/', {'description__isempty': '1'})
-        request.user = self.alfred
-        changelist = modeladmin.get_changelist_instance(request)
-        # Make sure the correct queryset is returned
-        queryset = changelist.get_queryset(request)
-        self.assertCountEqual(queryset, [self.django_book, self.bio_book, self.djangonaut_book])
-
-        # Not empty Field (allowing empty strings)
-        request = self.request_factory.get('/', {'description__isempty': '0'})
-        request.user = self.alfred
-        changelist = modeladmin.get_changelist_instance(request)
-        # Make sure the correct queryset is returned
-        queryset = changelist.get_queryset(request)
-        self.assertCountEqual(queryset, [self.guitar_book])
-
-        # Invalid parameter, an exception is raised
-        request = self.request_factory.get('/', {'description__isempty': 42})
-        request.user = self.alfred
-        with self.assertRaises(IncorrectLookupParameters):
-            modeladmin.get_changelist_instance(request)
-
-        # Field that cannot be empty, no filtering is done
-        modeladmin = EmployeeAdminWithEmptyFieldListFilter(Employee, site)
-        request = self.request_factory.get('/', {'department__isempty': '1'})
-        request.user = self.alfred
-        changelist = modeladmin.get_changelist_instance(request)
-        # Make sure the correct queryset is returned
-        queryset = changelist.get_queryset(request)
-        self.assertCountEqual(queryset, [self.jack, self.john])

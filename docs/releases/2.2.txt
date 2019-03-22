@@ -47,11 +47,6 @@ Minor features
 * Added a CSS class to the column headers of
   :class:`~django.contrib.admin.TabularInline`.
 
-* Added ``django.contrib.admin.EmptyFieldListFilter`` in
-  :attr:`ModelAdmin.list_filter <django.contrib.admin.ModelAdmin.list_filter>`
-  to allow filtering of empty values, letting the filter determine what
-  'empty' means according to the field's attributes.
-
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -52,6 +52,10 @@ Minor features
 
 * Added support for the ``admin_order_field`` attribute on properties in
   :attr:`.ModelAdmin.list_display`.
+* Added ``django.contrib.admin.EmptyFieldListFilter`` in
+  :attr:`ModelAdmin.list_filter <django.contrib.admin.ModelAdmin.list_filter>`
+  to allow filtering of empty values in changelist view. It can filter on both
+  empty strings and null, depending on what the field allows to store.
 
 * The new :meth:`ModelAdmin.get_inlines()
   <django.contrib.admin.ModelAdmin.get_inlines>` method allows specifying the
