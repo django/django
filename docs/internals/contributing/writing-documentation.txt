@@ -208,6 +208,9 @@ documentation:
   syntax, it won't be highlighted. Adding ``.. code-block:: python``, for
   example, will force highlighting despite invalid syntax.
 
+* To improve readability, use ``.. admonition:: Descriptive title`` rather than
+  ``.. note::``. Use these boxes sparingly.
+
 * Use these heading styles::
 
     ===
