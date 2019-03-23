@@ -1,3 +1,4 @@
+import re
 from functools import update_wrapper
 from weakref import WeakSet
 
@@ -106,7 +107,14 @@ class AdminSite:
                 )
 
             if model in self._registry:
-                raise AlreadyRegistered('The model %s is already registered' % model.__name__)
+                registered_admin = str(self._registry[model])
+                msg = 'The model %s is already registered ' % model.__name__
+                if registered_admin.endswith('.ModelAdmin'):
+                    # Most likely registered without a ModelAdmin subclass.
+                    msg += 'in app %r.' % re.sub(r'\.ModelAdmin$', '', registered_admin)
+                else:
+                    msg += 'with %r.' % registered_admin
+                raise AlreadyRegistered(msg)
 
             # Ignore the registration if the model has been
             # swapped out.
