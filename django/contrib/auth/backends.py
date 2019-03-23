@@ -15,11 +15,17 @@ class BaseBackend:
     def get_user(self, user_id):
         return None
 
+    def get_user_permissions(self, user_obj, obj=None):
+        return set()
+
     def get_group_permissions(self, user_obj, obj=None):
         return set()
 
     def get_all_permissions(self, user_obj, obj=None):
-        return self.get_group_permissions(user_obj, obj=obj)
+        return {
+            *self.get_user_permissions(user_obj, obj=obj),
+            *self.get_group_permissions(user_obj, obj=obj),
+        }
 
     def has_perm(self, user_obj, perm, obj=None):
         return perm in self.get_all_permissions(user_obj, obj=obj)
@@ -96,10 +102,7 @@ class ModelBackend(BaseBackend):
         if not user_obj.is_active or user_obj.is_anonymous or obj is not None:
             return set()
         if not hasattr(user_obj, '_perm_cache'):
-            user_obj._perm_cache = {
-                *self.get_user_permissions(user_obj),
-                *self.get_group_permissions(user_obj),
-            }
+            user_obj._perm_cache = super().get_all_permissions(user_obj)
         return user_obj._perm_cache
 
     def has_perm(self, user_obj, perm, obj=None):

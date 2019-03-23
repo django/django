@@ -191,6 +191,15 @@ Methods
         :meth:`~django.contrib.auth.models.User.set_unusable_password()` has
         been called for this user.
 
+    .. method:: get_user_permissions(obj=None)
+
+        .. versionadded:: 3.0
+
+        Returns a set of permission strings that the user has directly.
+
+        If ``obj`` is passed in, only returns the user permissions for this
+        specific object.
+
     .. method:: get_group_permissions(obj=None)
 
         Returns a set of permission strings that the user has, through their
@@ -467,14 +476,18 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
     A base class that provides default implementations for all required
     methods. By default, it will reject any user and provide no permissions.
 
+    .. method:: get_user_permissions(user_obj, obj=None)
+
+        Returns an empty set.
+
     .. method:: get_group_permissions(user_obj, obj=None)
 
         Returns an empty set.
 
     .. method:: get_all_permissions(user_obj, obj=None)
 
-        Uses :meth:`get_group_permissions` to get the set of permission strings
-        the ``user_obj`` has.
+        Uses :meth:`get_user_permissions` and :meth:`get_group_permissions` to
+        get the set of permission strings the ``user_obj`` has.
 
     .. method:: has_perm(user_obj, perm, obj=None)
 

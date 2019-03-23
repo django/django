@@ -180,7 +180,8 @@ Handling authorization in custom backends
 Custom auth backends can provide their own permissions.
 
 The user model will delegate permission lookup functions
-(:meth:`~django.contrib.auth.models.User.get_group_permissions()`,
+(:meth:`~django.contrib.auth.models.User.get_user_permissions()`,
+:meth:`~django.contrib.auth.models.User.get_group_permissions()`,
 :meth:`~django.contrib.auth.models.User.get_all_permissions()`,
 :meth:`~django.contrib.auth.models.User.has_perm()`, and
 :meth:`~django.contrib.auth.models.User.has_module_perms()`) to any
@@ -897,6 +898,15 @@ methods and attributes:
 
         Boolean. Designates that this user has all permissions without
         explicitly assigning them.
+
+    .. method:: models.PermissionsMixin.get_user_permissions(obj=None)
+
+        .. versionadded:: 3.0
+
+        Returns a set of permission strings that the user has directly.
+
+        If ``obj`` is passed in, only returns the user permissions for this
+        specific object.
 
     .. method:: models.PermissionsMixin.get_group_permissions(obj=None)
 

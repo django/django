@@ -72,6 +72,10 @@ Minor features
 * Added :class:`~django.contrib.auth.backends.BaseBackend` class to ease
   customization of authentication backends.
 
+* Added :meth:`~django.contrib.auth.models.User.get_user_permissions()` method
+  to mirror the existing
+  :meth:`~django.contrib.auth.models.User.get_group_permissions()` method.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
