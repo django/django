@@ -53,3 +53,17 @@ class Reference(models.Model):
 
     class Meta:
         ordering = ('article',)
+
+
+class OrderedByAggregateArticle(models.Model):
+    headline = models.CharField(max_length=255)
+    authors = models.ManyToManyField(Author)
+
+    def __str__(self):
+        return self.headline
+
+    class Meta:
+        ordering = [
+            models.Min('authors__id').asc(),
+            models.Max('authors__id').asc()
+        ]

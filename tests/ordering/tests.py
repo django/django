@@ -1,12 +1,16 @@
 from datetime import datetime
 from operator import attrgetter
 
-from django.db.models import Count, DateTimeField, F, Max, OuterRef, Subquery
+from django.db.models import (
+    Count, DateTimeField, F, Max, Min, OuterRef, Subquery,
+)
 from django.db.models.functions import Upper
-from django.test import TestCase
+from django.test import TestCase, ignore_warnings
 from django.utils.deprecation import RemovedInDjango31Warning
 
-from .models import Article, Author, OrderedByFArticle, Reference
+from .models import (
+    Article, Author, OrderedByAggregateArticle, OrderedByFArticle, Reference,
+)
 
 
 class OrderingTests(TestCase):
@@ -21,6 +25,11 @@ class OrderingTests(TestCase):
         cls.author_2 = Author.objects.create(name="Name 2")
         for i in range(2):
             Author.objects.create()
+
+        cls.oa1 = OrderedByAggregateArticle.objects.create(headline="OArticle 1")
+        cls.oa2 = OrderedByAggregateArticle.objects.create(headline="OArticle 2")
+        cls.oa2.authors.add(cls.author_1)
+        cls.oa1.authors.add(cls.author_2)
 
     def test_default_ordering(self):
         """
@@ -402,6 +411,21 @@ class OrderingTests(TestCase):
         articles.filter(headline='Article 3').update(author=self.author_1)
         self.assertQuerysetEqual(
             articles, ['Article 1', 'Article 4', 'Article 3', 'Article 2'],
+            attrgetter('headline')
+        )
+
+    def test_order_by_aggregate(self):
+        self.assertQuerysetEqual(
+            OrderedByAggregateArticle.objects.order_by(Min('authors__id').asc()),
+            ['OArticle 2', 'OArticle 1'],
+            attrgetter('headline')
+        )
+
+    @ignore_warnings(category=RemovedInDjango31Warning)
+    def test_order_by_aggregate_from_meta_ordering(self):
+        self.assertQuerysetEqual(
+            OrderedByAggregateArticle.objects.all(),
+            ['OArticle 2', 'OArticle 1'],
             attrgetter('headline')
         )
 

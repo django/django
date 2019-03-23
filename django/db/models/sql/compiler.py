@@ -263,7 +263,8 @@ class SQLCompiler:
         elif self.query.order_by:
             ordering = self.query.order_by
         elif self.query.get_meta().ordering:
-            ordering = self.query.get_meta().ordering
+            self.query.add_ordering(*self.query.get_meta().ordering)
+            ordering = self.query.order_by
             self._meta_ordering = ordering
         else:
             ordering = []
@@ -551,7 +552,7 @@ class SQLCompiler:
                             "%s QuerySet won't use Meta.ordering in Django 3.1. "
                             "Add .order_by('%s') to retain the current query." % (
                                 self.query.model.__name__,
-                                "', '".join(self._meta_ordering)
+                                "', '".join(str(x) for x in self._meta_ordering)
                             ),
                             RemovedInDjango31Warning,
                             stacklevel=4,

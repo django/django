@@ -1811,10 +1811,8 @@ class Query(BaseExpression):
             if not hasattr(item, 'resolve_expression') and not ORDER_PATTERN.match(item):
                 errors.append(item)
             if getattr(item, 'contains_aggregate', False):
-                raise FieldError(
-                    'Using an aggregate in order_by() without also including '
-                    'it in annotate() is not allowed: %s' % item
-                )
+                if self.group_by is None:
+                    self.group_by = tuple(self.select)
         if errors:
             raise FieldError('Invalid order_by arguments: %s' % errors)
         if ordering:
