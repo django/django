@@ -197,7 +197,7 @@ HTTP Strict Transport Security
 For sites that should only be accessed over HTTPS, you can instruct modern
 browsers to refuse to connect to your domain name via an insecure connection
 (for a given period of time) by setting the `"Strict-Transport-Security"
-header`_. This reduces your exposure to some SSL-stripping man-in-the-middle
+header`__. This reduces your exposure to some SSL-stripping man-in-the-middle
 (MITM) attacks.
 
 ``SecurityMiddleware`` will set this header for you on all HTTPS responses if
@@ -238,7 +238,7 @@ If you wish to submit your site to the `browser preload list`_, set the
     it may be because Django doesn't realize that it's on a secure connection;
     you may need to set the :setting:`SECURE_PROXY_SSL_HEADER` setting.
 
-.. _"Strict-Transport-Security" header: https://en.wikipedia.org/wiki/Strict_Transport_Security
+__ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
 .. _browser preload list: https://hstspreload.org/
 
 .. _x-content-type-options:
@@ -281,7 +281,7 @@ attack`_. They work by looking for JavaScript content in the GET or POST
 parameters of a page. If the JavaScript is replayed in the server's response,
 the page is blocked from rendering and an error page is shown instead.
 
-The `X-XSS-Protection header`_ is used to control the operation of the
+The `X-XSS-Protection header`__ is used to control the operation of the
 XSS filter.
 
 To enable the XSS filter in the browser, and force it to always block
@@ -296,7 +296,7 @@ header. ``SecurityMiddleware`` will do this for all responses if the
     sanitizing <cross-site-scripting>` all input to prevent XSS attacks.
 
 .. _XSS attack: https://en.wikipedia.org/wiki/Cross-site_scripting
-.. _X-XSS-Protection header: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection
+__ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection
 
 .. _ssl-redirect:
 
