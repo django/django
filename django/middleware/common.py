@@ -2,6 +2,7 @@ import re
 from urllib.parse import urlparse
 
 from django.conf import settings
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
 from django.core.mail import mail_managers
 from django.http import HttpResponsePermanentRedirect
@@ -119,7 +120,7 @@ class BrokenLinkEmailsMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
         """Send broken link emails for relevant 404 NOT FOUND responses."""
         if response.status_code == 404 and not settings.DEBUG:
-            domain = request.get_host()
+            domain = get_current_site(request).domain
             path = request.get_full_path()
             referer = request.META.get('HTTP_REFERER', '')
 
