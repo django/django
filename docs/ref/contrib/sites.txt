@@ -445,6 +445,10 @@ Here's how Django uses the sites framework:
   :class:`~django.contrib.sites.models.Site` object when calculating
   an object's URL.
 
+* The :class:`~django.middleware.common.BrokenLinkEmailsMiddleware` uses the
+  domain of the current :class:`~django.contrib.sites.models.Site` object in
+  the email subject.
+
 * In the admin framework, the "view on site" link uses the current
   :class:`~django.contrib.sites.models.Site` to work out the domain for the
   site that it will redirect to.
