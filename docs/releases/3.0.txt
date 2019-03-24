@@ -154,6 +154,9 @@ Management Commands
 * The new :option:`compilemessages --ignore` option allows ignoring specific
   directories when searching for ``.po`` files to compile.
 
+* :option:`showmigrations --list` now shows the applied datetimes when
+  ``--verbosity`` is 2 and above.
+
 Migrations
 ~~~~~~~~~~
 
@@ -162,7 +165,11 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* Added the :class:`~django.db.models.functions.MD5` database function.
+
+* The new ``is_dst``  parameter of the
+  :class:`~django.db.models.functions.Trunc` database functions determines the
+  treatment of nonexistent and ambiguous datetimes.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -187,7 +194,13 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* The new test :class:`~django.test.Client` argument
+  ``raise_request_exception`` allows controlling whether or not exceptions
+  raised during the request should also be raised in the test. The value
+  defaults to ``True`` for backwards compatibility. If it is ``False`` and an
+  exception occurs, the test client will return a 500 response with the
+  attribute :attr:`~django.test.Response.exc_info`, a tuple providing
+  information of the exception that occurred.
 
 URLs
 ~~~~
@@ -364,7 +377,7 @@ to remove usage of these features.
 * Support for the ``context`` argument of ``Field.from_db_value()`` and
   ``Expression.convert_value()`` is removed.
 
-* The ``field_name`` keyword argument of ``QuerySet.earliest()` and
+* The ``field_name`` keyword argument of ``QuerySet.earliest()`` and
   ``latest()`` is removed.
 
 See :ref:`deprecated-features-2.1` for details on these changes, including how

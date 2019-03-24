@@ -170,8 +170,9 @@ class TruncBase(TimezoneMixin, Transform):
     kind = None
     tzinfo = None
 
-    def __init__(self, expression, output_field=None, tzinfo=None, **extra):
+    def __init__(self, expression, output_field=None, tzinfo=None, is_dst=None, **extra):
         self.tzinfo = tzinfo
+        self.is_dst = is_dst
         super().__init__(expression, output_field=output_field, **extra)
 
     def as_sql(self, compiler, connection):
@@ -222,7 +223,7 @@ class TruncBase(TimezoneMixin, Transform):
                 pass
             elif value is not None:
                 value = value.replace(tzinfo=None)
-                value = timezone.make_aware(value, self.tzinfo)
+                value = timezone.make_aware(value, self.tzinfo, is_dst=self.is_dst)
             elif not connection.features.has_zoneinfo_database:
                 raise ValueError(
                     'Database returned an invalid datetime value. Are time '
@@ -240,9 +241,12 @@ class TruncBase(TimezoneMixin, Transform):
 
 class Trunc(TruncBase):
 
-    def __init__(self, expression, kind, output_field=None, tzinfo=None, **extra):
+    def __init__(self, expression, kind, output_field=None, tzinfo=None, is_dst=None, **extra):
         self.kind = kind
-        super().__init__(expression, output_field=output_field, tzinfo=tzinfo, **extra)
+        super().__init__(
+            expression, output_field=output_field, tzinfo=tzinfo,
+            is_dst=is_dst, **extra
+        )
 
 
 class TruncYear(TruncBase):

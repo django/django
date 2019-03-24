@@ -67,10 +67,13 @@ class MultiPartParser:
             raise MultiPartParserError('Invalid Content-Type: %s' % content_type)
 
         # Parse the header to get the boundary to split the parts.
-        ctypes, opts = parse_header(content_type.encode('ascii'))
+        try:
+            ctypes, opts = parse_header(content_type.encode('ascii'))
+        except UnicodeEncodeError:
+            raise MultiPartParserError('Invalid non-ASCII Content-Type in multipart: %s' % force_str(content_type))
         boundary = opts.get('boundary')
         if not boundary or not cgi.valid_boundary(boundary):
-            raise MultiPartParserError('Invalid boundary in multipart: %s' % boundary.decode())
+            raise MultiPartParserError('Invalid boundary in multipart: %s' % force_str(boundary))
 
         # Content-Length should contain the length of the body we are about
         # to receive.

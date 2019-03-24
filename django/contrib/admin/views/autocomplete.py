@@ -24,7 +24,6 @@ class AutocompleteJsonView(BaseListView):
             return JsonResponse({'error': '403 Forbidden'}, status=403)
 
         self.term = request.GET.get('term', '')
-        self.paginator_class = self.model_admin.paginator
         self.object_list = self.get_queryset()
         context = self.get_context_data()
         return JsonResponse({

@@ -1079,12 +1079,17 @@ Shows all migrations in a project. You can choose from one of two formats:
 
 Lists all of the apps Django knows about, the migrations available for each
 app, and whether or not each migration is applied (marked by an ``[X]`` next to
-the migration name).
+the migration name). For a ``--verbosity`` of 2 and above, the applied
+datetimes are also shown.
 
 Apps without migrations are also listed, but have ``(no migrations)`` printed
 under them.
 
 This is the default output format.
+
+.. versionchanged:: 3.0
+
+    Output of the applied datetimes at verbosity 2 and above was added.
 
 .. django-admin-option:: --plan, -p
 

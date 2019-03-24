@@ -5,6 +5,7 @@ from urllib.parse import urlencode
 from django.core.exceptions import DisallowedHost
 from django.core.handlers.wsgi import LimitedStream, WSGIRequest
 from django.http import HttpRequest, RawPostDataException, UnreadablePostError
+from django.http.multipartparser import MultiPartParserError
 from django.http.request import HttpHeaders, split_domain_port
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import FakePayload
@@ -475,6 +476,27 @@ class RequestsTests(SimpleTestCase):
             'wsgi.input': payload,
         })
         self.assertFalse(request.POST._mutable)
+
+    def test_multipart_without_boundary(self):
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'multipart/form-data;',
+            'CONTENT_LENGTH': 0,
+            'wsgi.input': FakePayload(),
+        })
+        with self.assertRaisesMessage(MultiPartParserError, 'Invalid boundary in multipart: None'):
+            request.POST
+
+    def test_multipart_non_ascii_content_type(self):
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'multipart/form-data; boundary = \xe0',
+            'CONTENT_LENGTH': 0,
+            'wsgi.input': FakePayload(),
+        })
+        msg = 'Invalid non-ASCII Content-Type in multipart: multipart/form-data; boundary = à'
+        with self.assertRaisesMessage(MultiPartParserError, msg):
+            request.POST
 
     def test_POST_connection_error(self):
         """

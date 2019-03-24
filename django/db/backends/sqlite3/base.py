@@ -4,6 +4,7 @@ SQLite backend for the sqlite3 module in the standard library.
 import datetime
 import decimal
 import functools
+import hashlib
 import math
 import operator
 import re
@@ -217,6 +218,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function('LN', 1, none_guard(math.log))
         conn.create_function('LOG', 2, none_guard(lambda x, y: math.log(y, x)))
         conn.create_function('LPAD', 3, _sqlite_lpad)
+        conn.create_function('MD5', 1, none_guard(lambda x: hashlib.md5(x.encode()).hexdigest()))
         conn.create_function('MOD', 2, none_guard(math.fmod))
         conn.create_function('PI', 0, lambda: math.pi)
         conn.create_function('POWER', 2, none_guard(operator.pow))

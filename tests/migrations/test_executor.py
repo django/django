@@ -711,7 +711,11 @@ class ExecutorUnitTests(SimpleTestCase):
         graph.add_dependency(None, a2, a1)
 
         executor = MigrationExecutor(None)
-        executor.loader = FakeLoader(graph, {a1, b1, a2})
+        executor.loader = FakeLoader(graph, {
+            a1: a1_impl,
+            b1: b1_impl,
+            a2: a2_impl,
+        })
 
         plan = executor.migration_plan({a1})
 
@@ -754,7 +758,14 @@ class ExecutorUnitTests(SimpleTestCase):
         graph.add_dependency(None, b2, a2)
 
         executor = MigrationExecutor(None)
-        executor.loader = FakeLoader(graph, {a1, b1, a2, b2, a3, a4})
+        executor.loader = FakeLoader(graph, {
+            a1: a1_impl,
+            b1: b1_impl,
+            a2: a2_impl,
+            b2: b2_impl,
+            a3: a3_impl,
+            a4: a4_impl,
+        })
 
         plan = executor.migration_plan({a1})
 
@@ -791,7 +802,10 @@ class ExecutorUnitTests(SimpleTestCase):
         graph.add_dependency(None, c1, a1)
 
         executor = MigrationExecutor(None)
-        executor.loader = FakeLoader(graph, {a1, b1})
+        executor.loader = FakeLoader(graph, {
+            a1: a1_impl,
+            b1: b1_impl,
+        })
 
         plan = executor.migration_plan({a1})
 

@@ -111,7 +111,7 @@ def iter_modules_and_files(modules, extra_files):
         # During debugging (with PyDev) the 'typing.io' and 'typing.re' objects
         # are added to sys.modules, however they are types not modules and so
         # cause issues here.
-        if not isinstance(module, ModuleType) or module.__spec__ is None:
+        if not isinstance(module, ModuleType) or getattr(module, '__spec__', None) is None:
             continue
         spec = module.__spec__
         # Modules could be loaded from places without a concrete location. If
@@ -578,10 +578,6 @@ def run_with_reloader(main_func, *args, **kwargs):
             logger.info('Watching for file changes with %s', reloader.__class__.__name__)
             start_django(reloader, main_func, *args, **kwargs)
         else:
-            try:
-                WatchmanReloader.check_availability()
-            except WatchmanUnavailable as e:
-                logger.info('Watchman unavailable: %s', e)
             exit_code = restart_with_reloader()
             sys.exit(exit_code)
     except KeyboardInterrupt:
