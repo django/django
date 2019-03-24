@@ -61,6 +61,11 @@ class UsernameField(forms.CharField):
     def to_python(self, value):
         return unicodedata.normalize('NFKC', super().to_python(value))
 
+    def widget_attrs(self, widget):
+        attrs = super().widget_attrs(widget)
+        attrs['autocapitalize'] = 'none'
+        return attrs
+
 
 class UserCreationForm(forms.ModelForm):
     """

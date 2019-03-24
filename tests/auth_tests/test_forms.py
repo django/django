@@ -261,6 +261,10 @@ class UserCreationFormTest(TestDataMixin, TestCase):
             ['The password is too similar to the first name.'],
         )
 
+    def test_username_field_autocapitalize_none(self):
+        form = UserCreationForm()
+        self.assertEqual(form.fields['username'].widget.attrs.get('autocapitalize'), 'none')
+
 
 # To verify that the login form rejects inactive users, use an authentication
 # backend that allows them.
@@ -438,6 +442,10 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         form = CustomAuthenticationForm()
         username_field = User._meta.get_field(User.USERNAME_FIELD)
         self.assertEqual(form.fields['username'].label, capfirst(username_field.verbose_name))
+
+    def test_username_field_autocapitalize_none(self):
+        form = AuthenticationForm()
+        self.assertEqual(form.fields['username'].widget.attrs.get('autocapitalize'), 'none')
 
     def test_username_field_label_empty_string(self):
 
@@ -727,6 +735,10 @@ class UserChangeFormTest(TestDataMixin, TestCase):
 
         form = UserChangeFormWithoutPassword()
         self.assertNotIn('password', form.fields)
+
+    def test_username_field_autocapitalize_none(self):
+        form = UserChangeForm()
+        self.assertEqual(form.fields['username'].widget.attrs.get('autocapitalize'), 'none')
 
 
 @override_settings(TEMPLATES=AUTH_TEMPLATES)
