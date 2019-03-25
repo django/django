@@ -58,10 +58,11 @@ class TemplateCommand(BaseCommand):
 
     def handle(self, app_or_project, name, target=None, **options):
         self.app_or_project = app_or_project
+        self.a_or_an = 'an' if app_or_project == 'app' else 'a'
         self.paths_to_remove = []
         self.verbosity = options['verbosity']
 
-        self.validate_name(name, app_or_project)
+        self.validate_name(name)
 
         # if some directory is given, make sure it's nicely expanded
         if target is None:
@@ -139,10 +140,12 @@ class TemplateCommand(BaseCommand):
                         break  # Only rewrite once
 
                 if path.exists(new_path):
-                    raise CommandError("%s already exists, overlaying a "
-                                       "project or app into an existing "
-                                       "directory won't replace conflicting "
-                                       "files" % new_path)
+                    raise CommandError(
+                        "%s already exists. Overlaying %s %s into an existing "
+                        "directory won't replace conflicting files." % (
+                            new_path, self.a_or_an, app_or_project,
+                        )
+                    )
 
                 # Only render the Python files, as we don't want to
                 # accidentally render Django templates files
@@ -202,12 +205,11 @@ class TemplateCommand(BaseCommand):
         raise CommandError("couldn't handle %s template %s." %
                            (self.app_or_project, template))
 
-    def validate_name(self, name, app_or_project):
-        a_or_an = 'an' if app_or_project == 'app' else 'a'
+    def validate_name(self, name):
         if name is None:
             raise CommandError('you must provide {an} {app} name'.format(
-                an=a_or_an,
-                app=app_or_project,
+                an=self.a_or_an,
+                app=self.app_or_project,
             ))
         # Check it's a valid directory name.
         if not name.isidentifier():
@@ -215,7 +217,7 @@ class TemplateCommand(BaseCommand):
                 "'{name}' is not a valid {app} name. Please make sure the "
                 "name is a valid identifier.".format(
                     name=name,
-                    app=app_or_project,
+                    app=self.app_or_project,
                 )
             )
         # Check it cannot be imported.
@@ -229,8 +231,8 @@ class TemplateCommand(BaseCommand):
                 "module and cannot be used as {an} {app} name. Please try "
                 "another name.".format(
                     name=name,
-                    an=a_or_an,
-                    app=app_or_project,
+                    an=self.a_or_an,
+                    app=self.app_or_project,
                 )
             )
 
