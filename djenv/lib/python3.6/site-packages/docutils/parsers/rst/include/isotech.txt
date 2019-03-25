@@ -1,0 +1,168 @@
+.. This data file has been placed in the public domain.
+.. Derived from the Unicode character mappings available from
+   <http://www.w3.org/2003/entities/xml/>.
+   Processed by unicode2rstsubs.py, part of Docutils:
+   <http://docutils.sourceforge.net>.
+
+.. |acd|      unicode:: U+0223F .. SINE WAVE
+.. |aleph|    unicode:: U+02135 .. ALEF SYMBOL
+.. |And|      unicode:: U+02A53 .. DOUBLE LOGICAL AND
+.. |and|      unicode:: U+02227 .. LOGICAL AND
+.. |andand|   unicode:: U+02A55 .. TWO INTERSECTING LOGICAL AND
+.. |andd|     unicode:: U+02A5C .. LOGICAL AND WITH HORIZONTAL DASH
+.. |andslope| unicode:: U+02A58 .. SLOPING LARGE AND
+.. |andv|     unicode:: U+02A5A .. LOGICAL AND WITH MIDDLE STEM
+.. |ang90|    unicode:: U+0221F .. RIGHT ANGLE
+.. |angrt|    unicode:: U+0221F .. RIGHT ANGLE
+.. |angsph|   unicode:: U+02222 .. SPHERICAL ANGLE
+.. |angst|    unicode:: U+0212B .. ANGSTROM SIGN
+.. |ap|       unicode:: U+02248 .. ALMOST EQUAL TO
+.. |apacir|   unicode:: U+02A6F .. ALMOST EQUAL TO WITH CIRCUMFLEX ACCENT
+.. |awconint| unicode:: U+02233 .. ANTICLOCKWISE CONTOUR INTEGRAL
+.. |awint|    unicode:: U+02A11 .. ANTICLOCKWISE INTEGRATION
+.. |becaus|   unicode:: U+02235 .. BECAUSE
+.. |bernou|   unicode:: U+0212C .. SCRIPT CAPITAL B
+.. |bne|      unicode:: U+0003D U+020E5 .. EQUALS SIGN with reverse slash
+.. |bnequiv|  unicode:: U+02261 U+020E5 .. IDENTICAL TO with reverse slash
+.. |bNot|     unicode:: U+02AED .. REVERSED DOUBLE STROKE NOT SIGN
+.. |bnot|     unicode:: U+02310 .. REVERSED NOT SIGN
+.. |bottom|   unicode:: U+022A5 .. UP TACK
+.. |cap|      unicode:: U+02229 .. INTERSECTION
+.. |Cconint|  unicode:: U+02230 .. VOLUME INTEGRAL
+.. |cirfnint| unicode:: U+02A10 .. CIRCULATION FUNCTION
+.. |compfn|   unicode:: U+02218 .. RING OPERATOR
+.. |cong|     unicode:: U+02245 .. APPROXIMATELY EQUAL TO
+.. |Conint|   unicode:: U+0222F .. SURFACE INTEGRAL
+.. |conint|   unicode:: U+0222E .. CONTOUR INTEGRAL
+.. |ctdot|    unicode:: U+022EF .. MIDLINE HORIZONTAL ELLIPSIS
+.. |cup|      unicode:: U+0222A .. UNION
+.. |cwconint| unicode:: U+02232 .. CLOCKWISE CONTOUR INTEGRAL
+.. |cwint|    unicode:: U+02231 .. CLOCKWISE INTEGRAL
+.. |cylcty|   unicode:: U+0232D .. CYLINDRICITY
+.. |disin|    unicode:: U+022F2 .. ELEMENT OF WITH LONG HORIZONTAL STROKE
+.. |Dot|      unicode:: U+000A8 .. DIAERESIS
+.. |DotDot|   unicode:: U+020DC .. COMBINING FOUR DOTS ABOVE
+.. |dsol|     unicode:: U+029F6 .. SOLIDUS WITH OVERBAR
+.. |dtdot|    unicode:: U+022F1 .. DOWN RIGHT DIAGONAL ELLIPSIS
+.. |dwangle|  unicode:: U+029A6 .. OBLIQUE ANGLE OPENING UP
+.. |elinters| unicode:: U+0FFFD .. REPLACEMENT CHARACTER
+.. |epar|     unicode:: U+022D5 .. EQUAL AND PARALLEL TO
+.. |eparsl|   unicode:: U+029E3 .. EQUALS SIGN AND SLANTED PARALLEL
+.. |equiv|    unicode:: U+02261 .. IDENTICAL TO
+.. |eqvparsl| unicode:: U+029E5 .. IDENTICAL TO AND SLANTED PARALLEL
+.. |exist|    unicode:: U+02203 .. THERE EXISTS
+.. |fltns|    unicode:: U+025B1 .. WHITE PARALLELOGRAM
+.. |fnof|     unicode:: U+00192 .. LATIN SMALL LETTER F WITH HOOK
+.. |forall|   unicode:: U+02200 .. FOR ALL
+.. |fpartint| unicode:: U+02A0D .. FINITE PART INTEGRAL
+.. |ge|       unicode:: U+02265 .. GREATER-THAN OR EQUAL TO
+.. |hamilt|   unicode:: U+0210B .. SCRIPT CAPITAL H
+.. |iff|      unicode:: U+021D4 .. LEFT RIGHT DOUBLE ARROW
+.. |iinfin|   unicode:: U+029DC .. INCOMPLETE INFINITY
+.. |imped|    unicode:: U+001B5 .. LATIN CAPITAL LETTER Z WITH STROKE
+.. |infin|    unicode:: U+0221E .. INFINITY
+.. |infintie| unicode:: U+029DD .. TIE OVER INFINITY
+.. |Int|      unicode:: U+0222C .. DOUBLE INTEGRAL
+.. |int|      unicode:: U+0222B .. INTEGRAL
+.. |intlarhk| unicode:: U+02A17 .. INTEGRAL WITH LEFTWARDS ARROW WITH HOOK
+.. |isin|     unicode:: U+02208 .. ELEMENT OF
+.. |isindot|  unicode:: U+022F5 .. ELEMENT OF WITH DOT ABOVE
+.. |isinE|    unicode:: U+022F9 .. ELEMENT OF WITH TWO HORIZONTAL STROKES
+.. |isins|    unicode:: U+022F4 .. SMALL ELEMENT OF WITH VERTICAL BAR AT END OF HORIZONTAL STROKE
+.. |isinsv|   unicode:: U+022F3 .. ELEMENT OF WITH VERTICAL BAR AT END OF HORIZONTAL STROKE
+.. |isinv|    unicode:: U+02208 .. ELEMENT OF
+.. |lagran|   unicode:: U+02112 .. SCRIPT CAPITAL L
+.. |Lang|     unicode:: U+0300A .. LEFT DOUBLE ANGLE BRACKET
+.. |lang|     unicode:: U+02329 .. LEFT-POINTING ANGLE BRACKET
+.. |lArr|     unicode:: U+021D0 .. LEFTWARDS DOUBLE ARROW
+.. |lbbrk|    unicode:: U+03014 .. LEFT TORTOISE SHELL BRACKET
+.. |le|       unicode:: U+02264 .. LESS-THAN OR EQUAL TO
+.. |loang|    unicode:: U+03018 .. LEFT WHITE TORTOISE SHELL BRACKET
+.. |lobrk|    unicode:: U+0301A .. LEFT WHITE SQUARE BRACKET
+.. |lopar|    unicode:: U+02985 .. LEFT WHITE PARENTHESIS
+.. |lowast|   unicode:: U+02217 .. ASTERISK OPERATOR
+.. |minus|    unicode:: U+02212 .. MINUS SIGN
+.. |mnplus|   unicode:: U+02213 .. MINUS-OR-PLUS SIGN
+.. |nabla|    unicode:: U+02207 .. NABLA
+.. |ne|       unicode:: U+02260 .. NOT EQUAL TO
+.. |nedot|    unicode:: U+02250 U+00338 .. APPROACHES THE LIMIT with slash
+.. |nhpar|    unicode:: U+02AF2 .. PARALLEL WITH HORIZONTAL STROKE
+.. |ni|       unicode:: U+0220B .. CONTAINS AS MEMBER
+.. |nis|      unicode:: U+022FC .. SMALL CONTAINS WITH VERTICAL BAR AT END OF HORIZONTAL STROKE
+.. |nisd|     unicode:: U+022FA .. CONTAINS WITH LONG HORIZONTAL STROKE
+.. |niv|      unicode:: U+0220B .. CONTAINS AS MEMBER
+.. |Not|      unicode:: U+02AEC .. DOUBLE STROKE NOT SIGN
+.. |notin|    unicode:: U+02209 .. NOT AN ELEMENT OF
+.. |notindot| unicode:: U+022F5 U+00338 .. ELEMENT OF WITH DOT ABOVE with slash
+.. |notinE|   unicode:: U+022F9 U+00338 .. ELEMENT OF WITH TWO HORIZONTAL STROKES with slash
+.. |notinva|  unicode:: U+02209 .. NOT AN ELEMENT OF
+.. |notinvb|  unicode:: U+022F7 .. SMALL ELEMENT OF WITH OVERBAR
+.. |notinvc|  unicode:: U+022F6 .. ELEMENT OF WITH OVERBAR
+.. |notni|    unicode:: U+0220C .. DOES NOT CONTAIN AS MEMBER
+.. |notniva|  unicode:: U+0220C .. DOES NOT CONTAIN AS MEMBER
+.. |notnivb|  unicode:: U+022FE .. SMALL CONTAINS WITH OVERBAR
+.. |notnivc|  unicode:: U+022FD .. CONTAINS WITH OVERBAR
+.. |nparsl|   unicode:: U+02AFD U+020E5 .. DOUBLE SOLIDUS OPERATOR with reverse slash
+.. |npart|    unicode:: U+02202 U+00338 .. PARTIAL DIFFERENTIAL with slash
+.. |npolint|  unicode:: U+02A14 .. LINE INTEGRATION NOT INCLUDING THE POLE
+.. |nvinfin|  unicode:: U+029DE .. INFINITY NEGATED WITH VERTICAL BAR
+.. |olcross|  unicode:: U+029BB .. CIRCLE WITH SUPERIMPOSED X
+.. |Or|       unicode:: U+02A54 .. DOUBLE LOGICAL OR
+.. |or|       unicode:: U+02228 .. LOGICAL OR
+.. |ord|      unicode:: U+02A5D .. LOGICAL OR WITH HORIZONTAL DASH
+.. |order|    unicode:: U+02134 .. SCRIPT SMALL O
+.. |oror|     unicode:: U+02A56 .. TWO INTERSECTING LOGICAL OR
+.. |orslope|  unicode:: U+02A57 .. SLOPING LARGE OR
+.. |orv|      unicode:: U+02A5B .. LOGICAL OR WITH MIDDLE STEM
+.. |par|      unicode:: U+02225 .. PARALLEL TO
+.. |parsl|    unicode:: U+02AFD .. DOUBLE SOLIDUS OPERATOR
+.. |part|     unicode:: U+02202 .. PARTIAL DIFFERENTIAL
+.. |permil|   unicode:: U+02030 .. PER MILLE SIGN
+.. |perp|     unicode:: U+022A5 .. UP TACK
+.. |pertenk|  unicode:: U+02031 .. PER TEN THOUSAND SIGN
+.. |phmmat|   unicode:: U+02133 .. SCRIPT CAPITAL M
+.. |pointint| unicode:: U+02A15 .. INTEGRAL AROUND A POINT OPERATOR
+.. |Prime|    unicode:: U+02033 .. DOUBLE PRIME
+.. |prime|    unicode:: U+02032 .. PRIME
+.. |profalar| unicode:: U+0232E .. ALL AROUND-PROFILE
+.. |profline| unicode:: U+02312 .. ARC
+.. |profsurf| unicode:: U+02313 .. SEGMENT
+.. |prop|     unicode:: U+0221D .. PROPORTIONAL TO
+.. |qint|     unicode:: U+02A0C .. QUADRUPLE INTEGRAL OPERATOR
+.. |qprime|   unicode:: U+02057 .. QUADRUPLE PRIME
+.. |quatint|  unicode:: U+02A16 .. QUATERNION INTEGRAL OPERATOR
+.. |radic|    unicode:: U+0221A .. SQUARE ROOT
+.. |Rang|     unicode:: U+0300B .. RIGHT DOUBLE ANGLE BRACKET
+.. |rang|     unicode:: U+0232A .. RIGHT-POINTING ANGLE BRACKET
+.. |rArr|     unicode:: U+021D2 .. RIGHTWARDS DOUBLE ARROW
+.. |rbbrk|    unicode:: U+03015 .. RIGHT TORTOISE SHELL BRACKET
+.. |roang|    unicode:: U+03019 .. RIGHT WHITE TORTOISE SHELL BRACKET
+.. |robrk|    unicode:: U+0301B .. RIGHT WHITE SQUARE BRACKET
+.. |ropar|    unicode:: U+02986 .. RIGHT WHITE PARENTHESIS
+.. |rppolint| unicode:: U+02A12 .. LINE INTEGRATION WITH RECTANGULAR PATH AROUND POLE
+.. |scpolint| unicode:: U+02A13 .. LINE INTEGRATION WITH SEMICIRCULAR PATH AROUND POLE
+.. |sim|      unicode:: U+0223C .. TILDE OPERATOR
+.. |simdot|   unicode:: U+02A6A .. TILDE OPERATOR WITH DOT ABOVE
+.. |sime|     unicode:: U+02243 .. ASYMPTOTICALLY EQUAL TO
+.. |smeparsl| unicode:: U+029E4 .. EQUALS SIGN AND SLANTED PARALLEL WITH TILDE ABOVE
+.. |square|   unicode:: U+025A1 .. WHITE SQUARE
+.. |squarf|   unicode:: U+025AA .. BLACK SMALL SQUARE
+.. |strns|    unicode:: U+000AF .. MACRON
+.. |sub|      unicode:: U+02282 .. SUBSET OF
+.. |sube|     unicode:: U+02286 .. SUBSET OF OR EQUAL TO
+.. |sup|      unicode:: U+02283 .. SUPERSET OF
+.. |supe|     unicode:: U+02287 .. SUPERSET OF OR EQUAL TO
+.. |tdot|     unicode:: U+020DB .. COMBINING THREE DOTS ABOVE
+.. |there4|   unicode:: U+02234 .. THEREFORE
+.. |tint|     unicode:: U+0222D .. TRIPLE INTEGRAL
+.. |top|      unicode:: U+022A4 .. DOWN TACK
+.. |topbot|   unicode:: U+02336 .. APL FUNCTIONAL SYMBOL I-BEAM
+.. |topcir|   unicode:: U+02AF1 .. DOWN TACK WITH CIRCLE BELOW
+.. |tprime|   unicode:: U+02034 .. TRIPLE PRIME
+.. |utdot|    unicode:: U+022F0 .. UP RIGHT DIAGONAL ELLIPSIS
+.. |uwangle|  unicode:: U+029A7 .. OBLIQUE ANGLE OPENING DOWN
+.. |vangrt|   unicode:: U+0299C .. RIGHT ANGLE VARIANT WITH SQUARE
+.. |veeeq|    unicode:: U+0225A .. EQUIANGULAR TO
+.. |Verbar|   unicode:: U+02016 .. DOUBLE VERTICAL LINE
+.. |wedgeq|   unicode:: U+02259 .. ESTIMATES
+.. |xnis|     unicode:: U+022FB .. CONTAINS WITH VERTICAL BAR AT END OF HORIZONTAL STROKE

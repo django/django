@@ -1,0 +1,36 @@
+{#
+    basic/searchresults.html
+    ~~~~~~~~~~~~~~~~~~~~~~~~
+
+    Template for the body of the search results page.
+
+    :copyright: Copyright 2007-2019 by the Sphinx team, see AUTHORS.
+    :license: BSD, see LICENSE for details.
+#}
+<h1 id="search-documentation">{{ _('Search') }}</h1>
+<p>
+  From here you can search these documents. Enter your search
+  words into the box below and click "search".
+</p>
+<form action="" method="get">
+  <input type="text" name="q" value="" />
+  <input type="submit" value="{{ _('search') }}" />
+  <span id="search-progress" style="padding-left: 10px"></span>
+</form>
+{%- if search_performed %}
+  <h2>{{ _('Search Results') }}</h2>
+  {%- if not search_results %}
+  <p>{{ _('Your search did not match any documents. Please make sure that all words are spelled correctly and that you\'ve selected enough categories.') }}</p>
+  {%- endif %}
+{%- endif %}
+<div id="search-results">
+  {%- if search_results %}
+  <ul class="search">
+    {% for href, caption, context in search_results %}
+    <li><a href="{{ docroot }}{{ href }}/?highlight={{ q }}">{{ caption }}</a>
+      <div class="context">{{ context|e }}</div>
+    </li>
+    {% endfor %}
+  </ul>
+  {%- endif %}
+</div>

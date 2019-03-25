@@ -1,0 +1,128 @@
+.. This data file has been placed in the public domain.
+.. Derived from the Unicode character mappings available from
+   <http://www.w3.org/2003/entities/xml/>.
+   Processed by unicode2rstsubs.py, part of Docutils:
+   <http://docutils.sourceforge.net>.
+
+.. |Abreve| unicode:: U+00102 .. LATIN CAPITAL LETTER A WITH BREVE
+.. |abreve| unicode:: U+00103 .. LATIN SMALL LETTER A WITH BREVE
+.. |Amacr|  unicode:: U+00100 .. LATIN CAPITAL LETTER A WITH MACRON
+.. |amacr|  unicode:: U+00101 .. LATIN SMALL LETTER A WITH MACRON
+.. |Aogon|  unicode:: U+00104 .. LATIN CAPITAL LETTER A WITH OGONEK
+.. |aogon|  unicode:: U+00105 .. LATIN SMALL LETTER A WITH OGONEK
+.. |Cacute| unicode:: U+00106 .. LATIN CAPITAL LETTER C WITH ACUTE
+.. |cacute| unicode:: U+00107 .. LATIN SMALL LETTER C WITH ACUTE
+.. |Ccaron| unicode:: U+0010C .. LATIN CAPITAL LETTER C WITH CARON
+.. |ccaron| unicode:: U+0010D .. LATIN SMALL LETTER C WITH CARON
+.. |Ccirc|  unicode:: U+00108 .. LATIN CAPITAL LETTER C WITH CIRCUMFLEX
+.. |ccirc|  unicode:: U+00109 .. LATIN SMALL LETTER C WITH CIRCUMFLEX
+.. |Cdot|   unicode:: U+0010A .. LATIN CAPITAL LETTER C WITH DOT ABOVE
+.. |cdot|   unicode:: U+0010B .. LATIN SMALL LETTER C WITH DOT ABOVE
+.. |Dcaron| unicode:: U+0010E .. LATIN CAPITAL LETTER D WITH CARON
+.. |dcaron| unicode:: U+0010F .. LATIN SMALL LETTER D WITH CARON
+.. |Dstrok| unicode:: U+00110 .. LATIN CAPITAL LETTER D WITH STROKE
+.. |dstrok| unicode:: U+00111 .. LATIN SMALL LETTER D WITH STROKE
+.. |Ecaron| unicode:: U+0011A .. LATIN CAPITAL LETTER E WITH CARON
+.. |ecaron| unicode:: U+0011B .. LATIN SMALL LETTER E WITH CARON
+.. |Edot|   unicode:: U+00116 .. LATIN CAPITAL LETTER E WITH DOT ABOVE
+.. |edot|   unicode:: U+00117 .. LATIN SMALL LETTER E WITH DOT ABOVE
+.. |Emacr|  unicode:: U+00112 .. LATIN CAPITAL LETTER E WITH MACRON
+.. |emacr|  unicode:: U+00113 .. LATIN SMALL LETTER E WITH MACRON
+.. |ENG|    unicode:: U+0014A .. LATIN CAPITAL LETTER ENG
+.. |eng|    unicode:: U+0014B .. LATIN SMALL LETTER ENG
+.. |Eogon|  unicode:: U+00118 .. LATIN CAPITAL LETTER E WITH OGONEK
+.. |eogon|  unicode:: U+00119 .. LATIN SMALL LETTER E WITH OGONEK
+.. |gacute| unicode:: U+001F5 .. LATIN SMALL LETTER G WITH ACUTE
+.. |Gbreve| unicode:: U+0011E .. LATIN CAPITAL LETTER G WITH BREVE
+.. |gbreve| unicode:: U+0011F .. LATIN SMALL LETTER G WITH BREVE
+.. |Gcedil| unicode:: U+00122 .. LATIN CAPITAL LETTER G WITH CEDILLA
+.. |gcedil| unicode:: U+00123 .. LATIN SMALL LETTER G WITH CEDILLA
+.. |Gcirc|  unicode:: U+0011C .. LATIN CAPITAL LETTER G WITH CIRCUMFLEX
+.. |gcirc|  unicode:: U+0011D .. LATIN SMALL LETTER G WITH CIRCUMFLEX
+.. |Gdot|   unicode:: U+00120 .. LATIN CAPITAL LETTER G WITH DOT ABOVE
+.. |gdot|   unicode:: U+00121 .. LATIN SMALL LETTER G WITH DOT ABOVE
+.. |Hcirc|  unicode:: U+00124 .. LATIN CAPITAL LETTER H WITH CIRCUMFLEX
+.. |hcirc|  unicode:: U+00125 .. LATIN SMALL LETTER H WITH CIRCUMFLEX
+.. |Hstrok| unicode:: U+00126 .. LATIN CAPITAL LETTER H WITH STROKE
+.. |hstrok| unicode:: U+00127 .. LATIN SMALL LETTER H WITH STROKE
+.. |Idot|   unicode:: U+00130 .. LATIN CAPITAL LETTER I WITH DOT ABOVE
+.. |IJlig|  unicode:: U+00132 .. LATIN CAPITAL LIGATURE IJ
+.. |ijlig|  unicode:: U+00133 .. LATIN SMALL LIGATURE IJ
+.. |Imacr|  unicode:: U+0012A .. LATIN CAPITAL LETTER I WITH MACRON
+.. |imacr|  unicode:: U+0012B .. LATIN SMALL LETTER I WITH MACRON
+.. |inodot| unicode:: U+00131 .. LATIN SMALL LETTER DOTLESS I
+.. |Iogon|  unicode:: U+0012E .. LATIN CAPITAL LETTER I WITH OGONEK
+.. |iogon|  unicode:: U+0012F .. LATIN SMALL LETTER I WITH OGONEK
+.. |Itilde| unicode:: U+00128 .. LATIN CAPITAL LETTER I WITH TILDE
+.. |itilde| unicode:: U+00129 .. LATIN SMALL LETTER I WITH TILDE
+.. |Jcirc|  unicode:: U+00134 .. LATIN CAPITAL LETTER J WITH CIRCUMFLEX
+.. |jcirc|  unicode:: U+00135 .. LATIN SMALL LETTER J WITH CIRCUMFLEX
+.. |Kcedil| unicode:: U+00136 .. LATIN CAPITAL LETTER K WITH CEDILLA
+.. |kcedil| unicode:: U+00137 .. LATIN SMALL LETTER K WITH CEDILLA
+.. |kgreen| unicode:: U+00138 .. LATIN SMALL LETTER KRA
+.. |Lacute| unicode:: U+00139 .. LATIN CAPITAL LETTER L WITH ACUTE
+.. |lacute| unicode:: U+0013A .. LATIN SMALL LETTER L WITH ACUTE
+.. |Lcaron| unicode:: U+0013D .. LATIN CAPITAL LETTER L WITH CARON
+.. |lcaron| unicode:: U+0013E .. LATIN SMALL LETTER L WITH CARON
+.. |Lcedil| unicode:: U+0013B .. LATIN CAPITAL LETTER L WITH CEDILLA
+.. |lcedil| unicode:: U+0013C .. LATIN SMALL LETTER L WITH CEDILLA
+.. |Lmidot| unicode:: U+0013F .. LATIN CAPITAL LETTER L WITH MIDDLE DOT
+.. |lmidot| unicode:: U+00140 .. LATIN SMALL LETTER L WITH MIDDLE DOT
+.. |Lstrok| unicode:: U+00141 .. LATIN CAPITAL LETTER L WITH STROKE
+.. |lstrok| unicode:: U+00142 .. LATIN SMALL LETTER L WITH STROKE
+.. |Nacute| unicode:: U+00143 .. LATIN CAPITAL LETTER N WITH ACUTE
+.. |nacute| unicode:: U+00144 .. LATIN SMALL LETTER N WITH ACUTE
+.. |napos|  unicode:: U+00149 .. LATIN SMALL LETTER N PRECEDED BY APOSTROPHE
+.. |Ncaron| unicode:: U+00147 .. LATIN CAPITAL LETTER N WITH CARON
+.. |ncaron| unicode:: U+00148 .. LATIN SMALL LETTER N WITH CARON
+.. |Ncedil| unicode:: U+00145 .. LATIN CAPITAL LETTER N WITH CEDILLA
+.. |ncedil| unicode:: U+00146 .. LATIN SMALL LETTER N WITH CEDILLA
+.. |Odblac| unicode:: U+00150 .. LATIN CAPITAL LETTER O WITH DOUBLE ACUTE
+.. |odblac| unicode:: U+00151 .. LATIN SMALL LETTER O WITH DOUBLE ACUTE
+.. |OElig|  unicode:: U+00152 .. LATIN CAPITAL LIGATURE OE
+.. |oelig|  unicode:: U+00153 .. LATIN SMALL LIGATURE OE
+.. |Omacr|  unicode:: U+0014C .. LATIN CAPITAL LETTER O WITH MACRON
+.. |omacr|  unicode:: U+0014D .. LATIN SMALL LETTER O WITH MACRON
+.. |Racute| unicode:: U+00154 .. LATIN CAPITAL LETTER R WITH ACUTE
+.. |racute| unicode:: U+00155 .. LATIN SMALL LETTER R WITH ACUTE
+.. |Rcaron| unicode:: U+00158 .. LATIN CAPITAL LETTER R WITH CARON
+.. |rcaron| unicode:: U+00159 .. LATIN SMALL LETTER R WITH CARON
+.. |Rcedil| unicode:: U+00156 .. LATIN CAPITAL LETTER R WITH CEDILLA
+.. |rcedil| unicode:: U+00157 .. LATIN SMALL LETTER R WITH CEDILLA
+.. |Sacute| unicode:: U+0015A .. LATIN CAPITAL LETTER S WITH ACUTE
+.. |sacute| unicode:: U+0015B .. LATIN SMALL LETTER S WITH ACUTE
+.. |Scaron| unicode:: U+00160 .. LATIN CAPITAL LETTER S WITH CARON
+.. |scaron| unicode:: U+00161 .. LATIN SMALL LETTER S WITH CARON
+.. |Scedil| unicode:: U+0015E .. LATIN CAPITAL LETTER S WITH CEDILLA
+.. |scedil| unicode:: U+0015F .. LATIN SMALL LETTER S WITH CEDILLA
+.. |Scirc|  unicode:: U+0015C .. LATIN CAPITAL LETTER S WITH CIRCUMFLEX
+.. |scirc|  unicode:: U+0015D .. LATIN SMALL LETTER S WITH CIRCUMFLEX
+.. |Tcaron| unicode:: U+00164 .. LATIN CAPITAL LETTER T WITH CARON
+.. |tcaron| unicode:: U+00165 .. LATIN SMALL LETTER T WITH CARON
+.. |Tcedil| unicode:: U+00162 .. LATIN CAPITAL LETTER T WITH CEDILLA
+.. |tcedil| unicode:: U+00163 .. LATIN SMALL LETTER T WITH CEDILLA
+.. |Tstrok| unicode:: U+00166 .. LATIN CAPITAL LETTER T WITH STROKE
+.. |tstrok| unicode:: U+00167 .. LATIN SMALL LETTER T WITH STROKE
+.. |Ubreve| unicode:: U+0016C .. LATIN CAPITAL LETTER U WITH BREVE
+.. |ubreve| unicode:: U+0016D .. LATIN SMALL LETTER U WITH BREVE
+.. |Udblac| unicode:: U+00170 .. LATIN CAPITAL LETTER U WITH DOUBLE ACUTE
+.. |udblac| unicode:: U+00171 .. LATIN SMALL LETTER U WITH DOUBLE ACUTE
+.. |Umacr|  unicode:: U+0016A .. LATIN CAPITAL LETTER U WITH MACRON
+.. |umacr|  unicode:: U+0016B .. LATIN SMALL LETTER U WITH MACRON
+.. |Uogon|  unicode:: U+00172 .. LATIN CAPITAL LETTER U WITH OGONEK
+.. |uogon|  unicode:: U+00173 .. LATIN SMALL LETTER U WITH OGONEK
+.. |Uring|  unicode:: U+0016E .. LATIN CAPITAL LETTER U WITH RING ABOVE
+.. |uring|  unicode:: U+0016F .. LATIN SMALL LETTER U WITH RING ABOVE
+.. |Utilde| unicode:: U+00168 .. LATIN CAPITAL LETTER U WITH TILDE
+.. |utilde| unicode:: U+00169 .. LATIN SMALL LETTER U WITH TILDE
+.. |Wcirc|  unicode:: U+00174 .. LATIN CAPITAL LETTER W WITH CIRCUMFLEX
+.. |wcirc|  unicode:: U+00175 .. LATIN SMALL LETTER W WITH CIRCUMFLEX
+.. |Ycirc|  unicode:: U+00176 .. LATIN CAPITAL LETTER Y WITH CIRCUMFLEX
+.. |ycirc|  unicode:: U+00177 .. LATIN SMALL LETTER Y WITH CIRCUMFLEX
+.. |Yuml|   unicode:: U+00178 .. LATIN CAPITAL LETTER Y WITH DIAERESIS
+.. |Zacute| unicode:: U+00179 .. LATIN CAPITAL LETTER Z WITH ACUTE
+.. |zacute| unicode:: U+0017A .. LATIN SMALL LETTER Z WITH ACUTE
+.. |Zcaron| unicode:: U+0017D .. LATIN CAPITAL LETTER Z WITH CARON
+.. |zcaron| unicode:: U+0017E .. LATIN SMALL LETTER Z WITH CARON
+.. |Zdot|   unicode:: U+0017B .. LATIN CAPITAL LETTER Z WITH DOT ABOVE
+.. |zdot|   unicode:: U+0017C .. LATIN SMALL LETTER Z WITH DOT ABOVE

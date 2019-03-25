@@ -1,0 +1,41 @@
+Metadata-Version: 2.0
+Name: Pygments
+Version: 2.3.1
+Summary: Pygments is a syntax highlighting package written in Python.
+Home-page: http://pygments.org/
+Author: Georg Brandl
+Author-email: georg@python.org
+License: BSD License
+Keywords: syntax highlighting
+Platform: any
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: End Users/Desktop
+Classifier: Intended Audience :: System Administrators
+Classifier: Development Status :: 6 - Mature
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Text Processing :: Filters
+Classifier: Topic :: Utilities
+
+Pygments
+~~~~~~~~
+
+Pygments is a syntax highlighting package written in Python.
+
+It is a generic syntax highlighter suitable for use in code hosting, forums,
+wikis or other applications that need to prettify source code.  Highlights
+are:
+
+* a wide range of over 300 languages and other text formats is supported
+* special attention is paid to details, increasing quality by a fair amount
+* support for new languages and formats are added easily
+* a number of output formats, presently HTML, LaTeX, RTF, SVG, all image       formats that PIL supports and ANSI sequences
+* it is usable as a command-line tool and as a library
+
+:copyright: Copyright 2006-2017 by the Pygments team, see AUTHORS.
+:license: BSD, see LICENSE for details.
+
+

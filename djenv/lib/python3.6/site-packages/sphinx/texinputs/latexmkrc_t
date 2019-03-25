@@ -1,0 +1,32 @@
+{% if latex_engine == 'pdflatex' -%}
+$latex = 'latex ' . $ENV{'LATEXOPTS'} . ' %O %S';
+$pdflatex = 'pdflatex ' . $ENV{'LATEXOPTS'} . ' %O %S';
+{% elif latex_engine == 'lualatex' -%}
+$latex = 'lualatex --output-format=dvi ' . $ENV{'LATEXOPTS'} . ' %O %S';
+$pdflatex = 'lualatex ' . $ENV{'LATEXOPTS'} . ' %O %S';
+{% elif latex_engine == 'xelatex' -%}
+$latex = 'xelatex --no-pdf ' . $ENV{'LATEXOPTS'} . ' %O %S';
+$pdflatex = 'xelatex ' . $ENV{'LATEXOPTS'} . ' %O %S';
+{% endif -%}
+$lualatex = 'lualatex ' . $ENV{'LATEXOPTS'} . ' %O %S';
+$xelatex = 'xelatex --no-pdf ' . $ENV{'LATEXOPTS'} . ' %O %S';
+{% if xindy_use -%}
+$makeindex = 'internal xindy ' . $ENV{'XINDYOPTS'} . ' %O -o %D %S';
+sub xindy {
+  my @args = @_;
+  if (-z $args[-1]) {
+    # create an empty .ind file if .idx is empty
+    open(FH, ">" . $args[-2]);
+    close(FH);
+    return 0;
+  } else {
+    return system("xindy", @args);
+  }
+}
+{% else -%}
+$makeindex = 'makeindex -s python.ist %O -o %D %S';
+{% endif -%}
+add_cus_dep( "glo", "gls", 0, "makeglo" );
+sub makeglo {
+ return system( "makeindex -s gglo.ist -o '$_[0].gls' '$_[0].glo'" );
+}

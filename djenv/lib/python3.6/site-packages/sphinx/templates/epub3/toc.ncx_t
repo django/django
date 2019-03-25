@@ -1,0 +1,24 @@
+{%- macro navPoints(navlist) %}
+{%- for nav in navlist %}
+<navPoint id="{{ nav.navpoint }}" playOrder="{{ nav.playorder }}">
+  <navLabel>
+    <text>{{ nav.text }}</text>
+  </navLabel>
+  <content src="{{ nav.refuri }}" />{{ navPoints(nav.children)|indent(2, true) }}
+</navPoint>
+{%- endfor %}
+{%- endmacro -%}
+<?xml version="1.0"?>
+<ncx version="2005-1" xmlns="http://www.daisy.org/z3986/2005/ncx/">
+  <head>
+    <meta name="dtb:uid" content="{{ uid }}"/>
+    <meta name="dtb:depth" content="{{ level }}"/>
+    <meta name="dtb:totalPageCount" content="0"/>
+    <meta name="dtb:maxPageNumber" content="0"/>
+  </head>
+  <docTitle>
+    <text>{{ title }}</text>
+  </docTitle>
+  <navMap>{{ navPoints(navpoints)|indent(4, true) }}
+  </navMap>
+</ncx>

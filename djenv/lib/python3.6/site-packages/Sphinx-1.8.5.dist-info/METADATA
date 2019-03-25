@@ -1,0 +1,197 @@
+Metadata-Version: 2.1
+Name: Sphinx
+Version: 1.8.5
+Summary: Python documentation generator
+Home-page: http://sphinx-doc.org/
+Author: Georg Brandl
+Author-email: georg@python.org
+License: BSD
+Download-URL: https://pypi.org/project/Sphinx/
+Platform: any
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Console
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Education
+Classifier: Intended Audience :: End Users/Desktop
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: System Administrators
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: Framework :: Setuptools Plugin
+Classifier: Framework :: Sphinx
+Classifier: Framework :: Sphinx :: Extension
+Classifier: Framework :: Sphinx :: Theme
+Classifier: Topic :: Documentation
+Classifier: Topic :: Documentation :: Sphinx
+Classifier: Topic :: Internet :: WWW/HTTP :: Site Management
+Classifier: Topic :: Printing
+Classifier: Topic :: Software Development
+Classifier: Topic :: Software Development :: Documentation
+Classifier: Topic :: Text Processing
+Classifier: Topic :: Text Processing :: General
+Classifier: Topic :: Text Processing :: Indexing
+Classifier: Topic :: Text Processing :: Markup
+Classifier: Topic :: Text Processing :: Markup :: HTML
+Classifier: Topic :: Text Processing :: Markup :: LaTeX
+Classifier: Topic :: Utilities
+Requires-Python: >=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*
+Requires-Dist: six (>=1.5)
+Requires-Dist: Jinja2 (>=2.3)
+Requires-Dist: Pygments (>=2.0)
+Requires-Dist: docutils (>=0.11)
+Requires-Dist: snowballstemmer (>=1.1)
+Requires-Dist: babel (!=2.0,>=1.3)
+Requires-Dist: alabaster (<0.8,>=0.7)
+Requires-Dist: imagesize
+Requires-Dist: requests (>=2.0.0)
+Requires-Dist: setuptools
+Requires-Dist: packaging
+Requires-Dist: sphinxcontrib-websupport
+Requires-Dist: typing ; python_version<"3.5"
+Requires-Dist: colorama (>=0.3.5) ; sys_platform=="win32"
+Provides-Extra: test
+Requires-Dist: mock ; extra == 'test'
+Requires-Dist: pytest ; extra == 'test'
+Requires-Dist: pytest-cov ; extra == 'test'
+Requires-Dist: html5lib ; extra == 'test'
+Requires-Dist: flake8 (>=3.5.0) ; extra == 'test'
+Requires-Dist: flake8-import-order ; extra == 'test'
+Requires-Dist: enum34 ; (python_version<"3") and extra == 'test'
+Requires-Dist: mypy ; (python_version>="3") and extra == 'test'
+Requires-Dist: typed-ast ; (python_version>="3") and extra == 'test'
+Provides-Extra: websupport
+Requires-Dist: sqlalchemy (>=0.9) ; extra == 'websupport'
+Requires-Dist: whoosh (>=2.0) ; extra == 'websupport'
+
+========
+ Sphinx
+========
+
+.. image:: https://img.shields.io/pypi/v/sphinx.svg
+   :target: https://pypi.org/project/Sphinx/
+   :alt: Package on PyPI
+
+.. image:: https://readthedocs.org/projects/sphinx/badge/?version=master
+   :target: http://www.sphinx-doc.org/
+   :alt: Documentation Status
+
+.. image:: https://travis-ci.org/sphinx-doc/sphinx.svg?branch=master
+   :target: https://travis-ci.org/sphinx-doc/sphinx
+   :alt: Build Status (Travis CI)
+
+.. image:: https://ci.appveyor.com/api/projects/status/github/sphinx-doc/sphinx?branch=master&svg=true
+   :target: https://ci.appveyor.com/project/sphinxdoc/sphinx
+   :alt: Build Status (AppVeyor)
+
+.. image:: https://circleci.com/gh/sphinx-doc/sphinx.svg?style=shield
+   :target: https://circleci.com/gh/sphinx-doc/sphinx
+   :alt: Build Status (CircleCI)
+
+.. image:: https://codecov.io/gh/sphinx-doc/sphinx/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/sphinx-doc/sphinx
+   :alt: Code Coverage Status (Codecov)
+
+Sphinx is a tool that makes it easy to create intelligent and beautiful
+documentation for Python projects (or other documents consisting of multiple
+reStructuredText sources), written by Georg Brandl.  It was originally created
+for the new Python documentation, and has excellent facilities for Python
+project documentation, but C/C++ is supported as well, and more languages are
+planned.
+
+Sphinx uses reStructuredText as its markup language, and many of its strengths
+come from the power and straightforwardness of reStructuredText and its parsing
+and translating suite, the Docutils.
+
+Among its features are the following:
+
+* Output formats: HTML (including derivative formats such as HTML Help, Epub
+  and Qt Help), plain text, manual pages and LaTeX or direct PDF output
+  using rst2pdf
+* Extensive cross-references: semantic markup and automatic links
+  for functions, classes, glossary terms and similar pieces of information
+* Hierarchical structure: easy definition of a document tree, with automatic
+  links to siblings, parents and children
+* Automatic indices: general index as well as a module index
+* Code handling: automatic highlighting using the Pygments highlighter
+* Flexible HTML output using the Jinja 2 templating engine
+* Various extensions are available, e.g. for automatic testing of snippets
+  and inclusion of appropriately formatted docstrings
+* Setuptools integration
+
+For more information, refer to the `the documentation`__.
+
+.. __: http://www.sphinx-doc.org/
+
+Installation
+============
+
+Sphinx is published on `PyPI`__ and can be installed from there::
+
+   pip install -U sphinx
+
+We also publish beta releases::
+
+   pip install -U --pre sphinx
+
+If you wish to install `Sphinx` for development purposes, refer to `the
+contributors guide`__.
+
+__ https://pypi.org/project/Sphinx/
+__ http://www.sphinx-doc.org/en/master/devguide.html
+
+Documentation
+=============
+
+Documentation is available from `sphinx-doc.org`__.
+
+__ http://www.sphinx-doc.org/
+
+Get in touch
+============
+
+- Report bugs, suggest features or view the source code `on GitHub`_.
+- For less well defined questions or ideas, use the `mailing list`_.
+
+.. _on GitHub: https://github.com/sphinx-doc/sphinx
+.. _mailing list: https://groups.google.com/forum/#!forum/sphinx-users
+
+Testing
+=======
+
+Continuous testing is provided by `Travis`__ (for unit tests and style checks
+on Linux), `AppVeyor`__ (for unit tests on Windows), and `CircleCI`__ (for
+large processes like TeX compilation).
+
+For information on running tests locally, refer to `the contributors guide`__.
+
+__ https://travis-ci.org/sphinx-doc/sphinx
+__ https://ci.appveyor.com/project/sphinxdoc/sphinx
+__ https://circleci.com/gh/sphinx-doc/sphinx
+__ http://www.sphinx-doc.org/en/master/devguide.html
+
+Contributing
+============
+
+Refer to `the contributors guide`__.
+
+__ http://www.sphinx-doc.org/en/master/devguide.html
+
+Release signatures
+==================
+
+Releases are signed with following keys:
+
+* `498D6B9E <https://pgp.mit.edu/pks/lookup?op=vindex&search=0x102C2C17498D6B9E>`_
+* `5EBA0E07 <https://pgp.mit.edu/pks/lookup?op=vindex&search=0x1425F8CE5EBA0E07>`_
+
+

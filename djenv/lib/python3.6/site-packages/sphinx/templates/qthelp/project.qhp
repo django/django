@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<QtHelpProject version="1.0">
+    <namespace>{{ namespace|e }}</namespace>
+    <virtualFolder>doc</virtualFolder>
+    <customFilter name="{{ project|e }} {{ version|e }}">
+        <filterAttribute>{{ outname|e }}</filterAttribute>
+        <filterAttribute>{{ version|e }}</filterAttribute>
+    </customFilter>
+    <filterSection>
+        <filterAttribute>{{ outname|e }}</filterAttribute>
+        <filterAttribute>{{ version|e }}</filterAttribute>
+        <toc>
+            <section title="{{ title|e }}" ref="{{ master_doc|e }}.html">
+{{ sections }}
+            </section>
+        </toc>
+        <keywords>
+{{ keywords }}
+        </keywords>
+        <files>
+            {%- for filename in files %}
+            <file>{{ filename|e }}</file>
+            {%- endfor %}
+        </files>
+    </filterSection>
+</QtHelpProject>

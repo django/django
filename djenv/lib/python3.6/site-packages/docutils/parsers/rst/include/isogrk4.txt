@@ -1,0 +1,8 @@
+.. This data file has been placed in the public domain.
+.. Derived from the Unicode character mappings available from
+   <http://www.w3.org/2003/entities/xml/>.
+   Processed by unicode2rstsubs.py, part of Docutils:
+   <http://docutils.sourceforge.net>.
+
+.. |b.Gammad| unicode:: U+003DC .. GREEK LETTER DIGAMMA
+.. |b.gammad| unicode:: U+003DD .. GREEK SMALL LETTER DIGAMMA

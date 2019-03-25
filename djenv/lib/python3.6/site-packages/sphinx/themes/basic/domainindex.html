@@ -1,0 +1,56 @@
+{#
+    basic/domainindex.html
+    ~~~~~~~~~~~~~~~~~~~~~~
+
+    Template for domain indices (module index, ...).
+
+    :copyright: Copyright 2007-2019 by the Sphinx team, see AUTHORS.
+    :license: BSD, see LICENSE for details.
+#}
+{%- extends "layout.html" %}
+{% set title = indextitle %}
+{% block extrahead %}
+{{ super() }}
+{% if not embedded and collapse_index %}
+    <script type="text/javascript">
+      DOCUMENTATION_OPTIONS.COLLAPSE_INDEX = true;
+    </script>
+{% endif %}
+{% endblock %}
+{% block body %}
+
+   {%- set groupid = idgen() %}
+
+   <h1>{{ indextitle }}</h1>
+
+   <div class="modindex-jumpbox">
+   {%- for (letter, entries) in content %}
+   <a href="#cap-{{ letter }}"><strong>{{ letter }}</strong></a>
+     {%- if not loop.last %} | {% endif %}
+   {%- endfor %}
+   </div>
+
+   <table class="indextable modindextable">
+   {%- for letter, entries in content %}
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-{{ letter }}"><td></td><td>
+       <strong>{{ letter }}</strong></td><td></td></tr>
+     {%- for (name, grouptype, page, anchor, extra, qualifier, description)
+             in entries %}
+     <tr{% if grouptype == 2 %} class="cg-{{ groupid.current() }}"{% endif %}>
+       <td>{% if grouptype == 1 -%}
+         <img src="{{ pathto('_static/minus.png', 1) }}" class="toggler"
+              id="toggle-{{ groupid.next() }}" style="display: none" alt="-" />
+           {%- endif %}</td>
+       <td>{% if grouptype == 2 %}&#160;&#160;&#160;{% endif %}
+       {% if page %}<a href="{{ pathto(page) }}#{{ anchor }}">{% endif -%}
+       <code class="xref">{{ name|e }}</code>
+       {%- if page %}</a>{% endif %}
+     {%- if extra %} <em>({{ extra|e }})</em>{% endif -%}
+     </td><td>{% if qualifier %}<strong>{{ qualifier|e }}:</strong>{% endif %}
+       <em>{{ description|e }}</em></td></tr>
+     {%- endfor %}
+   {%- endfor %}
+   </table>
+
+{% endblock %}

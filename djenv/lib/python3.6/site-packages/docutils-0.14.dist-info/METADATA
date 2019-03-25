@@ -1,0 +1,54 @@
+Metadata-Version: 2.0
+Name: docutils
+Version: 0.14
+Summary: Docutils -- Python Documentation Utilities
+Home-page: http://docutils.sourceforge.net/
+Author: docutils-develop list
+Author-email: docutils-develop@lists.sourceforge.net
+License: public domain, Python, 2-Clause BSD, GPL 3 (see COPYING.txt)
+Platform: OS-independent
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: End Users/Desktop
+Classifier: Intended Audience :: Other Audience
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: System Administrators
+Classifier: License :: Public Domain
+Classifier: License :: OSI Approved :: Python Software Foundation License
+Classifier: License :: OSI Approved :: BSD License
+Classifier: License :: OSI Approved :: GNU General Public License (GPL)
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 2.4
+Classifier: Programming Language :: Python :: 2.5
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Documentation
+Classifier: Topic :: Software Development :: Documentation
+Classifier: Topic :: Text Processing
+Classifier: Natural Language :: English
+Classifier: Natural Language :: Afrikaans
+Classifier: Natural Language :: Catalan
+Classifier: Natural Language :: Chinese (Simplified)
+Classifier: Natural Language :: Chinese (Traditional)
+Classifier: Natural Language :: Czech
+Classifier: Natural Language :: Dutch
+Classifier: Natural Language :: Esperanto
+Classifier: Natural Language :: Finnish
+Classifier: Natural Language :: French
+Classifier: Natural Language :: Galician
+Classifier: Natural Language :: German
+Classifier: Natural Language :: Italian
+Classifier: Natural Language :: Japanese
+Classifier: Natural Language :: Polish
+Classifier: Natural Language :: Portuguese (Brazilian)
+Classifier: Natural Language :: Russian
+Classifier: Natural Language :: Slovak
+Classifier: Natural Language :: Spanish
+Classifier: Natural Language :: Swedish
+
+Docutils is a modular system for processing documentation
+into useful formats, such as HTML, XML, and LaTeX.  For
+input Docutils supports reStructuredText, an easy-to-read,
+what-you-see-is-what-you-get plaintext markup syntax.
+

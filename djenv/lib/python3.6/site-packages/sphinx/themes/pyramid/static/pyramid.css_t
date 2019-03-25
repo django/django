@@ -1,0 +1,348 @@
+/*
+ * pyramid.css_t
+ * ~~~~~~~~~~~~
+ *
+ * Sphinx stylesheet -- pylons theme.
+ *
+ * :copyright: Copyright 2007-2019 by the Sphinx team, see AUTHORS.
+ * :license: BSD, see LICENSE for details.
+ *
+ */
+ 
+@import url("basic.css");
+ 
+/* -- page layout ----------------------------------------------------------- */
+ 
+body {
+    font-family: "Nobile", sans-serif;
+    font-size: 100%;
+    background-color: #393939;
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+
+div.documentwrapper {
+    float: left;
+    width: 100%;
+}
+
+div.bodywrapper {
+    margin: 0 0 0 {{ theme_sidebarwidth|todim }};
+}
+
+hr {
+    border: 1px solid #B1B4B6;
+}
+ 
+div.document {
+    background-color: #eee;
+}
+
+div.header {
+    width:100%;
+    background: #f4ad32 url(headerbg.png) repeat-x 0 top;
+    border-bottom: 2px solid #ffffff;
+}
+
+div.logo {
+    text-align: center;
+    padding-top: 10px;
+}
+
+div.body {
+    background-color: #ffffff;
+    color: #3E4349;
+    padding: 0 30px 30px 30px;
+    font-size: 1em;
+    border: 2px solid #ddd;
+    border-right-style: none;
+    overflow: auto;
+}
+ 
+div.footer {
+    color: #ffffff;
+    width: 100%;
+    padding: 13px 0;
+    text-align: center;
+    font-size: 75%;
+    background: transparent;
+    clear:both;
+}
+ 
+div.footer a {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+div.footer a:hover {
+    color: #e88f00;
+    text-decoration: underline;
+}
+ 
+div.related {
+    line-height: 30px;
+    color: #373839;
+    font-size: 0.8em;
+    background-color: #eee;
+}
+ 
+div.related a {
+    color: #1b61d6;
+}
+
+div.related ul {
+    padding-left: calc({{ theme_sidebarwidth|todim }} + 10px);
+}
+ 
+div.sphinxsidebar {
+    font-size: 0.75em;
+    line-height: 1.5em;
+}
+
+div.sphinxsidebarwrapper{
+    padding: 10px 0;
+}
+ 
+div.sphinxsidebar h3,
+div.sphinxsidebar h4 {
+    font-family: "Neuton", sans-serif;
+    color: #373839;
+    font-size: 1.4em;
+    font-weight: normal;
+    margin: 0;
+    padding: 5px 10px;
+    border-bottom: 2px solid #ddd;
+}
+
+div.sphinxsidebar h4{
+    font-size: 1.3em;
+}
+ 
+div.sphinxsidebar h3 a {
+    color: #000000;
+}
+ 
+ 
+div.sphinxsidebar p {
+    color: #888;
+    padding: 5px 20px;
+}
+ 
+div.sphinxsidebar p.topless {
+}
+ 
+div.sphinxsidebar ul {
+    margin: 10px 20px;
+    padding: 0;
+    color: #373839;
+}
+ 
+div.sphinxsidebar a {
+    color: #444;
+}
+ 
+div.sphinxsidebar input {
+    border: 1px solid #ccc;
+    font-family: sans-serif;
+    font-size: 1em;
+}
+
+div.sphinxsidebar .searchformwrapper {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+/* -- sidebars -------------------------------------------------------------- */
+
+div.sidebar {
+    margin: 0 0 0.5em 1em;
+    border: 2px solid #c6d880;
+    background-color: #e6efc2;
+    width: 40%;
+    float: right;
+    border-right-style: none;
+    border-left-style: none;
+    padding: 10px 20px;
+}
+
+p.sidebar-title {
+    font-weight: bold;
+}
+
+/* -- body styles ----------------------------------------------------------- */
+ 
+a, a .pre {
+    color: #1b61d6;
+    text-decoration: none;
+}
+ 
+a:hover, a:hover .pre {
+    text-decoration: underline;
+}
+ 
+div.body h1,
+div.body h2,
+div.body h3,
+div.body h4,
+div.body h5,
+div.body h6 {
+    font-family: "Neuton", sans-serif;
+    background-color: #ffffff;
+    font-weight: normal;
+    color: #373839;
+    margin: 30px 0px 10px 0px;
+    padding: 5px 0;
+}
+ 
+div.body h1 { border-top: 20px solid white; margin-top: 0; font-size: 200%; }
+div.body h2 { font-size: 150%; background-color: #ffffff; }
+div.body h3 { font-size: 120%; background-color: #ffffff; }
+div.body h4 { font-size: 110%; background-color: #ffffff; }
+div.body h5 { font-size: 100%; background-color: #ffffff; }
+div.body h6 { font-size: 100%; background-color: #ffffff; }
+ 
+a.headerlink {
+    color: #1b61d6;
+    font-size: 0.8em;
+    padding: 0 4px 0 4px;
+    text-decoration: none;
+}
+ 
+a.headerlink:hover {
+    text-decoration: underline;
+}
+ 
+div.body p, div.body dd, div.body li {
+    line-height: 1.5em;
+}
+ 
+div.admonition p.admonition-title + p {
+    display: inline;
+}
+
+div.admonition {
+    background: #eeeeec;
+    border: 2px solid #babdb6;
+    border-right-style: none;
+    border-left-style: none;
+    padding: 10px 20px 10px 60px;
+}
+
+div.highlight{
+    background-color: white;
+}
+
+div.note {
+    border: 2px solid #7a9eec;
+    border-right-style: none;
+    border-left-style: none;
+    padding: 10px 20px 10px 60px;
+    background: #e1ecfe url(dialog-note.png) no-repeat 10px 8px;
+}
+ 
+div.seealso {
+    background: #fff6bf url(dialog-seealso.png) no-repeat 10px 8px;
+    border: 2px solid #ffd324;
+    border-left-style: none;
+    border-right-style: none;
+    padding: 10px 20px 10px 60px;
+}
+ 
+div.topic {
+    background: #eeeeee;
+    border: 2px solid #C6C9CB;
+    padding: 10px 20px;
+    border-right-style: none;
+    border-left-style: none;
+}
+ 
+div.warning {
+    background: #fbe3e4 url(dialog-warning.png) no-repeat 10px 8px;
+    border: 2px solid #fbc2c4;
+    border-right-style: none;
+    border-left-style: none;
+    padding: 10px 20px 10px 60px;
+}
+
+div.admonition-todo {
+    background: #f2d9b4 url(dialog-todo.png) no-repeat 10px 8px;
+    border: 2px solid #e9b96e;
+    border-right-style: none;
+    border-left-style: none;
+    padding: 10px 20px 10px 60px;
+}
+ 
+div.note p.admonition-title,
+div.warning p.admonition-title,
+div.seealso p.admonition-title,
+div.admonition-todo p.admonition-title {
+    display: none;
+}
+ 
+p.admonition-title:after {
+    content: ":";
+}
+ 
+pre {
+    padding: 10px;
+    background-color: #fafafa;
+    color: #222;
+    line-height: 1.2em;
+    border: 2px solid #C6C9CB;
+    font-size: 1.1em;
+    margin: 1.5em 0 1.5em 0;
+    border-right-style: none;
+    border-left-style: none;
+}
+ 
+code {
+    background-color: transparent;
+    color: #222;
+    font-size: 1.1em;
+    font-family: monospace;
+}
+
+.viewcode-back {
+    font-family: "Nobile", sans-serif;
+}
+
+div.viewcode-block:target {
+    background-color: #fff6bf;
+    border: 2px solid #ffd324;
+    border-left-style: none;
+    border-right-style: none;
+    padding: 10px 20px;
+}
+
+table.highlighttable {
+    width: 100%;
+}
+
+table.highlighttable td {
+    padding: 0;
+}
+
+a em.std-term {
+   color: #007f00;
+}
+
+a:hover em.std-term {
+    text-decoration: underline;
+}
+
+.download {
+    font-family: "Nobile", sans-serif;
+    font-weight: normal;
+    font-style: normal;
+}
+
+code.xref {
+    font-weight: normal;
+    font-style: normal;
+}
+
+div.code-block-caption {
+    background-color: #ddd;
+    color: #222;
+}
