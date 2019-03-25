@@ -1,7 +1,0 @@
-@media print {
-    div.header, div.relnav, #toc { display: none; }
-    #contentwrapper { padding: 0; margin: 0; border: none; }
-    body { color: black; background-color: white; }
-    div.footer { border-top: 1px solid #888; color: #888; margin-top: 1cm; }
-    div.footer a { text-decoration: none; }
-}

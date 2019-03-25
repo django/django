@@ -1,3 +1,0 @@
-[sphinx.html_themes]
-alabaster = alabaster
-

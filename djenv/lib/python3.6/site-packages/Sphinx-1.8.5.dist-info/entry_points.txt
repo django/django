@@ -1,9 +1,0 @@
-[console_scripts]
-sphinx-apidoc = sphinx.ext.apidoc:main
-sphinx-autogen = sphinx.ext.autosummary.generate:main
-sphinx-build = sphinx.cmd.build:main
-sphinx-quickstart = sphinx.cmd.quickstart:main
-
-[distutils.commands]
-build_sphinx = sphinx.setup_command:BuildDoc
-

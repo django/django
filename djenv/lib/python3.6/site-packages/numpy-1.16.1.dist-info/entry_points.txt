@@ -1,5 +1,0 @@
-[console_scripts]
-f2py = numpy.f2py.f2py2e:main
-f2py3 = numpy.f2py.f2py2e:main
-f2py3.6 = numpy.f2py.f2py2e:main
-
