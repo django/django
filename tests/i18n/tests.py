@@ -1693,6 +1693,51 @@ class UnprefixedDefaultLanguageTests(SimpleTestCase):
 @override_settings(
     USE_I18N=True,
     LANGUAGES=[
+        ('en', 'English'),
+        ('de', 'German'),
+        ('fr', 'French'),
+    ],
+    MIDDLEWARE=[
+        'django.middleware.locale.LocaleMiddleware',
+        'django.middleware.common.CommonMiddleware',
+    ],
+    ROOT_URLCONF='i18n.urls_default_unprefixed',
+    LANGUAGE_CODE='en',
+)
+class UnprefixedDefaultLanguageUtilsTests(SimpleTestCase):
+    '''
+    Similar to UnprefixedDefaultLanguageTests but using the
+    get_language_from_request API
+    '''
+    def setUp(self):
+        '''
+        Emulate a browser with language set to German
+        '''
+        self.factory = RequestFactory(HTTP_ACCEPT_LANGUAGE='de')
+
+    def test_default_lang_without_prefix(self):
+        """
+        With i18n_patterns(..., prefix_default_language=False), the default
+        language (settings.LANGUAGE_CODE) should be returned without a prefix.
+        """
+        request = self.factory.get('/simple/')
+        lang = get_language_from_request(request, check_path=True)
+        self.assertEqual(lang, 'en')
+
+    def test_other_lang_with_prefix(self):
+        request = self.factory.get('/de/simple/')
+        lang = get_language_from_request(request, check_path=True)
+        self.assertEqual(lang, 'de')
+
+    def test_unprefixed_language_other_than_accept_language(self):
+        request = self.factory.get('/fr/simple/')
+        lang = get_language_from_request(request, check_path=True)
+        self.assertEqual(lang, 'fr')
+
+
+@override_settings(
+    USE_I18N=True,
+    LANGUAGES=[
         ('bg', 'Bulgarian'),
         ('en-us', 'English'),
         ('pt-br', 'Portuguese (Brazil)'),
