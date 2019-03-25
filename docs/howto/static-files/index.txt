@@ -77,16 +77,19 @@ Serving static files during development
 =======================================
 
 If you use :mod:`django.contrib.staticfiles` as explained above,
-:djadmin:`runserver` will do this automatically when :setting:`DEBUG` is set
-to ``True``. If you don't have ``django.contrib.staticfiles`` in
-:setting:`INSTALLED_APPS`, you can still manually serve static files using the
-:func:`django.views.static.serve` view.
+:djadmin:`runserver` will be overriden so that URL patterns are configured
+automatically when :setting:`DEBUG` is set to ``True``. If you don't have
+``django.contrib.staticfiles`` in :setting:`INSTALLED_APPS`, or are using a
+customized :djadmin:`runserver` command, you can still manually serve static
+files using the :func:`django.views.static.serve` view in conjunction with the
+:djadmin:`collectstatic` management command.
 
 This is not suitable for production use! For some common deployment
 strategies, see :doc:`/howto/static-files/deployment`.
 
-For example, if your :setting:`STATIC_URL` is defined as ``/static/``, you can do
-this by adding the following snippet to your urls.py::
+For example, if your :setting:`STATIC_URL` is defined as ``/static/``, and you
+have a :setting:`STATIC_ROOT` path configured, you can do this by adding the
+following snippet to your urls.py::
 
     from django.conf import settings
     from django.conf.urls.static import static
@@ -94,6 +97,13 @@ this by adding the following snippet to your urls.py::
     urlpatterns = [
         # ... the rest of your URLconf goes here ...
     ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+Now, run the :djadmin:`collectstatic` management command to collect the files::
+
+    $ python manage.py collectstatic
+
+Your static files will now be served when running :djadmin:`runserver`.
+
 
 .. note::
 
@@ -152,6 +162,8 @@ of the built-in one that has the ability to transparently serve all the assets
 during execution of these tests in a way very similar to what we get at
 development time with ``DEBUG = True``, i.e. without having to collect them
 using :djadmin:`collectstatic` first.
+
+.. _staticfiles-deployment:
 
 Deployment
 ==========
