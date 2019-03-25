@@ -473,6 +473,10 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
         # set a value manually, that will persist on the instance until cleared
         person.friends = ["Huckleberry Finn", "Tom Sawyer"]
 
+    Because of the way the `descriptor protocol
+    <descriptor-invocation>`_ works, using ``del`` (or ``delattr``) on a
+    ``cached_property`` that hasn't been accessed raises ``AttributeError``.
+
     As well as offering potential performance advantages, ``@cached_property``
     can ensure that an attribute's value does not change unexpectedly over the
     life of an instance. This could occur with a method whose computation is
