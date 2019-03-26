@@ -4291,7 +4291,7 @@ QUnit.diff = ( function() {
 		countInsert = 0;
 		textDelete = "";
 		textInsert = "";
-		commonlength;
+		
 		while ( pointer < diffs.length ) {
 			switch ( diffs[ pointer ][ 0 ] ) {
 			case DIFF_INSERT:
