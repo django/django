@@ -631,13 +631,18 @@ Usage
 Passing strings
 ~~~~~~~~~~~~~~~
 
-Typical usage is to pass the contents of the page, as a string or bytestring,
-to the :class:`HttpResponse` constructor::
+Typical usage is to pass the contents of the page, as a string, bytestring,
+or :class:`memoryview`, to the :class:`HttpResponse` constructor::
 
     >>> from django.http import HttpResponse
     >>> response = HttpResponse("Here's the text of the Web page.")
     >>> response = HttpResponse("Text only, please.", content_type="text/plain")
     >>> response = HttpResponse(b'Bytestrings are also accepted.')
+    >>> response = HttpResponse(memoryview(b'Memoryview as well.'))
+
+.. versionchanged:: 3.0
+
+    Support for :class:`memoryview` was added.
 
 But if you want to add content incrementally, you can use ``response`` as a
 file-like object::
@@ -741,10 +746,10 @@ Methods
     Instantiates an ``HttpResponse`` object with the given page content and
     content type.
 
-    ``content`` is most commonly an iterator, bytestring, or string. Other
-    types will be converted to a bytestring by encoding their string
-    representation. Iterators should return strings or bytestrings and those
-    will be joined together to form the content of the response.
+    ``content`` is most commonly an iterator, bytestring, :class:`memoryview`,
+    or string. Other types will be converted to a bytestring by encoding their
+    string representation. Iterators should return strings or bytestrings and
+    those will be joined together to form the content of the response.
 
     ``content_type`` is the MIME type optionally completed by a character set
     encoding and is used to fill the HTTP ``Content-Type`` header. If not
@@ -759,6 +764,10 @@ Methods
     ``charset`` is the charset in which the response will be encoded. If not
     given it will be extracted from ``content_type``, and if that
     is unsuccessful, the :setting:`DEFAULT_CHARSET` setting will be used.
+
+    .. versionchanged:: 3.0
+
+        Support for :class:`memoryview` ``content`` was added.
 
 .. method:: HttpResponse.__setitem__(header, value)
 

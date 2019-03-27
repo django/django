@@ -188,7 +188,8 @@ Models
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Allowed :class:`~django.http.HttpResponse` to be initialized with
+  :class:`memoryview` content.
 
 Serialization
 ~~~~~~~~~~~~~
