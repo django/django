@@ -2782,6 +2782,9 @@ class ExcludeTests(TestCase):
         annotation = Annotation.objects.create(name='annotation', tag=tag)
         self.assertEqual(Annotation.objects.exclude(tag__note__note=F('name')).get(), annotation)
 
+    def test_exclude_with_circular_fk_relation(self):
+        self.assertEqual(ObjectB.objects.exclude(objecta__objectb__name=F('name')).count(), 0)
+
 
 class ExcludeTest17600(TestCase):
     """
