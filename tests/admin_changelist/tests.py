@@ -259,7 +259,7 @@ class ChangeListTests(TestCase):
         new_parent = Parent.objects.create(name='parent')
         for i in range(200):
             Child.objects.create(name='name %s' % i, parent=new_parent)
-        request = self.factory.get('/child/', data={'p': -1})  # Anything outside range
+        request = self.factory.get('/child/', data={'p': 500})  # Anything outside range
         request.user = self.superuser
         m = ChildAdmin(Child, custom_site)
 

@@ -1,7 +1,9 @@
 from collections import OrderedDict
 from datetime import datetime, timedelta
 
+from django import forms
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.admin import FieldListFilter
 from django.contrib.admin.exceptions import (
     DisallowedModelAdminLookup, DisallowedModelAdminToField,
@@ -35,6 +37,16 @@ IGNORED_PARAMS = (
     ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, TO_FIELD_VAR)
 
 
+class ChangeListForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(ChangeListForm, self).__init__(*args, **kwargs)
+        self.fields = {
+            SEARCH_VAR: forms.CharField(required=False, strip=False),
+            PAGE_VAR: forms.IntegerField(required=False, min_value=0),
+            TO_FIELD_VAR: forms.CharField(required=False),
+        }
+
+
 class ChangeList:
     def __init__(self, request, model, list_display, list_display_links,
                  list_filter, date_hierarchy, search_fields, list_select_related,
@@ -57,16 +69,19 @@ class ChangeList:
         self.sortable_by = sortable_by
 
         # Get search parameters from the query string.
-        try:
-            self.page_num = int(request.GET.get(PAGE_VAR, 0))
-        except ValueError:
-            self.page_num = 0
+        change_list_form = ChangeListForm(request.GET)
+        if not change_list_form.is_valid():
+            messages.error(request, change_list_form.errors.as_text())
+
+        self.page_num = change_list_form.cleaned_data.get(PAGE_VAR) or 0
+        self.query = change_list_form.cleaned_data.get(SEARCH_VAR) or ''
+        self.to_field = change_list_form.cleaned_data.get(TO_FIELD_VAR)
+        if self.to_field and not model_admin.to_field_allowed(request, self.to_field):
+            raise DisallowedModelAdminToField("The field %s cannot be referenced." % self.to_field)
+
         self.show_all = ALL_VAR in request.GET
         self.is_popup = IS_POPUP_VAR in request.GET
-        to_field = request.GET.get(TO_FIELD_VAR)
-        if to_field and not model_admin.to_field_allowed(request, to_field):
-            raise DisallowedModelAdminToField("The field %s cannot be referenced." % to_field)
-        self.to_field = to_field
+
         self.params = dict(request.GET.items())
         if PAGE_VAR in self.params:
             del self.params[PAGE_VAR]
@@ -77,7 +92,6 @@ class ChangeList:
             self.list_editable = ()
         else:
             self.list_editable = list_editable
-        self.query = request.GET.get(SEARCH_VAR, '')
         self.queryset = self.get_queryset(request)
         self.get_results(request)
         if self.is_popup:
