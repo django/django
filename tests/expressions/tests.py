@@ -591,6 +591,17 @@ class BasicExpressionsTests(TestCase):
         outer = Company.objects.filter(pk__in=Subquery(inner.values('pk')))
         self.assertEqual(outer.get().name, 'Test GmbH')
 
+    def test_annotation_with_outerref(self):
+        gmbh_salary = Company.objects.annotate(
+            max_ceo_salary_raise=Subquery(
+                Company.objects.annotate(
+                    salary_raise=OuterRef('num_employees') + F('num_employees'),
+                ).order_by('-salary_raise').values('salary_raise')[:1],
+                output_field=models.IntegerField(),
+            ),
+        ).get(pk=self.gmbh.pk)
+        self.assertEqual(gmbh_salary.max_ceo_salary_raise, 2332)
+
     def test_pickle_expression(self):
         expr = Value(1, output_field=models.IntegerField())
         expr.convert_value  # populate cached property

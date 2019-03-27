@@ -527,6 +527,8 @@ class ResolvedOuterRef(F):
     In this case, the reference to the outer query has been resolved because
     the inner query has been used as a subquery.
     """
+    contains_aggregate = False
+
     def as_sql(self, *args, **kwargs):
         raise ValueError(
             'This queryset contains a reference to an outer query and may '
