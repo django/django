@@ -23,7 +23,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_delete_procedure = 'DROP FUNCTION %(procedure)s(%(param_types)s)'
 
     def quote_value(self, value):
-        # getquoted() returns a quoted byte string of the adapted value.
+        # getquoted() returns a quoted bytestring of the adapted value.
         return psycopg2.extensions.adapt(value).getquoted().decode()
 
     def _field_indexes_sql(self, model, field):

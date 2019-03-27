@@ -38,7 +38,7 @@ All attributes should be considered read-only, unless stated otherwise.
 
 .. attribute:: HttpRequest.body
 
-    The raw HTTP request body as a byte string. This is useful for processing
+    The raw HTTP request body as a bytestring. This is useful for processing
     data in different ways than conventional HTML forms: binary images,
     XML payload etc. For processing conventional form data, use
     :attr:`HttpRequest.POST`.
