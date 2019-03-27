@@ -631,12 +631,13 @@ Usage
 Passing strings
 ~~~~~~~~~~~~~~~
 
-Typical usage is to pass the contents of the page, as a string, to the
-:class:`HttpResponse` constructor::
+Typical usage is to pass the contents of the page, as a string or bytestring,
+to the :class:`HttpResponse` constructor::
 
     >>> from django.http import HttpResponse
     >>> response = HttpResponse("Here's the text of the Web page.")
     >>> response = HttpResponse("Text only, please.", content_type="text/plain")
+    >>> response = HttpResponse(b'Bytestrings are also accepted.')
 
 But if you want to add content incrementally, you can use ``response`` as a
 file-like object::
@@ -735,16 +736,15 @@ Attributes
 Methods
 -------
 
-.. method:: HttpResponse.__init__(content='', content_type=None, status=200, reason=None, charset=None)
+.. method:: HttpResponse.__init__(content=b'', content_type=None, status=200, reason=None, charset=None)
 
     Instantiates an ``HttpResponse`` object with the given page content and
     content type.
 
-    ``content`` should be an iterator or a string. If it's an
-    iterator, it should return strings, and those strings will be
-    joined together to form the content of the response. If it is not
-    an iterator or a string, it will be converted to a string when
-    accessed.
+    ``content`` is most commonly an iterator, bytestring, or string. Other
+    types will be converted to a bytestring by encoding their string
+    representation. Iterators should return strings or bytestrings and those
+    will be joined together to form the content of the response.
 
     ``content_type`` is the MIME type optionally completed by a character set
     encoding and is used to fill the HTTP ``Content-Type`` header. If not
