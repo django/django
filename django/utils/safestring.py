@@ -46,7 +46,7 @@ class SafeText(str, SafeData):
     """
     def __add__(self, rhs):
         """
-        Concatenating a safe string with another safe byte string or
+        Concatenating a safe string with another safe bytestring or
         safe string is safe. Otherwise, the result is no longer safe.
         """
         t = super().__add__(rhs)

@@ -145,7 +145,7 @@ Custom file upload handlers **must** define the following methods:
 
     Receives a "chunk" of data from the file upload.
 
-    ``raw_data`` is a byte string containing the uploaded data.
+    ``raw_data`` is a bytestring containing the uploaded data.
 
     ``start`` is the position in the file where this ``raw_data`` chunk
     begins.

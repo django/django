@@ -500,7 +500,7 @@ Python's copy of version 2.0.9. However, there are some incompatibilities
 between other versions of ``simplejson``:
 
 - While the ``simplejson`` API is documented as always returning unicode
-  strings, the optional C implementation can return a byte string. This was
+  strings, the optional C implementation can return a bytestring. This was
   fixed in Python 2.7.
 - ``simplejson.JSONEncoder`` gained a ``namedtuple_as_object`` keyword
   argument in version 2.2.
@@ -525,7 +525,7 @@ String types of hasher method parameters
 If you have written a :ref:`custom password hasher <auth_password_storage>`,
 your ``encode()``, ``verify()`` or ``safe_summary()`` methods should accept
 Unicode parameters (``password``, ``salt`` or ``encoded``). If any of the
-hashing methods need byte strings, you can use the
+hashing methods need bytestrings, you can use the
 :func:`~django.utils.encoding.force_bytes` utility to encode the strings.
 
 Validation of previous_page_number and next_page_number
