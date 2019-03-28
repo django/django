@@ -155,7 +155,8 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* ...
+* Migrations are now loaded also from directories without ``__init__.py``
+  files.
 
 Models
 ~~~~~~
