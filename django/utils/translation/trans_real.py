@@ -456,6 +456,13 @@ def get_language_from_request(request, check_path=False):
         if lang_code is not None:
             return lang_code
 
+        from django.conf.urls.i18n import is_language_prefix_patterns_used
+
+        urlconf = getattr(request, 'urlconf', settings.ROOT_URLCONF)
+        i18n_patterns_used, prefixed_default_language = is_language_prefix_patterns_used(urlconf)
+        if not lang_code and i18n_patterns_used and not prefixed_default_language:
+            return settings.LANGUAGE_CODE
+
     lang_code = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
     if lang_code is not None and lang_code in get_languages() and check_for_language(lang_code):
         return lang_code
