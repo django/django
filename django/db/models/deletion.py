@@ -3,6 +3,7 @@ from operator import attrgetter
 
 from django.db import IntegrityError, connections, transaction
 from django.db.models import signals, sql
+from django.utils.translation import gettext as _
 
 
 class ProtectedError(IntegrityError):
@@ -20,9 +21,11 @@ def CASCADE(collector, field, sub_objs, using):
 
 def PROTECT(collector, field, sub_objs, using):
     raise ProtectedError(
-        "Cannot delete some instances of model '%s' because they are "
-        "referenced through a protected foreign key: '%s.%s'" % (
-            field.remote_field.model.__name__, sub_objs[0].__class__.__name__, field.name
+        _("Cannot delete some instances of model '{model1}' because they are "
+          "referenced through a protected foreign key: '{model2}.{field}'").format(
+            model1=field.remote_field.model.__name__,
+            model2=sub_objs[0].__class__.__name__,
+            field=field.name,
         ),
         sub_objs
     )
