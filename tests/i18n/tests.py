@@ -1724,6 +1724,11 @@ class UnprefixedDefaultLanguageUtilsTests(SimpleTestCase):
         lang = get_language_from_request(request, check_path=True)
         self.assertEqual(lang, 'en')
 
+    def test_default_lang_with_default_prefix(self):
+        request = self.factory.get('/en/simple/')
+        lang = get_language_from_request(request, check_path=True)
+        self.assertEqual(lang, 'en')
+
     def test_other_lang_with_prefix(self):
         request = self.factory.get('/de/simple/')
         lang = get_language_from_request(request, check_path=True)
