@@ -46,6 +46,8 @@ extensions = [
 extlinks = {
     'commit': ('https://github.com/django/django/commit/%s', ''),
     'cve': ('https://nvd.nist.gov/view/vuln/detail?vulnId=%s', 'CVE-'),
+    # A file or directory. GitHub redirects from blob to tree if needed.
+    'source': ('https://github.com/django/django/blob/master/%s', ''),
     'ticket': ('https://code.djangoproject.com/ticket/%s', '#'),
 }
 

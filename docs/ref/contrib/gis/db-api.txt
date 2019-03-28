@@ -262,8 +262,8 @@ to be in the units of the field.
     in your field definition.
 
 For example, let's say we have a ``SouthTexasCity`` model (from the
-`GeoDjango distance tests`__ ) on a *projected* coordinate system valid for cities
-in southern Texas::
+:source:`GeoDjango distance tests <tests/gis_tests/distapp/models.py>` ) on a
+*projected* coordinate system valid for cities in southern Texas::
 
     from django.contrib.gis.db import models
 
@@ -296,8 +296,6 @@ both. To specify the band index of a raster input on the right hand side, a
 
 Where the band with index 2 (the third band) of the raster ``rst`` would be
 used for the lookup.
-
-__ https://github.com/django/django/blob/master/tests/gis_tests/distapp/models.py
 
 .. _compatibility-table:
 
