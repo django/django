@@ -92,13 +92,13 @@ Add the imports of ``mark_safe`` and ``json`` and add the ``room`` view function
 Create the route for the room view in ``chat/urls.py``::
 
     # chat/urls.py
-    from django.conf.urls import url
+    from django.urls import path
     
     from . import views
     
     urlpatterns = [
-        url(r'^$', views.index, name='index'),
-        url(r'^(?P<room_name>[^/]+)/$', views.room, name='room'),
+        path('', views.index, name='index'),
+        path('<str:room_name>/', views.room, name='room'),
     ]
 
 Start the Channels development server::
@@ -213,12 +213,12 @@ look like::
 Put the following code in ``chat/routing.py``::
 
     # chat/routing.py
-    from django.conf.urls import url
+    from django.urls import path
     
     from . import consumers
     
     websocket_urlpatterns = [
-        url(r'^ws/chat/(?P<room_name>[^/]+)/$', consumers.ChatConsumer),
+        path('ws/chat/<str:room_name>/$', consumers.ChatConsumer),
     ]
 
 The next step is to point the root routing configuration at the **chat.routing**

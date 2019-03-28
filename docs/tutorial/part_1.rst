@@ -188,12 +188,12 @@ Your app directory should now look like::
 In the ``chat/urls.py`` file include the following code::
 
     # chat/urls.py
-    from django.conf.urls import url
+    from django.urls import path
     
     from . import views
     
     urlpatterns = [
-        url(r'^$', views.index, name='index'),
+        path('', views.index, name='index'),
     ]
 
 The next step is to point the root URLconf at the **chat.urls** module.
@@ -201,12 +201,13 @@ In ``mysite/urls.py``, add an import for **django.conf.urls.include** and
 insert an **include()** in the **urlpatterns** list, so you have::
 
     # mysite/urls.py
-    from django.conf.urls import include, url
+    from django.conf.urls import include
+    from django.urls import path
     from django.contrib import admin
     
     urlpatterns = [
-        url(r'^chat/', include('chat.urls')),
-        url(r'^admin/', admin.site.urls),
+        path('chat/', include('chat.urls')),
+        path('admin/', admin.site.urls),
     ]
 
 Let's verify that the index view works. Run the following command::
