@@ -121,7 +121,7 @@ user with `ALTER ROLE`_.
 Django will work just fine without this optimization, but each new connection
 will do some additional queries to set these parameters.
 
-.. _ALTER ROLE: https://www.postgresql.org/docs/current/static/sql-alterrole.html
+.. _ALTER ROLE: https://www.postgresql.org/docs/current/sql-alterrole.html
 
 .. _database-isolation-level:
 
@@ -148,7 +148,7 @@ configuration in :setting:`DATABASES`::
     handle exceptions raised on serialization failures. This option is
     designed for advanced uses.
 
-.. _isolation level: https://www.postgresql.org/docs/current/static/transaction-iso.html
+.. _isolation level: https://www.postgresql.org/docs/current/transaction-iso.html
 
 Indexes for ``varchar`` and ``text`` columns
 --------------------------------------------
@@ -162,7 +162,7 @@ for the column.  The extra index is necessary to correctly perform
 lookups that use the ``LIKE`` operator in their SQL, as is done with the
 ``contains`` and ``startswith`` lookup types.
 
-.. _PostgreSQL operator class: https://www.postgresql.org/docs/current/static/indexes-opclass.html
+.. _PostgreSQL operator class: https://www.postgresql.org/docs/current/indexes-opclass.html
 
 Migration operation for adding extensions
 -----------------------------------------
@@ -185,7 +185,7 @@ faster, but this could diminish performance if more than 10% of the results are
 retrieved. PostgreSQL's assumptions on the number of rows retrieved for a
 cursor query is controlled with the `cursor_tuple_fraction`_ option.
 
-.. _cursor_tuple_fraction: https://www.postgresql.org/docs/current/static/runtime-config-query.html#GUC-CURSOR-TUPLE-FRACTION
+.. _cursor_tuple_fraction: https://www.postgresql.org/docs/current/runtime-config-query.html#GUC-CURSOR-TUPLE-FRACTION
 
 .. _transaction-pooling-server-side-cursors:
 
@@ -244,8 +244,8 @@ If you need to specify such values, reset the sequence afterwards to avoid
 reusing a value that's already in the table. The :djadmin:`sqlsequencereset`
 management command generates the SQL statements to do that.
 
-.. _SERIAL data type: https://www.postgresql.org/docs/current/static/datatype-numeric.html#DATATYPE-SERIAL
-.. _sequence: https://www.postgresql.org/docs/current/static/sql-createsequence.html
+.. _SERIAL data type: https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL
+.. _sequence: https://www.postgresql.org/docs/current/sql-createsequence.html
 
 Test database templates
 -----------------------
@@ -253,13 +253,13 @@ Test database templates
 You can use the :setting:`TEST['TEMPLATE'] <TEST_TEMPLATE>` setting to specify
 a `template`_ (e.g. ``'template0'``) from which to create a test database.
 
-.. _template: https://www.postgresql.org/docs/current/static/sql-createdatabase.html
+.. _template: https://www.postgresql.org/docs/current/sql-createdatabase.html
 
 Speeding up test execution with non-durable settings
 ----------------------------------------------------
 
 You can speed up test execution times by `configuring PostgreSQL to be
-non-durable <https://www.postgresql.org/docs/current/static/non-durability.html>`_.
+non-durable <https://www.postgresql.org/docs/current/non-durability.html>`_.
 
 .. warning::
 

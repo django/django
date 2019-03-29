@@ -77,7 +77,7 @@ in the same tablespace as the table.
 .. versionadded:: 2.2
 
 The names of the `PostgreSQL operator classes
-<https://www.postgresql.org/docs/current/static/indexes-opclass.html>`_ to use for
+<https://www.postgresql.org/docs/current/indexes-opclass.html>`_ to use for
 this index. If you require a custom operator class, you must provide one for
 each field in the index.
 

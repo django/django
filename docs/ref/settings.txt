@@ -710,7 +710,7 @@ backend-specific.
 
 Supported by the PostgreSQL_ (``postgresql``) and MySQL_ (``mysql``) backends.
 
-.. _PostgreSQL: https://www.postgresql.org/docs/current/static/multibyte.html
+.. _PostgreSQL: https://www.postgresql.org/docs/current/multibyte.html
 .. _MySQL: https://dev.mysql.com/doc/refman/en/charset-database.html
 
 .. setting:: TEST_COLLATION
@@ -791,7 +791,7 @@ This is a PostgreSQL-specific setting.
 The name of a `template`_ (e.g. ``'template0'``) from which to create the test
 database.
 
-.. _template: https://www.postgresql.org/docs/current/static/sql-createdatabase.html
+.. _template: https://www.postgresql.org/docs/current/sql-createdatabase.html
 
 .. setting:: TEST_CREATE
 

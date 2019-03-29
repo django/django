@@ -1492,7 +1492,7 @@ Usage example::
 
 .. admonition:: PostgreSQL
 
-    The `pgcrypto extension <https://www.postgresql.org/docs/current/static/
+    The `pgcrypto extension <https://www.postgresql.org/docs/current/
     pgcrypto.html>`_ must be installed. You can use the
     :class:`~django.contrib.postgres.operations.CryptoExtension` migration
     operation to install it.
