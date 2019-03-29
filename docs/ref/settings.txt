@@ -1839,11 +1839,7 @@ Here's a sample settings file::
 
 Default: A list of all language codes from the :setting:`LANGUAGES` setting
 that are written right-to-left. You can see the current list of these languages
-by looking in ``django/conf/global_settings.py`` (or view the `online
-source`_).
-
-.. _online source: https://github.com/django/django/blob/master/django/conf/global_settings.py
-
+by looking in :source:`django/conf/global_settings.py`.
 
 The list contains :term:`language codes<language code>` for languages that are
 written right-to-left.
