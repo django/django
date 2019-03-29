@@ -1158,8 +1158,6 @@ requests being returned as "Bad Request (400)".
     The default :file:`settings.py` file created by :djadmin:`django-admin
     startproject <startproject>` sets ``DEBUG = True`` for convenience.
 
-.. _django/views/debug.py: https://github.com/django/django/blob/master/django/views/debug.py
-
 .. setting:: DEBUG_PROPAGATE_EXCEPTIONS
 
 ``DEBUG_PROPAGATE_EXCEPTIONS``
@@ -1810,9 +1808,7 @@ deletes the one.
 Default: A list of all available languages. This list is continually growing
 and including a copy here would inevitably become rapidly out of date. You can
 see the current list of translated languages by looking in
-``django/conf/global_settings.py`` (or view the `online source`_).
-
-.. _online source: https://github.com/django/django/blob/master/django/conf/global_settings.py
+:source:`django/conf/global_settings.py`.
 
 The list is a list of two-tuples in the format
 (:term:`language code<language code>`, ``language name``) -- for example,
@@ -1891,9 +1887,7 @@ errors to an email log handler when :setting:`DEBUG` is ``False``. See also
 :ref:`configuring-logging`.
 
 You can see the default logging configuration by looking in
-``django/utils/log.py`` (or view the `online source`__).
-
-__ https://github.com/django/django/blob/master/django/utils/log.py
+:source:`django/utils/log.py`.
 
 .. setting:: LOGGING_CONFIG
 

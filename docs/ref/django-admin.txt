@@ -1199,10 +1199,9 @@ Generate squashed migration file without Django version and timestamp header.
 Creates a Django app directory structure for the given app name in the current
 directory or the given destination.
 
-By default the directory created contains a ``models.py`` file and other app
-template files. (See the `source`_ for more details.) If only the app
-name is given, the app directory will be created in the current working
-directory.
+By default, :source:`the new directory <django/conf/app_template>` contains a
+``models.py`` file and other app template files. If only the app name is given,
+the app directory will be created in the current working directory.
 
 If the optional destination is provided, Django will use that existing
 directory rather than creating a new one. You can use '.' to denote the current
@@ -1274,8 +1273,6 @@ files is:
     byte-compile invalid ``*.py`` files, template files ending with ``.py-tpl``
     will be renamed to ``.py``.
 
-.. _source: https://github.com/django/django/tree/master/django/conf/app_template/
-
 ``startproject``
 ----------------
 
@@ -1284,9 +1281,9 @@ files is:
 Creates a Django project directory structure for the given project name in
 the current directory or the given destination.
 
-By default, the new directory contains ``manage.py`` and a project package
-(containing a ``settings.py`` and other files). See the `template source`_ for
-details.
+By default, :source:`the new directory <django/conf/project_template>` contains
+``manage.py`` and a project package (containing a ``settings.py`` and other
+files).
 
 If only the project name is given, both the project directory and project
 package will be named ``<projectname>`` and the project directory
@@ -1328,8 +1325,6 @@ The :class:`template context <django.template.Context>` used is:
 
 Please also see the :ref:`rendering warning <render_warning>` as mentioned
 for :djadmin:`startapp`.
-
-.. _`template source`: https://github.com/django/django/tree/master/django/conf/project_template/
 
 ``test``
 --------
