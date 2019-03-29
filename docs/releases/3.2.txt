@@ -268,9 +268,15 @@ Models
   :py:class:`datetime.time`, :py:class:`datetime.timedelta`,
   :py:class:`decimal.Decimal`, and :py:class:`uuid.UUID` instances.
 
-* Added :class:`~django.db.models.functions.Log2`,
+* Added :class:`~django.db.models.functions.ACosh`,
+  :class:`~django.db.models.functions.ASinh`,
+  :class:`~django.db.models.functions.ATanh`,
+  :class:`~django.db.models.functions.Cosh`,
+  :class:`~django.db.models.functions.Log2`,
   :class:`~django.db.models.functions.Log10`,
-  :class:`~django.db.models.functions.Random`, and
+  :class:`~django.db.models.functions.Random`,
+  :class:`~django.db.models.functions.Sinh`,
+  :class:`~django.db.models.functions.Tanh`, and
   :class:`~django.db.models.functions.Truncate` database functions.
 
 Requests and Responses

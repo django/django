@@ -9,6 +9,20 @@ from django.db.models.functions.mixins import (
 from django.db.models.lookups import Transform
 
 
+class HyperbolicFallbackMixin:
+
+    def as_mysql(self, compiler, connection, **extra_context):
+        return super().as_sql(compiler, connection, template=self.fallback, **extra_context)
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        extra = {} if not self.is_inverse else {'template': self.fallback}
+        return super().as_sql(compiler, connection, **extra, **extra_context)
+
+    def as_postgresql(self, compiler, connection, **extra_context):
+        extra = {} if connection.features.is_postgresql_12 else {'template': self.fallback}
+        return super().as_sql(compiler, connection, **extra, **extra_context)
+
+
 class Abs(Transform):
     function = 'ABS'
     lookup_name = 'abs'
@@ -19,14 +33,35 @@ class ACos(NumericOutputFieldMixin, Transform):
     lookup_name = 'acos'
 
 
+class ACosh(HyperbolicFallbackMixin, NumericOutputFieldMixin, Transform):
+    function = 'ACOSH'
+    lookup_name = 'acosh'
+    fallback = '(LN((%(expressions)s) + SQRT(POWER((%(expressions)s), 2) - 1)))'
+    is_inverse = True
+
+
 class ASin(NumericOutputFieldMixin, Transform):
     function = 'ASIN'
     lookup_name = 'asin'
 
 
+class ASinh(HyperbolicFallbackMixin, NumericOutputFieldMixin, Transform):
+    function = 'ASINH'
+    lookup_name = 'asinh'
+    fallback = '(LN((%(expressions)s) + SQRT(POWER((%(expressions)s), 2) + 1)))'
+    is_inverse = True
+
+
 class ATan(NumericOutputFieldMixin, Transform):
     function = 'ATAN'
     lookup_name = 'atan'
+
+
+class ATanh(HyperbolicFallbackMixin, NumericOutputFieldMixin, Transform):
+    function = 'ATANH'
+    lookup_name = 'atanh'
+    fallback = '(LN((1 + (%(expressions)s)) / (1 - (%(expressions)s))) / 2)'
+    is_inverse = True
 
 
 class ATan2(NumericOutputFieldMixin, Func):
@@ -60,6 +95,13 @@ class Ceil(Transform):
 class Cos(NumericOutputFieldMixin, Transform):
     function = 'COS'
     lookup_name = 'cos'
+
+
+class Cosh(HyperbolicFallbackMixin, NumericOutputFieldMixin, Transform):
+    function = 'COSH'
+    lookup_name = 'cosh'
+    fallback = '((POWER(EXP(1), (%(expressions)s)) + POWER(EXP(1), -1 * (%(expressions)s))) / 2)'
+    is_inverse = False
 
 
 class Cot(NumericOutputFieldMixin, Transform):
@@ -195,6 +237,13 @@ class Sin(NumericOutputFieldMixin, Transform):
     lookup_name = 'sin'
 
 
+class Sinh(HyperbolicFallbackMixin, NumericOutputFieldMixin, Transform):
+    function = 'SINH'
+    lookup_name = 'sinh'
+    fallback = '((POWER(EXP(1), (%(expressions)s)) - POWER(EXP(1), -1 * (%(expressions)s))) / 2)'
+    is_inverse = False
+
+
 class Sqrt(NumericOutputFieldMixin, Transform):
     function = 'SQRT'
     lookup_name = 'sqrt'
@@ -203,6 +252,13 @@ class Sqrt(NumericOutputFieldMixin, Transform):
 class Tan(NumericOutputFieldMixin, Transform):
     function = 'TAN'
     lookup_name = 'tan'
+
+
+class Tanh(HyperbolicFallbackMixin, NumericOutputFieldMixin, Transform):
+    function = 'Tanh'
+    lookup_name = 'tanh'
+    fallback = '((POWER(EXP(1), 2 * (%(expressions)s)) - 1) / (POWER(EXP(1), 2 * (%(expressions)s)) + 1))'
+    is_inverse = False
 
 
 class Truncate(Transform):

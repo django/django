@@ -783,6 +783,32 @@ It can also be registered as a transform. For example::
     >>> # Get vectors whose arccosine is less than 1
     >>> vectors = Vector.objects.filter(x__acos__lt=1, y__acos__lt=1)
 
+``ACosh``
+---------
+
+.. class:: ACosh(expression, **extra)
+
+.. versionadded:: 3.2
+
+Returns the inverse hyperbolic cosine of a numeric field or expression. The
+expression value must be greater than or equal to 1.
+
+Usage example::
+
+    >>> from django.db.models.functions import ACosh
+    >>> Vector.objects.create(x=1.5, y=3.9)
+    >>> vector = Vector.objects.annotate(x_acosh=ACosh('x'), y_acosh=ACosh('y')).get()
+    >>> vector.x_acosh, vector.y_acosh
+    (0.9624236501192069, 2.0372664661418107)
+
+It can also be registered as a transform. For example::
+
+    >>> from django.db.models import FloatField
+    >>> from django.db.models.functions import ACosh
+    >>> FloatField.register_lookup(ACosh)
+    >>> # Get vectors whose inverse hyperbolic cosine is less than 1
+    >>> vectors = Vector.objects.filter(x__acosh__lt=1, y__acosh__lt=1)
+
 ``ASin``
 --------
 
@@ -807,6 +833,31 @@ It can also be registered as a transform. For example::
     >>> # Get vectors whose arcsine is less than 1
     >>> vectors = Vector.objects.filter(x__asin__lt=1, y__asin__lt=1)
 
+``ASinh``
+---------
+
+.. class:: ASinh(expression, **extra)
+
+.. versionadded:: 3.2
+
+Returns the inverse hyperbolic sine of a numeric field or expression.
+
+Usage example::
+
+    >>> from django.db.models.functions import ASinh
+    >>> Vector.objects.create(x=0.5, y=-0.9)
+    >>> vector = Vector.objects.annotate(x_asinh=ASinh('x'), y_asinh=ASinh('y')).get()
+    >>> vector.x_asinh, vector.y_asinh
+    (0.48121182505960347, -0.8088669356527824)
+
+It can also be registered as a transform. For example::
+
+    >>> from django.db.models import FloatField
+    >>> from django.db.models.functions import ASinh
+    >>> FloatField.register_lookup(ASinh)
+    >>> # Get vectors whose inverse hyperbolic sine is less than 1
+    >>> vectors = Vector.objects.filter(x__asinh__lt=1, y__asinh__lt=1)
+
 ``ATan``
 --------
 
@@ -829,6 +880,32 @@ It can also be registered as a transform. For example::
     >>> FloatField.register_lookup(ATan)
     >>> # Get vectors whose arctangent is less than 2
     >>> vectors = Vector.objects.filter(x__atan__lt=2, y__atan__lt=2)
+
+``ATanh``
+---------
+
+.. class:: ATanh(expression, **extra)
+
+.. versionadded:: 3.2
+
+Returns the inverse hyperbolic tangent of a numeric field or expression. The
+expression value must be between -1 to 1 (non-inclusive).
+
+Usage example::
+
+    >>> from django.db.models.functions import ATanh
+    >>> Vector.objects.create(x=0.5, y=-0.9)
+    >>> vector = Vector.objects.annotate(x_atanh=ATanh('x'), y_atanh=ATanh('y')).get()
+    >>> vector.x_atanh, vector.y_atanh
+    (0.5493061443340548, -1.4722194895832204)
+
+It can also be registered as a transform. For example::
+
+    >>> from django.db.models import FloatField
+    >>> from django.db.models.functions import ATanh
+    >>> FloatField.register_lookup(ATanh)
+    >>> # Get vectors whose inverse hyperbolic tangent is less than 1
+    >>> vectors = Vector.objects.filter(x__atanh__lt=1, y__atanh__lt=1)
 
 ``ATan2``
 ---------
@@ -891,6 +968,31 @@ It can also be registered as a transform. For example::
     >>> FloatField.register_lookup(Cos)
     >>> # Get vectors whose cosine is less than 0.5
     >>> vectors = Vector.objects.filter(x__cos__lt=0.5, y__cos__lt=0.5)
+
+``Cosh``
+--------
+
+.. class:: Cosh(expression, **extra)
+
+.. versionadded:: 3.2
+
+Returns the hyperbolic cosine of a numeric field or expression.
+
+Usage example::
+
+    >>> from django.db.models.functions import Cosh
+    >>> Vector.objects.create(x=0.5, y=-0.9)
+    >>> vector = Vector.objects.annotate(x_cosh=Cosh('x'), y_cosh=Cosh('y')).get()
+    >>> vector.x_cosh, vector.y_cosh
+    (1.1276259652063807, 1.4330863854487745)
+
+It can also be registered as a transform. For example::
+
+    >>> from django.db.models import FloatField
+    >>> from django.db.models.functions import Cosh
+    >>> FloatField.register_lookup(Cosh)
+    >>> # Get vectors whose hyperbolic cosine is less than 1
+    >>> vectors = Vector.objects.filter(x__cosh__lt=1, y__cosh__lt=1)
 
 ``Cot``
 -------
@@ -1176,6 +1278,31 @@ It can also be registered as a transform. For example::
     >>> # Get vectors whose sin() is less than 0
     >>> vectors = Vector.objects.filter(x__sin__lt=0, y__sin__lt=0)
 
+``Sinh``
+--------
+
+.. class:: Sinh(expression, **extra)
+
+.. versionadded:: 3.2
+
+Returns the hyperbolic sine of a numeric field or expression.
+
+Usage example::
+
+    >>> from django.db.models.functions import Sinh
+    >>> Vector.objects.create(x=0.5, y=-0.9)
+    >>> vector = Vector.objects.annotate(x_sinh=Sinh('x'), y_sinh=Sinh('y')).get()
+    >>> vector.x_sinh, vector.y_sinh
+    (0.5210953054937474, -1.0265167257081753)
+
+It can also be registered as a transform. For example::
+
+    >>> from django.db.models import FloatField
+    >>> from django.db.models.functions import Sinh
+    >>> FloatField.register_lookup(Sinh)
+    >>> # Get vectors whose hyperbolic sine is less than 1
+    >>> vectors = Vector.objects.filter(x__sinh__lt=1, y__sinh__lt=1)
+
 ``Sqrt``
 --------
 
@@ -1221,6 +1348,31 @@ It can also be registered as a transform. For example::
     >>> FloatField.register_lookup(Tan)
     >>> # Get vectors whose tangent is less than 0
     >>> vectors = Vector.objects.filter(x__tan__lt=0, y__tan__lt=0)
+
+``Tanh``
+--------
+
+.. class:: Tanh(expression, **extra)
+
+.. versionadded:: 3.2
+
+Returns the hyperbolic tangent of a numeric field or expression.
+
+Usage example::
+
+    >>> from django.db.models.functions import Tanh
+    >>> Vector.objects.create(x=0.5, y=-0.9)
+    >>> vector = Vector.objects.annotate(x_tanh=Tanh('x'), y_tanh=Tanh('y')).get()
+    >>> vector.x_tanh, vector.y_tanh
+    (0.46211715726000974, -0.7162978701990245)
+
+It can also be registered as a transform. For example::
+
+    >>> from django.db.models import FloatField
+    >>> from django.db.models.functions import Tanh
+    >>> FloatField.register_lookup(Tanh)
+    >>> # Get vectors whose hyperbolic tangent is less than 1
+    >>> vectors = Vector.objects.filter(x__tanh__lt=1, y__tanh__lt=1)
 
 ``Truncate``
 ------------
