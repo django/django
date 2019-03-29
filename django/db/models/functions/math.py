@@ -111,6 +111,30 @@ class Log(FixDecimalInputMixin, NumericOutputFieldMixin, Func):
         return clone.as_sql(compiler, connection, **extra_context)
 
 
+class Log2(FixDecimalInputMixin, NumericOutputFieldMixin, Transform):
+    function = 'LOG2'
+    lookup_name = 'log2'
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        return super().as_sql(compiler, connection, template='LOG(2, (%(expressions)s))', **extra_context)
+
+    def as_postgresql(self, compiler, connection, **extra_context):
+        return super().as_postgresql(compiler, connection, template='LOG(2, (%(expressions)s))', **extra_context)
+
+
+class Log10(FixDecimalInputMixin, NumericOutputFieldMixin, Transform):
+    function = 'LOG10'
+    lookup_name = 'log10'
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        return super().as_sql(compiler, connection, template='LOG(10, (%(expressions)s))', **extra_context)
+
+    def as_postgresql(self, compiler, connection, **extra_context):
+        if connection.features.is_postgresql_12:
+            return super().as_sql(compiler, connection, **extra_context)
+        return super().as_postgresql(compiler, connection, template='LOG(10, (%(expressions)s))', **extra_context)
+
+
 class Mod(FixDecimalInputMixin, NumericOutputFieldMixin, Func):
     function = 'MOD'
     arity = 2

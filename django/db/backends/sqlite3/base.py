@@ -237,6 +237,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         create_deterministic_function('FLOOR', 1, none_guard(math.floor))
         create_deterministic_function('LN', 1, none_guard(math.log))
         create_deterministic_function('LOG', 2, none_guard(lambda x, y: math.log(y, x)))
+        create_deterministic_function('LOG2', 1, none_guard(math.log2))
+        create_deterministic_function('LOG10', 1, none_guard(math.log10))
         create_deterministic_function('LPAD', 3, _sqlite_lpad)
         create_deterministic_function('MD5', 1, none_guard(lambda x: hashlib.md5(x.encode()).hexdigest()))
         create_deterministic_function('MOD', 2, none_guard(math.fmod))

@@ -1009,13 +1009,19 @@ It can also be registered as a transform. For example::
     >>> # Get vectors whose value greater than e
     >>> vectors = Vector.objects.filter(x__ln__gt=1, y__ln__gt=1)
 
-``Log``
--------
+``Log``, ``Log2``, ``Log10``
+----------------------------
 
 .. class:: Log(expression1, expression2, **extra)
 
 Accepts two numeric fields or expressions and returns the logarithm of
 the first to base of the second.
+
+.. class:: Log2(expression, **extra)
+.. class:: Log10(expression, **extra)
+
+Accepts a numeric field or expression and returns the logarithm of the value to
+base 2 or 10.
 
 Usage example::
 
@@ -1024,6 +1030,10 @@ Usage example::
     >>> vector = Vector.objects.annotate(log=Log('x', 'y')).get()
     >>> vector.log
     2.0
+
+.. versionadded:: 3.2
+
+    Added ``Log2`` and ``Log10``.
 
 ``Mod``
 -------
