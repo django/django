@@ -41,17 +41,17 @@ class Queries1Tests(TestCase):
         cls.t5 = Tag.objects.create(name='t5', parent=cls.t3)
 
         cls.n1 = Note.objects.create(note='n1', misc='foo', id=1)
-        n2 = Note.objects.create(note='n2', misc='bar', id=2)
+        cls.n2 = Note.objects.create(note='n2', misc='bar', id=2)
         cls.n3 = Note.objects.create(note='n3', misc='foo', id=3)
 
         ann1 = Annotation.objects.create(name='a1', tag=cls.t1)
         ann1.notes.add(cls.n1)
         ann2 = Annotation.objects.create(name='a2', tag=t4)
-        ann2.notes.add(n2, cls.n3)
+        ann2.notes.add(cls.n2, cls.n3)
 
         # Create these out of order so that sorting by 'id' will be different to sorting
         # by 'info'. Helps detect some problems later.
-        cls.e2 = ExtraInfo.objects.create(info='e2', note=n2, value=41)
+        cls.e2 = ExtraInfo.objects.create(info='e2', note=cls.n2, value=41)
         e1 = ExtraInfo.objects.create(info='e1', note=cls.n1, value=42)
 
         cls.a1 = Author.objects.create(name='a1', num=1001, extra=e1)
@@ -65,7 +65,7 @@ class Queries1Tests(TestCase):
         time4 = datetime.datetime(2007, 12, 20, 21, 0, 0)
         cls.i1 = Item.objects.create(name='one', created=cls.time1, modified=cls.time1, creator=cls.a1, note=cls.n3)
         cls.i1.tags.set([cls.t1, cls.t2])
-        cls.i2 = Item.objects.create(name='two', created=cls.time2, creator=cls.a2, note=n2)
+        cls.i2 = Item.objects.create(name='two', created=cls.time2, creator=cls.a2, note=cls.n2)
         cls.i2.tags.set([cls.t1, cls.t3])
         cls.i3 = Item.objects.create(name='three', created=time3, creator=cls.a2, note=cls.n3)
         i4 = Item.objects.create(name='four', created=time4, creator=cls.a4, note=cls.n3)
@@ -1172,6 +1172,16 @@ class Queries1Tests(TestCase):
             'mixed_case_db_column_category__category',
         )
         self.assertTrue(qs.first())
+
+    def test_excluded_intermediary_m2m_table_joined(self):
+        self.assertSequenceEqual(
+            Note.objects.filter(~Q(tag__annotation__name=F('note'))),
+            [self.n1, self.n2, self.n3],
+        )
+        self.assertSequenceEqual(
+            Note.objects.filter(tag__annotation__name='a1').filter(~Q(tag__annotation__name=F('note'))),
+            [],
+        )
 
 
 class Queries2Tests(TestCase):
