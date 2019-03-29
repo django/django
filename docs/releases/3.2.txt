@@ -268,7 +268,8 @@ Models
   :py:class:`datetime.time`, :py:class:`datetime.timedelta`,
   :py:class:`decimal.Decimal`, and :py:class:`uuid.UUID` instances.
 
-* Added :class:`~django.db.models.functions.Random` database function.
+* Added :class:`~django.db.models.functions.Random` and
+  :class:`~django.db.models.functions.Truncate` database functions.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~

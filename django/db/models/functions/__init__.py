@@ -8,7 +8,7 @@ from .datetime import (
 )
 from .math import (
     Abs, ACos, ASin, ATan, ATan2, Ceil, Cos, Cot, Degrees, Exp, Floor, Ln, Log,
-    Mod, Pi, Power, Radians, Random, Round, Sign, Sin, Sqrt, Tan,
+    Mod, Pi, Power, Radians, Random, Round, Sign, Sin, Sqrt, Tan, Truncate,
 )
 from .text import (
     MD5, SHA1, SHA224, SHA256, SHA384, SHA512, Chr, Concat, ConcatPair, Left,
@@ -32,7 +32,7 @@ __all__ = [
     # math
     'Abs', 'ACos', 'ASin', 'ATan', 'ATan2', 'Ceil', 'Cos', 'Cot', 'Degrees',
     'Exp', 'Floor', 'Ln', 'Log', 'Mod', 'Pi', 'Power', 'Radians', 'Random',
-    'Round', 'Sign', 'Sin', 'Sqrt', 'Tan',
+    'Round', 'Sign', 'Sin', 'Sqrt', 'Tan', 'Truncate',
     # text
     'MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA384', 'SHA512', 'Chr', 'Concat',
     'ConcatPair', 'Left', 'Length', 'Lower', 'LPad', 'LTrim', 'Ord', 'Repeat',

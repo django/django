@@ -1212,6 +1212,31 @@ It can also be registered as a transform. For example::
     >>> # Get vectors whose tangent is less than 0
     >>> vectors = Vector.objects.filter(x__tan__lt=0, y__tan__lt=0)
 
+``Truncate``
+------------
+
+.. class:: Truncate(expression, **extra)
+
+.. versionadded:: 3.2
+
+Truncates a numeric field or expression towards zero.
+
+Usage example::
+
+    >>> from django.db.models.functions import Truncate
+    >>> Vector.objects.create(x=5.4, y=-2.3)
+    >>> vector = Vector.objects.annotate(x_r=Truncate('x'), y_r=Truncate('y')).get()
+    >>> vector.x_r, vector.y_r
+    (5.0, -2.0)
+
+It can also be registered as a transform. For example::
+
+    >>> from django.db.models import FloatField
+    >>> from django.db.models.functions import Truncate
+    >>> FloatField.register_lookup(Truncate)
+    >>> # Get vectors whose truncated value is less than 20
+    >>> vectors = Vector.objects.filter(x__truncate__lt=20, y__truncate__lt=20)
+
 .. _text-functions:
 
 Text functions

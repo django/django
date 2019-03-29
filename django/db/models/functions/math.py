@@ -179,3 +179,11 @@ class Sqrt(NumericOutputFieldMixin, Transform):
 class Tan(NumericOutputFieldMixin, Transform):
     function = 'TAN'
     lookup_name = 'tan'
+
+
+class Truncate(Transform):
+    function = 'TRUNC'
+    lookup_name = 'truncate'
+
+    def as_mysql(self, compiler, connection, **extra_context):
+        return super().as_sql(compiler, connection, template='TRUNCATE((%(expressions)s), 0)', **extra_context)

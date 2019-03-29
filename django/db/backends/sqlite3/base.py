@@ -256,6 +256,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         create_deterministic_function('SIN', 1, none_guard(math.sin))
         create_deterministic_function('SQRT', 1, none_guard(math.sqrt))
         create_deterministic_function('TAN', 1, none_guard(math.tan))
+        create_deterministic_function('TRUNC', 1, none_guard(math.trunc))
         conn.create_aggregate('STDDEV_POP', 1, list_aggregate(statistics.pstdev))
         conn.create_aggregate('STDDEV_SAMP', 1, list_aggregate(statistics.stdev))
         conn.create_aggregate('VAR_POP', 1, list_aggregate(statistics.pvariance))
