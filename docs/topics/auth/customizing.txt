@@ -204,13 +204,11 @@ Notice that in addition to the same arguments given to the associated
 all take the user object, which may be an anonymous user, as an argument.
 
 A full authorization implementation can be found in the ``ModelBackend`` class
-in `django/contrib/auth/backends.py`_, which is the default backend and queries
-the ``auth_permission`` table most of the time. If you wish to provide
+in :source:`django/contrib/auth/backends.py`, which is the default backend and
+queries the ``auth_permission`` table most of the time. If you wish to provide
 custom behavior for only part of the backend API, you can take advantage of
 Python inheritance and subclass ``ModelBackend`` instead of implementing the
 complete API in a custom backend.
-
-.. _django/contrib/auth/backends.py: https://github.com/django/django/blob/master/django/contrib/auth/backends.py
 
 .. _anonymous_auth:
 
