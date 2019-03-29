@@ -38,10 +38,13 @@ class CommonMiddleware(MiddlewareMixin):
         """
 
         # Check for denied User-Agents
-        if 'HTTP_USER_AGENT' in request.META:
+        try:
+            uagent = request.META['HTTP_USER_AGENT']
             for user_agent_regex in settings.DISALLOWED_USER_AGENTS:
-                if user_agent_regex.search(request.META['HTTP_USER_AGENT']):
+                if user_agent_regex.search(uagent):
                     raise PermissionDenied('Forbidden user agent')
+        except KeyError:
+            pass
 
         # Check for a redirect based on settings.PREPEND_WWW
         host = request.get_host()
