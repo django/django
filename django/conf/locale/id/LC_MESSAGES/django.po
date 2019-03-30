@@ -2,19 +2,21 @@
 #
 # Translators:
 # Adiyat Mubarak <adiyatmubarak@gmail.com>, 2017
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2018
+# Claude Paroz <claude@2xlibre.net>, 2018
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # M Asep Indrayana <me@drayanaindra.com>, 2015
-# oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2016
+# oon arfiandwi <oon.arfiandwi@gmail.com>, 2016
 # rodin <romihardiyanto@gmail.com>, 2011
 # rodin <romihardiyanto@gmail.com>, 2013-2016
+# sage <laymonage@gmail.com>, 2018
 # Sutrisno Efendi <kangfend@gmail.com>, 2015,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-06-18 23:24+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-26 23:58+0000\n"
 "Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
@@ -143,6 +145,9 @@ msgstr "Sorbian Atas"
 
 msgid "Hungarian"
 msgstr "Hungaria"
+
+msgid "Armenian"
+msgstr "Armenian"
 
 msgid "Interlingua"
 msgstr "Interlingua"
@@ -605,6 +610,9 @@ msgstr "Data biner mentah"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' bukan UUID yang benar"
 
+msgid "Universally unique identifier"
+msgstr "Penciri unik secara universal"
+
 msgid "File"
 msgstr "Berkas"
 
@@ -1049,8 +1057,8 @@ msgstr "Ini bukan alamat IPv6 yang benar"
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "atau"
@@ -1104,19 +1112,19 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"Anda melihat pesan ini karena situs HTTP ini membutuhkan 'Referer header' "
-"dikirim dari Web browser anda, tapi tidak terkirim. Header tersebut wajib "
-"karena alasan keamanan, untuk memastikan bahwa browser anda tidak dibajak "
-"oleh pihak ketiga."
+"Anda melihat pesan ini karena situs HTTP ini membutuhkan header 'Referrer' "
+"dikirim dari web browser Anda, tetapi tidak terkirim. Header tersebut "
+"dibutuhkan karena alasan keamanan, untuk memastikan bahwa browser Anda tidak "
+"dibajak oleh pihak ketiga."
 
 msgid ""
 "If you have configured your browser to disable 'Referer' headers, please re-"
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
 "origin' requests."
 msgstr ""
-"Jika anda menonaktifkan 'Referer' headers pada konfigurasi browser anda, "
+"Jika Anda menonaktifkan header 'Referrer' pada konfigurasi browser Anda, "
 "mohon aktfikan kembali, setidaknya untuk situs ini atau untuk koneksi HTTPS, "
-"atau untuk 'same-origin' requests."
+"atau untuk request 'same-origin'."
 
 msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
@@ -1125,28 +1133,29 @@ msgid ""
 "If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
 "\" ...> for links to third-party sites."
 msgstr ""
-"Jika anda sedang menggunakan etiket <meta name=\"referrer\" content=\"no-"
-"referrer\"> atau menyertakan kepala 'Referrer-Policy: no-referrer', harap "
-"memindahkan mereka. Perlindungan CSRF membutuhkan kepala 'Referer' untuk "
-"melakukan pemeriksaan pengarahan ketat. Jika anda sedang khawatir mengenai "
-"pribadi, gunakan cara lain seperti <a rel=\"noreferrer\" ...> untuk tautan "
-"pada situs pihak-ketiga."
+"Jika Anda menggunakan tag <meta name=\"referrer\" content=\"no-referrer\"> "
+"atau menyertakan kepala 'Referrer-Policy: no-referrer', harap hapus mereka. "
+"Perlindungan CSRF membutuhkan kepala 'Referrer' untuk melakukan pemeriksaan "
+"pengarahan ketat. Jika Anda khawatir mengenai privasi, gunakan cara lain "
+"seperti <a rel=\"noreferrer\" ...> untuk tautan pada situs pihak ketiga."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
-"Kamu melihat pesan ini karena situs ini membutuhkan sebuah CSRF cookie "
-"ketika mengirimkan sebuah form. Cookie ini dibutuhkan for alasalan keamanan, "
-"untuk memastikan bahwa browser Anda tidak sedang dibajak oleh pihak ketiga."
+"Anda melihat pesan ini karena situs ini membutuhkan sebuah CSRF cookie "
+"ketika mengirimkan sebuah formulir. Cookie ini dibutuhkan untuk alasan "
+"keamanan, untuk memastikan bahwa browser Anda tidak sedang dibajak oleh "
+"pihak ketiga."
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for 'same-origin' requests."
 msgstr ""
-"Jika browser kamu memiliki konfigurasi untuk menyalakan cookies, maka "
-"nyalakan kembali, setidak nya untuk website ini."
+"Jika Anda telah mengatur browser Anda untuk menonaktifkan cookies, maka "
+"aktifkanlah kembali, setidaknya untuk website ini, atau untuk request 'same-"
+"origin'."
 
 msgid "More information is available with DEBUG=True."
 msgstr "Informasi lebih lanjut tersedia dengan DEBUG=True"
@@ -1244,7 +1253,7 @@ msgid "Topics, references, &amp; how-to's"
 msgstr "Topik, referensi &amp; cara pemakaian"
 
 msgid "Tutorial: A Polling App"
-msgstr "Tutorial: Sebuah aplikasi jejak pendapat"
+msgstr "Tutorial: Sebuah aplikasi jajak pendapat"
 
 msgid "Get started with Django"
 msgstr "Memulai dengan Django"

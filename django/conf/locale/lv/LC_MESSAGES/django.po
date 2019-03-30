@@ -8,14 +8,14 @@
 # krikulis <kristaps.kulis@gmail.com>, 2014
 # Māris Nartišs <maris.gis@gmail.com>, 2016
 # Mārtiņš Šulcs <shulcsm@gmail.com>, 2018
-# NullIsNot0 <nullisnot0@inbox.lv>, 2018
+# NullIsNot0 <nullisnot0@inbox.lv>, 2018-2019
 # peterisb <pb@sungis.lv>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-06-03 12:12+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-18 17:00+0000\n"
 "Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
@@ -145,6 +145,9 @@ msgstr "augšsorbu"
 
 msgid "Hungarian"
 msgstr "ungāru"
+
+msgid "Armenian"
+msgstr "Armēņu"
 
 msgid "Interlingua"
 msgstr "modernā latīņu valoda"
@@ -621,6 +624,9 @@ msgstr "Bināri dati"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' ir nederīgs UUID."
 
+msgid "Universally unique identifier"
+msgstr "Universāli unikāls identifikators"
+
 msgid "File"
 msgstr "Fails"
 
@@ -1070,7 +1076,7 @@ msgstr "Šī nav derīga IPv6 adrese."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
 msgstr "%(truncated_text)s..."
 
 msgid "or"

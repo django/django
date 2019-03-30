@@ -11,25 +11,27 @@
 # Ernesto Avilés Vázquez <whippiii@gmail.com>, 2014
 # Ernesto Rico-Schmidt <e.rico.schmidt@gmail.com>, 2017
 # franchukelly <inactive+franchukelly@transifex.com>, 2011
+# Ignacio José Lizarán Rus <ilizaran@gmail.com>, 2019
 # Igor Támara <igor@tamarapatino.org>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # José Luis <alagunajs@gmail.com>, 2016
 # Josue Naaman Nistal Guerra <josuenistal@hotmail.com>, 2014
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2011,2013
+# Luigy, 2019
 # Marc Garcia <garcia.marc@gmail.com>, 2011
 # monobotsoft <monobot.soft@gmail.com>, 2012
 # ntrrgc <ntrrgc@gmail.com>, 2013
 # ntrrgc <ntrrgc@gmail.com>, 2013
 # Pablo, 2015
-# Sebastián Magrí <sebasmagri@gmail.com>, 2013
+# Sebastián Magrí, 2013
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 14:56+0000\n"
-"Last-Translator: Ernesto Rico-Schmidt <e.rico.schmidt@gmail.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-19 08:50+0000\n"
+"Last-Translator: Ignacio José Lizarán Rus <ilizaran@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -158,6 +160,9 @@ msgstr "Alto sorbio"
 msgid "Hungarian"
 msgstr "Húngaro"
 
+msgid "Armenian"
+msgstr "Armenio/a"
+
 msgid "Interlingua"
 msgstr "Interlingua"
 
@@ -178,6 +183,9 @@ msgstr "Japonés"
 
 msgid "Georgian"
 msgstr "Georgiano"
+
+msgid "Kabyle"
+msgstr "Cabilio"
 
 msgid "Kazakh"
 msgstr "Kazajo"
@@ -402,6 +410,9 @@ msgstr[1] ""
 "Asegúrese de que este valor tenga menos de %(limit_value)d caracteres (tiene "
 "%(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Introduzca un número."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -481,6 +492,10 @@ msgstr "Entero grande (8 bytes)"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "El valor '%(value)s' debe ser verdadero o falso."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "El valor '%(value)s' debe ser Verdadero, Falso o Ninguno"
 
 msgid "Boolean (Either True or False)"
 msgstr "Booleano (Verdadero o Falso)"
@@ -619,6 +634,9 @@ msgstr "Data de binarios brutos"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' no es un UUID válido."
 
+msgid "Universally unique identifier"
+msgstr "Identificador universal único"
+
 msgid "File"
 msgstr "Archivo"
 
@@ -658,9 +676,6 @@ msgstr "Este campo es obligatorio."
 msgid "Enter a whole number."
 msgstr "Introduzca un número entero."
 
-msgid "Enter a number."
-msgstr "Introduzca un número."
-
 msgid "Enter a valid date."
 msgstr "Introduzca una fecha válida."
 
@@ -672,6 +687,10 @@ msgstr "Introduzca una fecha/hora válida."
 
 msgid "Enter a valid duration."
 msgstr "Introduzca una duración válida."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "El número de días debe estar entre {min_days} y {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
@@ -1067,7 +1086,7 @@ msgstr "Esta no es una dirección IPv6 válida."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
 msgstr "%(truncated_text)s..."
 
 msgid "or"

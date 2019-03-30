@@ -5,14 +5,15 @@
 # Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lasse Liehu <larso@gmx.com>, 2015
+# Mika Mäkelä <mika.m.makela@gmail.com>, 2018
 # Klaus Dahlén <klaus.dahlen@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-05-18 00:21+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 00:44+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
@@ -140,6 +141,9 @@ msgstr "Yläsorbi"
 
 msgid "Hungarian"
 msgstr "unkari"
+
+msgid "Armenian"
+msgstr ""
 
 msgid "Interlingua"
 msgstr "interlingua"
@@ -473,7 +477,7 @@ msgstr "%(value)s-arvo pitää olla joko tosi tai epätosi."
 
 #, python-format
 msgid "'%(value)s' value must be either True, False, or None."
-msgstr ""
+msgstr "%(value)s-arvo pitää olla joko tosi, epätosi tai ei mitään."
 
 msgid "Boolean (Either True or False)"
 msgstr "Totuusarvo: joko tosi (True) tai epätosi (False)"
@@ -608,6 +612,9 @@ msgstr "Raaka binaaridata"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "%(value)s ei ole kelvollinen UUID."
 
+msgid "Universally unique identifier"
+msgstr ""
+
 msgid "File"
 msgstr "Tiedosto"
 
@@ -661,7 +668,7 @@ msgstr "Syötä oikea kesto."
 
 #, python-brace-format
 msgid "The number of days must be between {min_days} and {max_days}."
-msgstr ""
+msgstr "Päivien määrä täytyy olla välillä {min_days} ja {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Tiedostoa ei lähetetty. Tarkista lomakkeen koodaus (encoding)."
@@ -754,7 +761,7 @@ msgid "Please correct the duplicate values below."
 msgstr "Korjaa allaolevat kaksoisarvot."
 
 msgid "The inline value did not match the parent instance."
-msgstr ""
+msgstr "Liittyvä arvo ei vastannut vanhempaa instanssia."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Valitse oikea vaihtoehto. Valintasi ei löydy vaihtoehtojen joukosta."
@@ -1051,8 +1058,8 @@ msgstr "Tämä ei ole kelvollinen IPv6-osoite."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s…"
+msgid "%(truncated_text)s…"
+msgstr ""
 
 msgid "or"
 msgstr "tai"
@@ -1224,6 +1231,8 @@ msgid ""
 "View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
 "target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
 msgstr ""
+"Katso Django %(version)s <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/releases/\" target=\"_blank\" rel=\"noopener\">julkaisutiedot</a>"
 
 msgid "The install worked successfully! Congratulations!"
 msgstr "Asennus toimi! Onneksi olkoon!"
@@ -1255,4 +1264,4 @@ msgid "Django Community"
 msgstr "Django-yhteisö"
 
 msgid "Connect, get help, or contribute"
-msgstr ""
+msgstr "Verkostoidu, saa apua tai jatkokehitä"
