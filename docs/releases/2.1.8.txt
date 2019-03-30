@@ -1,0 +1,12 @@
+==========================
+Django 2.1.8 release notes
+==========================
+
+*April 1, 2019*
+
+Django 2.1.8 fixes a bug in 2.1.7.
+
+Bugfixes
+========
+
+*
