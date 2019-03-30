@@ -283,8 +283,8 @@ transform do not change. For example::
     ``max_length`` won't be enforced in the database since ``citext`` behaves
     similar to PostgreSQL's ``text`` type.
 
-    .. _citext: https://www.postgresql.org/docs/current/static/citext.html
-    .. _the performance considerations: https://www.postgresql.org/docs/current/static/citext.html#AEN178177
+    .. _citext: https://www.postgresql.org/docs/current/citext.html
+    .. _the performance considerations: https://www.postgresql.org/docs/current/citext.html#AEN178177
 
 ``HStoreField``
 ===============
