@@ -4,13 +4,13 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # lardissone <lardissone@gmail.com>, 2014
 # poli <poli@devartis.com>, 2014
-# Ramiro Morales, 2013-2018
+# Ramiro Morales, 2013-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-06-18 20:22+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-03-20 14:07+0000\n"
 "Last-Translator: Ramiro Morales\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
 "language/es_AR/)\n"
@@ -139,6 +139,9 @@ msgstr "alto sorabo"
 
 msgid "Hungarian"
 msgstr "húngaro"
+
+msgid "Armenian"
+msgstr "Armenio"
 
 msgid "Interlingua"
 msgstr "Interlingua"
@@ -613,6 +616,9 @@ msgstr "Datos binarios crudos"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' no es un UUID válido."
 
+msgid "Universally unique identifier"
+msgstr "Identificador universalmente único"
+
 msgid "File"
 msgstr "Archivo"
 
@@ -1065,8 +1071,8 @@ msgstr "Esta no es una dirección IPv6 válida."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "o"

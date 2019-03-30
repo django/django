@@ -13,15 +13,16 @@
 # Alex Bolotov <oleksandr.bolotov@gmail.com>, 2013-2014
 # Roman Kozlovskyi <krzroman@gmail.com>, 2012
 # Sergiy Kuzmenko <s.kuzmenko@gmail.com>, 2011
-# Taras Korzhak <taras.korzhak96@gmail.com>, 2018
+# tarasyyyk <taras.korzhak96@gmail.com>, 2018
+# tarasyyyk <taras.korzhak96@gmail.com>, 2019
 # Zoriana Zaiats, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-08-24 19:51+0000\n"
-"Last-Translator: Taras Korzhak <taras.korzhak96@gmail.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-21 16:29+0000\n"
+"Last-Translator: tarasyyyk <taras.korzhak96@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -152,6 +153,9 @@ msgstr "Верхньолужицька"
 
 msgid "Hungarian"
 msgstr "Угорська"
+
+msgid "Armenian"
+msgstr "Вірменська"
 
 msgid "Interlingua"
 msgstr "Інтерлінгва"
@@ -647,6 +651,9 @@ msgstr "Необроблені двійкові дані"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' невірне значення UUID."
 
+msgid "Universally unique identifier"
+msgstr "Універсальний унікальний ідентифікатор"
+
 msgid "File"
 msgstr "Файл"
 
@@ -1107,8 +1114,8 @@ msgstr "Це не є правильною адресою IPv6."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "або"

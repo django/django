@@ -3,7 +3,7 @@
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
 # Danni Randeris <danniranderis+djangocore@gmail.com>, 2014
-# Erik Wognsen <r4mses@gmail.com>, 2013-2018
+# Erik Wognsen <r4mses@gmail.com>, 2013-2019
 # Finn Gruwier Larsen, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jonaskoelker <jonaskoelker@gnu.org>, 2012
@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-05-18 20:46+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 07:05+0000\n"
 "Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
@@ -142,6 +142,9 @@ msgstr "øvresorbisk"
 
 msgid "Hungarian"
 msgstr "ungarsk"
+
+msgid "Armenian"
+msgstr "armensk"
 
 msgid "Interlingua"
 msgstr "interlingua"
@@ -607,6 +610,9 @@ msgstr "Rå binære data"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' er ikke et gyldigt UUID."
 
+msgid "Universally unique identifier"
+msgstr "Universelt unik identifikator"
+
 msgid "File"
 msgstr "Fil"
 
@@ -1053,8 +1059,8 @@ msgstr "Dette er ikke en gyldig IPv6-adresse."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "eller"

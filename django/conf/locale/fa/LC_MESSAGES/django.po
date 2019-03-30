@@ -3,10 +3,12 @@
 # Translators:
 # Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
 # Arash Fazeli <a.fazeli@gmail.com>, 2012
+# Eric Hamiter <ehamiter@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Mazdak Badakhshan <geraneum@gmail.com>, 2014
+# Milad Hazrati <miladhazrati75@gmail.com>, 2019
 # MJafar Mashhadi <raindigital2007@gmail.com>, 2018
-# Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>, 2013
+# Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>, 2013,2019
 # Pouya Abbassi, 2016
 # Reza Mohammadi <reza@teeleh.ir>, 2013-2016
 # Saeed <sd.javadi@gmail.com>, 2011
@@ -15,9 +17,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-06-23 23:00+0000\n"
-"Last-Translator: MJafar Mashhadi <raindigital2007@gmail.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-03-22 09:42+0000\n"
+"Last-Translator: Milad Hazrati <miladhazrati75@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -93,7 +95,7 @@ msgid "Argentinian Spanish"
 msgstr "اسپانیایی آرژانتینی"
 
 msgid "Colombian Spanish"
-msgstr "کلمبیائی اسپانیایی"
+msgstr "اسپانیایی کلمبیایی"
 
 msgid "Mexican Spanish"
 msgstr "اسپانیولی مکزیکی"
@@ -146,6 +148,9 @@ msgstr "صربستانی بالا"
 msgid "Hungarian"
 msgstr "مجاری"
 
+msgid "Armenian"
+msgstr "ارمنی"
+
 msgid "Interlingua"
 msgstr "اینترلینگوا"
 
@@ -168,7 +173,7 @@ msgid "Georgian"
 msgstr "گرجی"
 
 msgid "Kabyle"
-msgstr ""
+msgstr "قبایلی"
 
 msgid "Kazakh"
 msgstr "قزاقستان"
@@ -420,7 +425,7 @@ msgstr ""
 "از: '%(allowed_extensions)s'"
 
 msgid "Null characters are not allowed."
-msgstr ""
+msgstr "کاراکترهای تهی مجاز نیستند."
 
 msgid "and"
 msgstr "و"
@@ -610,6 +615,9 @@ msgstr "دادهٔ دودویی خام"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' یک UUID معتبر نیست."
 
+msgid "Universally unique identifier"
+msgstr "شناسه منحصر به فرد سراسری"
+
 msgid "File"
 msgstr "پرونده"
 
@@ -663,7 +671,7 @@ msgstr "یک بازهٔ زمانی معتبر وارد کنید."
 
 #, python-brace-format
 msgid "The number of days must be between {min_days} and {max_days}."
-msgstr ""
+msgstr "عدد روز باید بین {min_days} و {max_days}  باشد."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "پرونده‌ای ارسال نشده است. نوع کدگذاری فرم را بررسی کنید."
@@ -755,14 +763,14 @@ msgid "Please correct the duplicate values below."
 msgstr "لطفا مقدار تکراری را اصلاح کنید."
 
 msgid "The inline value did not match the parent instance."
-msgstr ""
+msgstr "مقدار درون خطی موجود با نمونه والد آن مطابقت ندارد."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "یک گزینهٔ معتبر انتخاب کنید. آن گزینه از گزینه‌های موجود نیست."
 
 #, python-format
 msgid "\"%(pk)s\" is not a valid value."
-msgstr ""
+msgstr "\"%(pk)s\" یک مقدار معتبر نیست."
 
 #, python-format
 msgid ""
@@ -1052,8 +1060,8 @@ msgstr "این مقدار آدرس IPv6 معتبری نیست."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr ""
 
 msgid "or"
 msgstr "یا"
@@ -1134,6 +1142,11 @@ msgid ""
 "If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
 "\" ...> for links to third-party sites."
 msgstr ""
+"اگر از تگ <meta name=\"referrer\" content=\"no-referrer\"> یا هدر   "
+"'Referrer-Policy: no-referrer' استفاده می کنید، لطفا حذفشان کنید. محافظ CSRF "
+"به هدر 'Referer' برای بررسی قوی ارجاع دهنده نیازمند است. اگر شما نگران حریم "
+"خصوصی هستید، از جایگزین هایی مانند  <a rel=\"noreferrer\" ...> پیوندهای به "
+"سایت های دیگر استفاده کنید. "
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1212,16 +1225,19 @@ msgid "Index of %(directory)s"
 msgstr "فهرست %(directory)s"
 
 msgid "Django: the Web framework for perfectionists with deadlines."
-msgstr ""
+msgstr "جنگو: فریمورک وب برای کمال گرایانی که محدودیت زمانی دارند."
 
 #, python-format
 msgid ""
 "View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
 "target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
 msgstr ""
+"نمایش <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> برای نسخه %(version)s "
+"جنگو"
 
 msgid "The install worked successfully! Congratulations!"
-msgstr ""
+msgstr "نصب درست کار کرد. تبریک می گویم!"
 
 #, python-format
 msgid ""
@@ -1230,12 +1246,16 @@ msgid ""
 "\">DEBUG=True</a> is in your settings file and you have not configured any "
 "URLs."
 msgstr ""
+"شما این صفحه را به این دلیل مشاهده می کنید که <a href=\"https://docs."
+"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel="
+"\"noopener\">DEBUG=True</a> در فایل تنظیمات شما وجود دارد و شما هیچ URL "
+"تنظیم نکرده اید."
 
 msgid "Django Documentation"
 msgstr "مستندات جنگو"
 
 msgid "Topics, references, &amp; how-to's"
-msgstr ""
+msgstr "مباحث، ارجاعات و سوالات آغاز شونده با \"چگونه؟\""
 
 msgid "Tutorial: A Polling App"
 msgstr "آموزش گام به گام: برنامکی برای رأی‌گیری"
@@ -1247,4 +1267,4 @@ msgid "Django Community"
 msgstr "جامعهٔ جنگو"
 
 msgid "Connect, get help, or contribute"
-msgstr ""
+msgstr "متصل شوید، کمک بگیرید یا مشارکت کنید"

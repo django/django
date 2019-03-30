@@ -3,7 +3,7 @@
 # Translators:
 # Aitzol Naberan <anaberan@codesyntax.com>, 2013,2016
 # Ander Martínez <ander.basaundi@gmail.com>, 2013-2014
-# Eneko Illarramendi <eneko@illarra.com>, 2017-2018
+# Eneko Illarramendi <eneko@illarra.com>, 2017-2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jazpillaga <jazpillaga@codesyntax.com>, 2011
 # julen, 2011-2012
@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-08-23 14:04+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-22 10:02+0000\n"
 "Last-Translator: Eneko Illarramendi <eneko@illarra.com>\n"
 "Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
 "MIME-Version: 1.0\n"
@@ -144,6 +144,9 @@ msgstr "Goi-sorbiera"
 
 msgid "Hungarian"
 msgstr "Hungariera"
+
+msgid "Armenian"
+msgstr "Armeniera"
 
 msgid "Interlingua"
 msgstr "Interlingua"
@@ -615,6 +618,9 @@ msgstr "Datu bitar gordinak"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' ez da baleko UUID bat."
 
+msgid "Universally unique identifier"
+msgstr "\"Universally unique identifier\""
+
 msgid "File"
 msgstr "Fitxategia"
 
@@ -1061,8 +1067,8 @@ msgstr "Hau ez da baleko IPv6 helbide bat."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "edo"
