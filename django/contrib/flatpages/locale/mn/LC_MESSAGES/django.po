@@ -2,15 +2,16 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Zorig <zorig_ezd@yahoo.com>, 2014,2016
+# Zorig, 2014,2016
+# Zorig, 2019
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Zorig <zorig_ezd@yahoo.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-19 02:15+0000\n"
+"Last-Translator: Zorig\n"
 "Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
 "mn/)\n"
 "MIME-Version: 1.0\n"
@@ -39,6 +40,10 @@ msgid ""
 msgstr ""
 "Энэ хэсэгт зөвхөн үсэг, тоо, цэг, доогуур зураас, налуу зураасууд бичих "
 "боломжтой. "
+
+msgid "Example: '/about/contact'. Make sure to have a leading slash."
+msgstr ""
+"Жишээ: '/about/contact/'. Хөтлөх буюу зам заах ташуу зураас байх хэрэгтэй."
 
 msgid "URL is missing a leading slash."
 msgstr "URL ийн эхний slash ийг мартсан байна."

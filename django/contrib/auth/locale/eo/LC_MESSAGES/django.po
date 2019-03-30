@@ -2,13 +2,14 @@
 #
 # Translators:
 # Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2012-2013
-# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2013-2018
+# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2013-2019
+# Robin van der Vliet <info@robinvandervliet.nl>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2018-04-29 10:04+0000\n"
+"PO-Revision-Date: 2019-02-13 19:03+0000\n"
 "Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
 "Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
 "eo/)\n"
@@ -78,7 +79,7 @@ msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
-"Bonvolu enigi korektan %(username)sn kaj pasvorton. Notu, ke ambaŭ kampoj "
+"Bonvolu enigi ĝustan %(username)sn kaj pasvorton. Notu, ke ambaŭ kampoj "
 "povas esti usklecodistingaj."
 
 msgid "This account is inactive."
@@ -95,7 +96,7 @@ msgstr "Nova pasvorto por konfirmo"
 
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr ""
-"Via malnova pasvorto estis nekorekte tajpita. Bonvolu denove entajpi ĝin."
+"Via malnova pasvorto estis tajpita malĝuste. Bonvolu denove entajpi ĝin."
 
 msgid "Old password"
 msgstr "Malnova pasvorto"
@@ -183,7 +184,7 @@ msgid "username"
 msgstr "salutnomo"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "Petita. 150 karakteroj aŭ malpli. Nur literoj, ciferoj kaj @/./+/-/_."
+msgstr "Petita. 150 signoj aŭ malpli. Nur literoj, ciferoj kaj @/./+/-/_."
 
 msgid "A user with that username already exists."
 msgstr "Uzanto kun sama salutnomo jam ekzistas."
@@ -270,15 +271,15 @@ msgid ""
 "Enter a valid username. This value may contain only English letters, "
 "numbers, and @/./+/-/_ characters."
 msgstr ""
-"Enigu validan uzantnomon. Ĉi-tiu valoro povas enhavi nur sensupersignaj "
-"literoj, ciferoj kaj la @/./+/-/_ karakteroj."
+"Enigu validan uzantnomon. Ĉi tiu valoro povas enhavi nur sensupersignajn "
+"literojn, ciferojn kaj la signojn @/./+/-/_."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
 msgstr ""
-"Enigu validan uzantnomon. Ĉi-tiu valoro povas enhavi nur literoj, ciferoj "
-"kaj la @/./+/-/_ karakteroj."
+"Enigu validan uzantnomon. Ĉi tiu valoro povas enhavi nur literojn, ciferojn "
+"kaj la signojn @/./+/-/_."
 
 msgid "Logged out"
 msgstr "Adiaŭita"

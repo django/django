@@ -9,24 +9,26 @@
 # Le Yang <youngleocn@qq.com>, 2018
 # Liping Wang <lynn.config@gmail.com>, 2016-2017
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
-# Ronald White <ouyanghongyu@gmail.com>, 2013-2014
+# Ronald White <tkliuxing@me.com>, 2013-2014
 # Sean Lee <iseansay@gmail.com>, 2013
 # Sean Lee <iseansay@gmail.com>, 2013
 # slene <vslene@gmail.com>, 2011
+# Suntravel Chris <chrisfromcn@gmail.com>, 2019
 # Wentao Han <wentao.han@gmail.com>, 2018
 # xuyi wang <xuyi.wg@gmail.com>, 2018
 # yf zhan <daxian12345@gmail.com>, 2018
-# Ziang Song <songziang@gmail.com>, 2012
+# dykai <yingkaidang@gmail.com>, 2019
+# ced773123cfad7b4e8b79ca80f736af9, 2012
 # Kevin Sze <leiarix@gmail.com>, 2012
 # 雨翌 <yumendy@163.com>, 2016
-# Ronald White <ouyanghongyu@gmail.com>, 2013
+# Ronald White <tkliuxing@me.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-09-28 07:44+0000\n"
-"Last-Translator: Wentao Han <wentao.han@gmail.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-15 05:12+0000\n"
+"Last-Translator: dykai <yingkaidang@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -124,7 +126,7 @@ msgid "object id"
 msgstr "对象id"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "对象表示"
 
@@ -303,7 +305,7 @@ msgid "Page not found"
 msgstr "页面没有找到"
 
 msgid "We're sorry, but the requested page could not be found."
-msgstr "很报歉，请求页面无法找到。"
+msgstr "很抱歉，请求页面无法找到。"
 
 msgid "Home"
 msgstr "首页"
@@ -532,24 +534,8 @@ msgstr "显示全部"
 msgid "Save"
 msgstr "保存"
 
-msgid "Popup closing..."
-msgstr "弹窗关闭中。。。"
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "更改选中的%(model)s"
-
-#, python-format
-msgid "View selected %(model)s"
-msgstr "查看已选的%(model)s"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "增加另一个 %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "取消选中 %(model)s"
+msgid "Popup closing…"
+msgstr "弹窗关闭中..."
 
 msgid "Search"
 msgstr "搜索"
@@ -577,6 +563,18 @@ msgstr "保存并查看"
 
 msgid "Close"
 msgstr "关闭"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "更改选中的%(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "增加另一个 %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "取消选中 %(model)s"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "感谢您今天在本站花费了一些宝贵时间。"

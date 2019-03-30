@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# BouRock, 2015-2018
+# BouRock, 2015-2019
 # BouRock, 2014-2015
 # Caner Başaran <basaran.caner@protonmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2012
@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-05-28 17:04+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 16:09+0000\n"
 "Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
@@ -116,7 +116,7 @@ msgid "object id"
 msgstr "nesne kimliği"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "nesne kodu"
 
@@ -547,24 +547,8 @@ msgstr "Tümünü göster"
 msgid "Save"
 msgstr "Kaydet"
 
-msgid "Popup closing..."
-msgstr "Açılır pencere kapanıyor..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Seçilen %(model)s değiştir"
-
-#, python-format
-msgid "View selected %(model)s"
-msgstr "Seçilen %(model)s göster"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Başka bir %(model)s ekle"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Seçilen %(model)s sil"
+msgid "Popup closing…"
+msgstr "Açılır pencere kapanıyor…"
 
 msgid "Search"
 msgstr "Ara"
@@ -593,6 +577,18 @@ msgstr "Kaydet ve göster"
 
 msgid "Close"
 msgstr "Kapat"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Seçilen %(model)s değiştir"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Başka bir %(model)s ekle"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Seçilen %(model)s sil"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr ""

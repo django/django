@@ -2,10 +2,10 @@
 #
 # Translators:
 # Claude Paroz <claude@2xlibre.net>, 2014
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2018
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # M Asep Indrayana <me@drayanaindra.com>, 2015
-# oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2016
+# oon arfiandwi <oon.arfiandwi@gmail.com>, 2016
 # rodin <romihardiyanto@gmail.com>, 2011-2013
 # rodin <romihardiyanto@gmail.com>, 2013-2017
 # Sutrisno Efendi <kangfend@gmail.com>, 2015
@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-06-18 23:35+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-26 23:57+0000\n"
 "Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
@@ -115,7 +115,7 @@ msgid "object id"
 msgstr "id objek"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "representasi objek"
 
@@ -542,24 +542,8 @@ msgstr "Tampilkan semua"
 msgid "Save"
 msgstr "Simpan"
 
-msgid "Popup closing..."
-msgstr "Menutup jendela sembulan..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Ubah %(model)s yang dipilih"
-
-#, python-format
-msgid "View selected %(model)s"
-msgstr "Melihat%(model)sterpilih"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Tambahkan %(model)s yang lain"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Hapus %(model)s yang dipilih"
+msgid "Popup closing…"
+msgstr "Menutup popup..."
 
 msgid "Search"
 msgstr "Cari"
@@ -587,6 +571,18 @@ msgstr "Simpan dan tampilkan"
 
 msgid "Close"
 msgstr "Tutup"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Ubah %(model)s yang dipilih"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Tambahkan %(model)s yang lain"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Hapus %(model)s yang dipilih"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Terima kasih telah menggunakan situs ini hari ini."

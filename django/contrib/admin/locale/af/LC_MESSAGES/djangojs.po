@@ -1,14 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# F Wolff <friedel@translate.org.za>, 2019
+# Pi Delport <pjdelport@gmail.com>, 2013
 # Pi Delport <pjdelport@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
+"PO-Revision-Date: 2019-01-04 18:43+0000\n"
+"Last-Translator: F Wolff <friedel@translate.org.za>\n"
 "Language-Team: Afrikaans (http://www.transifex.com/django/django/language/"
 "af/)\n"
 "MIME-Version: 1.0\n"
@@ -26,20 +28,22 @@ msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
+"Hierdie is die lys beskikbare %s. Kies gerus deur hulle in die boksie "
+"hieronder te merk en dan die “Kies”-knoppie tussen die boksies te klik."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
-msgstr ""
+msgstr "Tik in hierdie blokkie om die lys beskikbare %s te filtreer."
 
 msgid "Filter"
-msgstr "Filter"
+msgstr "Filteer"
 
 msgid "Choose all"
-msgstr "Kies alle"
+msgstr "Kies almal"
 
 #, javascript-format
 msgid "Click to choose all %s at once."
-msgstr ""
+msgstr "Klik om al die %s gelyktydig te kies."
 
 msgid "Choose"
 msgstr "Kies"
@@ -56,68 +60,78 @@ msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
+"Hierdie is die lys gekose %s. Verwyder gerus deur hulle in die boksie "
+"hieronder te merk en dan die “Verwyder”-knoppie tussen die boksies te klik."
 
 msgid "Remove all"
-msgstr "Verwyder alle"
+msgstr "Verwyder almal"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
-msgstr ""
+msgstr "Klik om al die %s gelyktydig te verwyder."
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(sel)s van %(cnt)s gekies"
+msgstr[1] "%(sel)s van %(cnt)s gekies"
 
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
+"Daar is ongestoorde veranderinge op individuele redigeerbare velde. Deur nou "
+"’n aksie uit te voer, sal ongestoorde veranderinge verlore gaan."
 
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
+"U het ’n aksie gekies, maar nog nie die veranderinge aan individuele velde "
+"gestoor nie. Klik asb. OK om te stoor. Dit sal nodig wees om weer die aksie "
+"uit te voer."
 
 msgid ""
 "You have selected an action, and you haven't made any changes on individual "
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] ""
-msgstr[1] ""
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] ""
-msgstr[1] ""
+"U het ’n aksie gekies en het nie enige veranderinge aan individuele velde "
+"aangebring nie. U soek waarskynlik na die Gaan-knoppie eerder as die Stoor-"
+"knoppie."
 
 msgid "Now"
 msgstr "Nou"
-
-msgid "Choose a Time"
-msgstr ""
-
-msgid "Choose a time"
-msgstr "Kies 'n tyd"
 
 msgid "Midnight"
 msgstr "Middernag"
 
 msgid "6 a.m."
-msgstr "6 v.m."
+msgstr "06:00"
 
 msgid "Noon"
 msgstr "Middag"
 
 msgid "6 p.m."
-msgstr ""
+msgstr "18:00"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Let wel: U is %s uur voor die bedienertyd."
+msgstr[1] "Let wel: U is %s ure voor die bedienertyd."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Let wel: U is %s uur agter die bedienertyd."
+msgstr[1] "Let wel: U is %s ure agter die bedienertyd."
+
+msgid "Choose a Time"
+msgstr "Kies ’n tyd"
+
+msgid "Choose a time"
+msgstr "Kies ‘n tyd"
 
 msgid "Cancel"
 msgstr "Kanselleer"
@@ -126,7 +140,7 @@ msgid "Today"
 msgstr "Vandag"
 
 msgid "Choose a Date"
-msgstr ""
+msgstr "Kies ’n datum"
 
 msgid "Yesterday"
 msgstr "Gister"
@@ -135,68 +149,68 @@ msgid "Tomorrow"
 msgstr "Môre"
 
 msgid "January"
-msgstr ""
+msgstr "Januarie"
 
 msgid "February"
-msgstr ""
+msgstr "Februarie"
 
 msgid "March"
-msgstr ""
+msgstr "Maart"
 
 msgid "April"
-msgstr ""
+msgstr "April"
 
 msgid "May"
-msgstr ""
+msgstr "Mei"
 
 msgid "June"
-msgstr ""
+msgstr "Junie"
 
 msgid "July"
-msgstr ""
+msgstr "Julie"
 
 msgid "August"
-msgstr ""
+msgstr "Augustus"
 
 msgid "September"
-msgstr ""
+msgstr "September"
 
 msgid "October"
-msgstr ""
+msgstr "Oktober"
 
 msgid "November"
-msgstr ""
+msgstr "November"
 
 msgid "December"
-msgstr ""
+msgstr "Desember"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr ""
+msgstr "S"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr ""
+msgstr "M"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr ""
+msgstr "D"
 
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr ""
+msgstr "W"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr ""
+msgstr "D"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr ""
+msgstr "V"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr ""
+msgstr "S"
 
 msgid "Show"
 msgstr "Wys"

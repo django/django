@@ -3,14 +3,15 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Masashi SHIBATA <contact@c-bata.link>, 2017
+# Nikita K <hiyori.amatsuki@gmail.com>, 2019
 # Shinya Okano <tokibito@gmail.com>, 2013-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-09-24 17:59+0000\n"
-"Last-Translator: Masashi SHIBATA <contact@c-bata.link>\n"
+"PO-Revision-Date: 2019-03-28 12:08+0000\n"
+"Last-Translator: Nikita K <hiyori.amatsuki@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -61,7 +62,7 @@ msgid "Password"
 msgstr "パスワード"
 
 msgid "Password confirmation"
-msgstr "パスワードの確認"
+msgstr "パスワード(確認用)"
 
 msgid "Enter the same password as before, for verification."
 msgstr "確認のため、再度パスワードを入力してください。"
@@ -71,8 +72,8 @@ msgid ""
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "生のパスワードは格納されていないため、このユーザのパスワードを確認する方法は"
-"ありません。しかし<a href=\"{}\">このフォーム</a>をしようして　パスワードを変"
-"更できます。"
+"ありません。しかし<a href=\"{}\">このフォーム</a>を使用してパスワードを変更で"
+"きます。"
 
 #, python-format
 msgid ""
@@ -211,8 +212,8 @@ msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
-"ユーザーがアクティブかどうかを示します。アカウントを消す代わりに選択を解除し"
-"てください。"
+"ユーザーがアクティブかどうかを示します。アカウントを削除する代わりに選択を解"
+"除してください。"
 
 msgid "date joined"
 msgstr "登録日"

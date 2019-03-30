@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016-2018
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-06-24 18:59+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-03-04 13:47+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Upper Sorbian (http://www.transifex.com/django/django/"
 "language/hsb/)\n"
@@ -109,7 +109,7 @@ msgid "object id"
 msgstr "objektowy id"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "objektowa reprezentacija"
 
@@ -535,24 +535,8 @@ msgstr "Wšě pokazać"
 msgid "Save"
 msgstr "Składować"
 
-msgid "Popup closing..."
-msgstr "Wuskakowace wokno so začinja..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Wubrane %(model)s změnić"
-
-#, python-format
-msgid "View selected %(model)s"
-msgstr "Wibrany %(model)s pokazać"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Druhi %(model)s přidać"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Wubrane %(model)s zhašeć"
+msgid "Popup closing…"
+msgstr "Wuskakowace wokno so začinja…"
 
 msgid "Search"
 msgstr "Pytać"
@@ -583,6 +567,18 @@ msgstr "Składować a pokazać"
 
 msgid "Close"
 msgstr "Začinić"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Wubrane %(model)s změnić"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Druhi %(model)s přidać"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Wubrane %(model)s zhašeć"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Wulki dźak, zo sće dźensa rjane chwile z websydłom přebywali."
