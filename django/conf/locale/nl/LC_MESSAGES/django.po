@@ -14,14 +14,14 @@
 # Michiel Overtoom <motoom@xs4all.nl>, 2014
 # Sander Steffann <inactive+steffann@transifex.com>, 2014-2015
 # Tino de Bruijn <tinodb@gmail.com>, 2013
-# Tonnes <tonnes.mb@gmail.com>, 2017
+# Tonnes <tonnes.mb@gmail.com>, 2017,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:13+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-24 14:48+0000\n"
+"Last-Translator: Tonnes <tonnes.mb@gmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -135,7 +135,7 @@ msgid "Galician"
 msgstr "Galicisch"
 
 msgid "Hebrew"
-msgstr "Hebreews"
+msgstr "Hebreeuws"
 
 msgid "Hindi"
 msgstr "Hindi"
@@ -148,6 +148,9 @@ msgstr "Oppersorbisch"
 
 msgid "Hungarian"
 msgstr "Hongaars"
+
+msgid "Armenian"
+msgstr "Armeens"
 
 msgid "Interlingua"
 msgstr "Interlingua"
@@ -169,6 +172,9 @@ msgstr "Japans"
 
 msgid "Georgian"
 msgstr "Georgisch"
+
+msgid "Kabyle"
+msgstr "Kabylisch"
 
 msgid "Kazakh"
 msgstr "Kazachs"
@@ -394,6 +400,9 @@ msgstr[1] ""
 "Zorg dat deze waarde niet meer dan %(limit_value)d tekens bevat (het zijn er "
 "nu %(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Voer een getal in."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -423,7 +432,7 @@ msgstr ""
 "zijn: '%(allowed_extensions)s'."
 
 msgid "Null characters are not allowed."
-msgstr ""
+msgstr "Null-tekens zijn niet toegestaan."
 
 msgid "and"
 msgstr "en"
@@ -472,8 +481,12 @@ msgstr "Groot (8 byte) geheel getal"
 msgid "'%(value)s' value must be either True or False."
 msgstr "Waarde van '%(value)s' moet True of False zijn."
 
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "Waarde van '%(value)s' moet True, False of None zijn."
+
 msgid "Boolean (Either True or False)"
-msgstr "Boolean (True danwel False)"
+msgstr "Boolean (True of False)"
 
 #, python-format
 msgid "String (up to %(max_length)s)"
@@ -609,6 +622,9 @@ msgstr "Onbewerkte binaire gegevens"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' is geen geldige UUID."
 
+msgid "Universally unique identifier"
+msgstr "Universally unique identifier"
+
 msgid "File"
 msgstr "Bestand"
 
@@ -648,9 +664,6 @@ msgstr "Dit veld is verplicht."
 msgid "Enter a whole number."
 msgstr "Voer een geheel getal in."
 
-msgid "Enter a number."
-msgstr "Voer een getal in."
-
 msgid "Enter a valid date."
 msgstr "Voer een geldige datum in."
 
@@ -663,13 +676,16 @@ msgstr "Voer een geldige datum/tijd in."
 msgid "Enter a valid duration."
 msgstr "Voer een geldige tijdsduur in."
 
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Het aantal dagen moet tussen {min_days} en {max_days} liggen."
+
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
-"Er was geen bestand verstuurd. Controleer het coderingstype van het "
-"formulier."
+"Er is geen bestand verstuurd. Controleer het coderingstype op het formulier."
 
 msgid "No file was submitted."
-msgstr "Er was geen bestand verstuurd."
+msgstr "Er is geen bestand verstuurd."
 
 msgid "The submitted file is empty."
 msgstr "Het verstuurde bestand is leeg."
@@ -692,8 +708,8 @@ msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
-"Bestand ongeldig. Het bestand dat is gegeven is geen afbeelding of is "
-"beschadigd."
+"Upload een geldige afbeelding. Het geüploade bestand is geen of een "
+"beschadigde afbeelding."
 
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
@@ -717,7 +733,7 @@ msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(Verborgen veld %(name)s) %(error)s"
 
 msgid "ManagementForm data is missing or has been tampered with"
-msgstr "ManagementForm gegevens missen of zijn mee geknoeid"
+msgstr "ManagementForm-gegevens ontbreken, of er is mee geknoeid"
 
 #, python-format
 msgid "Please submit %d or fewer forms."
@@ -739,32 +755,32 @@ msgstr "Verwijderen"
 
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
-msgstr "Verbeter de dubbele gegevens voor %(field)s."
+msgstr "Corrigeer de dubbele gegevens voor %(field)s."
 
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
-msgstr "Verbeter de dubbele gegevens voor %(field)s, welke uniek moet zijn."
+msgstr "Corrigeer de dubbele gegevens voor %(field)s, dat uniek moet zijn."
 
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
 "for the %(lookup)s in %(date_field)s."
 msgstr ""
-"Verbeter de dubbele gegevens voor %(field_name)s, welke uniek moet zijn voor "
+"Corrigeer de dubbele gegevens voor %(field_name)s, dat uniek moet zijn voor "
 "de %(lookup)s in %(date_field)s."
 
 msgid "Please correct the duplicate values below."
-msgstr "Verbeter de dubbele waarden hieronder."
+msgstr "Corrigeer de dubbele waarden hieronder."
 
 msgid "The inline value did not match the parent instance."
-msgstr ""
+msgstr "De inline waarde komt niet overeen met de bovenliggende instantie."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Selecteer een geldige keuze. Deze keuze is niet beschikbaar."
 
 #, python-format
 msgid "\"%(pk)s\" is not a valid value."
-msgstr ""
+msgstr "'%(pk)s' is geen geldige waarde."
 
 #, python-format
 msgid ""
@@ -1054,8 +1070,8 @@ msgstr "Dit is geen geldig IPv6-adres."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "of"
@@ -1125,9 +1141,9 @@ msgid ""
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
 "origin' requests."
 msgstr ""
-"Als u uw webbrowser hebt ingesteld heeft om geen 'Referer headers' mee te "
-"sturen, schakelt u deze dan weer in, op zijn minst voor deze website, of "
-"voor HTTPS-verbindingen, of voor 'same-origin'-aanvragen."
+"Als u uw webbrowser hebt ingesteld om geen 'Referer headers' mee te sturen, "
+"schakelt u deze dan weer in, op zijn minst voor deze website, of voor HTTPS-"
+"verbindingen, of voor 'same-origin'-aanvragen."
 
 msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
@@ -1136,6 +1152,11 @@ msgid ""
 "If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
 "\" ...> for links to third-party sites."
 msgstr ""
+"Als u de tag <meta name=\"referrer\" content=\"no-referrer\"> gebruikt of de "
+"header 'Referrer-Policy: no-referrer' opneemt, verwijder deze dan. De CSRF-"
+"bescherming vereist de 'Referer'-header voor strenge referer-controle. Als u "
+"bezorgd bent om privacy, gebruik dan alternatieven zoals <a rel=\"noreferrer"
+"\" ...> voor koppelingen naar websites van derden."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1161,7 +1182,7 @@ msgid "No year specified"
 msgstr "Geen jaar opgegeven"
 
 msgid "Date out of range"
-msgstr ""
+msgstr "Datum buiten bereik"
 
 msgid "No month specified"
 msgstr "Geen maand opgegeven"
@@ -1225,9 +1246,12 @@ msgid ""
 "View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
 "target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
 msgstr ""
+"<a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" target="
+"\"_blank\" rel=\"noopener\">Uitgaveopmerkingen</a> voor Django %(version)s "
+"weergeven"
 
 msgid "The install worked successfully! Congratulations!"
-msgstr ""
+msgstr "De installatie is gelukt! Gefeliciteerd!"
 
 #, python-format
 msgid ""
@@ -1236,9 +1260,12 @@ msgid ""
 "\">DEBUG=True</a> is in your settings file and you have not configured any "
 "URLs."
 msgstr ""
+"U ziet deze pagina, omdat uw instellingenbestand <a href=\"https://docs."
+"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel="
+"\"noopener\">DEBUG=True</a> bevat en u geen URL's hebt geconfigureerd."
 
 msgid "Django Documentation"
-msgstr ""
+msgstr "Django-documentatie"
 
 msgid "Topics, references, &amp; how-to's"
 msgstr ""

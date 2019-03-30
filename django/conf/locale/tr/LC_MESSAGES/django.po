@@ -2,7 +2,7 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
-# BouRock, 2015-2018
+# BouRock, 2015-2019
 # BouRock, 2014-2015
 # Caner Başaran <basaran.caner@protonmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2012
@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-05-18 09:51+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 16:08+0000\n"
 "Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
@@ -146,6 +146,9 @@ msgstr "Yukarı Sorb dili"
 
 msgid "Hungarian"
 msgstr "Macarca"
+
+msgid "Armenian"
+msgstr "Ermenice"
 
 msgid "Interlingua"
 msgstr "Interlingua"
@@ -619,6 +622,9 @@ msgstr "Ham ikili veri"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' geçerli bir UUID değil."
 
+msgid "Universally unique identifier"
+msgstr "Evrensel benzersiz tanımlayıcı"
+
 msgid "File"
 msgstr "Dosya"
 
@@ -1067,8 +1073,8 @@ msgstr "Bu, geçerli bir IPv6 adresi değil."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "ya da"

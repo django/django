@@ -3,20 +3,21 @@
 # Translators:
 # Ankhbayar <ankhaa1002@gmail.com>, 2013
 # Bayarkhuu Bataa, 2014,2017-2018
-# Jacara <baskhuujacara@gmail.com>, 2011
+# Baskhuu Lodoikhuu <baskhuujacara@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jargalan <jargalanch@gmail.com>, 2011
 # Tsolmon <mnts26@gmail.com>, 2011
 # Zorig, 2013-2014,2016,2018
-# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2013-2016,2018
+# Zorig, 2019
+# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2013-2016,2018-2019
 # Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011,2015,2017
 # Ганзориг БП <ganzo.bp@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-07-09 06:54+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-19 08:42+0000\n"
 "Last-Translator: Анхбаяр Анхаа <l.ankhbayar@gmail.com>\n"
 "Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
 "mn/)\n"
@@ -145,6 +146,9 @@ msgstr "Дээд Сорбин"
 
 msgid "Hungarian"
 msgstr "Унгар"
+
+msgid "Armenian"
+msgstr "Армен"
 
 msgid "Interlingua"
 msgstr "Interlingua"
@@ -476,7 +480,7 @@ msgstr "'%(value)s' заавал True эсвэл False утга авах."
 
 #, python-format
 msgid "'%(value)s' value must be either True, False, or None."
-msgstr ""
+msgstr "'%(value)s' утга  True,False, None ийн аль нэг байх ёстой."
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolean (Үнэн худлын аль нэг нь)"
@@ -611,6 +615,9 @@ msgstr "Бинари өгөгдөл"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' утга зөв UUID биш байна."
 
+msgid "Universally unique identifier"
+msgstr "UUID"
+
 msgid "File"
 msgstr "Файл"
 
@@ -664,7 +671,7 @@ msgstr "Үргэлжилэх хугацааг зөв оруулна уу."
 
 #, python-brace-format
 msgid "The number of days must be between {min_days} and {max_days}."
-msgstr ""
+msgstr "Өдөрийн утга {min_days} ээс {max_days} ийн хооронд байх ёстой."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Файл оруулаагүй байна. Маягтаас кодлох төрлийг чагтал. "
@@ -760,7 +767,7 @@ msgid "Please correct the duplicate values below."
 msgstr "Доорх давхардсан утгуудыг засна уу."
 
 msgid "The inline value did not match the parent instance."
-msgstr ""
+msgstr "Inline утга эцэг обекттой таарахгүй байна."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Зөв сонголт хийнэ үү. Энэ утга сонголтонд алга."
@@ -1057,8 +1064,8 @@ msgstr "Энэ буруу IPv6 хаяг байна."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "буюу"
@@ -1137,6 +1144,11 @@ msgid ""
 "If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
 "\" ...> for links to third-party sites."
 msgstr ""
+"Хэрвээ та <meta name=\"referrer\" content=\"no-referrer\"> таг ашиглаж "
+"байгаа бол эсвэл 'Referrer-Policy: no-referrer' толгойг нэмсэн бол, "
+"эдгээрийг устгана уу. CSRF хамгаалалт 'Referer' толгойг чанд шалгалт хийхийг "
+"шаарддаг. Хэрвээ та хувийн аюулгүй байдалд санаа тавьдаг бол 3-дагч сайтыг "
+"холбохдоо <a rel=\"noreferrer\" ...> ашиглана уу."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1217,13 +1229,16 @@ msgid "Index of %(directory)s"
 msgstr "%(directory)s ийн жагсаалт"
 
 msgid "Django: the Web framework for perfectionists with deadlines."
-msgstr ""
+msgstr "Джанго: Чанартай бөгөөд хугацаанд нь хийхэд зориулсан Web framework."
 
 #, python-format
 msgid ""
 "View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
 "target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
 msgstr ""
+"Джанго %(version)s хувирбарын <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/releases/\" target=\"_blank\" rel=\"noopener\">тэмдэглэл харах</"
+"a> "
 
 msgid "The install worked successfully! Congratulations!"
 msgstr "Амжилттай суулгалаа! Баяр хүргэе!"
@@ -1244,7 +1259,7 @@ msgid "Django Documentation"
 msgstr "Джанго баримтжуулалт"
 
 msgid "Topics, references, &amp; how-to's"
-msgstr ""
+msgstr "Сэдэв, лавлахууд болон заавар-ууд"
 
 msgid "Tutorial: A Polling App"
 msgstr "Хичээл: Санал асуулга App"
