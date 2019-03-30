@@ -4,15 +4,16 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lele Long <schemacs@gmail.com>, 2011
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
-# Ronald White <ouyanghongyu@gmail.com>, 2014
+# Ronald White <tkliuxing@me.com>, 2014
+# Suntravel Chris <chrisfromcn@gmail.com>, 2019
 # Kevin Sze <leiarix@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: mozillazg <opensource.mozillazg@gmail.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-01 07:11+0000\n"
+"Last-Translator: Suntravel Chris <chrisfromcn@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -38,6 +39,9 @@ msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
 msgstr "该值必须只能包含字母，数字，点号，下划线，破折号，和"
+
+msgid "Example: '/about/contact'. Make sure to have a leading slash."
+msgstr "Example: '/about/contact'. 请确保开头的正斜杠。"
 
 msgid "URL is missing a leading slash."
 msgstr "URL头部缺失斜线."

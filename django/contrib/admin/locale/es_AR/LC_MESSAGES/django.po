@@ -3,13 +3,13 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Leonardo José Guzmán <ljguzman@gmail.com>, 2013
-# Ramiro Morales, 2013-2018
+# Ramiro Morales, 2013-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-07-31 16:49+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-03-20 14:06+0000\n"
 "Last-Translator: Ramiro Morales\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
 "language/es_AR/)\n"
@@ -111,7 +111,7 @@ msgid "object id"
 msgstr "id de objeto"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "repr de objeto"
 
@@ -543,24 +543,8 @@ msgstr "Mostrar todos/as"
 msgid "Save"
 msgstr "Guardar"
 
-msgid "Popup closing..."
-msgstr "Cerrando ventana emergente..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Modificar %(model)s seleccionados/as"
-
-#, python-format
-msgid "View selected %(model)s"
-msgstr "Ver %(model)s seleccionados/as"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Agregar otro/a %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Eliminar %(model)s seleccionados/as"
+msgid "Popup closing…"
+msgstr "Cerrando ventana amergente…"
 
 msgid "Search"
 msgstr "Buscar"
@@ -589,6 +573,18 @@ msgstr "Guardar y ver"
 
 msgid "Close"
 msgstr "Cerrar"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Modificar %(model)s seleccionados/as"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Agregar otro/a %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Eliminar %(model)s seleccionados/as"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Gracias por el tiempo que ha dedicado al sitio web hoy."

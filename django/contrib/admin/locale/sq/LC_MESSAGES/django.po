@@ -2,14 +2,14 @@
 #
 # Translators:
 # Besnik <besnik@programeshqip.org>, 2011,2015
-# Besnik <besnik@programeshqip.org>, 2015,2018
+# Besnik <besnik@programeshqip.org>, 2015,2018-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-05-28 01:29+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 11:06+0000\n"
+"Last-Translator: Besnik <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
@@ -110,9 +110,9 @@ msgid "object id"
 msgstr "id objekti"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
-msgstr ""
+msgstr "paraqitje objekti"
 
 msgid "action flag"
 msgstr "shenjë veprimi"
@@ -240,7 +240,7 @@ msgstr "Ndrysho %s"
 
 #, python-format
 msgid "View %s"
-msgstr ""
+msgstr "Shiheni %s"
 
 msgid "Database error"
 msgstr "Gabim baze të dhënash"
@@ -539,24 +539,8 @@ msgstr "Shfaqi krejt"
 msgid "Save"
 msgstr "Ruaje"
 
-msgid "Popup closing..."
-msgstr "Flluska po mbyllet…"
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Ndryshoni %(model)s e përzgjedhur"
-
-#, python-format
-msgid "View selected %(model)s"
-msgstr "Shiheni të përzgjedhurin %(model)s"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Shtoni një %(model)s tjetër"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Fshije %(model)s e përzgjedhur"
+msgid "Popup closing…"
+msgstr "Mbyllje flluske…"
 
 msgid "Search"
 msgstr "Kërko"
@@ -585,6 +569,18 @@ msgstr "Ruajeni dhe shiheni"
 
 msgid "Close"
 msgstr "Mbylle"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Ndryshoni %(model)s e përzgjedhur"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Shtoni një %(model)s tjetër"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Fshije %(model)s e përzgjedhur"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Faleminderit që shpenzoni sot pak kohë të çmuar me sajtin Web."
@@ -701,7 +697,7 @@ msgstr "Përzgjidhni %s për ta ndryshuar"
 
 #, python-format
 msgid "Select %s to view"
-msgstr ""
+msgstr "Përzgjidhni %s për parje"
 
 msgid "Date:"
 msgstr "Datë:"

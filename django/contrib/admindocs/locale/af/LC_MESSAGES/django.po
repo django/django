@@ -1,13 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# F Wolff <friedel@translate.org.za>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:51+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2019-01-07 08:38+0000\n"
+"Last-Translator: F Wolff <friedel@translate.org.za>\n"
 "Language-Team: Afrikaans (http://www.transifex.com/django/django/language/"
 "af/)\n"
 "MIME-Version: 1.0\n"
@@ -17,7 +18,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Administrative Documentation"
-msgstr ""
+msgstr "Administratiewe dokumentasie"
 
 msgid "Home"
 msgstr "Tuisblad"
@@ -38,7 +39,7 @@ msgid ""
 msgstr ""
 
 msgid "Documentation for this page"
-msgstr ""
+msgstr "Dokumentasie vir dié bladsy"
 
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
@@ -215,13 +216,6 @@ msgid ""
 "    View function: <code>%(full_name)s</code>. Name: <code>%(url_name)s</"
 "code>.\n"
 msgstr ""
-
-msgid "Boolean (Either True or False)"
-msgstr "Boole (Eder waar of vals)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Veld van type: %(field_type)s "
 
 msgid "tag:"
 msgstr ""
