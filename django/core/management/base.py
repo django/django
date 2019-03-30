@@ -126,7 +126,7 @@ class OutputWrapper(TextIOBase):
         else:
             self._style_func = lambda x: x
 
-    def __init__(self, out, style_func=None, ending='\n'):
+    def __init__(self, out, ending='\n'):
         self._out = out
         self.style_func = None
         self.ending = ending
@@ -355,7 +355,7 @@ class BaseCommand:
         if options.get('stdout'):
             self.stdout = OutputWrapper(options['stdout'])
         if options.get('stderr'):
-            self.stderr = OutputWrapper(options['stderr'], self.stderr.style_func)
+            self.stderr = OutputWrapper(options['stderr'])
 
         if self.requires_system_checks and not options.get('skip_checks'):
             self.check()
