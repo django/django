@@ -3,22 +3,22 @@
 # Translators:
 # angularcircle, 2011,2013
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Janusz Harkot <jh@blueice.pl>, 2015
+# Janusz Harkot <jh@trilab.pl>, 2015
 # Karol <kfuks2@o2.pl>, 2012
 # m_aciek <maciej.olko@gmail.com>, 2014
-# m_aciek <maciej.olko@gmail.com>, 2016-2017
+# m_aciek <maciej.olko@gmail.com>, 2016-2017,2019
 # m_aciek <maciej.olko@gmail.com>, 2014-2015
 # muszalski <m.muszalski@gmail.com>, 2016
 # p <inactive+poczciwiec@transifex.com>, 2014
 # Mattia Procopio <promat85@gmail.com>, 2014
-# Roman Barczyński <rombar@gmail.com>, 2012
+# Roman Barczyński, 2012
 # Tomasz Kajtoch <tomekkaj@tomekkaj.pl>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-09-25 18:09+0000\n"
+"PO-Revision-Date: 2019-01-04 11:37+0000\n"
 "Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -176,7 +176,7 @@ msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr ""
-"Oznacza, że ten użytkownik ma wszystkie uprawnienia bez jawnego ich "
+"Oznacza, że ten użytkownik ma wszystkie uprawnienia bez ich jawnego "
 "przypisywania."
 
 msgid ""
@@ -184,7 +184,7 @@ msgid ""
 "each of their groups."
 msgstr ""
 "Grupy do których należy użytkownik. Użytkownik otrzyma wszystkie uprawnienia "
-"przypisane do każdej z jego/jej grup."
+"przypisane do każdej z jego grup."
 
 msgid "user permissions"
 msgstr "uprawnienia użytkownika"
@@ -214,7 +214,7 @@ msgid "staff status"
 msgstr "w zespole"
 
 msgid "Designates whether the user can log into this admin site."
-msgstr "Określa czy użytkownik może zalogować się do panelu admina."
+msgstr "Określa czy użytkownik może zalogować się do panelu administracyjnego."
 
 msgid "active"
 msgstr "aktywny"

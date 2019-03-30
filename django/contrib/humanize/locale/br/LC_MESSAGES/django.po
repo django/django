@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
 "PO-Revision-Date: 2018-09-29 08:30+0000\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: Breton (http://www.transifex.com/django/django/language/br/)\n"
@@ -318,95 +318,8 @@ msgstr "dec'h"
 msgid "%(delta)s ago"
 msgstr ""
 
-#. Translators: 'naturaltime-past' strings will be included in
-#. '%(delta)s ago'
-#, python-format
-msgctxt "naturaltime-past"
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-
-#, python-format
-msgctxt "naturaltime-past"
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-
-#, python-format
-msgctxt "naturaltime-past"
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-
-#, python-format
-msgctxt "naturaltime-past"
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-
-#, python-format
-msgctxt "naturaltime-past"
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-
-#, python-format
-msgctxt "naturaltime-past"
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-
-msgid "now"
-msgstr "bremañ"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "a second ago"
-msgid_plural "%(count)s seconds ago"
-msgstr[0] "%(count)s eilenn zo"
-msgstr[1] "%(count)s eilenn zo"
-msgstr[2] "%(count)s eilenn zo"
-msgstr[3] "%(count)s eilenn zo"
-msgstr[4] "%(count)s eilenn zo"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "a minute ago"
-msgid_plural "%(count)s minutes ago"
-msgstr[0] "%(count)s munud zo"
-msgstr[1] "%(count)s munud zo"
-msgstr[2] "%(count)s munud zo"
-msgstr[3] "%(count)s munud zo"
-msgstr[4] "%(count)s munud zo"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
 #, python-format
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
@@ -416,14 +329,133 @@ msgstr[2] "%(count)s eurvezh zo"
 msgstr[3] "%(count)s eurvezh zo"
 msgstr[4] "%(count)s eurvezh zo"
 
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "a minute ago"
+msgid_plural "%(count)s minutes ago"
+msgstr[0] "%(count)s munud zo"
+msgstr[1] "%(count)s munud zo"
+msgstr[2] "%(count)s munud zo"
+msgstr[3] "%(count)s munud zo"
+msgstr[4] "%(count)s munud zo"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "a second ago"
+msgid_plural "%(count)s seconds ago"
+msgstr[0] "%(count)s eilenn zo"
+msgstr[1] "%(count)s eilenn zo"
+msgstr[2] "%(count)s eilenn zo"
+msgstr[3] "%(count)s eilenn zo"
+msgstr[4] "%(count)s eilenn zo"
+
+msgid "now"
+msgstr "bremañ"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "a second from now"
+msgid_plural "%(count)s seconds from now"
+msgstr[0] "a-benn %(count)s eilenn"
+msgstr[1] "a-benn %(count)s eilenn"
+msgstr[2] "a-benn %(count)s eilenn"
+msgstr[3] "a-benn %(count)s eilenn"
+msgstr[4] "a-benn %(count)s eilenn"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "a minute from now"
+msgid_plural "%(count)s minutes from now"
+msgstr[0] "a-benn %(count)s munud"
+msgstr[1] "a-benn %(count)s munud"
+msgstr[2] "a-benn %(count)s munud"
+msgstr[3] "a-benn %(count)s munud"
+msgstr[4] "a-benn %(count)s munud"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "an hour from now"
+msgid_plural "%(count)s hours from now"
+msgstr[0] "a-benn %(count)s eurvezh"
+msgstr[1] "a-benn %(count)s eurvezh"
+msgstr[2] "a-benn %(count)s eurvezh"
+msgstr[3] "a-benn %(count)s eurvezh"
+msgstr[4] "a-benn %(count)s eurvezh"
+
 #. Translators: delta will contain a string like '2 months' or '1 month, 2
 #. weeks'
 #, python-format
 msgid "%(delta)s from now"
 msgstr ""
 
-#. Translators: 'naturaltime-future' strings will be included in
-#. '%(delta)s from now'
+#. Translators: 'naturaltime-past' strings will be included in '%(delta)s ago'
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d month"
+msgid_plural "%d months"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d week"
+msgid_plural "%d weeks"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+
+#. Translators: 'naturaltime-future' strings will be included in '%(delta)s
+#. from now'
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%d year"
@@ -483,36 +515,3 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 msgstr[4] ""
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "a second from now"
-msgid_plural "%(count)s seconds from now"
-msgstr[0] "a-benn %(count)s eilenn"
-msgstr[1] "a-benn %(count)s eilenn"
-msgstr[2] "a-benn %(count)s eilenn"
-msgstr[3] "a-benn %(count)s eilenn"
-msgstr[4] "a-benn %(count)s eilenn"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "a minute from now"
-msgid_plural "%(count)s minutes from now"
-msgstr[0] "a-benn %(count)s munud"
-msgstr[1] "a-benn %(count)s munud"
-msgstr[2] "a-benn %(count)s munud"
-msgstr[3] "a-benn %(count)s munud"
-msgstr[4] "a-benn %(count)s munud"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "an hour from now"
-msgid_plural "%(count)s hours from now"
-msgstr[0] "a-benn %(count)s eurvezh"
-msgstr[1] "a-benn %(count)s eurvezh"
-msgstr[2] "a-benn %(count)s eurvezh"
-msgstr[3] "a-benn %(count)s eurvezh"
-msgstr[4] "a-benn %(count)s eurvezh"

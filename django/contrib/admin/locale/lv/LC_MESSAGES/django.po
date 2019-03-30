@@ -6,13 +6,14 @@
 # NullIsNot0 <nullisnot0@inbox.lv>, 2018
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Māris Nartišs <maris.gis@gmail.com>, 2016
+# NullIsNot0 <nullisnot0@inbox.lv>, 2019
 # peterisb <pb@sungis.lv>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-06-03 12:04+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-18 16:58+0000\n"
 "Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
@@ -114,7 +115,7 @@ msgid "object id"
 msgstr "objekta id"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "objekta attēlojums"
 
@@ -540,24 +541,8 @@ msgstr "Rādīt visu"
 msgid "Save"
 msgstr "Saglabāt"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Logs aizveras..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Mainīt izvēlēto %(model)s"
-
-#, python-format
-msgid "View selected %(model)s"
-msgstr "Apskatīt izvēlēto %(model)s"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Pievienot citu %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Dzēst izvēlēto %(model)s"
 
 msgid "Search"
 msgstr "Meklēt"
@@ -587,6 +572,18 @@ msgstr "Saglabāt un apskatīt"
 
 msgid "Close"
 msgstr "Aizvērt"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Mainīt izvēlēto %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Pievienot citu %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Dzēst izvēlēto %(model)s"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Paldies par pavadīto laiku mājas lapā."

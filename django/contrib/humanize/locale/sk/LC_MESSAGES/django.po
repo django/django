@@ -4,13 +4,13 @@
 # Claude Paroz <claude@2xlibre.net>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Marian Andre <marian@andre.sk>, 2012-2013
-# Martin Tóth <ezimir@gmail.com>, 2017-2018
+# Martin Tóth <ezimir@gmail.com>, 2017-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-09-05 17:04+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-31 12:54+0000\n"
 "Last-Translator: Martin Tóth <ezimir@gmail.com>\n"
 "Language-Team: Slovak (http://www.transifex.com/django/django/language/sk/)\n"
 "MIME-Version: 1.0\n"
@@ -296,8 +296,76 @@ msgstr "včera"
 msgid "%(delta)s ago"
 msgstr "pred %(delta)s"
 
-#. Translators: 'naturaltime-past' strings will be included in
-#. '%(delta)s ago'
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "an hour ago"
+msgid_plural "%(count)s hours ago"
+msgstr[0] "pred hodinou"
+msgstr[1] "pred %(count)s hodinami"
+msgstr[2] "pred %(count)s hodinami"
+msgstr[3] "pred %(count)s hodinami"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "a minute ago"
+msgid_plural "%(count)s minutes ago"
+msgstr[0] "pred minútou"
+msgstr[1] "pred %(count)s minútami"
+msgstr[2] "pred %(count)s minútami"
+msgstr[3] "pred %(count)s minútami"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "a second ago"
+msgid_plural "%(count)s seconds ago"
+msgstr[0] "pred sekundou"
+msgstr[1] "pred %(count)s sekundami"
+msgstr[2] "pred %(count)s sekundami"
+msgstr[3] "pred %(count)s sekundami"
+
+msgid "now"
+msgstr "teraz"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "a second from now"
+msgid_plural "%(count)s seconds from now"
+msgstr[0] "o sekundu"
+msgstr[1] "o %(count)s sekundy"
+msgstr[2] "o %(count)s sekúnd"
+msgstr[3] "o %(count)s sekúnd"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "a minute from now"
+msgid_plural "%(count)s minutes from now"
+msgstr[0] "o minútu"
+msgstr[1] "o %(count)s minúty"
+msgstr[2] "o %(count)s minút"
+msgstr[3] "o %(count)s minút"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "an hour from now"
+msgid_plural "%(count)s hours from now"
+msgstr[0] "o hodinu"
+msgstr[1] "o %(count)s hodiny"
+msgstr[2] "o %(count)s hodín"
+msgstr[3] "o %(count)s hodín"
+
+#. Translators: delta will contain a string like '2 months' or '1 month, 2
+#. weeks'
+#, python-format
+msgid "%(delta)s from now"
+msgstr "o %(delta)s"
+
+#. Translators: 'naturaltime-past' strings will be included in '%(delta)s ago'
 #, python-format
 msgctxt "naturaltime-past"
 msgid "%d year"
@@ -352,47 +420,8 @@ msgstr[1] "%d minútami"
 msgstr[2] "%d minútami"
 msgstr[3] "%d minútami"
 
-msgid "now"
-msgstr "teraz"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "a second ago"
-msgid_plural "%(count)s seconds ago"
-msgstr[0] "pred sekundou"
-msgstr[1] "pred %(count)s sekundami"
-msgstr[2] "pred %(count)s sekundami"
-msgstr[3] "pred %(count)s sekundami"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "a minute ago"
-msgid_plural "%(count)s minutes ago"
-msgstr[0] "pred minútou"
-msgstr[1] "pred %(count)s minútami"
-msgstr[2] "pred %(count)s minútami"
-msgstr[3] "pred %(count)s minútami"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "an hour ago"
-msgid_plural "%(count)s hours ago"
-msgstr[0] "pred hodinou"
-msgstr[1] "pred %(count)s hodinami"
-msgstr[2] "pred %(count)s hodinami"
-msgstr[3] "pred %(count)s hodinami"
-
-#. Translators: delta will contain a string like '2 months' or '1 month, 2
-#. weeks'
-#, python-format
-msgid "%(delta)s from now"
-msgstr "o %(delta)s"
-
-#. Translators: 'naturaltime-future' strings will be included in
-#. '%(delta)s from now'
+#. Translators: 'naturaltime-future' strings will be included in '%(delta)s
+#. from now'
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%d year"
@@ -446,33 +475,3 @@ msgstr[0] "%d minúta"
 msgstr[1] "%d minúty"
 msgstr[2] "%d minút"
 msgstr[3] "%d minút"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "a second from now"
-msgid_plural "%(count)s seconds from now"
-msgstr[0] "o sekundu"
-msgstr[1] "o %(count)s sekúnd"
-msgstr[2] "o %(count)s sekúnd"
-msgstr[3] "o %(count)s sekúnd"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "a minute from now"
-msgid_plural "%(count)s minutes from now"
-msgstr[0] "o minútu"
-msgstr[1] "o %(count)s minút"
-msgstr[2] "o %(count)s minút"
-msgstr[3] "o %(count)s minút"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "an hour from now"
-msgid_plural "%(count)s hours from now"
-msgstr[0] "o hodinu"
-msgstr[1] "o %(count)s hodín"
-msgstr[2] "o %(count)s hodín"
-msgstr[3] "o %(count)s hodín"

@@ -1,8 +1,8 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Topolino_Hackerino <claudiu.andrei.roman@gmail.com>, 2017
-# Carlo Miron <C8E@miron.it>, 2018
+# AndreiCR <claudiu.andrei.roman@gmail.com>, 2017
+# Carlo Miron <C8E@miron.it>, 2018-2019
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Flavio Curella <flavio.curella@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-07-30 21:10+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-19 10:24+0000\n"
 "Last-Translator: Carlo Miron <C8E@miron.it>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
@@ -119,7 +119,7 @@ msgid "object id"
 msgstr "id dell'oggetto"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "rappr. dell'oggetto"
 
@@ -553,24 +553,8 @@ msgstr "Mostra tutto"
 msgid "Save"
 msgstr "Salva"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Chiusura popup..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Modifica la selezione %(model)s"
-
-#, python-format
-msgid "View selected %(model)s"
-msgstr "Visualizza il %(model)s selezionato"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Aggiungi un altro %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Elimina la selezione %(model)s"
 
 msgid "Search"
 msgstr "Cerca"
@@ -599,6 +583,18 @@ msgstr "Salva e visualizza"
 
 msgid "Close"
 msgstr "Chiudi"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Modifica la selezione %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Aggiungi un altro %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Elimina la selezione %(model)s"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Grazie per aver speso il tuo tempo prezioso su questo sito oggi."
