@@ -792,7 +792,7 @@ object. If it's ``None``, Django uses the :ref:`current time zone
     - MySQL: load the time zone tables with `mysql_tzinfo_to_sql`_.
 
     .. _pytz: http://pytz.sourceforge.net/
-    .. _Time Zones: https://www.postgresql.org/docs/current/static/datatype-datetime.html#DATATYPE-TIMEZONES
+    .. _Time Zones: https://www.postgresql.org/docs/current/datatype-datetime.html#DATATYPE-TIMEZONES
     .. _Choosing a Time Zone File: https://docs.oracle.com/en/database/oracle/
        oracle-database/18/nlspg/datetime-data-types-and-time-zone-support.html
        #GUID-805AB986-DE12-4FEA-AF56-5AABCD2132DF

@@ -7,7 +7,7 @@ PostgreSQL specific aggregation functions
 
 These functions are available from the ``django.contrib.postgres.aggregates``
 module. They are described in more detail in the `PostgreSQL docs
-<https://www.postgresql.org/docs/current/static/functions-aggregate.html>`_.
+<https://www.postgresql.org/docs/current/functions-aggregate.html>`_.
 
 .. note::
 
