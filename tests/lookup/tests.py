@@ -478,10 +478,11 @@ class LookupTests(TestCase):
         )
 
     def test_exclude(self):
-        Article.objects.create(headline='Article_ with underscore', pub_date=datetime(2005, 11, 20))
-        Article.objects.create(headline='Article% with percent sign', pub_date=datetime(2005, 11, 21))
-        Article.objects.create(headline='Article with \\ backslash', pub_date=datetime(2005, 11, 22))
-
+        Article.objects.bulk_create([
+            Article(headline='Article_ with underscore', pub_date=datetime(2005, 11, 20)),
+            Article(headline='Article% with percent sign', pub_date=datetime(2005, 11, 21)),
+            Article(headline='Article with \\ backslash', pub_date=datetime(2005, 11, 22)),
+        ])
         # exclude() is the opposite of filter() when doing lookups:
         self.assertQuerysetEqual(
             Article.objects.filter(headline__contains='Article').exclude(headline__contains='with'),
@@ -606,15 +607,17 @@ class LookupTests(TestCase):
         for a in Article.objects.all():
             a.delete()
         now = datetime.now()
-        Article.objects.create(pub_date=now, headline='f')
-        Article.objects.create(pub_date=now, headline='fo')
-        Article.objects.create(pub_date=now, headline='foo')
-        Article.objects.create(pub_date=now, headline='fooo')
-        Article.objects.create(pub_date=now, headline='hey-Foo')
-        Article.objects.create(pub_date=now, headline='bar')
-        Article.objects.create(pub_date=now, headline='AbBa')
-        Article.objects.create(pub_date=now, headline='baz')
-        Article.objects.create(pub_date=now, headline='baxZ')
+        Article.objects.bulk_create([
+            Article(pub_date=now, headline='f'),
+            Article(pub_date=now, headline='fo'),
+            Article(pub_date=now, headline='foo'),
+            Article(pub_date=now, headline='fooo'),
+            Article(pub_date=now, headline='hey-Foo'),
+            Article(pub_date=now, headline='bar'),
+            Article(pub_date=now, headline='AbBa'),
+            Article(pub_date=now, headline='baz'),
+            Article(pub_date=now, headline='baxZ'),
+        ])
         # zero-or-more
         self.assertQuerysetEqual(
             Article.objects.filter(headline__regex=r'fo*'),
@@ -664,13 +667,15 @@ class LookupTests(TestCase):
         )
 
         # and more articles:
-        Article.objects.create(pub_date=now, headline='foobar')
-        Article.objects.create(pub_date=now, headline='foobaz')
-        Article.objects.create(pub_date=now, headline='ooF')
-        Article.objects.create(pub_date=now, headline='foobarbaz')
-        Article.objects.create(pub_date=now, headline='zoocarfaz')
-        Article.objects.create(pub_date=now, headline='barfoobaz')
-        Article.objects.create(pub_date=now, headline='bazbaRFOO')
+        Article.objects.bulk_create([
+            Article(pub_date=now, headline='foobar'),
+            Article(pub_date=now, headline='foobaz'),
+            Article(pub_date=now, headline='ooF'),
+            Article(pub_date=now, headline='foobarbaz'),
+            Article(pub_date=now, headline='zoocarfaz'),
+            Article(pub_date=now, headline='barfoobaz'),
+            Article(pub_date=now, headline='bazbaRFOO'),
+        ])
 
         # alternation
         self.assertQuerysetEqual(
@@ -723,13 +728,15 @@ class LookupTests(TestCase):
     def test_regex_backreferencing(self):
         # grouping and backreferences
         now = datetime.now()
-        Article.objects.create(pub_date=now, headline='foobar')
-        Article.objects.create(pub_date=now, headline='foobaz')
-        Article.objects.create(pub_date=now, headline='ooF')
-        Article.objects.create(pub_date=now, headline='foobarbaz')
-        Article.objects.create(pub_date=now, headline='zoocarfaz')
-        Article.objects.create(pub_date=now, headline='barfoobaz')
-        Article.objects.create(pub_date=now, headline='bazbaRFOO')
+        Article.objects.bulk_create([
+            Article(pub_date=now, headline='foobar'),
+            Article(pub_date=now, headline='foobaz'),
+            Article(pub_date=now, headline='ooF'),
+            Article(pub_date=now, headline='foobarbaz'),
+            Article(pub_date=now, headline='zoocarfaz'),
+            Article(pub_date=now, headline='barfoobaz'),
+            Article(pub_date=now, headline='bazbaRFOO'),
+        ])
         self.assertQuerysetEqual(
             Article.objects.filter(headline__regex=r'b(.).*b\1'),
             ['<Article: barfoobaz>', '<Article: bazbaRFOO>', '<Article: foobarbaz>']
