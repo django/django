@@ -104,7 +104,7 @@ class ArticleAdmin(admin.ModelAdmin):
     list_display = (
         'content', 'date', callable_year, 'model_year', 'modeladmin_year',
         'model_year_reversed', 'section', lambda obj: obj.title,
-        'order_by_expression', 'model_property_year',
+        'order_by_expression', 'model_property_year', 'model_month',
     )
     list_editable = ('section',)
     list_filter = ('date', 'section')

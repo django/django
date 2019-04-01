@@ -60,6 +60,10 @@ class Article(models.Model):
     property_year.admin_order_field = 'date'
     model_property_year = property(property_year)
 
+    @property
+    def model_month(self):
+        return self.date.month
+
 
 class Book(models.Model):
     """
