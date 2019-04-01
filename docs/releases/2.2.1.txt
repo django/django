@@ -9,4 +9,6 @@ Django 2.2.1 fixes several bugs in 2.2.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 2.1 that caused the incorrect quoting of
+  database user password when using :djadmin:`dbshell` on Oracle
+  (:ticket:`30307`).

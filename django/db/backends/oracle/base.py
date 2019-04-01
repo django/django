@@ -213,7 +213,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return settings_dict['NAME']
 
     def _connect_string(self):
-        return '%s/\\"%s\\"@%s' % (self.settings_dict['USER'], self.settings_dict['PASSWORD'], self._dsn())
+        return '%s/"%s"@%s' % (self.settings_dict['USER'], self.settings_dict['PASSWORD'], self._dsn())
 
     def get_connection_params(self):
         conn_params = self.settings_dict['OPTIONS'].copy()
