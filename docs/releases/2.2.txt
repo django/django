@@ -1,8 +1,8 @@
-============================================
-Django 2.2 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 2.2 release notes
+========================
 
-*Expected April 2019*
+*1 April 2019*
 
 Welcome to Django 2.2!
 
