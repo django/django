@@ -2,7 +2,7 @@
 Django 2.2 release notes
 ========================
 
-*1 April 2019*
+*April 1, 2019*
 
 Welcome to Django 2.2!
 
