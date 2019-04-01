@@ -1896,7 +1896,10 @@ A number of settings can be used to adjust language cookie options:
 * :setting:`LANGUAGE_COOKIE_NAME`
 * :setting:`LANGUAGE_COOKIE_AGE`
 * :setting:`LANGUAGE_COOKIE_DOMAIN`
+* :setting:`LANGUAGE_COOKIE_HTTPONLY`
 * :setting:`LANGUAGE_COOKIE_PATH`
+* :setting:`LANGUAGE_COOKIE_SAMESITE`
+* :setting:`LANGUAGE_COOKIE_SECURE`
 
 Implementation notes
 ====================

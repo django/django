@@ -1766,6 +1766,21 @@ permanently (via the :setting:`LANGUAGE_COOKIE_NAME` setting) and to add
 a middleware that copies the value from the old cookie to a new one and then
 deletes the old one.
 
+.. setting:: LANGUAGE_COOKIE_HTTPONLY
+
+``LANGUAGE_COOKIE_HTTPONLY``
+----------------------------
+
+.. versionadded:: 3.0
+
+Default: ``False``
+
+Whether to use ``HttpOnly`` flag on the language cookie. If this is set to
+``True``, client-side JavaScript will not to be able to access the language
+cookie.
+
+See :setting:`SESSION_COOKIE_HTTPONLY` for details on ``HttpOnly``.
+
 .. setting:: LANGUAGE_COOKIE_NAME
 
 ``LANGUAGE_COOKIE_NAME``
@@ -1799,6 +1814,33 @@ and reliable option to perform the switch is to change the language cookie name
 permanently (via the :setting:`LANGUAGE_COOKIE_NAME` setting), and to add
 a middleware that copies the value from the old cookie to a new one and then
 deletes the one.
+
+.. setting:: LANGUAGE_COOKIE_SAMESITE
+
+``LANGUAGE_COOKIE_SAMESITE``
+----------------------------
+
+.. versionadded:: 3.0
+
+Default: ``None``
+
+The value of the `SameSite`_ flag on the language cookie. This flag prevents the
+cookie from being sent in cross-site requests.
+
+See :setting:`SESSION_COOKIE_SAMESITE` for details about ``SameSite``.
+
+.. setting:: LANGUAGE_COOKIE_SECURE
+
+``LANGUAGE_COOKIE_SECURE``
+--------------------------
+
+.. versionadded:: 3.0
+
+Default: ``False``
+
+Whether to use a secure cookie for the language cookie. If this is set to
+``True``, the cookie will be marked as "secure", which means browsers may
+ensure that the cookie is only sent under an HTTPS connection.
 
 .. setting:: LANGUAGES
 
@@ -3402,8 +3444,11 @@ Globalization (``i18n``/``l10n``)
 * :setting:`LANGUAGE_CODE`
 * :setting:`LANGUAGE_COOKIE_AGE`
 * :setting:`LANGUAGE_COOKIE_DOMAIN`
+* :setting:`LANGUAGE_COOKIE_HTTPONLY`
 * :setting:`LANGUAGE_COOKIE_NAME`
 * :setting:`LANGUAGE_COOKIE_PATH`
+* :setting:`LANGUAGE_COOKIE_SAMESITE`
+* :setting:`LANGUAGE_COOKIE_SECURE`
 * :setting:`LANGUAGES`
 * :setting:`LANGUAGES_BIDI`
 * :setting:`LOCALE_PATHS`

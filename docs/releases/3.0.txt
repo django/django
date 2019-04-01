@@ -153,7 +153,11 @@ Generic Views
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Added the :setting:`LANGUAGE_COOKIE_HTTPONLY`,
+  :setting:`LANGUAGE_COOKIE_SAMESITE`, and :setting:`LANGUAGE_COOKIE_SECURE`
+  settings to set the ``HttpOnly``, ``SameSite``, and ``Secure`` flags on
+  language cookies. The default values of these settings preserve the previous
+  behavior.
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
