@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "DJANGO-ADMIN" "1" "January 17, 2019" "2.2" "Django"
+.TH "DJANGO-ADMIN" "1" "April 01, 2019" "2.2" "Django"
 .SH NAME
 django-admin \- Utility script for the Django Web framework
 .
@@ -34,16 +34,10 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 \fBdjango\-admin\fP is Django\(aqs command\-line utility for administrative tasks.
 This document outlines all it can do.
 .sp
-In addition, \fBmanage.py\fP is automatically created in each Django project.
-\fBmanage.py\fP does the same thing as \fBdjango\-admin\fP but takes care of a few
-things for you:
-.INDENT 0.0
-.IP \(bu 2
-It puts your project\(aqs package on \fBsys.path\fP\&.
-.IP \(bu 2
-It sets the \fBDJANGO_SETTINGS_MODULE\fP environment variable so that
-it points to your project\(aqs \fBsettings.py\fP file.
-.UNINDENT
+In addition, \fBmanage.py\fP is automatically created in each Django project. It
+does the same thing as \fBdjango\-admin\fP but also sets the
+\fBDJANGO_SETTINGS_MODULE\fP environment variable so that it points to your
+project\(aqs \fBsettings.py\fP file.
 .sp
 The \fBdjango\-admin\fP script should be on your system path if you installed
 Django via its \fBsetup.py\fP utility. If it\(aqs not on your path, you can find it
@@ -1645,10 +1639,9 @@ Generate squashed migration file without Django version and timestamp header.
 Creates a Django app directory structure for the given app name in the current
 directory or the given destination.
 .sp
-By default the directory created contains a \fBmodels.py\fP file and other app
-template files. (See the \fI\%source\fP for more details.) If only the app
-name is given, the app directory will be created in the current working
-directory.
+By default, \fI\%the new directory\fP contains a
+\fBmodels.py\fP file and other app template files. If only the app name is given,
+the app directory will be created in the current working directory.
 .sp
 If the optional destination is provided, Django will use that existing
 directory rather than creating a new one. You can use \(aq.\(aq to denote the current
@@ -1764,9 +1757,9 @@ will be renamed to \fB\&.py\fP\&.
 Creates a Django project directory structure for the given project name in
 the current directory or the given destination.
 .sp
-By default, the new directory contains \fBmanage.py\fP and a project package
-(containing a \fBsettings.py\fP and other files). See the \fI\%template source\fP for
-details.
+By default, \fI\%the new directory\fP contains
+\fBmanage.py\fP and a project package (containing a \fBsettings.py\fP and other
+files).
 .sp
 If only the project name is given, both the project directory and project
 package will be named \fB<projectname>\fP and the project directory
