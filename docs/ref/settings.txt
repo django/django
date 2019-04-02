@@ -386,7 +386,7 @@ See :setting:`SESSION_COOKIE_SAMESITE` for details about ``SameSite``.
 Default: ``False``
 
 Whether to use a secure cookie for the CSRF cookie. If this is set to ``True``,
-the cookie will be marked as "secure," which means browsers may ensure that the
+the cookie will be marked as "secure", which means browsers may ensure that the
 cookie is only sent with an HTTPS connection.
 
 .. setting:: CSRF_USE_SESSIONS
@@ -3076,7 +3076,7 @@ Possible values for the setting are:
 Default: ``False``
 
 Whether to use a secure cookie for the session cookie. If this is set to
-``True``, the cookie will be marked as "secure," which means browsers may
+``True``, the cookie will be marked as "secure", which means browsers may
 ensure that the cookie is only sent under an HTTPS connection.
 
 Leaving this setting off isn't a good idea because an attacker could capture an
