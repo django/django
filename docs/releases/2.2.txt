@@ -302,7 +302,7 @@ For example, in older versions of Django::
     class SubAdmin(BaseAdmin):
         actions = ['b']
 
-``SubAdmin`` will have actions ``'a'`` and ``'b'``.
+``SubAdmin`` would have actions ``'a'`` and ``'b'``.
 
 Now ``actions`` follows standard Python inheritance. To get the same result as
 before::
