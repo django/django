@@ -6,18 +6,25 @@ for convenience's sake.
 from django.http import (
     Http404, HttpResponse, HttpResponsePermanentRedirect, HttpResponseRedirect,
 )
+from django.http.response import HttpResponseBase
 from django.template import loader
 from django.urls import NoReverseMatch, reverse
 from django.utils.functional import Promise
 
 
-def render(request, template_name, context=None, content_type=None, status=None, using=None):
+def render(request, template_name, context=None, content_type=None,
+           status=None, using=None, klass=HttpResponse):
     """
     Return a HttpResponse whose content is filled with the result of calling
     django.template.loader.render_to_string() with the passed arguments.
+
+    klass may be any subclass of http.response.HttpResponseBase, and
+    defaults to http.HttpResponse.
     """
+    if not issubclass(klass, HttpResponseBase):
+        raise TypeError("`klass` must be HttpResponseBase subclass")
     content = loader.render_to_string(template_name, context, request, using=using)
-    return HttpResponse(content, content_type, status)
+    return klass(content, content_type, status)
 
 
 def redirect(to, *args, permanent=False, **kwargs):
