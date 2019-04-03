@@ -473,6 +473,8 @@ The following checks are performed on your URL configuration:
   end with a slash.
 * **urls.E007**: The custom ``handlerXXX`` view ``'path.to.view'`` does not
   take the correct number of arguments (…).
+* **urls.E008**: The custom ``handlerXXX`` view ``'path.to.view'`` could not be
+  imported.
 
 ``contrib`` app checks
 ======================
