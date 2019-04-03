@@ -46,3 +46,6 @@ Bugfixes
 * Fixed a regression in Django 2.2 where
   :class:`~django.contrib.postgres.search.SearchVector` generates SQL that is
   not indexable (:ticket:`30385`).
+
+* Fixed a regression in Django 2.2 that caused an exception to be raised when
+  a custom error handler could not be imported (:ticket:`30318`).
