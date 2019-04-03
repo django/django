@@ -199,6 +199,15 @@ All attributes should be considered read-only, unless stated otherwise.
         >>> request.headers.get('user-agent')
         Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6)
 
+    For use in, for example, Django templates, headers can also be looked up
+    using underscores in place of hyphens::
+
+        {{ request.headers.user_agent }}
+
+    .. versionchanged:: 3.0
+
+        Support for look ups using underscores was added.
+
 .. attribute:: HttpRequest.resolver_match
 
     An instance of :class:`~django.urls.ResolverMatch` representing the
