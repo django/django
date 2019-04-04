@@ -519,6 +519,24 @@ class BasicExpressionsTests(TestCase):
         # This exercises the double OuterRef form with AutoField as pk.
         self.assertCountEqual(outer, [first, second])
 
+    def test_union_group_by(self):
+        qs1 = Company.objects.filter(num_employees__lt=50).values('num_chairs', 'ceo')
+        qs2 = Company.objects.filter(num_employees__gt=50).values('num_chairs', 'ceo')
+        qs = qs1.union(qs2).values('ceo').annotate(num_chairs=Sum('num_chairs')).values('num_chairs')
+        self.assertSequenceEqual(
+            qs.order_by('-num_chairs'),
+            [{'num_chairs': 5}, {'num_chairs': 4}, {'num_chairs': 1}]
+        )
+
+    def test_union_annotate(self):
+        qs1 = Company.objects.filter(num_employees__lt=50)
+        qs2 = Company.objects.filter(num_employees__gt=50)
+        qs = qs1.union(qs2).annotate(new_num_chairs=F('num_chairs') + 1).values('new_num_chairs')
+        self.assertSequenceEqual(
+            qs.order_by('-new_num_chairs'),
+            [{'new_num_chairs': 6}, {'new_num_chairs': 5}, {'new_num_chairs': 2}]
+        )
+
     def test_annotations_within_subquery(self):
         Company.objects.filter(num_employees__lt=50).update(ceo=Employee.objects.get(firstname='Frank'))
         inner = Company.objects.filter(

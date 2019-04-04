@@ -449,6 +449,20 @@ class SQLCompiler:
             params.extend(part)
         return result, params
 
+    def _get_out_cols(self, extra_select, with_col_aliases):
+        out_cols = []
+        params = []
+        col_idx = 1
+        for _, (s_sql, s_params), alias in self.select + extra_select:
+            if alias:
+                s_sql = '%s AS %s' % (s_sql, self.connection.ops.quote_name(alias))
+            elif with_col_aliases:
+                s_sql = '%s AS %s' % (s_sql, 'Col%d' % col_idx)
+                col_idx += 1
+            params.extend(s_params)
+            out_cols.append(s_sql)
+        return out_cols, params
+
     def as_sql(self, with_limits=True, with_col_aliases=False):
         """
         Create the SQL for this query. Return the SQL string and list of
@@ -465,15 +479,35 @@ class SQLCompiler:
             with_limit_offset = with_limits and (self.query.high_mark is not None or self.query.low_mark)
             combinator = self.query.combinator
             features = self.connection.features
+            distinct_fields, distinct_params = self.get_distinct()
+            # This must come after 'select', 'ordering', and 'distinct'
+            # (see docstring of get_from_clause() for details).
+            from_, f_params = self.get_from_clause()
             if combinator:
                 if not getattr(features, 'supports_select_{}'.format(combinator)):
                     raise NotSupportedError('{} is not supported on this database backend.'.format(combinator))
                 result, params = self.get_combinator_sql(combinator, self.query.combinator_all)
+                # if outer query has different annotations,
+                # wrap combined queries and merge with annotations and group by.
+                if self.query.annotations != self.query.combined_queries[0].annotations:
+                    out_cols, select_params = self._get_out_cols(extra_select, with_col_aliases)
+                    group_query = ''
+                    group_params = []
+                    if group_by:
+                        group_cols = []
+                        for g_sql, g_params in group_by:
+                            group_params.extend(g_params)
+                            group_cols.append(g_sql)
+                        group_query = 'GROUP BY %s' % ', '.join(group_cols)
+
+                    params = select_params + f_params + params + group_params
+                    result = ['SELECT %s FROM (%s) %s %s' % (
+                        ', '.join(out_cols),
+                        ' '.join(result),
+                        *from_,
+                        group_query,
+                    )]
             else:
-                distinct_fields, distinct_params = self.get_distinct()
-                # This must come after 'select', 'ordering', and 'distinct'
-                # (see docstring of get_from_clause() for details).
-                from_, f_params = self.get_from_clause()
                 where, w_params = self.compile(self.where) if self.where is not None else ("", [])
                 having, h_params = self.compile(self.having) if self.having is not None else ("", [])
                 result = ['SELECT']
@@ -487,17 +521,8 @@ class SQLCompiler:
                     result += distinct_result
                     params += distinct_params
 
-                out_cols = []
-                col_idx = 1
-                for _, (s_sql, s_params), alias in self.select + extra_select:
-                    if alias:
-                        s_sql = '%s AS %s' % (s_sql, self.connection.ops.quote_name(alias))
-                    elif with_col_aliases:
-                        s_sql = '%s AS %s' % (s_sql, 'Col%d' % col_idx)
-                        col_idx += 1
-                    params.extend(s_params)
-                    out_cols.append(s_sql)
-
+                out_cols, out_params = self._get_out_cols(extra_select, with_col_aliases)
+                params.extend(out_params)
                 result += [', '.join(out_cols), 'FROM', *from_]
                 params.extend(f_params)
 
