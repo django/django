@@ -1173,13 +1173,13 @@ class ManageCheck(AdminScriptTestCase):
                 'django.contrib.auth',
                 'django.contrib.contenttypes',
                 'django.contrib.messages',
-                'django.contrib.sessions',
             ],
             sdict={
                 'DEBUG': True,
                 'MIDDLEWARE': [
                     'django.contrib.messages.middleware.MessageMiddleware',
                     'django.contrib.auth.middleware.AuthenticationMiddleware',
+                    'django.contrib.sessions.middleware.SessionMiddleware',
                 ],
                 'TEMPLATES': [
                     {

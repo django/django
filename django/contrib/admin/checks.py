@@ -68,7 +68,6 @@ def check_dependencies(**kwargs):
         ('django.contrib.contenttypes', 401),
         ('django.contrib.auth', 405),
         ('django.contrib.messages', 406),
-        ('django.contrib.sessions', 407),
     )
     for app_name, error_code in app_dependencies:
         if not apps.is_installed(app_name):
@@ -120,6 +119,12 @@ def check_dependencies(**kwargs):
             "'django.contrib.messages.middleware.MessageMiddleware' must "
             "be in MIDDLEWARE in order to use the admin application.",
             id='admin.E409',
+        ))
+    if not _contains_subclass('django.contrib.sessions.middleware.SessionMiddleware', settings.MIDDLEWARE):
+        errors.append(checks.Error(
+            "'django.contrib.sessions.middleware.SessionMiddleware' must "
+            "be in MIDDLEWARE in order to use the admin application.",
+            id='admin.E410',
         ))
     return errors
 
