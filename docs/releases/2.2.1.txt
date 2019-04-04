@@ -49,3 +49,9 @@ Bugfixes
 
 * Fixed a regression in Django 2.2 that caused an exception to be raised when
   a custom error handler could not be imported (:ticket:`30318`).
+
+* Relaxed the system check added in Django 2.2 for the admin app's dependencies
+  to reallow use of
+  :class:`~django.contrib.sessions.middleware.SessionMiddleware` subclasses,
+  rather than requiring :mod:`django.contrib.sessions` to be in
+  :setting:`INSTALLED_APPS` (:ticket:`30312`).
