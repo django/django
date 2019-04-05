@@ -33,6 +33,7 @@ logger = logging.getLogger('django.utils.autoreload')
 # file paths to allow watching them in the future.
 _error_files = []
 _exception = None
+_windows = sys.platform == "win32"
 
 try:
     import termios
@@ -347,10 +348,16 @@ class StatReloader(BaseReloader):
     def snapshot_files(self):
         for file in self.watched_files():
             try:
-                mtime = file.stat().st_mtime
+                stat = file.stat()
             except OSError:
                 # This is thrown when the file does not exist.
                 continue
+            mtime = stat.st_mtime
+            if _windows:
+                # The older implementation of the autoreloader included this conditional to account
+                # for daylight savings time. This is included for consistency, even if it may not be required
+                # on newer versions of Windows.
+                mtime -= stat.st_ctime
             yield file, mtime
 
     @classmethod
