@@ -14,3 +14,6 @@ Bugfixes
   (:ticket:`30307`).
 
 * Added compatibility for ``psycopg2`` 2.8 (:ticket:`30331`).
+
+* Fixed a regression in Django 2.2 that caused a crash when loading the
+  template for the technical 500 debug page (:ticket:`30324`).
