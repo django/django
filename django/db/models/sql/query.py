@@ -9,6 +9,7 @@ all about the internals of models in order to get the information it needs.
 import difflib
 import functools
 import inspect
+import sys
 import warnings
 from collections import Counter, namedtuple
 from collections.abc import Iterator, Mapping
@@ -883,7 +884,11 @@ class Query(BaseExpression):
             # No clashes between self and outer query should be possible.
             return
 
-        local_recursion_limit = 67  # explicitly avoid infinite loop
+        # Explicitly avoid infinite loop. The constant divider is based on how
+        # much depth recursive subquery references add to the stack. This value
+        # might need to be adjusted when adding or removing function calls from
+        # the code path in charge of performing these operations.
+        local_recursion_limit = sys.getrecursionlimit() // 16
         for pos, prefix in enumerate(prefix_gen()):
             if prefix not in self.subq_aliases:
                 self.alias_prefix = prefix
