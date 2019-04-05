@@ -22,3 +22,6 @@ Bugfixes
   :class:`~django.contrib.postgres.aggregates.ArrayAgg` and
   :class:`~django.contrib.postgres.aggregates.StringAgg` when it contains an
   expression with params (:ticket:`30332`).
+
+* Fixed a regression in Django 2.2 that caused a single instance fast-delete
+  to not set the primary key to ``None`` (:ticket:`30330`).
