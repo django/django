@@ -77,7 +77,18 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """, [table_name])
         field_map = {line[0]: line[1:] for line in cursor.fetchall()}
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
-        return [FieldInfo(*line[0:6], *field_map[line.name]) for line in cursor.description]
+        return [
+            FieldInfo(
+                line.name,
+                line.type_code,
+                line.display_size,
+                line.internal_size,
+                line.precision,
+                line.scale,
+                *field_map[line.name],
+            )
+            for line in cursor.description
+        ]
 
     def get_sequences(self, cursor, table_name, table_fields=()):
         cursor.execute("""
