@@ -328,14 +328,14 @@ class ExceptionReporter:
 
     def get_traceback_html(self):
         """Return HTML version of debug 500 HTTP error page."""
-        with Path(CURRENT_DIR, 'templates', 'technical_500.html').open() as fh:
+        with Path(CURRENT_DIR, 'templates', 'technical_500.html').open(encoding='utf-8') as fh:
             t = DEBUG_ENGINE.from_string(fh.read())
         c = Context(self.get_traceback_data(), use_l10n=False)
         return t.render(c)
 
     def get_traceback_text(self):
         """Return plain text version of debug 500 HTTP error page."""
-        with Path(CURRENT_DIR, 'templates', 'technical_500.txt').open() as fh:
+        with Path(CURRENT_DIR, 'templates', 'technical_500.txt').open(encoding='utf-8') as fh:
             t = DEBUG_ENGINE.from_string(fh.read())
         c = Context(self.get_traceback_data(), autoescape=False, use_l10n=False)
         return t.render(c)

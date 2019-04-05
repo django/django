@@ -7,6 +7,7 @@ import tempfile
 import threading
 from io import StringIO
 from pathlib import Path
+from unittest import mock
 
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -20,7 +21,8 @@ from django.utils.functional import SimpleLazyObject
 from django.utils.safestring import mark_safe
 from django.views.debug import (
     CLEANSED_SUBSTITUTE, CallableSettingWrapper, ExceptionReporter,
-    cleanse_setting, technical_500_response,
+    Path as DebugPath, cleanse_setting, default_urlconf,
+    technical_404_response, technical_500_response,
 )
 
 from ..views import (
@@ -647,6 +649,20 @@ class ExceptionReporterTests(SimpleTestCase):
 
         text = reporter.get_traceback_text()
         self.assertIn('USER: [unable to retrieve the current user]', text)
+
+    def test_template_encoding(self):
+        """
+        The templates are loaded directly, not via a template loader, and
+        should be opened as utf-8 charset as is the default specified on
+        template engines.
+        """
+        reporter = ExceptionReporter(None, None, None, None)
+        with mock.patch.object(DebugPath, 'open') as m:
+            reporter.get_traceback_html()
+            m.assert_called_once_with(encoding='utf-8')
+            m.reset_mock()
+            reporter.get_traceback_text()
+            m.assert_called_once_with(encoding='utf-8')
 
 
 class PlainTextReportTests(SimpleTestCase):
