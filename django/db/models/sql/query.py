@@ -894,7 +894,7 @@ class Query(BaseExpression):
                 self.alias_prefix = prefix
                 break
             if pos > local_recursion_limit:
-                raise RuntimeError(
+                raise RecursionError(
                     'Maximum recursion depth exceeded: too many subqueries.'
                 )
         self.subq_aliases = self.subq_aliases.union([self.alias_prefix])
