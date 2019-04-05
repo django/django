@@ -253,7 +253,7 @@ class StartDjangoTests(SimpleTestCase):
         self.assertEqual(mocked_thread.call_count, 1)
         self.assertEqual(
             mocked_thread.call_args[1],
-            {'target': fake_main_func, 'args': (123,), 'kwargs': {'abc': 123}}
+            {'target': fake_main_func, 'args': (123,), 'kwargs': {'abc': 123}, 'name': 'django-main-thread'}
         )
         self.assertSequenceEqual(fake_thread.setDaemon.call_args[0], [True])
         self.assertTrue(fake_thread.start.called)
