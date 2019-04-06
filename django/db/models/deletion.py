@@ -212,7 +212,8 @@ class Collector:
                                  collect_related=False,
                                  reverse_dependency=True)
         if collect_related:
-            parents = model._meta.parents
+            if keep_parents:
+                parents = set(model._meta.get_parent_list())
             for related in get_candidate_relations_to_delete(model._meta):
                 # Preserve parent reverse relationships if keep_parents=True.
                 if keep_parents and related.model in parents:

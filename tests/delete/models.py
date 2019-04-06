@@ -28,6 +28,10 @@ class RChild(R):
     pass
 
 
+class RChildChild(RChild):
+    pass
+
+
 class A(models.Model):
     name = models.CharField(max_length=30)
 
