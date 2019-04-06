@@ -17,3 +17,8 @@ Bugfixes
 
 * Fixed a regression in Django 2.2 that caused a crash when loading the
   template for the technical 500 debug page (:ticket:`30324`).
+
+* Fixed crash of ``ordering`` argument in
+  :class:`~django.contrib.postgres.aggregates.ArrayAgg` and
+  :class:`~django.contrib.postgres.aggregates.StringAgg` when it contains an
+  expression with params (:ticket:`30332`).

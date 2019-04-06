@@ -1,6 +1,7 @@
 import json
 
 from django.db.models.expressions import F, Value
+from django.db.models.functions import Concat, Substr
 from django.test.utils import Approximate
 
 from . import PostgreSQLTestCase
@@ -37,6 +38,12 @@ class TestGeneralAggregate(PostgreSQLTestCase):
             ((F('boolean_field'), F('char_field').desc()), ['Foo4', 'Foo2', 'Foo3', 'Foo1']),
             ('char_field', ['Foo1', 'Foo2', 'Foo3', 'Foo4']),
             ('-char_field', ['Foo4', 'Foo3', 'Foo2', 'Foo1']),
+            (Concat('char_field', Value('@')), ['Foo1', 'Foo2', 'Foo3', 'Foo4']),
+            (Concat('char_field', Value('@')).desc(), ['Foo4', 'Foo3', 'Foo2', 'Foo1']),
+            (
+                (Substr('char_field', 1, 1), F('integer_field'), Substr('char_field', 4, 1).desc()),
+                ['Foo3', 'Foo1', 'Foo2', 'Foo4'],
+            ),
         )
         for ordering, expected_output in ordering_test_cases:
             with self.subTest(ordering=ordering, expected_output=expected_output):
@@ -166,6 +173,8 @@ class TestGeneralAggregate(PostgreSQLTestCase):
             (F('char_field'), 'Foo1;Foo2;Foo3;Foo4'),
             ('char_field', 'Foo1;Foo2;Foo3;Foo4'),
             ('-char_field', 'Foo4;Foo3;Foo2;Foo1'),
+            (Concat('char_field', Value('@')), 'Foo1;Foo2;Foo3;Foo4'),
+            (Concat('char_field', Value('@')).desc(), 'Foo4;Foo3;Foo2;Foo1'),
         )
         for ordering, expected_output in ordering_test_cases:
             with self.subTest(ordering=ordering, expected_output=expected_output):
