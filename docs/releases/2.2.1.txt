@@ -38,3 +38,7 @@ Bugfixes
   :class:`~django.core.paginator.Paginator` crashed when ``object_list`` was
   a queryset ordered or aggregated over a nested ``JSONField`` key transform
   (:ticket:`30335`).
+
+* Fixed a regression in Django 2.2 where ``IntegerField`` validation of
+  database limits crashes if ``limit_value`` attribute in a custom validator is
+  callable (:ticket:`30328`).
