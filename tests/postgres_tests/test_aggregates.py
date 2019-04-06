@@ -164,6 +164,8 @@ class TestGeneralAggregate(PostgreSQLTestCase):
             (F('char_field').desc(), 'Foo4;Foo3;Foo2;Foo1'),
             (F('char_field').asc(), 'Foo1;Foo2;Foo3;Foo4'),
             (F('char_field'), 'Foo1;Foo2;Foo3;Foo4'),
+            ('char_field', 'Foo1;Foo2;Foo3;Foo4'),
+            ('-char_field', 'Foo4;Foo3;Foo2;Foo1'),
         )
         for ordering, expected_output in ordering_test_cases:
             with self.subTest(ordering=ordering, expected_output=expected_output):
