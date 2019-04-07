@@ -128,6 +128,9 @@ def result_headers(cl):
                 continue
 
             admin_order_field = getattr(attr, "admin_order_field", None)
+            # Set ordering for attr that is a property, if defined.
+            if isinstance(attr, property) and hasattr(attr, 'fget'):
+                admin_order_field = getattr(attr.fget, 'admin_order_field', None)
             if not admin_order_field:
                 is_field_sortable = False
 

@@ -2,6 +2,7 @@
 #
 # Translators:
 # Allisson Azevedo <allisson@gmail.com>, 2014
+# amcorreia <mutley.sandro@gmail.com>, 2018
 # Camilo B. Moreira <camilo.moreira@fatec.sp.gov.br>, 2017
 # Carlos Leite <caduado@gmail.com>, 2016
 # Filipe Cifali Stangler <cifali.filipe@gmail.com>, 2016
@@ -21,8 +22,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-11-21 22:11+0000\n"
-"Last-Translator: Camilo B. Moreira <camilo.moreira@fatec.sp.gov.br>\n"
+"PO-Revision-Date: 2018-11-22 10:47+0000\n"
+"Last-Translator: amcorreia <mutley.sandro@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -82,7 +83,7 @@ msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Não são salvas senhas brutas, então não é possível ver a senha deste "
+"Senhas brutas não são armazenadas, então não é possível ver a senha deste "
 "usuário, mas você pode trocá-la usando <a href=\"{}\">este formulário</a>."
 
 #, python-format

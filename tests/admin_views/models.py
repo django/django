@@ -55,6 +55,15 @@ class Article(models.Model):
     model_year_reversed.admin_order_field = '-date'
     model_year_reversed.short_description = ''
 
+    def property_year(self):
+        return self.date.year
+    property_year.admin_order_field = 'date'
+    model_property_year = property(property_year)
+
+    @property
+    def model_month(self):
+        return self.date.month
+
 
 class Book(models.Model):
     """

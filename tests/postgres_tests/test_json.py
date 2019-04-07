@@ -104,19 +104,19 @@ class TestSaveLoad(PostgreSQLTestCase):
 class TestQuerying(PostgreSQLTestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.objs = [
-            JSONModel.objects.create(field=None),
-            JSONModel.objects.create(field=True),
-            JSONModel.objects.create(field=False),
-            JSONModel.objects.create(field='yes'),
-            JSONModel.objects.create(field=7),
-            JSONModel.objects.create(field=[]),
-            JSONModel.objects.create(field={}),
-            JSONModel.objects.create(field={
+        cls.objs = JSONModel.objects.bulk_create([
+            JSONModel(field=None),
+            JSONModel(field=True),
+            JSONModel(field=False),
+            JSONModel(field='yes'),
+            JSONModel(field=7),
+            JSONModel(field=[]),
+            JSONModel(field={}),
+            JSONModel(field={
                 'a': 'b',
                 'c': 1,
             }),
-            JSONModel.objects.create(field={
+            JSONModel(field={
                 'a': 'b',
                 'c': 1,
                 'd': ['e', {'f': 'g'}],
@@ -125,13 +125,13 @@ class TestQuerying(PostgreSQLTestCase):
                 'j': None,
                 'k': {'l': 'm'},
             }),
-            JSONModel.objects.create(field=[1, [2]]),
-            JSONModel.objects.create(field={
+            JSONModel(field=[1, [2]]),
+            JSONModel(field={
                 'k': True,
                 'l': False,
             }),
-            JSONModel.objects.create(field={'foo': 'bar'}),
-        ]
+            JSONModel(field={'foo': 'bar'}),
+        ])
 
     def test_exact(self):
         self.assertSequenceEqual(

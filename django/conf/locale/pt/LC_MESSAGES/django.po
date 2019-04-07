@@ -7,16 +7,16 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # José Durães <jdmduraes@gmail.com>, 2014
 # jorgecarleitao <jorgecarleitao@gmail.com>, 2014-2015
-# Nuno Mariz <nmariz@gmail.com>, 2011-2013,2015-2017
+# Nuno Mariz <nmariz@gmail.com>, 2011-2013,2015-2018
 # Paulo Köch <paulo.koch@gmail.com>, 2011
 # Raúl Pedro Fernandes Santos, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-12-01 00:17+0000\n"
-"Last-Translator: Nuno Mariz <nmariz@gmail.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 00:44+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: Portuguese (http://www.transifex.com/django/django/language/"
 "pt/)\n"
 "MIME-Version: 1.0\n"
@@ -145,6 +145,9 @@ msgstr "Sorbedo superior"
 msgid "Hungarian"
 msgstr "Húngaro"
 
+msgid "Armenian"
+msgstr ""
+
 msgid "Interlingua"
 msgstr "Interlíngua"
 
@@ -165,6 +168,9 @@ msgstr "Japonês"
 
 msgid "Georgian"
 msgstr "Georgiano"
+
+msgid "Kabyle"
+msgstr "Kabyle"
 
 msgid "Kazakh"
 msgstr "Cazaque"
@@ -387,6 +393,9 @@ msgstr[1] ""
 "Garanta que este valor tenha no máximo %(limit_value)d caracteres (tem "
 "%(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Introduza um número."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -464,6 +473,10 @@ msgstr "Inteiro grande (8 byte)"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "O valor '%(value)s' deve ser True ou False."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "O valor '%(value)s' deve ser True, False ou None."
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolean (Pode ser True ou False)"
@@ -602,6 +615,9 @@ msgstr "Dados binários simples"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' não é um UUID válido."
 
+msgid "Universally unique identifier"
+msgstr ""
+
 msgid "File"
 msgstr "Ficheiro"
 
@@ -641,9 +657,6 @@ msgstr "Este campo é obrigatório."
 msgid "Enter a whole number."
 msgstr "Introduza um número inteiro."
 
-msgid "Enter a number."
-msgstr "Introduza um número."
-
 msgid "Enter a valid date."
 msgstr "Introduza uma data válida."
 
@@ -655,6 +668,10 @@ msgstr "Introduza uma data/hora válida."
 
 msgid "Enter a valid duration."
 msgstr "Introduza uma duração válida."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "O número de dias deve ser entre {min_days} e {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
@@ -1050,8 +1067,8 @@ msgstr "Este não é um endereço IPv6 válido."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr ""
 
 msgid "or"
 msgstr "ou"

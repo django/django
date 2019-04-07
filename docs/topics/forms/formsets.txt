@@ -448,6 +448,49 @@ happen when the user changes these values::
     {'pub_date': datetime.date(2008, 5, 11), 'ORDER': 1, 'title': 'Article #2'}
     {'pub_date': datetime.date(2008, 5, 10), 'ORDER': 2, 'title': 'Article #1'}
 
+:class:`~django.forms.formsets.BaseFormSet` also provides an
+:attr:`~django.forms.formsets.BaseFormSet.ordering_widget` attribute and
+:meth:`~django.forms.formsets.BaseFormSet.get_ordering_widget` method that
+control the widget used with
+:attr:`~django.forms.formsets.BaseFormSet.can_order`.
+
+``ordering_widget``
+^^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 3.0
+
+.. attribute:: BaseFormSet.ordering_widget
+
+Default: :class:`~django.forms.NumberInput`
+
+Set ``ordering_widget`` to specify the widget class to be used with
+``can_order``::
+
+    >>> from django.forms import BaseFormSet, formset_factory
+    >>> from myapp.forms import ArticleForm
+    >>> class BaseArticleFormSet(BaseFormSet):
+    ...     ordering_widget = HiddenInput
+
+    >>> ArticleFormSet = formset_factory(ArticleForm, formset=BaseArticleFormSet, can_order=True)
+
+``get_ordering_widget``
+^^^^^^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 3.0
+
+.. method:: BaseFormSet.get_ordering_widget()
+
+Override ``get_ordering_widget()`` if you need to provide a widget instance for
+use with ``can_order``::
+
+    >>> from django.forms import BaseFormSet, formset_factory
+    >>> from myapp.forms import ArticleForm
+    >>> class BaseArticleFormSet(BaseFormSet):
+    ...     def get_ordering_widget(self):
+    ...         return HiddenInput(attrs={'class': 'ordering'})
+
+    >>> ArticleFormSet = formset_factory(ArticleForm, formset=BaseArticleFormSet, can_order=True)
+
 ``can_delete``
 --------------
 

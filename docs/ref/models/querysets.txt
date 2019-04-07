@@ -312,9 +312,13 @@ identical to::
     Entry.objects.order_by('blog__name')
 
 You can also order by :doc:`query expressions </ref/models/expressions>` by
-calling ``asc()`` or ``desc()`` on the expression::
+calling :meth:`~.Expression.asc` or :meth:`~.Expression.desc` on the
+expression::
 
     Entry.objects.order_by(Coalesce('summary', 'headline').desc())
+
+:meth:`~.Expression.asc` and :meth:`~.Expression.desc` have arguments
+(``nulls_first`` and ``nulls_last``) that control how null values are sorted.
 
 Be cautious when ordering by fields in related models if you are also using
 :meth:`distinct()`. See the note in :meth:`distinct` for an explanation of how
@@ -788,7 +792,7 @@ object. If it's ``None``, Django uses the :ref:`current time zone
     - MySQL: load the time zone tables with `mysql_tzinfo_to_sql`_.
 
     .. _pytz: http://pytz.sourceforge.net/
-    .. _Time Zones: https://www.postgresql.org/docs/current/static/datatype-datetime.html#DATATYPE-TIMEZONES
+    .. _Time Zones: https://www.postgresql.org/docs/current/datatype-datetime.html#DATATYPE-TIMEZONES
     .. _Choosing a Time Zone File: https://docs.oracle.com/en/database/oracle/
        oracle-database/18/nlspg/datetime-data-types-and-time-zone-support.html
        #GUID-805AB986-DE12-4FEA-AF56-5AABCD2132DF

@@ -245,10 +245,6 @@ class BaseExpression:
         ])
         return c
 
-    def _prepare(self, field):
-        """Hook used by Lookup.get_prep_lookup() to do custom preparation."""
-        return self
-
     @property
     def field(self):
         return self.output_field
@@ -332,7 +328,7 @@ class BaseExpression:
     def copy(self):
         return copy.copy(self)
 
-    def get_group_by_cols(self):
+    def get_group_by_cols(self, alias=None):
         if not self.contains_aggregate:
             return [self]
         cols = []
@@ -531,14 +527,13 @@ class ResolvedOuterRef(F):
     In this case, the reference to the outer query has been resolved because
     the inner query has been used as a subquery.
     """
+    contains_aggregate = False
+
     def as_sql(self, *args, **kwargs):
         raise ValueError(
             'This queryset contains a reference to an outer query and may '
             'only be used in a subquery.'
         )
-
-    def _prepare(self, output_field=None):
-        return self
 
     def relabeled_clone(self, relabels):
         return self
@@ -550,9 +545,6 @@ class OuterRef(F):
         if isinstance(self.name, self.__class__):
             return self.name
         return ResolvedOuterRef(self.name)
-
-    def _prepare(self, output_field=None):
-        return self
 
 
 class Func(SQLiteNumericMixin, Expression):
@@ -669,7 +661,7 @@ class Value(Expression):
         c.for_save = for_save
         return c
 
-    def get_group_by_cols(self):
+    def get_group_by_cols(self, alias=None):
         return []
 
 
@@ -694,7 +686,7 @@ class RawSQL(Expression):
     def as_sql(self, compiler, connection):
         return '(%s)' % self.sql, self.params
 
-    def get_group_by_cols(self):
+    def get_group_by_cols(self, alias=None):
         return [self]
 
 
@@ -737,7 +729,7 @@ class Col(Expression):
     def relabeled_clone(self, relabels):
         return self.__class__(relabels.get(self.alias, self.alias), self.target, self.output_field)
 
-    def get_group_by_cols(self):
+    def get_group_by_cols(self, alias=None):
         return [self]
 
     def get_db_converters(self, connection):
@@ -769,7 +761,7 @@ class SimpleCol(Expression):
         qn = compiler.quote_name_unless_alias
         return qn(self.target.column), []
 
-    def get_group_by_cols(self):
+    def get_group_by_cols(self, alias=None):
         return [self]
 
     def get_db_converters(self, connection):
@@ -810,7 +802,7 @@ class Ref(Expression):
     def as_sql(self, compiler, connection):
         return connection.ops.quote_name(self.refs), []
 
-    def get_group_by_cols(self):
+    def get_group_by_cols(self, alias=None):
         return [self]
 
 
@@ -905,7 +897,7 @@ class When(Expression):
         template = template or self.template
         return template % template_params, sql_params
 
-    def get_group_by_cols(self):
+    def get_group_by_cols(self, alias=None):
         # This is not a complete expression and cannot be used in GROUP BY.
         cols = []
         for source in self.get_source_expressions():
@@ -998,107 +990,59 @@ class Subquery(Expression):
     contains_aggregate = False
 
     def __init__(self, queryset, output_field=None, **extra):
-        self.queryset = queryset
+        self.query = queryset.query
         self.extra = extra
         super().__init__(output_field)
 
+    def get_source_expressions(self):
+        return [self.query]
+
+    def set_source_expressions(self, exprs):
+        self.query = exprs[0]
+
     def _resolve_output_field(self):
-        if len(self.queryset.query.select) == 1:
-            return self.queryset.query.select[0].field
-        return super()._resolve_output_field()
+        return self.query.output_field
 
     def copy(self):
         clone = super().copy()
-        clone.queryset = clone.queryset.all()
+        clone.query = clone.query.clone()
         return clone
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        clone = self.copy()
-        clone.is_summary = summarize
-        clone.queryset.query.bump_prefix(query)
-
-        # Need to recursively resolve these.
-        def resolve_all(child):
-            if hasattr(child, 'children'):
-                [resolve_all(_child) for _child in child.children]
-            if hasattr(child, 'rhs'):
-                child.rhs = resolve(child.rhs)
-
-        def resolve(child):
-            if hasattr(child, 'resolve_expression'):
-                resolved = child.resolve_expression(
-                    query=query, allow_joins=allow_joins, reuse=reuse,
-                    summarize=summarize, for_save=for_save,
-                )
-                # Add table alias to the parent query's aliases to prevent
-                # quoting.
-                if hasattr(resolved, 'alias') and resolved.alias != resolved.target.model._meta.db_table:
-                    clone.queryset.query.external_aliases.add(resolved.alias)
-                return resolved
-            return child
-
-        resolve_all(clone.queryset.query.where)
-
-        for key, value in clone.queryset.query.annotations.items():
-            if isinstance(value, Subquery):
-                clone.queryset.query.annotations[key] = resolve(value)
-
-        return clone
-
-    def get_source_expressions(self):
-        return [
-            x for x in [
-                getattr(expr, 'lhs', None)
-                for expr in self.queryset.query.where.children
-            ] if x
-        ]
-
-    def relabeled_clone(self, change_map):
-        clone = self.copy()
-        clone.queryset.query = clone.queryset.query.relabeled_clone(change_map)
-        clone.queryset.query.external_aliases.update(
-            alias for alias in change_map.values()
-            if alias not in clone.queryset.query.alias_map
-        )
-        return clone
+    @property
+    def external_aliases(self):
+        return self.query.external_aliases
 
     def as_sql(self, compiler, connection, template=None, **extra_context):
         connection.ops.check_expression_support(self)
         template_params = {**self.extra, **extra_context}
-        template_params['subquery'], sql_params = self.queryset.query.get_compiler(connection=connection).as_sql()
+        subquery_sql, sql_params = self.query.as_sql(compiler, connection)
+        template_params['subquery'] = subquery_sql[1:-1]
 
         template = template or template_params.get('template', self.template)
         sql = template % template_params
         return sql, sql_params
 
-    def _prepare(self, output_field):
-        # This method will only be called if this instance is the "rhs" in an
-        # expression: the wrapping () must be removed (as the expression that
-        # contains this will provide them). SQLite evaluates ((subquery))
-        # differently than the other databases.
-        if self.template == '(%(subquery)s)':
-            clone = self.copy()
-            clone.template = '%(subquery)s'
-            return clone
-        return self
+    def get_group_by_cols(self, alias=None):
+        if alias:
+            return [Ref(alias, self)]
+        return []
 
 
 class Exists(Subquery):
     template = 'EXISTS(%(subquery)s)'
     output_field = fields.BooleanField()
 
-    def __init__(self, *args, negated=False, **kwargs):
-        self.negated = negated
-        super().__init__(*args, **kwargs)
-
-    def __invert__(self):
-        return type(self)(self.queryset, negated=(not self.negated), **self.extra)
-
-    def resolve_expression(self, query=None, *args, **kwargs):
+    def __init__(self, queryset, negated=False, **kwargs):
         # As a performance optimization, remove ordering since EXISTS doesn't
         # care about it, just whether or not a row matches.
-        self.queryset = self.queryset.order_by()
-        return super().resolve_expression(query, *args, **kwargs)
+        queryset = queryset.order_by()
+        self.negated = negated
+        super().__init__(queryset, **kwargs)
+
+    def __invert__(self):
+        clone = self.copy()
+        clone.negated = not self.negated
+        return clone
 
     def as_sql(self, compiler, connection, template=None, **extra_context):
         sql, params = super().as_sql(compiler, connection, template, **extra_context)
@@ -1171,7 +1115,7 @@ class OrderBy(BaseExpression):
             template = 'IF(ISNULL(%(expression)s),0,1), %(expression)s %(ordering)s '
         return self.as_sql(compiler, connection, template=template)
 
-    def get_group_by_cols(self):
+    def get_group_by_cols(self, alias=None):
         cols = []
         for source in self.get_source_expressions():
             cols.extend(source.get_group_by_cols())
@@ -1281,7 +1225,7 @@ class Window(Expression):
     def __repr__(self):
         return '<%s: %s>' % (self.__class__.__name__, self)
 
-    def get_group_by_cols(self):
+    def get_group_by_cols(self, alias=None):
         return []
 
 
@@ -1317,7 +1261,7 @@ class WindowFrame(Expression):
     def __repr__(self):
         return '<%s: %s>' % (self.__class__.__name__, self)
 
-    def get_group_by_cols(self):
+    def get_group_by_cols(self, alias=None):
         return []
 
     def __str__(self):

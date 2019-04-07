@@ -8,7 +8,7 @@ from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import strip_quotes, truncate_name
 from django.db.utils import DatabaseError
 from django.utils import timezone
-from django.utils.encoding import force_bytes
+from django.utils.encoding import force_bytes, force_str
 from django.utils.functional import cached_property
 
 from .base import Database
@@ -249,18 +249,25 @@ END;
 
     def limit_offset_sql(self, low_mark, high_mark):
         fetch, offset = self._get_limit_offset_params(low_mark, high_mark)
-        return '%s%s' % (
-            (' OFFSET %d ROWS' % offset) if offset else '',
-            (' FETCH FIRST %d ROWS ONLY' % fetch) if fetch else '',
-        )
+        return ' '.join(sql for sql in (
+            ('OFFSET %d ROWS' % offset) if offset else None,
+            ('FETCH FIRST %d ROWS ONLY' % fetch) if fetch else None,
+        ) if sql)
 
     def last_executed_query(self, cursor, sql, params):
         # https://cx-oracle.readthedocs.io/en/latest/cursor.html#Cursor.statement
         # The DB API definition does not define this attribute.
         statement = cursor.statement
-        # Unlike Psycopg's `query` and MySQLdb`'s `_executed`, CxOracle's
-        # `statement` doesn't contain the query parameters. refs #20010.
-        return super().last_executed_query(cursor, statement, params)
+        # Unlike Psycopg's `query` and MySQLdb`'s `_executed`, cx_Oracle's
+        # `statement` doesn't contain the query parameters. Substitute
+        # parameters manually.
+        if isinstance(params, (tuple, list)):
+            for i, param in enumerate(params):
+                statement = statement.replace(':arg%d' % i, force_str(param, errors='replace'))
+        elif isinstance(params, dict):
+            for key, param in params.items():
+                statement = statement.replace(':%s' % key, force_str(param, errors='replace'))
+        return statement
 
     def last_insert_id(self, cursor, table_name, pk_name):
         sq_name = self._get_sequence_name(cursor, strip_quotes(table_name), pk_name)

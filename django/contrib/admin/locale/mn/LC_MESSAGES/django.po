@@ -5,14 +5,14 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jargalan <jargalanch@gmail.com>, 2011
 # Zorig, 2016
-# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2013-2016,2018
+# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2013-2016,2018-2019
 # Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-07-09 04:47+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-13 09:17+0000\n"
 "Last-Translator: Анхбаяр Анхаа <l.ankhbayar@gmail.com>\n"
 "Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
 "mn/)\n"
@@ -113,7 +113,7 @@ msgid "object id"
 msgstr "обектийн id"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "обектийн хамаарал"
 
@@ -539,24 +539,8 @@ msgstr "Бүгдийг харуулах"
 msgid "Save"
 msgstr "Хадгалах"
 
-msgid "Popup closing..."
-msgstr "Цонх хаагдлаа"
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Сонгосон %(model)s-ийг өөрчлөх"
-
-#, python-format
-msgid "View selected %(model)s"
-msgstr "Сонгосон %(model)s-ийг  харах"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Өөр %(model)s нэмэх"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Сонгосон %(model)s устгах"
+msgid "Popup closing…"
+msgstr "Хааж байна..."
 
 msgid "Search"
 msgstr "Хайлт"
@@ -585,6 +569,18 @@ msgstr "Хадгалаад харах."
 
 msgid "Close"
 msgstr "Хаах"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Сонгосон %(model)s-ийг өөрчлөх"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Өөр %(model)s нэмэх"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Сонгосон %(model)s устгах"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Манай вэб сайтыг ашигласанд баярлалаа."

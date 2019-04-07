@@ -9,16 +9,17 @@
 # Jonathan Lindén, 2014
 # Mattias Hansson <mattias.gothenburg@gmail.com>, 2016
 # Mattias Benjaminsson <mattias@colourandcode.se>, 2011
+# Petter Strandmark <petter.strandmark@gmail.com>, 2019
 # Rasmus Précenth <prillan91@gmail.com>, 2014
 # Samuel Linde <samuel@linde.im>, 2011
-# Thomas Lundqvist <thomas@biljettshop.se>, 2013,2016
+# Thomas Lundqvist, 2013,2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:13+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-28 14:10+0000\n"
+"Last-Translator: Petter Strandmark <petter.strandmark@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -147,6 +148,9 @@ msgstr "Högsorbiska"
 msgid "Hungarian"
 msgstr "Ungerska"
 
+msgid "Armenian"
+msgstr "Armeniska"
+
 msgid "Interlingua"
 msgstr "Interlingua"
 
@@ -167,6 +171,9 @@ msgstr "Japanska"
 
 msgid "Georgian"
 msgstr "Georgiska"
+
+msgid "Kabyle"
+msgstr "Kabyliska"
 
 msgid "Kazakh"
 msgstr "Kazakiska"
@@ -304,13 +311,13 @@ msgid "Syndication"
 msgstr "Syndikering"
 
 msgid "That page number is not an integer"
-msgstr ""
+msgstr "Sidnumret är inte ett heltal"
 
 msgid "That page number is less than 1"
-msgstr ""
+msgstr "Sidnumret är mindre än 1"
 
 msgid "That page contains no results"
-msgstr ""
+msgstr "Sidan innehåller inga resultat"
 
 msgid "Enter a valid value."
 msgstr "Fyll i ett giltigt värde."
@@ -393,6 +400,9 @@ msgstr[1] ""
 "Säkerställ att detta värde har som mest %(limit_value)d tecken (den har "
 "%(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Fyll i ett tal."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -420,9 +430,11 @@ msgid ""
 "File extension '%(extension)s' is not allowed. Allowed extensions are: "
 "'%(allowed_extensions)s'."
 msgstr ""
+"Filändelse %(extension)s är inte tillåten. Tillåtna ändelser är: "
+"”%(allowed_extensions)s”."
 
 msgid "Null characters are not allowed."
-msgstr ""
+msgstr "Null-tecken är inte tillåtna."
 
 msgid "and"
 msgstr "och"
@@ -470,6 +482,10 @@ msgstr "Stort (8 byte) heltal"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "Värdet '%(value)s' måste vara antingen True eller False."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "”%(value)s” värde måste vara antingen True, False eller None."
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolesk (antingen True eller False)"
@@ -608,6 +624,9 @@ msgstr "Rå binärdata"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "Värdet '%(value)s' är inget giltigt UUID."
 
+msgid "Universally unique identifier"
+msgstr "Globalt unik identifierare"
+
 msgid "File"
 msgstr "Fil"
 
@@ -647,9 +666,6 @@ msgstr "Detta fält måste fyllas i."
 msgid "Enter a whole number."
 msgstr "Fyll i ett heltal."
 
-msgid "Enter a number."
-msgstr "Fyll i ett tal."
-
 msgid "Enter a valid date."
 msgstr "Fyll i ett giltigt datum."
 
@@ -661,6 +677,10 @@ msgstr "Fyll i ett giltigt datum/tid."
 
 msgid "Enter a valid duration."
 msgstr "Fyll i ett giltigt tidsspann."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Antalet dagar måste vara mellan {min_days} och {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Ingen fil skickades. Kontrollera kodningstypen i formuläret."
@@ -756,7 +776,7 @@ msgid "Please correct the duplicate values below."
 msgstr "Vänligen korrigera duplikatvärdena nedan."
 
 msgid "The inline value did not match the parent instance."
-msgstr ""
+msgstr "Värdet för InlineForeignKeyField motsvarade inte dess motpart."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
@@ -765,7 +785,7 @@ msgstr ""
 
 #, python-format
 msgid "\"%(pk)s\" is not a valid value."
-msgstr ""
+msgstr "\"%(pk)s\" är inte ett giltigt värde."
 
 #, python-format
 msgid ""
@@ -1055,8 +1075,8 @@ msgstr "Detta är inte en giltig IPv6 adress."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "eller"
@@ -1136,6 +1156,11 @@ msgid ""
 "If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
 "\" ...> for links to third-party sites."
 msgstr ""
+"Om du använder <meta name=\"referrer\" content=\"no-referrer\">-taggen eller "
+"har med ”Referrer-Policy: no-referrer”, tag bort dem. CSRF-skyddet kräver "
+"”Referer” för att kunna göra sin strikta kontroll. Om detta oroar dig, "
+"använd alternativ såsom <a rel=\"noreferrer\" ...> för länkar till tredje "
+"part."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1160,7 +1185,7 @@ msgid "No year specified"
 msgstr "Inget år angivet"
 
 msgid "Date out of range"
-msgstr ""
+msgstr "Datum är utanför intervallet"
 
 msgid "No month specified"
 msgstr "Ingen månad angiven"
@@ -1214,16 +1239,18 @@ msgid "Index of %(directory)s"
 msgstr "Innehåll i %(directory)s"
 
 msgid "Django: the Web framework for perfectionists with deadlines."
-msgstr ""
+msgstr "Django: webb-ramverket för perfektionister med deadlines."
 
 #, python-format
 msgid ""
 "View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
 "target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
 msgstr ""
+"Visa <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> för Django %(version)s"
 
 msgid "The install worked successfully! Congratulations!"
-msgstr ""
+msgstr "Installationen lyckades! Grattis!"
 
 #, python-format
 msgid ""
@@ -1232,21 +1259,25 @@ msgid ""
 "\">DEBUG=True</a> is in your settings file and you have not configured any "
 "URLs."
 msgstr ""
+"Du ser den här sidan eftersom <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> i din settings-fil och du har inte konfigurerat några URL:"
+"er."
 
 msgid "Django Documentation"
-msgstr ""
+msgstr "Djangodokumentation"
 
 msgid "Topics, references, &amp; how-to's"
-msgstr ""
+msgstr "Ämnen, referenser och how-to's"
 
 msgid "Tutorial: A Polling App"
-msgstr ""
+msgstr "Tutorial: En undersöknings-app"
 
 msgid "Get started with Django"
-msgstr ""
+msgstr "Kom igång med Django"
 
 msgid "Django Community"
-msgstr ""
+msgstr "Djangos community"
 
 msgid "Connect, get help, or contribute"
-msgstr ""
+msgstr "Kontakta, begär hjälp eller bidra"

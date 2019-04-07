@@ -8,9 +8,9 @@ from django.db.models import Field, IntegerField, Transform
 from django.db.models.lookups import Exact, In
 from django.utils.translation import gettext_lazy as _
 
+from ..utils import prefix_validation_error
 from .mixins import CheckFieldDefaultMixin
 from .utils import AttributeSetter
-from ..utils import prefix_validation_error
 
 __all__ = ['ArrayField']
 
@@ -240,8 +240,7 @@ class ArrayLenTransform(Transform):
 class ArrayInLookup(In):
     def get_prep_lookup(self):
         values = super().get_prep_lookup()
-        if hasattr(self.rhs, '_prepare'):
-            # Subqueries don't need further preparation.
+        if hasattr(values, 'resolve_expression'):
             return values
         # In.process_rhs() expects values to be hashable, so convert lists
         # to tuples.

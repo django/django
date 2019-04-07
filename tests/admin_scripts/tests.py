@@ -1938,7 +1938,11 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         # running again..
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "already exists")
+        self.assertOutput(
+            err,
+            "already exists. Overlaying a project into an existing directory "
+            "won't replace conflicting files."
+        )
 
     def test_custom_project_template(self):
         "Make sure the startproject management command is able to use a different project template"
@@ -2127,6 +2131,15 @@ class StartApp(AdminScriptTestCase):
             "another name."
         )
         self.assertFalse(os.path.exists(testproject_dir))
+
+    def test_overlaying_app(self):
+        self.run_django_admin(['startapp', 'app1'])
+        out, err = self.run_django_admin(['startapp', 'app2', 'app1'])
+        self.assertOutput(
+            err,
+            "already exists. Overlaying an app into an existing directory "
+            "won't replace conflicting files."
+        )
 
 
 class DiffSettings(AdminScriptTestCase):

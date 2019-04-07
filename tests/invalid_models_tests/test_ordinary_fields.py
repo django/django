@@ -40,6 +40,33 @@ class AutoFieldTests(SimpleTestCase):
 
 
 @isolate_apps('invalid_models_tests')
+class BinaryFieldTests(SimpleTestCase):
+
+    def test_valid_default_value(self):
+        class Model(models.Model):
+            field1 = models.BinaryField(default=b'test')
+            field2 = models.BinaryField(default=None)
+
+        for field_name in ('field1', 'field2'):
+            field = Model._meta.get_field(field_name)
+            self.assertEqual(field.check(), [])
+
+    def test_str_default_value(self):
+        class Model(models.Model):
+            field = models.BinaryField(default='test')
+
+        field = Model._meta.get_field('field')
+        self.assertEqual(field.check(), [
+            Error(
+                "BinaryField's default cannot be a string. Use bytes content "
+                "instead.",
+                obj=field,
+                id='fields.E170',
+            ),
+        ])
+
+
+@isolate_apps('invalid_models_tests')
 class CharFieldTests(SimpleTestCase):
 
     def test_valid_field(self):

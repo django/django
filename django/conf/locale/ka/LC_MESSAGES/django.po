@@ -2,6 +2,7 @@
 #
 # Translators:
 # André Bouatchidzé <a@anbz.net>, 2013-2015
+# David A. <avsd05@gmail.com>, 2019
 # David A. <avsd05@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Tornike Beradze <beradze@europe.com>, 2018
@@ -9,16 +10,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-01 21:10+0100\n"
-"PO-Revision-Date: 2018-02-07 12:13+0000\n"
-"Last-Translator: Tornike Beradze <beradze@europe.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-25 09:06+0000\n"
+"Last-Translator: David A. <avsd05@gmail.com>\n"
 "Language-Team: Georgian (http://www.transifex.com/django/django/language/"
 "ka/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ka\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
 
 msgid "Afrikaans"
 msgstr "აფრიკაანსი"
@@ -63,7 +64,7 @@ msgid "German"
 msgstr "გერმანული"
 
 msgid "Lower Sorbian"
-msgstr ""
+msgstr "ქვემო სორბული"
 
 msgid "Greek"
 msgstr "ბერძნული"
@@ -120,7 +121,7 @@ msgid "Irish"
 msgstr "ირლანდიური"
 
 msgid "Scottish Gaelic"
-msgstr ""
+msgstr "შოტლანდიური-გელური"
 
 msgid "Galician"
 msgstr "გალიციური"
@@ -135,10 +136,13 @@ msgid "Croatian"
 msgstr "ხორვატიული"
 
 msgid "Upper Sorbian"
-msgstr ""
+msgstr "ზემო სორბიული"
 
 msgid "Hungarian"
 msgstr "უნგრული"
+
+msgid "Armenian"
+msgstr "სომხური"
 
 msgid "Interlingua"
 msgstr "ინტერლინგუა"
@@ -162,7 +166,7 @@ msgid "Georgian"
 msgstr "ქართული"
 
 msgid "Kabyle"
-msgstr ""
+msgstr "კაბილური"
 
 msgid "Kazakh"
 msgstr "ყაზახური"
@@ -201,7 +205,7 @@ msgid "Burmese"
 msgstr "ბირმული"
 
 msgid "Norwegian Bokmål"
-msgstr ""
+msgstr "ნორვეგიული Bokmål"
 
 msgid "Nepali"
 msgstr "ნეპალური"
@@ -300,13 +304,13 @@ msgid "Syndication"
 msgstr "სინდიკაცია"
 
 msgid "That page number is not an integer"
-msgstr ""
+msgstr "გვერდის ნომერი არ არის მთელი რიცხვი"
 
 msgid "That page number is less than 1"
-msgstr ""
+msgstr "გვერდის ნომერი ნაკლებია 1-ზე"
 
 msgid "That page contains no results"
-msgstr ""
+msgstr "გვერდი არ შეიცავს მონაცემებს"
 
 msgid "Enter a valid value."
 msgstr "შეიყვანეთ სწორი მნიშვნელობა."
@@ -331,6 +335,8 @@ msgid ""
 "Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
+"შეიყვანეთ სწორი 'slug' მნიშვნელობა, რომელიც უნდა შეიცავდეს Unicode ასოებს, "
+"ციფრებს, ხაზგასმის ნიშნებს, ან დეფისებს."
 
 msgid "Enter a valid IPv4 address."
 msgstr "შეიყვანეთ სწორი IPv4 მისამართი."
@@ -366,6 +372,9 @@ msgid_plural ""
 msgstr[0] ""
 "მნიშვნელობას უნდა ჰქონდეს სულ ცოტა %(limit_value)d სიმბოლო (მას აქვს "
 "%(show_value)d)."
+msgstr[1] ""
+"მნიშვნელობას უნდა ჰქონდეს სულ ცოტა %(limit_value)d სიმბოლო (მას აქვს "
+"%(show_value)d)."
 
 #, python-format
 msgid ""
@@ -377,16 +386,26 @@ msgid_plural ""
 msgstr[0] ""
 "მნიშვნელობას უნდა ჰქონდეს არაუმეტეს %(limit_value)d სიმბოლოსი (მას აქვს "
 "%(show_value)d)."
+msgstr[1] ""
+"მნიშვნელობას უნდა ჰქონდეს არაუმეტეს %(limit_value)d სიმბოლოსი (მას აქვს "
+"%(show_value)d)."
+
+msgid "Enter a number."
+msgstr "შეიყვანეთ რიცხვი."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] ""
+msgstr[0] "ციფრების სრული რაოდენობა %(max)s-ს არ უნდა აღემატებოდეს."
+msgstr[1] "ციფრების სრული რაოდენობა %(max)s-ს არ უნდა აღემატებოდეს."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
 msgstr[0] ""
+"ათობითი გამყოფის შემდეგ ციფრების რაოდენობა %(max)s-ს არ უნდა აღემატებოდეს."
+msgstr[1] ""
+"ათობითი გამყოფის შემდეგ ციფრების რაოდენობა %(max)s-ს არ უნდა აღემატებოდეს."
 
 #, python-format
 msgid ""
@@ -394,15 +413,20 @@ msgid ""
 msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] ""
+"ათობითი გამყოფის შემდეგ ციფრების რაოდენობა %(max)s-ს არ უნდა აღემატებოდეს."
+msgstr[1] ""
+"ათობითი გამყოფის წინ ციფრების რაოდენობა %(max)s-ს არ უნდა აღემატებოდეს."
 
 #, python-format
 msgid ""
 "File extension '%(extension)s' is not allowed. Allowed extensions are: "
 "'%(allowed_extensions)s'."
 msgstr ""
+"ფაილის გაფართოება \"%(extension)s\" დაუშვებელია. დასაშვები გაფართოებებია: "
+"\"%(allowed_extensions)s\"."
 
 msgid "Null characters are not allowed."
-msgstr ""
+msgstr "Null მნიშვნელობები დაუშვებელია."
 
 msgid "and"
 msgstr "და"
@@ -451,6 +475,10 @@ msgstr "დიდი მთელი (8-ბაიტიანი)"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "მნიშვნელობა '%(value)s' უნდა იყოს True ან False."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "\"%(value)s\"-ის მნიშვნელობა შეიძლება იყოს True, False ან None."
 
 msgid "Boolean (Either True or False)"
 msgstr "ლოგიკური (True ან False)"
@@ -526,7 +554,7 @@ msgstr "გზა ფაილისაკენ"
 
 #, python-format
 msgid "'%(value)s' value must be a float."
-msgstr ""
+msgstr "\"%(value)s\"-ის მნიშვნელობა უნდა იყოს float ტიპის."
 
 msgid "Floating point number"
 msgstr "რიცხვი მცოცავი წერტილით"
@@ -565,12 +593,16 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
+"\"%(value)s\" მნიშვნელობას აქვს არასწორი ფორმატი. უნდა იყოს HH:MM[:ss[."
+"uuuuuu]]."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
+"\"%(value)s\"-ს აქვს სწორი ფორმატი (HH:MM[:ss[.uuuuuu]]), მაგრამ დროის "
+"მნიშვნელობა არასწორია."
 
 msgid "Time"
 msgstr "დრო"
@@ -579,11 +611,14 @@ msgid "URL"
 msgstr "URL"
 
 msgid "Raw binary data"
-msgstr ""
+msgstr "დაუმუშავებელი ორობითი მონაცემები"
 
 #, python-format
 msgid "'%(value)s' is not a valid UUID."
-msgstr ""
+msgstr "\"%(value)s\"-ს აქვს დაუშვებელი UUID-ის მნიშვნელობა."
+
+msgid "Universally unique identifier"
+msgstr "უნივერსალური უნიკალური იდენტიფიკატორი."
 
 msgid "File"
 msgstr "ფაილი"
@@ -624,9 +659,6 @@ msgstr "ეს ველი აუცილებელია."
 msgid "Enter a whole number."
 msgstr "შეიყვანეთ მთელი რიცხვი"
 
-msgid "Enter a number."
-msgstr "შეიყვანეთ რიცხვი."
-
 msgid "Enter a valid date."
 msgstr "შეიყვანეთ სწორი თარიღი."
 
@@ -638,6 +670,10 @@ msgstr "შეიყვანეთ სწორი თარიღი და �
 
 msgid "Enter a valid duration."
 msgstr "შეიყვანეთ სწორი დროის პერიოდი."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr ""
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
@@ -654,6 +690,7 @@ msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr[0] ""
+msgstr[1] ""
 
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr "ან გამოგზავნეთ ფაილი, ან მონიშნეთ \"წაშლის\" დროშა."
@@ -693,11 +730,13 @@ msgstr ""
 msgid "Please submit %d or fewer forms."
 msgid_plural "Please submit %d or fewer forms."
 msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
 msgstr[0] ""
+msgstr[1] ""
 
 msgid "Order"
 msgstr "დალაგება"
@@ -767,6 +806,7 @@ msgstr "კი,არა,შესაძლოა"
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d ბაიტი"
+msgstr[1] "%(size)d ბაიტი"
 
 #, python-format
 msgid "%s KB"
@@ -1021,8 +1061,8 @@ msgstr "ეს არ არის სწორი IPv6 მისამართ
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr ""
 
 msgid "or"
 msgstr "ან"
@@ -1035,31 +1075,37 @@ msgstr ", "
 msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] "%d წელი"
+msgstr[1] "%d წელი"
 
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] "%d თვე"
+msgstr[1] "%d თვე"
 
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
 msgstr[0] "%d კვირა"
+msgstr[1] "%d კვირა"
 
 #, python-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d დღე"
+msgstr[1] "%d დღე"
 
 #, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "%d საათი"
+msgstr[1] "%d საათი"
 
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d წუთი"
+msgstr[1] "%d წუთი"
 
 msgid "0 minutes"
 msgstr "0 წუთი"

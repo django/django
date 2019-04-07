@@ -40,6 +40,7 @@ class SessionMiddleware(MiddlewareMixin):
                     path=settings.SESSION_COOKIE_PATH,
                     domain=settings.SESSION_COOKIE_DOMAIN,
                 )
+                patch_vary_headers(response, ('Cookie',))
             else:
                 if accessed:
                     patch_vary_headers(response, ('Cookie',))

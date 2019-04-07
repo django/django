@@ -307,6 +307,9 @@ decorator. In the example, ``never_cache()`` will process the request before
 ``login_required()``.
 
 In this example, every instance of ``ProtectedView`` will have login protection.
+These examples use ``login_required``, however, the same behavior can be
+obtained more simply using
+:class:`~django.contrib.auth.mixins.LoginRequiredMixin`.
 
 .. note::
 

@@ -6,16 +6,16 @@
 # Arash Fazeli <a.fazeli@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # MJafar Mashhadi <raindigital2007@gmail.com>, 2018
-# Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>, 2017
+# Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>, 2017,2019
 # Pouya Abbassi, 2016
 # Reza Mohammadi <reza@teeleh.ir>, 2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-06-23 22:46+0000\n"
-"Last-Translator: MJafar Mashhadi <raindigital2007@gmail.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-23 12:01+0000\n"
+"Last-Translator: Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -115,7 +115,7 @@ msgid "object id"
 msgstr "شناسهٔ شیء"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "صورت شیء"
 
@@ -249,7 +249,7 @@ msgstr "تغییر %s"
 
 #, python-format
 msgid "View %s"
-msgstr ""
+msgstr "مشاهده %s"
 
 msgid "Database error"
 msgstr "خطا در بانک اطلاعاتی"
@@ -469,7 +469,7 @@ msgstr ""
 "ذیل به همراه موارد مرتبط با آنها حذف خواهند شد:"
 
 msgid "View"
-msgstr ""
+msgstr "مشاهده"
 
 msgid "Delete?"
 msgstr "حذف؟"
@@ -545,24 +545,8 @@ msgstr "نمایش همه"
 msgid "Save"
 msgstr "ذخیره"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "در حال بستن پنجره..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "تغییر دادن %(model)s انتخاب شده"
-
-#, python-format
-msgid "View selected %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "افزدون %(model)s دیگر"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "حذف کردن %(model)s انتخاب شده"
 
 msgid "Search"
 msgstr "جستجو"
@@ -591,6 +575,18 @@ msgstr "ذخیره و نمایش"
 
 msgid "Close"
 msgstr "بستن"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "تغییر دادن %(model)s انتخاب شده"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "افزدون %(model)s دیگر"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "حذف کردن %(model)s انتخاب شده"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "متشکر از اینکه مدتی از وقت خود را به ما اختصاص دادید."
@@ -704,7 +700,7 @@ msgstr "%s را برای تغییر انتخاب کنید"
 
 #, python-format
 msgid "Select %s to view"
-msgstr ""
+msgstr "%s را برای مشاهده انتخاب کنید"
 
 msgid "Date:"
 msgstr "تاریخ:"

@@ -7,7 +7,8 @@ from unittest import mock
 from django.db import (
     DatabaseError, IntegrityError, OperationalError, connection,
 )
-from django.db.models import Model
+from django.db.models import Model, Q
+from django.db.models.constraints import CheckConstraint, UniqueConstraint
 from django.db.models.deletion import CASCADE, PROTECT
 from django.db.models.fields import (
     AutoField, BigAutoField, BigIntegerField, BinaryField, BooleanField,
@@ -31,9 +32,11 @@ from .fields import (
 from .models import (
     Author, AuthorCharFieldWithIndex, AuthorTextFieldWithIndex,
     AuthorWithDefaultHeight, AuthorWithEvenLongerName, AuthorWithIndexedName,
-    Book, BookForeignObj, BookWeak, BookWithLongName, BookWithO2O,
-    BookWithoutAuthor, BookWithSlug, IntegerPK, Node, Note, NoteRename, Tag,
-    TagIndexed, TagM2MTest, TagUniqueRename, Thing, UniqueTest, new_apps,
+    AuthorWithIndexedNameAndBirthday, AuthorWithUniqueName,
+    AuthorWithUniqueNameAndBirthday, Book, BookForeignObj, BookWeak,
+    BookWithLongName, BookWithO2O, BookWithoutAuthor, BookWithSlug, IntegerPK,
+    Node, Note, NoteRename, Tag, TagIndexed, TagM2MTest, TagUniqueRename,
+    Thing, UniqueTest, new_apps,
 )
 
 
@@ -127,6 +130,14 @@ class SchemaTests(TransactionTestCase):
                 c['columns'][0]
                 for c in connection.introspection.get_constraints(cursor, table).values()
                 if c['index'] and len(c['columns']) == 1
+            ]
+
+    def get_uniques(self, table):
+        with connection.cursor() as cursor:
+            return [
+                c['columns'][0]
+                for c in connection.introspection.get_constraints(cursor, table).values()
+                if c['unique'] and len(c['columns']) == 1
             ]
 
     def get_constraints(self, table):
@@ -1537,6 +1548,53 @@ class SchemaTests(TransactionTestCase):
         if not any(details['columns'] == ['height'] and details['check'] for details in constraints.values()):
             self.fail("No check constraint for height found")
 
+    @skipUnlessDBFeature('supports_column_check_constraints')
+    def test_remove_field_check_does_not_remove_meta_constraints(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        # Add the custom check constraint
+        constraint = CheckConstraint(check=Q(height__gte=0), name='author_height_gte_0_check')
+        custom_constraint_name = constraint.name
+        Author._meta.constraints = [constraint]
+        with connection.schema_editor() as editor:
+            editor.add_constraint(Author, constraint)
+        # Ensure the constraints exist
+        constraints = self.get_constraints(Author._meta.db_table)
+        self.assertIn(custom_constraint_name, constraints)
+        other_constraints = [
+            name for name, details in constraints.items()
+            if details['columns'] == ['height'] and details['check'] and name != custom_constraint_name
+        ]
+        self.assertEqual(len(other_constraints), 1)
+        # Alter the column to remove field check
+        old_field = Author._meta.get_field('height')
+        new_field = IntegerField(null=True, blank=True)
+        new_field.set_attributes_from_name('height')
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, old_field, new_field, strict=True)
+        constraints = self.get_constraints(Author._meta.db_table)
+        self.assertIn(custom_constraint_name, constraints)
+        other_constraints = [
+            name for name, details in constraints.items()
+            if details['columns'] == ['height'] and details['check'] and name != custom_constraint_name
+        ]
+        self.assertEqual(len(other_constraints), 0)
+        # Alter the column to re-add field check
+        new_field2 = Author._meta.get_field('height')
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, new_field, new_field2, strict=True)
+        constraints = self.get_constraints(Author._meta.db_table)
+        self.assertIn(custom_constraint_name, constraints)
+        other_constraints = [
+            name for name, details in constraints.items()
+            if details['columns'] == ['height'] and details['check'] and name != custom_constraint_name
+        ]
+        self.assertEqual(len(other_constraints), 1)
+        # Drop the check constraint
+        with connection.schema_editor() as editor:
+            Author._meta.constraints = []
+            editor.remove_constraint(Author, constraint)
+
     def test_unique(self):
         """
         Tests removing and adding unique constraints to a single column.
@@ -1663,6 +1721,53 @@ class SchemaTests(TransactionTestCase):
         with self.assertRaises(IntegrityError):
             Tag.objects.create(title='bar', slug='foo')
 
+    @skipUnlessDBFeature('allows_multiple_constraints_on_same_fields')
+    def test_remove_field_unique_does_not_remove_meta_constraints(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(AuthorWithUniqueName)
+        # Add the custom unique constraint
+        constraint = UniqueConstraint(fields=['name'], name='author_name_uniq')
+        custom_constraint_name = constraint.name
+        AuthorWithUniqueName._meta.constraints = [constraint]
+        with connection.schema_editor() as editor:
+            editor.add_constraint(AuthorWithUniqueName, constraint)
+        # Ensure the constraints exist
+        constraints = self.get_constraints(AuthorWithUniqueName._meta.db_table)
+        self.assertIn(custom_constraint_name, constraints)
+        other_constraints = [
+            name for name, details in constraints.items()
+            if details['columns'] == ['name'] and details['unique'] and name != custom_constraint_name
+        ]
+        self.assertEqual(len(other_constraints), 1)
+        # Alter the column to remove field uniqueness
+        old_field = AuthorWithUniqueName._meta.get_field('name')
+        new_field = CharField(max_length=255)
+        new_field.set_attributes_from_name('name')
+        with connection.schema_editor() as editor:
+            editor.alter_field(AuthorWithUniqueName, old_field, new_field, strict=True)
+        constraints = self.get_constraints(AuthorWithUniqueName._meta.db_table)
+        self.assertIn(custom_constraint_name, constraints)
+        other_constraints = [
+            name for name, details in constraints.items()
+            if details['columns'] == ['name'] and details['unique'] and name != custom_constraint_name
+        ]
+        self.assertEqual(len(other_constraints), 0)
+        # Alter the column to re-add field uniqueness
+        new_field2 = AuthorWithUniqueName._meta.get_field('name')
+        with connection.schema_editor() as editor:
+            editor.alter_field(AuthorWithUniqueName, new_field, new_field2, strict=True)
+        constraints = self.get_constraints(AuthorWithUniqueName._meta.db_table)
+        self.assertIn(custom_constraint_name, constraints)
+        other_constraints = [
+            name for name, details in constraints.items()
+            if details['columns'] == ['name'] and details['unique'] and name != custom_constraint_name
+        ]
+        self.assertEqual(len(other_constraints), 1)
+        # Drop the unique constraint
+        with connection.schema_editor() as editor:
+            AuthorWithUniqueName._meta.constraints = []
+            editor.remove_constraint(AuthorWithUniqueName, constraint)
+
     def test_unique_together(self):
         """
         Tests removing and adding unique_together constraints on a model.
@@ -1734,6 +1839,50 @@ class SchemaTests(TransactionTestCase):
         # Alter it back
         with connection.schema_editor() as editor:
             editor.alter_unique_together(Book, [['author', 'title']], [])
+
+    @skipUnlessDBFeature('allows_multiple_constraints_on_same_fields')
+    def test_remove_unique_together_does_not_remove_meta_constraints(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(AuthorWithUniqueNameAndBirthday)
+        # Add the custom unique constraint
+        constraint = UniqueConstraint(fields=['name', 'birthday'], name='author_name_birthday_uniq')
+        custom_constraint_name = constraint.name
+        AuthorWithUniqueNameAndBirthday._meta.constraints = [constraint]
+        with connection.schema_editor() as editor:
+            editor.add_constraint(AuthorWithUniqueNameAndBirthday, constraint)
+        # Ensure the constraints exist
+        constraints = self.get_constraints(AuthorWithUniqueNameAndBirthday._meta.db_table)
+        self.assertIn(custom_constraint_name, constraints)
+        other_constraints = [
+            name for name, details in constraints.items()
+            if details['columns'] == ['name', 'birthday'] and details['unique'] and name != custom_constraint_name
+        ]
+        self.assertEqual(len(other_constraints), 1)
+        # Remove unique together
+        unique_together = AuthorWithUniqueNameAndBirthday._meta.unique_together
+        with connection.schema_editor() as editor:
+            editor.alter_unique_together(AuthorWithUniqueNameAndBirthday, unique_together, [])
+        constraints = self.get_constraints(AuthorWithUniqueNameAndBirthday._meta.db_table)
+        self.assertIn(custom_constraint_name, constraints)
+        other_constraints = [
+            name for name, details in constraints.items()
+            if details['columns'] == ['name', 'birthday'] and details['unique'] and name != custom_constraint_name
+        ]
+        self.assertEqual(len(other_constraints), 0)
+        # Re-add unique together
+        with connection.schema_editor() as editor:
+            editor.alter_unique_together(AuthorWithUniqueNameAndBirthday, [], unique_together)
+        constraints = self.get_constraints(AuthorWithUniqueNameAndBirthday._meta.db_table)
+        self.assertIn(custom_constraint_name, constraints)
+        other_constraints = [
+            name for name, details in constraints.items()
+            if details['columns'] == ['name', 'birthday'] and details['unique'] and name != custom_constraint_name
+        ]
+        self.assertEqual(len(other_constraints), 1)
+        # Drop the unique constraint
+        with connection.schema_editor() as editor:
+            AuthorWithUniqueNameAndBirthday._meta.constraints = []
+            editor.remove_constraint(AuthorWithUniqueNameAndBirthday, constraint)
 
     def test_index_together(self):
         """
@@ -1812,6 +1961,50 @@ class SchemaTests(TransactionTestCase):
                 if c['columns'] == ["slug", "title"]
             ),
         )
+
+    @skipUnlessDBFeature('allows_multiple_constraints_on_same_fields')
+    def test_remove_index_together_does_not_remove_meta_indexes(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(AuthorWithIndexedNameAndBirthday)
+        # Add the custom index
+        index = Index(fields=['name', 'birthday'], name='author_name_birthday_idx')
+        custom_index_name = index.name
+        AuthorWithIndexedNameAndBirthday._meta.indexes = [index]
+        with connection.schema_editor() as editor:
+            editor.add_index(AuthorWithIndexedNameAndBirthday, index)
+        # Ensure the indexes exist
+        constraints = self.get_constraints(AuthorWithIndexedNameAndBirthday._meta.db_table)
+        self.assertIn(custom_index_name, constraints)
+        other_constraints = [
+            name for name, details in constraints.items()
+            if details['columns'] == ['name', 'birthday'] and details['index'] and name != custom_index_name
+        ]
+        self.assertEqual(len(other_constraints), 1)
+        # Remove index together
+        index_together = AuthorWithIndexedNameAndBirthday._meta.index_together
+        with connection.schema_editor() as editor:
+            editor.alter_index_together(AuthorWithIndexedNameAndBirthday, index_together, [])
+        constraints = self.get_constraints(AuthorWithIndexedNameAndBirthday._meta.db_table)
+        self.assertIn(custom_index_name, constraints)
+        other_constraints = [
+            name for name, details in constraints.items()
+            if details['columns'] == ['name', 'birthday'] and details['index'] and name != custom_index_name
+        ]
+        self.assertEqual(len(other_constraints), 0)
+        # Re-add index together
+        with connection.schema_editor() as editor:
+            editor.alter_index_together(AuthorWithIndexedNameAndBirthday, [], index_together)
+        constraints = self.get_constraints(AuthorWithIndexedNameAndBirthday._meta.db_table)
+        self.assertIn(custom_index_name, constraints)
+        other_constraints = [
+            name for name, details in constraints.items()
+            if details['columns'] == ['name', 'birthday'] and details['index'] and name != custom_index_name
+        ]
+        self.assertEqual(len(other_constraints), 1)
+        # Drop the index
+        with connection.schema_editor() as editor:
+            AuthorWithIndexedNameAndBirthday._meta.indexes = []
+            editor.remove_index(AuthorWithIndexedNameAndBirthday, index)
 
     @isolate_apps('schema')
     def test_db_table(self):
@@ -1971,7 +2164,7 @@ class SchemaTests(TransactionTestCase):
             editor.add_field(Book, new_field3)
         self.assertIn(
             "slug",
-            self.get_indexes(Book._meta.db_table),
+            self.get_uniques(Book._meta.db_table),
         )
         # Remove the unique, check the index goes with it
         new_field4 = CharField(max_length=20, unique=False)
@@ -1980,7 +2173,7 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(BookWithSlug, new_field3, new_field4, strict=True)
         self.assertNotIn(
             "slug",
-            self.get_indexes(Book._meta.db_table),
+            self.get_uniques(Book._meta.db_table),
         )
 
     def test_text_field_with_db_index(self):

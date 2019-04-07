@@ -134,6 +134,14 @@ any time leading up to the actual release:
 
    and then commit the changed man page.
 
+#. If this is the "dot zero" release of a new series, create a new branch from
+   the current stable branch in the `django-docs-translations
+   <https://github.com/django/django-docs-translations>`_ repository. For
+   example, when releasing Django 2.2::
+
+    $ git checkout -b stable/2.2.x origin/stable/2.1.x
+    $ git push origin stable/2.2.x:stable/2.2.x
+
 Preparing for release
 =====================
 
@@ -401,10 +409,10 @@ need to be done by the releaser.
 
 #. Add the new branch to `Read the Docs
    <https://readthedocs.org/projects/django/>`_. Since the automatically
-   generated version names ("stable-A.B.x") differ from the version numbers
-   we've used historically in Read the Docs ("A.B.x"), we currently ask Eric
-   Holscher to add the version for us. Someday the alias functionality may be
-   built-in to the Read the Docs UI.
+   generated version names ("stable-A.B.x") differ from the version names
+   used in Read the Docs ("A.B.x"), `create a ticket
+   <https://github.com/rtfd/readthedocs.org/issues/5537>`_ requesting the new
+   version.
 
 Notes on setting the VERSION tuple
 ==================================

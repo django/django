@@ -4,13 +4,13 @@
 # Hafsteinn Einarsson <haffi67@gmail.com>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kári Tristan Helgason <inactive+einherji@transifex.com>, 2013
-# Thordur Sigurdsson <thordur@ja.is>, 2016-2018
+# Thordur Sigurdsson <thordur@ja.is>, 2016-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-06-22 20:44+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 15:40+0000\n"
 "Last-Translator: Thordur Sigurdsson <thordur@ja.is>\n"
 "Language-Team: Icelandic (http://www.transifex.com/django/django/language/"
 "is/)\n"
@@ -111,7 +111,7 @@ msgid "object id"
 msgstr "kenni hlutar"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "framsetning hlutar"
 
@@ -534,24 +534,8 @@ msgstr "Sýna allt"
 msgid "Save"
 msgstr "Vista"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Sprettigluggi lokast..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Breyta völdu %(model)s"
-
-#, python-format
-msgid "View selected %(model)s"
-msgstr "Skoða valið %(model)s"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Bæta við %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Eyða völdu %(model)s"
 
 msgid "Search"
 msgstr "Leita"
@@ -580,6 +564,18 @@ msgstr "Vista og skoða"
 
 msgid "Close"
 msgstr "Loka"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Breyta völdu %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Bæta við %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Eyða völdu %(model)s"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Takk fyrir að verja tíma í vefsíðuna í dag."

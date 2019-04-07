@@ -19,7 +19,7 @@ from any page in the site.
 {% endblocktrans %}</p>
 
 <div id="content-main">
-    <h3><a href="javascript:(function(){if(typeof ActiveXObject!='undefined'){x=new ActiveXObject('Microsoft.XMLHTTP')}else if(typeof XMLHttpRequest!='undefined'){x=new XMLHttpRequest()}else{return;}x.open('HEAD',location.href,false);x.send(null);try{view=x.getResponseHeader('x-view');}catch(e){alert('No view found for this page');return;}if(view=='undefined'){alert('No view found for this page');}document.location='{% url 'django-admindocs-views-index' %}'+view+'/';})()">{% trans "Documentation for this page" %}</a></h3>
+    <h3><a href="javascript:(function(){if(typeof XMLHttpRequest!='undefined'){x=new XMLHttpRequest()}else{return;}x.open('HEAD',location.href,false);x.send(null);try{view=x.getResponseHeader('x-view');}catch(e){alert('No view found for this page');return;}if(view=='undefined'){alert('No view found for this page');}document.location='{% url 'django-admindocs-views-index' %}'+view+'/';})()">{% trans "Documentation for this page" %}</a></h3>
     <p>{% trans "Jumps you from any page to the documentation for the view that generates that page." %}</p>
 </div>
 

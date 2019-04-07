@@ -28,6 +28,7 @@ from django.db.models.signals import (
     class_prepared, post_init, post_save, pre_init, pre_save,
 )
 from django.db.models.utils import make_model_tuple
+from django.utils.encoding import force_str
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext_lazy as _
 from django.utils.version import get_version
@@ -84,9 +85,12 @@ class ModelBase(type):
         # Pass all attrs without a (Django-specific) contribute_to_class()
         # method to type.__new__() so that they're properly initialized
         # (i.e. __set_name__()).
+        contributable_attrs = {}
         for obj_name, obj in list(attrs.items()):
-            if not _has_contribute_to_class(obj):
-                new_attrs[obj_name] = attrs.pop(obj_name)
+            if _has_contribute_to_class(obj):
+                contributable_attrs[obj_name] = obj
+            else:
+                new_attrs[obj_name] = obj
         new_class = super_new(cls, name, bases, new_attrs, **kwargs)
 
         abstract = getattr(attr_meta, 'abstract', False)
@@ -146,8 +150,9 @@ class ModelBase(type):
         if is_proxy and base_meta and base_meta.swapped:
             raise TypeError("%s cannot proxy the swapped model '%s'." % (name, base_meta.swapped))
 
-        # Add all attributes to the class.
-        for obj_name, obj in attrs.items():
+        # Add remaining attributes (those with a contribute_to_class() method)
+        # to the class.
+        for obj_name, obj in contributable_attrs.items():
             new_class.add_to_class(obj_name, obj)
 
         # All the fields of any type declared on this model
@@ -917,7 +922,8 @@ class Model(metaclass=ModelBase):
 
     def _get_FIELD_display(self, field):
         value = getattr(self, field.attname)
-        return dict(field.flatchoices).get(value, value)
+        # force_str() to coerce lazy strings.
+        return force_str(dict(field.flatchoices).get(value, value), strings_only=True)
 
     def _get_next_or_previous_by_FIELD(self, field, is_next, **kwargs):
         if not self.pk:

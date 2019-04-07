@@ -3671,6 +3671,11 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         self.assertTrue(f.is_valid())
         self.assertEqual(f.cleaned_data, {'data': 'xyzzy'})
 
+    def test_empty_data_files_multi_value_dict(self):
+        p = Person()
+        self.assertIsInstance(p.data, MultiValueDict)
+        self.assertIsInstance(p.files, MultiValueDict)
+
 
 class CustomRenderer(DjangoTemplates):
     pass

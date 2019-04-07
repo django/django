@@ -1593,7 +1593,7 @@ class DurationField(Field):
     empty_strings_allowed = False
     default_error_messages = {
         'invalid': _("'%(value)s' value has an invalid format. It must be in "
-                     "[DD] [HH:[MM:]]ss[.uuuuuu] format.")
+                     "[DD] [[HH:]MM:]ss[.uuuuuu] format.")
     }
     description = _("Duration")
 
@@ -2257,6 +2257,21 @@ class BinaryField(Field):
         super().__init__(*args, **kwargs)
         if self.max_length is not None:
             self.validators.append(validators.MaxLengthValidator(self.max_length))
+
+    def check(self, **kwargs):
+        return [*super().check(**kwargs), *self._check_str_default_value()]
+
+    def _check_str_default_value(self):
+        if self.has_default() and isinstance(self.default, str):
+            return [
+                checks.Error(
+                    "BinaryField's default cannot be a string. Use bytes "
+                    "content instead.",
+                    obj=self,
+                    id='fields.E170',
+                )
+            ]
+        return []
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()

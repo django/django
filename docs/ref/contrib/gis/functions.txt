@@ -20,17 +20,17 @@ get a ``NotImplementedError`` exception.
 
 Function's summary:
 
-==================  ========================   ======================  =======================  ==================  =====================
-Measurement         Relationships              Operations              Editors                  Output format       Miscellaneous
-==================  ========================   ======================  =======================  ==================  =====================
-:class:`Area`       :class:`Azimuth`           :class:`Difference`     :class:`ForcePolygonCW`  :class:`AsGeoJSON`  :class:`IsValid`
-:class:`Distance`   :class:`BoundingCircle`    :class:`Intersection`   :class:`MakeValid`       :class:`AsGML`      :class:`MemSize`
-:class:`Length`     :class:`Centroid`          :class:`SymDifference`  :class:`Reverse`         :class:`AsKML`      :class:`NumGeometries`
-:class:`Perimeter`  :class:`Envelope`          :class:`Union`          :class:`Scale`           :class:`AsSVG`      :class:`NumPoints`
-..                  :class:`LineLocatePoint`                           :class:`SnapToGrid`      :class:`GeoHash`
-..                  :class:`PointOnSurface`                            :class:`Transform`
-..                                                                     :class:`Translate`
-==================  ========================   ======================  =======================  ==================  =====================
+=========================  ========================  ======================  =======================  ==================  =====================
+Measurement                Relationships             Operations              Editors                  Output format       Miscellaneous
+=========================  ========================  ======================  =======================  ==================  =====================
+:class:`Area`              :class:`Azimuth`          :class:`Difference`     :class:`ForcePolygonCW`  :class:`AsGeoJSON`  :class:`IsValid`
+:class:`Distance`          :class:`BoundingCircle`   :class:`Intersection`   :class:`MakeValid`       :class:`AsGML`      :class:`MemSize`
+:class:`GeometryDistance`  :class:`Centroid`         :class:`SymDifference`  :class:`Reverse`         :class:`AsKML`      :class:`NumGeometries`
+:class:`Length`            :class:`Envelope`         :class:`Union`          :class:`Scale`           :class:`AsSVG`      :class:`NumPoints`
+:class:`Perimeter`         :class:`LineLocatePoint`                          :class:`SnapToGrid`      :class:`GeoHash`
+..                         :class:`PointOnSurface`                           :class:`Transform`
+..                                                                           :class:`Translate`
+=========================  ========================  ======================  =======================  ==================  =====================
 
 ``Area``
 ========
@@ -307,6 +307,19 @@ The ``precision`` keyword argument controls the number of characters in the
 result.
 
 __ https://en.wikipedia.org/wiki/Geohash
+
+``GeometryDistance``
+====================
+
+.. class:: GeometryDistance(expr1, expr2, **extra)
+
+.. versionadded:: 3.0
+
+*Availability*: `PostGIS <https://postgis.net/docs/geometry_distance_knn.html>`__
+
+Accepts two geographic fields or expressions and returns the distance between
+them. When used in an :meth:`~django.db.models.query.QuerySet.order_by` clause,
+it provides index-assisted nearest-neighbor result sets.
 
 ``Intersection``
 ================

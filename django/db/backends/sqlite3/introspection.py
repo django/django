@@ -217,50 +217,124 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             }
         return constraints
 
-    def _parse_table_constraints(self, sql):
+    def _parse_column_or_constraint_definition(self, tokens, columns):
+        token = None
+        is_constraint_definition = None
+        field_name = None
+        constraint_name = None
+        unique = False
+        unique_columns = []
+        check = False
+        check_columns = []
+        braces_deep = 0
+        for token in tokens:
+            if token.match(sqlparse.tokens.Punctuation, '('):
+                braces_deep += 1
+            elif token.match(sqlparse.tokens.Punctuation, ')'):
+                braces_deep -= 1
+                if braces_deep < 0:
+                    # End of columns and constraints for table definition.
+                    break
+            elif braces_deep == 0 and token.match(sqlparse.tokens.Punctuation, ','):
+                # End of current column or constraint definition.
+                break
+            # Detect column or constraint definition by first token.
+            if is_constraint_definition is None:
+                is_constraint_definition = token.match(sqlparse.tokens.Keyword, 'CONSTRAINT')
+                if is_constraint_definition:
+                    continue
+            if is_constraint_definition:
+                # Detect constraint name by second token.
+                if constraint_name is None:
+                    if token.ttype in (sqlparse.tokens.Name, sqlparse.tokens.Keyword):
+                        constraint_name = token.value
+                    elif token.ttype == sqlparse.tokens.Literal.String.Symbol:
+                        constraint_name = token.value[1:-1]
+                # Start constraint columns parsing after UNIQUE keyword.
+                if token.match(sqlparse.tokens.Keyword, 'UNIQUE'):
+                    unique = True
+                    unique_braces_deep = braces_deep
+                elif unique:
+                    if unique_braces_deep == braces_deep:
+                        if unique_columns:
+                            # Stop constraint parsing.
+                            unique = False
+                        continue
+                    if token.ttype in (sqlparse.tokens.Name, sqlparse.tokens.Keyword):
+                        unique_columns.append(token.value)
+                    elif token.ttype == sqlparse.tokens.Literal.String.Symbol:
+                        unique_columns.append(token.value[1:-1])
+            else:
+                # Detect field name by first token.
+                if field_name is None:
+                    if token.ttype in (sqlparse.tokens.Name, sqlparse.tokens.Keyword):
+                        field_name = token.value
+                    elif token.ttype == sqlparse.tokens.Literal.String.Symbol:
+                        field_name = token.value[1:-1]
+                if token.match(sqlparse.tokens.Keyword, 'UNIQUE'):
+                    unique_columns = [field_name]
+            # Start constraint columns parsing after CHECK keyword.
+            if token.match(sqlparse.tokens.Keyword, 'CHECK'):
+                check = True
+                check_braces_deep = braces_deep
+            elif check:
+                if check_braces_deep == braces_deep:
+                    if check_columns:
+                        # Stop constraint parsing.
+                        check = False
+                    continue
+                if token.ttype in (sqlparse.tokens.Name, sqlparse.tokens.Keyword):
+                    if token.value in columns:
+                        check_columns.append(token.value)
+                elif token.ttype == sqlparse.tokens.Literal.String.Symbol:
+                    if token.value[1:-1] in columns:
+                        check_columns.append(token.value[1:-1])
+        unique_constraint = {
+            'unique': True,
+            'columns': unique_columns,
+            'primary_key': False,
+            'foreign_key': None,
+            'check': False,
+            'index': False,
+        } if unique_columns else None
+        check_constraint = {
+            'check': True,
+            'columns': check_columns,
+            'primary_key': False,
+            'unique': False,
+            'foreign_key': None,
+            'index': False,
+        } if check_columns else None
+        return constraint_name, unique_constraint, check_constraint, token
+
+    def _parse_table_constraints(self, sql, columns):
         # Check constraint parsing is based of SQLite syntax diagram.
         # https://www.sqlite.org/syntaxdiagrams.html#table-constraint
-        def next_ttype(ttype):
-            for token in tokens:
-                if token.ttype == ttype:
-                    return token
-
         statement = sqlparse.parse(sql)[0]
         constraints = {}
-        tokens = statement.flatten()
+        unnamed_constrains_index = 0
+        tokens = (token for token in statement.flatten() if not token.is_whitespace)
+        # Go to columns and constraint definition
         for token in tokens:
-            name = None
-            if token.match(sqlparse.tokens.Keyword, 'CONSTRAINT'):
-                # Table constraint
-                name_token = next_ttype(sqlparse.tokens.Literal.String.Symbol)
-                name = name_token.value[1:-1]
-                token = next_ttype(sqlparse.tokens.Keyword)
-            if token.match(sqlparse.tokens.Keyword, 'UNIQUE'):
-                constraints[name] = {
-                    'unique': True,
-                    'columns': [],
-                    'primary_key': False,
-                    'foreign_key': None,
-                    'check': False,
-                    'index': False,
-                }
-            if token.match(sqlparse.tokens.Keyword, 'CHECK'):
-                # Column check constraint
-                if name is None:
-                    column_token = next_ttype(sqlparse.tokens.Literal.String.Symbol)
-                    column = column_token.value[1:-1]
-                    name = '__check__%s' % column
-                    columns = [column]
+            if token.match(sqlparse.tokens.Punctuation, '('):
+                break
+        # Parse columns and constraint definition
+        while True:
+            constraint_name, unique, check, end_token = self._parse_column_or_constraint_definition(tokens, columns)
+            if unique:
+                if constraint_name:
+                    constraints[constraint_name] = unique
                 else:
-                    columns = []
-                constraints[name] = {
-                    'check': True,
-                    'columns': columns,
-                    'primary_key': False,
-                    'unique': False,
-                    'foreign_key': None,
-                    'index': False,
-                }
+                    unnamed_constrains_index += 1
+                    constraints['__unnamed_constraint_%s__' % unnamed_constrains_index] = unique
+            if check:
+                if constraint_name:
+                    constraints[constraint_name] = check
+                else:
+                    unnamed_constrains_index += 1
+                    constraints['__unnamed_constraint_%s__' % unnamed_constrains_index] = check
+            if end_token.match(sqlparse.tokens.Punctuation, ')'):
+                break
         return constraints
 
     def get_constraints(self, cursor, table_name):
@@ -280,7 +354,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             # table_name is a view.
             pass
         else:
-            constraints.update(self._parse_table_constraints(table_schema))
+            columns = {info.name for info in self.get_table_description(cursor, table_name)}
+            constraints.update(self._parse_table_constraints(table_schema, columns))
 
         # Get the index info
         cursor.execute("PRAGMA index_list(%s)" % self.connection.ops.quote_name(table_name))
@@ -288,6 +363,21 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             # SQLite 3.8.9+ has 5 columns, however older versions only give 3
             # columns. Discard last 2 columns if there.
             number, index, unique = row[:3]
+            cursor.execute(
+                "SELECT sql FROM sqlite_master "
+                "WHERE type='index' AND name=%s" % self.connection.ops.quote_name(index)
+            )
+            # There's at most one row.
+            sql, = cursor.fetchone() or (None,)
+            # Inline constraints are already detected in
+            # _parse_table_constraints(). The reasons to avoid fetching inline
+            # constraints from `PRAGMA index_list` are:
+            # - Inline constraints can have a different name and information
+            #   than what `PRAGMA index_list` gives.
+            # - Not all inline constraints may appear in `PRAGMA index_list`.
+            if not sql:
+                # An inline constraint
+                continue
             # Get the index info for that index
             cursor.execute('PRAGMA index_info(%s)' % self.connection.ops.quote_name(index))
             for index_rank, column_rank, column in cursor.fetchall():
@@ -305,15 +395,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             if constraints[index]['index'] and not constraints[index]['unique']:
                 # SQLite doesn't support any index type other than b-tree
                 constraints[index]['type'] = Index.suffix
-                cursor.execute(
-                    "SELECT sql FROM sqlite_master "
-                    "WHERE type='index' AND name=%s" % self.connection.ops.quote_name(index)
-                )
-                orders = []
-                # There would be only 1 row to loop over
-                for sql, in cursor.fetchall():
-                    order_info = sql.split('(')[-1].split(')')[0].split(',')
-                    orders = ['DESC' if info.endswith('DESC') else 'ASC' for info in order_info]
+                order_info = sql.split('(')[-1].split(')')[0].split(',')
+                orders = ['DESC' if info.endswith('DESC') else 'ASC' for info in order_info]
                 constraints[index]['orders'] = orders
         # Get the PK
         pk_column = self.get_primary_key_column(cursor, table_name)

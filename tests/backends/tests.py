@@ -51,7 +51,7 @@ class DateQuotingTest(TestCase):
 @override_settings(DEBUG=True)
 class LastExecutedQueryTest(TestCase):
 
-    def test_last_executed_query(self):
+    def test_last_executed_query_without_previous_query(self):
         """
         last_executed_query should not raise an exception even if no previous
         query has been run.
@@ -72,6 +72,36 @@ class LastExecutedQueryTest(TestCase):
         cursor = data.query.get_compiler('default').execute_sql(CURSOR)
         last_sql = cursor.db.ops.last_executed_query(cursor, sql, params)
         self.assertIsInstance(last_sql, str)
+
+    def test_last_executed_query(self):
+        # last_executed_query() interpolate all parameters, in most cases it is
+        # not equal to QuerySet.query.
+        for qs in (
+            Article.objects.filter(pk=1),
+            Article.objects.filter(pk__in=(1, 2), reporter__pk=3),
+        ):
+            sql, params = qs.query.sql_with_params()
+            cursor = qs.query.get_compiler(DEFAULT_DB_ALIAS).execute_sql(CURSOR)
+            self.assertEqual(
+                cursor.db.ops.last_executed_query(cursor, sql, params),
+                str(qs.query),
+            )
+
+    @skipUnlessDBFeature('supports_paramstyle_pyformat')
+    def test_last_executed_query_dict(self):
+        square_opts = Square._meta
+        sql = 'INSERT INTO %s (%s, %s) VALUES (%%(root)s, %%(square)s)' % (
+            connection.introspection.identifier_converter(square_opts.db_table),
+            connection.ops.quote_name(square_opts.get_field('root').column),
+            connection.ops.quote_name(square_opts.get_field('square').column),
+        )
+        with connection.cursor() as cursor:
+            params = {'root': 2, 'square': 4}
+            cursor.execute(sql, params)
+            self.assertEqual(
+                cursor.db.ops.last_executed_query(cursor, sql, params),
+                sql % params,
+            )
 
 
 class ParameterHandlingTest(TestCase):

@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Claude Paroz <claude@2xlibre.net>, 2013-2018
+# Claude Paroz <claude@2xlibre.net>, 2013-2019
 # Claude Paroz <claude@2xlibre.net>, 2011,2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-05-28 15:45+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 17:28+0000\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -110,7 +110,7 @@ msgid "object id"
 msgstr "id de l'objet"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "représentation de l'objet"
 
@@ -549,24 +549,8 @@ msgstr "Tout afficher"
 msgid "Save"
 msgstr "Enregistrer"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Fenêtre en cours de fermeture…"
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Modifier l'objet %(model)s sélectionné"
-
-#, python-format
-msgid "View selected %(model)s"
-msgstr "Afficher l'objet %(model)s sélectionné"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Ajouter un autre objet %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Supprimer l'objet %(model)s sélectionné"
 
 msgid "Search"
 msgstr "Rechercher"
@@ -595,6 +579,18 @@ msgstr "Enregistrer et afficher"
 
 msgid "Close"
 msgstr "Fermer"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Modifier l'objet %(model)s sélectionné"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Ajouter un autre objet %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Supprimer l'objet %(model)s sélectionné"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Merci pour le temps que vous avez accordé à ce site aujourd'hui."

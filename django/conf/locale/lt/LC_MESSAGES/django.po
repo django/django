@@ -4,7 +4,7 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kostas <tamosiunas@gmail.com>, 2011
 # lauris <lauris@runbox.com>, 2011
-# Matas Dailyda <matas@dailyda.com>, 2015-2018
+# Matas Dailyda <matas@dailyda.com>, 2015-2019
 # naktinis <naktinis@gmail.com>, 2012
 # Nikolajus Krauklis <nikolajus@gmail.com>, 2013
 # Povilas Balzaravičius <pavvka@gmail.com>, 2011-2012
@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-05-18 08:24+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 10:33+0000\n"
 "Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/django/django/language/"
 "lt/)\n"
@@ -146,6 +146,9 @@ msgstr "Aukštutinė Sorbų"
 
 msgid "Hungarian"
 msgstr "Vengrų"
+
+msgid "Armenian"
+msgstr "Armėnų"
 
 msgid "Interlingua"
 msgstr "Interlingua"
@@ -638,6 +641,9 @@ msgstr "Neapdorota informacija"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' yra netinkama UUID reikšmė."
 
+msgid "Universally unique identifier"
+msgstr "Universaliai unikalus identifikatorius"
+
 msgid "File"
 msgstr "Failas"
 
@@ -1096,7 +1102,7 @@ msgstr "Tai nėra teisingas IPv6 adresas."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
 msgstr "%(truncated_text)s..."
 
 msgid "or"

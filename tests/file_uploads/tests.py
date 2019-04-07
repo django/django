@@ -385,8 +385,8 @@ class FileUploadTests(TestCase):
             file.write(b'a' * (2 ** 21))
             file.seek(0)
 
-            # AttributeError: You cannot alter upload handlers after the upload has been processed.
-            with self.assertRaises(AttributeError):
+            msg = 'You cannot alter upload handlers after the upload has been processed.'
+            with self.assertRaisesMessage(AttributeError, msg):
                 self.client.post('/quota/broken/', {'f': file})
 
     def test_fileupload_getlist(self):

@@ -22,7 +22,11 @@ class Command(BaseCommand):
         formats = parser.add_mutually_exclusive_group()
         formats.add_argument(
             '--list', '-l', action='store_const', dest='format', const='list',
-            help='Shows a list of all migrations and which are applied.',
+            help=(
+                'Shows a list of all migrations and which are applied. '
+                'With a verbosity level of 2 or above, the applied datetimes '
+                'will be included.'
+            ),
         )
         formats.add_argument(
             '--plan', '-p', action='store_const', dest='format', const='plan',
@@ -84,9 +88,13 @@ class Command(BaseCommand):
                         title = plan_node[1]
                         if graph.nodes[plan_node].replaces:
                             title += " (%s squashed migrations)" % len(graph.nodes[plan_node].replaces)
+                        applied_migration = loader.applied_migrations.get(plan_node)
                         # Mark it as applied/unapplied
-                        if plan_node in loader.applied_migrations:
-                            self.stdout.write(" [X] %s" % title)
+                        if applied_migration:
+                            output = ' [X] %s' % title
+                            if self.verbosity >= 2:
+                                output += ' (applied at %s)' % applied_migration.applied.strftime('%Y-%m-%d %H:%M:%S')
+                            self.stdout.write(output)
                         else:
                             self.stdout.write(" [ ] %s" % title)
                         shown.add(plan_node)

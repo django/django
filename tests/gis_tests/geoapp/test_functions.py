@@ -12,8 +12,8 @@ from django.db import NotSupportedError, connection
 from django.db.models import Sum
 from django.test import TestCase, skipUnlessDBFeature
 
-from .models import City, Country, CountryWebMercator, State, Track
 from ..utils import FuncTestMixin, mysql, oracle, postgis, spatialite
+from .models import City, Country, CountryWebMercator, State, Track
 
 
 class GISFunctionsTests(FuncTestMixin, TestCase):
@@ -239,6 +239,21 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         h2 = City.objects.annotate(geohash=functions.GeoHash('point', precision=5)).get(name='Houston')
         self.assertEqual(ref_hash, h1.geohash[:len(ref_hash)])
         self.assertEqual(ref_hash[:5], h2.geohash)
+
+    @skipUnlessDBFeature('has_GeometryDistance_function')
+    def test_geometry_distance(self):
+        point = Point(-90, 40, srid=4326)
+        qs = City.objects.annotate(distance=functions.GeometryDistance('point', point)).order_by('distance')
+        self.assertEqual([city.distance for city in qs], [
+            2.99091995527296,
+            5.33507274054713,
+            9.33852187483721,
+            9.91769193646233,
+            11.556465744884,
+            14.713098433352,
+            34.3635252198568,
+            276.987855073372,
+        ])
 
     @skipUnlessDBFeature("has_Intersection_function")
     def test_intersection(self):

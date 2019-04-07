@@ -974,12 +974,17 @@ calling the appropriate methods on the wrapped expression.
         A hook allowing the expression to coerce ``value`` into a more
         appropriate type.
 
-    .. method:: get_group_by_cols()
+    .. method:: get_group_by_cols(alias=None)
 
         Responsible for returning the list of columns references by
         this expression. ``get_group_by_cols()`` should be called on any
         nested expressions. ``F()`` objects, in particular, hold a reference
-        to a column.
+        to a column. The ``alias`` parameter will be ``None`` unless the
+        expression has been annotated and is used for grouping.
+
+        .. versionchanged:: 3.0
+
+            The ``alias`` parameter was added.
 
     .. method:: asc(nulls_first=False, nulls_last=False)
 

@@ -44,7 +44,8 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Added support for the ``admin_order_field`` attribute on properties in
+  :attr:`.ModelAdmin.list_display`.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -66,6 +67,9 @@ Minor features
 
 * Allowed MySQL spatial lookup functions to operate on real geometries.
   Previous support was limited to bounding boxes.
+
+* Added the :class:`~django.contrib.gis.db.models.functions.GeometryDistance`
+  function, supported on PostGIS.
 
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -136,7 +140,10 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* Formsets may control the widget used when ordering forms via
+  :attr:`~django.forms.formsets.BaseFormSet.can_order` by setting the
+  :attr:`~django.forms.formsets.BaseFormSet.ordering_widget` attribute or
+  overriding :attr:`~django.forms.formsets.BaseFormSet.get_ordering_widget()`.
 
 Generic Views
 ~~~~~~~~~~~~~
@@ -154,6 +161,9 @@ Management Commands
 * The new :option:`compilemessages --ignore` option allows ignoring specific
   directories when searching for ``.po`` files to compile.
 
+* :option:`showmigrations --list` now shows the applied datetimes when
+  ``--verbosity`` is 2 and above.
+
 Migrations
 ~~~~~~~~~~
 
@@ -162,12 +172,24 @@ Migrations
 Models
 ~~~~~~
 
-* Added the :class:`~django.db.models.functions.MD5` database function.
+* Added hash database functions :class:`~django.db.models.functions.MD5`,
+  :class:`~django.db.models.functions.SHA1`,
+  :class:`~django.db.models.functions.SHA224`,
+  :class:`~django.db.models.functions.SHA256`,
+  :class:`~django.db.models.functions.SHA384`, and
+  :class:`~django.db.models.functions.SHA512`.
+
+* Added the :class:`~django.db.models.functions.Sign` database function.
+
+* The new ``is_dst``  parameter of the
+  :class:`~django.db.models.functions.Trunc` database functions determines the
+  treatment of nonexistent and ambiguous datetimes.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Allowed :class:`~django.http.HttpResponse` to be initialized with
+  :class:`memoryview` content.
 
 Serialization
 ~~~~~~~~~~~~~
@@ -348,6 +370,9 @@ Miscellaneous
   in the session in Django 4.0. Since Django 2.1, the language is always stored
   in the :setting:`LANGUAGE_COOKIE_NAME` cookie.
 
+* ``alias=None`` is added to the signature of
+  :meth:`.Expression.get_group_by_cols`.
+
 .. _removed-features-3.0:
 
 Features removed in 3.0
@@ -370,7 +395,7 @@ to remove usage of these features.
 * Support for the ``context`` argument of ``Field.from_db_value()`` and
   ``Expression.convert_value()`` is removed.
 
-* The ``field_name`` keyword argument of ``QuerySet.earliest()` and
+* The ``field_name`` keyword argument of ``QuerySet.earliest()`` and
   ``latest()`` is removed.
 
 See :ref:`deprecated-features-2.1` for details on these changes, including how

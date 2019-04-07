@@ -64,7 +64,7 @@ class Aggregate(Func):
             return '%s__%s' % (expressions[0].name, self.name.lower())
         raise TypeError("Complex expressions require an alias")
 
-    def get_group_by_cols(self):
+    def get_group_by_cols(self, alias=None):
         return []
 
     def as_sql(self, compiler, connection, **extra_context):

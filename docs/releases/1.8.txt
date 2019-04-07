@@ -1111,7 +1111,7 @@ Miscellaneous
   (or 200M, before 1.7.2) to 500M.
 
 * ``reverse()`` and ``reverse_lazy()`` now return Unicode strings instead of
-  byte strings.
+  bytestrings.
 
 * The ``CacheClass`` shim has been removed from all cache backends.
   These aliases were provided for backwards compatibility with Django 1.3.

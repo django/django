@@ -8,6 +8,8 @@ all about the internals of models in order to get the information it needs.
 """
 import difflib
 import functools
+import inspect
+import warnings
 from collections import Counter, namedtuple
 from collections.abc import Iterator, Mapping
 from itertools import chain, count, product
@@ -19,7 +21,9 @@ from django.core.exceptions import (
 from django.db import DEFAULT_DB_ALIAS, NotSupportedError, connections
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import Col, F, Ref, SimpleCol
+from django.db.models.expressions import (
+    BaseExpression, Col, F, OuterRef, Ref, SimpleCol,
+)
 from django.db.models.fields import Field
 from django.db.models.fields.related_lookups import MultiColSource
 from django.db.models.lookups import Lookup
@@ -35,6 +39,7 @@ from django.db.models.sql.datastructures import (
 from django.db.models.sql.where import (
     AND, OR, ExtraWhere, NothingNode, WhereNode,
 )
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import cached_property
 from django.utils.tree import Node
 
@@ -136,7 +141,7 @@ class RawQuery:
         self.cursor.execute(self.sql, params)
 
 
-class Query:
+class Query(BaseExpression):
     """A single SQL query."""
 
     alias_prefix = 'T'
@@ -229,6 +234,13 @@ class Query:
         self.explain_options = {}
 
     @property
+    def output_field(self):
+        if len(self.select) == 1:
+            return self.select[0].field
+        elif len(self.annotation_select) == 1:
+            return next(iter(self.annotation_select.values())).output_field
+
+    @property
     def has_select_fields(self):
         return bool(self.select or self.annotation_select_mask or self.extra_select_mask)
 
@@ -260,9 +272,6 @@ class Query:
         result = self.clone()
         memo[id(self)] = result
         return result
-
-    def _prepare(self, field):
-        return self
 
     def get_compiler(self, using=None, connection=None):
         if using is None and connection is None:
@@ -373,18 +382,26 @@ class Query:
                 # before the contains_aggregate/is_summary condition below.
                 new_expr, col_cnt = self.rewrite_cols(expr, col_cnt)
                 new_exprs.append(new_expr)
-            elif isinstance(expr, Col) or (expr.contains_aggregate and not expr.is_summary):
-                # Reference to column. Make sure the referenced column
-                # is selected.
-                col_cnt += 1
-                col_alias = '__col%d' % col_cnt
-                self.annotations[col_alias] = expr
-                self.append_annotation_mask([col_alias])
-                new_exprs.append(Ref(col_alias, expr))
             else:
-                # Some other expression not referencing database values
-                # directly. Its subexpression might contain Cols.
-                new_expr, col_cnt = self.rewrite_cols(expr, col_cnt)
+                # Reuse aliases of expressions already selected in subquery.
+                for col_alias, selected_annotation in self.annotation_select.items():
+                    if selected_annotation == expr:
+                        new_expr = Ref(col_alias, expr)
+                        break
+                else:
+                    # An expression that is not selected the subquery.
+                    if isinstance(expr, Col) or (expr.contains_aggregate and not expr.is_summary):
+                        # Reference column or another aggregate. Select it
+                        # under a non-conflicting alias.
+                        col_cnt += 1
+                        col_alias = '__col%d' % col_cnt
+                        self.annotations[col_alias] = expr
+                        self.append_annotation_mask([col_alias])
+                        new_expr = Ref(col_alias, expr)
+                    else:
+                        # Some other expression not referencing database values
+                        # directly. Its subexpression might contain Cols.
+                        new_expr, col_cnt = self.rewrite_cols(expr, col_cnt)
                 new_exprs.append(new_expr)
         annotation.set_source_expressions(new_exprs)
         return annotation, col_cnt
@@ -396,11 +413,11 @@ class Query:
         if not self.annotation_select:
             return {}
         has_limit = self.low_mark != 0 or self.high_mark is not None
-        has_existing_annotations = any(
+        existing_annotations = [
             annotation for alias, annotation
             in self.annotations.items()
             if alias not in added_aggregate_names
-        )
+        ]
         # Decide if we need to use a subquery.
         #
         # Existing annotations would cause incorrect results as get_aggregation()
@@ -412,13 +429,14 @@ class Query:
         # those operations must be done in a subquery so that the query
         # aggregates on the limit and/or distinct results instead of applying
         # the distinct and limit after the aggregation.
-        if (isinstance(self.group_by, tuple) or has_limit or has_existing_annotations or
+        if (isinstance(self.group_by, tuple) or has_limit or existing_annotations or
                 self.distinct or self.combinator):
             from django.db.models.sql.subqueries import AggregateQuery
             outer_query = AggregateQuery(self.model)
             inner_query = self.clone()
             inner_query.select_for_update = False
             inner_query.select_related = False
+            inner_query.set_annotation_mask(self.annotation_select)
             if not has_limit and not self.distinct_fields:
                 # Queries with distinct_fields need ordering and when a limit
                 # is applied we must take the slice from the ordered query.
@@ -430,7 +448,11 @@ class Query:
                 # query is grouped by the main model's primary key. However,
                 # clearing the select clause can alter results if distinct is
                 # used.
-                if inner_query.default_cols and has_existing_annotations:
+                has_existing_aggregate_annotations = any(
+                    annotation for annotation in existing_annotations
+                    if getattr(annotation, 'contains_aggregate', True)
+                )
+                if inner_query.default_cols and has_existing_aggregate_annotations:
                     inner_query.group_by = (self.model._meta.pk.get_col(inner_query.get_initial_alias()),)
                 inner_query.default_cols = False
 
@@ -440,10 +462,12 @@ class Query:
             # and move them to the outer AggregateQuery.
             col_cnt = 0
             for alias, expression in list(inner_query.annotation_select.items()):
+                annotation_select_mask = inner_query.annotation_select_mask
                 if expression.is_summary:
                     expression, col_cnt = inner_query.rewrite_cols(expression, col_cnt)
                     outer_query.annotations[alias] = expression.relabeled_clone(relabels)
                     del inner_query.annotations[alias]
+                    annotation_select_mask.remove(alias)
                 # Make sure the annotation_select wont use cached results.
                 inner_query.set_annotation_mask(inner_query.annotation_select_mask)
             if inner_query.select == () and not inner_query.default_cols and not inner_query.annotation_select_mask:
@@ -859,7 +883,7 @@ class Query:
             # No clashes between self and outer query should be possible.
             return
 
-        local_recursion_limit = 127  # explicitly avoid infinite loop
+        local_recursion_limit = 67  # explicitly avoid infinite loop
         for pos, prefix in enumerate(prefix_gen()):
             if prefix not in self.subq_aliases:
                 self.alias_prefix = prefix
@@ -994,10 +1018,28 @@ class Query:
                 not self.distinct_fields and
                 not self.select_for_update):
             clone.clear_ordering(True)
+        clone.where.resolve_expression(query, *args, **kwargs)
+        for key, value in clone.annotations.items():
+            resolved = value.resolve_expression(query, *args, **kwargs)
+            if hasattr(resolved, 'external_aliases'):
+                resolved.external_aliases.update(clone.alias_map)
+            clone.annotations[key] = resolved
+        # Outer query's aliases are considered external.
+        clone.external_aliases.update(
+            alias for alias, table in query.alias_map.items()
+            if (
+                isinstance(table, Join) and table.join_field.related_model._meta.db_table != alias
+            ) or (
+                isinstance(table, BaseTable) and table.table_name != table.table_alias
+            )
+        )
         return clone
 
     def as_sql(self, compiler, connection):
-        return self.get_compiler(connection=connection).as_sql()
+        sql, params = self.get_compiler(connection=connection).as_sql()
+        if self.subquery:
+            sql = '(%s)' % sql
+        return sql, params
 
     def resolve_lookup_value(self, value, can_reuse, allow_joins, simple_col):
         if hasattr(value, 'resolve_expression'):
@@ -1614,6 +1656,9 @@ class Query:
         saner null handling, and is easier for the backend's optimizer to
         handle.
         """
+        filter_lhs, filter_rhs = filter_expr
+        if isinstance(filter_rhs, F):
+            filter_expr = (filter_lhs, OuterRef(filter_rhs.name))
         # Generate the inner query.
         query = Query(self.model)
         query.add_filter(filter_expr)
@@ -1818,9 +1863,20 @@ class Query:
         """
         group_by = list(self.select)
         if self.annotation_select:
-            for annotation in self.annotation_select.values():
-                for col in annotation.get_group_by_cols():
-                    group_by.append(col)
+            for alias, annotation in self.annotation_select.items():
+                try:
+                    inspect.getcallargs(annotation.get_group_by_cols, alias=alias)
+                except TypeError:
+                    annotation_class = annotation.__class__
+                    msg = (
+                        '`alias=None` must be added to the signature of '
+                        '%s.%s.get_group_by_cols().'
+                    ) % (annotation_class.__module__, annotation_class.__qualname__)
+                    warnings.warn(msg, category=RemovedInDjango40Warning)
+                    group_by_cols = annotation.get_group_by_cols()
+                else:
+                    group_by_cols = annotation.get_group_by_cols(alias=alias)
+                group_by.extend(group_by_cols)
         self.group_by = tuple(group_by)
 
     def add_select_related(self, fields):

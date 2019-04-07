@@ -281,6 +281,10 @@ class BaseDatabaseFeatures:
     supports_partial_indexes = True
     supports_functions_in_partial_indexes = True
 
+    # Does the database allow more than one constraint or index on the same
+    # field(s)?
+    allows_multiple_constraints_on_same_fields = True
+
     def __init__(self, connection):
         self.connection = connection
 

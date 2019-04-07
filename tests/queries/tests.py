@@ -41,17 +41,17 @@ class Queries1Tests(TestCase):
         cls.t5 = Tag.objects.create(name='t5', parent=cls.t3)
 
         cls.n1 = Note.objects.create(note='n1', misc='foo', id=1)
-        n2 = Note.objects.create(note='n2', misc='bar', id=2)
+        cls.n2 = Note.objects.create(note='n2', misc='bar', id=2)
         cls.n3 = Note.objects.create(note='n3', misc='foo', id=3)
 
         ann1 = Annotation.objects.create(name='a1', tag=cls.t1)
         ann1.notes.add(cls.n1)
         ann2 = Annotation.objects.create(name='a2', tag=t4)
-        ann2.notes.add(n2, cls.n3)
+        ann2.notes.add(cls.n2, cls.n3)
 
         # Create these out of order so that sorting by 'id' will be different to sorting
         # by 'info'. Helps detect some problems later.
-        cls.e2 = ExtraInfo.objects.create(info='e2', note=n2, value=41)
+        cls.e2 = ExtraInfo.objects.create(info='e2', note=cls.n2, value=41)
         e1 = ExtraInfo.objects.create(info='e1', note=cls.n1, value=42)
 
         cls.a1 = Author.objects.create(name='a1', num=1001, extra=e1)
@@ -65,7 +65,7 @@ class Queries1Tests(TestCase):
         time4 = datetime.datetime(2007, 12, 20, 21, 0, 0)
         cls.i1 = Item.objects.create(name='one', created=cls.time1, modified=cls.time1, creator=cls.a1, note=cls.n3)
         cls.i1.tags.set([cls.t1, cls.t2])
-        cls.i2 = Item.objects.create(name='two', created=cls.time2, creator=cls.a2, note=n2)
+        cls.i2 = Item.objects.create(name='two', created=cls.time2, creator=cls.a2, note=cls.n2)
         cls.i2.tags.set([cls.t1, cls.t3])
         cls.i3 = Item.objects.create(name='three', created=time3, creator=cls.a2, note=cls.n3)
         i4 = Item.objects.create(name='four', created=time4, creator=cls.a4, note=cls.n3)
@@ -402,7 +402,7 @@ class Queries1Tests(TestCase):
 
     def test_avoid_infinite_loop_on_too_many_subqueries(self):
         x = Tag.objects.filter(pk=1)
-        local_recursion_limit = 127
+        local_recursion_limit = 67
         msg = 'Maximum recursion depth exceeded: too many subqueries.'
         with self.assertRaisesMessage(RuntimeError, msg):
             for i in range(local_recursion_limit * 2):
@@ -1172,6 +1172,16 @@ class Queries1Tests(TestCase):
             'mixed_case_db_column_category__category',
         )
         self.assertTrue(qs.first())
+
+    def test_excluded_intermediary_m2m_table_joined(self):
+        self.assertSequenceEqual(
+            Note.objects.filter(~Q(tag__annotation__name=F('note'))),
+            [self.n1, self.n2, self.n3],
+        )
+        self.assertSequenceEqual(
+            Note.objects.filter(tag__annotation__name='a1').filter(~Q(tag__annotation__name=F('note'))),
+            [],
+        )
 
 
 class Queries2Tests(TestCase):
@@ -2775,6 +2785,15 @@ class ExcludeTests(TestCase):
         alex_nontech_employers = alex.employers.exclude(
             employment__title__in=('Engineer', 'Developer')).distinct().order_by('name')
         self.assertSequenceEqual(alex_nontech_employers, [google, intel, microsoft])
+
+    def test_exclude_reverse_fk_field_ref(self):
+        tag = Tag.objects.create()
+        Note.objects.create(tag=tag, note='note')
+        annotation = Annotation.objects.create(name='annotation', tag=tag)
+        self.assertEqual(Annotation.objects.exclude(tag__note__note=F('name')).get(), annotation)
+
+    def test_exclude_with_circular_fk_relation(self):
+        self.assertEqual(ObjectB.objects.exclude(objecta__objectb__name=F('name')).count(), 0)
 
 
 class ExcludeTest17600(TestCase):

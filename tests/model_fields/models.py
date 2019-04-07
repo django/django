@@ -12,6 +12,7 @@ from django.db.models.fields.files import ImageField, ImageFieldFile
 from django.db.models.fields.related import (
     ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
 )
+from django.utils.translation import gettext_lazy as _
 
 try:
     from PIL import Image
@@ -46,6 +47,7 @@ class Whiz(models.Model):
         )
         ),
         (0, 'Other'),
+        (5, _('translated')),
     )
     c = models.IntegerField(choices=CHOICES, null=True)
 
@@ -344,7 +346,7 @@ class AllFieldsModel(models.Model):
     fo = ForeignObject(
         'self',
         on_delete=models.CASCADE,
-        from_fields=['abstract_non_concrete_id'],
+        from_fields=['positive_integer'],
         to_fields=['id'],
         related_name='reverse'
     )

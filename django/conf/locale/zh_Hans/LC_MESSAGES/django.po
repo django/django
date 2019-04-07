@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Bai HuanCheng (Bestony) <xiqingongzi@gmail.com>, 2017-2018
+# HuanCheng Bai <xiqingongzi@gmail.com>, 2017-2018
 # Daniel Duan <DaNmarner@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
@@ -9,26 +9,28 @@
 # Le Yang <youngleocn@qq.com>, 2018
 # Liping Wang <lynn.config@gmail.com>, 2016-2017
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
-# Ronald White <ouyanghongyu@gmail.com>, 2014
+# Ronald White <tkliuxing@me.com>, 2014
 # pylemon <leeway1985@gmail.com>, 2013
 # Ray Wang <pivstone@gmail.com>, 2017
 # slene <vslene@gmail.com>, 2011
 # Sun Liwen <sunliwen@gmail.com>, 2014
+# Suntravel Chris <chrisfromcn@gmail.com>, 2019
 # Liping Wang <lynn.config@gmail.com>, 2016
 # Wentao Han <wentao.han@gmail.com>, 2018
 # Xiang Yu <bupt.aswmtjdsj@gmail.com>, 2014
-# Yin Jifeng <jifeng.yin@gmail.com>, 2013
+# Jeff Yin <jifeng.yin@gmail.com>, 2013
 # Zhengyang Wang <sufforest@gmail.com>, 2017
-# Ziang Song <songziang@gmail.com>, 2011-2012
+# ced773123cfad7b4e8b79ca80f736af9, 2011-2012
 # Ziya Tang <tcztzy@gmail.com>, 2018
+# 付峥 <fuzheng1998@outlook.com>, 2018
 # Kevin Sze <leiarix@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-09-28 07:47+0000\n"
-"Last-Translator: Wentao Han <wentao.han@gmail.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-01 07:07+0000\n"
+"Last-Translator: Suntravel Chris <chrisfromcn@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -38,7 +40,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "Afrikaans"
-msgstr "南非语"
+msgstr "南非荷兰语"
 
 msgid "Arabic"
 msgstr "阿拉伯语"
@@ -156,6 +158,9 @@ msgstr "上索布"
 
 msgid "Hungarian"
 msgstr "匈牙利语"
+
+msgid "Armenian"
+msgstr "亚美尼亚语"
 
 msgid "Interlingua"
 msgstr "国际语"
@@ -601,6 +606,9 @@ msgstr "原始二进制数据"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "‘%(value)s’不是有效UUID。"
 
+msgid "Universally unique identifier"
+msgstr "通用唯一识别码"
+
 msgid "File"
 msgstr "文件"
 
@@ -1035,8 +1043,8 @@ msgstr "该值不是合法的IPv6地址。"
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s"
 
 msgid "or"
 msgstr "或"

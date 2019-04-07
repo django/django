@@ -748,6 +748,9 @@ class SessionMiddlewareTests(TestCase):
             ),
             str(response.cookies[settings.SESSION_COOKIE_NAME])
         )
+        # SessionMiddleware sets 'Vary: Cookie' to prevent the 'Set-Cookie'
+        # from being cached.
+        self.assertEqual(response['Vary'], 'Cookie')
 
     @override_settings(SESSION_COOKIE_DOMAIN='.example.local', SESSION_COOKIE_PATH='/example/')
     def test_session_delete_on_end_with_custom_domain_and_path(self):
