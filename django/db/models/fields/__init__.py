@@ -739,7 +739,7 @@ class Field(RegisterLookupMixin):
         """
         self.set_attributes_from_name(name)
         self.model = cls
-        cls._meta.add_field(self)  # might not needed
+        # cls._meta.add_field(self)  # might not needed
         if private_only:
             cls._meta.add_field(self, private=True)
         else:

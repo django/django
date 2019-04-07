@@ -30,6 +30,7 @@ from django.db.models.fields.related import (  # isort:skip
     ForeignKey, ForeignObject, OneToOneField, ManyToManyField,
     ManyToOneRel, ManyToManyRel, OneToOneRel,
 )
+from django.db.models.fields.virtual import VirtualField
 
 
 __all__ = aggregates_all + constraints_all + fields_all + indexes_all
@@ -44,5 +45,5 @@ __all__ += [
     'Prefetch', 'Q', 'QuerySet', 'prefetch_related_objects', 'DEFERRED', 'Model',
     'FilteredRelation',
     'ForeignKey', 'ForeignObject', 'OneToOneField', 'ManyToManyField',
-    'ManyToOneRel', 'ManyToManyRel', 'OneToOneRel',
+    'ManyToOneRel', 'ManyToManyRel', 'OneToOneRel', 'VirtualField',
 ]

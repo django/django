@@ -8,7 +8,7 @@ class VirtualField(Field):
 
     def __init__(self, **kwargs):
         kwargs.setdefault('serialize', False)
-        super(VirtualField, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def db_type(self, connection):
         return None
