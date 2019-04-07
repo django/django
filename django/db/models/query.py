@@ -1461,7 +1461,7 @@ class RawQuerySet:
         converter = connections[self.db].introspection.identifier_converter
         model_fields = {}
         for field in self.model._meta.fields:
-            name, column = field.get_attname_column()
+            column = field.get_column()
             model_fields[converter(column)] = field
         return model_fields
 

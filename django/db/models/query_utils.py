@@ -235,6 +235,10 @@ def select_related_descend(field, restricted, requested, load_fields, reverse=Fa
     """
     if not field.remote_field:
         return False
+    if field.is_reverse_link:
+        # The field is a standalone reverse link,
+        # such as GenericRelation
+        return False
     if field.remote_field.parent_link and not reverse:
         return False
     if restricted:

@@ -456,6 +456,8 @@ class ForeignObject(RelatedField):
     related_accessor_class = ReverseManyToOneDescriptor
     forward_related_accessor_class = ForwardManyToOneDescriptor
     rel_class = ForeignObjectRel
+    # GenericRelation is an example of a reverse link.
+    is_reverse_link = False
 
     def __init__(self, to, on_delete, from_fields, to_fields, rel=None, related_name=None,
                  related_query_name=None, limit_choices_to=None, parent_link=False,
@@ -655,9 +657,8 @@ class ForeignObject(RelatedField):
             ret.append(getattr(instance, field.attname))
         return tuple(ret)
 
-    def get_attname_column(self):
-        attname, column = super().get_attname_column()
-        return attname, None
+    def get_column(self):
+        return None
 
     def get_joining_columns(self, reverse_join=False):
         source = self.reverse_related_fields if reverse_join else self.related_fields
@@ -916,10 +917,8 @@ class ForeignKey(ForeignObject):
     def get_attname(self):
         return '%s_id' % self.name
 
-    def get_attname_column(self):
-        attname = self.get_attname()
-        column = self.db_column or attname
-        return attname, column
+    def get_column(self):
+        return self.db_column or self.attname
 
     def get_default(self):
         """Return the to_field if the default value is an object."""
