@@ -75,6 +75,9 @@ Minor features
 * Added the :class:`~django.contrib.gis.db.models.functions.GeometryDistance`
   function, supported on PostGIS.
 
+* Added support for the ``furlong`` unit in
+  :class:`~django.contrib.gis.measure.Distance`.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
