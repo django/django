@@ -37,7 +37,7 @@ msgstr "آیا مطمئن هستید؟"
 
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
-msgstr "حذف  %(verbose_name_plural)s های انتخاب شده"
+msgstr "حذف  %(verbose_name_plural)s انتخاب شده"
 
 msgid "Administration"
 msgstr "مدیریت"
