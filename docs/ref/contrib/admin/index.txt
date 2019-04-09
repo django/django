@@ -752,13 +752,14 @@ subclass::
                   return self.first_name + ' ' + self.last_name
               full_name.admin_order_field = Concat('first_name', Value(' '), 'last_name')
 
-    * Elements of ``list_display`` can also be properties. Please note however,
-      that due to the way properties work in Python, setting
-      ``short_description`` or ``admin_order_field`` on a property is only
-      possible when using the ``property()`` function and **not** with the
-      ``@property`` decorator.
-
-      For example::
+    * Elements of ``list_display`` can also be properties, 
+      and their use is different when using the ``property()`` 
+      function and when using ``@property`` decorator.
+      
+    * If you are using decorator, you must specify the attribute in ``fget``, 
+      the getter function name of the property object.
+              
+      For example (function)::
 
           class Person(models.Model):
               first_name = models.CharField(max_length=50)
@@ -773,6 +774,23 @@ subclass::
 
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('full_name',)
+
+      For example (decorator)::
+
+          class Person(models.Model):
+              first_name = models.CharField(max_length=50)
+              last_name = models.CharField(max_length=50)
+
+              @property
+              def full_name(self):
+                  return self.first_name + ' ' + self.last_name
+
+              full_name.fget.short_description = "Full name of the person"
+              full_name.fget.admin_order_field = 'last_name'
+
+          class PersonAdmin(admin.ModelAdmin):
+              list_display = ('full_name',)
+
 
 
     * The field names in ``list_display`` will also appear as CSS classes in
