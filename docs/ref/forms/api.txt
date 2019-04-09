@@ -299,6 +299,8 @@ provided in :attr:`~Form.initial`. It returns an empty list if no data differs.
     >>> f = ContactForm(request.POST, initial=data)
     >>> if f.has_changed():
     ...     print("The following fields changed: %s" % ", ".join(f.changed_data))
+    >>> f.changed_data
+    ['subject', 'message']
 
 Accessing the fields from the form
 ==================================
