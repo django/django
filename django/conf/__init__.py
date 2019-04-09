@@ -174,6 +174,17 @@ class Settings:
             # we don't do this unconditionally (breaks Windows).
             os.environ['TZ'] = self.TIME_ZONE
             time.tzset()
+        if not self.is_overridden('LANGUAGES_BIDI'):
+            language_codes = {language[0] for language in getattr(self, 'LANGUAGES', ())}
+            setattr(
+                self,
+                'LANGUAGES_BIDI',
+                [
+                    language
+                    for language in getattr(self, 'LANGUAGES_BIDI', ())
+                    if language in language_codes
+                ]
+            )
 
     def is_overridden(self, setting):
         return setting in self._explicit_settings
