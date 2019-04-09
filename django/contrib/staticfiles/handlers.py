@@ -3,7 +3,7 @@ from urllib.request import url2pathname
 
 from django.conf import settings
 from django.contrib.staticfiles import utils
-from django.contrib.staticfiles.views import serve
+from django.contrib.staticfiles.views import Serve
 from django.core.handlers.exception import response_for_exception
 from django.core.handlers.wsgi import WSGIHandler, get_path_info
 
@@ -48,7 +48,8 @@ class StaticFilesHandler(WSGIHandler):
 
     def serve(self, request):
         """Serve the request path."""
-        return serve(request, self.file_path(request.path), insecure=True)
+        serve = Serve(insecure=True)
+        return serve.get(request, self.file_path(request.path))
 
     def get_response(self, request):
         from django.http import Http404

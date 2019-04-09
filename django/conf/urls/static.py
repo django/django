@@ -4,10 +4,10 @@ from urllib.parse import urlsplit
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import re_path
-from django.views.static import serve
+from django.views.static import ServeStatic
 
 
-def static(prefix, view=serve, **kwargs):
+def static(prefix, view=ServeStatic, **kwargs):
     """
     Return a URL pattern for serving files in debug mode.
 

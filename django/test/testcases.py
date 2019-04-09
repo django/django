@@ -39,7 +39,7 @@ from django.test.utils import (
 )
 from django.utils.decorators import classproperty
 from django.utils.deprecation import RemovedInDjango31Warning
-from django.views.static import serve
+from django.views.static import ServeStatic
 
 __all__ = ('TestCase', 'TransactionTestCase',
            'SimpleTestCase', 'skipIfDBFeature', 'skipUnlessDBFeature')
@@ -1328,7 +1328,9 @@ class FSFilesHandler(WSGIHandler):
         # invokes staticfiles' finders functionality.
         # TODO: Modify if/when that internal API is refactored
         final_rel_path = os_rel_path.replace('\\', '/').lstrip('/')
-        return serve(request, final_rel_path, document_root=self.get_base_dir())
+        serve_static = ServeStatic(document_root=self.get_base_dir())
+
+        return serve_static.get(request, final_rel_path)
 
     def __call__(self, environ, start_response):
         if not self._should_handle(get_path_info(environ)):
