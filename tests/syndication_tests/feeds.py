@@ -136,6 +136,10 @@ class TemplateContextFeed(TestRss2Feed):
         return context
 
 
+class TestLanguageFeed(TestRss2Feed):
+    language = 'de'
+
+
 class NaiveDatesFeed(TestAtomFeed):
     """
     A feed with naive (non-timezone-aware) dates.
