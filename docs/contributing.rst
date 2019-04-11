@@ -85,19 +85,19 @@ Also, there is a tox.ini file at the root of the repository. Example commands::
 
    $ tox -l
    py36-dj11
-   py36-dj20
    py36-dj21
+   py36-dj22
    py37-dj11
-   py37-dj20
    py37-dj21
+   py37-dj22
 
    # run the test with Python 3.7, on Django 2.2 and Django master branch
-   $ tox -e py37-dj21 && tox -e py37-djmaster
+   $ tox -e py37-dj22 && tox -e py37-djmaster
 
 Note that tox can also forward arguments to pytest. When using pdb with pytest,
 forward the ``-s`` option to pytest as such::
 
-   tox -e py37-dj21 -- -s
+   tox -e py37-dj22 -- -s
 
 Can you pay me for my time?
 ---------------------------
