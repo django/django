@@ -24,6 +24,7 @@ arctangent
 arg
 args
 assistive
+async
 atomicity
 attr
 auth
@@ -115,6 +116,7 @@ conf
 config
 contenttypes
 contrib
+coroutines
 covariance
 criticals
 cron
@@ -133,6 +135,7 @@ customizations
 Dahl
 Daly
 Danga
+Daphne
 Darussalam
 databrowse
 datafile
@@ -750,6 +753,7 @@ utc
 UTF
 util
 utils
+Uvicorn
 uwsgi
 uWSGI
 validator

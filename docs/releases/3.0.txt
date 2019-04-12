@@ -44,6 +44,28 @@ MariaDB support
 Django now officially supports `MariaDB <https://mariadb.org/>`_ 10.1 and
 higher. See :ref:`MariaDB notes <mariadb-notes>` for more details.
 
+ASGI support
+------------
+
+Django 3.0 begins our journey to making Django fully async-capable by providing
+support for running as an `ASGI <https://asgi.readthedocs.io/>`_ application.
+
+This is in addition to our existing WSGI support. Django intends to support
+both for the foreseeable future. Async features will only be available to
+applications that run under ASGI, however.
+
+There is no need to switch your applications over unless you want to start
+experimenting with asynchronous code, but we have
+:doc:`documentation on deploying with ASGI </howto/deployment/asgi/index>` if
+you want to learn more.
+
+Note that as a side-effect of this change, Django is now aware of asynchronous
+event loops and will block you calling code marked as "async unsafe" - such as
+ORM operations - from an asynchronous context. If you were using Django from
+async code before, this may trigger if you were doing it incorrectly. If you
+see a ``SynchronousOnlyOperation`` error, then closely examine your code and
+move any database operations to be in a synchronous child thread.
+
 Minor features
 --------------
 

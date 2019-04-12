@@ -1,5 +1,6 @@
-import threading
 from pathlib import Path
+
+from asgiref.local import Local
 
 from django.apps import apps
 
@@ -25,5 +26,5 @@ def translation_file_changed(sender, file_path, **kwargs):
         gettext._translations = {}
         trans_real._translations = {}
         trans_real._default = None
-        trans_real._active = threading.local()
+        trans_real._active = Local()
         return True

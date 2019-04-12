@@ -4,6 +4,7 @@ PostgreSQL database backend for Django.
 Requires psycopg 2: http://initd.org/projects/psycopg2
 """
 
+import asyncio
 import threading
 import warnings
 
@@ -15,6 +16,7 @@ from django.db.backends.utils import (
     CursorDebugWrapper as BaseCursorDebugWrapper,
 )
 from django.db.utils import DatabaseError as WrappedDatabaseError
+from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeString
 from django.utils.version import get_version_tuple
@@ -177,6 +179,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             conn_params['port'] = settings_dict['PORT']
         return conn_params
 
+    @async_unsafe
     def get_new_connection(self, conn_params):
         connection = Database.connect(**conn_params)
 
@@ -217,6 +220,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             if not self.get_autocommit():
                 self.connection.commit()
 
+    @async_unsafe
     def create_cursor(self, name=None):
         if name:
             # In autocommit mode, the cursor will be used outside of a
@@ -227,12 +231,34 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         cursor.tzinfo_factory = utc_tzinfo_factory if settings.USE_TZ else None
         return cursor
 
+    @async_unsafe
     def chunked_cursor(self):
         self._named_cursor_idx += 1
+        # Get the current async task
+        # Note that right now this is behind @async_unsafe, so this is
+        # unreachable, but in future we'll start loosening this restriction.
+        # For now, it's here so that every use of "threading" is
+        # also async-compatible.
+        try:
+            if hasattr(asyncio, 'current_task'):
+                # Python 3.7 and up
+                current_task = asyncio.current_task()
+            else:
+                # Python 3.6
+                current_task = asyncio.Task.current_task()
+        except RuntimeError:
+            current_task = None
+        # Current task can be none even if the current_task call didn't error
+        if current_task:
+            task_ident = str(id(current_task))
+        else:
+            task_ident = 'sync'
+        # Use that and the thread ident to get a unique name
         return self._cursor(
-            name='_django_curs_%d_%d' % (
-                # Avoid reusing name in other threads
+            name='_django_curs_%d_%s_%d' % (
+                # Avoid reusing name in other threads / tasks
                 threading.current_thread().ident,
+                task_ident,
                 self._named_cursor_idx,
             )
         )

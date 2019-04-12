@@ -1,5 +1,6 @@
-from threading import local
 from urllib.parse import urlsplit, urlunsplit
+
+from asgiref.local import Local
 
 from django.utils.encoding import iri_to_uri
 from django.utils.functional import lazy
@@ -12,10 +13,10 @@ from .utils import get_callable
 # SCRIPT_NAME prefixes for each thread are stored here. If there's no entry for
 # the current thread (which is the only one we ever access), it is assumed to
 # be empty.
-_prefixes = local()
+_prefixes = Local()
 
 # Overridden URLconfs for each thread are stored here.
-_urlconfs = local()
+_urlconfs = Local()
 
 
 def resolve(path, urlconf=None):

@@ -8,10 +8,9 @@ import tempfile
 from contextlib import contextmanager
 from importlib import import_module
 from pathlib import Path
-from threading import local
 from unittest import mock
 
-import _thread
+from asgiref.local import Local
 
 from django import forms
 from django.apps import AppConfig
@@ -289,7 +288,7 @@ class TranslationTests(SimpleTestCase):
 
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_pgettext(self):
-        trans_real._active = local()
+        trans_real._active = Local()
         trans_real._translations = {}
         with translation.override('de'):
             self.assertEqual(pgettext("unexisting", "May"), "May")
@@ -310,7 +309,7 @@ class TranslationTests(SimpleTestCase):
         Translating a string requiring no auto-escaping with gettext or pgettext
         shouldn't change the "safe" status.
         """
-        trans_real._active = local()
+        trans_real._active = Local()
         trans_real._translations = {}
         s1 = mark_safe('Password')
         s2 = mark_safe('May')
@@ -1882,7 +1881,7 @@ class TranslationFileChangedTests(SimpleTestCase):
         self.assertEqual(gettext_module._translations, {})
         self.assertEqual(trans_real._translations, {})
         self.assertIsNone(trans_real._default)
-        self.assertIsInstance(trans_real._active, _thread._local)
+        self.assertIsInstance(trans_real._active, Local)
 
 
 class UtilsTests(SimpleTestCase):

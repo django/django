@@ -17,6 +17,7 @@ from django.db.backends.signals import connection_created
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError, DatabaseErrorWrapper
 from django.utils import timezone
+from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
 
 NO_DB_ALIAS = '__no_db__'
@@ -177,6 +178,7 @@ class BaseDatabaseWrapper:
 
     # ##### Backend-specific methods for creating connections #####
 
+    @async_unsafe
     def connect(self):
         """Connect to the database. Assume that the connection is closed."""
         # Check for invalid configurations.
@@ -210,6 +212,7 @@ class BaseDatabaseWrapper:
                     "Connection '%s' cannot set TIME_ZONE because its engine "
                     "handles time zones conversions natively." % self.alias)
 
+    @async_unsafe
     def ensure_connection(self):
         """Guarantee that a connection to the database is established."""
         if self.connection is None:
@@ -251,10 +254,12 @@ class BaseDatabaseWrapper:
 
     # ##### Generic wrappers for PEP-249 connection methods #####
 
+    @async_unsafe
     def cursor(self):
         """Create a cursor, opening a connection if necessary."""
         return self._cursor()
 
+    @async_unsafe
     def commit(self):
         """Commit a transaction and reset the dirty flag."""
         self.validate_thread_sharing()
@@ -264,6 +269,7 @@ class BaseDatabaseWrapper:
         self.errors_occurred = False
         self.run_commit_hooks_on_set_autocommit_on = True
 
+    @async_unsafe
     def rollback(self):
         """Roll back a transaction and reset the dirty flag."""
         self.validate_thread_sharing()
@@ -274,6 +280,7 @@ class BaseDatabaseWrapper:
         self.needs_rollback = False
         self.run_on_commit = []
 
+    @async_unsafe
     def close(self):
         """Close the connection to the database."""
         self.validate_thread_sharing()
@@ -313,6 +320,7 @@ class BaseDatabaseWrapper:
 
     # ##### Generic savepoint management methods #####
 
+    @async_unsafe
     def savepoint(self):
         """
         Create a savepoint inside the current transaction. Return an
@@ -333,6 +341,7 @@ class BaseDatabaseWrapper:
 
         return sid
 
+    @async_unsafe
     def savepoint_rollback(self, sid):
         """
         Roll back to a savepoint. Do nothing if savepoints are not supported.
@@ -348,6 +357,7 @@ class BaseDatabaseWrapper:
             (sids, func) for (sids, func) in self.run_on_commit if sid not in sids
         ]
 
+    @async_unsafe
     def savepoint_commit(self, sid):
         """
         Release a savepoint. Do nothing if savepoints are not supported.
@@ -358,6 +368,7 @@ class BaseDatabaseWrapper:
         self.validate_thread_sharing()
         self._savepoint_commit(sid)
 
+    @async_unsafe
     def clean_savepoints(self):
         """
         Reset the counter used to generate unique savepoint ids in this thread.

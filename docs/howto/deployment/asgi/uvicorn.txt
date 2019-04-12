@@ -1,0 +1,35 @@
+==============================
+How to use Django with Uvicorn
+==============================
+
+.. highlight:: bash
+
+Uvicorn_ is an ASGI server based on ``uvloop`` and ``httptools``, with an
+emphasis on speed.
+
+Installing Uvicorn
+==================
+
+You can install Uvicorn with ``pip``::
+
+    python -m pip install uvicorn
+
+Running Django in Uvicorn
+=========================
+
+When Uvicorn is installed, a ``uvicorn`` command is available which runs ASGI
+applications. Uvicorn needs to be called with the location of a module
+containing a ASGI application object, followed by what the application is
+called (separated by a colon).
+
+For a typical Django project, invoking Uvicorn would look like::
+
+    uvicorn myproject.asgi:application
+
+This will start one process listening on ``127.0.0.1:8000``. It requires that
+your project be on the Python path; to ensure that run this command from the
+same directory as your ``manage.py`` file.
+
+For more advanced usage, please read the `Uvicorn documentation <Uvicorn_>`_.
+
+.. _Uvicorn: https://www.uvicorn.org/
