@@ -1162,7 +1162,7 @@ class ModelChoiceField(ChoiceField):
                  required=True, widget=None, label=None, initial=None,
                  help_text='', to_field_name=None, limit_choices_to=None,
                  **kwargs):
-        #  A blank option is not idiomatic for radio buttons, 
+        #  A blank option is not idiomatic for radio buttons,
         #  see https://code.djangoproject.com/ticket/26813
         if required and (initial is not None) or isinstance(widget, RadioSelect):
             self.empty_label = None
