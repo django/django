@@ -1,5 +1,7 @@
 from django.contrib.postgres.signals import (
-    get_citext_oids, get_hstore_oids, register_type_handlers,
+    get_citext_oids,
+    get_hstore_oids,
+    register_type_handlers,
 )
 from django.db.migrations.operations.base import Operation
 
@@ -14,9 +16,11 @@ class CreateExtension(Operation):
         pass
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        if schema_editor.connection.vendor != 'postgresql':
+        if schema_editor.connection.vendor != "postgresql":
             return
-        schema_editor.execute("CREATE EXTENSION IF NOT EXISTS %s" % schema_editor.quote_name(self.name))
+        schema_editor.execute(
+            "CREATE EXTENSION IF NOT EXISTS %s" % schema_editor.quote_name(self.name)
+        )
         # Clear cached, stale oids.
         get_hstore_oids.cache_clear()
         get_citext_oids.cache_clear()
@@ -36,42 +40,35 @@ class CreateExtension(Operation):
 
 
 class BtreeGinExtension(CreateExtension):
-
     def __init__(self):
-        self.name = 'btree_gin'
+        self.name = "btree_gin"
 
 
 class BtreeGistExtension(CreateExtension):
-
     def __init__(self):
-        self.name = 'btree_gist'
+        self.name = "btree_gist"
 
 
 class CITextExtension(CreateExtension):
-
     def __init__(self):
-        self.name = 'citext'
+        self.name = "citext"
 
 
 class CryptoExtension(CreateExtension):
-
     def __init__(self):
-        self.name = 'pgcrypto'
+        self.name = "pgcrypto"
 
 
 class HStoreExtension(CreateExtension):
-
     def __init__(self):
-        self.name = 'hstore'
+        self.name = "hstore"
 
 
 class TrigramExtension(CreateExtension):
-
     def __init__(self):
-        self.name = 'pg_trgm'
+        self.name = "pg_trgm"
 
 
 class UnaccentExtension(CreateExtension):
-
     def __init__(self):
-        self.name = 'unaccent'
+        self.name = "unaccent"

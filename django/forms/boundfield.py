@@ -7,12 +7,13 @@ from django.utils.html import conditional_escape, format_html, html_safe
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
-__all__ = ('BoundField',)
+__all__ = ("BoundField",)
 
 
 @html_safe
 class BoundField:
     "A Field plus data"
+
     def __init__(self, form, field, name):
         self.form = form
         self.field = field
@@ -24,7 +25,7 @@ class BoundField:
             self.label = pretty_name(name)
         else:
             self.label = self.field.label
-        self.help_text = field.help_text or ''
+        self.help_text = field.help_text or ""
 
     def __str__(self):
         """Render this field as an HTML widget."""
@@ -41,12 +42,14 @@ class BoundField:
         This property is cached so that only one database query occurs when
         rendering ModelChoiceFields.
         """
-        id_ = self.field.widget.attrs.get('id') or self.auto_id
-        attrs = {'id': id_} if id_ else {}
+        id_ = self.field.widget.attrs.get("id") or self.auto_id
+        attrs = {"id": id_} if id_ else {}
         attrs = self.build_widget_attrs(attrs)
         return [
             BoundWidget(self.field.widget, widget, self.form.renderer)
-            for widget in self.field.widget.subwidgets(self.html_name, self.value(), attrs=attrs)
+            for widget in self.field.widget.subwidgets(
+                self.html_name, self.value(), attrs=attrs
+            )
         ]
 
     def __bool__(self):
@@ -84,8 +87,10 @@ class BoundField:
             widget.is_localized = True
         attrs = attrs or {}
         attrs = self.build_widget_attrs(attrs, widget)
-        if self.auto_id and 'id' not in widget.attrs:
-            attrs.setdefault('id', self.html_initial_id if only_initial else self.auto_id)
+        if self.auto_id and "id" not in widget.attrs:
+            attrs.setdefault(
+                "id", self.html_initial_id if only_initial else self.auto_id
+            )
         return widget.render(
             name=self.html_initial_name if only_initial else self.html_name,
             value=self.value(),
@@ -114,7 +119,9 @@ class BoundField:
         """
         Return the data for this BoundField, or None if it wasn't given.
         """
-        return self.field.widget.value_from_datadict(self.form.data, self.form.files, self.html_name)
+        return self.field.widget.value_from_datadict(
+            self.form.data, self.form.files, self.html_name
+        )
 
     def value(self):
         """
@@ -138,27 +145,30 @@ class BoundField:
         """
         contents = contents or self.label
         if label_suffix is None:
-            label_suffix = (self.field.label_suffix if self.field.label_suffix is not None
-                            else self.form.label_suffix)
+            label_suffix = (
+                self.field.label_suffix
+                if self.field.label_suffix is not None
+                else self.form.label_suffix
+            )
         # Only add the suffix if the label does not end in punctuation.
         # Translators: If found as last label character, these punctuation
         # characters will prevent the default label_suffix to be appended to the label
-        if label_suffix and contents and contents[-1] not in _(':?.!'):
-            contents = format_html('{}{}', contents, label_suffix)
+        if label_suffix and contents and contents[-1] not in _(":?.!"):
+            contents = format_html("{}{}", contents, label_suffix)
         widget = self.field.widget
-        id_ = widget.attrs.get('id') or self.auto_id
+        id_ = widget.attrs.get("id") or self.auto_id
         if id_:
             id_for_label = widget.id_for_label(id_)
             if id_for_label:
-                attrs = {**(attrs or {}), 'for': id_for_label}
-            if self.field.required and hasattr(self.form, 'required_css_class'):
+                attrs = {**(attrs or {}), "for": id_for_label}
+            if self.field.required and hasattr(self.form, "required_css_class"):
                 attrs = attrs or {}
-                if 'class' in attrs:
-                    attrs['class'] += ' ' + self.form.required_css_class
+                if "class" in attrs:
+                    attrs["class"] += " " + self.form.required_css_class
                 else:
-                    attrs['class'] = self.form.required_css_class
-            attrs = flatatt(attrs) if attrs else ''
-            contents = format_html('<label{}>{}</label>', attrs, contents)
+                    attrs["class"] = self.form.required_css_class
+            attrs = flatatt(attrs) if attrs else ""
+            contents = format_html("<label{}>{}</label>", attrs, contents)
         else:
             contents = conditional_escape(contents)
         return mark_safe(contents)
@@ -167,14 +177,14 @@ class BoundField:
         """
         Return a string of space-separated CSS classes for this field.
         """
-        if hasattr(extra_classes, 'split'):
+        if hasattr(extra_classes, "split"):
             extra_classes = extra_classes.split()
         extra_classes = set(extra_classes or [])
-        if self.errors and hasattr(self.form, 'error_css_class'):
+        if self.errors and hasattr(self.form, "error_css_class"):
             extra_classes.add(self.form.error_css_class)
-        if self.field.required and hasattr(self.form, 'required_css_class'):
+        if self.field.required and hasattr(self.form, "required_css_class"):
             extra_classes.add(self.form.required_css_class)
-        return ' '.join(extra_classes)
+        return " ".join(extra_classes)
 
     @property
     def is_hidden(self):
@@ -188,11 +198,11 @@ class BoundField:
         associated Form has specified auto_id. Return an empty string otherwise.
         """
         auto_id = self.form.auto_id  # Boolean or string
-        if auto_id and '%s' in str(auto_id):
+        if auto_id and "%s" in str(auto_id):
             return auto_id % self.html_name
         elif auto_id:
             return self.html_name
-        return ''
+        return ""
 
     @property
     def id_for_label(self):
@@ -202,7 +212,7 @@ class BoundField:
         it has a single widget or a MultiWidget.
         """
         widget = self.field.widget
-        id_ = widget.attrs.get('id') or self.auto_id
+        id_ = widget.attrs.get("id") or self.auto_id
         return widget.id_for_label(id_)
 
     @cached_property
@@ -210,18 +220,24 @@ class BoundField:
         data = self.form.get_initial_for_field(self.field, self.name)
         # If this is an auto-generated default date, nix the microseconds for
         # standardized handling. See #22502.
-        if (isinstance(data, (datetime.datetime, datetime.time)) and
-                not self.field.widget.supports_microseconds):
+        if (
+            isinstance(data, (datetime.datetime, datetime.time))
+            and not self.field.widget.supports_microseconds
+        ):
             data = data.replace(microsecond=0)
         return data
 
     def build_widget_attrs(self, attrs, widget=None):
         widget = widget or self.field.widget
         attrs = dict(attrs)  # Copy attrs to avoid modifying the argument.
-        if widget.use_required_attribute(self.initial) and self.field.required and self.form.use_required_attribute:
-            attrs['required'] = True
+        if (
+            widget.use_required_attribute(self.initial)
+            and self.field.required
+            and self.form.use_required_attribute
+        ):
+            attrs["required"] = True
         if self.field.disabled:
-            attrs['disabled'] = True
+            attrs["disabled"] = True
         return attrs
 
 
@@ -239,6 +255,7 @@ class BoundWidget:
       </label>
     {% endfor %}
     """
+
     def __init__(self, parent_widget, data, renderer):
         self.parent_widget = parent_widget
         self.data = data
@@ -248,19 +265,19 @@ class BoundWidget:
         return self.tag(wrap_label=True)
 
     def tag(self, wrap_label=False):
-        context = {'widget': {**self.data, 'wrap_label': wrap_label}}
+        context = {"widget": {**self.data, "wrap_label": wrap_label}}
         return self.parent_widget._render(self.template_name, context, self.renderer)
 
     @property
     def template_name(self):
-        if 'template_name' in self.data:
-            return self.data['template_name']
+        if "template_name" in self.data:
+            return self.data["template_name"]
         return self.parent_widget.template_name
 
     @property
     def id_for_label(self):
-        return 'id_%s_%s' % (self.data['name'], self.data['index'])
+        return "id_%s_%s" % (self.data["name"], self.data["index"])
 
     @property
     def choice_label(self):
-        return self.data['label']
+        return self.data["label"]

@@ -9,51 +9,51 @@ class PostgresSimpleLookup(FieldGetDbPrepValueMixin, Lookup):
         lhs, lhs_params = self.process_lhs(qn, connection)
         rhs, rhs_params = self.process_rhs(qn, connection)
         params = lhs_params + rhs_params
-        return '%s %s %s' % (lhs, self.operator, rhs), params
+        return "%s %s %s" % (lhs, self.operator, rhs), params
 
 
 class DataContains(PostgresSimpleLookup):
-    lookup_name = 'contains'
-    operator = '@>'
+    lookup_name = "contains"
+    operator = "@>"
 
 
 class ContainedBy(PostgresSimpleLookup):
-    lookup_name = 'contained_by'
-    operator = '<@'
+    lookup_name = "contained_by"
+    operator = "<@"
 
 
 class Overlap(PostgresSimpleLookup):
-    lookup_name = 'overlap'
-    operator = '&&'
+    lookup_name = "overlap"
+    operator = "&&"
 
 
 class HasKey(PostgresSimpleLookup):
-    lookup_name = 'has_key'
-    operator = '?'
+    lookup_name = "has_key"
+    operator = "?"
     prepare_rhs = False
 
 
 class HasKeys(PostgresSimpleLookup):
-    lookup_name = 'has_keys'
-    operator = '?&'
+    lookup_name = "has_keys"
+    operator = "?&"
 
     def get_prep_lookup(self):
         return [str(item) for item in self.rhs]
 
 
 class HasAnyKeys(HasKeys):
-    lookup_name = 'has_any_keys'
-    operator = '?|'
+    lookup_name = "has_any_keys"
+    operator = "?|"
 
 
 class Unaccent(Transform):
     bilateral = True
-    lookup_name = 'unaccent'
-    function = 'UNACCENT'
+    lookup_name = "unaccent"
+    function = "UNACCENT"
 
 
 class SearchLookup(SearchVectorExact):
-    lookup_name = 'search'
+    lookup_name = "search"
 
     def process_lhs(self, qn, connection):
         if not isinstance(self.lhs.output_field, SearchVectorField):
@@ -63,8 +63,8 @@ class SearchLookup(SearchVectorExact):
 
 
 class TrigramSimilar(PostgresSimpleLookup):
-    lookup_name = 'trigram_similar'
-    operator = '%%'
+    lookup_name = "trigram_similar"
+    operator = "%%"
 
 
 class JSONExact(Exact):
@@ -73,4 +73,4 @@ class JSONExact(Exact):
     def process_rhs(self, compiler, connection):
         result = super().process_rhs(compiler, connection)
         # Treat None lookup values as null.
-        return ("'null'", []) if result == ('%s', [None]) else result
+        return ("'null'", []) if result == ("%s", [None]) else result

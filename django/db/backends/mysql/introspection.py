@@ -3,58 +3,65 @@ from collections import namedtuple
 from MySQLdb.constants import FIELD_TYPE
 
 from django.db.backends.base.introspection import (
-    BaseDatabaseIntrospection, FieldInfo as BaseFieldInfo, TableInfo,
+    BaseDatabaseIntrospection,
+    FieldInfo as BaseFieldInfo,
+    TableInfo,
 )
 from django.db.models.indexes import Index
 from django.utils.datastructures import OrderedSet
 
-FieldInfo = namedtuple('FieldInfo', BaseFieldInfo._fields + ('extra', 'is_unsigned'))
-InfoLine = namedtuple('InfoLine', 'col_name data_type max_len num_prec num_scale extra column_default is_unsigned')
+FieldInfo = namedtuple("FieldInfo", BaseFieldInfo._fields + ("extra", "is_unsigned"))
+InfoLine = namedtuple(
+    "InfoLine",
+    "col_name data_type max_len num_prec num_scale extra column_default is_unsigned",
+)
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
     data_types_reverse = {
-        FIELD_TYPE.BLOB: 'TextField',
-        FIELD_TYPE.CHAR: 'CharField',
-        FIELD_TYPE.DECIMAL: 'DecimalField',
-        FIELD_TYPE.NEWDECIMAL: 'DecimalField',
-        FIELD_TYPE.DATE: 'DateField',
-        FIELD_TYPE.DATETIME: 'DateTimeField',
-        FIELD_TYPE.DOUBLE: 'FloatField',
-        FIELD_TYPE.FLOAT: 'FloatField',
-        FIELD_TYPE.INT24: 'IntegerField',
-        FIELD_TYPE.LONG: 'IntegerField',
-        FIELD_TYPE.LONGLONG: 'BigIntegerField',
-        FIELD_TYPE.SHORT: 'SmallIntegerField',
-        FIELD_TYPE.STRING: 'CharField',
-        FIELD_TYPE.TIME: 'TimeField',
-        FIELD_TYPE.TIMESTAMP: 'DateTimeField',
-        FIELD_TYPE.TINY: 'IntegerField',
-        FIELD_TYPE.TINY_BLOB: 'TextField',
-        FIELD_TYPE.MEDIUM_BLOB: 'TextField',
-        FIELD_TYPE.LONG_BLOB: 'TextField',
-        FIELD_TYPE.VAR_STRING: 'CharField',
+        FIELD_TYPE.BLOB: "TextField",
+        FIELD_TYPE.CHAR: "CharField",
+        FIELD_TYPE.DECIMAL: "DecimalField",
+        FIELD_TYPE.NEWDECIMAL: "DecimalField",
+        FIELD_TYPE.DATE: "DateField",
+        FIELD_TYPE.DATETIME: "DateTimeField",
+        FIELD_TYPE.DOUBLE: "FloatField",
+        FIELD_TYPE.FLOAT: "FloatField",
+        FIELD_TYPE.INT24: "IntegerField",
+        FIELD_TYPE.LONG: "IntegerField",
+        FIELD_TYPE.LONGLONG: "BigIntegerField",
+        FIELD_TYPE.SHORT: "SmallIntegerField",
+        FIELD_TYPE.STRING: "CharField",
+        FIELD_TYPE.TIME: "TimeField",
+        FIELD_TYPE.TIMESTAMP: "DateTimeField",
+        FIELD_TYPE.TINY: "IntegerField",
+        FIELD_TYPE.TINY_BLOB: "TextField",
+        FIELD_TYPE.MEDIUM_BLOB: "TextField",
+        FIELD_TYPE.LONG_BLOB: "TextField",
+        FIELD_TYPE.VAR_STRING: "CharField",
     }
 
     def get_field_type(self, data_type, description):
         field_type = super().get_field_type(data_type, description)
-        if 'auto_increment' in description.extra:
-            if field_type == 'IntegerField':
-                return 'AutoField'
-            elif field_type == 'BigIntegerField':
-                return 'BigAutoField'
+        if "auto_increment" in description.extra:
+            if field_type == "IntegerField":
+                return "AutoField"
+            elif field_type == "BigIntegerField":
+                return "BigAutoField"
         if description.is_unsigned:
-            if field_type == 'IntegerField':
-                return 'PositiveIntegerField'
-            elif field_type == 'SmallIntegerField':
-                return 'PositiveSmallIntegerField'
+            if field_type == "IntegerField":
+                return "PositiveIntegerField"
+            elif field_type == "SmallIntegerField":
+                return "PositiveSmallIntegerField"
         return field_type
 
     def get_table_list(self, cursor):
         """Return a list of table and view names in the current database."""
         cursor.execute("SHOW FULL TABLES")
-        return [TableInfo(row[0], {'BASE TABLE': 't', 'VIEW': 'v'}.get(row[1]))
-                for row in cursor.fetchall()]
+        return [
+            TableInfo(row[0], {"BASE TABLE": "t", "VIEW": "v"}.get(row[1]))
+            for row in cursor.fetchall()
+        ]
 
     def get_table_description(self, cursor, table_name):
         """
@@ -66,7 +73,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         #   not visible length (#5725)
         # - precision and scale (for decimal fields) (#5014)
         # - auto_increment is not available in cursor.description
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
                 column_name, data_type, character_maximum_length,
                 numeric_precision, numeric_scale, extra, column_default,
@@ -75,10 +83,14 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     ELSE 0
                 END AS is_unsigned
             FROM information_schema.columns
-            WHERE table_name = %s AND table_schema = DATABASE()""", [table_name])
+            WHERE table_name = %s AND table_schema = DATABASE()""",
+            [table_name],
+        )
         field_info = {line[0]: InfoLine(*line) for line in cursor.fetchall()}
 
-        cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
+        cursor.execute(
+            "SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name)
+        )
 
         def to_int(i):
             return int(i) if i is not None else i
@@ -86,23 +98,25 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         fields = []
         for line in cursor.description:
             info = field_info[line[0]]
-            fields.append(FieldInfo(
-                *line[:3],
-                to_int(info.max_len) or line[3],
-                to_int(info.num_prec) or line[4],
-                to_int(info.num_scale) or line[5],
-                line[6],
-                info.column_default,
-                info.extra,
-                info.is_unsigned,
-            ))
+            fields.append(
+                FieldInfo(
+                    *line[:3],
+                    to_int(info.max_len) or line[3],
+                    to_int(info.num_prec) or line[4],
+                    to_int(info.num_scale) or line[5],
+                    line[6],
+                    info.column_default,
+                    info.extra,
+                    info.is_unsigned,
+                )
+            )
         return fields
 
     def get_sequences(self, cursor, table_name, table_fields=()):
         for field_info in self.get_table_description(cursor, table_name):
-            if 'auto_increment' in field_info.extra:
+            if "auto_increment" in field_info.extra:
                 # MySQL allows only one auto-increment column per table.
-                return [{'table': table_name, 'column': field_info.name}]
+                return [{"table": table_name, "column": field_info.name}]
         return []
 
     def get_relations(self, cursor, table_name):
@@ -122,13 +136,16 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         for all key columns in the given table.
         """
         key_columns = []
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT column_name, referenced_table_name, referenced_column_name
             FROM information_schema.key_column_usage
             WHERE table_name = %s
                 AND table_schema = DATABASE()
                 AND referenced_table_name IS NOT NULL
-                AND referenced_column_name IS NOT NULL""", [table_name])
+                AND referenced_column_name IS NOT NULL""",
+            [table_name],
+        )
         key_columns.extend(cursor.fetchall())
         return key_columns
 
@@ -138,9 +155,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         storage engine if the table doesn't exist.
         """
         cursor.execute(
-            "SELECT engine "
-            "FROM information_schema.tables "
-            "WHERE table_name = %s", [table_name])
+            "SELECT engine " "FROM information_schema.tables " "WHERE table_name = %s",
+            [table_name],
+        )
         result = cursor.fetchone()
         if not result:
             return self.connection.features._mysql_storage_engine
@@ -166,14 +183,14 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         for constraint, column, ref_table, ref_column in cursor.fetchall():
             if constraint not in constraints:
                 constraints[constraint] = {
-                    'columns': OrderedSet(),
-                    'primary_key': False,
-                    'unique': False,
-                    'index': False,
-                    'check': False,
-                    'foreign_key': (ref_table, ref_column) if ref_column else None,
+                    "columns": OrderedSet(),
+                    "primary_key": False,
+                    "unique": False,
+                    "index": False,
+                    "check": False,
+                    "foreign_key": (ref_table, ref_column) if ref_column else None,
                 }
-            constraints[constraint]['columns'].add(column)
+            constraints[constraint]["columns"].add(column)
         # Now get the constraint types
         type_query = """
             SELECT c.constraint_name, c.constraint_type
@@ -185,25 +202,31 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         cursor.execute(type_query, [table_name])
         for constraint, kind in cursor.fetchall():
             if kind.lower() == "primary key":
-                constraints[constraint]['primary_key'] = True
-                constraints[constraint]['unique'] = True
+                constraints[constraint]["primary_key"] = True
+                constraints[constraint]["unique"] = True
             elif kind.lower() == "unique":
-                constraints[constraint]['unique'] = True
+                constraints[constraint]["unique"] = True
         # Now add in the indexes
-        cursor.execute("SHOW INDEX FROM %s" % self.connection.ops.quote_name(table_name))
-        for table, non_unique, index, colseq, column, type_ in [x[:5] + (x[10],) for x in cursor.fetchall()]:
+        cursor.execute(
+            "SHOW INDEX FROM %s" % self.connection.ops.quote_name(table_name)
+        )
+        for table, non_unique, index, colseq, column, type_ in [
+            x[:5] + (x[10],) for x in cursor.fetchall()
+        ]:
             if index not in constraints:
                 constraints[index] = {
-                    'columns': OrderedSet(),
-                    'primary_key': False,
-                    'unique': False,
-                    'check': False,
-                    'foreign_key': None,
+                    "columns": OrderedSet(),
+                    "primary_key": False,
+                    "unique": False,
+                    "check": False,
+                    "foreign_key": None,
                 }
-            constraints[index]['index'] = True
-            constraints[index]['type'] = Index.suffix if type_ == 'BTREE' else type_.lower()
-            constraints[index]['columns'].add(column)
+            constraints[index]["index"] = True
+            constraints[index]["type"] = (
+                Index.suffix if type_ == "BTREE" else type_.lower()
+            )
+            constraints[index]["columns"].add(column)
         # Convert the sorted sets to lists
         for constraint in constraints.values():
-            constraint['columns'] = list(constraint['columns'])
+            constraint["columns"] = list(constraint["columns"])
         return constraints

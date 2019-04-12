@@ -9,4 +9,6 @@ class Employee(models.Model):
     age = models.IntegerField(blank=False, null=False)
 
     def __str__(self):
-        return '{}, {}, {}, {}'.format(self.name, self.department, self.salary, self.hire_date)
+        return "{}, {}, {}, {}".format(
+            self.name, self.department, self.salary, self.hire_date
+        )

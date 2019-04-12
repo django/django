@@ -17,7 +17,10 @@ def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB
     try:
         klass = apps.get_model(label, model)
     except LookupError:
-        raise Http404('You must supply a valid app label and module name.  Got "%s.%s"' % (label, model))
+        raise Http404(
+            'You must supply a valid app label and module name.  Got "%s.%s"'
+            % (label, model)
+        )
 
     if field_name:
         try:
@@ -25,7 +28,7 @@ def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB
             if not isinstance(field, GeometryField):
                 raise FieldDoesNotExist
         except FieldDoesNotExist:
-            raise Http404('Invalid geometry field.')
+            raise Http404("Invalid geometry field.")
 
     connection = connections[using]
 
@@ -38,8 +41,9 @@ def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB
         placemarks = []
         if connection.features.has_Transform_function:
             qs = klass._default_manager.using(using).annotate(
-                **{'%s_4326' % field_name: Transform(field_name, 4326)})
-            field_name += '_4326'
+                **{"%s_4326" % field_name: Transform(field_name, 4326)}
+            )
+            field_name += "_4326"
         else:
             qs = klass._default_manager.using(using).all()
         for mod in qs:
@@ -51,7 +55,7 @@ def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB
         render = render_to_kmz
     else:
         render = render_to_kml
-    return render('gis/kml/placemarks.kml', {'places': placemarks})
+    return render("gis/kml/placemarks.kml", {"places": placemarks})
 
 
 def kmz(request, label, model, field_name=None, using=DEFAULT_DB_ALIAS):

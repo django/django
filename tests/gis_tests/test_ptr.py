@@ -6,7 +6,6 @@ from django.test import SimpleTestCase
 
 
 class CPointerBaseTests(SimpleTestCase):
-
     def test(self):
         destructor_mock = mock.Mock()
 
@@ -41,10 +40,10 @@ class CPointerBaseTests(SimpleTestCase):
         # results in a TypeError when trying to assign it to the `ptr` property.
         # Thus, memory addresses (integers) and pointers of the incorrect type
         # (in `bad_ptrs`) aren't allowed.
-        bad_ptrs = (5, ctypes.c_char_p(b'foobar'))
+        bad_ptrs = (5, ctypes.c_char_p(b"foobar"))
         for bad_ptr in bad_ptrs:
             for fg in (fg1, fg2):
-                with self.assertRaisesMessage(TypeError, 'Incompatible pointer type'):
+                with self.assertRaisesMessage(TypeError, "Incompatible pointer type"):
                     fg.ptr = bad_ptr
 
         # Object can be deleted without a destructor set.
@@ -60,7 +59,7 @@ class CPointerBaseTests(SimpleTestCase):
 
         # The destructor is called if set.
         fg = FakeGeom2()
-        ptr = fg.ptr_type(ctypes.c_float(1.))
+        ptr = fg.ptr_type(ctypes.c_float(1.0))
         fg.ptr = ptr
         del fg
         destructor_mock.assert_called_with(ptr)

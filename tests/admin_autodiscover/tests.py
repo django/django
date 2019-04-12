@@ -8,6 +8,7 @@ class AdminAutoDiscoverTests(TestCase):
     Test for bug #8245 - don't raise an AlreadyRegistered exception when using
     autodiscover() and an admin.py module contains an error.
     """
+
     def test_double_call_autodiscover(self):
         # The first time autodiscover is called, we should get our real error.
         with self.assertRaises(Exception) as cm:

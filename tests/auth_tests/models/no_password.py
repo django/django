@@ -17,5 +17,5 @@ class NoPasswordUser(AbstractBaseUser):
     last_login = None
     username = models.CharField(max_length=50, unique=True)
 
-    USERNAME_FIELD = 'username'
+    USERNAME_FIELD = "username"
     objects = UserManager()

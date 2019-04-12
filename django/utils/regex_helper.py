@@ -69,23 +69,23 @@ def normalize(pattern):
     try:
         ch, escaped = next(pattern_iter)
     except StopIteration:
-        return [('', [])]
+        return [("", [])]
 
     try:
         while True:
             if escaped:
                 result.append(ch)
-            elif ch == '.':
+            elif ch == ".":
                 # Replace "any character" with an arbitrary representative.
                 result.append(".")
-            elif ch == '|':
+            elif ch == "|":
                 # FIXME: One day we'll should do this, but not in 1.0.
-                raise NotImplementedError('Awaiting Implementation')
+                raise NotImplementedError("Awaiting Implementation")
             elif ch == "^":
                 pass
-            elif ch == '$':
+            elif ch == "$":
                 break
-            elif ch == ')':
+            elif ch == ")":
                 # This can only be the end of a non-capturing group, since all
                 # other unescaped parentheses are handled by the grouping
                 # section later (and the full group is handled there).
@@ -95,17 +95,17 @@ def normalize(pattern):
                 start = non_capturing_groups.pop()
                 inner = NonCapture(result[start:])
                 result = result[:start] + [inner]
-            elif ch == '[':
+            elif ch == "[":
                 # Replace ranges with the first character in the range.
                 ch, escaped = next(pattern_iter)
                 result.append(ch)
                 ch, escaped = next(pattern_iter)
-                while escaped or ch != ']':
+                while escaped or ch != "]":
                     ch, escaped = next(pattern_iter)
-            elif ch == '(':
+            elif ch == "(":
                 # Some kind of group.
                 ch, escaped = next(pattern_iter)
-                if ch != '?' or escaped:
+                if ch != "?" or escaped:
                     # A positional group
                     name = "_%d" % num_args
                     num_args += 1
@@ -113,37 +113,39 @@ def normalize(pattern):
                     walk_to_end(ch, pattern_iter)
                 else:
                     ch, escaped = next(pattern_iter)
-                    if ch in '!=<':
+                    if ch in "!=<":
                         # All of these are ignorable. Walk to the end of the
                         # group.
                         walk_to_end(ch, pattern_iter)
-                    elif ch == ':':
+                    elif ch == ":":
                         # Non-capturing group
                         non_capturing_groups.append(len(result))
-                    elif ch != 'P':
+                    elif ch != "P":
                         # Anything else, other than a named group, is something
                         # we cannot reverse.
                         raise ValueError("Non-reversible reg-exp portion: '(?%s'" % ch)
                     else:
                         ch, escaped = next(pattern_iter)
-                        if ch not in ('<', '='):
-                            raise ValueError("Non-reversible reg-exp portion: '(?P%s'" % ch)
+                        if ch not in ("<", "="):
+                            raise ValueError(
+                                "Non-reversible reg-exp portion: '(?P%s'" % ch
+                            )
                         # We are in a named capturing group. Extra the name and
                         # then skip to the end.
-                        if ch == '<':
-                            terminal_char = '>'
+                        if ch == "<":
+                            terminal_char = ">"
                         # We are in a named backreference.
                         else:
-                            terminal_char = ')'
+                            terminal_char = ")"
                         name = []
                         ch, escaped = next(pattern_iter)
                         while ch != terminal_char:
                             name.append(ch)
                             ch, escaped = next(pattern_iter)
-                        param = ''.join(name)
+                        param = "".join(name)
                         # Named backreferences have already consumed the
                         # parenthesis.
-                        if terminal_char != ')':
+                        if terminal_char != ")":
                             result.append(Group((("%%(%s)s" % param), param)))
                             walk_to_end(ch, pattern_iter)
                         else:
@@ -181,7 +183,7 @@ def normalize(pattern):
         pass
     except NotImplementedError:
         # A case of using the disjunctive form. No results for you!
-        return [('', [])]
+        return [("", [])]
 
     return list(zip(*flatten_result(result)))
 
@@ -197,7 +199,7 @@ def next_char(input_iter):
     raw (unescaped) character or not.
     """
     for ch in input_iter:
-        if ch != '\\':
+        if ch != "\\":
             yield ch, False
             continue
         ch = next(input_iter)
@@ -213,16 +215,16 @@ def walk_to_end(ch, input_iter):
     this group, skipping over any nested groups and handling escaped
     parentheses correctly.
     """
-    if ch == '(':
+    if ch == "(":
         nesting = 1
     else:
         nesting = 0
     for ch, escaped in input_iter:
         if escaped:
             continue
-        elif ch == '(':
+        elif ch == "(":
             nesting += 1
-        elif ch == ')':
+        elif ch == ")":
             if not nesting:
                 return
             nesting -= 1
@@ -237,30 +239,30 @@ def get_quantifier(ch, input_iter):
     either None or the next character from the input_iter if the next character
     is not part of the quantifier.
     """
-    if ch in '*?+':
+    if ch in "*?+":
         try:
             ch2, escaped = next(input_iter)
         except StopIteration:
             ch2 = None
-        if ch2 == '?':
+        if ch2 == "?":
             ch2 = None
-        if ch == '+':
+        if ch == "+":
             return 1, ch2
         return 0, ch2
 
     quant = []
-    while ch != '}':
+    while ch != "}":
         ch, escaped = next(input_iter)
         quant.append(ch)
     quant = quant[:-1]
-    values = ''.join(quant).split(',')
+    values = "".join(quant).split(",")
 
     # Consume the trailing '?', if necessary.
     try:
         ch, escaped = next(input_iter)
     except StopIteration:
         ch = None
-    if ch == '?':
+    if ch == "?":
         ch = None
     return int(values[0]), ch
 
@@ -286,20 +288,20 @@ def flatten_result(source):
     Each of the two lists will be of the same length.
     """
     if source is None:
-        return [''], [[]]
+        return [""], [[]]
     if isinstance(source, Group):
         if source[1] is None:
             params = []
         else:
             params = [source[1]]
         return [source[0]], [params]
-    result = ['']
+    result = [""]
     result_args = [[]]
     pos = last = 0
     for pos, elt in enumerate(source):
         if isinstance(elt, str):
             continue
-        piece = ''.join(source[last:pos])
+        piece = "".join(source[last:pos])
         if isinstance(elt, Group):
             piece += elt[0]
             param = elt[1]
@@ -327,7 +329,7 @@ def flatten_result(source):
             result = new_result
             result_args = new_args
     if pos >= last:
-        piece = ''.join(source[last:])
+        piece = "".join(source[last:])
         for i in range(len(result)):
             result[i] += piece
     return result, result_args

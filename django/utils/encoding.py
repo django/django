@@ -15,10 +15,14 @@ class DjangoUnicodeDecodeError(UnicodeDecodeError):
         super().__init__(*args)
 
     def __str__(self):
-        return '%s. You passed in %r (%s)' % (super().__str__(), self.obj, type(self.obj))
+        return "%s. You passed in %r (%s)" % (
+            super().__str__(),
+            self.obj,
+            type(self.obj),
+        )
 
 
-def smart_str(s, encoding='utf-8', strings_only=False, errors='strict'):
+def smart_str(s, encoding="utf-8", strings_only=False, errors="strict"):
     """
     Return a string representing 's'. Treat bytestrings using the 'encoding'
     codec.
@@ -32,7 +36,13 @@ def smart_str(s, encoding='utf-8', strings_only=False, errors='strict'):
 
 
 _PROTECTED_TYPES = (
-    type(None), int, float, Decimal, datetime.datetime, datetime.date, datetime.time,
+    type(None),
+    int,
+    float,
+    Decimal,
+    datetime.datetime,
+    datetime.date,
+    datetime.time,
 )
 
 
@@ -45,7 +55,7 @@ def is_protected_type(obj):
     return isinstance(obj, _PROTECTED_TYPES)
 
 
-def force_str(s, encoding='utf-8', strings_only=False, errors='strict'):
+def force_str(s, encoding="utf-8", strings_only=False, errors="strict"):
     """
     Similar to smart_str(), except that lazy instances are resolved to
     strings, rather than kept as lazy objects.
@@ -67,7 +77,7 @@ def force_str(s, encoding='utf-8', strings_only=False, errors='strict'):
     return s
 
 
-def smart_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
+def smart_bytes(s, encoding="utf-8", strings_only=False, errors="strict"):
     """
     Return a bytestring version of 's', encoded as specified in 'encoding'.
 
@@ -79,7 +89,7 @@ def smart_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
     return force_bytes(s, encoding, strings_only, errors)
 
 
-def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
+def force_bytes(s, encoding="utf-8", strings_only=False, errors="strict"):
     """
     Similar to smart_bytes, except that lazy instances are resolved to
     strings, rather than kept as lazy objects.
@@ -88,10 +98,10 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
     # Handle the common case first for performance reasons.
     if isinstance(s, bytes):
-        if encoding == 'utf-8':
+        if encoding == "utf-8":
             return s
         else:
-            return s.decode('utf-8', errors).encode(encoding, errors)
+            return s.decode("utf-8", errors).encode(encoding, errors)
     if strings_only and is_protected_type(s):
         return s
     if isinstance(s, memoryview):
@@ -99,18 +109,20 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
     return str(s).encode(encoding, errors)
 
 
-def smart_text(s, encoding='utf-8', strings_only=False, errors='strict'):
+def smart_text(s, encoding="utf-8", strings_only=False, errors="strict"):
     warnings.warn(
-        'smart_text() is deprecated in favor of smart_str().',
-        RemovedInDjango40Warning, stacklevel=2,
+        "smart_text() is deprecated in favor of smart_str().",
+        RemovedInDjango40Warning,
+        stacklevel=2,
     )
     return smart_str(s, encoding, strings_only, errors)
 
 
-def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
+def force_text(s, encoding="utf-8", strings_only=False, errors="strict"):
     warnings.warn(
-        'force_text() is deprecated in favor of force_str().',
-        RemovedInDjango40Warning, stacklevel=2,
+        "force_text() is deprecated in favor of force_str().",
+        RemovedInDjango40Warning,
+        stacklevel=2,
     )
     return force_str(s, encoding, strings_only, errors)
 
@@ -154,15 +166,14 @@ _hextobyte = {
     (fmt % char).encode(): bytes((char,))
     for ascii_range in _ascii_ranges
     for char in ascii_range
-    for fmt in ['%02x', '%02X']
+    for fmt in ["%02x", "%02X"]
 }
 # And then everything above 128, because bytes ≥ 128 are part of multibyte
 # unicode characters.
-_hexdig = '0123456789ABCDEFabcdef'
-_hextobyte.update({
-    (a + b).encode(): bytes.fromhex(a + b)
-    for a in _hexdig[8:] for b in _hexdig
-})
+_hexdig = "0123456789ABCDEFabcdef"
+_hextobyte.update(
+    {(a + b).encode(): bytes.fromhex(a + b) for a in _hexdig[8:] for b in _hexdig}
+)
 
 
 def uri_to_iri(uri):
@@ -182,7 +193,7 @@ def uri_to_iri(uri):
     # second block, decode the first 2 bytes if they represent a hex code to
     # decode. The rest of the block is the part after '%AB', not containing
     # any '%'. Add that to the output without further processing.
-    bits = uri.split(b'%')
+    bits = uri.split(b"%")
     if len(bits) == 1:
         iri = uri
     else:
@@ -195,9 +206,9 @@ def uri_to_iri(uri):
                 append(hextobyte[item[:2]])
                 append(item[2:])
             else:
-                append(b'%')
+                append(b"%")
                 append(item)
-        iri = b''.join(parts)
+        iri = b"".join(parts)
     return repercent_broken_unicode(iri).decode()
 
 
@@ -227,9 +238,10 @@ def repercent_broken_unicode(path):
     try:
         path.decode()
     except UnicodeDecodeError as e:
-        repercent = quote(path[e.start:e.end], safe=b"/#%[]=:;$&()+,!?*@'~")
+        repercent = quote(path[e.start : e.end], safe=b"/#%[]=:;$&()+,!?*@'~")
         path = repercent_broken_unicode(
-            path[:e.start] + force_bytes(repercent) + path[e.end:])
+            path[: e.start] + force_bytes(repercent) + path[e.end :]
+        )
     return path
 
 
@@ -255,10 +267,10 @@ def get_system_encoding():
     #10335 and #5846.
     """
     try:
-        encoding = locale.getdefaultlocale()[1] or 'ascii'
+        encoding = locale.getdefaultlocale()[1] or "ascii"
         codecs.lookup(encoding)
     except Exception:
-        encoding = 'ascii'
+        encoding = "ascii"
     return encoding
 
 

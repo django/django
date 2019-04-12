@@ -31,15 +31,15 @@ class ModelBackend:
         Reject users with is_active=False. Custom user models that don't have
         that attribute are allowed.
         """
-        is_active = getattr(user, 'is_active', None)
+        is_active = getattr(user, "is_active", None)
         return is_active or is_active is None
 
     def _get_user_permissions(self, user_obj):
         return user_obj.user_permissions.all()
 
     def _get_group_permissions(self, user_obj):
-        user_groups_field = get_user_model()._meta.get_field('groups')
-        user_groups_query = 'group__%s' % user_groups_field.related_query_name()
+        user_groups_field = get_user_model()._meta.get_field("groups")
+        user_groups_query = "group__%s" % user_groups_field.related_query_name()
         return Permission.objects.filter(**{user_groups_query: user_obj})
 
     def _get_permissions(self, user_obj, obj, from_name):
@@ -51,14 +51,16 @@ class ModelBackend:
         if not user_obj.is_active or user_obj.is_anonymous or obj is not None:
             return set()
 
-        perm_cache_name = '_%s_perm_cache' % from_name
+        perm_cache_name = "_%s_perm_cache" % from_name
         if not hasattr(user_obj, perm_cache_name):
             if user_obj.is_superuser:
                 perms = Permission.objects.all()
             else:
-                perms = getattr(self, '_get_%s_permissions' % from_name)(user_obj)
-            perms = perms.values_list('content_type__app_label', 'codename').order_by()
-            setattr(user_obj, perm_cache_name, {"%s.%s" % (ct, name) for ct, name in perms})
+                perms = getattr(self, "_get_%s_permissions" % from_name)(user_obj)
+            perms = perms.values_list("content_type__app_label", "codename").order_by()
+            setattr(
+                user_obj, perm_cache_name, {"%s.%s" % (ct, name) for ct, name in perms}
+            )
         return getattr(user_obj, perm_cache_name)
 
     def get_user_permissions(self, user_obj, obj=None):
@@ -66,19 +68,19 @@ class ModelBackend:
         Return a set of permission strings the user `user_obj` has from their
         `user_permissions`.
         """
-        return self._get_permissions(user_obj, obj, 'user')
+        return self._get_permissions(user_obj, obj, "user")
 
     def get_group_permissions(self, user_obj, obj=None):
         """
         Return a set of permission strings the user `user_obj` has from the
         groups they belong.
         """
-        return self._get_permissions(user_obj, obj, 'group')
+        return self._get_permissions(user_obj, obj, "group")
 
     def get_all_permissions(self, user_obj, obj=None):
         if not user_obj.is_active or user_obj.is_anonymous or obj is not None:
             return set()
-        if not hasattr(user_obj, '_perm_cache'):
+        if not hasattr(user_obj, "_perm_cache"):
             user_obj._perm_cache = {
                 *self.get_user_permissions(user_obj),
                 *self.get_group_permissions(user_obj),
@@ -93,7 +95,7 @@ class ModelBackend:
         Return True if user_obj has any permissions in the given app_label.
         """
         return user_obj.is_active and any(
-            perm[:perm.index('.')] == app_label
+            perm[: perm.index(".")] == app_label
             for perm in self.get_all_permissions(user_obj)
         )
 
@@ -143,9 +145,9 @@ class RemoteUserBackend(ModelBackend):
         # instead we use get_or_create when creating unknown users since it has
         # built-in safeguards for multiple threads.
         if self.create_unknown_user:
-            user, created = UserModel._default_manager.get_or_create(**{
-                UserModel.USERNAME_FIELD: username
-            })
+            user, created = UserModel._default_manager.get_or_create(
+                **{UserModel.USERNAME_FIELD: username}
+            )
             if created:
                 args = (request, user)
                 try:
@@ -153,9 +155,9 @@ class RemoteUserBackend(ModelBackend):
                 except TypeError:
                     args = (user,)
                     warnings.warn(
-                        'Update %s.configure_user() to accept `request` as '
-                        'the first argument.'
-                        % self.__class__.__name__, RemovedInDjango31Warning
+                        "Update %s.configure_user() to accept `request` as "
+                        "the first argument." % self.__class__.__name__,
+                        RemovedInDjango31Warning,
                     )
                 user = self.configure_user(*args)
         else:

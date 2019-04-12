@@ -15,7 +15,7 @@ class Session(models.Model):
 
 class SessionEvent(models.Model):
     dt = models.DateTimeField()
-    session = models.ForeignKey(Session, models.CASCADE, related_name='events')
+    session = models.ForeignKey(Session, models.CASCADE, related_name="events")
 
 
 class Timestamp(models.Model):

@@ -1,8 +1,18 @@
 from django.contrib import admin
 
 from .models import (
-    Advisor, Album, Band, Bee, Car, CarTire, Event, Inventory, Member, Profile,
-    School, User,
+    Advisor,
+    Album,
+    Band,
+    Bee,
+    Car,
+    CarTire,
+    Event,
+    Inventory,
+    Member,
+    Profile,
+    School,
+    User,
 )
 
 
@@ -11,8 +21,8 @@ class WidgetAdmin(admin.AdminSite):
 
 
 class CarAdmin(admin.ModelAdmin):
-    list_display = ['make', 'model', 'owner']
-    list_editable = ['owner']
+    list_display = ["make", "model", "owner"]
+    list_editable = ["owner"]
 
 
 class CarTireAdmin(admin.ModelAdmin):
@@ -24,20 +34,20 @@ class CarTireAdmin(admin.ModelAdmin):
 
 
 class EventAdmin(admin.ModelAdmin):
-    raw_id_fields = ['main_band', 'supporting_bands']
+    raw_id_fields = ["main_band", "supporting_bands"]
 
 
 class AlbumAdmin(admin.ModelAdmin):
-    fields = ('name', 'cover_art',)
-    readonly_fields = ('cover_art',)
+    fields = ("name", "cover_art")
+    readonly_fields = ("cover_art",)
 
 
 class SchoolAdmin(admin.ModelAdmin):
-    filter_vertical = ('students',)
-    filter_horizontal = ('alumni',)
+    filter_vertical = ("students",)
+    filter_horizontal = ("alumni",)
 
 
-site = WidgetAdmin(name='widget-admin')
+site = WidgetAdmin(name="widget-admin")
 
 site.register(User)
 site.register(Car, CarAdmin)

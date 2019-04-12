@@ -12,12 +12,13 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--database', default=DEFAULT_DB_ALIAS,
+            "--database",
+            default=DEFAULT_DB_ALIAS,
             help='Nominates a database onto which to open a shell. Defaults to the "default" database.',
         )
 
     def handle(self, **options):
-        connection = connections[options['database']]
+        connection = connections[options["database"]]
         try:
             connection.client.runshell()
         except OSError:
@@ -26,6 +27,6 @@ class Command(BaseCommand):
             # for some other reason, in which case this error message would be
             # inaccurate. Still, this message catches the common case.
             raise CommandError(
-                'You appear not to have the %r program installed or on your path.' %
-                connection.client.executable_name
+                "You appear not to have the %r program installed or on your path."
+                % connection.client.executable_name
             )

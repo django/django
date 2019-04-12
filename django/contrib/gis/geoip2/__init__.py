@@ -11,7 +11,7 @@ downloaded from MaxMind at http://dev.maxmind.com/geoip/geoip2/geolite2/.
 Grab GeoLite2-Country.mmdb.gz and GeoLite2-City.mmdb.gz, and unzip them in the
 directory corresponding to settings.GEOIP_PATH.
 """
-__all__ = ['HAS_GEOIP2']
+__all__ = ["HAS_GEOIP2"]
 
 try:
     import geoip2  # NOQA
@@ -19,5 +19,6 @@ except ImportError:
     HAS_GEOIP2 = False
 else:
     from .base import GeoIP2, GeoIP2Exception
+
     HAS_GEOIP2 = True
-    __all__ += ['GeoIP2', 'GeoIP2Exception']
+    __all__ += ["GeoIP2", "GeoIP2Exception"]

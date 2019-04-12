@@ -3,7 +3,7 @@ from django.db import models
 
 # We're testing app registry presence on load, so this is handy.
 
-new_apps = Apps(['apps'])
+new_apps = Apps(["apps"])
 
 
 class TotallyNormal(models.Model):

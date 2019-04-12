@@ -10,7 +10,7 @@ def import_string(dotted_path):
     last name in the path. Raise ImportError if the import failed.
     """
     try:
-        module_path, class_name = dotted_path.rsplit('.', 1)
+        module_path, class_name = dotted_path.rsplit(".", 1)
     except ValueError as err:
         raise ImportError("%s doesn't look like a module path" % dotted_path) from err
 
@@ -19,8 +19,9 @@ def import_string(dotted_path):
     try:
         return getattr(module, class_name)
     except AttributeError as err:
-        raise ImportError('Module "%s" does not define a "%s" attribute/class' % (
-            module_path, class_name)
+        raise ImportError(
+            'Module "%s" does not define a "%s" attribute/class'
+            % (module_path, class_name)
         ) from err
 
 
@@ -36,7 +37,7 @@ def autodiscover_modules(*args, **kwargs):
     """
     from django.apps import apps
 
-    register_to = kwargs.get('register_to')
+    register_to = kwargs.get("register_to")
     for app_config in apps.get_app_configs():
         for module_to_search in args:
             # Attempt to import the app's module.
@@ -44,7 +45,7 @@ def autodiscover_modules(*args, **kwargs):
                 if register_to:
                     before_import_registry = copy.copy(register_to._registry)
 
-                import_module('%s.%s' % (app_config.name, module_to_search))
+                import_module("%s.%s" % (app_config.name, module_to_search))
             except Exception:
                 # Reset the registry to the state before the last import
                 # as this import will have to reoccur on the next request and
@@ -69,7 +70,7 @@ def module_has_submodule(package, module_name):
         # package isn't a package.
         return False
 
-    full_module_name = package_name + '.' + module_name
+    full_module_name = package_name + "." + module_name
     try:
         return importlib_find(full_module_name, package_path) is not None
     except (ModuleNotFoundError, AttributeError):
@@ -87,11 +88,11 @@ def module_dir(module):
     over several directories.
     """
     # Convert to list because _NamespacePath does not support indexing.
-    paths = list(getattr(module, '__path__', []))
+    paths = list(getattr(module, "__path__", []))
     if len(paths) == 1:
         return paths[0]
     else:
-        filename = getattr(module, '__file__', None)
+        filename = getattr(module, "__file__", None)
         if filename is not None:
             return os.path.dirname(filename)
     raise ValueError("Cannot determine directory containing %s" % module)

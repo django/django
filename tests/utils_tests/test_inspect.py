@@ -13,7 +13,7 @@ class Person:
     def just_args(self, *args):
         return args
 
-    def all_kinds(self, name, address='home', age=25, *args, **kwargs):
+    def all_kinds(self, name, address="home", age=25, *args, **kwargs):
         return kwargs
 
 
@@ -22,10 +22,18 @@ class TestInspectMethods(unittest.TestCase):
         self.assertEqual(inspect.get_func_full_args(Person.no_arguments), [])
 
     def test_get_func_full_args_one_argument(self):
-        self.assertEqual(inspect.get_func_full_args(Person.one_argument), [('something',)])
+        self.assertEqual(
+            inspect.get_func_full_args(Person.one_argument), [("something",)]
+        )
 
     def test_get_func_full_args_all_arguments(self):
-        arguments = [('name',), ('address', 'home'), ('age', 25), ('*args',), ('**kwargs',)]
+        arguments = [
+            ("name",),
+            ("address", "home"),
+            ("age", 25),
+            ("*args",),
+            ("**kwargs",),
+        ]
         self.assertEqual(inspect.get_func_full_args(Person.all_kinds), arguments)
 
     def test_func_accepts_var_args_has_var_args(self):

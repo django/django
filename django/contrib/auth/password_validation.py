@@ -6,7 +6,9 @@ from pathlib import Path
 
 from django.conf import settings
 from django.core.exceptions import (
-    FieldDoesNotExist, ImproperlyConfigured, ValidationError,
+    FieldDoesNotExist,
+    ImproperlyConfigured,
+    ValidationError,
 )
 from django.utils.functional import lazy
 from django.utils.html import format_html, format_html_join
@@ -23,11 +25,11 @@ def get_password_validators(validator_config):
     validators = []
     for validator in validator_config:
         try:
-            klass = import_string(validator['NAME'])
+            klass = import_string(validator["NAME"])
         except ImportError:
             msg = "The module in NAME could not be imported: %s. Check your AUTH_PASSWORD_VALIDATORS setting."
-            raise ImproperlyConfigured(msg % validator['NAME'])
-        validators.append(klass(**validator.get('OPTIONS', {})))
+            raise ImproperlyConfigured(msg % validator["NAME"])
+        validators.append(klass(**validator.get("OPTIONS", {})))
 
     return validators
 
@@ -59,7 +61,7 @@ def password_changed(password, user=None, password_validators=None):
     if password_validators is None:
         password_validators = get_default_password_validators()
     for validator in password_validators:
-        password_changed = getattr(validator, 'password_changed', lambda *a: None)
+        password_changed = getattr(validator, "password_changed", lambda *a: None)
         password_changed(password, user)
 
 
@@ -81,8 +83,10 @@ def _password_validators_help_text_html(password_validators=None):
     in an <ul>.
     """
     help_texts = password_validators_help_texts(password_validators)
-    help_items = format_html_join('', '<li>{}</li>', ((help_text,) for help_text in help_texts))
-    return format_html('<ul>{}</ul>', help_items) if help_items else ''
+    help_items = format_html_join(
+        "", "<li>{}</li>", ((help_text,) for help_text in help_texts)
+    )
+    return format_html("<ul>{}</ul>", help_items) if help_items else ""
 
 
 password_validators_help_text_html = lazy(_password_validators_help_text_html, str)
@@ -92,6 +96,7 @@ class MinimumLengthValidator:
     """
     Validate whether the password is of a minimum length.
     """
+
     def __init__(self, min_length=8):
         self.min_length = min_length
 
@@ -101,18 +106,18 @@ class MinimumLengthValidator:
                 ngettext(
                     "This password is too short. It must contain at least %(min_length)d character.",
                     "This password is too short. It must contain at least %(min_length)d characters.",
-                    self.min_length
+                    self.min_length,
                 ),
-                code='password_too_short',
-                params={'min_length': self.min_length},
+                code="password_too_short",
+                params={"min_length": self.min_length},
             )
 
     def get_help_text(self):
         return ngettext(
             "Your password must contain at least %(min_length)d character.",
             "Your password must contain at least %(min_length)d characters.",
-            self.min_length
-        ) % {'min_length': self.min_length}
+            self.min_length,
+        ) % {"min_length": self.min_length}
 
 
 class UserAttributeSimilarityValidator:
@@ -126,7 +131,8 @@ class UserAttributeSimilarityValidator:
     example, a password is validated against either part of an email address,
     as well as the full address.
     """
-    DEFAULT_USER_ATTRIBUTES = ('username', 'first_name', 'last_name', 'email')
+
+    DEFAULT_USER_ATTRIBUTES = ("username", "first_name", "last_name", "email")
 
     def __init__(self, user_attributes=DEFAULT_USER_ATTRIBUTES, max_similarity=0.7):
         self.user_attributes = user_attributes
@@ -140,21 +146,30 @@ class UserAttributeSimilarityValidator:
             value = getattr(user, attribute_name, None)
             if not value or not isinstance(value, str):
                 continue
-            value_parts = re.split(r'\W+', value) + [value]
+            value_parts = re.split(r"\W+", value) + [value]
             for value_part in value_parts:
-                if SequenceMatcher(a=password.lower(), b=value_part.lower()).quick_ratio() >= self.max_similarity:
+                if (
+                    SequenceMatcher(
+                        a=password.lower(), b=value_part.lower()
+                    ).quick_ratio()
+                    >= self.max_similarity
+                ):
                     try:
-                        verbose_name = str(user._meta.get_field(attribute_name).verbose_name)
+                        verbose_name = str(
+                            user._meta.get_field(attribute_name).verbose_name
+                        )
                     except FieldDoesNotExist:
                         verbose_name = attribute_name
                     raise ValidationError(
                         _("The password is too similar to the %(verbose_name)s."),
-                        code='password_too_similar',
-                        params={'verbose_name': verbose_name},
+                        code="password_too_similar",
+                        params={"verbose_name": verbose_name},
                     )
 
     def get_help_text(self):
-        return _("Your password can't be too similar to your other personal information.")
+        return _(
+            "Your password can't be too similar to your other personal information."
+        )
 
 
 class CommonPasswordValidator:
@@ -167,7 +182,10 @@ class CommonPasswordValidator:
     https://gist.github.com/roycewilliams/281ce539915a947a23db17137d91aeb7
     The password list must be lowercased to match the comparison in validate().
     """
-    DEFAULT_PASSWORD_LIST_PATH = Path(__file__).resolve().parent / 'common-passwords.txt.gz'
+
+    DEFAULT_PASSWORD_LIST_PATH = (
+        Path(__file__).resolve().parent / "common-passwords.txt.gz"
+    )
 
     def __init__(self, password_list_path=DEFAULT_PASSWORD_LIST_PATH):
         try:
@@ -182,8 +200,7 @@ class CommonPasswordValidator:
     def validate(self, password, user=None):
         if password.lower().strip() in self.passwords:
             raise ValidationError(
-                _("This password is too common."),
-                code='password_too_common',
+                _("This password is too common."), code="password_too_common"
             )
 
     def get_help_text(self):
@@ -194,11 +211,12 @@ class NumericPasswordValidator:
     """
     Validate whether the password is alphanumeric.
     """
+
     def validate(self, password, user=None):
         if password.isdigit():
             raise ValidationError(
                 _("This password is entirely numeric."),
-                code='password_entirely_numeric',
+                code="password_entirely_numeric",
             )
 
     def get_help_text(self):

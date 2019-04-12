@@ -1,12 +1,17 @@
 from contextlib import ContextDecorator, contextmanager
 
 from django.db import (
-    DEFAULT_DB_ALIAS, DatabaseError, Error, ProgrammingError, connections,
+    DEFAULT_DB_ALIAS,
+    DatabaseError,
+    Error,
+    ProgrammingError,
+    connections,
 )
 
 
 class TransactionManagementError(ProgrammingError):
     """Transaction management is used improperly."""
+
     pass
 
 
@@ -132,6 +137,7 @@ def on_commit(func, using=None):
 # Decorators / context managers #
 #################################
 
+
 class Atomic(ContextDecorator):
     """
     Guarantee the atomic execution of a given block.
@@ -190,7 +196,9 @@ class Atomic(ContextDecorator):
             else:
                 connection.savepoint_ids.append(None)
         else:
-            connection.set_autocommit(False, force_begin_transaction_with_broken_autocommit=True)
+            connection.set_autocommit(
+                False, force_begin_transaction_with_broken_autocommit=True
+            )
             connection.in_atomic_block = True
 
     def __exit__(self, exc_type, exc_value, traceback):

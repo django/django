@@ -26,9 +26,7 @@ class EmptyPage(InvalidPage):
 
 
 class Paginator:
-
-    def __init__(self, object_list, per_page, orphans=0,
-                 allow_empty_first_page=True):
+    def __init__(self, object_list, per_page, orphans=0, allow_empty_first_page=True):
         self.object_list = object_list
         self._check_object_list_is_ordered()
         self.per_page = int(per_page)
@@ -42,14 +40,14 @@ class Paginator:
                 raise ValueError
             number = int(number)
         except (TypeError, ValueError):
-            raise PageNotAnInteger(_('That page number is not an integer'))
+            raise PageNotAnInteger(_("That page number is not an integer"))
         if number < 1:
-            raise EmptyPage(_('That page number is less than 1'))
+            raise EmptyPage(_("That page number is less than 1"))
         if number > self.num_pages:
             if number == 1 and self.allow_empty_first_page:
                 pass
             else:
-                raise EmptyPage(_('That page contains no results'))
+                raise EmptyPage(_("That page contains no results"))
         return number
 
     def get_page(self, number):
@@ -86,7 +84,7 @@ class Paginator:
     @cached_property
     def count(self):
         """Return the total number of objects, across all pages."""
-        c = getattr(self.object_list, 'count', None)
+        c = getattr(self.object_list, "count", None)
         if callable(c) and not inspect.isbuiltin(c) and method_has_no_args(c):
             return c()
         return len(self.object_list)
@@ -111,40 +109,41 @@ class Paginator:
         """
         Warn if self.object_list is unordered (typically a QuerySet).
         """
-        ordered = getattr(self.object_list, 'ordered', None)
+        ordered = getattr(self.object_list, "ordered", None)
         if ordered is not None and not ordered:
             obj_list_repr = (
-                '{} {}'.format(self.object_list.model, self.object_list.__class__.__name__)
-                if hasattr(self.object_list, 'model')
-                else '{!r}'.format(self.object_list)
+                "{} {}".format(
+                    self.object_list.model, self.object_list.__class__.__name__
+                )
+                if hasattr(self.object_list, "model")
+                else "{!r}".format(self.object_list)
             )
             warnings.warn(
-                'Pagination may yield inconsistent results with an unordered '
-                'object_list: {}.'.format(obj_list_repr),
+                "Pagination may yield inconsistent results with an unordered "
+                "object_list: {}.".format(obj_list_repr),
                 UnorderedObjectListWarning,
-                stacklevel=3
+                stacklevel=3,
             )
 
 
 class QuerySetPaginator(Paginator):
-
     def __init__(self, *args, **kwargs):
         warnings.warn(
-            'The QuerySetPaginator alias of Paginator is deprecated.',
-            RemovedInDjango31Warning, stacklevel=2,
+            "The QuerySetPaginator alias of Paginator is deprecated.",
+            RemovedInDjango31Warning,
+            stacklevel=2,
         )
         super().__init__(*args, **kwargs)
 
 
 class Page(collections.abc.Sequence):
-
     def __init__(self, object_list, number, paginator):
         self.object_list = object_list
         self.number = number
         self.paginator = paginator
 
     def __repr__(self):
-        return '<Page %s of %s>' % (self.number, self.paginator.num_pages)
+        return "<Page %s of %s>" % (self.number, self.paginator.num_pages)
 
     def __len__(self):
         return len(self.object_list)

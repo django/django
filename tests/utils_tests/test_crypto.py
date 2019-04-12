@@ -5,13 +5,12 @@ from django.utils.crypto import constant_time_compare, pbkdf2
 
 
 class TestUtilsCryptoMisc(unittest.TestCase):
-
     def test_constant_time_compare(self):
         # It's hard to test for constant time, just test the result.
-        self.assertTrue(constant_time_compare(b'spam', b'spam'))
-        self.assertFalse(constant_time_compare(b'spam', b'eggs'))
-        self.assertTrue(constant_time_compare('spam', 'spam'))
-        self.assertFalse(constant_time_compare('spam', 'eggs'))
+        self.assertTrue(constant_time_compare(b"spam", b"spam"))
+        self.assertFalse(constant_time_compare(b"spam", b"eggs"))
+        self.assertTrue(constant_time_compare("spam", "spam"))
+        self.assertFalse(constant_time_compare("spam", "eggs"))
 
 
 class TestUtilsCryptoPBKDF2(unittest.TestCase):
@@ -110,34 +109,44 @@ class TestUtilsCryptoPBKDF2(unittest.TestCase):
                 "dklen": 0,
                 "digest": hashlib.sha512,
             },
-            "result": ("afe6c5530785b6cc6b1c6453384731bd5ee432ee"
-                       "549fd42fb6695779ad8a1c5bf59de69c48f774ef"
-                       "c4007d5298f9033c0241d5ab69305e7b64eceeb8d"
-                       "834cfec"),
+            "result": (
+                "afe6c5530785b6cc6b1c6453384731bd5ee432ee"
+                "549fd42fb6695779ad8a1c5bf59de69c48f774ef"
+                "c4007d5298f9033c0241d5ab69305e7b64eceeb8d"
+                "834cfec"
+            ),
         },
         # Check leading zeros are not stripped (#17481)
         {
             "args": {
-                "password": b'\xba',
+                "password": b"\xba",
                 "salt": "salt",
                 "iterations": 1,
                 "dklen": 20,
                 "digest": hashlib.sha1,
             },
-            "result": '0053d3b91a7f1e54effebd6d68771e8a6e0b2c5b',
+            "result": "0053d3b91a7f1e54effebd6d68771e8a6e0b2c5b",
         },
     ]
 
     def test_public_vectors(self):
         for vector in self.rfc_vectors:
-            result = pbkdf2(**vector['args'])
-            self.assertEqual(result.hex(), vector['result'])
+            result = pbkdf2(**vector["args"])
+            self.assertEqual(result.hex(), vector["result"])
 
     def test_regression_vectors(self):
         for vector in self.regression_vectors:
-            result = pbkdf2(**vector['args'])
-            self.assertEqual(result.hex(), vector['result'])
+            result = pbkdf2(**vector["args"])
+            self.assertEqual(result.hex(), vector["result"])
 
     def test_default_hmac_alg(self):
-        kwargs = {'password': b'password', 'salt': b'salt', 'iterations': 1, 'dklen': 20}
-        self.assertEqual(pbkdf2(**kwargs), hashlib.pbkdf2_hmac(hash_name=hashlib.sha256().name, **kwargs))
+        kwargs = {
+            "password": b"password",
+            "salt": b"salt",
+            "iterations": 1,
+            "dklen": 20,
+        }
+        self.assertEqual(
+            pbkdf2(**kwargs),
+            hashlib.pbkdf2_hmac(hash_name=hashlib.sha256().name, **kwargs),
+        )

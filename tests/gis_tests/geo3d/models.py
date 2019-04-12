@@ -41,7 +41,6 @@ class Polygon3D(NamedModel):
 
 
 class SimpleModel(models.Model):
-
     class Meta:
         abstract = True
 

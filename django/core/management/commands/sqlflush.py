@@ -14,9 +14,12 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         super().add_arguments(parser)
         parser.add_argument(
-            '--database', default=DEFAULT_DB_ALIAS,
+            "--database",
+            default=DEFAULT_DB_ALIAS,
             help='Nominates a database to print the SQL for. Defaults to the "default" database.',
         )
 
     def handle(self, **options):
-        return '\n'.join(sql_flush(self.style, connections[options['database']], only_django=True))
+        return "\n".join(
+            sql_flush(self.style, connections[options["database"]], only_django=True)
+        )

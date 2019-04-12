@@ -1,6 +1,11 @@
 from django.contrib.auth.models import (
-    AbstractBaseUser, AbstractUser, BaseUserManager, Group, Permission,
-    PermissionsMixin, UserManager,
+    AbstractBaseUser,
+    AbstractUser,
+    BaseUserManager,
+    Group,
+    Permission,
+    PermissionsMixin,
+    UserManager,
 )
 from django.db import models
 
@@ -14,12 +19,10 @@ class CustomUserManager(BaseUserManager):
         Creates and saves a User with the given email and password.
         """
         if not email:
-            raise ValueError('Users must have an email address')
+            raise ValueError("Users must have an email address")
 
         user = self.model(
-            email=self.normalize_email(email),
-            date_of_birth=date_of_birth,
-            **fields
+            email=self.normalize_email(email), date_of_birth=date_of_birth, **fields
         )
 
         user.set_password(password)
@@ -27,14 +30,16 @@ class CustomUserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password, date_of_birth, **fields):
-        u = self.create_user(email, password=password, date_of_birth=date_of_birth, **fields)
+        u = self.create_user(
+            email, password=password, date_of_birth=date_of_birth, **fields
+        )
         u.is_admin = True
         u.save(using=self._db)
         return u
 
 
 class CustomUser(AbstractBaseUser):
-    email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
+    email = models.EmailField(verbose_name="email address", max_length=255, unique=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     date_of_birth = models.DateField()
@@ -42,8 +47,8 @@ class CustomUser(AbstractBaseUser):
 
     custom_objects = CustomUserManager()
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['date_of_birth', 'first_name']
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["date_of_birth", "first_name"]
 
     def __str__(self):
         return self.email
@@ -76,6 +81,7 @@ class RemoveGroupsAndPermissions:
     fields from the AbstractUser class, so they don't clash with the
     related_name sets.
     """
+
     def __enter__(self):
         self._old_au_local_m2m = AbstractUser._meta.local_many_to_many
         self._old_pm_local_m2m = PermissionsMixin._meta.local_many_to_many
@@ -97,16 +103,17 @@ class CustomUserWithoutIsActiveField(AbstractBaseUser):
 
     objects = UserManager()
 
-    USERNAME_FIELD = 'username'
+    USERNAME_FIELD = "username"
 
 
 # The extension user is a simple extension of the built-in user class,
 # adding a required date_of_birth field. This allows us to check for
 # any hard references to the name "User" in forms/handlers etc.
 with RemoveGroupsAndPermissions():
+
     class ExtensionUser(AbstractUser):
         date_of_birth = models.DateField()
 
         custom_objects = UserManager()
 
-        REQUIRED_FIELDS = AbstractUser.REQUIRED_FIELDS + ['date_of_birth']
+        REQUIRED_FIELDS = AbstractUser.REQUIRED_FIELDS + ["date_of_birth"]

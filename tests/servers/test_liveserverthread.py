@@ -3,7 +3,6 @@ from django.test import LiveServerTestCase, TestCase
 
 
 class LiveServerThreadTest(TestCase):
-
     def run_live_server_thread(self, connections_override=None):
         thread = LiveServerTestCase._create_server_thread(connections_override)
         thread.daemon = True
@@ -13,8 +12,10 @@ class LiveServerThreadTest(TestCase):
 
     def test_closes_connections(self):
         conn = connections[DEFAULT_DB_ALIAS]
-        if conn.vendor == 'sqlite' and conn.is_in_memory_db():
-            self.skipTest("the sqlite backend's close() method is a no-op when using an in-memory database")
+        if conn.vendor == "sqlite" and conn.is_in_memory_db():
+            self.skipTest(
+                "the sqlite backend's close() method is a no-op when using an in-memory database"
+            )
         # Pass a connection to the thread to check they are being closed.
         connections_override = {DEFAULT_DB_ALIAS: conn}
 

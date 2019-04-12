@@ -1,9 +1,7 @@
 from django.db import DatabaseError, IntegrityError, transaction
 from django.test import TestCase
 
-from .models import (
-    Counter, InheritedCounter, ProxyCounter, SubCounter, WithCustomPK,
-)
+from .models import Counter, InheritedCounter, ProxyCounter, SubCounter, WithCustomPK
 
 
 class ForceTests(TestCase):
@@ -20,14 +18,14 @@ class ForceTests(TestCase):
         # Won't work because force_update and force_insert are mutually
         # exclusive
         c.value = 4
-        msg = 'Cannot force both insert and updating in model saving.'
+        msg = "Cannot force both insert and updating in model saving."
         with self.assertRaisesMessage(ValueError, msg):
             c.save(force_insert=True, force_update=True)
 
         # Try to update something that doesn't have a primary key in the first
         # place.
         c1 = Counter(name="two", value=2)
-        msg = 'Cannot force an update in save() with no primary key.'
+        msg = "Cannot force an update in save() with no primary key."
         with self.assertRaisesMessage(ValueError, msg):
             with transaction.atomic():
                 c1.save(force_update=True)
@@ -42,7 +40,7 @@ class ForceTests(TestCase):
         # Trying to update should still fail, even with manual primary keys, if
         # the data isn't in the database already.
         obj = WithCustomPK(name=1, value=1)
-        msg = 'Forced update did not affect any rows.'
+        msg = "Forced update did not affect any rows."
         with self.assertRaisesMessage(DatabaseError, msg):
             with transaction.atomic():
                 obj.save(force_update=True)
@@ -60,10 +58,10 @@ class InheritanceTests(TestCase):
         a.save(force_update=True)
 
     def test_force_update_on_inherited_model_without_fields(self):
-        '''
+        """
         Issue 13864: force_update fails on subclassed models, if they don't
         specify custom fields.
-        '''
+        """
         a = SubCounter(name="count", value=1)
         a.save()
         a.value = 2

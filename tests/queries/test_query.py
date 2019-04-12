@@ -21,7 +21,7 @@ class TestQuery(SimpleTestCase):
         lookup = where.children[0]
         self.assertIsInstance(lookup, GreaterThan)
         self.assertEqual(lookup.rhs, 2)
-        self.assertEqual(lookup.lhs.target, Author._meta.get_field('num'))
+        self.assertEqual(lookup.lhs.target, Author._meta.get_field("num"))
 
     def test_complex_query(self):
         query = Query(Author)
@@ -31,32 +31,32 @@ class TestQuery(SimpleTestCase):
         lookup = where.children[0]
         self.assertIsInstance(lookup, GreaterThan)
         self.assertEqual(lookup.rhs, 2)
-        self.assertEqual(lookup.lhs.target, Author._meta.get_field('num'))
+        self.assertEqual(lookup.lhs.target, Author._meta.get_field("num"))
 
         lookup = where.children[1]
         self.assertIsInstance(lookup, LessThan)
         self.assertEqual(lookup.rhs, 0)
-        self.assertEqual(lookup.lhs.target, Author._meta.get_field('num'))
+        self.assertEqual(lookup.lhs.target, Author._meta.get_field("num"))
 
     def test_multiple_fields(self):
         query = Query(Item)
-        where = query.build_where(Q(modified__gt=F('created')))
+        where = query.build_where(Q(modified__gt=F("created")))
         lookup = where.children[0]
         self.assertIsInstance(lookup, GreaterThan)
         self.assertIsInstance(lookup.rhs, SimpleCol)
         self.assertIsInstance(lookup.lhs, SimpleCol)
-        self.assertEqual(lookup.rhs.target, Item._meta.get_field('created'))
-        self.assertEqual(lookup.lhs.target, Item._meta.get_field('modified'))
+        self.assertEqual(lookup.rhs.target, Item._meta.get_field("created"))
+        self.assertEqual(lookup.lhs.target, Item._meta.get_field("modified"))
 
     def test_transform(self):
         query = Query(Author)
         with register_lookup(CharField, Lower):
-            where = query.build_where(~Q(name__lower='foo'))
+            where = query.build_where(~Q(name__lower="foo"))
         lookup = where.children[0]
         self.assertIsInstance(lookup, Exact)
         self.assertIsInstance(lookup.lhs, Lower)
         self.assertIsInstance(lookup.lhs.lhs, SimpleCol)
-        self.assertEqual(lookup.lhs.lhs.target, Author._meta.get_field('name'))
+        self.assertEqual(lookup.lhs.lhs.target, Author._meta.get_field("name"))
 
     def test_negated_nullable(self):
         query = Query(Item)
@@ -64,21 +64,21 @@ class TestQuery(SimpleTestCase):
         self.assertTrue(where.negated)
         lookup = where.children[0]
         self.assertIsInstance(lookup, LessThan)
-        self.assertEqual(lookup.lhs.target, Item._meta.get_field('modified'))
+        self.assertEqual(lookup.lhs.target, Item._meta.get_field("modified"))
         lookup = where.children[1]
         self.assertIsInstance(lookup, IsNull)
-        self.assertEqual(lookup.lhs.target, Item._meta.get_field('modified'))
+        self.assertEqual(lookup.lhs.target, Item._meta.get_field("modified"))
 
     def test_foreign_key(self):
         query = Query(Item)
-        msg = 'Joined field references are not permitted in this query'
+        msg = "Joined field references are not permitted in this query"
         with self.assertRaisesMessage(FieldError, msg):
             query.build_where(Q(creator__num__gt=2))
 
     def test_foreign_key_f(self):
         query = Query(Ranking)
         with self.assertRaises(FieldError):
-            query.build_where(Q(rank__gt=F('author__num')))
+            query.build_where(Q(rank__gt=F("author__num")))
 
     def test_foreign_key_exclusive(self):
         query = Query(ObjectC)
@@ -86,8 +86,8 @@ class TestQuery(SimpleTestCase):
         a_isnull = where.children[0]
         self.assertIsInstance(a_isnull, RelatedIsNull)
         self.assertIsInstance(a_isnull.lhs, SimpleCol)
-        self.assertEqual(a_isnull.lhs.target, ObjectC._meta.get_field('objecta'))
+        self.assertEqual(a_isnull.lhs.target, ObjectC._meta.get_field("objecta"))
         b_isnull = where.children[1]
         self.assertIsInstance(b_isnull, RelatedIsNull)
         self.assertIsInstance(b_isnull.lhs, SimpleCol)
-        self.assertEqual(b_isnull.lhs.target, ObjectC._meta.get_field('objectb'))
+        self.assertEqual(b_isnull.lhs.target, ObjectC._meta.get_field("objectb"))

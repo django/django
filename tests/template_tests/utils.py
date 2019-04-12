@@ -6,7 +6,7 @@ from django.test.utils import override_settings
 from django.utils.safestring import mark_safe
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
-TEMPLATE_DIR = os.path.join(ROOT, 'templates')
+TEMPLATE_DIR = os.path.join(ROOT, "templates")
 
 
 def setup(templates, *args, **kwargs):
@@ -24,7 +24,7 @@ def setup(templates, *args, **kwargs):
     """
     # when testing deprecation warnings, it's useful to run just one test since
     # the message won't be displayed multiple times
-    test_once = kwargs.get('test_once', False)
+    test_once = kwargs.get("test_once", False)
 
     for arg in args:
         templates.update(arg)
@@ -34,9 +34,10 @@ def setup(templates, *args, **kwargs):
     templates["inclusion.html"] = "{{ result }}"
 
     loaders = [
-        ('django.template.loaders.cached.Loader', [
-            ('django.template.loaders.locmem.Loader', templates),
-        ]),
+        (
+            "django.template.loaders.cached.Loader",
+            [("django.template.loaders.locmem.Loader", templates)],
+        )
     ]
 
     def decorator(func):
@@ -46,30 +47,21 @@ def setup(templates, *args, **kwargs):
         @functools.wraps(func)
         def inner(self):
             # Set up custom template tag libraries if specified
-            libraries = getattr(self, 'libraries', {})
+            libraries = getattr(self, "libraries", {})
 
-            self.engine = Engine(
-                libraries=libraries,
-                loaders=loaders,
-            )
+            self.engine = Engine(libraries=libraries, loaders=loaders)
             func(self)
             if test_once:
                 return
             func(self)
 
             self.engine = Engine(
-                libraries=libraries,
-                loaders=loaders,
-                string_if_invalid='INVALID',
+                libraries=libraries, loaders=loaders, string_if_invalid="INVALID"
             )
             func(self)
             func(self)
 
-            self.engine = Engine(
-                debug=True,
-                libraries=libraries,
-                loaders=loaders,
-            )
+            self.engine = Engine(debug=True, libraries=libraries, loaders=loaders)
             func(self)
             func(self)
 
@@ -98,7 +90,7 @@ class SomeClass:
         self.otherclass = OtherClass()
 
     def method(self):
-        return 'SomeClass.method'
+        return "SomeClass.method"
 
     def method2(self, o):
         return o
@@ -113,9 +105,9 @@ class SomeClass:
         raise TypeError
 
     def __getitem__(self, key):
-        if key == 'silent_fail_key':
+        if key == "silent_fail_key":
             raise SomeException
-        elif key == 'noisy_fail_key':
+        elif key == "noisy_fail_key":
             raise SomeOtherException
         raise KeyError
 
@@ -138,7 +130,7 @@ class SomeClass:
 
 class OtherClass:
     def method(self):
-        return 'OtherClass.method'
+        return "OtherClass.method"
 
 
 class TestObj:
@@ -160,21 +152,23 @@ class SilentGetItemClass:
 class SilentAttrClass:
     def b(self):
         raise SomeException
+
     b = property(b)
 
 
 class UTF8Class:
     "Class whose __str__ returns non-ASCII data"
+
     def __str__(self):
-        return 'ŠĐĆŽćžšđ'
+        return "ŠĐĆŽćžšđ"
 
 
 # These two classes are used to test auto-escaping of string output.
 class UnsafeClass:
     def __str__(self):
-        return 'you & me'
+        return "you & me"
 
 
 class SafeClass:
     def __str__(self):
-        return mark_safe('you &gt; me')
+        return mark_safe("you &gt; me")

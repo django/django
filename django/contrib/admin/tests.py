@@ -7,20 +7,21 @@ from django.utils.translation import gettext as _
 
 class CSPMiddleware(MiddlewareMixin):
     """The admin's JavaScript should be compatible with CSP."""
+
     def process_response(self, request, response):
-        response['Content-Security-Policy'] = "default-src 'self'"
+        response["Content-Security-Policy"] = "default-src 'self'"
         return response
 
 
-@modify_settings(MIDDLEWARE={'append': 'django.contrib.admin.tests.CSPMiddleware'})
+@modify_settings(MIDDLEWARE={"append": "django.contrib.admin.tests.CSPMiddleware"})
 class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
 
     available_apps = [
-        'django.contrib.admin',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
-        'django.contrib.sites',
+        "django.contrib.admin",
+        "django.contrib.auth",
+        "django.contrib.contenttypes",
+        "django.contrib.sessions",
+        "django.contrib.sites",
     ]
 
     def wait_until(self, callback, timeout=10):
@@ -31,6 +32,7 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         call this function for more details.
         """
         from selenium.webdriver.support.wait import WebDriverWait
+
         WebDriverWait(self.selenium, timeout).until(callback)
 
     def wait_for_popup(self, num_windows=2, timeout=10):
@@ -46,9 +48,9 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         """
         from selenium.webdriver.common.by import By
         from selenium.webdriver.support import expected_conditions as ec
+
         self.wait_until(
-            ec.presence_of_element_located((By.CSS_SELECTOR, css_selector)),
-            timeout
+            ec.presence_of_element_located((By.CSS_SELECTOR, css_selector)), timeout
         )
 
     def wait_for_text(self, css_selector, text, timeout=10):
@@ -57,10 +59,10 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         """
         from selenium.webdriver.common.by import By
         from selenium.webdriver.support import expected_conditions as ec
+
         self.wait_until(
-            ec.text_to_be_present_in_element(
-                (By.CSS_SELECTOR, css_selector), text),
-            timeout
+            ec.text_to_be_present_in_element((By.CSS_SELECTOR, css_selector), text),
+            timeout,
         )
 
     def wait_for_value(self, css_selector, text, timeout=10):
@@ -69,10 +71,12 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         """
         from selenium.webdriver.common.by import By
         from selenium.webdriver.support import expected_conditions as ec
+
         self.wait_until(
             ec.text_to_be_present_in_element_value(
-                (By.CSS_SELECTOR, css_selector), text),
-            timeout
+                (By.CSS_SELECTOR, css_selector), text
+            ),
+            timeout,
         )
 
     def wait_until_visible(self, css_selector, timeout=10):
@@ -81,9 +85,9 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         """
         from selenium.webdriver.common.by import By
         from selenium.webdriver.support import expected_conditions as ec
+
         self.wait_until(
-            ec.visibility_of_element_located((By.CSS_SELECTOR, css_selector)),
-            timeout
+            ec.visibility_of_element_located((By.CSS_SELECTOR, css_selector)), timeout
         )
 
     def wait_until_invisible(self, css_selector, timeout=10):
@@ -92,9 +96,9 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         """
         from selenium.webdriver.common.by import By
         from selenium.webdriver.support import expected_conditions as ec
+
         self.wait_until(
-            ec.invisibility_of_element_located((By.CSS_SELECTOR, css_selector)),
-            timeout
+            ec.invisibility_of_element_located((By.CSS_SELECTOR, css_selector)), timeout
         )
 
     def wait_page_loaded(self):
@@ -102,27 +106,27 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         Block until page has started to load.
         """
         from selenium.common.exceptions import TimeoutException
+
         try:
             # Wait for the next page to be loaded
-            self.wait_for('body')
+            self.wait_for("body")
         except TimeoutException:
             # IE7 occasionally returns an error "Internet Explorer cannot
             # display the webpage" and doesn't load the next page. We just
             # ignore it.
             pass
 
-    def admin_login(self, username, password, login_url='/admin/'):
+    def admin_login(self, username, password, login_url="/admin/"):
         """
         Log in to the admin.
         """
-        self.selenium.get('%s%s' % (self.live_server_url, login_url))
-        username_input = self.selenium.find_element_by_name('username')
+        self.selenium.get("%s%s" % (self.live_server_url, login_url))
+        username_input = self.selenium.find_element_by_name("username")
         username_input.send_keys(username)
-        password_input = self.selenium.find_element_by_name('password')
+        password_input = self.selenium.find_element_by_name("password")
         password_input.send_keys(password)
-        login_text = _('Log in')
-        self.selenium.find_element_by_xpath(
-            '//input[@value="%s"]' % login_text).click()
+        login_text = _("Log in")
+        self.selenium.find_element_by_xpath('//input[@value="%s"]' % login_text).click()
         self.wait_page_loaded()
 
     def get_css_value(self, selector, attribute):
@@ -131,7 +135,8 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         the given selector. Uses the jQuery that ships with Django.
         """
         return self.selenium.execute_script(
-            'return django.jQuery("%s").css("%s")' % (selector, attribute))
+            'return django.jQuery("%s").css("%s")' % (selector, attribute)
+        )
 
     def get_select_option(self, selector, value):
         """
@@ -139,18 +144,21 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         identified by the CSS selector `selector`.
         """
         from selenium.common.exceptions import NoSuchElementException
-        options = self.selenium.find_elements_by_css_selector('%s > option' % selector)
+
+        options = self.selenium.find_elements_by_css_selector("%s > option" % selector)
         for option in options:
-            if option.get_attribute('value') == value:
+            if option.get_attribute("value") == value:
                 return option
-        raise NoSuchElementException('Option "%s" not found in "%s"' % (value, selector))
+        raise NoSuchElementException(
+            'Option "%s" not found in "%s"' % (value, selector)
+        )
 
     def _assertOptionsValues(self, options_selector, values):
         if values:
             options = self.selenium.find_elements_by_css_selector(options_selector)
             actual_values = []
             for option in options:
-                actual_values.append(option.get_attribute('value'))
+                actual_values.append(option.get_attribute("value"))
             self.assertEqual(values, actual_values)
         else:
             # Prevent the `find_elements_by_css_selector` call from blocking
@@ -158,7 +166,9 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
             # to be the case.
             with self.disable_implicit_wait():
                 self.wait_until(
-                    lambda driver: not driver.find_elements_by_css_selector(options_selector)
+                    lambda driver: not driver.find_elements_by_css_selector(
+                        options_selector
+                    )
                 )
 
     def assertSelectOptions(self, selector, values):
@@ -180,5 +190,9 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         Return True if the element identified by `selector` has the CSS class
         `klass`.
         """
-        return (self.selenium.find_element_by_css_selector(selector)
-                .get_attribute('class').find(klass) != -1)
+        return (
+            self.selenium.find_element_by_css_selector(selector)
+            .get_attribute("class")
+            .find(klass)
+            != -1
+        )

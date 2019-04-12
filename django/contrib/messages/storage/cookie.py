@@ -11,7 +11,8 @@ class MessageEncoder(json.JSONEncoder):
     """
     Compactly serialize instances of the ``Message`` class as JSON.
     """
-    message_key = '__json_message'
+
+    message_key = "__json_message"
 
     def default(self, obj):
         if isinstance(obj, Message):
@@ -40,8 +41,7 @@ class MessageDecoder(json.JSONDecoder):
                 return Message(*obj[2:])
             return [self.process_messages(item) for item in obj]
         if isinstance(obj, dict):
-            return {key: self.process_messages(value)
-                    for key, value in obj.items()}
+            return {key: self.process_messages(value) for key, value in obj.items()}
         return obj
 
     def decode(self, s, **kwargs):
@@ -53,12 +53,13 @@ class CookieStorage(BaseStorage):
     """
     Store messages in a cookie.
     """
-    cookie_name = 'messages'
+
+    cookie_name = "messages"
     # uwsgi's default configuration enforces a maximum size of 4kb for all the
     # HTTP headers. In order to leave some room for other cookies and headers,
     # restrict the session cookie to 1/2 of 4kb. See #18781.
     max_cookie_size = 2048
-    not_finished = '__messagesnotfinished__'
+    not_finished = "__messagesnotfinished__"
 
     def _get(self, *args, **kwargs):
         """
@@ -82,14 +83,17 @@ class CookieStorage(BaseStorage):
         """
         if encoded_data:
             response.set_cookie(
-                self.cookie_name, encoded_data,
+                self.cookie_name,
+                encoded_data,
                 domain=settings.SESSION_COOKIE_DOMAIN,
                 secure=settings.SESSION_COOKIE_SECURE or None,
                 httponly=settings.SESSION_COOKIE_HTTPONLY or None,
                 samesite=settings.SESSION_COOKIE_SAMESITE,
             )
         else:
-            response.delete_cookie(self.cookie_name, domain=settings.SESSION_COOKIE_DOMAIN)
+            response.delete_cookie(
+                self.cookie_name, domain=settings.SESSION_COOKIE_DOMAIN
+            )
 
     def _store(self, messages, response, remove_oldest=True, *args, **kwargs):
         """
@@ -115,8 +119,9 @@ class CookieStorage(BaseStorage):
                     unstored_messages.append(messages.pop(0))
                 else:
                     unstored_messages.insert(0, messages.pop())
-                encoded_data = self._encode(messages + [self.not_finished],
-                                            encode_empty=unstored_messages)
+                encoded_data = self._encode(
+                    messages + [self.not_finished], encode_empty=unstored_messages
+                )
         self._update_cookie(encoded_data, response)
         return unstored_messages
 
@@ -125,7 +130,7 @@ class CookieStorage(BaseStorage):
         Create an HMAC/SHA1 hash based on the value and the project setting's
         SECRET_KEY, modified to make it unique for the present purpose.
         """
-        key_salt = 'django.contrib.messages'
+        key_salt = "django.contrib.messages"
         return salted_hmac(key_salt, value).hexdigest()
 
     def _encode(self, messages, encode_empty=False):
@@ -137,9 +142,9 @@ class CookieStorage(BaseStorage):
         also contains a hash to ensure that the data was not tampered with.
         """
         if messages or encode_empty:
-            encoder = MessageEncoder(separators=(',', ':'))
+            encoder = MessageEncoder(separators=(",", ":"))
             value = encoder.encode(messages)
-            return '%s$%s' % (self._hash(value), value)
+            return "%s$%s" % (self._hash(value), value)
 
     def _decode(self, data):
         """
@@ -150,7 +155,7 @@ class CookieStorage(BaseStorage):
         """
         if not data:
             return None
-        bits = data.split('$', 1)
+        bits = data.split("$", 1)
         if len(bits) == 2:
             hash, value = bits
             if constant_time_compare(hash, self._hash(value)):

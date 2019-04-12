@@ -10,15 +10,15 @@ class OriginTestCase(TestCase):
         self.engine = Engine(dirs=[TEMPLATE_DIR])
 
     def test_origin_compares_equal(self):
-        a = self.engine.get_template('index.html')
-        b = self.engine.get_template('index.html')
+        a = self.engine.get_template("index.html")
+        b = self.engine.get_template("index.html")
         self.assertEqual(a.origin, b.origin)
         self.assertTrue(a.origin == b.origin)
         self.assertFalse(a.origin != b.origin)
 
     def test_origin_compares_not_equal(self):
-        a = self.engine.get_template('first/test.html')
-        b = self.engine.get_template('second/test.html')
+        a = self.engine.get_template("first/test.html")
+        b = self.engine.get_template("second/test.html")
         self.assertNotEqual(a.origin, b.origin)
         self.assertFalse(a.origin == b.origin)
         self.assertTrue(a.origin != b.origin)

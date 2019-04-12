@@ -2,12 +2,8 @@ import os
 import re
 from datetime import datetime
 
-from django.contrib.gis.gdal import (
-    DataSource, Envelope, GDALException, OGRGeometry,
-)
-from django.contrib.gis.gdal.field import (
-    OFTDateTime, OFTInteger, OFTReal, OFTString,
-)
+from django.contrib.gis.gdal import DataSource, Envelope, GDALException, OGRGeometry
+from django.contrib.gis.gdal.field import OFTDateTime, OFTInteger, OFTReal, OFTString
 from django.test import SimpleTestCase
 
 from ..test_data import TEST_DATA, TestDS, get_ds_file
@@ -15,87 +11,110 @@ from ..test_data import TEST_DATA, TestDS, get_ds_file
 wgs_84_wkt = (
     'GEOGCS["GCS_WGS_1984",DATUM["WGS_1984",SPHEROID["WGS_1984",'
     '6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",'
-    '0.017453292519943295]]'
+    "0.017453292519943295]]"
 )
 # Using a regex because of small differences depending on GDAL versions.
 wgs_84_wkt_regex = r'^GEOGCS\["(GCS_)?WGS[ _](19)?84".*$'
 
-datetime_format = '%Y-%m-%dT%H:%M:%S'
+datetime_format = "%Y-%m-%dT%H:%M:%S"
 
 # List of acceptable data sources.
 ds_list = (
     TestDS(
-        'test_point', nfeat=5, nfld=3, geom='POINT', gtype=1, driver='ESRI Shapefile',
-        fields={'dbl': OFTReal, 'int': OFTInteger, 'str': OFTString},
-        extent=(-1.35011, 0.166623, -0.524093, 0.824508),  # Got extent from QGIS
+        "test_point",
+        nfeat=5,
+        nfld=3,
+        geom="POINT",
+        gtype=1,
+        driver="ESRI Shapefile",
+        fields={"dbl": OFTReal, "int": OFTInteger, "str": OFTString},
+        extent=(-1.35011, 0.166_623, -0.524_093, 0.824_508),  # Got extent from QGIS
         srs_wkt=wgs_84_wkt,
         field_values={
-            'dbl': [float(i) for i in range(1, 6)],
-            'int': list(range(1, 6)),
-            'str': [str(i) for i in range(1, 6)],
+            "dbl": [float(i) for i in range(1, 6)],
+            "int": list(range(1, 6)),
+            "str": [str(i) for i in range(1, 6)],
         },
-        fids=range(5)
+        fids=range(5),
     ),
     TestDS(
-        'test_vrt', ext='vrt', nfeat=3, nfld=3, geom='POINT', gtype='Point25D',
-        driver='OGR_VRT',
+        "test_vrt",
+        ext="vrt",
+        nfeat=3,
+        nfld=3,
+        geom="POINT",
+        gtype="Point25D",
+        driver="OGR_VRT",
         fields={
-            'POINT_X': OFTString,
-            'POINT_Y': OFTString,
-            'NUM': OFTString,
+            "POINT_X": OFTString,
+            "POINT_Y": OFTString,
+            "NUM": OFTString,
         },  # VRT uses CSV, which all types are OFTString.
         extent=(1.0, 2.0, 100.0, 523.5),  # Min/Max from CSV
         field_values={
-            'POINT_X': ['1.0', '5.0', '100.0'],
-            'POINT_Y': ['2.0', '23.0', '523.5'],
-            'NUM': ['5', '17', '23'],
+            "POINT_X": ["1.0", "5.0", "100.0"],
+            "POINT_Y": ["2.0", "23.0", "523.5"],
+            "NUM": ["5", "17", "23"],
         },
-        fids=range(1, 4)
+        fids=range(1, 4),
     ),
     TestDS(
-        'test_poly', nfeat=3, nfld=3, geom='POLYGON', gtype=3,
-        driver='ESRI Shapefile',
-        fields={'float': OFTReal, 'int': OFTInteger, 'str': OFTString},
-        extent=(-1.01513, -0.558245, 0.161876, 0.839637),  # Got extent from QGIS
+        "test_poly",
+        nfeat=3,
+        nfld=3,
+        geom="POLYGON",
+        gtype=3,
+        driver="ESRI Shapefile",
+        fields={"float": OFTReal, "int": OFTInteger, "str": OFTString},
+        extent=(-1.01513, -0.558_245, 0.161_876, 0.839_637),  # Got extent from QGIS
         srs_wkt=wgs_84_wkt,
     ),
     TestDS(
-        'has_nulls', nfeat=3, nfld=6, geom='POLYGON', gtype=3,
-        driver='GeoJSON', ext='geojson',
+        "has_nulls",
+        nfeat=3,
+        nfld=6,
+        geom="POLYGON",
+        gtype=3,
+        driver="GeoJSON",
+        ext="geojson",
         fields={
-            'uuid': OFTString,
-            'name': OFTString,
-            'num': OFTReal,
-            'integer': OFTInteger,
-            'datetime': OFTDateTime,
-            'boolean': OFTInteger,
+            "uuid": OFTString,
+            "name": OFTString,
+            "num": OFTReal,
+            "integer": OFTInteger,
+            "datetime": OFTDateTime,
+            "boolean": OFTInteger,
         },
-        extent=(-75.274200, 39.846504, -74.959717, 40.119040),  # Got extent from QGIS
+        extent=(
+            -75.274_200,
+            39.846_504,
+            -74.959_717,
+            40.119_040,
+        ),  # Got extent from QGIS
         field_values={
-            'uuid': [
-                '1378c26f-cbe6-44b0-929f-eb330d4991f5',
-                'fa2ba67c-a135-4338-b924-a9622b5d869f',
-                '4494c1f3-55ab-4256-b365-12115cb388d5',
+            "uuid": [
+                "1378c26f-cbe6-44b0-929f-eb330d4991f5",
+                "fa2ba67c-a135-4338-b924-a9622b5d869f",
+                "4494c1f3-55ab-4256-b365-12115cb388d5",
             ],
-            'name': ['Philadelphia', None, 'north'],
-            'num': [1.001, None, 0.0],
-            'integer': [5, None, 8],
-            'boolean': [True, None, False],
-            'datetime': [
-                datetime.strptime('1994-08-14T11:32:14', datetime_format),
+            "name": ["Philadelphia", None, "north"],
+            "num": [1.001, None, 0.0],
+            "integer": [5, None, 8],
+            "boolean": [True, None, False],
+            "datetime": [
+                datetime.strptime("1994-08-14T11:32:14", datetime_format),
                 None,
-                datetime.strptime('2018-11-29T03:02:52', datetime_format),
-            ]
+                datetime.strptime("2018-11-29T03:02:52", datetime_format),
+            ],
         },
         fids=range(3),
     ),
 )
 
-bad_ds = (TestDS('foo'),)
+bad_ds = (TestDS("foo"),)
 
 
 class DataSourceTest(SimpleTestCase):
-
     def test01_valid_shp(self):
         "Testing valid SHP Data Source files."
 
@@ -113,12 +132,14 @@ class DataSourceTest(SimpleTestCase):
             self.assertEqual(source.driver, str(ds.driver))
 
             # Making sure indexing works
-            msg = 'Index out of range when accessing layers in a datasource: %s.'
+            msg = "Index out of range when accessing layers in a datasource: %s."
             with self.assertRaisesMessage(IndexError, msg % len(ds)):
                 ds.__getitem__(len(ds))
 
-            with self.assertRaisesMessage(IndexError, 'Invalid OGR layer name given: invalid.'):
-                ds.__getitem__('invalid')
+            with self.assertRaisesMessage(
+                IndexError, "Invalid OGR layer name given: invalid."
+            ):
+                ds.__getitem__("invalid")
 
     def test02_invalid_shp(self):
         "Testing invalid SHP files for the Data Source."
@@ -153,12 +174,14 @@ class DataSourceTest(SimpleTestCase):
                     self.assertIn(f, source.fields)
 
                 # Negative FIDs are not allowed.
-                with self.assertRaisesMessage(IndexError, 'Negative indices are not allowed on OGR Layers.'):
+                with self.assertRaisesMessage(
+                    IndexError, "Negative indices are not allowed on OGR Layers."
+                ):
                     layer.__getitem__(-1)
-                with self.assertRaisesMessage(IndexError, 'Invalid feature id: 50000.'):
+                with self.assertRaisesMessage(IndexError, "Invalid feature id: 50000."):
                     layer.__getitem__(50000)
 
-                if hasattr(source, 'field_values'):
+                if hasattr(source, "field_values"):
                     # Testing `Layer.get_fields` (which uses Layer.__iter__)
                     for fld_name, fld_value in source.field_values.items():
                         self.assertEqual(fld_value, layer.get_fields(fld_name))
@@ -172,12 +195,16 @@ class DataSourceTest(SimpleTestCase):
                         for fld_name, fld_value in source.field_values.items():
                             self.assertEqual(fld_value[i], feat.get(fld_name))
 
-                        msg = 'Index out of range when accessing field in a feature: %s.'
+                        msg = (
+                            "Index out of range when accessing field in a feature: %s."
+                        )
                         with self.assertRaisesMessage(IndexError, msg % len(feat)):
                             feat.__getitem__(len(feat))
 
-                        with self.assertRaisesMessage(IndexError, 'Invalid OFT field name given: invalid.'):
-                            feat.__getitem__('invalid')
+                        with self.assertRaisesMessage(
+                            IndexError, "Invalid OFT field name given: invalid."
+                        ):
+                            feat.__getitem__("invalid")
 
     def test03b_layer_slice(self):
         "Test indexing and slicing on Layers."
@@ -214,7 +241,7 @@ class DataSourceTest(SimpleTestCase):
         self.assertEqual(source.gtype, lyr.geom_type.num)
 
         # Same issue for Feature/Field objects, see #18640
-        self.assertEqual(str(lyr[0]['str']), "1")
+        self.assertEqual(str(lyr[0]["str"]), "1")
 
     def test04_features(self):
         "Testing Data Source Features."
@@ -256,12 +283,12 @@ class DataSourceTest(SimpleTestCase):
                     self.assertEqual(source.gtype, g.geom_type)
 
                     # Making sure the SpatialReference is as expected.
-                    if hasattr(source, 'srs_wkt'):
+                    if hasattr(source, "srs_wkt"):
                         self.assertIsNotNone(re.match(wgs_84_wkt_regex, g.srs.wkt))
 
     def test06_spatial_filter(self):
         "Testing the Layer.spatial_filter property."
-        ds = DataSource(get_ds_file('cities', 'shp'))
+        ds = DataSource(get_ds_file("cities", "shp"))
         lyr = ds[0]
 
         # When not set, it should be None.
@@ -269,30 +296,30 @@ class DataSourceTest(SimpleTestCase):
 
         # Must be set a/an OGRGeometry or 4-tuple.
         with self.assertRaises(TypeError):
-            lyr._set_spatial_filter('foo')
+            lyr._set_spatial_filter("foo")
 
         # Setting the spatial filter with a tuple/list with the extent of
         # a buffer centering around Pueblo.
         with self.assertRaises(ValueError):
             lyr._set_spatial_filter(list(range(5)))
-        filter_extent = (-105.609252, 37.255001, -103.609252, 39.255001)
-        lyr.spatial_filter = (-105.609252, 37.255001, -103.609252, 39.255001)
+        filter_extent = (-105.609_252, 37.255_001, -103.609_252, 39.255_001)
+        lyr.spatial_filter = (-105.609_252, 37.255_001, -103.609_252, 39.255_001)
         self.assertEqual(OGRGeometry.from_bbox(filter_extent), lyr.spatial_filter)
         feats = [feat for feat in lyr]
         self.assertEqual(1, len(feats))
-        self.assertEqual('Pueblo', feats[0].get('Name'))
+        self.assertEqual("Pueblo", feats[0].get("Name"))
 
         # Setting the spatial filter with an OGRGeometry for buffer centering
         # around Houston.
         filter_geom = OGRGeometry(
-            'POLYGON((-96.363151 28.763374,-94.363151 28.763374,'
-            '-94.363151 30.763374,-96.363151 30.763374,-96.363151 28.763374))'
+            "POLYGON((-96.363151 28.763374,-94.363151 28.763374,"
+            "-94.363151 30.763374,-96.363151 30.763374,-96.363151 28.763374))"
         )
         lyr.spatial_filter = filter_geom
         self.assertEqual(filter_geom, lyr.spatial_filter)
         feats = [feat for feat in lyr]
         self.assertEqual(1, len(feats))
-        self.assertEqual('Houston', feats[0].get('Name'))
+        self.assertEqual("Houston", feats[0].get("Name"))
 
         # Clearing the spatial filter by setting it to None.  Now
         # should indicate that there are 3 features in the Layer.
@@ -304,7 +331,7 @@ class DataSourceTest(SimpleTestCase):
         # Using *.dbf from Census 2010 TIGER Shapefile for Texas,
         # which has land area ('ALAND10') stored in a Real field
         # with no precision.
-        ds = DataSource(os.path.join(TEST_DATA, 'texas.dbf'))
+        ds = DataSource(os.path.join(TEST_DATA, "texas.dbf"))
         feat = ds[0][0]
         # Reference value obtained using `ogrinfo`.
-        self.assertEqual(676586997978, feat.get('ALAND10'))
+        self.assertEqual(676_586_997_978, feat.get("ALAND10"))

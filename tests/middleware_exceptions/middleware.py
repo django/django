@@ -15,39 +15,45 @@ class BaseMiddleware:
 
 class ProcessExceptionMiddleware(BaseMiddleware):
     def process_exception(self, request, exception):
-        return HttpResponse('Exception caught')
+        return HttpResponse("Exception caught")
 
 
 class ProcessExceptionLogMiddleware(BaseMiddleware):
     def process_exception(self, request, exception):
-        log.append('process-exception')
+        log.append("process-exception")
 
 
 class ProcessExceptionExcMiddleware(BaseMiddleware):
     def process_exception(self, request, exception):
-        raise Exception('from process-exception')
+        raise Exception("from process-exception")
 
 
 class ProcessViewMiddleware(BaseMiddleware):
     def process_view(self, request, view_func, view_args, view_kwargs):
-        return HttpResponse('Processed view %s' % view_func.__name__)
+        return HttpResponse("Processed view %s" % view_func.__name__)
 
 
 class ProcessViewNoneMiddleware(BaseMiddleware):
     def process_view(self, request, view_func, view_args, view_kwargs):
-        log.append('processed view %s' % view_func.__name__)
+        log.append("processed view %s" % view_func.__name__)
         return None
 
 
 class ProcessViewTemplateResponseMiddleware(BaseMiddleware):
     def process_view(self, request, view_func, view_args, view_kwargs):
-        template = engines['django'].from_string('Processed view {{ view }}{% for m in mw %}\n{{ m }}{% endfor %}')
-        return TemplateResponse(request, template, {'mw': [self.__class__.__name__], 'view': view_func.__name__})
+        template = engines["django"].from_string(
+            "Processed view {{ view }}{% for m in mw %}\n{{ m }}{% endfor %}"
+        )
+        return TemplateResponse(
+            request,
+            template,
+            {"mw": [self.__class__.__name__], "view": view_func.__name__},
+        )
 
 
 class TemplateResponseMiddleware(BaseMiddleware):
     def process_template_response(self, request, response):
-        response.context_data['mw'].append(self.__class__.__name__)
+        response.context_data["mw"].append(self.__class__.__name__)
         return response
 
 
@@ -65,4 +71,4 @@ class NoTemplateResponseMiddleware(BaseMiddleware):
 
 class NotFoundMiddleware(BaseMiddleware):
     def __call__(self, request):
-        raise Http404('not found')
+        raise Http404("not found")

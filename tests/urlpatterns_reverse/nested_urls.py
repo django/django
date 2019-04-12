@@ -14,12 +14,15 @@ class View3(View):
     pass
 
 
-nested = ([
-    path('view1/', view1, name='view1'),
-    path('view3/', View3.as_view(), name='view3'),
-], 'backend')
+nested = (
+    [
+        path("view1/", view1, name="view1"),
+        path("view3/", View3.as_view(), name="view3"),
+    ],
+    "backend",
+)
 
 urlpatterns = [
-    path('some/path/', include(nested, namespace='nested')),
-    path('view2/', view2, name='view2'),
+    path("some/path/", include(nested, namespace="nested")),
+    path("view2/", view2, name="view2"),
 ]

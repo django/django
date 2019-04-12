@@ -6,21 +6,21 @@ from django.db import DatabaseError, connection, connections
 from django.test import TestCase
 
 
-@unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL tests')
+@unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL tests")
 class Tests(TestCase):
-
     def test_nodb_connection(self):
         """
         The _nodb_connection property fallbacks to the default connection
         database when access to the 'postgres' database is not granted.
         """
+
         def mocked_connect(self):
-            if self.settings_dict['NAME'] is None:
+            if self.settings_dict["NAME"] is None:
                 raise DatabaseError()
-            return ''
+            return ""
 
         nodb_conn = connection._nodb_connection
-        self.assertIsNone(nodb_conn.settings_dict['NAME'])
+        self.assertIsNone(nodb_conn.settings_dict["NAME"])
 
         # Now assume the 'postgres' db isn't available
         msg = (
@@ -31,27 +31,33 @@ class Tests(TestCase):
             "database and will use the first PostgreSQL database instead."
         )
         with self.assertWarnsMessage(RuntimeWarning, msg):
-            with mock.patch('django.db.backends.base.base.BaseDatabaseWrapper.connect',
-                            side_effect=mocked_connect, autospec=True):
+            with mock.patch(
+                "django.db.backends.base.base.BaseDatabaseWrapper.connect",
+                side_effect=mocked_connect,
+                autospec=True,
+            ):
                 with mock.patch.object(
                     connection,
-                    'settings_dict',
-                    {**connection.settings_dict, 'NAME': 'postgres'},
+                    "settings_dict",
+                    {**connection.settings_dict, "NAME": "postgres"},
                 ):
                     nodb_conn = connection._nodb_connection
-        self.assertIsNotNone(nodb_conn.settings_dict['NAME'])
-        self.assertEqual(nodb_conn.settings_dict['NAME'], connections['other'].settings_dict['NAME'])
+        self.assertIsNotNone(nodb_conn.settings_dict["NAME"])
+        self.assertEqual(
+            nodb_conn.settings_dict["NAME"], connections["other"].settings_dict["NAME"]
+        )
 
     def test_database_name_too_long(self):
         from django.db.backends.postgresql.base import DatabaseWrapper
+
         settings = connection.settings_dict.copy()
         max_name_length = connection.ops.max_name_length()
-        settings['NAME'] = 'a' + (max_name_length * 'a')
+        settings["NAME"] = "a" + (max_name_length * "a")
         msg = (
             "The database name '%s' (%d characters) is longer than "
             "PostgreSQL's limit of %s characters. Supply a shorter NAME in "
             "settings.DATABASES."
-        ) % (settings['NAME'], max_name_length + 1, max_name_length)
+        ) % (settings["NAME"], max_name_length + 1, max_name_length)
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             DatabaseWrapper(settings).get_connection_params()
 
@@ -69,7 +75,7 @@ class Tests(TestCase):
                 cursor.execute("RESET TIMEZONE")
                 cursor.execute("SHOW TIMEZONE")
                 db_default_tz = cursor.fetchone()[0]
-            new_tz = 'Europe/Paris' if db_default_tz == 'UTC' else 'UTC'
+            new_tz = "Europe/Paris" if db_default_tz == "UTC" else "UTC"
             new_connection.close()
 
             # Invalidate timezone name cache, because the setting_changed
@@ -97,7 +103,7 @@ class Tests(TestCase):
         after setting the time zone when AUTOCOMMIT is False (#21452).
         """
         new_connection = connection.copy()
-        new_connection.settings_dict['AUTOCOMMIT'] = False
+        new_connection.settings_dict["AUTOCOMMIT"] = False
 
         try:
             # Open a database connection.
@@ -116,16 +122,17 @@ class Tests(TestCase):
             ISOLATION_LEVEL_READ_COMMITTED as read_committed,
             ISOLATION_LEVEL_SERIALIZABLE as serializable,
         )
+
         # Since this is a django.test.TestCase, a transaction is in progress
         # and the isolation level isn't reported as 0. This test assumes that
         # PostgreSQL is configured with the default isolation level.
 
         # Check the level on the psycopg2 connection, not the Django wrapper.
-        default_level = read_committed if psycopg2.__version__ < '2.7' else None
+        default_level = read_committed if psycopg2.__version__ < "2.7" else None
         self.assertEqual(connection.connection.isolation_level, default_level)
 
         new_connection = connection.copy()
-        new_connection.settings_dict['OPTIONS']['isolation_level'] = serializable
+        new_connection.settings_dict["OPTIONS"]["isolation_level"] = serializable
         try:
             # Start a transaction so the isolation level isn't reported as 0.
             new_connection.set_autocommit(False)
@@ -136,43 +143,54 @@ class Tests(TestCase):
 
     def test_connect_no_is_usable_checks(self):
         new_connection = connection.copy()
-        with mock.patch.object(new_connection, 'is_usable') as is_usable:
+        with mock.patch.object(new_connection, "is_usable") as is_usable:
             new_connection.connect()
         is_usable.assert_not_called()
 
     def _select(self, val):
         with connection.cursor() as cursor:
-            cursor.execute('SELECT %s', (val,))
+            cursor.execute("SELECT %s", (val,))
             return cursor.fetchone()[0]
 
     def test_select_ascii_array(self):
-        a = ['awef']
+        a = ["awef"]
         b = self._select(a)
         self.assertEqual(a[0], b[0])
 
     def test_select_unicode_array(self):
-        a = ['ᄲawef']
+        a = ["ᄲawef"]
         b = self._select(a)
         self.assertEqual(a[0], b[0])
 
     def test_lookup_cast(self):
         from django.db.backends.postgresql.operations import DatabaseOperations
+
         do = DatabaseOperations(connection=None)
         lookups = (
-            'iexact', 'contains', 'icontains', 'startswith', 'istartswith',
-            'endswith', 'iendswith', 'regex', 'iregex',
+            "iexact",
+            "contains",
+            "icontains",
+            "startswith",
+            "istartswith",
+            "endswith",
+            "iendswith",
+            "regex",
+            "iregex",
         )
         for lookup in lookups:
             with self.subTest(lookup=lookup):
-                self.assertIn('::text', do.lookup_cast(lookup))
+                self.assertIn("::text", do.lookup_cast(lookup))
         for lookup in lookups:
-            for field_type in ('CICharField', 'CIEmailField', 'CITextField'):
+            for field_type in ("CICharField", "CIEmailField", "CITextField"):
                 with self.subTest(lookup=lookup, field_type=field_type):
-                    self.assertIn('::citext', do.lookup_cast(lookup, internal_type=field_type))
+                    self.assertIn(
+                        "::citext", do.lookup_cast(lookup, internal_type=field_type)
+                    )
 
     def test_correct_extraction_psycopg2_version(self):
         from django.db.backends.postgresql.base import psycopg2_version
-        with mock.patch('psycopg2.__version__', '4.2.1 (dt dec pq3 ext lo64)'):
+
+        with mock.patch("psycopg2.__version__", "4.2.1 (dt dec pq3 ext lo64)"):
             self.assertEqual(psycopg2_version(), (4, 2, 1))
-        with mock.patch('psycopg2.__version__', '4.2b0.dev1 (dt dec pq3 ext lo64)'):
+        with mock.patch("psycopg2.__version__", "4.2b0.dev1 (dt dec pq3 ext lo64)"):
             self.assertEqual(psycopg2_version(), (4, 2))

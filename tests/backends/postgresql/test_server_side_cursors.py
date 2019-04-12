@@ -9,19 +9,23 @@ from django.test import TestCase
 from ..models import Person
 
 
-@unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL tests')
+@unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL tests")
 class ServerSideCursorsPostgres(TestCase):
-    cursor_fields = 'name, statement, is_holdable, is_binary, is_scrollable, creation_time'
-    PostgresCursor = namedtuple('PostgresCursor', cursor_fields)
+    cursor_fields = (
+        "name, statement, is_holdable, is_binary, is_scrollable, creation_time"
+    )
+    PostgresCursor = namedtuple("PostgresCursor", cursor_fields)
 
     @classmethod
     def setUpTestData(cls):
-        Person.objects.create(first_name='a', last_name='a')
-        Person.objects.create(first_name='b', last_name='b')
+        Person.objects.create(first_name="a", last_name="a")
+        Person.objects.create(first_name="b", last_name="b")
 
     def inspect_cursors(self):
         with connection.cursor() as cursor:
-            cursor.execute('SELECT {fields} FROM pg_cursors;'.format(fields=self.cursor_fields))
+            cursor.execute(
+                "SELECT {fields} FROM pg_cursors;".format(fields=self.cursor_fields)
+            )
             cursors = cursor.fetchall()
         return [self.PostgresCursor._make(cursor) for cursor in cursors]
 
@@ -30,7 +34,9 @@ class ServerSideCursorsPostgres(TestCase):
         for setting in kwargs:
             original_value = connection.settings_dict.get(setting)
             if setting in connection.settings_dict:
-                self.addCleanup(operator.setitem, connection.settings_dict, setting, original_value)
+                self.addCleanup(
+                    operator.setitem, connection.settings_dict, setting, original_value
+                )
             else:
                 self.addCleanup(operator.delitem, connection.settings_dict, setting)
 
@@ -42,7 +48,7 @@ class ServerSideCursorsPostgres(TestCase):
         cursors = self.inspect_cursors()
         self.assertEqual(len(cursors), num_expected)
         for cursor in cursors:
-            self.assertIn('_django_curs_', cursor.name)
+            self.assertIn("_django_curs_", cursor.name)
             self.assertFalse(cursor.is_scrollable)
             self.assertFalse(cursor.is_holdable)
             self.assertFalse(cursor.is_binary)
@@ -54,17 +60,23 @@ class ServerSideCursorsPostgres(TestCase):
         self.assertUsesCursor(Person.objects.iterator())
 
     def test_values(self):
-        self.assertUsesCursor(Person.objects.values('first_name').iterator())
+        self.assertUsesCursor(Person.objects.values("first_name").iterator())
 
     def test_values_list(self):
-        self.assertUsesCursor(Person.objects.values_list('first_name').iterator())
+        self.assertUsesCursor(Person.objects.values_list("first_name").iterator())
 
     def test_values_list_flat(self):
-        self.assertUsesCursor(Person.objects.values_list('first_name', flat=True).iterator())
+        self.assertUsesCursor(
+            Person.objects.values_list("first_name", flat=True).iterator()
+        )
 
     def test_values_list_fields_not_equal_to_names(self):
-        expr = models.Count('id')
-        self.assertUsesCursor(Person.objects.annotate(id__count=expr).values_list(expr, 'id__count').iterator())
+        expr = models.Count("id")
+        self.assertUsesCursor(
+            Person.objects.annotate(id__count=expr)
+            .values_list(expr, "id__count")
+            .iterator()
+        )
 
     def test_server_side_cursor_many_cursors(self):
         persons = Person.objects.iterator()

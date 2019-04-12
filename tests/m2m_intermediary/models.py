@@ -34,4 +34,4 @@ class Writer(models.Model):
     position = models.CharField(max_length=100)
 
     def __str__(self):
-        return '%s (%s)' % (self.reporter, self.position)
+        return "%s (%s)" % (self.reporter, self.position)

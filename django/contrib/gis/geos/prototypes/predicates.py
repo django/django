@@ -22,22 +22,26 @@ class BinaryPredicate(UnaryPredicate):
 
 
 # ## Unary Predicates ##
-geos_hasz = UnaryPredicate('GEOSHasZ')
-geos_isclosed = UnaryPredicate('GEOSisClosed')
-geos_isempty = UnaryPredicate('GEOSisEmpty')
-geos_isring = UnaryPredicate('GEOSisRing')
-geos_issimple = UnaryPredicate('GEOSisSimple')
-geos_isvalid = UnaryPredicate('GEOSisValid')
+geos_hasz = UnaryPredicate("GEOSHasZ")
+geos_isclosed = UnaryPredicate("GEOSisClosed")
+geos_isempty = UnaryPredicate("GEOSisEmpty")
+geos_isring = UnaryPredicate("GEOSisRing")
+geos_issimple = UnaryPredicate("GEOSisSimple")
+geos_isvalid = UnaryPredicate("GEOSisValid")
 
 # ## Binary Predicates ##
-geos_contains = BinaryPredicate('GEOSContains')
-geos_covers = BinaryPredicate('GEOSCovers')
-geos_crosses = BinaryPredicate('GEOSCrosses')
-geos_disjoint = BinaryPredicate('GEOSDisjoint')
-geos_equals = BinaryPredicate('GEOSEquals')
-geos_equalsexact = BinaryPredicate('GEOSEqualsExact', argtypes=[GEOM_PTR, GEOM_PTR, c_double])
-geos_intersects = BinaryPredicate('GEOSIntersects')
-geos_overlaps = BinaryPredicate('GEOSOverlaps')
-geos_relatepattern = BinaryPredicate('GEOSRelatePattern', argtypes=[GEOM_PTR, GEOM_PTR, c_char_p])
-geos_touches = BinaryPredicate('GEOSTouches')
-geos_within = BinaryPredicate('GEOSWithin')
+geos_contains = BinaryPredicate("GEOSContains")
+geos_covers = BinaryPredicate("GEOSCovers")
+geos_crosses = BinaryPredicate("GEOSCrosses")
+geos_disjoint = BinaryPredicate("GEOSDisjoint")
+geos_equals = BinaryPredicate("GEOSEquals")
+geos_equalsexact = BinaryPredicate(
+    "GEOSEqualsExact", argtypes=[GEOM_PTR, GEOM_PTR, c_double]
+)
+geos_intersects = BinaryPredicate("GEOSIntersects")
+geos_overlaps = BinaryPredicate("GEOSOverlaps")
+geos_relatepattern = BinaryPredicate(
+    "GEOSRelatePattern", argtypes=[GEOM_PTR, GEOM_PTR, c_char_p]
+)
+geos_touches = BinaryPredicate("GEOSTouches")
+geos_within = BinaryPredicate("GEOSWithin")

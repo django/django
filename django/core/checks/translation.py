@@ -4,30 +4,30 @@ from django.utils.translation.trans_real import language_code_re
 from . import Error, Tags, register
 
 E001 = Error(
-    'You have provided an invalid value for the LANGUAGE_CODE setting: {}.',
-    id='translation.E001',
+    "You have provided an invalid value for the LANGUAGE_CODE setting: {}.",
+    id="translation.E001",
 )
 
 E002 = Error(
-    'You have provided an invalid language code in the LANGUAGES setting: {}.',
-    id='translation.E002',
+    "You have provided an invalid language code in the LANGUAGES setting: {}.",
+    id="translation.E002",
 )
 
 E003 = Error(
-    'You have provided an invalid language code in the LANGUAGES_BIDI setting: {}.',
-    id='translation.E003',
+    "You have provided an invalid language code in the LANGUAGES_BIDI setting: {}.",
+    id="translation.E003",
 )
 
 E004 = Error(
-    'You have provided a value for the LANGUAGE_CODE setting that is not in '
-    'the LANGUAGES setting.',
-    id='translation.E004',
+    "You have provided a value for the LANGUAGE_CODE setting that is not in "
+    "the LANGUAGES setting.",
+    id="translation.E004",
 )
 
 E005 = Error(
-    'You have provided values in the LANGUAGES_BIDI setting that are not in '
-    'the LANGUAGES setting.',
-    id='translation.E005',
+    "You have provided values in the LANGUAGES_BIDI setting that are not in "
+    "the LANGUAGES setting.",
+    id="translation.E005",
 )
 
 
@@ -45,7 +45,8 @@ def check_setting_languages(app_configs, **kwargs):
     """Error if LANGUAGES setting is invalid."""
     return [
         Error(E002.msg.format(tag), id=E002.id)
-        for tag, _ in settings.LANGUAGES if not isinstance(tag, str) or not language_code_re.match(tag)
+        for tag, _ in settings.LANGUAGES
+        if not isinstance(tag, str) or not language_code_re.match(tag)
     ]
 
 
@@ -54,14 +55,15 @@ def check_setting_languages_bidi(app_configs, **kwargs):
     """Error if LANGUAGES_BIDI setting is invalid."""
     return [
         Error(E003.msg.format(tag), id=E003.id)
-        for tag in settings.LANGUAGES_BIDI if not isinstance(tag, str) or not language_code_re.match(tag)
+        for tag in settings.LANGUAGES_BIDI
+        if not isinstance(tag, str) or not language_code_re.match(tag)
     ]
 
 
 @register(Tags.translation)
 def check_language_settings_consistent(app_configs, **kwargs):
     """Error if language settings are not consistent with each other."""
-    available_tags = {i for i, _ in settings.LANGUAGES} | {'en-us'}
+    available_tags = {i for i, _ in settings.LANGUAGES} | {"en-us"}
     messages = []
     if settings.LANGUAGE_CODE not in available_tags:
         messages.append(E004)

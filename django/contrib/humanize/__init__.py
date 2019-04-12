@@ -1,1 +1,1 @@
-default_app_config = 'django.contrib.humanize.apps.HumanizeConfig'
+default_app_config = "django.contrib.humanize.apps.HumanizeConfig"

@@ -1,27 +1,30 @@
 from datetime import datetime
 
 from django.forms import (
-    CharField, Form, MultipleChoiceField, MultiValueField, MultiWidget,
-    SelectMultiple, SplitDateTimeField, SplitDateTimeWidget, TextInput,
+    CharField,
+    Form,
+    MultipleChoiceField,
+    MultiValueField,
+    MultiWidget,
+    SelectMultiple,
+    SplitDateTimeField,
+    SplitDateTimeWidget,
+    TextInput,
     ValidationError,
 )
 from django.test import SimpleTestCase
 
-beatles = (('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))
+beatles = (("J", "John"), ("P", "Paul"), ("G", "George"), ("R", "Ringo"))
 
 
 class ComplexMultiWidget(MultiWidget):
     def __init__(self, attrs=None):
-        widgets = (
-            TextInput(),
-            SelectMultiple(choices=beatles),
-            SplitDateTimeWidget(),
-        )
+        widgets = (TextInput(), SelectMultiple(choices=beatles), SplitDateTimeWidget())
         super().__init__(widgets, attrs)
 
     def decompress(self, value):
         if value:
-            data = value.split(',')
+            data = value.split(",")
             return [
                 data[0],
                 list(data[1]),
@@ -41,7 +44,7 @@ class ComplexField(MultiValueField):
 
     def compress(self, data_list):
         if data_list:
-            return '%s,%s,%s' % (data_list[0], ''.join(data_list[1]), data_list[2])
+            return "%s,%s,%s" % (data_list[0], "".join(data_list[1]), data_list[2])
         return None
 
 
@@ -50,7 +53,6 @@ class ComplexFieldForm(Form):
 
 
 class MultiValueFieldTest(SimpleTestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.field = ComplexField(widget=ComplexMultiWidget())
@@ -58,8 +60,8 @@ class MultiValueFieldTest(SimpleTestCase):
 
     def test_clean(self):
         self.assertEqual(
-            self.field.clean(['some text', ['J', 'P'], ['2007-04-25', '6:24:00']]),
-            'some text,JP,2007-04-25 06:24:00',
+            self.field.clean(["some text", ["J", "P"], ["2007-04-25", "6:24:00"]]),
+            "some text,JP,2007-04-25 06:24:00",
         )
 
     def test_clean_disabled_multivalue(self):
@@ -67,20 +69,20 @@ class MultiValueFieldTest(SimpleTestCase):
             f = ComplexField(disabled=True, widget=ComplexMultiWidget)
 
         inputs = (
-            'some text,JP,2007-04-25 06:24:00',
-            ['some text', ['J', 'P'], ['2007-04-25', '6:24:00']],
+            "some text,JP,2007-04-25 06:24:00",
+            ["some text", ["J", "P"], ["2007-04-25", "6:24:00"]],
         )
         for data in inputs:
             with self.subTest(data=data):
-                form = ComplexFieldForm({}, initial={'f': data})
+                form = ComplexFieldForm({}, initial={"f": data})
                 form.full_clean()
                 self.assertEqual(form.errors, {})
-                self.assertEqual(form.cleaned_data, {'f': inputs[0]})
+                self.assertEqual(form.cleaned_data, {"f": inputs[0]})
 
     def test_bad_choice(self):
         msg = "'Select a valid choice. X is not one of the available choices.'"
         with self.assertRaisesMessage(ValidationError, msg):
-            self.field.clean(['some text', ['X'], ['2007-04-25', '6:24:00']])
+            self.field.clean(["some text", ["X"], ["2007-04-25", "6:24:00"]])
 
     def test_no_value(self):
         """
@@ -88,39 +90,49 @@ class MultiValueFieldTest(SimpleTestCase):
         """
         msg = "'This field is required.'"
         with self.assertRaisesMessage(ValidationError, msg):
-            self.field.clean(['some text', ['JP']])
+            self.field.clean(["some text", ["JP"]])
 
     def test_has_changed_no_initial(self):
-        self.assertTrue(self.field.has_changed(None, ['some text', ['J', 'P'], ['2007-04-25', '6:24:00']]))
+        self.assertTrue(
+            self.field.has_changed(
+                None, ["some text", ["J", "P"], ["2007-04-25", "6:24:00"]]
+            )
+        )
 
     def test_has_changed_same(self):
-        self.assertFalse(self.field.has_changed(
-            'some text,JP,2007-04-25 06:24:00',
-            ['some text', ['J', 'P'], ['2007-04-25', '6:24:00']],
-        ))
+        self.assertFalse(
+            self.field.has_changed(
+                "some text,JP,2007-04-25 06:24:00",
+                ["some text", ["J", "P"], ["2007-04-25", "6:24:00"]],
+            )
+        )
 
     def test_has_changed_first_widget(self):
         """
         Test when the first widget's data has changed.
         """
-        self.assertTrue(self.field.has_changed(
-            'some text,JP,2007-04-25 06:24:00',
-            ['other text', ['J', 'P'], ['2007-04-25', '6:24:00']],
-        ))
+        self.assertTrue(
+            self.field.has_changed(
+                "some text,JP,2007-04-25 06:24:00",
+                ["other text", ["J", "P"], ["2007-04-25", "6:24:00"]],
+            )
+        )
 
     def test_has_changed_last_widget(self):
         """
         Test when the last widget's data has changed. This ensures that it is
         not short circuiting while testing the widgets.
         """
-        self.assertTrue(self.field.has_changed(
-            'some text,JP,2007-04-25 06:24:00',
-            ['some text', ['J', 'P'], ['2009-04-25', '11:44:00']],
-        ))
+        self.assertTrue(
+            self.field.has_changed(
+                "some text,JP,2007-04-25 06:24:00",
+                ["some text", ["J", "P"], ["2009-04-25", "11:44:00"]],
+            )
+        )
 
     def test_disabled_has_changed(self):
         f = MultiValueField(fields=(CharField(), CharField()), disabled=True)
-        self.assertIs(f.has_changed(['x', 'x'], ['y', 'y']), False)
+        self.assertIs(f.has_changed(["x", "x"], ["y", "y"]), False)
 
     def test_form_as_table(self):
         form = ComplexFieldForm()
@@ -141,12 +153,14 @@ class MultiValueFieldTest(SimpleTestCase):
         )
 
     def test_form_as_table_data(self):
-        form = ComplexFieldForm({
-            'field1_0': 'some text',
-            'field1_1': ['J', 'P'],
-            'field1_2_0': '2007-04-25',
-            'field1_2_1': '06:24:00',
-        })
+        form = ComplexFieldForm(
+            {
+                "field1_0": "some text",
+                "field1_1": ["J", "P"],
+                "field1_2_0": "2007-04-25",
+                "field1_2_1": "06:24:00",
+            }
+        )
         self.assertHTMLEqual(
             form.as_table(),
             """
@@ -164,11 +178,15 @@ class MultiValueFieldTest(SimpleTestCase):
         )
 
     def test_form_cleaned_data(self):
-        form = ComplexFieldForm({
-            'field1_0': 'some text',
-            'field1_1': ['J', 'P'],
-            'field1_2_0': '2007-04-25',
-            'field1_2_1': '06:24:00',
-        })
+        form = ComplexFieldForm(
+            {
+                "field1_0": "some text",
+                "field1_1": ["J", "P"],
+                "field1_2_0": "2007-04-25",
+                "field1_2_1": "06:24:00",
+            }
+        )
         form.is_valid()
-        self.assertEqual(form.cleaned_data['field1'], 'some text,JP,2007-04-25 06:24:00')
+        self.assertEqual(
+            form.cleaned_data["field1"], "some text,JP,2007-04-25 06:24:00"
+        )

@@ -145,11 +145,11 @@ class BaseDatabaseFeatures:
 
     # Some backends may not be able to differentiate BigAutoField from other
     # fields such as AutoField.
-    introspected_big_auto_field_type = 'BigAutoField'
+    introspected_big_auto_field_type = "BigAutoField"
 
     # Some backends may not be able to differentiate BooleanField from other
     # fields such as IntegerField.
-    introspected_boolean_field_type = 'BooleanField'
+    introspected_boolean_field_type = "BooleanField"
 
     # Can the backend introspect the column order (ASC/DESC) for indexes?
     supports_index_column_ordering = True
@@ -200,7 +200,7 @@ class BaseDatabaseFeatures:
     has_case_insensitive_like = True
 
     # Suffix for backends that don't support "SELECT xxx;" queries.
-    bare_select_suffix = ''
+    bare_select_suffix = ""
 
     # If NULL is implied on columns without needing to be explicitly specified
     implied_column_null = False
@@ -297,12 +297,12 @@ class BaseDatabaseFeatures:
     def supports_transactions(self):
         """Confirm support for transactions."""
         with self.connection.cursor() as cursor:
-            cursor.execute('CREATE TABLE ROLLBACK_TEST (X INT)')
+            cursor.execute("CREATE TABLE ROLLBACK_TEST (X INT)")
             self.connection.set_autocommit(False)
-            cursor.execute('INSERT INTO ROLLBACK_TEST (X) VALUES (8)')
+            cursor.execute("INSERT INTO ROLLBACK_TEST (X) VALUES (8)")
             self.connection.rollback()
             self.connection.set_autocommit(True)
-            cursor.execute('SELECT COUNT(X) FROM ROLLBACK_TEST')
+            cursor.execute("SELECT COUNT(X) FROM ROLLBACK_TEST")
             count, = cursor.fetchone()
-            cursor.execute('DROP TABLE ROLLBACK_TEST')
+            cursor.execute("DROP TABLE ROLLBACK_TEST")
         return count == 0

@@ -7,9 +7,8 @@ from django.test import TestCase
 
 
 class TokenGeneratorTest(TestCase):
-
     def test_make_token(self):
-        user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
+        user = User.objects.create_user("tokentestuser", "test2@example.com", "testpw")
         p0 = PasswordResetTokenGenerator()
         tk1 = p0.make_token(user)
         self.assertTrue(p0.check_token(user, tk1))
@@ -20,10 +19,10 @@ class TokenGeneratorTest(TestCase):
         will work correctly.
         """
         # See ticket #10265
-        user = User.objects.create_user('comebackkid', 'test3@example.com', 'testpw')
+        user = User.objects.create_user("comebackkid", "test3@example.com", "testpw")
         p0 = PasswordResetTokenGenerator()
         tk1 = p0.make_token(user)
-        reload = User.objects.get(username='comebackkid')
+        reload = User.objects.get(username="comebackkid")
         tk2 = p0.make_token(reload)
         self.assertEqual(tk1, tk2)
 
@@ -40,7 +39,7 @@ class TokenGeneratorTest(TestCase):
             def _today(self):
                 return self._today_val
 
-        user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
+        user = User.objects.create_user("tokentestuser", "test2@example.com", "testpw")
         p0 = PasswordResetTokenGenerator()
         tk1 = p0.make_token(user)
         p1 = Mocked(date.today() + timedelta(settings.PASSWORD_RESET_TIMEOUT_DAYS))
@@ -49,7 +48,7 @@ class TokenGeneratorTest(TestCase):
         self.assertFalse(p2.check_token(user, tk1))
 
     def test_check_token_with_nonexistent_token_and_user(self):
-        user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
+        user = User.objects.create_user("tokentestuser", "test2@example.com", "testpw")
         p0 = PasswordResetTokenGenerator()
         tk1 = p0.make_token(user)
         self.assertIs(p0.check_token(None, tk1), False)
@@ -60,8 +59,8 @@ class TokenGeneratorTest(TestCase):
         A valid token can be created with a secret other than SECRET_KEY by
         using the PasswordResetTokenGenerator.secret attribute.
         """
-        user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
-        new_secret = 'abcdefghijkl'
+        user = User.objects.create_user("tokentestuser", "test2@example.com", "testpw")
+        new_secret = "abcdefghijkl"
         # Create and check a token with a different secret.
         p0 = PasswordResetTokenGenerator()
         p0.secret = new_secret

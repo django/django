@@ -13,12 +13,14 @@ def set_session_data(storage, messages):
     backend's loaded data cache.
     """
     storage.request.session[storage.session_key] = storage.serialize_messages(messages)
-    if hasattr(storage, '_loaded_data'):
+    if hasattr(storage, "_loaded_data"):
         del storage._loaded_data
 
 
 def stored_session_messages_count(storage):
-    data = storage.deserialize_messages(storage.request.session.get(storage.session_key, []))
+    data = storage.deserialize_messages(
+        storage.request.session.get(storage.session_key, [])
+    )
     return len(data)
 
 
@@ -36,7 +38,7 @@ class SessionTests(BaseTests, TestCase):
 
     def test_get(self):
         storage = self.storage_class(self.get_request())
-        example_messages = ['test', 'me']
+        example_messages = ["test", "me"]
         set_session_data(storage, example_messages)
         self.assertEqual(list(storage), example_messages)
 

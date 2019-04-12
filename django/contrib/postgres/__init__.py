@@ -1,1 +1,1 @@
-default_app_config = 'django.contrib.postgres.apps.PostgresConfig'
+default_app_config = "django.contrib.postgres.apps.PostgresConfig"

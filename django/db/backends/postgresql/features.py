@@ -53,7 +53,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     requires_casted_case_in_updates = True
     supports_over_clause = True
     supports_aggregate_filter_clause = True
-    supported_explain_formats = {'JSON', 'TEXT', 'XML', 'YAML'}
+    supported_explain_formats = {"JSON", "TEXT", "XML", "YAML"}
     validates_explain_options = False  # A query will error on invalid options.
 
     @cached_property
@@ -62,8 +62,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def is_postgresql_10(self):
-        return self.connection.pg_version >= 100000
+        return self.connection.pg_version >= 100_000
 
-    has_brin_autosummarize = property(operator.attrgetter('is_postgresql_10'))
-    has_phraseto_tsquery = property(operator.attrgetter('is_postgresql_9_6'))
-    supports_table_partitions = property(operator.attrgetter('is_postgresql_10'))
+    has_brin_autosummarize = property(operator.attrgetter("is_postgresql_10"))
+    has_phraseto_tsquery = property(operator.attrgetter("is_postgresql_9_6"))
+    supports_table_partitions = property(operator.attrgetter("is_postgresql_10"))

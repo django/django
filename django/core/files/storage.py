@@ -17,8 +17,11 @@ from django.utils.module_loading import import_string
 from django.utils.text import get_valid_filename
 
 __all__ = (
-    'Storage', 'FileSystemStorage', 'DefaultStorage', 'default_storage',
-    'get_storage_class',
+    "Storage",
+    "FileSystemStorage",
+    "DefaultStorage",
+    "default_storage",
+    "get_storage_class",
 )
 
 
@@ -31,7 +34,7 @@ class Storage:
     # The following methods represent a public interface to private methods.
     # These shouldn't be overridden by subclasses unless absolutely necessary.
 
-    def open(self, name, mode='rb'):
+    def open(self, name, mode="rb"):
         """Retrieve the specified file from storage."""
         return self._open(name, mode)
 
@@ -45,7 +48,7 @@ class Storage:
         if name is None:
             name = content.name
 
-        if not hasattr(content, 'chunks'):
+        if not hasattr(content, "chunks"):
             content = File(content, name)
 
         name = self.get_available_name(name, max_length=max_length)
@@ -74,7 +77,9 @@ class Storage:
         # exceed the max_length.
         while self.exists(name) or (max_length and len(name) > max_length):
             # file_ext includes the dot.
-            name = os.path.join(dir_name, "%s_%s%s" % (file_root, get_random_string(7), file_ext))
+            name = os.path.join(
+                dir_name, "%s_%s%s" % (file_root, get_random_string(7), file_ext)
+            )
             if max_length is None:
                 continue
             # Truncate file_root if max_length exceeded.
@@ -85,10 +90,12 @@ class Storage:
                 if not file_root:
                     raise SuspiciousFileOperation(
                         'Storage can not find an available filename for "%s". '
-                        'Please make sure that the corresponding file field '
+                        "Please make sure that the corresponding file field "
                         'allows sufficient "max_length".' % name
                     )
-                name = os.path.join(dir_name, "%s_%s%s" % (file_root, get_random_string(7), file_ext))
+                name = os.path.join(
+                    dir_name, "%s_%s%s" % (file_root, get_random_string(7), file_ext)
+                )
         return name
 
     def generate_filename(self, filename):
@@ -115,55 +122,67 @@ class Storage:
         """
         Delete the specified file from the storage system.
         """
-        raise NotImplementedError('subclasses of Storage must provide a delete() method')
+        raise NotImplementedError(
+            "subclasses of Storage must provide a delete() method"
+        )
 
     def exists(self, name):
         """
         Return True if a file referenced by the given name already exists in the
         storage system, or False if the name is available for a new file.
         """
-        raise NotImplementedError('subclasses of Storage must provide an exists() method')
+        raise NotImplementedError(
+            "subclasses of Storage must provide an exists() method"
+        )
 
     def listdir(self, path):
         """
         List the contents of the specified path. Return a 2-tuple of lists:
         the first item being directories, the second item being files.
         """
-        raise NotImplementedError('subclasses of Storage must provide a listdir() method')
+        raise NotImplementedError(
+            "subclasses of Storage must provide a listdir() method"
+        )
 
     def size(self, name):
         """
         Return the total size, in bytes, of the file specified by name.
         """
-        raise NotImplementedError('subclasses of Storage must provide a size() method')
+        raise NotImplementedError("subclasses of Storage must provide a size() method")
 
     def url(self, name):
         """
         Return an absolute URL where the file's contents can be accessed
         directly by a Web browser.
         """
-        raise NotImplementedError('subclasses of Storage must provide a url() method')
+        raise NotImplementedError("subclasses of Storage must provide a url() method")
 
     def get_accessed_time(self, name):
         """
         Return the last accessed time (as a datetime) of the file specified by
         name. The datetime will be timezone-aware if USE_TZ=True.
         """
-        raise NotImplementedError('subclasses of Storage must provide a get_accessed_time() method')
+        raise NotImplementedError(
+            "subclasses of Storage must provide a get_accessed_time() method"
+        )
 
     def get_created_time(self, name):
         """
         Return the creation time (as a datetime) of the file specified by name.
         The datetime will be timezone-aware if USE_TZ=True.
         """
-        raise NotImplementedError('subclasses of Storage must provide a get_created_time() method')
+        raise NotImplementedError(
+            "subclasses of Storage must provide a get_created_time() method"
+        )
 
     def get_modified_time(self, name):
         """
         Return the last modified time (as a datetime) of the file specified by
         name. The datetime will be timezone-aware if USE_TZ=True.
         """
-        raise NotImplementedError('subclasses of Storage must provide a get_modified_time() method')
+        raise NotImplementedError(
+            "subclasses of Storage must provide a get_modified_time() method"
+        )
 
 
 @deconstructible
@@ -171,12 +190,18 @@ class FileSystemStorage(Storage):
     """
     Standard filesystem storage
     """
+
     # The combination of O_CREAT and O_EXCL makes os.open() raise OSError if
     # the file already exists before it's opened.
-    OS_OPEN_FLAGS = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, 'O_BINARY', 0)
+    OS_OPEN_FLAGS = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0)
 
-    def __init__(self, location=None, base_url=None, file_permissions_mode=None,
-                 directory_permissions_mode=None):
+    def __init__(
+        self,
+        location=None,
+        base_url=None,
+        file_permissions_mode=None,
+        directory_permissions_mode=None,
+    ):
         self._location = location
         self._base_url = base_url
         self._file_permissions_mode = file_permissions_mode
@@ -185,15 +210,15 @@ class FileSystemStorage(Storage):
 
     def _clear_cached_properties(self, setting, **kwargs):
         """Reset setting based property values."""
-        if setting == 'MEDIA_ROOT':
-            self.__dict__.pop('base_location', None)
-            self.__dict__.pop('location', None)
-        elif setting == 'MEDIA_URL':
-            self.__dict__.pop('base_url', None)
-        elif setting == 'FILE_UPLOAD_PERMISSIONS':
-            self.__dict__.pop('file_permissions_mode', None)
-        elif setting == 'FILE_UPLOAD_DIRECTORY_PERMISSIONS':
-            self.__dict__.pop('directory_permissions_mode', None)
+        if setting == "MEDIA_ROOT":
+            self.__dict__.pop("base_location", None)
+            self.__dict__.pop("location", None)
+        elif setting == "MEDIA_URL":
+            self.__dict__.pop("base_url", None)
+        elif setting == "FILE_UPLOAD_PERMISSIONS":
+            self.__dict__.pop("file_permissions_mode", None)
+        elif setting == "FILE_UPLOAD_DIRECTORY_PERMISSIONS":
+            self.__dict__.pop("directory_permissions_mode", None)
 
     def _value_or_setting(self, value, setting):
         return setting if value is None else value
@@ -208,19 +233,23 @@ class FileSystemStorage(Storage):
 
     @cached_property
     def base_url(self):
-        if self._base_url is not None and not self._base_url.endswith('/'):
-            self._base_url += '/'
+        if self._base_url is not None and not self._base_url.endswith("/"):
+            self._base_url += "/"
         return self._value_or_setting(self._base_url, settings.MEDIA_URL)
 
     @cached_property
     def file_permissions_mode(self):
-        return self._value_or_setting(self._file_permissions_mode, settings.FILE_UPLOAD_PERMISSIONS)
+        return self._value_or_setting(
+            self._file_permissions_mode, settings.FILE_UPLOAD_PERMISSIONS
+        )
 
     @cached_property
     def directory_permissions_mode(self):
-        return self._value_or_setting(self._directory_permissions_mode, settings.FILE_UPLOAD_DIRECTORY_PERMISSIONS)
+        return self._value_or_setting(
+            self._directory_permissions_mode, settings.FILE_UPLOAD_DIRECTORY_PERMISSIONS
+        )
 
-    def _open(self, name, mode='rb'):
+    def _open(self, name, mode="rb"):
         return File(open(self.path(name), mode))
 
     def _save(self, name, content):
@@ -234,13 +263,15 @@ class FileSystemStorage(Storage):
                 # for consistency with file_permissions_mode behavior.
                 old_umask = os.umask(0)
                 try:
-                    os.makedirs(directory, self.directory_permissions_mode, exist_ok=True)
+                    os.makedirs(
+                        directory, self.directory_permissions_mode, exist_ok=True
+                    )
                 finally:
                     os.umask(old_umask)
             else:
                 os.makedirs(directory, exist_ok=True)
         except FileExistsError:
-            raise FileExistsError('%s exists and is not a directory.' % directory)
+            raise FileExistsError("%s exists and is not a directory." % directory)
 
         # There's a potential race condition between get_available_name and
         # saving the file; it's possible that two threads might return the
@@ -251,7 +282,7 @@ class FileSystemStorage(Storage):
         while True:
             try:
                 # This file has a file path that we can move.
-                if hasattr(content, 'temporary_file_path'):
+                if hasattr(content, "temporary_file_path"):
                     file_move_safe(content.temporary_file_path(), full_path)
 
                 # This is a normal uploadedfile that we can stream.
@@ -263,7 +294,7 @@ class FileSystemStorage(Storage):
                         locks.lock(fd, locks.LOCK_EX)
                         for chunk in content.chunks():
                             if _file is None:
-                                mode = 'wb' if isinstance(chunk, bytes) else 'wt'
+                                mode = "wb" if isinstance(chunk, bytes) else "wt"
                                 _file = os.fdopen(fd, mode)
                             _file.write(chunk)
                     finally:
@@ -284,7 +315,7 @@ class FileSystemStorage(Storage):
             os.chmod(full_path, self.file_permissions_mode)
 
         # Store filenames with forward slashes, even on Windows.
-        return name.replace('\\', '/')
+        return name.replace("\\", "/")
 
     def delete(self, name):
         assert name, "The name argument is not allowed to be empty."
@@ -324,7 +355,7 @@ class FileSystemStorage(Storage):
             raise ValueError("This file is not accessible via a URL.")
         url = filepath_to_uri(name)
         if url is not None:
-            url = url.lstrip('/')
+            url = url.lstrip("/")
         return urljoin(self.base_url, url)
 
     def _datetime_from_timestamp(self, ts):

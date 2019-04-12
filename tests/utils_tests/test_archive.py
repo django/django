@@ -7,7 +7,7 @@ import unittest
 
 from django.utils.archive import Archive, extract
 
-TEST_DIR = os.path.join(os.path.dirname(__file__), 'archives')
+TEST_DIR = os.path.join(os.path.dirname(__file__), "archives")
 
 
 class ArchiveTester:
@@ -43,14 +43,16 @@ class ArchiveTester:
         extract(self.archive_path, self.tmpdir)
         self.check_files(self.tmpdir)
 
-    @unittest.skipIf(sys.platform == 'win32', 'Python on Windows has a limited os.chmod().')
+    @unittest.skipIf(
+        sys.platform == "win32", "Python on Windows has a limited os.chmod()."
+    )
     def test_extract_file_permissions(self):
         """Archive.extract() preserves file permissions."""
         extract(self.archive_path, self.tmpdir)
-        filepath = os.path.join(self.tmpdir, 'executable')
+        filepath = os.path.join(self.tmpdir, "executable")
         # The file has executable permission.
         self.assertTrue(os.stat(filepath).st_mode & stat.S_IXOTH)
-        filepath = os.path.join(self.tmpdir, 'no_permissions')
+        filepath = os.path.join(self.tmpdir, "no_permissions")
         # The file is readable even though it doesn't have permission data in
         # the archive.
         self.assertTrue(os.stat(filepath).st_mode & stat.S_IROTH)
@@ -65,25 +67,25 @@ class ArchiveTester:
         self.check_files(self.tmpdir)
 
     def check_files(self, tmpdir):
-        self.assertTrue(os.path.isfile(os.path.join(self.tmpdir, '1')))
-        self.assertTrue(os.path.isfile(os.path.join(self.tmpdir, '2')))
-        self.assertTrue(os.path.isfile(os.path.join(self.tmpdir, 'foo', '1')))
-        self.assertTrue(os.path.isfile(os.path.join(self.tmpdir, 'foo', '2')))
-        self.assertTrue(os.path.isfile(os.path.join(self.tmpdir, 'foo', 'bar', '1')))
-        self.assertTrue(os.path.isfile(os.path.join(self.tmpdir, 'foo', 'bar', '2')))
+        self.assertTrue(os.path.isfile(os.path.join(self.tmpdir, "1")))
+        self.assertTrue(os.path.isfile(os.path.join(self.tmpdir, "2")))
+        self.assertTrue(os.path.isfile(os.path.join(self.tmpdir, "foo", "1")))
+        self.assertTrue(os.path.isfile(os.path.join(self.tmpdir, "foo", "2")))
+        self.assertTrue(os.path.isfile(os.path.join(self.tmpdir, "foo", "bar", "1")))
+        self.assertTrue(os.path.isfile(os.path.join(self.tmpdir, "foo", "bar", "2")))
 
 
 class TestZip(ArchiveTester, unittest.TestCase):
-    archive = 'foobar.zip'
+    archive = "foobar.zip"
 
 
 class TestTar(ArchiveTester, unittest.TestCase):
-    archive = 'foobar.tar'
+    archive = "foobar.tar"
 
 
 class TestGzipTar(ArchiveTester, unittest.TestCase):
-    archive = 'foobar.tar.gz'
+    archive = "foobar.tar.gz"
 
 
 class TestBzip2Tar(ArchiveTester, unittest.TestCase):
-    archive = 'foobar.tar.bz2'
+    archive = "foobar.tar.bz2"

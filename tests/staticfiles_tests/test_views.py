@@ -7,11 +7,12 @@ from django.test import override_settings
 from .cases import StaticFilesTestCase, TestDefaults
 
 
-@override_settings(ROOT_URLCONF='staticfiles_tests.urls.default')
+@override_settings(ROOT_URLCONF="staticfiles_tests.urls.default")
 class TestServeStatic(StaticFilesTestCase):
     """
     Test static asset serving view.
     """
+
     def _response(self, filepath):
         return self.client.get(quote(posixpath.join(settings.STATIC_URL, filepath)))
 
@@ -27,8 +28,9 @@ class TestServeDisabled(TestServeStatic):
     """
     Test serving static files disabled when DEBUG is False.
     """
+
     def test_disabled_serving(self):
-        self.assertFileNotFound('test.txt')
+        self.assertFileNotFound("test.txt")
 
 
 @override_settings(DEBUG=True)
@@ -38,7 +40,7 @@ class TestServeStaticWithDefaultURL(TestDefaults, TestServeStatic):
     """
 
 
-@override_settings(DEBUG=True, ROOT_URLCONF='staticfiles_tests.urls.helper')
+@override_settings(DEBUG=True, ROOT_URLCONF="staticfiles_tests.urls.helper")
 class TestServeStaticWithURLHelper(TestDefaults, TestServeStatic):
     """
     Test static asset serving view with staticfiles_urlpatterns helper.

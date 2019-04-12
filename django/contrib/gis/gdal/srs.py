@@ -40,9 +40,10 @@ class SpatialReference(GDALBase):
     the SpatialReference object "provide[s] services to represent coordinate
     systems (projections and datums) and to transform between them."
     """
+
     destructor = capi.release_srs
 
-    def __init__(self, srs_input='', srs_type='user'):
+    def __init__(self, srs_input="", srs_type="user"):
         """
         Create a GDAL OSR Spatial Reference object from the given input.
         The input may be string of OGC Well Known Text (WKT), an integer
@@ -50,8 +51,8 @@ class SpatialReference(GDALBase):
         string (one of 'WGS84', 'WGS72', 'NAD27', 'NAD83').
         """
 
-        if srs_type == 'wkt':
-            self.ptr = capi.new_srs(c_char_p(b''))
+        if srs_type == "wkt":
+            self.ptr = capi.new_srs(c_char_p(b""))
             self.import_wkt(srs_input)
             return
         elif isinstance(srs_input, str):
@@ -59,36 +60,38 @@ class SpatialReference(GDALBase):
                 # If SRID is a string, e.g., '4326', then make acceptable
                 # as user input.
                 srid = int(srs_input)
-                srs_input = 'EPSG:%d' % srid
+                srs_input = "EPSG:%d" % srid
             except ValueError:
                 pass
         elif isinstance(srs_input, int):
             # EPSG integer code was input.
-            srs_type = 'epsg'
+            srs_type = "epsg"
         elif isinstance(srs_input, self.ptr_type):
             srs = srs_input
-            srs_type = 'ogr'
+            srs_type = "ogr"
         else:
             raise TypeError('Invalid SRS type "%s"' % srs_type)
 
-        if srs_type == 'ogr':
+        if srs_type == "ogr":
             # Input is already an SRS pointer.
             srs = srs_input
         else:
             # Creating a new SRS pointer, using the string buffer.
-            buf = c_char_p(b'')
+            buf = c_char_p(b"")
             srs = capi.new_srs(buf)
 
         # If the pointer is NULL, throw an exception.
         if not srs:
-            raise SRSException('Could not create spatial reference from: %s' % srs_input)
+            raise SRSException(
+                "Could not create spatial reference from: %s" % srs_input
+            )
         else:
             self.ptr = srs
 
         # Importing from either the user input string or an integer SRID.
-        if srs_type == 'user':
+        if srs_type == "user":
             self.import_user_input(srs_input)
-        elif srs_type == 'epsg':
+        elif srs_type == "epsg":
             self.import_epsg(srs_input)
 
     def __getitem__(self, target):
@@ -169,11 +172,11 @@ class SpatialReference(GDALBase):
     def name(self):
         "Return the name of this Spatial Reference."
         if self.projected:
-            return self.attr_value('PROJCS')
+            return self.attr_value("PROJCS")
         elif self.geographic:
-            return self.attr_value('GEOGCS')
+            return self.attr_value("GEOGCS")
         elif self.local:
-            return self.attr_value('LOCAL_CS')
+            return self.attr_value("LOCAL_CS")
         else:
             return None
 
@@ -181,7 +184,7 @@ class SpatialReference(GDALBase):
     def srid(self):
         "Return the SRID of top-level authority, or None if undefined."
         try:
-            return int(self.attr_value('AUTHORITY', 1))
+            return int(self.attr_value("AUTHORITY", 1))
         except (TypeError, ValueError):
             return None
 
@@ -314,7 +317,7 @@ class SpatialReference(GDALBase):
         return self.proj
 
     @property
-    def xml(self, dialect=''):
+    def xml(self, dialect=""):
         "Return the XML representation of this Spatial Reference."
         return capi.to_xml(self.ptr, byref(c_char_p()), force_bytes(dialect))
 
@@ -325,8 +328,10 @@ class CoordTransform(GDALBase):
 
     def __init__(self, source, target):
         "Initialize on a source and target SpatialReference objects."
-        if not isinstance(source, SpatialReference) or not isinstance(target, SpatialReference):
-            raise TypeError('source and target must be of type SpatialReference')
+        if not isinstance(source, SpatialReference) or not isinstance(
+            target, SpatialReference
+        ):
+            raise TypeError("source and target must be of type SpatialReference")
         self.ptr = capi.new_ct(source._ptr, target._ptr)
         self._srs1_name = source.name
         self._srs2_name = target.name

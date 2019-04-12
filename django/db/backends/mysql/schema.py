@@ -13,32 +13,41 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     # No 'CASCADE' which works as a no-op in MySQL but is undocumented
     sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"
 
-    sql_rename_column = "ALTER TABLE %(table)s CHANGE %(old_column)s %(new_column)s %(type)s"
+    sql_rename_column = (
+        "ALTER TABLE %(table)s CHANGE %(old_column)s %(new_column)s %(type)s"
+    )
 
     sql_delete_unique = "ALTER TABLE %(table)s DROP INDEX %(name)s"
     sql_create_column_inline_fk = (
-        ', ADD CONSTRAINT %(name)s FOREIGN KEY (%(column)s) '
-        'REFERENCES %(to_table)s(%(to_column)s)'
+        ", ADD CONSTRAINT %(name)s FOREIGN KEY (%(column)s) "
+        "REFERENCES %(to_table)s(%(to_column)s)"
     )
     sql_delete_fk = "ALTER TABLE %(table)s DROP FOREIGN KEY %(name)s"
 
     sql_delete_index = "DROP INDEX %(name)s ON %(table)s"
 
-    sql_create_pk = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s PRIMARY KEY (%(columns)s)"
+    sql_create_pk = (
+        "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s PRIMARY KEY (%(columns)s)"
+    )
     sql_delete_pk = "ALTER TABLE %(table)s DROP PRIMARY KEY"
 
-    sql_create_index = 'CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s'
+    sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s"
 
     def quote_value(self, value):
         self.connection.ensure_connection()
-        quoted = self.connection.connection.escape(value, self.connection.connection.encoders)
+        quoted = self.connection.connection.escape(
+            value, self.connection.connection.encoders
+        )
         if isinstance(value, str):
             quoted = quoted.decode()
         return quoted
 
     def _is_limited_data_type(self, field):
         db_type = field.db_type(self.connection)
-        return db_type is not None and db_type.lower() in self.connection._limited_data_types
+        return (
+            db_type is not None
+            and db_type.lower() in self.connection._limited_data_types
+        )
 
     def skip_default(self, field):
         return self._is_limited_data_type(field)
@@ -50,10 +59,14 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # field.default may be unhashable, so a set isn't used for "in" check.
         if self.skip_default(field) and field.default not in (None, NOT_PROVIDED):
             effective_default = self.effective_default(field)
-            self.execute('UPDATE %(table)s SET %(column)s = %%s' % {
-                'table': self.quote_name(model._meta.db_table),
-                'column': self.quote_name(field.column),
-            }, [effective_default])
+            self.execute(
+                "UPDATE %(table)s SET %(column)s = %%s"
+                % {
+                    "table": self.quote_name(model._meta.db_table),
+                    "column": self.quote_name(field.column),
+                },
+                [effective_default],
+            )
 
     def _field_should_be_indexed(self, model, field):
         create_index = super()._field_should_be_indexed(model, field)
@@ -63,10 +76,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # No need to create an index for ForeignKey fields except if
         # db_constraint=False because the index from that constraint won't be
         # created.
-        if (storage == "InnoDB" and
-                create_index and
-                field.get_internal_type() == 'ForeignKey' and
-                field.db_constraint):
+        if (
+            storage == "InnoDB"
+            and create_index
+            and field.get_internal_type() == "ForeignKey"
+            and field.db_constraint
+        ):
             return False
         return not self._is_limited_data_type(field) and create_index
 
@@ -80,8 +95,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         recreate a FK index.
         """
         first_field = model._meta.get_field(fields[0])
-        if first_field.get_internal_type() == 'ForeignKey':
-            constraint_names = self._constraint_names(model, [first_field.column], index=True)
+        if first_field.get_internal_type() == "ForeignKey":
+            constraint_names = self._constraint_names(
+                model, [first_field.column], index=True
+            )
             if not constraint_names:
                 self.execute(self._create_index_sql(model, [first_field], suffix=""))
         return super()._delete_composed_index(model, fields, *args)

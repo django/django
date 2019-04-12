@@ -19,12 +19,12 @@ class OracleGeometryColumns(models.Model):
     # TODO: Add support for `diminfo` column (type MDSYS.SDO_DIM_ARRAY).
 
     class Meta:
-        app_label = 'gis'
-        db_table = 'USER_SDO_GEOM_METADATA'
+        app_label = "gis"
+        db_table = "USER_SDO_GEOM_METADATA"
         managed = False
 
     def __str__(self):
-        return '%s - %s (SRID: %s)' % (self.table_name, self.column_name, self.srid)
+        return "%s - %s (SRID: %s)" % (self.table_name, self.column_name, self.srid)
 
     @classmethod
     def table_name_col(cls):
@@ -32,7 +32,7 @@ class OracleGeometryColumns(models.Model):
         Return the name of the metadata column used to store the feature table
         name.
         """
-        return 'table_name'
+        return "table_name"
 
     @classmethod
     def geom_col_name(cls):
@@ -40,7 +40,7 @@ class OracleGeometryColumns(models.Model):
         Return the name of the metadata column used to store the feature
         geometry column.
         """
-        return 'column_name'
+        return "column_name"
 
 
 class OracleSpatialRefSys(models.Model, SpatialRefSysMixin):
@@ -55,8 +55,8 @@ class OracleSpatialRefSys(models.Model, SpatialRefSysMixin):
     cs_bounds = models.PolygonField(null=True)
 
     class Meta:
-        app_label = 'gis'
-        db_table = 'CS_SRS'
+        app_label = "gis"
+        db_table = "CS_SRS"
         managed = False
 
     @property

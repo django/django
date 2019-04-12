@@ -1,1 +1,1 @@
-default_app_config = 'django.contrib.sites.apps.SitesConfig'
+default_app_config = "django.contrib.sites.apps.SitesConfig"

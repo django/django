@@ -3,17 +3,19 @@ from django.template import Context, Template
 from django.test import SimpleTestCase, override_settings
 
 
-@override_settings(
-    STATIC_URL='http://media.example.com/static/',
-)
+@override_settings(STATIC_URL="http://media.example.com/static/")
 class FormsMediaTestCase(SimpleTestCase):
     """Tests for the media handling on widgets and forms"""
 
     def test_construction(self):
         # Check construction of media objects
         m = Media(
-            css={'all': ('path/to/css1', '/path/to/css2')},
-            js=('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3'),
+            css={"all": ("path/to/css1", "/path/to/css2")},
+            js=(
+                "/path/to/js1",
+                "http://media.other.com/path/to/js2",
+                "https://secure.other.com/path/to/js3",
+            ),
         )
         self.assertEqual(
             str(m),
@@ -21,19 +23,21 @@ class FormsMediaTestCase(SimpleTestCase):
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet">
 <script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>""",
         )
         self.assertEqual(
             repr(m),
             "Media(css={'all': ['path/to/css1', '/path/to/css2']}, "
-            "js=['/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3'])"
+            "js=['/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3'])",
         )
 
         class Foo:
-            css = {
-                'all': ('path/to/css1', '/path/to/css2')
-            }
-            js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
+            css = {"all": ("path/to/css1", "/path/to/css2")}
+            js = (
+                "/path/to/js1",
+                "http://media.other.com/path/to/js2",
+                "https://secure.other.com/path/to/js3",
+            )
 
         m3 = Media(Foo)
         self.assertEqual(
@@ -42,7 +46,7 @@ class FormsMediaTestCase(SimpleTestCase):
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet">
 <script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>""",
         )
 
         # A widget can exist without a media definition
@@ -50,7 +54,7 @@ class FormsMediaTestCase(SimpleTestCase):
             pass
 
         w = MyWidget()
-        self.assertEqual(str(w.media), '')
+        self.assertEqual(str(w.media), "")
 
     def test_media_dsl(self):
         ###############################################################
@@ -62,10 +66,12 @@ class FormsMediaTestCase(SimpleTestCase):
         # with the value of settings.MEDIA_URL
         class MyWidget1(TextInput):
             class Media:
-                css = {
-                    'all': ('path/to/css1', '/path/to/css2')
-                }
-                js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
+                css = {"all": ("path/to/css1", "/path/to/css2")}
+                js = (
+                    "/path/to/js1",
+                    "http://media.other.com/path/to/js2",
+                    "https://secure.other.com/path/to/js3",
+                )
 
         w1 = MyWidget1()
         self.assertEqual(
@@ -74,21 +80,21 @@ class FormsMediaTestCase(SimpleTestCase):
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet">
 <script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>""",
         )
 
         # Media objects can be interrogated by media type
         self.assertEqual(
-            str(w1.media['css']),
+            str(w1.media["css"]),
             """<link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet">
-<link href="/path/to/css2" type="text/css" media="all" rel="stylesheet">"""
+<link href="/path/to/css2" type="text/css" media="all" rel="stylesheet">""",
         )
 
         self.assertEqual(
-            str(w1.media['js']),
+            str(w1.media["js"]),
             """<script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>""",
         )
 
     def test_combine_media(self):
@@ -96,24 +102,22 @@ class FormsMediaTestCase(SimpleTestCase):
         # once. Duplicated media definitions are ignored.
         class MyWidget1(TextInput):
             class Media:
-                css = {
-                    'all': ('path/to/css1', '/path/to/css2')
-                }
-                js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
+                css = {"all": ("path/to/css1", "/path/to/css2")}
+                js = (
+                    "/path/to/js1",
+                    "http://media.other.com/path/to/js2",
+                    "https://secure.other.com/path/to/js3",
+                )
 
         class MyWidget2(TextInput):
             class Media:
-                css = {
-                    'all': ('/path/to/css2', '/path/to/css3')
-                }
-                js = ('/path/to/js1', '/path/to/js4')
+                css = {"all": ("/path/to/css2", "/path/to/css3")}
+                js = ("/path/to/js1", "/path/to/js4")
 
         class MyWidget3(TextInput):
             class Media:
-                css = {
-                    'all': ('path/to/css1', '/path/to/css3')
-                }
-                js = ('/path/to/js1', '/path/to/js4')
+                css = {"all": ("path/to/css1", "/path/to/css3")}
+                js = ("/path/to/js1", "/path/to/js4")
 
         w1 = MyWidget1()
         w2 = MyWidget2()
@@ -126,7 +130,7 @@ class FormsMediaTestCase(SimpleTestCase):
 <script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="/path/to/js4"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>""",
         )
 
         # media addition hasn't affected the original objects
@@ -136,7 +140,7 @@ class FormsMediaTestCase(SimpleTestCase):
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet">
 <script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>""",
         )
 
         # Regression check for #12879: specifying the same CSS or JS file
@@ -144,23 +148,29 @@ class FormsMediaTestCase(SimpleTestCase):
         # only being included once.
         class MyWidget4(TextInput):
             class Media:
-                css = {'all': ('/path/to/css1', '/path/to/css1')}
-                js = ('/path/to/js1', '/path/to/js1')
+                css = {"all": ("/path/to/css1", "/path/to/css1")}
+                js = ("/path/to/js1", "/path/to/js1")
 
         w4 = MyWidget4()
-        self.assertEqual(str(w4.media), """<link href="/path/to/css1" type="text/css" media="all" rel="stylesheet">
-<script type="text/javascript" src="/path/to/js1"></script>""")
+        self.assertEqual(
+            str(w4.media),
+            """<link href="/path/to/css1" type="text/css" media="all" rel="stylesheet">
+<script type="text/javascript" src="/path/to/js1"></script>""",
+        )
 
     def test_media_deduplication(self):
         # A deduplication test applied directly to a Media object, to confirm
         # that the deduplication doesn't only happen at the point of merging
         # two or more media objects.
         media = Media(
-            css={'all': ('/path/to/css1', '/path/to/css1')},
-            js=('/path/to/js1', '/path/to/js1'),
+            css={"all": ("/path/to/css1", "/path/to/css1")},
+            js=("/path/to/js1", "/path/to/js1"),
         )
-        self.assertEqual(str(media), """<link href="/path/to/css1" type="text/css" media="all" rel="stylesheet">
-<script type="text/javascript" src="/path/to/js1"></script>""")
+        self.assertEqual(
+            str(media),
+            """<link href="/path/to/css1" type="text/css" media="all" rel="stylesheet">
+<script type="text/javascript" src="/path/to/js1"></script>""",
+        )
 
     def test_media_property(self):
         ###############################################################
@@ -170,38 +180,53 @@ class FormsMediaTestCase(SimpleTestCase):
         # Widget media can be defined as a property
         class MyWidget4(TextInput):
             def _media(self):
-                return Media(css={'all': ('/some/path',)}, js=('/some/js',))
+                return Media(css={"all": ("/some/path",)}, js=("/some/js",))
+
             media = property(_media)
 
         w4 = MyWidget4()
-        self.assertEqual(str(w4.media), """<link href="/some/path" type="text/css" media="all" rel="stylesheet">
-<script type="text/javascript" src="/some/js"></script>""")
+        self.assertEqual(
+            str(w4.media),
+            """<link href="/some/path" type="text/css" media="all" rel="stylesheet">
+<script type="text/javascript" src="/some/js"></script>""",
+        )
 
         # Media properties can reference the media of their parents
         class MyWidget5(MyWidget4):
             def _media(self):
-                return super().media + Media(css={'all': ('/other/path',)}, js=('/other/js',))
+                return super().media + Media(
+                    css={"all": ("/other/path",)}, js=("/other/js",)
+                )
+
             media = property(_media)
 
         w5 = MyWidget5()
-        self.assertEqual(str(w5.media), """<link href="/some/path" type="text/css" media="all" rel="stylesheet">
+        self.assertEqual(
+            str(w5.media),
+            """<link href="/some/path" type="text/css" media="all" rel="stylesheet">
 <link href="/other/path" type="text/css" media="all" rel="stylesheet">
 <script type="text/javascript" src="/some/js"></script>
-<script type="text/javascript" src="/other/js"></script>""")
+<script type="text/javascript" src="/other/js"></script>""",
+        )
 
     def test_media_property_parent_references(self):
         # Media properties can reference the media of their parents,
         # even if the parent media was defined using a class
         class MyWidget1(TextInput):
             class Media:
-                css = {
-                    'all': ('path/to/css1', '/path/to/css2')
-                }
-                js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
+                css = {"all": ("path/to/css1", "/path/to/css2")}
+                js = (
+                    "/path/to/js1",
+                    "http://media.other.com/path/to/js2",
+                    "https://secure.other.com/path/to/js3",
+                )
 
         class MyWidget6(MyWidget1):
             def _media(self):
-                return super().media + Media(css={'all': ('/other/path',)}, js=('/other/js',))
+                return super().media + Media(
+                    css={"all": ("/other/path",)}, js=("/other/js",)
+                )
+
             media = property(_media)
 
         w6 = MyWidget6()
@@ -213,7 +238,7 @@ class FormsMediaTestCase(SimpleTestCase):
 <script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="/other/js"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>""",
         )
 
     def test_media_inheritance(self):
@@ -224,10 +249,12 @@ class FormsMediaTestCase(SimpleTestCase):
         # If a widget extends another but provides no media definition, it inherits the parent widget's media
         class MyWidget1(TextInput):
             class Media:
-                css = {
-                    'all': ('path/to/css1', '/path/to/css2')
-                }
-                js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
+                css = {"all": ("path/to/css1", "/path/to/css2")}
+                js = (
+                    "/path/to/js1",
+                    "http://media.other.com/path/to/js2",
+                    "https://secure.other.com/path/to/js3",
+                )
 
         class MyWidget7(MyWidget1):
             pass
@@ -239,16 +266,14 @@ class FormsMediaTestCase(SimpleTestCase):
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet">
 <script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>""",
         )
 
         # If a widget extends another but defines media, it extends the parent widget's media by default
         class MyWidget8(MyWidget1):
             class Media:
-                css = {
-                    'all': ('/path/to/css3', 'path/to/css1')
-                }
-                js = ('/path/to/js1', '/path/to/js4')
+                css = {"all": ("/path/to/css3", "path/to/css1")}
+                js = ("/path/to/js1", "/path/to/js4")
 
         w8 = MyWidget8()
         self.assertEqual(
@@ -259,7 +284,7 @@ class FormsMediaTestCase(SimpleTestCase):
 <script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="/path/to/js4"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>""",
         )
 
     def test_media_inheritance_from_property(self):
@@ -267,22 +292,23 @@ class FormsMediaTestCase(SimpleTestCase):
         # even if the parent defined media using a property.
         class MyWidget1(TextInput):
             class Media:
-                css = {
-                    'all': ('path/to/css1', '/path/to/css2')
-                }
-                js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
+                css = {"all": ("path/to/css1", "/path/to/css2")}
+                js = (
+                    "/path/to/js1",
+                    "http://media.other.com/path/to/js2",
+                    "https://secure.other.com/path/to/js3",
+                )
 
         class MyWidget4(TextInput):
             def _media(self):
-                return Media(css={'all': ('/some/path',)}, js=('/some/js',))
+                return Media(css={"all": ("/some/path",)}, js=("/some/js",))
+
             media = property(_media)
 
         class MyWidget9(MyWidget4):
             class Media:
-                css = {
-                    'all': ('/other/path',)
-                }
-                js = ('/other/js',)
+                css = {"all": ("/other/path",)}
+                js = ("/other/js",)
 
         w9 = MyWidget9()
         self.assertEqual(
@@ -290,40 +316,41 @@ class FormsMediaTestCase(SimpleTestCase):
             """<link href="/some/path" type="text/css" media="all" rel="stylesheet">
 <link href="/other/path" type="text/css" media="all" rel="stylesheet">
 <script type="text/javascript" src="/some/js"></script>
-<script type="text/javascript" src="/other/js"></script>"""
+<script type="text/javascript" src="/other/js"></script>""",
         )
 
         # A widget can disable media inheritance by specifying 'extend=False'
         class MyWidget10(MyWidget1):
             class Media:
                 extend = False
-                css = {
-                    'all': ('/path/to/css3', 'path/to/css1')
-                }
-                js = ('/path/to/js1', '/path/to/js4')
+                css = {"all": ("/path/to/css3", "path/to/css1")}
+                js = ("/path/to/js1", "/path/to/js4")
 
         w10 = MyWidget10()
-        self.assertEqual(str(w10.media), """<link href="/path/to/css3" type="text/css" media="all" rel="stylesheet">
+        self.assertEqual(
+            str(w10.media),
+            """<link href="/path/to/css3" type="text/css" media="all" rel="stylesheet">
 <link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet">
 <script type="text/javascript" src="/path/to/js1"></script>
-<script type="text/javascript" src="/path/to/js4"></script>""")
+<script type="text/javascript" src="/path/to/js4"></script>""",
+        )
 
     def test_media_inheritance_extends(self):
         # A widget can explicitly enable full media inheritance by specifying 'extend=True'
         class MyWidget1(TextInput):
             class Media:
-                css = {
-                    'all': ('path/to/css1', '/path/to/css2')
-                }
-                js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
+                css = {"all": ("path/to/css1", "/path/to/css2")}
+                js = (
+                    "/path/to/js1",
+                    "http://media.other.com/path/to/js2",
+                    "https://secure.other.com/path/to/js3",
+                )
 
         class MyWidget11(MyWidget1):
             class Media:
                 extend = True
-                css = {
-                    'all': ('/path/to/css3', 'path/to/css1')
-                }
-                js = ('/path/to/js1', '/path/to/js4')
+                css = {"all": ("/path/to/css3", "path/to/css1")}
+                js = ("/path/to/js1", "/path/to/js4")
 
         w11 = MyWidget11()
         self.assertEqual(
@@ -334,25 +361,25 @@ class FormsMediaTestCase(SimpleTestCase):
 <script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="/path/to/js4"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>""",
         )
 
     def test_media_inheritance_single_type(self):
         # A widget can enable inheritance of one media type by specifying extend as a tuple
         class MyWidget1(TextInput):
             class Media:
-                css = {
-                    'all': ('path/to/css1', '/path/to/css2')
-                }
-                js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
+                css = {"all": ("path/to/css1", "/path/to/css2")}
+                js = (
+                    "/path/to/js1",
+                    "http://media.other.com/path/to/js2",
+                    "https://secure.other.com/path/to/js3",
+                )
 
         class MyWidget12(MyWidget1):
             class Media:
-                extend = ('css',)
-                css = {
-                    'all': ('/path/to/css3', 'path/to/css1')
-                }
-                js = ('/path/to/js1', '/path/to/js4')
+                extend = ("css",)
+                css = {"all": ("/path/to/css3", "path/to/css1")}
+                js = ("/path/to/js1", "/path/to/js4")
 
         w12 = MyWidget12()
         self.assertEqual(
@@ -361,7 +388,7 @@ class FormsMediaTestCase(SimpleTestCase):
 <link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet">
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet">
 <script type="text/javascript" src="/path/to/js1"></script>
-<script type="text/javascript" src="/path/to/js4"></script>"""
+<script type="text/javascript" src="/path/to/js4"></script>""",
         )
 
     def test_multi_media(self):
@@ -373,11 +400,11 @@ class FormsMediaTestCase(SimpleTestCase):
         class MultimediaWidget(TextInput):
             class Media:
                 css = {
-                    'screen, print': ('/file1', '/file2'),
-                    'screen': ('/file3',),
-                    'print': ('/file4',)
+                    "screen, print": ("/file1", "/file2"),
+                    "screen": ("/file3",),
+                    "print": ("/file4",),
                 }
-                js = ('/path/to/js1', '/path/to/js4')
+                js = ("/path/to/js1", "/path/to/js4")
 
         multimedia = MultimediaWidget()
         self.assertEqual(
@@ -387,7 +414,7 @@ class FormsMediaTestCase(SimpleTestCase):
 <link href="/file1" type="text/css" media="screen, print" rel="stylesheet">
 <link href="/file2" type="text/css" media="screen, print" rel="stylesheet">
 <script type="text/javascript" src="/path/to/js1"></script>
-<script type="text/javascript" src="/path/to/js4"></script>"""
+<script type="text/javascript" src="/path/to/js4"></script>""",
         )
 
     def test_multi_widget(self):
@@ -397,24 +424,22 @@ class FormsMediaTestCase(SimpleTestCase):
 
         class MyWidget1(TextInput):
             class Media:
-                css = {
-                    'all': ('path/to/css1', '/path/to/css2')
-                }
-                js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
+                css = {"all": ("path/to/css1", "/path/to/css2")}
+                js = (
+                    "/path/to/js1",
+                    "http://media.other.com/path/to/js2",
+                    "https://secure.other.com/path/to/js3",
+                )
 
         class MyWidget2(TextInput):
             class Media:
-                css = {
-                    'all': ('/path/to/css2', '/path/to/css3')
-                }
-                js = ('/path/to/js1', '/path/to/js4')
+                css = {"all": ("/path/to/css2", "/path/to/css3")}
+                js = ("/path/to/js1", "/path/to/js4")
 
         class MyWidget3(TextInput):
             class Media:
-                css = {
-                    'all': ('path/to/css1', '/path/to/css3')
-                }
-                js = ('/path/to/js1', '/path/to/js4')
+                css = {"all": ("path/to/css1", "/path/to/css3")}
+                js = ("/path/to/js1", "/path/to/js4")
 
         # MultiWidgets have a default media definition that gets all the
         # media from the component widgets
@@ -432,7 +457,7 @@ class FormsMediaTestCase(SimpleTestCase):
 <script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="/path/to/js4"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>""",
         )
 
     def test_form_media(self):
@@ -442,29 +467,28 @@ class FormsMediaTestCase(SimpleTestCase):
 
         class MyWidget1(TextInput):
             class Media:
-                css = {
-                    'all': ('path/to/css1', '/path/to/css2')
-                }
-                js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
+                css = {"all": ("path/to/css1", "/path/to/css2")}
+                js = (
+                    "/path/to/js1",
+                    "http://media.other.com/path/to/js2",
+                    "https://secure.other.com/path/to/js3",
+                )
 
         class MyWidget2(TextInput):
             class Media:
-                css = {
-                    'all': ('/path/to/css2', '/path/to/css3')
-                }
-                js = ('/path/to/js1', '/path/to/js4')
+                css = {"all": ("/path/to/css2", "/path/to/css3")}
+                js = ("/path/to/js1", "/path/to/js4")
 
         class MyWidget3(TextInput):
             class Media:
-                css = {
-                    'all': ('path/to/css1', '/path/to/css3')
-                }
-                js = ('/path/to/js1', '/path/to/js4')
+                css = {"all": ("path/to/css1", "/path/to/css3")}
+                js = ("/path/to/js1", "/path/to/js4")
 
         # You can ask a form for the media required by its widgets.
         class MyForm(Form):
             field1 = CharField(max_length=20, widget=MyWidget1())
             field2 = CharField(max_length=20, widget=MyWidget2())
+
         f1 = MyForm()
         self.assertEqual(
             str(f1.media),
@@ -474,12 +498,13 @@ class FormsMediaTestCase(SimpleTestCase):
 <script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="/path/to/js4"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>""",
         )
 
         # Form media can be combined to produce a single media definition.
         class AnotherForm(Form):
             field3 = CharField(max_length=20, widget=MyWidget3())
+
         f2 = AnotherForm()
         self.assertEqual(
             str(f1.media + f2.media),
@@ -489,7 +514,7 @@ class FormsMediaTestCase(SimpleTestCase):
 <script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="/path/to/js4"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>""",
         )
 
         # Forms can also define media, following the same rules as widgets.
@@ -498,10 +523,9 @@ class FormsMediaTestCase(SimpleTestCase):
             field2 = CharField(max_length=20, widget=MyWidget2())
 
             class Media:
-                js = ('/some/form/javascript',)
-                css = {
-                    'all': ('/some/form/css',)
-                }
+                js = ("/some/form/javascript",)
+                css = {"all": ("/some/form/css",)}
+
         f3 = FormWithMedia()
         self.assertEqual(
             str(f3.media),
@@ -513,12 +537,14 @@ class FormsMediaTestCase(SimpleTestCase):
 <script type="text/javascript" src="/some/form/javascript"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="/path/to/js4"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>""",
         )
 
         # Media works in templates
         self.assertEqual(
-            Template("{{ form.media.js }}{{ form.media.css }}").render(Context({'form': f3})),
+            Template("{{ form.media.js }}{{ form.media.css }}").render(
+                Context({"form": f3})
+            ),
             """<script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="/some/form/javascript"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
@@ -527,12 +553,12 @@ class FormsMediaTestCase(SimpleTestCase):
             """<link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet">
 <link href="/some/form/css" type="text/css" media="all" rel="stylesheet">
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet">
-<link href="/path/to/css3" type="text/css" media="all" rel="stylesheet">"""
+<link href="/path/to/css3" type="text/css" media="all" rel="stylesheet">""",
         )
 
     def test_html_safe(self):
-        media = Media(css={'all': ['/path/to/css']}, js=['/path/to/js'])
-        self.assertTrue(hasattr(Media, '__html__'))
+        media = Media(css={"all": ["/path/to/css"]}, js=["/path/to/js"])
+        self.assertTrue(hasattr(Media, "__html__"))
         self.assertEqual(str(media), media.__html__())
 
     def test_merge(self):
@@ -544,7 +570,10 @@ class FormsMediaTestCase(SimpleTestCase):
             (([1, 2], [1, 3]), [1, 2, 3]),
             (([1, 2], [3, 2]), [1, 3, 2]),
             (([1, 2], [1, 2]), [1, 2]),
-            ([[1, 2], [1, 3], [2, 3], [5, 7], [5, 6], [6, 7, 9], [8, 9]], [1, 5, 8, 2, 6, 3, 7, 9]),
+            (
+                [[1, 2], [1, 3], [2, 3], [5, 7], [5, 6], [6, 7, 9], [8, 9]],
+                [1, 5, 8, 2, 6, 3, 7, 9],
+            ),
             ((), []),
             (([1, 2],), [1, 2]),
         )
@@ -553,7 +582,7 @@ class FormsMediaTestCase(SimpleTestCase):
                 self.assertEqual(Media.merge(*lists), expected)
 
     def test_merge_warning(self):
-        msg = 'Detected duplicate Media files in an opposite order: [1, 2], [2, 1]'
+        msg = "Detected duplicate Media files in an opposite order: [1, 2], [2, 1]"
         with self.assertWarnsMessage(RuntimeWarning, msg):
             self.assertEqual(Media.merge([1, 2], [2, 1]), [1, 2])
 
@@ -561,30 +590,39 @@ class FormsMediaTestCase(SimpleTestCase):
         """
         The relative order of scripts is preserved in a three-way merge.
         """
-        widget1 = Media(js=['color-picker.js'])
-        widget2 = Media(js=['text-editor.js'])
-        widget3 = Media(js=['text-editor.js', 'text-editor-extras.js', 'color-picker.js'])
+        widget1 = Media(js=["color-picker.js"])
+        widget2 = Media(js=["text-editor.js"])
+        widget3 = Media(
+            js=["text-editor.js", "text-editor-extras.js", "color-picker.js"]
+        )
         merged = widget1 + widget2 + widget3
-        self.assertEqual(merged._js, ['text-editor.js', 'text-editor-extras.js', 'color-picker.js'])
+        self.assertEqual(
+            merged._js, ["text-editor.js", "text-editor-extras.js", "color-picker.js"]
+        )
 
     def test_merge_js_three_way2(self):
         # The merge prefers to place 'c' before 'b' and 'g' before 'h' to
         # preserve the original order. The preference 'c'->'b' is overridden by
         # widget3's media, but 'g'->'h' survives in the final ordering.
-        widget1 = Media(js=['a', 'c', 'f', 'g', 'k'])
-        widget2 = Media(js=['a', 'b', 'f', 'h', 'k'])
-        widget3 = Media(js=['b', 'c', 'f', 'k'])
+        widget1 = Media(js=["a", "c", "f", "g", "k"])
+        widget2 = Media(js=["a", "b", "f", "h", "k"])
+        widget3 = Media(js=["b", "c", "f", "k"])
         merged = widget1 + widget2 + widget3
-        self.assertEqual(merged._js, ['a', 'b', 'c', 'f', 'g', 'h', 'k'])
+        self.assertEqual(merged._js, ["a", "b", "c", "f", "g", "h", "k"])
 
     def test_merge_css_three_way(self):
-        widget1 = Media(css={'screen': ['c.css'], 'all': ['d.css', 'e.css']})
-        widget2 = Media(css={'screen': ['a.css']})
-        widget3 = Media(css={'screen': ['a.css', 'b.css', 'c.css'], 'all': ['e.css']})
+        widget1 = Media(css={"screen": ["c.css"], "all": ["d.css", "e.css"]})
+        widget2 = Media(css={"screen": ["a.css"]})
+        widget3 = Media(css={"screen": ["a.css", "b.css", "c.css"], "all": ["e.css"]})
         merged = widget1 + widget2
         # c.css comes before a.css because widget1 + widget2 establishes this
         # order.
-        self.assertEqual(merged._css, {'screen': ['c.css', 'a.css'], 'all': ['d.css', 'e.css']})
+        self.assertEqual(
+            merged._css, {"screen": ["c.css", "a.css"], "all": ["d.css", "e.css"]}
+        )
         merged = merged + widget3
         # widget3 contains an explicit ordering of c.css and a.css.
-        self.assertEqual(merged._css, {'screen': ['a.css', 'b.css', 'c.css'], 'all': ['d.css', 'e.css']})
+        self.assertEqual(
+            merged._css,
+            {"screen": ["a.css", "b.css", "c.css"], "all": ["d.css", "e.css"]},
+        )

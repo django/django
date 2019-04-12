@@ -34,6 +34,4 @@ def is_language_prefix_patterns_used(urlconf):
     return False, False
 
 
-urlpatterns = [
-    path('setlang/', set_language, name='set_language'),
-]
+urlpatterns = [path("setlang/", set_language, name="set_language")]

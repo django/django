@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 class TestModel(models.Model):
-    text = models.CharField(max_length=10, default=_('Anything'))
+    text = models.CharField(max_length=10, default=_("Anything"))
 
 
 class Company(models.Model):
@@ -15,4 +15,4 @@ class Company(models.Model):
     products_delivered = models.IntegerField()
 
     class Meta:
-        verbose_name = _('Company')
+        verbose_name = _("Company")

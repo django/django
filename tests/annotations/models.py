@@ -4,7 +4,7 @@ from django.db import models
 class Author(models.Model):
     name = models.CharField(max_length=100)
     age = models.IntegerField()
-    friends = models.ManyToManyField('self', blank=True)
+    friends = models.ManyToManyField("self", blank=True)
 
     def __str__(self):
         return self.name
@@ -25,7 +25,7 @@ class Book(models.Model):
     rating = models.FloatField()
     price = models.DecimalField(decimal_places=2, max_digits=6)
     authors = models.ManyToManyField(Author)
-    contact = models.ForeignKey(Author, models.CASCADE, related_name='book_contact_set')
+    contact = models.ForeignKey(Author, models.CASCADE, related_name="book_contact_set")
     publisher = models.ForeignKey(Publisher, models.CASCADE)
     pubdate = models.DateField()
 
@@ -47,7 +47,7 @@ class DepartmentStore(Store):
     chain = models.CharField(max_length=255)
 
     def __str__(self):
-        return '%s - %s ' % (self.chain, self.name)
+        return "%s - %s " % (self.chain, self.name)
 
 
 class Employee(models.Model):
@@ -62,7 +62,7 @@ class Employee(models.Model):
     salary = models.DecimalField(max_digits=8, decimal_places=2)
 
     def __str__(self):
-        return '%s %s' % (self.first_name, self.last_name)
+        return "%s %s" % (self.first_name, self.last_name)
 
 
 class Company(models.Model):
@@ -72,8 +72,11 @@ class Company(models.Model):
     description = models.CharField(max_length=200, null=True, blank=True)
 
     def __str__(self):
-        return 'Company(name=%s, motto=%s, ticker_name=%s, description=%s)' % (
-            self.name, self.motto, self.ticker_name, self.description,
+        return "Company(name=%s, motto=%s, ticker_name=%s, description=%s)" % (
+            self.name,
+            self.motto,
+            self.ticker_name,
+            self.description,
         )
 
 
@@ -82,4 +85,4 @@ class Ticket(models.Model):
     duration = models.DurationField()
 
     def __str__(self):
-        return '{} - {}'.format(self.active_at, self.duration)
+        return "{} - {}".format(self.active_at, self.duration)

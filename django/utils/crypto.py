@@ -15,8 +15,11 @@ try:
     using_sysrandom = True
 except NotImplementedError:
     import warnings
-    warnings.warn('A secure pseudo-random number generator is not available '
-                  'on your system. Falling back to Mersenne Twister.')
+
+    warnings.warn(
+        "A secure pseudo-random number generator is not available "
+        "on your system. Falling back to Mersenne Twister."
+    )
     using_sysrandom = False
 
 
@@ -45,9 +48,10 @@ def salted_hmac(key_salt, value, secret=None):
     return hmac.new(key, msg=force_bytes(value), digestmod=hashlib.sha1)
 
 
-def get_random_string(length=12,
-                      allowed_chars='abcdefghijklmnopqrstuvwxyz'
-                                    'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):
+def get_random_string(
+    length=12,
+    allowed_chars="abcdefghijklmnopqrstuvwxyz" "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+):
     """
     Return a securely generated random string.
 
@@ -63,10 +67,12 @@ def get_random_string(length=12,
         # is better than absolute predictability.
         random.seed(
             hashlib.sha256(
-                ('%s%s%s' % (random.getstate(), time.time(), settings.SECRET_KEY)).encode()
+                (
+                    "%s%s%s" % (random.getstate(), time.time(), settings.SECRET_KEY)
+                ).encode()
             ).digest()
         )
-    return ''.join(random.choice(allowed_chars) for i in range(length))
+    return "".join(random.choice(allowed_chars) for i in range(length))
 
 
 def constant_time_compare(val1, val2):

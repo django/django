@@ -9,10 +9,10 @@ class ArticleForm(forms.ModelForm):
 
     class Meta:
         model = Article
-        fields = '__all__'
+        fields = "__all__"
 
 
 class ArticleFormView(UpdateView):
     model = Article
-    success_url = '/'
+    success_url = "/"
     form_class = ArticleForm

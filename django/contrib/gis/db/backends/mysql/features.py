@@ -1,7 +1,5 @@
 from django.contrib.gis.db.backends.base.features import BaseSpatialFeatures
-from django.db.backends.mysql.features import (
-    DatabaseFeatures as MySQLDatabaseFeatures,
-)
+from django.db.backends.mysql.features import DatabaseFeatures as MySQLDatabaseFeatures
 from django.utils.functional import cached_property
 
 

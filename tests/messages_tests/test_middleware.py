@@ -5,7 +5,6 @@ from django.http import HttpRequest, HttpResponse
 
 
 class MiddlewareTests(unittest.TestCase):
-
     def setUp(self):
         self.middleware = MessageMiddleware()
 

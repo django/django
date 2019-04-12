@@ -1,1 +1,1 @@
-content = 'Grandchild Module'
+content = "Grandchild Module"

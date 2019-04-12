@@ -4,5 +4,5 @@ from django.apps import AppConfig
 
 
 class NSAppConfig(AppConfig):
-    name = 'nsapp'
+    name = "nsapp"
     path = os.path.dirname(__file__)

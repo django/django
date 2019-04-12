@@ -11,7 +11,7 @@ except ImportError:
 else:
     closure_compiler = closure.get_jar_filename()
 
-js_path = Path(__file__).parent.parent / 'static' / 'admin' / 'js'
+js_path = Path(__file__).parent.parent / "static" / "admin" / "js"
 
 
 def main():
@@ -19,9 +19,11 @@ def main():
 compress all jQuery-based files of the admin app. Requires the Google Closure
 Compiler library and Java version 6 or later."""
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('file', nargs='*')
+    parser.add_argument("file", nargs="*")
     parser.add_argument(
-        "-c", dest="compiler", default="~/bin/compiler.jar",
+        "-c",
+        dest="compiler",
+        default="~/bin/compiler.jar",
         help="path to Closure Compiler jar file",
     )
     parser.add_argument("-v", "--verbose", action="store_true", dest="verbose")
@@ -48,9 +50,10 @@ Compiler library and Java version 6 or later."""
     for file_path in files:
         to_compress = file_path.expanduser()
         if to_compress.exists():
-            to_compress_min = to_compress.with_suffix('.min.js')
-            cmd = "java -jar %s --rewrite_polyfills=false --js %s --js_output_file %s" % (
-                compiler, to_compress, to_compress_min,
+            to_compress_min = to_compress.with_suffix(".min.js")
+            cmd = (
+                "java -jar %s --rewrite_polyfills=false --js %s --js_output_file %s"
+                % (compiler, to_compress, to_compress_min)
             )
             if options.verbose:
                 sys.stdout.write("Running: %s\n" % cmd)
@@ -59,5 +62,5 @@ Compiler library and Java version 6 or later."""
             sys.stdout.write("File %s not found. Sure it exists?\n" % to_compress)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

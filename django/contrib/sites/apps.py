@@ -6,7 +6,7 @@ from .management import create_default_site
 
 
 class SitesConfig(AppConfig):
-    name = 'django.contrib.sites'
+    name = "django.contrib.sites"
     verbose_name = _("Sites")
 
     def ready(self):

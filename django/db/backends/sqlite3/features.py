@@ -18,7 +18,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_introspect_duration_field = False
     can_introspect_positive_integer_field = True
     can_introspect_small_integer_field = True
-    introspected_big_auto_field_type = 'AutoField'
+    introspected_big_auto_field_type = "AutoField"
     supports_transactions = True
     atomic_transactions = False
     can_rollback_ddl = True

@@ -19,16 +19,16 @@ class Driver(GDALBase):
     # https://www.gdal.org/formats_list.html (raster)
     _alias = {
         # vector
-        'esri': 'ESRI Shapefile',
-        'shp': 'ESRI Shapefile',
-        'shape': 'ESRI Shapefile',
-        'tiger': 'TIGER',
-        'tiger/line': 'TIGER',
+        "esri": "ESRI Shapefile",
+        "shp": "ESRI Shapefile",
+        "shape": "ESRI Shapefile",
+        "tiger": "TIGER",
+        "tiger/line": "TIGER",
         # raster
-        'tiff': 'GTiff',
-        'tif': 'GTiff',
-        'jpeg': 'JPEG',
-        'jpg': 'JPEG',
+        "tiff": "GTiff",
+        "tif": "GTiff",
+        "jpeg": "JPEG",
+        "jpg": "JPEG",
     }
 
     def __init__(self, dr_input):
@@ -60,11 +60,15 @@ class Driver(GDALBase):
         elif isinstance(dr_input, c_void_p):
             driver = dr_input
         else:
-            raise GDALException('Unrecognized input type for GDAL/OGR Driver: %s' % type(dr_input))
+            raise GDALException(
+                "Unrecognized input type for GDAL/OGR Driver: %s" % type(dr_input)
+            )
 
         # Making sure we get a valid pointer to the OGR Driver
         if not driver:
-            raise GDALException('Could not initialize GDAL/OGR Driver on input: %s' % dr_input)
+            raise GDALException(
+                "Could not initialize GDAL/OGR Driver on input: %s" % dr_input
+            )
         self.ptr = driver
 
     def __str__(self):

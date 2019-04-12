@@ -5,19 +5,16 @@ from django.test.utils import override_settings
 
 class CheckCacheSettingsAppDirsTest(SimpleTestCase):
     VALID_CACHES_CONFIGURATION = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        },
+        "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}
     }
     INVALID_CACHES_CONFIGURATION = {
-        'other': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        },
+        "other": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}
     }
 
     @property
     def func(self):
         from django.core.checks.caches import check_default_cache_is_configured
+
         return check_default_cache_is_configured
 
     @override_settings(CACHES=VALID_CACHES_CONFIGURATION)

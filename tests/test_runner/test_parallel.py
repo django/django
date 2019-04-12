@@ -15,6 +15,7 @@ class ExceptionThatFailsUnpickling(Exception):
     After pickling, this class fails unpickling with an error about incorrect
     arguments passed to __init__().
     """
+
     def __init__(self, arg):
         super().__init__()
 
@@ -51,19 +52,18 @@ class SampleFailingSubtest(SimpleTestCase):
 
 
 class RemoteTestResultTest(SimpleTestCase):
-
     def test_pickle_errors_detection(self):
-        picklable_error = RuntimeError('This is fine')
-        not_unpicklable_error = ExceptionThatFailsUnpickling('arg')
+        picklable_error = RuntimeError("This is fine")
+        not_unpicklable_error = ExceptionThatFailsUnpickling("arg")
 
         result = RemoteTestResult()
         result._confirm_picklable(picklable_error)
 
-        msg = '__init__() missing 1 required positional argument'
+        msg = "__init__() missing 1 required positional argument"
         with self.assertRaisesMessage(TypeError, msg):
             result._confirm_picklable(not_unpicklable_error)
 
-    @unittest.skipUnless(tblib is not None, 'requires tblib to be installed')
+    @unittest.skipUnless(tblib is not None, "requires tblib to be installed")
     def test_add_failing_subtests(self):
         """
         Failing subtests are added correctly using addSubTest().
@@ -71,17 +71,24 @@ class RemoteTestResultTest(SimpleTestCase):
         # Manually run a test with failing subtests to prevent the failures
         # from affecting the actual test run.
         result = RemoteTestResult()
-        subtest_test = SampleFailingSubtest(methodName='dummy_test')
+        subtest_test = SampleFailingSubtest(methodName="dummy_test")
         subtest_test.run(result=result)
 
         events = result.events
         self.assertEqual(len(events), 4)
 
         event = events[1]
-        self.assertEqual(event[0], 'addSubTest')
-        self.assertEqual(str(event[2]), 'dummy_test (test_runner.test_parallel.SampleFailingSubtest) (index=0)')
-        trailing_comma = '' if PY37 else ','
-        self.assertEqual(repr(event[3][1]), "AssertionError('0 != 1'%s)" % trailing_comma)
+        self.assertEqual(event[0], "addSubTest")
+        self.assertEqual(
+            str(event[2]),
+            "dummy_test (test_runner.test_parallel.SampleFailingSubtest) (index=0)",
+        )
+        trailing_comma = "" if PY37 else ","
+        self.assertEqual(
+            repr(event[3][1]), "AssertionError('0 != 1'%s)" % trailing_comma
+        )
 
         event = events[2]
-        self.assertEqual(repr(event[3][1]), "AssertionError('2 != 1'%s)" % trailing_comma)
+        self.assertEqual(
+            repr(event[3][1]), "AssertionError('2 != 1'%s)" % trailing_comma
+        )

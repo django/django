@@ -13,10 +13,7 @@ class MigrationDataPersistenceTestCase(TransactionTestCase):
     serialized_rollback = True
 
     def test_persistence(self):
-        self.assertEqual(
-            Book.objects.count(),
-            1,
-        )
+        self.assertEqual(Book.objects.count(), 1)
 
 
 class MigrationDataNormalPersistenceTestCase(TestCase):
@@ -25,7 +22,4 @@ class MigrationDataNormalPersistenceTestCase(TestCase):
     """
 
     def test_persistence(self):
-        self.assertEqual(
-            Book.objects.count(),
-            1,
-        )
+        self.assertEqual(Book.objects.count(), 1)

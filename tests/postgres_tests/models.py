@@ -2,9 +2,19 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 
 from .fields import (
-    ArrayField, BigIntegerRangeField, CICharField, CIEmailField, CITextField,
-    DateRangeField, DateTimeRangeField, DecimalRangeField, EnumField,
-    HStoreField, IntegerRangeField, JSONField, SearchVectorField,
+    ArrayField,
+    BigIntegerRangeField,
+    CICharField,
+    CIEmailField,
+    CITextField,
+    DateRangeField,
+    DateTimeRangeField,
+    DecimalRangeField,
+    EnumField,
+    HStoreField,
+    IntegerRangeField,
+    JSONField,
+    SearchVectorField,
 )
 
 
@@ -17,7 +27,6 @@ class Tag:
 
 
 class TagField(models.SmallIntegerField):
-
     def from_db_value(self, value, expression, connection):
         if value is None:
             return value
@@ -37,7 +46,7 @@ class TagField(models.SmallIntegerField):
 class PostgreSQLModel(models.Model):
     class Meta:
         abstract = True
-        required_db_vendor = 'postgresql'
+        required_db_vendor = "postgresql"
 
 
 class IntegerArrayModel(PostgreSQLModel):
@@ -65,7 +74,9 @@ class NestedIntegerArrayModel(PostgreSQLModel):
 class OtherTypesArrayModel(PostgreSQLModel):
     ips = ArrayField(models.GenericIPAddressField(), default=list)
     uuids = ArrayField(models.UUIDField(), default=list)
-    decimals = ArrayField(models.DecimalField(max_digits=5, decimal_places=2), default=list)
+    decimals = ArrayField(
+        models.DecimalField(max_digits=5, decimal_places=2), default=list
+    )
     tags = ArrayField(TagField(), blank=True, null=True)
     json = ArrayField(JSONField(default=dict), default=list)
     int_ranges = ArrayField(IntegerRangeField(), blank=True, null=True)
@@ -120,14 +131,14 @@ class CITestModel(PostgreSQLModel):
 
 
 class Line(PostgreSQLModel):
-    scene = models.ForeignKey('Scene', models.CASCADE)
-    character = models.ForeignKey('Character', models.CASCADE)
+    scene = models.ForeignKey("Scene", models.CASCADE)
+    character = models.ForeignKey("Character", models.CASCADE)
     dialogue = models.TextField(blank=True, null=True)
     dialogue_search_vector = SearchVectorField(blank=True, null=True)
     dialogue_config = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
-        return self.dialogue or ''
+        return self.dialogue or ""
 
 
 class RangesModel(PostgreSQLModel):
@@ -161,6 +172,7 @@ class AggregateTestModel(models.Model):
     """
     To test postgres-specific general aggregation functions
     """
+
     char_field = models.CharField(max_length=30, blank=True)
     integer_field = models.IntegerField(null=True)
     boolean_field = models.BooleanField(null=True)
@@ -170,6 +182,7 @@ class StatTestModel(models.Model):
     """
     To test postgres-specific aggregation functions for statistics
     """
+
     int1 = models.IntegerField()
     int2 = models.IntegerField()
     related_field = models.ForeignKey(AggregateTestModel, models.SET_NULL, null=True)

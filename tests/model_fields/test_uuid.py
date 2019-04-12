@@ -4,11 +4,17 @@ import uuid
 from django.core import exceptions, serializers
 from django.db import IntegrityError, models
 from django.test import (
-    SimpleTestCase, TestCase, TransactionTestCase, skipUnlessDBFeature,
+    SimpleTestCase,
+    TestCase,
+    TransactionTestCase,
+    skipUnlessDBFeature,
 )
 
 from .models import (
-    NullableUUIDModel, PrimaryKeyUUIDModel, RelatedToUUIDModel, UUIDGrandchild,
+    NullableUUIDModel,
+    PrimaryKeyUUIDModel,
+    RelatedToUUIDModel,
+    UUIDGrandchild,
     UUIDModel,
 )
 
@@ -20,19 +26,19 @@ class TestSaveLoad(TestCase):
         self.assertEqual(loaded.field, instance.field)
 
     def test_str_instance_no_hyphens(self):
-        UUIDModel.objects.create(field='550e8400e29b41d4a716446655440000')
+        UUIDModel.objects.create(field="550e8400e29b41d4a716446655440000")
         loaded = UUIDModel.objects.get()
-        self.assertEqual(loaded.field, uuid.UUID('550e8400e29b41d4a716446655440000'))
+        self.assertEqual(loaded.field, uuid.UUID("550e8400e29b41d4a716446655440000"))
 
     def test_str_instance_hyphens(self):
-        UUIDModel.objects.create(field='550e8400-e29b-41d4-a716-446655440000')
+        UUIDModel.objects.create(field="550e8400-e29b-41d4-a716-446655440000")
         loaded = UUIDModel.objects.get()
-        self.assertEqual(loaded.field, uuid.UUID('550e8400e29b41d4a716446655440000'))
+        self.assertEqual(loaded.field, uuid.UUID("550e8400e29b41d4a716446655440000"))
 
     def test_str_instance_bad_hyphens(self):
-        UUIDModel.objects.create(field='550e84-00-e29b-41d4-a716-4-466-55440000')
+        UUIDModel.objects.create(field="550e84-00-e29b-41d4-a716-4-466-55440000")
         loaded = UUIDModel.objects.get()
-        self.assertEqual(loaded.field, uuid.UUID('550e8400e29b41d4a716446655440000'))
+        self.assertEqual(loaded.field, uuid.UUID("550e8400e29b41d4a716446655440000"))
 
     def test_null_handling(self):
         NullableUUIDModel.objects.create(field=None)
@@ -40,22 +46,29 @@ class TestSaveLoad(TestCase):
         self.assertIsNone(loaded.field)
 
     def test_pk_validated(self):
-        with self.assertRaisesMessage(exceptions.ValidationError, 'is not a valid UUID'):
+        with self.assertRaisesMessage(
+            exceptions.ValidationError, "is not a valid UUID"
+        ):
             PrimaryKeyUUIDModel.objects.get(pk={})
 
-        with self.assertRaisesMessage(exceptions.ValidationError, 'is not a valid UUID'):
+        with self.assertRaisesMessage(
+            exceptions.ValidationError, "is not a valid UUID"
+        ):
             PrimaryKeyUUIDModel.objects.get(pk=[])
 
     def test_wrong_value(self):
-        with self.assertRaisesMessage(exceptions.ValidationError, 'is not a valid UUID'):
-            UUIDModel.objects.get(field='not-a-uuid')
+        with self.assertRaisesMessage(
+            exceptions.ValidationError, "is not a valid UUID"
+        ):
+            UUIDModel.objects.get(field="not-a-uuid")
 
-        with self.assertRaisesMessage(exceptions.ValidationError, 'is not a valid UUID'):
-            UUIDModel.objects.create(field='not-a-uuid')
+        with self.assertRaisesMessage(
+            exceptions.ValidationError, "is not a valid UUID"
+        ):
+            UUIDModel.objects.create(field="not-a-uuid")
 
 
 class TestMethods(SimpleTestCase):
-
     def test_deconstruct(self):
         field = models.UUIDField()
         name, path, args, kwargs = field.deconstruct()
@@ -67,12 +80,12 @@ class TestMethods(SimpleTestCase):
     def test_to_python_int_values(self):
         self.assertEqual(
             models.UUIDField().to_python(0),
-            uuid.UUID('00000000-0000-0000-0000-000000000000')
+            uuid.UUID("00000000-0000-0000-0000-000000000000"),
         )
         # Works for integers less than 128 bits.
         self.assertEqual(
             models.UUIDField().to_python((2 ** 128) - 1),
-            uuid.UUID('ffffffff-ffff-ffff-ffff-ffffffffffff')
+            uuid.UUID("ffffffff-ffff-ffff-ffff-ffffffffffff"),
         )
 
     def test_to_python_int_too_large(self):
@@ -86,20 +99,21 @@ class TestQuerying(TestCase):
     def setUpTestData(cls):
         cls.objs = [
             NullableUUIDModel.objects.create(field=uuid.uuid4()),
-            NullableUUIDModel.objects.create(field='550e8400e29b41d4a716446655440000'),
+            NullableUUIDModel.objects.create(field="550e8400e29b41d4a716446655440000"),
             NullableUUIDModel.objects.create(field=None),
         ]
 
     def test_exact(self):
         self.assertSequenceEqual(
-            NullableUUIDModel.objects.filter(field__exact='550e8400e29b41d4a716446655440000'),
-            [self.objs[1]]
+            NullableUUIDModel.objects.filter(
+                field__exact="550e8400e29b41d4a716446655440000"
+            ),
+            [self.objs[1]],
         )
 
     def test_isnull(self):
         self.assertSequenceEqual(
-            NullableUUIDModel.objects.filter(field__isnull=True),
-            [self.objs[2]]
+            NullableUUIDModel.objects.filter(field__isnull=True), [self.objs[2]]
         )
 
 
@@ -114,16 +128,20 @@ class TestSerialization(SimpleTestCase):
     )
 
     def test_dumping(self):
-        instance = UUIDModel(field=uuid.UUID('550e8400e29b41d4a716446655440000'))
-        data = serializers.serialize('json', [instance])
+        instance = UUIDModel(field=uuid.UUID("550e8400e29b41d4a716446655440000"))
+        data = serializers.serialize("json", [instance])
         self.assertEqual(json.loads(data), json.loads(self.test_data))
 
     def test_loading(self):
-        instance = list(serializers.deserialize('json', self.test_data))[0].object
-        self.assertEqual(instance.field, uuid.UUID('550e8400-e29b-41d4-a716-446655440000'))
+        instance = list(serializers.deserialize("json", self.test_data))[0].object
+        self.assertEqual(
+            instance.field, uuid.UUID("550e8400-e29b-41d4-a716-446655440000")
+        )
 
     def test_nullable_loading(self):
-        instance = list(serializers.deserialize('json', self.nullable_test_data))[0].object
+        instance = list(serializers.deserialize("json", self.nullable_test_data))[
+            0
+        ].object
         self.assertIsNone(instance.field)
 
 
@@ -131,9 +149,12 @@ class TestValidation(SimpleTestCase):
     def test_invalid_uuid(self):
         field = models.UUIDField()
         with self.assertRaises(exceptions.ValidationError) as cm:
-            field.clean('550e8400', None)
-        self.assertEqual(cm.exception.code, 'invalid')
-        self.assertEqual(cm.exception.message % cm.exception.params, "'550e8400' is not a valid UUID.")
+            field.clean("550e8400", None)
+        self.assertEqual(cm.exception.code, "invalid")
+        self.assertEqual(
+            cm.exception.message % cm.exception.params,
+            "'550e8400' is not a valid UUID.",
+        )
 
     def test_uuid_instance_ok(self):
         field = models.UUIDField()
@@ -197,9 +218,9 @@ class TestAsPrimaryKey(TestCase):
 
 class TestAsPrimaryKeyTransactionTests(TransactionTestCase):
     # Need a TransactionTestCase to avoid deferring FK constraint checking.
-    available_apps = ['model_fields']
+    available_apps = ["model_fields"]
 
-    @skipUnlessDBFeature('supports_foreign_keys')
+    @skipUnlessDBFeature("supports_foreign_keys")
     def test_unsaved_fk(self):
         u1 = PrimaryKeyUUIDModel()
         with self.assertRaises(IntegrityError):

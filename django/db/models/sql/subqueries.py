@@ -5,18 +5,16 @@ Query subclasses which provide extra functionality beyond simple data retrieval.
 from django.core.exceptions import FieldError
 from django.db import connections
 from django.db.models.query_utils import Q
-from django.db.models.sql.constants import (
-    CURSOR, GET_ITERATOR_CHUNK_SIZE, NO_RESULTS,
-)
+from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE, NO_RESULTS
 from django.db.models.sql.query import Query
 
-__all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'AggregateQuery']
+__all__ = ["DeleteQuery", "UpdateQuery", "InsertQuery", "AggregateQuery"]
 
 
 class DeleteQuery(Query):
     """A DELETE SQL query."""
 
-    compiler = 'SQLDeleteCompiler'
+    compiler = "SQLDeleteCompiler"
 
     def do_query(self, table, where, using):
         self.alias_map = {table: self.alias_map[table]}
@@ -36,9 +34,17 @@ class DeleteQuery(Query):
         field = self.get_meta().pk
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             self.where = self.where_class()
-            self.add_q(Q(
-                **{field.attname + '__in': pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]}))
-            num_deleted += self.do_query(self.get_meta().db_table, self.where, using=using)
+            self.add_q(
+                Q(
+                    **{
+                        field.attname
+                        + "__in": pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE]
+                    }
+                )
+            )
+            num_deleted += self.do_query(
+                self.get_meta().db_table, self.where, using=using
+            )
         return num_deleted
 
     def delete_qs(self, query, using):
@@ -52,7 +58,9 @@ class DeleteQuery(Query):
         innerq.get_initial_alias()
         # The same for our new query.
         self.get_initial_alias()
-        innerq_used_tables = tuple([t for t in innerq.alias_map if innerq.alias_refcount[t]])
+        innerq_used_tables = tuple(
+            [t for t in innerq.alias_map if innerq.alias_refcount[t]]
+        )
         if not innerq_used_tables or innerq_used_tables == tuple(self.alias_map):
             # There is only the base table in use in the query.
             self.where = innerq.where
@@ -60,15 +68,13 @@ class DeleteQuery(Query):
             pk = query.model._meta.pk
             if not connections[using].features.update_can_self_select:
                 # We can't do the delete using subquery.
-                values = list(query.values_list('pk', flat=True))
+                values = list(query.values_list("pk", flat=True))
                 if not values:
                     return 0
                 return self.delete_batch(values, using)
             else:
                 innerq.clear_select_clause()
-                innerq.select = [
-                    pk.get_col(self.get_initial_alias())
-                ]
+                innerq.select = [pk.get_col(self.get_initial_alias())]
                 values = innerq
             self.where = self.where_class()
             self.add_q(Q(pk__in=values))
@@ -79,7 +85,7 @@ class DeleteQuery(Query):
 class UpdateQuery(Query):
     """An UPDATE SQL query."""
 
-    compiler = 'SQLUpdateCompiler'
+    compiler = "SQLUpdateCompiler"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -103,7 +109,7 @@ class UpdateQuery(Query):
         self.add_update_values(values)
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             self.where = self.where_class()
-            self.add_q(Q(pk__in=pk_list[offset: offset + GET_ITERATOR_CHUNK_SIZE]))
+            self.add_q(Q(pk__in=pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE]))
             self.get_compiler(using).execute_sql(NO_RESULTS)
 
     def add_update_values(self, values):
@@ -115,12 +121,14 @@ class UpdateQuery(Query):
         values_seq = []
         for name, val in values.items():
             field = self.get_meta().get_field(name)
-            direct = not (field.auto_created and not field.concrete) or not field.concrete
+            direct = (
+                not (field.auto_created and not field.concrete) or not field.concrete
+            )
             model = field.model._meta.concrete_model
             if not direct or (field.is_relation and field.many_to_many):
                 raise FieldError(
-                    'Cannot update model field %r (only non-relations and '
-                    'foreign keys permitted).' % field
+                    "Cannot update model field %r (only non-relations and "
+                    "foreign keys permitted)." % field
                 )
             if model is not self.get_meta().concrete_model:
                 self.add_related_update(model, field, val)
@@ -135,7 +143,7 @@ class UpdateQuery(Query):
         called add_update_targets() to hint at the extra information here.
         """
         for field, model, val in values_seq:
-            if hasattr(val, 'resolve_expression'):
+            if hasattr(val, "resolve_expression"):
                 # Resolve expressions here so that annotations are no longer needed
                 val = val.resolve_expression(self, allow_joins=False, for_save=True)
             self.values.append((field, model, val))
@@ -161,13 +169,13 @@ class UpdateQuery(Query):
             query = UpdateQuery(model)
             query.values = values
             if self.related_ids is not None:
-                query.add_filter(('pk__in', self.related_ids))
+                query.add_filter(("pk__in", self.related_ids))
             result.append(query)
         return result
 
 
 class InsertQuery(Query):
-    compiler = 'SQLInsertCompiler'
+    compiler = "SQLInsertCompiler"
 
     def __init__(self, *args, ignore_conflicts=False, **kwargs):
         super().__init__(*args, **kwargs)
@@ -187,8 +195,10 @@ class AggregateQuery(Query):
     elements in the provided list.
     """
 
-    compiler = 'SQLAggregateCompiler'
+    compiler = "SQLAggregateCompiler"
 
     def add_subquery(self, query, using):
         query.subquery = True
-        self.subquery, self.sub_params = query.get_compiler(using).as_sql(with_col_aliases=True)
+        self.subquery, self.sub_params = query.get_compiler(using).as_sql(
+            with_col_aliases=True
+        )

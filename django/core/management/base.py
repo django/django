@@ -26,6 +26,7 @@ class CommandError(Exception):
     error) is the preferred way to indicate that something has gone
     wrong in the execution of a command.
     """
+
     pass
 
 
@@ -33,6 +34,7 @@ class SystemCheckError(CommandError):
     """
     The system check framework detected unrecoverable errors.
     """
+
     pass
 
 
@@ -42,15 +44,19 @@ class CommandParser(ArgumentParser):
     SystemExit in several occasions, as SystemExit is unacceptable when a
     command is called programmatically.
     """
-    def __init__(self, *, missing_args_message=None, called_from_command_line=None, **kwargs):
+
+    def __init__(
+        self, *, missing_args_message=None, called_from_command_line=None, **kwargs
+    ):
         self.missing_args_message = missing_args_message
         self.called_from_command_line = called_from_command_line
         super().__init__(**kwargs)
 
     def parse_args(self, args=None, namespace=None):
         # Catch missing argument for a better error message
-        if (self.missing_args_message and
-                not (args or any(not arg.startswith('-') for arg in args))):
+        if self.missing_args_message and not (
+            args or any(not arg.startswith("-") for arg in args)
+        ):
             self.error(self.missing_args_message)
         return super().parse_args(args, namespace)
 
@@ -68,15 +74,17 @@ def handle_default_options(options):
     user commands.
     """
     if options.settings:
-        os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
+        os.environ["DJANGO_SETTINGS_MODULE"] = options.settings
     if options.pythonpath:
         sys.path.insert(0, options.pythonpath)
 
 
 def no_translations(handle_func):
     """Decorator that forces a command to run with translations deactivated."""
+
     def wrapped(*args, **kwargs):
         from django.utils import translation
+
         saved_locale = translation.get_language()
         translation.deactivate_all()
         try:
@@ -85,6 +93,7 @@ def no_translations(handle_func):
             if saved_locale is not None:
                 translation.activate(saved_locale)
         return res
+
     return wrapped
 
 
@@ -93,15 +102,20 @@ class DjangoHelpFormatter(HelpFormatter):
     Customized formatter so that command-specific arguments appear in the
     --help output before arguments common to all commands.
     """
+
     show_last = {
-        '--version', '--verbosity', '--traceback', '--settings', '--pythonpath',
-        '--no-color', '--force-color',
+        "--version",
+        "--verbosity",
+        "--traceback",
+        "--settings",
+        "--pythonpath",
+        "--no-color",
+        "--force-color",
     }
 
     def _reordered_actions(self, actions):
         return sorted(
-            actions,
-            key=lambda a: set(a.option_strings) & self.show_last != set()
+            actions, key=lambda a: set(a.option_strings) & self.show_last != set()
         )
 
     def add_usage(self, usage, actions, *args, **kwargs):
@@ -115,6 +129,7 @@ class OutputWrapper(TextIOBase):
     """
     Wrapper around stdout/stderr
     """
+
     @property
     def style_func(self):
         return self._style_func
@@ -126,7 +141,7 @@ class OutputWrapper(TextIOBase):
         else:
             self._style_func = lambda x: x
 
-    def __init__(self, out, ending='\n'):
+    def __init__(self, out, ending="\n"):
         self._out = out
         self.style_func = None
         self.ending = ending
@@ -135,7 +150,7 @@ class OutputWrapper(TextIOBase):
         return getattr(self._out, name)
 
     def isatty(self):
-        return hasattr(self._out, 'isatty') and self._out.isatty()
+        return hasattr(self._out, "isatty") and self._out.isatty()
 
     def write(self, msg, style_func=None, ending=None):
         ending = self.ending if ending is None else ending
@@ -213,8 +228,9 @@ class BaseCommand:
         A tuple of any options the command uses which aren't defined by the
         argument parser.
     """
+
     # Metadata about this command.
-    help = ''
+    help = ""
 
     # Configuration shortcuts that alter various logic.
     _called_from_command_line = False
@@ -223,7 +239,7 @@ class BaseCommand:
     requires_system_checks = True
     # Arguments, common to all commands, which aren't defined by the argument
     # parser.
-    base_stealth_options = ('skip_checks', 'stderr', 'stdout')
+    base_stealth_options = ("skip_checks", "stderr", "stdout")
     # Command-specific options not defined by the argument parser.
     stealth_options = ()
 
@@ -252,39 +268,44 @@ class BaseCommand:
         parse the arguments to this command.
         """
         parser = CommandParser(
-            prog='%s %s' % (os.path.basename(prog_name), subcommand),
+            prog="%s %s" % (os.path.basename(prog_name), subcommand),
             description=self.help or None,
             formatter_class=DjangoHelpFormatter,
-            missing_args_message=getattr(self, 'missing_args_message', None),
-            called_from_command_line=getattr(self, '_called_from_command_line', None),
-            **kwargs
+            missing_args_message=getattr(self, "missing_args_message", None),
+            called_from_command_line=getattr(self, "_called_from_command_line", None),
+            **kwargs,
         )
-        parser.add_argument('--version', action='version', version=self.get_version())
+        parser.add_argument("--version", action="version", version=self.get_version())
         parser.add_argument(
-            '-v', '--verbosity', default=1,
-            type=int, choices=[0, 1, 2, 3],
-            help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output',
+            "-v",
+            "--verbosity",
+            default=1,
+            type=int,
+            choices=[0, 1, 2, 3],
+            help="Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output",
         )
         parser.add_argument(
-            '--settings',
+            "--settings",
             help=(
-                'The Python path to a settings module, e.g. '
+                "The Python path to a settings module, e.g. "
                 '"myproject.settings.main". If this isn\'t provided, the '
-                'DJANGO_SETTINGS_MODULE environment variable will be used.'
+                "DJANGO_SETTINGS_MODULE environment variable will be used."
             ),
         )
         parser.add_argument(
-            '--pythonpath',
+            "--pythonpath",
             help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".',
         )
-        parser.add_argument('--traceback', action='store_true', help='Raise on CommandError exceptions')
         parser.add_argument(
-            '--no-color', action='store_true',
-            help="Don't colorize the command output.",
+            "--traceback", action="store_true", help="Raise on CommandError exceptions"
         )
         parser.add_argument(
-            '--force-color', action='store_true',
-            help='Force colorization of the command output.',
+            "--no-color", action="store_true", help="Don't colorize the command output."
+        )
+        parser.add_argument(
+            "--force-color",
+            action="store_true",
+            help="Force colorization of the command output.",
         )
         self.add_arguments(parser)
         return parser
@@ -317,7 +338,7 @@ class BaseCommand:
         options = parser.parse_args(argv[2:])
         cmd_options = vars(options)
         # Move positional args out of options to mimic legacy optparse
-        args = cmd_options.pop('args', ())
+        args = cmd_options.pop("args", ())
         handle_default_options(options)
         try:
             self.execute(*args, **cmd_options)
@@ -329,7 +350,7 @@ class BaseCommand:
             if isinstance(e, SystemCheckError):
                 self.stderr.write(str(e), lambda x: x)
             else:
-                self.stderr.write('%s: %s' % (e.__class__.__name__, e))
+                self.stderr.write("%s: %s" % (e.__class__.__name__, e))
             sys.exit(1)
         finally:
             try:
@@ -345,27 +366,29 @@ class BaseCommand:
         controlled by the ``requires_system_checks`` attribute, except if
         force-skipped).
         """
-        if options['force_color'] and options['no_color']:
-            raise CommandError("The --no-color and --force-color options can't be used together.")
-        if options['force_color']:
+        if options["force_color"] and options["no_color"]:
+            raise CommandError(
+                "The --no-color and --force-color options can't be used together."
+            )
+        if options["force_color"]:
             self.style = color_style(force_color=True)
-        elif options['no_color']:
+        elif options["no_color"]:
             self.style = no_style()
             self.stderr.style_func = None
-        if options.get('stdout'):
-            self.stdout = OutputWrapper(options['stdout'])
-        if options.get('stderr'):
-            self.stderr = OutputWrapper(options['stderr'])
+        if options.get("stdout"):
+            self.stdout = OutputWrapper(options["stdout"])
+        if options.get("stderr"):
+            self.stderr = OutputWrapper(options["stderr"])
 
-        if self.requires_system_checks and not options.get('skip_checks'):
+        if self.requires_system_checks and not options.get("skip_checks"):
             self.check()
         if self.requires_migrations_checks:
             self.check_migrations()
         output = self.handle(*args, **options)
         if output:
             if self.output_transaction:
-                connection = connections[options.get('database', DEFAULT_DB_ALIAS)]
-                output = '%s\n%s\n%s' % (
+                connection = connections[options.get("database", DEFAULT_DB_ALIAS)]
+                output = "%s\n%s\n%s" % (
                     self.style.SQL_KEYWORD(connection.ops.start_transaction_sql()),
                     output,
                     self.style.SQL_KEYWORD(connection.ops.end_transaction_sql()),
@@ -376,8 +399,14 @@ class BaseCommand:
     def _run_checks(self, **kwargs):
         return checks.run_checks(**kwargs)
 
-    def check(self, app_configs=None, tags=None, display_num_errors=False,
-              include_deployment_checks=False, fail_level=checks.ERROR):
+    def check(
+        self,
+        app_configs=None,
+        tags=None,
+        display_num_errors=False,
+        include_deployment_checks=False,
+        fail_level=checks.ERROR,
+    ):
         """
         Use the system check framework to validate entire Django project.
         Raise CommandError for any serious message (error or critical errors).
@@ -394,17 +423,35 @@ class BaseCommand:
         visible_issue_count = 0  # excludes silenced warnings
 
         if all_issues:
-            debugs = [e for e in all_issues if e.level < checks.INFO and not e.is_silenced()]
-            infos = [e for e in all_issues if checks.INFO <= e.level < checks.WARNING and not e.is_silenced()]
-            warnings = [e for e in all_issues if checks.WARNING <= e.level < checks.ERROR and not e.is_silenced()]
-            errors = [e for e in all_issues if checks.ERROR <= e.level < checks.CRITICAL and not e.is_silenced()]
-            criticals = [e for e in all_issues if checks.CRITICAL <= e.level and not e.is_silenced()]
+            debugs = [
+                e for e in all_issues if e.level < checks.INFO and not e.is_silenced()
+            ]
+            infos = [
+                e
+                for e in all_issues
+                if checks.INFO <= e.level < checks.WARNING and not e.is_silenced()
+            ]
+            warnings = [
+                e
+                for e in all_issues
+                if checks.WARNING <= e.level < checks.ERROR and not e.is_silenced()
+            ]
+            errors = [
+                e
+                for e in all_issues
+                if checks.ERROR <= e.level < checks.CRITICAL and not e.is_silenced()
+            ]
+            criticals = [
+                e
+                for e in all_issues
+                if checks.CRITICAL <= e.level and not e.is_silenced()
+            ]
             sorted_issues = [
-                (criticals, 'CRITICALS'),
-                (errors, 'ERRORS'),
-                (warnings, 'WARNINGS'),
-                (infos, 'INFOS'),
-                (debugs, 'DEBUGS'),
+                (criticals, "CRITICALS"),
+                (errors, "ERRORS"),
+                (warnings, "WARNINGS"),
+                (infos, "INFOS"),
+                (debugs, "DEBUGS"),
             ]
 
             for issues, group_name in sorted_issues:
@@ -414,20 +461,23 @@ class BaseCommand:
                         self.style.ERROR(str(e))
                         if e.is_serious()
                         else self.style.WARNING(str(e))
-                        for e in issues)
+                        for e in issues
+                    )
                     formatted = "\n".join(sorted(formatted))
-                    body += '\n%s:\n%s\n' % (group_name, formatted)
+                    body += "\n%s:\n%s\n" % (group_name, formatted)
 
         if visible_issue_count:
             header = "System check identified some issues:\n"
 
         if display_num_errors:
             if visible_issue_count:
-                footer += '\n'
+                footer += "\n"
             footer += "System check identified %s (%s silenced)." % (
-                "no issues" if visible_issue_count == 0 else
-                "1 issue" if visible_issue_count == 1 else
-                "%s issues" % visible_issue_count,
+                "no issues"
+                if visible_issue_count == 0
+                else "1 issue"
+                if visible_issue_count == 1
+                else "%s issues" % visible_issue_count,
                 len(all_issues) - visible_issue_count,
             )
 
@@ -449,6 +499,7 @@ class BaseCommand:
         migrations in the database.
         """
         from django.db.migrations.executor import MigrationExecutor
+
         try:
             executor = MigrationExecutor(connections[DEFAULT_DB_ALIAS])
         except ImproperlyConfigured:
@@ -457,25 +508,32 @@ class BaseCommand:
 
         plan = executor.migration_plan(executor.loader.graph.leaf_nodes())
         if plan:
-            apps_waiting_migration = sorted({migration.app_label for migration, backwards in plan})
+            apps_waiting_migration = sorted(
+                {migration.app_label for migration, backwards in plan}
+            )
             self.stdout.write(
                 self.style.NOTICE(
                     "\nYou have %(unpplied_migration_count)s unapplied migration(s). "
                     "Your project may not work properly until you apply the "
-                    "migrations for app(s): %(apps_waiting_migration)s." % {
+                    "migrations for app(s): %(apps_waiting_migration)s."
+                    % {
                         "unpplied_migration_count": len(plan),
                         "apps_waiting_migration": ", ".join(apps_waiting_migration),
                     }
                 )
             )
-            self.stdout.write(self.style.NOTICE("Run 'python manage.py migrate' to apply them.\n"))
+            self.stdout.write(
+                self.style.NOTICE("Run 'python manage.py migrate' to apply them.\n")
+            )
 
     def handle(self, *args, **options):
         """
         The actual logic of the command. Subclasses must implement
         this method.
         """
-        raise NotImplementedError('subclasses of BaseCommand must provide a handle() method')
+        raise NotImplementedError(
+            "subclasses of BaseCommand must provide a handle() method"
+        )
 
 
 class AppCommand(BaseCommand):
@@ -486,23 +544,32 @@ class AppCommand(BaseCommand):
     Rather than implementing ``handle()``, subclasses must implement
     ``handle_app_config()``, which will be called once for each application.
     """
+
     missing_args_message = "Enter at least one application label."
 
     def add_arguments(self, parser):
-        parser.add_argument('args', metavar='app_label', nargs='+', help='One or more application label.')
+        parser.add_argument(
+            "args",
+            metavar="app_label",
+            nargs="+",
+            help="One or more application label.",
+        )
 
     def handle(self, *app_labels, **options):
         from django.apps import apps
+
         try:
             app_configs = [apps.get_app_config(app_label) for app_label in app_labels]
         except (LookupError, ImportError) as e:
-            raise CommandError("%s. Are you sure your INSTALLED_APPS setting is correct?" % e)
+            raise CommandError(
+                "%s. Are you sure your INSTALLED_APPS setting is correct?" % e
+            )
         output = []
         for app_config in app_configs:
             app_output = self.handle_app_config(app_config, **options)
             if app_output:
                 output.append(app_output)
-        return '\n'.join(output)
+        return "\n".join(output)
 
     def handle_app_config(self, app_config, **options):
         """
@@ -510,8 +577,8 @@ class AppCommand(BaseCommand):
         corresponding to an application label given on the command line.
         """
         raise NotImplementedError(
-            "Subclasses of AppCommand must provide"
-            "a handle_app_config() method.")
+            "Subclasses of AppCommand must provide" "a handle_app_config() method."
+        )
 
 
 class LabelCommand(BaseCommand):
@@ -526,11 +593,12 @@ class LabelCommand(BaseCommand):
     If the arguments should be names of installed applications, use
     ``AppCommand`` instead.
     """
-    label = 'label'
+
+    label = "label"
     missing_args_message = "Enter at least one %s." % label
 
     def add_arguments(self, parser):
-        parser.add_argument('args', metavar=self.label, nargs='+')
+        parser.add_argument("args", metavar=self.label, nargs="+")
 
     def handle(self, *labels, **options):
         output = []
@@ -538,11 +606,13 @@ class LabelCommand(BaseCommand):
             label_output = self.handle_label(label, **options)
             if label_output:
                 output.append(label_output)
-        return '\n'.join(output)
+        return "\n".join(output)
 
     def handle_label(self, label, **options):
         """
         Perform the command's actions for ``label``, which will be the
         string as given on the command line.
         """
-        raise NotImplementedError('subclasses of LabelCommand must provide a handle_label() method')
+        raise NotImplementedError(
+            "subclasses of LabelCommand must provide a handle_label() method"
+        )

@@ -10,13 +10,13 @@ class Product(models.Model):
     class Meta:
         constraints = [
             models.CheckConstraint(
-                check=models.Q(price__gt=models.F('discounted_price')),
-                name='price_gt_discounted_price',
+                check=models.Q(price__gt=models.F("discounted_price")),
+                name="price_gt_discounted_price",
             ),
-            models.UniqueConstraint(fields=['name', 'color'], name='name_color_uniq'),
+            models.UniqueConstraint(fields=["name", "color"], name="name_color_uniq"),
             models.UniqueConstraint(
-                fields=['name'],
-                name='name_without_color_uniq',
+                fields=["name"],
+                name="name_without_color_uniq",
                 condition=models.Q(color__isnull=True),
             ),
         ]

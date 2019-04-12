@@ -18,18 +18,27 @@ Example Usage::
 """
 import os
 
-__all__ = ('LOCK_EX', 'LOCK_SH', 'LOCK_NB', 'lock', 'unlock')
+__all__ = ("LOCK_EX", "LOCK_SH", "LOCK_NB", "lock", "unlock")
 
 
 def _fd(f):
     """Get a filedescriptor from something which could be a file or an fd."""
-    return f.fileno() if hasattr(f, 'fileno') else f
+    return f.fileno() if hasattr(f, "fileno") else f
 
 
-if os.name == 'nt':
+if os.name == "nt":
     import msvcrt
-    from ctypes import (sizeof, c_ulong, c_void_p, c_int64,
-                        Structure, Union, POINTER, windll, byref)
+    from ctypes import (
+        sizeof,
+        c_ulong,
+        c_void_p,
+        c_int64,
+        Structure,
+        Union,
+        POINTER,
+        windll,
+        byref,
+    )
     from ctypes.wintypes import BOOL, DWORD, HANDLE
 
     LOCK_SH = 0  # the default
@@ -46,23 +55,20 @@ if os.name == 'nt':
 
     # --- Union inside Structure by stackoverflow:3480240 ---
     class _OFFSET(Structure):
-        _fields_ = [
-            ('Offset', DWORD),
-            ('OffsetHigh', DWORD)]
+        _fields_ = [("Offset", DWORD), ("OffsetHigh", DWORD)]
 
     class _OFFSET_UNION(Union):
-        _anonymous_ = ['_offset']
-        _fields_ = [
-            ('_offset', _OFFSET),
-            ('Pointer', PVOID)]
+        _anonymous_ = ["_offset"]
+        _fields_ = [("_offset", _OFFSET), ("Pointer", PVOID)]
 
     class OVERLAPPED(Structure):
-        _anonymous_ = ['_offset_union']
+        _anonymous_ = ["_offset_union"]
         _fields_ = [
-            ('Internal', ULONG_PTR),
-            ('InternalHigh', ULONG_PTR),
-            ('_offset_union', _OFFSET_UNION),
-            ('hEvent', HANDLE)]
+            ("Internal", ULONG_PTR),
+            ("InternalHigh", ULONG_PTR),
+            ("_offset_union", _OFFSET_UNION),
+            ("hEvent", HANDLE),
+        ]
 
     LPOVERLAPPED = POINTER(OVERLAPPED)
 
@@ -85,9 +91,12 @@ if os.name == 'nt':
         overlapped = OVERLAPPED()
         ret = UnlockFileEx(hfile, 0, 0, 0xFFFF0000, byref(overlapped))
         return bool(ret)
+
+
 else:
     try:
         import fcntl
+
         LOCK_SH = fcntl.LOCK_SH  # shared lock
         LOCK_NB = fcntl.LOCK_NB  # non-blocking
         LOCK_EX = fcntl.LOCK_EX
@@ -103,7 +112,9 @@ else:
         def unlock(f):
             # File is unlocked
             return True
+
     else:
+
         def lock(f, flags):
             ret = fcntl.flock(_fd(f), flags)
             return ret == 0

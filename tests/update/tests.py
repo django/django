@@ -62,7 +62,6 @@ class SimpleTest(TestCase):
 
 
 class AdvancedTests(TestCase):
-
     @classmethod
     def setUpTestData(cls):
         cls.d0 = DataPoint.objects.create(name="d0", value="apple")
@@ -85,9 +84,9 @@ class AdvancedTests(TestCase):
         """
         We can update multiple objects at once.
         """
-        resp = DataPoint.objects.filter(value='banana').update(value='pineapple')
+        resp = DataPoint.objects.filter(value="banana").update(value="pineapple")
         self.assertEqual(resp, 2)
-        self.assertEqual(DataPoint.objects.get(name="d2").value, 'pineapple')
+        self.assertEqual(DataPoint.objects.get(name="d2").value, "pineapple")
 
     def test_update_fk(self):
         """
@@ -104,36 +103,37 @@ class AdvancedTests(TestCase):
         Multiple fields can be updated at once
         """
         resp = DataPoint.objects.filter(value="apple").update(
-            value="fruit", another_value="peach")
+            value="fruit", another_value="peach"
+        )
         self.assertEqual(resp, 1)
         d = DataPoint.objects.get(name="d0")
-        self.assertEqual(d.value, 'fruit')
-        self.assertEqual(d.another_value, 'peach')
+        self.assertEqual(d.value, "fruit")
+        self.assertEqual(d.another_value, "peach")
 
     def test_update_all(self):
         """
         In the rare case you want to update every instance of a model, update()
         is also a manager method.
         """
-        self.assertEqual(DataPoint.objects.update(value='thing'), 3)
-        resp = DataPoint.objects.values('value').distinct()
-        self.assertEqual(list(resp), [{'value': 'thing'}])
+        self.assertEqual(DataPoint.objects.update(value="thing"), 3)
+        resp = DataPoint.objects.values("value").distinct()
+        self.assertEqual(list(resp), [{"value": "thing"}])
 
     def test_update_slice_fail(self):
         """
         We do not support update on already sliced query sets.
         """
         method = DataPoint.objects.all()[:2].update
-        msg = 'Cannot update a query once a slice has been taken.'
+        msg = "Cannot update a query once a slice has been taken."
         with self.assertRaisesMessage(AssertionError, msg):
-            method(another_value='another thing')
+            method(another_value="another thing")
 
     def test_update_respects_to_field(self):
         """
         Update of an FK field which specifies a to_field works.
         """
-        a_foo = Foo.objects.create(target='aaa')
-        b_foo = Foo.objects.create(target='bbb')
+        a_foo = Foo.objects.create(target="aaa")
+        b_foo = Foo.objects.create(target="bbb")
         bar = Bar.objects.create(foo=a_foo)
         self.assertEqual(bar.foo_id, a_foo.target)
         bar_qs = Bar.objects.filter(pk=bar.pk)
@@ -143,55 +143,55 @@ class AdvancedTests(TestCase):
 
     def test_update_m2m_field(self):
         msg = (
-            'Cannot update model field '
-            '<django.db.models.fields.related.ManyToManyField: m2m_foo> '
-            '(only non-relations and foreign keys permitted).'
+            "Cannot update model field "
+            "<django.db.models.fields.related.ManyToManyField: m2m_foo> "
+            "(only non-relations and foreign keys permitted)."
         )
         with self.assertRaisesMessage(FieldError, msg):
-            Bar.objects.update(m2m_foo='whatever')
+            Bar.objects.update(m2m_foo="whatever")
 
     def test_update_annotated_queryset(self):
         """
         Update of a queryset that's been annotated.
         """
         # Trivial annotated update
-        qs = DataPoint.objects.annotate(alias=F('value'))
-        self.assertEqual(qs.update(another_value='foo'), 3)
+        qs = DataPoint.objects.annotate(alias=F("value"))
+        self.assertEqual(qs.update(another_value="foo"), 3)
         # Update where annotation is used for filtering
-        qs = DataPoint.objects.annotate(alias=F('value')).filter(alias='apple')
-        self.assertEqual(qs.update(another_value='foo'), 1)
+        qs = DataPoint.objects.annotate(alias=F("value")).filter(alias="apple")
+        self.assertEqual(qs.update(another_value="foo"), 1)
         # Update where annotation is used in update parameters
-        qs = DataPoint.objects.annotate(alias=F('value'))
-        self.assertEqual(qs.update(another_value=F('alias')), 3)
+        qs = DataPoint.objects.annotate(alias=F("value"))
+        self.assertEqual(qs.update(another_value=F("alias")), 3)
         # Update where aggregation annotation is used in update parameters
-        qs = DataPoint.objects.annotate(max=Max('value'))
+        qs = DataPoint.objects.annotate(max=Max("value"))
         msg = (
-            'Aggregate functions are not allowed in this query '
-            '(another_value=Max(Col(update_datapoint, update.DataPoint.value))).'
+            "Aggregate functions are not allowed in this query "
+            "(another_value=Max(Col(update_datapoint, update.DataPoint.value)))."
         )
         with self.assertRaisesMessage(FieldError, msg):
-            qs.update(another_value=F('max'))
+            qs.update(another_value=F("max"))
 
     def test_update_annotated_multi_table_queryset(self):
         """
         Update of a queryset that's been annotated and involves multiple tables.
         """
         # Trivial annotated update
-        qs = DataPoint.objects.annotate(related_count=Count('relatedpoint'))
-        self.assertEqual(qs.update(value='Foo'), 3)
+        qs = DataPoint.objects.annotate(related_count=Count("relatedpoint"))
+        self.assertEqual(qs.update(value="Foo"), 3)
         # Update where annotation is used for filtering
-        qs = DataPoint.objects.annotate(related_count=Count('relatedpoint'))
-        self.assertEqual(qs.filter(related_count=1).update(value='Foo'), 1)
+        qs = DataPoint.objects.annotate(related_count=Count("relatedpoint"))
+        self.assertEqual(qs.filter(related_count=1).update(value="Foo"), 1)
         # Update where annotation is used in update parameters
         # #26539 - This isn't forbidden but also doesn't generate proper SQL
         # qs = RelatedPoint.objects.annotate(data_name=F('data__name'))
         # updated = qs.update(name=F('data_name'))
         # self.assertEqual(updated, 1)
         # Update where aggregation annotation is used in update parameters
-        qs = RelatedPoint.objects.annotate(max=Max('data__value'))
+        qs = RelatedPoint.objects.annotate(max=Max("data__value"))
         msg = (
-            'Aggregate functions are not allowed in this query '
-            '(name=Max(Col(update_datapoint, update.DataPoint.value))).'
+            "Aggregate functions are not allowed in this query "
+            "(name=Max(Col(update_datapoint, update.DataPoint.value)))."
         )
         with self.assertRaisesMessage(FieldError, msg):
-            qs.update(name=F('max'))
+            qs.update(name=F("max"))

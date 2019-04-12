@@ -6,21 +6,21 @@ from django.utils.timezone import is_aware, utc
 from django.utils.translation import gettext, ngettext_lazy
 
 TIME_STRINGS = {
-    'year': ngettext_lazy('%d year', '%d years'),
-    'month': ngettext_lazy('%d month', '%d months'),
-    'week': ngettext_lazy('%d week', '%d weeks'),
-    'day': ngettext_lazy('%d day', '%d days'),
-    'hour': ngettext_lazy('%d hour', '%d hours'),
-    'minute': ngettext_lazy('%d minute', '%d minutes'),
+    "year": ngettext_lazy("%d year", "%d years"),
+    "month": ngettext_lazy("%d month", "%d months"),
+    "week": ngettext_lazy("%d week", "%d weeks"),
+    "day": ngettext_lazy("%d day", "%d days"),
+    "hour": ngettext_lazy("%d hour", "%d hours"),
+    "minute": ngettext_lazy("%d minute", "%d minutes"),
 }
 
 TIMESINCE_CHUNKS = (
-    (60 * 60 * 24 * 365, 'year'),
-    (60 * 60 * 24 * 30, 'month'),
-    (60 * 60 * 24 * 7, 'week'),
-    (60 * 60 * 24, 'day'),
-    (60 * 60, 'hour'),
-    (60, 'minute'),
+    (60 * 60 * 24 * 365, "year"),
+    (60 * 60 * 24 * 30, "month"),
+    (60 * 60 * 24 * 7, "week"),
+    (60 * 60 * 24, "day"),
+    (60 * 60, "hour"),
+    (60, "minute"),
 )
 
 
@@ -69,7 +69,7 @@ def timesince(d, now=None, reversed=False, time_strings=None):
     since = delta.days * 24 * 60 * 60 + delta.seconds
     if since <= 0:
         # d is in the future compared to now, stop processing.
-        return avoid_wrapping(gettext('0 minutes'))
+        return avoid_wrapping(gettext("0 minutes"))
     for i, (seconds, name) in enumerate(TIMESINCE_CHUNKS):
         count = since // seconds
         if count != 0:
@@ -80,7 +80,7 @@ def timesince(d, now=None, reversed=False, time_strings=None):
         seconds2, name2 = TIMESINCE_CHUNKS[i + 1]
         count2 = (since - (seconds * count)) // seconds2
         if count2 != 0:
-            result += gettext(', ') + avoid_wrapping(time_strings[name2] % count2)
+            result += gettext(", ") + avoid_wrapping(time_strings[name2] % count2)
     return result
 
 

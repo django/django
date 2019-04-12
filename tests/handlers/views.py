@@ -33,7 +33,7 @@ def not_in_transaction(request):
 
 
 def suspicious(request):
-    raise SuspiciousOperation('dubious')
+    raise SuspiciousOperation("dubious")
 
 
 @csrf_exempt

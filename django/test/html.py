@@ -3,11 +3,11 @@
 import re
 from html.parser import HTMLParser
 
-WHITESPACE = re.compile(r'\s+')
+WHITESPACE = re.compile(r"\s+")
 
 
 def normalize_whitespace(string):
-    return WHITESPACE.sub(' ', string)
+    return WHITESPACE.sub(" ", string)
 
 
 class Element:
@@ -48,11 +48,11 @@ class Element:
         for i, child in enumerate(self.children):
             if isinstance(child, str):
                 self.children[i] = child.strip()
-            elif hasattr(child, 'finalize'):
+            elif hasattr(child, "finalize"):
                 child.finalize()
 
     def __eq__(self, element):
-        if not hasattr(element, 'name') or self.name != element.name:
+        if not hasattr(element, "name") or self.name != element.name:
             return False
         if len(self.attributes) != len(element.attributes):
             return False
@@ -107,18 +107,18 @@ class Element:
         return self.children[key]
 
     def __str__(self):
-        output = '<%s' % self.name
+        output = "<%s" % self.name
         for key, value in self.attributes:
             if value:
                 output += ' %s="%s"' % (key, value)
             else:
-                output += ' %s' % key
+                output += " %s" % key
         if self.children:
-            output += '>\n'
-            output += ''.join(str(c) for c in self.children)
-            output += '\n</%s>' % self.name
+            output += ">\n"
+            output += "".join(str(c) for c in self.children)
+            output += "\n</%s>" % self.name
         else:
-            output += '>'
+            output += ">"
         return output
 
     def __repr__(self):
@@ -130,7 +130,7 @@ class RootElement(Element):
         super().__init__(None, ())
 
     def __str__(self):
-        return ''.join(str(c) for c in self.children)
+        return "".join(str(c) for c in self.children)
 
 
 class HTMLParseError(Exception):
@@ -139,8 +139,16 @@ class HTMLParseError(Exception):
 
 class Parser(HTMLParser):
     SELF_CLOSING_TAGS = (
-        'br', 'hr', 'input', 'img', 'meta', 'spacer', 'link', 'frame', 'base',
-        'col',
+        "br",
+        "hr",
+        "input",
+        "img",
+        "meta",
+        "spacer",
+        "link",
+        "frame",
+        "base",
+        "col",
     )
 
     def __init__(self):
@@ -157,9 +165,9 @@ class Parser(HTMLParser):
             position = self.element_positions[element]
         if position is None:
             position = self.getpos()
-        if hasattr(position, 'lineno'):
+        if hasattr(position, "lineno"):
             position = position.lineno, position.offset
-        return 'Line %d, Column %d' % position
+        return "Line %d, Column %d" % position
 
     @property
     def current(self):
@@ -190,23 +198,23 @@ class Parser(HTMLParser):
 
     def handle_endtag(self, tag):
         if not self.open_tags:
-            self.error("Unexpected end tag `%s` (%s)" % (
-                tag, self.format_position()))
+            self.error("Unexpected end tag `%s` (%s)" % (tag, self.format_position()))
         element = self.open_tags.pop()
         while element.name != tag:
             if not self.open_tags:
-                self.error("Unexpected end tag `%s` (%s)" % (
-                    tag, self.format_position()))
+                self.error(
+                    "Unexpected end tag `%s` (%s)" % (tag, self.format_position())
+                )
             element = self.open_tags.pop()
 
     def handle_data(self, data):
         self.current.append(data)
 
     def handle_charref(self, name):
-        self.current.append('&%s;' % name)
+        self.current.append("&%s;" % name)
 
     def handle_entityref(self, name):
-        self.current.append('&%s;' % name)
+        self.current.append("&%s;" % name)
 
 
 def parse_html(html):

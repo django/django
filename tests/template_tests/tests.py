@@ -9,12 +9,11 @@ from django.utils import translation
 
 
 class TemplateTests(SimpleTestCase):
-
     def test_string_origin(self):
-        template = Engine().from_string('string template')
+        template = Engine().from_string("string template")
         self.assertEqual(template.origin.name, UNKNOWN_SOURCE)
         self.assertIsNone(template.origin.loader_name)
-        self.assertEqual(template.source, 'string template')
+        self.assertEqual(template.source, "string template")
 
     @override_settings(SETTINGS_MODULE=None)
     def test_url_reverse_no_settings_module(self):
@@ -22,7 +21,7 @@ class TemplateTests(SimpleTestCase):
         #9005 -- url tag shouldn't require settings.SETTINGS_MODULE to
         be set.
         """
-        t = Engine(debug=True).from_string('{% url will_not_match %}')
+        t = Engine(debug=True).from_string("{% url will_not_match %}")
         c = Context()
         with self.assertRaises(NoReverseMatch):
             t.render(c)
@@ -32,7 +31,7 @@ class TemplateTests(SimpleTestCase):
         #19827 -- url tag should keep original strack trace when reraising
         exception.
         """
-        t = Engine().from_string('{% url will_not_match %}')
+        t = Engine().from_string("{% url will_not_match %}")
         c = Context()
         try:
             t.render(c)
@@ -42,7 +41,9 @@ class TemplateTests(SimpleTestCase):
             while tb.tb_next is not None:
                 tb = tb.tb_next
                 depth += 1
-            self.assertGreater(depth, 5, "The traceback context was lost when reraising the traceback.")
+            self.assertGreater(
+                depth, 5, "The traceback context was lost when reraising the traceback."
+            )
 
     def test_no_wrapped_exception(self):
         """
@@ -57,8 +58,8 @@ class TemplateTests(SimpleTestCase):
             t.render(c)
 
         debug = e.exception.template_debug
-        self.assertEqual(debug['start'], 0)
-        self.assertEqual(debug['end'], 14)
+        self.assertEqual(debug["start"], 0)
+        self.assertEqual(debug["end"], 14)
 
     def test_invalid_block_suggestion(self):
         """
@@ -70,7 +71,7 @@ class TemplateTests(SimpleTestCase):
             "Invalid block tag on line 1: 'endblock', expected 'elif', 'else' "
             "or 'endif'. Did you forget to register or load this tag?"
         )
-        with self.settings(USE_I18N=True), translation.override('de'):
+        with self.settings(USE_I18N=True), translation.override("de"):
             with self.assertRaisesMessage(TemplateSyntaxError, msg):
                 engine.from_string("{% if 1 %}lala{% endblock %}{% endif %}")
 
@@ -95,8 +96,8 @@ class TemplateTests(SimpleTestCase):
             engine.from_string("{% if 1 %}{{ foo@bar }}{% endif %}")
 
         debug = e.exception.template_debug
-        self.assertEqual((debug['start'], debug['end']), (10, 23))
-        self.assertEqual((debug['during']), '{{ foo@bar }}')
+        self.assertEqual((debug["start"], debug["end"]), (10, 23))
+        self.assertEqual((debug["during"]), "{{ foo@bar }}")
 
     def test_compile_tag_error(self):
         """
@@ -104,42 +105,41 @@ class TemplateTests(SimpleTestCase):
         information.
         """
         engine = Engine(
-            debug=True,
-            libraries={'bad_tag': 'template_tests.templatetags.bad_tag'},
+            debug=True, libraries={"bad_tag": "template_tests.templatetags.bad_tag"}
         )
         with self.assertRaises(RuntimeError) as e:
             engine.from_string("{% load bad_tag %}{% badtag %}")
-        self.assertEqual(e.exception.template_debug['during'], '{% badtag %}')
+        self.assertEqual(e.exception.template_debug["during"], "{% badtag %}")
 
     def test_compile_tag_error_27584(self):
         engine = Engine(
             app_dirs=True,
             debug=True,
-            libraries={'tag_27584': 'template_tests.templatetags.tag_27584'},
+            libraries={"tag_27584": "template_tests.templatetags.tag_27584"},
         )
-        t = engine.get_template('27584_parent.html')
+        t = engine.get_template("27584_parent.html")
         with self.assertRaises(TemplateSyntaxError) as e:
             t.render(Context())
-        self.assertEqual(e.exception.template_debug['during'], '{% badtag %}')
+        self.assertEqual(e.exception.template_debug["during"], "{% badtag %}")
 
     def test_compile_tag_error_27956(self):
         """Errors in a child of {% extends %} are displayed correctly."""
         engine = Engine(
             app_dirs=True,
             debug=True,
-            libraries={'tag_27584': 'template_tests.templatetags.tag_27584'},
+            libraries={"tag_27584": "template_tests.templatetags.tag_27584"},
         )
-        t = engine.get_template('27956_child.html')
+        t = engine.get_template("27956_child.html")
         with self.assertRaises(TemplateSyntaxError) as e:
             t.render(Context())
-        self.assertEqual(e.exception.template_debug['during'], '{% badtag %}')
+        self.assertEqual(e.exception.template_debug["during"], "{% badtag %}")
 
     def test_super_errors(self):
         """
         #18169 -- NoReverseMatch should not be silence in block.super.
         """
         engine = Engine(app_dirs=True)
-        t = engine.get_template('included_content.html')
+        t = engine.get_template("included_content.html")
         with self.assertRaises(NoReverseMatch):
             t.render(Context())
 
@@ -149,7 +149,7 @@ class TemplateTests(SimpleTestCase):
         """
         group = Group(name="清風")
         c1 = Context({"objs": [group]})
-        t1 = Engine().from_string('{% debug %}')
+        t1 = Engine().from_string("{% debug %}")
         self.assertIn("清風", t1.render(c1))
 
     def test_extends_generic_template(self):
@@ -158,16 +158,17 @@ class TemplateTests(SimpleTestCase):
         objects.
         """
         engine = Engine()
-        parent = engine.from_string('{% block content %}parent{% endblock %}')
+        parent = engine.from_string("{% block content %}parent{% endblock %}")
         child = engine.from_string(
-            '{% extends parent %}{% block content %}child{% endblock %}')
-        self.assertEqual(child.render(Context({'parent': parent})), 'child')
+            "{% extends parent %}{% block content %}child{% endblock %}"
+        )
+        self.assertEqual(child.render(Context({"parent": parent})), "child")
 
     def test_node_origin(self):
         """
         #25848 -- Set origin on Node so debugging tools can determine which
         template the node came from even if extending or including templates.
         """
-        template = Engine().from_string('content')
+        template = Engine().from_string("content")
         for node in template.nodelist:
             self.assertEqual(node.origin, template.origin)

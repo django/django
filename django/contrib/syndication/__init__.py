@@ -1,1 +1,1 @@
-default_app_config = 'django.contrib.syndication.apps.SyndicationConfig'
+default_app_config = "django.contrib.syndication.apps.SyndicationConfig"

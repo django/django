@@ -21,7 +21,7 @@ class DistanceTest(unittest.TestCase):
             self.assertEqual(d.m, 100)
 
         d = D(nm=100)
-        self.assertEqual(d.m, 185200)
+        self.assertEqual(d.m, 185_200)
 
         y1, y2, y3 = D(yd=100), D(yard=100), D(Yard=100)
         for d in (y1, y2, y3):
@@ -46,7 +46,7 @@ class DistanceTest(unittest.TestCase):
     def testAccessInvalid(self):
         "Testing access in invalid units"
         d = D(m=100)
-        self.assertFalse(hasattr(d, 'banana'))
+        self.assertFalse(hasattr(d, "banana"))
 
     def testAddition(self):
         "Test addition & subtraction"
@@ -109,13 +109,13 @@ class DistanceTest(unittest.TestCase):
         d2 = D(km=1)
 
         d3 = d1 + d2
-        self.assertEqual(d3._default_unit, 'm')
+        self.assertEqual(d3._default_unit, "m")
         d4 = d2 + d1
-        self.assertEqual(d4._default_unit, 'km')
+        self.assertEqual(d4._default_unit, "km")
         d5 = d1 * 2
-        self.assertEqual(d5._default_unit, 'm')
+        self.assertEqual(d5._default_unit, "m")
         d6 = d1 / 2
-        self.assertEqual(d6._default_unit, 'm')
+        self.assertEqual(d6._default_unit, "m")
 
     def testComparisons(self):
         "Testing comparisons"
@@ -133,15 +133,21 @@ class DistanceTest(unittest.TestCase):
         d1 = D(m=100)
         d2 = D(km=3.5)
 
-        self.assertEqual(str(d1), '100.0 m')
-        self.assertEqual(str(d2), '3.5 km')
-        self.assertEqual(repr(d1), 'Distance(m=100.0)')
-        self.assertEqual(repr(d2), 'Distance(km=3.5)')
+        self.assertEqual(str(d1), "100.0 m")
+        self.assertEqual(str(d2), "3.5 km")
+        self.assertEqual(repr(d1), "Distance(m=100.0)")
+        self.assertEqual(repr(d2), "Distance(km=3.5)")
 
     def testUnitAttName(self):
         "Testing the `unit_attname` class method"
-        unit_tuple = [('Yard', 'yd'), ('Nautical Mile', 'nm'), ('German legal metre', 'german_m'),
-                      ('Indian yard', 'indian_yd'), ('Chain (Sears)', 'chain_sears'), ('Chain', 'chain')]
+        unit_tuple = [
+            ("Yard", "yd"),
+            ("Nautical Mile", "nm"),
+            ("German legal metre", "german_m"),
+            ("Indian yard", "indian_yd"),
+            ("Chain (Sears)", "chain_sears"),
+            ("Chain", "chain"),
+        ]
         for nm, att in unit_tuple:
             with self.subTest(nm=nm):
                 self.assertEqual(att, D.unit_attname(nm))
@@ -159,7 +165,7 @@ class AreaTest(unittest.TestCase):
         self.assertEqual(a.sq_m, 100)
 
         a = A(sq_mi=100)
-        self.assertEqual(a.sq_m, 258998811.0336)
+        self.assertEqual(a.sq_m, 258_998_811.0336)
 
     def testInitInvaliA(self):
         "Testing initialization from invalid units"
@@ -175,7 +181,7 @@ class AreaTest(unittest.TestCase):
     def testAccessInvaliA(self):
         "Testing access in invalid units"
         a = A(sq_m=100)
-        self.assertFalse(hasattr(a, 'banana'))
+        self.assertFalse(hasattr(a, "banana"))
 
     def testAddition(self):
         "Test addition & subtraction"
@@ -238,13 +244,13 @@ class AreaTest(unittest.TestCase):
         a2 = A(sq_km=1)
 
         a3 = a1 + a2
-        self.assertEqual(a3._default_unit, 'sq_m')
+        self.assertEqual(a3._default_unit, "sq_m")
         a4 = a2 + a1
-        self.assertEqual(a4._default_unit, 'sq_km')
+        self.assertEqual(a4._default_unit, "sq_km")
         a5 = a1 * 2
-        self.assertEqual(a5._default_unit, 'sq_m')
+        self.assertEqual(a5._default_unit, "sq_m")
         a6 = a1 / 2
-        self.assertEqual(a6._default_unit, 'sq_m')
+        self.assertEqual(a6._default_unit, "sq_m")
 
     def testComparisons(self):
         "Testing comparisons"
@@ -262,10 +268,10 @@ class AreaTest(unittest.TestCase):
         a1 = A(sq_m=100)
         a2 = A(sq_km=3.5)
 
-        self.assertEqual(str(a1), '100.0 sq_m')
-        self.assertEqual(str(a2), '3.5 sq_km')
-        self.assertEqual(repr(a1), 'Area(sq_m=100.0)')
-        self.assertEqual(repr(a2), 'Area(sq_km=3.5)')
+        self.assertEqual(str(a1), "100.0 sq_m")
+        self.assertEqual(str(a2), "3.5 sq_km")
+        self.assertEqual(repr(a1), "Area(sq_m=100.0)")
+        self.assertEqual(repr(a2), "Area(sq_km=3.5)")
 
 
 def suite():

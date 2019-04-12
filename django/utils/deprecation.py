@@ -14,7 +14,9 @@ RemovedInNextVersionWarning = RemovedInDjango31Warning
 
 
 class warn_about_renamed_method:
-    def __init__(self, class_name, old_method_name, new_method_name, deprecation_warning):
+    def __init__(
+        self, class_name, old_method_name, new_method_name, deprecation_warning
+    ):
         self.class_name = class_name
         self.old_method_name = old_method_name
         self.new_method_name = new_method_name
@@ -23,10 +25,13 @@ class warn_about_renamed_method:
     def __call__(self, f):
         def wrapped(*args, **kwargs):
             warnings.warn(
-                "`%s.%s` is deprecated, use `%s` instead." %
-                (self.class_name, self.old_method_name, self.new_method_name),
-                self.deprecation_warning, 2)
+                "`%s.%s` is deprecated, use `%s` instead."
+                % (self.class_name, self.old_method_name, self.new_method_name),
+                self.deprecation_warning,
+                2,
+            )
             return f(*args, **kwargs)
+
         return wrapped
 
 
@@ -60,9 +65,11 @@ class RenameMethodsBase(type):
                 # Define the new method if missing and complain about it
                 if not new_method and old_method:
                     warnings.warn(
-                        "`%s.%s` method should be renamed `%s`." %
-                        (class_name, old_method_name, new_method_name),
-                        deprecation_warning, 2)
+                        "`%s.%s` method should be renamed `%s`."
+                        % (class_name, old_method_name, new_method_name),
+                        deprecation_warning,
+                        2,
+                    )
                     setattr(base, new_method_name, old_method)
                     setattr(base, old_method_name, wrapper(old_method))
 
@@ -77,7 +84,8 @@ class DeprecationInstanceCheck(type):
     def __instancecheck__(self, instance):
         warnings.warn(
             "`%s` is deprecated, use `%s` instead." % (self.__name__, self.alternative),
-            self.deprecation_warning, 2
+            self.deprecation_warning,
+            2,
         )
         return super().__instancecheck__(instance)
 
@@ -89,9 +97,9 @@ class MiddlewareMixin:
 
     def __call__(self, request):
         response = None
-        if hasattr(self, 'process_request'):
+        if hasattr(self, "process_request"):
             response = self.process_request(request)
         response = response or self.get_response(request)
-        if hasattr(self, 'process_response'):
+        if hasattr(self, "process_response"):
             response = self.process_response(request, response)
         return response

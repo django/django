@@ -7,9 +7,18 @@ import warnings
 from binascii import Error as BinasciiError
 from email.utils import formatdate
 from urllib.parse import (
-    ParseResult, SplitResult, _coerce_args, _splitnetloc, _splitparams, quote,
-    quote_plus, scheme_chars, unquote, unquote_plus,
-    urlencode as original_urlencode, uses_params,
+    ParseResult,
+    SplitResult,
+    _coerce_args,
+    _splitnetloc,
+    _splitparams,
+    quote,
+    quote_plus,
+    scheme_chars,
+    unquote,
+    unquote_plus,
+    urlencode as original_urlencode,
+    uses_params,
 )
 
 from django.core.exceptions import TooManyFieldsSent
@@ -18,56 +27,61 @@ from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import keep_lazy_text
 
 # based on RFC 7232, Appendix C
-ETAG_MATCH = re.compile(r'''
+ETAG_MATCH = re.compile(
+    r"""
     \A(      # start of string and capture group
     (?:W/)?  # optional weak indicator
     "        # opening quote
     [^"]*    # any sequence of non-quote characters
     "        # end quote
     )\Z      # end of string and capture group
-''', re.X)
+""",
+    re.X,
+)
 
-MONTHS = 'jan feb mar apr may jun jul aug sep oct nov dec'.split()
-__D = r'(?P<day>\d{2})'
-__D2 = r'(?P<day>[ \d]\d)'
-__M = r'(?P<mon>\w{3})'
-__Y = r'(?P<year>\d{4})'
-__Y2 = r'(?P<year>\d{2})'
-__T = r'(?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})'
-RFC1123_DATE = re.compile(r'^\w{3}, %s %s %s %s GMT$' % (__D, __M, __Y, __T))
-RFC850_DATE = re.compile(r'^\w{6,9}, %s-%s-%s %s GMT$' % (__D, __M, __Y2, __T))
-ASCTIME_DATE = re.compile(r'^\w{3} %s %s %s %s$' % (__M, __D2, __T, __Y))
+MONTHS = "jan feb mar apr may jun jul aug sep oct nov dec".split()
+__D = r"(?P<day>\d{2})"
+__D2 = r"(?P<day>[ \d]\d)"
+__M = r"(?P<mon>\w{3})"
+__Y = r"(?P<year>\d{4})"
+__Y2 = r"(?P<year>\d{2})"
+__T = r"(?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})"
+RFC1123_DATE = re.compile(r"^\w{3}, %s %s %s %s GMT$" % (__D, __M, __Y, __T))
+RFC850_DATE = re.compile(r"^\w{6,9}, %s-%s-%s %s GMT$" % (__D, __M, __Y2, __T))
+ASCTIME_DATE = re.compile(r"^\w{3} %s %s %s %s$" % (__M, __D2, __T, __Y))
 
 RFC3986_GENDELIMS = ":/?#[]@"
 RFC3986_SUBDELIMS = "!$&'()*+,;="
 
-FIELDS_MATCH = re.compile('[&;]')
+FIELDS_MATCH = re.compile("[&;]")
 
 
 @keep_lazy_text
-def urlquote(url, safe='/'):
+def urlquote(url, safe="/"):
     """
     A legacy compatibility wrapper to Python's urllib.parse.quote() function.
     (was used for unicode handling on Python 2)
     """
     warnings.warn(
-        'django.utils.http.urlquote() is deprecated in favor of '
-        'urllib.parse.quote().',
-        RemovedInDjango40Warning, stacklevel=2,
+        "django.utils.http.urlquote() is deprecated in favor of "
+        "urllib.parse.quote().",
+        RemovedInDjango40Warning,
+        stacklevel=2,
     )
     return quote(url, safe)
 
 
 @keep_lazy_text
-def urlquote_plus(url, safe=''):
+def urlquote_plus(url, safe=""):
     """
     A legacy compatibility wrapper to Python's urllib.parse.quote_plus()
     function. (was used for unicode handling on Python 2)
     """
     warnings.warn(
-        'django.utils.http.urlquote_plus() is deprecated in favor of '
-        'urllib.parse.quote_plus(),',
-        RemovedInDjango40Warning, stacklevel=2,
+        "django.utils.http.urlquote_plus() is deprecated in favor of "
+        "urllib.parse.quote_plus(),",
+        RemovedInDjango40Warning,
+        stacklevel=2,
     )
     return quote_plus(url, safe)
 
@@ -79,9 +93,10 @@ def urlunquote(quoted_url):
     (was used for unicode handling on Python 2)
     """
     warnings.warn(
-        'django.utils.http.urlunquote() is deprecated in favor of '
-        'urllib.parse.unquote().',
-        RemovedInDjango40Warning, stacklevel=2,
+        "django.utils.http.urlunquote() is deprecated in favor of "
+        "urllib.parse.unquote().",
+        RemovedInDjango40Warning,
+        stacklevel=2,
     )
     return unquote(quoted_url)
 
@@ -93,9 +108,10 @@ def urlunquote_plus(quoted_url):
     function. (was used for unicode handling on Python 2)
     """
     warnings.warn(
-        'django.utils.http.urlunquote_plus() is deprecated in favor of '
-        'urllib.parse.unquote_plus().',
-        RemovedInDjango40Warning, stacklevel=2,
+        "django.utils.http.urlunquote_plus() is deprecated in favor of "
+        "urllib.parse.unquote_plus().",
+        RemovedInDjango40Warning,
+        stacklevel=2,
     )
     return unquote_plus(quoted_url)
 
@@ -107,14 +123,14 @@ def urlencode(query, doseq=False):
     """
     if isinstance(query, MultiValueDict):
         query = query.lists()
-    elif hasattr(query, 'items'):
+    elif hasattr(query, "items"):
         query = query.items()
     query_params = []
     for key, value in query:
         if value is None:
             raise TypeError(
-                'Cannot encode None in a query string. Did you mean to pass '
-                'an empty string or omit the value?'
+                "Cannot encode None in a query string. Did you mean to pass "
+                "an empty string or omit the value?"
             )
         elif isinstance(value, (str, bytes)):
             query_val = value
@@ -130,8 +146,8 @@ def urlencode(query, doseq=False):
                 for item in itr:
                     if item is None:
                         raise TypeError(
-                            'Cannot encode None in a query string. Did you '
-                            'mean to pass an empty string or omit the value?'
+                            "Cannot encode None in a query string. Did you "
+                            "mean to pass an empty string or omit the value?"
                         )
                     elif not isinstance(item, bytes):
                         item = str(item)
@@ -173,17 +189,17 @@ def parse_http_date(date):
     else:
         raise ValueError("%r is not in a valid HTTP date format" % date)
     try:
-        year = int(m.group('year'))
+        year = int(m.group("year"))
         if year < 100:
             if year < 70:
                 year += 2000
             else:
                 year += 1900
-        month = MONTHS.index(m.group('mon').lower()) + 1
-        day = int(m.group('day'))
-        hour = int(m.group('hour'))
-        min = int(m.group('min'))
-        sec = int(m.group('sec'))
+        month = MONTHS.index(m.group("mon").lower()) + 1
+        day = int(m.group("day"))
+        hour = int(m.group("hour"))
+        min = int(m.group("min"))
+        sec = int(m.group("sec"))
         result = datetime.datetime(year, month, day, hour, min, sec)
         return calendar.timegm(result.utctimetuple())
     except Exception as exc:
@@ -202,6 +218,7 @@ def parse_http_date_safe(date):
 
 # Base 36 functions: useful for generating compact URLs
 
+
 def base36_to_int(s):
     """
     Convert a base 36 string to an int. Raise ValueError if the input won't fit
@@ -217,12 +234,12 @@ def base36_to_int(s):
 
 def int_to_base36(i):
     """Convert an integer to a base36 string."""
-    char_set = '0123456789abcdefghijklmnopqrstuvwxyz'
+    char_set = "0123456789abcdefghijklmnopqrstuvwxyz"
     if i < 0:
         raise ValueError("Negative base36 conversion input.")
     if i < 36:
         return char_set[i]
-    b36 = ''
+    b36 = ""
     while i != 0:
         i, n = divmod(i, 36)
         b36 = char_set[n] + b36
@@ -234,7 +251,7 @@ def urlsafe_base64_encode(s):
     Encode a bytestring to a base64 string for use in URLs. Strip any trailing
     equal signs.
     """
-    return base64.urlsafe_b64encode(s).rstrip(b'\n=').decode('ascii')
+    return base64.urlsafe_b64encode(s).rstrip(b"\n=").decode("ascii")
 
 
 def urlsafe_base64_decode(s):
@@ -244,7 +261,7 @@ def urlsafe_base64_decode(s):
     """
     s = s.encode()
     try:
-        return base64.urlsafe_b64decode(s.ljust(len(s) + len(s) % 4, b'='))
+        return base64.urlsafe_b64decode(s.ljust(len(s) + len(s) % 4, b"="))
     except (LookupError, BinasciiError) as e:
         raise ValueError(e)
 
@@ -255,11 +272,11 @@ def parse_etags(etag_str):
     defined by RFC 7232. Return a list of quoted ETags, or ['*'] if all ETags
     should be matched.
     """
-    if etag_str.strip() == '*':
-        return ['*']
+    if etag_str.strip() == "*":
+        return ["*"]
     else:
         # Parse each ETag individually, and return any that are valid.
-        etag_matches = (ETAG_MATCH.match(etag.strip()) for etag in etag_str.split(','))
+        etag_matches = (ETAG_MATCH.match(etag.strip()) for etag in etag_str.split(","))
         return [match.group(1) for match in etag_matches if match]
 
 
@@ -288,8 +305,9 @@ def is_same_domain(host, pattern):
 
     pattern = pattern.lower()
     return (
-        pattern[0] == '.' and (host.endswith(pattern) or host == pattern[1:]) or
-        pattern == host
+        pattern[0] == "."
+        and (host.endswith(pattern) or host == pattern[1:])
+        or pattern == host
     )
 
 
@@ -313,12 +331,15 @@ def is_safe_url(url, allowed_hosts, require_https=False):
         allowed_hosts = {allowed_hosts}
     # Chrome treats \ completely as / in paths but it could be part of some
     # basic auth credentials so we need to check both URLs.
-    return (_is_safe_url(url, allowed_hosts, require_https=require_https) and
-            _is_safe_url(url.replace('\\', '/'), allowed_hosts, require_https=require_https))
+    return _is_safe_url(
+        url, allowed_hosts, require_https=require_https
+    ) and _is_safe_url(
+        url.replace("\\", "/"), allowed_hosts, require_https=require_https
+    )
 
 
 # Copied from urllib.parse.urlparse() but uses fixed urlsplit() function.
-def _urlparse(url, scheme='', allow_fragments=True):
+def _urlparse(url, scheme="", allow_fragments=True):
     """Parse a URL into 6 components:
     <scheme>://<netloc>/<path>;<params>?<query>#<fragment>
     Return a 6-tuple: (scheme, netloc, path, params, query, fragment).
@@ -327,41 +348,42 @@ def _urlparse(url, scheme='', allow_fragments=True):
     url, scheme, _coerce_result = _coerce_args(url, scheme)
     splitresult = _urlsplit(url, scheme, allow_fragments)
     scheme, netloc, url, query, fragment = splitresult
-    if scheme in uses_params and ';' in url:
+    if scheme in uses_params and ";" in url:
         url, params = _splitparams(url)
     else:
-        params = ''
+        params = ""
     result = ParseResult(scheme, netloc, url, params, query, fragment)
     return _coerce_result(result)
 
 
 # Copied from urllib.parse.urlsplit() with
 # https://github.com/python/cpython/pull/661 applied.
-def _urlsplit(url, scheme='', allow_fragments=True):
+def _urlsplit(url, scheme="", allow_fragments=True):
     """Parse a URL into 5 components:
     <scheme>://<netloc>/<path>?<query>#<fragment>
     Return a 5-tuple: (scheme, netloc, path, query, fragment).
     Note that we don't break the components up in smaller bits
     (e.g. netloc is a single string) and we don't expand % escapes."""
     url, scheme, _coerce_result = _coerce_args(url, scheme)
-    netloc = query = fragment = ''
-    i = url.find(':')
+    netloc = query = fragment = ""
+    i = url.find(":")
     if i > 0:
         for c in url[:i]:
             if c not in scheme_chars:
                 break
         else:
-            scheme, url = url[:i].lower(), url[i + 1:]
+            scheme, url = url[:i].lower(), url[i + 1 :]
 
-    if url[:2] == '//':
+    if url[:2] == "//":
         netloc, url = _splitnetloc(url, 2)
-        if (('[' in netloc and ']' not in netloc) or
-                (']' in netloc and '[' not in netloc)):
+        if ("[" in netloc and "]" not in netloc) or (
+            "]" in netloc and "[" not in netloc
+        ):
             raise ValueError("Invalid IPv6 URL")
-    if allow_fragments and '#' in url:
-        url, fragment = url.split('#', 1)
-    if '?' in url:
-        url, query = url.split('?', 1)
+    if allow_fragments and "#" in url:
+        url, fragment = url.split("#", 1)
+    if "?" in url:
+        url, query = url.split("?", 1)
     v = SplitResult(scheme, netloc, url, query, fragment)
     return _coerce_result(v)
 
@@ -369,7 +391,7 @@ def _urlsplit(url, scheme='', allow_fragments=True):
 def _is_safe_url(url, allowed_hosts, require_https=False):
     # Chrome considers any URL with more than two slashes to be absolute, but
     # urlparse is not so flexible. Treat any url with three slashes as unsafe.
-    if url.startswith('///'):
+    if url.startswith("///"):
         return False
     try:
         url_info = _urlparse(url)
@@ -384,19 +406,21 @@ def _is_safe_url(url, allowed_hosts, require_https=False):
     # Forbid URLs that start with control characters. Some browsers (like
     # Chrome) ignore quite a few control characters at the start of a
     # URL and might consider the URL as scheme relative.
-    if unicodedata.category(url[0])[0] == 'C':
+    if unicodedata.category(url[0])[0] == "C":
         return False
     scheme = url_info.scheme
     # Consider URLs without a scheme (e.g. //example.com/p) to be http.
     if not url_info.scheme and url_info.netloc:
-        scheme = 'http'
-    valid_schemes = ['https'] if require_https else ['http', 'https']
-    return ((not url_info.netloc or url_info.netloc in allowed_hosts) and
-            (not scheme or scheme in valid_schemes))
+        scheme = "http"
+    valid_schemes = ["https"] if require_https else ["http", "https"]
+    return (not url_info.netloc or url_info.netloc in allowed_hosts) and (
+        not scheme or scheme in valid_schemes
+    )
 
 
-def limited_parse_qsl(qs, keep_blank_values=False, encoding='utf-8',
-                      errors='replace', fields_limit=None):
+def limited_parse_qsl(
+    qs, keep_blank_values=False, encoding="utf-8", errors="replace", fields_limit=None
+):
     """
     Return a list of key/value tuples parsed from query string.
 
@@ -423,8 +447,8 @@ def limited_parse_qsl(qs, keep_blank_values=False, encoding='utf-8',
         pairs = FIELDS_MATCH.split(qs, fields_limit)
         if len(pairs) > fields_limit:
             raise TooManyFieldsSent(
-                'The number of GET/POST parameters exceeded '
-                'settings.DATA_UPLOAD_MAX_NUMBER_FIELDS.'
+                "The number of GET/POST parameters exceeded "
+                "settings.DATA_UPLOAD_MAX_NUMBER_FIELDS."
             )
     else:
         pairs = FIELDS_MATCH.split(qs)
@@ -432,17 +456,17 @@ def limited_parse_qsl(qs, keep_blank_values=False, encoding='utf-8',
     for name_value in pairs:
         if not name_value:
             continue
-        nv = name_value.split('=', 1)
+        nv = name_value.split("=", 1)
         if len(nv) != 2:
             # Handle case of a control-name with no equal sign
             if keep_blank_values:
-                nv.append('')
+                nv.append("")
             else:
                 continue
         if nv[1] or keep_blank_values:
-            name = nv[0].replace('+', ' ')
+            name = nv[0].replace("+", " ")
             name = unquote(name, encoding=encoding, errors=errors)
-            value = nv[1].replace('+', ' ')
+            value = nv[1].replace("+", " ")
             value = unquote(value, encoding=encoding, errors=errors)
             r.append((name, value))
     return r
@@ -454,6 +478,6 @@ def escape_leading_slashes(url):
     escaped to prevent browsers from handling the path as schemaless and
     redirecting to another host.
     """
-    if url.startswith('//'):
-        url = '/%2F{}'.format(url[2:])
+    if url.startswith("//"):
+        url = "/%2F{}".format(url[2:])
     return url

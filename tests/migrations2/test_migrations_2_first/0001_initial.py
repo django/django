@@ -3,12 +3,9 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ("migrations", "__first__"),
-    ]
+    dependencies = [("migrations", "__first__")]
 
     operations = [
-
         migrations.CreateModel(
             "OtherAuthor",
             [
@@ -18,6 +15,5 @@ class Migration(migrations.Migration):
                 ("age", models.IntegerField(default=0)),
                 ("silly_field", models.BooleanField(default=False)),
             ],
-        ),
-
+        )
     ]

@@ -6,7 +6,6 @@ class Migration(migrations.Migration):
     dependencies = []
 
     operations = [
-
         migrations.CreateModel(
             "OtherAuthor",
             [
@@ -16,6 +15,5 @@ class Migration(migrations.Migration):
                 ("age", models.IntegerField(default=0)),
                 ("silly_field", models.BooleanField(default=False)),
             ],
-        ),
-
+        )
     ]

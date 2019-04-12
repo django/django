@@ -8,4 +8,4 @@ class FakePayloadTests(SimpleTestCase):
         payload.read()
         msg = "Unable to write a payload after it's been read"
         with self.assertRaisesMessage(ValueError, msg):
-            payload.write(b'abc')
+            payload.write(b"abc")

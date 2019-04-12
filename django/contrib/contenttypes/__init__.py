@@ -1,1 +1,1 @@
-default_app_config = 'django.contrib.contenttypes.apps.ContentTypesConfig'
+default_app_config = "django.contrib.contenttypes.apps.ContentTypesConfig"

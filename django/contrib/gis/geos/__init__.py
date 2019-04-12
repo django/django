@@ -3,7 +3,10 @@ The GeoDjango GEOS module.  Please consult the GeoDjango documentation
 for more details: https://docs.djangoproject.com/en/dev/ref/contrib/gis/geos/
 """
 from .collections import (  # NOQA
-    GeometryCollection, MultiLineString, MultiPoint, MultiPolygon,
+    GeometryCollection,
+    MultiLineString,
+    MultiPoint,
+    MultiPolygon,
 )
 from .error import GEOSException  # NOQA
 from .factory import fromfile, fromstr  # NOQA

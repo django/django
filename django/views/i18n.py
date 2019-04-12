@@ -12,12 +12,14 @@ from django.urls import translate_url
 from django.utils.formats import get_format
 from django.utils.http import is_safe_url
 from django.utils.translation import (
-    LANGUAGE_SESSION_KEY, check_for_language, get_language,
+    LANGUAGE_SESSION_KEY,
+    check_for_language,
+    get_language,
 )
 from django.utils.translation.trans_real import DjangoTranslation
 from django.views.generic import View
 
-LANGUAGE_QUERY_PARAMETER = 'language'
+LANGUAGE_QUERY_PARAMETER = "language"
 
 
 def set_language(request):
@@ -31,27 +33,33 @@ def set_language(request):
     redirect to the page in the request (the 'next' parameter) without changing
     any state.
     """
-    next = request.POST.get('next', request.GET.get('next'))
-    if ((next or not request.is_ajax()) and
-            not is_safe_url(url=next, allowed_hosts={request.get_host()}, require_https=request.is_secure())):
-        next = request.META.get('HTTP_REFERER')
+    next = request.POST.get("next", request.GET.get("next"))
+    if (next or not request.is_ajax()) and not is_safe_url(
+        url=next, allowed_hosts={request.get_host()}, require_https=request.is_secure()
+    ):
+        next = request.META.get("HTTP_REFERER")
         next = next and unquote(next)  # HTTP_REFERER may be encoded.
-        if not is_safe_url(url=next, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
-            next = '/'
+        if not is_safe_url(
+            url=next,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure(),
+        ):
+            next = "/"
     response = HttpResponseRedirect(next) if next else HttpResponse(status=204)
-    if request.method == 'POST':
+    if request.method == "POST":
         lang_code = request.POST.get(LANGUAGE_QUERY_PARAMETER)
         if lang_code and check_for_language(lang_code):
             if next:
                 next_trans = translate_url(next, lang_code)
                 if next_trans != next:
                     response = HttpResponseRedirect(next_trans)
-            if hasattr(request, 'session'):
+            if hasattr(request, "session"):
                 # Storing the language in the session is deprecated.
                 # (RemovedInDjango40Warning)
                 request.session[LANGUAGE_SESSION_KEY] = lang_code
             response.set_cookie(
-                settings.LANGUAGE_COOKIE_NAME, lang_code,
+                settings.LANGUAGE_COOKIE_NAME,
+                lang_code,
                 max_age=settings.LANGUAGE_COOKIE_AGE,
                 path=settings.LANGUAGE_COOKIE_PATH,
                 domain=settings.LANGUAGE_COOKIE_DOMAIN,
@@ -65,11 +73,20 @@ def set_language(request):
 def get_formats():
     """Return all formats strings required for i18n to work."""
     FORMAT_SETTINGS = (
-        'DATE_FORMAT', 'DATETIME_FORMAT', 'TIME_FORMAT',
-        'YEAR_MONTH_FORMAT', 'MONTH_DAY_FORMAT', 'SHORT_DATE_FORMAT',
-        'SHORT_DATETIME_FORMAT', 'FIRST_DAY_OF_WEEK', 'DECIMAL_SEPARATOR',
-        'THOUSAND_SEPARATOR', 'NUMBER_GROUPING',
-        'DATE_INPUT_FORMATS', 'TIME_INPUT_FORMATS', 'DATETIME_INPUT_FORMATS'
+        "DATE_FORMAT",
+        "DATETIME_FORMAT",
+        "TIME_FORMAT",
+        "YEAR_MONTH_FORMAT",
+        "MONTH_DAY_FORMAT",
+        "SHORT_DATE_FORMAT",
+        "SHORT_DATETIME_FORMAT",
+        "FIRST_DAY_OF_WEEK",
+        "DECIMAL_SEPARATOR",
+        "THOUSAND_SEPARATOR",
+        "NUMBER_GROUPING",
+        "DATE_INPUT_FORMATS",
+        "TIME_INPUT_FORMATS",
+        "DATETIME_INPUT_FORMATS",
     )
     return {attr: get_format(attr) for attr in FORMAT_SETTINGS}
 
@@ -192,31 +209,37 @@ class JavaScriptCatalog(View):
     want to do that as JavaScript messages go to the djangojs domain. This
     might be needed if you deliver your JavaScript source from Django templates.
     """
-    domain = 'djangojs'
+
+    domain = "djangojs"
     packages = None
 
     def get(self, request, *args, **kwargs):
         locale = get_language()
-        domain = kwargs.get('domain', self.domain)
+        domain = kwargs.get("domain", self.domain)
         # If packages are not provided, default to all installed packages, as
         # DjangoTranslation without localedirs harvests them all.
-        packages = kwargs.get('packages', '')
-        packages = packages.split('+') if packages else self.packages
+        packages = kwargs.get("packages", "")
+        packages = packages.split("+") if packages else self.packages
         paths = self.get_paths(packages) if packages else None
         self.translation = DjangoTranslation(locale, domain=domain, localedirs=paths)
         context = self.get_context_data(**kwargs)
         return self.render_to_response(context)
 
     def get_paths(self, packages):
-        allowable_packages = {app_config.name: app_config for app_config in apps.get_app_configs()}
-        app_configs = [allowable_packages[p] for p in packages if p in allowable_packages]
+        allowable_packages = {
+            app_config.name: app_config for app_config in apps.get_app_configs()
+        }
+        app_configs = [
+            allowable_packages[p] for p in packages if p in allowable_packages
+        ]
         if len(app_configs) < len(packages):
             excluded = [p for p in packages if p not in allowable_packages]
             raise ValueError(
-                'Invalid package(s) provided to JavaScriptCatalog: %s' % ','.join(excluded)
+                "Invalid package(s) provided to JavaScriptCatalog: %s"
+                % ",".join(excluded)
             )
         # paths of requested packages
-        return [os.path.join(app.path, 'locale') for app in app_configs]
+        return [os.path.join(app.path, "locale") for app in app_configs]
 
     @property
     def _num_plurals(self):
@@ -224,7 +247,7 @@ class JavaScriptCatalog(View):
         Return the number of plurals for this catalog language, or 2 if no
         plural string is available.
         """
-        match = re.search(r'nplurals=\s*(\d+)', self._plural_string or '')
+        match = re.search(r"nplurals=\s*(\d+)", self._plural_string or "")
         if match:
             return int(match.groups()[0])
         return 2
@@ -235,10 +258,10 @@ class JavaScriptCatalog(View):
         Return the plural string (including nplurals) for this catalog language,
         or None if no plural string is available.
         """
-        if '' in self.translation._catalog:
-            for line in self.translation._catalog[''].split('\n'):
-                if line.startswith('Plural-Forms:'):
-                    return line.split(':', 1)[1].strip()
+        if "" in self.translation._catalog:
+            for line in self.translation._catalog[""].split("\n"):
+                if line.startswith("Plural-Forms:"):
+                    return line.split(":", 1)[1].strip()
         return None
 
     def get_plural(self):
@@ -247,7 +270,11 @@ class JavaScriptCatalog(View):
             # This should be a compiled function of a typical plural-form:
             # Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 :
             #               n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;
-            plural = [el.strip() for el in plural.split(';') if el.strip().startswith('plural=')][0].split('=', 1)[1]
+            plural = [
+                el.strip()
+                for el in plural.split(";")
+                if el.strip().startswith("plural=")
+            ][0].split("=", 1)[1]
         return plural
 
     def get_catalog(self):
@@ -255,10 +282,14 @@ class JavaScriptCatalog(View):
         num_plurals = self._num_plurals
         catalog = {}
         trans_cat = self.translation._catalog
-        trans_fallback_cat = self.translation._fallback._catalog if self.translation._fallback else {}
+        trans_fallback_cat = (
+            self.translation._fallback._catalog if self.translation._fallback else {}
+        )
         seen_keys = set()
-        for key, value in itertools.chain(trans_cat.items(), trans_fallback_cat.items()):
-            if key == '' or key in seen_keys:
+        for key, value in itertools.chain(
+            trans_cat.items(), trans_fallback_cat.items()
+        ):
+            if key == "" or key in seen_keys:
                 continue
             if isinstance(key, str):
                 catalog[key] = value
@@ -269,27 +300,33 @@ class JavaScriptCatalog(View):
                 raise TypeError(key)
             seen_keys.add(key)
         for k, v in pdict.items():
-            catalog[k] = [v.get(i, '') for i in range(num_plurals)]
+            catalog[k] = [v.get(i, "") for i in range(num_plurals)]
         return catalog
 
     def get_context_data(self, **kwargs):
         return {
-            'catalog': self.get_catalog(),
-            'formats': get_formats(),
-            'plural': self.get_plural(),
+            "catalog": self.get_catalog(),
+            "formats": get_formats(),
+            "plural": self.get_plural(),
         }
 
     def render_to_response(self, context, **response_kwargs):
         def indent(s):
-            return s.replace('\n', '\n  ')
+            return s.replace("\n", "\n  ")
 
         template = Engine().from_string(js_catalog_template)
-        context['catalog_str'] = indent(
-            json.dumps(context['catalog'], sort_keys=True, indent=2)
-        ) if context['catalog'] else None
-        context['formats_str'] = indent(json.dumps(context['formats'], sort_keys=True, indent=2))
+        context["catalog_str"] = (
+            indent(json.dumps(context["catalog"], sort_keys=True, indent=2))
+            if context["catalog"]
+            else None
+        )
+        context["formats_str"] = indent(
+            json.dumps(context["formats"], sort_keys=True, indent=2)
+        )
 
-        return HttpResponse(template.render(Context(context)), 'text/javascript; charset="utf-8"')
+        return HttpResponse(
+            template.render(Context(context)), 'text/javascript; charset="utf-8"'
+        )
 
 
 class JSONCatalog(JavaScriptCatalog):
@@ -309,5 +346,6 @@ class JSONCatalog(JavaScriptCatalog):
             "plural": '...'  # Expression for plural forms, or null.
         }
     """
+
     def render_to_response(self, context, **response_kwargs):
         return JsonResponse(context)

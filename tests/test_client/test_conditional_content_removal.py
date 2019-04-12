@@ -6,7 +6,6 @@ from django.test.client import conditional_content_removal
 
 
 class ConditionalContentTests(SimpleTestCase):
-
     def test_conditional_content_removal(self):
         """
         Content is removed from regular and streaming responses with a
@@ -15,43 +14,43 @@ class ConditionalContentTests(SimpleTestCase):
         req = HttpRequest()
 
         # Do nothing for 200 responses.
-        res = HttpResponse('abc')
+        res = HttpResponse("abc")
         conditional_content_removal(req, res)
-        self.assertEqual(res.content, b'abc')
+        self.assertEqual(res.content, b"abc")
 
-        res = StreamingHttpResponse(['abc'])
+        res = StreamingHttpResponse(["abc"])
         conditional_content_removal(req, res)
-        self.assertEqual(b''.join(res), b'abc')
+        self.assertEqual(b"".join(res), b"abc")
 
         # Strip content for some status codes.
         for status_code in (100, 150, 199, 204, 304):
-            res = HttpResponse('abc', status=status_code)
+            res = HttpResponse("abc", status=status_code)
             conditional_content_removal(req, res)
-            self.assertEqual(res.content, b'')
+            self.assertEqual(res.content, b"")
 
-            res = StreamingHttpResponse(['abc'], status=status_code)
+            res = StreamingHttpResponse(["abc"], status=status_code)
             conditional_content_removal(req, res)
-            self.assertEqual(b''.join(res), b'')
+            self.assertEqual(b"".join(res), b"")
 
         # Issue #20472
-        abc = gzip.compress(b'abc')
+        abc = gzip.compress(b"abc")
         res = HttpResponse(abc, status=304)
-        res['Content-Encoding'] = 'gzip'
+        res["Content-Encoding"] = "gzip"
         conditional_content_removal(req, res)
-        self.assertEqual(res.content, b'')
+        self.assertEqual(res.content, b"")
 
         res = StreamingHttpResponse([abc], status=304)
-        res['Content-Encoding'] = 'gzip'
+        res["Content-Encoding"] = "gzip"
         conditional_content_removal(req, res)
-        self.assertEqual(b''.join(res), b'')
+        self.assertEqual(b"".join(res), b"")
 
         # Strip content for HEAD requests.
-        req.method = 'HEAD'
+        req.method = "HEAD"
 
-        res = HttpResponse('abc')
+        res = HttpResponse("abc")
         conditional_content_removal(req, res)
-        self.assertEqual(res.content, b'')
+        self.assertEqual(res.content, b"")
 
-        res = StreamingHttpResponse(['abc'])
+        res = StreamingHttpResponse(["abc"])
         conditional_content_removal(req, res)
-        self.assertEqual(b''.join(res), b'')
+        self.assertEqual(b"".join(res), b"")

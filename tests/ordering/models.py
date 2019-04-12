@@ -20,17 +20,19 @@ class Author(models.Model):
     name = models.CharField(max_length=63, null=True, blank=True)
 
     class Meta:
-        ordering = ('-pk',)
+        ordering = ("-pk",)
 
 
 class Article(models.Model):
     author = models.ForeignKey(Author, models.SET_NULL, null=True)
-    second_author = models.ForeignKey(Author, models.SET_NULL, null=True, related_name='+')
+    second_author = models.ForeignKey(
+        Author, models.SET_NULL, null=True, related_name="+"
+    )
     headline = models.CharField(max_length=100)
     pub_date = models.DateTimeField()
 
     class Meta:
-        ordering = ('-pub_date', 'headline')
+        ordering = ("-pub_date", "headline")
 
     def __str__(self):
         return self.headline
@@ -39,17 +41,17 @@ class Article(models.Model):
 class OrderedByAuthorArticle(Article):
     class Meta:
         proxy = True
-        ordering = ('author', 'second_author')
+        ordering = ("author", "second_author")
 
 
 class OrderedByFArticle(Article):
     class Meta:
         proxy = True
-        ordering = (models.F('author').asc(nulls_first=True), 'id')
+        ordering = (models.F("author").asc(nulls_first=True), "id")
 
 
 class Reference(models.Model):
     article = models.ForeignKey(OrderedByAuthorArticle, models.CASCADE)
 
     class Meta:
-        ordering = ('article',)
+        ordering = ("article",)

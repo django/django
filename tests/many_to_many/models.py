@@ -13,7 +13,7 @@ class Publication(models.Model):
     title = models.CharField(max_length=30)
 
     class Meta:
-        ordering = ('title',)
+        ordering = ("title",)
 
     def __str__(self):
         return self.title
@@ -31,11 +31,11 @@ class Article(models.Model):
     headline = models.CharField(max_length=100)
     # Assign a string as name to make sure the intermediary model is
     # correctly created. Refs #20207
-    publications = models.ManyToManyField(Publication, name='publications')
-    tags = models.ManyToManyField(Tag, related_name='tags')
+    publications = models.ManyToManyField(Publication, name="publications")
+    tags = models.ManyToManyField(Tag, related_name="tags")
 
     class Meta:
-        ordering = ('headline',)
+        ordering = ("headline",)
 
     def __str__(self):
         return self.headline
@@ -46,7 +46,9 @@ class AbstractArticle(models.Model):
     class Meta:
         abstract = True
 
-    publications = models.ManyToManyField(Publication, name='publications', related_name='+')
+    publications = models.ManyToManyField(
+        Publication, name="publications", related_name="+"
+    )
 
 
 class InheritedArticleA(AbstractArticle):
@@ -59,7 +61,9 @@ class InheritedArticleB(AbstractArticle):
 
 class NullableTargetArticle(models.Model):
     headline = models.CharField(max_length=100)
-    publications = models.ManyToManyField(Publication, through='NullablePublicationThrough')
+    publications = models.ManyToManyField(
+        Publication, through="NullablePublicationThrough"
+    )
 
 
 class NullablePublicationThrough(models.Model):

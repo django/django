@@ -15,6 +15,7 @@ class Choice(models.Model):
     def __str__(self):
         return "Choice: %s in poll %s" % (self.choice, self.poll)
 
+
 # A set of models with an inner one pointing to two outer ones.
 
 

@@ -1,7 +1,5 @@
 from django.contrib.messages import constants
-from django.contrib.messages.storage.fallback import (
-    CookieStorage, FallbackStorage,
-)
+from django.contrib.messages.storage.fallback import CookieStorage, FallbackStorage
 from django.test import SimpleTestCase
 
 from .base import BaseTests
@@ -34,10 +32,9 @@ class FallbackTests(BaseTests, SimpleTestCase):
         """
         Return the storage totals from both cookie and session backends.
         """
-        return (
-            self.stored_cookie_messages_count(storage, response) +
-            self.stored_session_messages_count(storage, response)
-        )
+        return self.stored_cookie_messages_count(
+            storage, response
+        ) + self.stored_session_messages_count(storage, response)
 
     def test_get(self):
         request = self.get_request()
@@ -67,7 +64,9 @@ class FallbackTests(BaseTests, SimpleTestCase):
 
         # Set initial cookie and session data.
         example_messages = [str(i) for i in range(5)]
-        set_cookie_data(cookie_storage, example_messages[:4] + [CookieStorage.not_finished])
+        set_cookie_data(
+            cookie_storage, example_messages[:4] + [CookieStorage.not_finished]
+        )
         set_session_data(session_storage, example_messages[4:])
         self.assertEqual(list(storage), example_messages)
 
@@ -88,8 +87,8 @@ class FallbackTests(BaseTests, SimpleTestCase):
         cookie_storage = self.get_cookie_storage(storage)
         session_storage = self.get_session_storage(storage)
         # Set initial cookie and session data.
-        set_cookie_data(cookie_storage, ['cookie', CookieStorage.not_finished])
-        set_session_data(session_storage, ['session'])
+        set_cookie_data(cookie_storage, ["cookie", CookieStorage.not_finished])
+        set_session_data(session_storage, ["session"])
         # When updating, previously used but no longer needed backends are
         # flushed.
         response = self.get_response()
@@ -143,7 +142,7 @@ class FallbackTests(BaseTests, SimpleTestCase):
         """
         storage = self.get_storage()
         response = self.get_response()
-        storage.add(constants.INFO, 'x' * 5000)
+        storage.add(constants.INFO, "x" * 5000)
         storage.update(response)
         cookie_storing = self.stored_cookie_messages_count(storage, response)
         self.assertEqual(cookie_storing, 0)

@@ -10,7 +10,7 @@ class Car(models.Model):
 
 class Person(models.Model):
     name = models.CharField(max_length=100)
-    cars = models.ManyToManyField(Car, through='PossessedCar')
+    cars = models.ManyToManyField(Car, through="PossessedCar")
 
     def __str__(self):
         return self.name

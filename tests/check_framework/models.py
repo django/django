@@ -7,7 +7,7 @@ class SimpleModel(models.Model):
     manager = models.manager.Manager()
 
 
-@register('tests')
+@register("tests")
 def my_check(app_configs, **kwargs):
     my_check.did_run = True
     return []

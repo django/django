@@ -46,25 +46,27 @@ from django.utils.crypto import constant_time_compare, salted_hmac
 from django.utils.encoding import force_bytes
 from django.utils.module_loading import import_string
 
-_SEP_UNSAFE = re.compile(r'^[A-z0-9-_=]*$')
+_SEP_UNSAFE = re.compile(r"^[A-z0-9-_=]*$")
 
 
 class BadSignature(Exception):
     """Signature does not match."""
+
     pass
 
 
 class SignatureExpired(BadSignature):
     """Signature timestamp is older than required max_age."""
+
     pass
 
 
 def b64_encode(s):
-    return base64.urlsafe_b64encode(s).strip(b'=')
+    return base64.urlsafe_b64encode(s).strip(b"=")
 
 
 def b64_decode(s):
-    pad = b'=' * (-len(s) % 4)
+    pad = b"=" * (-len(s) % 4)
     return base64.urlsafe_b64decode(s + pad)
 
 
@@ -72,10 +74,10 @@ def base64_hmac(salt, value, key):
     return b64_encode(salted_hmac(salt, value, key).digest()).decode()
 
 
-def get_cookie_signer(salt='django.core.signing.get_cookie_signer'):
+def get_cookie_signer(salt="django.core.signing.get_cookie_signer"):
     Signer = import_string(settings.SIGNING_BACKEND)
     key = force_bytes(settings.SECRET_KEY)  # SECRET_KEY may be str or bytes.
-    return Signer(b'django.http.cookies' + key, salt=salt)
+    return Signer(b"django.http.cookies" + key, salt=salt)
 
 
 class JSONSerializer:
@@ -83,14 +85,17 @@ class JSONSerializer:
     Simple wrapper around json to be used in signing.dumps and
     signing.loads.
     """
+
     def dumps(self, obj):
-        return json.dumps(obj, separators=(',', ':')).encode('latin-1')
+        return json.dumps(obj, separators=(",", ":")).encode("latin-1")
 
     def loads(self, data):
-        return json.loads(data.decode('latin-1'))
+        return json.loads(data.decode("latin-1"))
 
 
-def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, compress=False):
+def dumps(
+    obj, key=None, salt="django.core.signing", serializer=JSONSerializer, compress=False
+):
     """
     Return URL-safe, hmac/SHA1 signed base64 compressed JSON string. If key is
     None, use settings.SECRET_KEY instead.
@@ -119,11 +124,13 @@ def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, 
             is_compressed = True
     base64d = b64_encode(data).decode()
     if is_compressed:
-        base64d = '.' + base64d
+        base64d = "." + base64d
     return TimestampSigner(key, salt=salt).sign(base64d)
 
 
-def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None):
+def loads(
+    s, key=None, salt="django.core.signing", serializer=JSONSerializer, max_age=None
+):
     """
     Reverse of dumps(), raise BadSignature if signature fails.
 
@@ -132,7 +139,7 @@ def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, ma
     # TimestampSigner.unsign() returns str but base64 and zlib compression
     # operate on bytes.
     base64d = TimestampSigner(key, salt=salt).unsign(s, max_age=max_age).encode()
-    decompress = base64d[:1] == b'.'
+    decompress = base64d[:1] == b"."
     if decompress:
         # It's compressed; uncompress it first
         base64d = base64d[1:]
@@ -143,23 +150,25 @@ def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, ma
 
 
 class Signer:
-
-    def __init__(self, key=None, sep=':', salt=None):
+    def __init__(self, key=None, sep=":", salt=None):
         # Use of native strings in all versions of Python
         self.key = key or settings.SECRET_KEY
         self.sep = sep
         if _SEP_UNSAFE.match(self.sep):
             raise ValueError(
-                'Unsafe Signer separator: %r (cannot be empty or consist of '
-                'only A-z0-9-_=)' % sep,
+                "Unsafe Signer separator: %r (cannot be empty or consist of "
+                "only A-z0-9-_=)" % sep
             )
-        self.salt = salt or '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
+        self.salt = salt or "%s.%s" % (
+            self.__class__.__module__,
+            self.__class__.__name__,
+        )
 
     def signature(self, value):
-        return base64_hmac(self.salt + 'signer', value, self.key)
+        return base64_hmac(self.salt + "signer", value, self.key)
 
     def sign(self, value):
-        return '%s%s%s' % (value, self.sep, self.signature(value))
+        return "%s%s%s" % (value, self.sep, self.signature(value))
 
     def unsign(self, signed_value):
         if self.sep not in signed_value:
@@ -171,12 +180,11 @@ class Signer:
 
 
 class TimestampSigner(Signer):
-
     def timestamp(self):
         return baseconv.base62.encode(int(time.time()))
 
     def sign(self, value):
-        value = '%s%s%s' % (value, self.sep, self.timestamp())
+        value = "%s%s%s" % (value, self.sep, self.timestamp())
         return super().sign(value)
 
     def unsign(self, value, max_age=None):
@@ -193,6 +201,5 @@ class TimestampSigner(Signer):
             # Check timestamp is not older than max_age
             age = time.time() - timestamp
             if age > max_age:
-                raise SignatureExpired(
-                    'Signature age %s > %s seconds' % (age, max_age))
+                raise SignatureExpired("Signature age %s > %s seconds" % (age, max_age))
         return value

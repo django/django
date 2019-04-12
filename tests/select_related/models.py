@@ -7,9 +7,7 @@ isn't always a good idea, so the ``depth`` argument control how many "levels"
 the select-related behavior will traverse.
 """
 
-from django.contrib.contenttypes.fields import (
-    GenericForeignKey, GenericRelation,
-)
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
@@ -78,13 +76,14 @@ class Species(models.Model):
     def __str__(self):
         return self.name
 
+
 # and we'll invent a new thing so we have a model with two foreign keys
 
 
 class HybridSpecies(models.Model):
     name = models.CharField(max_length=50)
-    parent_1 = models.ForeignKey(Species, models.CASCADE, related_name='child_1')
-    parent_2 = models.ForeignKey(Species, models.CASCADE, related_name='child_2')
+    parent_1 = models.ForeignKey(Species, models.CASCADE, related_name="child_1")
+    parent_2 = models.ForeignKey(Species, models.CASCADE, related_name="child_2")
 
     def __str__(self):
         return self.name
@@ -108,9 +107,11 @@ class Pizza(models.Model):
 class TaggedItem(models.Model):
     tag = models.CharField(max_length=30)
 
-    content_type = models.ForeignKey(ContentType, models.CASCADE, related_name='select_related_tagged_items')
+    content_type = models.ForeignKey(
+        ContentType, models.CASCADE, related_name="select_related_tagged_items"
+    )
     object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey("content_type", "object_id")
 
     def __str__(self):
         return self.tag

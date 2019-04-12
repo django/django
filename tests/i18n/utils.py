@@ -7,25 +7,25 @@ source_code_dir = os.path.dirname(__file__)
 
 
 def copytree(src, dst):
-    shutil.copytree(src, dst, ignore=shutil.ignore_patterns('__pycache__'))
+    shutil.copytree(src, dst, ignore=shutil.ignore_patterns("__pycache__"))
 
 
 class POFileAssertionMixin:
-
     def _assertPoKeyword(self, keyword, expected_value, haystack, use_quotes=True):
         q = '"'
         if use_quotes:
             expected_value = '"%s"' % expected_value
             q = "'"
-        needle = '%s %s' % (keyword, expected_value)
+        needle = "%s %s" % (keyword, expected_value)
         expected_value = re.escape(expected_value)
         return self.assertTrue(
-            re.search('^%s %s' % (keyword, expected_value), haystack, re.MULTILINE),
-            'Could not find %(q)s%(n)s%(q)s in generated PO file' % {'n': needle, 'q': q}
+            re.search("^%s %s" % (keyword, expected_value), haystack, re.MULTILINE),
+            "Could not find %(q)s%(n)s%(q)s in generated PO file"
+            % {"n": needle, "q": q},
         )
 
     def assertMsgId(self, msgid, haystack, use_quotes=True):
-        return self._assertPoKeyword('msgid', msgid, haystack, use_quotes=use_quotes)
+        return self._assertPoKeyword("msgid", msgid, haystack, use_quotes=use_quotes)
 
 
 class RunInTmpDirMixin:
@@ -44,7 +44,7 @@ class RunInTmpDirMixin:
 
     def setUp(self):
         self._cwd = os.getcwd()
-        self.work_dir = tempfile.mkdtemp(prefix='i18n_')
+        self.work_dir = tempfile.mkdtemp(prefix="i18n_")
         # Resolve symlinks, if any, in test directory paths.
         self.test_dir = os.path.realpath(os.path.join(self.work_dir, self.work_subdir))
         copytree(os.path.join(source_code_dir, self.work_subdir), self.test_dir)
@@ -56,6 +56,9 @@ class RunInTmpDirMixin:
         os.chdir(self.test_dir)
 
     def _rmrf(self, dname):
-        if os.path.commonprefix([self.test_dir, os.path.abspath(dname)]) != self.test_dir:
+        if (
+            os.path.commonprefix([self.test_dir, os.path.abspath(dname)])
+            != self.test_dir
+        ):
             return
         shutil.rmtree(dname)

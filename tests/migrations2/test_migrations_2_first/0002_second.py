@@ -6,7 +6,6 @@ class Migration(migrations.Migration):
     dependencies = [("migrations2", "0001_initial")]
 
     operations = [
-
         migrations.CreateModel(
             "Bookstore",
             [
@@ -14,6 +13,5 @@ class Migration(migrations.Migration):
                 ("name", models.CharField(max_length=255)),
                 ("slug", models.SlugField(null=True)),
             ],
-        ),
-
+        )
     ]

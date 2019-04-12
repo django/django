@@ -9,15 +9,14 @@ The canonical example is tags (although this example implementation is *far*
 from complete).
 """
 
-from django.contrib.contenttypes.fields import (
-    GenericForeignKey, GenericRelation,
-)
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
 
 class TaggedItem(models.Model):
     """A tag on an item."""
+
     tag = models.SlugField()
     content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
@@ -38,7 +37,9 @@ class ValuableTaggedItem(TaggedItem):
 class AbstractComparison(models.Model):
     comparative = models.CharField(max_length=50)
 
-    content_type1 = models.ForeignKey(ContentType, models.CASCADE, related_name="comparative1_set")
+    content_type1 = models.ForeignKey(
+        ContentType, models.CASCADE, related_name="comparative1_set"
+    )
     object_id1 = models.PositiveIntegerField()
 
     first_obj = GenericForeignKey(ct_field="content_type1", fk_field="object_id1")
@@ -49,7 +50,10 @@ class Comparison(AbstractComparison):
     A model that tests having multiple GenericForeignKeys. One is defined
     through an inherited abstract model and one defined directly on this class.
     """
-    content_type2 = models.ForeignKey(ContentType, models.CASCADE, related_name="comparative2_set")
+
+    content_type2 = models.ForeignKey(
+        ContentType, models.CASCADE, related_name="comparative2_set"
+    )
     object_id2 = models.PositiveIntegerField()
 
     other_obj = GenericForeignKey(ct_field="content_type2", fk_field="object_id2")
@@ -62,10 +66,10 @@ class Animal(models.Model):
     common_name = models.CharField(max_length=150)
     latin_name = models.CharField(max_length=150)
 
-    tags = GenericRelation(TaggedItem, related_query_name='animal')
-    comparisons = GenericRelation(Comparison,
-                                  object_id_field="object_id1",
-                                  content_type_field="content_type1")
+    tags = GenericRelation(TaggedItem, related_query_name="animal")
+    comparisons = GenericRelation(
+        Comparison, object_id_field="object_id1", content_type_field="content_type1"
+    )
 
     def __str__(self):
         return self.common_name
@@ -116,7 +120,7 @@ class ValuableRock(Mineral):
 
 class ManualPK(models.Model):
     id = models.IntegerField(primary_key=True)
-    tags = GenericRelation(TaggedItem, related_query_name='manualpk')
+    tags = GenericRelation(TaggedItem, related_query_name="manualpk")
 
 
 class ForProxyModelModel(models.Model):

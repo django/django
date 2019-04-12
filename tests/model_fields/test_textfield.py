@@ -8,7 +8,6 @@ from .models import Post
 
 
 class TextFieldTests(TestCase):
-
     def test_max_length_passed_to_formfield(self):
         """
         TextField passes its max_length attribute to form fields created using
@@ -21,19 +20,22 @@ class TextFieldTests(TestCase):
 
     def test_choices_generates_select_widget(self):
         """A TextField with choices uses a Select widget."""
-        f = models.TextField(choices=[('A', 'A'), ('B', 'B')])
+        f = models.TextField(choices=[("A", "A"), ("B", "B")])
         self.assertIsInstance(f.formfield().widget, forms.Select)
 
     def test_to_python(self):
         """TextField.to_python() should return a string."""
         f = models.TextField()
-        self.assertEqual(f.to_python(1), '1')
+        self.assertEqual(f.to_python(1), "1")
 
     def test_lookup_integer_in_textfield(self):
         self.assertEqual(Post.objects.filter(body=24).count(), 0)
 
-    @skipIf(connection.vendor == 'mysql', 'Running on MySQL requires utf8mb4 encoding (#18392)')
+    @skipIf(
+        connection.vendor == "mysql",
+        "Running on MySQL requires utf8mb4 encoding (#18392)",
+    )
     def test_emoji(self):
-        p = Post.objects.create(title='Whatever', body='Smile 😀.')
+        p = Post.objects.create(title="Whatever", body="Smile 😀.")
         p.refresh_from_db()
-        self.assertEqual(p.body, 'Smile 😀.')
+        self.assertEqual(p.body, "Smile 😀.")

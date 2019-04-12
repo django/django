@@ -5,7 +5,7 @@ from . import Error, Tags, register
 
 E001 = Error(
     "You must define a '%s' cache in your CACHES setting." % DEFAULT_CACHE_ALIAS,
-    id='caches.E001',
+    id="caches.E001",
 )
 
 

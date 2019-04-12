@@ -13,18 +13,22 @@ class QuerySetIteratorTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        Article.objects.create(name='Article 1', created=datetime.datetime.now())
-        Article.objects.create(name='Article 2', created=datetime.datetime.now())
+        Article.objects.create(name="Article 1", created=datetime.datetime.now())
+        Article.objects.create(name="Article 2", created=datetime.datetime.now())
 
     def test_iterator_invalid_chunk_size(self):
         for size in (0, -1):
             with self.subTest(size=size):
-                with self.assertRaisesMessage(ValueError, 'Chunk size must be strictly positive.'):
+                with self.assertRaisesMessage(
+                    ValueError, "Chunk size must be strictly positive."
+                ):
                     Article.objects.iterator(chunk_size=size)
 
     def test_default_iterator_chunk_size(self):
         qs = Article.objects.iterator()
-        with mock.patch('django.db.models.sql.compiler.cursor_iter', side_effect=cursor_iter) as cursor_iter_mock:
+        with mock.patch(
+            "django.db.models.sql.compiler.cursor_iter", side_effect=cursor_iter
+        ) as cursor_iter_mock:
             next(qs)
         self.assertEqual(cursor_iter_mock.call_count, 1)
         mock_args, _mock_kwargs = cursor_iter_mock.call_args
@@ -33,7 +37,9 @@ class QuerySetIteratorTests(TestCase):
     def test_iterator_chunk_size(self):
         batch_size = 3
         qs = Article.objects.iterator(chunk_size=batch_size)
-        with mock.patch('django.db.models.sql.compiler.cursor_iter', side_effect=cursor_iter) as cursor_iter_mock:
+        with mock.patch(
+            "django.db.models.sql.compiler.cursor_iter", side_effect=cursor_iter
+        ) as cursor_iter_mock:
             next(qs)
         self.assertEqual(cursor_iter_mock.call_count, 1)
         mock_args, _mock_kwargs = cursor_iter_mock.call_args
@@ -47,6 +53,6 @@ class QuerySetIteratorTests(TestCase):
         qs = Article.objects.all()
         compiler = qs.query.get_compiler(using=qs.db)
         features = connections[qs.db].features
-        with mock.patch.object(features, 'can_use_chunked_reads', False):
+        with mock.patch.object(features, "can_use_chunked_reads", False):
             result = compiler.execute_sql(chunked_fetch=True)
         self.assertIsInstance(result, list)

@@ -7,18 +7,18 @@ from django.db import models
 
 
 class Article(models.Model):
-    headline = models.CharField(max_length=100, default='Default headline')
+    headline = models.CharField(max_length=100, default="Default headline")
     pub_date = models.DateTimeField()
 
     class Meta:
-        ordering = ('pub_date', 'headline')
+        ordering = ("pub_date", "headline")
 
     def __str__(self):
         return self.headline
 
 
 class FeaturedArticle(models.Model):
-    article = models.OneToOneField(Article, models.CASCADE, related_name='featured')
+    article = models.OneToOneField(Article, models.CASCADE, related_name="featured")
 
 
 class ArticleSelectOnSave(Article):
@@ -29,10 +29,7 @@ class ArticleSelectOnSave(Article):
 
 class SelfRef(models.Model):
     selfref = models.ForeignKey(
-        'self',
-        models.SET_NULL,
-        null=True, blank=True,
-        related_name='+',
+        "self", models.SET_NULL, null=True, blank=True, related_name="+"
     )
     article = models.ForeignKey(Article, models.SET_NULL, null=True, blank=True)
 

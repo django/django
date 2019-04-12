@@ -6,7 +6,9 @@ from django.test import TestCase
 
 class TestAuthenticationMiddleware(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user('test_user', 'test@example.com', 'test_password')
+        self.user = User.objects.create_user(
+            "test_user", "test@example.com", "test_password"
+        )
         self.middleware = AuthenticationMiddleware()
         self.client.force_login(self.user)
         self.request = HttpRequest()
@@ -20,7 +22,7 @@ class TestAuthenticationMiddleware(TestCase):
 
     def test_changed_password_invalidates_session(self):
         # After password change, user should be anonymous
-        self.user.set_password('new_password')
+        self.user.set_password("new_password")
         self.user.save()
         self.middleware.process_request(self.request)
         self.assertIsNotNone(self.request.user)

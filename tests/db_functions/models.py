@@ -15,7 +15,7 @@ class Author(models.Model):
 
 
 class Article(models.Model):
-    authors = models.ManyToManyField(Author, related_name='articles')
+    authors = models.ManyToManyField(Author, related_name="articles")
     title = models.CharField(max_length=50)
     summary = models.CharField(max_length=200, null=True, blank=True)
     text = models.TextField()
@@ -31,7 +31,7 @@ class Article(models.Model):
 class Fan(models.Model):
     name = models.CharField(max_length=50)
     age = models.PositiveSmallIntegerField(default=30)
-    author = models.ForeignKey(Author, models.CASCADE, related_name='fans')
+    author = models.ForeignKey(Author, models.CASCADE, related_name="fans")
     fan_since = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
@@ -49,7 +49,7 @@ class DTModel(models.Model):
     duration = models.DurationField(null=True, blank=True)
 
     def __str__(self):
-        return 'DTModel({0})'.format(self.name)
+        return "DTModel({0})".format(self.name)
 
 
 class DecimalModel(models.Model):

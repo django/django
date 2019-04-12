@@ -4,7 +4,6 @@ from django.test import SimpleTestCase, TestCase as DjangoTestCase
 
 
 class DjangoCase1(DjangoTestCase):
-
     def test_1(self):
         pass
 
@@ -13,7 +12,6 @@ class DjangoCase1(DjangoTestCase):
 
 
 class DjangoCase2(DjangoTestCase):
-
     def test_1(self):
         pass
 
@@ -22,7 +20,6 @@ class DjangoCase2(DjangoTestCase):
 
 
 class SimpleCase1(SimpleTestCase):
-
     def test_1(self):
         pass
 
@@ -31,7 +28,6 @@ class SimpleCase1(SimpleTestCase):
 
 
 class SimpleCase2(SimpleTestCase):
-
     def test_1(self):
         pass
 
@@ -40,7 +36,6 @@ class SimpleCase2(SimpleTestCase):
 
 
 class UnittestCase1(TestCase):
-
     def test_1(self):
         pass
 
@@ -49,7 +44,6 @@ class UnittestCase1(TestCase):
 
 
 class UnittestCase2(TestCase):
-
     def test_1(self):
         pass
 

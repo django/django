@@ -25,15 +25,14 @@ class NamedCategory(DumbCategory):
 class Tag(models.Model):
     name = models.CharField(max_length=10)
     parent = models.ForeignKey(
-        'self',
-        models.SET_NULL,
-        blank=True, null=True,
-        related_name='children',
+        "self", models.SET_NULL, blank=True, null=True, related_name="children"
     )
-    category = models.ForeignKey(NamedCategory, models.SET_NULL, null=True, default=None)
+    category = models.ForeignKey(
+        NamedCategory, models.SET_NULL, null=True, default=None
+    )
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
     def __str__(self):
         return self.name
@@ -45,7 +44,7 @@ class Note(models.Model):
     tag = models.ForeignKey(Tag, models.SET_NULL, blank=True, null=True)
 
     class Meta:
-        ordering = ['note']
+        ordering = ["note"]
 
     def __str__(self):
         return self.note
@@ -73,7 +72,7 @@ class ExtraInfo(models.Model):
     value = models.IntegerField(null=True)
 
     class Meta:
-        ordering = ['info']
+        ordering = ["info"]
 
     def __str__(self):
         return self.info
@@ -85,7 +84,7 @@ class Author(models.Model):
     extra = models.ForeignKey(ExtraInfo, models.CASCADE)
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
     def __str__(self):
         return self.name
@@ -100,7 +99,7 @@ class Item(models.Model):
     note = models.ForeignKey(Note, models.CASCADE)
 
     class Meta:
-        ordering = ['-note', 'name']
+        ordering = ["-note", "name"]
 
     def __str__(self):
         return self.name
@@ -108,7 +107,7 @@ class Item(models.Model):
 
 class Report(models.Model):
     name = models.CharField(max_length=10)
-    creator = models.ForeignKey(Author, models.SET_NULL, to_field='num', null=True)
+    creator = models.ForeignKey(Author, models.SET_NULL, to_field="num", null=True)
 
     def __str__(self):
         return self.name
@@ -124,10 +123,10 @@ class Ranking(models.Model):
 
     class Meta:
         # A complex ordering specification. Should stress the system a bit.
-        ordering = ('author__extra__note', 'author__name', 'rank')
+        ordering = ("author__extra__note", "author__name", "rank")
 
     def __str__(self):
-        return '%d: %s' % (self.rank, self.author.name)
+        return "%d: %s" % (self.rank, self.author.name)
 
 
 class Cover(models.Model):
@@ -135,7 +134,7 @@ class Cover(models.Model):
     item = models.ForeignKey(Item, models.CASCADE)
 
     class Meta:
-        ordering = ['item']
+        ordering = ["item"]
 
     def __str__(self):
         return self.title
@@ -147,51 +146,54 @@ class Number(models.Model):
     def __str__(self):
         return str(self.num)
 
+
 # Symmetrical m2m field with a normal field using the reverse accessor name
 # ("valid").
 
 
 class Valid(models.Model):
     valid = models.CharField(max_length=10)
-    parent = models.ManyToManyField('self')
+    parent = models.ManyToManyField("self")
 
     class Meta:
-        ordering = ['valid']
+        ordering = ["valid"]
+
 
 # Some funky cross-linked models for testing a couple of infinite recursion
 # cases.
 
 
 class X(models.Model):
-    y = models.ForeignKey('Y', models.CASCADE)
+    y = models.ForeignKey("Y", models.CASCADE)
 
 
 class Y(models.Model):
-    x1 = models.ForeignKey(X, models.CASCADE, related_name='y1')
+    x1 = models.ForeignKey(X, models.CASCADE, related_name="y1")
+
 
 # Some models with a cycle in the default ordering. This would be bad if we
 # didn't catch the infinite loop.
 
 
 class LoopX(models.Model):
-    y = models.ForeignKey('LoopY', models.CASCADE)
+    y = models.ForeignKey("LoopY", models.CASCADE)
 
     class Meta:
-        ordering = ['y']
+        ordering = ["y"]
 
 
 class LoopY(models.Model):
     x = models.ForeignKey(LoopX, models.CASCADE)
 
     class Meta:
-        ordering = ['x']
+        ordering = ["x"]
 
 
 class LoopZ(models.Model):
-    z = models.ForeignKey('self', models.CASCADE)
+    z = models.ForeignKey("self", models.CASCADE)
 
     class Meta:
-        ordering = ['z']
+        ordering = ["z"]
 
 
 # A model and custom default manager combination.
@@ -200,7 +202,7 @@ class LoopZ(models.Model):
 class CustomManager(models.Manager):
     def get_queryset(self):
         qs = super().get_queryset()
-        return qs.filter(public=True, tag__name='t1')
+        return qs.filter(public=True, tag__name="t1")
 
 
 class ManagedModel(models.Model):
@@ -213,6 +215,7 @@ class ManagedModel(models.Model):
 
     def __str__(self):
         return self.data
+
 
 # An inter-related setup with multiple paths from Child to Detail.
 
@@ -237,6 +240,7 @@ class Child(models.Model):
     person = models.OneToOneField(Member, models.CASCADE, primary_key=True)
     parent = models.ForeignKey(Member, models.CASCADE, related_name="children")
 
+
 # Custom primary keys interfered with ordering in the past.
 
 
@@ -245,7 +249,7 @@ class CustomPk(models.Model):
     extra = models.CharField(max_length=10)
 
     class Meta:
-        ordering = ['name', 'extra']
+        ordering = ["name", "extra"]
 
 
 class Related(models.Model):
@@ -256,6 +260,7 @@ class CustomPkTag(models.Model):
     id = models.CharField(max_length=20, primary_key=True)
     custom_pk = models.ManyToManyField(CustomPk)
     tag = models.CharField(max_length=20)
+
 
 # An inter-related setup with a model subclass that has a nullable
 # path to another model, and a return path from that model.
@@ -275,6 +280,7 @@ class TvChef(Celebrity):
 
 class Fan(models.Model):
     fan_of = models.ForeignKey(Celebrity, models.CASCADE)
+
 
 # Multiple foreign keys
 
@@ -302,6 +308,7 @@ class ReservedName(models.Model):
     def __str__(self):
         return self.name
 
+
 # A simpler shared-foreign-key setup that can expose some problems.
 
 
@@ -319,6 +326,7 @@ class PointerA(models.Model):
 class PointerB(models.Model):
     connection = models.ForeignKey(SharedConnection, models.CASCADE)
 
+
 # Multi-layer ordering
 
 
@@ -326,7 +334,7 @@ class SingleObject(models.Model):
     name = models.CharField(max_length=10)
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
     def __str__(self):
         return self.name
@@ -337,7 +345,7 @@ class RelatedObject(models.Model):
     f = models.IntegerField(null=True)
 
     class Meta:
-        ordering = ['single']
+        ordering = ["single"]
 
 
 class Plaything(models.Model):
@@ -345,7 +353,7 @@ class Plaything(models.Model):
     others = models.ForeignKey(RelatedObject, models.SET_NULL, null=True)
 
     class Meta:
-        ordering = ['others']
+        ordering = ["others"]
 
     def __str__(self):
         return self.name
@@ -381,6 +389,7 @@ class Node(models.Model):
     def __str__(self):
         return "%s" % self.num
 
+
 # Bug #12252
 
 
@@ -392,7 +401,7 @@ class ObjectA(models.Model):
 
     def __iter__(self):
         # Ticket #23721
-        assert False, 'type checking should happen without calling model __iter__'
+        assert False, "type checking should happen without calling model __iter__"
 
 
 class ProxyObjectA(ObjectA):
@@ -422,7 +431,9 @@ class ObjectC(models.Model):
     name = models.CharField(max_length=50)
     objecta = models.ForeignKey(ObjectA, models.SET_NULL, null=True)
     objectb = models.ForeignKey(ObjectB, models.SET_NULL, null=True)
-    childobjecta = models.ForeignKey(ChildObjectA, models.SET_NULL, null=True, related_name='ca_pk')
+    childobjecta = models.ForeignKey(
+        ChildObjectA, models.SET_NULL, null=True, related_name="ca_pk"
+    )
 
     def __str__(self):
         return self.name
@@ -454,7 +465,9 @@ class MixedCaseFieldCategoryItem(models.Model):
 
 
 class MixedCaseDbColumnCategoryItem(models.Model):
-    category = models.ForeignKey(SimpleCategory, models.CASCADE, db_column='CaTeGoRy_Id')
+    category = models.ForeignKey(
+        SimpleCategory, models.CASCADE, db_column="CaTeGoRy_Id"
+    )
 
 
 class OneToOneCategory(models.Model):
@@ -466,21 +479,27 @@ class OneToOneCategory(models.Model):
 
 
 class CategoryRelationship(models.Model):
-    first = models.ForeignKey(SimpleCategory, models.CASCADE, related_name='first_rel')
-    second = models.ForeignKey(SimpleCategory, models.CASCADE, related_name='second_rel')
+    first = models.ForeignKey(SimpleCategory, models.CASCADE, related_name="first_rel")
+    second = models.ForeignKey(
+        SimpleCategory, models.CASCADE, related_name="second_rel"
+    )
 
 
 class CommonMixedCaseForeignKeys(models.Model):
     category = models.ForeignKey(CategoryItem, models.CASCADE)
-    mixed_case_field_category = models.ForeignKey(MixedCaseFieldCategoryItem, models.CASCADE)
-    mixed_case_db_column_category = models.ForeignKey(MixedCaseDbColumnCategoryItem, models.CASCADE)
+    mixed_case_field_category = models.ForeignKey(
+        MixedCaseFieldCategoryItem, models.CASCADE
+    )
+    mixed_case_db_column_category = models.ForeignKey(
+        MixedCaseDbColumnCategoryItem, models.CASCADE
+    )
 
 
 class NullableName(models.Model):
     name = models.CharField(max_length=20, null=True)
 
     class Meta:
-        ordering = ['id']
+        ordering = ["id"]
 
 
 class ModelD(models.Model):
@@ -510,17 +529,21 @@ class Job(models.Model):
 
 
 class JobResponsibilities(models.Model):
-    job = models.ForeignKey(Job, models.CASCADE, to_field='name')
-    responsibility = models.ForeignKey('Responsibility', models.CASCADE, to_field='description')
+    job = models.ForeignKey(Job, models.CASCADE, to_field="name")
+    responsibility = models.ForeignKey(
+        "Responsibility", models.CASCADE, to_field="description"
+    )
 
 
 class Responsibility(models.Model):
     description = models.CharField(max_length=20, unique=True)
-    jobs = models.ManyToManyField(Job, through=JobResponsibilities,
-                                  related_name='responsibilities')
+    jobs = models.ManyToManyField(
+        Job, through=JobResponsibilities, related_name="responsibilities"
+    )
 
     def __str__(self):
         return self.description
+
 
 # Models for disjunction join promotion low level testing.
 
@@ -564,17 +587,17 @@ class Channel(models.Model):
 
 class Book(models.Model):
     title = models.TextField()
-    chapter = models.ForeignKey('Chapter', models.CASCADE)
+    chapter = models.ForeignKey("Chapter", models.CASCADE)
 
 
 class Chapter(models.Model):
     title = models.TextField()
-    paragraph = models.ForeignKey('Paragraph', models.CASCADE)
+    paragraph = models.ForeignKey("Paragraph", models.CASCADE)
 
 
 class Paragraph(models.Model):
     text = models.TextField()
-    page = models.ManyToManyField('Page')
+    page = models.ManyToManyField("Page")
 
 
 class Page(models.Model):
@@ -582,33 +605,36 @@ class Page(models.Model):
 
 
 class MyObject(models.Model):
-    parent = models.ForeignKey('self', models.SET_NULL, null=True, blank=True, related_name='children')
+    parent = models.ForeignKey(
+        "self", models.SET_NULL, null=True, blank=True, related_name="children"
+    )
     data = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
+
 
 # Models for #17600 regressions
 
 
 class Order(models.Model):
     id = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=12, null=True, default='')
+    name = models.CharField(max_length=12, null=True, default="")
 
     class Meta:
-        ordering = ('pk',)
+        ordering = ("pk",)
 
     def __str__(self):
-        return '%s' % self.pk
+        return "%s" % self.pk
 
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, models.CASCADE, related_name='items')
+    order = models.ForeignKey(Order, models.CASCADE, related_name="items")
     status = models.IntegerField()
 
     class Meta:
-        ordering = ('pk',)
+        ordering = ("pk",)
 
     def __str__(self):
-        return '%s' % self.pk
+        return "%s" % self.pk
 
 
 class BaseUser(models.Model):
@@ -617,8 +643,8 @@ class BaseUser(models.Model):
 
 class Task(models.Model):
     title = models.CharField(max_length=10)
-    owner = models.ForeignKey(BaseUser, models.CASCADE, related_name='owner')
-    creator = models.ForeignKey(BaseUser, models.CASCADE, related_name='creator')
+    owner = models.ForeignKey(BaseUser, models.CASCADE, related_name="owner")
+    creator = models.ForeignKey(BaseUser, models.CASCADE, related_name="creator")
 
     def __str__(self):
         return self.title
@@ -632,7 +658,7 @@ class Staff(models.Model):
 
 
 class StaffUser(BaseUser):
-    staff = models.OneToOneField(Staff, models.CASCADE, related_name='user')
+    staff = models.OneToOneField(Staff, models.CASCADE, related_name="user")
 
     def __str__(self):
         return self.staff
@@ -655,7 +681,9 @@ class Person(models.Model):
 
 class Company(models.Model):
     name = models.CharField(max_length=128)
-    employees = models.ManyToManyField(Person, related_name='employers', through='Employment')
+    employees = models.ManyToManyField(
+        Person, related_name="employers", through="Employment"
+    )
 
     def __str__(self):
         return self.name
@@ -679,12 +707,12 @@ class Classroom(models.Model):
     name = models.CharField(max_length=20)
     has_blackboard = models.BooleanField(null=True)
     school = models.ForeignKey(School, models.CASCADE)
-    students = models.ManyToManyField(Student, related_name='classroom')
+    students = models.ManyToManyField(Student, related_name="classroom")
 
 
 class Teacher(models.Model):
     schools = models.ManyToManyField(School)
-    friends = models.ManyToManyField('self')
+    friends = models.ManyToManyField("self")
 
 
 class Ticket23605AParent(models.Model):
@@ -711,16 +739,18 @@ class Individual(models.Model):
     alive = models.BooleanField()
 
     class Meta:
-        db_table = 'Individual'
+        db_table = "Individual"
 
 
 class RelatedIndividual(models.Model):
-    related = models.ForeignKey(Individual, models.CASCADE, related_name='related_individual')
+    related = models.ForeignKey(
+        Individual, models.CASCADE, related_name="related_individual"
+    )
 
     class Meta:
-        db_table = 'RelatedIndividual'
+        db_table = "RelatedIndividual"
 
 
 class CustomDbColumn(models.Model):
-    custom_column = models.IntegerField(db_column='custom_name', null=True)
+    custom_column = models.IntegerField(db_column="custom_name", null=True)
     ip_address = models.GenericIPAddressField(null=True)

@@ -27,7 +27,7 @@ class Reporter(models.Model):
     interval = models.DurationField()
 
     class Meta:
-        unique_together = ('first_name', 'last_name')
+        unique_together = ("first_name", "last_name")
 
     def __str__(self):
         return "%s %s" % (self.first_name, self.last_name)
@@ -36,16 +36,18 @@ class Reporter(models.Model):
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateField()
-    body = models.TextField(default='')
+    body = models.TextField(default="")
     reporter = models.ForeignKey(Reporter, models.CASCADE)
-    response_to = models.ForeignKey('self', models.SET_NULL, null=True)
-    unmanaged_reporters = models.ManyToManyField(Reporter, through='ArticleReporter', related_name='+')
+    response_to = models.ForeignKey("self", models.SET_NULL, null=True)
+    unmanaged_reporters = models.ManyToManyField(
+        Reporter, through="ArticleReporter", related_name="+"
+    )
 
     class Meta:
-        ordering = ('headline',)
+        ordering = ("headline",)
         index_together = [
             ["headline", "pub_date"],
-            ['headline', 'response_to', 'pub_date', 'reporter'],
+            ["headline", "response_to", "pub_date", "reporter"],
         ]
 
     def __str__(self):
@@ -70,9 +72,14 @@ class Comment(models.Model):
 
     class Meta:
         constraints = [
-            models.CheckConstraint(name='up_votes_gte_0_check', check=models.Q(up_votes__gte=0)),
-            models.UniqueConstraint(fields=['article', 'email', 'pub_date'], name='article_email_pub_date_uniq'),
+            models.CheckConstraint(
+                name="up_votes_gte_0_check", check=models.Q(up_votes__gte=0)
+            ),
+            models.UniqueConstraint(
+                fields=["article", "email", "pub_date"],
+                name="article_email_pub_date_uniq",
+            ),
         ]
         indexes = [
-            models.Index(fields=['email', 'pub_date'], name='email_pub_date_idx'),
+            models.Index(fields=["email", "pub_date"], name="email_pub_date_idx")
         ]

@@ -15,10 +15,12 @@ def file_upload_view(request):
     """
     form_data = request.POST.copy()
     form_data.update(request.FILES)
-    if isinstance(form_data.get('file_field'), UploadedFile) and isinstance(form_data['name'], str):
+    if isinstance(form_data.get("file_field"), UploadedFile) and isinstance(
+        form_data["name"], str
+    ):
         # If a file is posted, the dummy client should only post the file name,
         # not the full path.
-        if os.path.dirname(form_data['file_field'].name) != '':
+        if os.path.dirname(form_data["file_field"].name) != "":
             return HttpResponseServerError()
         return HttpResponse()
     else:
@@ -33,11 +35,11 @@ def file_upload_view_verify(request):
     form_data.update(request.FILES)
 
     for key, value in form_data.items():
-        if key.endswith('_hash'):
+        if key.endswith("_hash"):
             continue
-        if key + '_hash' not in form_data:
+        if key + "_hash" not in form_data:
             continue
-        submitted_hash = form_data[key + '_hash']
+        submitted_hash = form_data[key + "_hash"]
         if isinstance(value, UploadedFile):
             new_hash = hashlib.sha1(value.read()).hexdigest()
         else:
@@ -46,7 +48,7 @@ def file_upload_view_verify(request):
             return HttpResponseServerError()
 
     # Adding large file to the database should succeed
-    largefile = request.FILES['file_field2']
+    largefile = request.FILES["file_field2"]
     obj = FileModel()
     obj.testfile.save(largefile.name, largefile)
 
@@ -55,13 +57,13 @@ def file_upload_view_verify(request):
 
 def file_upload_unicode_name(request):
     # Check to see if unicode name came through properly.
-    if not request.FILES['file_unicode'].name.endswith(UNICODE_FILENAME):
+    if not request.FILES["file_unicode"].name.endswith(UNICODE_FILENAME):
         return HttpResponseServerError()
     # Check to make sure the exotic characters are preserved even
     # through file save.
-    uni_named_file = request.FILES['file_unicode']
+    uni_named_file = request.FILES["file_unicode"]
     FileModel.objects.create(testfile=uni_named_file)
-    full_name = '%s/%s' % (UPLOAD_TO, uni_named_file.name)
+    full_name = "%s/%s" % (UPLOAD_TO, uni_named_file.name)
     return HttpResponse() if os.path.exists(full_name) else HttpResponseServerError()
 
 
@@ -77,9 +79,11 @@ def file_upload_echo_content(request):
     """
     Simple view to echo back the content of uploaded files for tests.
     """
+
     def read_and_close(f):
         with f:
             return f.read().decode()
+
     r = {k: read_and_close(f) for k, f in request.FILES.items()}
     return JsonResponse(r)
 
@@ -121,10 +125,10 @@ def file_upload_filename_case_view(request):
     """
     Check adding the file to the database will preserve the filename case.
     """
-    file = request.FILES['file_field']
+    file = request.FILES["file_field"]
     obj = FileModel()
     obj.testfile.save(file.name, file)
-    return HttpResponse('%d' % obj.pk)
+    return HttpResponse("%d" % obj.pk)
 
 
 def file_upload_content_type_extra(request):
@@ -133,11 +137,13 @@ def file_upload_content_type_extra(request):
     """
     params = {}
     for file_name, uploadedfile in request.FILES.items():
-        params[file_name] = {k: v.decode() for k, v in uploadedfile.content_type_extra.items()}
+        params[file_name] = {
+            k: v.decode() for k, v in uploadedfile.content_type_extra.items()
+        }
     return JsonResponse(params)
 
 
 def file_upload_fd_closing(request, access):
-    if access == 't':
+    if access == "t":
         request.FILES  # Trigger file parsing.
     return HttpResponse()

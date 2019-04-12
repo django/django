@@ -11,7 +11,7 @@ from django.utils.module_loading import import_string
 
 from .exception import convert_exception_to_response
 
-logger = logging.getLogger('django.request')
+logger = logging.getLogger("django.request")
 
 
 class BaseHandler:
@@ -38,21 +38,23 @@ class BaseHandler:
             except MiddlewareNotUsed as exc:
                 if settings.DEBUG:
                     if str(exc):
-                        logger.debug('MiddlewareNotUsed(%r): %s', middleware_path, exc)
+                        logger.debug("MiddlewareNotUsed(%r): %s", middleware_path, exc)
                     else:
-                        logger.debug('MiddlewareNotUsed: %r', middleware_path)
+                        logger.debug("MiddlewareNotUsed: %r", middleware_path)
                 continue
 
             if mw_instance is None:
                 raise ImproperlyConfigured(
-                    'Middleware factory %s returned None.' % middleware_path
+                    "Middleware factory %s returned None." % middleware_path
                 )
 
-            if hasattr(mw_instance, 'process_view'):
+            if hasattr(mw_instance, "process_view"):
                 self._view_middleware.insert(0, mw_instance.process_view)
-            if hasattr(mw_instance, 'process_template_response'):
-                self._template_response_middleware.append(mw_instance.process_template_response)
-            if hasattr(mw_instance, 'process_exception'):
+            if hasattr(mw_instance, "process_template_response"):
+                self._template_response_middleware.append(
+                    mw_instance.process_template_response
+                )
+            if hasattr(mw_instance, "process_exception"):
                 self._exception_middleware.append(mw_instance.process_exception)
 
             handler = convert_exception_to_response(mw_instance)
@@ -62,9 +64,12 @@ class BaseHandler:
         self._middleware_chain = handler
 
     def make_view_atomic(self, view):
-        non_atomic_requests = getattr(view, '_non_atomic_requests', set())
+        non_atomic_requests = getattr(view, "_non_atomic_requests", set())
         for db in connections.all():
-            if db.settings_dict['ATOMIC_REQUESTS'] and db.alias not in non_atomic_requests:
+            if (
+                db.settings_dict["ATOMIC_REQUESTS"]
+                and db.alias not in non_atomic_requests
+            ):
                 view = transaction.atomic(using=db.alias)(view)
         return view
 
@@ -76,7 +81,9 @@ class BaseHandler:
         response._closable_objects.append(request)
         if response.status_code >= 400:
             log_response(
-                '%s: %s', response.reason_phrase, request.path,
+                "%s: %s",
+                response.reason_phrase,
+                request.path,
                 response=response,
                 request=request,
             )
@@ -90,7 +97,7 @@ class BaseHandler:
         """
         response = None
 
-        if hasattr(request, 'urlconf'):
+        if hasattr(request, "urlconf"):
             urlconf = request.urlconf
             set_urlconf(urlconf)
             resolver = get_resolver(urlconf)
@@ -103,7 +110,9 @@ class BaseHandler:
 
         # Apply view middleware
         for middleware_method in self._view_middleware:
-            response = middleware_method(request, callback, callback_args, callback_kwargs)
+            response = middleware_method(
+                request, callback, callback_args, callback_kwargs
+            )
             if response:
                 break
 
@@ -116,10 +125,10 @@ class BaseHandler:
 
         # Complain if the view returned None (a common error).
         if response is None:
-            if isinstance(callback, types.FunctionType):    # FBV
+            if isinstance(callback, types.FunctionType):  # FBV
                 view_name = callback.__name__
-            else:                                           # CBV
-                view_name = callback.__class__.__name__ + '.__call__'
+            else:  # CBV
+                view_name = callback.__class__.__name__ + ".__call__"
 
             raise ValueError(
                 "The view %s.%s didn't return an HttpResponse object. It "
@@ -128,7 +137,7 @@ class BaseHandler:
 
         # If the response supports deferred rendering, apply template
         # response middleware and then render the response
-        elif hasattr(response, 'render') and callable(response.render):
+        elif hasattr(response, "render") and callable(response.render):
             for middleware_method in self._template_response_middleware:
                 response = middleware_method(request, response)
                 # Complain if the template response middleware returned None (a common error).

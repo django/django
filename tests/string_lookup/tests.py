@@ -4,7 +4,6 @@ from .models import Article, Bar, Base, Child, Foo, Whiz
 
 
 class StringLookupTests(TestCase):
-
     def test_string_form_referencing(self):
         """
         Regression test for #1661 and #1662
@@ -47,9 +46,9 @@ class StringLookupTests(TestCase):
         A properly configured UTF-8 database can handle this.
         """
 
-        fx = Foo(name='Bjorn', friend='François')
+        fx = Foo(name="Bjorn", friend="François")
         fx.save()
-        self.assertEqual(Foo.objects.get(friend__contains='\xe7'), fx)
+        self.assertEqual(Foo.objects.get(friend__contains="\xe7"), fx)
 
     def test_queries_on_textfields(self):
         """
@@ -58,11 +57,16 @@ class StringLookupTests(TestCase):
         make sure we can perform queries on TextFields.
         """
 
-        a = Article(name='Test', text='The quick brown fox jumps over the lazy dog.')
+        a = Article(name="Test", text="The quick brown fox jumps over the lazy dog.")
         a.save()
-        self.assertEqual(Article.objects.get(text__exact='The quick brown fox jumps over the lazy dog.'), a)
+        self.assertEqual(
+            Article.objects.get(
+                text__exact="The quick brown fox jumps over the lazy dog."
+            ),
+            a,
+        )
 
-        self.assertEqual(Article.objects.get(text__contains='quick brown fox'), a)
+        self.assertEqual(Article.objects.get(text__contains="quick brown fox"), a)
 
     def test_ipaddress_on_postgresql(self):
         """
@@ -70,8 +74,12 @@ class StringLookupTests(TestCase):
 
         "like" queries on IP address fields require casting with HOST() (on PostgreSQL).
         """
-        a = Article(name='IP test', text='The body', submitted_from='192.0.2.100')
+        a = Article(name="IP test", text="The body", submitted_from="192.0.2.100")
         a.save()
-        self.assertSequenceEqual(Article.objects.filter(submitted_from__contains='192.0.2'), [a])
+        self.assertSequenceEqual(
+            Article.objects.filter(submitted_from__contains="192.0.2"), [a]
+        )
         # The searches do not match the subnet mask (/32 in this case)
-        self.assertEqual(Article.objects.filter(submitted_from__contains='32').count(), 0)
+        self.assertEqual(
+            Article.objects.filter(submitted_from__contains="32").count(), 0
+        )

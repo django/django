@@ -8,7 +8,7 @@ class Place(models.Model):
     address = models.CharField(max_length=80)
 
     class Meta:
-        ordering = ('name',)
+        ordering = ("name",)
 
     def __str__(self):
         return "%s the place" % self.name
@@ -31,7 +31,9 @@ class ItalianRestaurant(Restaurant):
 
 class ParkingLot(Place):
     # An explicit link to the parent (we can control the attribute name).
-    parent = models.OneToOneField(Place, models.CASCADE, primary_key=True, parent_link=True)
+    parent = models.OneToOneField(
+        Place, models.CASCADE, primary_key=True, parent_link=True
+    )
     capacity = models.IntegerField()
 
     def __str__(self):
@@ -69,7 +71,9 @@ class Supplier(models.Model):
 
 
 class Wholesaler(Supplier):
-    retailer = models.ForeignKey(Supplier, models.CASCADE, related_name='wholesale_supplier')
+    retailer = models.ForeignKey(
+        Supplier, models.CASCADE, related_name="wholesale_supplier"
+    )
 
 
 class Parent(models.Model):
@@ -82,7 +86,7 @@ class Child(Parent):
 
 class SelfRefParent(models.Model):
     parent_data = models.IntegerField()
-    self_data = models.ForeignKey('self', models.SET_NULL, null=True)
+    self_data = models.ForeignKey("self", models.SET_NULL, null=True)
 
 
 class SelfRefChild(SelfRefParent):
@@ -94,7 +98,7 @@ class Article(models.Model):
     pub_date = models.DateTimeField()
 
     class Meta:
-        ordering = ('-pub_date', 'headline')
+        ordering = ("-pub_date", "headline")
 
     def __str__(self):
         return self.headline
@@ -136,7 +140,10 @@ class DerivedM(BaseM):
 
     def __str__(self):
         return "PK = %d, base_name = %s, derived_name = %s" % (
-            self.customPK, self.base_name, self.derived_name)
+            self.customPK,
+            self.base_name,
+            self.derived_name,
+        )
 
 
 class AuditBase(models.Model):
@@ -144,7 +151,7 @@ class AuditBase(models.Model):
 
     class Meta:
         abstract = True
-        verbose_name_plural = 'Audits'
+        verbose_name_plural = "Audits"
 
 
 class CertificationAudit(AuditBase):
@@ -161,7 +168,7 @@ class Person(models.Model):
     name = models.CharField(max_length=100)
 
     class Meta:
-        ordering = ('name',)
+        ordering = ("name",)
 
     def __str__(self):
         return self.name
@@ -173,7 +180,7 @@ class AbstractEvent(models.Model):
 
     class Meta:
         abstract = True
-        ordering = ('name',)
+        ordering = ("name",)
 
     def __str__(self):
         return self.name

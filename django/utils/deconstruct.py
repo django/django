@@ -10,6 +10,7 @@ def deconstructible(*args, path=None):
 
     The `path` kwarg specifies the import path.
     """
+
     def decorator(klass):
         def __new__(cls, *args, **kwargs):
             # We capture the arguments to make returning them trivial
@@ -24,7 +25,7 @@ def deconstructible(*args, path=None):
             """
             # Fallback version
             if path:
-                module_name, _, name = path.rpartition('.')
+                module_name, _, name = path.rpartition(".")
             else:
                 module_name = obj.__module__
                 name = obj.__class__.__name__
@@ -38,9 +39,10 @@ def deconstructible(*args, path=None):
                     "body to use migrations.\n"
                     "For more information, see "
                     "https://docs.djangoproject.com/en/%s/topics/migrations/#serializing-values"
-                    % (name, module_name, get_docs_version()))
+                    % (name, module_name, get_docs_version())
+                )
             return (
-                path or '%s.%s' % (obj.__class__.__module__, name),
+                path or "%s.%s" % (obj.__class__.__module__, name),
                 obj._constructor_args[0],
                 obj._constructor_args[1],
             )

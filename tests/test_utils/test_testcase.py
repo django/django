@@ -5,9 +5,8 @@ from .models import Car, PossessedCar
 
 
 class TestTestCase(TestCase):
-
-    @skipUnlessDBFeature('can_defer_constraint_checks')
-    @skipUnlessDBFeature('supports_foreign_keys')
+    @skipUnlessDBFeature("can_defer_constraint_checks")
+    @skipUnlessDBFeature("supports_foreign_keys")
     def test_fixture_teardown_checks_constraints(self):
         rollback_atomics = self._rollback_atomics
         self._rollback_atomics = lambda connection: None  # noop
@@ -26,9 +25,9 @@ class TestTestCase(TestCase):
             "ensure proper test isolation and silence this failure."
         )
         with self.assertRaisesMessage(AssertionError, message):
-            connections['other'].connect()
+            connections["other"].connect()
         with self.assertRaisesMessage(AssertionError, message):
-            connections['other'].temporary_connection()
+            connections["other"].temporary_connection()
 
     def test_disallowed_database_queries(self):
         message = (
@@ -37,4 +36,4 @@ class TestTestCase(TestCase):
             "ensure proper test isolation and silence this failure."
         )
         with self.assertRaisesMessage(AssertionError, message):
-            Car.objects.using('other').get()
+            Car.objects.using("other").get()

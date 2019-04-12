@@ -2,7 +2,9 @@ from django.apps import apps
 from django.db import models
 
 
-def sql_flush(style, connection, only_django=False, reset_sequences=True, allow_cascade=False):
+def sql_flush(
+    style, connection, only_django=False, reset_sequences=True, allow_cascade=False
+):
     """
     Return a list of the SQL statements used to flush the database.
 
@@ -10,7 +12,9 @@ def sql_flush(style, connection, only_django=False, reset_sequences=True, allow_
     Django models and are in INSTALLED_APPS .
     """
     if only_django:
-        tables = connection.introspection.django_table_names(only_existing=True, include_views=False)
+        tables = connection.introspection.django_table_names(
+            only_existing=True, include_views=False
+        )
     else:
         tables = connection.introspection.table_names(include_views=False)
     seqs = connection.introspection.sequence_list() if reset_sequences else ()
@@ -31,7 +35,7 @@ def emit_pre_migrate_signal(verbosity, interactive, db, **kwargs):
             verbosity=verbosity,
             interactive=interactive,
             using=db,
-            **kwargs
+            **kwargs,
         )
 
 
@@ -48,5 +52,5 @@ def emit_post_migrate_signal(verbosity, interactive, db, **kwargs):
             verbosity=verbosity,
             interactive=interactive,
             using=db,
-            **kwargs
+            **kwargs,
         )

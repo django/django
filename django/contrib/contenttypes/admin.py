@@ -4,7 +4,8 @@ from django.contrib.admin.checks import InlineModelAdminChecks
 from django.contrib.admin.options import InlineModelAdmin, flatten_fieldsets
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.forms import (
-    BaseGenericInlineFormSet, generic_inlineformset_factory,
+    BaseGenericInlineFormSet,
+    generic_inlineformset_factory,
 )
 from django.core import checks
 from django.core.exceptions import FieldDoesNotExist
@@ -22,17 +23,17 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
         # and that they are part of a GenericForeignKey.
 
         gfks = [
-            f for f in obj.model._meta.private_fields
+            f
+            for f in obj.model._meta.private_fields
             if isinstance(f, GenericForeignKey)
         ]
         if not gfks:
             return [
                 checks.Error(
-                    "'%s.%s' has no GenericForeignKey." % (
-                        obj.model._meta.app_label, obj.model._meta.object_name
-                    ),
+                    "'%s.%s' has no GenericForeignKey."
+                    % (obj.model._meta.app_label, obj.model._meta.object_name),
                     obj=obj.__class__,
-                    id='admin.E301'
+                    id="admin.E301",
                 )
             ]
         else:
@@ -42,11 +43,14 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
             except FieldDoesNotExist:
                 return [
                     checks.Error(
-                        "'ct_field' references '%s', which is not a field on '%s.%s'." % (
-                            obj.ct_field, obj.model._meta.app_label, obj.model._meta.object_name
+                        "'ct_field' references '%s', which is not a field on '%s.%s'."
+                        % (
+                            obj.ct_field,
+                            obj.model._meta.app_label,
+                            obj.model._meta.object_name,
                         ),
                         obj=obj.__class__,
-                        id='admin.E302'
+                        id="admin.E302",
                     )
                 ]
 
@@ -55,11 +59,14 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
             except FieldDoesNotExist:
                 return [
                     checks.Error(
-                        "'ct_fk_field' references '%s', which is not a field on '%s.%s'." % (
-                            obj.ct_fk_field, obj.model._meta.app_label, obj.model._meta.object_name
+                        "'ct_fk_field' references '%s', which is not a field on '%s.%s'."
+                        % (
+                            obj.ct_fk_field,
+                            obj.model._meta.app_label,
+                            obj.model._meta.object_name,
                         ),
                         obj=obj.__class__,
-                        id='admin.E303'
+                        id="admin.E303",
                     )
                 ]
 
@@ -71,11 +78,15 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
 
             return [
                 checks.Error(
-                    "'%s.%s' has no GenericForeignKey using content type field '%s' and object ID field '%s'." % (
-                        obj.model._meta.app_label, obj.model._meta.object_name, obj.ct_field, obj.ct_fk_field
+                    "'%s.%s' has no GenericForeignKey using content type field '%s' and object ID field '%s'."
+                    % (
+                        obj.model._meta.app_label,
+                        obj.model._meta.object_name,
+                        obj.ct_field,
+                        obj.ct_fk_field,
                     ),
                     obj=obj.__class__,
-                    id='admin.E304'
+                    id="admin.E304",
                 )
             ]
 
@@ -88,42 +99,48 @@ class GenericInlineModelAdmin(InlineModelAdmin):
     checks_class = GenericInlineModelAdminChecks
 
     def get_formset(self, request, obj=None, **kwargs):
-        if 'fields' in kwargs:
-            fields = kwargs.pop('fields')
+        if "fields" in kwargs:
+            fields = kwargs.pop("fields")
         else:
             fields = flatten_fieldsets(self.get_fieldsets(request, obj))
         exclude = [*(self.exclude or []), *self.get_readonly_fields(request, obj)]
-        if self.exclude is None and hasattr(self.form, '_meta') and self.form._meta.exclude:
+        if (
+            self.exclude is None
+            and hasattr(self.form, "_meta")
+            and self.form._meta.exclude
+        ):
             # Take the custom ModelForm's Meta.exclude into account only if the
             # GenericInlineModelAdmin doesn't define its own.
             exclude.extend(self.form._meta.exclude)
         exclude = exclude or None
         can_delete = self.can_delete and self.has_delete_permission(request, obj)
         defaults = {
-            'ct_field': self.ct_field,
-            'fk_field': self.ct_fk_field,
-            'form': self.form,
-            'formfield_callback': partial(self.formfield_for_dbfield, request=request),
-            'formset': self.formset,
-            'extra': self.get_extra(request, obj),
-            'can_delete': can_delete,
-            'can_order': False,
-            'fields': fields,
-            'min_num': self.get_min_num(request, obj),
-            'max_num': self.get_max_num(request, obj),
-            'exclude': exclude,
+            "ct_field": self.ct_field,
+            "fk_field": self.ct_fk_field,
+            "form": self.form,
+            "formfield_callback": partial(self.formfield_for_dbfield, request=request),
+            "formset": self.formset,
+            "extra": self.get_extra(request, obj),
+            "can_delete": can_delete,
+            "can_order": False,
+            "fields": fields,
+            "min_num": self.get_min_num(request, obj),
+            "max_num": self.get_max_num(request, obj),
+            "exclude": exclude,
             **kwargs,
         }
 
-        if defaults['fields'] is None and not modelform_defines_fields(defaults['form']):
-            defaults['fields'] = ALL_FIELDS
+        if defaults["fields"] is None and not modelform_defines_fields(
+            defaults["form"]
+        ):
+            defaults["fields"] = ALL_FIELDS
 
         return generic_inlineformset_factory(self.model, **defaults)
 
 
 class GenericStackedInline(GenericInlineModelAdmin):
-    template = 'admin/edit_inline/stacked.html'
+    template = "admin/edit_inline/stacked.html"
 
 
 class GenericTabularInline(GenericInlineModelAdmin):
-    template = 'admin/edit_inline/tabular.html'
+    template = "admin/edit_inline/tabular.html"

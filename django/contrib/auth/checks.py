@@ -12,7 +12,7 @@ def check_user_model(app_configs=None, **kwargs):
     if app_configs is None:
         cls = apps.get_model(settings.AUTH_USER_MODEL)
     else:
-        app_label, model_name = settings.AUTH_USER_MODEL.split('.')
+        app_label, model_name = settings.AUTH_USER_MODEL.split(".")
         for app_config in app_configs:
             if app_config.label == app_label:
                 cls = app_config.get_model(model_name)
@@ -29,9 +29,7 @@ def check_user_model(app_configs=None, **kwargs):
     if not isinstance(cls.REQUIRED_FIELDS, (list, tuple)):
         errors.append(
             checks.Error(
-                "'REQUIRED_FIELDS' must be a list or tuple.",
-                obj=cls,
-                id='auth.E001',
+                "'REQUIRED_FIELDS' must be a list or tuple.", obj=cls, id="auth.E001"
             )
         )
 
@@ -42,53 +40,52 @@ def check_user_model(app_configs=None, **kwargs):
                 "The field named as the 'USERNAME_FIELD' "
                 "for a custom user model must not be included in 'REQUIRED_FIELDS'.",
                 obj=cls,
-                id='auth.E002',
+                id="auth.E002",
             )
         )
 
     # Check that the username field is unique
     if not cls._meta.get_field(cls.USERNAME_FIELD).unique:
-        if (settings.AUTHENTICATION_BACKENDS ==
-                ['django.contrib.auth.backends.ModelBackend']):
+        if settings.AUTHENTICATION_BACKENDS == [
+            "django.contrib.auth.backends.ModelBackend"
+        ]:
             errors.append(
                 checks.Error(
-                    "'%s.%s' must be unique because it is named as the 'USERNAME_FIELD'." % (
-                        cls._meta.object_name, cls.USERNAME_FIELD
-                    ),
+                    "'%s.%s' must be unique because it is named as the 'USERNAME_FIELD'."
+                    % (cls._meta.object_name, cls.USERNAME_FIELD),
                     obj=cls,
-                    id='auth.E003',
+                    id="auth.E003",
                 )
             )
         else:
             errors.append(
                 checks.Warning(
-                    "'%s.%s' is named as the 'USERNAME_FIELD', but it is not unique." % (
-                        cls._meta.object_name, cls.USERNAME_FIELD
-                    ),
-                    hint='Ensure that your authentication backend(s) can handle non-unique usernames.',
+                    "'%s.%s' is named as the 'USERNAME_FIELD', but it is not unique."
+                    % (cls._meta.object_name, cls.USERNAME_FIELD),
+                    hint="Ensure that your authentication backend(s) can handle non-unique usernames.",
                     obj=cls,
-                    id='auth.W004',
+                    id="auth.W004",
                 )
             )
 
     if isinstance(cls().is_anonymous, MethodType):
         errors.append(
             checks.Critical(
-                '%s.is_anonymous must be an attribute or property rather than '
-                'a method. Ignoring this is a security issue as anonymous '
-                'users will be treated as authenticated!' % cls,
+                "%s.is_anonymous must be an attribute or property rather than "
+                "a method. Ignoring this is a security issue as anonymous "
+                "users will be treated as authenticated!" % cls,
                 obj=cls,
-                id='auth.C009',
+                id="auth.C009",
             )
         )
     if isinstance(cls().is_authenticated, MethodType):
         errors.append(
             checks.Critical(
-                '%s.is_authenticated must be an attribute or property rather '
-                'than a method. Ignoring this is a security issue as anonymous '
-                'users will be treated as authenticated!' % cls,
+                "%s.is_authenticated must be an attribute or property rather "
+                "than a method. Ignoring this is a security issue as anonymous "
+                "users will be treated as authenticated!" % cls,
                 obj=cls,
-                id='auth.C010',
+                id="auth.C010",
             )
         )
     return errors
@@ -98,10 +95,12 @@ def check_models_permissions(app_configs=None, **kwargs):
     if app_configs is None:
         models = apps.get_models()
     else:
-        models = chain.from_iterable(app_config.get_models() for app_config in app_configs)
+        models = chain.from_iterable(
+            app_config.get_models() for app_config in app_configs
+        )
 
-    Permission = apps.get_model('auth', 'Permission')
-    permission_name_max_length = Permission._meta.get_field('name').max_length
+    Permission = apps.get_model("auth", "Permission")
+    permission_name_max_length = Permission._meta.get_field("name").max_length
     errors = []
 
     for model in models:
@@ -110,20 +109,25 @@ def check_models_permissions(app_configs=None, **kwargs):
         # Check builtin permission name length.
         max_builtin_permission_name_length = (
             max(len(name) for name in builtin_permissions.values())
-            if builtin_permissions else 0
+            if builtin_permissions
+            else 0
         )
         if max_builtin_permission_name_length > permission_name_max_length:
-            verbose_name_max_length = (
-                permission_name_max_length - (max_builtin_permission_name_length - len(opts.verbose_name_raw))
+            verbose_name_max_length = permission_name_max_length - (
+                max_builtin_permission_name_length - len(opts.verbose_name_raw)
             )
             errors.append(
                 checks.Error(
                     "The verbose_name of model '%s.%s' must be at most %d characters "
-                    "for its builtin permission names to be at most %d characters." % (
-                        opts.app_label, opts.object_name, verbose_name_max_length, permission_name_max_length
+                    "for its builtin permission names to be at most %d characters."
+                    % (
+                        opts.app_label,
+                        opts.object_name,
+                        verbose_name_max_length,
+                        permission_name_max_length,
                     ),
                     obj=model,
-                    id='auth.E007',
+                    id="auth.E007",
                 )
             )
         codenames = set()
@@ -132,11 +136,15 @@ def check_models_permissions(app_configs=None, **kwargs):
             if len(name) > permission_name_max_length:
                 errors.append(
                     checks.Error(
-                        "The permission named '%s' of model '%s.%s' is longer than %d characters." % (
-                            name, opts.app_label, opts.object_name, permission_name_max_length
+                        "The permission named '%s' of model '%s.%s' is longer than %d characters."
+                        % (
+                            name,
+                            opts.app_label,
+                            opts.object_name,
+                            permission_name_max_length,
                         ),
                         obj=model,
-                        id='auth.E008',
+                        id="auth.E008",
                     )
                 )
             # Check custom permissions codename clashing.
@@ -144,21 +152,19 @@ def check_models_permissions(app_configs=None, **kwargs):
                 errors.append(
                     checks.Error(
                         "The permission codenamed '%s' clashes with a builtin permission "
-                        "for model '%s.%s'." % (
-                            codename, opts.app_label, opts.object_name
-                        ),
+                        "for model '%s.%s'."
+                        % (codename, opts.app_label, opts.object_name),
                         obj=model,
-                        id='auth.E005',
+                        id="auth.E005",
                     )
                 )
             elif codename in codenames:
                 errors.append(
                     checks.Error(
-                        "The permission codenamed '%s' is duplicated for model '%s.%s'." % (
-                            codename, opts.app_label, opts.object_name
-                        ),
+                        "The permission codenamed '%s' is duplicated for model '%s.%s'."
+                        % (codename, opts.app_label, opts.object_name),
                         obj=model,
-                        id='auth.E006',
+                        id="auth.E006",
                     )
                 )
             codenames.add(codename)

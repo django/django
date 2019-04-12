@@ -4,7 +4,8 @@ import inspect
 def get_func_args(func):
     sig = inspect.signature(func)
     return [
-        arg_name for arg_name, param in sig.parameters.items()
+        arg_name
+        for arg_name, param in sig.parameters.items()
         if param.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
     ]
 
@@ -20,12 +21,12 @@ def get_func_full_args(func):
     for arg_name, param in sig.parameters.items():
         name = arg_name
         # Ignore 'self'
-        if name == 'self':
+        if name == "self":
             continue
         if param.kind == inspect.Parameter.VAR_POSITIONAL:
-            name = '*' + name
+            name = "*" + name
         elif param.kind == inspect.Parameter.VAR_KEYWORD:
-            name = '**' + name
+            name = "**" + name
         if param.default != inspect.Parameter.empty:
             args.append((name, param.default))
         else:
@@ -35,7 +36,8 @@ def get_func_full_args(func):
 
 def func_accepts_kwargs(func):
     return any(
-        p for p in inspect.signature(func).parameters.values()
+        p
+        for p in inspect.signature(func).parameters.values()
         if p.kind == p.VAR_KEYWORD
     )
 
@@ -45,17 +47,21 @@ def func_accepts_var_args(func):
     Return True if function 'func' accepts positional arguments *args.
     """
     return any(
-        p for p in inspect.signature(func).parameters.values()
+        p
+        for p in inspect.signature(func).parameters.values()
         if p.kind == p.VAR_POSITIONAL
     )
 
 
 def method_has_no_args(meth):
     """Return True if a method only accepts 'self'."""
-    count = len([
-        p for p in inspect.signature(meth).parameters.values()
-        if p.kind == p.POSITIONAL_OR_KEYWORD
-    ])
+    count = len(
+        [
+            p
+            for p in inspect.signature(meth).parameters.values()
+            if p.kind == p.POSITIONAL_OR_KEYWORD
+        ]
+    )
     return count == 0 if inspect.ismethod(meth) else count == 1
 
 

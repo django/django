@@ -1,6 +1,4 @@
-from django.contrib.contenttypes.fields import (
-    GenericForeignKey, GenericRelation,
-)
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
@@ -18,7 +16,7 @@ class Person(models.Model):
     last_name = models.CharField(max_length=20)
 
     def __str__(self):
-        return '%s %s' % (self.first_name, self.last_name)
+        return "%s %s" % (self.first_name, self.last_name)
 
 
 class SchoolClass(models.Model):
@@ -28,25 +26,33 @@ class SchoolClass(models.Model):
 
 
 class VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ(models.Model):
-    primary_key_is_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz = models.AutoField(primary_key=True)
-    charfield_is_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz = models.CharField(max_length=100)
-    m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz = models.ManyToManyField(Person, blank=True)
+    primary_key_is_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz = models.AutoField(
+        primary_key=True
+    )
+    charfield_is_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz = models.CharField(
+        max_length=100
+    )
+    m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz = models.ManyToManyField(
+        Person, blank=True
+    )
 
 
 class Tag(models.Model):
     name = models.CharField(max_length=30)
-    content_type = models.ForeignKey(ContentType, models.CASCADE, related_name='backend_tags')
+    content_type = models.ForeignKey(
+        ContentType, models.CASCADE, related_name="backend_tags"
+    )
     object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey("content_type", "object_id")
 
 
 class Post(models.Model):
     name = models.CharField(max_length=30)
     text = models.TextField()
-    tags = GenericRelation('Tag')
+    tags = GenericRelation("Tag")
 
     class Meta:
-        db_table = 'CaseSensitive_Post'
+        db_table = "CaseSensitive_Post"
 
 
 class Reporter(models.Model):
@@ -67,10 +73,7 @@ class Article(models.Model):
     pub_date = models.DateField()
     reporter = models.ForeignKey(Reporter, models.CASCADE)
     reporter_proxy = models.ForeignKey(
-        ReporterProxy,
-        models.SET_NULL,
-        null=True,
-        related_name='reporter_proxy',
+        ReporterProxy, models.SET_NULL, null=True, related_name="reporter_proxy"
     )
 
     def __str__(self):
@@ -88,7 +91,9 @@ class Item(models.Model):
 
 
 class Object(models.Model):
-    related_objects = models.ManyToManyField("self", db_constraint=False, symmetrical=False)
+    related_objects = models.ManyToManyField(
+        "self", db_constraint=False, symmetrical=False
+    )
 
     def __str__(self):
         return str(self.id)
@@ -110,4 +115,4 @@ class Author(models.Model):
 
 
 class Book(models.Model):
-    author = models.ForeignKey(Author, models.CASCADE, to_field='name')
+    author = models.ForeignKey(Author, models.CASCADE, to_field="name")

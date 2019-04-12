@@ -20,7 +20,9 @@ def ogrinfo(data_source, num_features=10):
     elif isinstance(data_source, DataSource):
         pass
     else:
-        raise Exception('Data source parameter must be a string or a DataSource object.')
+        raise Exception(
+            "Data source parameter must be a string or a DataSource object."
+        )
 
     for i, layer in enumerate(data_source):
         print("data source : %s" % data_source.name)
@@ -44,8 +46,8 @@ def ogrinfo(data_source, num_features=10):
                     if isinstance(val, str):
                         val_fmt = ' ("%s")'
                     else:
-                        val_fmt = ' (%s)'
+                        val_fmt = " (%s)"
                     output += val_fmt % val
                 else:
-                    output += ' (None)'
+                    output += " (None)"
                 print(output)

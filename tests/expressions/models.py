@@ -12,7 +12,7 @@ class Employee(models.Model):
     salary = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
-        return '%s %s' % (self.firstname, self.lastname)
+        return "%s %s" % (self.firstname, self.lastname)
 
 
 class RemoteEmployee(Employee):
@@ -23,15 +23,11 @@ class Company(models.Model):
     name = models.CharField(max_length=100)
     num_employees = models.PositiveIntegerField()
     num_chairs = models.PositiveIntegerField()
-    ceo = models.ForeignKey(
-        Employee,
-        models.CASCADE,
-        related_name='company_ceo_set',
-    )
+    ceo = models.ForeignKey(Employee, models.CASCADE, related_name="company_ceo_set")
     point_of_contact = models.ForeignKey(
         Employee,
         models.SET_NULL,
-        related_name='company_point_of_contact_set',
+        related_name="company_point_of_contact_set",
         null=True,
     )
 
@@ -40,11 +36,11 @@ class Company(models.Model):
 
 
 class Number(models.Model):
-    integer = models.BigIntegerField(db_column='the_integer')
-    float = models.FloatField(null=True, db_column='the_float')
+    integer = models.BigIntegerField(db_column="the_integer")
+    float = models.FloatField(null=True, db_column="the_float")
 
     def __str__(self):
-        return '%i, %.3f' % (self.integer, self.float)
+        return "%i, %.3f" % (self.integer, self.float)
 
 
 class Experiment(models.Model):
@@ -56,8 +52,8 @@ class Experiment(models.Model):
     end = models.DateTimeField()
 
     class Meta:
-        db_table = 'expressions_ExPeRiMeNt'
-        ordering = ('name',)
+        db_table = "expressions_ExPeRiMeNt"
+        ordering = ("name",)
 
     def duration(self):
         return self.end - self.start
@@ -79,8 +75,8 @@ class Time(models.Model):
 
 
 class SimulationRun(models.Model):
-    start = models.ForeignKey(Time, models.CASCADE, null=True, related_name='+')
-    end = models.ForeignKey(Time, models.CASCADE, null=True, related_name='+')
+    start = models.ForeignKey(Time, models.CASCADE, null=True, related_name="+")
+    end = models.ForeignKey(Time, models.CASCADE, null=True, related_name="+")
     midpoint = models.TimeField()
 
     def __str__(self):

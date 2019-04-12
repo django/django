@@ -5,8 +5,8 @@ from django.db.backends.base.client import BaseDatabaseClient
 
 
 class DatabaseClient(BaseDatabaseClient):
-    executable_name = 'sqlplus'
-    wrapper_name = 'rlwrap'
+    executable_name = "sqlplus"
+    wrapper_name = "rlwrap"
 
     def runshell(self):
         conn_string = self.connection._connect_string()

@@ -5,21 +5,25 @@ Global Django exception and warning classes.
 
 class FieldDoesNotExist(Exception):
     """The requested model field does not exist"""
+
     pass
 
 
 class AppRegistryNotReady(Exception):
     """The django.apps registry is not populated yet"""
+
     pass
 
 
 class ObjectDoesNotExist(Exception):
     """The requested object does not exist"""
+
     silent_variable_failure = True
 
 
 class MultipleObjectsReturned(Exception):
     """The query returned multiple objects when only one was expected."""
+
     pass
 
 
@@ -29,21 +33,25 @@ class SuspiciousOperation(Exception):
 
 class SuspiciousMultipartForm(SuspiciousOperation):
     """Suspect MIME request in multipart form data"""
+
     pass
 
 
 class SuspiciousFileOperation(SuspiciousOperation):
     """A Suspicious filesystem operation was attempted"""
+
     pass
 
 
 class DisallowedHost(SuspiciousOperation):
     """HTTP_HOST header contains invalid value"""
+
     pass
 
 
 class DisallowedRedirect(SuspiciousOperation):
     """Redirect to scheme not in allowed list"""
+
     pass
 
 
@@ -52,6 +60,7 @@ class TooManyFieldsSent(SuspiciousOperation):
     The number of fields in a GET or POST request exceeded
     settings.DATA_UPLOAD_MAX_NUMBER_FIELDS.
     """
+
     pass
 
 
@@ -60,39 +69,46 @@ class RequestDataTooBig(SuspiciousOperation):
     The size of the request (excluding any file uploads) exceeded
     settings.DATA_UPLOAD_MAX_MEMORY_SIZE.
     """
+
     pass
 
 
 class PermissionDenied(Exception):
     """The user did not have permission to do that"""
+
     pass
 
 
 class ViewDoesNotExist(Exception):
     """The requested view does not exist"""
+
     pass
 
 
 class MiddlewareNotUsed(Exception):
     """This middleware is not used in this server configuration"""
+
     pass
 
 
 class ImproperlyConfigured(Exception):
     """Django is somehow improperly configured"""
+
     pass
 
 
 class FieldError(Exception):
     """Some kind of problem with a model field."""
+
     pass
 
 
-NON_FIELD_ERRORS = '__all__'
+NON_FIELD_ERRORS = "__all__"
 
 
 class ValidationError(Exception):
     """An error while validating data."""
+
     def __init__(self, message, code=None, params=None):
         """
         The `message` argument can be a single error, a list of errors, or a
@@ -105,9 +121,9 @@ class ValidationError(Exception):
         super().__init__(message, code, params)
 
         if isinstance(message, ValidationError):
-            if hasattr(message, 'error_dict'):
+            if hasattr(message, "error_dict"):
                 message = message.error_dict
-            elif not hasattr(message, 'message'):
+            elif not hasattr(message, "message"):
                 message = message.error_list
             else:
                 message, code, params = message.message, message.code, message.params
@@ -125,7 +141,7 @@ class ValidationError(Exception):
                 # Normalize plain strings to instances of ValidationError.
                 if not isinstance(message, ValidationError):
                     message = ValidationError(message)
-                if hasattr(message, 'error_dict'):
+                if hasattr(message, "error_dict"):
                     self.error_list.extend(sum(message.error_dict.values(), []))
                 else:
                     self.error_list.extend(message.error_list)
@@ -140,18 +156,18 @@ class ValidationError(Exception):
     def message_dict(self):
         # Trigger an AttributeError if this ValidationError
         # doesn't have an error_dict.
-        getattr(self, 'error_dict')
+        getattr(self, "error_dict")
 
         return dict(self)
 
     @property
     def messages(self):
-        if hasattr(self, 'error_dict'):
+        if hasattr(self, "error_dict"):
             return sum(dict(self).values(), [])
         return list(self)
 
     def update_error_dict(self, error_dict):
-        if hasattr(self, 'error_dict'):
+        if hasattr(self, "error_dict"):
             for field, error_list in self.error_dict.items():
                 error_dict.setdefault(field, []).extend(error_list)
         else:
@@ -159,7 +175,7 @@ class ValidationError(Exception):
         return error_dict
 
     def __iter__(self):
-        if hasattr(self, 'error_dict'):
+        if hasattr(self, "error_dict"):
             for field, errors in self.error_dict.items():
                 yield field, list(ValidationError(errors))
         else:
@@ -170,14 +186,15 @@ class ValidationError(Exception):
                 yield str(message)
 
     def __str__(self):
-        if hasattr(self, 'error_dict'):
+        if hasattr(self, "error_dict"):
             return repr(dict(self))
         return repr(list(self))
 
     def __repr__(self):
-        return 'ValidationError(%s)' % self
+        return "ValidationError(%s)" % self
 
 
 class EmptyResultSet(Exception):
     """A database query predicate is impossible."""
+
     pass

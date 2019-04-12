@@ -1,0 +1,10 @@
+[tool.black]
+safe = true
+py36 = true
+target_version = ['cpy36']
+exclude = '''
+/(
+  migrations
+  | __pycache__
+)/
+'''
