@@ -6,7 +6,7 @@ import hmac
 import random
 import time
 
-from django.conf import settings
+from django.core.secret_key import get_secret_key
 from django.utils.encoding import force_bytes
 
 # Use the system PRNG if possible
@@ -28,7 +28,7 @@ def salted_hmac(key_salt, value, secret=None):
     A different key_salt should be passed in for every application of HMAC.
     """
     if secret is None:
-        secret = settings.SECRET_KEY
+        secret = get_secret_key()
 
     key_salt = force_bytes(key_salt)
     secret = force_bytes(secret)
@@ -63,7 +63,7 @@ def get_random_string(length=12,
         # is better than absolute predictability.
         random.seed(
             hashlib.sha256(
-                ('%s%s%s' % (random.getstate(), time.time(), settings.SECRET_KEY)).encode()
+                ('%s%s%s' % (random.getstate(), time.time(), get_secret_key())).encode()
             ).digest()
         )
     return ''.join(random.choice(allowed_chars) for i in range(length))
@@ -72,6 +72,16 @@ def get_random_string(length=12,
 def constant_time_compare(val1, val2):
     """Return True if the two strings are equal, False otherwise."""
     return hmac.compare_digest(force_bytes(val1), force_bytes(val2))
+
+
+def constant_time_any(seq):
+    """
+    Like any() but avoid returning early for successful outcomes.
+    """
+    result = False
+    for value in seq:
+        result |= bool(value)
+    return result
 
 
 def pbkdf2(password, salt, iterations, dklen=0, digest=None):

@@ -41,8 +41,11 @@ import time
 import zlib
 
 from django.conf import settings
+from django.core.secret_key import get_secret_key, get_verification_keys
 from django.utils import baseconv
-from django.utils.crypto import constant_time_compare, salted_hmac
+from django.utils.crypto import (
+    constant_time_any, constant_time_compare, salted_hmac,
+)
 from django.utils.encoding import force_bytes
 from django.utils.module_loading import import_string
 
@@ -72,10 +75,17 @@ def base64_hmac(salt, value, key):
     return b64_encode(salted_hmac(salt, value, key).digest()).decode()
 
 
+def _cookie_signer_key(key):
+    return b'django.http.cookies' + force_bytes(key)
+
+
 def get_cookie_signer(salt='django.core.signing.get_cookie_signer'):
     Signer = import_string(settings.SIGNING_BACKEND)
-    key = force_bytes(settings.SECRET_KEY)  # SECRET_KEY may be str or bytes.
-    return Signer(b'django.http.cookies' + key, salt=salt)
+    return Signer(
+        _cookie_signer_key(get_secret_key()),
+        salt=salt,
+        verification_keys=[_cookie_signer_key(k) for k in get_verification_keys()],
+    )
 
 
 class JSONSerializer:
@@ -90,10 +100,17 @@ class JSONSerializer:
         return json.loads(data.decode('latin-1'))
 
 
-def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, compress=False):
+def dumps(
+    obj,
+    key=None,
+    verification_keys=None,
+    salt='django.core.signing',
+    serializer=JSONSerializer,
+    compress=False,
+):
     """
     Return URL-safe, hmac/SHA1 signed base64 compressed JSON string. If key is
-    None, use settings.SECRET_KEY instead.
+    None, use the default secret key instead.
 
     If compress is True (not the default), check if compressing using zlib can
     save some space. Prepend a '.' to signify compression. This is included
@@ -120,7 +137,7 @@ def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, 
     base64d = b64_encode(data).decode()
     if is_compressed:
         base64d = '.' + base64d
-    return TimestampSigner(key, salt=salt).sign(base64d)
+    return TimestampSigner(key, verification_keys=verification_keys, salt=salt).sign(base64d)
 
 
 def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None):
@@ -144,9 +161,10 @@ def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, ma
 
 class Signer:
 
-    def __init__(self, key=None, sep=':', salt=None):
+    def __init__(self, key=None, sep=':', verification_keys=None, salt=None):
         # Use of native strings in all versions of Python
-        self.key = key or settings.SECRET_KEY
+        self.key = key or get_secret_key()
+        self.verification_keys = get_verification_keys() if verification_keys is None else verification_keys
         self.sep = sep
         if _SEP_UNSAFE.match(self.sep):
             raise ValueError(
@@ -155,18 +173,25 @@ class Signer:
             )
         self.salt = salt or '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
 
-    def signature(self, value):
-        return base64_hmac(self.salt + 'signer', value, self.key)
+    def signature(self, value, key):
+        return base64_hmac(self.salt + 'signer', value, key)
 
     def sign(self, value):
-        return '%s%s%s' % (value, self.sep, self.signature(value))
+        return '%s%s%s' % (value, self.sep, self.signature(value, self.key))
 
     def unsign(self, signed_value):
         if self.sep not in signed_value:
             raise BadSignature('No "%s" found in value' % self.sep)
         value, sig = signed_value.rsplit(self.sep, 1)
-        if constant_time_compare(sig, self.signature(value)):
+
+        attempts = [
+            constant_time_compare(sig, self.signature(value, key))
+            for key in self.verification_keys
+        ]
+
+        if constant_time_any(attempts):
             return value
+
         raise BadSignature('Signature "%s" does not match' % sig)
 
 

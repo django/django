@@ -263,6 +263,12 @@ IGNORABLE_404_URLS = []
 # loudly.
 SECRET_KEY = ''
 
+# A list of secret keys that can be used in addition to the SECRET_KEY to
+# verify signatures.
+VERIFICATION_SECRET_KEYS = []
+
+SECRET_KEY_BACKEND = 'django.core.secret_key.SecretKeySettingsBackend'
+
 # Default file storage mechanism that holds media.
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 

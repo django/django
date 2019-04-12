@@ -1,8 +1,14 @@
 from datetime import date
 
 from django.conf import settings
-from django.utils.crypto import constant_time_compare, salted_hmac
+from django.core.exceptions import ImproperlyConfigured
+from django.core.secret_key import get_secret_key, get_verification_keys
+from django.utils.crypto import (
+    constant_time_any, constant_time_compare, salted_hmac,
+)
 from django.utils.http import base36_to_int, int_to_base36
+
+USE_DEFAULT = object()
 
 
 class PasswordResetTokenGenerator:
@@ -11,14 +17,40 @@ class PasswordResetTokenGenerator:
     reset mechanism.
     """
     key_salt = "django.contrib.auth.tokens.PasswordResetTokenGenerator"
-    secret = settings.SECRET_KEY
+    _secret = USE_DEFAULT
+    verification_keys = USE_DEFAULT
+
+    @property
+    def secret(self):
+        if self._secret is USE_DEFAULT:
+            return get_secret_key()
+        return self._secret
+
+    @secret.setter
+    def secret(self, value):
+        self._secret = value
+
+    def _get_verification_keys(self):
+        if self.verification_keys is not USE_DEFAULT:
+            if self._secret is USE_DEFAULT:
+                raise ImproperlyConfigured(
+                    'verification_keys was specified on %s. '
+                    'When specifying verification_keys, secret must also be specified.'
+                )
+
+            return self.verification_keys
+
+        if self._secret is USE_DEFAULT:
+            return get_verification_keys()
+
+        return [self._secret]
 
     def make_token(self, user):
         """
         Return a token that can be used once to do a password reset
         for the given user.
         """
-        return self._make_token_with_timestamp(user, self._num_days(self._today()))
+        return self._make_token_with_timestamp(user, self._num_days(self._today()), self.secret)
 
     def check_token(self, user, token):
         """
@@ -38,7 +70,12 @@ class PasswordResetTokenGenerator:
             return False
 
         # Check that the timestamp/uid has not been tampered with
-        if not constant_time_compare(self._make_token_with_timestamp(user, ts), token):
+        attempts = [
+            constant_time_compare(self._make_token_with_timestamp(user, ts, key), token)
+            for key in self._get_verification_keys()
+        ]
+
+        if not constant_time_any(attempts):
             return False
 
         # Check the timestamp is within limit. Timestamps are rounded to
@@ -51,14 +88,14 @@ class PasswordResetTokenGenerator:
 
         return True
 
-    def _make_token_with_timestamp(self, user, timestamp):
+    def _make_token_with_timestamp(self, user, timestamp, secret):
         # timestamp is number of days since 2001-1-1.  Converted to
         # base 36, this gives us a 3 digit string until about 2121
         ts_b36 = int_to_base36(timestamp)
         hash_string = salted_hmac(
             self.key_salt,
             self._make_hash_value(user, timestamp),
-            secret=self.secret,
+            secret=secret,
         ).hexdigest()[::2]  # Limit to 20 characters to shorten the URL.
         return "%s-%s" % (ts_b36, hash_string)
 
