@@ -108,6 +108,14 @@ class StateTests(SimpleTestCase):
                 app_label = "migrations"
                 apps = new_apps
 
+        class Unmanaged(models.Model):
+            title = models.CharField(max_length=1000)
+
+            class Meta:
+                app_label = "migrations"
+                apps = new_apps
+                managed = False
+
         project_state = ProjectState.from_apps(new_apps)
         author_state = project_state.models['migrations', 'author']
         author_proxy_state = project_state.models['migrations', 'authorproxy']
@@ -119,6 +127,10 @@ class StateTests(SimpleTestCase):
         food_order_manager_state = project_state.models['migrations', 'foodorderedmanagers']
         book_index = models.Index(fields=['title'])
         book_index.set_name_with_model(Book)
+
+        # unmanaged models should not appear in migrations
+        with self.assertRaises(KeyError):
+            project_state.models['migrations', 'unmanaged']
 
         self.assertEqual(author_state.app_label, "migrations")
         self.assertEqual(author_state.name, "Author")
