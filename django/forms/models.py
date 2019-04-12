@@ -13,7 +13,7 @@ from django.forms.forms import BaseForm, DeclarativeFieldsMetaclass
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.forms.utils import ErrorList
 from django.forms.widgets import (
-    HiddenInput, MultipleHiddenInput, RadioSelect, SelectMultiple
+    HiddenInput, MultipleHiddenInput, RadioSelect, SelectMultiple,
 )
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext, gettext_lazy as _
