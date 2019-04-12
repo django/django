@@ -422,9 +422,12 @@ class AutocompleteMixin:
         }
         if not self.is_required and not self.allow_multiple_selected:
             default[1].append(self.create_option(name, '', '', False, 0))
+
+        fk = self.choices.field.to_field_name or 'pk'
+        fk_filter = {'{fk}__in'.format(fk=fk): selected_choices}
         choices = (
             (obj.pk, self.choices.field.label_from_instance(obj))
-            for obj in self.choices.queryset.using(self.db).filter(pk__in=selected_choices)
+            for obj in self.choices.queryset.using(self.db).filter(**fk_filter)
         )
         for option_value, option_label in choices:
             selected = (
