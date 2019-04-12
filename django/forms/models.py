@@ -13,7 +13,7 @@ from django.forms.forms import BaseForm, DeclarativeFieldsMetaclass
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.forms.utils import ErrorList
 from django.forms.widgets import (
-    HiddenInput, MultipleHiddenInput, SelectMultiple,
+    HiddenInput, MultipleHiddenInput, SelectMultiple, RadioSelect
 )
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext, gettext_lazy as _
@@ -1162,7 +1162,9 @@ class ModelChoiceField(ChoiceField):
                  required=True, widget=None, label=None, initial=None,
                  help_text='', to_field_name=None, limit_choices_to=None,
                  **kwargs):
-        if required and (initial is not None):
+        #  A blank option is not idiomatic for radio buttons, 
+        #  see https://code.djangoproject.com/ticket/26813
+        if required and (initial is not None) or isinstance(widget, RadioSelect):
             self.empty_label = None
         else:
             self.empty_label = empty_label
