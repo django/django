@@ -338,6 +338,8 @@ Miscellaneous
   deprecated, ``LocaleMiddleware`` no longer looks for the user's language in
   the session and :func:`django.contrib.auth.logout` no longer preserves the
   session's language after logout.
+  
+* ``ModelChoiceField`` using the ``RadioSelect´´ widget no longer presents an empty label '--------', as it is idiomatically incorrect.
 
 .. _deprecated-features-3.0:
 
