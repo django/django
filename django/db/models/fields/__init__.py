@@ -894,6 +894,7 @@ class Field(RegisterLookupMixin):
         return getattr(obj, self.attname)
 
     def slice_expression(self, expression, start, length):
+        """Return a slice of an expression, or None if field is not sliceable."""
         return None
 
 
