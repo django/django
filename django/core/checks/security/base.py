@@ -181,9 +181,9 @@ def check_ssl_redirect(app_configs, **kwargs):
 
 
 @register(Tags.security, deploy=True)
-def check_secret_key(app_configs, **kwargs):
-    from django.core import secret_key
-    return secret_key.check_secret_key()
+def check_secret_keys(app_configs, **kwargs):
+    from django.core import secret_keys
+    return secret_keys.check()
 
 
 @register(Tags.security, deploy=True)

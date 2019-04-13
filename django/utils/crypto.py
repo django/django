@@ -6,7 +6,7 @@ import hmac
 import random
 import time
 
-from django.core.secret_key import get_secret_key
+from django.core.secret_keys import get_secret_key
 from django.utils.encoding import force_bytes
 
 # Use the system PRNG if possible

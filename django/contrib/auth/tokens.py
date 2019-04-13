@@ -2,7 +2,7 @@ from datetime import date
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.core.secret_key import get_old_keys, get_secret_key
+from django.core.secret_keys import get_old_keys, get_secret_key
 from django.utils.crypto import (
     constant_time_any, constant_time_compare, salted_hmac,
 )

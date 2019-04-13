@@ -2,14 +2,14 @@ from django.conf import settings
 from django.utils.module_loading import import_string
 
 
-class SecretKeySettingsBackend:
+class SettingsSecretKeys:
     def get_secret_key(self):
         return settings.SECRET_KEY
 
     def get_old_keys(self):
         return list(settings.OLD_SECRET_KEYS)
 
-    def check_secret_key(self):
+    def check(self):
 
         from django.core.checks.security.base import (
             SECRET_KEY_MIN_LENGTH, SECRET_KEY_MIN_UNIQUE_CHARACTERS, W009,
@@ -24,7 +24,7 @@ class SecretKeySettingsBackend:
 
 
 def _get_backend():
-    return import_string(settings.SECRET_KEY_BACKEND)()
+    return import_string(settings.SECRET_KEYS_BACKEND)()
 
 
 def get_secret_key():
@@ -35,5 +35,5 @@ def get_old_keys():
     return _get_backend().get_old_keys()
 
 
-def check_secret_key():
-    return _get_backend().check_secret_key()
+def check():
+    return _get_backend().check()

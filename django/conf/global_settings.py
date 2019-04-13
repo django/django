@@ -267,7 +267,7 @@ SECRET_KEY = ''
 # verify signatures.
 OLD_SECRET_KEYS = []
 
-SECRET_KEY_BACKEND = 'django.core.secret_key.SecretKeySettingsBackend'
+SECRET_KEYS_BACKEND = 'django.core.secret_keys.SettingsSecretKeys'
 
 # Default file storage mechanism that holds media.
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
