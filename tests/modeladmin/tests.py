@@ -585,7 +585,7 @@ class ModelAdminTests(TestCase):
         self.assertEqual(cmafa.base_fields['opening_band'].widget.attrs, {'class': 'radiolist'})
         self.assertEqual(
             list(cmafa.base_fields['opening_band'].widget.choices),
-            [('', 'None'), (self.band.id, 'The Doors')]
+            [(self.band.id, 'The Doors')]
         )
         self.assertEqual(type(cmafa.base_fields['day'].widget), AdminRadioSelect)
         self.assertEqual(cmafa.base_fields['day'].widget.attrs, {'class': 'radiolist'})
@@ -595,7 +595,7 @@ class ModelAdminTests(TestCase):
         self.assertEqual(cmafa.base_fields['transport'].widget.attrs, {'class': 'radiolist inline'})
         self.assertEqual(
             list(cmafa.base_fields['transport'].widget.choices),
-            [('', 'None'), (1, 'Plane'), (2, 'Train'), (3, 'Bus')]
+            [(1, 'Plane'), (2, 'Train'), (3, 'Bus')]
         )
 
         class AdminConcertForm(forms.ModelForm):
