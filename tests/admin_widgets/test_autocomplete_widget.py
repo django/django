@@ -53,7 +53,7 @@ class AutocompleteMixinTests(TestCase):
             'class': 'my-class admin-autocomplete',
             'data-ajax--cache': 'true',
             'data-ajax--type': 'GET',
-            'data-ajax--url': '/admin_widgets/band/autocomplete/',
+            'data-ajax--url': '/admin_widgets/band/autocomplete/?fk=id',
             'data-theme': 'admin-autocomplete',
             'data-allow-clear': 'false',
             'data-placeholder': ''
