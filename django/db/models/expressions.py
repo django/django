@@ -557,30 +557,35 @@ class SliceableF(F):
     Object resolves the column on which the slicing is applied, and then
     applies the slicing if possible.
     """
-    def __init__(self, f, k):
-        if not isinstance(k, (int, slice)):
+    def __init__(self, f_obj, slice_obj):
+        if not isinstance(slice_obj, (int, slice)):
             raise TypeError
-        assert ((not isinstance(k, slice) and (k >= 0)) or
-                (isinstance(k, slice) and (k.start is None or k.start >= 0) and
-                 (k.stop is None or k.stop >= 0))), \
-            "Negative indexing is not supported."
 
-        assert ((not isinstance(k, slice)) or
-                (isinstance(k, slice) and k.step is None)), \
-            "Step argument is not supported."
+        is_negative_int = isinstance(slice_obj, int) and (slice_obj < 0)
+        has_negative_slice = (
+            isinstance(slice_obj, slice) and
+            ((slice_obj.start is not None and slice_obj.start < 0) or
+             (slice_obj.stop is not None and slice_obj.stop < 0))
+        )
+        if (is_negative_int or has_negative_slice):
+            raise ValueError("Negative indexing is not supported.")
 
-        self.expression = f
-        if isinstance(k, slice):
-            if k.start is not None:
-                self.low = int(k.start) + 1
+        if isinstance(slice_obj, slice) and slice_obj.step is not None:
+            raise ValueError("Step argument is not supported.")
+
+        self.expression = f_obj
+        if isinstance(slice_obj, slice):
+            if slice_obj.start is not None:
+                self.low = int(slice_obj.start) + 1
             else:
                 self.low = 1
-            if k.stop is not None:
-                self.length = int(k.stop) - self.low + 1
+
+            if slice_obj.stop is not None:
+                self.length = int(slice_obj.stop) - self.low + 1
             else:
                 self.length = None
         else:
-            self.low = int(k)
+            self.low = int(slice_obj)
             self.length = 1
 
     def __repr__(self):

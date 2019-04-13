@@ -161,14 +161,14 @@ class BasicExpressionsTests(TestCase):
     def test_negative_index_in_slicing_f_expressions(self):
         # Check that negative indexing is not supported
         msg = "Negative indexing is not supported."
-        with self.assertRaisesMessage(AssertionError, msg):
+        with self.assertRaisesMessage(ValueError, msg):
             company = Company.objects.filter(name="Foobar Ltd.")
             company.update(name=F('name')[:-4])
 
     def test_step_in_slicing_f_expressions(self):
         # Check that step argument is not supported
         msg = "Step argument is not supported."
-        with self.assertRaisesMessage(AssertionError, msg):
+        with self.assertRaisesMessage(ValueError, msg):
             company = Company.objects.filter(name="Foobar Ltd.")
             company.update(name=F('name')[::4])
 
