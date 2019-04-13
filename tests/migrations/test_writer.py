@@ -451,6 +451,11 @@ class WriterTests(SimpleTestCase):
         self.assertSerializedEqual(one_item_tuple)
         self.assertSerializedEqual(many_items_tuple)
 
+    def test_serialize_range(self):
+        string, imports = MigrationWriter.serialize(range(1, 5))
+        self.assertEqual(string, 'range(1, 5)')
+        self.assertEqual(imports, set())
+
     def test_serialize_builtins(self):
         string, imports = MigrationWriter.serialize(range)
         self.assertEqual(string, 'range')

@@ -284,7 +284,7 @@ class Serializer:
         (datetime.date, datetime.timedelta, datetime.time): DateTimeSerializer,
         SettingsReference: SettingsReferenceSerializer,
         float: FloatSerializer,
-        (bool, int, type(None), bytes, str): BaseSimpleSerializer,
+        (bool, int, type(None), bytes, str, range): BaseSimpleSerializer,
         decimal.Decimal: DecimalSerializer,
         (functools.partial, functools.partialmethod): FunctoolsPartialSerializer,
         (types.FunctionType, types.BuiltinFunctionType, types.MethodType): FunctionTypeSerializer,

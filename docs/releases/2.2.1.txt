@@ -25,3 +25,7 @@ Bugfixes
 
 * Fixed a regression in Django 2.2 that caused a single instance fast-delete
   to not set the primary key to ``None`` (:ticket:`30330`).
+
+* Prevented :djadmin:`makemigrations` from generating infinite migrations for
+  check constraints and partial indexes when ``condition`` contains
+  a :class:`~python:range` object (:ticket:`30350`).
