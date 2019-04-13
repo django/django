@@ -421,8 +421,8 @@ class Photo(models.Model):
         super().__init__(*args, **kwargs)
         self._savecount = 0
 
-    def save(self, force_insert=False, force_update=False):
-        super().save(force_insert, force_update)
+    def save(self, force_insert=False, force_update=False, using=None):
+        super().save(force_insert=force_insert, force_update=force_update, using=using)
         self._savecount += 1
 
 

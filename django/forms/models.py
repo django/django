@@ -280,7 +280,7 @@ class BaseModelForm(BaseForm):
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=None,
                  empty_permitted=False, instance=None, use_required_attribute=None,
-                 renderer=None):
+                 renderer=None, using=None):
         opts = self._meta
         if opts.model is None:
             raise ValueError('ModelForm has no model class specified.')
@@ -305,6 +305,14 @@ class BaseModelForm(BaseForm):
         )
         for formfield in self.fields.values():
             apply_limit_choices_to_to_formfield(formfield)
+        # Use the correct database for choice field querysets
+        self.using = using
+        if self.using is None and instance is not None:
+            self.using = instance._state.db
+        if using is not None:
+            model_choice_fields = filter(lambda f: isinstance(f, ModelChoiceField), self.fields.values())
+            for field in model_choice_fields:
+                field.queryset = field.queryset.using(using)
 
     def _get_validation_exclusions(self):
         """
@@ -456,7 +464,7 @@ class BaseModelForm(BaseForm):
             )
         if commit:
             # If committing, save the instance and the m2m data immediately.
-            self.instance.save()
+            self.instance.save(using=self.using)
             self._save_m2m()
         else:
             # If not committing, add a method to the form to allow deferred
@@ -477,6 +485,8 @@ def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
                       field_classes=None):
     """
     Return a ModelForm containing form fields for the given model.
+    You can optionally pass a ``form`` argument to use as a starting point for
+    constructing the ``ModelForm``.
 
     ``fields`` is an optional list of field names. If provided, include only
     the named fields in the returned fields. If omitted or '__all__', use all
@@ -618,6 +628,7 @@ class BaseModelFormSet(BaseFormSet):
                 kwargs['initial'] = self.initial_extra[i - self.initial_form_count()]
             except IndexError:
                 pass
+        kwargs['using'] = self.get_queryset()._db
         form = super()._construct_form(i, **kwargs)
         if pk_required:
             form.fields[self.model._meta.pk.name].required = True

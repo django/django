@@ -2107,3 +2107,29 @@ class RelationAssignmentTests(SimpleTestCase):
         profile = UserProfile()
         with self.assertRaisesMessage(ValueError, self.router_prevents_msg):
             user.userprofile = profile
+
+
+class ModelFormsetUsingTestCase(TestCase):
+    databases = {'default', 'other'}
+
+    def test_formset_using(self):
+        from django import forms
+        from django.forms.models import modelformset_factory
+
+        author = Person.objects.using('other').create(name="Marty Alchin")
+        editor = Person.objects.using('other').create(name="George Vilches")
+        b = Book.objects.using('other').create(title="Pro Django",
+                                               published=datetime.date(2008, 12, 16),
+                                               editor=editor)
+        b.authors.add(author)
+
+        class BookForm(forms.ModelForm):
+            class Meta:
+                model = Book
+                fields = ('title', 'authors', 'editor')
+        formset_class = modelformset_factory(Book, BookForm)
+        formset = formset_class(queryset=Book.objects.using('other').all())
+        for form in formset.forms:
+            databases = [i._state.db for i in form.fields['editor'].queryset]
+            databases.extend([i._state.db for i in form.fields['authors'].queryset])
+            self.assertEqual(set(databases), set(['other']))
