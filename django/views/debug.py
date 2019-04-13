@@ -24,7 +24,7 @@ DEBUG_ENGINE = Engine(
     libraries={'i18n': 'django.templatetags.i18n'},
 )
 
-HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|SIGNATURE', flags=re.IGNORECASE)
+HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|SIGNATURE|URL|DSN', flags=re.IGNORECASE)
 
 CLEANSED_SUBSTITUTE = '********************'
 
@@ -79,6 +79,16 @@ def get_safe_settings():
         if k.isupper():
             settings_dict[k] = cleanse_setting(k, getattr(settings, k))
     return settings_dict
+
+
+def get_safe_request_meta(request):
+    """
+    Return a dictionary of the request.META environment with values of
+    sensitive keys replaced with stars (*********).
+    """
+    if not request:
+        return {}
+    return {key: cleanse_setting(key, value) for key, value in request.META.items()}
 
 
 def technical_500_response(request, exc_type, exc_value, tb, status_code=500):
@@ -304,6 +314,7 @@ class ExceptionReporter:
             'user_str': user_str,
             'filtered_POST_items': list(self.filter.get_post_parameters(self.request).items()),
             'settings': get_safe_settings(),
+            'request_meta': get_safe_request_meta(self.request),
             'sys_executable': sys.executable,
             'sys_version_info': '%d.%d.%d' % sys.version_info[0:3],
             'server_time': timezone.now(),

@@ -296,7 +296,8 @@ class ExceptionReporterTests(SimpleTestCase):
     def test_request_and_exception(self):
         "A simple exception report can be generated"
         try:
-            request = self.rf.get('/test_view/')
+            rf = RequestFactory(OS_ENV_KEY="s!cr3t", DATABASE_URL="psql://user:pass@localhost/db")
+            request = rf.get('/test_view/')
             request.user = User()
             raise ValueError("Can't find my keys")
         except ValueError:
@@ -315,6 +316,21 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertIn('<h2>Request information</h2>', html)
         self.assertNotIn('<p>Request data not supplied</p>', html)
         self.assertIn('<p>No POST data</p>', html)
+        self.assertIn('<h3 id="meta-info">META</h3>', html)
+        self.assertInHTML(
+            """<tr>
+                <td>OS_ENV_KEY</td>
+                <td class="code"><pre>&#39;********************&#39;</pre></td>
+            </tr>""",
+            html,
+        )
+        self.assertInHTML(
+            """<tr>
+                <td>DATABASE_URL</td>
+                <td class="code"><pre>&#39;********************&#39;</pre></td>
+            </tr>""",
+            html,
+        )
 
     def test_no_request(self):
         "An exception report can be generated without request"
