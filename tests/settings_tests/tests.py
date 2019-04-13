@@ -1,7 +1,6 @@
 import os
 import sys
 import unittest
-from contextlib import contextmanager
 from types import ModuleType, SimpleNamespace
 from unittest import mock
 
