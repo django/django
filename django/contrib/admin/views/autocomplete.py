@@ -23,10 +23,15 @@ class AutocompleteJsonView(BaseListView):
         if not self.has_perm(request):
             return JsonResponse({'error': '403 Forbidden'}, status=403)
 
-        fk = request.GET.get('fk', 'pk')
         self.term = request.GET.get('term', '')
+        self.paginator_class = self.model_admin.paginator
         self.object_list = self.get_queryset()
         context = self.get_context_data()
+
+        # specified ForeignKey by `AutocompleteMixin.get_url`
+        # ForeignKey may not be a primary_key
+        fk = request.GET.get('fk', 'pk')
+
         return JsonResponse({
             'results': [
                 {'id': str(getattr(obj, fk)), 'text': str(obj)}

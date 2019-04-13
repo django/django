@@ -387,10 +387,16 @@ class AutocompleteMixin:
         self.attrs = {} if attrs is None else attrs.copy()
 
     def get_url(self):
-        model = self.rel.model
-        autocomplete_url = reverse(self.url_name % (self.admin_site.name, model._meta.app_label, model._meta.model_name))
+        """
+        specify ForeignKey field in `AutocompleteJsonView`
+
+        `to_field` may not be a primary_key
+        """
         fk = self.choices.field.to_field_name or 'pk'
-        return '{url}?fk={fk}'.format(url=autocomplete_url, fk=fk)
+        query = '?fk={fk}'.format(fk=fk)
+        model = self.rel.model
+        return reverse(self.url_name % (self.admin_site.name, model._meta.app_label, model._meta.model_name)) + query
+
 
     def build_attrs(self, base_attrs, extra_attrs=None):
         """
