@@ -397,7 +397,6 @@ class AutocompleteMixin:
         model = self.rel.model
         return reverse(self.url_name % (self.admin_site.name, model._meta.app_label, model._meta.model_name)) + query
 
-
     def build_attrs(self, base_attrs, extra_attrs=None):
         """
         Set select2's AJAX attributes.
