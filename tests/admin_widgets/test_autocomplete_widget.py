@@ -78,7 +78,7 @@ class AutocompleteMixinTests(TestCase):
         rel = Album._meta.get_field('band').remote_field
         w = AutocompleteSelect(rel, admin.site)
         url = w.get_url()
-        self.assertEqual(url, '/admin_widgets/band/autocomplete/')
+        self.assertEqual(url, '/admin_widgets/band/autocomplete/?fk=id')
 
     def test_render_options(self):
         beatles = Band.objects.create(name='The Beatles', style='rock')
