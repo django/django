@@ -388,7 +388,9 @@ class AutocompleteMixin:
 
     def get_url(self):
         model = self.rel.model
-        return reverse(self.url_name % (self.admin_site.name, model._meta.app_label, model._meta.model_name))
+        autocomplete_url = reverse(self.url_name % (self.admin_site.name, model._meta.app_label, model._meta.model_name))
+        fk = self.choices.field.to_field_name or 'pk'
+        return '{url}?fk={fk}'.format(url=autocomplete_url, fk=fk)
 
     def build_attrs(self, base_attrs, extra_attrs=None):
         """
@@ -422,10 +424,14 @@ class AutocompleteMixin:
         }
         if not self.is_required and not self.allow_multiple_selected:
             default[1].append(self.create_option(name, '', '', False, 0))
-        choices = (
-            (obj.pk, self.choices.field.label_from_instance(obj))
-            for obj in self.choices.queryset.using(self.db).filter(pk__in=selected_choices)
-        )
+
+        fk = self.choices.field.to_field_name or 'pk'
+        fk_filter = {'{fk}__in'.format(fk=fk): selected_choices}
+        choices = [
+            (getattr(obj, fk), self.choices.field.label_from_instance(obj))
+            for obj in self.choices.queryset.using(self.db).filter(**fk_filter)
+        ]
+
         for option_value, option_label in choices:
             selected = (
                 str(option_value) in value and
