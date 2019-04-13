@@ -504,7 +504,7 @@ class F(Combinable):
         return "{}({})".format(self.__class__.__name__, self.name)
 
     def __getitem__(self, k):
-        return SlicableF(self, k)
+        return SliceableF(self, k)
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         return query.resolve_ref(self.name, allow_joins, reuse, summarize)
@@ -549,7 +549,7 @@ class OuterRef(F):
         return ResolvedOuterRef(self.name)
 
 
-class SlicableF(F):
+class SliceableF(F):
     """
     An object that can add slicing notation to F expression.
 
