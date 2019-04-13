@@ -2,13 +2,10 @@ from datetime import date
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.core.secret_keys import get_old_keys, get_secret_key
 from django.utils.crypto import (
     constant_time_any, constant_time_compare, salted_hmac,
 )
 from django.utils.http import base36_to_int, int_to_base36
-
-USE_DEFAULT = object()
 
 
 class PasswordResetTokenGenerator:
@@ -17,40 +14,26 @@ class PasswordResetTokenGenerator:
     reset mechanism.
     """
     key_salt = "django.contrib.auth.tokens.PasswordResetTokenGenerator"
-    _secret = USE_DEFAULT
-    old_keys = USE_DEFAULT
+    secret = None
+    secrets = None
 
-    @property
-    def secret(self):
-        if self._secret is USE_DEFAULT:
-            return get_secret_key()
-        return self._secret
+    def _get_secrets(self):
+        if self.secret is not None:
+            if self.secrets is not None:
+                raise ImproperlyConfigured('Both secret and secrets can not be specified on {}'.format(self.__class__))
 
-    @secret.setter
-    def secret(self, value):
-        self._secret = value
+            return [self.secret]
+        elif self.secrets is not None:
+            return self.secrets
 
-    def _get_all_keys(self):
-        if self.old_keys is not USE_DEFAULT:
-            if self._secret is USE_DEFAULT:
-                raise ImproperlyConfigured(
-                    'old_keys was specified on %s. '
-                    'When specifying old_keys, secret must also be specified.'
-                )
-
-            old_keys = list(self.old_keys)
-
-        else:
-            old_keys = list(get_old_keys())
-
-        return [self.secret] + old_keys
+        return settings.SECRET_KEYS
 
     def make_token(self, user):
         """
         Return a token that can be used once to do a password reset
         for the given user.
         """
-        return self._make_token_with_timestamp(user, self._num_days(self._today()), self.secret)
+        return self._make_token_with_timestamp(user, self._num_days(self._today()), self._get_secrets()[0])
 
     def check_token(self, user, token):
         """
@@ -71,8 +54,8 @@ class PasswordResetTokenGenerator:
 
         # Check that the timestamp/uid has not been tampered with
         attempts = [
-            constant_time_compare(self._make_token_with_timestamp(user, ts, key), token)
-            for key in self._get_all_keys()
+            constant_time_compare(self._make_token_with_timestamp(user, ts, secret), token)
+            for secret in self._get_secrets()
         ]
 
         if not constant_time_any(attempts):

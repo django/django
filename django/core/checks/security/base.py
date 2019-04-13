@@ -182,8 +182,12 @@ def check_ssl_redirect(app_configs, **kwargs):
 
 @register(Tags.security, deploy=True)
 def check_secret_keys(app_configs, **kwargs):
-    from django.core import secret_keys
-    return secret_keys.check()
+    passed_check = (
+        getattr(settings, 'SECRET_KEY', None) and
+        len(set(settings.SECRET_KEY)) >= SECRET_KEY_MIN_UNIQUE_CHARACTERS and
+        len(settings.SECRET_KEY) >= SECRET_KEY_MIN_LENGTH
+    )
+    return [] if passed_check else [W009]
 
 
 @register(Tags.security, deploy=True)

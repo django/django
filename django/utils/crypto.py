@@ -6,7 +6,7 @@ import hmac
 import random
 import time
 
-from django.core.secret_keys import get_secret_key
+from django.conf import settings
 from django.utils.encoding import force_bytes
 
 # Use the system PRNG if possible
@@ -28,7 +28,7 @@ def salted_hmac(key_salt, value, secret=None):
     A different key_salt should be passed in for every application of HMAC.
     """
     if secret is None:
-        secret = get_secret_key()
+        secret = settings.SECRET_KEY
 
     key_salt = force_bytes(key_salt)
     secret = force_bytes(secret)
@@ -63,7 +63,7 @@ def get_random_string(length=12,
         # is better than absolute predictability.
         random.seed(
             hashlib.sha256(
-                ('%s%s%s' % (random.getstate(), time.time(), get_secret_key())).encode()
+                ('%s%s%s' % (random.getstate(), time.time(), settings.SECRET_KEY)).encode()
             ).digest()
         )
     return ''.join(random.choice(allowed_chars) for i in range(length))

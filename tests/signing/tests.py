@@ -116,22 +116,21 @@ class TestSigner(SimpleTestCase):
             with self.assertRaisesMessage(ValueError, msg % sep):
                 signing.Signer(sep=sep)
 
-    def test_verify_with_old_keys(self):
+    def test_verify_with_non_default_key(self):
         old_signer = signing.Signer('secret')
-        new_signer = signing.Signer('newsecret', old_keys=['secret'])
+        new_signer = signing.Signer(keys=['newsecret', 'secret'])
         signed = old_signer.sign('abc')
         self.assertEqual(new_signer.unsign(signed), 'abc')
 
-    def test_sign_unsign_with_default_key(self):
+    def test_sign_unsign_multiple_keys(self):
         """Make sure the default key is a valid verification key."""
-        signer = signing.Signer('secret', old_keys=['oldsecret'])
+        signer = signing.Signer(keys=['secret', 'oldsecret'])
         signed = signer.sign('abc')
 
         self.assertEqual(signer.unsign(signed), 'abc')
 
     @override_settings(
-        SECRET_KEY='secret',
-        OLD_SECRET_KEYS=['old_secret'],
+        SECRET_KEYS=['secret', 'old_secret'],
     )
     def test_default_keys_verification(self):
         old_signer = signing.Signer('old_secret')

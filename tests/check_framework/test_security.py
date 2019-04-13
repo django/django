@@ -469,8 +469,8 @@ class CheckSSLRedirectTest(SimpleTestCase):
 class CheckSecretKeyTest(SimpleTestCase):
     @property
     def func(self):
-        from django.core.checks.security.base import check_secret_key
-        return check_secret_key
+        from django.core.checks.security.base import check_secret_keys
+        return check_secret_keys
 
     @override_settings(SECRET_KEY=('abcdefghijklmnopqrstuvwx' * 2) + 'ab')
     def test_okay_secret_key(self):

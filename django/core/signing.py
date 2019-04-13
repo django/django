@@ -42,7 +42,6 @@ import zlib
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.core.secret_keys import get_old_keys, get_secret_key
 from django.utils import baseconv
 from django.utils.crypto import (
     constant_time_any, constant_time_compare, salted_hmac,
@@ -83,9 +82,8 @@ def _cookie_signer_key(key):
 def get_cookie_signer(salt='django.core.signing.get_cookie_signer'):
     Signer = import_string(settings.SIGNING_BACKEND)
     return Signer(
-        _cookie_signer_key(get_secret_key()),
+        keys=[_cookie_signer_key(k) for k in settings.SECRET_KEYS],
         salt=salt,
-        old_keys=[_cookie_signer_key(k) for k in get_old_keys()],
     )
 
 
@@ -104,7 +102,6 @@ class JSONSerializer:
 def dumps(
     obj,
     key=None,
-    old_keys=None,
     salt='django.core.signing',
     serializer=JSONSerializer,
     compress=False,
@@ -138,10 +135,10 @@ def dumps(
     base64d = b64_encode(data).decode()
     if is_compressed:
         base64d = '.' + base64d
-    return TimestampSigner(key, old_keys=old_keys, salt=salt).sign(base64d)
+    return TimestampSigner(key, salt=salt).sign(base64d)
 
 
-def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None):
+def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None, keys=None):
     """
     Reverse of dumps(), raise BadSignature if signature fails.
 
@@ -149,7 +146,7 @@ def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, ma
     """
     # TimestampSigner.unsign() returns str but base64 and zlib compression
     # operate on bytes.
-    base64d = TimestampSigner(key, salt=salt).unsign(s, max_age=max_age).encode()
+    base64d = TimestampSigner(key, salt=salt, keys=keys).unsign(s, max_age=max_age).encode()
     decompress = base64d[:1] == b'.'
     if decompress:
         # It's compressed; uncompress it first
@@ -162,18 +159,16 @@ def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, ma
 
 class Signer:
 
-    def __init__(self, key=None, sep=':', old_keys=None, salt=None):
-        if key is None:
-            if old_keys is not None:
-                raise ImproperlyConfigured('You must specify key when you specify old_keys.')
+    def __init__(self, key=None, sep=':', salt=None, keys=None):
+        if key is not None:
+            if keys is not None:
+                raise TypeError('key and keys can not be specified together.')
 
-            self.key = get_secret_key()
-            self.old_keys = [self.key] + get_old_keys()
+            self.keys = [key]
+        elif keys is not None:
+            self.keys = keys
         else:
-            self.key = key
-            self.old_keys = [key] + (
-                [] if old_keys is None else list(old_keys)
-            )
+            self.keys = settings.SECRET_KEYS
 
         self.sep = sep
         if _SEP_UNSAFE.match(self.sep):
@@ -187,10 +182,10 @@ class Signer:
         return base64_hmac(self.salt + 'signer', value, key)
 
     def signature(self, value):
-        return self._signature(value, self.key)
+        return self._signature(value, self.keys[0])
 
     def sign(self, value):
-        return '%s%s%s' % (value, self.sep, self._signature(value, self.key))
+        return '%s%s%s' % (value, self.sep, self.signature(value))
 
     def unsign(self, signed_value):
         if self.sep not in signed_value:
@@ -199,7 +194,7 @@ class Signer:
 
         attempts = [
             constant_time_compare(sig, self._signature(value, key))
-            for key in self.old_keys
+            for key in self.keys
         ]
 
         if constant_time_any(attempts):
