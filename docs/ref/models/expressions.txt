@@ -124,6 +124,8 @@ notation. The indices used in slicing are 0-based. The step-argument is not supp
     >>> writer.name
     'riya'
 
+.. versionadded:: 3.0
+
 When Django encounters an instance of ``F()``, it overrides the standard Python
 operators to create an encapsulated SQL expression; in this case, one which
 instructs the database to increment the database field represented by
