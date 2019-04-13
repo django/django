@@ -181,7 +181,9 @@ instance and will be applied on each :meth:`~Model.save()`. For example::
     reporter.save()
 
 ``stories_filed`` will be updated twice in this case. If it's initially ``1``,
-the final value will be ``3``.
+the final value will be ``3``. This persistence can be avoided by reloading the
+model object after saving it, for example, by using
+:meth:`~Model.refresh_from_db()`.
 
 Using ``F()`` in filters
 ~~~~~~~~~~~~~~~~~~~~~~~~
