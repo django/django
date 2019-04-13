@@ -81,3 +81,40 @@ Model Form API reference. For introductory material about model forms, see the
     the ``parent_model``, you must specify a ``fk_name``.
 
     See :ref:`inline-formsets` for example usage.
+
+``ModelForm``
+=============
+
+.. class:: ModelForm
+
+   This class can be subclassed with the
+   :func:`~django.forms.models.modelform_factory` method, or subclassed
+   normally. Please see the :doc:`/topics/forms/modelforms` topic guide for
+   examples.
+
+   Nearly all of the keyword arguments supplied to a ``ModelForm`` instance
+   match the keyword arguments supplied to a :class:`~django.forms.Form`
+   instance, but the ``instance`` and ``using`` attributes are custom to
+   ``ModelForm``.
+
+   .. attribute:: ModelForm.instance
+
+      If the ``ModelForm`` is meant to update an existing object instance
+      instead of creating a new one, a database object may be passed here.
+      It will then be updated from the data bound to the form when calling
+      the ``save()`` method.
+
+   .. attribute:: ModelForm.using
+
+      If a non-default database should be used when saving database objects
+      and building querysets for fields containing related objects, a
+      database object may be passed here.
+
+   .. method:: save(self, commit=True)
+
+      The ``save()`` method of a ``ModelForm`` creates a database object from
+      the data bound to the form, or updates an existing object bound to
+      the form.
+
+      If ``commit=False`` is passed to the ``save()`` method, the method will
+      return a database object that has not yet been saved to the database.
