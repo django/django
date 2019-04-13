@@ -502,6 +502,14 @@ class CheckSecretKeyTest(SimpleTestCase):
         self.assertLess(len(set(settings.SECRET_KEY)), base.SECRET_KEY_MIN_UNIQUE_CHARACTERS)
         self.assertEqual(self.func(None), [base.W009])
 
+    @override_settings(SECRET_KEYS=[
+        ('abcdefghijklmnopqrstuvwx' * 2) + 'ab',
+        'badkey'
+    ])
+    def test_multiple_keys(self):
+        self.assertEqual(self.func(None), [base.W009])
+        self.assertEqual(self.func(None), [base.W009])
+
 
 class CheckDebugTest(SimpleTestCase):
     @property
