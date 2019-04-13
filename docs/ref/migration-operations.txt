@@ -132,6 +132,18 @@ should be a dictionary mapping option names to values.
 
 Alters the managers that are available during migrations.
 
+``AlterModelBases``
+-------------------
+
+.. class:: AlterModelBases(model_name, bases)
+
+.. versionadded:: 3.0
+
+Updates the list of concrete base models in the model's inheritance hierarchy.
+Abstract parent models should not be included.
+
+    AlterModelBases('child', (models.Model, Parent))
+
 ``AddField``
 ------------
 

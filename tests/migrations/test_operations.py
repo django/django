@@ -1375,6 +1375,25 @@ class OperationTests(OperationTestBase):
         self.assertTableExists(original_m2m_table)
         self.assertTableNotExists(new_m2m_table)
 
+    def test_alter_model_bases(self):
+        """
+        Tests the AlterModelBases operation.
+        """
+        project_state = self.set_up_test_model("test_almotb", mti_model=True)
+        # Test the state alteration
+        operation = migrations.AlterModelBases("shetlandpony", bases=(models.Model,))
+        self.assertEqual(operation.describe(), "Update shetlandpony bases to {}".format((models.Model,)))
+        new_state = project_state.clone()
+        operation.state_forwards("test_almotb", new_state)
+        self.assertEqual(new_state.models["test_almotb", "shetlandpony"].bases, (models.Model,))
+        # Test the database alteration
+        # And test reversal
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "AlterModelBases")
+        self.assertEqual(definition[1], ('shetlandpony',))
+        self.assertEqual(definition[2], {'bases': (models.Model,)})
+
     def test_alter_field(self):
         """
         Tests the AlterField operation.

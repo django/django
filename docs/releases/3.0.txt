@@ -171,7 +171,7 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* ...
+* Added migration operation :class:`~django.db.migrations.operations.AlterModelBases`.
 
 Models
 ~~~~~~
