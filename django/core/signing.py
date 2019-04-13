@@ -168,11 +168,11 @@ class Signer:
                 raise ImproperlyConfigured('You must specify key when you specify verification_keys.')
 
             self.key = get_secret_key()
-            self.verification_keys = get_verification_keys()
+            self.verification_keys = [self.key] + get_verification_keys()
         else:
             self.key = key
-            self.verification_keys = (
-                [key] if verification_keys is None else verification_keys
+            self.verification_keys = [key] + (
+                [] if verification_keys is None else list(verification_keys)
             )
 
         self.sep = sep

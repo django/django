@@ -7,7 +7,7 @@ class SecretKeySettingsBackend:
         return settings.SECRET_KEY
 
     def get_verification_keys(self):
-        return [settings.SECRET_KEY] + list(settings.VERIFICATION_SECRET_KEYS)
+        return list(settings.VERIFICATION_SECRET_KEYS)
 
     def check_secret_key(self):
 

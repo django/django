@@ -30,7 +30,7 @@ class PasswordResetTokenGenerator:
     def secret(self, value):
         self._secret = value
 
-    def _get_verification_keys(self):
+    def _get_all_verification_keys(self):
         if self.verification_keys is not USE_DEFAULT:
             if self._secret is USE_DEFAULT:
                 raise ImproperlyConfigured(
@@ -38,12 +38,12 @@ class PasswordResetTokenGenerator:
                     'When specifying verification_keys, secret must also be specified.'
                 )
 
-            return self.verification_keys
+            verification_keys = list(self.verification_keys)
 
-        if self._secret is USE_DEFAULT:
-            return get_verification_keys()
+        else:
+            verification_keys = list(get_verification_keys())
 
-        return [self._secret]
+        return [self.secret] + verification_keys
 
     def make_token(self, user):
         """
@@ -72,7 +72,7 @@ class PasswordResetTokenGenerator:
         # Check that the timestamp/uid has not been tampered with
         attempts = [
             constant_time_compare(self._make_token_with_timestamp(user, ts, key), token)
-            for key in self._get_verification_keys()
+            for key in self._get_all_verification_keys()
         ]
 
         if not constant_time_any(attempts):
