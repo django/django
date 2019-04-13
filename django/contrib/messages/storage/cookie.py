@@ -2,8 +2,9 @@ import json
 
 from django.conf import settings
 from django.contrib.messages.storage.base import BaseStorage, Message
+from django.core import signing
 from django.http import SimpleCookie
-from django.utils.crypto import constant_time_compare, salted_hmac
+from django.utils.crypto import constant_time_compare
 from django.utils.safestring import SafeData, mark_safe
 
 
@@ -122,11 +123,10 @@ class CookieStorage(BaseStorage):
 
     def _hash(self, value):
         """
-        Create an HMAC/SHA1 hash based on the value and the project setting's
-        SECRET_KEY, modified to make it unique for the present purpose.
+        Create a hash based on the value.
         """
         key_salt = 'django.contrib.messages'
-        return salted_hmac(key_salt, value).hexdigest()
+        return signing.get_cookie_signer(salt=key_salt).signature(value)
 
     def _encode(self, messages, encode_empty=False):
         """
