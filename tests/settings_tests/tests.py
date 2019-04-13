@@ -326,6 +326,16 @@ class SettingsTests(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, 'Incorrect timezone setting: test'):
             settings._setup()
 
+    @override_settings(SECRET_KEY='kex123')
+    def test_secret_key(self):
+        self.assertEqual(settings.SECRET_KEY, 'kex123')
+        self.assertEqual(settings.SECRET_KEYS, ['kex123'])
+
+    @override_settings(SECRET_KEYS=['aaa11', 'bbb22'])
+    def test_secret_keys(self):
+        self.assertEqual(settings.SECRET_KEY, 'aaa11')
+        self.assertEqual(settings.SECRET_KEYS, ['aaa11', 'bbb22'])
+
 
 class TestComplexSettingOverride(SimpleTestCase):
     def setUp(self):
