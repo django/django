@@ -28,6 +28,9 @@ from django.utils import timezone
 from django.utils.functional import cached_property, partition
 from django.utils.version import get_version
 
+# The maximum number of results to fetch in a get() query.
+MAX_GET_RESULTS = 21
+
 # The maximum number of items to display in a QuerySet.__repr__
 REPR_OUTPUT_SIZE = 20
 
@@ -398,6 +401,10 @@ class QuerySet:
         clone = self.filter(*args, **kwargs)
         if self.query.can_filter() and not self.query.distinct_fields:
             clone = clone.order_by()
+        limit = None
+        if not clone.query.select_for_update or connections[clone.db].features.supports_select_for_update_with_limit:
+            limit = MAX_GET_RESULTS
+            clone.query.set_limits(high=limit)
         num = len(clone)
         if num == 1:
             return clone._result_cache[0]
@@ -407,8 +414,10 @@ class QuerySet:
                 self.model._meta.object_name
             )
         raise self.model.MultipleObjectsReturned(
-            "get() returned more than one %s -- it returned %s!" %
-            (self.model._meta.object_name, num)
+            'get() returned more than one %s -- it returned %s!' % (
+                self.model._meta.object_name,
+                num if not limit or num < limit else 'more than %s' % (limit - 1),
+            )
         )
 
     def create(self, **kwargs):
