@@ -41,6 +41,7 @@ import time
 import zlib
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.core.secret_key import get_secret_key, get_verification_keys
 from django.utils import baseconv
 from django.utils.crypto import (
@@ -162,9 +163,18 @@ def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, ma
 class Signer:
 
     def __init__(self, key=None, sep=':', verification_keys=None, salt=None):
-        # Use of native strings in all versions of Python
-        self.key = key or get_secret_key()
-        self.verification_keys = get_verification_keys() if verification_keys is None else verification_keys
+        if key is None:
+            if verification_keys is not None:
+                raise ImproperlyConfigured('You must specify key when you specify verification_keys.')
+
+            self.key = get_secret_key()
+            self.verification_keys = get_verification_keys()
+        else:
+            self.key = key
+            self.verification_keys = (
+                [key] if verification_keys is None else verification_keys
+            )
+
         self.sep = sep
         if _SEP_UNSAFE.match(self.sep):
             raise ValueError(
@@ -173,11 +183,14 @@ class Signer:
             )
         self.salt = salt or '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
 
-    def signature(self, value, key):
+    def _signature(self, value, key):
         return base64_hmac(self.salt + 'signer', value, key)
 
+    def signature(self, value):
+        return self._signature(value, self.key)
+
     def sign(self, value):
-        return '%s%s%s' % (value, self.sep, self.signature(value, self.key))
+        return '%s%s%s' % (value, self.sep, self._signature(value, self.key))
 
     def unsign(self, signed_value):
         if self.sep not in signed_value:
@@ -185,7 +198,7 @@ class Signer:
         value, sig = signed_value.rsplit(self.sep, 1)
 
         attempts = [
-            constant_time_compare(sig, self.signature(value, key))
+            constant_time_compare(sig, self._signature(value, key))
             for key in self.verification_keys
         ]
 
