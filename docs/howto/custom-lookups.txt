@@ -14,7 +14,9 @@ A simple lookup example
 
 Let's start with a simple custom lookup. We will write a custom lookup ``ne``
 which works opposite to ``exact``. ``Author.objects.filter(name__ne='Jack')``
-will translate to the SQL::
+will translate to the SQL:
+
+.. code-block:: sql
 
   "author"."name" <> 'Jack'
 
@@ -124,14 +126,18 @@ Next, let's register it for ``IntegerField``::
   IntegerField.register_lookup(AbsoluteValue)
 
 We can now run the queries we had before.
-``Experiment.objects.filter(change__abs=27)`` will generate the following SQL::
+``Experiment.objects.filter(change__abs=27)`` will generate the following SQL:
+
+.. code-block:: sql
 
     SELECT ... WHERE ABS("experiments"."change") = 27
 
 By using ``Transform`` instead of ``Lookup`` it means we are able to chain
 further lookups afterwards. So
 ``Experiment.objects.filter(change__abs__lt=27)`` will generate the following
-SQL::
+SQL:
+
+.. code-block:: sql
 
     SELECT ... WHERE ABS("experiments"."change") < 27
 
@@ -139,12 +145,16 @@ Note that in case there is no other lookup specified, Django interprets
 ``change__abs=27`` as ``change__abs__exact=27``.
 
 This also allows the result to be used in ``ORDER BY`` and ``DISTINCT ON``
-clauses. For example ``Experiment.objects.order_by('change__abs')`` generates::
+clauses. For example ``Experiment.objects.order_by('change__abs')`` generates:
+
+.. code-block:: sql
 
     SELECT ... ORDER BY ABS("experiments"."change") ASC
 
 And on databases that support distinct on fields (such as PostgreSQL),
-``Experiment.objects.distinct('change__abs')`` generates::
+``Experiment.objects.distinct('change__abs')`` generates:
+
+.. code-block:: sql
 
     SELECT ... DISTINCT ON ABS("experiments"."change")
 
@@ -178,7 +188,9 @@ indexes efficiently in some cases. In particular, when we use
 ``change__lt=27``. (For the ``lte`` case we could use the SQL ``BETWEEN``).
 
 So we would like ``Experiment.objects.filter(change__abs__lt=27)`` to generate
-the following SQL::
+the following SQL:
+
+.. code-block:: sql
 
     SELECT .. WHERE "experiments"."change" < 27 AND "experiments"."change" > -27
 
@@ -253,7 +265,9 @@ Next, let's register it::
   TextField.register_lookup(UpperCase)
 
 Now, the queryset ``Author.objects.filter(name__upper="doe")`` will generate a case
-insensitive query like this::
+insensitive query like this:
+
+.. code-block:: sql
 
     SELECT ... WHERE UPPER("author"."name") = UPPER('doe')
 

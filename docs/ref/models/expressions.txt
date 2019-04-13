@@ -262,7 +262,9 @@ or they can be used to build a library of database functions::
     queryset.annotate(field_lower=Lower('field'))
 
 But both cases will result in a queryset where each model is annotated with an
-extra attribute ``field_lower`` produced, roughly, from the following SQL::
+extra attribute ``field_lower`` produced, roughly, from the following SQL:
+
+.. code-block:: sql
 
     SELECT
         ...
