@@ -114,9 +114,9 @@ normal Python assignment of value to an instance attribute, in fact it's an SQL
 construct describing an operation on the database.
 
 For fields that are string-expressions (or ``django.contrib.postgres.fields.ArrayField``), you can use the standard slicing
-notation. The indices used in slicing are 0-based. However, step-argument is not supported in slicing::
+notation. The indices used in slicing are 0-based. The step-argument is not supported. For example::
 
-    >>> # Replacing a name with its substring 
+    >>> # Replacing a name with its substring
     >>> writer = Writers.objects.get(name='Priyansh')
     >>> writer.name = F('name')[1:5]
     >>> writer.save()
