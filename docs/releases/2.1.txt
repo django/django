@@ -196,10 +196,6 @@ Models
   plan of a queryset's query.
 
 *  :meth:`.QuerySet.raw` now supports :meth:`~.QuerySet.prefetch_related`.
-* Slicing notation added to F expressions over the following field-types:
-  ``BinaryField``, ``CharField``, ``EmailField``, ``FilePathField``,
-  ``GenericIPAddressField``, ``SlugField``, ``TextField``, ``URLField`` and
-  ``django.contrib.postgres.fields.ArrayField``.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~

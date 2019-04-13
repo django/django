@@ -210,6 +210,9 @@ Models
 * ``connection.queries`` now shows ``COPY … TO`` statements on PostgreSQL.
 
 * :class:`~django.db.models.FilePathField` now accepts a callable ``path``.
+* Slicing notation added to F expressions over the following field types:
+  ``CharField``, ``EmailField``, ``SlugField``, ``URLField`` and
+  ``django.contrib.postgres.fields.ArrayField``.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
