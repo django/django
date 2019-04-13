@@ -893,6 +893,9 @@ class Field(RegisterLookupMixin):
         """Return the value of this field in the given model instance."""
         return getattr(obj, self.attname)
 
+    def slice_expression(self, expression, start, length):
+        return None
+
 
 class AutoField(Field):
     description = _("Integer")
@@ -1090,6 +1093,10 @@ class CharField(Field):
             defaults['empty_value'] = None
         defaults.update(kwargs)
         return super().formfield(**defaults)
+
+    def slice_expression(self, expression, start, length):
+        from django.db.models.functions import Substr
+        return Substr(expression, start, length)
 
 
 class CommaSeparatedIntegerField(CharField):

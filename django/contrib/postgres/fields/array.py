@@ -149,6 +149,12 @@ class ArrayField(CheckFieldDefaultMixin, Field):
         else:
             return SliceTransformFactory(start, end)
 
+    def slice_expression(self, expression, start, length):
+        if length is None:
+            return SliceTransform(start, 2147483647, expression)
+
+        return SliceTransform(start, min(2147483647, start + length - 1), expression)
+
     def validate(self, value, model_instance):
         super().validate(value, model_instance)
         for index, part in enumerate(value):

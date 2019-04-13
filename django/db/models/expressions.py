@@ -588,22 +588,13 @@ class SliceableF(F):
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None,
                            summarize=False, for_save=False, simple_col=False):
-        text_fields = ['BinaryField', 'CharField', 'EmailField', 'FilePathField',
-                       'GenericIPAddressField', 'SlugField', 'TextField', 'URLField'
-                       ]
         resolved = query.resolve_ref(self.expression.name, allow_joins, reuse, summarize, simple_col)
-        field_type = resolved.target.get_internal_type()
-        if field_type in text_fields:
-            from django.db.models.functions import Substr
-            return Substr(resolved, self.low, self.length)
-        elif field_type == "ArrayField":
-            from django.contrib.postgres.fields.array import SliceTransform
-            if self.length is None:
-                return SliceTransform(self.low, 2147483647, resolved)
-            else:
-                return SliceTransform(self.low, min(2147483647, self.length + self.low - 1), resolved)
-        else:
+        sliced_expression = resolved.target.slice_expression(resolved, self.low, self.length)
+
+        if sliced_expression is None:
             raise TypeError("Slicing cannot be applied to this field-type.")
+
+        return sliced_expression
 
 
 class Func(SQLiteNumericMixin, Expression):
