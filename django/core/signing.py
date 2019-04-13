@@ -98,13 +98,7 @@ class JSONSerializer:
         return json.loads(data.decode('latin-1'))
 
 
-def dumps(
-    obj,
-    key=None,
-    salt='django.core.signing',
-    serializer=JSONSerializer,
-    compress=False,
-):
+def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, compress=False):
     """
     Return URL-safe, hmac/SHA1 signed base64 compressed JSON string. If key is
     None, use the default secret key instead.
