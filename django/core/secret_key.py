@@ -6,8 +6,8 @@ class SecretKeySettingsBackend:
     def get_secret_key(self):
         return settings.SECRET_KEY
 
-    def get_verification_keys(self):
-        return list(settings.VERIFICATION_SECRET_KEYS)
+    def get_old_keys(self):
+        return list(settings.OLD_SECRET_KEYS)
 
     def check_secret_key(self):
 
@@ -31,8 +31,8 @@ def get_secret_key():
     return _get_backend().get_secret_key()
 
 
-def get_verification_keys():
-    return _get_backend().get_verification_keys()
+def get_old_keys():
+    return _get_backend().get_old_keys()
 
 
 def check_secret_key():

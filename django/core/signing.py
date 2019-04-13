@@ -42,7 +42,7 @@ import zlib
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.core.secret_key import get_secret_key, get_verification_keys
+from django.core.secret_key import get_old_keys, get_secret_key
 from django.utils import baseconv
 from django.utils.crypto import (
     constant_time_any, constant_time_compare, salted_hmac,
@@ -85,7 +85,7 @@ def get_cookie_signer(salt='django.core.signing.get_cookie_signer'):
     return Signer(
         _cookie_signer_key(get_secret_key()),
         salt=salt,
-        verification_keys=[_cookie_signer_key(k) for k in get_verification_keys()],
+        old_keys=[_cookie_signer_key(k) for k in get_old_keys()],
     )
 
 
@@ -104,7 +104,7 @@ class JSONSerializer:
 def dumps(
     obj,
     key=None,
-    verification_keys=None,
+    old_keys=None,
     salt='django.core.signing',
     serializer=JSONSerializer,
     compress=False,
@@ -138,7 +138,7 @@ def dumps(
     base64d = b64_encode(data).decode()
     if is_compressed:
         base64d = '.' + base64d
-    return TimestampSigner(key, verification_keys=verification_keys, salt=salt).sign(base64d)
+    return TimestampSigner(key, old_keys=old_keys, salt=salt).sign(base64d)
 
 
 def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None):
@@ -162,17 +162,17 @@ def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, ma
 
 class Signer:
 
-    def __init__(self, key=None, sep=':', verification_keys=None, salt=None):
+    def __init__(self, key=None, sep=':', old_keys=None, salt=None):
         if key is None:
-            if verification_keys is not None:
-                raise ImproperlyConfigured('You must specify key when you specify verification_keys.')
+            if old_keys is not None:
+                raise ImproperlyConfigured('You must specify key when you specify old_keys.')
 
             self.key = get_secret_key()
-            self.verification_keys = [self.key] + get_verification_keys()
+            self.old_keys = [self.key] + get_old_keys()
         else:
             self.key = key
-            self.verification_keys = [key] + (
-                [] if verification_keys is None else list(verification_keys)
+            self.old_keys = [key] + (
+                [] if old_keys is None else list(old_keys)
             )
 
         self.sep = sep
@@ -199,7 +199,7 @@ class Signer:
 
         attempts = [
             constant_time_compare(sig, self._signature(value, key))
-            for key in self.verification_keys
+            for key in self.old_keys
         ]
 
         if constant_time_any(attempts):

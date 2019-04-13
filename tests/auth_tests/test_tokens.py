@@ -76,7 +76,7 @@ class TokenGeneratorTest(TestCase):
         self.assertFalse(p0.check_token(user, tk1))
         self.assertFalse(p1.check_token(user, tk0))
 
-    def test_verify_with_verification_keys(self):
+    def test_verify_with_old_keys(self):
         user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
 
         p1 = PasswordResetTokenGenerator()
@@ -84,7 +84,7 @@ class TokenGeneratorTest(TestCase):
 
         p2 = PasswordResetTokenGenerator()
         p2.secret = 'newsecret'
-        p2.verification_keys = ['secret']
+        p2.old_keys = ['secret']
 
         tk1 = p1.make_token(user)
         self.assertTrue(p1.check_token(user, tk1))
@@ -92,7 +92,7 @@ class TokenGeneratorTest(TestCase):
 
     @override_settings(
         SECRET_KEY='secret',
-        VERIFICATION_SECRET_KEYS=['old_secret'],
+        OLD_SECRET_KEYS=['old_secret'],
     )
     def test_default_keys_verification(self):
         user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')

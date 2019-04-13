@@ -2,7 +2,7 @@ from datetime import date
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.core.secret_key import get_secret_key, get_verification_keys
+from django.core.secret_key import get_old_keys, get_secret_key
 from django.utils.crypto import (
     constant_time_any, constant_time_compare, salted_hmac,
 )
@@ -18,7 +18,7 @@ class PasswordResetTokenGenerator:
     """
     key_salt = "django.contrib.auth.tokens.PasswordResetTokenGenerator"
     _secret = USE_DEFAULT
-    verification_keys = USE_DEFAULT
+    old_keys = USE_DEFAULT
 
     @property
     def secret(self):
@@ -30,20 +30,20 @@ class PasswordResetTokenGenerator:
     def secret(self, value):
         self._secret = value
 
-    def _get_all_verification_keys(self):
-        if self.verification_keys is not USE_DEFAULT:
+    def _get_all_keys(self):
+        if self.old_keys is not USE_DEFAULT:
             if self._secret is USE_DEFAULT:
                 raise ImproperlyConfigured(
-                    'verification_keys was specified on %s. '
-                    'When specifying verification_keys, secret must also be specified.'
+                    'old_keys was specified on %s. '
+                    'When specifying old_keys, secret must also be specified.'
                 )
 
-            verification_keys = list(self.verification_keys)
+            old_keys = list(self.old_keys)
 
         else:
-            verification_keys = list(get_verification_keys())
+            old_keys = list(get_old_keys())
 
-        return [self.secret] + verification_keys
+        return [self.secret] + old_keys
 
     def make_token(self, user):
         """
@@ -72,7 +72,7 @@ class PasswordResetTokenGenerator:
         # Check that the timestamp/uid has not been tampered with
         attempts = [
             constant_time_compare(self._make_token_with_timestamp(user, ts, key), token)
-            for key in self._get_all_verification_keys()
+            for key in self._get_all_keys()
         ]
 
         if not constant_time_any(attempts):

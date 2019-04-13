@@ -265,7 +265,7 @@ SECRET_KEY = ''
 
 # A list of secret keys that can be used in addition to the SECRET_KEY to
 # verify signatures.
-VERIFICATION_SECRET_KEYS = []
+OLD_SECRET_KEYS = []
 
 SECRET_KEY_BACKEND = 'django.core.secret_key.SecretKeySettingsBackend'
 
