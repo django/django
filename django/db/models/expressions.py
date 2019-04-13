@@ -506,8 +506,9 @@ class F(Combinable):
     def __getitem__(self, k):
         return SliceableF(self, k)
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        return query.resolve_ref(self.name, allow_joins, reuse, summarize)
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None,
+                           summarize=False, for_save=False, simple_col=False):
+        return query.resolve_ref(self.name, allow_joins, reuse, summarize, simple_col)
 
     def asc(self, **kwargs):
         return OrderBy(self, **kwargs)
@@ -585,11 +586,12 @@ class SliceableF(F):
     def __repr__(self):
         return "{}({})".format(self.__class__.__name__, self.expression.name)
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None,
+                           summarize=False, for_save=False, simple_col=False):
         text_fields = ['BinaryField', 'CharField', 'EmailField', 'FilePathField',
                        'GenericIPAddressField', 'SlugField', 'TextField', 'URLField'
                        ]
-        resolved = query.resolve_ref(self.expression.name, allow_joins, reuse, summarize)
+        resolved = query.resolve_ref(self.expression.name, allow_joins, reuse, summarize, simple_col)
         field_type = resolved.target.get_internal_type()
         if field_type in text_fields:
             from django.db.models.functions import Substr
