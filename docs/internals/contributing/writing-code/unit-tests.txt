@@ -401,6 +401,20 @@ test failures. You can adjust this behavior with the ``--parallel`` option::
 You can also use the ``DJANGO_TEST_PROCESSES`` environment variable for this
 purpose.
 
+Tests hang with "in progress in another thread" message
+-------------------------------------------------------
+
+On macOS (High Sierra and newer versions), you might see this message while
+tests are running, after which the testing freezes::
+
+    objc[42074]: +[__NSPlaceholderDate initialize] may have been in progress in another thread when fork() was called.
+
+This happens because multithreading was restricted.
+One workaround is to run tests with the environment variable
+``OBJC_DISABLE_INITIALIZE_FORK_SAFETY`` enabled, for example by running::
+
+    OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES ./runtests.py
+
 Tips for writing tests
 ----------------------
 
