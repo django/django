@@ -1,7 +1,7 @@
 import datetime
 
 from django.core import signing
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
 from django.test.utils import freeze_time
 
 
@@ -115,6 +115,30 @@ class TestSigner(SimpleTestCase):
         for sep in separators:
             with self.assertRaisesMessage(ValueError, msg % sep):
                 signing.Signer(sep=sep)
+
+    def test_verify_with_verification_keys(self):
+        old_signer = signing.Signer('secret')
+        new_signer = signing.Signer('newsecret', verification_keys=['secret'])
+        signed = old_signer.sign('abc')
+        self.assertEqual(new_signer.unsign(signed), 'abc')
+
+    def test_sign_unsign_with_default_key(self):
+        """Make sure the default key is a valid verification key."""
+        signer = signing.Signer('secret', verification_keys=['oldsecret'])
+        signed = signer.sign('abc')
+
+        self.assertEqual(signer.unsign(signed), 'abc')
+
+    @override_settings(
+        SECRET_KEY='secret',
+        VERIFICATION_SECRET_KEYS=['old_secret'],
+    )
+    def test_default_keys_verification(self):
+        old_signer = signing.Signer('old_secret')
+        signed = old_signer.sign('abc')
+
+        signer = signing.Signer()
+        self.assertEqual(signer.unsign(signed), 'abc')
 
 
 class TestTimestampSigner(SimpleTestCase):
