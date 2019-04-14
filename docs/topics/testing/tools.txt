@@ -920,7 +920,7 @@ Python path:
 
 .. console::
 
-    $ pip install selenium
+    $ python -m pip install selenium
 
 Then, add a ``LiveServerTestCase``-based test to your app's tests module
 (for example: ``myapp/tests.py``). For this example, we'll assume you're using

@@ -145,7 +145,7 @@ parallel test runner to handle this exception cleanly.
 
 In order to see the traceback, you should install tblib:
 
-    pip install tblib
+    python -m pip install tblib
 """.format(test, original_exc_txt))
             else:
                 print("""

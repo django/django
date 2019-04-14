@@ -96,7 +96,7 @@ Imports
 
   .. console::
 
-      $ pip install isort
+      $ python -m pip install isort
       $ isort -rc .
 
   This runs ``isort`` recursively from your current directory, modifying any

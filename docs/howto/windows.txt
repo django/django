@@ -50,7 +50,7 @@ each Django project you create. While not mandatory, this is considered a best
 practice and will save you time in the future when you're ready to deploy your
 project. Simply type::
 
-    pip install virtualenvwrapper-win
+    python -m pip install virtualenvwrapper-win
 
 Then create a virtual environment for your project::
 
@@ -73,7 +73,7 @@ Django can be installed easily using ``pip`` within your virtual environment.
 In the command prompt, ensure your virtual environment is active, and execute
 the following command::
 
-    pip install django
+    python -m pip install django
 
 This will download and install the latest Django release.
 
@@ -93,8 +93,8 @@ Common pitfalls
   than one Python version installed.
 
 * If you are connecting to the internet behind a proxy, there might be problem
-  in running the command ``pip install django``. Set the environment variables
-  for proxy configuration in the command prompt as follows::
+  in running the command ``python -m pip install django``. Set the environment
+  variables for proxy configuration in the command prompt as follows::
 
     set http_proxy=http://username:password@proxyserver:proxyport
     set https_proxy=https://username:password@proxyserver:proxyport
