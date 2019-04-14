@@ -2,8 +2,8 @@ from unittest import mock
 
 from django.contrib.auth import models
 from django.contrib.auth.mixins import (
-    LoginRequiredMixin, PermissionRequiredMixin,
-    SuperuserRequiredMixin, UserPassesTestMixin,
+    LoginRequiredMixin, PermissionRequiredMixin, SuperuserRequiredMixin,
+    UserPassesTestMixin,
 )
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied

@@ -1,10 +1,9 @@
-from django.contrib.auth.models import AnonymousUser
-
 from django.conf import settings
 from django.contrib.auth import models
 from django.contrib.auth.decorators import (
     login_required, permission_required, superuser_required,
 )
+from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.test import TestCase, override_settings
