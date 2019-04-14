@@ -144,12 +144,6 @@ decorator on your :meth:`~BaseCommand.handle` method::
 Since translation deactivation requires access to configured settings, the
 decorator can't be used for commands that work without configured settings.
 
-.. versionchanged:: 2.1
-
-    The ``@no_translations`` decorator is new. In older versions, translations
-    are deactivated before running a command unless the command's
-    ``leave_locale_alone`` attribute (now removed) is set to ``True``.
-
 Testing
 =======
 

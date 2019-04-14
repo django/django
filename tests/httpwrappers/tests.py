@@ -366,6 +366,10 @@ class HttpResponseTests(unittest.TestCase):
         r.content = 12345
         self.assertEqual(r.content, b'12345')
 
+    def test_memoryview_content(self):
+        r = HttpResponse(memoryview(b'memoryview'))
+        self.assertEqual(r.content, b'memoryview')
+
     def test_iter_content(self):
         r = HttpResponse(['abc', 'def', 'ghi'])
         self.assertEqual(r.content, b'abcdefghi')

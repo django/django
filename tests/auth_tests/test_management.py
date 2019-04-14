@@ -6,7 +6,7 @@ from io import StringIO
 from unittest import mock
 
 from django.apps import apps
-from django.contrib.auth import management
+from django.contrib.auth import get_permission_codename, management
 from django.contrib.auth.management import (
     create_permissions, get_default_username,
 )
@@ -23,6 +23,7 @@ from django.utils.translation import gettext_lazy as _
 
 from .models import (
     CustomUser, CustomUserNonUniqueUsername, CustomUserWithFK, Email,
+    UserProxy,
 )
 
 MOCK_INPUT_KEY_TO_PROMPTS = {
@@ -132,8 +133,11 @@ class GetDefaultUsernameTestCase(TestCase):
 ])
 class ChangepasswordManagementCommandTestCase(TestCase):
 
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(username='joe', password='qwerty')
+
     def setUp(self):
-        self.user = User.objects.create_user(username='joe', password='qwerty')
         self.stdout = StringIO()
         self.stderr = StringIO()
 
@@ -210,7 +214,7 @@ class ChangepasswordManagementCommandTestCase(TestCase):
 
 
 class MultiDBChangepasswordManagementCommandTestCase(TestCase):
-    multi_db = True
+    databases = {'default', 'other'}
 
     @mock.patch.object(changepassword.Command, '_get_pass', return_value='not qwerty')
     def test_that_changepassword_command_with_database_option_uses_given_db(self, mock_get_pass):
@@ -903,7 +907,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
 
 class MultiDBCreatesuperuserTestCase(TestCase):
-    multi_db = True
+    databases = {'default', 'other'}
 
     def test_createsuperuser_command_with_database_option(self):
         """
@@ -982,3 +986,18 @@ class CreatePermissionsTests(TestCase):
         ContentType.objects.filter(app_label='auth', model='group').delete()
         # This fails with a foreign key constraint without the fix.
         create_permissions(apps.get_app_config('auth'), interactive=False, verbosity=0)
+
+    def test_permission_with_proxy_content_type_created(self):
+        """
+        A proxy model's permissions use its own content type rather than the
+        content type of the concrete model.
+        """
+        opts = UserProxy._meta
+        codename = get_permission_codename('add', opts)
+        self.assertTrue(
+            Permission.objects.filter(
+                content_type__model=opts.model_name,
+                content_type__app_label=opts.app_label,
+                codename=codename,
+            ).exists()
+        )

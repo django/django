@@ -7,13 +7,13 @@
 # Matt R, 2018
 # saevarom <saevar@saevar.is>, 2011
 # saevarom <saevar@saevar.is>, 2013,2015
-# Thordur Sigurdsson <thordur@ja.is>, 2016-2018
+# Thordur Sigurdsson <thordur@ja.is>, 2016-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-06-22 20:45+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 15:48+0000\n"
 "Last-Translator: Thordur Sigurdsson <thordur@ja.is>\n"
 "Language-Team: Icelandic (http://www.transifex.com/django/django/language/"
 "is/)\n"
@@ -142,6 +142,9 @@ msgstr "Efri sorbíska"
 
 msgid "Hungarian"
 msgstr "Ungverska"
+
+msgid "Armenian"
+msgstr "Armenska"
 
 msgid "Interlingua"
 msgstr "Interlingua"
@@ -614,6 +617,9 @@ msgstr "Hrá tvíundargögn (binary data)"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' er ekki gilt UUID."
 
+msgid "Universally unique identifier"
+msgstr ""
+
 msgid "File"
 msgstr "Skrá"
 
@@ -1060,8 +1066,8 @@ msgstr "Þetta er ekki gilt IPv6 vistfang."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "eða"

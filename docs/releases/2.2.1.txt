@@ -1,0 +1,27 @@
+==========================
+Django 2.2.1 release notes
+==========================
+
+*Expected May 1, 2019*
+
+Django 2.2.1 fixes several bugs in 2.2.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 2.1 that caused the incorrect quoting of
+  database user password when using :djadmin:`dbshell` on Oracle
+  (:ticket:`30307`).
+
+* Added compatibility for ``psycopg2`` 2.8 (:ticket:`30331`).
+
+* Fixed a regression in Django 2.2 that caused a crash when loading the
+  template for the technical 500 debug page (:ticket:`30324`).
+
+* Fixed crash of ``ordering`` argument in
+  :class:`~django.contrib.postgres.aggregates.ArrayAgg` and
+  :class:`~django.contrib.postgres.aggregates.StringAgg` when it contains an
+  expression with params (:ticket:`30332`).
+
+* Fixed a regression in Django 2.2 that caused a single instance fast-delete
+  to not set the primary key to ``None`` (:ticket:`30330`).

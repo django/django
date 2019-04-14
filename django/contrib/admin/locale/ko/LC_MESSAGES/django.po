@@ -2,6 +2,7 @@
 #
 # Translators:
 # Jiyoon, Ha <cryptography@konkuk.ac.kr>, 2016
+# Gihun Ham <progh2@gmail.com>, 2018
 # Hoseok Lee <ihooi77@gmail.com>, 2016
 # Ian Y. Choi <ianyrchoi@gmail.com>, 2015
 # Jaehong Kim <mixe@korea.com>, 2011
@@ -14,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-07-18 09:00+0000\n"
-"Last-Translator: Noh Seho <iam@sehonoh.kr>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 00:36+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: Korean (http://www.transifex.com/django/django/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -115,7 +116,7 @@ msgid "object id"
 msgstr "오브젝트 아이디"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "오브젝트 표현"
 
@@ -468,7 +469,7 @@ msgstr ""
 "템들이 모두 삭제됩니다:"
 
 msgid "View"
-msgstr ""
+msgstr "보기"
 
 msgid "Delete?"
 msgstr "삭제"
@@ -543,24 +544,8 @@ msgstr "모두 표시"
 msgid "Save"
 msgstr "저장"
 
-msgid "Popup closing..."
-msgstr "팝업 닫는 중..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "선택된 %(model)s 변경"
-
-#, python-format
-msgid "View selected %(model)s"
+msgid "Popup closing…"
 msgstr ""
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "%(model)s 추가"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "선택된 %(model)s 제거"
 
 msgid "Search"
 msgstr "검색"
@@ -588,6 +573,18 @@ msgstr "저정하고 조회하기"
 
 msgid "Close"
 msgstr "닫기"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "선택된 %(model)s 변경"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "%(model)s 추가"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "선택된 %(model)s 제거"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "사이트를 이용해 주셔서 고맙습니다."
@@ -701,7 +698,7 @@ msgstr "변경할 %s 선택"
 
 #, python-format
 msgid "Select %s to view"
-msgstr ""
+msgstr "보기위한 1%s 를(을) 선택"
 
 msgid "Date:"
 msgstr "날짜:"

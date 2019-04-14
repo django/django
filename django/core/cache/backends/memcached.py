@@ -68,10 +68,7 @@ class BaseMemcachedCache(BaseCache):
 
     def get(self, key, default=None, version=None):
         key = self.make_key(key, version=version)
-        val = self._cache.get(key)
-        if val is None:
-            return default
-        return val
+        return self._cache.get(key, default)
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
@@ -162,6 +159,16 @@ class MemcachedCache(BaseMemcachedCache):
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
         return self._cache.touch(key, self.get_backend_timeout(timeout)) != 0
+
+    def get(self, key, default=None, version=None):
+        key = self.make_key(key, version=version)
+        val = self._cache.get(key)
+        # python-memcached doesn't support default values in get().
+        # https://github.com/linsomniac/python-memcached/issues/159
+        # Remove this method if that issue is fixed.
+        if val is None:
+            return default
+        return val
 
 
 class PyLibMCCache(BaseMemcachedCache):

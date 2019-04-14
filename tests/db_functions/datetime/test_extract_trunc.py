@@ -1044,6 +1044,30 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
         self.assertEqual(model.melb_year.year, 2016)
         self.assertEqual(model.pacific_year.year, 2015)
 
+    def test_trunc_ambiguous_and_invalid_times(self):
+        sao = pytz.timezone('America/Sao_Paulo')
+        utc = pytz.timezone('UTC')
+        start_datetime = utc.localize(datetime(2016, 10, 16, 13))
+        end_datetime = utc.localize(datetime(2016, 2, 21, 1))
+        self.create_model(start_datetime, end_datetime)
+        with timezone.override(sao):
+            with self.assertRaisesMessage(pytz.NonExistentTimeError, '2016-10-16 00:00:00'):
+                model = DTModel.objects.annotate(truncated_start=TruncDay('start_datetime')).get()
+            with self.assertRaisesMessage(pytz.AmbiguousTimeError, '2016-02-20 23:00:00'):
+                model = DTModel.objects.annotate(truncated_end=TruncHour('end_datetime')).get()
+            model = DTModel.objects.annotate(
+                truncated_start=TruncDay('start_datetime', is_dst=False),
+                truncated_end=TruncHour('end_datetime', is_dst=False),
+            ).get()
+            self.assertEqual(model.truncated_start.dst(), timedelta(0))
+            self.assertEqual(model.truncated_end.dst(), timedelta(0))
+            model = DTModel.objects.annotate(
+                truncated_start=TruncDay('start_datetime', is_dst=True),
+                truncated_end=TruncHour('end_datetime', is_dst=True),
+            ).get()
+            self.assertEqual(model.truncated_start.dst(), timedelta(0, 3600))
+            self.assertEqual(model.truncated_end.dst(), timedelta(0, 3600))
+
     def test_trunc_func_with_timezone(self):
         """
         If the truncated datetime transitions to a different offset (daylight

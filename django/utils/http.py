@@ -14,7 +14,7 @@ from urllib.parse import (
 
 from django.core.exceptions import TooManyFieldsSent
 from django.utils.datastructures import MultiValueDict
-from django.utils.deprecation import RemovedInDjango30Warning
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import keep_lazy_text
 
 # based on RFC 7232, Appendix C
@@ -50,6 +50,11 @@ def urlquote(url, safe='/'):
     A legacy compatibility wrapper to Python's urllib.parse.quote() function.
     (was used for unicode handling on Python 2)
     """
+    warnings.warn(
+        'django.utils.http.urlquote() is deprecated in favor of '
+        'urllib.parse.quote().',
+        RemovedInDjango40Warning, stacklevel=2,
+    )
     return quote(url, safe)
 
 
@@ -59,6 +64,11 @@ def urlquote_plus(url, safe=''):
     A legacy compatibility wrapper to Python's urllib.parse.quote_plus()
     function. (was used for unicode handling on Python 2)
     """
+    warnings.warn(
+        'django.utils.http.urlquote_plus() is deprecated in favor of '
+        'urllib.parse.quote_plus(),',
+        RemovedInDjango40Warning, stacklevel=2,
+    )
     return quote_plus(url, safe)
 
 
@@ -68,6 +78,11 @@ def urlunquote(quoted_url):
     A legacy compatibility wrapper to Python's urllib.parse.unquote() function.
     (was used for unicode handling on Python 2)
     """
+    warnings.warn(
+        'django.utils.http.urlunquote() is deprecated in favor of '
+        'urllib.parse.unquote().',
+        RemovedInDjango40Warning, stacklevel=2,
+    )
     return unquote(quoted_url)
 
 
@@ -77,6 +92,11 @@ def urlunquote_plus(quoted_url):
     A legacy compatibility wrapper to Python's urllib.parse.unquote_plus()
     function. (was used for unicode handling on Python 2)
     """
+    warnings.warn(
+        'django.utils.http.urlunquote_plus() is deprecated in favor of '
+        'urllib.parse.unquote_plus().',
+        RemovedInDjango40Warning, stacklevel=2,
+    )
     return unquote_plus(quoted_url)
 
 
@@ -91,41 +111,33 @@ def urlencode(query, doseq=False):
         query = query.items()
     query_params = []
     for key, value in query:
-        if isinstance(value, (str, bytes)):
+        if value is None:
+            raise TypeError(
+                'Cannot encode None in a query string. Did you mean to pass '
+                'an empty string or omit the value?'
+            )
+        elif isinstance(value, (str, bytes)):
             query_val = value
         else:
             try:
-                iter(value)
+                itr = iter(value)
             except TypeError:
                 query_val = value
             else:
                 # Consume generators and iterators, even when doseq=True, to
                 # work around https://bugs.python.org/issue31706.
-                query_val = [
-                    item if isinstance(item, bytes) else str(item)
-                    for item in value
-                ]
+                query_val = []
+                for item in itr:
+                    if item is None:
+                        raise TypeError(
+                            'Cannot encode None in a query string. Did you '
+                            'mean to pass an empty string or omit the value?'
+                        )
+                    elif not isinstance(item, bytes):
+                        item = str(item)
+                    query_val.append(item)
         query_params.append((key, query_val))
     return original_urlencode(query_params, doseq)
-
-
-def cookie_date(epoch_seconds=None):
-    """
-    Format the time to ensure compatibility with Netscape's cookie standard.
-
-    `epoch_seconds` is a floating point number expressed in seconds since the
-    epoch, in UTC - such as that outputted by time.time(). If set to None, it
-    defaults to the current time.
-
-    Output a string in the format 'Wdy, DD-Mon-YYYY HH:MM:SS GMT'.
-    """
-    warnings.warn(
-        'cookie_date() is deprecated in favor of http_date(), which follows '
-        'the format of the latest RFC.',
-        RemovedInDjango30Warning, stacklevel=2,
-    )
-    rfcdate = formatdate(epoch_seconds)
-    return '%s-%s-%s GMT' % (rfcdate[:7], rfcdate[8:11], rfcdate[12:25])
 
 
 def http_date(epoch_seconds=None):

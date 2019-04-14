@@ -13,18 +13,17 @@ logger = logging.getLogger('django.contrib.gis')
 try:
     from django.conf import settings
     lib_path = settings.GDAL_LIBRARY_PATH
-except (AttributeError, EnvironmentError,
-        ImportError, ImproperlyConfigured):
+except (AttributeError, ImportError, ImproperlyConfigured, OSError):
     lib_path = None
 
 if lib_path:
     lib_names = None
 elif os.name == 'nt':
     # Windows NT shared libraries
-    lib_names = ['gdal203', 'gdal202', 'gdal201', 'gdal20', 'gdal111']
+    lib_names = ['gdal204', 'gdal203', 'gdal202', 'gdal201', 'gdal20']
 elif os.name == 'posix':
     # *NIX library names.
-    lib_names = ['gdal', 'GDAL', 'gdal2.3.0', 'gdal2.2.0', 'gdal2.1.0', 'gdal2.0.0', 'gdal1.11.0']
+    lib_names = ['gdal', 'GDAL', 'gdal2.4.0', 'gdal2.3.0', 'gdal2.2.0', 'gdal2.1.0', 'gdal2.0.0']
 else:
     raise ImproperlyConfigured('GDAL is unsupported on OS "%s".' % os.name)
 

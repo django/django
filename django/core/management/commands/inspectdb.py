@@ -1,6 +1,5 @@
 import keyword
 import re
-from collections import OrderedDict
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
@@ -98,7 +97,7 @@ class Command(BaseCommand):
                 column_to_field_name = {}  # Maps column names to names of model fields
                 for row in table_description:
                     comment_notes = []  # Holds Field notes, to be displayed in a Python comment.
-                    extra_params = OrderedDict()  # Holds Field parameters such as 'db_column'.
+                    extra_params = {}  # Holds Field parameters such as 'db_column'.
                     column_name = row.name
                     is_relation = column_name in relations
 
@@ -232,7 +231,7 @@ class Command(BaseCommand):
         description, this routine will return the given field type name, as
         well as any additional keyword parameters and notes for the field.
         """
-        field_params = OrderedDict()
+        field_params = {}
         field_notes = []
 
         try:
@@ -240,12 +239,6 @@ class Command(BaseCommand):
         except KeyError:
             field_type = 'TextField'
             field_notes.append('This field type is a guess.')
-
-        # This is a hook for data_types_reverse to return a tuple of
-        # (field_type, field_params_dict).
-        if type(field_type) is tuple:
-            field_type, new_params = field_type
-            field_params.update(new_params)
 
         # Add max_length for all CharFields.
         if field_type == 'CharField' and row.internal_size:

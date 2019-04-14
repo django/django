@@ -1662,6 +1662,11 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel"])
         self.assertOperationAttributes(changes, 'testapp', 0, 0, name="AuthorUnmanaged", options={"managed": False})
 
+    def test_unmanaged_delete(self):
+        changes = self.get_changes([self.author_empty, self.author_unmanaged], [self.author_empty])
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ['DeleteModel'])
+
     def test_unmanaged_to_managed(self):
         # Now, we test turning an unmanaged model into a managed model
         changes = self.get_changes(

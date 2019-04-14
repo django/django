@@ -9,7 +9,7 @@ from django.forms import CharField, Form, widgets
 from django.test.utils import isolate_apps
 from django.utils.html import escape
 
-from . import PostgreSQLTestCase
+from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .models import JSONModel, PostgreSQLModel
 
 try:
@@ -17,6 +17,15 @@ try:
     from django.contrib.postgres.fields import JSONField
 except ImportError:
     pass
+
+
+class TestModelMetaOrdering(PostgreSQLSimpleTestCase):
+    def test_ordering_by_json_field_value(self):
+        class TestJSONModel(JSONModel):
+            class Meta:
+                ordering = ['field__value']
+
+        self.assertEqual(TestJSONModel.check(), [])
 
 
 class TestSaveLoad(PostgreSQLTestCase):
@@ -95,19 +104,19 @@ class TestSaveLoad(PostgreSQLTestCase):
 class TestQuerying(PostgreSQLTestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.objs = [
-            JSONModel.objects.create(field=None),
-            JSONModel.objects.create(field=True),
-            JSONModel.objects.create(field=False),
-            JSONModel.objects.create(field='yes'),
-            JSONModel.objects.create(field=7),
-            JSONModel.objects.create(field=[]),
-            JSONModel.objects.create(field={}),
-            JSONModel.objects.create(field={
+        cls.objs = JSONModel.objects.bulk_create([
+            JSONModel(field=None),
+            JSONModel(field=True),
+            JSONModel(field=False),
+            JSONModel(field='yes'),
+            JSONModel(field=7),
+            JSONModel(field=[]),
+            JSONModel(field={}),
+            JSONModel(field={
                 'a': 'b',
                 'c': 1,
             }),
-            JSONModel.objects.create(field={
+            JSONModel(field={
                 'a': 'b',
                 'c': 1,
                 'd': ['e', {'f': 'g'}],
@@ -116,13 +125,13 @@ class TestQuerying(PostgreSQLTestCase):
                 'j': None,
                 'k': {'l': 'm'},
             }),
-            JSONModel.objects.create(field=[1, [2]]),
-            JSONModel.objects.create(field={
+            JSONModel(field=[1, [2]]),
+            JSONModel(field={
                 'k': True,
                 'l': False,
             }),
-            JSONModel.objects.create(field={'foo': 'bar'}),
-        ]
+            JSONModel(field={'foo': 'bar'}),
+        ])
 
     def test_exact(self):
         self.assertSequenceEqual(
@@ -301,7 +310,7 @@ class TestQuerying(PostgreSQLTestCase):
 
 
 @isolate_apps('postgres_tests')
-class TestChecks(PostgreSQLTestCase):
+class TestChecks(PostgreSQLSimpleTestCase):
 
     def test_invalid_default(self):
         class MyModel(PostgreSQLModel):
@@ -336,7 +345,7 @@ class TestChecks(PostgreSQLTestCase):
         self.assertEqual(model.check(), [])
 
 
-class TestSerialization(PostgreSQLTestCase):
+class TestSerialization(PostgreSQLSimpleTestCase):
     test_data = (
         '[{"fields": {"field": %s, "field_custom": null}, '
         '"model": "postgres_tests.jsonmodel", "pk": null}]'
@@ -362,7 +371,7 @@ class TestSerialization(PostgreSQLTestCase):
                 self.assertEqual(instance.field, value)
 
 
-class TestValidation(PostgreSQLTestCase):
+class TestValidation(PostgreSQLSimpleTestCase):
 
     def test_not_serializable(self):
         field = JSONField()
@@ -378,7 +387,7 @@ class TestValidation(PostgreSQLTestCase):
         self.assertEqual(field.clean(datetime.timedelta(days=1), None), datetime.timedelta(days=1))
 
 
-class TestFormField(PostgreSQLTestCase):
+class TestFormField(PostgreSQLSimpleTestCase):
 
     def test_valid(self):
         field = forms.JSONField()

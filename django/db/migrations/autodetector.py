@@ -12,8 +12,7 @@ from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.utils import (
     COMPILED_REGEX_TYPE, RegexObject, get_migration_name_timestamp,
 )
-
-from .topological_sort import stable_topological_sort
+from django.utils.topological_sort import stable_topological_sort
 
 
 class MigrationAutodetector:
@@ -722,10 +721,6 @@ class MigrationAutodetector:
         for app_label, model_name in all_deleted_models:
             model_state = self.from_state.models[app_label, model_name]
             model = self.old_apps.get_model(app_label, model_name)
-            if not model._meta.managed:
-                # Skip here, no need to handle fields for unmanaged models
-                continue
-
             # Gather related fields
             related_fields = {}
             for field in model._meta.local_fields:

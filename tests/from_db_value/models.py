@@ -28,12 +28,3 @@ class CashModel(models.Model):
 
     def __str__(self):
         return str(self.cash)
-
-
-class CashFieldDeprecated(CashField):
-    def from_db_value(self, value, expression, connection, context):
-        return super().from_db_value(value, expression, connection)
-
-
-class CashModelDeprecated(models.Model):
-    cash = CashFieldDeprecated()

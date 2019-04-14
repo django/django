@@ -19,6 +19,7 @@ class DefaultsTests(TestCase):
         '/nonexistent_url/',  # this is in urls.py
         '/other_nonexistent_url/',  # this NOT in urls.py
     ]
+    request_factory = RequestFactory()
 
     @classmethod
     def setUpTestData(cls):
@@ -73,8 +74,7 @@ class DefaultsTests(TestCase):
         self.assertEqual(response.status_code, 500)
 
     def test_bad_request(self):
-        rf = RequestFactory()
-        request = rf.get('/')
+        request = self.request_factory.get('/')
         response = bad_request(request, Exception())
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.content, b'<h1>Bad Request (400)</h1>')
@@ -116,8 +116,7 @@ class DefaultsTests(TestCase):
         Default error views should raise TemplateDoesNotExist when passed a
         template that doesn't exist.
         """
-        rf = RequestFactory()
-        request = rf.get('/')
+        request = self.request_factory.get('/')
 
         with self.assertRaises(TemplateDoesNotExist):
             bad_request(request, Exception(), template_name='nonexistent')

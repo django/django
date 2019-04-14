@@ -20,11 +20,11 @@ class Article(models.Model):
     pub_date = models.DateField()
     reporter = models.ForeignKey(Reporter, models.CASCADE)
 
-    def __str__(self):
-        return self.headline
-
     class Meta:
         ordering = ('headline',)
+
+    def __str__(self):
+        return self.headline
 
 
 class City(models.Model):

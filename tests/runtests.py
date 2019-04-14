@@ -10,18 +10,24 @@ import sys
 import tempfile
 import warnings
 
-import django
-from django.apps import apps
-from django.conf import settings
-from django.db import connection, connections
-from django.test import TestCase, TransactionTestCase
-from django.test.runner import default_test_processes
-from django.test.selenium import SeleniumTestCaseBase
-from django.test.utils import get_runner
-from django.utils.deprecation import (
-    RemovedInDjango30Warning, RemovedInDjango31Warning,
-)
-from django.utils.log import DEFAULT_LOGGING
+try:
+    import django
+except ImportError as e:
+    raise RuntimeError(
+        'Django module not found, reference tests/README.rst for instructions.'
+    ) from e
+else:
+    from django.apps import apps
+    from django.conf import settings
+    from django.db import connection, connections
+    from django.test import TestCase, TransactionTestCase
+    from django.test.runner import default_test_processes
+    from django.test.selenium import SeleniumTestCaseBase
+    from django.test.utils import get_runner
+    from django.utils.deprecation import (
+        RemovedInDjango31Warning, RemovedInDjango40Warning,
+    )
+    from django.utils.log import DEFAULT_LOGGING
 
 try:
     import MySQLdb
@@ -32,7 +38,7 @@ else:
     warnings.filterwarnings('ignore', r'\(1003, *', category=MySQLdb.Warning)
 
 # Make deprecation warnings errors to ensure no usage of deprecated features.
-warnings.simplefilter("error", RemovedInDjango30Warning)
+warnings.simplefilter("error", RemovedInDjango40Warning)
 warnings.simplefilter('error', RemovedInDjango31Warning)
 # Make runtime warning errors to ensure no usage of error prone patterns.
 warnings.simplefilter("error", RuntimeWarning)
@@ -234,7 +240,7 @@ def teardown(state):
     # Discard the multiprocessing.util finalizer that tries to remove a
     # temporary directory that's already removed by this script's
     # atexit.register(shutil.rmtree, TMPDIR) handler. Prevents
-    # FileNotFoundError at the end of a test run on Python 3.6+ (#27890).
+    # FileNotFoundError at the end of a test run (#27890).
     from multiprocessing.util import _finalizer_registry
     _finalizer_registry.pop((-100, 0), None)
 

@@ -9,6 +9,7 @@ from django.test.client import RequestFactory
 
 @override_settings(ROOT_URLCONF='wsgi.urls')
 class WSGITest(SimpleTestCase):
+    request_factory = RequestFactory()
 
     def setUp(self):
         request_started.disconnect(close_old_connections)
@@ -22,7 +23,7 @@ class WSGITest(SimpleTestCase):
         """
         application = get_wsgi_application()
 
-        environ = RequestFactory()._base_environ(
+        environ = self.request_factory._base_environ(
             PATH_INFO="/",
             CONTENT_TYPE="text/html; charset=utf-8",
             REQUEST_METHOD="GET"
@@ -53,7 +54,7 @@ class WSGITest(SimpleTestCase):
             def __init__(self, filelike, blksize=8192):
                 filelike.close()
         application = get_wsgi_application()
-        environ = RequestFactory()._base_environ(
+        environ = self.request_factory._base_environ(
             PATH_INFO='/file/',
             REQUEST_METHOD='GET',
             **{'wsgi.file_wrapper': FileWrapper}

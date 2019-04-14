@@ -29,8 +29,7 @@ class FileUploadTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        if not os.path.isdir(MEDIA_ROOT):
-            os.makedirs(MEDIA_ROOT)
+        os.makedirs(MEDIA_ROOT, exist_ok=True)
 
     @classmethod
     def tearDownClass(cls):
@@ -386,8 +385,8 @@ class FileUploadTests(TestCase):
             file.write(b'a' * (2 ** 21))
             file.seek(0)
 
-            # AttributeError: You cannot alter upload handlers after the upload has been processed.
-            with self.assertRaises(AttributeError):
+            msg = 'You cannot alter upload handlers after the upload has been processed.'
+            with self.assertRaisesMessage(AttributeError, msg):
                 self.client.post('/quota/broken/', {'f': file})
 
     def test_fileupload_getlist(self):
@@ -528,8 +527,7 @@ class DirectoryCreationTests(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        if not os.path.isdir(MEDIA_ROOT):
-            os.makedirs(MEDIA_ROOT)
+        os.makedirs(MEDIA_ROOT, exist_ok=True)
 
     @classmethod
     def tearDownClass(cls):
@@ -548,16 +546,13 @@ class DirectoryCreationTests(SimpleTestCase):
             self.obj.testfile.save('foo.txt', SimpleUploadedFile('foo.txt', b'x'), save=False)
 
     def test_not_a_directory(self):
-        """The correct IOError is raised when the upload directory name exists but isn't a directory"""
         # Create a file with the upload directory name
         open(UPLOAD_TO, 'wb').close()
         self.addCleanup(os.remove, UPLOAD_TO)
-        with self.assertRaises(IOError) as exc_info:
+        msg = '%s exists and is not a directory.' % UPLOAD_TO
+        with self.assertRaisesMessage(FileExistsError, msg):
             with SimpleUploadedFile('foo.txt', b'x') as file:
                 self.obj.testfile.save('foo.txt', file, save=False)
-        # The test needs to be done on a specific string as IOError
-        # is raised even without the patch (just not early enough)
-        self.assertEqual(exc_info.exception.args[0], "%s exists and is not a directory." % UPLOAD_TO)
 
 
 class MultiParserTests(SimpleTestCase):

@@ -55,18 +55,18 @@ class CustomMembership(models.Model):
     weird_fk = models.ForeignKey(Membership, models.SET_NULL, null=True)
     date_joined = models.DateTimeField(default=datetime.now)
 
-    def __str__(self):
-        return "%s is a member of %s" % (self.person.name, self.group.name)
-
     class Meta:
         db_table = "test_table"
         ordering = ["date_joined"]
+
+    def __str__(self):
+        return "%s is a member of %s" % (self.person.name, self.group.name)
 
 
 class TestNoDefaultsOrNulls(models.Model):
     person = models.ForeignKey(Person, models.CASCADE)
     group = models.ForeignKey(Group, models.CASCADE)
-    nodefaultnonull = models.CharField(max_length=5)
+    nodefaultnonull = models.IntegerField()
 
 
 class PersonSelfRefM2M(models.Model):

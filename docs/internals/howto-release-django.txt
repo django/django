@@ -134,6 +134,14 @@ any time leading up to the actual release:
 
    and then commit the changed man page.
 
+#. If this is the "dot zero" release of a new series, create a new branch from
+   the current stable branch in the `django-docs-translations
+   <https://github.com/django/django-docs-translations>`_ repository. For
+   example, when releasing Django 2.2::
+
+    $ git checkout -b stable/2.2.x origin/stable/2.1.x
+    $ git push origin stable/2.2.x:stable/2.2.x
+
 Preparing for release
 =====================
 
@@ -179,9 +187,7 @@ OK, this is the fun part, where we actually push out a release!
    checkout security/1.5.x; git rebase stable/1.5.x``) and then switch back and
    do the merge. Make sure the commit message for each security fix explains
    that the commit is a security fix and that an announcement will follow
-   (`example security commit`__).
-
-   __ https://github.com/django/django/commit/3ef4bbf495cc6c061789132e3d50a8231a89406b
+   (:commit:`example security commit <bf39978a53f117ca02e9a0c78b76664a41a54745>`).
 
 #. For a feature release, remove the ``UNDER DEVELOPMENT`` header at the
    top of the release notes and add the release date on the next line. For a
@@ -403,10 +409,10 @@ need to be done by the releaser.
 
 #. Add the new branch to `Read the Docs
    <https://readthedocs.org/projects/django/>`_. Since the automatically
-   generated version names ("stable-A.B.x") differ from the version numbers
-   we've used historically in Read the Docs ("A.B.x"), we currently ask Eric
-   Holscher to add the version for us. Someday the alias functionality may be
-   built-in to the Read the Docs UI.
+   generated version names ("stable-A.B.x") differ from the version names
+   used in Read the Docs ("A.B.x"), `create a ticket
+   <https://github.com/rtfd/readthedocs.org/issues/5537>`_ requesting the new
+   version.
 
 Notes on setting the VERSION tuple
 ==================================

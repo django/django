@@ -40,7 +40,34 @@ class AutoFieldTests(SimpleTestCase):
 
 
 @isolate_apps('invalid_models_tests')
-class CharFieldTests(TestCase):
+class BinaryFieldTests(SimpleTestCase):
+
+    def test_valid_default_value(self):
+        class Model(models.Model):
+            field1 = models.BinaryField(default=b'test')
+            field2 = models.BinaryField(default=None)
+
+        for field_name in ('field1', 'field2'):
+            field = Model._meta.get_field(field_name)
+            self.assertEqual(field.check(), [])
+
+    def test_str_default_value(self):
+        class Model(models.Model):
+            field = models.BinaryField(default='test')
+
+        field = Model._meta.get_field('field')
+        self.assertEqual(field.check(), [
+            Error(
+                "BinaryField's default cannot be a string. Use bytes content "
+                "instead.",
+                obj=field,
+                id='fields.E170',
+            ),
+        ])
+
+
+@isolate_apps('invalid_models_tests')
+class CharFieldTests(SimpleTestCase):
 
     def test_valid_field(self):
         class Model(models.Model):
@@ -156,14 +183,14 @@ class CharFieldTests(TestCase):
                 self.display = display
 
             def __iter__(self):
-                return (x for x in [self.value, self.display])
+                return iter((self.value, self.display))
 
             def __len__(self):
                 return 2
 
         class Things:
             def __iter__(self):
-                return (x for x in [ThingItem(1, 2), ThingItem(3, 4)])
+                return iter((ThingItem(1, 2), ThingItem(3, 4)))
 
         class ThingWithIterableChoices(models.Model):
             thing = models.CharField(max_length=100, blank=True, choices=Things())
@@ -312,7 +339,7 @@ class CharFieldTests(TestCase):
 
 
 @isolate_apps('invalid_models_tests')
-class DateFieldTests(TestCase):
+class DateFieldTests(SimpleTestCase):
     maxDiff = None
 
     def test_auto_now_and_auto_now_add_raise_error(self):
@@ -375,7 +402,7 @@ class DateFieldTests(TestCase):
 
 
 @isolate_apps('invalid_models_tests')
-class DateTimeFieldTests(TestCase):
+class DateTimeFieldTests(SimpleTestCase):
     maxDiff = None
 
     def test_fix_default_value(self):
@@ -638,7 +665,7 @@ class IntegerFieldTests(SimpleTestCase):
 
 
 @isolate_apps('invalid_models_tests')
-class TimeFieldTests(TestCase):
+class TimeFieldTests(SimpleTestCase):
     maxDiff = None
 
     def test_fix_default_value(self):

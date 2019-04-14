@@ -11,7 +11,7 @@ from io import StringIO
 
 from django.core.management import call_command
 from django.db import connections
-from django.test import SimpleTestCase, TestCase, TransactionTestCase
+from django.test import SimpleTestCase, TestCase
 from django.test.utils import (
     setup_databases as _setup_databases, setup_test_environment,
     teardown_databases as _teardown_databases, teardown_test_environment,
@@ -66,9 +66,9 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
             self.stream.writeln(self.separator1)
             self.stream.writeln("%s: %s" % (flavour, self.getDescription(test)))
             self.stream.writeln(self.separator2)
-            self.stream.writeln("%s" % err)
+            self.stream.writeln(err)
             self.stream.writeln(self.separator2)
-            self.stream.writeln("%s" % sql_debug)
+            self.stream.writeln(sql_debug)
 
 
 class RemoteTestResult:
@@ -391,6 +391,9 @@ class ParallelTestSuite(unittest.TestSuite):
 
         return result
 
+    def __iter__(self):
+        return iter(self.subsuites)
+
 
 class DiscoverRunner:
     """A Django test runner that uses unittest2 test discovery."""
@@ -399,7 +402,7 @@ class DiscoverRunner:
     parallel_test_suite = ParallelTestSuite
     test_runner = unittest.TextTestRunner
     test_loader = unittest.defaultTestLoader
-    reorder_by = (TestCase, TransactionTestCase, SimpleTestCase)
+    reorder_by = (TestCase, SimpleTestCase)
 
     def __init__(self, pattern=None, top_level=None, verbosity=1,
                  interactive=True, failfast=False, keepdb=False,
@@ -587,6 +590,27 @@ class DiscoverRunner:
     def suite_result(self, suite, result, **kwargs):
         return len(result.failures) + len(result.errors)
 
+    def _get_databases(self, suite):
+        databases = set()
+        for test in suite:
+            if isinstance(test, unittest.TestCase):
+                test_databases = getattr(test, 'databases', None)
+                if test_databases == '__all__':
+                    return set(connections)
+                if test_databases:
+                    databases.update(test_databases)
+            else:
+                databases.update(self._get_databases(test))
+        return databases
+
+    def get_databases(self, suite):
+        databases = self._get_databases(suite)
+        if self.verbosity >= 2:
+            unused_databases = [alias for alias in connections if alias not in databases]
+            if unused_databases:
+                print('Skipping setup of unused database(s): %s.' % ', '.join(sorted(unused_databases)))
+        return databases
+
     def run_tests(self, test_labels, extra_tests=None, **kwargs):
         """
         Run the unit tests for all the test labels in the provided list.
@@ -601,7 +625,8 @@ class DiscoverRunner:
         """
         self.setup_test_environment()
         suite = self.build_suite(test_labels, extra_tests)
-        old_config = self.setup_databases()
+        databases = self.get_databases(suite)
+        old_config = self.setup_databases(aliases=databases)
         run_failed = False
         try:
             self.run_checks()
@@ -637,22 +662,6 @@ def is_discoverable(label):
     return os.path.isdir(os.path.abspath(label))
 
 
-def reorder_postprocess(reordered_suite):
-    """
-    To make TransactionTestCases initialize their data properly, they must know
-    if the next TransactionTestCase needs initial data migrations serialized in
-    the connection. Initialize _next_serialized_rollback attribute depending on
-    the serialized_rollback option present in the next test class in the suite.
-    If the next test has no serialized_rollback attribute, it means there
-    aren't any more TransactionTestCases.
-    """
-    for previous_test, next_test in zip(reordered_suite._tests[:-1], reordered_suite._tests[1:]):
-        next_serialized_rollback = getattr(next_test, 'serialized_rollback', None)
-        if next_serialized_rollback is not None:
-            previous_test._next_serialized_rollback = next_serialized_rollback
-    return reordered_suite
-
-
 def reorder_suite(suite, classes, reverse=False):
     """
     Reorder a test suite by test type.
@@ -672,7 +681,7 @@ def reorder_suite(suite, classes, reverse=False):
     reordered_suite = suite_class()
     for i in range(class_count + 1):
         reordered_suite.addTests(bins[i])
-    return reorder_postprocess(reordered_suite)
+    return reordered_suite
 
 
 def partition_suite_by_type(suite, classes, bins, reverse=False):

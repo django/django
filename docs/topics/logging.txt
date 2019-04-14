@@ -746,5 +746,10 @@ Independent of the value of :setting:`DEBUG`:
 * The :ref:`django-server-logger` logger sends messages at the ``INFO`` level
   or higher to the console.
 
+All loggers except :ref:`django-server-logger` propagate logging to their
+parents, up to the root ``django`` logger. The ``console`` and ``mail_admins``
+handlers are attached to the root logger to provide the behavior described
+above.
+
 See also :ref:`Configuring logging <configuring-logging>` to learn how you can
 complement or replace this default logging configuration.

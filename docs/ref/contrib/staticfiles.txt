@@ -372,7 +372,7 @@ hashing algorithm.
 
 .. class:: storage.CachedStaticFilesStorage
 
-.. deprecated:: 2.1
+.. deprecated:: 2.2
 
     ``CachedStaticFilesStorage`` is deprecated as it has some intractable
     problems, some of which are outlined below. Use

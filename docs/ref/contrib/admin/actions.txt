@@ -361,8 +361,6 @@ Conditionally enabling or disabling actions
 Setting permissions for actions
 -------------------------------
 
-.. versionadded:: 2.1
-
 Actions may limit their availability to users with specific permissions by
 setting an ``allowed_permissions`` attribute on the action function::
 

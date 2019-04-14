@@ -9,7 +9,8 @@ from .models import Container, Event, Group, Happening, M2MModel
 
 
 class PickleabilityTestCase(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         Happening.objects.create()  # make sure the defaults are working (#20158)
 
     def assert_pickles(self, qs):

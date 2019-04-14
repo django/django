@@ -28,6 +28,7 @@ from django.db.models.signals import (
     class_prepared, post_init, post_save, pre_init, pre_save,
 )
 from django.db.models.utils import make_model_tuple
+from django.utils.encoding import force_str
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext_lazy as _
 from django.utils.version import get_version
@@ -58,6 +59,11 @@ def subclass_exception(name, bases, module, attached_to):
     })
 
 
+def _has_contribute_to_class(value):
+    # Only call contribute_to_class() if it's bound.
+    return not inspect.isclass(value) and hasattr(value, 'contribute_to_class')
+
+
 class ModelBase(type):
     """Metaclass for all models."""
     def __new__(cls, name, bases, attrs, **kwargs):
@@ -75,8 +81,18 @@ class ModelBase(type):
         classcell = attrs.pop('__classcell__', None)
         if classcell is not None:
             new_attrs['__classcell__'] = classcell
-        new_class = super_new(cls, name, bases, new_attrs, **kwargs)
         attr_meta = attrs.pop('Meta', None)
+        # Pass all attrs without a (Django-specific) contribute_to_class()
+        # method to type.__new__() so that they're properly initialized
+        # (i.e. __set_name__()).
+        contributable_attrs = {}
+        for obj_name, obj in list(attrs.items()):
+            if _has_contribute_to_class(obj):
+                contributable_attrs[obj_name] = obj
+            else:
+                new_attrs[obj_name] = obj
+        new_class = super_new(cls, name, bases, new_attrs, **kwargs)
+
         abstract = getattr(attr_meta, 'abstract', False)
         meta = attr_meta or getattr(new_class, 'Meta', None)
         base_meta = getattr(new_class, '_meta', None)
@@ -134,8 +150,9 @@ class ModelBase(type):
         if is_proxy and base_meta and base_meta.swapped:
             raise TypeError("%s cannot proxy the swapped model '%s'." % (name, base_meta.swapped))
 
-        # Add all attributes to the class.
-        for obj_name, obj in attrs.items():
+        # Add remaining attributes (those with a contribute_to_class() method)
+        # to the class.
+        for obj_name, obj in contributable_attrs.items():
             new_class.add_to_class(obj_name, obj)
 
         # All the fields of any type declared on this model
@@ -300,8 +317,7 @@ class ModelBase(type):
         return new_class
 
     def add_to_class(cls, name, value):
-        # We should call the contribute_to_class method only if it's bound
-        if not inspect.isclass(value) and hasattr(value, 'contribute_to_class'):
+        if _has_contribute_to_class(value):
             value.contribute_to_class(cls, name)
         else:
             setattr(cls, name, value)
@@ -906,7 +922,8 @@ class Model(metaclass=ModelBase):
 
     def _get_FIELD_display(self, field):
         value = getattr(self, field.attname)
-        return dict(field.flatchoices).get(value, value)
+        # force_str() to coerce lazy strings.
+        return force_str(dict(field.flatchoices).get(value, value), strings_only=True)
 
     def _get_next_or_previous_by_FIELD(self, field, is_next, **kwargs):
         if not self.pk:
@@ -998,6 +1015,8 @@ class Model(metaclass=ModelBase):
         for model_class, model_constraints in constraints:
             for constraint in model_constraints:
                 if (isinstance(constraint, UniqueConstraint) and
+                        # Partial unique constraints can't be validated.
+                        constraint.condition is None and
                         not any(name in exclude for name in constraint.fields)):
                     unique_checks.append((model_class, constraint.fields))
 
@@ -1630,9 +1649,35 @@ class Model(metaclass=ModelBase):
         # Convert "-field" to "field".
         fields = ((f[1:] if f.startswith('-') else f) for f in fields)
 
-        # Skip ordering in the format field1__field2 (FIXME: checking
-        # this format would be nice, but it's a little fiddly).
-        fields = (f for f in fields if LOOKUP_SEP not in f)
+        # Separate related fields and non-related fields.
+        _fields = []
+        related_fields = []
+        for f in fields:
+            if LOOKUP_SEP in f:
+                related_fields.append(f)
+            else:
+                _fields.append(f)
+        fields = _fields
+
+        # Check related fields.
+        for field in related_fields:
+            _cls = cls
+            fld = None
+            for part in field.split(LOOKUP_SEP):
+                try:
+                    fld = _cls._meta.get_field(part)
+                    if fld.is_relation:
+                        _cls = fld.get_path_info()[-1].to_opts.model
+                except (FieldDoesNotExist, AttributeError):
+                    if fld is None or fld.get_transform(part) is None:
+                        errors.append(
+                            checks.Error(
+                                "'ordering' refers to the nonexistent field, "
+                                "related field, or lookup '%s'." % field,
+                                obj=cls,
+                                id='models.E015',
+                            )
+                        )
 
         # Skip ordering on pk. This is always a valid order_by field
         # but is an alias and therefore won't be found by opts.get_field.
@@ -1654,7 +1699,8 @@ class Model(metaclass=ModelBase):
         for invalid_field in invalid_fields:
             errors.append(
                 checks.Error(
-                    "'ordering' refers to the nonexistent field '%s'." % invalid_field,
+                    "'ordering' refers to the nonexistent field, related "
+                    "field, or lookup '%s'." % invalid_field,
                     obj=cls,
                     id='models.E015',
                 )
@@ -1769,11 +1815,9 @@ def method_set_order(self, ordered_obj, id_list, using=None):
         using = DEFAULT_DB_ALIAS
     order_wrt = ordered_obj._meta.order_with_respect_to
     filter_args = order_wrt.get_forward_related_filter(self)
-    # FIXME: It would be nice if there was an "update many" version of update
-    # for situations like this.
-    with transaction.atomic(using=using, savepoint=False):
-        for i, j in enumerate(id_list):
-            ordered_obj.objects.filter(pk=j, **filter_args).update(_order=i)
+    ordered_obj.objects.db_manager(using).filter(**filter_args).bulk_update([
+        ordered_obj(pk=pk, _order=order) for order, pk in enumerate(id_list)
+    ], ['_order'])
 
 
 def method_get_order(self, ordered_obj):

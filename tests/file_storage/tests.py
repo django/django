@@ -410,12 +410,13 @@ class FileStorageTests(SimpleTestCase):
 
         # Monkey-patch os.makedirs, to simulate a normal call, a raced call,
         # and an error.
-        def fake_makedirs(path):
+        def fake_makedirs(path, mode=0o777, exist_ok=False):
             if path == os.path.join(self.temp_dir, 'normal'):
-                real_makedirs(path)
+                real_makedirs(path, mode, exist_ok)
             elif path == os.path.join(self.temp_dir, 'raced'):
-                real_makedirs(path)
-                raise FileExistsError()
+                real_makedirs(path, mode, exist_ok)
+                if not exist_ok:
+                    raise FileExistsError()
             elif path == os.path.join(self.temp_dir, 'error'):
                 raise PermissionError()
             else:
@@ -482,9 +483,9 @@ class FileStorageTests(SimpleTestCase):
         f1 = ContentFile('chunks fails')
 
         def failing_chunks():
-            raise IOError
+            raise OSError
         f1.chunks = failing_chunks
-        with self.assertRaises(IOError):
+        with self.assertRaises(OSError):
             self.storage.save('error.file', f1)
 
     def test_delete_no_name(self):

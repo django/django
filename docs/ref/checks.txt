@@ -159,6 +159,8 @@ Model fields
 * **fields.W161**: Fixed default value provided.
 * **fields.W162**: ``<database>`` does not support a database index on
   ``<field data type>`` columns.
+* **fields.E170**: ``BinaryField``’s ``default`` cannot be a string. Use bytes
+  content instead.
 * **fields.E900**: ``IPAddressField`` has been removed except for support in
   historical migrations.
 * **fields.W900**: ``IPAddressField`` has been deprecated. Support for it
@@ -277,8 +279,8 @@ Models
   supported for that option.
 * **models.E014**: ``ordering`` must be a tuple or list (even if you want to
   order by only one field).
-* **models.E015**: ``ordering`` refers to the nonexistent field
-  ``<field name>``.
+* **models.E015**: ``ordering`` refers to the nonexistent field, related field,
+  or lookup ``<field name>``.
 * **models.E016**: ``indexes/index_together/unique_together`` refers to field
   ``<field_name>`` which is not local to model ``<model>``.
 * **models.E017**: Proxy model ``<model>`` contains model fields.
@@ -302,6 +304,8 @@ Models
 * **models.E026**: The model cannot have more than one field with
   ``primary_key=True``.
 * **models.W027**: ``<database>`` does not support check constraints.
+* **models.E028**: ``db_table`` ``<db_table>`` is used by multiple models:
+  ``<model list>``.
 
 Security
 --------
@@ -436,7 +440,17 @@ Translation
 The following checks are performed on your translation configuration:
 
 * **translation.E001**: You have provided an invalid value for the
-  :setting:`LANGUAGE_CODE` setting.
+  :setting:`LANGUAGE_CODE` setting: ``<value>``.
+* **translation.E002**: You have provided an invalid language code in the
+  :setting:`LANGUAGES` setting: ``<value>``.
+* **translation.E003**: You have provided an invalid language code in the
+  :setting:`LANGUAGES_BIDI` setting: ``<value>``.
+* **translation.E004**: You have provided a value for the
+  :setting:`LANGUAGE_CODE` setting that is not in the :setting:`LANGUAGES`
+  setting.
+* **translation.E005**: You have provided values in the
+  :setting:`LANGUAGES_BIDI` setting that are not in the :setting:`LANGUAGES`
+  setting.
 
 URLs
 ----

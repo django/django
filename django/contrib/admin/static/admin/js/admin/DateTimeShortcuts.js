@@ -1,4 +1,4 @@
-/*global Calendar, findPosX, findPosY, getStyle, get_format, gettext, gettext_noop, interpolate, ngettext, quickElement*/
+/*global Calendar, findPosX, findPosY, get_format, gettext, gettext_noop, interpolate, ngettext, quickElement*/
 // Inserts shortcut buttons after all of the following:
 //     <input type="text" class="vDateField">
 //     <input type="text" class="vTimeField">
@@ -197,7 +197,7 @@
 
             // Recalculate the clockbox position
             // is it left-to-right or right-to-left layout ?
-            if (getStyle(document.body, 'direction') !== 'rtl') {
+            if (window.getComputedStyle(document.body).direction !== 'rtl') {
                 clock_box.style.left = findPosX(clock_link) + 17 + 'px';
             }
             else {
@@ -370,7 +370,7 @@
 
             // Recalculate the clockbox position
             // is it left-to-right or right-to-left layout ?
-            if (getStyle(document.body, 'direction') !== 'rtl') {
+            if (window.getComputedStyle(document.body).direction !== 'rtl') {
                 cal_box.style.left = findPosX(cal_link) + 17 + 'px';
             }
             else {

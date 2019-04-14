@@ -12,11 +12,11 @@ from django.db import models
 class Publication(models.Model):
     title = models.CharField(max_length=30)
 
-    def __str__(self):
-        return self.title
-
     class Meta:
         ordering = ('title',)
+
+    def __str__(self):
+        return self.title
 
 
 class Tag(models.Model):
@@ -34,11 +34,11 @@ class Article(models.Model):
     publications = models.ManyToManyField(Publication, name='publications')
     tags = models.ManyToManyField(Tag, related_name='tags')
 
-    def __str__(self):
-        return self.headline
-
     class Meta:
         ordering = ('headline',)
+
+    def __str__(self):
+        return self.headline
 
 
 # Models to test correct related_name inheritance

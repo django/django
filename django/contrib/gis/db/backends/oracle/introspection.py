@@ -10,20 +10,20 @@ class OracleIntrospection(DatabaseIntrospection):
     data_types_reverse = DatabaseIntrospection.data_types_reverse.copy()
     data_types_reverse[cx_Oracle.OBJECT] = 'GeometryField'
 
-    def get_geometry_type(self, table_name, geo_col):
+    def get_geometry_type(self, table_name, description):
         with self.connection.cursor() as cursor:
             # Querying USER_SDO_GEOM_METADATA to get the SRID and dimension information.
             try:
                 cursor.execute(
                     'SELECT "DIMINFO", "SRID" FROM "USER_SDO_GEOM_METADATA" '
                     'WHERE "TABLE_NAME"=%s AND "COLUMN_NAME"=%s',
-                    (table_name.upper(), geo_col.upper())
+                    (table_name.upper(), description.name.upper())
                 )
                 row = cursor.fetchone()
             except Exception as exc:
                 raise Exception(
                     'Could not find entry in USER_SDO_GEOM_METADATA '
-                    'corresponding to "%s"."%s"' % (table_name, geo_col)
+                    'corresponding to "%s"."%s"' % (table_name, description.name)
                 ) from exc
 
             # TODO: Research way to find a more specific geometry field type for

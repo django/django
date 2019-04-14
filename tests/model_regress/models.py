@@ -1,12 +1,11 @@
 from django.db import models
 
-CHOICES = (
-    (1, 'first'),
-    (2, 'second'),
-)
-
 
 class Article(models.Model):
+    CHOICES = (
+        (1, 'first'),
+        (2, 'second'),
+    )
     headline = models.CharField(max_length=100, default='Default headline')
     pub_date = models.DateTimeField()
     status = models.IntegerField(blank=True, null=True, choices=CHOICES)

@@ -99,8 +99,6 @@ class SearchQueryCombinable:
                 'SearchQuery can only be combined with other SearchQuerys, '
                 'got {}.'.format(type(other))
             )
-        if not self.config == other.config:
-            raise TypeError("SearchQuery configs don't match.")
         if reversed:
             return CombinedSearchQuery(other, connector, self, self.config)
         return CombinedSearchQuery(self, connector, other, self.config)

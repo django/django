@@ -6,13 +6,13 @@
 # Jirka Vejrazka <Jirka.Vejrazka@gmail.com>, 2011
 # Tomáš Ehrlich <tomas.ehrlich@gmail.com>, 2015
 # Vláďa Macek <macek@sandbox.cz>, 2012-2014
-# Vláďa Macek <macek@sandbox.cz>, 2015-2018
+# Vláďa Macek <macek@sandbox.cz>, 2015-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-07-15 18:02+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-19 07:53+0000\n"
 "Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -141,6 +141,9 @@ msgstr "hornolužickou srbštinou"
 
 msgid "Hungarian"
 msgstr "maďarsky"
+
+msgid "Armenian"
+msgstr "arménštinou"
 
 msgid "Interlingua"
 msgstr "interlingua"
@@ -629,6 +632,9 @@ msgstr "Přímá binární data"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "\"%(value)s\" není platná hodnota typu UUID."
 
+msgid "Universally unique identifier"
+msgstr "Všeobecně jedinečný identifikátor"
+
 msgid "File"
 msgstr "Soubor"
 
@@ -1082,8 +1088,8 @@ msgstr "Toto není platná adresa typu IPv6."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "nebo"

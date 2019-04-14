@@ -149,6 +149,25 @@ will result in a database error.
     The PostgreSQL behavior can be emulated using ``Coalesce`` if you know
     a sensible maximum value to provide as a default.
 
+``NullIf``
+----------
+
+.. class:: NullIf(expression1, expression2)
+
+.. versionadded:: 2.2
+
+Accepts two expressions and returns ``None`` if they are equal, otherwise
+returns ``expression1``.
+
+.. admonition:: Caveats on Oracle
+
+    Due to an :ref:`Oracle convention<oracle-null-empty-strings>`, this
+    function returns the empty string instead of ``None`` when the expressions
+    are of type :class:`~django.db.models.CharField`.
+
+    Passing ``Value(None)`` to ``expression1`` is prohibited on Oracle since
+    Oracle doesn't accept ``NULL`` as the first argument.
+
 .. _date-functions:
 
 Date functions
@@ -423,7 +442,7 @@ Usage example::
 ``Trunc``
 ---------
 
-.. class:: Trunc(expression, kind, output_field=None, tzinfo=None, **extra)
+.. class:: Trunc(expression, kind, output_field=None, tzinfo=None, is_dst=None, **extra)
 
 Truncates a date up to a significant component.
 
@@ -440,6 +459,14 @@ depending on ``output_field``, with fields up to ``kind`` set to their minimum
 value. If ``output_field`` is omitted, it will default to the ``output_field``
 of ``expression``. A ``tzinfo`` subclass, usually provided by ``pytz``, can be
 passed to truncate a value in a specific timezone.
+
+The ``is_dst`` parameter indicates whether or not ``pytz`` should interpret
+nonexistent and ambiguous datetimes in daylight saving time. By default (when
+``is_dst=None``), ``pytz`` raises an exception for such datetimes.
+
+.. versionadded:: 3.0
+
+    The ``is_dst`` parameter was added.
 
 Given the datetime ``2015-06-15 14:30:50.000321+00:00``, the built-in ``kind``\s
 return:
@@ -506,23 +533,21 @@ Usage example::
 ``DateField`` truncation
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. class:: TruncYear(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncYear(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'year'
 
-.. class:: TruncMonth(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncMonth(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'month'
 
-.. class:: TruncWeek(expression, output_field=None, tzinfo=None, **extra)
-
-    .. versionadded:: 2.1
+.. class:: TruncWeek(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     Truncates to midnight on the Monday of the week.
 
     .. attribute:: kind = 'week'
 
-.. class:: TruncQuarter(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncQuarter(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'quarter'
 
@@ -586,19 +611,19 @@ truncate function. It's also registered as a transform on  ``DateTimeField`` as
 truncate function. It's also registered as a transform on ``DateTimeField`` as
 ``__time``.
 
-.. class:: TruncDay(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncDay(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'day'
 
-.. class:: TruncHour(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncHour(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'hour'
 
-.. class:: TruncMinute(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncMinute(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'minute'
 
-.. class:: TruncSecond(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncSecond(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'second'
 
@@ -636,15 +661,15 @@ Usage example::
 ``TimeField`` truncation
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. class:: TruncHour(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncHour(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'hour'
 
-.. class:: TruncMinute(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncMinute(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'minute'
 
-.. class:: TruncSecond(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncSecond(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'second'
 
@@ -1074,6 +1099,31 @@ It can also be registered as a transform. For example::
     >>> # Get vectors whose round() is less than 20
     >>> vectors = Vector.objects.filter(x__round__lt=20, y__round__lt=20)
 
+``Sign``
+--------
+
+.. class:: Sign(expression, **extra)
+
+.. versionadded:: 3.0
+
+Returns the sign (-1, 0, 1) of a numeric field or expression.
+
+Usage example::
+
+    >>> from django.db.models.functions import Sign
+    >>> Vector.objects.create(x=5.4, y=-2.3)
+    >>> vector = Vector.objects.annotate(x_sign=Sign('x'), y_sign=Sign('y')).get()
+    >>> vector.x_sign, vector.y_sign
+    (1, -1)
+
+It can also be registered as a transform. For example::
+
+    >>> from django.db.models import FloatField
+    >>> from django.db.models.functions import Sign
+    >>> FloatField.register_lookup(Sign)
+    >>> # Get vectors whose signs of components are less than 0.
+    >>> vectors = Vector.objects.filter(x__sign__lt=0, y__sign__lt=0)
+
 ``Sin``
 -------
 
@@ -1153,8 +1203,6 @@ Text functions
 
 .. class:: Chr(expression, **extra)
 
-.. versionadded:: 2.1
-
 Accepts a numeric field or expression and returns the text representation of
 the expression as a single character. It works the same as Python's :func:`chr`
 function.
@@ -1205,8 +1253,6 @@ Usage example::
 --------
 
 .. class:: Left(expression, length, **extra)
-
-.. versionadded:: 2.1
 
 Returns the first ``length`` characters of the given text field or expression.
 
@@ -1268,8 +1314,6 @@ Usage example::
 
 .. class:: LPad(expression, length, fill_text=Value(' '), **extra)
 
-.. versionadded:: 2.1
-
 Returns the value of the given text field or expression padded on the left side
 with ``fill_text`` so that the resulting value is ``length`` characters long.
 The default ``fill_text`` is a space.
@@ -1289,17 +1333,33 @@ Usage example::
 
 .. class:: LTrim(expression, **extra)
 
-.. versionadded:: 2.1
-
 Similar to :class:`~django.db.models.functions.Trim`, but removes only leading
 spaces.
+
+``MD5``
+-------
+
+.. class:: MD5(expression, **extra)
+
+.. versionadded:: 3.0
+
+Accepts a single text field or expression and returns the MD5 hash of the
+string.
+
+It can also be registered as a transform as described in :class:`Length`.
+
+Usage example::
+
+    >>> from django.db.models.functions import MD5
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.annotate(name_md5=MD5('name')).get()
+    >>> print(author.name_md5)
+    749fb689816b2db85f5b169c2055b247
 
 ``Ord``
 -------
 
 .. class:: Ord(expression, **extra)
-
-.. versionadded:: 2.1
 
 Accepts a single text field or expression and returns the Unicode code point
 value for the first character of that expression. It works similar to Python's
@@ -1322,8 +1382,6 @@ Usage example::
 
 .. class:: Repeat(expression, number, **extra)
 
-.. versionadded:: 2.1
-
 Returns the value of the given text field or expression repeated ``number``
 times.
 
@@ -1341,8 +1399,6 @@ Usage example::
 
 .. class:: Replace(expression, text, replacement=Value(''), **extra)
 
-.. versionadded:: 2.1
-
 Replaces all occurrences of ``text`` with ``replacement`` in ``expression``.
 The default replacement text is the empty string. The arguments to the function
 are case-sensitive.
@@ -1358,12 +1414,31 @@ Usage example::
     >>> Author.objects.values('name')
     <QuerySet [{'name': 'Margareth Johnson'}, {'name': 'Margareth Smith'}]>
 
+``Reverse``
+-----------
+
+.. class:: Reverse(expression, **extra)
+
+.. versionadded:: 2.2
+
+Accepts a single text field or expression and returns the characters of that
+expression in reverse order.
+
+It can also be registered as a transform as described in :class:`Length`. The
+default lookup name is ``reverse``.
+
+Usage example::
+
+    >>> from django.db.models.functions import Reverse
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.annotate(backward=Reverse('name')).get()
+    >>> print(author.backward)
+    htimS teragraM
+
 ``Right``
 ---------
 
 .. class:: Right(expression, length, **extra)
-
-.. versionadded:: 2.1
 
 Returns the last ``length`` characters of the given text field or expression.
 
@@ -1380,8 +1455,6 @@ Usage example::
 
 .. class:: RPad(expression, length, fill_text=Value(' '), **extra)
 
-.. versionadded:: 2.1
-
 Similar to :class:`~django.db.models.functions.LPad`, but pads on the right
 side.
 
@@ -1390,10 +1463,43 @@ side.
 
 .. class:: RTrim(expression, **extra)
 
-.. versionadded:: 2.1
-
 Similar to :class:`~django.db.models.functions.Trim`, but removes only trailing
 spaces.
+
+``SHA1``, ``SHA224``, ``SHA256``, ``SHA384``, and ``SHA512``
+------------------------------------------------------------
+
+.. class:: SHA1(expression, **extra)
+.. class:: SHA224(expression, **extra)
+.. class:: SHA256(expression, **extra)
+.. class:: SHA384(expression, **extra)
+.. class:: SHA512(expression, **extra)
+
+.. versionadded:: 3.0
+
+Accepts a single text field or expression and returns the particular hash of
+the string.
+
+They can also be registered as transforms as described in :class:`Length`.
+
+Usage example::
+
+    >>> from django.db.models.functions import SHA1
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.annotate(name_sha1=SHA1('name')).get()
+    >>> print(author.name_sha1)
+    b87efd8a6c991c390be5a68e8a7945a7851c7e5c
+
+.. admonition:: PostgreSQL
+
+    The `pgcrypto extension <https://www.postgresql.org/docs/current/
+    pgcrypto.html>`_ must be installed. You can use the
+    :class:`~django.contrib.postgres.operations.CryptoExtension` migration
+    operation to install it.
+
+.. admonition:: Oracle
+
+    Oracle doesn't support the ``SHA224`` function.
 
 ``StrIndex``
 ------------
@@ -1450,8 +1556,6 @@ Usage example::
 --------
 
 .. class:: Trim(expression, **extra)
-
-.. versionadded:: 2.1
 
 Returns the value of the given text field or expression with leading and
 trailing spaces removed.

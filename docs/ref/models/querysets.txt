@@ -312,9 +312,13 @@ identical to::
     Entry.objects.order_by('blog__name')
 
 You can also order by :doc:`query expressions </ref/models/expressions>` by
-calling ``asc()`` or ``desc()`` on the expression::
+calling :meth:`~.Expression.asc` or :meth:`~.Expression.desc` on the
+expression::
 
     Entry.objects.order_by(Coalesce('summary', 'headline').desc())
+
+:meth:`~.Expression.asc` and :meth:`~.Expression.desc` have arguments
+(``nulls_first`` and ``nulls_last``) that control how null values are sorted.
 
 Be cautious when ordering by fields in related models if you are also using
 :meth:`distinct()`. See the note in :meth:`distinct` for an explanation of how
@@ -544,10 +548,6 @@ ordering. For example::
     >>> Blog.objects.values('name__lower')
     <QuerySet [{'name__lower': 'beatles blog'}]>
 
-.. versionchanged:: 2.1
-
-    Support for lookups was added.
-
 An aggregate within a ``values()`` clause is applied before other arguments
 within the same ``values()`` clause. If you need to group by another value,
 add it to an earlier ``values()`` clause instead. For example::
@@ -752,10 +752,6 @@ Examples::
     >>> Entry.objects.filter(headline__contains='Lennon').dates('pub_date', 'day')
     [datetime.date(2005, 3, 20)]
 
-.. versionchanged:: 2.1
-
-    "week" support was added.
-
 ``datetimes()``
 ~~~~~~~~~~~~~~~
 
@@ -781,10 +777,6 @@ object. If it's ``None``, Django uses the :ref:`current time zone
 <default-current-time-zone>`. It has no effect when :setting:`USE_TZ` is
 ``False``.
 
-.. versionchanged:: 2.1
-
-    "week" support was added.
-
 .. _database-time-zone-definitions:
 
 .. note::
@@ -800,8 +792,10 @@ object. If it's ``None``, Django uses the :ref:`current time zone
     - MySQL: load the time zone tables with `mysql_tzinfo_to_sql`_.
 
     .. _pytz: http://pytz.sourceforge.net/
-    .. _Time Zones: https://www.postgresql.org/docs/current/static/datatype-datetime.html#DATATYPE-TIMEZONES
-    .. _Choosing a Time Zone File: https://docs.oracle.com/database/121/NLSPG/ch4datetime.htm#NLSPG258
+    .. _Time Zones: https://www.postgresql.org/docs/current/datatype-datetime.html#DATATYPE-TIMEZONES
+    .. _Choosing a Time Zone File: https://docs.oracle.com/en/database/oracle/
+       oracle-database/18/nlspg/datetime-data-types-and-time-zone-support.html
+       #GUID-805AB986-DE12-4FEA-AF56-5AABCD2132DF
     .. _mysql_tzinfo_to_sql: https://dev.mysql.com/doc/refman/en/mysql-tzinfo-to-sql.html
 
 ``none()``
@@ -1375,17 +1369,14 @@ of the arguments is required, but you should use at least one of them.
 
   In some rare cases, you might wish to pass parameters to the SQL
   fragments in ``extra(select=...)``. For this purpose, use the
-  ``select_params`` parameter. Since ``select_params`` is a sequence and
-  the ``select`` attribute is a dictionary, some care is required so that
-  the parameters are matched up correctly with the extra select pieces.
-  In this situation, you should use a :class:`collections.OrderedDict` for
-  the ``select`` value, not just a normal Python dictionary.
+  ``select_params`` parameter.
 
   This will work, for example::
 
       Blog.objects.extra(
-          select=OrderedDict([('a', '%s'), ('b', '%s')]),
-          select_params=('one', 'two'))
+          select={'a': '%s', 'b': '%s'},
+          select_params=('one', 'two'),
+      )
 
   If you need to use a literal ``%s`` inside your select string, use
   the sequence ``%%s``.
@@ -2085,11 +2076,11 @@ The ``batch_size`` parameter controls how many objects are created in a single
 query. The default is to create all objects in one batch, except for SQLite
 where the default is such that at most 999 variables per query are used.
 
-On databases that support it (all except PostgreSQL < 9.5 and Oracle), setting
-the ``ignore_conflicts`` parameter to ``True`` tells the database to ignore
-failure to insert any rows that fail constraints such as duplicate unique
-values. Enabling this parameter disables setting the primary key on each model
-instance (if the database normally supports it).
+On databases that support it (all but Oracle), setting the ``ignore_conflicts``
+parameter to ``True`` tells the database to ignore failure to insert any rows
+that fail constraints such as duplicate unique values. Enabling this parameter
+disables setting the primary key on each model instance (if the database
+normally supports it).
 
 .. versionchanged:: 2.2
 
@@ -2126,9 +2117,10 @@ them, but it has a few caveats:
   ``batch_size``.
 * Updating fields defined on multi-table inheritance ancestors will incur an
   extra query per ancestor.
+* If ``objs`` contains duplicates, only the first one is updated.
 
 The ``batch_size`` parameter controls how many objects are saved in a single
-query. The default is to create all objects in one batch, except for SQLite
+query. The default is to update all objects in one batch, except for SQLite
 and Oracle which have restrictions on the number of variables used in a query.
 
 ``count()``
@@ -2559,8 +2551,6 @@ with a copy of the ``QuerySet``’s methods. See
 
 ``explain()``
 ~~~~~~~~~~~~~
-
-.. versionadded:: 2.1
 
 .. method:: explain(format=None, **options)
 
@@ -3297,10 +3287,10 @@ documentation to learn how to create your aggregates.
 
 All aggregates have the following parameters in common:
 
-``expression``
-~~~~~~~~~~~~~~
+``expressions``
+~~~~~~~~~~~~~~~
 
-A string that references a field on the model, or a :doc:`query expression
+Strings that reference fields on the model, or :doc:`query expressions
 </ref/models/expressions>`.
 
 ``output_field``
@@ -3314,6 +3304,8 @@ of the return value
     When combining multiple field types, Django can only determine the
     ``output_field`` if all fields are of the same type. Otherwise, you
     must provide the ``output_field`` yourself.
+
+.. _aggregate-filter:
 
 ``filter``
 ~~~~~~~~~~
@@ -3333,14 +3325,14 @@ by the aggregate.
 ``Avg``
 ~~~~~~~
 
-.. class:: Avg(expression, output_field=FloatField(), filter=None, **extra)
+.. class:: Avg(expression, output_field=None, filter=None, **extra)
 
     Returns the mean value of the given expression, which must be numeric
     unless you specify a different ``output_field``.
 
     * Default alias: ``<field>__avg``
-    * Return type: ``float`` (or the type of whatever ``output_field`` is
-      specified)
+    * Return type: ``float`` if input is ``int``, otherwise same as input
+      field, or ``output_field`` if supplied
 
 ``Count``
 ~~~~~~~~~
@@ -3384,12 +3376,13 @@ by the aggregate.
 ``StdDev``
 ~~~~~~~~~~
 
-.. class:: StdDev(expression, sample=False, filter=None, **extra)
+.. class:: StdDev(expression, output_field=None, sample=False, filter=None, **extra)
 
     Returns the standard deviation of the data in the provided expression.
 
     * Default alias: ``<field>__stddev``
-    * Return type: ``float``
+    * Return type: ``float`` if input is ``int``, otherwise same as input
+      field, or ``output_field`` if supplied
 
     Has one optional argument:
 
@@ -3398,12 +3391,9 @@ by the aggregate.
         By default, ``StdDev`` returns the population standard deviation. However,
         if ``sample=True``, the return value will be the sample standard deviation.
 
-    .. admonition:: SQLite
+    .. versionchanged:: 2.2
 
-        SQLite doesn't provide ``StdDev`` out of the box. An implementation
-        is available as an extension module for SQLite. Consult the `SQlite
-        documentation`_ for instructions on obtaining and installing this
-        extension.
+        SQLite support was added.
 
 ``Sum``
 ~~~~~~~
@@ -3418,12 +3408,13 @@ by the aggregate.
 ``Variance``
 ~~~~~~~~~~~~
 
-.. class:: Variance(expression, sample=False, filter=None, **extra)
+.. class:: Variance(expression, output_field=None, sample=False, filter=None, **extra)
 
     Returns the variance of the data in the provided expression.
 
     * Default alias: ``<field>__variance``
-    * Return type: ``float``
+    * Return type: ``float`` if input is ``int``, otherwise same as input
+      field, or ``output_field`` if supplied
 
     Has one optional argument:
 
@@ -3432,14 +3423,9 @@ by the aggregate.
         By default, ``Variance`` returns the population variance. However,
         if ``sample=True``, the return value will be the sample variance.
 
-    .. admonition:: SQLite
+    .. versionchanged:: 2.2
 
-        SQLite doesn't provide ``Variance`` out of the box. An implementation
-        is available as an extension module for SQLite. Consult the `SQlite
-        documentation`_ for instructions on obtaining and installing this
-        extension.
-
-.. _SQLite documentation: https://www.sqlite.org/contrib
+        SQLite support was added.
 
 Query-related tools
 ===================
@@ -3498,7 +3484,7 @@ attribute:
 
     >>> prefetch = Prefetch('choice_set', queryset=voted_choices, to_attr='voted_choices')
     >>> Question.objects.prefetch_related(prefetch).get().voted_choices
-    <QuerySet [<Choice: The sky>]>
+    [<Choice: The sky>]
     >>> Question.objects.prefetch_related(prefetch).get().choice_set.all()
     <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
 

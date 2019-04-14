@@ -4,7 +4,9 @@ import glob
 import os
 
 from django.core.management.base import BaseCommand, CommandError
-from django.core.management.utils import find_command, popen_wrapper
+from django.core.management.utils import (
+    find_command, is_ignored_path, popen_wrapper,
+)
 
 
 def has_bom(fn):
@@ -19,7 +21,7 @@ def is_writable(path):
     try:
         with open(path, 'a'):
             os.utime(path, None)
-    except (IOError, OSError):
+    except OSError:
         return False
     return True
 
@@ -46,10 +48,17 @@ class Command(BaseCommand):
             '--use-fuzzy', '-f', dest='fuzzy', action='store_true',
             help='Use fuzzy translations.',
         )
+        parser.add_argument(
+            '--ignore', '-i', action='append', dest='ignore_patterns',
+            default=[], metavar='PATTERN',
+            help='Ignore directories matching this glob-style pattern. '
+                 'Use multiple times to ignore more.',
+        )
 
     def handle(self, **options):
         locale = options['locale']
         exclude = options['exclude']
+        ignore_patterns = set(options['ignore_patterns'])
         self.verbosity = options['verbosity']
         if options['fuzzy']:
             self.program_options = self.program_options + ['-f']
@@ -66,7 +75,9 @@ class Command(BaseCommand):
         # Walk entire tree, looking for locale directories
         for dirpath, dirnames, filenames in os.walk('.', topdown=True):
             for dirname in dirnames:
-                if dirname == 'locale':
+                if is_ignored_path(os.path.normpath(os.path.join(dirpath, dirname)), ignore_patterns):
+                    dirnames.remove(dirname)
+                elif dirname == 'locale':
                     basedirs.append(os.path.join(dirpath, dirname))
 
         # Gather existing directories.

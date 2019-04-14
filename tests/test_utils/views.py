@@ -16,4 +16,4 @@ def no_template_used(request):
 
 
 def empty_response(request):
-    return HttpResponse('')
+    return HttpResponse()

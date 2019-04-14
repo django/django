@@ -58,10 +58,11 @@ class TemplateCommand(BaseCommand):
 
     def handle(self, app_or_project, name, target=None, **options):
         self.app_or_project = app_or_project
+        self.a_or_an = 'an' if app_or_project == 'app' else 'a'
         self.paths_to_remove = []
         self.verbosity = options['verbosity']
 
-        self.validate_name(name, app_or_project)
+        self.validate_name(name)
 
         # if some directory is given, make sure it's nicely expanded
         if target is None:
@@ -120,8 +121,7 @@ class TemplateCommand(BaseCommand):
             relative_dir = path_rest.replace(base_name, name)
             if relative_dir:
                 target_dir = path.join(top_dir, relative_dir)
-                if not path.exists(target_dir):
-                    os.mkdir(target_dir)
+                os.makedirs(target_dir, exist_ok=True)
 
             for dirname in dirs[:]:
                 if dirname.startswith('.') or dirname == '__pycache__':
@@ -140,15 +140,17 @@ class TemplateCommand(BaseCommand):
                         break  # Only rewrite once
 
                 if path.exists(new_path):
-                    raise CommandError("%s already exists, overlaying a "
-                                       "project or app into an existing "
-                                       "directory won't replace conflicting "
-                                       "files" % new_path)
+                    raise CommandError(
+                        "%s already exists. Overlaying %s %s into an existing "
+                        "directory won't replace conflicting files." % (
+                            new_path, self.a_or_an, app_or_project,
+                        )
+                    )
 
                 # Only render the Python files, as we don't want to
                 # accidentally render Django templates files
                 if new_path.endswith(extensions) or filename in extra_files:
-                    with open(old_path, 'r', encoding='utf-8') as template_file:
+                    with open(old_path, encoding='utf-8') as template_file:
                         content = template_file.read()
                     template = Engine().from_string(content)
                     content = template.render(context)
@@ -203,12 +205,11 @@ class TemplateCommand(BaseCommand):
         raise CommandError("couldn't handle %s template %s." %
                            (self.app_or_project, template))
 
-    def validate_name(self, name, app_or_project):
-        a_or_an = 'an' if app_or_project == 'app' else 'a'
+    def validate_name(self, name):
         if name is None:
             raise CommandError('you must provide {an} {app} name'.format(
-                an=a_or_an,
-                app=app_or_project,
+                an=self.a_or_an,
+                app=self.app_or_project,
             ))
         # Check it's a valid directory name.
         if not name.isidentifier():
@@ -216,7 +217,7 @@ class TemplateCommand(BaseCommand):
                 "'{name}' is not a valid {app} name. Please make sure the "
                 "name is a valid identifier.".format(
                     name=name,
-                    app=app_or_project,
+                    app=self.app_or_project,
                 )
             )
         # Check it cannot be imported.
@@ -230,8 +231,8 @@ class TemplateCommand(BaseCommand):
                 "module and cannot be used as {an} {app} name. Please try "
                 "another name.".format(
                     name=name,
-                    an=a_or_an,
-                    app=app_or_project,
+                    an=self.a_or_an,
+                    app=self.app_or_project,
                 )
             )
 
@@ -257,7 +258,7 @@ class TemplateCommand(BaseCommand):
             self.stdout.write("Downloading %s\n" % display_url)
         try:
             the_path, info = urlretrieve(url, path.join(tempdir, filename))
-        except IOError as e:
+        except OSError as e:
             raise CommandError("couldn't download URL %s to %s: %s" %
                                (url, filename, e))
 
@@ -312,7 +313,7 @@ class TemplateCommand(BaseCommand):
         try:
             archive.extract(filename, tempdir)
             return tempdir
-        except (archive.ArchiveException, IOError) as e:
+        except (archive.ArchiveException, OSError) as e:
             raise CommandError("couldn't extract file %s to %s: %s" %
                                (filename, tempdir, e))
 

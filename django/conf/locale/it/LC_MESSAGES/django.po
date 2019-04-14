@@ -1,10 +1,10 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Topolino_Hackerino <claudiu.andrei.roman@gmail.com>, 2017
+# AndreiCR <claudiu.andrei.roman@gmail.com>, 2017
 # Carlo Miron <C8E@miron.it>, 2011
 # Carlo Miron <C8E@miron.it>, 2014
-# Carlo Miron <C8E@miron.it>, 2018
+# Carlo Miron <C8E@miron.it>, 2018-2019
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Flavio Curella <flavio.curella@gmail.com>, 2013,2016
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -21,8 +21,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-07-30 21:04+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-19 10:28+0000\n"
 "Last-Translator: Carlo Miron <C8E@miron.it>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
@@ -151,6 +151,9 @@ msgstr "Sorabo superiore"
 
 msgid "Hungarian"
 msgstr "Ungherese"
+
+msgid "Armenian"
+msgstr "Armeno"
 
 msgid "Interlingua"
 msgstr "Interlingua"
@@ -622,6 +625,9 @@ msgstr "Dati binari grezzi"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' non è uno UUID valido."
 
+msgid "Universally unique identifier"
+msgstr "Identificatore univoco universale"
+
 msgid "File"
 msgstr "File"
 
@@ -1071,8 +1077,8 @@ msgstr "Questo non è un indirizzo IPv6 valido."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr " %(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "o"

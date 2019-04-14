@@ -5,7 +5,6 @@ from io import StringIO
 from wsgiref.util import FileWrapper
 
 from django import forms
-from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin import BooleanFieldListFilter
 from django.contrib.admin.views.main import ChangeList
@@ -17,6 +16,7 @@ from django.core.mail import EmailMessage
 from django.db import models
 from django.forms.models import BaseModelFormSet
 from django.http import HttpResponse, StreamingHttpResponse
+from django.urls import path
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
@@ -43,7 +43,8 @@ from .models import (
     Restaurant, RowLevelChangePermissionModel, Section, ShortMessage, Simple,
     Sketch, State, Story, StumpJoke, Subscriber, SuperVillain, Telegram, Thing,
     Topping, UnchangeableObject, UndeletableObject, UnorderedObject,
-    UserMessenger, Villain, Vodcast, Whatsit, Widget, Worker, WorkHour,
+    UserMessenger, UserProxy, Villain, Vodcast, Whatsit, Widget, Worker,
+    WorkHour,
 )
 
 
@@ -103,7 +104,7 @@ class ArticleAdmin(admin.ModelAdmin):
     list_display = (
         'content', 'date', callable_year, 'model_year', 'modeladmin_year',
         'model_year_reversed', 'section', lambda obj: obj.title,
-        'order_by_expression',
+        'order_by_expression', 'model_property_year', 'model_month',
     )
     list_editable = ('section',)
     list_filter = ('date', 'section')
@@ -459,6 +460,13 @@ class PrePopulatedPostAdmin(admin.ModelAdmin):
         return self.prepopulated_fields
 
 
+class PrePopulatedPostReadOnlyAdmin(admin.ModelAdmin):
+    prepopulated_fields = {'slug': ('title',)}
+
+    def has_change_permission(self, *args, **kwargs):
+        return False
+
+
 class PostAdmin(admin.ModelAdmin):
     list_display = ['title', 'public']
     readonly_fields = (
@@ -697,7 +705,7 @@ class ReportAdmin(admin.ModelAdmin):
 
     def get_urls(self):
         # Corner case: Don't call parent implementation
-        return [url(r'^extra/$', self.extra, name='cable_extra')]
+        return [path('extra/', self.extra, name='cable_extra')]
 
 
 class CustomTemplateBooleanFieldListFilter(BooleanFieldListFilter):
@@ -723,16 +731,20 @@ class RelatedPrepopulatedInline1(admin.StackedInline):
     model = RelatedPrepopulated
     extra = 1
     autocomplete_fields = ['fk', 'm2m']
-    prepopulated_fields = {'slug1': ['name', 'pubdate'],
-                           'slug2': ['status', 'name']}
+    prepopulated_fields = {
+        'slug1': ['name', 'pubdate'],
+        'slug2': ['status', 'name'],
+    }
 
 
 class RelatedPrepopulatedInline2(admin.TabularInline):
     model = RelatedPrepopulated
     extra = 1
     autocomplete_fields = ['fk', 'm2m']
-    prepopulated_fields = {'slug1': ['name', 'pubdate'],
-                           'slug2': ['status', 'name']}
+    prepopulated_fields = {
+        'slug1': ['name', 'pubdate'],
+        'slug2': ['status', 'name'],
+    }
 
 
 class RelatedPrepopulatedInline3(admin.TabularInline):
@@ -1064,6 +1076,7 @@ site.register(Ingredient)
 site.register(NotReferenced)
 site.register(ExplicitlyProvidedPK, GetFormsetsArgumentCheckingAdmin)
 site.register(ImplicitlyGeneratedPK, GetFormsetsArgumentCheckingAdmin)
+site.register(UserProxy)
 
 # Register core models we need in our tests
 site.register(User, UserAdmin)
@@ -1085,6 +1098,7 @@ site2.register(Person, save_as_continue=False)
 site7 = admin.AdminSite(name="admin7")
 site7.register(Article, ArticleAdmin2)
 site7.register(Section)
+site7.register(PrePopulatedPost, PrePopulatedPostReadOnlyAdmin)
 
 
 # Used to test ModelAdmin.sortable_by and get_sortable_by().

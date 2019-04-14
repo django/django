@@ -4,7 +4,7 @@ from datetime import date, datetime
 
 from django.core.exceptions import FieldError
 from django.db import connection, models
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import register_lookup
 from django.utils import timezone
 
@@ -234,17 +234,14 @@ class LookupTests(TestCase):
         __exact=None is transformed to __isnull=True if a custom lookup class
         with lookup_name != 'exact' is registered as the `exact` lookup.
         """
-        class CustomExactLookup(models.Lookup):
-            lookup_name = 'somecustomlookup'
-
         field = Author._meta.get_field('birthdate')
         OldExactLookup = field.get_lookup('exact')
         author = Author.objects.create(name='author', birthdate=None)
         try:
-            type(field).register_lookup(Exactly, 'exact')
+            field.register_lookup(Exactly, 'exact')
             self.assertEqual(Author.objects.get(birthdate__exact=None), author)
         finally:
-            type(field).register_lookup(OldExactLookup, 'exact')
+            field.register_lookup(OldExactLookup, 'exact')
 
     def test_basic_lookup(self):
         a1 = Author.objects.create(name='a1', age=1)
@@ -400,12 +397,15 @@ class DateTimeLookupTests(TestCase):
 
 
 class YearLteTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.a1 = Author.objects.create(name='a1', birthdate=date(1981, 2, 16))
+        cls.a2 = Author.objects.create(name='a2', birthdate=date(2012, 2, 29))
+        cls.a3 = Author.objects.create(name='a3', birthdate=date(2012, 1, 31))
+        cls.a4 = Author.objects.create(name='a4', birthdate=date(2012, 3, 1))
+
     def setUp(self):
         models.DateField.register_lookup(YearTransform)
-        self.a1 = Author.objects.create(name='a1', birthdate=date(1981, 2, 16))
-        self.a2 = Author.objects.create(name='a2', birthdate=date(2012, 2, 29))
-        self.a3 = Author.objects.create(name='a3', birthdate=date(2012, 1, 31))
-        self.a4 = Author.objects.create(name='a4', birthdate=date(2012, 3, 1))
 
     def tearDown(self):
         models.DateField._unregister_lookup(YearTransform)
@@ -513,7 +513,7 @@ class TrackCallsYearTransform(YearTransform):
         return super().get_transform(lookup_name)
 
 
-class LookupTransformCallOrderTests(TestCase):
+class LookupTransformCallOrderTests(SimpleTestCase):
     def test_call_order(self):
         with register_lookup(models.DateField, TrackCallsYearTransform):
             # junk lookup - tries lookup, then transform, then fails
@@ -540,7 +540,7 @@ class LookupTransformCallOrderTests(TestCase):
                              ['lookup'])
 
 
-class CustomisedMethodsTests(TestCase):
+class CustomisedMethodsTests(SimpleTestCase):
 
     def test_overridden_get_lookup(self):
         q = CustomModel.objects.filter(field__lookupfunc_monkeys=3)

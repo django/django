@@ -2,7 +2,7 @@
 Django 2.1.4 release notes
 ==========================
 
-*Expected December 3, 2018*
+*December 3, 2018*
 
 Django 2.1.4 fixes several bugs in 2.1.3.
 
@@ -19,3 +19,10 @@ Bugfixes
 
 * Fixed keep-alive support in ``runserver`` after it was disabled to fix
   another issue in Django 2.0 (:ticket:`29849`).
+
+* Fixed admin view-only change form crash when using
+  ``ModelAdmin.prepopulated_fields`` (:ticket:`29929`).
+
+* Fixed "Please correct the errors below" error message when editing an object
+  in the admin if the user only has the "view" permission on inlines
+  (:ticket:`29930`).

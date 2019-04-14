@@ -7,6 +7,9 @@ View decorators
 Django provides several decorators that can be applied to views to support
 various HTTP features.
 
+See :ref:`decorating-class-based-views` for how to use these decorators with
+class-based views.
+
 Allowed HTTP methods
 ====================
 

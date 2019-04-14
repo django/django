@@ -1,12 +1,20 @@
+from psycopg2.extras import (
+    DateRange, DateTimeRange, DateTimeTZRange, NumericRange,
+)
+
 from django.apps import AppConfig
 from django.db import connections
 from django.db.backends.signals import connection_created
+from django.db.migrations.writer import MigrationWriter
 from django.db.models import CharField, TextField
 from django.test.signals import setting_changed
 from django.utils.translation import gettext_lazy as _
 
 from .lookups import SearchLookup, TrigramSimilar, Unaccent
+from .serializers import RangeSerializer
 from .signals import register_type_handlers
+
+RANGE_TYPES = (DateRange, DateTimeRange, DateTimeTZRange, NumericRange)
 
 
 def uninstall_if_needed(setting, value, enter, **kwargs):
@@ -26,6 +34,7 @@ def uninstall_if_needed(setting, value, enter, **kwargs):
         # and ready() connects it again to prevent unnecessary processing on
         # each setting change.
         setting_changed.disconnect(uninstall_if_needed)
+        MigrationWriter.unregister_serializer(RANGE_TYPES)
 
 
 class PostgresConfig(AppConfig):
@@ -54,3 +63,4 @@ class PostgresConfig(AppConfig):
         TextField.register_lookup(SearchLookup)
         CharField.register_lookup(TrigramSimilar)
         TextField.register_lookup(TrigramSimilar)
+        MigrationWriter.register_serializer(RANGE_TYPES, RangeSerializer)

@@ -1,4 +1,4 @@
-from collections import Counter, OrderedDict
+from collections import Counter
 from operator import attrgetter
 
 from django.db import IntegrityError, connections, transaction
@@ -64,7 +64,7 @@ class Collector:
     def __init__(self, using):
         self.using = using
         # Initially, {model: {instances}}, later values become lists.
-        self.data = OrderedDict()
+        self.data = {}
         self.field_updates = {}  # {model: {(field, value): {instances}}}
         # fast_deletes is a list of queryset-likes that can be deleted without
         # fetching the objects into memory.
@@ -257,8 +257,7 @@ class Collector:
                     found = True
             if not found:
                 return
-        self.data = OrderedDict((model, self.data[model])
-                                for model in sorted_models)
+        self.data = {model: self.data[model] for model in sorted_models}
 
     def delete(self):
         # sort instance collections
@@ -278,6 +277,7 @@ class Collector:
             if self.can_fast_delete(instance):
                 with transaction.mark_for_rollback_on_error():
                     count = sql.DeleteQuery(model).delete_batch([instance.pk], self.using)
+                setattr(instance, model._meta.pk.attname, None)
                 return count, {model._meta.label: count}
 
         with transaction.atomic(using=self.using, savepoint=False):

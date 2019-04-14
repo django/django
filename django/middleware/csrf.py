@@ -293,7 +293,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
             if request.method == "POST":
                 try:
                     request_csrf_token = request.POST.get('csrfmiddlewaretoken', '')
-                except IOError:
+                except OSError:
                     # Handle a broken connection before we've completed reading
                     # the POST data. process_view shouldn't raise any
                     # exceptions, so we'll ignore and serve the user a 403

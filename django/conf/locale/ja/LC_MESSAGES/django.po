@@ -5,15 +5,17 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kentaro Matsuzaki <kentaro0919@gmail.com>, 2015
 # Masashi SHIBATA <contact@c-bata.link>, 2017
-# Shinya Okano <tokibito@gmail.com>, 2012-2018
+# Nikita K <hiyori.amatsuki@gmail.com>, 2019
+# Shinichi Katsumata <shinichi.katsumata@gmail.com>, 2019
+# Shinya Okano <tokibito@gmail.com>, 2012-2019
 # Tetsuya Morimoto <tetsuya.morimoto@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-05-23 03:26+0000\n"
-"Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-03-28 12:33+0000\n"
+"Last-Translator: Nikita K <hiyori.amatsuki@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -141,6 +143,9 @@ msgstr "高地ソルブ語"
 
 msgid "Hungarian"
 msgstr "ハンガリー語"
+
+msgid "Armenian"
+msgstr "アルメニア"
 
 msgid "Interlingua"
 msgstr "インターリングア"
@@ -325,14 +330,14 @@ msgstr "有効なメールアドレスを入力してください。"
 #. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
-msgstr "slug には半角の英数字、アンダースコア、ハイフン以外は使用できません。"
+msgstr "スラグには半角の英数字、アンダースコア、ハイフン以外は使用できません。"
 
 msgid ""
 "Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
-"ユニコード文字、数字、アンダースコアまたはハイフンで構成された、有効な"
-"「slug」を入力してください"
+"ユニコード文字、数字、アンダースコアまたはハイフンで構成された、有効なスラグ"
+"を入力してください"
 
 msgid "Enter a valid IPv4 address."
 msgstr "有効なIPアドレス (IPv4) を入力してください。"
@@ -597,6 +602,9 @@ msgstr "生のバイナリデータ"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' は有効なUUIDではありません。"
 
+msgid "Universally unique identifier"
+msgstr "汎用一意識別子"
+
 msgid "File"
 msgstr "ファイル"
 
@@ -643,7 +651,7 @@ msgid "Enter a valid time."
 msgstr "時間を正しく入力してください。"
 
 msgid "Enter a valid date/time."
-msgstr "日付/時間を正しく入力してください。"
+msgstr "日時を正しく入力してください。"
 
 msgid "Enter a valid duration."
 msgstr "時間差分を正しく入力してください。"
@@ -654,7 +662,7 @@ msgstr "日数は{min_days}から{max_days}の間でなければなりません�
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
-"ファイルが取得できませんでした。formのencoding typeを確認してください。"
+"ファイルが取得できませんでした。フォームのencoding typeを確認してください。"
 
 msgid "No file was submitted."
 msgstr "ファイルが送信されていません。"
@@ -704,7 +712,7 @@ msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(隠しフィールド %(name)s) %(error)s"
 
 msgid "ManagementForm data is missing or has been tampered with"
-msgstr "ManagementFormデータが見つからないか、改竄されています。"
+msgstr "マネジメントフォームのデータが見つからないか、改竄されています。"
 
 #, python-format
 msgid "Please submit %d or fewer forms."
@@ -1040,8 +1048,8 @@ msgstr "これは有効なIPv6アドレスではありません。"
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "または"
@@ -1187,18 +1195,18 @@ msgid "Empty list and '%(class_name)s.allow_empty' is False."
 msgstr "空の一覧かつ '%(class_name)s.allow_empty' がFalseです。"
 
 msgid "Directory indexes are not allowed here."
-msgstr "Directory indexes are not allowed here."
+msgstr "ここではディレクトリインデックスが許可されていません。"
 
 #, python-format
 msgid "\"%(path)s\" does not exist"
-msgstr "\"%(path)s\" does not exist"
+msgstr "\"%(path)s\" が存在しません。"
 
 #, python-format
 msgid "Index of %(directory)s"
-msgstr "Index of %(directory)s"
+msgstr "%(directory)sのディレクトリインデックス"
 
 msgid "Django: the Web framework for perfectionists with deadlines."
-msgstr "Django: 納期を逃さない開発者のためのWebフレームワーク"
+msgstr "Django: 納期を逃さない完璧主義者のためのWebフレームワーク"
 
 #, python-format
 msgid ""
@@ -1206,8 +1214,7 @@ msgid ""
 "target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
 msgstr ""
 "Django%(version)sの<a href=\"https://docs.djangoproject.com/en/%(version)s/"
-"releases/\" target=\"_blank\" rel=\"noopener\">リリースノート</a>を見てくださ"
-"い。"
+"releases/\" target=\"_blank\" rel=\"noopener\">リリースノート</a>を見る。"
 
 msgid "The install worked successfully! Congratulations!"
 msgstr "インストールは成功しました！おめでとうございます！"

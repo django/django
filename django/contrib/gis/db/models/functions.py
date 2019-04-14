@@ -1,4 +1,3 @@
-import warnings
 from decimal import Decimal
 
 from django.contrib.gis.db.models.fields import BaseSpatialField, GeometryField
@@ -11,7 +10,6 @@ from django.db.models import (
 from django.db.models.expressions import Func, Value
 from django.db.models.functions import Cast
 from django.db.utils import NotSupportedError
-from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.functional import cached_property
 
 NUMERIC_TYPES = (int, float, Decimal)
@@ -50,7 +48,7 @@ class GeoFuncMixin:
         return self.source_expressions[self.geom_param_pos[0]].field
 
     def as_sql(self, compiler, connection, function=None, **extra_context):
-        if not self.function and not function:
+        if self.function is None and function is None:
             function = connection.ops.spatial_function_name(self.name)
         return super().as_sql(compiler, connection, function=function, **extra_context)
 
@@ -284,17 +282,6 @@ class ForcePolygonCW(GeomOutputGeoFunc):
     arity = 1
 
 
-class ForceRHR(GeomOutputGeoFunc):
-    arity = 1
-
-    def __init__(self, *args, **kwargs):
-        warnings.warn(
-            'ForceRHR is deprecated in favor of ForcePolygonCW.',
-            RemovedInDjango30Warning, stacklevel=2,
-        )
-        super().__init__(*args, **kwargs)
-
-
 class GeoHash(GeoFunc):
     output_field = TextField()
 
@@ -310,6 +297,14 @@ class GeoHash(GeoFunc):
         if len(clone.source_expressions) < 2:
             clone.source_expressions.append(Value(100))
         return clone.as_sql(compiler, connection, **extra_context)
+
+
+class GeometryDistance(GeoFunc):
+    output_field = FloatField()
+    arity = 2
+    function = ''
+    arg_joiner = ' <-> '
+    geom_param_pos = (0, 1)
 
 
 class Intersection(OracleToleranceMixin, GeomOutputGeoFunc):

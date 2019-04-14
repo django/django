@@ -2872,8 +2872,14 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         self.assertEqual(form.errors, {'name': ['bad value not allowed']})
         form = NameForm(data={'name': ['should be overly', 'long for the field names']})
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors, {'name': ['Ensure this value has at most 10 characters (it has 16).',
-                                                'Ensure this value has at most 10 characters (it has 24).']})
+        self.assertEqual(
+            form.errors, {
+                'name': [
+                    'Ensure this value has at most 10 characters (it has 16).',
+                    'Ensure this value has at most 10 characters (it has 24).',
+                ],
+            }
+        )
         form = NameForm(data={'name': ['fname', 'lname']})
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data, {'name': 'fname lname'})
@@ -3664,6 +3670,11 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         f = DataForm({'data': 'xyzzy'})
         self.assertTrue(f.is_valid())
         self.assertEqual(f.cleaned_data, {'data': 'xyzzy'})
+
+    def test_empty_data_files_multi_value_dict(self):
+        p = Person()
+        self.assertIsInstance(p.data, MultiValueDict)
+        self.assertIsInstance(p.files, MultiValueDict)
 
 
 class CustomRenderer(DjangoTemplates):

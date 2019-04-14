@@ -20,22 +20,22 @@ class Category(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
 
-    def __str__(self):
-        return self.title
-
     class Meta:
         ordering = ('title',)
+
+    def __str__(self):
+        return self.title
 
 
 class Article(models.Model):
     headline = models.CharField(max_length=100, default='Default headline')
     pub_date = models.DateTimeField()
 
-    def __str__(self):
-        return self.headline
-
     class Meta:
         ordering = ('-pub_date', 'headline')
+
+    def __str__(self):
+        return self.headline
 
 
 class Blog(models.Model):
@@ -68,11 +68,11 @@ class Person(models.Model):
     objects = PersonManager()
     name = models.CharField(max_length=100)
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         ordering = ('name',)
+
+    def __str__(self):
+        return self.name
 
     def natural_key(self):
         return (self.name,)
@@ -106,12 +106,12 @@ class Book(models.Model):
     name = models.CharField(max_length=100)
     authors = models.ManyToManyField(Person)
 
+    class Meta:
+        ordering = ('name',)
+
     def __str__(self):
         authors = ' and '.join(a.name for a in self.authors.all())
         return '%s by %s' % (self.name, authors) if authors else self.name
-
-    class Meta:
-        ordering = ('name',)
 
 
 class PrimaryKeyUUIDModel(models.Model):

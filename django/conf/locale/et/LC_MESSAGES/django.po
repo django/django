@@ -6,14 +6,14 @@
 # Janno Liivak <jannolii@gmail.com>, 2013-2015
 # madisvain <madisvain@gmail.com>, 2011
 # Martin Pajuste <martinpajuste@gmail.com>, 2014-2015
-# Martin Pajuste <martinpajuste@gmail.com>, 2016-2017
+# Martin Pajuste <martinpajuste@gmail.com>, 2016-2017,2019
 # Marti Raudsepp <marti@juffo.org>, 2014,2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 10:26+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 16:27+0000\n"
 "Last-Translator: Martin Pajuste <martinpajuste@gmail.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
@@ -143,6 +143,9 @@ msgstr "ülemsorbi"
 msgid "Hungarian"
 msgstr "ungari"
 
+msgid "Armenian"
+msgstr "armeenia"
+
 msgid "Interlingua"
 msgstr "interlingua"
 
@@ -163,6 +166,9 @@ msgstr "jaapani"
 
 msgid "Georgian"
 msgstr "gruusia"
+
+msgid "Kabyle"
+msgstr ""
 
 msgid "Kazakh"
 msgstr "kasahhi"
@@ -385,6 +391,9 @@ msgstr[1] ""
 "Väärtuses võib olla kõige rohkem %(limit_value)d tähemärki (praegu on "
 "%(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Sisestage arv."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -416,7 +425,7 @@ msgstr ""
 "'%(allowed_extensions)s'."
 
 msgid "Null characters are not allowed."
-msgstr ""
+msgstr "Tühjad tähemärgid ei ole lubatud."
 
 msgid "and"
 msgstr "ja"
@@ -465,6 +474,10 @@ msgstr "Suur (8 baiti) täisarv"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' väärtus peab olema kas Tõene või Väär."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr ""
 
 msgid "Boolean (Either True or False)"
 msgstr "Tõeväärtus (Kas tõene või väär)"
@@ -602,6 +615,9 @@ msgstr "Töötlemata binaarandmed"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' ei ole korrektne UUID."
 
+msgid "Universally unique identifier"
+msgstr ""
+
 msgid "File"
 msgstr "Fail"
 
@@ -641,9 +657,6 @@ msgstr "See lahter on nõutav."
 msgid "Enter a whole number."
 msgstr "Sisestage täisarv."
 
-msgid "Enter a number."
-msgstr "Sisestage arv."
-
 msgid "Enter a valid date."
 msgstr "Sisestage korrektne kuupäev."
 
@@ -655,6 +668,10 @@ msgstr "Sisestage korrektne kuupäev ja kellaaeg."
 
 msgid "Enter a valid duration."
 msgstr "Sisestage korrektne kestus."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Päevade arv peab jääma vahemikku {min_days} kuni {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Ühtegi faili ei saadetud. Kontrollige vormi kodeeringutüüpi."
@@ -1046,8 +1063,8 @@ msgstr "See ei ole korrektne IPv6 aadress."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr ""
 
 msgid "or"
 msgstr "või"

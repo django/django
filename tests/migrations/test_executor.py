@@ -8,7 +8,7 @@ from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.utils import DatabaseError
 from django.test import (
-    TestCase, modify_settings, override_settings, skipUnlessDBFeature,
+    SimpleTestCase, modify_settings, override_settings, skipUnlessDBFeature,
 )
 
 from .test_base import MigrationTestBase
@@ -685,7 +685,7 @@ class FakeMigration:
         return 'M<%s>' % self.name
 
 
-class ExecutorUnitTests(TestCase):
+class ExecutorUnitTests(SimpleTestCase):
     """(More) isolated unit tests for executor methods."""
     def test_minimize_rollbacks(self):
         """
@@ -711,7 +711,11 @@ class ExecutorUnitTests(TestCase):
         graph.add_dependency(None, a2, a1)
 
         executor = MigrationExecutor(None)
-        executor.loader = FakeLoader(graph, {a1, b1, a2})
+        executor.loader = FakeLoader(graph, {
+            a1: a1_impl,
+            b1: b1_impl,
+            a2: a2_impl,
+        })
 
         plan = executor.migration_plan({a1})
 
@@ -754,7 +758,14 @@ class ExecutorUnitTests(TestCase):
         graph.add_dependency(None, b2, a2)
 
         executor = MigrationExecutor(None)
-        executor.loader = FakeLoader(graph, {a1, b1, a2, b2, a3, a4})
+        executor.loader = FakeLoader(graph, {
+            a1: a1_impl,
+            b1: b1_impl,
+            a2: a2_impl,
+            b2: b2_impl,
+            a3: a3_impl,
+            a4: a4_impl,
+        })
 
         plan = executor.migration_plan({a1})
 
@@ -791,7 +802,10 @@ class ExecutorUnitTests(TestCase):
         graph.add_dependency(None, c1, a1)
 
         executor = MigrationExecutor(None)
-        executor.loader = FakeLoader(graph, {a1, b1})
+        executor.loader = FakeLoader(graph, {
+            a1: a1_impl,
+            b1: b1_impl,
+        })
 
         plan = executor.migration_plan({a1})
 

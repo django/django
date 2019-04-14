@@ -1,5 +1,4 @@
 import copy
-from collections import OrderedDict
 from contextlib import contextmanager
 
 from django.apps import AppConfig
@@ -264,9 +263,11 @@ class StateApps(Apps):
         app_configs = [AppConfigStub(label) for label in sorted([*real_apps, *app_labels])]
         super().__init__(app_configs)
 
-        # The lock gets in the way of copying as implemented in clone(), which
-        # is called whenever Django duplicates a StateApps before updating it.
+        # These locks get in the way of copying as implemented in clone(),
+        # which is called whenever Django duplicates a StateApps before
+        # updating it.
         self._lock = None
+        self.ready_event = None
 
         self.render_multiple([*models.values(), *self.real_models])
 
@@ -332,7 +333,7 @@ class StateApps(Apps):
         if app_label not in self.app_configs:
             self.app_configs[app_label] = AppConfigStub(app_label)
             self.app_configs[app_label].apps = self
-            self.app_configs[app_label].models = OrderedDict()
+            self.app_configs[app_label].models = {}
         self.app_configs[app_label].models[model._meta.model_name] = model
         self.do_pending_operations(model)
         self.clear_cache()

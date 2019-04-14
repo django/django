@@ -1,6 +1,6 @@
 """
 SQL functions reference lists:
-https://www.gaia-gis.it/gaia-sins/spatialite-sql-4.2.1.html
+https://www.gaia-gis.it/gaia-sins/spatialite-sql-4.3.0.html
 """
 from django.contrib.gis.db.backends.base.operations import (
     BaseSpatialOperations,
@@ -9,7 +9,7 @@ from django.contrib.gis.db.backends.spatialite.adapter import SpatiaLiteAdapter
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.db.models import aggregates
 from django.contrib.gis.geos.geometry import GEOSGeometry, GEOSGeometryBase
-from django.contrib.gis.geos.prototypes.io import wkb_r, wkt_r
+from django.contrib.gis.geos.prototypes.io import wkb_r
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.sqlite3.operations import DatabaseOperations
@@ -64,9 +64,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     disallowed_aggregates = (aggregates.Extent3D,)
 
-    @cached_property
-    def select(self):
-        return 'CAST (AsEWKB(%s) AS BLOB)' if self.spatial_version >= (4, 3, 0) else 'AsText(%s)'
+    select = 'CAST (AsEWKB(%s) AS BLOB)'
 
     function_names = {
         'ForcePolygonCW': 'ST_ForceLHR',
@@ -81,7 +79,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     @cached_property
     def unsupported_functions(self):
-        unsupported = {'BoundingCircle', 'ForceRHR', 'MemSize'}
+        unsupported = {'BoundingCircle', 'GeometryDistance', 'MemSize'}
         if not self.lwgeom_version():
             unsupported |= {'Azimuth', 'GeoHash', 'IsValid', 'MakeValid'}
         return unsupported
@@ -98,8 +96,8 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
                     self.connection.settings_dict['NAME'],
                 )
             ) from exc
-        if version < (4, 1, 0):
-            raise ImproperlyConfigured('GeoDjango only supports SpatiaLite versions 4.1.0 and above.')
+        if version < (4, 3, 0):
+            raise ImproperlyConfigured('GeoDjango supports SpatiaLite 4.3.0 and above.')
         return version
 
     def convert_extent(self, box):
@@ -199,21 +197,8 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     def get_geometry_converter(self, expression):
         geom_class = expression.output_field.geom_class
-        if self.spatial_version >= (4, 3, 0):
-            read = wkb_r().read
+        read = wkb_r().read
 
-            def converter(value, expression, connection):
-                return None if value is None else GEOSGeometryBase(read(value), geom_class)
-        else:
-            read = wkt_r().read
-            srid = expression.output_field.srid
-            if srid == -1:
-                srid = None
-
-            def converter(value, expression, connection):
-                if value is not None:
-                    geom = GEOSGeometryBase(read(value), geom_class)
-                    if srid:
-                        geom.srid = srid
-                    return geom
+        def converter(value, expression, connection):
+            return None if value is None else GEOSGeometryBase(read(value), geom_class)
         return converter

@@ -11,7 +11,7 @@ from django.contrib.auth.password_validation import (
 )
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import isolate_apps
 from django.utils.html import conditional_escape
 
@@ -22,7 +22,7 @@ from django.utils.html import conditional_escape
         'min_length': 12,
     }},
 ])
-class PasswordValidationTest(TestCase):
+class PasswordValidationTest(SimpleTestCase):
     def test_get_default_password_validators(self):
         validators = get_default_password_validators()
         self.assertEqual(len(validators), 2)
@@ -95,7 +95,7 @@ class PasswordValidationTest(TestCase):
         self.assertEqual(password_validators_help_text_html(), '')
 
 
-class MinimumLengthValidatorTest(TestCase):
+class MinimumLengthValidatorTest(SimpleTestCase):
     def test_validate(self):
         expected_error = "This password is too short. It must contain at least %d characters."
         self.assertIsNone(MinimumLengthValidator().validate('12345678'))
@@ -182,7 +182,7 @@ class UserAttributeSimilarityValidatorTest(TestCase):
         )
 
 
-class CommonPasswordValidatorTest(TestCase):
+class CommonPasswordValidatorTest(SimpleTestCase):
     def test_validate(self):
         expected_error = "This password is too common."
         self.assertIsNone(CommonPasswordValidator().validate('a-safe-password'))
@@ -214,7 +214,7 @@ class CommonPasswordValidatorTest(TestCase):
         )
 
 
-class NumericPasswordValidatorTest(TestCase):
+class NumericPasswordValidatorTest(SimpleTestCase):
     def test_validate(self):
         expected_error = "This password is entirely numeric."
         self.assertIsNone(NumericPasswordValidator().validate('a-safe-password'))
@@ -231,13 +231,13 @@ class NumericPasswordValidatorTest(TestCase):
         )
 
 
-class UsernameValidatorsTests(TestCase):
+class UsernameValidatorsTests(SimpleTestCase):
     def test_unicode_validator(self):
         valid_usernames = ['joe', 'René', 'ᴮᴵᴳᴮᴵᴿᴰ', 'أحمد']
         invalid_usernames = [
             "o'connell", "عبد ال",
             "zerowidth\u200Bspace", "nonbreaking\u00A0space",
-            "en\u2013dash",
+            "en\u2013dash", 'trailingnewline\u000A',
         ]
         v = validators.UnicodeUsernameValidator()
         for valid in valid_usernames:
@@ -250,7 +250,7 @@ class UsernameValidatorsTests(TestCase):
 
     def test_ascii_validator(self):
         valid_usernames = ['glenn', 'GLEnN', 'jean-marc']
-        invalid_usernames = ["o'connell", 'Éric', 'jean marc', "أحمد"]
+        invalid_usernames = ["o'connell", 'Éric', 'jean marc', "أحمد", 'trailingnewline\n']
         v = validators.ASCIIUsernameValidator()
         for valid in valid_usernames:
             with self.subTest(valid=valid):

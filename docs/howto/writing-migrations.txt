@@ -221,7 +221,10 @@ smaller batches::
         ]
 
 The ``atomic`` attribute doesn't have an effect on databases that don't support
-DDL transactions (e.g. MySQL, Oracle).
+DDL transactions (e.g. MySQL, Oracle). (MySQL's `atomic DDL statement support
+<https://dev.mysql.com/doc/refman/en/atomic-ddl.html>`_ refers to individual
+statements rather than multiple statements wrapped in a transaction that can be
+rolled back.)
 
 Controlling the order of migrations
 ===================================

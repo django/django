@@ -1,0 +1,414 @@
+============================================
+Django 3.0 release notes - UNDER DEVELOPMENT
+============================================
+
+*Expected December 2019*
+
+Welcome to Django 3.0!
+
+These release notes cover the :ref:`new features <whats-new-3.0>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-3.0>` you'll
+want to be aware of when upgrading from Django 2.2 or earlier. We've
+:ref:`dropped some features<removed-features-3.0>` that have reached the end of
+their deprecation cycle, and we've :ref:`begun the deprecation process for
+some features <deprecated-features-3.0>`.
+
+See the :doc:`/howto/upgrade-version` guide if you're updating an existing
+project.
+
+Python compatibility
+====================
+
+Django 3.0 supports Python 3.6, 3.7, and 3.8. We **highly recommend** and only
+officially support the latest release of each series.
+
+The Django 2.2.x series is the last to support Python 3.5.
+
+Third-party library support for older version of Django
+=======================================================
+
+Following the release of Django 3.0, we suggest that third-party app authors
+drop support for all versions of Django prior to 2.2. At that time, you should
+be able to run your package's tests using ``python -Wd`` so that deprecation
+warnings appear. After making the deprecation warning fixes, your app should be
+compatible with Django 3.0.
+
+.. _whats-new-3.0:
+
+What's new in Django 3.0
+========================
+
+Minor features
+--------------
+
+:mod:`django.contrib.admin`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Added support for the ``admin_order_field`` attribute on properties in
+  :attr:`.ModelAdmin.list_display`.
+
+:mod:`django.contrib.admindocs`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.auth`
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.contenttypes`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Allowed MySQL spatial lookup functions to operate on real geometries.
+  Previous support was limited to bounding boxes.
+
+* Added the :class:`~django.contrib.gis.db.models.functions.GeometryDistance`
+  function, supported on PostGIS.
+
+:mod:`django.contrib.messages`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.postgres`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.redirects`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sessions`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sitemaps`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sites`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.staticfiles`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.syndication`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Cache
+~~~~~
+
+* ...
+
+CSRF
+~~~~
+
+* ...
+
+Email
+~~~~~
+
+* ...
+
+File Storage
+~~~~~~~~~~~~
+
+* ...
+
+File Uploads
+~~~~~~~~~~~~
+
+* ...
+
+
+Forms
+~~~~~
+
+* Formsets may control the widget used when ordering forms via
+  :attr:`~django.forms.formsets.BaseFormSet.can_order` by setting the
+  :attr:`~django.forms.formsets.BaseFormSet.ordering_widget` attribute or
+  overriding :attr:`~django.forms.formsets.BaseFormSet.get_ordering_widget()`.
+
+Generic Views
+~~~~~~~~~~~~~
+
+* ...
+
+Internationalization
+~~~~~~~~~~~~~~~~~~~~
+
+* Added the :setting:`LANGUAGE_COOKIE_HTTPONLY`,
+  :setting:`LANGUAGE_COOKIE_SAMESITE`, and :setting:`LANGUAGE_COOKIE_SECURE`
+  settings to set the ``HttpOnly``, ``SameSite``, and ``Secure`` flags on
+  language cookies. The default values of these settings preserve the previous
+  behavior.
+
+Management Commands
+~~~~~~~~~~~~~~~~~~~
+
+* The new :option:`compilemessages --ignore` option allows ignoring specific
+  directories when searching for ``.po`` files to compile.
+
+* :option:`showmigrations --list` now shows the applied datetimes when
+  ``--verbosity`` is 2 and above.
+
+Migrations
+~~~~~~~~~~
+
+* ...
+
+Models
+~~~~~~
+
+* Added hash database functions :class:`~django.db.models.functions.MD5`,
+  :class:`~django.db.models.functions.SHA1`,
+  :class:`~django.db.models.functions.SHA224`,
+  :class:`~django.db.models.functions.SHA256`,
+  :class:`~django.db.models.functions.SHA384`, and
+  :class:`~django.db.models.functions.SHA512`.
+
+* Added the :class:`~django.db.models.functions.Sign` database function.
+
+* The new ``is_dst``  parameter of the
+  :class:`~django.db.models.functions.Trunc` database functions determines the
+  treatment of nonexistent and ambiguous datetimes.
+
+Requests and Responses
+~~~~~~~~~~~~~~~~~~~~~~
+
+* Allowed :class:`~django.http.HttpResponse` to be initialized with
+  :class:`memoryview` content.
+
+Serialization
+~~~~~~~~~~~~~
+
+* ...
+
+Signals
+~~~~~~~
+
+* ...
+
+Templates
+~~~~~~~~~
+
+* ...
+
+Tests
+~~~~~
+
+* The new test :class:`~django.test.Client` argument
+  ``raise_request_exception`` allows controlling whether or not exceptions
+  raised during the request should also be raised in the test. The value
+  defaults to ``True`` for backwards compatibility. If it is ``False`` and an
+  exception occurs, the test client will return a 500 response with the
+  attribute :attr:`~django.test.Response.exc_info`, a tuple providing
+  information of the exception that occurred.
+
+URLs
+~~~~
+
+* ...
+
+Validators
+~~~~~~~~~~
+
+* ...
+
+.. _backwards-incompatible-3.0:
+
+Backwards incompatible changes in 3.0
+=====================================
+
+Database backend API
+--------------------
+
+This section describes changes that may be needed in third-party database
+backends.
+
+* The second argument of ``DatabaseIntrospection.get_geometry_type()`` is now
+  the row description instead of the column name.
+
+* ``DatabaseIntrospection.get_field_type()`` may no longer return tuples.
+
+* If the database can create foreign keys in the same SQL statement that adds a
+  field, add ``SchemaEditor.sql_create_column_inline_fk`` with the appropriate
+  SQL; otherwise, set ``DatabaseFeatures.can_create_inline_fk = False``.
+
+* ``DatabaseFeatures.can_return_id_from_insert`` and
+  ``can_return_ids_from_bulk_insert`` are renamed to
+  ``can_return_columns_from_insert`` and ``can_return_rows_from_bulk_insert``.
+
+:mod:`django.contrib.gis`
+-------------------------
+
+* Support for PostGIS 2.1 is removed.
+
+* Support for SpatiaLite 4.1 and 4.2 is removed.
+
+* Support for GDAL 1.11 and GEOS 3.4 is removed.
+
+Dropped support for PostgreSQL 9.4
+----------------------------------
+
+Upstream support for PostgreSQL 9.4 ends in December 2019. Django 3.0 supports
+PostgreSQL 9.5 and higher.
+
+Dropped support for Oracle 12.1
+-------------------------------
+
+Upstream support for Oracle 12.1 ends in July 2021. Django 2.2 will be
+supported until April 2022. Django 3.0 officially supports Oracle 12.2 and 18c.
+
+Removed private Python 2 compatibility APIs
+-------------------------------------------
+
+While Python 2 support was removed in Django 2.0, some private APIs weren't
+removed from Django so that third party apps could continue using them until
+the Python 2 end-of-life.
+
+Since we expect apps to drop Python 2 compatibility when adding support for
+Django 3.0, we're removing these APIs at this time.
+
+* ``django.test.utils.str_prefix()`` - Strings don't have 'u' prefixes in
+  Python 3.
+
+* ``django.test.utils.patch_logger()`` - Use
+  :meth:`unittest.TestCase.assertLogs` instead.
+
+* ``django.utils.lru_cache.lru_cache()`` - Alias of
+  :func:`functools.lru_cache`.
+
+* ``django.utils.decorators.available_attrs()`` - This function returns
+  ``functools.WRAPPER_ASSIGNMENTS``.
+
+* ``django.utils.decorators.ContextDecorator`` - Alias of
+  :class:`contextlib.ContextDecorator`.
+
+* ``django.utils._os.abspathu()`` - Alias of :func:`os.path.abspath`.
+
+* ``django.utils._os.upath()`` and ``npath()`` - These functions do nothing on
+  Python 3.
+
+* ``django.utils.six`` - Remove usage of this vendored library or switch to
+  `six <https://pypi.org/project/six/>`_.
+
+* ``django.utils.encoding.python_2_unicode_compatible()`` - Alias of
+  ``six.python_2_unicode_compatible()``.
+
+* ``django.utils.functional.curry()`` - Use :func:`functools.partial` or
+  :class:`functools.partialmethod`. See :commit:`5b1c389603a353625ae1603`.
+
+* ``django.utils.safestring.SafeBytes`` - Unused since Django 2.0.
+
+New default value for the ``FILE_UPLOAD_PERMISSIONS`` setting
+-------------------------------------------------------------
+
+In older versions, the :setting:`FILE_UPLOAD_PERMISSIONS` setting defaults to
+``None``. With the default :setting:`FILE_UPLOAD_HANDLERS`, this results in
+uploaded files having different permissions depending on their size and which
+upload handler is used.
+
+``FILE_UPLOAD_PERMISSION`` now defaults to ``0o644`` to avoid this
+inconsistency.
+
+Miscellaneous
+-------------
+
+* ``ContentType.__str__()`` now includes the model's ``app_label`` to
+  disambiguate model's with the same name in different apps.
+
+* Because accessing the language in the session rather than in the cookie is
+  deprecated, ``LocaleMiddleware`` no longer looks for the user's language in
+  the session and :func:`django.contrib.auth.logout` no longer preserves the
+  session's language after logout.
+
+.. _deprecated-features-3.0:
+
+Features deprecated in 3.0
+==========================
+
+``django.utils.encoding.force_text()`` and ``smart_text()``
+-----------------------------------------------------------
+
+The ``smart_text()`` and ``force_text()`` aliases (since Django 2.0) of
+``smart_str()`` and ``force_str()`` are deprecated. Ignore this deprecation if
+your code supports Python 2 as the behavior of ``smart_str()`` and
+``force_str()`` is different there.
+
+Miscellaneous
+-------------
+
+* ``django.utils.http.urlquote()``, ``urlquote_plus()``, ``urlunquote()``, and
+  ``urlunquote_plus()`` are deprecated in favor of the functions that they're
+  aliases for: :func:`urllib.parse.quote`, :func:`~urllib.parse.quote_plus`,
+  :func:`~urllib.parse.unquote`, and :func:`~urllib.parse.unquote_plus`.
+
+* ``django.utils.translation.ugettext()``, ``ugettext_lazy()``,
+  ``ugettext_noop()``, ``ungettext()``, and ``ungettext_lazy()`` are deprecated
+  in favor of the functions that they're aliases for:
+  :func:`django.utils.translation.gettext`,
+  :func:`~django.utils.translation.gettext_lazy`,
+  :func:`~django.utils.translation.gettext_noop`,
+  :func:`~django.utils.translation.ngettext`, and
+  :func:`~django.utils.translation.ngettext_lazy`.
+
+* To limit creation of sessions and hence favor some caching strategies,
+  :func:`django.views.i18n.set_language` will stop setting the user's language
+  in the session in Django 4.0. Since Django 2.1, the language is always stored
+  in the :setting:`LANGUAGE_COOKIE_NAME` cookie.
+
+* ``alias=None`` is added to the signature of
+  :meth:`.Expression.get_group_by_cols`.
+
+.. _removed-features-3.0:
+
+Features removed in 3.0
+=======================
+
+These features have reached the end of their deprecation cycle and are removed
+in Django 3.0.
+
+See :ref:`deprecated-features-2.0` for details on these changes, including how
+to remove usage of these features.
+
+* The ``django.db.backends.postgresql_psycopg2`` module is removed.
+
+* ``django.shortcuts.render_to_response()`` is removed.
+
+* The ``DEFAULT_CONTENT_TYPE`` setting is removed.
+
+* ``HttpRequest.xreadlines()`` is removed.
+
+* Support for the ``context`` argument of ``Field.from_db_value()`` and
+  ``Expression.convert_value()`` is removed.
+
+* The ``field_name`` keyword argument of ``QuerySet.earliest()`` and
+  ``latest()`` is removed.
+
+See :ref:`deprecated-features-2.1` for details on these changes, including how
+to remove usage of these features.
+
+* The ``ForceRHR`` GIS function is removed.
+
+* ``django.utils.http.cookie_date()`` is removed.
+
+* The ``staticfiles`` and ``admin_static`` template tag libraries are removed.
+
+* ``django.contrib.staticfiles.templatetags.staticfiles.static()`` is removed.

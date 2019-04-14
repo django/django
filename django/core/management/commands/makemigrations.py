@@ -49,6 +49,10 @@ class Command(BaseCommand):
             help="Use this name for migration file(s).",
         )
         parser.add_argument(
+            '--no-header', action='store_false', dest='include_header',
+            help='Do not add header comments to new migration file(s).',
+        )
+        parser.add_argument(
             '--check', action='store_true', dest='check_changes',
             help='Exit with a non-zero status if model changes are missing migrations.',
         )
@@ -63,6 +67,7 @@ class Command(BaseCommand):
         self.migration_name = options['name']
         if self.migration_name and not self.migration_name.isidentifier():
             raise CommandError('The migration name must be a valid Python identifier.')
+        self.include_header = options['include_header']
         check_changes = options['check_changes']
 
         # Make sure the app they asked for exists
@@ -188,7 +193,7 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.MIGRATE_HEADING("Migrations for '%s':" % app_label) + "\n")
             for migration in app_migrations:
                 # Describe the migration
-                writer = MigrationWriter(migration)
+                writer = MigrationWriter(migration, self.include_header)
                 if self.verbosity >= 1:
                     # Display a relative path if it's below the current working
                     # directory, or an absolute path otherwise.
@@ -205,8 +210,7 @@ class Command(BaseCommand):
                     # Write the migrations file to the disk.
                     migrations_directory = os.path.dirname(writer.path)
                     if not directory_created.get(app_label):
-                        if not os.path.isdir(migrations_directory):
-                            os.mkdir(migrations_directory)
+                        os.makedirs(migrations_directory, exist_ok=True)
                         init_path = os.path.join(migrations_directory, "__init__.py")
                         if not os.path.isfile(init_path):
                             open(init_path, "w").close()
@@ -288,7 +292,7 @@ class Command(BaseCommand):
                     self.migration_name or ("merge_%s" % get_migration_name_timestamp())
                 )
                 new_migration = subclass(migration_name, app_label)
-                writer = MigrationWriter(new_migration)
+                writer = MigrationWriter(new_migration, self.include_header)
 
                 if not self.dry_run:
                     # Write the merge migrations file to the disk

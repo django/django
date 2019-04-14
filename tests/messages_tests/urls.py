@@ -1,11 +1,10 @@
 from django import forms
-from django.conf.urls import url
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import engines
 from django.template.response import TemplateResponse
-from django.urls import reverse
+from django.urls import path, re_path, reverse
 from django.views.decorators.cache import never_cache
 from django.views.generic.edit import FormView
 
@@ -65,10 +64,12 @@ class ContactFormViewWithMsg(SuccessMessageMixin, FormView):
 
 
 urlpatterns = [
-    url('^add/(debug|info|success|warning|error)/$', add, name='add_message'),
-    url('^add/msg/$', ContactFormViewWithMsg.as_view(), name='add_success_msg'),
-    url('^show/$', show, name='show_message'),
-    url('^template_response/add/(debug|info|success|warning|error)/$',
-        add_template_response, name='add_template_response'),
-    url('^template_response/show/$', show_template_response, name='show_template_response'),
+    re_path('^add/(debug|info|success|warning|error)/$', add, name='add_message'),
+    path('add/msg/', ContactFormViewWithMsg.as_view(), name='add_success_msg'),
+    path('show/', show, name='show_message'),
+    re_path(
+        '^template_response/add/(debug|info|success|warning|error)/$',
+        add_template_response, name='add_template_response',
+    ),
+    path('template_response/show/', show_template_response, name='show_template_response'),
 ]

@@ -110,6 +110,11 @@ class QuerySetSetOperationTests(TestCase):
         qs2 = Number.objects.filter(num__gte=2, num__lte=3)
         self.assertNumbersEqual(qs1.union(qs2).order_by('-num'), [3, 2, 1, 0])
 
+    def test_ordering_by_f_expression(self):
+        qs1 = Number.objects.filter(num__lte=1)
+        qs2 = Number.objects.filter(num__gte=2, num__lte=3)
+        self.assertNumbersEqual(qs1.union(qs2).order_by(F('num').desc()), [3, 2, 1, 0])
+
     def test_union_with_values(self):
         ReservedName.objects.create(name='a', order=2)
         qs1 = ReservedName.objects.all()
@@ -214,3 +219,9 @@ class QuerySetSetOperationTests(TestCase):
             list(qs1.union(qs2).order_by('num'))
         # switched order, now 'exists' again:
         list(qs2.union(qs1).order_by('num'))
+
+    @skipUnlessDBFeature('supports_select_difference', 'supports_select_intersection')
+    def test_qs_with_subcompound_qs(self):
+        qs1 = Number.objects.all()
+        qs2 = Number.objects.intersection(Number.objects.filter(num__gt=1))
+        self.assertEqual(qs1.difference(qs2).count(), 2)

@@ -1,11 +1,11 @@
 """
 A second, custom AdminSite -- see tests.CustomAdminSiteTests.
 """
-from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.http import HttpResponse
+from django.urls import path
 
 from . import admin as base_admin, forms, models
 
@@ -25,7 +25,7 @@ class Admin2(admin.AdminSite):
 
     def get_urls(self):
         return [
-            url(r'^my_view/$', self.admin_view(self.my_view), name='my_view'),
+            path('my_view/', self.admin_view(self.my_view), name='my_view'),
         ] + super().get_urls()
 
     def my_view(self, request):

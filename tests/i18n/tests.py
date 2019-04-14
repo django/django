@@ -7,8 +7,11 @@ import re
 import tempfile
 from contextlib import contextmanager
 from importlib import import_module
+from pathlib import Path
 from threading import local
 from unittest import mock
+
+import _thread
 
 from django import forms
 from django.apps import AppConfig
@@ -20,18 +23,23 @@ from django.test import (
     RequestFactory, SimpleTestCase, TestCase, override_settings,
 )
 from django.utils import translation
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.formats import (
     date_format, get_format, get_format_modules, iter_format_modules, localize,
     localize_input, reset_format_cache, sanitize_separators, time_format,
 )
 from django.utils.numberformat import format as nformat
-from django.utils.safestring import SafeText, mark_safe
+from django.utils.safestring import SafeString, mark_safe
 from django.utils.translation import (
     LANGUAGE_SESSION_KEY, activate, check_for_language, deactivate,
     get_language, get_language_bidi, get_language_from_request,
     get_language_info, gettext, gettext_lazy, ngettext, ngettext_lazy,
     npgettext, npgettext_lazy, pgettext, to_language, to_locale, trans_null,
-    trans_real, ugettext, ugettext_lazy, ungettext, ungettext_lazy,
+    trans_real, ugettext, ugettext_lazy, ugettext_noop, ungettext,
+    ungettext_lazy,
+)
+from django.utils.translation.reloader import (
+    translation_file_changed, watch_for_translation_changes,
 )
 
 from .forms import CompanyForm, I18nForm, SelectDateForm
@@ -68,13 +76,39 @@ class TranslationTests(SimpleTestCase):
         """
         Pre-Django 2.0 aliases with u prefix are still available.
         """
-        self.assertEqual(ugettext("Image"), "Bild")
-        self.assertEqual(ugettext_lazy("Image"), gettext_lazy("Image"))
-        self.assertEqual(ungettext("%d year", "%d years", 0) % 0, "0 Jahre")
-        self.assertEqual(
-            ungettext_lazy("%d year", "%d years", 0) % 0,
-            ngettext_lazy("%d year", "%d years", 0) % 0,
+        msg = (
+            'django.utils.translation.ugettext_noop() is deprecated in favor '
+            'of django.utils.translation.gettext_noop().'
         )
+        with self.assertWarnsMessage(RemovedInDjango40Warning, msg):
+            self.assertEqual(ugettext_noop("Image"), "Image")
+        msg = (
+            'django.utils.translation.ugettext() is deprecated in favor of '
+            'django.utils.translation.gettext().'
+        )
+        with self.assertWarnsMessage(RemovedInDjango40Warning, msg):
+            self.assertEqual(ugettext("Image"), "Bild")
+        msg = (
+            'django.utils.translation.ugettext_lazy() is deprecated in favor '
+            'of django.utils.translation.gettext_lazy().'
+        )
+        with self.assertWarnsMessage(RemovedInDjango40Warning, msg):
+            self.assertEqual(ugettext_lazy("Image"), gettext_lazy("Image"))
+        msg = (
+            'django.utils.translation.ungettext() is deprecated in favor of '
+            'django.utils.translation.ngettext().'
+        )
+        with self.assertWarnsMessage(RemovedInDjango40Warning, msg):
+            self.assertEqual(ungettext("%d year", "%d years", 0) % 0, "0 Jahre")
+        msg = (
+            'django.utils.translation.ungettext_lazy() is deprecated in favor '
+            'of django.utils.translation.ngettext_lazy().'
+        )
+        with self.assertWarnsMessage(RemovedInDjango40Warning, msg):
+            self.assertEqual(
+                ungettext_lazy("%d year", "%d years", 0) % 0,
+                ngettext_lazy("%d year", "%d years", 0) % 0,
+            )
 
     @translation.override('fr')
     def test_plural(self):
@@ -208,6 +242,39 @@ class TranslationTests(SimpleTestCase):
             with self.assertRaisesMessage(KeyError, 'Your dictionary lacks key'):
                 complex_context_deferred % {'name': 'Jim'}
 
+    @override_settings(LOCALE_PATHS=extended_locale_paths)
+    def test_ngettext_lazy_format_style(self):
+        simple_with_format = ngettext_lazy('{} good result', '{} good results')
+        simple_context_with_format = npgettext_lazy('Exclamation', '{} good result', '{} good results')
+
+        with translation.override('de'):
+            self.assertEqual(simple_with_format.format(1), '1 gutes Resultat')
+            self.assertEqual(simple_with_format.format(4), '4 guten Resultate')
+            self.assertEqual(simple_context_with_format.format(1), '1 gutes Resultat!')
+            self.assertEqual(simple_context_with_format.format(4), '4 guten Resultate!')
+
+        complex_nonlazy = ngettext_lazy('Hi {name}, {num} good result', 'Hi {name}, {num} good results', 4)
+        complex_deferred = ngettext_lazy(
+            'Hi {name}, {num} good result', 'Hi {name}, {num} good results', 'num'
+        )
+        complex_context_nonlazy = npgettext_lazy(
+            'Greeting', 'Hi {name}, {num} good result', 'Hi {name}, {num} good results', 4
+        )
+        complex_context_deferred = npgettext_lazy(
+            'Greeting', 'Hi {name}, {num} good result', 'Hi {name}, {num} good results', 'num'
+        )
+        with translation.override('de'):
+            self.assertEqual(complex_nonlazy.format(num=4, name='Jim'), 'Hallo Jim, 4 guten Resultate')
+            self.assertEqual(complex_deferred.format(name='Jim', num=1), 'Hallo Jim, 1 gutes Resultat')
+            self.assertEqual(complex_deferred.format(name='Jim', num=5), 'Hallo Jim, 5 guten Resultate')
+            with self.assertRaisesMessage(KeyError, 'Your dictionary lacks key'):
+                complex_deferred.format(name='Jim')
+            self.assertEqual(complex_context_nonlazy.format(num=4, name='Jim'), 'Willkommen Jim, 4 guten Resultate')
+            self.assertEqual(complex_context_deferred.format(name='Jim', num=1), 'Willkommen Jim, 1 gutes Resultat')
+            self.assertEqual(complex_context_deferred.format(name='Jim', num=5), 'Willkommen Jim, 5 guten Resultate')
+            with self.assertRaisesMessage(KeyError, 'Your dictionary lacks key'):
+                complex_context_deferred.format(name='Jim')
+
     def test_ngettext_lazy_bool(self):
         self.assertTrue(ngettext_lazy('%d good result', '%d good results'))
         self.assertFalse(ngettext_lazy('', ''))
@@ -248,10 +315,10 @@ class TranslationTests(SimpleTestCase):
         s1 = mark_safe('Password')
         s2 = mark_safe('May')
         with translation.override('de', deactivate=True):
-            self.assertIs(type(gettext(s1)), SafeText)
-            self.assertIs(type(pgettext('month name', s2)), SafeText)
-        self.assertEqual('aPassword', SafeText('a') + s1)
-        self.assertEqual('Passworda', s1 + SafeText('a'))
+            self.assertIs(type(gettext(s1)), SafeString)
+            self.assertIs(type(pgettext('month name', s2)), SafeString)
+        self.assertEqual('aPassword', SafeString('a') + s1)
+        self.assertEqual('Passworda', s1 + SafeString('a'))
         self.assertEqual('Passworda', s1 + mark_safe('a'))
         self.assertEqual('aPassword', mark_safe('a') + s1)
         self.assertEqual('as', mark_safe('a') + mark_safe('s'))
@@ -1142,10 +1209,7 @@ class FormattingTests(SimpleTestCase):
 
 
 class MiscTests(SimpleTestCase):
-
-    def setUp(self):
-        super().setUp()
-        self.rf = RequestFactory()
+    rf = RequestFactory()
 
     @override_settings(LANGUAGE_CODE='de')
     def test_english_fallback(self):
@@ -1496,7 +1560,7 @@ class TestModels(TestCase):
 
     def test_safestr(self):
         c = Company(cents_paid=12, products_delivered=1)
-        c.name = SafeText('Iñtërnâtiônàlizætiøn1')
+        c.name = SafeString('Iñtërnâtiônàlizætiøn1')
         c.save()
 
 
@@ -1640,10 +1704,7 @@ class UnprefixedDefaultLanguageTests(SimpleTestCase):
     ROOT_URLCONF='i18n.urls'
 )
 class CountrySpecificLanguageTests(SimpleTestCase):
-
-    def setUp(self):
-        super().setUp()
-        self.rf = RequestFactory()
+    rf = RequestFactory()
 
     def test_check_for_language(self):
         self.assertTrue(check_for_language('en'))
@@ -1714,13 +1775,10 @@ class TranslationFilesMissing(SimpleTestCase):
         gettext_module.find = lambda *args, **kw: None
 
     def test_failure_finding_default_mo_files(self):
-        '''
-        Ensure IOError is raised if the default language is unparseable.
-        Refs: #18192
-        '''
+        """OSError is raised if the default language is unparseable."""
         self.patchGettextFind()
         trans_real._translations = {}
-        with self.assertRaises(IOError):
+        with self.assertRaises(OSError):
             activate('en')
 
 
@@ -1763,3 +1821,65 @@ class NonDjangoLanguageTests(SimpleTestCase):
     def test_plural_non_django_language(self):
         self.assertEqual(get_language(), 'xyz')
         self.assertEqual(ngettext('year', 'years', 2), 'years')
+
+
+@override_settings(USE_I18N=True)
+class WatchForTranslationChangesTests(SimpleTestCase):
+    @override_settings(USE_I18N=False)
+    def test_i18n_disabled(self):
+        mocked_sender = mock.MagicMock()
+        watch_for_translation_changes(mocked_sender)
+        mocked_sender.watch_dir.assert_not_called()
+
+    def test_i18n_enabled(self):
+        mocked_sender = mock.MagicMock()
+        watch_for_translation_changes(mocked_sender)
+        self.assertGreater(mocked_sender.watch_dir.call_count, 1)
+
+    def test_i18n_locale_paths(self):
+        mocked_sender = mock.MagicMock()
+        with tempfile.TemporaryDirectory() as app_dir:
+            with self.settings(LOCALE_PATHS=[app_dir]):
+                watch_for_translation_changes(mocked_sender)
+            mocked_sender.watch_dir.assert_any_call(Path(app_dir), '**/*.mo')
+
+    def test_i18n_app_dirs(self):
+        mocked_sender = mock.MagicMock()
+        with self.settings(INSTALLED_APPS=['tests.i18n.sampleproject']):
+            watch_for_translation_changes(mocked_sender)
+        project_dir = Path(__file__).parent / 'sampleproject' / 'locale'
+        mocked_sender.watch_dir.assert_any_call(project_dir, '**/*.mo')
+
+    def test_i18n_local_locale(self):
+        mocked_sender = mock.MagicMock()
+        watch_for_translation_changes(mocked_sender)
+        locale_dir = Path(__file__).parent / 'locale'
+        mocked_sender.watch_dir.assert_any_call(locale_dir, '**/*.mo')
+
+
+class TranslationFileChangedTests(SimpleTestCase):
+    def setUp(self):
+        self.gettext_translations = gettext_module._translations.copy()
+        self.trans_real_translations = trans_real._translations.copy()
+
+    def tearDown(self):
+        gettext._translations = self.gettext_translations
+        trans_real._translations = self.trans_real_translations
+
+    def test_ignores_non_mo_files(self):
+        gettext_module._translations = {'foo': 'bar'}
+        path = Path('test.py')
+        self.assertIsNone(translation_file_changed(None, path))
+        self.assertEqual(gettext_module._translations, {'foo': 'bar'})
+
+    def test_resets_cache_with_mo_files(self):
+        gettext_module._translations = {'foo': 'bar'}
+        trans_real._translations = {'foo': 'bar'}
+        trans_real._default = 1
+        trans_real._active = False
+        path = Path('test.mo')
+        self.assertIs(translation_file_changed(None, path), True)
+        self.assertEqual(gettext_module._translations, {})
+        self.assertEqual(trans_real._translations, {})
+        self.assertIsNone(trans_real._default)
+        self.assertIsInstance(trans_real._active, _thread._local)

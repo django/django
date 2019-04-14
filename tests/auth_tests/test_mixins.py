@@ -8,7 +8,7 @@ from django.contrib.auth.mixins import (
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, SimpleTestCase, TestCase
 from django.views.generic import View
 
 
@@ -112,7 +112,7 @@ class AccessMixinTests(TestCase):
             view(request)
 
 
-class UserPassesTestTests(TestCase):
+class UserPassesTestTests(SimpleTestCase):
 
     factory = RequestFactory()
 

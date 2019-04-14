@@ -19,7 +19,7 @@ only the common types, such as ``VARCHAR`` and ``INTEGER``. For more obscure
 column types, such as geographic polygons or even user-created types such as
 `PostgreSQL custom types`_, you can define your own Django ``Field`` subclasses.
 
-.. _PostgreSQL custom types: https://www.postgresql.org/docs/current/static/sql-createtype.html
+.. _PostgreSQL custom types: https://www.postgresql.org/docs/current/sql-createtype.html
 
 Alternatively, you may have a complex Python object that can somehow be
 serialized to fit into a standard database column type. This is another case
@@ -231,9 +231,10 @@ Field deconstruction
 --------------------
 
 The counterpoint to writing your ``__init__()`` method is writing the
-``deconstruct()`` method. This method tells Django how to take an instance
-of your new field and reduce it to a serialized form - in particular, what
-arguments to pass to ``__init__()`` to re-create it.
+:meth:`~.Field.deconstruct` method. It's used during :doc:`model migrations
+</topics/migrations>` to tell Django how to take an instance of your new field
+and reduce it to a serialized form - in particular, what arguments to pass to
+``__init__()`` to re-create it.
 
 If you haven't added any extra options on top of the field you inherited from,
 then there's no need to write a new ``deconstruct()`` method. If, however,
@@ -269,8 +270,10 @@ we can drop it from the keyword arguments for readability::
             del kwargs["max_length"]
             return name, path, args, kwargs
 
-If you add a new keyword argument, you need to write code to put its value
-into ``kwargs`` yourself::
+If you add a new keyword argument, you need to write code in ``deconstruct()``
+that puts its value into ``kwargs`` yourself. You should also omit the value
+from ``kwargs`` when it isn't necessary to reconstruct the state of the field,
+such as when the default value is being used::
 
     from django.db import models
 
@@ -692,7 +695,7 @@ existing conversion code::
             return self.get_prep_value(value)
 
 Some general advice
---------------------
+-------------------
 
 Writing a custom field can be a tricky process, particularly if you're doing
 complex conversions between your Python types and your database and
@@ -731,7 +734,7 @@ told to use it. To do so, simply assign the new ``File`` subclass to the special
 ``attr_class`` attribute of the ``FileField`` subclass.
 
 A few suggestions
-------------------
+-----------------
 
 In addition to the above details, there are a few guidelines which can greatly
 improve the efficiency and readability of the field's code.

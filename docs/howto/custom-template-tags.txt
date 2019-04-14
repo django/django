@@ -200,12 +200,12 @@ passed around inside the template code:
   to be interpreted as-is on the client side.
 
   Internally, these strings are of type
-  :class:`~django.utils.safestring.SafeText`. You can test for them
+  :class:`~django.utils.safestring.SafeString`. You can test for them
   using code like::
 
-      from django.utils.safestring import SafeText
+      from django.utils.safestring import SafeString
 
-      if isinstance(value, SafeText):
+      if isinstance(value, SafeString):
           # Do something with the "safe" string.
           ...
 

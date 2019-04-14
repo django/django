@@ -151,6 +151,13 @@ You can prevent the test databases from being destroyed by using the
 runs. If the database does not exist, it will first be created. Any migrations
 will also be applied in order to keep it up to date.
 
+As described in the previous section, if a test run is forcefully interrupted,
+the test database may not be destroyed. On the next run, you'll be asked
+whether you want to reuse or destroy the database. Use the :option:`test
+--noinput` option to suppress that prompt and automatically destroy the
+database. This can be useful when running tests on a continuous integration
+server where tests may be interrupted by a timeout, for example.
+
 The default test database names are created by prepending ``test_`` to the
 value of each :setting:`NAME` in :setting:`DATABASES`. When using SQLite, the
 tests will use an in-memory database by default (i.e., the database will be
@@ -279,7 +286,7 @@ When you run your tests, you'll see a number of messages as the test runner
 prepares itself. You can control the level of detail of these messages with the
 ``verbosity`` option on the command line::
 
-    Creating test database…
+    Creating test database...
     Creating table myapp_animal
     Creating table myapp_mineral
 

@@ -1,4 +1,5 @@
 import decimal
+import enum
 import json
 import unittest
 import uuid
@@ -12,11 +13,13 @@ from django.test import TransactionTestCase, modify_settings, override_settings
 from django.test.utils import isolate_apps
 from django.utils import timezone
 
-from . import PostgreSQLTestCase, PostgreSQLWidgetTestCase
+from . import (
+    PostgreSQLSimpleTestCase, PostgreSQLTestCase, PostgreSQLWidgetTestCase,
+)
 from .models import (
-    ArrayFieldSubclass, CharArrayModel, DateTimeArrayModel, IntegerArrayModel,
-    NestedIntegerArrayModel, NullableIntegerArrayModel, OtherTypesArrayModel,
-    PostgreSQLModel, Tag,
+    ArrayEnumModel, ArrayFieldSubclass, CharArrayModel, DateTimeArrayModel,
+    IntegerArrayModel, NestedIntegerArrayModel, NullableIntegerArrayModel,
+    OtherTypesArrayModel, PostgreSQLModel, Tag,
 )
 
 try:
@@ -136,14 +139,15 @@ class TestSaveLoad(PostgreSQLTestCase):
 
 class TestQuerying(PostgreSQLTestCase):
 
-    def setUp(self):
-        self.objs = [
-            NullableIntegerArrayModel.objects.create(field=[1]),
-            NullableIntegerArrayModel.objects.create(field=[2]),
-            NullableIntegerArrayModel.objects.create(field=[2, 3]),
-            NullableIntegerArrayModel.objects.create(field=[20, 30, 40]),
-            NullableIntegerArrayModel.objects.create(field=None),
-        ]
+    @classmethod
+    def setUpTestData(cls):
+        cls.objs = NullableIntegerArrayModel.objects.bulk_create([
+            NullableIntegerArrayModel(field=[1]),
+            NullableIntegerArrayModel(field=[2]),
+            NullableIntegerArrayModel(field=[2, 3]),
+            NullableIntegerArrayModel(field=[20, 30, 40]),
+            NullableIntegerArrayModel(field=None),
+        ])
 
     def test_exact(self):
         self.assertSequenceEqual(
@@ -354,6 +358,16 @@ class TestQuerying(PostgreSQLTestCase):
             [self.objs[3]]
         )
 
+    def test_enum_lookup(self):
+        class TestEnum(enum.Enum):
+            VALUE_1 = 'value_1'
+
+        instance = ArrayEnumModel.objects.create(array_of_enums=[TestEnum.VALUE_1])
+        self.assertSequenceEqual(
+            ArrayEnumModel.objects.filter(array_of_enums__contains=[TestEnum.VALUE_1]),
+            [instance]
+        )
+
     def test_unsupported_lookup(self):
         msg = "Unsupported lookup '0_bar' for ArrayField or join on the field not permitted."
         with self.assertRaisesMessage(FieldError, msg):
@@ -366,17 +380,14 @@ class TestQuerying(PostgreSQLTestCase):
 
 class TestDateTimeExactQuerying(PostgreSQLTestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         now = timezone.now()
-        self.datetimes = [now]
-        self.dates = [now.date()]
-        self.times = [now.time()]
-        self.objs = [
-            DateTimeArrayModel.objects.create(
-                datetimes=self.datetimes,
-                dates=self.dates,
-                times=self.times,
-            )
+        cls.datetimes = [now]
+        cls.dates = [now.date()]
+        cls.times = [now.time()]
+        cls.objs = [
+            DateTimeArrayModel.objects.create(datetimes=cls.datetimes, dates=cls.dates, times=cls.times),
         ]
 
     def test_exact_datetimes(self):
@@ -400,17 +411,18 @@ class TestDateTimeExactQuerying(PostgreSQLTestCase):
 
 class TestOtherTypesExactQuerying(PostgreSQLTestCase):
 
-    def setUp(self):
-        self.ips = ['192.168.0.1', '::1']
-        self.uuids = [uuid.uuid4()]
-        self.decimals = [decimal.Decimal(1.25), 1.75]
-        self.tags = [Tag(1), Tag(2), Tag(3)]
-        self.objs = [
+    @classmethod
+    def setUpTestData(cls):
+        cls.ips = ['192.168.0.1', '::1']
+        cls.uuids = [uuid.uuid4()]
+        cls.decimals = [decimal.Decimal(1.25), 1.75]
+        cls.tags = [Tag(1), Tag(2), Tag(3)]
+        cls.objs = [
             OtherTypesArrayModel.objects.create(
-                ips=self.ips,
-                uuids=self.uuids,
-                decimals=self.decimals,
-                tags=self.tags,
+                ips=cls.ips,
+                uuids=cls.uuids,
+                decimals=cls.decimals,
+                tags=cls.tags,
             )
         ]
 
@@ -440,7 +452,7 @@ class TestOtherTypesExactQuerying(PostgreSQLTestCase):
 
 
 @isolate_apps('postgres_tests')
-class TestChecks(PostgreSQLTestCase):
+class TestChecks(PostgreSQLSimpleTestCase):
 
     def test_field_checks(self):
         class MyModel(PostgreSQLModel):
@@ -589,7 +601,7 @@ class TestMigrations(TransactionTestCase):
             self.assertNotIn(table_name, connection.introspection.table_names(cursor))
 
 
-class TestSerialization(PostgreSQLTestCase):
+class TestSerialization(PostgreSQLSimpleTestCase):
     test_data = (
         '[{"fields": {"field": "[\\"1\\", \\"2\\", null]"}, "model": "postgres_tests.integerarraymodel", "pk": null}]'
     )
@@ -604,7 +616,7 @@ class TestSerialization(PostgreSQLTestCase):
         self.assertEqual(instance.field, [1, 2, None])
 
 
-class TestValidation(PostgreSQLTestCase):
+class TestValidation(PostgreSQLSimpleTestCase):
 
     def test_unbounded(self):
         field = ArrayField(models.IntegerField())
@@ -664,7 +676,7 @@ class TestValidation(PostgreSQLTestCase):
         self.assertEqual(exception.params, {'nth': 1, 'value': 0, 'limit_value': 1, 'show_value': 0})
 
 
-class TestSimpleFormField(PostgreSQLTestCase):
+class TestSimpleFormField(PostgreSQLSimpleTestCase):
 
     def test_valid(self):
         field = SimpleArrayField(forms.CharField())
@@ -782,7 +794,7 @@ class TestSimpleFormField(PostgreSQLTestCase):
         self.assertIs(field.has_changed([], ''), False)
 
 
-class TestSplitFormField(PostgreSQLTestCase):
+class TestSplitFormField(PostgreSQLSimpleTestCase):
 
     def test_valid(self):
         class SplitForm(forms.Form):

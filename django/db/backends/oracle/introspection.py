@@ -48,8 +48,20 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_table_list(self, cursor):
         """Return a list of table and view names in the current database."""
-        cursor.execute("SELECT TABLE_NAME, 't' FROM USER_TABLES UNION ALL "
-                       "SELECT VIEW_NAME, 'v' FROM USER_VIEWS")
+        cursor.execute("""
+            SELECT table_name, 't'
+            FROM user_tables
+            WHERE
+                NOT EXISTS (
+                    SELECT 1
+                    FROM user_mviews
+                    WHERE user_mviews.mview_name = user_tables.table_name
+                )
+            UNION ALL
+            SELECT view_name, 'v' FROM user_views
+            UNION ALL
+            SELECT mview_name, 'v' FROM user_mviews
+        """)
         return [TableInfo(self.identifier_converter(row[0]), row[1]) for row in cursor.fetchall()]
 
     def get_table_description(self, cursor, table_name):
@@ -160,6 +172,22 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             tuple(self.identifier_converter(cell) for cell in row)
             for row in cursor.fetchall()
         ]
+
+    def get_primary_key_column(self, cursor, table_name):
+        cursor.execute("""
+            SELECT
+                cols.column_name
+            FROM
+                user_constraints,
+                user_cons_columns cols
+            WHERE
+                user_constraints.constraint_name = cols.constraint_name AND
+                user_constraints.constraint_type = 'P' AND
+                user_constraints.table_name = UPPER(%s) AND
+                cols.position = 1
+        """, [table_name])
+        row = cursor.fetchone()
+        return self.identifier_converter(row[0]) if row else None
 
     def get_constraints(self, cursor, table_name):
         """

@@ -148,11 +148,6 @@ And on databases that support distinct on fields (such as PostgreSQL),
 
     SELECT ... DISTINCT ON ABS("experiments"."change")
 
-.. versionchanged:: 2.1
-
-    Ordering and distinct support as described in the last two paragraphs was
-    added.
-
 When looking for which lookups are allowable after the ``Transform`` has been
 applied, Django uses the ``output_field`` attribute. We didn't need to specify
 this here as it didn't change, but supposing we were applying ``AbsoluteValue``

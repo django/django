@@ -91,10 +91,10 @@ class GenericAdminViewTest(TestDataMixin, TestCase):
 
 @override_settings(ROOT_URLCONF='generic_inline_admin.urls')
 class GenericInlineAdminParametersTest(TestDataMixin, TestCase):
+    factory = RequestFactory()
 
     def setUp(self):
         self.client.force_login(self.superuser)
-        self.factory = RequestFactory()
 
     def _create_object(self, model):
         """

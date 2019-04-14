@@ -31,7 +31,7 @@ from ctypes import byref, c_char_p, c_int
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import SRSException
 from django.contrib.gis.gdal.prototypes import srs as capi
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_bytes, force_str
 
 
 class SpatialReference(GDALBase):
@@ -222,7 +222,7 @@ class SpatialReference(GDALBase):
         elif self.geographic:
             units, name = capi.angular_units(self.ptr, byref(c_char_p()))
         if name is not None:
-            name = force_text(name)
+            name = force_str(name)
         return (units, name)
 
     # #### Spheroid/Ellipsoid Properties ####

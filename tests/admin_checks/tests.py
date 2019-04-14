@@ -1,7 +1,10 @@
 from django import forms
 from django.contrib import admin
 from django.contrib.admin import AdminSite
+from django.contrib.auth.backends import ModelBackend
+from django.contrib.auth.middleware import AuthenticationMiddleware
 from django.contrib.contenttypes.admin import GenericStackedInline
+from django.contrib.messages.middleware import MessageMiddleware
 from django.core import checks
 from django.test import SimpleTestCase, override_settings
 
@@ -35,6 +38,18 @@ class ValidFormFieldsets(admin.ModelAdmin):
 class MyAdmin(admin.ModelAdmin):
     def check(self, **kwargs):
         return ['error!']
+
+
+class AuthenticationMiddlewareSubclass(AuthenticationMiddleware):
+    pass
+
+
+class MessageMiddlewareSubclass(MessageMiddleware):
+    pass
+
+
+class ModelBackendSubclass(ModelBackend):
+    pass
 
 
 @override_settings(
@@ -130,6 +145,27 @@ class SystemChecksTestCase(SimpleTestCase):
             self.assertEqual(admin.checks.check_dependencies(), expected[1:])
 
     @override_settings(
+        AUTHENTICATION_BACKENDS=['admin_checks.tests.ModelBackendSubclass'],
+        TEMPLATES=[{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [],
+            'APP_DIRS': True,
+            'OPTIONS': {
+                'context_processors': ['django.contrib.messages.context_processors.messages'],
+            },
+        }],
+    )
+    def test_context_processor_dependencies_model_backend_subclass(self):
+        self.assertEqual(admin.checks.check_dependencies(), [
+            checks.Error(
+                "'django.contrib.auth.context_processors.auth' must be "
+                "enabled in DjangoTemplates (TEMPLATES) if using the default "
+                "auth backend in order to use the admin application.",
+                id='admin.E402',
+            ),
+        ])
+
+    @override_settings(
         TEMPLATES=[
             {
                 'BACKEND': 'django.template.backends.dummy.TemplateStrings',
@@ -168,6 +204,21 @@ class SystemChecksTestCase(SimpleTestCase):
             )
         ]
         self.assertEqual(errors, expected)
+
+    @override_settings(MIDDLEWARE=[
+        'admin_checks.tests.AuthenticationMiddlewareSubclass',
+        'admin_checks.tests.MessageMiddlewareSubclass',
+    ])
+    def test_middleware_subclasses(self):
+        self.assertEqual(admin.checks.check_dependencies(), [])
+
+    @override_settings(MIDDLEWARE=[
+        'django.contrib.does.not.Exist',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+    ])
+    def test_admin_check_ignores_import_error_in_middleware(self):
+        self.assertEqual(admin.checks.check_dependencies(), [])
 
     def test_custom_adminsite(self):
         class CustomAdminSite(admin.AdminSite):

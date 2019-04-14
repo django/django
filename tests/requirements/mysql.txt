@@ -1,2 +1,1 @@
-# Due to a bug that will be fixed in mysqlclient 1.3.7.
-mysqlclient >= 1.3.7
+mysqlclient >= 1.3.13

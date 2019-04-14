@@ -7,15 +7,15 @@
 # Nick Mavrakis <mavrakis.n@gmail.com>, 2017-2018
 # Nick Mavrakis <mavrakis.n@gmail.com>, 2016
 # Pãnoș <panos.laganakos@gmail.com>, 2014
-# Pãnoș <panos.laganakos@gmail.com>, 2016
+# Pãnoș <panos.laganakos@gmail.com>, 2016,2019
 # Yorgos Pagles <y.pagles@gmail.com>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-09-22 09:56+0000\n"
-"Last-Translator: Nick Mavrakis <mavrakis.n@gmail.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-25 19:38+0000\n"
+"Last-Translator: Pãnoș <panos.laganakos@gmail.com>\n"
 "Language-Team: Greek (http://www.transifex.com/django/django/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -115,7 +115,7 @@ msgid "object id"
 msgstr "ταυτότητα αντικειμένου"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "αναπαράσταση αντικειμένου"
 
@@ -554,24 +554,8 @@ msgstr "Εμφάνιση όλων"
 msgid "Save"
 msgstr "Αποθήκευση"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Κλείσιμο popup..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Άλλαξε το επιλεγμένο %(model)s"
-
-#, python-format
-msgid "View selected %(model)s"
-msgstr "Επιλεγμένο View %(model)s"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Πρόσθεσε άλλο ένα %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Διέγραψε το επιλεγμένο %(model)s"
 
 msgid "Search"
 msgstr "Αναζήτηση"
@@ -600,6 +584,18 @@ msgstr "Αποθήκευση και προβολή"
 
 msgid "Close"
 msgstr "Κλείσιμο"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Άλλαξε το επιλεγμένο %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Πρόσθεσε άλλο ένα %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Διέγραψε το επιλεγμένο %(model)s"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Ευχαριστούμε που διαθέσατε κάποιο ποιοτικό χρόνο στον ιστότοπο σήμερα."

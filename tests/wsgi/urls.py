@@ -1,5 +1,5 @@
-from django.conf.urls import url
 from django.http import FileResponse, HttpResponse
+from django.urls import path
 
 
 def helloworld(request):
@@ -7,6 +7,6 @@ def helloworld(request):
 
 
 urlpatterns = [
-    url("^$", helloworld),
-    url(r'^file/$', lambda x: FileResponse(open(__file__, 'rb'))),
+    path('', helloworld),
+    path('file/', lambda x: FileResponse(open(__file__, 'rb'))),
 ]

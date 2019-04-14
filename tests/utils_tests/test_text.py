@@ -58,6 +58,7 @@ class TestUtilsText(SimpleTestCase):
         self.assertEqual('The quick brown fox jumped over the lazy dog.', truncator.chars(100)),
         self.assertEqual('The quick brown fox …', truncator.chars(21)),
         self.assertEqual('The quick brown fo.....', truncator.chars(23, '.....')),
+        self.assertEqual('.....', truncator.chars(4, '.....')),
 
         nfc = text.Truncator('o\xfco\xfco\xfco\xfc')
         nfd = text.Truncator('ou\u0308ou\u0308ou\u0308ou\u0308')
@@ -188,7 +189,9 @@ class TestUtilsText(SimpleTestCase):
             ('', ''),
             ('foo', 'foo'),
             ('&amp;', '&'),
+            ('&am;', '&am;'),
             ('&#x26;', '&'),
+            ('&#xk;', '&#xk;'),
             ('&#38;', '&'),
             ('foo &amp; bar', 'foo & bar'),
             ('foo & bar', 'foo & bar'),
