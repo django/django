@@ -104,14 +104,15 @@ class SuperuserRequiredTestCase(TestCase):
         self.assertEqual('/accounts/login/?next=/rand', response.url)
 
         request = self.factory.get('/rand')
-        request.user = self.user
-        response = only_superusers(request)
-        self.assertEqual(response.status_code, 403)
-
-        request = self.factory.get('/rand')
         request.user = self.superuser
         response = only_superusers(request)
         self.assertEqual(response.status_code, 200)
+
+        with self.assertRaises(PermissionDenied):
+            request = self.factory.get('/rand')
+            request.user = self.user
+            response = only_superusers(request)
+            self.assertEqual(response.status_code, 403)
 
 
 class PermissionsRequiredDecoratorTest(TestCase):

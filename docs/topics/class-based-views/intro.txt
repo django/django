@@ -314,9 +314,7 @@ In this example, every instance of ``ProtectedView`` will have login protection.
 These examples use ``login_required``, however, the same behavior can be
 obtained more simply using
 :class:`~django.contrib.auth.mixins.LoginRequiredMixin`.
-Also ``superuser_required`` will only allow superusers to access this view
-and the same behavior can be obtained using
-:class:`~django.contrib.auth.mixins.SuperuserRequiredMixin`.
+Also ``superuser_required`` will only allow superusers to access this view.
 
 .. note::
 
