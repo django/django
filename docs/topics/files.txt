@@ -78,7 +78,7 @@ Setting files on a models programatically
 
 If you are working on an file importer/exporter, or editing an uploaded file, you will have a few options for updating files on model instances.
 
-Setting the path on a model to where a file already exists
+Set the path on a model to where a file already exists
 ---------------------------------------------------------------------
 
 If you already have a file uploaded, that you want to link it to the model, set the path to this file, and call `save()`.`
@@ -114,23 +114,39 @@ By default, this will save changes to the database. You can avoid this by passin
 
 If you need to make changes to an existing file, load it into memory, make changes there, then save it back to the path you initially read from.
 
-Loading a file into memory then writing it to your chosen path
+Load a file into memory, then write it to your chosen path with ``save()``
 --------------------------------------------------------------------
 
-    # >>> code example here of loading an existing file, manipulating it, then
-    # >>> saving it back with
-    # >>> car.photo.save('path/to/new/photo.jpg', updated_file_in_memory)
+If you need to edit a file already attached, you can load the contents in a context manager, operate on this file, then save it back to the model with ``save()``
+
+    >>> with car.photo.open() as f:
+    ...     file_in_memory = f.read()
+    ...     updated_file_in_memory = operate_on_file(file_in_memory)
+    >>> car.photo.save('path/to/new/photo.jpg', updated_file_in_memory)
 
 
 If a file is too large to load into memory
 --------------------------------------------------------------------
 
-Some files will be too large to load into memory without issues - 
+Some files will be too large to load into memory without issues in one go. Use the methods on the Django :class:`~django.core.files.File` class to load the file in smaller sections, based on the structure of the file.
 
-    # >>> code example here of loading an existing file, *line by line*,
-    # manipulating it, then
-    # >>> saving it back with
-    # >>> car.photo.save('path/to/new/photo.jpg', updated_file_in_memory)
+If the file is suitable work working on it line-by-line, loop through it with the `__iter__` method on the Django file class. So, if we have a model with an FileField attachment like so:
+
+    class Dataset(models.Model):
+        name = models.CharField(max_length=255)
+        attachment = models.Filefield(upload_to='datasets')
+
+Then we can loop through each line in the attachment, loading each line into memory one at a time:
+
+    >>> dataset = Dataset.objects.get(name="my dataset")
+    >>> for line in dataset.attachment:
+    >>>     operate_on_line(line)
+
+
+If a file is a long stream of characters, use the ``chunks()`` method to work on the file in chunks of a set size (by default 64k):
+
+    >>> for chunk in enumerate(car.photo.chunks()):
+    >>>     operate_on_chunk(chunk)
 
 
 The ``File`` object
