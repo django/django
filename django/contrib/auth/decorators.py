@@ -19,18 +19,13 @@ def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIE
         def _wrapped_view(request, *args, **kwargs):
             if test_func(request.user):
                 return view_func(request, *args, **kwargs)
-            path = request.build_absolute_uri()
-            resolved_login_url = resolve_url(login_url or settings.LOGIN_URL)
-            # If the login url is the same scheme and net location then just
-            # use the path as the "next" url.
-            login_scheme, login_netloc = urlparse(resolved_login_url)[:2]
-            current_scheme, current_netloc = urlparse(path)[:2]
-            if ((not login_scheme or login_scheme == current_scheme) and
-                    (not login_netloc or login_netloc == current_netloc)):
-                path = request.get_full_path()
-            from django.contrib.auth.views import redirect_to_login
-            return redirect_to_login(
-                path, resolved_login_url, redirect_field_name)
+
+            return _get_login_redirect(
+                request,
+                redirect_field_name=redirect_field_name,
+                login_url=login_url
+            )
+
         return _wrapped_view
     return decorator
 
@@ -50,21 +45,30 @@ def login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login
     return actual_decorator
 
 
-def superuser_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url=None):
+def superuser_required(redirect_field_name=REDIRECT_FIELD_NAME, login_url=None):
     """
     Decorator for views that checks that the user is superuser, redirecting
     to the log-in page if necessary or disallowing non superusers.
     """
-    actual_decorator = user_passes_test(
-        lambda u: u.is_superuser,
-        login_url=login_url,
-        redirect_field_name=redirect_field_name
-    )
 
-    if function:
-        return actual_decorator(function)
+    def decorator(view_func):
+        @wraps(view_func)
+        def _wrapped_view(request, *args, **kwargs):
+            if request.user.is_superuser:
+                return view_func(request, *args, **kwargs)
 
-    return actual_decorator
+            if not request.user.is_authenticated:
+                return _get_login_redirect(
+                    request,
+                    redirect_field_name=redirect_field_name,
+                    login_url=login_url
+                )
+
+            raise PermissionDenied
+
+        return _wrapped_view
+
+    return decorator
 
 
 def permission_required(perm, login_url=None, raise_exception=False):
@@ -88,3 +92,27 @@ def permission_required(perm, login_url=None, raise_exception=False):
         # As the last resort, show the login form
         return False
     return user_passes_test(check_perms, login_url=login_url)
+
+
+def _get_login_redirect(request, redirect_field_name=REDIRECT_FIELD_NAME, login_url=None):
+    """Build login redirect response"""
+    path = request.build_absolute_uri()
+    resolved_login_url = resolve_url(login_url or settings.LOGIN_URL)
+
+    # If the login url is the same scheme and net location then just
+    # use the path as the "next" url.
+    login_scheme, login_netloc = urlparse(resolved_login_url)[:2]
+    current_scheme, current_netloc = urlparse(path)[:2]
+    if (
+        (not login_scheme or login_scheme == current_scheme) and
+        (not login_netloc or login_netloc == current_netloc)
+    ):
+        path = request.get_full_path()
+
+    from django.contrib.auth.views import redirect_to_login
+
+    return redirect_to_login(
+        path,
+        resolved_login_url,
+        redirect_field_name
+    )
