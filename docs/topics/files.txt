@@ -73,6 +73,66 @@ location (:setting:`MEDIA_ROOT` if you are using the default
     >>> car.photo.path == new_path
     True
 
+Setting files on a models programatically
+===============================================
+
+If you are working on an file importer/exporter, or editing an uploaded file, you will have a few options for updating files on model instances.
+
+Setting the path on a model to where a file already exists
+---------------------------------------------------------------------
+
+If you already have a file uploaded, that you want to link it to the model, set the path to this file, and call `save()`.`
+
+        >>> from django.core.files.base import ContentFile
+
+        >>> car.photo = "path/to/new/photo.jpg"
+        >>> car.save()
+
+The file needs to exist at the path you use, other wise you will trigger a `FileNotFoundError` exception.
+It file also needs to be inside the base path for your project, otherwise you will raise a `SuspiciousFileOperation` exception.
+
+
+Make a file in memory, and call save on the filefield
+--------------------------------------------------------------------------------
+
+Alternatively, you can set the contents of a file field programatically by creating a file object, and setting it as a model's photo property, with a call to `save()` on the field itself.
+
+    >>> from django.core.files.base import ContentFile
+
+    >>> file_in_memory = ContentFile('binary-data-representing-a-picture')
+    >>> car.photo.save('path/to/new/photo.jpg', file_in_memory)
+
+By default, this will save changes to the database. You can avoid this by passing in the `save=False` keyword argument.
+
+    # defer writing the file to the path, until you call `save()` on the instance
+    >>> car.photo.save('path/to/new/photo.jpg', file_in_memory, save=False)
+
+    # check that
+    >>> car.refresh_from_db()
+    >>> car.photo.path
+    'cars/chevy_ii.jpg'
+
+If you need to make changes to an existing file, load it into memory, make changes there, then save it back to the path you initially read from.
+
+Loading a file into memory then writing it to your chosen path
+--------------------------------------------------------------------
+
+    # >>> code example here of loading an existing file, manipulating it, then
+    # >>> saving it back with
+    # >>> car.photo.save('path/to/new/photo.jpg', updated_file_in_memory)
+
+
+If a file is too large to load into memory
+--------------------------------------------------------------------
+
+Some files will be too large to load into memory without issues - 
+
+    # >>> code example here of loading an existing file, *line by line*,
+    # manipulating it, then
+    # >>> saving it back with
+    # >>> car.photo.save('path/to/new/photo.jpg', updated_file_in_memory)
+
+
 The ``File`` object
 ===================
 
