@@ -136,7 +136,7 @@ class GenericInlineAdminParametersTest(TestDataMixin, TestCase):
         self.assertEqual(formset.total_form_count(), 1)
         self.assertEqual(formset.initial_form_count(), 1)
 
-    def testMaxNumParam(self):
+    def test_max_num_param(self):
         """
         With extra=5 and max_num=2, there should be only 2 forms.
         """
