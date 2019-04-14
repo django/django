@@ -290,7 +290,7 @@ If you have a set of common decorators used in several places, you can define
 a list or tuple of decorators and use this instead of invoking
 ``method_decorator()`` multiple times. These two classes are equivalent::
 
-    decorators = [never_cache, login_required]
+    decorators = [never_cache, login_required, superuser_required]
 
     @method_decorator(decorators, name='dispatch')
     class ProtectedView(TemplateView):
@@ -301,11 +301,16 @@ a list or tuple of decorators and use this instead of invoking
     class ProtectedView(TemplateView):
         template_name = 'secret.html'
 
+    @method_decorator(superuser_required, name='dispatch')
+    class SuperuserOnlyView(TemplateView):
+        template_name = 'secret.html'
+
 The decorators will process a request in the order they are passed to the
 decorator. In the example, ``never_cache()`` will process the request before
 ``login_required()``.
 
-In this example, every instance of ``ProtectedView`` will have login protection.
+In this example, every instance of ``ProtectedView`` will have login protection
+and ``SuperuserOnlyView`` will allow only superusers to access this view.
 
 .. note::
 

@@ -219,7 +219,8 @@ to edit, and override
 
 Note that you'll need to :ref:`decorate this
 view<decorating-class-based-views>` using
-:func:`~django.contrib.auth.decorators.login_required`, or
+:func:`~django.contrib.auth.decorators.login_required` or
+:func:`~django.contrib.auth.decorators.superuser_required`, or
 alternatively handle unauthorized users in the
 :meth:`~django.views.generic.edit.ModelFormMixin.form_valid()`.
 
