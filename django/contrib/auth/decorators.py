@@ -50,18 +50,21 @@ def login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login
     return actual_decorator
 
 
-def superuser_required(view_func):
+def superuser_required(view_func, redirect_field_name=REDIRECT_FIELD_NAME, login_url=None):
     """
-    Decorator for views that checks that the user is superuser.
+    Decorator for views that checks that the user is superuser, redirecting
+    to the log-in page if necessary or disallowing non superusers.
     """
-    @wraps(view_func)
-    def _wrapped_view(request, *args, **kwargs):
-        if request.user.is_superuser:
-            return view_func(request, *args, **kwargs)
+    actual_decorator = user_passes_test(
+        lambda u: u.is_superuser,
+        login_url=login_url,
+        redirect_field_name=redirect_field_name
+    )
 
-        raise PermissionDenied
+    if view_func:
+        return actual_decorator(view_func)
 
-    return _wrapped_view
+    return actual_decorator
 
 
 def permission_required(perm, login_url=None, raise_exception=False):
