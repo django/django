@@ -4,7 +4,7 @@ from django.conf import settings
 from django.contrib.messages.storage.base import BaseStorage, Message
 from django.core import signing
 from django.http import SimpleCookie
-from django.utils.crypto import constant_time_compare
+from django.utils.crypto import constant_time_compare, salted_hmac
 from django.utils.safestring import SafeData, mark_safe
 
 
@@ -128,6 +128,13 @@ class CookieStorage(BaseStorage):
         key_salt = 'django.contrib.messages'
         return signing.get_cookie_signer(salt=key_salt).signature(value)
 
+    def _legacy_hash(self, value):
+        """
+        Hashing function used before #27604.
+        """
+        key_salt = 'django.contrib.messages'
+        return salted_hmac(key_salt, value).hexdigest()
+
     def _encode(self, messages, encode_empty=False):
         """
         Return an encoded version of the messages list which can be stored as
@@ -153,7 +160,10 @@ class CookieStorage(BaseStorage):
         bits = data.split('$', 1)
         if len(bits) == 2:
             hash, value = bits
-            if constant_time_compare(hash, self._hash(value)):
+            if (
+                constant_time_compare(hash, self._hash(value)) or
+                constant_time_compare(hash, self._legacy_hash(value))
+            ):
                 try:
                     # If we get here (and the JSON decode works), everything is
                     # good. In any other case, drop back and return None.

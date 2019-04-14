@@ -174,3 +174,20 @@ class CookieTests(BaseTests, SimpleTestCase):
         # Decode the messages in the old format (without is_safedata)
         decoded_messages = json.loads(encoded_messages, cls=MessageDecoder)
         self.assertEqual(messages, decoded_messages)
+
+    def test_legacy_hash_decode(self):
+        """
+        Messages with hashes generated using the legacy hash function are still
+        decoded correctly (#27604).
+        """
+        storage = self.storage_class(self.get_request())
+        messages = ['this', 'that']
+
+        # Encode a message using the legacy hash.
+        encoder = MessageEncoder(separators=(',', ':'))
+        value = encoder.encode(messages)
+        encoded_messages = '%s$%s' % (storage._legacy_hash(value), value)
+
+        # Assert those messages can be decoded.
+        decoded_messages = storage._decode(encoded_messages)
+        self.assertEqual(messages, decoded_messages)
