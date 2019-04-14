@@ -2,6 +2,7 @@ import glob
 import os
 import re
 import sys
+import tempfile
 from functools import total_ordering
 from itertools import dropwhile
 
@@ -211,6 +212,7 @@ class Command(BaseCommand):
     msgmerge_options = ['-q', '--previous']
     msguniq_options = ['--to-code=utf-8']
     msgattrib_options = ['--no-obsolete']
+    msgfmt_options = ['--check-format']
     xgettext_options = ['--from-code=UTF-8', '--add-comments=Translators']
 
     def add_arguments(self, parser):
@@ -279,6 +281,10 @@ class Command(BaseCommand):
             '--keep-pot', action='store_true',
             help="Keep .pot file after making messages. Useful when debugging.",
         )
+        parser.add_argument(
+            '--stats-only', action='store_true',
+            help="Provide translation statistics without overwriting message files."
+        )
 
     def handle(self, *args, **options):
         locale = options['locale']
@@ -319,6 +325,7 @@ class Command(BaseCommand):
 
         self.no_obsolete = options['no_obsolete']
         self.keep_pot = options['keep_pot']
+        self.stats_only = options['stats_only']
 
         if self.domain not in ('django', 'djangojs'):
             raise CommandError("currently makemessages only supports domains "
@@ -378,6 +385,16 @@ class Command(BaseCommand):
 
         check_programs('xgettext')
 
+        if locales and self.stats_only:
+            check_programs('msgfmt')
+            stats_dir = tempfile.mkdtemp()
+            if self.verbosity > 1:
+                self.stdout.write(
+                    'stats-only mode: will write po files to %s\n' % stats_dir
+                )
+        else:
+            stats_dir = None
+
         try:
             potfiles = self.build_potfiles()
 
@@ -386,7 +403,7 @@ class Command(BaseCommand):
                 if self.verbosity > 0:
                     self.stdout.write("processing locale %s\n" % locale)
                 for potfile in potfiles:
-                    self.write_po_file(potfile, locale)
+                    self.write_po_file(potfile, locale, stats_dir=stats_dir)
         finally:
             if not self.keep_pot:
                 self.remove_potfiles()
@@ -589,7 +606,7 @@ class Command(BaseCommand):
         for build_file in build_files:
             build_file.cleanup()
 
-    def write_po_file(self, potfile, locale):
+    def write_po_file(self, potfile, locale, stats_dir=None):
         """
         Create or update the PO file for self.domain and `locale`.
         Use contents of the existing `potfile`.
@@ -617,6 +634,14 @@ class Command(BaseCommand):
         msgs = normalize_eols(msgs)
         msgs = msgs.replace(
             "#. #-#-#-#-#  %s.pot (PACKAGE VERSION)  #-#-#-#-#\n" % self.domain, "")
+
+        if stats_dir:
+            pofile_src = pofile
+            pofile = os.path.join(stats_dir, pofile.lstrip(os.path.sep))
+            pofile_dir = os.path.dirname(pofile)
+            if not os.path.isdir(pofile_dir):
+                os.makedirs(pofile_dir)
+
         with open(pofile, 'w', encoding='utf-8') as fp:
             fp.write(msgs)
 
@@ -629,6 +654,29 @@ class Command(BaseCommand):
                         "errors happened while running msgattrib\n%s" % errors)
                 elif self.verbosity > 0:
                     self.stdout.write(errors)
+
+        if stats_dir:
+            base_path = os.path.splitext(pofile)[0]
+            args = ['msgfmt'] + self.msgfmt_options + [
+                '--statistics',
+                '-o', base_path + '.mo',
+                base_path + '.po'
+            ]
+            output, errors, status = popen_wrapper(args)
+            if status:
+                if errors:
+                    msg = "Execution of %s failed: %s" % ('msgfmt', errors)
+                else:
+                    msg = "Execution of %s failed" % 'msgfmt'
+                raise CommandError(msg)
+            elif errors:
+                # statistics output goes to stderr
+                if pofile_src.startswith(os.getcwd()):
+                    pofile_src = os.path.join(
+                        os.path.curdir,
+                        os.path.relpath(pofile_src, os.getcwd())
+                    )
+                self.stdout.write('stats for %s: %s' % (pofile_src, errors))
 
     def copy_plural_forms(self, msgs, locale):
         """

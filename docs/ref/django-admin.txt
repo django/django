@@ -733,6 +733,12 @@ Prevents deleting the temporary ``.pot`` files generated before creating the
 ``.po`` file. This is useful for debugging errors which may prevent the final
 language files from being created.
 
+.. django-admin-option:: --stats-only
+
+Writes ``.po`` files to a temporary directory, so that ``.po`` files in default
+directories are not overwritten, and outputs translation statistics as returned
+by GNU gettext ``msgfmt`` command. The output is localized as per system locale.
+
 .. seealso::
 
     See :ref:`customizing-makemessages` for instructions on how to customize
