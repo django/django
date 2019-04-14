@@ -50,7 +50,7 @@ def login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login
     return actual_decorator
 
 
-def superuser_required(view_func, redirect_field_name=REDIRECT_FIELD_NAME, login_url=None):
+def superuser_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url=None):
     """
     Decorator for views that checks that the user is superuser, redirecting
     to the log-in page if necessary or disallowing non superusers.
@@ -61,8 +61,8 @@ def superuser_required(view_func, redirect_field_name=REDIRECT_FIELD_NAME, login
         redirect_field_name=redirect_field_name
     )
 
-    if view_func:
-        return actual_decorator(view_func)
+    if function:
+        return actual_decorator(function)
 
     return actual_decorator
 

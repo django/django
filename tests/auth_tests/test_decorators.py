@@ -58,7 +58,7 @@ class LoginRequiredTestCase(AuthViewsTestCase):
 
 
 @override_settings(ROOT_URLCONF='auth_tests.urls')
-class SuperuserRequiredTestCase(AuthViewsTestCase):
+class SuperuserRequiredTestCase(TestCase):
     """
     Tests the login_required decorators
     """
@@ -78,7 +78,7 @@ class SuperuserRequiredTestCase(AuthViewsTestCase):
 
         self.factory = RequestFactory()
 
-    def testCallable(self):
+    def test_callable(self):
         """
         superuser_required is assignable to callable objects.
         """
@@ -88,7 +88,7 @@ class SuperuserRequiredTestCase(AuthViewsTestCase):
 
         superuser_required(CallableView())
 
-    def testSuperuserRequired(self):
+    def test_superuser_required(self):
         """
         superuser_required works as expected.
         """
