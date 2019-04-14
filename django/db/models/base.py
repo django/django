@@ -727,7 +727,7 @@ class Model(metaclass=ModelBase):
                                  % ', '.join(non_model_fields))
 
         # If saving to the same database, and this model is deferred, then
-        # automatically do a "update_fields" save on the loaded fields.
+        # automatically do an "update_fields" save on the loaded fields.
         elif not force_insert and deferred_fields and using == self._state.db:
             field_names = set()
             for field in self._meta.concrete_fields:

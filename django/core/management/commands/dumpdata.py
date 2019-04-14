@@ -110,7 +110,7 @@ class Command(BaseCommand):
 
                     app_list_value = app_list.setdefault(app_config, [])
 
-                    # We may have previously seen a "all-models" request for
+                    # We may have previously seen an "all-models" request for
                     # this app (no model qualifier was given). In this case
                     # there is no need adding specific models to the list.
                     if app_list_value is not None:
