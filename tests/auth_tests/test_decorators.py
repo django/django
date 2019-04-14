@@ -94,7 +94,7 @@ class SuperuserRequiredTestCase(AuthViewsTestCase):
         superuser_required works as expected.
         """
 
-        @superuser_required(view_url='/login_required/', login_url=settings.LOGIN_URL)
+        @superuser_required(login_url=settings.LOGIN_URL)
         def only_superusers(request):
             return HttpResponse('OK')
 
@@ -113,22 +113,6 @@ class SuperuserRequiredTestCase(AuthViewsTestCase):
         request.user = self.superuser
         response = only_superusers(request)
         self.assertEqual(response.status_code, 200)
-
-    def testSuperuserRequired(self):
-        """
-        superuser_required works on a simple view wrapped in a superuser_required
-        decorator.
-        """
-        @superuser_required
-        def only_superusers(request):
-            return HttpResponse('OK')
-
-        request = self.factory.get('/superuser')
-        request.user = self.user
-
-        with self.assertRaises(PermissionDenied):
-            resp = only_superusers(request)
-            self.assertEqual(resp.status_code, 403)
 
 
 class PermissionsRequiredDecoratorTest(TestCase):
