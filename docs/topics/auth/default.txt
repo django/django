@@ -686,7 +686,7 @@ inheritance list.
 .. currentmodule:: django.contrib.auth.mixins
 
 The ``SuperuserRequired`` mixin
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When using :doc:`class-based views </topics/class-based-views/index>`, you can
 achieve the same behavior as with ``superuser_required`` by using the
