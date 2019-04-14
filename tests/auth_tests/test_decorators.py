@@ -1,3 +1,5 @@
+from django.contrib.auth.models import AnonymousUser
+
 from django.conf import settings
 from django.contrib.auth import models
 from django.contrib.auth.decorators import (
@@ -56,17 +58,17 @@ class LoginRequiredTestCase(AuthViewsTestCase):
         self.testLoginRequired(view_url='/login_required_login_url/', login_url='/somewhere/')
 
 
-class SuperuserRequiredTestCase(TestCase):
+@override_settings(ROOT_URLCONF='auth_tests.urls')
+class SuperuserRequiredTestCase(AuthViewsTestCase):
     """
     Tests the login_required decorators
     """
 
     def setUp(self):
-        self.superuser = models.User.objects.create_user(
+        self.superuser = models.User.objects.create_superuser(
             username='superuser',
             password='password',
-            email='superuser@example.com',
-            is_superuser=True,
+            email='superuser@example.com'
         )
 
         self.user = models.User.objects.create_user(
@@ -87,19 +89,30 @@ class SuperuserRequiredTestCase(TestCase):
 
         superuser_required(CallableView())
 
-    def testView(self):
+    def testSuperuserRequired(self):
         """
-        superuser_required is assignable to normal views.
+        superuser_required works as expected.
         """
-        @superuser_required
-        def normal_view(request):
+
+        @superuser_required(view_url='/login_required/', login_url=settings.LOGIN_URL)
+        def only_superusers(request):
             return HttpResponse('OK')
 
-        request = self.factory.get('/superuser')
-        request.user = self.superuser
-        resp = normal_view(request)
+        request = self.factory.get('/rand')
+        request.user = AnonymousUser()
+        response = only_superusers(request)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual('/accounts/login/?next=/rand', response.url)
 
-        self.assertEqual(resp.status_code, 200)
+        request = self.factory.get('/rand')
+        request.user = self.user
+        response = only_superusers(request)
+        self.assertEqual(response.status_code, 403)
+
+        request = self.factory.get('/rand')
+        request.user = self.superuser
+        response = only_superusers(request)
+        self.assertEqual(response.status_code, 200)
 
     def testSuperuserRequired(self):
         """

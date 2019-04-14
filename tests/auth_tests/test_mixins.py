@@ -2,7 +2,8 @@ from unittest import mock
 
 from django.contrib.auth import models
 from django.contrib.auth.mixins import (
-    LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin,
+    LoginRequiredMixin, PermissionRequiredMixin,
+    SuperuserRequiredMixin, UserPassesTestMixin,
 )
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
@@ -217,6 +218,42 @@ class LoginRequiredMixinTests(TestCase):
         self.assertEqual('/accounts/login/?next=/rand', response.url)
         request = self.factory.get('/rand')
         request.user = self.user
+        response = view(request)
+        self.assertEqual(response.status_code, 200)
+
+
+class SuperuserRequiredMixinTests(TestCase):
+
+    factory = RequestFactory()
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = models.User.objects.create(username='joe', password='qwerty')
+        cls.superuser = models.User.objects.create_superuser(username='superuser', password='qwerty')
+
+    def test_superuser_required(self):
+        """
+        superuser_required works on a simple view wrapped in a superuser_required
+        decorator.
+        """
+        class AView(SuperuserRequiredMixin, EmptyResponseView):
+            pass
+
+        view = AView.as_view()
+
+        request = self.factory.get('/rand')
+        request.user = AnonymousUser()
+        response = view(request)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual('/accounts/login/?next=/rand', response.url)
+
+        request = self.factory.get('/rand')
+        request.user = self.user
+        response = view(request)
+        self.assertEqual(response.status_code, 403)
+
+        request = self.factory.get('/rand')
+        request.user = self.superuser
         response = view(request)
         self.assertEqual(response.status_code, 200)
 
