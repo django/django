@@ -228,8 +228,12 @@ class SuperuserRequiredMixinTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.user = models.User.objects.create(username='joe', password='qwerty')
-        cls.superuser = models.User.objects.create_superuser(username='superuser', password='qwerty')
+        cls.user = models.User.objects.create(username='joe', email='joe@example.com', password='qwerty')
+        cls.superuser = models.User.objects.create_superuser(
+            username='superuser',
+            email='superuser@example.com',
+            password='qwerty'
+        )
 
     def test_superuser_required(self):
         """

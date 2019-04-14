@@ -55,7 +55,7 @@ class LoginRequiredMixin(AccessMixin):
 class SuperuserRequiredMixin(AccessMixin):
     """Verify that the current user is superuser."""
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_superuser:
+        if not request.user.is_superuser:
             return self.handle_no_permission()
 
         return super().dispatch(request, *args, **kwargs)
