@@ -1,0 +1,10 @@
+2.2.0 Release Notes
+===================
+
+Channels 2.2.0 updates the requirements for ASGI version 3, and the supporting
+Daphne v2.3 release.
+
+Backwards Incompatible Changes
+------------------------------
+
+None.

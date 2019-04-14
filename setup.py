@@ -15,7 +15,7 @@ setup(
     install_requires=[
         'Django>=1.11',
         'asgiref~=3.0',
-        'daphne~=2.2',
+        'daphne~=2.3',
     ],
     extras_require={
         'tests': [

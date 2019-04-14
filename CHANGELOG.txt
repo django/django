@@ -1,6 +1,11 @@
 Full release notes, with more details and upgrade information, are available at:
 https://channels.readthedocs.io/en/latest/releases
 
+2.2.0 (2019-04-14)
+------------------
+
+* Updated requirements for ASGI v3 and Daphne 2.3.
+
 
 2.1.7 (2019-01-31)
 ------------------
