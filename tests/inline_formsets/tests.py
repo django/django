@@ -202,3 +202,17 @@ class InlineFormsetFactoryTest(TestCase):
         PoemFormSet = inlineformset_factory(Poet, Poem, form=PoemModelForm, fields=('name',), extra=0)
         formset = PoemFormSet(None, instance=poet)
         formset.forms  # Trigger form instantiation to run the assert above.
+
+    def test_formset_with_auto_id(self):
+        """
+        A foreign key field is in Meta for all forms in the formset (#26538).
+        """
+        class PoemModelForm(ModelForm):
+            pass
+
+        poet = Poet.objects.create(name='test')
+        poet.poem_set.create(name='first test poem')
+        poet.poem_set.create(name='second test poem')
+        PoemFormSet = inlineformset_factory(Poet, Poem, form=PoemModelForm, fields=('name',), extra=0)
+        formset = PoemFormSet(None, instance=poet, auto_id='id_for_%s')
+        self.assertEqual(formset.forms[0].auto_id, 'id_for_%s')
