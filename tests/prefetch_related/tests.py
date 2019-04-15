@@ -964,6 +964,16 @@ class GenericRelationTests(TestCase):
         # instance returned by the manager.
         self.assertEqual(list(bookmark.tags.all()), list(bookmark.tags.all().all()))
 
+    def test_foreign_key_GFK(self):
+        book = Book.objects.create(title="Poems")
+        book_with_year = BookWithYear.objects.create(book=book, published_year=2019)
+        Comment.objects.create(comment="awesome", content_object=book_with_year)
+
+        with self.assertNumQueries(2):
+            qs = Comment.objects.prefetch_related("content_object")
+            for c in qs:
+                self.assertIsNotNone(c.content_object)
+
 
 class MultiTableInheritanceTest(TestCase):
 
