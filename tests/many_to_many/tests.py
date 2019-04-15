@@ -580,3 +580,9 @@ class ManyToManyTests(TestCase):
             ]
         )
         self.assertQuerysetEqual(b.publications.all(), ['<Publication: Science Weekly>'])
+
+    def test_custom_default_manager_exists_count(self):
+        a5 = Article.objects.create(headline='deleted')
+        a5.publications.add(self.p2)
+        self.assertEqual(self.p2.article_set.count(), self.p2.article_set.all().count())
+        self.assertEqual(self.p3.article_set.exists(), self.p3.article_set.all().exists())
