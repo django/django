@@ -29,3 +29,7 @@ Bugfixes
 * Prevented :djadmin:`makemigrations` from generating infinite migrations for
   check constraints and partial indexes when ``condition`` contains
   a :class:`~python:range` object (:ticket:`30350`).
+
+* Reverted an optimization in Django 2.2 (:ticket:`29725`) that caused the
+  inconsistent behavior of ``count()`` and ``exists()`` on a reverse
+  many-to-many relationship with a custom manager (:ticket:`30325`).
