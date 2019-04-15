@@ -567,6 +567,13 @@ As with all template tags, this tag needs to be loaded in all templates which
 use translations, even those templates that extend from other templates which
 have already loaded the ``i18n`` tag.
 
+.. warning::
+
+    Translated strings will not be escaped when rendered in a template.
+    This allows you to include HTML in translations, for example for emphasis,
+    but potentially dangerous characters (e.g. ``"``) will also be rendered
+    unchanged.
+
 .. templatetag:: trans
 
 ``trans`` template tag
