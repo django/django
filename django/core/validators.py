@@ -318,7 +318,7 @@ class BaseValidator:
     def __call__(self, value):
         cleaned = self.clean(value)
         limit_value = self.limit_value() if callable(self.limit_value) else self.limit_value
-        params = {'limit_value': limit_value, 'show_value': cleaned, 'value': value}
+        params = self.get_message_params(cleaned, limit_value, value)
         if self.compare(cleaned, limit_value):
             raise ValidationError(self.message, code=self.code, params=params)
 
@@ -329,6 +329,9 @@ class BaseValidator:
             self.message == other.message and
             self.code == other.code
         )
+
+    def get_message_params(self, cleaned, limit_value, value):
+        return {'show_value': cleaned, 'limit_value': 'limit_value', 'value': value}
 
     def compare(self, a, b):
         return a is not b
