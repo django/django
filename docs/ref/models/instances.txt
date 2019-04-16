@@ -368,7 +368,7 @@ primary key — then that auto-incremented value will be calculated and saved as
 an attribute on your object the first time you call ``save()``::
 
     >>> b2 = Blog(name='Cheddar Talk', tagline='Thoughts on cheese.')
-    >>> b2.id     # Returns None, because b doesn't have an ID yet.
+    >>> b2.id     # Returns None, because b2 doesn't have an ID yet.
     >>> b2.save()
     >>> b2.id     # Returns the ID of your new object.
 
