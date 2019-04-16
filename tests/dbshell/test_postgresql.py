@@ -18,11 +18,16 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
         """
         def _mock_subprocess_run(*args, env=os.environ, **kwargs):
             self.subprocess_args = list(*args)
+            self.environment = {
+                key: env.get(key)
+                for key in ('PGPASSWORD', 'PGSSLROOTCERT', 'PGSSLCERT', 'PGSSLKEY')
+                if env.get(key)
+            }
             self.pgpassword = env.get('PGPASSWORD')
             return subprocess.CompletedProcess(self.subprocess_args, 0)
         with mock.patch('subprocess.run', new=_mock_subprocess_run):
             DatabaseClient.runshell_db(dbinfo)
-        return self.subprocess_args, self.pgpassword
+        return self.subprocess_args, self.environment
 
     def test_basic(self):
         self.assertEqual(
@@ -34,7 +39,7 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
                 'port': '444',
             }), (
                 ['psql', '-U', 'someuser', '-h', 'somehost', '-p', '444', 'dbname'],
-                'somepassword',
+                {'PGPASSWORD': 'somepassword'},
             )
         )
 
@@ -47,7 +52,7 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
                 'port': '444',
             }), (
                 ['psql', '-U', 'someuser', '-h', 'somehost', '-p', '444', 'dbname'],
-                None,
+                {},
             )
         )
 
@@ -61,7 +66,7 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
                 'port': '444',
             }), (
                 ['psql', '-U', 'some:user', '-h', '::1', '-p', '444', 'dbname'],
-                'some:password',
+                {'PGPASSWORD': 'some:password'},
             )
         )
 
@@ -77,7 +82,31 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
                 'port': '444',
             }), (
                 ['psql', '-U', username, '-h', 'somehost', '-p', '444', 'dbname'],
-                password,
+                {'PGPASSWORD': password},
+            )
+        )
+
+    def test_ssl_connection(self):
+        username = 'rôle'
+        password = 'sésame'
+        self.assertEqual(
+            self._run_it({
+                'database': 'dbname',
+                'user': username,
+                'password': password,
+                'host': 'somehost',
+                'port': '444',
+                'sslrootcert': '/path/to/rootcert',
+                'sslcert': '/path/to/cert',
+                'sslkey': '/path/to/key',
+            }), (
+                ['psql', '-U', username, '-h', 'somehost', '-p', '444', 'dbname'],
+                {
+                    'PGPASSWORD': password,
+                    'PGSSLROOTCERT': '/path/to/rootcert',
+                    'PGSSLCERT': '/path/to/cert',
+                    'PGSSLKEY': '/path/to/key',
+                }
             )
         )
 
