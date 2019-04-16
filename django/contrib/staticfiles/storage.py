@@ -151,7 +151,24 @@ class HashedFilesMixin:
         """
         return self._url(self.stored_name, name, force)
 
-    def url_converter(self, name, hashed_files, template=None):
+    def get_comment_blocks(self, content):
+        """
+        Return a list of (start, end) tuples for each comment block.
+        """
+        return [
+            (match.start(), match.end())
+            for match in re.finditer(r"\/\*.*?\*\/", content, flags=re.DOTALL)
+        ]
+
+    def is_in_comment(self, pos, comments):
+        for start, end in comments:
+            if start < pos and pos < end:
+                return True
+            if pos < start:
+                return False
+        return False
+
+    def url_converter(self, name, hashed_files, template=None, comment_blocks=[]):
         """
         Return the custom URL converter for the given file name.
         """
@@ -166,6 +183,10 @@ class HashedFilesMixin:
             to and calling the url() method of the storage.
             """
             matched, url = matchobj.groups()
+
+            # Ignore URLs in comments.
+            if self.is_in_comment(matchobj.start(), comment_blocks):
+                return matched
 
             # Ignore absolute/protocol-relative and data-uri URLs.
             if re.match(r'^[a-z]+:', url):
@@ -287,8 +308,9 @@ class HashedFilesMixin:
                     content = original_file.read().decode(settings.FILE_CHARSET)
                     for extension, patterns in self._patterns.items():
                         if matches_patterns(path, (extension,)):
+                            comment_blocks = self.get_comment_blocks(content)
                             for pattern, template in patterns:
-                                converter = self.url_converter(name, hashed_files, template)
+                                converter = self.url_converter(name, hashed_files, template, comment_blocks)
                                 try:
                                     content = pattern.sub(converter, content)
                                 except ValueError as exc:

@@ -1,0 +1,18 @@
+@import url("window.css");
+
+/* Single line: @import url("does.not.exist.A.css"); */
+
+/* Multi lines:
+ * @import url("does.not.exist.B.css");
+ */
+
+@font-face {
+  src: url("fonts/font.eot?#iefix") format("embedded-opentype");
+  /* Single line: src: url("does.not.exist.C.eot") format("embedded-opentype"); */
+}
+
+/* Multi lines:
+ *  @font-face {
+ *    src: url("does.not.exist.D.eot") format("embedded-opentype");
+ *  }
+ */

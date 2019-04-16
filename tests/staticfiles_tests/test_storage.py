@@ -229,6 +229,25 @@ class TestHashedFiles:
         self.assertEqual("Post-processing 'faulty.css' failed!\n\n", err.getvalue())
         self.assertPostCondition()
 
+    def test_no_replacement_in_comments(self):
+        relpath = self.hashed_file_path("cached/css/comments.css")
+        self.assertEqual(relpath, "cached/css/comments.e40cd3721ac1.css")
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            content = relfile.read()
+
+            # Non-commented content is replaced
+            self.assertNotIn(b'url("window.css")', content)
+            self.assertIn(b'url("window.5d5c10836967.css")', content)
+            self.assertNotIn(b'url("fonts/font.eot?#iefix")', content)
+            self.assertIn(b'url("window.5d5c10836967.css")', content)
+
+            # Commented lines are not replaced
+            self.assertIn(b'url("does.not.exist.A.css")', content)
+            self.assertIn(b'url("does.not.exist.B.css")', content)
+            self.assertIn(b'url("does.not.exist.C.eot")', content)
+            self.assertIn(b'url("does.not.exist.D.eot")', content)
+        self.assertPostCondition()
+
 
 @ignore_warnings(category=RemovedInDjango31Warning)
 @override_settings(
