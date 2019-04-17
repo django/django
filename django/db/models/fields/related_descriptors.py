@@ -1097,7 +1097,8 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
         def _remove_items(self, source_field_name, target_field_name, *objs):
             # source_field_name: the PK colname in join table for the source object
             # target_field_name: the PK colname in join table for the target object
-            # *objs - objects to remove
+            # *objs - objects to remove. Either object instances, or primary
+            # keys of object instances.
             if not objs:
                 return
 
