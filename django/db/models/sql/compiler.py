@@ -469,6 +469,7 @@ class SQLCompiler(object):
 
                     nowait = self.query.select_for_update_nowait
                     skip_locked = self.query.select_for_update_skip_locked
+                    no_key = self.query.select_for_no_key_update
                     # If it's a NOWAIT/SKIP LOCKED query but the backend
                     # doesn't support it, raise a DatabaseError to prevent a
                     # possible deadlock.
@@ -476,7 +477,7 @@ class SQLCompiler(object):
                         raise DatabaseError('NOWAIT is not supported on this database backend.')
                     elif skip_locked and not self.connection.features.has_select_for_update_skip_locked:
                         raise DatabaseError('SKIP LOCKED is not supported on this database backend.')
-                    for_update_part = self.connection.ops.for_update_sql(nowait=nowait, skip_locked=skip_locked)
+                    for_update_part = self.connection.ops.for_update_sql(nowait=nowait, skip_locked=skip_locked, no_key=no_key)
 
                 if for_update_part and self.connection.features.for_update_after_from:
                     result.append(for_update_part)

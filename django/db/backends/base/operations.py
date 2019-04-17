@@ -182,7 +182,7 @@ class BaseDatabaseOperations(object):
         """
         return []
 
-    def for_update_sql(self, nowait=False, skip_locked=False):
+    def for_update_sql(self, nowait=False, skip_locked=False, no_key=False):
         """
         Returns the FOR UPDATE SQL clause to lock rows for an update operation.
         """

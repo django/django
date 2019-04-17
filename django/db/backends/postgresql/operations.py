@@ -270,3 +270,13 @@ class DatabaseOperations(BaseDatabaseOperations):
             "Add 'django.contrib.postgres' to settings.INSTALLED_APPS to use "
             "the search operator."
         )
+
+    def for_update_sql(self, nowait=False, skip_locked=False, no_key=False):
+        """
+        Return the FOR UPDATE SQL clause to lock rows for an update operation.
+        """
+        return 'FOR%s UPDATE%s%s' % (
+            ' NO KEY' if no_key else '',
+            ' NOWAIT' if nowait else '',
+            ' SKIP LOCKED' if skip_locked else '',
+        )
