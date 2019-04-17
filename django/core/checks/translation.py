@@ -24,12 +24,6 @@ E004 = Error(
     id='translation.E004',
 )
 
-E005 = Error(
-    'You have provided values in the LANGUAGES_BIDI setting that are not in '
-    'the LANGUAGES setting.',
-    id='translation.E005',
-)
-
 
 @register(Tags.translation)
 def check_setting_language_code(app_configs, **kwargs):
@@ -62,9 +56,6 @@ def check_setting_languages_bidi(app_configs, **kwargs):
 def check_language_settings_consistent(app_configs, **kwargs):
     """Error if language settings are not consistent with each other."""
     available_tags = {i for i, _ in settings.LANGUAGES} | {'en-us'}
-    messages = []
     if settings.LANGUAGE_CODE not in available_tags:
-        messages.append(E004)
-    if not available_tags.issuperset(settings.LANGUAGES_BIDI):
-        messages.append(E005)
-    return messages
+        return [E004]
+    return []

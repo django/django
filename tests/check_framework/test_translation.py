@@ -80,15 +80,7 @@ class TranslationCheckTests(SimpleTestCase):
             'You have provided a value for the LANGUAGE_CODE setting that is '
             'not in the LANGUAGES setting.'
         )
-        with self.settings(LANGUAGE_CODE='fr', LANGUAGES=[('en', 'English')], LANGUAGES_BIDI=[]):
+        with self.settings(LANGUAGE_CODE='fr', LANGUAGES=[('en', 'English')]):
             self.assertEqual(check_language_settings_consistent(None), [
                 Error(msg, id='translation.E004'),
-            ])
-        msg = (
-            'You have provided values in the LANGUAGES_BIDI setting that are '
-            'not in the LANGUAGES setting.'
-        )
-        with self.settings(LANGUAGE_CODE='en', LANGUAGES=[('en', 'English')], LANGUAGES_BIDI=['he']):
-            self.assertEqual(check_language_settings_consistent(None), [
-                Error(msg, id='translation.E005'),
             ])
