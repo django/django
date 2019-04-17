@@ -17,6 +17,7 @@ from django.db.utils import DatabaseError, NotSupportedError
 from django.utils.deprecation import (
     RemovedInDjango30Warning, RemovedInDjango31Warning,
 )
+from django.utils.hashable import make_hashable
 from django.utils.inspect import func_supports_parameter
 
 FORCE = object()
@@ -135,9 +136,10 @@ class SQLCompiler:
                 # wrapping () because they could be removed when a subquery is
                 # the "rhs" in an expression (see Subquery._prepare()).
                 sql = '(%s)' % sql
-            if (sql, tuple(params)) not in seen:
+            params_hash = make_hashable(params)
+            if (sql, params_hash) not in seen:
                 result.append((sql, params))
-                seen.add((sql, tuple(params)))
+                seen.add((sql, params_hash))
         return result
 
     def collapse_group_by(self, expressions, having):
@@ -361,9 +363,10 @@ class SQLCompiler:
             # is refactored into expressions, then we can check each part as we
             # generate it.
             without_ordering = self.ordering_parts.search(sql).group(1)
-            if (without_ordering, tuple(params)) in seen:
+            params_hash = make_hashable(params)
+            if (without_ordering, params_hash) in seen:
                 continue
-            seen.add((without_ordering, tuple(params)))
+            seen.add((without_ordering, params_hash))
             result.append((resolved, (sql, params, is_ref)))
         return result
 

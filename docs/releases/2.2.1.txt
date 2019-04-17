@@ -33,3 +33,8 @@ Bugfixes
 * Reverted an optimization in Django 2.2 (:ticket:`29725`) that caused the
   inconsistent behavior of ``count()`` and ``exists()`` on a reverse
   many-to-many relationship with a custom manager (:ticket:`30325`).
+
+* Fixed a regression in Django 2.2 where
+  :class:`~django.core.paginator.Paginator` crashed when ``object_list`` was
+  a queryset ordered or aggregated over a nested ``JSONField`` key transform
+  (:ticket:`30335`).
