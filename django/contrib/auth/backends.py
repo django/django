@@ -3,8 +3,8 @@ import warnings
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
-from django.utils.deprecation import RemovedInDjango31Warning
 from django.db.models import Q
+from django.utils.deprecation import RemovedInDjango31Warning
 
 UserModel = get_user_model()
 
