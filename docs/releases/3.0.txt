@@ -59,7 +59,9 @@ Minor features
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new
+  :meth:`UserManager.with_perm() <django.contrib.auth.models.UserManager.with_perm>`
+  method returns all users that have the specified permission.
 
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -148,9 +148,6 @@ Minor features
 
 * The :func:`~django.contrib.auth.signals.user_login_failed` signal now
   receives a ``request`` argument.
-* The new
-  :meth:`UserManager.with_perm() <django.contrib.auth.models.UserManager.with_perm>`
-  method returns all users that have the specified permission.
 
 * :class:`~django.contrib.auth.forms.PasswordResetForm` supports custom user
   models that use an email field named something other than ``'email'``.

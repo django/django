@@ -277,7 +277,7 @@ Manager methods
 
     .. method:: with_perm(perm, is_active=True, is_superuser=True, backend=None, obj=None)
 
-        .. versionadded:: 1.11
+        .. versionadded:: 3.0
 
         Returns a queryset containing :class:`~django.contrib.auth.models.User`
         objects that have the given permission ``perm`` in the form of
@@ -556,7 +556,7 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
     .. method:: with_perm(perm, is_active=True, is_superuser=True, obj=None)
 
-        .. versionadded:: 1.11
+        .. versionadded:: 3.0
 
         Returns all active users who have the permission ``perm`` in the form
         of ``"<app label>.<permission codename>"``. Returns an empty queryset

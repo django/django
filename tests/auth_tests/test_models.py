@@ -12,9 +12,8 @@ from django.core import mail
 from django.db.models.signals import post_save
 from django.test import SimpleTestCase, TestCase, override_settings
 
-from .models import IntegerUsernameUser
+from .models import CustomModel, IntegerUsernameUser
 from .models.with_custom_email_field import CustomEmailField
-from .models import CustomModel
 
 
 class NaturalKeysTestCase(TestCase):
@@ -282,10 +281,10 @@ class UserWithPermTestCase(TestCase):
 
         cls.user3 = User.objects.create_user('user3', 'baz@example.com')
         cls.superuser = User.objects.create_superuser(
-            'superuser', 'superuser@example.com', 'superpassword'
+            'superuser', 'superuser@example.com', 'superpassword',
         )
         cls.inactive_user = User.objects.create_user(
-            'inactive_user', 'baz@example.com', is_active=False
+            'inactive_user', 'baz@example.com', is_active=False,
         )
         cls.inactive_user.user_permissions.add(cls.permission)
         cls.charlie = User.objects.create_user('charlie', 'charlie@example.com')
@@ -298,17 +297,15 @@ class UserWithPermTestCase(TestCase):
                 User.objects.with_perm(perm)
 
     def test_with_perm_user_permissions(self):
-        six.assertCountEqual(
-            self,
+        self.assertCountEqual(
             User.objects.with_perm('auth.test'),
-            [self.user1, self.user2, self.superuser]
+            [self.user1, self.user2, self.superuser],
         )
 
     def test_with_perm_group_permissions(self):
-        six.assertCountEqual(
-            self,
+        self.assertCountEqual(
             User.objects.with_perm('auth.test'),
-            [self.user1, self.user2, self.superuser]
+            [self.user1, self.user2, self.superuser],
         )
 
     def test_with_perm_no_permissions(self):
@@ -331,10 +328,9 @@ class UserWithPermTestCase(TestCase):
         self.assertNotIn(self.user1, users)
 
     def test_with_perm_non_duplicate_users(self):
-        six.assertCountEqual(
-            self,
+        self.assertCountEqual(
             User.objects.with_perm('auth.test'),
-            [self.user1, self.user2, self.superuser]
+            [self.user1, self.user2, self.superuser],
         )
 
     @override_settings(AUTHENTICATION_BACKENDS=[
@@ -349,30 +345,25 @@ class UserWithPermTestCase(TestCase):
         backend = 'auth_tests.test_auth_backends.CustomModelBackend'
         with self.assertRaisesMessage(ValueError, msg):
             User.objects.with_perm('auth.test')
-        six.assertCountEqual(
-            self,
+        self.assertCountEqual(
             User.objects.with_perm('auth.test', backend=backend),
-            [self.charlie, self.charlie_brown]
+            [self.charlie, self.charlie_brown],
         )
         self.assertNotIn(self.user1, User.objects.with_perm('auth.test', backend=backend))
 
     def test_with_perm_default_backend_with_obj(self):
         obj = CustomModel.objects.create(user=self.charlie_brown)
-        six.assertCountEqual(
-            self,
+        self.assertCountEqual(
             User.objects.with_perm('auth.test', obj=obj),
-            []
+            [],
         )
 
-    @override_settings(AUTHENTICATION_BACKENDS=[
-        'auth_tests.test_auth_backends.CustomModelBackend',
-    ])
+    @override_settings(AUTHENTICATION_BACKENDS=['auth_tests.test_auth_backends.CustomModelBackend'])
     def test_with_perm_custom_backend_with_obj(self):
         obj = CustomModel.objects.create(user=self.charlie_brown)
-        six.assertCountEqual(
-            self,
+        self.assertCountEqual(
             User.objects.with_perm('auth.test', obj=obj),
-            [self.charlie_brown]
+            [self.charlie_brown],
         )
 
     def test_with_perm_invalid_backend_type(self):
@@ -391,20 +382,16 @@ class UserWithPermTestCase(TestCase):
             )
 
     def test_with_perm_invalid_permission(self):
-        six.assertCountEqual(
-            self,
+        self.assertCountEqual(
             User.objects.with_perm('invalid.perm'),
-            [self.superuser]
+            [self.superuser],
         )
 
-    @override_settings(AUTHENTICATION_BACKENDS=[
-        'auth_tests.test_auth_backends.BareModelBackend',
-    ])
+    @override_settings(AUTHENTICATION_BACKENDS=['auth_tests.test_auth_backends.BareModelBackend'])
     def test_backend_without_with_perm(self):
-        six.assertCountEqual(
-            self,
+        self.assertCountEqual(
             User.objects.with_perm('auth.test'),
-            []
+            [],
         )
 
 

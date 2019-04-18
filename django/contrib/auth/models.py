@@ -166,10 +166,8 @@ class UserManager(BaseUserManager):
                     'therefore must provide the `backend` argument.'
                 )
             _, backend = backends[0]
-        elif not isinstance(backend, six.text_type):
-            raise TypeError(
-                'The `backend` argument must be a string.'
-            )
+        elif not isinstance(backend, str):
+            raise TypeError('The `backend` argument must be a string.')
         backend = auth.load_backend(backend)
         if hasattr(backend, 'with_perm'):
             return backend.with_perm(perm, is_active=is_active, is_superuser=is_superuser, obj=obj)
