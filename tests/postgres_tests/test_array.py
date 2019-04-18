@@ -149,6 +149,14 @@ class TestQuerying(PostgreSQLTestCase):
             NullableIntegerArrayModel(field=None),
         ])
 
+    def test_empty_list(self):
+        NullableIntegerArrayModel.objects.create(field=[])
+        obj = NullableIntegerArrayModel.objects.annotate(
+            empty_array=models.Value([], output_field=ArrayField(models.IntegerField())),
+        ).filter(field=models.F('empty_array')).get()
+        self.assertEqual(obj.field, [])
+        self.assertEqual(obj.empty_array, [])
+
     def test_exact(self):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__exact=[1]),
