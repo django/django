@@ -365,6 +365,8 @@ class ModelBase(type):
         for index in cls._meta.indexes:
             if not index.name:
                 index.set_name_with_model(cls)
+            else:
+                index.set_name_with_dict(cls)
 
         class_prepared.send(sender=cls)
 

@@ -1,3 +1,4 @@
+from django.core.exceptions import FieldDoesNotExist
 from django.db.backends.utils import names_digest, split_identifier
 from django.db.models.query_utils import Q
 from django.db.models.sql import Query
@@ -35,8 +36,9 @@ class Index:
         self.name = name or ''
         if self.name:
             errors = self.check_name()
-            if len(self.name) > self.max_name_length:
-                errors.append('Index names cannot be longer than %s characters.' % self.max_name_length)
+            if "%(table)s" not in self.name and "%(column)s" not in self.name:
+                if len(self.name) > self.max_name_length:
+                    errors.append('Index names cannot be longer than %s characters.' % self.max_name_length)
             if errors:
                 raise ValueError(errors)
         self.db_tablespace = db_tablespace
@@ -95,6 +97,22 @@ class Index:
         """Create a copy of this Index."""
         _, _, kwargs = self.deconstruct()
         return self.__class__(**kwargs)
+
+    def set_name_with_dict(self, model):
+        try:
+            _, table_name = split_identifier(model._meta.db_table)
+            column_names = [model._meta.get_field(field_name).column for field_name, order in self.fields_orders]
+            self.name = self.name % {
+                'table': table_name[:11],
+                'column': column_names[0][:7]
+            }
+
+            assert len(self.name) <= self.max_name_length, (
+                'Index names cannot be longer than %s characters.' % self.max_name_length
+            )
+            self.check_name()
+        except FieldDoesNotExist:
+            pass
 
     def set_name_with_model(self, model):
         """

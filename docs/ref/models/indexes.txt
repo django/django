@@ -49,6 +49,22 @@ The name of the index. If ``name`` isn't provided Django will auto-generate a
 name. For compatibility with different databases, index names cannot be longer
 than 30 characters and shouldn't start with a number (0-9) or underscore (_).
 
+Beside other rules, ``name`` always must be a *unique* phrase. To fix this,
+should be use ``'%(table)s'`` and ``'%(columns)s'``
+- ``'%(table)s'`` is replaced by the lowercased name of the model table name.
+- ``'%(columns)s'`` is replaced by the lowercased name of the column name.
+
+For example, can use like this::
+
+    from django.db import models
+
+    class Foo(models.Model):
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['id'], name='%(table)s_%(column)s_index'),
+        ]
+
 ``db_tablespace``
 -----------------
 

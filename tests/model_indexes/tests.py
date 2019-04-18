@@ -98,6 +98,11 @@ class SimpleIndexesTests(SimpleTestCase):
         with self.assertRaisesMessage(AssertionError, msg):
             long_field_index.set_name_with_model(Book)
 
+    def test_name_with_dict(self):
+        index = models.Index(fields=['author'], name='%(table)s_%(column)s_index')
+        index.set_name_with_dict(Book)
+        self.assertEqual(index.name, 'model_index_author_index')
+
     @isolate_apps('model_indexes')
     def test_name_auto_generation_with_quoted_db_table(self):
         class QuotedDbTable(models.Model):
