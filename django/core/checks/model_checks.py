@@ -1,6 +1,6 @@
 import inspect
 import types
-from collections import defaultdict
+from collections import Counter, defaultdict
 from itertools import chain
 
 from django.apps import apps
@@ -10,6 +10,8 @@ from django.core.checks import Error, Tags, register
 @register(Tags.models)
 def check_all_models(app_configs=None, **kwargs):
     db_table_models = defaultdict(list)
+    index_names = []
+    index_models = []
     errors = []
     if app_configs is None:
         models = apps.get_models()
@@ -29,6 +31,9 @@ def check_all_models(app_configs=None, **kwargs):
             )
         else:
             errors.extend(model.check(**kwargs))
+        for model_index in model._meta.indexes:
+            index_models.append(model)
+            index_names.append(model_index.name)
     for db_table, model_labels in db_table_models.items():
         if len(model_labels) != 1:
             errors.append(
@@ -37,6 +42,17 @@ def check_all_models(app_configs=None, **kwargs):
                     % (db_table, ', '.join(db_table_models[db_table])),
                     obj=db_table,
                     id='models.E028',
+                )
+            )
+    if index_models:
+        repetitive_index_names = [k for k, v in Counter(index_names).items() if v > 1]
+        index_names_dict = dict((k, v) for (k, v) in zip(index_models, index_names) if v in repetitive_index_names)
+        for k, v in index_names_dict.items():
+            errors.append(
+                Error(
+                    "'%s' index name is not unique." % v,
+                    obj=k,
+                    id='models.E027',
                 )
             )
     return errors

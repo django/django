@@ -73,3 +73,44 @@ class DuplicateDBTableTests(SimpleTestCase):
 
         self.assertEqual(Model._meta.db_table, ProxyModel._meta.db_table)
         self.assertEqual(checks.run_checks(app_configs=self.apps.get_app_configs()), [])
+
+
+@isolate_apps('check_framework', attr_name='apps')
+@override_system_checks([checks.model_checks.check_all_models])
+class DuplicateDBIndexTests(SimpleTestCase):
+    def test_index_name_in_same_model(self):
+        index = models.Index(fields=['id'], name='foo')
+
+        class Model(models.Model):
+            class Meta:
+                indexes = [index, index]
+        self.assertEqual(checks.run_checks(app_configs=self.apps.get_app_configs()), [
+            Error(
+                "'foo' index name is not unique.",
+                obj=Model,
+                id='models.E027'
+            )
+        ])
+
+    def test_index_name_in_diff_model(self):
+        index = models.Index(fields=['id'], name='foo')
+
+        class Model1(models.Model):
+            class Meta:
+                indexes = [index]
+
+        class Model2(models.Model):
+            class Meta:
+                indexes = [index]
+        self.assertEqual(checks.run_checks(app_configs=self.apps.get_app_configs()), [
+            Error(
+                "'foo' index name is not unique.",
+                obj=Model1,
+                id='models.E027'
+            ),
+            Error(
+                "'foo' index name is not unique.",
+                obj=Model2,
+                id='models.E027'
+            )
+        ])
