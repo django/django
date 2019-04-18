@@ -21,8 +21,7 @@ from django.utils.safestring import mark_safe
 from django.utils.version import PY36
 from django.views.debug import (
     CLEANSED_SUBSTITUTE, CallableSettingWrapper, ExceptionReporter,
-    Path as DebugPath, cleanse_setting, default_urlconf,
-    technical_404_response, technical_500_response,
+    Path as DebugPath, cleanse_setting, technical_500_response,
 )
 
 from ..views import (
