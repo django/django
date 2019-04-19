@@ -42,3 +42,7 @@ Bugfixes
 * Fixed a regression in Django 2.2 where ``IntegerField`` validation of
   database limits crashes if ``limit_value`` attribute in a custom validator is
   callable (:ticket:`30328`).
+
+* Fixed a regression in Django 2.2 where
+  :class:`~django.contrib.postgres.search.SearchVector` generates SQL that is
+  not indexable (:ticket:`30385`).
