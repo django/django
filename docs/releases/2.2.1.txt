@@ -35,7 +35,7 @@ Bugfixes
   many-to-many relationship with a custom manager (:ticket:`30325`).
 
 * Fixed a regression in Django 2.2 where
-  :class:`~django.core.paginator.Paginator` crashed when ``object_list`` was
+  :class:`~django.core.paginator.Paginator` crashes if ``object_list`` is
   a queryset ordered or aggregated over a nested ``JSONField`` key transform
   (:ticket:`30335`).
 
