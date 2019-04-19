@@ -295,7 +295,7 @@ class FloatField(IntegerField):
         Validate that float() can be called on the input. Return the result
         of float() or None for empty values.
         """
-        value = super(IntegerField, self).to_python(value)
+        value = super().to_python(value)
         if value in self.empty_values:
             return None
         if self.localize:
