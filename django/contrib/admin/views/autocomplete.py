@@ -30,11 +30,11 @@ class AutocompleteJsonView(BaseListView):
 
         # specified ForeignKey by `AutocompleteMixin.get_url`
         # ForeignKey may not be a primary_key
-        fk = request.GET.get('fk', 'pk')
+        to_field = request.GET.get('_to_field', 'pk')
 
         return JsonResponse({
             'results': [
-                {'id': str(getattr(obj, fk)), 'text': str(obj)}
+                {'id': str(getattr(obj, to_field)), 'text': str(obj)}
                 for obj in context['object_list']
             ],
             'pagination': {'more': context['page_obj'].has_next()},

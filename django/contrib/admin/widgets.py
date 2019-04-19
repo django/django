@@ -392,8 +392,8 @@ class AutocompleteMixin:
 
         `to_field` may not be a primary_key
         """
-        fk = getattr(self.rel, 'field_name', 'pk')
-        query = '?fk={fk}'.format(fk=fk)
+        to_field = getattr(self.rel, 'field_name', 'pk')
+        query = '?_to_field={to_field}'.format(to_field=to_field)
         model = self.rel.model
         return reverse(self.url_name % (self.admin_site.name, model._meta.app_label, model._meta.model_name)) + query
 
