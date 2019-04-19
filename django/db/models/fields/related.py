@@ -1234,18 +1234,6 @@ class ManyToManyField(RelatedField):
                 to_model_name = to_model._meta.object_name
             relationship_model_name = self.remote_field.through._meta.object_name
             self_referential = from_model == to_model
-
-            # Check symmetrical attribute.
-            if (self_referential and self.remote_field.symmetrical and
-                    not self.remote_field.through._meta.auto_created):
-                errors.append(
-                    checks.Error(
-                        'Many-to-many fields with intermediate tables must not be symmetrical.',
-                        obj=self,
-                        id='fields.E332',
-                    )
-                )
-
             # Count foreign keys in intermediate model
             if self_referential:
                 seen_self = sum(

@@ -1537,6 +1537,11 @@ that control how the relationship functions.
     add the descriptor for the reverse relationship, allowing
     :class:`ManyToManyField` relationships to be non-symmetrical.
 
+    .. versionchanged:: 3.0
+
+        Specifying ``symmetrical=True`` for recursive many-to-many
+        relationships using an intermediary model was allowed.
+
 .. attribute:: ManyToManyField.through
 
     Django will automatically generate a table to manage many-to-many
@@ -1548,6 +1553,16 @@ that control how the relationship functions.
     The most common use for this option is when you want to associate
     :ref:`extra data with a many-to-many relationship
     <intermediary-manytomany>`.
+
+    .. note::
+
+        Recursive relationships using an intermediary model and defined as
+        symmetrical (that is, with :attr:`symmetrical=True
+        <ManyToManyField.symmetrical>`, which is the default) can't determine
+        the reverse accessors names, as they would be the same. You need to set
+        a :attr:`~ForeignKey.related_name` to at least one of them. If you'd
+        prefer Django not to create a backwards relation, set ``related_name``
+        to ``'+'``.
 
     If you don't specify an explicit ``through`` model, there is still an
     implicit ``through`` model class you can use to directly access the table
@@ -1623,12 +1638,6 @@ that control how the relationship functions.
     when an intermediary model is used and there are more than two
     foreign keys to the model, or you want to explicitly specify which two
     Django should use.
-
-    Recursive relationships using an intermediary model are always defined as
-    non-symmetrical -- that is, with :attr:`symmetrical=False <ManyToManyField.symmetrical>`
-    -- therefore, there is the concept of a "source" and a "target". In that
-    case ``'field1'`` will be treated as the "source" of the relationship and
-    ``'field2'`` as the "target".
 
 .. attribute:: ManyToManyField.db_table
 

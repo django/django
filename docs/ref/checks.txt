@@ -222,7 +222,7 @@ Related fields
 * **fields.E331**: Field specifies a many-to-many relation through model
   ``<model>``, which has not been installed.
 * **fields.E332**: Many-to-many fields with intermediate tables must not be
-  symmetrical.
+  symmetrical. *This check appeared before Django 3.0.*
 * **fields.E333**: The model is used as an intermediate model by ``<model>``,
   but it has more than two foreign keys to ``<model>``, which is ambiguous.
   You must specify which two foreign keys Django should use via the

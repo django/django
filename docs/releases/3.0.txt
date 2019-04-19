@@ -254,6 +254,9 @@ Models
 
 * :class:`~django.db.models.FilePathField` now accepts a callable ``path``.
 
+* Allowed symmetrical intermediate table for self-referential
+  :class:`~django.db.models.ManyToManyField`.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
