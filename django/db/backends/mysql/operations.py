@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.utils import timezone
 from django.utils.duration import duration_microseconds
+from django.utils.encoding import force_str
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -141,10 +142,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         # With MySQLdb, cursor objects have an (undocumented) "_executed"
         # attribute where the exact query sent to the database is saved.
         # See MySQLdb/cursors.py in the source distribution.
-        query = getattr(cursor, '_executed', None)
-        if query is not None:
-            query = query.decode(errors='replace')
-        return query
+        # MySQLdb returns string, PyMySQL bytes.
+        return force_str(getattr(cursor, '_last_executed', None), errors='replace')
 
     def no_limit_value(self):
         # 2**64 - 1, as recommended by the MySQL documentation
