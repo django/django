@@ -32,6 +32,12 @@ class AutocompleteJsonView(BaseListView):
         # ForeignKey may not be a primary_key
         to_field = request.GET.get('_to_field', 'pk')
 
+        if not hasattr(obj, to_field):
+            return JsonResponse(
+                {'error': 'to_field `{to_field}` not in model'.format(to_field=to_field)}, 
+                status=400
+            )
+
         return JsonResponse({
             'results': [
                 {'id': str(getattr(obj, to_field)), 'text': str(obj)}
