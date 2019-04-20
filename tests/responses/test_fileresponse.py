@@ -45,9 +45,9 @@ class FileResponseTests(SimpleTestCase):
 
     def test_compressed_response(self):
         """
-        If compressed responses are served with the uncompressed Content-Type
+        If a compressed responses are served with the uncompressed Content-Type
         and a compression Content-Encoding, browsers might automatically
-        uncompress the file, which is most probably not wanted.
+        uncompress the file, which is most likely undesirable.
         """
         test_tuples = (
             ('.tar.gz', 'application/gzip'),
