@@ -582,6 +582,19 @@ class SchemaTests(TransactionTestCase):
         # Introspection treats BLOBs as TextFields
         self.assertEqual(columns['bits'][0], "TextField")
 
+    def test_add_field_explicitly_named_index(self):
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        # Add the new field
+        new_field = IntegerField(db_index=Index(name='my_index'))
+        new_field.set_attributes_from_name("number")
+        with connection.schema_editor() as editor:
+            editor.add_field(Author, new_field)
+        # Ensure the field is right afterwards
+        constraints = self.get_constraints_for_column(Author, 'number')
+        self.assertEqual(constraints, ['my_index'])
+
     def test_alter(self):
         """
         Tests simple altering of fields
@@ -612,6 +625,48 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(Author)
         self.assertEqual(columns['name'][0], "TextField")
         self.assertEqual(bool(columns['name'][1][6]), bool(connection.features.interprets_empty_strings_as_nulls))
+
+    def test_alter_field_to_explicitly_named_index(self):
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        # Add the simple field
+        new_field = IntegerField(db_index=True)
+        new_field.set_attributes_from_name("number")
+        with connection.schema_editor() as editor:
+            editor.add_field(Author, new_field)
+        # Ensure the field is right afterwards
+        constraints = self.get_constraints_for_column(Author, 'number')
+        self.assertEqual(constraints, ['schema_author_number_28383ccf'])
+        # Add the new field
+        new_field2 = IntegerField(db_index=Index(fields=['new_field2'], name='my_index'))
+        new_field2.set_attributes_from_name("number")
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, new_field, new_field2, strict=True)
+        # Ensure the field is right afterwards
+        constraints = self.get_constraints_for_column(Author, 'number')
+        self.assertEqual(constraints, ['my_index'])
+
+    def test_alter_field_drop_explicitly_named_index(self):
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        # Add the simple field
+        new_field = IntegerField(db_index=Index(fields=['new_field'], name='my_index'))
+        new_field.set_attributes_from_name("number")
+        with connection.schema_editor() as editor:
+            editor.add_field(Author, new_field)
+        # Ensure the field is right afterwards
+        constraints = self.get_constraints_for_column(Author, 'number')
+        self.assertEqual(constraints, ['my_index'])
+        # Add the new field
+        new_field2 = IntegerField(db_index=False)
+        new_field2.set_attributes_from_name("number")
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, new_field, new_field2, strict=True)
+        # Ensure the field is right afterwards
+        constraints = self.get_constraints_for_column(Author, 'number')
+        self.assertEqual(constraints, [])
 
     def test_alter_auto_field_to_integer_field(self):
         # Create the table

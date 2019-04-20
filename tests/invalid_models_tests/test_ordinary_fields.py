@@ -296,7 +296,7 @@ class CharFieldTests(SimpleTestCase):
         field = Model._meta.get_field('field')
         self.assertEqual(field.check(), [
             Error(
-                "'db_index' must be None, True or False.",
+                "'db_index' must be None, True or False, or an instance of Index.",
                 obj=field,
                 id='fields.E006',
             ),

@@ -290,10 +290,11 @@ class Field(RegisterLookupMixin):
         ]
 
     def _check_db_index(self):
-        if self.db_index not in (None, True, False):
+        from django.db.models.indexes import Index
+        if self.db_index not in (None, True, False) and not isinstance(self.db_index, Index):
             return [
                 checks.Error(
-                    "'db_index' must be None, True or False.",
+                    "'db_index' must be None, True or False, or an instance of Index.",
                     obj=self,
                     id='fields.E006',
                 )

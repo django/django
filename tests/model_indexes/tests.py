@@ -39,8 +39,9 @@ class SimpleIndexesTests(SimpleTestCase):
 
     def test_raises_error_without_field(self):
         msg = 'At least one field is required to define an index.'
+        index = models.Index()
         with self.assertRaisesMessage(ValueError, msg):
-            models.Index()
+            index.create_sql(None, None, None)
 
     def test_opclasses_requires_index_name(self):
         with self.assertRaisesMessage(ValueError, 'An index must be named to use opclasses.'):

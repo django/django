@@ -55,10 +55,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             # and text[size], so skip them.
             if '[' in db_type:
                 return None
-            if db_type.startswith('varchar'):
-                return self._create_index_sql(model, [field], suffix='_like', opclasses=['varchar_pattern_ops'])
-            elif db_type.startswith('text'):
-                return self._create_index_sql(model, [field], suffix='_like', opclasses=['text_pattern_ops'])
+            if db_type.startswith('varchar') or db_type.startswith('text'):
+                init_kwargs = {
+                    'opclasses': ['varchar_pattern_ops'] if db_type.startswith('varchar') else ['text_pattern_ops'],
+                    'suffix': '_like',
+                }
+                return self._create_index_sql(model, [field], **init_kwargs)
         return None
 
     def _alter_column_type_sql(self, model, old_field, new_field, new_type):

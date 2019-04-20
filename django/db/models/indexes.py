@@ -24,14 +24,7 @@ class Index:
             raise ValueError('Index.opclasses must be a list or tuple.')
         if opclasses and len(fields) != len(opclasses):
             raise ValueError('Index.fields and Index.opclasses must have the same number of elements.')
-        if not fields:
-            raise ValueError('At least one field is required to define an index.')
         self.fields = list(fields)
-        # A list of 2-tuple with the field name and ordering ('' or 'DESC').
-        self.fields_orders = [
-            (field_name[1:], 'DESC') if field_name.startswith('-') else (field_name, '')
-            for field_name in self.fields
-        ]
         self.name = name or ''
         if self.name:
             errors = self.check_name()
@@ -42,6 +35,19 @@ class Index:
         self.db_tablespace = db_tablespace
         self.opclasses = opclasses
         self.condition = condition
+
+    @property
+    def fields(self):
+        return self._fields
+
+    @fields.setter
+    def fields(self, fields):
+        self._fields = fields
+        # A list of 2-tuple with the field name and ordering ('' or 'DESC').
+        self.fields_orders = [
+            (field_name[1:], 'DESC') if field_name.startswith('-') else (field_name, '')
+            for field_name in self.fields
+        ]
 
     def check_name(self):
         errors = []
@@ -68,6 +74,8 @@ class Index:
         return sql % tuple(map(schema_editor.quote_value, params))
 
     def create_sql(self, model, schema_editor, using=''):
+        if not self.fields:
+            raise ValueError('At least one field is required to define an index.')
         fields = [model._meta.get_field(field_name) for field_name, _ in self.fields_orders]
         col_suffixes = [order[1] for order in self.fields_orders]
         condition = self._get_condition_sql(model, schema_editor)
@@ -132,3 +140,6 @@ class Index:
 
     def __eq__(self, other):
         return (self.__class__ == other.__class__) and (self.deconstruct() == other.deconstruct())
+
+    def __hash__(self):
+        return hash((self.__class__.__name__, tuple(self.fields), self.name))

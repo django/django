@@ -988,13 +988,29 @@ class BaseDatabaseSchemaEditor:
             output.append(index.create_sql(model, self))
         return output
 
+    def _get_index_type_kwargs(self, model, field, kwargs=None):
+        kwargs = kwargs or {}
+        _kwargs = {}
+        if isinstance(field.db_index, Index):
+            if not field.db_index.name:
+                field.db_index.set_name_with_model(model)
+            _kwargs = {
+                'name': field.db_index.name,
+                'condition': field.db_index.condition,
+                'opclasses': field.db_index.opclasses,
+                'db_tablespace': field.db_index.db_tablespace,
+                'suffix': field.db_index.suffix,
+            }
+        return _kwargs
+
     def _field_indexes_sql(self, model, field):
         """
         Return a list of all index SQL statements for the specified field.
         """
         output = []
         if self._field_should_be_indexed(model, field):
-            output.append(self._create_index_sql(model, [field]))
+            kwargs = self._get_index_type_kwargs(model, field)
+            output.append(self._create_index_sql(model, [field], **kwargs))
         return output
 
     def _field_should_be_indexed(self, model, field):
