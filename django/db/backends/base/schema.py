@@ -611,7 +611,10 @@ class BaseDatabaseSchemaEditor:
         # True               | False            | False              | False
         # True               | False            | False              | True
         # True               | False            | True               | True
-        if old_field.db_index and not old_field.unique and (not new_field.db_index or new_field.unique):
+        if old_field.db_index and not old_field.unique and (
+            not new_field.db_index or
+            new_field.unique or
+            old_field.db_index is not new_field.db_index):
             # Find the index for this field
             meta_index_names = {index.name for index in model._meta.indexes}
             # Retrieve only BTREE indexes since this is what's created with
@@ -740,8 +743,11 @@ class BaseDatabaseSchemaEditor:
         # False              | False            | True               | False
         # False              | True             | True               | False
         # True               | True             | True               | False
-        if (not old_field.db_index or old_field.unique) and new_field.db_index and not new_field.unique:
-            self.execute(self._create_index_sql(model, [new_field]))
+        if (not old_field.db_index or
+            old_field.db_index is not new_field.db_index or
+            old_field.unique) and new_field.db_index and not new_field.unique:
+            kwargs = self._get_index_type_kwargs(model, new_field)
+            self.execute(self._create_index_sql(model, [new_field], **kwargs))
         # Type alteration on primary key? Then we need to alter the column
         # referring to us.
         rels_to_update = []

@@ -639,20 +639,36 @@ class SchemaTests(TransactionTestCase):
         constraints = self.get_constraints_for_column(Author, 'number')
         self.assertEqual(constraints, ['schema_author_number_28383ccf'])
         # Add the new field
-        new_field2 = IntegerField(db_index=Index(fields=['new_field2'], name='my_index'))
+        new_field2 = IntegerField(db_index=Index(name='my_index'))
         new_field2.set_attributes_from_name("number")
         with connection.schema_editor() as editor:
             editor.alter_field(Author, new_field, new_field2, strict=True)
         # Ensure the field is right afterwards
         constraints = self.get_constraints_for_column(Author, 'number')
         self.assertEqual(constraints, ['my_index'])
+        # Add the new field that contains an index type index.
+        new_field3 = IntegerField(db_index=Index(name='my_index2'))
+        new_field3.set_attributes_from_name("number")
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, new_field2, new_field3, strict=True)
+        # Ensure the field is right afterwards
+        constraints = self.get_constraints_for_column(Author, 'number')
+        self.assertEqual(constraints, ['my_index2'])
+        # Add the new field to return to the beginning.
+        new_field4 = IntegerField(db_index=True)
+        new_field4.set_attributes_from_name("number")
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, new_field3, new_field4, strict=True)
+        # Ensure the field is right afterwards
+        constraints = self.get_constraints_for_column(Author, 'number')
+        self.assertEqual(constraints, ['schema_author_number_28383ccf'])
 
     def test_alter_field_drop_explicitly_named_index(self):
         # Create the table
         with connection.schema_editor() as editor:
             editor.create_model(Author)
         # Add the simple field
-        new_field = IntegerField(db_index=Index(fields=['new_field'], name='my_index'))
+        new_field = IntegerField(db_index=Index(name='my_index'))
         new_field.set_attributes_from_name("number")
         with connection.schema_editor() as editor:
             editor.add_field(Author, new_field)
