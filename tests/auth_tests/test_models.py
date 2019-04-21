@@ -290,44 +290,44 @@ class UserWithPermTestCase(TestCase):
         cls.charlie = User.objects.create_user('charlie', 'charlie@example.com')
         cls.charlie_brown = User.objects.create_user('charliebrown', 'charlie@brown.com')
 
-    def test_with_perm_invalid_permission_name(self):
+    def test_invalid_permission_name(self):
         msg = "Permission name should be in the form 'app_label.perm_name'."
         for perm in ('nodots', 'too.many.dots', '...', ''):
             with self.assertRaisesMessage(ValueError, msg):
                 User.objects.with_perm(perm)
 
-    def test_with_perm_user_permissions(self):
+    def test_user_permissions(self):
         self.assertCountEqual(
             User.objects.with_perm('auth.test'),
             [self.user1, self.user2, self.superuser],
         )
 
-    def test_with_perm_group_permissions(self):
+    def test_group_permissions(self):
         self.assertCountEqual(
             User.objects.with_perm('auth.test'),
             [self.user1, self.user2, self.superuser],
         )
 
-    def test_with_perm_no_permissions(self):
+    def test_no_permissions(self):
         self.assertNotIn(self.user3, User.objects.with_perm('auth.test'))
 
-    def test_with_perm_superuser(self):
+    def test_superuser(self):
         self.assertIn(self.superuser, User.objects.with_perm('auth.test'))
 
-    def test_with_perm_exclude_superuser(self):
+    def test_exclude_superuser(self):
         users = User.objects.with_perm('auth.test', is_superuser=False)
         self.assertNotIn(self.superuser, users)
         self.assertIn(self.user1, users)
 
-    def test_with_perm_exclude_inactive(self):
+    def test_exclude_inactive(self):
         self.assertNotIn(self.inactive_user, User.objects.with_perm('auth.test'))
 
-    def test_with_perm_inactive(self):
+    def test_inactive(self):
         users = User.objects.with_perm('auth.test', is_active=False)
         self.assertIn(self.inactive_user, users)
         self.assertNotIn(self.user1, users)
 
-    def test_with_perm_non_duplicate_users(self):
+    def test_non_duplicate_users(self):
         self.assertCountEqual(
             User.objects.with_perm('auth.test'),
             [self.user1, self.user2, self.superuser],
@@ -369,7 +369,7 @@ class UserWithPermTestCase(TestCase):
         'auth_tests.test_auth_backends.CustomModelBackend',
         'django.contrib.auth.backends.ModelBackend',
     ])
-    def test_with_perm_custom_backend(self):
+    def test_custom_backend(self):
         msg = (
             'You have multiple authentication backends configured and '
             'therefore must provide the `backend` argument.'
@@ -383,7 +383,7 @@ class UserWithPermTestCase(TestCase):
         )
         self.assertNotIn(self.user1, User.objects.with_perm('auth.test', backend=backend))
 
-    def test_with_perm_default_backend_with_obj(self):
+    def test_default_backend_with_obj(self):
         obj = CustomModel.objects.create(user=self.charlie_brown)
         self.assertCountEqual(
             User.objects.with_perm('auth.test', obj=obj),
@@ -391,14 +391,14 @@ class UserWithPermTestCase(TestCase):
         )
 
     @override_settings(AUTHENTICATION_BACKENDS=['auth_tests.test_auth_backends.CustomModelBackend'])
-    def test_with_perm_custom_backend_with_obj(self):
+    def test_custom_backend_with_obj(self):
         obj = CustomModel.objects.create(user=self.charlie_brown)
         self.assertCountEqual(
             User.objects.with_perm('auth.test', obj=obj),
             [self.charlie_brown],
         )
 
-    def test_with_perm_invalid_backend_type(self):
+    def test_invalid_backend_type(self):
         msg = 'The `backend` argument must be a string.'
         with self.assertRaisesMessage(TypeError, msg):
             User.objects.with_perm(
@@ -406,14 +406,14 @@ class UserWithPermTestCase(TestCase):
                 backend=b'auth_tests.test_auth_backends.CustomModelBackend',
             )
 
-    def test_with_perm_nonexistent_backend(self):
+    def test_nonexistent_backend(self):
         with self.assertRaises(ImportError):
             User.objects.with_perm(
                 'auth.test',
                 backend='invalid.backend.CustomModelBackend',
             )
 
-    def test_with_perm_invalid_permission(self):
+    def test_invalid_permission(self):
         self.assertCountEqual(
             User.objects.with_perm('invalid.perm'),
             [self.superuser],
