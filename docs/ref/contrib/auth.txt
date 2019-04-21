@@ -280,9 +280,10 @@ Manager methods
         .. versionadded:: 3.0
 
         Returns a queryset containing :class:`~django.contrib.auth.models.User`
-        objects that have the given permission ``perm`` in the form of
-        ``"<app label>.<permission codename>"``, including superusers (if
-        ``is_superuser`` is ``True``.)
+        objects that have the given permission ``perm`` either in the form of
+        ``"<app label>.<permission codename>"`` or a
+        :class:`~django.contrib.auth.models.Permission` instance, including
+        superusers (if ``is_superuser`` is ``True``.)
 
         If ``is_active`` is ``True``, all active users will be included.
 
@@ -558,9 +559,10 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
         .. versionadded:: 3.0
 
-        Returns all active users who have the permission ``perm`` in the form
-        of ``"<app label>.<permission codename>"``. Returns an empty queryset
-        if no users who have the ``perm`` found.
+        Returns all active users who have the permission ``perm`` either in
+        the form of ``"<app label>.<permission codename>"`` or a
+        :class:`~django.contrib.auth.models.Permission` instance. Returns an
+        empty queryset if no users who have the ``perm`` found.
 
 .. class:: AllowAllUsersModelBackend
 

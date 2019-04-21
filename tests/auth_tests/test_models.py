@@ -333,6 +333,38 @@ class UserWithPermTestCase(TestCase):
             [self.user1, self.user2, self.superuser],
         )
 
+    def test_with_permission_instance(self):
+        self.assertCountEqual(
+            User.objects.with_perm(self.permission),
+            [self.user1, self.user2, self.superuser],
+        )
+
+    def test_default_backend_with_permission_instance_and_obj(self):
+        obj = CustomModel.objects.create(user=self.charlie_brown)
+        self.assertCountEqual(
+            User.objects.with_perm(self.permission, obj=obj),
+            [],
+        )
+
+    @override_settings(AUTHENTICATION_BACKENDS=['auth_tests.test_auth_backends.CustomModelBackend'])
+    def test_custom_backend_with_permission_instance_and_obj(self):
+        obj = CustomModel.objects.create(user=self.charlie_brown)
+        self.assertCountEqual(
+            User.objects.with_perm(self.permission, obj=obj),
+            [self.charlie_brown],
+        )
+
+    def test_invalid_perm_type(self):
+        msg = 'The `perm` argument must be a string or a permission instance.'
+
+        class FakePermission:
+            pass
+
+        for perm in (b'auth.test', FakePermission()):
+            with self.subTest(perm=perm):
+                with self.assertRaisesMessage(TypeError, msg):
+                    User.objects.with_perm(perm)
+
     @override_settings(AUTHENTICATION_BACKENDS=[
         'auth_tests.test_auth_backends.CustomModelBackend',
         'django.contrib.auth.backends.ModelBackend',

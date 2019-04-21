@@ -100,12 +100,25 @@ class ModelBackend:
 
     def with_perm(self, perm, is_active=True, is_superuser=True, obj=None):
         UserModel = get_user_model()
-        try:
-            app_label, codename = perm.split('.')
-        except ValueError:
-            raise ValueError("Permission name should be in the form 'app_label.perm_name'.")
+        if not isinstance(perm, (str, Permission)):
+            raise TypeError('The `perm` argument must be a string or a permission instance.')
+        elif isinstance(perm, str):
+            try:
+                app_label, codename = perm.split('.')
+            except ValueError:
+                raise ValueError("Permission name should be in the form 'app_label.perm_name'.") from None
+
         if obj is not None:
             return UserModel._default_manager.none()
+
+        if isinstance(perm, Permission):
+            return UserModel._default_manager.filter(
+                Q(is_active=is_active) & (
+                    Q(is_superuser=is_superuser) |
+                    Q(user_permissions=perm) |
+                    Q(groups__permissions=perm)
+                )
+            ).distinct()
 
         user_q = Q(user_permissions__codename=codename,
                    user_permissions__content_type__app_label=app_label)
