@@ -143,7 +143,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         # attribute where the exact query sent to the database is saved.
         # See MySQLdb/cursors.py in the source distribution.
         # MySQLdb returns string, PyMySQL bytes.
-        return force_str(getattr(cursor, '_last_executed', None), errors='replace')
+        return force_str(getattr(cursor, '_executed', None), errors='replace')
 
     def no_limit_value(self):
         # 2**64 - 1, as recommended by the MySQL documentation
