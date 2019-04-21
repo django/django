@@ -306,8 +306,8 @@ class CharFieldTests(SimpleTestCase):
             ),
         ])
         msg = "if 'db_index' is an instance of Index, fields must be None or name has to be set."
-        self.assertEqual(field2.check(), [ Error(msg, obj=field2, id='fields.E006', ), ])
-        self.assertEqual(field3.check(), [ Error(msg, obj=field3, id='fields.E006', ), ])
+        self.assertEqual(field2.check(), [Error(msg, obj=field2, id='fields.E006', ), ])
+        self.assertEqual(field3.check(), [Error(msg, obj=field3, id='fields.E006', ), ])
 
     def test_bad_validators(self):
         class Model(models.Model):
