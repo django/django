@@ -60,7 +60,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                     'opclasses': ['varchar_pattern_ops'] if db_type.startswith('varchar') else ['text_pattern_ops'],
                     'suffix': '_like',
                 }
-                return self._create_index_sql(model, [field], **init_kwargs)
+                kwargs = self._get_index_type_kwargs(model, field, init_kwargs)
+                return self._create_index_sql(model, [field], **kwargs)
         return None
 
     def _alter_column_type_sql(self, model, old_field, new_field, new_type):

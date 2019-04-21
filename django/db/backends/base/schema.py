@@ -1001,6 +1001,7 @@ class BaseDatabaseSchemaEditor:
                 'db_tablespace': field.db_index.db_tablespace,
                 'suffix': field.db_index.suffix,
             }
+        _kwargs.update(kwargs)
         return _kwargs
 
     def _field_indexes_sql(self, model, field):
