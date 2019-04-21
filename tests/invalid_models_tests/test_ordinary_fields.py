@@ -292,8 +292,12 @@ class CharFieldTests(SimpleTestCase):
     def test_bad_db_index_value(self):
         class Model(models.Model):
             field = models.CharField(max_length=10, db_index='bad')
+            field2 = models.CharField(max_length=10, db_index=models.Index(fields=['field2'], name='name'))
+            field3 = models.CharField(max_length=10, db_index=models.Index())
 
         field = Model._meta.get_field('field')
+        field2 = Model._meta.get_field('field2')
+        field3 = Model._meta.get_field('field3')
         self.assertEqual(field.check(), [
             Error(
                 "'db_index' must be None, True or False, or an instance of Index.",
@@ -301,6 +305,9 @@ class CharFieldTests(SimpleTestCase):
                 id='fields.E006',
             ),
         ])
+        msg = "if 'db_index' is an instance of Index, fields must be None or name has to be set."
+        self.assertEqual(field2.check(), [ Error(msg, obj=field2, id='fields.E006', ), ])
+        self.assertEqual(field3.check(), [ Error(msg, obj=field3, id='fields.E006', ), ])
 
     def test_bad_validators(self):
         class Model(models.Model):

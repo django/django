@@ -299,6 +299,14 @@ class Field(RegisterLookupMixin):
                     id='fields.E006',
                 )
             ]
+        elif isinstance(self.db_index, Index) and (self.db_index.fields or not self.db_index.name):
+            return [
+                checks.Error(
+                    "if 'db_index' is an instance of Index, fields must be None or name has to be set.",
+                    obj=self,
+                    id='fields.E006',
+                )
+            ]
         else:
             return []
 
