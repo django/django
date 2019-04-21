@@ -45,7 +45,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         when the column type is 'varchar' or 'text', otherwise return None.
         """
         db_type = field.db_type(connection=self.connection)
-        if db_type is not None and (field.db_index or field.unique):
+        if db_type is not None and (field.db_index is True or field.unique):
+            # TODO: index is being created twice without 'field.db_index is True'
+            # if field.db_index is an instance of Index, index will be created with own params.
+            # See #28053.
+            #
             # Fields with database column types of `varchar` and `text` need
             # a second index that specifies their operator class, which is
             # needed when performing correct LIKE queries outside the

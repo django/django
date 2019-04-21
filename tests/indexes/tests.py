@@ -2,7 +2,7 @@ import datetime
 from unittest import skipIf, skipUnless
 
 from django.db import connection
-from django.db.models import Index
+from django.db.models import CharField, Index
 from django.db.models.deletion import CASCADE
 from django.db.models.fields.related import ForeignKey
 from django.db.models.query_utils import Q
@@ -150,6 +150,18 @@ class SchemaIndexesPostgreSQLTests(TransactionTestCase):
         with editor.connection.cursor() as cursor:
             cursor.execute(self.get_opclass_query % 'test_ops_class')
             self.assertEqual(cursor.fetchall(), [('varchar_pattern_ops', 'test_ops_class')])
+
+    def test_ops_class_field(self):
+        new_field = CharField(
+            max_length=100,
+            db_index=Index(name='test_ops_class_field', opclasses=['varchar_pattern_ops'])
+        )
+        new_field.set_attributes_from_name("headline2")
+        with connection.schema_editor() as editor:
+            editor.add_field(IndexedArticle2, new_field)
+        with editor.connection.cursor() as cursor:
+            cursor.execute(self.get_opclass_query % 'test_ops_class_field')
+            self.assertEqual(cursor.fetchall(), [('varchar_pattern_ops', 'test_ops_class_field')])
 
     def test_ops_class_multiple_columns(self):
         index = Index(

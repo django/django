@@ -22,8 +22,6 @@ class Index:
             raise ValueError('Index.fields must be a list or tuple.')
         if not isinstance(opclasses, (list, tuple)):
             raise ValueError('Index.opclasses must be a list or tuple.')
-        if opclasses and len(fields) != len(opclasses):
-            raise ValueError('Index.fields and Index.opclasses must have the same number of elements.')
         self.fields = list(fields)
         self.name = name or ''
         if self.name:
@@ -76,6 +74,8 @@ class Index:
     def create_sql(self, model, schema_editor, using=''):
         if not self.fields:
             raise ValueError('At least one field is required to define an index.')
+        if self.opclasses and len(self.fields) != len(self.opclasses):
+            raise ValueError('Index.fields and Index.opclasses must have the same number of elements.')
         fields = [model._meta.get_field(field_name) for field_name, _ in self.fields_orders]
         col_suffixes = [order[1] for order in self.fields_orders]
         condition = self._get_condition_sql(model, schema_editor)
