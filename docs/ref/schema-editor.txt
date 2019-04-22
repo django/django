@@ -120,7 +120,7 @@ Moves the model's table from one tablespace to another.
 
 Adds a column (or sometimes multiple) to the model's table to represent the
 field. This will also add indexes or a unique constraint
-if the field has ``db_index=True`` or ``unique=True``.
+if the field has ``db_index!=False`` or ``unique=True``.
 
 If the field is a ``ManyToManyField`` without a value for ``through``, instead
 of creating a column, it will make a table to represent the relationship. If

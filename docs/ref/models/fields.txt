@@ -188,6 +188,18 @@ scenes.
 
 If ``True``, a database index will be created for this field.
 
+If instance of Index, a database index will be created with name.
+
+    For example::
+
+        from django.db import models
+
+        class Customer(models.Model):
+            first_name = models.CharField(
+                max_length=100,
+                db_index=models.Index(name='first_name_idx')
+            )
+
 ``db_tablespace``
 -----------------
 
