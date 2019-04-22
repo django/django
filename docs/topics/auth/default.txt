@@ -328,12 +328,12 @@ inherit the permissions of the concrete model they subclass::
 
     class Person(models.Model):
         class Meta:
-            permissions = (('can_eat_pizzas', 'Can eat pizzas'),)
+            permissions = [('can_eat_pizzas', 'Can eat pizzas')]
 
     class Student(Person):
         class Meta:
             proxy = True
-            permissions = (('can_deliver_pizzas', 'Can deliver pizzas'),)
+            permissions = [('can_deliver_pizzas', 'Can deliver pizzas')]
 
     >>> # Fetch the content type for the proxy model.
     >>> content_type = ContentType.objects.get_for_model(Student, for_concrete_model=False)

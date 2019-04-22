@@ -277,10 +277,10 @@ can or cannot do with ``Task`` instances, specific to your application::
     class Task(models.Model):
         ...
         class Meta:
-            permissions = (
+            permissions = [
                 ("change_task_status", "Can change the status of tasks"),
                 ("close_task", "Can remove a task by setting its status as closed"),
-            )
+            ]
 
 The only thing this does is create those extra permissions when you run
 :djadmin:`manage.py migrate <migrate>` (the function that creates permissions
