@@ -173,6 +173,7 @@ class ConnectionHandler:
         if conn['ENGINE'] == 'django.db.backends.' or not conn['ENGINE']:
             conn['ENGINE'] = 'django.db.backends.dummy'
         conn.setdefault('CONN_MAX_AGE', 0)
+        conn.setdefault('CONN_HEALTH_CHECK_DELAY', None)
         conn.setdefault('OPTIONS', {})
         conn.setdefault('TIME_ZONE', None)
         for setting in ['NAME', 'USER', 'PASSWORD', 'HOST', 'PORT']:

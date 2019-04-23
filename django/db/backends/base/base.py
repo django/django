@@ -75,6 +75,9 @@ class BaseDatabaseWrapper:
         self.needs_rollback = False
 
         # Connection termination related attributes.
+        self.health_check_at = None
+        self.health_check_delay = None
+        self.health_check_done = False
         self.close_at = None
         self.closed_in_transaction = False
         self.errors_occurred = False
@@ -185,9 +188,15 @@ class BaseDatabaseWrapper:
         self.in_atomic_block = False
         self.savepoint_ids = []
         self.needs_rollback = False
-        # Reset parameters defining when to close the connection
+        # Reset parameters defining when to close/health-check the connection
         max_age = self.settings_dict['CONN_MAX_AGE']
-        self.close_at = None if max_age is None else time.time() + max_age
+        self.health_check_delay = self.settings_dict['CONN_HEALTH_CHECK_DELAY']
+        time_now = time.time()
+        self.close_at = None if max_age is None else time_now + max_age
+        self.health_check_at = None
+        if self.health_check_delay is not None:
+            self.health_check_at = time_now + self.health_check_delay
+        self.health_check_done = True
         self.closed_in_transaction = False
         self.errors_occurred = False
         # Establish the connection
@@ -230,6 +239,7 @@ class BaseDatabaseWrapper:
         return wrapped_cursor
 
     def _cursor(self, name=None):
+        self._close_if_health_check_failed()
         self.ensure_connection()
         with self.wrap_database_errors:
             return self._prepare_cursor(self.create_cursor(name))
@@ -489,12 +499,29 @@ class BaseDatabaseWrapper:
         raise NotImplementedError(
             "subclasses of BaseDatabaseWrapper may require an is_usable() method")
 
+    def _close_if_health_check_failed(self):
+        if not (self.connection and
+                self.health_check_at and
+                not self.health_check_done):
+            return
+
+        self.health_check_done = True
+        time_now = time.time()
+
+        if time_now >= self.health_check_at:
+            if self.is_usable():
+                self.health_check_at = time_now + self.health_check_delay
+            else:
+                self.close()
+
     def close_if_unusable_or_obsolete(self):
         """
         Close the current connection if unrecoverable errors have occurred
         or if it outlived its maximum age.
         """
         if self.connection is not None:
+            self.health_check_done = False
+
             # If the application didn't restore the original autocommit setting,
             # don't take chances, drop the connection.
             if self.get_autocommit() != self.settings_dict['AUTOCOMMIT']:
