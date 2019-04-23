@@ -78,6 +78,8 @@ class BaseDatabaseWrapper:
         self.close_at = None
         self.closed_in_transaction = False
         self.errors_occurred = False
+        self.health_checks_on = False
+        self.health_check_done = False
 
         # Thread-safety related attributes.
         self._thread_sharing_lock = threading.Lock()
@@ -185,9 +187,11 @@ class BaseDatabaseWrapper:
         self.in_atomic_block = False
         self.savepoint_ids = []
         self.needs_rollback = False
-        # Reset parameters defining when to close the connection
+        # Reset parameters defining when to close/health-check the connection
+        self.health_checks_on = self.settings_dict['CONN_HEALTH_CHECKS']
         max_age = self.settings_dict['CONN_MAX_AGE']
         self.close_at = None if max_age is None else time.time() + max_age
+        self.health_check_done = True
         self.closed_in_transaction = False
         self.errors_occurred = False
         # Establish the connection
@@ -230,6 +234,7 @@ class BaseDatabaseWrapper:
         return wrapped_cursor
 
     def _cursor(self, name=None):
+        self._close_if_health_check_failed()
         self.ensure_connection()
         with self.wrap_database_errors:
             return self._prepare_cursor(self.create_cursor(name))
@@ -489,12 +494,25 @@ class BaseDatabaseWrapper:
         raise NotImplementedError(
             "subclasses of BaseDatabaseWrapper may require an is_usable() method")
 
+    def _close_if_health_check_failed(self):
+        if not (self.connection and
+                self.health_checks_on and
+                not self.health_check_done):
+            return
+
+        if not self.is_usable():
+            self.close()
+
+        self.health_check_done = True
+
     def close_if_unusable_or_obsolete(self):
         """
         Close the current connection if unrecoverable errors have occurred
         or if it outlived its maximum age.
         """
         if self.connection is not None:
+            self.health_check_done = False
+
             # If the application didn't restore the original autocommit setting,
             # don't take chances, drop the connection.
             if self.get_autocommit() != self.settings_dict['AUTOCOMMIT']:
