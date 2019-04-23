@@ -55,3 +55,7 @@ Bugfixes
   :class:`~django.contrib.sessions.middleware.SessionMiddleware` subclasses,
   rather than requiring :mod:`django.contrib.sessions` to be in
   :setting:`INSTALLED_APPS` (:ticket:`30312`).
+
+* Increased the default timeout when using ``Watchman`` to 5 seconds to prevent
+  falling back to ``StatReloader`` on larger projects and made it customizable
+  via the ``DJANGO_WATCHMAN_TIMEOUT`` environment variable (:ticket:`30361`).

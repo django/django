@@ -897,6 +897,11 @@ more robust change detection, and a reduction in power usage.
     for optimal performance. See the `watchman documentation`_ for information
     on how to do this.
 
+.. admonition:: Watchman timeout
+
+    The default timeout of ``Watchman`` client is 5 seconds. You can change it
+    by setting the ``DJANGO_WATCHMAN_TIMEOUT`` environment variable.
+
 .. _Watchman: https://facebook.github.io/watchman/
 .. _pywatchman: https://pypi.org/project/pywatchman/
 .. _watchman documentation: https://facebook.github.io/watchman/docs/config.html#ignore_dirs

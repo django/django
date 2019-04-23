@@ -366,11 +366,12 @@ class WatchmanReloader(BaseReloader):
     def __init__(self):
         self.roots = defaultdict(set)
         self.processed_request = threading.Event()
+        self.client_timeout = int(os.environ.get('DJANGO_WATCHMAN_TIMEOUT', 5))
         super().__init__()
 
     @cached_property
     def client(self):
-        return pywatchman.client()
+        return pywatchman.client(timeout=self.client_timeout)
 
     def _watch_root(self, root):
         # In practice this shouldn't occur, however, it's possible that a
@@ -528,7 +529,7 @@ class WatchmanReloader(BaseReloader):
     def check_availability(cls):
         if not pywatchman:
             raise WatchmanUnavailable('pywatchman not installed.')
-        client = pywatchman.client(timeout=0.01)
+        client = pywatchman.client(timeout=0.1)
         try:
             result = client.capabilityCheck()
         except Exception:

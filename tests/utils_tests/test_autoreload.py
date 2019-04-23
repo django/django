@@ -558,6 +558,11 @@ def skip_unless_watchman_available():
 class WatchmanReloaderTests(ReloaderTests, IntegrationTests):
     RELOADER_CLS = autoreload.WatchmanReloader
 
+    def setUp(self):
+        super().setUp()
+        # Shorten the timeout to speed up tests.
+        self.reloader.client_timeout = 0.1
+
     def test_watch_glob_ignores_non_existing_directories_two_levels(self):
         with mock.patch.object(self.reloader, '_subscribe') as mocked_subscribe:
             self.reloader._watch_glob(self.tempdir / 'does_not_exist' / 'more', ['*'])
@@ -637,6 +642,10 @@ class WatchmanReloaderTests(ReloaderTests, IntegrationTests):
                 with self.assertRaises(TestException):
                     self.reloader.update_watches()
                 self.assertIsInstance(mocked_server_status.call_args[0][0], TestException)
+
+    @mock.patch.dict(os.environ, {'DJANGO_WATCHMAN_TIMEOUT': '10'})
+    def test_setting_timeout_from_environment_variable(self):
+        self.assertEqual(self.RELOADER_CLS.client_timeout, 10)
 
 
 @skipIf(on_macos_with_hfs(), "These tests do not work with HFS+ as a filesystem")
