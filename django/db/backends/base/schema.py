@@ -6,8 +6,9 @@ from django.db.backends.ddl_references import (
 )
 from django.db.backends.utils import names_digest, split_identifier
 from django.db.models import Index
+from django.db.models.sql.query import Query
 from django.db.transaction import TransactionManagementError, atomic
-from django.utils import timezone
+from django.utils import timezone, tree
 
 logger = logging.getLogger('django.db.backends.schema')
 
@@ -114,7 +115,7 @@ class BaseDatabaseSchemaEditor:
 
     # Core utility functions
 
-    def execute(self, sql, params=()):
+    def execute(self, sql, params=None):
         """Execute the given SQL statement, with optional parameters."""
         # Don't perform the transactional DDL check if SQL is being collected
         # as it's not going to be executed anyway.
@@ -934,6 +935,17 @@ class BaseDatabaseSchemaEditor:
             return ' ' + self.connection.ops.tablespace_sql(db_tablespace)
         return ''
 
+    def _get_condition_sql(self, model, condition):
+        if condition is None:
+            return None
+        if isinstance(condition, tree.Node):
+            query = Query(model=model)
+            where = query.build_where(condition)
+            compiler = query.get_compiler(connection=self.connection)
+            sql, params = where.as_sql(compiler, self.connection)
+            return sql % tuple(self.quote_value(p) for p in params)
+        return condition
+
     def _create_index_sql(self, model, fields, *, name=None, suffix='', using='',
                           db_tablespace=None, col_suffixes=(), sql=None, opclasses=(),
                           condition=None):
@@ -953,6 +965,11 @@ class BaseDatabaseSchemaEditor:
                 name = self._create_index_name(*args, **kwargs)
             return self.quote_name(name)
 
+        if condition:
+            condition = self._get_condition_sql(model, condition)
+            condition = (' WHERE ' + condition)
+        else:
+            condition = ''
         return Statement(
             sql_create_index,
             table=Table(table, self.quote_name),
@@ -960,7 +977,7 @@ class BaseDatabaseSchemaEditor:
             using=using,
             columns=self._index_columns(table, columns, col_suffixes, opclasses),
             extra=tablespace_sql,
-            condition=(' WHERE ' + condition) if condition else '',
+            condition=condition,
         )
 
     def _delete_index_sql(self, model, name):

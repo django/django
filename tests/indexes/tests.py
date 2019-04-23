@@ -156,7 +156,7 @@ class SchemaIndexesPostgreSQLTests(TransactionTestCase):
             max_length=100,
             db_index=Index(name='test_ops_class_field', opclasses=['varchar_pattern_ops'])
         )
-        new_field.set_attributes_from_name("headline2")
+        new_field.set_attributes_from_name('headline2')
         with connection.schema_editor() as editor:
             editor.add_field(IndexedArticle2, new_field)
         with editor.connection.cursor() as cursor:
@@ -203,6 +203,25 @@ class SchemaIndexesPostgreSQLTests(TransactionTestCase):
         )
         with connection.schema_editor() as editor:
             editor.add_index(IndexedArticle2, index)
+            self.assertIn('TABLESPACE "pg_default" ', str(index.create_sql(IndexedArticle2, editor)))
+        with editor.connection.cursor() as cursor:
+            cursor.execute(self.get_opclass_query % indexname)
+            self.assertCountEqual(cursor.fetchall(), [('text_pattern_ops', indexname)])
+
+    def test_ops_class_partial_tablespace_field(self):
+        indexname = 'test_ops_class_tblspace_field'
+        index = Index(
+            name=indexname,
+            opclasses=['text_pattern_ops'],
+            condition=Q(headline__contains='China'),
+            db_tablespace='pg_default',
+        )
+        old_field = IndexedArticle2._meta.get_field("headline")
+        new_field = CharField(max_length=100, db_index=index)
+        new_field.set_attributes_from_name('headline')
+        with connection.schema_editor() as editor:
+            editor.alter_field(IndexedArticle2, old_field, new_field)
+            index.fields = ['headline']
             self.assertIn('TABLESPACE "pg_default" ', str(index.create_sql(IndexedArticle2, editor)))
         with editor.connection.cursor() as cursor:
             cursor.execute(self.get_opclass_query % indexname)
