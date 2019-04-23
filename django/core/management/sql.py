@@ -14,8 +14,7 @@ def sql_flush(style, connection, only_django=False, reset_sequences=True, allow_
     else:
         tables = connection.introspection.table_names(include_views=False)
     seqs = connection.introspection.sequence_list() if reset_sequences else ()
-    statements = connection.ops.sql_flush(style, tables, seqs, allow_cascade)
-    return statements
+    return connection.ops.sql_flush(style, tables, seqs, allow_cascade)
 
 
 def emit_pre_migrate_signal(verbosity, interactive, db, **kwargs):

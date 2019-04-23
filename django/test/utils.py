@@ -306,8 +306,7 @@ def get_runner(settings, test_runner_class=None):
     else:
         test_module_name = '.'
     test_module = __import__(test_module_name, {}, {}, test_path[-1])
-    test_runner = getattr(test_module, test_path[-1])
-    return test_runner
+    return getattr(test_module, test_path[-1])
 
 
 class TestContextDecorator:
@@ -757,7 +756,7 @@ def require_jinja2(test_func):
     Django template engine for a test or skip it if Jinja2 isn't available.
     """
     test_func = skipIf(jinja2 is None, "this test requires jinja2")(test_func)
-    test_func = override_settings(TEMPLATES=[{
+    return override_settings(TEMPLATES=[{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'APP_DIRS': True,
     }, {
@@ -765,7 +764,6 @@ def require_jinja2(test_func):
         'APP_DIRS': True,
         'OPTIONS': {'keep_trailing_newline': True},
     }])(test_func)
-    return test_func
 
 
 class override_script_prefix(TestContextDecorator):
