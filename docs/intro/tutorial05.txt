@@ -387,7 +387,7 @@ With that ready, we can ask the client to do some work for us::
     >>> response.status_code
     200
     >>> response.content
-    b'\n    <ul>\n    \n        <li><a href="/polls/1/">What&#39;s up?</a></li>\n    \n    </ul>\n\n'
+    b'\n    <ul>\n    \n        <li><a href="/polls/1/">What&#x27;s up?</a></li>\n    \n    </ul>\n\n'
     >>> response.context['latest_question_list']
     <QuerySet [<Question: What's up?>]>
 
