@@ -160,6 +160,10 @@ class URLTranslationTests(URLTestCaseBase):
             self.assertEqual(translation.get_language(), 'en')
             # URL with parameters.
             self.assertEqual(
+                translate_url('/en/with-arguments/regular-argument/', 'nl'),
+                '/nl/with-arguments/regular-argument/',
+            )
+            self.assertEqual(
                 translate_url('/en/with-arguments/regular-argument/optional.html', 'nl'),
                 '/nl/with-arguments/regular-argument/optional.html',
             )
