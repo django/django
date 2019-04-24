@@ -49,6 +49,16 @@ The name of the index. If ``name`` isn't provided Django will auto-generate a
 name. For compatibility with different databases, index names cannot be longer
 than 30 characters and shouldn't start with a number (0-9) or underscore (_).
 
+.. admonition:: Partial indexes in abstract base classes
+
+    You must always specify a unique name for an index. As such, you
+    cannot normally specify a partial index on an abstract base class, since
+    the :attr:`Meta.indexes <django.db.models.Options.indexes>` option is
+    inherited by subclasses, with exactly the same values for the attributes
+    (including ``name``) each time. Instead, specify the ``indexes`` option
+    on subclasses directly, providing a unique name for each index.
+
+
 ``db_tablespace``
 -----------------
 
