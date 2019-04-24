@@ -584,6 +584,11 @@ escaping HTML.
     for use in HTML. The input is first coerced to a string and the output has
     :func:`~django.utils.safestring.mark_safe` applied.
 
+    .. versionchanged:: 3.0
+
+        In older versions, ``'`` is converted to its decimal code ``&#39;``
+        instead of the equivalent hex code ``&#x27;``.
+
 .. function:: conditional_escape(text)
 
     Similar to ``escape()``, except that it doesn't operate on pre-escaped

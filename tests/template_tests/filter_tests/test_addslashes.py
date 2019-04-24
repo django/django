@@ -15,7 +15,7 @@ class AddslashesTests(SimpleTestCase):
     @setup({'addslashes02': '{{ a|addslashes }} {{ b|addslashes }}'})
     def test_addslashes02(self):
         output = self.engine.render_to_string('addslashes02', {"a": "<a>'", "b": mark_safe("<a>'")})
-        self.assertEqual(output, r"&lt;a&gt;\&#39; <a>\'")
+        self.assertEqual(output, r"&lt;a&gt;\&#x27; <a>\'")
 
 
 class FunctionTests(SimpleTestCase):

@@ -348,6 +348,10 @@ Miscellaneous
   the session and :func:`django.contrib.auth.logout` no longer preserves the
   session's language after logout.
 
+* :func:`django.utils.html.escape` now uses :func:`html.escape` to escape HTML.
+  This converts ``'`` to ``&#x27;`` instead of the previous equivalent decimal
+  code ``&#39;``.
+
 .. _deprecated-features-3.0:
 
 Features deprecated in 3.0
