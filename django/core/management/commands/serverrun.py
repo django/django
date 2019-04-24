@@ -120,7 +120,7 @@ class TransparentProxyHttpServer(http.server.HTTPServer):
 
 
 class TransparentProxyThreadingHttpServer(ThreadingMixIn, TransparentProxyHttpServer):
-    pass
+    daemon_threads = True
 
 
 class HttpRequestHandler(http.server.BaseHTTPRequestHandler):
@@ -182,17 +182,40 @@ class HttpRequestHandler(http.server.BaseHTTPRequestHandler):
         resp = conn.getresponse()
         resp_headers = resp.msg
 
+        # HTTP/1.1 requires support for persistent connections. Send 'close' if
+        # the content length is unknown to prevent clients from reusing the
+        # connection.
+        must_send_connection_close = 'Content-Length' not in resp_headers
+        saw_connection_header = False
+
         self.send_response(resp.status, resp.reason)
+
         for name, value in resp_headers.items():
-            if name.lower() in ('date', 'server'):
+            lower_hdr_name = name.lower()
+            if lower_hdr_name in ('date', 'server'):
                 continue
+            if lower_hdr_name == 'connection' and must_send_connection_close:
+                saw_connection_header = True
+                value = 'close'
+                self.close_connection = True
             self.send_header(name, value)
+        if not saw_connection_header:
+            self.send_header('Connection', 'close')
+            self.close_connection = True
         self.end_headers()
+
         self.wfile.write(resp.read())
 
     def do_verb(self):
         conn = self.handle_request()
         self.handle_response(conn)
+
+    def handle(self):
+        super().handle()
+        try:
+            self.connection.shutdown(socket.SHUT_WR)
+        except (AttributeError, OSError):
+            pass
 
     def log_message(self, format, *args):
         extra = {
@@ -213,14 +236,6 @@ class HttpRequestHandler(http.server.BaseHTTPRequestHandler):
 def run(server_address, upstream_address, child_args, ipv6=False, threading=False):
     httpd_cls = TransparentProxyThreadingHttpServer if threading else TransparentProxyHttpServer
     httpd = httpd_cls(upstream_address, child_args, server_address, HttpRequestHandler, ipv6=ipv6)
-    if threading:
-        # ThreadingMixIn.daemon_threads indicates how threads will behave on an
-        # abrupt shutdown; like quitting the server by the user or restarting
-        # by the auto-reloader. True means the server will not wait for thread
-        # termination before it quits. This will make auto-reloader faster
-        # and will prevent the need to kill the server manually if a thread
-        # isn't terminating correctly.
-        httpd.daemon_threads = True
     httpd.serve_forever()
 
 
