@@ -8,6 +8,7 @@ import base64
 import binascii
 import cgi
 import collections
+import html
 from urllib.parse import unquote
 
 from django.conf import settings
@@ -19,7 +20,6 @@ from django.core.files.uploadhandler import (
 )
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str
-from django.utils.text import unescape_entities
 
 __all__ = ('MultiPartParser', 'MultiPartParserError', 'InputStreamExhausted')
 
@@ -209,7 +209,7 @@ class MultiPartParser:
                     file_name = disposition.get('filename')
                     if file_name:
                         file_name = force_str(file_name, encoding, errors='replace')
-                        file_name = self.IE_sanitize(unescape_entities(file_name))
+                        file_name = self.IE_sanitize(html.unescape(file_name))
                     if not file_name:
                         continue
 

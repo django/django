@@ -411,6 +411,10 @@ Miscellaneous
 * ``alias=None`` is added to the signature of
   :meth:`.Expression.get_group_by_cols`.
 
+* ``django.utils.text.unescape_entities()`` is deprecated in favor of
+  :func:`html.unescape`. Note that unlike ``unescape_entities()``,
+  ``html.unescape()`` evaluates lazy strings immediately.
+
 .. _removed-features-3.0:
 
 Features removed in 3.0
