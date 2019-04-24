@@ -42,7 +42,7 @@ class TranslationCheckTests(SimpleTestCase):
                 self.assertEqual(check_setting_language_code(None), [])
 
     def test_invalid_language_code(self):
-        msg = 'You have provided an invalid value for the LANGUAGE_CODE setting: %s.'
+        msg = 'You have provided an invalid value for the LANGUAGE_CODE setting: %r.'
         for tag in self.invalid_tags:
             with self.subTest(tag), self.settings(LANGUAGE_CODE=tag):
                 self.assertEqual(check_setting_language_code(None), [
@@ -55,7 +55,7 @@ class TranslationCheckTests(SimpleTestCase):
                 self.assertEqual(check_setting_languages(None), [])
 
     def test_invalid_languages(self):
-        msg = 'You have provided an invalid language code in the LANGUAGES setting: %s.'
+        msg = 'You have provided an invalid language code in the LANGUAGES setting: %r.'
         for tag in self.invalid_tags:
             with self.subTest(tag), self.settings(LANGUAGES=[(tag, tag)]):
                 self.assertEqual(check_setting_languages(None), [
@@ -68,7 +68,7 @@ class TranslationCheckTests(SimpleTestCase):
                 self.assertEqual(check_setting_languages_bidi(None), [])
 
     def test_invalid_languages_bidi(self):
-        msg = 'You have provided an invalid language code in the LANGUAGES_BIDI setting: %s.'
+        msg = 'You have provided an invalid language code in the LANGUAGES_BIDI setting: %r.'
         for tag in self.invalid_tags:
             with self.subTest(tag), self.settings(LANGUAGES_BIDI=[tag]):
                 self.assertEqual(check_setting_languages_bidi(None), [
