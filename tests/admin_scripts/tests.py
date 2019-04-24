@@ -1374,6 +1374,7 @@ class ManageTestserver(SimpleTestCase):
             insecure_serving=False,
             no_color=False,
             pythonpath=None,
+            really_quiet=False,
             settings=None,
             shutdown_message=(
                 "\nServer stopped.\nNote that the test database, 'test_db', "

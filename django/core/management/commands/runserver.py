@@ -1,3 +1,4 @@
+import argparse
 import errno
 import os
 import re
@@ -51,6 +52,11 @@ class Command(BaseCommand):
             '--noreload', action='store_false', dest='use_reloader',
             help='Tells Django to NOT use the auto-reloader.',
         )
+        # `--really_quiet` is a hidden option
+        parser.add_argument(
+            '--really_quiet', action='store_true', dest='really_quiet',
+            help=argparse.SUPPRESS
+        )
 
     def execute(self, *args, **options):
         if options['no_color']:
@@ -93,6 +99,7 @@ class Command(BaseCommand):
         if not self.addr:
             self.addr = self.default_addr_ipv6 if self.use_ipv6 else self.default_addr
             self._raw_ipv6 = self.use_ipv6
+        self.really_quiet = options['really_quiet']
         self.run(**options)
 
     def run(self, **options):
@@ -114,25 +121,27 @@ class Command(BaseCommand):
         shutdown_message = options.get('shutdown_message', '')
         quit_command = 'CTRL-BREAK' if sys.platform == 'win32' else 'CONTROL-C'
 
-        self.stdout.write("Performing system checks...\n\n")
+        if not self.really_quiet:
+            self.stdout.write("Performing system checks...\n\n")
         self.check(display_num_errors=True)
         # Need to check migrations here, so can't use the
         # requires_migrations_check attribute.
         self.check_migrations()
-        now = datetime.now().strftime('%B %d, %Y - %X')
-        self.stdout.write(now)
-        self.stdout.write((
-            "Django version %(version)s, using settings %(settings)r\n"
-            "Starting development server at %(protocol)s://%(addr)s:%(port)s/\n"
-            "Quit the server with %(quit_command)s."
-        ) % {
-            "version": self.get_version(),
-            "settings": settings.SETTINGS_MODULE,
-            "protocol": self.protocol,
-            "addr": '[%s]' % self.addr if self._raw_ipv6 else self.addr,
-            "port": self.port,
-            "quit_command": quit_command,
-        })
+        if not self.really_quiet:
+            now = datetime.now().strftime('%B %d, %Y - %X')
+            self.stdout.write(now)
+            self.stdout.write((
+                "Django version %(version)s, using settings %(settings)r\n"
+                "Starting development server at %(protocol)s://%(addr)s:%(port)s/\n"
+                "Quit the server with %(quit_command)s."
+            ) % {
+                "version": self.get_version(),
+                "settings": settings.SETTINGS_MODULE,
+                "protocol": self.protocol,
+                "addr": '[%s]' % self.addr if self._raw_ipv6 else self.addr,
+                "port": self.port,
+                "quit_command": quit_command,
+            })
 
         try:
             handler = self.get_handler(*args, **options)
@@ -153,6 +162,6 @@ class Command(BaseCommand):
             # Need to use an OS exit because sys.exit doesn't work in a thread
             os._exit(1)
         except KeyboardInterrupt:
-            if shutdown_message:
+            if not self.really_quiet and shutdown_message:
                 self.stdout.write(shutdown_message)
             sys.exit(0)
