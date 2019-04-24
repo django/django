@@ -31,6 +31,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         output = super()._field_indexes_sql(model, field)
         like_index_statement = self._create_like_index_sql(model, field)
         if like_index_statement is not None:
+            # if _like index is already created, refresh it from _create_like_index_sql.
+            [output.remove(o) for o in output if str(o.parts['name']) == str(like_index_statement.parts['name'])]
             output.append(like_index_statement)
         return output
 
@@ -45,11 +47,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         when the column type is 'varchar' or 'text', otherwise return None.
         """
         db_type = field.db_type(connection=self.connection)
-        if db_type is not None and (field.db_index is True or field.unique):
-            # TODO: index is being created twice without 'field.db_index is True'
-            # if field.db_index is an instance of Index, index will be created with own params.
-            # See #28053.
-            #
+        if db_type is not None and (field.db_index or field.unique):
             # Fields with database column types of `varchar` and `text` need
             # a second index that specifies their operator class, which is
             # needed when performing correct LIKE queries outside the
@@ -60,11 +58,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             if '[' in db_type:
                 return None
             if db_type.startswith('varchar') or db_type.startswith('text'):
-                init_kwargs = {
-                    'opclasses': ['varchar_pattern_ops'] if db_type.startswith('varchar') else ['text_pattern_ops'],
-                    'suffix': '_like',
-                }
-                kwargs = self._get_index_type_kwargs(model, field, init_kwargs)
+                kwargs = self._get_index_type_kwargs(model, field)
+                kwargs['suffix'] = '_like'
+                if 'opclasses' not in kwargs.keys() or not kwargs['opclasses']:
+                    opclasses = ['varchar_pattern_ops'] if db_type.startswith('varchar') else ['text_pattern_ops']
+                    kwargs['opclasses'] = opclasses
                 return self._create_index_sql(model, [field], **kwargs)
         return None
 
@@ -147,17 +145,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             model, old_field, new_field, old_type, new_type, old_db_params,
             new_db_params, strict,
         )
-        # Added an index? Create any PostgreSQL-specific indexes.
-        if ((not (old_field.db_index or old_field.unique) and new_field.db_index) or
-                (not old_field.unique and new_field.unique)):
-            like_index_statement = self._create_like_index_sql(model, new_field)
-            if like_index_statement is not None:
-                self.execute(like_index_statement)
-
-        # Removed an index? Drop any PostgreSQL-specific indexes.
-        if old_field.unique and not (new_field.db_index or new_field.unique):
-            index_to_remove = self._create_index_name(model._meta.db_table, [old_field.column], suffix='_like')
-            self.execute(self._delete_index_sql(model, index_to_remove))
 
     def _index_columns(self, table, columns, col_suffixes, opclasses):
         if opclasses:

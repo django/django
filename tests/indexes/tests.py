@@ -152,13 +152,22 @@ class SchemaIndexesPostgreSQLTests(TransactionTestCase):
             self.assertEqual(cursor.fetchall(), [('varchar_pattern_ops', 'test_ops_class')])
 
     def test_ops_class_field(self):
+        new_field_with_opclasses = CharField(
+            max_length=100,
+            db_index=Index(name='test_ops_class_field_with_opc', opclasses=['text_pattern_ops'])
+        )
         new_field = CharField(
             max_length=100,
-            db_index=Index(name='test_ops_class_field', opclasses=['varchar_pattern_ops'])
+            db_index=Index(name='test_ops_class_field')
         )
-        new_field.set_attributes_from_name('headline2')
+        new_field_with_opclasses.set_attributes_from_name('headline2')
+        new_field.set_attributes_from_name('headline3')
         with connection.schema_editor() as editor:
+            editor.add_field(IndexedArticle2, new_field_with_opclasses)
             editor.add_field(IndexedArticle2, new_field)
+        with editor.connection.cursor() as cursor:
+            cursor.execute(self.get_opclass_query % 'test_ops_class_field_with_opc')
+            self.assertEqual(cursor.fetchall(), [('text_pattern_ops', 'test_ops_class_field_with_opc')])
         with editor.connection.cursor() as cursor:
             cursor.execute(self.get_opclass_query % 'test_ops_class_field')
             self.assertEqual(cursor.fetchall(), [('varchar_pattern_ops', 'test_ops_class_field')])

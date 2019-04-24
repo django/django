@@ -1009,8 +1009,7 @@ class BaseDatabaseSchemaEditor:
             output.append(index.create_sql(model, self))
         return output
 
-    def _get_index_type_kwargs(self, model, field, kwargs=None):
-        kwargs = kwargs or {}
+    def _get_index_type_kwargs(self, model, field):
         _kwargs = {}
         if isinstance(field.db_index, Index):
             if not field.db_index.name:
@@ -1022,7 +1021,6 @@ class BaseDatabaseSchemaEditor:
                 'db_tablespace': field.db_index.db_tablespace,
                 'suffix': field.db_index.suffix,
             }
-        _kwargs.update(kwargs)
         return _kwargs
 
     def _field_indexes_sql(self, model, field):
