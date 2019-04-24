@@ -78,7 +78,10 @@ The name of the constraint.
 A :class:`Q` object that specifies the condition you want the constraint to
 enforce.
 
-For example, ``UniqueConstraint(fields=['user'], condition=Q(status='DRAFT')``
+For example::
+
+    UniqueConstraint(fields=['user'], condition=Q(status='DRAFT'), name='unique_draft_user')
+
 ensures that each user only has one draft.
 
 These conditions have the same database restrictions as
