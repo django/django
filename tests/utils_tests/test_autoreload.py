@@ -11,13 +11,15 @@ import weakref
 import zipfile
 from importlib import import_module
 from pathlib import Path
-from unittest import mock, skip
+from unittest import mock, skip, skipIf
 
 from django.apps.registry import Apps
 from django.test import SimpleTestCase
 from django.test.utils import extend_sys_path
 from django.utils import autoreload
 from django.utils.autoreload import WatchmanUnavailable
+
+from .utils import on_macos_with_hfs
 
 
 class TestIterModulesAndFiles(SimpleTestCase):
@@ -637,6 +639,7 @@ class WatchmanReloaderTests(ReloaderTests, IntegrationTests):
                 self.assertIsInstance(mocked_server_status.call_args[0][0], TestException)
 
 
+@skipIf(on_macos_with_hfs(), "These tests do not work with HFS+ as a filesystem")
 class StatReloaderTests(ReloaderTests, IntegrationTests):
     RELOADER_CLS = autoreload.StatReloader
 
