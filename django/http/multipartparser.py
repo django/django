@@ -360,8 +360,7 @@ class LazyStream:
                     remaining -= len(emitting)
                     yield emitting
 
-        out = b''.join(parts())
-        return out
+        return b''.join(parts())
 
     def __next__(self):
         """
