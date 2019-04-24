@@ -282,6 +282,11 @@ Miscellaneous
 * :tfilter:`floatformat` template filter now outputs (positive) ``0`` for
   negative numbers which round to zero.
 
+* :attr:`Meta.ordering <django.db.models.Options.ordering>` and
+  :attr:`Meta.unique_together <django.db.models.Options.unique_together>`
+  options on models in ``django.contrib`` modules that were formerly tuples are
+  now lists.
+
 .. _deprecated-features-3.1:
 
 Features deprecated in 3.1
