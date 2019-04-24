@@ -4,17 +4,17 @@ from django.utils.translation.trans_real import language_code_re
 from . import Error, Tags, register
 
 E001 = Error(
-    'You have provided an invalid value for the LANGUAGE_CODE setting: {}.',
+    'You have provided an invalid value for the LANGUAGE_CODE setting: {!r}.',
     id='translation.E001',
 )
 
 E002 = Error(
-    'You have provided an invalid language code in the LANGUAGES setting: {}.',
+    'You have provided an invalid language code in the LANGUAGES setting: {!r}.',
     id='translation.E002',
 )
 
 E003 = Error(
-    'You have provided an invalid language code in the LANGUAGES_BIDI setting: {}.',
+    'You have provided an invalid language code in the LANGUAGES_BIDI setting: {!r}.',
     id='translation.E003',
 )
 
