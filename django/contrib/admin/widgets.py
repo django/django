@@ -392,9 +392,9 @@ class AutocompleteMixin:
 
         `to_field` may not be a primary_key
         """
-        to_field = getattr(self.rel, 'field_name', 'pk')
-        query = '?_to_field={to_field}'.format(to_field=to_field)
         model = self.rel.model
+        to_field = getattr(self.rel, 'field_name', model._meta.pk.name)
+        query = '?_to_field={to_field}'.format(to_field=to_field)
         return reverse(self.url_name % (self.admin_site.name, model._meta.app_label, model._meta.model_name)) + query
 
     def build_attrs(self, base_attrs, extra_attrs=None):
@@ -430,7 +430,8 @@ class AutocompleteMixin:
         if not self.is_required and not self.allow_multiple_selected:
             default[1].append(self.create_option(name, '', '', False, 0))
 
-        fk = getattr(self.rel, 'field_name', 'pk')
+        model = self.rel.model
+        fk = getattr(self.rel, 'field_name', model._meta.pk.name)
         fk_filter = {'{fk}__in'.format(fk=fk): selected_choices}
         choices = [
             (getattr(obj, fk), self.choices.field.label_from_instance(obj))

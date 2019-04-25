@@ -30,7 +30,8 @@ class AutocompleteJsonView(BaseListView):
 
         # specified ForeignKey by `AutocompleteMixin.get_url`
         # ForeignKey may not be a primary_key
-        to_field = request.GET.get('_to_field', 'pk')
+        model = self.model_admin.model
+        to_field = request.GET.get('_to_field', model._meta.pk.name)
 
         if not hasattr(obj, to_field):
             return JsonResponse(
