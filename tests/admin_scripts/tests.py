@@ -2132,6 +2132,25 @@ class StartApp(AdminScriptTestCase):
         )
         self.assertFalse(os.path.exists(testproject_dir))
 
+    def test_invalid_target_name(self):
+        for bad_target in ('invalid.dir_name', '7invalid_dir_name', '.invalid_dir_name'):
+            with self.subTest(bad_target):
+                _, err = self.run_django_admin(['startapp', 'app', bad_target])
+                self.assertOutput(
+                    err,
+                    "CommandError: '%s' is not a valid app directory. Please "
+                    "make sure the directory is a valid identifier." % bad_target
+                )
+
+    def test_importable_target_name(self):
+        _, err = self.run_django_admin(['startapp', 'app', 'os'])
+        self.assertOutput(
+            err,
+            "CommandError: 'os' conflicts with the name of an existing Python "
+            "module and cannot be used as an app directory. Please try "
+            "another directory."
+        )
+
     def test_overlaying_app(self):
         self.run_django_admin(['startapp', 'app1'])
         out, err = self.run_django_admin(['startapp', 'app2', 'app1'])
