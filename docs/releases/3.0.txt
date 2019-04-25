@@ -177,6 +177,9 @@ Management Commands
 
 * On PostgreSQL, :djadmin:`dbshell` now supports client-side TLS certificates.
 
+* :djadmin:`inspectdb` now introspects :class:`~django.db.models.OneToOneField`
+  when a foreign key has a unique or primary key constraint.
+
 Migrations
 ~~~~~~~~~~
 
