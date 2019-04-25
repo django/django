@@ -11,6 +11,9 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connections
 from django.db.backends.base.base import BaseDatabaseWrapper
+from django.db.backends.utils import (
+    CursorDebugWrapper as BaseCursorDebugWrapper,
+)
 from django.db.utils import DatabaseError as WrappedDatabaseError
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeString
@@ -281,3 +284,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def pg_version(self):
         with self.temporary_connection():
             return self.connection.server_version
+
+    def make_debug_cursor(self, cursor):
+        return CursorDebugWrapper(cursor, self)
+
+
+class CursorDebugWrapper(BaseCursorDebugWrapper):
+    def copy_expert(self, sql, file, *args):
+        with self.debug_sql(sql):
+            return self.cursor.copy_expert(sql, file, *args)
+
+    def copy_to(self, file, table, *args, **kwargs):
+        with self.debug_sql(sql='COPY %s TO STDOUT' % table):
+            return self.cursor.copy_to(file, table, *args, **kwargs)

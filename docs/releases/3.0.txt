@@ -201,6 +201,8 @@ Models
   :class:`~django.db.models.functions.Trunc` database functions determines the
   treatment of nonexistent and ambiguous datetimes.
 
+* ``connection.queries`` now shows ``COPY … TO`` statements on PostgreSQL.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
