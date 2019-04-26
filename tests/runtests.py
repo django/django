@@ -115,20 +115,7 @@ def get_installed():
     return [app_config.name for app_config in apps.get_app_configs()]
 
 
-def setup(verbosity, test_labels, parallel):
-    # Reduce the given test labels to just the app module path.
-    test_labels_set = set()
-    for label in test_labels:
-        bits = label.split('.')[:1]
-        test_labels_set.add('.'.join(bits))
-
-    if verbosity >= 1:
-        msg = "Testing against Django installed in '%s'" % os.path.dirname(django.__file__)
-        max_parallel = default_test_processes() if parallel == 0 else parallel
-        if max_parallel > 1:
-            msg += " with up to %d processes" % max_parallel
-        print(msg)
-
+def setup_django():
     # Force declaring available_apps in TransactionTestCase for faster tests.
     def no_available_apps(self):
         raise Exception("Please define available_apps in TransactionTestCase "
@@ -147,7 +134,7 @@ def setup(verbosity, test_labels, parallel):
     }
 
     # Redirect some settings for the duration of these tests.
-    settings.INSTALLED_APPS = ALWAYS_INSTALLED_APPS
+    settings.INSTALLED_APPS = ALWAYS_INSTALLED_APPS[:]
     settings.ROOT_URLCONF = 'urls'
     settings.STATIC_URL = '/static/'
     settings.STATIC_ROOT = os.path.join(TMPDIR, 'static')
@@ -186,16 +173,46 @@ def setup(verbosity, test_labels, parallel):
     # Load all the ALWAYS_INSTALLED_APPS.
     django.setup()
 
+    return state
+
+
+def setup(verbosity, test_labels, parallel):
+    if verbosity >= 1:
+        msg = "Testing with Django installed in '%s'" % os.path.dirname(django.__file__)
+        max_parallel = default_test_processes() if parallel == 0 else parallel
+        if max_parallel > 1:
+            msg += " with up to %d processes" % max_parallel
+        print(msg)
+
+    state = setup_django()
+
+    # Load all the test model apps.
+    test_modules = get_test_modules()
+
+    # Reduce the given test labels to just the app module path.
+    test_labels_mods = set()
+    for label in test_labels:
+        bits = label.split('.')[:1]
+        test_labels_mods.add('.'.join(bits))
+
+    # set_installed_apps(verbosity, test_modules, test_labels_set)
+    installed_apps = get_installed_apps(verbosity, test_modules, test_labels_mods)
+    settings.INSTALLED_APPS.extend(installed_apps)
+    apps.set_installed_apps(settings.INSTALLED_APPS)
+
+    return state
+
+
+def get_installed_apps(verbosity, test_modules, test_labels_mods):
     # It would be nice to put this validation earlier but it must come after
     # django.setup() so that connection.features.gis_enabled can be accessed
     # without raising AppRegistryNotReady when running gis_tests in isolation
     # on some backends (e.g. PostGIS).
-    if 'gis_tests' in test_labels_set and not connection.features.gis_enabled:
+    if 'gis_tests' in test_labels_mods and not connection.features.gis_enabled:
         print('Aborting: A GIS database backend is required to run gis_tests.')
         sys.exit(1)
 
-    # Load all the test model apps.
-    test_modules = get_test_modules()
+    installed_apps = []
 
     installed_app_names = set(get_installed())
     for modpath, module_name in test_modules:
@@ -206,31 +223,32 @@ def setup(verbosity, test_labels, parallel):
         # if the module (or an ancestor) was named on the command line, or
         # no modules were named (i.e., run all), import
         # this module and add it to INSTALLED_APPS.
-        module_found_in_labels = not test_labels or any(
+        module_found_in_labels = not test_labels_mods or any(
             # exact match or ancestor match
             module_label == label or module_label.startswith(label + '.')
-            for label in test_labels_set
+            for label in test_labels_mods
         )
 
         if module_name in CONTRIB_TESTS_TO_APPS and module_found_in_labels:
-            settings.INSTALLED_APPS.append(CONTRIB_TESTS_TO_APPS[module_name])
+            installed_apps.append(CONTRIB_TESTS_TO_APPS[module_name])
 
         if module_found_in_labels and module_label not in installed_app_names:
             if verbosity >= 2:
                 print("Importing application %s" % module_name)
-            settings.INSTALLED_APPS.append(module_label)
+            installed_apps.append(module_label)
+        else:
+            if verbosity >= 2:
+                print("Skipping application %s" % module_name)
 
     # Add contrib.gis to INSTALLED_APPS if needed (rather than requiring
     # @override_settings(INSTALLED_APPS=...) on all test cases.
     gis = 'django.contrib.gis'
-    if connection.features.gis_enabled and gis not in settings.INSTALLED_APPS:
+    if connection.features.gis_enabled and gis not in installed_apps:
         if verbosity >= 2:
             print("Importing application %s" % gis)
-        settings.INSTALLED_APPS.append(gis)
+        installed_apps.append(gis)
 
-    apps.set_installed_apps(settings.INSTALLED_APPS)
-
-    return state
+    return installed_apps
 
 
 def teardown(state):
