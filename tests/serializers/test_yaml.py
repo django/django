@@ -85,13 +85,13 @@ class NoYamlSerializerTestCase(SimpleTestCase):
 @unittest.skipUnless(HAS_YAML, "No yaml library detected")
 class YamlSerializerTestCase(SerializersTestBase, TestCase):
     serializer_name = "yaml"
-    pkless_str = """- fields:
-    name: Reference
+    pkless_str = """- model: serializers.category
   pk: null
-  model: serializers.category
-- fields:
-    name: Non-fiction
-  model: serializers.category"""
+  fields:
+    name: Reference
+- model: serializers.category
+  fields:
+    name: Non-fiction"""
 
     mapping_ordering_str = """- model: serializers.article
   pk: %(article_pk)s
@@ -147,18 +147,18 @@ class YamlSerializerTestCase(SerializersTestBase, TestCase):
 @unittest.skipUnless(HAS_YAML, "No yaml library detected")
 class YamlSerializerTransactionTestCase(SerializersTransactionTestBase, TransactionTestCase):
     serializer_name = "yaml"
-    fwd_ref_str = """- fields:
+    fwd_ref_str = """- model: serializers.article
+  pk: 1
+  fields:
     headline: Forward references pose no problem
     pub_date: 2006-06-16 15:00:00
     categories: [1]
     author: 1
+- model: serializers.category
   pk: 1
-  model: serializers.article
-- fields:
+  fields:
     name: Reference
+- model: serializers.author
   pk: 1
-  model: serializers.category
-- fields:
-    name: Agnes
-  pk: 1
-  model: serializers.author"""
+  fields:
+    name: Agnes"""
