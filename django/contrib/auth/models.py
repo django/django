@@ -258,7 +258,7 @@ class PermissionsMixin(models.Model):
         """
         # Active superusers have all permissions.
         if self.is_active and self.is_superuser:
-            return True
+            return perm in _user_get_all_permissions(self, obj)
 
         # Otherwise we need to check the backends.
         return _user_has_perm(self, perm, obj)

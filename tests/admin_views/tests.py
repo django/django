@@ -3470,7 +3470,7 @@ class AdminSearchTest(TestCase):
         #   1 query for session + 1 for fetching user
         # + 1 for filtered result + 1 for filtered count
         # + 1 for total count
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(7):
             response = self.client.get(reverse('admin:admin_views_person_changelist') + '?q=Gui')
         self.assertContains(
             response,
@@ -3485,7 +3485,7 @@ class AdminSearchTest(TestCase):
         """
         #   1 query for session + 1 for fetching user
         # + 1 for filtered result + 1 for filtered count
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(6):
             response = self.client.get(reverse('admin:admin_views_recommendation_changelist') + '?q=bar')
         self.assertContains(
             response,
@@ -3659,21 +3659,21 @@ class AdminCustomQuerysetTest(TestCase):
 
         # 5 queries are expected: 1 for the session, 1 for the user,
         # 2 for the counts and 1 for the objects on the page
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(7):
             resp = self.client.get(changelist_url)
             self.assertEqual(resp.context['selection_note'], '0 of 2 selected')
             self.assertEqual(resp.context['selection_note_all'], 'All 2 selected')
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(7):
             extra = {'q': 'not_in_name'}
             resp = self.client.get(changelist_url, extra)
             self.assertEqual(resp.context['selection_note'], '0 of 0 selected')
             self.assertEqual(resp.context['selection_note_all'], 'All 0 selected')
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(7):
             extra = {'q': 'person'}
             resp = self.client.get(changelist_url, extra)
             self.assertEqual(resp.context['selection_note'], '0 of 2 selected')
             self.assertEqual(resp.context['selection_note_all'], 'All 2 selected')
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(7):
             extra = {'gender__exact': '1'}
             resp = self.client.get(changelist_url, extra)
             self.assertEqual(resp.context['selection_note'], '0 of 1 selected')
@@ -5255,7 +5255,7 @@ class UserAdminTest(TestCase):
         # Don't depend on a warm cache, see #17377.
         ContentType.objects.clear_cache()
 
-        with self.assertNumQueries(10):
+        with self.assertNumQueries(12):
             response = self.client.get(reverse('admin:auth_user_change', args=(u.pk,)))
             self.assertEqual(response.status_code, 200)
 
@@ -5295,7 +5295,7 @@ class GroupAdminTest(TestCase):
         # Ensure no queries are skipped due to cached content type for Group.
         ContentType.objects.clear_cache()
 
-        with self.assertNumQueries(8):
+        with self.assertNumQueries(10):
             response = self.client.get(reverse('admin:auth_group_change', args=(g.pk,)))
             self.assertEqual(response.status_code, 200)
 

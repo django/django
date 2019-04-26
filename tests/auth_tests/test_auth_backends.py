@@ -63,6 +63,16 @@ class BaseModelBackendTest:
 
         user.is_superuser = True
         user.save()
+
+        # if the perm is not on the db should return False, after we add the permission
+        # should be True
+        self.assertIs(user.has_perm('auth.test'), False)
+
+        content_type = ContentType.objects.get_for_model(Group)
+        Permission.objects.create(name='test', content_type=content_type, codename='test')
+
+        # reloading user to purge the _perm_cache
+        user = self.UserModel._default_manager.get(pk=self.user.pk)
         self.assertIs(user.has_perm('auth.test'), True)
 
         user.is_staff = True
