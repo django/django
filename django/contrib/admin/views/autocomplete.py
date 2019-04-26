@@ -36,7 +36,7 @@ class AutocompleteJsonView(BaseListView):
         for obj in context['object_list']:
             if not hasattr(obj, to_field):
                 return JsonResponse(
-                    {'error': 'to_field `{to_field}` not in model'.format(to_field=to_field)}, 
+                    {'error': 'to_field `{to_field}` not in model'.format(to_field=to_field)},
                     status=400
                 )
 
