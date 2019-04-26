@@ -157,7 +157,7 @@ class SetLanguageTests(TestCase):
         self.assertEqual(response.url, '/')
         self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, lang_code)
 
-    def test_session_langauge_deprecation(self):
+    def test_session_language_deprecation(self):
         msg = (
             'The user language will no longer be stored in request.session '
             'in Django 4.0. Read it from '
