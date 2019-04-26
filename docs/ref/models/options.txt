@@ -309,7 +309,7 @@ Django quotes column and table names behind the scenes.
     Add, change, delete, and view permissions are automatically created for each
     model. This example specifies an extra permission, ``can_deliver_pizzas``::
 
-        permissions = (("can_deliver_pizzas", "Can deliver pizzas"),)
+        permissions = [('can_deliver_pizzas', 'Can deliver pizzas')]
 
     This is a list or tuple of 2-tuples in the format ``(permission_code,
     human_readable_permission_name)``.
@@ -408,17 +408,17 @@ Django quotes column and table names behind the scenes.
 
     Sets of field names that, taken together, must be unique::
 
-        unique_together = (("driver", "restaurant"),)
+        unique_together = [['driver', 'restaurant']]
 
-    This is a tuple of tuples that must be unique when considered together.
+    This is a list of lists that must be unique when considered together.
     It's used in the Django admin and is enforced at the database level (i.e., the
     appropriate ``UNIQUE`` statements are included in the ``CREATE TABLE``
     statement).
 
-    For convenience, unique_together can be a single tuple when dealing with a single
-    set of fields::
+    For convenience, ``unique_together`` can be a single list when dealing with
+    a single set of fields::
 
-        unique_together = ("driver", "restaurant")
+        unique_together = ['driver', 'restaurant']
 
     A :class:`~django.db.models.ManyToManyField` cannot be included in
     unique_together. (It's not clear what that would even mean!) If you

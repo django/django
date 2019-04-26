@@ -74,6 +74,8 @@ class TemplateCommand(BaseCommand):
             except OSError as e:
                 raise CommandError(e)
         else:
+            if app_or_project == 'app':
+                self.validate_name(os.path.basename(target), 'directory')
             top_dir = os.path.abspath(path.expanduser(target))
             if not os.path.exists(top_dir):
                 raise CommandError("Destination directory '%s' does not "
@@ -205,7 +207,7 @@ class TemplateCommand(BaseCommand):
         raise CommandError("couldn't handle %s template %s." %
                            (self.app_or_project, template))
 
-    def validate_name(self, name):
+    def validate_name(self, name, name_or_dir='name'):
         if name is None:
             raise CommandError('you must provide {an} {app} name'.format(
                 an=self.a_or_an,
@@ -214,10 +216,11 @@ class TemplateCommand(BaseCommand):
         # Check it's a valid directory name.
         if not name.isidentifier():
             raise CommandError(
-                "'{name}' is not a valid {app} name. Please make sure the "
-                "name is a valid identifier.".format(
+                "'{name}' is not a valid {app} {type}. Please make sure the "
+                "{type} is a valid identifier.".format(
                     name=name,
                     app=self.app_or_project,
+                    type=name_or_dir,
                 )
             )
         # Check it cannot be imported.
@@ -228,11 +231,12 @@ class TemplateCommand(BaseCommand):
         else:
             raise CommandError(
                 "'{name}' conflicts with the name of an existing Python "
-                "module and cannot be used as {an} {app} name. Please try "
-                "another name.".format(
+                "module and cannot be used as {an} {app} {type}. Please try "
+                "another {type}.".format(
                     name=name,
                     an=self.a_or_an,
                     app=self.app_or_project,
+                    type=name_or_dir,
                 )
             )
 

@@ -628,7 +628,7 @@ below.
 
 Also, you can give :class:`RequestContext` a list of additional processors,
 using the optional, third positional argument, ``processors``. In this
-example, the :class:`RequestContext` instance gets a ``ip_address`` variable::
+example, the :class:`RequestContext` instance gets an ``ip_address`` variable::
 
     from django.http import HttpResponse
     from django.template import RequestContext, Template

@@ -25,7 +25,7 @@ from .models import (
 class TestCaseFixtureLoadingTests(TestCase):
     fixtures = ['fixture1.json', 'fixture2.json']
 
-    def testClassFixtures(self):
+    def test_class_fixtures(self):
         "Test case has installed 3 fixture objects"
         self.assertEqual(Article.objects.count(), 3)
         self.assertQuerysetEqual(Article.objects.all(), [
@@ -41,7 +41,7 @@ class SubclassTestCaseFixtureLoadingTests(TestCaseFixtureLoadingTests):
     """
     fixtures = []
 
-    def testClassFixtures(self):
+    def test_class_fixtures(self):
         "There were no fixture objects installed"
         self.assertEqual(Article.objects.count(), 0)
 

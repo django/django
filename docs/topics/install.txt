@@ -155,7 +155,7 @@ This is the recommended way to install Django.
 
    .. console::
 
-        $ pip install Django
+        $ python -m pip install Django
 
 .. _pip: https://pip.pypa.io/
 .. _virtualenv: https://virtualenv.pypa.io/
@@ -214,7 +214,7 @@ latest bug fixes and improvements, follow these instructions:
 
    .. console::
 
-        $ pip install -e django/
+        $ python -m pip install -e django/
 
    This will make Django's code importable, and will also make the
    ``django-admin`` utility command available. In other words, you're all

@@ -27,12 +27,19 @@ class Tag(models.Model):
         return self.name
 
 
+class NoDeletedArticleManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().exclude(headline='deleted')
+
+
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     # Assign a string as name to make sure the intermediary model is
     # correctly created. Refs #20207
     publications = models.ManyToManyField(Publication, name='publications')
     tags = models.ManyToManyField(Tag, related_name='tags')
+
+    objects = NoDeletedArticleManager()
 
     class Meta:
         ordering = ('headline',)
@@ -55,13 +62,3 @@ class InheritedArticleA(AbstractArticle):
 
 class InheritedArticleB(AbstractArticle):
     pass
-
-
-class NullableTargetArticle(models.Model):
-    headline = models.CharField(max_length=100)
-    publications = models.ManyToManyField(Publication, through='NullablePublicationThrough')
-
-
-class NullablePublicationThrough(models.Model):
-    article = models.ForeignKey(NullableTargetArticle, models.CASCADE)
-    publication = models.ForeignKey(Publication, models.CASCADE, null=True)

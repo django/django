@@ -274,7 +274,9 @@ is where you define your own validation that works at the formset level::
     ...             return
     ...         titles = []
     ...         for form in self.forms:
-    ...             title = form.cleaned_data['title']
+    ...             if self.can_delete and self._should_delete_form(form):
+    ...                 continue
+    ...             title = form.cleaned_data.get('title')
     ...             if title in titles:
     ...                 raise forms.ValidationError("Articles in a set must have distinct titles.")
     ...             titles.append(title)

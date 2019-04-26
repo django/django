@@ -9,7 +9,7 @@ class TitleTests(SimpleTestCase):
     @setup({'title1': '{{ a|title }}'})
     def test_title1(self):
         output = self.engine.render_to_string('title1', {'a': 'JOE\'S CRAB SHACK'})
-        self.assertEqual(output, 'Joe&#39;s Crab Shack')
+        self.assertEqual(output, 'Joe&#x27;s Crab Shack')
 
     @setup({'title2': '{{ a|title }}'})
     def test_title2(self):

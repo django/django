@@ -181,7 +181,9 @@ instance and will be applied on each :meth:`~Model.save()`. For example::
     reporter.save()
 
 ``stories_filed`` will be updated twice in this case. If it's initially ``1``,
-the final value will be ``3``.
+the final value will be ``3``. This persistence can be avoided by reloading the
+model object after saving it, for example, by using
+:meth:`~Model.refresh_from_db()`.
 
 Using ``F()`` in filters
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -260,7 +262,9 @@ or they can be used to build a library of database functions::
     queryset.annotate(field_lower=Lower('field'))
 
 But both cases will result in a queryset where each model is annotated with an
-extra attribute ``field_lower`` produced, roughly, from the following SQL::
+extra attribute ``field_lower`` produced, roughly, from the following SQL:
+
+.. code-block:: sql
 
     SELECT
         ...

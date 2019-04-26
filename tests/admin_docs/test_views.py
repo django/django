@@ -199,7 +199,7 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
         """
         Methods with keyword arguments should have their arguments displayed.
         """
-        self.assertContains(self.response, "<td>suffix=&#39;ltd&#39;</td>")
+        self.assertContains(self.response, '<td>suffix=&#x27;ltd&#x27;</td>')
 
     def test_methods_with_multiple_arguments_display_arguments(self):
         """

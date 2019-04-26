@@ -341,8 +341,8 @@ features:
 * A :doc:`syndication framework </ref/contrib/syndication>` that makes
   creating RSS and Atom feeds as easy as writing a small Python class.
 
-* More sexy automatically-generated admin features -- this overview barely
-  scratched the surface.
+* More attractive automatically-generated admin features -- this overview
+  barely scratched the surface.
 
 The next obvious steps are for you to `download Django`_, read :doc:`the
 tutorial </intro/tutorial01>` and join `the community`_. Thanks for your

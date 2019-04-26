@@ -150,6 +150,10 @@ If the ``source`` command is not available, you can try using a dot instead:
 
     $ . ~/.virtualenvs/djangodev/bin/activate
 
+You have to activate the virtual environment whenever you open a new
+terminal window. virtualenvwrapper__ is a useful tool for making this
+more convenient.
+
 .. admonition:: For Windows users
 
     To activate your virtual environment on Windows, run:
@@ -158,9 +162,12 @@ If the ``source`` command is not available, you can try using a dot instead:
 
         ...\> %HOMEPATH%\.virtualenvs\djangodev\Scripts\activate.bat
 
-You have to activate the virtual environment whenever you open a new
-terminal window. virtualenvwrapper__ is a useful tool for making this
-more convenient.
+    or you can install :ref:`a Windows version of virtualenvwrapper
+    <virtualenvwrapper-win>` and then use:
+
+    .. code-block:: doscon
+
+        ...\> workon djangodev
 
 __ https://virtualenvwrapper.readthedocs.io/en/latest/
 
@@ -173,7 +180,7 @@ Go ahead and install the previously cloned copy of Django:
 
 .. console::
 
-    $ pip install -e /path/to/your/local/clone/django/
+    $ python -m pip install -e /path/to/your/local/clone/django/
 
 The installed version of Django is now pointing at your local copy. You will
 immediately see any changes you make to it, which is of great help when writing
@@ -195,7 +202,7 @@ Django ``tests/`` directory and then running:
 
 .. console::
 
-    $ pip install -r requirements/py3.txt
+    $ python -m pip install -r requirements/py3.txt
 
 If you encounter an error during the installation, your system might be missing
 a dependency for one or more of the Python packages. Consult the failing

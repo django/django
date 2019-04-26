@@ -134,7 +134,7 @@ extensibility and customization in mind.
 
 Practically, this means you'll need to rewrite all of your ``class Admin``
 declarations. You've already seen in `models`_ above how to replace your ``class
-Admin`` with a ``admin.site.register()`` call in an ``admin.py`` file. Below are
+Admin`` with an ``admin.site.register()`` call in an ``admin.py`` file. Below are
 some more details on how to rewrite that ``Admin`` declaration into the new
 syntax.
 

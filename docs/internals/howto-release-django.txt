@@ -58,7 +58,7 @@ You'll need a few things before getting started:
 
 * An install of some required Python packages::
 
-      $ pip install wheel twine
+      $ python -m pip install wheel twine
 
 * Access to Django's record on PyPI. Create a file with your credentials:
 
@@ -305,10 +305,10 @@ Now you're ready to actually put the release out there. To do this:
         $ easy_install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION.tar.gz
         $ deactivate
         $ mktmpenv
-        $ pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION.tar.gz
+        $ python -m pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION.tar.gz
         $ deactivate
         $ mktmpenv
-        $ pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION-py3-none-any.whl
+        $ python -m pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION-py3-none-any.whl
         $ deactivate
 
    This just tests that the tarballs are available (i.e. redirects are up) and

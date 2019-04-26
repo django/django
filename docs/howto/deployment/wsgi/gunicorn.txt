@@ -12,7 +12,7 @@ dependencies and is easy to install and use.
 Installing Gunicorn
 ===================
 
-Installing gunicorn is as easy as ``pip install gunicorn``. For more
+Installing gunicorn is as easy as ``python -m pip install gunicorn``. For more
 details, see the `gunicorn documentation`_.
 
 .. _gunicorn documentation: https://docs.gunicorn.org/en/latest/install.html

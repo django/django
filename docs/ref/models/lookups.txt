@@ -132,7 +132,7 @@ following methods:
     prominent example is ``__year`` that transforms a ``DateField`` into a
     ``IntegerField``.
 
-    The notation to use a ``Transform`` in an lookup expression is
+    The notation to use a ``Transform`` in a lookup expression is
     ``<expression>__<transformation>`` (e.g. ``date__year``).
 
     This class follows the :ref:`Query Expression API <query-expression>`, which

@@ -840,7 +840,9 @@ together. For example::
         Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6))
     )
 
-... roughly translates into the SQL::
+... roughly translates into the SQL:
+
+.. code-block:: sql
 
     SELECT * from polls WHERE question LIKE 'Who%'
         AND (pub_date = '2005-05-02' OR pub_date = '2005-05-06')

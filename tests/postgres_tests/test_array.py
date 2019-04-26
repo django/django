@@ -149,6 +149,14 @@ class TestQuerying(PostgreSQLTestCase):
             NullableIntegerArrayModel(field=None),
         ])
 
+    def test_empty_list(self):
+        NullableIntegerArrayModel.objects.create(field=[])
+        obj = NullableIntegerArrayModel.objects.annotate(
+            empty_array=models.Value([], output_field=ArrayField(models.IntegerField())),
+        ).filter(field=models.F('empty_array')).get()
+        self.assertEqual(obj.field, [])
+        self.assertEqual(obj.empty_array, [])
+
     def test_exact(self):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__exact=[1]),
@@ -376,6 +384,17 @@ class TestQuerying(PostgreSQLTestCase):
         msg = "Unsupported lookup '0bar' for ArrayField or join on the field not permitted."
         with self.assertRaisesMessage(FieldError, msg):
             list(NullableIntegerArrayModel.objects.filter(field__0bar=[2]))
+
+    def test_grouping_by_annotations_with_array_field_param(self):
+        value = models.Value([1], output_field=ArrayField(models.IntegerField()))
+        self.assertEqual(
+            NullableIntegerArrayModel.objects.annotate(
+                array_length=models.Func(value, 1, function='ARRAY_LENGTH'),
+            ).values('array_length').annotate(
+                count=models.Count('pk'),
+            ).get()['array_length'],
+            1,
+        )
 
 
 class TestDateTimeExactQuerying(PostgreSQLTestCase):

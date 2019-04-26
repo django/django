@@ -8,6 +8,7 @@ transcript.
 from django.contrib.postgres.search import (
     SearchQuery, SearchRank, SearchVector,
 )
+from django.db import connection
 from django.db.models import F
 from django.test import SimpleTestCase, modify_settings, skipUnlessDBFeature
 
@@ -344,6 +345,23 @@ class TestRankingAndWeights(GrailTestData, PostgreSQLTestCase):
             rank=SearchRank(SearchVector('dialogue'), SearchQuery('brave sir robin')),
         ).filter(rank__gt=0.3)
         self.assertSequenceEqual(searched, [self.verse0])
+
+
+class SearchVectorIndexTests(PostgreSQLTestCase):
+    def test_search_vector_index(self):
+        """SearchVector generates IMMUTABLE SQL in order to be indexable."""
+        # This test should be moved to test_indexes and use a functional
+        # index instead once support lands (see #26167).
+        query = Line.objects.all().query
+        resolved = SearchVector('id', 'dialogue', config='english').resolve_expression(query)
+        compiler = query.get_compiler(connection.alias)
+        sql, params = resolved.as_sql(compiler, connection)
+        # Indexed function must be IMMUTABLE.
+        with connection.cursor() as cursor:
+            cursor.execute(
+                'CREATE INDEX search_vector_index ON %s USING GIN (%s)' % (Line._meta.db_table, sql),
+                params,
+            )
 
 
 class SearchQueryTests(SimpleTestCase):

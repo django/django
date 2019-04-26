@@ -55,7 +55,7 @@ version. To run it:
 
 .. console::
 
-    $ pip install closure
+    $ python -m pip install closure
     $ python django/contrib/admin/bin/compress.py
 
 Behind the scenes, ``compress.py`` is a front-end for Google's
