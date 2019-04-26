@@ -180,6 +180,9 @@ Management Commands
 * :djadmin:`inspectdb` now introspects :class:`~django.db.models.OneToOneField`
   when a foreign key has a unique or primary key constraint.
 
+* The new :option:`--skip-checks` option skips running system checks prior to
+  running the command.
+
 Migrations
 ~~~~~~~~~~
 

@@ -1724,6 +1724,19 @@ Forces colorization of the command output if it would otherwise be disabled
 as discussed in :ref:`syntax-coloring`. For example, you may want to pipe
 colored output to another command.
 
+.. django-admin-option:: --skip-checks
+
+.. versionadded:: 3.0
+
+Skips running system checks prior to running the command. This option is only
+available if the
+:attr:`~django.core.management.BaseCommand.requires_system_checks` command
+attribute is set to ``True``.
+
+Example usage::
+
+    django-admin migrate --skip-checks
+
 Extra niceties
 ==============
 
