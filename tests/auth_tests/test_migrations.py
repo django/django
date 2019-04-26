@@ -4,6 +4,7 @@ from django.apps import apps
 from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
+from django.test.utils import captured_stdout
 
 from .models import Proxy, UserProxy
 
@@ -152,3 +153,27 @@ class ProxyModelWithSameAppLabelTests(TestCase):
         user = User._default_manager.get(pk=user.pk)
         for permission in [self.default_permission, self.custom_permission]:
             self.assertTrue(user.has_perm('auth_tests.' + permission.codename))
+
+    def test_migrate_with_existing_target_permission(self):
+        """
+        Permissions may already exist:
+
+        - Old workaround was to manually create permissions for proxy models.
+        - Model may have been concrete and then converted to proxy.
+
+        Output a reminder to audit relevant permissions.
+        """
+        proxy_model_content_type = ContentType.objects.get_for_model(Proxy, for_concrete_model=False)
+        Permission.objects.create(
+            content_type=proxy_model_content_type,
+            codename='add_proxy',
+            name='Can add proxy',
+        )
+        Permission.objects.create(
+            content_type=proxy_model_content_type,
+            codename='display_proxys',
+            name='May display proxys information',
+        )
+        with captured_stdout() as stdout:
+            update_proxy_permissions.update_proxy_model_permissions(apps, None)
+        self.assertIn('A problem arose migrating proxy model permissions', stdout.getvalue())
