@@ -300,8 +300,7 @@ class Command(BaseCommand):
                 dirs.append(app_dir)
         dirs.extend(fixture_dirs)
         dirs.append('')
-        dirs = [os.path.abspath(os.path.realpath(d)) for d in dirs]
-        return dirs
+        return [os.path.realpath(d) for d in dirs]
 
     def parse_name(self, fixture_name):
         """

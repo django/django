@@ -80,8 +80,7 @@ class SimpleTemplateResponse(HttpResponse):
         """
         template = self.resolve_template(self.template_name)
         context = self.resolve_context(self.context_data)
-        content = template.render(context, self._request)
-        return content
+        return template.render(context, self._request)
 
     def add_post_render_callback(self, callback):
         """Add a new post-rendering callback.

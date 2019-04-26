@@ -19,6 +19,15 @@ option.
     convention is to use ``from django.db import models`` and refer to the
     constraints as ``models.<Foo>Constraint``.
 
+.. admonition:: Constraints in abstract base classes
+
+    You must always specify a unique name for the constraint. As such, you
+    cannot normally specify a constraint on an abstract base class, since the
+    :attr:`Meta.constraints <django.db.models.Options.constraints>` option is
+    inherited by subclasses, with exactly the same values for the attributes
+    (including ``name``) each time. Instead, specify the ``constraints`` option
+    on subclasses directly, providing a unique name for each constraint.
+
 ``CheckConstraint``
 ===================
 
@@ -78,7 +87,10 @@ The name of the constraint.
 A :class:`Q` object that specifies the condition you want the constraint to
 enforce.
 
-For example, ``UniqueConstraint(fields=['user'], condition=Q(status='DRAFT')``
+For example::
+
+    UniqueConstraint(fields=['user'], condition=Q(status='DRAFT'), name='unique_draft_user')
+
 ensures that each user only has one draft.
 
 These conditions have the same database restrictions as

@@ -2,7 +2,7 @@ import threading
 from datetime import datetime, timedelta
 
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections
+from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections, models
 from django.db.models.manager import BaseManager
 from django.db.models.query import EmptyQuerySet, QuerySet
 from django.test import (
@@ -356,6 +356,23 @@ class ModelTest(TestCase):
             # No PK value -> unhashable (because save() would then change
             # hash)
             hash(Article())
+
+    def test_missing_hash_not_inherited(self):
+        class NoHash(models.Model):
+            def __eq__(self, other):
+                return super.__eq__(other)
+
+        with self.assertRaisesMessage(TypeError, "unhashable type: 'NoHash'"):
+            hash(NoHash(id=1))
+
+    def test_specified_parent_hash_inherited(self):
+        class ParentHash(models.Model):
+            def __eq__(self, other):
+                return super.__eq__(other)
+
+            __hash__ = models.Model.__hash__
+
+        self.assertEqual(hash(ParentHash(id=1)), 1)
 
     def test_delete_and_access_field(self):
         # Accessing a field after it's deleted from a model reloads its value.

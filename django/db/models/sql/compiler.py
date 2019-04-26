@@ -892,7 +892,9 @@ class SQLCompiler:
                     from_parent = issubclass(model, opts.model) and model is not opts.model
 
                     def local_setter(obj, from_obj):
-                        f.remote_field.set_cached_value(from_obj, obj)
+                        # Set a reverse fk object when relation is non-empty.
+                        if from_obj:
+                            f.remote_field.set_cached_value(from_obj, obj)
 
                     def remote_setter(obj, from_obj):
                         setattr(from_obj, name, obj)

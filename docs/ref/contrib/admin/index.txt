@@ -1273,7 +1273,9 @@ subclass::
     word must be in at least one of ``search_fields``. For example, if
     ``search_fields`` is set to ``['first_name', 'last_name']`` and a user
     searches for ``john lennon``, Django will do the equivalent of this SQL
-    ``WHERE`` clause::
+    ``WHERE`` clause:
+
+    .. code-block:: sql
 
         WHERE (first_name ILIKE '%john%' OR last_name ILIKE '%john%')
         AND (first_name ILIKE '%lennon%' OR last_name ILIKE '%lennon%')

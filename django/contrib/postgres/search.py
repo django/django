@@ -1,5 +1,6 @@
-from django.db.models import Field, FloatField
+from django.db.models import CharField, Field, FloatField, TextField
 from django.db.models.expressions import CombinedExpression, Func, Value
+from django.db.models.functions import Cast, Coalesce
 from django.db.models.lookups import Lookup
 
 
@@ -45,8 +46,7 @@ class SearchVectorCombinable:
 
 class SearchVector(SearchVectorCombinable, Func):
     function = 'to_tsvector'
-    arg_joiner = ", ' ',"
-    template = '%(function)s(concat(%(expressions)s))'
+    arg_joiner = " || ' ' || "
     output_field = SearchVectorField()
     config = None
 
@@ -60,6 +60,14 @@ class SearchVector(SearchVectorCombinable, Func):
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         resolved = super().resolve_expression(query, allow_joins, reuse, summarize, for_save)
+        resolved.set_source_expressions([
+            Coalesce(
+                expression
+                if isinstance(expression.output_field, (CharField, TextField))
+                else Cast(expression, TextField()),
+                Value('')
+            ) for expression in resolved.get_source_expressions()
+        ])
         if self.config:
             if not hasattr(self.config, 'resolve_expression'):
                 resolved.config = Value(self.config).resolve_expression(query, allow_joins, reuse, summarize, for_save)
@@ -72,7 +80,7 @@ class SearchVector(SearchVectorCombinable, Func):
         if template is None:
             if self.config:
                 config_sql, config_params = compiler.compile(self.config)
-                template = "%(function)s({}::regconfig, concat(%(expressions)s))".format(config_sql.replace('%', '%%'))
+                template = '%(function)s({}::regconfig, %(expressions)s)'.format(config_sql.replace('%', '%%'))
             else:
                 template = self.template
         sql, params = super().as_sql(compiler, connection, function=function, template=template)

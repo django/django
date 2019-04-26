@@ -152,11 +152,11 @@ class InspectDBTestCase(TestCase):
             output,
         )
         self.assertIn(
-            "people_pk = models.ForeignKey(InspectdbPeople, models.DO_NOTHING, primary_key=True)",
+            'people_pk = models.OneToOneField(InspectdbPeople, models.DO_NOTHING, primary_key=True)',
             output,
         )
         self.assertIn(
-            "people_unique = models.ForeignKey(InspectdbPeople, models.DO_NOTHING, unique=True)",
+            'people_unique = models.OneToOneField(InspectdbPeople, models.DO_NOTHING)',
             output,
         )
 
