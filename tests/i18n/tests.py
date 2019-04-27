@@ -1801,7 +1801,7 @@ class NonDjangoLanguageTests(SimpleTestCase):
         self.assertEqual(gettext("year"), "reay")
 
     @override_settings(USE_I18N=True)
-    def test_check_for_langauge(self):
+    def test_check_for_language(self):
         with tempfile.TemporaryDirectory() as app_dir:
             os.makedirs(os.path.join(app_dir, 'locale', 'dummy_Lang', 'LC_MESSAGES'))
             open(os.path.join(app_dir, 'locale', 'dummy_Lang', 'LC_MESSAGES', 'django.mo'), 'w').close()
