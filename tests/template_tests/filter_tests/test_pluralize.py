@@ -58,8 +58,9 @@ class FunctionTests(SimpleTestCase):
         self.assertEqual(pluralize(0, 'y,ies,error'), '')
 
     def test_no_len_type(self):
-        self.assertEqual(pluralize(object(), 'y,es'), 'y')
+        self.assertEqual(pluralize(object(), 'y,es'), '')
         self.assertEqual(pluralize(object(), 'es'), '')
 
     def test_value_error(self):
-        self.assertEqual(pluralize('', 'y,es'), 'y')
+        self.assertEqual(pluralize('', 'y,es'), '')
+        self.assertEqual(pluralize('', 'es'), '')

@@ -879,17 +879,15 @@ def pluralize(value, arg='s'):
     singular_suffix, plural_suffix = bits[:2]
 
     try:
-        if float(value) != 1:
-            return plural_suffix
+        return singular_suffix if float(value) == 1 else plural_suffix
     except ValueError:  # Invalid string that's not a number.
         pass
     except TypeError:  # Value isn't a string or a number; maybe it's a list?
         try:
-            if len(value) != 1:
-                return plural_suffix
+            return singular_suffix if len(value) == 1 else plural_suffix
         except TypeError:  # len() of unsized object.
             pass
-    return singular_suffix
+    return ''
 
 
 @register.filter("phone2numeric", is_safe=True)
