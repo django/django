@@ -851,8 +851,8 @@ def filesizeformat(bytes_):
 @register.filter(is_safe=False)
 def pluralize(value, arg='s'):
     """
-    Return a plural suffix if the value is not 1. By default, use 's' as the
-    suffix:
+    Return a plural suffix if the value is not 1, '1', or an object of
+    length 1. By default, use 's' as the suffix:
 
     * If value is 0, vote{{ value|pluralize }} display "votes".
     * If value is 1, vote{{ value|pluralize }} display "vote".
