@@ -14,17 +14,11 @@ from socketserver import ThreadingMixIn
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
+from django.core.management.commands.runserver import naiveip_re
 from django.core.servers import basehttp
 from django.utils.autoreload import StatReloader, file_changed
 
 MAXIMUM_WAIT_FOR_DJANGO_RELOAD_IN_SECONDS = 10
-
-naiveip_re = re.compile(r"""^(?:
-(?P<addr>
-    (?P<ipv4>\d{1,3}(?:\.\d{1,3}){3}) |         # IPv4 address
-    (?P<ipv6>\[[a-fA-F0-9:]+\]) |               # IPv6 address
-    (?P<fqdn>[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*) # FQDN
-):)?(?P<port>\d+)$""", re.X)
 
 logger = logging.getLogger(__name__)
 
