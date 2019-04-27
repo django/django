@@ -1990,8 +1990,8 @@ If ``value`` is ``800-COLLECT``, the output will be ``800-2655328``.
 ``pluralize``
 -------------
 
-Returns a plural suffix if the value is not 1. By default, this suffix is
-``'s'``.
+Returns a plural suffix if the value is not ``1``, ``'1'``, or an object of
+length 1. By default, this suffix is ``'s'``.
 
 Example::
 
