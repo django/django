@@ -76,25 +76,6 @@ def raise_last_exception():
         raise _exception[1]
 
 
-def ensure_echo_on():
-    """
-    Ensure that echo mode is enabled. Some tools such as PDB disable
-    it which causes usability issues after reload.
-    """
-    if not termios or not sys.stdin.isatty():
-        return
-    attr_list = termios.tcgetattr(sys.stdin)
-    if not attr_list[3] & termios.ECHO:
-        attr_list[3] |= termios.ECHO
-        if hasattr(signal, 'SIGTTOU'):
-            old_handler = signal.signal(signal.SIGTTOU, signal.SIG_IGN)
-        else:
-            old_handler = None
-        termios.tcsetattr(sys.stdin, termios.TCSANOW, attr_list)
-        if old_handler is not None:
-            signal.signal(signal.SIGTTOU, old_handler)
-
-
 def iter_all_python_module_files():
     # This is a hot path during reloading. Create a stable sorted list of
     # modules based on the module name and pass it to iter_modules_and_files().
@@ -223,11 +204,39 @@ def trigger_reload(filename):
     sys.exit(3)
 
 
+def _save_termstate():
+    if termios and sys.stdin.isatty():
+        return termios.tcgetattr(sys.stdin)
+
+
+def _restore_termstate(old_term_attr):
+    """
+    Restore initial terminal state, which is important for echo mode (PDB),
+    and Ctrl-C (pdb++ with pyrepl).
+
+    Disables SIGTTOU during restoring to avoid "suspended (tty output)"
+    with backgrounded process (#15880).
+    """
+    if hasattr(signal, 'SIGTTOU'):
+        old_handler = signal.signal(signal.SIGTTOU, signal.SIG_IGN)
+    else:
+        old_handler = None
+    termios.tcsetattr(sys.stdin, termios.TCSANOW, old_term_attr)
+    if old_handler is not None:
+        signal.signal(signal.SIGTTOU, old_handler)
+
+
 def restart_with_reloader():
+    old_term_attr = _save_termstate()
+
     new_environ = {**os.environ, DJANGO_AUTORELOAD_ENV: 'true'}
     args = get_child_arguments()
     while True:
         p = subprocess.run(args, env=new_environ, close_fds=False)
+
+        if old_term_attr:
+            _restore_termstate(old_term_attr)
+
         if p.returncode != 3:
             return p.returncode
 
@@ -572,8 +581,6 @@ def get_reloader():
 
 
 def start_django(reloader, main_func, *args, **kwargs):
-    ensure_echo_on()
-
     main_func = check_errors(main_func)
     django_main_thread = threading.Thread(target=main_func, args=args, kwargs=kwargs, name='django-main-thread')
     django_main_thread.setDaemon(True)

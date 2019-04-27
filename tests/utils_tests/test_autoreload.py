@@ -250,12 +250,6 @@ class StartDjangoTests(SimpleTestCase):
         autoreload.start_django(fake_reloader, lambda: None)
         self.assertEqual(mocked_stat.call_count, 1)
 
-    @mock.patch('django.utils.autoreload.ensure_echo_on')
-    def test_echo_on_called(self, mocked_echo):
-        fake_reloader = mock.MagicMock()
-        autoreload.start_django(fake_reloader, lambda: None)
-        self.assertEqual(mocked_echo.call_count, 1)
-
     @mock.patch('django.utils.autoreload.check_errors')
     def test_check_errors_called(self, mocked_check_errors):
         fake_method = mock.MagicMock(return_value=None)
@@ -374,6 +368,25 @@ class RestartWithReloaderTests(SimpleTestCase):
             autoreload.restart_with_reloader()
             self.assertEqual(mock_call.call_count, 1)
             self.assertEqual(mock_call.call_args[0][0], [self.executable, '-Wall', '-m', 'django'] + argv[1:])
+
+    @mock.patch('termios.tcsetattr')
+    @mock.patch('termios.tcgetattr')
+    @mock.patch('sys.stdin.isatty', lambda: True)
+    @skipIf(autoreload.termios is None, "no termios")
+    def test_restart_with_reloader_resets_term(self, mocked_tcgetattr, mocked_tcsetattr):
+        import termios
+
+        sentinel = object()
+        mocked_tcgetattr.return_value = sentinel
+
+        argv = ['./manage.py', 'runserver']
+        mock_call = self.patch_autoreload(argv)
+        autoreload.restart_with_reloader()
+        self.assertEqual(mock_call.call_count, 1)
+        self.assertEqual(mock_call.call_args[0][0], [self.executable, '-Wall'] + argv)
+
+        self.assertEqual(list(mocked_tcgetattr.call_args), [(sys.stdin,), {}])
+        self.assertEqual(list(mocked_tcsetattr.call_args), [(sys.stdin, termios.TCSADRAIN, sentinel), {}])
 
 
 class ReloaderTests(SimpleTestCase):
