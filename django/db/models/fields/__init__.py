@@ -732,10 +732,7 @@ class Field(RegisterLookupMixin):
         """
         self.set_attributes_from_name(name)
         self.model = cls
-        if private_only:
-            cls._meta.add_field(self, private=True)
-        else:
-            cls._meta.add_field(self)
+        cls._meta.add_field(self, private=private_only)
         if self.column:
             # Don't override classmethods with the descriptor. This means that
             # if you have a classmethod and a field with the same name, then
