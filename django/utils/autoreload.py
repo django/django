@@ -272,7 +272,12 @@ class BaseReloader:
         from django.urls import get_resolver
         # Prevent a race condition where URL modules aren't loaded when the
         # reloader starts by accessing the urlconf_module property.
-        get_resolver().urlconf_module
+        try:
+            get_resolver().urlconf_module
+        except Exception:
+            # Loading the urlconf can result in errors during development.
+            # If this occurs then swallow the error and continue.
+            pass
         logger.debug('Apps ready_event triggered. Sending autoreload_started signal.')
         autoreload_started.send(sender=self)
         self.run_loop()
