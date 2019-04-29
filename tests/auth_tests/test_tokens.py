@@ -31,21 +31,33 @@ class TokenGeneratorTest(TestCase):
         """
         The token is valid after n days, but no greater.
         """
-        # Uses a mocked version of PasswordResetTokenGenerator so we can change
-        # the value of 'today'
-        class Mocked(PasswordResetTokenGenerator):
-            def __init__(self, today):
-                self._today_val = today
-
-            def _today(self):
-                return self._today_val
-
         user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
         p0 = PasswordResetTokenGenerator()
         tk1 = p0.make_token(user)
-        p1 = Mocked(date.today() + timedelta(settings.PASSWORD_RESET_TIMEOUT_DAYS))
+        p1 = MockedTodayPasswordResetTokenGenerator(
+            date.today() + timedelta(settings.PASSWORD_RESET_TIMEOUT_DAYS))
         self.assertTrue(p1.check_token(user, tk1))
-        p2 = Mocked(date.today() + timedelta(settings.PASSWORD_RESET_TIMEOUT_DAYS + 1))
+        p2 = MockedTodayPasswordResetTokenGenerator(
+            date.today() + timedelta(settings.PASSWORD_RESET_TIMEOUT_DAYS + 1))
+        self.assertFalse(p2.check_token(user, tk1))
+
+    def test_overridden_timeout(self):
+        """
+        It is possible to create token generators that use a timeout different than
+        settings.PASSWORD_RESET_TIMEOUT_DAYS.
+        """
+        timeout = settings.PASSWORD_RESET_TIMEOUT_DAYS + 1
+        today = date.today()
+
+        class Mocked(MockedTodayPasswordResetTokenGenerator):
+            timeout_days = timeout
+
+        user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
+        p0 = Mocked(today)
+        tk1 = p0.make_token(user)
+        p1 = Mocked(today + timedelta(timeout))
+        self.assertTrue(p1.check_token(user, tk1))
+        p2 = Mocked(today + timedelta(timeout + 1))
         self.assertFalse(p2.check_token(user, tk1))
 
     def test_check_token_with_nonexistent_token_and_user(self):
@@ -75,3 +87,15 @@ class TokenGeneratorTest(TestCase):
         # Tokens created with a different secret don't validate.
         self.assertFalse(p0.check_token(user, tk1))
         self.assertFalse(p1.check_token(user, tk0))
+
+
+class MockedTodayPasswordResetTokenGenerator(PasswordResetTokenGenerator):
+    """
+    Version of PasswordResetTokenGenerator where the
+    value used for 'today' can be mocked.
+    """
+    def __init__(self, today):
+        self._today_val = today
+
+    def _today(self):
+        return self._today_val
