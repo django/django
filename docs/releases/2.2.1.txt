@@ -64,3 +64,6 @@ Bugfixes
   permissions for proxy models if the target permissions already existed. For
   example, when a permission had been created manually or a model had been
   migrated from concrete to proxy (:ticket:`30351`).
+
+* Fixed a regression in Django 2.2 that caused a crash of :djadmin:`runserver`
+  when URLConf modules raised exceptions (:ticket:`30323`).
