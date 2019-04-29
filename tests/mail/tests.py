@@ -748,9 +748,29 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
                 'utf-8',
                 '=?utf-8?q?to=40other=2Ecom?= <to@example.com>',
             ),
+            (
+                ('To Example', 'to@other.com@example.com'),
+                'utf-8',
+                '=?utf-8?q?To_Example?= <"to@other.com"@example.com>',
+            ),
         ):
             with self.subTest(email_address=email_address, encoding=encoding):
                 self.assertEqual(sanitize_address(email_address, encoding), expected_result)
+
+    def test_sanitize_address_invalid(self):
+        for email_address in (
+            # Invalid address with two @ signs.
+            'to@other.com@example.com',
+            # Invalid address without the quotes.
+            'to@other.com <to@example.com>',
+            # Other invalid addresses.
+            '@',
+            'to@',
+            '@example.com',
+        ):
+            with self.subTest(email_address=email_address):
+                with self.assertRaises(ValueError):
+                    sanitize_address(email_address, encoding='utf-8')
 
 
 @requires_tz_support
