@@ -375,7 +375,7 @@ class SelectForUpdateTests(TransactionTestCase):
 
         # Check the thread has finished. Assuming it has, we should
         # find that it has updated the person's name.
-        self.assertFalse(thread.isAlive())
+        self.assertFalse(thread.is_alive())
 
         # We must commit the transaction to ensure that MySQL gets a fresh read,
         # since by default it runs in REPEATABLE READ mode
