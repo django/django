@@ -546,6 +546,8 @@ class WatchmanReloader(BaseReloader):
                 for sub in list(self.client.subs.keys()):
                     self._check_subscription(sub)
             yield
+            # Protect against busy loops.
+            time.sleep(0.1)
 
     def stop(self):
         self.client.close()
