@@ -509,6 +509,7 @@ class WatchmanReloader(BaseReloader):
             except pywatchman.SocketTimeout:
                 pass
             except pywatchman.WatchmanError as ex:
+                logger.debug('Watchman error: %s, checking server status.', ex)
                 self.check_server_status(ex)
             else:
                 for sub in list(self.client.subs.keys()):
