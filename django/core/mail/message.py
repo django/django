@@ -2,15 +2,15 @@ import mimetypes
 from email import (
     charset as Charset, encoders as Encoders, generator, message_from_string,
 )
-from email.errors import InvalidHeaderDefect, NonASCIILocalPartDefect
+from email.errors import HeaderParseError
 from email.header import Header
-from email.headerregistry import Address
+from email.headerregistry import Address, parser
 from email.message import Message
 from email.mime.base import MIMEBase
 from email.mime.message import MIMEMessage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.utils import formatdate, getaddresses, make_msgid, parseaddr
+from email.utils import formatdate, getaddresses, make_msgid
 from io import BytesIO, StringIO
 from pathlib import Path
 
@@ -71,56 +71,44 @@ def forbid_multi_line_headers(name, val, encoding):
     return name, val
 
 
-def split_addr(addr, encoding):
-    """
-    Split the address into local part and domain and encode them.
-
-    When non-ascii characters are present in the local part, it must be
-    MIME-word encoded. The domain name must be idna-encoded if it contains
-    non-ascii characters.
-    """
-    if '@' in addr:
-        localpart, domain = addr.split('@', 1)
-        # Try to get the simplest encoding - ascii if possible so that
-        # to@example.com doesn't become =?utf-8?q?to?=@example.com. This
-        # makes unit testing a bit easier and more readable.
-        try:
-            localpart.encode('ascii')
-        except UnicodeEncodeError:
-            localpart = Header(localpart, encoding).encode()
-        domain = domain.encode('idna').decode('ascii')
-    else:
-        localpart = Header(addr, encoding).encode()
-        domain = ''
-    return (localpart, domain)
-
-
 def sanitize_address(addr, encoding):
     """
     Format a pair of (name, address) or an email address string.
     """
+    address = None
     if not isinstance(addr, tuple):
-        addr = parseaddr(addr)
-    nm, addr = addr
-    localpart, domain = None, None
+        addr = force_str(addr)
+        try:
+            token, rest = parser.get_mailbox(addr)
+        except (HeaderParseError, ValueError, IndexError):
+            raise ValueError('Invalid address "%s"' % addr)
+        else:
+            if rest:
+                # The entire email address must be parsed.
+                raise ValueError(
+                    'Invalid adddress; only %s could be parsed from "%s"'
+                    % (token, addr)
+                )
+            nm = token.display_name or ''
+            localpart = token.local_part
+            domain = token.domain or ''
+    else:
+        nm, address = addr
+        localpart, domain = address.rsplit('@', 1)
+
     nm = Header(nm, encoding).encode()
+    # Avoid UTF-8 encode, if it's possible.
     try:
-        addr.encode('ascii')
-    except UnicodeEncodeError:  # IDN or non-ascii in the local part
-        localpart, domain = split_addr(addr, encoding)
-
-    # An `email.headerregistry.Address` object is used since
-    # email.utils.formataddr() naively encodes the name as ascii (see #25986).
-    if localpart and domain:
-        address = Address(nm, username=localpart, domain=domain)
-        return str(address)
-
+        localpart.encode('ascii')
+    except UnicodeEncodeError:
+        localpart = Header(localpart, encoding).encode()
     try:
-        address = Address(nm, addr_spec=addr)
-    except (InvalidHeaderDefect, NonASCIILocalPartDefect):
-        localpart, domain = split_addr(addr, encoding)
-        address = Address(nm, username=localpart, domain=domain)
-    return str(address)
+        domain.encode('ascii')
+    except UnicodeEncodeError:
+        domain = domain.encode('idna').decode('ascii')
+
+    parsed_address = Address(nm, username=localpart, domain=domain)
+    return str(parsed_address)
 
 
 class MIMEMixin:
