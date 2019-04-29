@@ -705,32 +705,27 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertEqual(message.get_payload(), encoding.body_encode(body))
 
     def test_sanitize_address(self):
-        """
-        Email addresses are properly sanitized.
-        """
-        # Simple ASCII address - string form
-        self.assertEqual(sanitize_address('to@example.com', 'ascii'), 'to@example.com')
-        self.assertEqual(sanitize_address('to@example.com', 'utf-8'), 'to@example.com')
-
-        # Simple ASCII address - tuple form
-        self.assertEqual(
-            sanitize_address(('A name', 'to@example.com'), 'ascii'),
-            'A name <to@example.com>'
-        )
-        self.assertEqual(
-            sanitize_address(('A name', 'to@example.com'), 'utf-8'),
-            '=?utf-8?q?A_name?= <to@example.com>'
-        )
-
-        # Unicode characters are are supported in RFC-6532.
-        self.assertEqual(
-            sanitize_address('tó@example.com', 'utf-8'),
-            '=?utf-8?b?dMOz?=@example.com'
-        )
-        self.assertEqual(
-            sanitize_address(('Tó Example', 'tó@example.com'), 'utf-8'),
-            '=?utf-8?q?T=C3=B3_Example?= <=?utf-8?b?dMOz?=@example.com>'
-        )
+        """Email addresses are properly sanitized."""
+        for email_address, encoding, expected_result in (
+            # ASCII addresses.
+            ('to@example.com', 'ascii', 'to@example.com'),
+            ('to@example.com', 'utf-8', 'to@example.com'),
+            (('A name', 'to@example.com'), 'ascii', 'A name <to@example.com>'),
+            (
+                ('A name', 'to@example.com'),
+                'utf-8',
+                '=?utf-8?q?A_name?= <to@example.com>',
+            ),
+            # Unicode addresses (supported per RFC-6532).
+            ('tó@example.com', 'utf-8', '=?utf-8?b?dMOz?=@example.com'),
+            (
+                ('Tó Example', 'tó@example.com'),
+                'utf-8',
+                '=?utf-8?q?T=C3=B3_Example?= <=?utf-8?b?dMOz?=@example.com>',
+            ),
+        ):
+            with self.subTest(email_address=email_address, encoding=encoding):
+                self.assertEqual(sanitize_address(email_address, encoding), expected_result)
 
 
 @requires_tz_support
