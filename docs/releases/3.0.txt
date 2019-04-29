@@ -368,6 +368,8 @@ Miscellaneous
 * The ``django-admin test -k`` option now works as the :option:`unittest
   -k<unittest.-k>` option rather than as a shortcut for ``--keepdb``.
 
+* Support for ``pywatchman`` < 1.2.0 is removed.
+
 .. _deprecated-features-3.0:
 
 Features deprecated in 3.0

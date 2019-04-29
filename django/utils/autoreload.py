@@ -506,6 +506,8 @@ class WatchmanReloader(BaseReloader):
                 self.processed_request.clear()
             try:
                 self.client.receive()
+            except pywatchman.SocketTimeout:
+                pass
             except pywatchman.WatchmanError as ex:
                 self.check_server_status(ex)
             else:
