@@ -324,41 +324,33 @@ class StatReloader(BaseReloader):
     SLEEP_TIME = 1  # Check for changes once per second.
 
     def tick(self):
-        state, previous_timestamp = {}, time.time()
+        mtimes = {}
         while True:
-            state.update(self.loop_files(state, previous_timestamp))
-            previous_timestamp = time.time()
+            for filepath, mtime in self.snapshot_files():
+                old_time = mtimes.get(filepath)
+                if old_time is None:
+                    logger.debug('File %s first seen with mtime %s', filepath, mtime)
+                    mtimes[filepath] = mtime
+                    continue
+                elif mtime > old_time:
+                    logger.debug('File %s previous mtime: %s, current mtime: %s', filepath, old_time, mtime)
+                    self.notify_file_changed(filepath)
+
             time.sleep(self.SLEEP_TIME)
             yield
 
-    def loop_files(self, previous_times, previous_timestamp):
-        updated_times = {}
-        for path, mtime in self.snapshot_files():
-            previous_time = previous_times.get(path)
-            # If there are overlapping globs, a file may be iterated twice.
-            if path in updated_times:
-                continue
-            # A new file has been detected. This could happen due to it being
-            # imported at runtime and only being polled now, or because the
-            # file was just created. Compare the file's mtime to the
-            # previous_timestamp and send a notification if it was created
-            # since the last poll.
-            is_newly_created = previous_time is None and mtime > previous_timestamp
-            is_changed = previous_time is not None and previous_time != mtime
-            if is_newly_created or is_changed:
-                logger.debug('File %s. is_changed: %s, is_new: %s', path, is_changed, is_newly_created)
-                logger.debug('File %s previous mtime: %s, current mtime: %s', path, previous_time, mtime)
-                self.notify_file_changed(path)
-                updated_times[path] = mtime
-        return updated_times
-
     def snapshot_files(self):
+        # watched_files may produce duplicate paths if globs overlap.
+        seen_files = set()
         for file in self.watched_files():
+            if file in seen_files:
+                continue
             try:
                 mtime = file.stat().st_mtime
             except OSError:
                 # This is thrown when the file does not exist.
                 continue
+            seen_files.add(file)
             yield file, mtime
 
     @classmethod
@@ -564,7 +556,7 @@ def start_django(reloader, main_func, *args, **kwargs):
     ensure_echo_on()
 
     main_func = check_errors(main_func)
-    django_main_thread = threading.Thread(target=main_func, args=args, kwargs=kwargs)
+    django_main_thread = threading.Thread(target=main_func, args=args, kwargs=kwargs, name='django-main-thread')
     django_main_thread.setDaemon(True)
     django_main_thread.start()
 

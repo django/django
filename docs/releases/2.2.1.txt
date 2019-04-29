@@ -67,3 +67,6 @@ Bugfixes
 
 * Fixed a regression in Django 2.2 that caused a crash of :djadmin:`runserver`
   when URLConf modules raised exceptions (:ticket:`30323`).
+
+* Fixed a regression in Django 2.2 where changes were not reliably detected by
+  auto-reloader when using ``StatReloader`` (:ticket:`30323`).
