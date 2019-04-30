@@ -187,7 +187,7 @@ class BaseDatabaseWrapper:
         self.needs_rollback = False
         # Reset parameters defining when to close the connection
         max_age = self.settings_dict['CONN_MAX_AGE']
-        self.close_at = None if max_age is None else time.time() + max_age
+        self.close_at = None if max_age is None else time.monotonic() + max_age
         self.closed_in_transaction = False
         self.errors_occurred = False
         # Establish the connection
@@ -510,7 +510,7 @@ class BaseDatabaseWrapper:
                     self.close()
                     return
 
-            if self.close_at is not None and time.time() >= self.close_at:
+            if self.close_at is not None and time.monotonic() >= self.close_at:
                 self.close()
                 return
 
