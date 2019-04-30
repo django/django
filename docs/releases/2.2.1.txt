@@ -74,3 +74,6 @@ Bugfixes
 * Fixed a migration crash on Oracle and PostgreSQL when adding a check
   constraint with a ``contains``, ``startswith``, or ``endswith`` lookup (or
   their case-insensitive variant) (:ticket:`30408`).
+
+* Fixed a migration crash on Oracle and SQLite when adding a check constraint
+  with ``condition`` contains ``|`` (``OR``) operator (:ticket:`30412`).
