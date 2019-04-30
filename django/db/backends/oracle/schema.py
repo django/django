@@ -23,7 +23,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         if isinstance(value, (datetime.date, datetime.time, datetime.datetime)):
             return "'%s'" % value
         elif isinstance(value, str):
-            return "'%s'" % value.replace("\'", "\'\'")
+            return "'%s'" % value.replace("\'", "\'\'").replace('%', '%%')
         elif isinstance(value, (bytes, bytearray, memoryview)):
             return "'%s'" % value.hex()
         elif isinstance(value, bool):
