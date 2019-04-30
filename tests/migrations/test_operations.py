@@ -1856,6 +1856,49 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[2], {'model_name': "Pony", 'constraint': gt_constraint})
 
     @skipUnlessDBFeature('supports_table_check_constraints')
+    def test_add_constraint_percent_escaping(self):
+        app_label = 'add_constraint_string_quoting'
+        operations = [
+            CreateModel(
+                'Author',
+                fields=[
+                    ('id', models.AutoField(primary_key=True)),
+                    ('name', models.CharField(max_length=100)),
+                    ('rebate', models.CharField(max_length=100)),
+                ],
+            ),
+        ]
+        from_state = self.apply_operations(app_label, ProjectState(), operations)
+        # "%" generated in startswith lookup should be escaped in a way that is
+        # considered a leading wildcard.
+        check = models.Q(name__startswith='Albert')
+        constraint = models.CheckConstraint(check=check, name='name_constraint')
+        operation = migrations.AddConstraint('Author', constraint)
+        to_state = from_state.clone()
+        operation.state_forwards(app_label, to_state)
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, from_state, to_state)
+        Author = to_state.apps.get_model(app_label, 'Author')
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Author.objects.create(name='Artur')
+        # Literal "%" should be escaped in a way that is not a considered a
+        # wildcard.
+        check = models.Q(rebate__endswith='%')
+        constraint = models.CheckConstraint(check=check, name='rebate_constraint')
+        operation = migrations.AddConstraint('Author', constraint)
+        from_state = to_state
+        to_state = from_state.clone()
+        operation.state_forwards(app_label, to_state)
+        Author = to_state.apps.get_model(app_label, 'Author')
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, from_state, to_state)
+        Author = to_state.apps.get_model(app_label, 'Author')
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Author.objects.create(name='Albert', rebate='10$')
+        author = Author.objects.create(name='Albert', rebate='10%')
+        self.assertEqual(Author.objects.get(), author)
+
+    @skipUnlessDBFeature('supports_table_check_constraints')
     def test_remove_constraint(self):
         project_state = self.set_up_test_model("test_removeconstraint", constraints=[
             models.CheckConstraint(check=models.Q(pink__gt=2), name="test_remove_constraint_pony_pink_gt_2"),

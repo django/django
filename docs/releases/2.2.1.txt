@@ -70,3 +70,7 @@ Bugfixes
 
 * Fixed a regression in Django 2.2 where changes were not reliably detected by
   auto-reloader when using ``StatReloader`` (:ticket:`30323`).
+
+* Fixed a migration crash on Oracle and PostgreSQL when adding a check
+  constraint with a ``contains``, ``startswith``, or ``endswith`` lookup (or
+  their case-insensitive variant) (:ticket:`30408`).
