@@ -1569,11 +1569,13 @@ class Model(metaclass=ModelBase):
     def _check_local_fields(cls, fields, option):
         from django.db import models
 
+        forward_fields_map = {}
         # In order to avoid hitting the relation tree prematurely, we use our
         # own fields_map instead of using get_field()
-        forward_fields_map = {
-            field.name: field for field in cls._meta._get_fields(reverse=False)
-        }
+        for field in cls._meta._get_fields(reverse=False):
+            forward_fields_map[field.name] = field
+            if hasattr(field, 'attname'):
+                forward_fields_map[field.attname] = field
 
         errors = []
         for field_name in fields:
