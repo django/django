@@ -218,6 +218,7 @@ Models
   treatment of nonexistent and ambiguous datetimes.
 
 * ``connection.queries`` now shows ``COPY … TO`` statements on PostgreSQL.
+
 * Added :class:`~django.db.models.Index` support for :attr:`~django.db.models.Field.db_index`.
 
 * :class:`~django.db.models.FilePathField` now accepts a callable ``path``.
