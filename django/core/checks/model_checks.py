@@ -10,6 +10,8 @@ from django.core.checks import Error, Tags, register
 @register(Tags.models)
 def check_all_models(app_configs=None, **kwargs):
     db_table_models = defaultdict(list)
+    indexes = defaultdict(list)
+    constraints = defaultdict(list)
     errors = []
     if app_configs is None:
         models = apps.get_models()
@@ -29,6 +31,10 @@ def check_all_models(app_configs=None, **kwargs):
             )
         else:
             errors.extend(model.check(**kwargs))
+        for model_index in model._meta.indexes:
+            indexes[model_index.name].append(model._meta.label)
+        for model_constraint in model._meta.constraints:
+            constraints[model_constraint.name].append(model._meta.label)
     for db_table, model_labels in db_table_models.items():
         if len(model_labels) != 1:
             errors.append(
@@ -38,6 +44,32 @@ def check_all_models(app_configs=None, **kwargs):
                     obj=db_table,
                     id='models.E028',
                 )
+            )
+    for index_name, model_labels in indexes.items():
+        if len(model_labels) > 1:
+            model_labels = set(model_labels)
+            errors.append(
+                Error(
+                    "index name '%s' is not unique %s %s." % (
+                        index_name,
+                        'for model' if len(model_labels) == 1 else 'amongst models:',
+                        ', '.join(sorted(model_labels)),
+                    ),
+                    id='models.E029' if len(model_labels) == 1 else 'models.E030',
+                ),
+            )
+    for constraint_name, model_labels in constraints.items():
+        if len(model_labels) > 1:
+            model_labels = set(model_labels)
+            errors.append(
+                Error(
+                    "constraint name '%s' is not unique %s %s." % (
+                        constraint_name,
+                        'for model' if len(model_labels) == 1 else 'amongst models:',
+                        ', '.join(sorted(model_labels)),
+                    ),
+                    id='models.E031' if len(model_labels) == 1 else 'models.E032',
+                ),
             )
     return errors
 

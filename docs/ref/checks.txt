@@ -306,6 +306,13 @@ Models
 * **models.W027**: ``<database>`` does not support check constraints.
 * **models.E028**: ``db_table`` ``<db_table>`` is used by multiple models:
   ``<model list>``.
+* **models.E029**: index name ``<index>`` is not unique for model ``<model>``.
+* **models.E030**: index name ``<index>`` is not unique amongst models:
+  ``<model list>``.
+* **models.E031**: constraint name ``<constraint>`` is not unique for model
+  ``<model>``.
+* **models.E032**: constraint name ``<constraint>`` is not unique amongst
+  models: ``<model list>``.
 
 Security
 --------

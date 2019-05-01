@@ -1,7 +1,7 @@
 from django.core import checks
 from django.core.checks import Error
 from django.db import models
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import (
     isolate_apps, modify_settings, override_system_checks,
 )
@@ -73,3 +73,166 @@ class DuplicateDBTableTests(SimpleTestCase):
 
         self.assertEqual(Model._meta.db_table, ProxyModel._meta.db_table)
         self.assertEqual(checks.run_checks(app_configs=self.apps.get_app_configs()), [])
+
+
+@isolate_apps('check_framework', attr_name='apps')
+@override_system_checks([checks.model_checks.check_all_models])
+class IndexNameTests(SimpleTestCase):
+    def test_collision_in_same_model(self):
+        index = models.Index(fields=['id'], name='foo')
+
+        class Model(models.Model):
+            class Meta:
+                indexes = [index, index]
+
+        self.assertEqual(checks.run_checks(app_configs=self.apps.get_app_configs()), [
+            Error(
+                "index name 'foo' is not unique for model check_framework.Model.",
+                id='models.E029',
+            ),
+        ])
+
+    def test_collision_in_different_models(self):
+        index = models.Index(fields=['id'], name='foo')
+
+        class Model1(models.Model):
+            class Meta:
+                indexes = [index]
+
+        class Model2(models.Model):
+            class Meta:
+                indexes = [index]
+
+        self.assertEqual(checks.run_checks(app_configs=self.apps.get_app_configs()), [
+            Error(
+                "index name 'foo' is not unique amongst models: "
+                "check_framework.Model1, check_framework.Model2.",
+                id='models.E030',
+            ),
+        ])
+
+    def test_collision_abstract_model(self):
+        class AbstractModel(models.Model):
+            class Meta:
+                indexes = [models.Index(fields=['id'], name='foo')]
+                abstract = True
+
+        class Model1(AbstractModel):
+            pass
+
+        class Model2(AbstractModel):
+            pass
+
+        self.assertEqual(checks.run_checks(app_configs=self.apps.get_app_configs()), [
+            Error(
+                "index name 'foo' is not unique amongst models: "
+                "check_framework.Model1, check_framework.Model2.",
+                id='models.E030',
+            ),
+        ])
+
+    @modify_settings(INSTALLED_APPS={'append': 'basic'})
+    @isolate_apps('basic', 'check_framework', kwarg_name='apps')
+    def test_collision_across_apps(self, apps):
+        index = models.Index(fields=['id'], name='foo')
+
+        class Model1(models.Model):
+            class Meta:
+                app_label = 'basic'
+                indexes = [index]
+
+        class Model2(models.Model):
+            class Meta:
+                app_label = 'check_framework'
+                indexes = [index]
+
+        self.assertEqual(checks.run_checks(app_configs=apps.get_app_configs()), [
+            Error(
+                "index name 'foo' is not unique amongst models: basic.Model1, "
+                "check_framework.Model2.",
+                id='models.E030',
+            ),
+        ])
+
+
+@isolate_apps('check_framework', attr_name='apps')
+@override_system_checks([checks.model_checks.check_all_models])
+@skipUnlessDBFeature('supports_table_check_constraints')
+class ConstraintNameTests(TestCase):
+    def test_collision_in_same_model(self):
+        class Model(models.Model):
+            class Meta:
+                constraints = [
+                    models.CheckConstraint(check=models.Q(id__gt=0), name='foo'),
+                    models.CheckConstraint(check=models.Q(id__lt=100), name='foo'),
+                ]
+
+        self.assertEqual(checks.run_checks(app_configs=self.apps.get_app_configs()), [
+            Error(
+                "constraint name 'foo' is not unique for model "
+                "check_framework.Model.",
+                id='models.E031',
+            ),
+        ])
+
+    def test_collision_in_different_models(self):
+        constraint = models.CheckConstraint(check=models.Q(id__gt=0), name='foo')
+
+        class Model1(models.Model):
+            class Meta:
+                constraints = [constraint]
+
+        class Model2(models.Model):
+            class Meta:
+                constraints = [constraint]
+
+        self.assertEqual(checks.run_checks(app_configs=self.apps.get_app_configs()), [
+            Error(
+                "constraint name 'foo' is not unique amongst models: "
+                "check_framework.Model1, check_framework.Model2.",
+                id='models.E032',
+            ),
+        ])
+
+    def test_collision_abstract_model(self):
+        class AbstractModel(models.Model):
+            class Meta:
+                constraints = [models.CheckConstraint(check=models.Q(id__gt=0), name='foo')]
+                abstract = True
+
+        class Model1(AbstractModel):
+            pass
+
+        class Model2(AbstractModel):
+            pass
+
+        self.assertEqual(checks.run_checks(app_configs=self.apps.get_app_configs()), [
+            Error(
+                "constraint name 'foo' is not unique amongst models: "
+                "check_framework.Model1, check_framework.Model2.",
+                id='models.E032',
+            ),
+        ])
+
+    @modify_settings(INSTALLED_APPS={'append': 'basic'})
+    @isolate_apps('basic', 'check_framework', kwarg_name='apps')
+    def test_collision_across_apps(self, apps):
+        constraint = models.CheckConstraint(check=models.Q(id__gt=0), name='foo')
+
+        class Model1(models.Model):
+            class Meta:
+                app_label = 'basic'
+                constraints = [constraint]
+
+        class Model2(models.Model):
+            class Meta:
+                app_label = 'check_framework'
+                constraints = [constraint]
+
+        self.assertEqual(checks.run_checks(app_configs=apps.get_app_configs()), [
+            Error(
+                "constraint name 'foo' is not unique amongst models: "
+                "basic.Model1, check_framework.Model2.",
+                id='models.E032',
+            ),
+        ])
