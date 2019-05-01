@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "DJANGO-ADMIN" "1" "April 01, 2019" "2.2" "Django"
+.TH "DJANGO-ADMIN" "1" "May 01, 2019" "2.2" "Django"
 .SH NAME
 django-admin \- Utility script for the Django Web framework
 .
@@ -1195,6 +1195,14 @@ When using Watchman with a project that includes large non\-Python
 directories like \fBnode_modules\fP, it\(aqs advisable to ignore this directory
 for optimal performance. See the \fI\%watchman documentation\fP for information
 on how to do this.
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.IP "Watchman timeout"
+.sp
+The default timeout of \fBWatchman\fP client is 5 seconds. You can change it
+by setting the \fBDJANGO_WATCHMAN_TIMEOUT\fP environment variable.
 .UNINDENT
 .UNINDENT
 .sp
