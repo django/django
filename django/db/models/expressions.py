@@ -1,6 +1,8 @@
 import copy
 import datetime
 import inspect
+import itertools
+import multipledispatch
 from decimal import Decimal
 
 from django.core.exceptions import EmptyResultSet, FieldError
@@ -51,6 +53,10 @@ class Combinable:
     BITOR = '|'
     BITLEFTSHIFT = '<<'
     BITRIGHTSHIFT = '>>'
+
+    # This allows CombinedExpression.dispatch to register special handling
+    # for given operand types, regardless of operator
+    ANY = None
 
     def _combine(self, other, connector, reversed):
         if not hasattr(other, 'resolve_expression'):
@@ -388,6 +394,7 @@ class Expression(BaseExpression, Combinable):
 
 
 class CombinedExpression(SQLiteNumericMixin, Expression):
+    expression_dispatchers = {}
 
     def __init__(self, lhs, connector, rhs, output_field=None):
         super().__init__(output_field=output_field)

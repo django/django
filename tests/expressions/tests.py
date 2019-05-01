@@ -1584,3 +1584,16 @@ class CombinableTests(SimpleTestCase):
     def test_reversed_or(self):
         with self.assertRaisesMessage(NotImplementedError, self.bitwise_msg):
             object() | Combinable()
+
+
+class OperatorTests(TestCase):
+
+    def test_add(self):
+        instance = Employee.objects.create(firstname='John', lastname='Doe')
+        Employee.objects.update(
+            firstname=F('firstname') + Value('_firstname', output_field=CharField()),
+            lastname=F('lastname') + Value('_lastname', output_field=CharField())
+        )
+        instance.refresh_from_db()
+        self.assertEqual(instance.firstname, 'John_firstname')
+        self.assertEqual(instance.lastname, 'Doe_lastname')

@@ -30,9 +30,11 @@ from django.db.models.fields.related import (  # isort:skip
     ForeignKey, ForeignObject, OneToOneField, ManyToManyField,
     ManyToOneRel, ManyToManyRel, OneToOneRel,
 )
+from django.db.models.operators import *  # NOQA isort:skip
+from django.db.models.operators import __all__ as operators_all
 
 
-__all__ = aggregates_all + constraints_all + fields_all + indexes_all
+__all__ = aggregates_all + constraints_all + fields_all + indexes_all + operators_all
 __all__ += [
     'ObjectDoesNotExist', 'signals',
     'CASCADE', 'DO_NOTHING', 'PROTECT', 'SET', 'SET_DEFAULT', 'SET_NULL',
