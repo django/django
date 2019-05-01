@@ -2,7 +2,7 @@
 Django 2.2.1 release notes
 ==========================
 
-*Expected May 1, 2019*
+*May 1, 2019*
 
 Django 2.2.1 fixes several bugs in 2.2.
 
