@@ -39,10 +39,10 @@ Use standard DB optimization techniques
 
 * Indexes_. This is a number one priority, *after* you have determined from
   profiling what indexes should be added. Use
-  :attr:`Field.db_index <django.db.models.Field.db_index>` or
-  :attr:`Meta.index_together <django.db.models.Options.index_together>` to add
-  these from Django. Consider adding indexes to fields that you frequently
-  query using :meth:`~django.db.models.query.QuerySet.filter()`,
+  :attr:`Meta.indexes <django.db.models.Options.indexes>` or
+  :attr:`Field.db_index <django.db.models.Field.db_index>` to add these from
+  Django. Consider adding indexes to fields that you frequently query using
+  :meth:`~django.db.models.query.QuerySet.filter()`,
   :meth:`~django.db.models.query.QuerySet.exclude()`,
   :meth:`~django.db.models.query.QuerySet.order_by()`, etc. as indexes may help
   to speed up lookups. Note that determining the best indexes is a complex
