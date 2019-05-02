@@ -559,7 +559,7 @@ class SliceableF(F):
     """
     def __init__(self, f_obj, slice_obj):
         if not isinstance(slice_obj, (int, slice)):
-            raise TypeError
+            raise TypeError("Argument to slice must be either int or slice instance.")
 
         is_negative_int = isinstance(slice_obj, int) and (slice_obj < 0)
         has_negative_slice = (
