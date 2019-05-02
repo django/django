@@ -118,3 +118,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def supports_default_in_lead_lag(self):
         # To be added in https://jira.mariadb.org/browse/MDEV-12981.
         return not self.connection.mysql_is_mariadb
+
+    @cached_property
+    def supports_parentheses_in_subquery_compound(self):
+        # Fixed with version 8 (https://dev.mysql.com/worklog/task/?id=8083)
+        return self.connection.mysql_version >= (8, 0, 0)

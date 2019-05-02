@@ -498,6 +498,19 @@ class BasicExpressionsTests(TestCase):
         )
         self.assertCountEqual(contrived.values_list(), outer.values_list())
 
+    def test_union_subquery(self):
+        qs1 = Company.objects.filter(num_employees__lt=50)
+        qs2 = Company.objects.filter(num_employees__gt=50)
+
+        self.assertSequenceEqual(
+            Employee.objects.annotate(
+                company_name=Subquery(
+                    qs1.union(qs2).filter(ceo=OuterRef('pk')).values('name')
+                ),
+            ).values_list('company_name', flat=True),
+            ['Example Inc.', 'Foobar Ltd.', 'Test GmbH']
+        )
+
     def test_nested_subquery_outer_ref_2(self):
         first = Time.objects.create(time='09:00')
         second = Time.objects.create(time='17:00')

@@ -422,6 +422,26 @@ class SQLCompiler:
                         *self.query.values_select,
                         *self.query.annotation_select,
                     ))
+                if self.query.subquery:
+                    from django.db.models.fields.related_lookups import RelatedExact
+                    from django.db.models.sql.datastructures import BaseTable
+                    related_exacts = [
+                        child for child in self.query.where.children
+                        if isinstance(child, RelatedExact)
+                    ]
+                    if related_exacts:
+                        exact_children = [
+                            child for child in compiler.query.where.children
+                            if isinstance(child, RelatedExact) is False
+                        ]
+                        compiler.query.where.children = exact_children + related_exacts
+                        base_alias = [k for k, v in self.query.alias_map.items() if isinstance(v, BaseTable)][0]
+                        base_table = [k for k, v in compiler.query.alias_map.items() if isinstance(v, BaseTable)][0]
+                        compiler.query.table_map[base_table] = [base_alias]
+                        compiler.query.change_aliases({
+                            k: v[0] for k, v in compiler.query.table_map.items()
+                            if k != v[0]
+                        })
                 part_sql, part_args = compiler.as_sql()
                 if compiler.query.combinator:
                     # Wrap in a subquery if wrapping in parentheses isn't
@@ -444,7 +464,11 @@ class SQLCompiler:
         combinator_sql = self.connection.ops.set_operators[combinator]
         if all and combinator == 'union':
             combinator_sql += ' ALL'
-        braces = '({})' if features.supports_slicing_ordering_in_compound else '{}'
+        braces = '{}'
+        if self.query.subquery and features.supports_parentheses_in_subquery_compound is False:
+            pass
+        elif features.supports_slicing_ordering_in_compound:
+            braces = '({})'
         sql_parts, args_parts = zip(*((braces.format(sql), args) for sql, args in parts))
         result = [' {} '.format(combinator_sql).join(sql_parts)]
         params = []

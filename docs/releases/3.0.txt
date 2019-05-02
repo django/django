@@ -208,6 +208,8 @@ Models
 
 * :class:`~django.db.models.FilePathField` now accepts a callable ``path``.
 
+* Allowed using subqueries with ``union()``.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
