@@ -32,7 +32,8 @@ class SQLCompiler:
         self.select = None
         self.annotation_col_map = None
         self.klass_info = None
-        self.ordering_parts = re.compile(r'(.*)\s(ASC|DESC)(.*)')
+        # Multiline ordering SQL clause may appear from RawSQL.
+        self.ordering_parts = re.compile(r'^(.*)\s(ASC|DESC)(.*)', re.MULTILINE | re.DOTALL)
         self._meta_ordering = None
 
     def setup_query(self):
