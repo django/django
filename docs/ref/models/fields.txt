@@ -868,6 +868,23 @@ directory on the filesystem. Has three special arguments, of which the first is
     Required. The absolute filesystem path to a directory from which this
     :class:`FilePathField` should get its choices. Example: ``"/home/images"``.
 
+    ``path`` may also be a callable, such as a function to dynamically set the
+    path at runtime. Example::
+
+        import os
+        from django.conf import settings
+        from django.db import models
+
+        def images_path():
+            return os.path.join(settings.LOCAL_FILE_DIR, 'images')
+
+        class MyModel(models.Model):
+            file = models.FilePathField(path=images_path)
+
+    .. versionchanged:: 3.0
+
+        ``path`` can now be a callable.
+
 .. attribute:: FilePathField.match
 
     Optional. A regular expression, as a string, that :class:`FilePathField`

@@ -206,6 +206,8 @@ Models
 
 * ``connection.queries`` now shows ``COPY … TO`` statements on PostgreSQL.
 
+* :class:`~django.db.models.FilePathField` now accepts a callable ``path``.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
