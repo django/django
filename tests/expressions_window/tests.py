@@ -779,6 +779,14 @@ class WindowFunctionTests(TestCase):
             )))
 
 
+class WindowUnsupportedTests(TestCase):
+    def test_unsupported_backend(self):
+        msg = 'This backend does not support window expressions.'
+        with mock.patch.object(connection.features, 'supports_over_clause', False):
+            with self.assertRaisesMessage(NotSupportedError, msg):
+                Employee.objects.annotate(dense_rank=Window(expression=DenseRank())).get()
+
+
 class NonQueryWindowTests(SimpleTestCase):
     def test_window_repr(self):
         self.assertEqual(
@@ -827,12 +835,6 @@ class NonQueryWindowTests(SimpleTestCase):
         msg = 'Window is disallowed in the filter clause'
         with self.assertRaisesMessage(NotSupportedError, msg):
             Employee.objects.annotate(dense_rank=Window(expression=DenseRank())).filter(dense_rank__gte=1)
-
-    def test_unsupported_backend(self):
-        msg = 'This backend does not support window expressions.'
-        with mock.patch.object(connection.features, 'supports_over_clause', False):
-            with self.assertRaisesMessage(NotSupportedError, msg):
-                Employee.objects.annotate(dense_rank=Window(expression=DenseRank())).get()
 
     def test_invalid_order_by(self):
         msg = 'order_by must be either an Expression or a sequence of expressions'
