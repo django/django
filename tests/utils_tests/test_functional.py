@@ -233,6 +233,10 @@ class FunctionalTests(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, msg):
             lazy_obj()
 
+    def test_lazy_str_cast_mixed_result_types(self):
+        lazy_value = lazy(lambda: [1], str, list)()
+        self.assertEqual(str(lazy_value), "[1]")
+
     def test_classproperty_getter(self):
         class Foo:
             foo_attr = 123
