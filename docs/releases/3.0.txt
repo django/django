@@ -165,6 +165,12 @@ Forms
   :attr:`~django.forms.formsets.BaseFormSet.ordering_widget` attribute or
   overriding :attr:`~django.forms.formsets.BaseFormSet.get_ordering_widget()`.
 
+* Form fields generated for a :class:`~django.db.models.IntegerField`
+  will now include ``min`` and/or ``max`` attributes if a
+  :class:`~django.core.validators.MinValueValidator` and/or a
+  :class:`~django.core.validators.MaxValueValidator` are part of the field's
+  validators.
+
 Generic Views
 ~~~~~~~~~~~~~
 

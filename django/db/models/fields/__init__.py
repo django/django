@@ -1833,6 +1833,21 @@ class IntegerField(Field):
             )
 
     def formfield(self, **kwargs):
+        for validator in self.validators:
+            if isinstance(validator, validators.MinValueValidator):
+                value = (
+                    validator.limit_value()
+                    if callable(validator.limit_value)
+                    else validator.limit_value
+                )
+                kwargs['min_value'] = max(value, kwargs.get('min_value', value))
+            elif isinstance(validator, validators.MaxValueValidator):
+                value = (
+                    validator.limit_value()
+                    if callable(validator.limit_value)
+                    else validator.limit_value
+                )
+                kwargs['max_value'] = min(value, kwargs.get('max_value', value))
         return super().formfield(**{
             'form_class': forms.IntegerField,
             **kwargs,
