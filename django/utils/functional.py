@@ -99,15 +99,6 @@ def lazy(func, *resultclasses):
                 self.__prepare_class__()
             self.__class__.__prepared = True
 
-        def __reduce__(self):
-            return (
-                _lazy_proxy_unpickle,
-                (func, self.__args, self.__kw) + resultclasses,
-            )
-
-        def __repr__(self):
-            return repr(self.__cast())
-
         @classmethod
         def __prepare_class__(cls):
             for resultclass in resultclasses:
@@ -133,6 +124,9 @@ def lazy(func, *resultclasses):
 
         def __cast(self):
             return func(*self.__args, **self.__kw)
+
+        def __repr__(self):
+            return repr(self.__cast())
 
         def __str__(self):
             # object defines __str__(), so __prepare_class__() won't overload
@@ -160,6 +154,12 @@ def lazy(func, *resultclasses):
 
         def __radd__(self, other):
             return other + self.__cast()
+
+        def __reduce__(self):
+            return (
+                _lazy_proxy_unpickle,
+                (func, self.__args, self.__kw) + resultclasses
+            )
 
         def __deepcopy__(self, memo):
             # Instances of this class are effectively immutable. It's just a
