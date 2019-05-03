@@ -125,8 +125,6 @@ def lazy(func, *resultclasses):
                     "Cannot call lazy() with both bytes and text return types."
                 )
 
-            if cls._delegate_bytes:
-                cls.__bytes__ = cls.__bytes_cast
 
         @classmethod
         def __promise__(cls, method_name):
@@ -138,9 +136,6 @@ def lazy(func, *resultclasses):
                 return getattr(res, method_name)(*args, **kw)
 
             return __wrapper__
-
-        def __bytes_cast(self):
-            return bytes(func(*self.__args, **self.__kw))
 
         def __cast(self):
             return func(*self.__args, **self.__kw)
