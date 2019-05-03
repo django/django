@@ -1,7 +1,7 @@
 import copy
 import itertools
 import operator
-from functools import total_ordering, wraps
+from functools import wraps
 
 
 class cached_property:
@@ -82,7 +82,6 @@ def lazy(func, *resultclasses):
     function is evaluated on every access.
     """
 
-    @total_ordering
     class __proxy__(Promise):
         """
         Encapsulate a function call and act as a proxy for methods that are
@@ -138,10 +137,30 @@ def lazy(func, *resultclasses):
                 other = other.__cast()
             return self.__cast() == other
 
+        def __ne__(self, other):
+            if isinstance(other, Promise):
+                other = other.__cast()
+            return self.__cast() != other
+
         def __lt__(self, other):
             if isinstance(other, Promise):
                 other = other.__cast()
             return self.__cast() < other
+
+        def __le__(self, other):
+            if isinstance(other, Promise):
+                other = other.__cast()
+            return self.__cast() <= other
+
+        def __gt__(self, other):
+            if isinstance(other, Promise):
+                other = other.__cast()
+            return self.__cast() > other
+
+        def __ge__(self, other):
+            if isinstance(other, Promise):
+                other = other.__cast()
+            return self.__cast() >= other
 
         def __hash__(self):
             return hash(self.__cast())
