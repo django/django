@@ -120,8 +120,7 @@ def lazy(func, *resultclasses):
                         meth = cls.__promise__(method_name)
                         setattr(cls, method_name, meth)
             cls._delegate_bytes = bytes in resultclasses
-            cls._delegate_text = str in resultclasses
-            if cls._delegate_bytes and cls._delegate_text:
+            if cls._delegate_bytes and str in resultclasses:
                 raise ValueError(
                     "Cannot call lazy() with both bytes and text return types."
                 )
