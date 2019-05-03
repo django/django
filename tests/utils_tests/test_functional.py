@@ -229,9 +229,7 @@ class FunctionalTests(SimpleTestCase):
 
     def test_lazy_bytes_and_str_result_classes(self):
         lazy_obj = lazy(lambda: "test", str, bytes)
-        msg = "Cannot call lazy() with both bytes and text return types."
-        with self.assertRaisesMessage(ValueError, msg):
-            lazy_obj()
+        self.assertEqual(str(lazy_obj()), "test")
 
     def test_lazy_str_cast_mixed_result_types(self):
         lazy_value = lazy(lambda: [1], str, list)()
