@@ -104,8 +104,12 @@ def lazy(func, *resultclasses):
                 (func, self.__args, self.__kw) + resultclasses,
             )
 
-        def __repr__(self):
-            return repr(self.__cast())
+        def __deepcopy__(self, memo):
+            # Instances of this class are effectively immutable. It's just a
+            # collection of functions. So we don't need to do anything
+            # complicated for copying.
+            memo[id(self)] = self
+            return self
 
         @classmethod
         def __prepare_class__(cls):
@@ -132,6 +136,12 @@ def lazy(func, *resultclasses):
 
         def __cast(self):
             return func(*self.__args, **self.__kw)
+
+        # Explicitly wrap methods which are defined on object and hence would
+        # not have been overloaded by the loop over resultclasses below.
+
+        def __repr__(self):
+            return repr(self.__cast())
 
         def __str__(self):
             # object defines __str__(), so __prepare_class__() won't overload
@@ -171,8 +181,8 @@ def lazy(func, *resultclasses):
         def __hash__(self):
             return hash(self.__cast())
 
-        def __mod__(self, rhs):
-            return self.__cast() % rhs
+        # Explicitly wrap methods which are required for certain operations on
+        # int/str objects to function correctly.
 
         def __add__(self, other):
             return self.__cast() + other
@@ -180,12 +190,8 @@ def lazy(func, *resultclasses):
         def __radd__(self, other):
             return other + self.__cast()
 
-        def __deepcopy__(self, memo):
-            # Instances of this class are effectively immutable. It's just a
-            # collection of functions. So we don't need to do anything
-            # complicated for copying.
-            memo[id(self)] = self
-            return self
+        def __mod__(self, other):
+            return self.__cast() % other
 
     @wraps(func)
     def __wrapper__(*args, **kw):
