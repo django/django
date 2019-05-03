@@ -38,6 +38,7 @@ class Article(models.Model):
     # correctly created. Refs #20207
     publications = models.ManyToManyField(Publication, name='publications')
     tags = models.ManyToManyField(Tag, related_name='tags')
+    authors = models.ManyToManyField('User', through='UserArticle')
 
     objects = NoDeletedArticleManager()
 
@@ -46,6 +47,18 @@ class Article(models.Model):
 
     def __str__(self):
         return self.headline
+
+
+class User(models.Model):
+    username = models.CharField(max_length=20, unique=True)
+
+    def __str__(self):
+        return self.username
+
+
+class UserArticle(models.Model):
+    user = models.ForeignKey(User, models.CASCADE, to_field='username')
+    article = models.ForeignKey(Article, models.CASCADE)
 
 
 # Models to test correct related_name inheritance

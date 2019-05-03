@@ -3,7 +3,9 @@ from unittest import mock
 from django.db import transaction
 from django.test import TestCase, skipUnlessDBFeature
 
-from .models import Article, InheritedArticleA, InheritedArticleB, Publication
+from .models import (
+    Article, InheritedArticleA, InheritedArticleB, Publication, User,
+)
 
 
 class ManyToManyTests(TestCase):
@@ -75,6 +77,32 @@ class ManyToManyTests(TestCase):
                 '<Publication: The Python Journal>',
             ]
         )
+
+    def test_add_remove_set_by_pk(self):
+        a5 = Article.objects.create(headline='Django lets you create Web apps easily')
+        a5.publications.add(self.p1.pk)
+        self.assertQuerysetEqual(
+            a5.publications.all(),
+            ['<Publication: The Python Journal>'],
+        )
+        a5.publications.set([self.p2.pk])
+        self.assertQuerysetEqual(
+            a5.publications.all(),
+            ['<Publication: Science News>'],
+        )
+        a5.publications.remove(self.p2.pk)
+        self.assertQuerysetEqual(a5.publications.all(), [])
+
+    def test_add_remove_set_by_to_field(self):
+        user_1 = User.objects.create(username='Jean')
+        user_2 = User.objects.create(username='Joe')
+        a5 = Article.objects.create(headline='Django lets you create Web apps easily')
+        a5.authors.add(user_1.username)
+        self.assertQuerysetEqual(a5.authors.all(), ['<User: Jean>'])
+        a5.authors.set([user_2.username])
+        self.assertQuerysetEqual(a5.authors.all(), ['<User: Joe>'])
+        a5.authors.remove(user_2.username)
+        self.assertQuerysetEqual(a5.authors.all(), [])
 
     def test_reverse_add(self):
         # Adding via the 'other' end of an m2m
