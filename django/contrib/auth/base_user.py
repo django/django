@@ -15,8 +15,8 @@ from django.utils.translation import gettext_lazy as _
 
 class BaseUserManager(models.Manager):
 
-    @classmethod
-    def normalize_email(cls, email):
+    @staticmethod
+    def normalize_email(email):
         """
         Normalize the email address by lowercasing the domain part of it.
         """
@@ -29,7 +29,8 @@ class BaseUserManager(models.Manager):
             email = email_name + '@' + domain_part.lower()
         return email
 
-    def make_random_password(self, length=10,
+    @staticmethod
+    def make_random_password(length=10,
                              allowed_chars='abcdefghjkmnpqrstuvwxyz'
                                            'ABCDEFGHJKLMNPQRSTUVWXYZ'
                                            '23456789'):
@@ -134,6 +135,6 @@ class AbstractBaseUser(models.Model):
         except AttributeError:
             return 'email'
 
-    @classmethod
-    def normalize_username(cls, username):
+    @staticmethod
+    def normalize_username(username):
         return unicodedata.normalize('NFKC', username) if isinstance(username, str) else username
