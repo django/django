@@ -1,3 +1,5 @@
+from unittest import mock
+
 from django.test import SimpleTestCase
 from django.utils.functional import cached_property, lazy
 
@@ -207,3 +209,12 @@ class FunctionalTests(SimpleTestCase):
         original_object = b'J\xc3\xbcst a str\xc3\xadng'
         lazy_obj = lazy(lambda: original_object, bytes)
         self.assertEqual(repr(original_object), repr(lazy_obj()))
+
+    def test_lazy_class_preparation_caching(self):
+        # lazy() should prepare the proxy class only once i.e. the first time
+        # it's used.
+        lazified = lazy(lambda: 0, int)
+        __proxy__ = lazified().__class__
+        with mock.patch.object(__proxy__, '__prepare_class__') as mocked:
+            lazified()
+            mocked.assert_not_called()
