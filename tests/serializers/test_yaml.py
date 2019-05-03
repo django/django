@@ -85,22 +85,6 @@ class NoYamlSerializerTestCase(SimpleTestCase):
 @unittest.skipUnless(HAS_YAML, "No yaml library detected")
 class YamlSerializerTestCase(SerializersTestBase, TestCase):
     serializer_name = "yaml"
-    fwd_ref_str = """- fields:
-    headline: Forward references pose no problem
-    pub_date: 2006-06-16 15:00:00
-    categories: [1]
-    author: 1
-  pk: 1
-  model: serializers.article
-- fields:
-    name: Reference
-  pk: 1
-  model: serializers.category
-- fields:
-    name: Agnes
-  pk: 1
-  model: serializers.author"""
-
     pkless_str = """- fields:
     name: Reference
   pk: null
