@@ -28,8 +28,18 @@ datetime_re = re.compile(
 
 standard_duration_re = re.compile(
     r'^'
-    r'(?:(?P<days>-?\d+) (days?, )?)?'
     r'(?P<sign>-?)'
+    r'(?:(?P<days>\d+) )?'
+    r'((?:(?P<hours>\d+):)(?=\d+:\d+))?'
+    r'(?:(?P<minutes>\d+):)?'
+    r'(?P<seconds>\d+)'
+    r'(?:\.(?P<microseconds>\d{1,6})\d{0,6})?'
+    r'$'
+)
+
+python_duration_re = re.compile(
+    r'^'
+    r'(?:(?P<days>-?\d+) days?, )?'
     r'((?:(?P<hours>\d+):)(?=\d+:\d+))?'
     r'(?:(?P<minutes>\d+):)?'
     r'(?P<seconds>\d+)'
@@ -57,7 +67,7 @@ iso8601_duration_re = re.compile(
 postgres_interval_re = re.compile(
     r'^'
     r'(?:(?P<days>-?\d+) (days? ?))?'
-    r'(?:(?P<sign>[-+])?'
+    r'(?:(?P<time_sign>[-+])?'
     r'(?P<hours>\d+):'
     r'(?P<minutes>\d\d):'
     r'(?P<seconds>\d\d)'
@@ -132,6 +142,7 @@ def parse_duration(value):
     """
     match = (
         standard_duration_re.match(value) or
+        python_duration_re.match(value) or
         iso8601_duration_re.match(value) or
         postgres_interval_re.match(value)
     )
@@ -139,9 +150,10 @@ def parse_duration(value):
         kw = match.groupdict()
         days = datetime.timedelta(float(kw.pop('days', 0) or 0))
         sign = -1 if kw.pop('sign', '+') == '-' else 1
+        time_sign = -1 if kw.pop('time_sign', '+') == '-' else 1
         if kw.get('microseconds'):
             kw['microseconds'] = kw['microseconds'].ljust(6, '0')
         if kw.get('seconds') and kw.get('microseconds') and kw['seconds'].startswith('-'):
             kw['microseconds'] = '-' + kw['microseconds']
         kw = {k: float(v) for k, v in kw.items() if v is not None}
-        return days + sign * datetime.timedelta(**kw)
+        return sign * (days + time_sign * datetime.timedelta(**kw))

@@ -111,7 +111,8 @@ class DurationParseTests(unittest.TestCase):
 
     def test_negative(self):
         test_values = (
-            ('-4 15:30', timedelta(days=-4, minutes=15, seconds=30)),
+            ('-4 15:30', timedelta(days=-4, minutes=-15, seconds=-30)),
+            ('-4 -15:30', None),
             ('-172800', timedelta(days=-2)),
             ('-15:30', timedelta(minutes=-15, seconds=-30)),
             ('-1:15:30', timedelta(hours=-1, minutes=-15, seconds=-30)),
