@@ -373,6 +373,10 @@ Miscellaneous
 
 * Support for ``pywatchman`` < 1.2.0 is removed.
 
+* HTML rendered by :class:`~django.forms.SelectDateWidget` for required fields
+  now have the ``placeholder`` attribute, which mainly may require some
+  adjustments in tests that compare HTML.
+
 .. _deprecated-features-3.0:
 
 Features deprecated in 3.0
