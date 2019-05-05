@@ -80,6 +80,7 @@ class CursorWrapper:
         self.db.validate_no_broken_transaction()
         with self.db.wrap_database_errors:
             if params is None:
+                # params default might be backend specific.
                 return self.cursor.execute(sql)
             else:
                 return self.cursor.execute(sql, params)
