@@ -20,8 +20,8 @@ script:
   - pytest
 
 stages:
-  - lint
   - test
+  - lint
   - name: release
     if: tag IS present
 
@@ -36,7 +36,7 @@ jobs:
       install: pip install -U -e .[tests] black pyflakes isort
       script:
         - pyflakes channels tests
-        - black --check channels tests
+        - black --check --diff channels tests
         - isort --check-only --diff --recursive channels tests
 
     - stage: release
