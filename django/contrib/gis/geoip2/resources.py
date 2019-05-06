@@ -6,6 +6,7 @@ def City(response):
         'country_code': response.country.iso_code,
         'country_name': response.country.name,
         'dma_code': response.location.metro_code,
+        'is_in_european_union': response.country.is_in_european_union,
         'latitude': response.location.latitude,
         'longitude': response.location.longitude,
         'postal_code': response.postal.code,
