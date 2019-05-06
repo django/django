@@ -7,7 +7,7 @@ from django.utils.functional import lazy
 from django.utils.translation import override
 
 from .exceptions import NoReverseMatch, Resolver404
-from .resolvers import get_ns_resolver, get_resolver
+from .resolvers import _get_cached_resolver, get_ns_resolver, get_resolver
 from .utils import get_callable
 
 # SCRIPT_NAME prefixes for each thread are stored here. If there's no entry for
@@ -92,7 +92,7 @@ reverse_lazy = lazy(reverse, str)
 
 def clear_url_caches():
     get_callable.cache_clear()
-    get_resolver.cache_clear()
+    _get_cached_resolver.cache_clear()
     get_ns_resolver.cache_clear()
 
 
