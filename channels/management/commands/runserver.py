@@ -51,7 +51,7 @@ class Command(RunserverCommand):
         self.http_timeout = options.get("http_timeout", None)
         self.websocket_handshake_timeout = options.get("websocket_handshake_timeout", 5)
         # Check Channels is installed right
-        if not hasattr(settings, "ASGI_APPLICATION"):
+        if options["use_asgi"] and not hasattr(settings, "ASGI_APPLICATION"):
             raise CommandError(
                 "You have not set ASGI_APPLICATION, which is needed to run the server."
             )
