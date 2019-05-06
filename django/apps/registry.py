@@ -3,7 +3,6 @@ import sys
 import threading
 import warnings
 from collections import Counter, defaultdict
-from functools import partial
 
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
 
@@ -399,7 +398,7 @@ class Apps:
             # has been imported and registered. The `func` attribute provides
             # duck-type compatibility with partials.
             def apply_next_model(model):
-                next_function = partial(apply_next_model.func, model)
+                next_function = functools.partial(apply_next_model.func, model)
                 self.lazy_model_operation(next_function, *more_models)
             apply_next_model.func = function
 
