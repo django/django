@@ -94,3 +94,31 @@ class CompetingTeam(Competitor):
 class ProxiedIndividualCompetitor(IndividualCompetitor):
     class Meta:
         proxy = True
+
+
+# Through model with default ordering defined
+# i.e., first place, second place, third place
+class Dog(models.Model):
+    class Meta:
+        ordering = ('name',)
+
+    name = models.CharField(max_length=128)
+
+    def __str__(self):
+        return self.name
+
+
+class OrderedMembership(models.Model):
+
+    class Meta:
+        ordering = ('position',)
+
+    dog = models.ForeignKey('Dog', models.CASCADE)
+    winner = models.ForeignKey('Winner', models.CASCADE)
+    position = models.PositiveIntegerField()
+
+
+class Winner(models.Model):
+    name = models.CharField(max_length=128)
+    # OrderedMembership object defined as a class
+    members = models.ManyToManyField(Dog, through=OrderedMembership)

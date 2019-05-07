@@ -5,7 +5,8 @@ from django.core import management
 from django.test import TestCase
 
 from .models import (
-    Car, CarDriver, Driver, Group, Membership, Person, UserMembership,
+    Car, CarDriver, Dog, Driver, Group, Membership, OrderedMembership, Person,
+    UserMembership, Winner,
 )
 
 
@@ -262,4 +263,51 @@ class ThroughLoadDataTestCase(TestCase):
             '[{"pk": 1, "model": "m2m_through_regress.usermembership", "fields": {"price": 100, "group": 1, "user"'
             ': 1}}, {"pk": 1, "model": "m2m_through_regress.person", "fields": {"name": "Guido"}}, {"pk": 1, '
             '"model": "m2m_through_regress.group", "fields": {"name": "Python Core Group"}}]'
+        )
+
+
+class M2MThroughCustomOrderingTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.rover = Dog.objects.create(name="Rover")
+        cls.fido = Dog.objects.create(name="Fido")
+        cls.lassie = Dog.objects.create(name="Lassie")
+
+        cls.dog_show = Winner.objects.create(name="AKC Dog Show")
+
+        OrderedMembership.objects.create(dog=cls.lassie, winner=cls.dog_show, position=3)
+        OrderedMembership.objects.create(dog=cls.fido, winner=cls.dog_show, position=2)
+        OrderedMembership.objects.create(dog=cls.rover, winner=cls.dog_show, position=1)
+
+    def test_default_model_order(self):
+        self.assertQuerysetEqual(
+            list(self.dog_show.members.all()), [
+                "<Dog: Rover>",
+                "<Dog: Fido>",
+                "<Dog: Lassie>",
+            ]
+        )
+
+    def test_order_by_precedence(self):
+        self.assertQuerysetEqual(
+            list(self.dog_show.members.order_by('name').all()), [
+                "<Dog: Fido>",
+                "<Dog: Lassie>",
+                "<Dog: Rover>",
+            ]
+        )
+
+    def test_secondary_ordering(self):
+        # order by OrderedMembership.position _first_,
+        # *then* Dog.name
+        tied_dog_show = Winner.objects.create(name="AKC Dog Show")
+
+        for dog in (self.lassie, self.fido, self.rover):
+            OrderedMembership.objects.create(dog=dog, winner=tied_dog_show, position=1)
+        self.assertQuerysetEqual(
+            list(tied_dog_show.members.all()), [
+                "<Dog: Fido>",
+                "<Dog: Lassie>",
+                "<Dog: Rover>",
+            ]
         )

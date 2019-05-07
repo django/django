@@ -24,7 +24,7 @@ class M2mThroughTests(TestCase):
         Membership.objects.create(person=self.jim, group=self.rock)
         Membership.objects.create(person=self.jane, group=self.rock)
 
-        expected = ['Jane', 'Jim']
+        expected = ['Jim', 'Jane']
         self.assertQuerysetEqual(
             self.rock.members.all(),
             expected,

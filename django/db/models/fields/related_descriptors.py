@@ -875,7 +875,17 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             queryset._add_hints(instance=self.instance)
             if self._db:
                 queryset = queryset.using(self._db)
-            return queryset._next_is_sticky().filter(**self.core_filters)
+            queryset = queryset._next_is_sticky().filter(**self.core_filters)
+            qn = connections[queryset.db].ops.quote_name
+            ordering = [
+                '%s.%s' % (
+                    qn(self.through._meta.db_table),
+                    qn(self.through._meta.get_field(o).get_attname_column()[1])
+                ) for o in self.through._meta.ordering
+            ] + list(self.model._meta.ordering)
+            if ordering:
+                queryset.query.extra_order_by = ordering
+            return queryset
 
         def _remove_prefetched_objects(self):
             try:
