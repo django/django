@@ -1,6 +1,6 @@
 import functools
 from importlib import import_module
-from inspect import getfullargspec
+from inspect import getfullargspec, unwrap
 
 from django.utils.html import conditional_escape
 from django.utils.itercompat import is_iterable
@@ -106,7 +106,7 @@ class Library:
             return 'world'
         """
         def dec(func):
-            params, varargs, varkw, defaults, kwonly, kwonly_defaults, _ = getfullargspec(func)
+            params, varargs, varkw, defaults, kwonly, kwonly_defaults, _ = getfullargspec(unwrap(func))
             function_name = (name or getattr(func, '_decorated_function', func).__name__)
 
             @functools.wraps(func)
@@ -143,7 +143,7 @@ class Library:
             return {'choices': choices}
         """
         def dec(func):
-            params, varargs, varkw, defaults, kwonly, kwonly_defaults, _ = getfullargspec(func)
+            params, varargs, varkw, defaults, kwonly, kwonly_defaults, _ = getfullargspec(unwrap(func))
             function_name = (name or getattr(func, '_decorated_function', func).__name__)
 
             @functools.wraps(func)
