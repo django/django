@@ -53,12 +53,10 @@ class StaticFilesHandler(WSGIHandler):
     def get_response(self, request):
         from django.http import Http404
 
-        if self._should_handle(request.path):
-            try:
-                return self.serve(request)
-            except Http404 as e:
-                return response_for_exception(request, e)
-        return super().get_response(request)
+        try:
+            return self.serve(request)
+        except Http404 as e:
+            return response_for_exception(request, e)
 
     def __call__(self, environ, start_response):
         if not self._should_handle(get_path_info(environ)):
