@@ -127,6 +127,7 @@ class GeoIPTest(SimpleTestCase):
             self.assertEqual('Houston', d['city'])
             self.assertEqual('TX', d['region'])
             self.assertEqual('America/Chicago', d['time_zone'])
+            self.assertFalse(d['is_in_european_union'])
             geom = g.geos(query)
             self.assertIsInstance(geom, GEOSGeometry)
 
