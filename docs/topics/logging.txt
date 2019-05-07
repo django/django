@@ -752,4 +752,5 @@ handlers are attached to the root logger to provide the behavior described
 above.
 
 See also :ref:`Configuring logging <configuring-logging>` to learn how you can
-complement or replace this default logging configuration.
+complement or replace this default logging configuration defined in
+:source:`django/utils/log.py`.
