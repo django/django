@@ -395,7 +395,6 @@ class DebugLexer(Lexer):
                 token_string = self.template_string[upto:start]
                 result.append(self.create_token(token_string, (upto, start), lineno, in_tag=False))
                 lineno += token_string.count('\n')
-                upto = start
             token_string = self.template_string[start:end]
             result.append(self.create_token(token_string, (start, end), lineno, in_tag=True))
             lineno += token_string.count('\n')
