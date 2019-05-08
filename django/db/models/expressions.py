@@ -1038,6 +1038,9 @@ class Subquery(Expression):
 
         resolve_all(clone.queryset.query.where)
 
+        for combined_query in clone.queryset.query.combined_queries:
+            resolve_all(combined_query.where)
+
         for key, value in clone.queryset.query.annotations.items():
             if isinstance(value, Subquery):
                 clone.queryset.query.annotations[key] = resolve(value)
