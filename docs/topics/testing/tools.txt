@@ -1603,14 +1603,16 @@ your test suite.
     * The ordering of attributes of an HTML element is not significant.
     * Attributes without an argument are equal to attributes that equal in
       name and value (see the examples).
+    * Text, character references, and entity references that refer to the same
+      character are equivalent.
 
     The following examples are valid tests and don't raise any
     ``AssertionError``::
 
         self.assertHTMLEqual(
-            '<p>Hello <b>world!</p>',
+            '<p>Hello <b>&#x27;world&#x27;!</p>',
             '''<p>
-                Hello   <b>world! </b>
+                Hello   <b>&#39;world&#39;! </b>
             </p>'''
         )
         self.assertHTMLEqual(
