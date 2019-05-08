@@ -3,8 +3,8 @@ import decimal
 import functools
 import hashlib
 import logging
+import time
 from contextlib import contextmanager
-from time import time
 
 from django.conf import settings
 from django.db.utils import NotSupportedError
@@ -105,11 +105,11 @@ class CursorDebugWrapper(CursorWrapper):
 
     @contextmanager
     def debug_sql(self, sql=None, params=None, use_last_executed_query=False, many=False):
-        start = time()
+        start = time.monotonic()
         try:
             yield
         finally:
-            stop = time()
+            stop = time.monotonic()
             duration = stop - start
             if use_last_executed_query:
                 sql = self.db.ops.last_executed_query(self.cursor, sql, params)
