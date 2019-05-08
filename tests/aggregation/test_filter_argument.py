@@ -1,7 +1,7 @@
 import datetime
 from decimal import Decimal
 
-from django.db.models import Case, Count, F, Q, Sum, When
+from django.db.models import Case, Count, F, OuterRef, Q, Subquery, Sum, When
 from django.test import TestCase
 
 from .models import Author, Book, Publisher
@@ -93,5 +93,17 @@ class FilteredAggregateTests(TestCase):
             double_age=F('age') * 2,
         ).aggregate(
             cnt=Count('pk', filter=Q(double_age__gt=100)),
+        )
+        self.assertEqual(aggs['cnt'], 2)
+
+    def test_filtered_aggregate_ref_subquery_annotation(self):
+        aggs = Author.objects.annotate(
+            earliest_book_year=Subquery(
+                Book.objects.filter(
+                    contact__pk=OuterRef('pk'),
+                ).order_by('pubdate').values('pubdate__year')[:1]
+            ),
+        ).aggregate(
+            cnt=Count('pk', filter=Q(earliest_book_year=2008)),
         )
         self.assertEqual(aggs['cnt'], 2)
