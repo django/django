@@ -1,0 +1,12 @@
+==========================
+Django 2.2.2 release notes
+==========================
+
+*Expected June 3, 2019*
+
+Django 2.2.2 fixes several bugs in 2.2.1.
+
+Bugfixes
+========
+
+* ...
