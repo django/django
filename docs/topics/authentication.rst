@@ -86,7 +86,8 @@ query string and uses that::
             close_old_connections()
 
             # Look up user from query string (you should also do things like
-            # check it's a valid user ID, or if scope["user"] is already populated)
+            # checking if it is a valid user ID, or if scope["user"] is already
+            # populated).
             user = User.objects.get(id=int(scope["query_string"]))
 
             # Return the inner application directly and let it run everything else
