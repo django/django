@@ -246,6 +246,11 @@ Tests
 * Tests and test cases to run can be selected by test name pattern using the
   new :option:`test -k` option.
 
+* HTML comparison, as used by
+  :meth:`~django.test.SimpleTestCase.assertHTMLEqual`, now treats text, character
+  references, and entity references that refer to the same character as
+  equivalent.
+
 URLs
 ~~~~
 

@@ -612,6 +612,31 @@ class HTMLEqualTests(SimpleTestCase):
             '<input type="text" id="id_name" />',
             '<input type="password" id="id_name" />')
 
+    def test_normalize_refs(self):
+        pairs = [
+            ('&#39;', '&#x27;'),
+            ('&#39;', "'"),
+            ('&#x27;', '&#39;'),
+            ('&#x27;', "'"),
+            ("'", '&#39;'),
+            ("'", '&#x27;'),
+            ('&amp;', '&#38;'),
+            ('&amp;', '&#x26;'),
+            ('&amp;', '&'),
+            ('&#38;', '&amp;'),
+            ('&#38;', '&#x26;'),
+            ('&#38;', '&'),
+            ('&#x26;', '&amp;'),
+            ('&#x26;', '&#38;'),
+            ('&#x26;', '&'),
+            ('&', '&amp;'),
+            ('&', '&#38;'),
+            ('&', '&#x26;'),
+        ]
+        for pair in pairs:
+            with self.subTest(repr(pair)):
+                self.assertHTMLEqual(*pair)
+
     def test_complex_examples(self):
         self.assertHTMLEqual(
             """<tr><th><label for="id_first_name">First name:</label></th>
