@@ -87,4 +87,3 @@ class LazyStreamTests(unittest.TestCase):
         with self.assertRaises(SuspiciousMultipartForm):
             while True:
                 stream.unget(b"Hey :D")
-
