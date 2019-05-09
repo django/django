@@ -542,17 +542,18 @@ class HTMLEqualTests(SimpleTestCase):
             'base', 'col',
         )
         for tag in self_closing_tags:
-            dom = parse_html('<p>Hello <%s> world</p>' % tag)
-            self.assertEqual(len(dom.children), 3)
-            self.assertEqual(dom[0], 'Hello')
-            self.assertEqual(dom[1].name, tag)
-            self.assertEqual(dom[2], 'world')
+            with self.subTest(tag):
+                dom = parse_html('<p>Hello <%s> world</p>' % tag)
+                self.assertEqual(len(dom.children), 3)
+                self.assertEqual(dom[0], 'Hello')
+                self.assertEqual(dom[1].name, tag)
+                self.assertEqual(dom[2], 'world')
 
-            dom = parse_html('<p>Hello <%s /> world</p>' % tag)
-            self.assertEqual(len(dom.children), 3)
-            self.assertEqual(dom[0], 'Hello')
-            self.assertEqual(dom[1].name, tag)
-            self.assertEqual(dom[2], 'world')
+                dom = parse_html('<p>Hello <%s /> world</p>' % tag)
+                self.assertEqual(len(dom.children), 3)
+                self.assertEqual(dom[0], 'Hello')
+                self.assertEqual(dom[1].name, tag)
+                self.assertEqual(dom[2], 'world')
 
     def test_simple_equal_html(self):
         self.assertHTMLEqual('', '')
