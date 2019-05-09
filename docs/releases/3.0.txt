@@ -217,6 +217,9 @@ Requests and Responses
 * Allowed :class:`~django.http.HttpResponse` to be initialized with
   :class:`memoryview` content.
 
+* For use in, for example, Django templates, :attr:`.HttpRequest.headers` now
+  allows look ups using underscores (e.g. ``user_agent``) in place of hyphens.
+
 Serialization
 ~~~~~~~~~~~~~
 
