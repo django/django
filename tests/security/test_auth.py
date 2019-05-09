@@ -249,6 +249,7 @@ async def test_logout_not_logged_in(session):
 
 
 @pytest.mark.django_db(transaction=True)
+@pytest.mark.asyncio
 async def test_scope_user_error_message(session):
     """
     Tests that the correct error message is thrown when scope user is accessed before it's ready
