@@ -180,7 +180,7 @@ class Parser(HTMLParser):
         # Special case handling of 'class' attribute, so that comparisons of DOM
         # instances are not sensitive to ordering of classes.
         attrs = [
-            (name, " ".join(sorted(value.split(" "))))
+            (name, ' '.join(sorted(value for value in ASCII_WHITESPACE.split(value) if value)))
             if name == "class"
             else (name, value)
             for name, value in attrs
