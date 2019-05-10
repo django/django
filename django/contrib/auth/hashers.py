@@ -296,43 +296,46 @@ class Argon2PasswordHasher(BasePasswordHasher):
     library = 'argon2'
     variety = 'argon2id'
 
-    time_cost = 2
-    memory_cost = 102400
-    parallelism = 8
+    time_cost = None
+    memory_cost = None
+    parallelism = None
+
+    def __init__(self):
+        self.argon2 = self._load_library()
+        self.time_cost = self.time_cost or self.argon2.DEFAULT_TIME_COST
+        self.memory_cost = self.memory_cost or self.argon2.DEFAULT_MEMORY_COST
+        self.parallelism = self.parallelism or self.argon2.DEFAULT_PARALLELISM
 
     def _get_type(self, variety=None):
-        argon2 = self._load_library()
         return {
-            'argon2d': argon2.low_level.Type.D,
-            'argon2i': argon2.low_level.Type.I,
-            'argon2id': argon2.low_level.Type.ID,
+            'argon2d': self.argon2.low_level.Type.D,
+            'argon2i': self.argon2.low_level.Type.I,
+            'argon2id': self.argon2.low_level.Type.ID,
         }.get(variety or self.variety, self.variety)
 
     def encode(self, password, salt):
-        argon2 = self._load_library()
-        data = argon2.low_level.hash_secret(
+        data = self.argon2.low_level.hash_secret(
             password.encode(),
             salt.encode(),
             time_cost=self.time_cost,
             memory_cost=self.memory_cost,
             parallelism=self.parallelism,
-            hash_len=argon2.DEFAULT_HASH_LENGTH,
+            hash_len=self.argon2.DEFAULT_HASH_LENGTH,
             type=self._get_type(),
         )
         return self.algorithm + data.decode('ascii')
 
     def verify(self, password, encoded):
-        argon2 = self._load_library()
         algorithm, variety, *_ = self._decode(encoded)
         assert algorithm == self.algorithm
         try:
-            return argon2.low_level.verify_secret(
+            return self.argon2.low_level.verify_secret(
                 (encoded[len(algorithm):]).encode('ascii'),
                 password.encode(),
                 type=self._get_type(variety),
             )
-        except (argon2.exceptions.VerifyMismatchError,
-                argon2.exceptions.VerificationError):
+        except (self.argon2.exceptions.VerifyMismatchError,
+                self.argon2.exceptions.VerificationError):
             return False
 
     def safe_summary(self, encoded):
@@ -354,10 +357,9 @@ class Argon2PasswordHasher(BasePasswordHasher):
         (algorithm, variety, version, time_cost, memory_cost, parallelism,
             salt, data) = self._decode(encoded)
         assert algorithm == self.algorithm
-        argon2 = self._load_library()
         return (
             self.variety != variety or
-            argon2.low_level.ARGON2_VERSION != version or
+            self.argon2.low_level.ARGON2_VERSION != version or
             self.time_cost != time_cost or
             self.memory_cost != memory_cost or
             self.parallelism != parallelism
