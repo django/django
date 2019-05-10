@@ -505,8 +505,10 @@ class TestUtilsHashPassArgon2(SimpleTestCase):
         self.assertFalse(check_password('wrong', encoded))
 
     def test_argon2_upgrade(self):
+        self._test_argon2_upgrade('variety', 'variety', 'argon2d')
+        self._test_argon2_upgrade('variety', 'variety', 'argon2i')
         self._test_argon2_upgrade('time_cost', 'time cost', 1)
-        self._test_argon2_upgrade('memory_cost', 'memory cost', 16)
+        self._test_argon2_upgrade('memory_cost', 'memory cost', 512)
         self._test_argon2_upgrade('parallelism', 'parallelism', 1)
 
     def test_argon2_version_upgrade(self):

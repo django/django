@@ -294,10 +294,19 @@ class Argon2PasswordHasher(BasePasswordHasher):
     """
     algorithm = 'argon2'
     library = 'argon2'
+    variety = 'argon2id'
 
     time_cost = 2
-    memory_cost = 512
-    parallelism = 2
+    memory_cost = 102400
+    parallelism = 8
+
+    def _get_type(self, variety=None):
+        argon2 = self._load_library()
+        return {
+            'argon2d': argon2.low_level.Type.D,
+            'argon2i': argon2.low_level.Type.I,
+            'argon2id': argon2.low_level.Type.ID,
+        }.get(variety or self.variety, self.variety)
 
     def encode(self, password, salt):
         argon2 = self._load_library()
@@ -308,21 +317,22 @@ class Argon2PasswordHasher(BasePasswordHasher):
             memory_cost=self.memory_cost,
             parallelism=self.parallelism,
             hash_len=argon2.DEFAULT_HASH_LENGTH,
-            type=argon2.low_level.Type.I,
+            type=self._get_type(),
         )
         return self.algorithm + data.decode('ascii')
 
     def verify(self, password, encoded):
         argon2 = self._load_library()
-        algorithm, rest = encoded.split('$', 1)
+        algorithm, variety, *_ = self._decode(encoded)
         assert algorithm == self.algorithm
         try:
             return argon2.low_level.verify_secret(
-                ('$' + rest).encode('ascii'),
+                (encoded[len(algorithm):]).encode('ascii'),
                 password.encode(),
-                type=argon2.low_level.Type.I,
+                type=self._get_type(variety),
             )
-        except argon2.exceptions.VerificationError:
+        except (argon2.exceptions.VerifyMismatchError,
+                argon2.exceptions.VerificationError):
             return False
 
     def safe_summary(self, encoded):
@@ -346,6 +356,7 @@ class Argon2PasswordHasher(BasePasswordHasher):
         assert algorithm == self.algorithm
         argon2 = self._load_library()
         return (
+            self.variety != variety or
             argon2.low_level.ARGON2_VERSION != version or
             self.time_cost != time_cost or
             self.memory_cost != memory_cost or
