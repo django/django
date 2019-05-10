@@ -1,4 +1,5 @@
 import inspect
+import re
 from importlib import import_module
 from pathlib import Path
 
@@ -399,6 +400,10 @@ def extract_views_from_urlpatterns(urlpatterns, base='', namespace=None):
     return views
 
 
+_REGEX_STRIP_CHARACTERS_RE = re.compile(r'((?<!\\)(?:\\{2})*(?!\\))([\^\?\$])')
+_REGEX_ESCAPE_CHARACTERS_RE = re.compile(r'\\([\#\&\\[\]\+\.\^\|\~\-\*\?\$])')
+
+
 def simplify_regex(pattern):
     r"""
     Clean up urlpattern regexes into something more readable by humans. For
@@ -408,7 +413,8 @@ def simplify_regex(pattern):
     pattern = replace_named_groups(pattern)
     pattern = replace_unnamed_groups(pattern)
     # clean up any outstanding regex-y characters.
-    pattern = pattern.replace('^', '').replace('$', '').replace('?', '')
+    pattern = _REGEX_STRIP_CHARACTERS_RE.sub(r'\g<1>', pattern)
+    pattern = _REGEX_ESCAPE_CHARACTERS_RE.sub(r'\g<1>', pattern)
     if not pattern.startswith('/'):
         pattern = '/' + pattern
     return pattern

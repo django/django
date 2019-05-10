@@ -358,3 +358,19 @@ class AdminDocViewFunctionsTests(SimpleTestCase):
         for pattern, output in tests:
             with self.subTest(pattern=pattern):
                 self.assertEqual(simplify_regex(pattern), output)
+
+    def test_simplify_regex_unescapes_escape_sequences_outside_groups(self):
+        tests = (
+            (r'^\^a/b-c/$', r'/^a/b-c/'),
+            (r'^(?P<a>\w+)\$/b\$$', r'/<a>$/b$'),
+            (r'^(?P<a>\w+)/\|$', r'/<a>/|'),
+            (r'^(?P<a>\w+)/\[\]$', r'/<a>/[]'),
+            (r'^(?P<a>\w+)/\+$', r'/<a>/+'),
+            (r'^(?P<a>\w+)/\.$', r'/<a>/.'),
+            (r'^(?P<a>\w+)/b/\\$', '/<a>/b/\\'),
+            (r'^(?P<a>\w+)/b/\\\$', r'/<a>/b/\$'),
+            (r'^(?P<a>\w+)/b/\\\\$', r'/<a>/b/\\'),
+        )
+        for pattern, output in tests:
+            with self.subTest(pattern=pattern):
+                self.assertEqual(simplify_regex(pattern), output)
