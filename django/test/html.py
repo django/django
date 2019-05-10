@@ -141,10 +141,13 @@ class HTMLParseError(Exception):
 
 
 class Parser(HTMLParser):
-    SELF_CLOSING_TAGS = (
-        'br', 'hr', 'input', 'img', 'meta', 'spacer', 'link', 'frame', 'base',
-        'col',
-    )
+    # https://html.spec.whatwg.org/#void-elements
+    SELF_CLOSING_TAGS = {
+        'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta',
+        'param', 'source', 'track', 'wbr',
+        # Deprecated tags
+        'frame', 'spacer',
+    }
 
     def __init__(self):
         super().__init__()
