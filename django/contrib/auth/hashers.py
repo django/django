@@ -146,14 +146,12 @@ def identify_hasher(encoded):
     return get_hasher(algorithm)
 
 
-def mask_hash(hash, show=6, char="*"):
+def mask_hash(hash, show=6, char='*'):
     """
     Return the given hash, with only the first ``show`` number shown. The
     rest are masked with ``char`` for security reasons.
     """
-    masked = hash[:show]
-    masked += char * len(hash[show:])
-    return masked
+    return '{}{}'.format(hash[:show], char * (len(hash) - show))
 
 
 class BasePasswordHasher:
@@ -412,12 +410,13 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
     library = ("bcrypt", "bcrypt")
     rounds = 12
 
+    def __init__(self):
+        self.bcrypt = self._load_library()
+
     def salt(self):
-        bcrypt = self._load_library()
-        return bcrypt.gensalt(self.rounds)
+        return self.bcrypt.gensalt(self.rounds)
 
     def encode(self, password, salt):
-        bcrypt = self._load_library()
         password = password.encode()
         # Hash the password prior to using bcrypt to prevent password
         # truncation as described in #20138.
@@ -425,7 +424,7 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
             # Use binascii.hexlify() because a hex encoded bytestring is str.
             password = binascii.hexlify(self.digest(password).digest())
 
-        data = bcrypt.hashpw(password, salt)
+        data = self.bcrypt.hashpw(password, salt)
         return "%s$%s" % (self.algorithm, data.decode('ascii'))
 
     def verify(self, password, encoded):
@@ -619,22 +618,23 @@ class CryptPasswordHasher(BasePasswordHasher):
     algorithm = "crypt"
     library = "crypt"
 
+    def __init__(self):
+        self.crypt = self._load_library()
+
     def salt(self):
         return get_random_string(2)
 
     def encode(self, password, salt):
-        crypt = self._load_library()
         assert len(salt) == 2
-        data = crypt.crypt(password, salt)
+        data = self.crypt.crypt(password, salt)
         assert data is not None  # A platform like OpenBSD with a dummy crypt module.
         # we don't need to store the salt, but Django used to do this
         return "%s$%s$%s" % (self.algorithm, '', data)
 
     def verify(self, password, encoded):
-        crypt = self._load_library()
         algorithm, salt, data = encoded.split('$', 2)
         assert algorithm == self.algorithm
-        return constant_time_compare(data, crypt.crypt(password, data))
+        return constant_time_compare(data, self.crypt.crypt(password, data))
 
     def safe_summary(self, encoded):
         algorithm, salt, data = encoded.split('$', 2)
