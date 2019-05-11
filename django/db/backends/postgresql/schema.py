@@ -6,8 +6,6 @@ from django.db.backends.ddl_references import IndexColumns
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
-    sql_alter_column_type = "ALTER COLUMN %(column)s TYPE %(type)s USING %(column)s::%(type)s"
-
     sql_create_sequence = "CREATE SEQUENCE %(sequence)s"
     sql_delete_sequence = "DROP SEQUENCE IF EXISTS %(sequence)s CASCADE"
     sql_set_sequence_max = "SELECT setval('%(sequence)s', MAX(%(column)s)) FROM %(table)s"
@@ -36,6 +34,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             output.append(like_index_statement)
         return output
 
+    def _field_data_type(self, field):
+        if field.is_relation:
+            return field.rel_db_type(self.connection)
+        return self.connection.data_types[field.get_internal_type()]
+
     def _create_like_index_sql(self, model, field):
         """
         Return the statement to create an index with varchar operator pattern
@@ -59,7 +62,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         return None
 
     def _alter_column_type_sql(self, model, old_field, new_field, new_type):
-        """Make ALTER TYPE with SERIAL make sense."""
+        self.sql_alter_column_type = 'ALTER COLUMN %(column)s TYPE %(type)s'
+        # Cast when data type changed.
+        if self._field_data_type(old_field) != self._field_data_type(new_field):
+            self.sql_alter_column_type += ' USING %(column)s::%(type)s'
+        # Make ALTER TYPE with SERIAL make sense.
         table = model._meta.db_table
         if new_type.lower() in ("serial", "bigserial"):
             column = new_field.column
