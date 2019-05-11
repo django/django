@@ -9,4 +9,5 @@ Django 2.2.2 fixes several bugs in 2.2.1.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 2.2 that stopped Show/Hide toggles working on
+  dynamically added admin inlines (:ticket:`30459`).

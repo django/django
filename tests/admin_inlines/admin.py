@@ -3,13 +3,14 @@ from django.contrib import admin
 from django.db import models
 
 from .models import (
-    Author, BinaryTree, CapoFamiglia, Chapter, ChildModel1, ChildModel2,
+    Author, BinaryTree, CapoFamiglia, Chapter, Child, ChildModel1, ChildModel2,
     Consigliere, EditablePKBook, ExtraTerrestrial, Fashionista, Holder,
     Holder2, Holder3, Holder4, Inner, Inner2, Inner3, Inner4Stacked,
     Inner4Tabular, NonAutoPKBook, NonAutoPKBookChild, Novel,
     NovelReadonlyChapter, ParentModelWithCustomPk, Poll, Profile,
     ProfileCollection, Question, ReadOnlyInline, ShoppingWeakness, Sighting,
-    SomeChildModel, SomeParentModel, SottoCapo, Title, TitleCollection,
+    SomeChildModel, SomeParentModel, SottoCapo, Teacher, Title,
+    TitleCollection,
 )
 
 site = admin.AdminSite(name="admin")
@@ -235,6 +236,18 @@ class SomeChildModelInline(admin.TabularInline):
     readonly_fields = ('readonly_field',)
 
 
+class StudentInline(admin.StackedInline):
+    model = Child
+    extra = 1
+    fieldsets = [
+        ('Name', {'fields': ('name',), 'classes': ('collapse',)}),
+    ]
+
+
+class TeacherAdmin(admin.ModelAdmin):
+    inlines = [StudentInline]
+
+
 site.register(TitleCollection, inlines=[TitleInline])
 # Test bug #12561 and #12778
 # only ModelAdmin media
@@ -257,3 +270,4 @@ site.register(BinaryTree, inlines=[BinaryTreeAdmin])
 site.register(ExtraTerrestrial, inlines=[SightingInline])
 site.register(SomeParentModel, inlines=[SomeChildModelInline])
 site.register([Question, Inner4Stacked, Inner4Tabular])
+site.register(Teacher, TeacherAdmin)
