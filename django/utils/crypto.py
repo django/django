@@ -3,7 +3,7 @@ Django's standard crypto functions and utilities.
 """
 import hashlib
 import hmac
-import random
+import secrets
 import time
 
 from django.conf import settings
@@ -11,7 +11,7 @@ from django.utils.encoding import force_bytes
 
 # Use the system PRNG if possible
 try:
-    random = random.SystemRandom()
+    sysrandom = secrets.SystemRandom()
     using_sysrandom = True
 except NotImplementedError:
     import warnings
@@ -61,12 +61,13 @@ def get_random_string(length=12,
         # time a random string is required. This may change the
         # properties of the chosen random sequence slightly, but this
         # is better than absolute predictability.
+        import random
         random.seed(
             hashlib.sha256(
                 ('%s%s%s' % (random.getstate(), time.time(), settings.SECRET_KEY)).encode()
             ).digest()
         )
-    return ''.join(random.choice(allowed_chars) for i in range(length))
+    return ''.join(sysrandom.choice(allowed_chars) for i in range(length))
 
 
 def constant_time_compare(val1, val2):
