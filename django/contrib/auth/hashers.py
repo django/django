@@ -305,11 +305,18 @@ class Argon2PasswordHasher(BasePasswordHasher):
         self.parallelism = self.parallelism or self.argon2.DEFAULT_PARALLELISM
 
     def _get_type(self, variety=None):
-        return {
-            'argon2d': self.argon2.low_level.Type.D,
-            'argon2i': self.argon2.low_level.Type.I,
-            'argon2id': self.argon2.low_level.Type.ID,
-        }.get(variety or self.variety, self.variety)
+        low_level_type = self.argon2.low_level.Type
+        type_mapping = {
+            'argon2d': low_level_type.D,
+            'argon2i': low_level_type.I,
+            'argon2id': low_level_type.ID,
+        }
+        types = set(type_mapping.keys())
+        if variety:
+            assert variety in types
+        elif self.variety:
+            assert self.variety in types
+        return type_mapping[variety or self.variety]
 
     def encode(self, password, salt):
         data = self.argon2.low_level.hash_secret(
