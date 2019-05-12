@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
 from django.test import RequestFactory, TestCase, override_settings
 
-from .models import Book, Bookmark, Department, Employee, TaggedItem
+from .models import Book, Bookmark, Department, Employee, TaggedItem, Office
 
 
 def select_by(dictlist, key, value):
@@ -294,9 +294,14 @@ class ListFiltersTests(TestCase):
         cls.dev = Department.objects.create(code='DEV', description='Development')
         cls.design = Department.objects.create(code='DSN', description='Design')
 
+        # Offices
+        cls.blue_office = Office.objects.create(code='BLU', name='Blue Office')
+        cls.red_office = Office.objects.create(code='RED', name='Red Office')
+        cls.black_office = Office.objects.create(code='BLC', name='Black Office')
+
         # Employees
-        cls.john = Employee.objects.create(name='John Blue', department=cls.dev)
-        cls.jack = Employee.objects.create(name='Jack Red', department=cls.design)
+        cls.john = Employee.objects.create(name='John Blue', department=cls.dev, office=cls.blue_office)
+        cls.jack = Employee.objects.create(name='Jack Red', department=cls.design, office=cls.red_office)
 
     def test_choicesfieldlistfilter_has_none_choice(self):
         """
@@ -554,23 +559,55 @@ class ListFiltersTests(TestCase):
         self.assertIs(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?author__id__exact=%d' % self.alfred.pk)
 
-    def test_relatedfieldlistfilter_foreignkey_ordering(self):
+    def test_relatedfieldlistfilter_foreignkey_admin_ordering(self):
         """RelatedFieldListFilter ordering respects ModelAdmin.ordering."""
-        class EmployeeAdminWithOrdering(ModelAdmin):
-            ordering = ('name',)
+        class OfficeAdminWithOrdering(ModelAdmin):
+            ordering = ('code',)
 
-        class BookAdmin(ModelAdmin):
-            list_filter = ('employee',)
+        class EmployeeAdmin(ModelAdmin):
+            list_filter = ('office',)
 
-        site.register(Employee, EmployeeAdminWithOrdering)
-        self.addCleanup(lambda: site.unregister(Employee))
-        modeladmin = BookAdmin(Book, site)
+        site.register(Office, OfficeAdminWithOrdering)
+        self.addCleanup(lambda: site.unregister(Office))
+        modeladmin = EmployeeAdmin(Employee, site)
 
         request = self.request_factory.get('/')
         request.user = self.alfred
         changelist = modeladmin.get_changelist_instance(request)
         filterspec = changelist.get_filters(request)[0][0]
-        expected = [(self.jack.pk, 'Jack Red'), (self.john.pk, 'John Blue')]
+        # Expected to be sorted by `code`.
+        expected = [
+            (self.black_office.pk, str(self.black_office)),
+            (self.blue_office.pk, str(self.blue_office)),
+            (self.red_office.pk, str(self.red_office)),
+        ]
+        self.assertEqual(filterspec.lookup_choices, expected)
+
+    def test_relatedfieldlistfilter_foreignkey_model_ordering(self):
+        """
+        RelatedFieldListFilter ordering respects Model.ordering when
+        no ordering is defined in ModelAdmin.
+        """
+        class OfficeAdminWithOrdering(ModelAdmin):
+            pass
+
+        class EmployeeAdmin(ModelAdmin):
+            list_filter = ('office',)
+
+        site.register(Office, OfficeAdminWithOrdering)
+        self.addCleanup(lambda: site.unregister(Office))
+        modeladmin = EmployeeAdmin(Employee, site)
+
+        request = self.request_factory.get('/')
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        filterspec = changelist.get_filters(request)[0][0]
+        # Expected to be sorted by `-pk`.
+        expected = [
+            (self.black_office.pk, str(self.black_office)),
+            (self.red_office.pk, str(self.red_office)),
+            (self.blue_office.pk, str(self.blue_office)),
+        ]
         self.assertEqual(filterspec.lookup_choices, expected)
 
     def test_relatedfieldlistfilter_foreignkey_ordering_reverse(self):
@@ -707,6 +744,59 @@ class ListFiltersTests(TestCase):
         filterspec = changelist.get_filters(request)[0][4]
         expected = [(self.alfred.pk, 'alfred'), (self.bob.pk, 'bob')]
         self.assertEqual(sorted(filterspec.lookup_choices), sorted(expected))
+
+    def test_relatedonlyfieldlistfilter_foreignkey_admin_ordering(self):
+        """RelatedOnlyFieldListFilter ordering respects ModelAdmin.ordering."""
+        class OfficeAdminWithOrdering(ModelAdmin):
+            ordering = ('-code',)
+
+        class EmployeeAdmin(ModelAdmin):
+            list_filter = (
+                ('office', RelatedOnlyFieldListFilter),
+            )
+
+        site.register(Office, OfficeAdminWithOrdering)
+        self.addCleanup(lambda: site.unregister(Office))
+        modeladmin = EmployeeAdmin(Employee, site)
+
+        request = self.request_factory.get('/')
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        filterspec = changelist.get_filters(request)[0][0]
+        # Expected to be ordered by `-code`.
+        expected = [
+            (self.red_office.pk, str(self.red_office)),
+            (self.blue_office.pk, str(self.blue_office)),
+        ]
+        self.assertEqual(filterspec.lookup_choices, expected)
+
+    def test_relatedonlyfieldlistfilter_foreignkey_model_ordering(self):
+        """
+        RelatedOnlyFieldListFilter ordering respects Model.ordering when
+        no ordering is defined in ModelAdmin.
+        """
+        class OfficeAdminWithOrdering(ModelAdmin):
+            pass
+
+        class EmployeeAdmin(ModelAdmin):
+            list_filter = (
+                ('office', RelatedOnlyFieldListFilter),
+            )
+
+        site.register(Office, OfficeAdminWithOrdering)
+        self.addCleanup(lambda: site.unregister(Office))
+        modeladmin = EmployeeAdmin(Employee, site)
+
+        request = self.request_factory.get('/')
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        filterspec = changelist.get_filters(request)[0][0]
+        # Expected to be ordered by `-pk`.
+        expected = [
+            (self.red_office.pk, str(self.red_office)),
+            (self.blue_office.pk, str(self.blue_office)),
+        ]
+        self.assertEqual(filterspec.lookup_choices, expected)
 
     def test_relatedonlyfieldlistfilter_underscorelookup_foreignkey(self):
         Department.objects.create(code='TEST', description='Testing')

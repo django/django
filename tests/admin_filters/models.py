@@ -46,8 +46,20 @@ class Department(models.Model):
         return self.description
 
 
+class Office(models.Model):
+    code = models.CharField(max_length=3, unique=True)
+    name = models.CharField(max_length=50)
+
+    class Meta:
+        ordering = ('-pk',)
+
+    def __str__(self):
+        return self.name
+
+
 class Employee(models.Model):
     department = models.ForeignKey(Department, models.CASCADE, to_field="code")
+    office = models.ForeignKey(Office, models.CASCADE)
     name = models.CharField(max_length=100)
 
     def __str__(self):
