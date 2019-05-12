@@ -21,6 +21,13 @@ class OnDeleteTests(TestCase):
         a.auto.delete()
         self.assertFalse(A.objects.filter(name='auto').exists())
 
+    def test_non_callable(self):
+        msg = 'on_delete must be callable.'
+        with self.assertRaisesMessage(TypeError, msg):
+            models.ForeignKey('self', on_delete=None)
+        with self.assertRaisesMessage(TypeError, msg):
+            models.OneToOneField('self', on_delete=None)
+
     def test_auto_nullable(self):
         a = create_a('auto_nullable')
         a.auto_nullable.delete()
