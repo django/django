@@ -233,6 +233,15 @@ Models
 * The ``of`` argument of :meth:`.QuerySet.select_for_update()` is now allowed
   on MySQL 8.0.1+.
 
+* :class:`Value() <django.db.models.Value>` expression now
+  automatically resolves its ``output_field`` to the appropriate
+  :class:`Field <django.db.models.Field>` subclass based on the type of
+  it's provided ``value`` for :py:class:`bool`, :py:class:`bytes`,
+  :py:class:`float`, :py:class:`int`, :py:class:`str`,
+  :py:class:`datetime.date`, :py:class:`datetime.datetime`,
+  :py:class:`datetime.time`, :py:class:`datetime.timedelta`,
+  :py:class:`decimal.Decimal`, and :py:class:`uuid.UUID` instances.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

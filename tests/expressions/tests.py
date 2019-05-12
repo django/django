@@ -3,15 +3,17 @@ import pickle
 import unittest
 import uuid
 from copy import deepcopy
+from decimal import Decimal
 from unittest import mock
 
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import (
-    Avg, BooleanField, Case, CharField, Count, DateField, DateTimeField,
-    DurationField, Exists, Expression, ExpressionList, ExpressionWrapper, F,
-    Func, IntegerField, Max, Min, Model, OrderBy, OuterRef, Q, StdDev,
-    Subquery, Sum, TimeField, UUIDField, Value, Variance, When,
+    Avg, BinaryField, BooleanField, Case, CharField, Count, DateField,
+    DateTimeField, DecimalField, DurationField, Exists, Expression,
+    ExpressionList, ExpressionWrapper, F, FloatField, Func, IntegerField, Max,
+    Min, Model, OrderBy, OuterRef, Q, StdDev, Subquery, Sum, TimeField,
+    UUIDField, Value, Variance, When,
 )
 from django.db.models.expressions import Col, Combinable, Random, RawSQL, Ref
 from django.db.models.functions import (
@@ -1711,6 +1713,30 @@ class ValueTests(TestCase):
         value = Value('foo', output_field=CharField())
         self.assertEqual(value.as_sql(compiler, connection), ('%s', ['foo']))
 
+    def test_resolve_output_field(self):
+        value_types = [
+            ('str', CharField),
+            (True, BooleanField),
+            (42, IntegerField),
+            (3.14, FloatField),
+            (datetime.date(2019, 5, 15), DateField),
+            (datetime.datetime(2019, 5, 15), DateTimeField),
+            (datetime.time(3, 16), TimeField),
+            (datetime.timedelta(1), DurationField),
+            (Decimal('3.14'), DecimalField),
+            (b'', BinaryField),
+            (uuid.uuid4(), UUIDField),
+        ]
+        for value, ouput_field_type in value_types:
+            with self.subTest(type=type(value)):
+                expr = Value(value)
+                self.assertIsInstance(expr.output_field, ouput_field_type)
+
+    def test_resolve_output_field_failure(self):
+        msg = 'Cannot resolve expression type, unknown output_field'
+        with self.assertRaisesMessage(FieldError, msg):
+            Value(object()).output_field
+
 
 class FieldTransformTests(TestCase):
 
@@ -1848,7 +1874,9 @@ class ExpressionWrapperTests(SimpleTestCase):
         self.assertEqual(expr.get_group_by_cols(alias=None), [])
 
     def test_non_empty_group_by(self):
-        expr = ExpressionWrapper(Lower(Value('f')), output_field=IntegerField())
+        value = Value('f')
+        value.output_field = None
+        expr = ExpressionWrapper(Lower(value), output_field=IntegerField())
         group_by_cols = expr.get_group_by_cols(alias=None)
         self.assertEqual(group_by_cols, [expr.expression])
         self.assertEqual(group_by_cols[0].output_field, expr.output_field)
