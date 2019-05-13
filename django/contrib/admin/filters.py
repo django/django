@@ -195,7 +195,7 @@ class RelatedFieldListFilter(FieldListFilter):
 
     def get_field_ordering(self, field, request, model_admin):
         """
-        Return the list of ordering fields for related field, 
+        Return the list of ordering fields for related field,
         if related model admin has `ordering`.
         """
         ordering = ()

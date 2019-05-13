@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
 from django.test import RequestFactory, TestCase, override_settings
 
-from .models import Book, Bookmark, Department, Employee, TaggedItem, Office
+from .models import Book, Bookmark, Department, Employee, Office, TaggedItem
 
 
 def select_by(dictlist, key, value):
