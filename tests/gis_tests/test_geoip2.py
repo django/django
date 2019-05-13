@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from unittest import mock, skipUnless
 
 from django.conf import settings
@@ -11,7 +12,7 @@ if HAS_GEOIP2:
 
 
 # Note: Requires both the GeoIP country and city datasets.
-# The GEOIP_DATA path should be the only setting set (the directory
+# The GEOIP_PATH path should be the only setting set (the directory
 # should contain links or the actual database files 'GeoLite2-City.mmdb' and
 # 'GeoLite2-City.mmdb'.
 @skipUnless(
@@ -24,22 +25,33 @@ class GeoIPTest(SimpleTestCase):
 
     def test01_init(self):
         "GeoIP initialization."
-        g1 = GeoIP2()  # Everything inferred from GeoIP path
+        g1 = GeoIP2()  # Everything inferred from GeoIP path.
+
         path = settings.GEOIP_PATH
         g2 = GeoIP2(path, 0)  # Passing in data path explicitly.
-        g3 = GeoIP2.open(path, 0)  # MaxMind Python API syntax.
 
-        for g in (g1, g2, g3):
+        # Should support both str and pathlib.Path as path.
+        if isinstance(path, str):
+            other_style_path = Path(path)
+        elif isinstance(path, Path):
+            other_style_path = str(path)
+        else:
+            other_style_path = path
+        g3 = GeoIP2(other_style_path, 0)
+
+        g4 = GeoIP2.open(path, 0)  # MaxMind Python API syntax.
+
+        for g in (g1, g2, g3, g4):
             self.assertTrue(g._country)
             self.assertTrue(g._city)
 
         # Only passing in the location of one database.
         city = os.path.join(path, 'GeoLite2-City.mmdb')
         cntry = os.path.join(path, 'GeoLite2-Country.mmdb')
-        g4 = GeoIP2(city, country='')
-        self.assertIsNone(g4._country)
-        g5 = GeoIP2(cntry, city='')
-        self.assertIsNone(g5._city)
+        g5 = GeoIP2(city, country='')
+        self.assertIsNone(g5._country)
+        g6 = GeoIP2(cntry, city='')
+        self.assertIsNone(g6._city)
 
         # Improper parameters.
         bad_params = (23, 'foo', 15.23)

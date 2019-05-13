@@ -151,9 +151,9 @@ Settings
 ``GEOIP_PATH``
 --------------
 
-A string specifying the directory where the GeoIP data files are
-located. This setting is *required* unless manually specified
-with ``path`` keyword when initializing the :class:`GeoIP2` object.
+A ``string`` or ``pathlib.Path`` object specifying the directory where
+the GeoIP data files are located. This setting is *required* unless manually
+specified with ``path`` keyword when initializing the :class:`GeoIP2` object.
 
 .. setting:: GEOIP_COUNTRY
 
