@@ -1,7 +1,10 @@
 from datetime import datetime
 from operator import attrgetter
 
-from django.db.models import Count, DateTimeField, F, Max, OuterRef, Subquery
+from django.core.exceptions import FieldError
+from django.db.models import (
+    CharField, Count, DateTimeField, F, Max, OuterRef, Subquery, Value,
+)
 from django.db.models.functions import Upper
 from django.test import TestCase
 from django.utils.deprecation import RemovedInDjango31Warning
@@ -313,6 +316,28 @@ class OrderingTests(TestCase):
                 "Article 3",
                 "Article 2",
                 "Article 1",
+            ],
+            attrgetter("headline")
+        )
+
+    def test_order_by_value_expression_with_annotate(self):
+        msg = 'Value expression not found in select clause : headline2'
+        with self.assertRaisesMessage(FieldError, msg):
+            list(Article.objects.annotate(
+                headline2=Value('foo')).order_by('headline2').values_list('headline'))
+
+        msg = 'Cannot resolve expression type, unknown output_field'
+        with self.assertRaisesMessage(FieldError, msg):
+            list(Article.objects.annotate(
+                headline2=Value('foo')).order_by('headline2').values_list('headline', 'headline2'))
+
+        self.assertQuerysetEqual(
+            Article.objects.annotate(
+                headline2=Value('foo', output_field=CharField())).order_by('headline2'), [
+                "Article 1",
+                "Article 2",
+                "Article 3",
+                "Article 4",
             ],
             attrgetter("headline")
         )

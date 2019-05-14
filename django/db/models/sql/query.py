@@ -23,7 +23,7 @@ from django.db import DEFAULT_DB_ALIAS, NotSupportedError, connections
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import (
-    BaseExpression, Col, F, OuterRef, Ref, SimpleCol,
+    BaseExpression, Col, F, OuterRef, Ref, SimpleCol, Value,
 )
 from django.db.models.fields import Field
 from django.db.models.fields.related_lookups import MultiColSource
@@ -2058,6 +2058,13 @@ class Query(BaseExpression):
             self.set_annotation_mask(annotation_names)
         else:
             field_names = [f.attname for f in self.model._meta.concrete_fields]
+
+        if self.order_by and self.annotations:
+            for o in self.order_by:
+                if isinstance(self.annotations[o], Value) and o not in annotation_names:
+                    raise FieldError(
+                        'Value expression not found in select clause : %s' % o
+                    )
 
         self.values_select = tuple(field_names)
         self.add_fields(field_names, True)
