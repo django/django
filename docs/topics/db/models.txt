@@ -161,13 +161,13 @@ ones:
 
     A choices list looks like this::
 
-        YEAR_IN_SCHOOL_CHOICES = (
+        YEAR_IN_SCHOOL_CHOICES = [
             ('FR', 'Freshman'),
             ('SO', 'Sophomore'),
             ('JR', 'Junior'),
             ('SR', 'Senior'),
             ('GR', 'Graduate'),
-        )
+        ]
 
     The first element in each tuple is the value that will be stored in the
     database. The second element is displayed by the field's form widget.
