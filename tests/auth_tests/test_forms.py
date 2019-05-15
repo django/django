@@ -881,7 +881,7 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
 
     def test_save_html_email_template_name(self):
         """
-        Test the PasswordResetFOrm.save() method with html_email_template_name
+        Test the PasswordResetForm.save() method with html_email_template_name
         parameter specified.
         Test to ensure that a multipart email is sent with both text/plain
         and text/html parts.
