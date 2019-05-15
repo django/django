@@ -400,11 +400,16 @@ class CustomPrefetchTests(TestCase):
             "'houses' lookup was already seen with a different queryset. You "
             "may need to adjust the ordering of your lookups."
         )
-        with self.assertRaisesMessage(ValueError, msg):
-            self.traverse_qs(
-                Person.objects.prefetch_related('houses__rooms', Prefetch('houses', queryset=House.objects.all())),
-                [['houses', 'rooms']]
-            )
+        # lookup.queryset shouldn't be evaluated.
+        with self.assertNumQueries(3):
+            with self.assertRaisesMessage(ValueError, msg):
+                self.traverse_qs(
+                    Person.objects.prefetch_related(
+                        'houses__rooms',
+                        Prefetch('houses', queryset=House.objects.all()),
+                    ),
+                    [['houses', 'rooms']],
+                )
 
         # Ambiguous: Lookup houses_lst doesn't yet exist when performing houses_lst__rooms.
         msg = (

@@ -1556,7 +1556,7 @@ def prefetch_related_objects(model_instances, *related_lookups):
     while all_lookups:
         lookup = all_lookups.pop()
         if lookup.prefetch_to in done_queries:
-            if lookup.queryset:
+            if lookup.queryset is not None:
                 raise ValueError("'%s' lookup was already seen with a different queryset. "
                                  "You may need to adjust the ordering of your lookups." % lookup.prefetch_to)
 
