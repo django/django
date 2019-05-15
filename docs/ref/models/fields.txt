@@ -89,12 +89,12 @@ these choices instead of the standard text field.
 The first element in each tuple is the actual value to be set on the model,
 and the second element is the human-readable name. For example::
 
-    YEAR_IN_SCHOOL_CHOICES = (
+    YEAR_IN_SCHOOL_CHOICES = [
         ('FR', 'Freshman'),
         ('SO', 'Sophomore'),
         ('JR', 'Junior'),
         ('SR', 'Senior'),
-    )
+    ]
 
 Generally, it's best to define choices inside a model class, and to
 define a suitably-named constant for each value::
@@ -106,12 +106,12 @@ define a suitably-named constant for each value::
         SOPHOMORE = 'SO'
         JUNIOR = 'JR'
         SENIOR = 'SR'
-        YEAR_IN_SCHOOL_CHOICES = (
+        YEAR_IN_SCHOOL_CHOICES = [
             (FRESHMAN, 'Freshman'),
             (SOPHOMORE, 'Sophomore'),
             (JUNIOR, 'Junior'),
             (SENIOR, 'Senior'),
-        )
+        ]
         year_in_school = models.CharField(
             max_length=2,
             choices=YEAR_IN_SCHOOL_CHOICES,
@@ -130,7 +130,7 @@ will work anywhere that the ``Student`` model has been imported).
 You can also collect your available choices into named groups that can
 be used for organizational purposes::
 
-    MEDIA_CHOICES = (
+    MEDIA_CHOICES = [
         ('Audio', (
                 ('vinyl', 'Vinyl'),
                 ('cd', 'CD'),
@@ -142,7 +142,7 @@ be used for organizational purposes::
             )
         ),
         ('unknown', 'Unknown'),
-    )
+    ]
 
 The first element in each tuple is the name to apply to the group. The
 second element is an iterable of 2-tuples, with each 2-tuple containing
