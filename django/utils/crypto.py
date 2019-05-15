@@ -3,7 +3,7 @@ Django's standard crypto functions and utilities.
 """
 import hashlib
 import hmac
-import random
+import secrets
 
 from django.conf import settings
 from django.utils.encoding import force_bytes
@@ -43,12 +43,12 @@ def get_random_string(length=12,
     The default length of 12 with the a-z, A-Z, 0-9 character set returns
     a 71-bit value. log_2((26+26+10)^12) =~ 71 bits
     """
-    return ''.join(random.choice(allowed_chars) for i in range(length))
+    return ''.join(secrets.choice(allowed_chars) for i in range(length))
 
 
 def constant_time_compare(val1, val2):
     """Return True if the two strings are equal, False otherwise."""
-    return hmac.compare_digest(force_bytes(val1), force_bytes(val2))
+    return secrets.compare_digest(force_bytes(val1), force_bytes(val2))
 
 
 def pbkdf2(password, salt, iterations, dklen=0, digest=None):
