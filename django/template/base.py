@@ -967,7 +967,7 @@ def render_value_in_context(value, context):
     value = template_localtime(value, use_tz=context.use_tz)
     value = localize(value, use_l10n=context.use_l10n)
     if context.autoescape:
-        if not issubclass(type(value), str):
+        if not isinstance(value, str):
             value = str(value)
         return conditional_escape(value)
     else:

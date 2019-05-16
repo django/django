@@ -53,7 +53,7 @@ def force_str(s, encoding='utf-8', strings_only=False, errors='strict'):
     If strings_only is True, don't convert (some) non-string-like objects.
     """
     # Handle the common case first for performance reasons.
-    if issubclass(type(s), str):
+    if isinstance(s, str):
         return s
     if strings_only and is_protected_type(s):
         return s
