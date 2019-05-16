@@ -239,7 +239,7 @@ For example, to sort companies that haven't been contacted (``last_contacted``
 is null) after companies that have been contacted::
 
     from django.db.models import F
-    Company.object.order_by(F('last_contacted').desc(nulls_last=True))
+    Company.objects.order_by(F('last_contacted').desc(nulls_last=True))
 
 .. _func-expressions:
 
