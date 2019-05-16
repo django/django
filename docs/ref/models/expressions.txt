@@ -239,7 +239,7 @@ For example, to sort companies that haven't been contacted (``last_contacted``
 is null) after companies that have been contacted::
 
     from django.db.models import F
-    Company.object.order_by(F('last_contacted').desc(nulls_last=True))
+    Company.objects.order_by(F('last_contacted').desc(nulls_last=True))
 
 .. _func-expressions:
 
@@ -446,6 +446,7 @@ SQL that is generated. Here's a brief example::
         # supports COUNT(distinct field)
         function = 'COUNT'
         template = '%(function)s(%(distinct)s%(expressions)s)'
+        allow_distinct=True
 
         def __init__(self, expression, distinct=False, **extra):
             super().__init__(
