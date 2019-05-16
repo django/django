@@ -379,7 +379,7 @@ The ``Aggregate`` API is as follows:
 
         A class attribute, as a format string, that describes the SQL that is
         generated for this aggregate. Defaults to
-        ``'%(function)s( %(expressions)s )'``.
+        ``'%(function)s(%(distinct)s%(expressions)s)'``.
 
     .. attribute:: function
 
@@ -442,19 +442,18 @@ SQL that is generated. Here's a brief example::
 
     from django.db.models import Aggregate
 
-    class Count(Aggregate):
-        # supports COUNT(distinct field)
-        function = 'COUNT'
-        template = '%(function)s(%(distinct)s%(expressions)s)'
+    class Sum(Aggregate):
+        # Supports SUM(ALL field).
+        function = 'SUM'
+        template = '%(function)s(%(all_values)s%(expressions)s)'
+        allow_distinct = False
 
-        def __init__(self, expression, distinct=False, **extra):
+        def __init__(self, expression, all_values=False, **extra):
             super().__init__(
                 expression,
-                distinct='DISTINCT ' if distinct else '',
-                output_field=IntegerField(),
+                all_values='ALL ' if all_values else '',
                 **extra
             )
-
 
 ``Value()`` expressions
 -----------------------
