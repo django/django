@@ -335,6 +335,7 @@ class BaseFormSet:
             # _should_delete_form() requires cleaned_data.
             form_errors = form.errors
             if self.can_delete and self._should_delete_form(form):
+                self._errors.append({})
                 continue
             self._errors.append(form_errors)
         try:
