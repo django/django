@@ -7,6 +7,8 @@ GDAL_TO_POSTGIS = [None, 4, 6, 5, 8, 7, 10, 11, None, None, None, None]
 # Lookup to convert pixel type values from PostGIS to GDAL
 POSTGIS_TO_GDAL = [1, 1, 1, 3, 1, 3, 2, 5, 4, None, 6, 7, None, None]
 
+# see https://trac.osgeo.org/postgis/wiki/WKTRaster/RFC/RFC1_V0SerialFormat
+
 # Struct pack structure for raster header, the raster header has the
 # following structure:
 #
@@ -41,3 +43,19 @@ STRUCT_SIZE = {
     'f': 4,  # Float
     'd': 8,  # Double
 }
+
+# Pixel type specifies type of pixel values in a band. Storage flag specifies
+# whether the band data is stored as part of the datum or is to be found on
+# the server's filesystem.
+
+# There are currently 11 supported pixel value types, so 4 bits are enough
+# to account for all. We'll reserve the upper 4 bits for generic flags and
+# define upmost as storage flag:
+
+BANDTYPE_FLAGS_MASK = 0xF0
+BANDTYPE_PIXTYPE_MASK = 0x0F
+
+BANDTYPE_FLAG_OFFDB = 1 << 7
+BANDTYPE_FLAG_HASNODATA = 1 << 6
+BANDTYPE_FLAG_ISNODATA = 1 << 5
+BANDTYPE_FLAG_RESERVED3 = 1 << 4

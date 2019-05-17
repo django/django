@@ -8,7 +8,7 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D
 from django.contrib.gis.shortcuts import numpy
 from django.db import connection
-from django.db.models import Q, Func, F
+from django.db.models import F, Func, Q
 from django.test import TransactionTestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
@@ -221,7 +221,7 @@ class RasterFieldTest(TransactionTestCase):
             qs = RasterModel.objects.filter(Q(**combos[0]) & Q(**combos[1]))
             self.assertIn(qs.count(), [0, 1])
 
-    def test_dwithin_gis_lookup_ouptut_with_rasters(self):
+    def test_dwithin_gis_lookup_output_with_rasters(self):
         """
         Check the logical functionality of the dwithin lookup for different
         input parameters.
