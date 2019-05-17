@@ -1,4 +1,0 @@
-**/*.min.js
-**/vendor/**/*.js
-django/contrib/gis/templates/**/*.js
-node_modules/**.js

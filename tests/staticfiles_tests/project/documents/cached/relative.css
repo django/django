@@ -1,6 +1,0 @@
-@import url("../cached/styles.css");
-@import url("absolute.css");
-@import url("absolute.css#eggs");
-body {
-    background: #d3d6d8 url(img/relative.png);
-}

@@ -1,8 +1,0 @@
-{% load i18n %}
-{% comment %}
-This file has a literal with plural forms. When processed first, makemessages
-shouldn't create a .po file with duplicate `Plural-Forms` headers
-{% endcomment %}
-{% blocktrans count number=3 %}{{ number }} Bar{% plural %}{{ number }} Bars{% endblocktrans %}
-
-{% trans 'First `trans`, then `blocktrans` with a plural' %}

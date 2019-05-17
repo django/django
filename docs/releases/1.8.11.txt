@@ -1,8 +1,0 @@
-===========================
-Django 1.8.11 release notes
-===========================
-
-*March 5, 2016*
-
-Django 1.8.11 fixes a regression on Python 2 in the 1.8.10 security release
-where ``utils.http.is_safe_url()`` crashes on bytestring URLs (:ticket:`26308`).

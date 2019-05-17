@@ -1,9 +1,0 @@
-[
-    {
-        "pk": "4",
-        "model": "fixtures_regress.person",
-        "fields": {
-            "name": "Neal Stephenson"
-        }
-    }
-]

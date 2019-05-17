@@ -1,9 +1,0 @@
-[
-    {
-        "pk": "1",
-        "model": "fixtures_regress.absolute",
-        "fields": {
-            "name": "Load Absolute Path Test"
-        }
-    }
-]
