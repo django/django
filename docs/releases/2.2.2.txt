@@ -11,3 +11,6 @@ Bugfixes
 
 * Fixed a regression in Django 2.2 that stopped Show/Hide toggles working on
   dynamically added admin inlines (:ticket:`30459`).
+
+* Fixed a regression in Django 2.2 where deprecation message crashes if
+  ``Meta.ordering`` contains an expression (:ticket:`30463`).

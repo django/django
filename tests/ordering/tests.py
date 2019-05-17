@@ -408,7 +408,9 @@ class OrderingTests(TestCase):
     def test_deprecated_values_annotate(self):
         msg = (
             "Article QuerySet won't use Meta.ordering in Django 3.1. Add "
-            ".order_by('-pub_date', 'headline') to retain the current query."
+            ".order_by('-pub_date', 'headline', OrderBy(F(author__name), "
+            "descending=False), OrderBy(F(second_author__name), "
+            "descending=False)) to retain the current query."
         )
         with self.assertRaisesMessage(RemovedInDjango31Warning, msg):
             list(Article.objects.values('author').annotate(Count('headline')))

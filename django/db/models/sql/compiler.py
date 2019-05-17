@@ -561,9 +561,9 @@ class SQLCompiler:
                         # order_by = None
                         warnings.warn(
                             "%s QuerySet won't use Meta.ordering in Django 3.1. "
-                            "Add .order_by('%s') to retain the current query." % (
+                            "Add .order_by(%s) to retain the current query." % (
                                 self.query.model.__name__,
-                                "', '".join(self._meta_ordering)
+                                ', '.join(repr(f) for f in self._meta_ordering),
                             ),
                             RemovedInDjango31Warning,
                             stacklevel=4,
