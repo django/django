@@ -488,7 +488,10 @@ this entry are the four standard isolation levels:
 
 or ``None`` to use the server's configured isolation level. However, Django
 works best with and defaults to read committed rather than MySQL's default,
-repeatable read. Data loss is possible with repeatable read.
+repeatable read. Data loss is possible with repeatable read. In particular,
+you may see cases where :meth:`~django.db.models.query.QuerySet.get_or_create`
+will raise an :exc:`~django.db.IntegrityError` but the object won't appear in
+a subsequent :meth:`~django.db.models.query.QuerySet.get` call.
 
 .. _transaction isolation level: https://dev.mysql.com/doc/refman/en/innodb-transaction-isolation-levels.html
 

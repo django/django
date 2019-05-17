@@ -1879,7 +1879,8 @@ Returns a tuple of ``(object, created)``, where ``object`` is the retrieved or
 created object and ``created`` is a boolean specifying whether a new object was
 created.
 
-This is meant as a shortcut to boilerplatish code. For example::
+This is meant to prevent duplicate objects from being created when requests are
+made in parallel, and as a shortcut to boilerplatish code. For example::
 
     try:
         obj = Person.objects.get(first_name='John', last_name='Lennon')
@@ -1887,8 +1888,9 @@ This is meant as a shortcut to boilerplatish code. For example::
         obj = Person(first_name='John', last_name='Lennon', birthday=date(1940, 10, 9))
         obj.save()
 
-This pattern gets quite unwieldy as the number of fields in a model goes up.
-The above example can be rewritten using ``get_or_create()`` like so::
+Here, with concurrent requests, multiple attempts to save a ``Person`` with
+the same parameters may be made. To avoid this race condition, the above
+example can be rewritten using ``get_or_create()`` like so::
 
     obj, created = Person.objects.get_or_create(
         first_name='John',
@@ -1899,6 +1901,15 @@ The above example can be rewritten using ``get_or_create()`` like so::
 Any keyword arguments passed to ``get_or_create()`` — *except* an optional one
 called ``defaults`` — will be used in a :meth:`get()` call. If an object is
 found, ``get_or_create()`` returns a tuple of that object and ``False``.
+
+.. warning::
+
+    This method is atomic assuming that the database enforces uniqueness of the
+    keyword arguments (see :attr:`~django.db.models.Field.unique` or
+    :attr:`~django.db.models.Options.unique_together`). If the fields used in the
+    keyword arguments do not have a uniqueness constraint, concurrent calls to
+    this method may result in multiple rows with the same parameters being
+    inserted.
 
 You can specify more complex conditions for the retrieved object by chaining
 ``get_or_create()`` with ``filter()`` and using :class:`Q objects
@@ -1940,20 +1951,6 @@ The ``get_or_create()`` method has similar error behavior to :meth:`create()`
 when you're using manually specified primary keys. If an object needs to be
 created and the key already exists in the database, an
 :exc:`~django.db.IntegrityError` will be raised.
-
-This method is atomic assuming correct usage, correct database configuration,
-and correct behavior of the underlying database. However, if uniqueness is not
-enforced at the database level for the ``kwargs`` used in a ``get_or_create``
-call (see :attr:`~django.db.models.Field.unique` or
-:attr:`~django.db.models.Options.unique_together`), this method is prone to a
-race-condition which can result in multiple rows with the same parameters being
-inserted simultaneously.
-
-If you are using MySQL, be sure to use the ``READ COMMITTED`` isolation level
-rather than ``REPEATABLE READ`` (the default), otherwise you may see cases
-where ``get_or_create`` will raise an :exc:`~django.db.IntegrityError` but the
-object won't appear in a subsequent :meth:`~django.db.models.query.QuerySet.get`
-call.
 
 Finally, a word on using ``get_or_create()`` in Django views. Please make sure
 to use it only in ``POST`` requests unless you have a good reason not to.
