@@ -1107,15 +1107,17 @@ Attributes
     optimized for binary files. It uses `wsgi.file_wrapper`_ if provided by the
     wsgi server, otherwise it streams the file out in small chunks.
 
-    If ``as_attachment=True``, the ``Content-Disposition`` header is set, which
-    asks the browser to offer the file to the user as a download.
+    If ``as_attachment=True``, the ``Content-Disposition`` header is set to
+    ``attachment``, which asks the browser to offer the file to the user as a
+    download. Otherwise, a ``Content-Disposition`` header with a value of
+    ``inline`` (the browser default) will be set only if a filename is
+    available.
 
     If ``open_file`` doesn't have a name or if the name of ``open_file`` isn't
     appropriate, provide a custom file name using the ``filename``  parameter.
 
-    The ``Content-Length``, ``Content-Type``, and ``Content-Disposition``
-    headers are automatically set when they can be guessed from contents of
-    ``open_file``.
+    The ``Content-Length`` and ``Content-Type`` headers are automatically set
+    when they can be guessed from contents of ``open_file``.
 
 .. _wsgi.file_wrapper: https://www.python.org/dev/peps/pep-3333/#optional-platform-specific-file-handling
 
