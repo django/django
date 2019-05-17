@@ -113,6 +113,10 @@ class SearchVectorFieldTest(GrailTestData, PostgreSQLTestCase):
         searched = Line.objects.filter(dialogue_search_vector=SearchQuery('cadeaux', config='french'))
         self.assertSequenceEqual(searched, [self.french])
 
+    def test_single_coalesce_expression(self):
+        searched = Line.objects.annotate(search=SearchVector('dialogue')).filter(search='cadeaux')
+        self.assertNotIn('COALESCE(COALESCE', str(searched.query))
+
 
 class MultipleFieldsTest(GrailTestData, PostgreSQLTestCase):
 
