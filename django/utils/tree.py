@@ -110,7 +110,7 @@ class Node:
             else:
                 # We could use perhaps additional logic here to see if some
                 # children could be used for pushdown here.
-                self.children.append(data)
+                self.children.insert(0, data)
                 return data
         else:
             obj = self._new_instance(self.children, self.connector,

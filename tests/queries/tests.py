@@ -3224,8 +3224,10 @@ class NullJoinPromotionOrTest(TestCase):
         # Finally, a more complex case, one time in a way where each
         # NOT is pushed to lowest level in the boolean tree, and
         # another query where this isn't done.
+        #
+        # ~Q(program__id=p1.id) = NOT ( "queries_program"."id" IS NOT NULL AND "queries_program"."id" = 1 )
         qs1 = Identifier.objects.filter(
-            ~Q(~Q(program__id=p2.id, channel__id=c1.id) & Q(program__id=p1.id))
+            ~Q(~Q(program__id=p2.id, channel__id=c1.id) & Q(program__id=p1.id) & Q(program__id__isnull=False))
         ).order_by('pk')
         qs2 = Identifier.objects.filter(
             Q(Q(program__id=p2.id, channel__id=c1.id) | ~Q(program__id=p1.id))
