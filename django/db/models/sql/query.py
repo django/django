@@ -23,7 +23,7 @@ from django.db import DEFAULT_DB_ALIAS, NotSupportedError, connections
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import (
-    BaseExpression, Col, F, OuterRef, Ref, SimpleCol,
+    BaseExpression, Col, F, OuterRef, Ref, SimpleCol, Value,
 )
 from django.db.models.fields import Field
 from django.db.models.fields.related_lookups import MultiColSource
@@ -1844,6 +1844,13 @@ class Query(BaseExpression):
         if errors:
             raise FieldError('Invalid order_by arguments: %s' % errors)
         if ordering:
+            # Remove constants from ordering.
+            constants_ordering = {item for item in ordering if isinstance(self.annotations.get(item), Value)}
+            if constants_ordering:
+                ordering = tuple(set(ordering) - constants_ordering)
+                warnings.warn(
+                    'Constants were removed from ordering: %s' % ', '.join(constants_ordering),
+                    RuntimeWarning, stacklevel=2)
             self.order_by += ordering
         else:
             self.default_ordering = False

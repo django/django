@@ -1,7 +1,9 @@
 from datetime import datetime
 from operator import attrgetter
 
-from django.db.models import Count, DateTimeField, F, Max, OuterRef, Subquery
+from django.db.models import (
+    Count, DateTimeField, F, Max, OuterRef, Subquery, Value,
+)
 from django.db.models.functions import Upper
 from django.test import TestCase
 from django.utils.deprecation import RemovedInDjango31Warning
@@ -316,6 +318,13 @@ class OrderingTests(TestCase):
             ],
             attrgetter("headline")
         )
+
+    def test_removing_constants_from_order_by(self):
+        msg = 'Constants were removed from ordering: headline2'
+        with self.assertWarnsMessage(RuntimeWarning, msg):
+            qs = Article.objects.annotate(
+                headline2=Value('foo')).order_by('headline2', 'headline').values_list('headline')
+        self.assertEqual(qs.query.order_by, ('headline',))
 
     def test_order_by_f_expression(self):
         self.assertQuerysetEqual(
