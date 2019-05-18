@@ -107,3 +107,15 @@ class School(models.Model):
 
 class Student(models.Model):
     school = models.ForeignKey(School, models.CASCADE)
+
+
+class Author(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+
+
+class Book(models.Model):
+    author = models.ForeignKey(Author, models.CASCADE, null=True)
+
+
+class ToFieldBook(models.Model):
+    author = models.ForeignKey(Author, models.CASCADE, null=True, to_field="name", related_name="to_field_book")

@@ -1026,6 +1026,10 @@ class OneToOneField(ForeignKey):
             setattr(instance, self.name, data)
         else:
             setattr(instance, self.attname, data)
+            # remote field object must be cleared otherwise Model.save()
+            # will reassign attname using the related object pk
+            if data is None:
+                setattr(instance, self.name, data)
 
     def _check_unique(self, **kwargs):
         # Override ForeignKey since check isn't applicable here.
