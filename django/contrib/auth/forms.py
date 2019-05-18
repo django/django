@@ -150,6 +150,11 @@ class UserChangeForm(forms.ModelForm):
         user_permissions = self.fields.get('user_permissions')
         if user_permissions:
             user_permissions.queryset = user_permissions.queryset.select_related('content_type')
+        # Prevent non-superusers from granting superusers rights.
+        is_superuser = self.fields.get('is_superuser')
+        if is_superuser:
+            if not getattr(self.instance, 'is_superuser', False):
+                is_superuser.disabled = True
 
     def clean_password(self):
         # Regardless of what the user provides, return the initial value.

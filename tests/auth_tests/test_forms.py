@@ -740,6 +740,19 @@ class UserChangeFormTest(TestDataMixin, TestCase):
         form = UserChangeForm()
         self.assertEqual(form.fields['username'].widget.attrs.get('autocapitalize'), 'none')
 
+    def test_only_superuser_should_be_able_to_grant_superuser(self):
+        not_superuser = User.objects.get(username='staff')
+        form = UserChangeForm(instance=not_superuser)
+        self.assertTrue(form.fields['is_superuser'].disabled)
+
+        superuser = User.objects.create_superuser(
+            username='superfoo',
+            email='foo@bar.baz',
+            password='secret',
+        )
+        form = UserChangeForm(instance=superuser)
+        self.assertFalse(form.fields['is_superuser'].disabled)
+
 
 @override_settings(TEMPLATES=AUTH_TEMPLATES)
 class PasswordResetFormTest(TestDataMixin, TestCase):
