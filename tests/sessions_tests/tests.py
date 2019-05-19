@@ -454,6 +454,7 @@ class DatabaseSessionWithTimeZoneTests(DatabaseSessionTests):
 class CustomDatabaseSessionTests(DatabaseSessionTests):
     backend = CustomDatabaseSession
     session_engine = 'sessions_tests.models'
+    custom_session_cookie_age = 60 * 60 * 24  # One day.
 
     def test_extra_session_field(self):
         # Set the account ID to be picked up by a custom session storage
@@ -472,6 +473,17 @@ class CustomDatabaseSessionTests(DatabaseSessionTests):
         # Make sure that save() on an existing session did the right job.
         s = self.model.objects.get(session_key=self.session.session_key)
         self.assertIsNone(s.account_id)
+
+    def test_custom_expiry_reset(self):
+        self.session.set_expiry(None)
+        self.session.set_expiry(10)
+        self.session.set_expiry(None)
+        self.assertEqual(self.session.get_expiry_age(), self.custom_session_cookie_age)
+
+    def test_default_expiry(self):
+        self.assertEqual(self.session.get_expiry_age(), self.custom_session_cookie_age)
+        self.session.set_expiry(0)
+        self.assertEqual(self.session.get_expiry_age(), self.custom_session_cookie_age)
 
 
 class CacheDBSessionTests(SessionTestsMixin, TestCase):

@@ -96,7 +96,9 @@ Minor features
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new
+  :meth:`~django.contrib.sessions.backends.base.SessionBase.get_session_cookie_age()`
+  methods allows dynamically specifying the session cookie age.
 
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
