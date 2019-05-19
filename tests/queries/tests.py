@@ -3928,3 +3928,26 @@ class Ticket23622Tests(TestCase):
             set(Ticket23605A.objects.filter(qy).values_list('pk', flat=True))
         )
         self.assertSequenceEqual(Ticket23605A.objects.filter(qx), [a2])
+
+
+class Ticket28944Tests(TestCase):
+    @skipUnlessDBFeature('has_select_for_update', 'has_select_for_update_of')
+    def test_ticket_28944(self):
+        # The custom pk is not important here, it's used because the structure
+        # of CustomPk and Related matches the ticket's description.
+        foo = CustomPk.objects.create(name='foo')
+        related = Related.objects.create(custom=foo)
+        self.assertEqual(
+            list(Related.objects.select_related('custom').filter(
+                custom__isnull=False
+            ).select_for_update(of=('self', 'custom'))),
+            [related]
+        )
+        qs = Related.objects.select_related('custom').filter(
+            custom__isnull=False
+        ).select_for_update(
+            of=('self', 'custom')
+        ).values_list('pk', 'custom__name')
+        self.assertEqual(
+            list(qs), [(related.pk, 'foo')]
+        )

@@ -223,6 +223,8 @@ class SQLCompiler:
                 'model': self.query.model,
                 'select_fields': select_list,
             }
+        else:
+            self.query.select_related = False
         for alias, annotation in self.query.annotation_select.items():
             annotations[alias] = select_idx
             select.append((annotation, alias))
@@ -656,6 +658,8 @@ class SQLCompiler:
             alias = self.query.join_parent_model(opts, model, start_alias,
                                                  seen_models)
             column = field.get_col(alias)
+            if self.query.select_related and self.query.select and column not in self.query.select:
+                continue
             result.append(column)
         return result
 
@@ -978,12 +982,14 @@ class SQLCompiler:
             if klass_info is None:
                 invalid_names.append(name)
                 continue
-            select_index = klass_info['select_fields'][0]
-            col = self.select[select_index][0]
-            if self.connection.features.select_for_update_of_column:
-                result.append(self.compile(col)[0])
-            else:
-                result.append(self.quote_name_unless_alias(col.alias))
+            select_fields = klass_info['select_fields']
+            if select_fields:
+                select_index = select_fields[0]
+                col = self.select[select_index][0]
+                if self.connection.features.select_for_update_of_column:
+                    result.append(self.compile(col)[0])
+                else:
+                    result.append(self.quote_name_unless_alias(col.alias))
         if invalid_names:
             raise FieldError(
                 'Invalid field name(s) given in select_for_update(of=(...)): %s. '

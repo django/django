@@ -2028,7 +2028,6 @@ class Query(BaseExpression):
         self._extra_select_cache = None
 
     def set_values(self, fields):
-        self.select_related = False
         self.clear_deferred_loading()
         self.clear_select_fields()
 
