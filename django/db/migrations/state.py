@@ -366,6 +366,9 @@ class ModelState:
         self.options.setdefault('constraints', [])
         self.bases = bases or (models.Model,)
         self.managers = managers or []
+        self._cached_render = None
+        self._cached_render_props = None
+
         # Sanity-check that fields is NOT a dict. It must be ordered.
         if isinstance(self.fields, dict):
             raise ValueError("ModelState.fields cannot be a dict - it must be a list of 2-tuples.")
@@ -554,8 +557,27 @@ class ModelState:
             managers=list(self.managers),
         )
 
+    def _can_use_cached_render(self):
+        if not self._cached_render:
+            return False
+        # if _cached_render exists, then _cached_render_props exists
+        fields, options, bases, app_label = self._cached_render_props
+        return (fields == self.fields and
+                options == self.options and
+                bases == self.bases and
+                app_label == self.app_label)
+
     def render(self, apps):
         """Create a Model object from our current state into the given apps."""
+        # If the properties for creating the render haven't changed, let's return the previously rendered type
+        if self._can_use_cached_render():
+            # we just need to register the model again (since below we rely on this step in the class construction)
+            apps.register_model(self.app_label, self._cached_render)
+            return self._cached_render
+        # clear out the cache properties
+        self._cached_render = None
+        self._cached_render_props = None
+
         # First, make a Meta object
         meta_contents = {'app_label': self.app_label, 'apps': apps, **self.options}
         meta = type("Meta", (), meta_contents)
@@ -574,8 +596,13 @@ class ModelState:
 
         # Restore managers
         body.update(self.construct_managers())
+
         # Then, make a Model object (apps.register_model is called in __new__)
-        return type(self.name, bases, body)
+        rendered_model = type(self.name, bases, body)
+        # save this in the cache (along with the properties that rendered it
+        self._cached_render = rendered_model
+        self._cached_render_props = list(self.fields), dict(self.options), tuple(self.bases), self.app_label
+        return rendered_model
 
     def get_field_by_name(self, name):
         for fname, field in self.fields:
