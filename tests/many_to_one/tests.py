@@ -522,6 +522,15 @@ class ManyToOneTests(TestCase):
         self.assertIsNot(c.parent, p)
         self.assertEqual(c.parent, p)
 
+    def test_save_nullable_fk_after_parent_with_to_field(self):
+        parent = Parent(name='jeff')
+        child = ToFieldChild(parent=parent)
+        parent.save()
+        child.save()
+        child.refresh_from_db()
+        self.assertEqual(child.parent, parent)
+        self.assertEqual(child.parent_id, parent.name)
+
     def test_fk_to_bigautofield(self):
         ch = City.objects.create(name='Chicago')
         District.objects.create(city=ch, name='Far South')
