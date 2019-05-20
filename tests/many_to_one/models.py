@@ -70,6 +70,10 @@ class Child(models.Model):
     parent = models.ForeignKey(Parent, models.CASCADE)
 
 
+class ChildNullableParent(models.Model):
+    parent = models.ForeignKey(Parent, models.CASCADE, null=True)
+
+
 class ToFieldChild(models.Model):
     parent = models.ForeignKey(Parent, models.CASCADE, to_field='name', related_name='to_field_children')
 

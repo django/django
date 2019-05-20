@@ -684,14 +684,19 @@ class Model(metaclass=ModelBase):
                 # database to raise an IntegrityError if applicable. If
                 # constraints aren't supported by the database, there's the
                 # unavoidable risk of data corruption.
-                if obj and obj.pk is None:
-                    # Remove the object from a related instance cache.
-                    if not field.remote_field.multiple:
-                        field.remote_field.delete_cached_value(obj)
-                    raise ValueError(
-                        "save() prohibited to prevent data loss due to "
-                        "unsaved related object '%s'." % field.name
-                    )
+                if obj:
+                    if obj.pk is None:
+                        # Remove the object from a related instance cache.
+                        if not field.remote_field.multiple:
+                            field.remote_field.delete_cached_value(obj)
+                        raise ValueError(
+                            "save() prohibited to prevent data loss due to "
+                            "unsaved related object '%s'." % field.name
+                        )
+                    elif getattr(self, field.attname) is None:
+                        # Use pk from related object if it has been saved after
+                        # an assignment.
+                        setattr(self, field.attname, obj.pk)
                 # If the relationship's pk/to_field was changed, clear the
                 # cached relationship.
                 if obj and getattr(obj, field.target_field.attname) != getattr(self, field.attname):
