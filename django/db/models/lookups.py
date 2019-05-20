@@ -508,21 +508,16 @@ class YearExact(YearLookup, Exact):
     lookup_name = 'exact'
 
     def as_sql(self, compiler, connection):
-        # We will need to skip the extract part and instead go
-        # directly with the originating field, that is self.lhs.lhs.
-        lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
-        rhs_sql, rhs_params = self.process_rhs(compiler, connection)
-        try:
-            # Check that rhs_params[0] exists (IndexError),
-            # it isn't None (TypeError), and is a number (ValueError)
-            int(rhs_params[0])
-        except (IndexError, TypeError, ValueError):
-            # Can't determine the bounds before executing the query, so skip
-            # optimizations by falling back to a standard exact comparison.
-            return super().as_sql(compiler, connection)
-        bounds = self.year_lookup_bounds(connection, rhs_params[0])
-        params.extend(bounds)
-        return '%s BETWEEN %%s AND %%s' % lhs_sql, params
+        # Avoid the extract operation if the rhs is a direct value to allow
+        # indexes to be used.
+        if self.rhs_is_direct_value():
+            # Skip the extract part by directly using the originating field,
+            # that is self.lhs.lhs.
+            lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
+            bounds = self.year_lookup_bounds(connection, self.rhs)
+            params.extend(bounds)
+            return '%s BETWEEN %%s AND %%s' % lhs_sql, params
+        return super().as_sql(compiler, connection)
 
 
 class YearGt(YearComparisonLookup):

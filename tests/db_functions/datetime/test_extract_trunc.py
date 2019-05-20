@@ -4,7 +4,8 @@ import pytz
 
 from django.conf import settings
 from django.db.models import (
-    DateField, DateTimeField, IntegerField, Max, OuterRef, Subquery, TimeField,
+    DateField, DateTimeField, F, IntegerField, Max, OuterRef, Subquery,
+    TimeField,
 )
 from django.db.models.functions import (
     Extract, ExtractDay, ExtractHour, ExtractIsoYear, ExtractMinute,
@@ -108,6 +109,14 @@ class DateFunctionTests(TestCase):
                 query_string = str(qs.query).lower()
                 self.assertEqual(query_string.count(' between '), 1)
                 self.assertEqual(query_string.count('extract'), 0)
+                # an expression rhs cannot use the between optimization.
+                qs = DTModel.objects.annotate(
+                    start_year=ExtractYear('start_datetime'),
+                ).filter(end_datetime__year=F('start_year') + 1)
+                self.assertEqual(qs.count(), 1)
+                query_string = str(qs.query).lower()
+                self.assertEqual(query_string.count(' between '), 0)
+                self.assertEqual(query_string.count('extract'), 3)
 
     def test_extract_year_greaterthan_lookup(self):
         start_datetime = datetime(2015, 6, 15, 14, 10)
