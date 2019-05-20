@@ -572,7 +572,7 @@ class ModelState:
         # If the properties for creating the render haven't changed, let's return the previously rendered type
         if self._can_use_cached_render():
             # we just need to register the model again (since below we rely on this step in the class construction)
-            apps.register_model(self.app_label, self._cached_render)
+            apps.register_model(self._cached_render._meta.app_label, self._cached_render)
             return self._cached_render
         # clear out the cache properties
         self._cached_render = None
