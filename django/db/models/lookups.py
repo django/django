@@ -483,8 +483,6 @@ class YearLookup(Lookup):
             bounds = connection.ops.year_lookup_bounds_for_date_field(year)
         return bounds
 
-
-class YearComparisonLookup(YearLookup):
     def as_sql(self, compiler, connection):
         # Avoid the extract operation if the rhs is a direct value to allow
         # indexes to be used.
@@ -493,53 +491,44 @@ class YearComparisonLookup(YearLookup):
             # that is self.lhs.lhs.
             lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
             rhs_sql, _ = self.process_rhs(compiler, connection)
-            rhs_sql = self.get_rhs_op(connection, rhs_sql)
+            rhs_sql = self.get_direct_rhs_sql(connection, rhs_sql)
             start, finish = self.year_lookup_bounds(connection, self.rhs)
-            params.append(self.get_bound(start, finish))
+            params.extend(self.get_bound_params(start, finish))
             return '%s %s' % (lhs_sql, rhs_sql), params
         return super().as_sql(compiler, connection)
 
-    def get_rhs_op(self, connection, rhs):
+    def get_direct_rhs_sql(self, connection, rhs):
         return connection.operators[self.lookup_name] % rhs
 
-    def get_bound(self, start, finish):
+    def get_bound_params(self, start, finish):
         raise NotImplementedError(
-            'subclasses of YearComparisonLookup must provide a get_bound() method'
+            'subclasses of YearLookup must provide a get_bound_params() method'
         )
 
 
 class YearExact(YearLookup, Exact):
-    lookup_name = 'exact'
+    def get_direct_rhs_sql(self, connection, rhs):
+        return 'BETWEEN %s AND %s'
 
-    def as_sql(self, compiler, connection):
-        # Avoid the extract operation if the rhs is a direct value to allow
-        # indexes to be used.
-        if self.rhs_is_direct_value():
-            # Skip the extract part by directly using the originating field,
-            # that is self.lhs.lhs.
-            lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
-            bounds = self.year_lookup_bounds(connection, self.rhs)
-            params.extend(bounds)
-            return '%s BETWEEN %%s AND %%s' % lhs_sql, params
-        return super().as_sql(compiler, connection)
+    def get_bound_params(self, start, finish):
+        return (start, finish)
 
 
-
-class YearGt(YearComparisonLookup, GreaterThan):
-    def get_bound(self, start, finish):
-        return finish
-
-
-class YearGte(YearComparisonLookup, GreaterThanOrEqual):
-    def get_bound(self, start, finish):
-        return start
+class YearGt(YearLookup, GreaterThan):
+    def get_bound_params(self, start, finish):
+        return (finish,)
 
 
-class YearLt(YearComparisonLookup, LessThan):
-    def get_bound(self, start, finish):
-        return start
+class YearGte(YearLookup, GreaterThanOrEqual):
+    def get_bound_params(self, start, finish):
+        return (start,)
 
 
-class YearLte(YearComparisonLookup, LessThanOrEqual):
-    def get_bound(self, start, finish):
-        return finish
+class YearLt(YearLookup, LessThan):
+    def get_bound_params(self, start, finish):
+        return (start,)
+
+
+class YearLte(YearLookup, LessThanOrEqual):
+    def get_bound_params(self, start, finish):
+        return (finish,)
