@@ -56,7 +56,7 @@ The name of the constraint.
 ``UniqueConstraint``
 ====================
 
-.. class:: UniqueConstraint(*, fields, name)
+.. class:: UniqueConstraint(*, fields, name, condition=None)
 
     Creates a unique constraint in the database.
 
