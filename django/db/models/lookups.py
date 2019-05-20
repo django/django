@@ -486,14 +486,18 @@ class YearLookup(Lookup):
 
 class YearComparisonLookup(YearLookup):
     def as_sql(self, compiler, connection):
-        # We will need to skip the extract part and instead go
-        # directly with the originating field, that is self.lhs.lhs.
-        lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
-        rhs_sql, rhs_params = self.process_rhs(compiler, connection)
-        rhs_sql = self.get_rhs_op(connection, rhs_sql)
-        start, finish = self.year_lookup_bounds(connection, rhs_params[0])
-        params.append(self.get_bound(start, finish))
-        return '%s %s' % (lhs_sql, rhs_sql), params
+        # Avoid the extract operation if the rhs is a direct value to allow
+        # indexes to be used.
+        if self.rhs_is_direct_value():
+            # Skip the extract part by directly using the originating field,
+            # that is self.lhs.lhs.
+            lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
+            rhs_sql, _ = self.process_rhs(compiler, connection)
+            rhs_sql = self.get_rhs_op(connection, rhs_sql)
+            start, finish = self.year_lookup_bounds(connection, self.rhs)
+            params.append(self.get_bound(start, finish))
+            return '%s %s' % (lhs_sql, rhs_sql), params
+        return super().as_sql(compiler, connection)
 
     def get_rhs_op(self, connection, rhs):
         return connection.operators[self.lookup_name] % rhs
@@ -520,29 +524,22 @@ class YearExact(YearLookup, Exact):
         return super().as_sql(compiler, connection)
 
 
-class YearGt(YearComparisonLookup):
-    lookup_name = 'gt'
 
+class YearGt(YearComparisonLookup, GreaterThan):
     def get_bound(self, start, finish):
         return finish
 
 
-class YearGte(YearComparisonLookup):
-    lookup_name = 'gte'
-
+class YearGte(YearComparisonLookup, GreaterThanOrEqual):
     def get_bound(self, start, finish):
         return start
 
 
-class YearLt(YearComparisonLookup):
-    lookup_name = 'lt'
-
+class YearLt(YearComparisonLookup, LessThan):
     def get_bound(self, start, finish):
         return start
 
 
-class YearLte(YearComparisonLookup):
-    lookup_name = 'lte'
-
+class YearLte(YearComparisonLookup, LessThanOrEqual):
     def get_bound(self, start, finish):
         return finish
