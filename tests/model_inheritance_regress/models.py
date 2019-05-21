@@ -60,6 +60,11 @@ class ParkingLot4B(Place, ParkingLot4):
     pass
 
 
+class ParkingLot5(Place):
+    parent1 = models.OneToOneField(Place, models.CASCADE, parent_link=True, related_name='p1')
+    parent2 = models.OneToOneField(Place, models.CASCADE, related_name='p2')
+
+
 class Supplier(models.Model):
     name = models.CharField(max_length=50)
     restaurant = models.ForeignKey(Restaurant, models.CASCADE)

@@ -12,8 +12,9 @@ from .models import (
     ArticleWithAuthor, BachelorParty, BirthdayParty, BusStation, Child,
     DerivedM, InternalCertificationAudit, ItalianRestaurant, M2MChild,
     MessyBachelorParty, ParkingLot, ParkingLot3, ParkingLot4A, ParkingLot4B,
-    Person, Place, Profile, QualityControl, Restaurant, SelfRefChild,
-    SelfRefParent, Senator, Supplier, TrainStation, User, Wholesaler,
+    ParkingLot5, Person, Place, Profile, QualityControl, Restaurant,
+    SelfRefChild, SelfRefParent, Senator, Supplier, TrainStation, User,
+    Wholesaler,
 )
 
 
@@ -303,6 +304,10 @@ class ModelInheritanceTest(TestCase):
             name="Parking4B",
             address='21 Jump Street',
         )
+
+    def test_issue_29998(self):
+        # multi-table inheritance with multiple o2o references.
+        self.assertEqual(ParkingLot5._meta.pk.name, "parent1")
 
     def test_all_fields_from_abstract_base_class(self):
         """
