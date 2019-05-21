@@ -1,7 +1,10 @@
 from datetime import datetime
 from operator import attrgetter
 
-from django.db.models import Count, DateTimeField, F, Max, OuterRef, Subquery
+from django.core.exceptions import FieldError
+from django.db.models import (
+    CharField, Count, DateTimeField, F, Max, OuterRef, Subquery, Value,
+)
 from django.db.models.functions import Upper
 from django.test import TestCase
 from django.utils.deprecation import RemovedInDjango31Warning
@@ -401,6 +404,18 @@ class OrderingTests(TestCase):
             ],
             attrgetter("headline")
         )
+
+    def test_order_by_annotated_constant_value(self):
+        qs = Article.objects.annotate(
+            constant=Value('1', output_field=CharField()),
+        ).order_by('constant', '-headline')
+        self.assertSequenceEqual(qs, [self.a4, self.a3, self.a2, self.a1])
+
+    def test_order_by_constant_value_without_output_field(self):
+        msg = 'Cannot resolve expression type, unknown output_field'
+        qs = Article.objects.annotate(constant=Value('1')).order_by('constant')
+        with self.assertRaisesMessage(FieldError, msg):
+            qs.first()
 
     def test_related_ordering_duplicate_table_reference(self):
         """
