@@ -119,7 +119,7 @@ Minor features
 * Added the ``language`` class attribute to the
   :class:`django.contrib.syndication.views.Feed` to customize a feed language.
   The default value is :func:`~django.utils.translation.get_language()` instead
-  of setting:`LANGUAGE_CODE`.
+  of :setting:`LANGUAGE_CODE`.
 
 Cache
 ~~~~~
