@@ -1,4 +1,5 @@
 from django.db.models import Exists, F, IntegerField, OuterRef, Value
+from django.db.models.functions import Power
 from django.db.utils import DatabaseError, NotSupportedError
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
@@ -204,7 +205,7 @@ class QuerySetSetOperationTests(TestCase):
 
     def test_order_raises_on_non_selected_column(self):
         qs1 = Number.objects.filter().annotate(
-            annotation=Value(1, IntegerField()),
+            annotation=Power('num', Value(2, IntegerField())),
         ).values('annotation', num2=F('num'))
         qs2 = Number.objects.filter().values('id', 'num')
         # Should not raise
