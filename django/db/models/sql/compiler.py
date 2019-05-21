@@ -5,7 +5,8 @@ from itertools import chain
 
 from django.core.exceptions import EmptyResultSet, FieldError
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import OrderBy, Random, RawSQL, Ref
+from django.db.models.expressions import OrderBy, Random, RawSQL, Ref, Value
+from django.db.models.functions import Cast
 from django.db.models.query_utils import QueryWrapper, select_related_descend
 from django.db.models.sql.constants import (
     CURSOR, GET_ITERATOR_CHUNK_SIZE, MULTI, NO_RESULTS, ORDER_DIR, SINGLE,
@@ -278,6 +279,9 @@ class SQLCompiler:
         order_by = []
         for field in ordering:
             if hasattr(field, 'resolve_expression'):
+                if isinstance(field, Value):
+                    # output_field must be resolved for constants.
+                    field = Cast(field, field.output_field)
                 if not isinstance(field, OrderBy):
                     field = field.asc()
                 if not self.query.standard_ordering:
@@ -299,10 +303,13 @@ class SQLCompiler:
                     True))
                 continue
             if col in self.query.annotations:
-                # References to an expression which is masked out of the SELECT clause
-                order_by.append((
-                    OrderBy(self.query.annotations[col], descending=descending),
-                    False))
+                # References to an expression which is masked out of the SELECT
+                # clause.
+                expr = self.query.annotations[col]
+                if isinstance(expr, Value):
+                    # output_field must be resolved for constants.
+                    expr = Cast(expr, expr.output_field)
+                order_by.append((OrderBy(expr, descending=descending), False))
                 continue
 
             if '.' in field:
