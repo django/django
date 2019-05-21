@@ -405,17 +405,35 @@ class OrderingTests(TestCase):
             attrgetter("headline")
         )
 
-    def test_order_by_annotated_constant_value(self):
+    def test_order_by_constant_value(self):
+        # Order by annotated constant from selected columns.
         qs = Article.objects.annotate(
             constant=Value('1', output_field=CharField()),
         ).order_by('constant', '-headline')
+        self.assertSequenceEqual(qs, [self.a4, self.a3, self.a2, self.a1])
+        # Order by annotated constant which is out of selected columns.
+        self.assertSequenceEqual(
+            qs.values_list('headline', flat=True), [
+                'Article 4',
+                'Article 3',
+                'Article 2',
+                'Article 1',
+            ],
+        )
+        # Order by constant.
+        qs = Article.objects.order_by(Value('1', output_field=CharField()), '-headline')
         self.assertSequenceEqual(qs, [self.a4, self.a3, self.a2, self.a1])
 
     def test_order_by_constant_value_without_output_field(self):
         msg = 'Cannot resolve expression type, unknown output_field'
         qs = Article.objects.annotate(constant=Value('1')).order_by('constant')
-        with self.assertRaisesMessage(FieldError, msg):
-            qs.first()
+        for ordered_qs in (
+            qs,
+            qs.values('headline'),
+            Article.objects.order_by(Value('1')),
+        ):
+            with self.subTest(ordered_qs=ordered_qs), self.assertRaisesMessage(FieldError, msg):
+                ordered_qs.first()
 
     def test_related_ordering_duplicate_table_reference(self):
         """
