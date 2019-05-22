@@ -55,6 +55,7 @@ class HashedFilesMixin:
             (r"""(@import\s*["']\s*(.*?)["'])""", """@import url("%s")"""),
         )),
     )
+    keep_intermediate_files = True
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -297,8 +298,9 @@ class HashedFilesMixin:
                         self.delete(hashed_name)
                     # then save the processed result
                     content_file = ContentFile(content.encode())
-                    # Save intermediate file for reference
-                    saved_name = self._save(hashed_name, content_file)
+                    if self.keep_intermediate_files:
+                        # Save intermediate file for reference
+                        self._save(hashed_name, content_file)
                     hashed_name = self.hashed_name(name, content_file)
 
                     if self.exists(hashed_name):
@@ -370,6 +372,7 @@ class ManifestFilesMixin(HashedFilesMixin):
     manifest_version = '1.0'  # the manifest format standard
     manifest_name = 'staticfiles.json'
     manifest_strict = True
+    keep_intermediate_files = False
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
