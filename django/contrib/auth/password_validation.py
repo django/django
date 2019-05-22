@@ -171,10 +171,10 @@ class CommonPasswordValidator:
 
     def __init__(self, password_list_path=DEFAULT_PASSWORD_LIST_PATH):
         try:
-            with gzip.open(str(password_list_path), 'rt') as f:
+            with gzip.open(password_list_path, 'rt') as f:
                 self.passwords = {x.strip() for x in f}
         except OSError:
-            with open(str(password_list_path)) as f:
+            with open(password_list_path) as f:
                 self.passwords = {x.strip() for x in f}
 
     def validate(self, password, user=None):
