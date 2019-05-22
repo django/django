@@ -268,6 +268,18 @@ non-durable <https://www.postgresql.org/docs/current/non-durability.html>`_.
     a development machine where you can easily restore the entire contents of
     all databases in the cluster.
 
+.. _mariadb-notes:
+
+MariaDB notes
+=============
+
+.. versionadded:: 3.0
+
+Django supports MariaDB 10.1 and higher.
+
+To use MariaDB, use the MySQL backend, which is shared between the two. See the
+:ref:`MySQL notes <mysql-notes>` for more details.
+
 .. _mysql-notes:
 
 MySQL notes

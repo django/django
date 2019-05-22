@@ -30,10 +30,12 @@ popular alternatives.
 
 If you want to use Django with a database, which is probably the case, you'll
 also need a database engine. PostgreSQL_ is recommended, because we're
-PostgreSQL fans, and MySQL_, `SQLite`_, and Oracle_ are also supported.
+PostgreSQL fans, and MariaDB_, MySQL_, `SQLite`_, and Oracle_ are also
+supported.
 
 .. _Python: https://www.python.org/
 .. _PostgreSQL: https://www.postgresql.org/
+.. _MariaDB: https://mariadb.org/
 .. _MySQL: https://www.mysql.com/
 .. _`SQLite`: https://www.sqlite.org/
 .. _Oracle: https://www.oracle.com/
