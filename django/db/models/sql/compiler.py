@@ -281,6 +281,7 @@ class SQLCompiler:
                 if not isinstance(field, OrderBy):
                     field = field.asc()
                 if not self.query.standard_ordering:
+                    field = field.copy()
                     field.reverse_ordering()
                 order_by.append((field, False))
                 continue
