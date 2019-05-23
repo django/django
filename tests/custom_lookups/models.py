@@ -20,3 +20,8 @@ class MySQLUnixTimestamp(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class InstanceRegisterModel(models.Model):
+    field1 = models.IntegerField(null=True)
+    field2 = models.IntegerField(null=True)

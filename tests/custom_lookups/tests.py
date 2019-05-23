@@ -8,7 +8,7 @@ from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import register_lookup
 from django.utils import timezone
 
-from .models import Article, Author, MySQLUnixTimestamp
+from .models import Article, Author, InstanceRegisterModel, MySQLUnixTimestamp
 
 
 class Div3Lookup(models.Lookup):
@@ -213,6 +213,25 @@ class DateTimeTransform(models.Transform):
     def as_sql(self, compiler, connection):
         lhs, params = compiler.compile(self.lhs)
         return 'from_unixtime({})'.format(lhs), params
+
+
+class CustomExactLookup(models.Lookup):
+    lookup_name = 'c_equal'
+
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
+        params = lhs_params + rhs_params
+        return '%s = %s' % (lhs, rhs), params
+
+
+class CustomAbsTransform(models.Transform):
+    lookup_name = 'c_abs'
+    function = 'ABS'
+
+    @property
+    def output_field(self):
+        return models.FloatField()
 
 
 class LookupTests(TestCase):
@@ -568,3 +587,62 @@ class SubqueryTransformTests(TestCase):
             Author.objects.create(name='a4', age=4)
             qs = Author.objects.order_by('name').filter(id__in=Author.objects.filter(age__div3=2))
             self.assertSequenceEqual(qs, [a2])
+
+
+class LookupForInstanceTests(TestCase):
+    def test_custom_lookup(self):
+        get_query = InstanceRegisterModel.objects.get
+        get_field = InstanceRegisterModel._meta.get_field
+        msg = "Unsupported lookup 'c_equal' for IntegerField or join on the field not permitted."
+
+        result = InstanceRegisterModel.objects.create(field1=1, field2=2)
+        field1 = get_field('field1')
+        field2 = get_field('field2')
+
+        field1.register_instance_lookup(CustomExactLookup)
+        self.assertEqual(get_query(field1__c_equal=1), result)
+        with self.assertRaisesMessage(FieldError, msg):
+            get_query(field2__c_equal=2)
+
+        field2.register_instance_lookup(CustomExactLookup)
+        self.assertEqual(get_query(field2__c_equal=2), result)
+
+        field1._unregister_instance_lookup(CustomExactLookup)
+        field2._unregister_instance_lookup(CustomExactLookup)
+        with self.assertRaisesMessage(FieldError, msg):
+            get_query(field1__c_equal=1)
+
+    def test_custom_transform(self):
+        get_query = InstanceRegisterModel.objects.get
+        get_field = InstanceRegisterModel._meta.get_field
+        msg = "Unsupported lookup 'c_abs' for IntegerField or join on the field not permitted."
+
+        result = InstanceRegisterModel.objects.create(field1=-1, field2=-2)
+        field1 = get_field('field1')
+        field2 = get_field('field2')
+
+        field1.register_instance_lookup(CustomAbsTransform)
+        self.assertEqual(get_query(field1__c_abs=1), result)
+        with self.assertRaisesMessage(FieldError, msg):
+            get_query(field2__c_abs=2)
+
+        field1._unregister_instance_lookup(CustomAbsTransform)
+        field2.register_instance_lookup(CustomAbsTransform)
+        with self.assertRaisesMessage(FieldError, msg):
+            get_query(field1__c_abs=1)
+        self.assertEqual(get_query(field2__c_abs=2), result)
+
+    def test_unregister_from_instance(self):
+        field1 = InstanceRegisterModel._meta.get_field('field1')
+        field2 = InstanceRegisterModel._meta.get_field('field2')
+
+        field1._unregister_instance_lookup(models.lookups.Exact)
+        self.assertIsNone(field1.get_lookup('exact'))
+        self.assertIsNotNone(field2.get_lookup('exact'))
+
+    def test_override_from_instance(self):
+        field1 = InstanceRegisterModel._meta.get_field('field1')
+        field2 = InstanceRegisterModel._meta.get_field('field2')
+        field1.register_instance_lookup(CustomExactLookup, 'exact')
+        self.assertEqual(field1.get_lookup('exact'), CustomExactLookup)
+        self.assertEqual(field2.get_lookup('exact'), models.lookups.Exact)

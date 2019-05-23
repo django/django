@@ -1169,15 +1169,17 @@ class Query(BaseExpression):
         if transform_class:
             return transform_class(lhs)
         else:
-            output_field = lhs.output_field.__class__
-            suggested_lookups = difflib.get_close_matches(name, output_field.get_lookups())
+            output_field = lhs.output_field
+            suggested_lookups = difflib.get_close_matches(name, output_field.__class__.get_lookups())
+            suggested_instance_lookups = difflib.get_close_matches(name, output_field.get_instance_lookups())
+            suggested_lookups.extend(suggested_instance_lookups)
             if suggested_lookups:
                 suggestion = ', perhaps you meant %s?' % ' or '.join(suggested_lookups)
             else:
                 suggestion = '.'
             raise FieldError(
                 "Unsupported lookup '%s' for %s or join on the field not "
-                "permitted%s" % (name, output_field.__name__, suggestion)
+                "permitted%s" % (name, output_field.__class__.__name__, suggestion)
             )
 
     def build_filter(self, filter_expr, branch_negated=False, current_negated=False,

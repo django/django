@@ -163,9 +163,14 @@ class RegisterLookupMixin:
         class_lookups = [parent.__dict__.get('class_lookups', {}) for parent in inspect.getmro(cls)]
         return cls.merge_dicts(class_lookups)
 
+    def _is_lookup_name_exist(self, lookup_name):
+        if self._get_unregistered_instance_lookup(lookup_name):
+            return None
+        return self._get_instance_lookup(lookup_name) or self._get_lookup(lookup_name)
+
     def get_lookup(self, lookup_name):
         from django.db.models.lookups import Lookup
-        found = self._get_lookup(lookup_name)
+        found = self._is_lookup_name_exist(lookup_name)
         if found is None and hasattr(self, 'output_field'):
             return self.output_field.get_lookup(lookup_name)
         if found is not None and not issubclass(found, Lookup):
@@ -174,7 +179,7 @@ class RegisterLookupMixin:
 
     def get_transform(self, lookup_name):
         from django.db.models.lookups import Transform
-        found = self._get_lookup(lookup_name)
+        found = self._is_lookup_name_exist(lookup_name)
         if found is None and hasattr(self, 'output_field'):
             return self.output_field.get_transform(lookup_name)
         if found is not None and not issubclass(found, Transform):
@@ -216,6 +221,36 @@ class RegisterLookupMixin:
         if lookup_name is None:
             lookup_name = lookup.lookup_name
         del cls.class_lookups[lookup_name]
+
+    def get_instance_lookups(self):
+        return self.__dict__.get('instance_lookups', {})
+
+    def get_unregistered_instance_lookups(self):
+        return self.__dict__.get('unregistered_instance_lookups', {})
+
+    def _get_instance_lookup(self, lookup_name):
+        return self.get_instance_lookups().get(lookup_name, None)
+
+    def _get_unregistered_instance_lookup(self, lookup_name):
+        return self.get_unregistered_instance_lookups().get(lookup_name, None)
+
+    def register_instance_lookup(self, lookup, lookup_name=None):
+        if lookup_name is None:
+            lookup_name = lookup.lookup_name
+        if not hasattr(self, 'instance_lookups'):
+            self.instance_lookups = {}
+        self.instance_lookups[lookup_name] = lookup
+        return lookup
+
+    def _unregister_instance_lookup(self, lookup, lookup_name=None):
+        if lookup_name is None:
+            lookup_name = lookup.lookup_name
+        if self._get_lookup(lookup_name):
+            if not hasattr(self, 'unregistered_instance_lookups'):
+                self.unregistered_instance_lookups = {}
+            self.unregistered_instance_lookups[lookup_name] = lookup
+        elif hasattr(self, 'instance_lookups') and lookup_name in self.instance_lookups.keys():
+            del self.instance_lookups[lookup_name]
 
 
 def select_related_descend(field, restricted, requested, load_fields, reverse=False):
