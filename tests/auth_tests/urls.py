@@ -91,7 +91,10 @@ urlpatterns = auth_urlpatterns + [
     path('password_reset_from_email/', views.PasswordResetView.as_view(from_email='staffmember@example.com')),
     path(
         'password_reset_extra_email_context/',
-        views.PasswordResetView.as_view(extra_email_context={'greeting': 'Hello!'})),
+        views.PasswordResetView.as_view(
+            extra_email_context={'greeting': 'Hello!', 'domain': 'custom.example.com'},
+        ),
+    ),
     path(
         'password_reset/custom_redirect/',
         views.PasswordResetView.as_view(success_url='/custom/')),

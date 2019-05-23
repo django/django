@@ -134,6 +134,7 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn('Email email context: "Hello!"', mail.outbox[0].body)
+        self.assertIn('http://custom.example.com/reset/', mail.outbox[0].body)
 
     def test_html_mail_template(self):
         """
