@@ -112,6 +112,10 @@ urlpatterns = auth_urlpatterns + [
         views.PasswordResetConfirmView.as_view(success_url=reverse_lazy('password_reset')),
     ),
     re_path(
+        '^reset/custom/token/{}/$'.format(uid_token),
+        views.PasswordResetConfirmView.as_view(reset_url_token='set-passwordcustom'),
+    ),
+    re_path(
         '^reset/post_reset_login/{}/$'.format(uid_token),
         views.PasswordResetConfirmView.as_view(post_reset_login=True),
     ),

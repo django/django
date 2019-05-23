@@ -59,7 +59,9 @@ Minor features
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new ``reset_url_token`` attribute in
+  :class:`~django.contrib.auth.views.PasswordResetConfirmView` allows specifying
+  a token parameter displayed as a component of password reset URLs.
 
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
