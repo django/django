@@ -6,6 +6,7 @@ import json
 
 from django import forms
 from django.conf import settings
+from django.contrib.admin.utils import quote
 from django.core.exceptions import ValidationError
 from django.db.models.deletion import CASCADE
 from django.urls import reverse
@@ -188,7 +189,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
                     obj._meta.app_label,
                     obj._meta.object_name.lower(),
                 ),
-                args=(obj.pk,)
+                args=(quote(obj.pk),)
             )
         except NoReverseMatch:
             url = ''  # Admin not registered for target model.
@@ -239,6 +240,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         self.attrs = widget.attrs
         self.choices = widget.choices
         self.widget = widget
+        self.widget.option_template_name = 'admin/widgets/related_widget_select_option.html'
         self.rel = rel
         # Backwards compatible check for whether a user can add related
         # objects.

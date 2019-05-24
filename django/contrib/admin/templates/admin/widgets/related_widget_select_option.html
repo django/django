@@ -1,0 +1,1 @@
+{% load admin_urls %}<option value="{{ widget.value|admin_urlquote|stringformat:'s' }}"{% include "django/forms/widgets/attrs.html" %}>{{ widget.label }}</option>
