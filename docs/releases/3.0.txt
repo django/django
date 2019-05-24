@@ -89,6 +89,8 @@ Minor features
 
 * Select2 library is upgraded from version 4.0.3 to 4.0.7.
 
+* jQuery is upgraded from version 3.3.1 to 3.4.1.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
