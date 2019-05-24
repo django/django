@@ -345,7 +345,13 @@ Now you're ready to actually put the release out there. To do this:
 
    Create new ``DocumentRelease`` objects for each language that has an entry
    for the previous release. Update djangoproject.com's `robots.docs.txt`__
-   file by copying entries from the previous release.
+   file by copying entries from ``manage_translations.py robots_txt`` from the
+   current stable branch in the ``django-docs-translations`` repository. For
+   example, when releasing Django 2.2::
+
+        $ git checkout stable/2.2.x
+        $ git pull
+        $ python manage_translations.py robots_txt
 
    __ https://github.com/django/djangoproject.com/blob/master/djangoproject/static/robots.docs.txt
 
@@ -368,8 +374,12 @@ You're almost done! All that's left to do now is:
    ``VERSION = (1, 5, 2, 'alpha', 0)``.
 
 #. Add the release in `Trac's versions list`_ if necessary (and make it the
-   default if it's a final release). Not all versions are declared;
-   take example on previous releases.
+   default by changing the ``default_version`` setting in the
+   code.djangoproject.com's `trac.ini`__, if it's a final release). The new X.Y
+   version should be added after the alpha release and the default version
+   should be updated after "dot zero" release.
+
+   __ https://github.com/django/code.djangoproject.com/blob/master/trac-env/conf/trac.ini
 
 #. If this was a security release, update :doc:`/releases/security` with
    details of the issues addressed.
