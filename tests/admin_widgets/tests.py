@@ -11,6 +11,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin import widgets
 from django.contrib.admin.tests import AdminSeleniumTestCase
+from django.contrib.admin.utils import quote
 from django.contrib.auth.models import User
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -21,7 +22,7 @@ from django.utils import translation
 
 from .models import (
     Advisor, Album, Band, Bee, Car, Company, Event, Honeycomb, Individual,
-    Inventory, Member, MyFileField, Profile, School, Student,
+    Inventory, Member, MyFileField, Pizza, Profile, School, Student, Topping,
 )
 from .widgetadmin import site as widget_admin_site
 
@@ -577,6 +578,26 @@ class ForeignKeyRawIdWidgetTest(TestCase):
             'class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
             '&nbsp;<strong><a href="/admin_widgets/inventory/%(pk)s/change/">'
             'Hidden</a></strong>' % {'pk': hidden.pk}
+        )
+
+    def test_quoted_pk_on_url_for_value(self):
+        """
+        Ensure that the 'pk' in change url of ForeignKeyRawIdWidget is quoted.
+        Refs #30386
+        """
+        # '_40' is a special string that should be quoted in url.
+        cheese = Topping.objects.create(name='cheese_40', code='ch')
+
+        rel = Pizza._meta.get_field('topping').remote_field
+        w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
+        self.assertHTMLEqual(
+            w.render('test', cheese.pk, attrs={}),
+            '<input type="text" name="test" value="%(val)s" '
+            'class="vForeignKeyRawIdAdminField">'
+            '<a href="/admin_widgets/topping/?_to_field=name" '
+            'class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
+            '&nbsp;<strong><a href="/admin_widgets/topping/%(pk)s/change/">'
+            '%(val)s</a></strong>' % {'val': cheese.pk, 'pk': quote(cheese.pk)}
         )
 
 
@@ -1347,6 +1368,19 @@ class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
 
 class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
 
+    def setUp(self):
+        super().setUp()
+        self.toppings = []
+        self.toppings.append(Topping.objects.create(name='c>h<e%e[s]e_40', code='c1'))
+        self.toppings.append(Topping.objects.create(name='on/ion?\\at@w$mw+', code='c2'))
+        self.toppings.append(Topping.objects.create(name='sa:la"m,i\nw;th=', code='c3'))
+        self.toppings.append(Topping.objects.create(name='?_3A_40', code='c4'))
+        self.toppings.append(Topping.objects.create(name='qwerttyuiop12345', code='c5'))
+        self.toppings.append(Topping.objects.create(name='ASDfgHJKL06789', code='c6'))
+        self.toppings.append(Topping.objects.create(name='zZccVBnm,l.;\'t039_)?', code='c7'))
+        self.toppings.append(Topping.objects.create(name='Iñtërnâtiônàlizætiøn', code='c8'))
+        self.toppings.append(Topping.objects.create(name='1', code='c9'))
+
     def test_ForeignKey_using_to_field(self):
         self.admin_login(username='super', password='secret', login_url='/')
         self.selenium.get(self.live_server_url + reverse('admin:admin_widgets_profile_add'))
@@ -1390,3 +1424,23 @@ class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
         profiles = Profile.objects.all()
         self.assertEqual(len(profiles), 1)
         self.assertEqual(profiles[0].user.username, username_value)
+
+    def test_related_url_quoted(self):
+        self.admin_login(username='super', password='secret', login_url='/')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_widgets_pizza_add'))
+        main_window = self.selenium.current_window_handle
+
+        # Ensure that the 'pk' in the change url of RelatedFieldWidget is quoted (#30386).
+        for topping in self.toppings:
+            quoted_pk = quote(topping.pk)
+            self.get_select_option('#id_topping', quoted_pk).click()
+            self.wait_for_value('#id_topping', quoted_pk)
+            # Click change button for current Topping option.
+            self.selenium.find_element_by_id('change_id_topping').click()
+            self.wait_for_popup()
+            self.selenium.switch_to.window('id_topping')
+            self.wait_for('#id_code')
+            code_field = self.selenium.find_element_by_id('id_code')
+            # Ensure that the current page is change page of this Topping object.
+            self.assertEqual(code_field.get_attribute('value'), topping.code)
+            self.selenium.switch_to.window(main_window)

@@ -156,3 +156,19 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username
+
+
+class Topping(models.Model):
+    name = models.CharField(max_length=30, primary_key=True)
+    code = models.CharField(max_length=2, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Pizza(models.Model):
+    name = models.CharField(max_length=40)
+    topping = models.ForeignKey(Topping, on_delete=models.PROTECT, related_name='pizzas')
+
+    def __str__(self):
+        return self.name
