@@ -34,7 +34,20 @@ class URLEncodeTests(SimpleTestCase):
         ])
 
     def test_dict_containing_sequence_not_doseq(self):
-        self.assertEqual(urlencode({'a': [1, 2]}, doseq=False), 'a=%5B%271%27%2C+%272%27%5D')
+        self.assertEqual(urlencode({'a': [1, 2]}, doseq=False), 'a=%5B1%2C+2%5D')
+
+    def test_dict_containing_tuple_not_doseq(self):
+        self.assertEqual(urlencode({'a': (1, 2)}, doseq=False), 'a=%281%2C+2%29')
+
+    def test_custom_iterable_not_doseq(self):
+        class IterableWithStr:
+            def __str__(self):
+                return 'custom'
+
+            def __iter__(self):
+                yield from range(0, 3)
+
+        self.assertEqual(urlencode({'a': IterableWithStr()}, doseq=False), 'a=custom')
 
     def test_dict_containing_sequence_doseq(self):
         self.assertEqual(urlencode({'a': [1, 2]}, doseq=True), 'a=1&a=2')
@@ -61,14 +74,11 @@ class URLEncodeTests(SimpleTestCase):
 
     def test_dict_with_bytearray(self):
         self.assertEqual(urlencode({'a': bytearray(range(2))}, doseq=True), 'a=0&a=1')
-        self.assertEqual(urlencode({'a': bytearray(range(2))}, doseq=False), 'a=%5B%270%27%2C+%271%27%5D')
+        self.assertEqual(urlencode({'a': bytearray(range(2))}, doseq=False), 'a=bytearray%28b%27%5Cx00%5Cx01%27%29')
 
     def test_generator(self):
-        def gen():
-            yield from range(2)
-
-        self.assertEqual(urlencode({'a': gen()}, doseq=True), 'a=0&a=1')
-        self.assertEqual(urlencode({'a': gen()}, doseq=False), 'a=%5B%270%27%2C+%271%27%5D')
+        self.assertEqual(urlencode({'a': range(2)}, doseq=True), 'a=0&a=1')
+        self.assertEqual(urlencode({'a': range(2)}, doseq=False), 'a=range%280%2C+2%29')
 
     def test_none(self):
         with self.assertRaisesMessage(TypeError, self.cannot_encode_none_msg):

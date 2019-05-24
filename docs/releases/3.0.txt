@@ -392,6 +392,10 @@ Miscellaneous
   now have the ``placeholder`` attribute, which mainly may require some
   adjustments in tests that compare HTML.
 
+* :func:`~django.utils.http.urlencode` now encodes iterable values as they are
+  when ``doseq=False``, rather than iterating them, bringing it into line with
+  the standard library :func:`urllib.parse.urlencode` function.
+
 .. _deprecated-features-3.0:
 
 Features deprecated in 3.0

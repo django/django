@@ -116,7 +116,7 @@ def urlencode(query, doseq=False):
                 'Cannot encode None in a query string. Did you mean to pass '
                 'an empty string or omit the value?'
             )
-        elif isinstance(value, (str, bytes)):
+        elif isinstance(value, (str, bytes)) or not doseq:
             query_val = value
         else:
             try:
@@ -124,7 +124,7 @@ def urlencode(query, doseq=False):
             except TypeError:
                 query_val = value
             else:
-                # Consume generators and iterators, even when doseq=True, to
+                # Consume generators and iterators, when doseq=True, to
                 # work around https://bugs.python.org/issue31706.
                 query_val = []
                 for item in itr:
