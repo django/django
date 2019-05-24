@@ -280,6 +280,14 @@ class OneToOneTests(TestCase):
         self.assertEqual(num_deleted, 1)
         self.assertEqual(objs, {'one_to_one.Pointer': 1})
 
+    def test_save_nullable_o2o_after_parent(self):
+        place = Place(name='Rose tattoo')
+        bar = UndergroundBar(place=place)
+        place.save()
+        bar.save()
+        bar.refresh_from_db()
+        self.assertEqual(bar.place, place)
+
     def test_reverse_object_does_not_exist_cache(self):
         """
         Regression for #13839 and #17439.
