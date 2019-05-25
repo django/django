@@ -116,7 +116,7 @@ def get_installed():
     return [app_config.name for app_config in apps.get_app_configs()]
 
 
-def setup(verbosity, test_labels, parallel):
+def setup(verbosity, test_labels, parallel, start_at, start_after):
     # Reduce the given test labels to just the app module path.
     test_labels_set = set()
     for label in test_labels:
@@ -202,12 +202,21 @@ def setup(verbosity, test_labels, parallel):
     # Load all the test model apps.
     test_modules = get_test_modules()
 
+    found_start = not (start_at or start_after)
     installed_app_names = set(get_installed())
     for modpath, module_name in test_modules:
         if modpath:
             module_label = modpath + '.' + module_name
         else:
             module_label = module_name
+        if not found_start:
+            if start_at and _module_match_label(module_label, start_at):
+                found_start = True
+            elif start_after and _module_match_label(module_label, start_after):
+                found_start = True
+                continue
+            else:
+                continue
         # if the module (or an ancestor) was named on the command line, or
         # no modules were named (i.e., run all), import
         # this module and add it to INSTALLED_APPS.
@@ -275,8 +284,8 @@ class ActionSelenium(argparse.Action):
 
 def django_tests(verbosity, interactive, failfast, keepdb, reverse,
                  test_labels, debug_sql, parallel, tags, exclude_tags,
-                 test_name_patterns):
-    state = setup(verbosity, test_labels, parallel)
+                 test_name_patterns, start_at, start_after):
+    state = setup(verbosity, test_labels, parallel, start_at, start_after)
     extra_tests = []
 
     # Run the test suite, including the extra validation tests.
@@ -321,8 +330,8 @@ def get_subprocess_args(options):
     return subprocess_args
 
 
-def bisect_tests(bisection_label, options, test_labels, parallel):
-    state = setup(options.verbosity, test_labels, parallel)
+def bisect_tests(bisection_label, options, test_labels, parallel, start_at, start_after):
+    state = setup(options.verbosity, test_labels, parallel, start_at, start_after)
 
     test_labels = test_labels or get_installed()
 
@@ -372,8 +381,8 @@ def bisect_tests(bisection_label, options, test_labels, parallel):
     teardown(state)
 
 
-def paired_tests(paired_test, options, test_labels, parallel):
-    state = setup(options.verbosity, test_labels, parallel)
+def paired_tests(paired_test, options, test_labels, parallel, start_at, start_after):
+    state = setup(options.verbosity, test_labels, parallel, start_at, start_after)
 
     test_labels = test_labels or get_installed()
 
@@ -478,6 +487,14 @@ if __name__ == "__main__":
         '--exclude-tag', dest='exclude_tags', action='append',
         help='Do not run tests with the specified tag. Can be used multiple times.',
     )
+    parser.add_argument(
+        '--start-after', dest='start_after',
+        help='Run tests starting after the specified top-level module.',
+    )
+    parser.add_argument(
+        '--start-at', dest='start_at',
+        help='Run tests starting at the specified top-level module.',
+    )
     if PY37:
         parser.add_argument(
             '-k', dest='test_name_patterns', action='append',
@@ -498,6 +515,18 @@ if __name__ == "__main__":
     # Allow including a trailing slash on app_labels for tab completion convenience
     options.modules = [os.path.normpath(labels) for labels in options.modules]
 
+    mutually_exclusive_options = [options.start_at, options.start_after, options.modules]
+    enabled_module_options = [bool(option) for option in mutually_exclusive_options].count(True)
+    if enabled_module_options > 1:
+        print('Aborting: --start-at, --start-after, and test labels are mutually exclusive.')
+        sys.exit(1)
+    for opt_name in ['start_at', 'start_after']:
+        opt_val = getattr(options, opt_name)
+        if opt_val:
+            if '.' in opt_val:
+                print('Aborting: --%s must be a top-level module.' % opt_name.replace('_', '-'))
+                sys.exit(1)
+            setattr(options, opt_name, os.path.normpath(opt_val))
     if options.settings:
         os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
     else:
@@ -516,9 +545,15 @@ if __name__ == "__main__":
         SeleniumTestCaseBase.browsers = options.selenium
 
     if options.bisect:
-        bisect_tests(options.bisect, options, options.modules, options.parallel)
+        bisect_tests(
+            options.bisect, options, options.modules, options.parallel,
+            options.start_at, options.start_after,
+        )
     elif options.pair:
-        paired_tests(options.pair, options, options.modules, options.parallel)
+        paired_tests(
+            options.pair, options, options.modules, options.parallel,
+            options.start_at, options.start_after,
+        )
     else:
         failures = django_tests(
             options.verbosity, options.interactive, options.failfast,
@@ -526,6 +561,7 @@ if __name__ == "__main__":
             options.debug_sql, options.parallel, options.tags,
             options.exclude_tags,
             getattr(options, 'test_name_patterns', None),
+            options.start_at, options.start_after,
         )
         if failures:
             sys.exit(1)

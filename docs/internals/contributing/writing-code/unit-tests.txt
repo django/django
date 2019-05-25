@@ -213,6 +213,24 @@ Going beyond that, you can specify an individual test method like this:
 
    $ ./runtests.py --settings=path.to.settings i18n.tests.TranslationTests.test_lazy_objects
 
+You can run tests starting at a specified top-level module with ``--start-at``
+option. For example:
+
+.. console::
+
+   $ ./runtests.py --start-at=wsgi
+
+You can also run tests starting after a specified top-level module with
+``--start-after`` option. For example:
+
+.. console::
+
+   $ ./runtests.py --start-after=wsgi
+
+Note that the ``--reverse`` option doesn't impact on ``--start-at`` or
+``--start-after`` options. Moreover these options cannot be used with test
+labels.
+
 Running the Selenium tests
 --------------------------
 
