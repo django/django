@@ -21,3 +21,7 @@ Bugfixes
 
 * Fixed a regression in Django 2.2 where auto-reloader doesn't detect changes
   in ``manage.py`` file when using ``StatReloader`` (:ticket:`30479`).
+
+* Fixed crash of :class:`~django.contrib.postgres.aggregates.ArrayAgg` and
+  :class:`~django.contrib.postgres.aggregates.StringAgg` with ``ordering``
+  argument when used in a ``Subquery`` (:ticket:`30315`).
