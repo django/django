@@ -1215,7 +1215,7 @@ class SQLInsertCompiler(SQLCompiler):
             return getattr(obj, field.attname)
         return field.pre_save(obj, add=True)
 
-    def assemble_as_sql(self, fields, value_rows):
+    def assemble_as_sql(self, fields, value_rows, cursor=None):
         """
         Take a sequence of N fields and a sequence of M rows of values, and
         generate placeholder SQL and parameters for each field and value.
@@ -1245,12 +1245,16 @@ class SQLInsertCompiler(SQLCompiler):
         # Each of these has shape [n_objs][n_fields]
         placeholder_rows, param_rows = zip(*sql_and_param_pair_rows)
 
+        # Allow params to be post processed at the query level.
+        if cursor is not None:
+            param_rows = self.connection.adjust_param_rows(param_rows, cursor)
+
         # Params for each field are still lists, and need to be flattened.
         param_rows = [[p for ps in row for p in ps] for row in param_rows]
 
         return placeholder_rows, param_rows
 
-    def as_sql(self):
+    def as_sql(self, cursor=None):
         # We don't need quote_name_unless_alias() here, since these are all
         # going to be column names (so we can avoid the extra overhead).
         qn = self.connection.ops.quote_name
@@ -1276,7 +1280,7 @@ class SQLInsertCompiler(SQLCompiler):
         # expressions in bulk inserts too.
         can_bulk = (not self.return_id and self.connection.features.has_bulk_insert)
 
-        placeholder_rows, param_rows = self.assemble_as_sql(fields, value_rows)
+        placeholder_rows, param_rows = self.assemble_as_sql(fields, value_rows, cursor=cursor)
 
         ignore_conflicts_suffix_sql = self.connection.ops.ignore_conflicts_suffix_sql(
             ignore_conflicts=self.query.ignore_conflicts
@@ -1319,7 +1323,7 @@ class SQLInsertCompiler(SQLCompiler):
         )
         self.return_id = return_id
         with self.connection.cursor() as cursor:
-            for sql, params in self.as_sql():
+            for sql, params in self.as_sql(cursor):
                 cursor.execute(sql, params)
             if not return_id:
                 return

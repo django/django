@@ -49,6 +49,19 @@ class BulkCreateTests(TestCase):
         Country.objects.bulk_create([Country(description='Ж' * 3000)])
         self.assertEqual(Country.objects.count(), 1)
 
+    @skipUnlessDBFeature('has_bulk_insert')
+    def test_long_and_short(self):
+        """
+        A bulk insert with long and short values for the same field should
+        ensure that if one field requires a CLOB type they all get the CLOB
+        type.
+        """
+        Country.objects.bulk_create([
+            Country(description='aaa'),
+            Country(description='a' * 6000),
+        ])
+        self.assertEqual(Country.objects.count(), 2)
+
     def test_multi_table_inheritance_unsupported(self):
         expected_message = "Can't bulk create a multi-table inherited model"
         with self.assertRaisesMessage(ValueError, expected_message):

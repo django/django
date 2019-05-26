@@ -657,3 +657,9 @@ class BaseDatabaseWrapper:
         if alias is None:
             alias = self.alias
         return type(self)(settings_dict, alias)
+
+    def adjust_param_rows(self, param_rows, cursor):
+        """
+        Only the Oracle backend needs to adjust parameters of the query.
+        """
+        return param_rows

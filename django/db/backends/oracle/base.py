@@ -311,6 +311,33 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         with self.temporary_connection():
             return tuple(int(x) for x in self.connection.version.split('.'))
 
+    def adjust_param_rows(self, param_rows, cursor):
+        """
+        Wrap params in OracleParam. If any of the rows for a field are have
+        CLOB type all values for that field should be treated as a CLOB type.
+        """
+        # Determine which fields are CLOB fields.
+        result = [
+            [
+                [OracleParam(param, cursor, True) for param in field]
+                for field in row
+            ] for row in param_rows
+        ]
+
+        clob_params = set(
+            (i, j) for row in result
+            for (i, field) in enumerate(row)
+            for (j, param) in enumerate(field)
+            if param.input_size == Database.CLOB
+        )
+
+        # Update the input_size to be CLOB if its clob in any of the rows.
+        for row in result:
+            for i, j in clob_params:
+                row[i][j].input_size = Database.CLOB
+
+        return result
+
 
 class OracleParam:
     """
@@ -335,7 +362,9 @@ class OracleParam:
             param = 1
         elif param is False:
             param = 0
-        if hasattr(param, 'bind_parameter'):
+        if hasattr(param, 'force_bytes'):
+            self.force_bytes = param.force_bytes
+        elif hasattr(param, 'bind_parameter'):
             self.force_bytes = param.bind_parameter(cursor)
         elif isinstance(param, (Database.Binary, datetime.timedelta)):
             self.force_bytes = param
