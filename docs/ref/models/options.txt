@@ -72,7 +72,7 @@ If your database table name is an SQL reserved word, or contains characters that
 aren't allowed in Python variable names -- notably, the hyphen -- that's OK.
 Django quotes column and table names behind the scenes.
 
-.. admonition:: Use lowercase table names for MySQL
+.. admonition:: Use lowercase table names for MariaDB and MySQL
 
     It is strongly advised that you use lowercase table names when you override
     the table name via ``db_table``, particularly if you are using the MySQL

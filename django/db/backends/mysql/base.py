@@ -340,5 +340,4 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @cached_property
     def mysql_is_mariadb(self):
-        # MariaDB isn't officially supported.
         return 'mariadb' in self.mysql_server_info.lower()

@@ -487,7 +487,7 @@ SQLite. This can be configured using the following::
         }
     }
 
-When connecting to other database backends, such as MySQL, Oracle, or
+When connecting to other database backends, such as MariaDB, MySQL, Oracle, or
 PostgreSQL, additional connection parameters will be required. See
 the :setting:`ENGINE <DATABASE-ENGINE>` setting below on how to specify
 other database types. This example is for PostgreSQL::

@@ -31,8 +31,8 @@ Set up a database
 =================
 
 This step is only necessary if you'd like to work with a "large" database engine
-like PostgreSQL, MySQL, or Oracle. To install such a database, consult the
-:ref:`database installation information <database-installation>`.
+like PostgreSQL, MariaDB, MySQL, or Oracle. To install such a database, consult
+the :ref:`database installation information <database-installation>`.
 
 Install Django
 ==============
