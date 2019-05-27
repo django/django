@@ -19,3 +19,14 @@ payload, could result in an clickable JavaScript link.
 link. You may customise the validator by passing a ``validator_class`` kwarg to
 ``AdminURLFieldWidget.__init__()``, e.g. when using
 :attr:`~django.contrib.admin.ModelAdmin.formfield_overrides`.
+
+Patched bundled jQuery for CVE-2019-11358: Prototype pollution
+--------------------------------------------------------------
+
+jQuery before 3.4.0, mishandles ``jQuery.extend(true, {}, ...)`` because of
+``Object.prototype`` pollution. If an unsanitized source object contained an
+enumerable ``__proto__`` property, it could extend the native
+``Object.prototype``.
+
+The bundled version of jQuery used by the Django admin has been patched to
+allow for the ``select2`` library's use of ``jQuery.extend()``.
