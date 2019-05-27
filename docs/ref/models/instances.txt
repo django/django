@@ -472,7 +472,8 @@ follows this algorithm:
   ``True`` (i.e., a value other than ``None`` or the empty string), Django
   executes an ``UPDATE``.
 * If the object's primary key attribute is *not* set or if the ``UPDATE``
-  didn't update anything, Django executes an ``INSERT``.
+  didn't update anything (e.g. if primary key is set to a value that doesn't
+  exist in the database), Django executes an ``INSERT``.
 
 The one gotcha here is that you should be careful not to specify a primary-key
 value explicitly when saving new objects, if you cannot guarantee the
