@@ -28,3 +28,7 @@ Bugfixes
 
 * Fixed a regression in Django 2.2 that caused a crash of auto-reloader when
   an exception with custom signature is raised (:ticket:`30516`).
+
+* Fixed a regression in Django 2.2.1 where auto-reloader unnecessarily reloads
+  translation files multiple times when using ``StatReloader``
+  (:ticket:`30523`).

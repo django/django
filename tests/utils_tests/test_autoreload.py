@@ -659,6 +659,16 @@ class StatReloaderTests(ReloaderTests, IntegrationTests):
         # Shorten the sleep time to speed up tests.
         self.reloader.SLEEP_TIME = 0.01
 
+    @mock.patch('django.utils.autoreload.StatReloader.notify_file_changed')
+    def test_tick_does_not_trigger_twice(self, mock_notify_file_changed):
+        with mock.patch.object(self.reloader, 'watched_files', return_value=[self.existing_file]):
+            ticker = self.reloader.tick()
+            next(ticker)
+            self.increment_mtime(self.existing_file)
+            next(ticker)
+            next(ticker)
+            self.assertEqual(mock_notify_file_changed.call_count, 1)
+
     def test_snapshot_files_ignores_missing_files(self):
         with mock.patch.object(self.reloader, 'watched_files', return_value=[self.nonexistent_file]):
             self.assertEqual(dict(self.reloader.snapshot_files()), {})
