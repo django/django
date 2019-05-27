@@ -18,3 +18,6 @@ Bugfixes
 * Fixed a regression in Django 2.2.1 where
   :class:`~django.contrib.postgres.search.SearchVector` generates SQL with a
   redundant ``Coalesce`` call (:ticket:`30488`).
+
+* Prevented migrations from detecting changes on field choices when only the
+  ordering has changed (:ticket:`30505`).

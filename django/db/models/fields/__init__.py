@@ -463,7 +463,7 @@ class Field(RegisterLookupMixin):
             value = getattr(self, attr_overrides.get(name, name))
             # Unroll anything iterable for choices into a concrete list
             if name == "choices" and isinstance(value, collections.abc.Iterable):
-                value = list(value)
+                value = list(sorted(value))
             # Do correct kind of comparison
             if name in equals_comparison:
                 if value != default:

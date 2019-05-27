@@ -193,6 +193,20 @@ class AutodetectorTests(TestCase):
             c=None,
         ))),
     ])
+    author_with_choices = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("choices", models.CharField(max_length=3, choices=[
+            ("foo", "Foo"),
+            ("bar", "Bar"),
+        ])),
+    ])
+    author_with_choices_ordered = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("choices", models.CharField(max_length=3, choices=[
+            ("bar", "Bar"),
+            ("foo", "Foo"),
+        ])),
+    ])
     author_custom_pk = ModelState("testapp", "Author", [("pk_field", models.IntegerField(primary_key=True))])
     author_with_biography_non_blank = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
@@ -775,6 +789,14 @@ class AutodetectorTests(TestCase):
             (_content_file_name, ('file',), {'spam': 'eggs'}),
             (value.func, value.args, value.keywords)
         )
+
+    def test_alter_field_choices(self):
+        """
+        #30505 - Different order of choices should not trigger a migration
+        """
+        changes = self.get_changes(
+            [self.author_with_choices], [self.author_with_choices_ordered])
+        self.assertNumberMigrations(changes, 'testapp', 0)
 
     @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',
                 side_effect=AssertionError("Should not have prompted for not null addition"))
