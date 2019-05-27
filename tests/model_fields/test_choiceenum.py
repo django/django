@@ -1,6 +1,8 @@
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase
+
+from .models import Foo
 
 
 class TestChoiceEnumDefinition(SimpleTestCase):
@@ -77,3 +79,26 @@ class TestChoiceEnumValidation(SimpleTestCase):
             self.IntEnum.validate('not int')
         with self.assertRaises(ValidationError):
             self.StrEnum.validate(b'2')
+
+
+class TestStrChoiceEnumInDatabase(TestCase):
+
+    class StrEnum(str, models.ChoiceEnum):
+        ONE = '1', 'One'
+        ONE_PLUS_ONE = '2'
+        THREE = '3'
+
+    def test_value_saved(self):
+        foo = Foo.objects.create(a=self.StrEnum.ONE, d=1.0)
+        foo.refresh_from_db()
+        self.assertEquals(foo.a, self.StrEnum.ONE)
+        self.assertEquals(foo.a, '1')
+
+    def test_value_query(self):
+        foo = Foo.objects.create(a=self.StrEnum.ONE_PLUS_ONE, d=2.0)
+        bar = Foo.objects.get(a=self.StrEnum.ONE_PLUS_ONE)
+        self.assertEquals(bar.a, self.StrEnum.ONE_PLUS_ONE)
+        self.assertEquals(bar.a, '2')
+        baz = Foo.objects.get(a='2')
+        self.assertEquals(bar, baz)
+        self.assertEquals(baz.a, self.StrEnum.ONE_PLUS_ONE)
