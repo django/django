@@ -1,0 +1,7 @@
+============================
+Django 1.11.21 release notes
+============================
+
+*June 3, 2019*
+
+Django 1.11.21 fixes security issues in 1.11.20.

@@ -1,0 +1,7 @@
+============================
+Django 2.1.9 release notes
+============================
+
+*June 3, 2019*
+
+Django 2.1.9 fixes security issues in 2.1.8.
