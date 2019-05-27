@@ -116,7 +116,7 @@ def urlencode(query, doseq=False):
                 'Cannot encode None in a query string. Did you mean to pass '
                 'an empty string or omit the value?'
             )
-        elif isinstance(value, (str, bytes)) or not doseq:
+        elif not doseq or isinstance(value, (str, bytes)):
             query_val = value
         else:
             try:
