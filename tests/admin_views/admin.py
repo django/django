@@ -1158,3 +1158,31 @@ class ArticleAdmin10(admin.ModelAdmin):
 
 site10 = admin.AdminSite(name='admin10')
 site10.register(Article, ArticleAdmin10)
+
+
+# Tests #30520
+class ChildForm(forms.ModelForm):
+    extra_field = forms.CharField()
+
+    class Meta:
+        model = Child
+        fields = '__all__'
+
+
+class ChildAdmin(admin.ModelAdmin):
+    '''The ModelForm renders as expected'''
+    form = ChildForm
+
+
+class ChildInline(admin.TabularInline):
+    model = Child
+    form = ChildForm
+
+
+class ParentAdmin(admin.ModelAdmin):
+    inlines = (ChildInline,)
+
+
+site11 = admin.AdminSite(name='admin11')
+site11.register(Child, ChildAdmin)
+site11.register(Parent, ParentAdmin)
