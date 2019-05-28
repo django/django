@@ -295,6 +295,36 @@ class TestRaiseLastException(SimpleTestCase):
             with self.assertRaisesMessage(MyException, 'Test Message'):
                 autoreload.raise_last_exception()
 
+    def test_raises_custom_exception(self):
+        class MyException(Exception):
+            def __init__(self, msg, extra_context):
+                super().__init__(msg)
+                self.extra_context = extra_context
+        # Create an exception.
+        try:
+            raise MyException('Test Message', 'extra context')
+        except MyException:
+            exc_info = sys.exc_info()
+
+        with mock.patch('django.utils.autoreload._exception', exc_info):
+            with self.assertRaisesMessage(MyException, 'Test Message'):
+                autoreload.raise_last_exception()
+
+    def test_raises_exception_with_context(self):
+        try:
+            raise Exception(2)
+        except Exception as e:
+            try:
+                raise Exception(1) from e
+            except Exception:
+                exc_info = sys.exc_info()
+
+        with mock.patch('django.utils.autoreload._exception', exc_info):
+            with self.assertRaises(Exception) as cm:
+                autoreload.raise_last_exception()
+            self.assertEqual(cm.exception.args[0], 1)
+            self.assertEqual(cm.exception.__cause__.args[0], 2)
+
 
 class RestartWithReloaderTests(SimpleTestCase):
     executable = '/usr/bin/python'

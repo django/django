@@ -25,3 +25,6 @@ Bugfixes
 * Fixed crash of :class:`~django.contrib.postgres.aggregates.ArrayAgg` and
   :class:`~django.contrib.postgres.aggregates.StringAgg` with ``ordering``
   argument when used in a ``Subquery`` (:ticket:`30315`).
+
+* Fixed a regression in Django 2.2 that caused a crash of auto-reloader when
+  an exception with custom signature is raised (:ticket:`30516`).
