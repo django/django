@@ -70,6 +70,9 @@ class DatabaseCreation(BaseDatabaseCreation):
                         self.log('Destroying old test database for alias %s...' % (
                             self._get_database_display_str(verbosity, target_database_name),
                         ))
+                    cursor.execute("""
+                    select pg_terminate_backend(pg_stat_activity.pid) from pg_stat_activity where pg_stat_activity.datname = '%(dbname)s'
+                    """ % test_db_params)
                     cursor.execute('DROP DATABASE %(dbname)s' % test_db_params)
                     self._execute_create_test_db(cursor, test_db_params, keepdb)
                 except Exception as e:
