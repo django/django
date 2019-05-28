@@ -1872,8 +1872,10 @@ class AdminViewPermissionsTest(TestCase):
 
     def test_inline_model_extra_field(self):
         add_url = reverse('admin11:admin_views_parent_add')
-        self.viewuser.user_permissions.add(get_perm(Parent, get_permission_codename('add', Parent._meta)))
-        self.viewuser.user_permissions.add(get_perm(Child, get_permission_codename('add', Child._meta)))
+        self.viewuser.user_permissions.add(
+            get_perm(Parent, get_permission_codename('add', Parent._meta)))
+        self.viewuser.user_permissions.add(
+            get_perm(Child, get_permission_codename('add', Child._meta)))
         self.client.force_login(self.viewuser)
         response = self.client.get(add_url)
         self.assertContains(response, "Extra field")
