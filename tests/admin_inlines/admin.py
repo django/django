@@ -4,10 +4,10 @@ from django.db import models
 
 from .models import (
     Author, BinaryTree, CapoFamiglia, Chapter, Child, ChildModel1, ChildModel2,
-    Consigliere, EditablePKBook, ExtraTerrestrial, Fashionista, Holder,
-    Holder2, Holder3, Holder4, Inner, Inner2, Inner3, Inner4Stacked,
+    Consigliere, EditablePKBook, ExtraTerrestrial, Fashionista, FootNote,
+    Holder, Holder2, Holder3, Holder4, Inner, Inner2, Inner3, Inner4Stacked,
     Inner4Tabular, NonAutoPKBook, NonAutoPKBookChild, Novel,
-    NovelReadonlyChapter, ParentModelWithCustomPk, Poll, Profile,
+    NovelReadonlyChapter, OutfitItem, ParentModelWithCustomPk, Poll, Profile,
     ProfileCollection, Question, ReadOnlyInline, ShoppingWeakness, Sighting,
     SomeChildModel, SomeParentModel, SottoCapo, Teacher, Title,
     TitleCollection,
@@ -129,6 +129,35 @@ class Holder4Admin(admin.ModelAdmin):
 class InlineWeakness(admin.TabularInline):
     model = ShoppingWeakness
     extra = 1
+
+
+class WeaknessForm(forms.ModelForm):
+    extra_field = forms.CharField()
+
+    class Meta:
+        model = ShoppingWeakness
+        fields = '__all__'
+
+
+class WeaknessInlineCustomForm(admin.TabularInline):
+    model = ShoppingWeakness
+    form = WeaknessForm
+
+
+class FootNoteForm(forms.ModelForm):
+    extra_field = forms.CharField()
+
+    class Meta:
+        model = FootNote
+        fields = '__all__'
+
+
+class FootNoteNonEditableInlineCustomForm(admin.TabularInline):
+    model = FootNote
+    form = FootNoteForm
+
+    def has_change_permission(self, request, obj=None):
+        return False
 
 
 class QuestionInline(admin.TabularInline):
@@ -271,3 +300,5 @@ site.register(ExtraTerrestrial, inlines=[SightingInline])
 site.register(SomeParentModel, inlines=[SomeChildModelInline])
 site.register([Question, Inner4Stacked, Inner4Tabular])
 site.register(Teacher, TeacherAdmin)
+site.register(Chapter, inlines=[FootNoteNonEditableInlineCustomForm])
+site.register(OutfitItem, inlines=[WeaknessInlineCustomForm])
