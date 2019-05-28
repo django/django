@@ -195,6 +195,10 @@ def setup(verbosity, test_labels, parallel):
         print('Aborting: A GIS database backend is required to run gis_tests.')
         sys.exit(1)
 
+    def _module_match_label(module_label, label):
+        # Exact or ancestor match.
+        return module_label == label or module_label.startswith(label + '.')
+
     # Load all the test model apps.
     test_modules = get_test_modules()
 
@@ -208,9 +212,7 @@ def setup(verbosity, test_labels, parallel):
         # no modules were named (i.e., run all), import
         # this module and add it to INSTALLED_APPS.
         module_found_in_labels = not test_labels or any(
-            # exact match or ancestor match
-            module_label == label or module_label.startswith(label + '.')
-            for label in test_labels_set
+            _module_match_label(module_label, label) for label in test_labels_set
         )
 
         if module_name in CONTRIB_TESTS_TO_APPS and module_found_in_labels:
