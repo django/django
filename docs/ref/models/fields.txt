@@ -80,7 +80,7 @@ If a field has ``blank=False``, the field will be required.
 
 .. attribute:: Field.choices
 
-An :term:`iterable` consisting itself of iterables of exactly two items (e.g.
+A :term:`sequence` consisting itself of iterables of exactly two items (e.g.
 ``[(A, B), (A, B) ...]``) to use as choices for this field. If choices are
 given, they're enforced by :ref:`model validation <validating-objects>` and the
 default form widget will be a select box with these choices instead of the
@@ -155,11 +155,14 @@ method to retrieve the human-readable name for the field's current value. See
 :meth:`~django.db.models.Model.get_FOO_display` in the database API
 documentation.
 
-Note that choices can be any iterable object -- not necessarily a list or tuple.
-This lets you construct choices dynamically. But if you find yourself hacking
-:attr:`~Field.choices` to be dynamic, you're probably better off using a proper
-database table with a :class:`ForeignKey`. :attr:`~Field.choices` is meant for
-static data that doesn't change much, if ever.
+Note that choices can be any sequence object -- not necessarily a list or
+tuple. This lets you construct choices dynamically. But if you find yourself
+hacking :attr:`~Field.choices` to be dynamic, you're probably better off using
+a proper database table with a :class:`ForeignKey`. :attr:`~Field.choices` is
+meant for static data that doesn't change much, if ever.
+
+.. note::
+    A new migration is created each time the order of ``choices`` changes.
 
 Unless :attr:`blank=False<Field.blank>` is set on the field along with a
 :attr:`~Field.default` then a label containing ``"---------"`` will be rendered
