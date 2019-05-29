@@ -410,6 +410,11 @@ Here are some tips for working with inheritance:
   not be automatically escaped (see the `next section`_), since it was
   already escaped, if necessary, in the parent template.
 
+* The :ttag:`{% extends %}<extends>` tag can be used to inherit a template of
+  the same name, which will then inherit from the next template of that same
+  name in the lookup order. For examples and further details see
+  :doc:`/howto/recursive-inheritance`.
+
 * Variables created outside of a :ttag:`{% block %}<block>` using the template
   tag ``as`` syntax can't be used inside the block. For example, this template
   doesn't render anything::

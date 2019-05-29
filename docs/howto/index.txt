@@ -25,6 +25,7 @@ you quickly accomplish common tasks.
    outputting-csv
    outputting-pdf
    overriding-templates
+   recursive-inheritance
    static-files/index
    static-files/deployment
    windows

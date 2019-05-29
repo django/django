@@ -4,13 +4,26 @@ Overriding templates
 
 In your project, you might want to override a template in another Django
 application, whether it be a third-party application or a contrib application
-such as ``django.contrib.admin``. You can either put template overrides in your
-project's templates directory or in an application's templates directory.
+such as ``django.contrib.admin``.
+
+The first thing you need to consider is whether you need to entirely override
+the template, or simply want to add a small change to the existing template
+using the blocks it already has. If it is only a small template, or one meant
+explicitly for overriding and customization then overriding is the way to go.
+But if the template is complex and your needed changes are minor, you should
+reconsider. If you outright override the template you are essentially forking
+it, and now you have to maintain that yourself, and it will likely end up out
+of sync with potential changes in the third-party or contrib application.
+
+The best approach in those cases is to make use of recursive inheritance and
+override only the blocks you need. See :doc:`/howto/recursive-inheritance` for
+more information and an example.
 
 If you have app and project templates directories that both contain overrides,
 the default Django template loader will try to load the template from the
 project-level directory first. In other words, :setting:`DIRS <TEMPLATES-DIRS>`
-is searched before :setting:`APP_DIRS <TEMPLATES-APP_DIRS>`.
+is searched before :setting:`APP_DIRS <TEMPLATES-APP_DIRS>`, with the latter
+being searched in the order defined in :setting:`INSTALLED_APPS <INSTALLED_APPS>`.
 
 .. seealso::
 

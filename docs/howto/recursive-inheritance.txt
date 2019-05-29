@@ -1,0 +1,97 @@
+=====================
+Recursive inheritance
+=====================
+
+While not clear from the template inheritance examples,
+:ttag:`{% extends %}<extends>` can be used to inherit and extend from a
+template of the same name. That template in turn can extend another template
+of the same name. This semi-recursive pattern continues until reaching a
+template that doesn't extend just like normal inheritance. This isn't true
+recursion, as the same template file isn't used more than once, instead this
+is just another way of using inheritance to build layers into a single
+template that can be reused by multiple other templates.
+
+The best way to understand this use of inheritance is with a simple example:
+
+.. code-block:: html+django
+    :caption: reusable_app/templates/reuseable_app_base.html
+
+    {% block header %}
+    <h1>Title from the reusable app</h1>
+    {% endblock %}
+
+    {% block main %}
+    <p>A paragraph in the reusable app.</p>
+    {% endblock %}
+
+    {% block footer %}
+    <footer>Footer text from the reusable app</footer>
+    {% endblock %}
+
+Here we have a reusable app that gives us a ``reuseable_app_base.html``
+template. Let's imagine for this example that this is a useful third-party app,
+and that there are many other apps built to complement it.
+
+.. code-block:: html+django
+    :caption: reusable_app_menus/templates/reuseable_app_base.html
+
+    {% extends "reuseable_app_base.html" %}
+    {% block header %}
+    {{ block.super }}
+    <div id="menu"><p>Menu in the second reusable app</p></div>
+    {% endblock %}
+
+This app extends the ``reuseable_app_base.html`` template from the first and
+adds a menu div. By simply adding this app to your :setting:`INSTALLED_APPS`
+before the otherwise the ``reuseable_app_base.html`` template has changed.
+
+Now in your own app:
+
+.. code-block:: html+django
+    :caption: myproject/my_app/templates/page.html
+
+    {% extends "reuseable_app_base.html" %}
+    {% block main %}
+    <p>A paragraph in my app, that wants to be on top of the other</p>
+    {{ block.super }}
+    {% endblock %}
+
+And assuming your settings file looks as follows:
+
+.. code-block:: html+django
+    :caption: settings.py
+
+    INSTALLED_APPS = (
+        "my_app",
+        "reusable_app_menus",
+        "reusable_app",
+    )
+
+The resulting HTML rendered when ``page.html`` was loaded would be::
+
+    <h1>Title from the reusable app</h1>
+    <div id="menu"><p>Menu in the second reusable app</p></div>
+    <p>A paragraph in my app, that wants to be on top of the other</p>
+    <p>A paragraph in the reusable app.</p>
+    <footer>Footer text from the reusable app</footer>
+
+There are many additional ways to use recursive inheritance, including as a
+means of avoiding overriding templates outright. The power though is that it
+lets you build templates as layers, and then use normal non-recursive
+inheritance on the end result.
+
+It also means that any changes to ``reuseable_app_base.html`` in the original
+third-party reusable app will automatically affect the final rendered result of
+your page when you next update it.
+
+Tips for using recursive inheritance:
+
+* Recursive inheritance is a middle ground between template overriding, and
+  template inheritance. Both in some of the ways you might use it, or even in
+  that many of the mechanisms work when it comes to template look up. For a
+  breakdown of that, have a look at :doc:`/howto/overriding-templates`.
+
+* To make the most out of recursive inheritance ``{{ block.super }}`` becomes
+  very important, as otherwise you are effectively overriding rather than
+  simply extending. Consider carefully what you want to achieve, but if you
+  need to override a block don't be a afraid to.
