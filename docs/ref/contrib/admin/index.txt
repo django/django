@@ -2235,6 +2235,7 @@ adds some of its own (the shared features are actually defined in the
 - :attr:`~ModelAdmin.filter_vertical`
 - :attr:`~ModelAdmin.ordering`
 - :attr:`~ModelAdmin.prepopulated_fields`
+- :meth:`~ModelAdmin.get_fieldsets`
 - :meth:`~ModelAdmin.get_queryset`
 - :attr:`~ModelAdmin.radio_fields`
 - :attr:`~ModelAdmin.readonly_fields`
@@ -2358,7 +2359,8 @@ The ``InlineModelAdmin`` class adds or customizes:
 .. method:: InlineModelAdmin.get_formset(request, obj=None, **kwargs)
 
     Returns a :class:`~django.forms.models.BaseInlineFormSet` class for use in
-    admin add/change views. See the example for
+    admin add/change views. ``obj`` is the parent object being edited or
+    ``None`` when adding a new parent. See the example for
     :class:`ModelAdmin.get_formsets_with_inlines`.
 
 .. method:: InlineModelAdmin.get_extra(request, obj=None, **kwargs)
@@ -2421,6 +2423,10 @@ The ``InlineModelAdmin`` class adds or customizes:
 
     Should return ``True`` if deleting an inline object is permitted, ``False``
     otherwise. ``obj`` is the parent object being edited.
+
+.. note::
+    The ``obj`` argument passed to ``InlineModelAdmin`` methods is the parent
+    object being edited or ``None`` when adding a new parent.
 
 Working with a model with two or more foreign keys to the same parent model
 ---------------------------------------------------------------------------
