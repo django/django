@@ -1,12 +1,13 @@
 import os
 import signal
 import subprocess
-from unittest import mock
+from unittest import mock, skipUnless
 
 from django.db.backends.postgresql.client import DatabaseClient
 from django.test import SimpleTestCase
 
 
+@skipUnless(connection.vendor == 'postgresql', 'PostgreSQL tests')
 class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
 
     def _run_it(self, dbinfo):

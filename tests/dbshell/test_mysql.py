@@ -1,7 +1,10 @@
+from unittest import skipUnless
+
 from django.db.backends.mysql.client import DatabaseClient
 from django.test import SimpleTestCase
 
 
+@skipUnless(connection.vendor == 'mysql', 'MySQL tests')
 class MySqlDbshellCommandTestCase(SimpleTestCase):
 
     def test_fails_with_keyerror_on_incomplete_config(self):
