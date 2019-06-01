@@ -3,6 +3,7 @@ import signal
 import subprocess
 from unittest import mock, skipUnless
 
+from django.db import connection
 from django.db.backends.postgresql.client import DatabaseClient
 from django.test import SimpleTestCase
 

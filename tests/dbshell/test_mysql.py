@@ -1,5 +1,6 @@
 from unittest import skipUnless
 
+from django.db import connection
 from django.db.backends.mysql.client import DatabaseClient
 from django.test import SimpleTestCase
 
