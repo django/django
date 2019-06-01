@@ -122,6 +122,10 @@ class SchemaIndexesPostgreSQLTests(TransactionTestCase):
         JOIN pg_class as c on c.oid = i.indexrelid
         WHERE c.relname = '%s'
     '''
+    get_indexes_query_by_name = '''
+        SELECT indexdef FROM pg_indexes
+        WHERE indexdef like '%%%s%%'
+    '''
 
     def test_text_indexes(self):
         """Test creation of PostgreSQL-specific text indexes (#12234)"""
@@ -171,6 +175,20 @@ class SchemaIndexesPostgreSQLTests(TransactionTestCase):
         with editor.connection.cursor() as cursor:
             cursor.execute(self.get_opclass_query % 'test_ops_class_field')
             self.assertEqual(cursor.fetchall(), [('varchar_pattern_ops', 'test_ops_class_field')])
+
+    def test_ops_class_field_unique_index(self):
+        new_field = CharField(
+            max_length=100,
+            unique=True,
+            db_index=Index(name='test_ops_class_field_unique')
+        )
+        new_field.set_attributes_from_name('headline5')
+        with connection.schema_editor() as editor:
+            editor.add_field(IndexedArticle2, new_field)
+        with editor.connection.cursor() as cursor:
+            cursor.execute(self.get_indexes_query_by_name % 'headline5')
+            expected_sql = 'CREATE UNIQUE INDEX test_ops_class_field_unique'
+            self.assertIn(expected_sql, cursor.fetchall()[0][0])
 
     def test_ops_class_multiple_columns(self):
         index = Index(

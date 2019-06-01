@@ -82,6 +82,7 @@ class BaseDatabaseSchemaEditor:
     sql_delete_fk = sql_delete_constraint
 
     sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s%(condition)s"
+    sql_create_index_with_unique = "CREATE UNIQUE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s%(condition)s"
     sql_create_unique_index = "CREATE UNIQUE INDEX %(name)s ON %(table)s (%(columns)s)%(condition)s"
     sql_delete_index = "DROP INDEX %(name)s"
 
@@ -200,6 +201,9 @@ class BaseDatabaseSchemaEditor:
 
     # Field <-> database mapping functions
 
+    def _is_specific_index(self, field, db_type=None):
+        return False
+
     def column_sql(self, model, field, include_default=False):
         """
         Take a field and return its column definition.
@@ -239,7 +243,7 @@ class BaseDatabaseSchemaEditor:
         # Primary key/unique outputs
         if field.primary_key:
             sql += " PRIMARY KEY"
-        elif field.unique:
+        elif field.unique and not (field.db_index and self._is_specific_index(field)):
             sql += " UNIQUE"
         # Optionally add the tablespace if it's an implicitly indexed column
         tablespace = field.db_tablespace or model._meta.db_tablespace
@@ -948,7 +952,7 @@ class BaseDatabaseSchemaEditor:
 
     def _create_index_sql(self, model, fields, *, name=None, suffix='', using='',
                           db_tablespace=None, col_suffixes=(), sql=None, opclasses=(),
-                          condition=None):
+                          condition=None, unique_index=False):
         """
         Return the SQL statement to create the index for one or several fields.
         `sql` can be specified if the syntax differs from the standard (GIS
@@ -956,7 +960,7 @@ class BaseDatabaseSchemaEditor:
         """
         tablespace_sql = self._get_index_tablespace_sql(model, fields, db_tablespace=db_tablespace)
         columns = [field.column for field in fields]
-        sql_create_index = sql or self.sql_create_index
+        sql_create_index = sql or (self.sql_create_index_with_unique if unique_index else self.sql_create_index)
         table = model._meta.db_table
 
         def create_index_name(*args, **kwargs):

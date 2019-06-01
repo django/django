@@ -41,13 +41,23 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             return field.rel_db_type(self.connection)
         return self.connection.data_types[field.get_internal_type()]
 
+    def _is_specific_index(self, field, db_type=None):
+        if not db_type:
+            db_type = field.db_type(connection=self.connection)
+        if db_type is not None and (field.db_index or field.unique):
+            if db_type.startswith('varchar') or db_type.startswith('text'):
+                return True
+        return False
+
     def _create_like_index_sql(self, model, field):
         """
         Return the statement to create an index with varchar operator pattern
         when the column type is 'varchar' or 'text', otherwise return None.
         """
         db_type = field.db_type(connection=self.connection)
-        if db_type is not None and (field.db_index or field.unique):
+        if db_type is not None and '[' in db_type:
+            return None
+        if self._is_specific_index(field, db_type):
             # Fields with database column types of `varchar` and `text` need
             # a second index that specifies their operator class, which is
             # needed when performing correct LIKE queries outside the
@@ -55,16 +65,21 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             #
             # The same doesn't apply to array fields such as varchar[size]
             # and text[size], so skip them.
-            if '[' in db_type:
-                return None
-            if db_type.startswith('varchar') or db_type.startswith('text'):
-                kwargs = self._get_index_type_kwargs(model, field)
-                kwargs['suffix'] = '_like'
-                if 'opclasses' not in kwargs.keys() or not kwargs['opclasses']:
-                    opclasses = ['varchar_pattern_ops'] if db_type.startswith('varchar') else ['text_pattern_ops']
-                    kwargs['opclasses'] = opclasses
-                return self._create_index_sql(model, [field], **kwargs)
+            kwargs = self._get_index_type_kwargs(model, field)
+            kwargs['suffix'] = '_like'
+            kwargs['unique_index'] = field.unique
+            if 'opclasses' not in kwargs.keys() or not kwargs['opclasses']:
+                opclasses = ['varchar_pattern_ops'] if db_type.startswith('varchar') else ['text_pattern_ops']
+                kwargs['opclasses'] = opclasses
+            return self._create_index_sql(model, [field], **kwargs)
         return None
+
+    def _unique_should_be_added(self, old_field, new_field):
+        result = super()._unique_should_be_added(old_field, new_field)
+        if result:
+            if self._is_specific_index(new_field):
+                result = False
+        return result
 
     def _alter_column_type_sql(self, model, old_field, new_field, new_type):
         self.sql_alter_column_type = 'ALTER COLUMN %(column)s TYPE %(type)s'
