@@ -1,5 +1,6 @@
 import os
 
+import django
 from django.apps import AppConfig, apps
 from django.apps.registry import Apps
 from django.contrib.admin.models import LogEntry
@@ -438,3 +439,63 @@ class NamespacePackageAppTests(SimpleTestCase):
             with self.settings(INSTALLED_APPS=['nsapp.apps.NSAppConfig']):
                 app_config = apps.get_app_config('nsapp')
                 self.assertEqual(app_config.path, self.app_path)
+
+
+_fake_setup_callable_called = 0
+
+
+def fake_setup_callable():
+    global _fake_setup_callable_called
+    _fake_setup_callable_called += 1
+
+
+class DjangoSetupTests(SimpleTestCase):
+    """Check the behaviour of django.setup()"""
+
+    def test_django_setup_is_idempotent(self):
+        self.assertTrue(django.is_ready)  # already setup by runtests
+
+        original_setup = django._setup
+
+        try:
+            del django._setup
+            self.assertFalse(django.setup())  # no problem due to idempotence
+            django.is_ready = False
+
+            with self.assertRaises(NameError):
+                django.setup()
+            self.assertFalse(django.is_ready)
+
+            django._setup = original_setup
+            self.assertTrue(django.setup())
+            self.assertTrue(django.is_ready)
+        finally:  # protect other tests against failures of this one
+            django.is_ready = True
+            django._setup = original_setup
+
+    def test_django_setup_callable_setting(self):
+
+        original_setup = django._setup
+
+        try:
+            self.assertFalse(django.setup())  # already initialized
+            self.assertEqual(_fake_setup_callable_called, 0)
+
+            del django._setup  # this one won't be called at all here
+            django.is_ready = False
+
+            with self.settings(DJANGO_SETUP_CALLABLE='apps.tests.unexisting_callable'):
+                with self.assertRaisesRegex(ImproperlyConfigured,
+                                            "Could not load 'apps.tests.unexisting_callable' callable"):
+                    django.setup()
+                self.assertEqual(_fake_setup_callable_called, 0)
+                self.assertFalse(django.is_ready)
+
+            with self.settings(DJANGO_SETUP_CALLABLE='apps.tests.fake_setup_callable'):
+                self.assertTrue(django.setup())
+                self.assertEqual(_fake_setup_callable_called, 1)
+                self.assertTrue(django.is_ready)
+
+        finally:  # protect other tests against failures of this one
+            django.is_ready = True
+            django._setup = original_setup

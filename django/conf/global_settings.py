@@ -232,6 +232,10 @@ PREPEND_WWW = False
 # Override the server-derived value of SCRIPT_NAME
 FORCE_SCRIPT_NAME = None
 
+# Dotted-string callable taken as a replacement for the django._setup() initialization
+# routine, which is called by django.setup().
+DJANGO_SETUP_CALLABLE = None
+
 # List of compiled regular expression objects representing User-Agent strings
 # that are not allowed to visit any page, systemwide. Use this for bad
 # robots/crawlers. Here are a few examples:

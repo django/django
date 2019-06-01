@@ -1572,6 +1572,26 @@ of the preferred value or not supplied at all. It is also used by
 request/response cycle (e.g. in management commands and standalone scripts) to
 generate correct URLs when ``SCRIPT_NAME`` is not ``/``.
 
+
+.. setting:: DJANGO_SETUP_CALLABLE
+
+``DJANGO_SETUP_CALLABLE``
+---------------------------
+
+Default: ``None``
+
+If not ``None``, this must be a dotted string representing the callable of
+your choice, e.g. "myapp.my_function". This callable will be used (without
+arguments) as a replacement for the ``django._setup()`` initialization routine,
+when ``django.setup()`` gets called.
+
+You can use this setting to run pre/post operations against the environment, at
+the moment django is setup. Don't forget to call ``django._setup()`` from your
+custom setup callable, else logging, apps registry and other features won't be
+properly configured.
+
+
+
 .. setting:: FORM_RENDERER
 
 ``FORM_RENDERER``

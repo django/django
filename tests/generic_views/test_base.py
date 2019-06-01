@@ -250,7 +250,7 @@ class ViewTest(SimpleTestCase):
     def test_not_calling_parent_setup_error(self):
         class TestView(View):
             def setup(self, request, *args, **kwargs):
-                pass  # Not calling supre().setup()
+                pass  # Not calling super().setup()
 
         msg = (
             "TestView instance has no 'request' attribute. Did you override "
