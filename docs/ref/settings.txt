@@ -1586,7 +1586,7 @@ arguments) as a replacement for the ``django._setup()`` initialization routine,
 when ``django.setup()`` gets called.
 
 You can use this setting to run pre/post operations against the environment, at
-the moment django is setup. Don't forget to call ``django._setup()`` from your
+the moment Django is setup. Don't forget to call ``django._setup()`` from your
 custom setup callable, else logging, apps registry and other features won't be
 properly configured.
 

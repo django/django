@@ -308,7 +308,7 @@ main application::
 
 
 Customizing ``django.setup()`` behavior
-------------------------------------------
+---------------------------------------
 
 By default, ``django.setup()`` delegates actual configuration (settings, logging,
 app registry...) to ``django._setup()``.
@@ -319,7 +319,7 @@ for testing purposes, you can provide an alternative callable setup, in settings
     DJANGO_SETUP_CALLABLE = "myapp.my_function"
 
 This alternative callable will be called without arguments.
-Don't forget, in its implementation, to call ``django._setup()`` at some point,
+Don't forget to call ``django._setup()`` in its implementation at some point,
 to perform actual configuration of the framework.
 
 
