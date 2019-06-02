@@ -35,6 +35,13 @@ class BaseDatabaseCreation:
         cursor.execute('SELECT 1 FROM pg_catalog.pg_database WHERE datname = %s', [strip_quotes(database_name)])
         return cursor.fetchone() is not None
 
+    def _check_keepdb(self, keepdb):
+        if keepdb:
+            with self._nodb_connection.cursor() as cursor:
+                if self._database_exists(cursor, self._get_test_db_name()):
+                    return True
+        return False
+
     def create_test_db(self, verbosity=1, autoclobber=False, serialize=True, keepdb=False):
         """
         Create a test database, prompting the user for confirmation if the
@@ -47,7 +54,7 @@ class BaseDatabaseCreation:
 
         if verbosity >= 1:
             action = 'Creating'
-            if keepdb:
+            if self._check_keepdb(keepdb):
                 action = "Using existing"
 
             self.log('%s test database for alias %s...' % (

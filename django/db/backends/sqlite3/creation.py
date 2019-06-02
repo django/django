@@ -20,6 +20,11 @@ class DatabaseCreation(BaseDatabaseCreation):
     def _database_exists(self, cursor, database_name):
         return os.access(database_name, os.F_OK)
 
+    def _check_keepdb(self, keepdb):
+        if keepdb and self._database_exists(None, self._get_test_db_name()):
+            return True
+        return False
+
     def _create_test_db(self, verbosity, autoclobber, keepdb=False):
         test_database_name = self._get_test_db_name()
 

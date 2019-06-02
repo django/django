@@ -32,6 +32,13 @@ class DatabaseCreation(BaseDatabaseCreation):
         cursor.execute('SELECT 1 FROM USER_TABLESPACES WHERE TABLESPACE_NAME = %s', [strip_quotes(database_name)])
         return cursor.fetchone() is not None
 
+    def _check_keepdb(self, keepdb):
+        if keepdb:
+            with self._maindb_connection.cursor() as cursor:
+                if self._database_exists(cursor, self._test_database_tblspace().upper()):
+                    return True
+        return False
+
     def _create_test_db(self, verbosity=1, autoclobber=False, keepdb=False):
         parameters = self._get_test_db_params()
         with self._maindb_connection.cursor() as cursor:
