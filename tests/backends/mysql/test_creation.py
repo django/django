@@ -6,7 +6,7 @@ from django.db import connection
 from django.db.backends.base.creation import BaseDatabaseCreation
 from django.db.backends.mysql.creation import DatabaseCreation
 from django.db.utils import DatabaseError
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase
 
 
 @unittest.skipUnless(connection.vendor == 'mysql', 'MySQL tests')
@@ -50,3 +50,14 @@ class DatabaseCreationTests(SimpleTestCase):
             with mock.patch.object(DatabaseCreation, '_clone_db') as _clone_db:
                 creation._clone_test_db('suffix', verbosity=0, keepdb=True)
                 _clone_db.assert_not_called()
+
+
+@unittest.skipUnless(connection.vendor == 'mysql', 'MySQL tests')
+class DatabaseExistsTests(TestCase):
+
+    def test_database_exists(self):
+        creation = DatabaseCreation(connection)
+        with creation._nodb_connection.cursor() as cursor:
+            db_name = connection.settings_dict['NAME']
+            self.assertTrue(creation._database_exists(cursor, db_name))
+            self.assertFalse(creation._database_exists(cursor, db_name + '1'))

@@ -2,6 +2,7 @@ import subprocess
 import sys
 
 from django.db.backends.base.creation import BaseDatabaseCreation
+from django.db.backends.utils import strip_quotes
 
 from .client import DatabaseClient
 
@@ -65,3 +66,10 @@ class DatabaseCreation(BaseDatabaseCreation):
             with subprocess.Popen(load_cmd, stdin=dump_proc.stdout, stdout=subprocess.DEVNULL):
                 # Allow dump_proc to receive a SIGPIPE if the load process exits.
                 dump_proc.stdout.close()
+
+    def _database_exists(self, cursor, database_name):
+        cursor.execute(
+            'SELECT 1 FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = %s',
+            [strip_quotes(database_name)]
+        )
+        return cursor.fetchone() is not None

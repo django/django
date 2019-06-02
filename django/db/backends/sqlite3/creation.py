@@ -17,6 +17,9 @@ class DatabaseCreation(BaseDatabaseCreation):
             return 'file:memorydb_%s?mode=memory&cache=shared' % self.connection.alias
         return test_database_name
 
+    def _database_exists(self, cursor, database_name):
+        return os.access(database_name, os.F_OK)
+
     def _create_test_db(self, verbosity, autoclobber, keepdb=False):
         test_database_name = self._get_test_db_name()
 

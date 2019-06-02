@@ -6,7 +6,7 @@ from unittest import mock
 from django.db import connection
 from django.db.backends.base.creation import BaseDatabaseCreation
 from django.db.utils import DatabaseError
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase
 
 try:
     import psycopg2  # NOQA
@@ -100,3 +100,14 @@ class DatabaseCreationTests(SimpleTestCase):
         with self.patch_test_db_creation(self._execute_raise_permission_denied):
             with mock.patch.object(DatabaseCreation, '_database_exists', return_value=True):
                 creation._create_test_db(verbosity=0, autoclobber=False, keepdb=True)
+
+
+@unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL tests')
+class DatabaseExistsTests(TestCase):
+
+    def test_database_exists(self):
+        creation = DatabaseCreation(connection)
+        with creation._nodb_connection.cursor() as cursor:
+            db_name = connection.settings_dict['NAME']
+            self.assertTrue(creation._database_exists(cursor, db_name))
+            self.assertFalse(creation._database_exists(cursor, db_name + '1'))

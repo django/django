@@ -6,6 +6,7 @@ from django.apps import apps
 from django.conf import settings
 from django.core import serializers
 from django.db import router
+from django.db.backends.utils import strip_quotes
 
 # The prefix to put on the default database name when creating
 # the test database.
@@ -29,6 +30,10 @@ class BaseDatabaseCreation:
 
     def log(self, msg):
         sys.stderr.write(msg + os.linesep)
+
+    def _database_exists(self, cursor, database_name):
+        cursor.execute('SELECT 1 FROM pg_catalog.pg_database WHERE datname = %s', [strip_quotes(database_name)])
+        return cursor.fetchone() is not None
 
     def create_test_db(self, verbosity=1, autoclobber=False, serialize=True, keepdb=False):
         """

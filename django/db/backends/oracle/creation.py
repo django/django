@@ -2,6 +2,7 @@ import sys
 
 from django.conf import settings
 from django.db.backends.base.creation import BaseDatabaseCreation
+from django.db.backends.utils import strip_quotes
 from django.db.utils import DatabaseError
 from django.utils.crypto import get_random_string
 from django.utils.functional import cached_property
@@ -26,6 +27,10 @@ class DatabaseCreation(BaseDatabaseCreation):
         settings_dict = {**settings_dict, 'USER': user, 'PASSWORD': password}
         DatabaseWrapper = type(self.connection)
         return DatabaseWrapper(settings_dict, alias=self.connection.alias)
+
+    def _database_exists(self, cursor, database_name):
+        cursor.execute('SELECT 1 FROM USER_TABLESPACES WHERE TABLESPACE_NAME = %s', [strip_quotes(database_name)])
+        return cursor.fetchone() is not None
 
     def _create_test_db(self, verbosity=1, autoclobber=False, keepdb=False):
         parameters = self._get_test_db_params()

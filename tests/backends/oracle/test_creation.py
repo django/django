@@ -93,3 +93,14 @@ class DatabaseCreationTests(TestCase):
                     # REUSE cannot be used with OMF.
                     self.assertNotIn('REUSE', tblspace_sql)
                     self.assertNotIn('REUSE', tblspace_tmp_sql)
+
+
+@unittest.skipUnless(connection.vendor == 'oracle', 'Oracle tests')
+class DatabaseExistsTests(TestCase):
+
+    def test_database_exists(self):
+        creation = DatabaseCreation(connection)
+        with connection.cursor() as cursor:
+            db_name = creation._test_database_tblspace().upper()
+            self.assertTrue(creation._database_exists(cursor, db_name))
+            self.assertFalse(creation._database_exists(cursor, db_name + '1'))
