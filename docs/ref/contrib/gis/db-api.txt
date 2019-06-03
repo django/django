@@ -17,9 +17,6 @@ GeoDjango currently provides the following spatial database backends:
 * ``django.contrib.gis.db.backends.oracle``
 * ``django.contrib.gis.db.backends.spatialite``
 
-.. module:: django.contrib.gis.db.models
-    :synopsis: GeoDjango's database API.
-
 .. _mysql-spatial-limitations:
 
 MySQL Spatial Limitations
@@ -354,11 +351,10 @@ Lookup Type                        PostGIS    Oracle    MySQL [#]_   SpatiaLite 
 Database functions
 ------------------
 
-.. module:: django.contrib.gis.db.models.functions
-    :synopsis: GeoDjango's database functions.
-
 The following table provides a summary of what geography-specific database
 functions are available on each spatial backend.
+
+.. currentmodule:: django.contrib.gis.db.models.functions
 
 ====================================  =======  ==============  ===========  ==========
 Function                              PostGIS  Oracle          MySQL        SpatiaLite
