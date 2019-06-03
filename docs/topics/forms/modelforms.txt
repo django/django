@@ -2,9 +2,6 @@
 Creating forms from models
 ==========================
 
-.. module:: django.forms.models
-   :synopsis: ModelForm and ModelFormset.
-
 .. currentmodule:: django.forms
 
 ``ModelForm``
