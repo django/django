@@ -473,8 +473,9 @@ class SetupConfigureLogging(SimpleTestCase):
         LOGGING=OLD_LOGGING,
     )
     def test_configure_initializes_logging(self):
-        from django import setup
-        setup()
+        import django
+        django.is_ready = False  # hack to break idempotence of django.setup()
+        django.setup()
         self.assertTrue(dictConfig.called)
 
 

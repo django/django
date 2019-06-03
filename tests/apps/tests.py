@@ -1,3 +1,4 @@
+import concurrent
 import os
 
 from django.apps import AppConfig, apps
@@ -438,3 +439,53 @@ class NamespacePackageAppTests(SimpleTestCase):
             with self.settings(INSTALLED_APPS=['nsapp.apps.NSAppConfig']):
                 app_config = apps.get_app_config('nsapp')
                 self.assertEqual(app_config.path, self.app_path)
+
+
+class DjangoSetupTests(SimpleTestCase):
+    """Check the behaviour of django.setup()"""
+
+    def test_django_setup_is_idempotent(self):
+
+        import django.conf
+        self.assertTrue(django.is_ready)  # Already setup by runtests
+        original_settings = django.conf.settings
+
+        import django.utils.log
+        original_configure_logging = django.utils.log.configure_logging
+
+        try:
+            slow_configure_logging_calls = []
+
+            # We slow the process to really test concurrency
+            def slow_configure_logging(*args, **kwars):
+                import time
+                time.sleep(0.001)
+                slow_configure_logging_calls.append(True)
+                return original_configure_logging(*args, **kwars)
+            django.utils.log.configure_logging = slow_configure_logging
+
+            del django.conf.settings  # Break setup dependencies
+
+            self.assertFalse(django.setup())  # No problem due to idempotence
+            django.is_ready = False
+            self.assertEqual(len(slow_configure_logging_calls), 0)
+
+            with self.assertRaises(ImportError):
+                django.setup()
+            self.assertFalse(django.is_ready)
+            self.assertEqual(len(slow_configure_logging_calls), 0)
+
+            django.conf.settings = original_settings
+
+            with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+                futures = [executor.submit(django.setup) for _ in range(5)]
+                results = [int(future.result()) for future in futures]
+
+            self.assertEqual(sum(results), 1)  # One and only one thread performed setup
+            self.assertEqual(len(slow_configure_logging_calls), 1)
+            self.assertTrue(django.is_ready)
+
+        finally:  # Protect other tests against failures of this one
+            django.is_ready = True
+            django.conf.settings = original_settings
+            django.utils.log.configure_logging = original_configure_logging

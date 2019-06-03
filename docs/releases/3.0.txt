@@ -131,6 +131,11 @@ Minor features
   The default value is :func:`~django.utils.translation.get_language()` instead
   of :setting:`LANGUAGE_CODE`.
 
+App-loading changes
+~~~~~~~~~~~~~~~~~~~~
+
+* ``django.setup()`` is now idempotent and thread-safe, and returns a boolean indicating whether setup occurred on this call.
+
 Cache
 ~~~~~
 

@@ -291,16 +291,20 @@ Note that calling ``django.setup()`` is only necessary if your code is truly
 standalone. When invoked by your Web server, or through :doc:`django-admin
 </ref/django-admin>`, Django will handle this for you.
 
-.. admonition:: ``django.setup()`` may only be called once.
+Note that ``django.setup()`` is idempotent - all calls after the first one will
+be ignored (along with their potential arguments). This function returns a
+boolean indicating whether setup occurred for the first time.
+You can also check this beforehand, with the ``django.is_ready`` boolean.
 
-    Therefore, avoid putting reusable application logic in standalone scripts
-    so that you have to import from the script elsewhere in your application.
-    If you can't avoid that, put the call to ``django.setup()`` inside an
-    ``if`` block::
+It is good practice to avoid putting reusable application logic in standalone
+scripts, so that you don't have to import from the script elsewhere in your
+application. However if you can't avoid that, put the call to ``django.setup()``
+inside an ``if`` block, so that you don't interfere with the setup logic of the
+main application::
 
-        if __name__ == '__main__':
-            import django
-            django.setup()
+    if __name__ == '__main__':
+        import django
+        django.setup()
 
 .. seealso::
 
