@@ -936,3 +936,15 @@ Versions affected
 * Django 2.0 :commit:`(patch <1f42f82566c9d2d73aff1c42790d6b1b243f7676>` and
   :commit:`correction) <392e040647403fc8007708d52ce01d915b014849>`
 * Django 1.11 :commit:`(patch) <0bbb560183fabf0533289700845dafa94951f227>`
+
+June 3, 2019 - :cve:`2019-11358`
+--------------------------------
+
+Prototype pollution in bundled jQuery. `Full description
+<https://www.djangoproject.com/weblog/2019/jun/03/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 2.2 :commit:`(patch) <baaf187a4e354bf3976c51e2c83a0d2f8ee6e6ad>`
+* Django 2.1 :commit:`(patch) <95649bc08547a878cebfa1d019edec8cb1b80829>`
