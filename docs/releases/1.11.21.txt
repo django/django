@@ -16,6 +16,6 @@ payload, could result in an clickable JavaScript link.
 
 ``AdminURLFieldWidget`` now validates the provided value using
 :class:`~django.core.validators.URLValidator` before displaying the clickable
-link. You may customise the validator by passing a ``validator_class`` kwarg to
+link. You may customize the validator by passing a ``validator_class`` kwarg to
 ``AdminURLFieldWidget.__init__()``, e.g. when using
 :attr:`~django.contrib.admin.ModelAdmin.formfield_overrides`.
