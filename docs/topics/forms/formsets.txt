@@ -2,8 +2,7 @@
 Formsets
 ========
 
-.. module:: django.forms.formsets
-    :synopsis: An abstraction for working with multiple forms on the same page.
+.. currentmodule:: django.forms.formsets
 
 .. class:: BaseFormSet
 

@@ -2,7 +2,7 @@
 Translation
 ===========
 
-.. module:: django.utils.translation
+.. currentmodule:: django.utils.translation
 
 Overview
 ========
