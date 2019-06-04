@@ -1820,6 +1820,37 @@ Here's example HTML template code:
 In this example, Django looks up the URL of the page to which the user will be
 redirected in the ``redirect_to`` context variable.
 
+The ``redirect_to`` context variable, can be set:
+
+
+* by setting ``prefix_default_language=True`` in :func:`~django.conf.urls.i18n.i18n_patterns`
+
+
+* by calling :func:`django.views.i18n.set_language` with a ``next`` parameter in the
+  ``POST`` or ``GET`` data:
+
+  .. code-block:: python
+
+       self.client.post(
+          '/i18n/setlang/',
+          data={'language': 'fr', 'next': '/admin/'},
+          follow=True,
+      )
+
+
+* by creating a context processor:
+
+  .. code-block:: python
+
+      from django.urls import translate_url
+
+      def redirect_path_context_processor(request):
+          return {'language_select_redirect_to': translate_url(request.path, settings.LANGUAGE_CODE)}
+
+  and adding it in ``settings.TEMPLATES['OPTIONS']['context_processors']``
+  (:class:`django.template.backends.django.DjangoTemplates`).
+
+
 .. _explicitly-setting-the-active-language:
 
 Explicitly setting the active language
