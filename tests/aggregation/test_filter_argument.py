@@ -1,8 +1,11 @@
 import datetime
 from decimal import Decimal
 
-from django.db.models import Case, Count, F, OuterRef, Q, Subquery, Sum, When
+from django.db.models import (
+    Avg, Case, Count, F, OuterRef, Q, StdDev, Subquery, Sum, Variance, When,
+)
 from django.test import TestCase
+from django.test.utils import Approximate
 
 from .models import Author, Book, Publisher
 
@@ -39,6 +42,16 @@ class FilteredAggregateTests(TestCase):
     def test_filtered_aggregates(self):
         agg = Sum('age', filter=Q(name__startswith='test'))
         self.assertEqual(Author.objects.aggregate(age=agg)['age'], 200)
+
+    def test_filtered_numerical_aggregates(self):
+        for aggregate, expected_result in (
+            (Avg, Approximate(66.7, 1)),
+            (StdDev, Approximate(24.9, 1)),
+            (Variance, Approximate(622.2, 1)),
+        ):
+            with self.subTest(aggregate=aggregate.__name__):
+                agg = aggregate('age', filter=Q(name__startswith='test'))
+                self.assertEqual(Author.objects.aggregate(age=agg)['age'], expected_result)
 
     def test_double_filtered_aggregates(self):
         agg = Sum('age', filter=Q(Q(name='test2') & ~Q(name='test')))
