@@ -742,7 +742,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
             if isinstance(field, models.ManyToManyField):
                 return [
                     checks.Error(
-                        "The value of '%s' refers to '%s', which must not be a ManyToManyField." % (label, item),
+                        "The value of '%s' must not be a ManyToManyField." % (label, item),
                         obj=obj.__class__,
                         id='admin.E109',
                     )
