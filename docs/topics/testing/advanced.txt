@@ -301,6 +301,37 @@ Advanced features of ``TransactionTestCase``
 
 .. _testing-reusable-applications:
 
+Enforce serialization of TestCases that share a common resource
+===============================================================
+
+If you have test cases that needs to access the same resources, one solution is
+to make these test cases not run in parallel using
+``django.test.testcases.SerializeMixin``. This mixin requires a ``lockfile``
+that must point to a file that exist on the filesystem.
+
+For example, you could use ``__file__`` to determine that all test cases
+extending ``SerializeMixin`` in the same file will run serially::
+
+    from django.test.testcases import SerializeMixin
+
+    class ImageTestCaseMixin(SerializeMixin):
+        lockfile = __file__
+
+        def setUp(self):
+            self.filename = os.path.join(temp_storage_dir, 'my_file.png')
+            self.file = create_file(self.filename)
+
+    class RemoveImageTestCase(ImageTestCaseMixin, TestCase):
+        def test_remove_image(self):
+            remove_image(self.file)
+            self.assertFalse(file_exists(self.file))
+
+    class ResizeImageTestCase(ImageTestCaseMixin, TestCase):
+        def test_resize_image(self):
+            resize_image(self.file, (48, 48))
+            self.assertEqual((48, 48), get_image_size(self.file))
+
+
 Using the Django test runner to test reusable applications
 ==========================================================
 

@@ -1402,6 +1402,13 @@ Each process gets its own database. You must ensure that different test cases
 don't access the same resources. For instance, test cases that touch the
 filesystem should create a temporary directory for their own use.
 
+.. note::
+
+    If you have test cases that needs to access the same resources, one
+    solution is to make these test cases not run in parallel, see
+    :doc:`Enforce serialization of TestCases that share a common resource </topics/testing/advanced>`
+    for details.
+
 This option requires the third-party ``tblib`` package to display tracebacks
 correctly:
 
