@@ -716,12 +716,37 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
                 'utf-8',
                 '=?utf-8?q?A_name?= <to@example.com>',
             ),
+            # ASCII addresses with display names.
+            ('A name <to@example.com>', 'ascii', 'A name <to@example.com>'),
+            ('A name <to@example.com>', 'utf-8', '=?utf-8?q?A_name?= <to@example.com>'),
+            ('"A name" <to@example.com>', 'ascii', 'A name <to@example.com>'),
+            ('"A name" <to@example.com>', 'utf-8', '=?utf-8?q?A_name?= <to@example.com>'),
             # Unicode addresses (supported per RFC-6532).
             ('tó@example.com', 'utf-8', '=?utf-8?b?dMOz?=@example.com'),
+            ('to@éxample.com', 'utf-8', 'to@xn--xample-9ua.com'),
             (
                 ('Tó Example', 'tó@example.com'),
                 'utf-8',
                 '=?utf-8?q?T=C3=B3_Example?= <=?utf-8?b?dMOz?=@example.com>',
+            ),
+            # Unicode addresses with display names.
+            (
+                'Tó Example <tó@example.com>',
+                'utf-8',
+                '=?utf-8?q?T=C3=B3_Example?= <=?utf-8?b?dMOz?=@example.com>',
+            ),
+            ('To Example <to@éxample.com>', 'ascii', 'To Example <to@xn--xample-9ua.com>'),
+            (
+                'To Example <to@éxample.com>',
+                'utf-8',
+                '=?utf-8?q?To_Example?= <to@xn--xample-9ua.com>',
+            ),
+            # Addresses with two @ signs.
+            ('"to@other.com"@example.com', 'utf-8', r'"to@other.com"@example.com'),
+            (
+                '"to@other.com" <to@example.com>',
+                'utf-8',
+                '=?utf-8?q?to=40other=2Ecom?= <to@example.com>',
             ),
         ):
             with self.subTest(email_address=email_address, encoding=encoding):
