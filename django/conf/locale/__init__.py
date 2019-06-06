@@ -218,6 +218,12 @@ LANG_INFO = {
         'name': 'Galician',
         'name_local': 'galego',
     },
+    'gu': {
+        'bidi': False,
+        'code': 'gu',
+        'name': 'Gujarati',
+        'name_local': 'ગુજરાતી',
+    },  
     'he': {
         'bidi': True,
         'code': 'he',
@@ -228,7 +234,7 @@ LANG_INFO = {
         'bidi': False,
         'code': 'hi',
         'name': 'Hindi',
-        'name_local': 'Hindi',
+        'name_local': 'हिंदी',
     },
     'hr': {
         'bidi': False,
