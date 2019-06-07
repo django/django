@@ -47,6 +47,11 @@ class DefaultsTests(TestCase):
         for url in self.nonexistent_urls:
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)
+        self.assertIn(b'<h1>Not Found</h1>', response.content)
+        self.assertIn(
+            b'<p>The requested resource was not found on this server.</p>',
+            response.content,
+        )
 
     @override_settings(TEMPLATES=[{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -71,7 +76,7 @@ class DefaultsTests(TestCase):
     def test_server_error(self):
         "The server_error view raises a 500 status"
         response = self.client.get('/server_error/')
-        self.assertEqual(response.status_code, 500)
+        self.assertContains(response, b'<h1>Server Error (500)</h1>', status_code=500)
 
     def test_bad_request(self):
         request = self.request_factory.get('/')
