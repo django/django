@@ -109,6 +109,10 @@ def return_json_response(request):
     return JsonResponse({'key': 'value'}, **kwargs)
 
 
+def return_json_response_latin1(request):
+    return HttpResponse(b'{"a":"\xc5"}', content_type='application/json; charset=latin1')
+
+
 def return_text_file(request):
     "A view that parses and returns text as a file."
     match = CONTENT_TYPE_RE.match(request.META['CONTENT_TYPE'])
