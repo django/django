@@ -884,7 +884,10 @@ class AggregateTestCase(TestCase):
         self.assertEqual(p2, {'avg_price': Approximate(Decimal('53.39'), places=2)})
 
     def test_combine_different_types(self):
-        msg = 'Expression contains mixed types. You must set output_field.'
+        msg = (
+            'Expression contains mixed types: FloatField, IntegerField. '
+            'You must set output_field.'
+        )
         qs = Book.objects.annotate(sums=Sum('rating') + Sum('pages') + Sum('price'))
         with self.assertRaisesMessage(FieldError, msg):
             qs.first()

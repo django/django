@@ -286,8 +286,15 @@ class BaseExpression:
         """
         sources_iter = (source for source in self.get_source_fields() if source is not None)
         for output_field in sources_iter:
-            if any(not isinstance(output_field, source.__class__) for source in sources_iter):
-                raise FieldError('Expression contains mixed types. You must set output_field.')
+            for source in sources_iter:
+                if not isinstance(output_field, source.__class__):
+                    raise FieldError(
+                        'Expression contains mixed types: %s, %s. You must '
+                        'set output_field.' % (
+                            output_field.__class__.__name__,
+                            source.__class__.__name__,
+                        )
+                    )
             return output_field
 
     @staticmethod
