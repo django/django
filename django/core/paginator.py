@@ -28,12 +28,15 @@ class EmptyPage(InvalidPage):
 class Paginator:
 
     def __init__(self, object_list, per_page, orphans=0,
-                 allow_empty_first_page=True):
+                 allow_empty_first_page=True, slice_by_pk=False):
         self.object_list = object_list
         self._check_object_list_is_ordered()
         self.per_page = int(per_page)
         self.orphans = int(orphans)
         self.allow_empty_first_page = allow_empty_first_page
+        if slice_by_pk:
+            self.object_list_pks = object_list.values(slice_by_pk)
+        self._slice_by_pk = slice_by_pk
 
     def validate_number(self, number):
         """Validate the given 1-based page number."""
@@ -72,6 +75,8 @@ class Paginator:
         top = bottom + self.per_page
         if top + self.orphans >= self.count:
             top = self.count
+        if self._slice_by_pk:
+            return self._get_page(self.object_list.filter(pk__in=self.object_list_pks[bottom:top]), number, self)
         return self._get_page(self.object_list[bottom:top], number, self)
 
     def _get_page(self, *args, **kwargs):
