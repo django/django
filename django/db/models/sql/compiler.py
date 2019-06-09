@@ -54,10 +54,10 @@ class SQLCompiler:
         self.where, self.having = self.query.where.split_having()
         extra_select = self.get_extra_select(order_by, self.select)
         self.has_extra_select = bool(extra_select)
-        group_by = self.get_group_by(self.select + extra_select, order_by)
+        group_by = self.get_group_by(self.select + extra_select)
         return extra_select, order_by, group_by
 
-    def get_group_by(self, select, order_by):
+    def get_group_by(self, select):
         """
         Return a list of 2-tuples of form (sql, params).
 
@@ -115,11 +115,6 @@ class SQLCompiler:
             cols = expr.get_group_by_cols()
             for col in cols:
                 expressions.append(col)
-        for expr, (sql, params, is_ref) in order_by:
-            # Skip References to the select clause, as all expressions in the
-            # select clause are already part of the group by.
-            if not expr.contains_aggregate and not is_ref:
-                expressions.extend(expr.get_source_expressions())
         having_group_by = self.having.get_group_by_cols() if self.having else ()
         for expr in having_group_by:
             expressions.append(expr)
