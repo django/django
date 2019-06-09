@@ -218,15 +218,15 @@ default logging configuration <default-logging-configuration>` using the
 following scheme.
 
 If the ``disable_existing_loggers`` key in the :setting:`LOGGING` dictConfig is
-set to ``True`` (which is the default) then all loggers from the default
-configuration will be disabled. Disabled loggers are not the same as removed;
-the logger will still exist, but will silently discard anything logged to it,
-not even propagating entries to a parent logger. Thus you should be very
-careful using ``'disable_existing_loggers': True``; it's probably not what you
-want. Instead, you can set ``disable_existing_loggers`` to ``False`` and
-redefine some or all of the default loggers; or you can set
-:setting:`LOGGING_CONFIG` to ``None`` and :ref:`handle logging config yourself
-<disabling-logging-configuration>`.
+set to ``True`` (which is the ``dictConfig`` default if the key is missing)
+then all loggers from the default configuration will be disabled. Disabled
+loggers are not the same as removed; the logger will still exist, but will
+silently discard anything logged to it, not even propagating entries to a
+parent logger. Thus you should be very careful using
+``'disable_existing_loggers': True``; it's probably not what you want. Instead,
+you can set ``disable_existing_loggers`` to ``False`` and redefine some or all
+of the default loggers; or you can set :setting:`LOGGING_CONFIG` to ``None``
+and :ref:`handle logging config yourself <disabling-logging-configuration>`.
 
 Logging is configured as part of the general Django ``setup()`` function.
 Therefore, you can be certain that loggers are always ready for use in your
