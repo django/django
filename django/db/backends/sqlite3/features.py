@@ -1,4 +1,9 @@
+import operator
+
+from django.db import transaction
 from django.db.backends.base.features import BaseDatabaseFeatures
+from django.db.utils import OperationalError
+from django.utils.functional import cached_property
 
 from .base import Database
 
@@ -45,3 +50,14 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_aggregate_filter_clause = Database.sqlite_version_info >= (3, 30, 1)
     supports_order_by_nulls_modifier = Database.sqlite_version_info >= (3, 30, 0)
     order_by_nulls_first = True
+
+    @cached_property
+    def supports_json_field(self):
+        try:
+            with self.connection.cursor() as cursor, transaction.atomic():
+                cursor.execute('SELECT JSON(\'{"a": "b"}\')')
+        except OperationalError:
+            return False
+        return True
+
+    can_introspect_json_field = property(operator.attrgetter('supports_json_field'))

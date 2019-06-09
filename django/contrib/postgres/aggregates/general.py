@@ -1,5 +1,5 @@
-from django.contrib.postgres.fields import ArrayField, JSONField
-from django.db.models import Aggregate, Value
+from django.contrib.postgres.fields import ArrayField
+from django.db.models import Aggregate, JSONField, Value
 
 from .mixins import OrderableAggMixin
 

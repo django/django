@@ -190,6 +190,7 @@ Model fields
   ``<field data type>`` columns.
 * **fields.E170**: ``BinaryField``’s ``default`` cannot be a string. Use bytes
   content instead.
+* **fields.E180**: ``<database>`` does not support ``JSONField``\s.
 * **fields.E900**: ``IPAddressField`` has been removed except for support in
   historical migrations.
 * **fields.W900**: ``IPAddressField`` has been deprecated. Support for it
@@ -204,6 +205,9 @@ Model fields
   Django 3.1. *This check appeared in Django 2.2 and 3.0*.
 * **fields.W903**: ``NullBooleanField`` is deprecated. Support for it (except
   in historical migrations) will be removed in Django 4.0.
+* **fields.W904**: ``django.contrib.postgres.fields.JSONField`` is deprecated.
+  Support for it (except in historical migrations) will be removed in Django
+  4.0.
 
 File fields
 ~~~~~~~~~~~

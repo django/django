@@ -776,6 +776,60 @@ For each field, we describe the default widget used if you don't specify
 
     These control the range of values permitted in the field.
 
+``JSONField``
+-------------
+
+.. class:: JSONField(encoder=None, decoder=None, **kwargs)
+
+    .. versionadded:: 3.1
+
+    A field which accepts JSON encoded data for a
+    :class:`~django.db.models.JSONField`.
+
+    * Default widget: :class:`Textarea`
+    * Empty value: ``''`` (an empty string)
+    * Normalizes to: A Python representation of the JSON value (usually as a
+      ``dict``, ``list``, or ``None``), depending on :attr:`JSONField.decoder`.
+    * Validates that the given value is a valid JSON.
+    * Error message keys: ``required``, ``invalid``
+
+    Takes two optional arguments:
+
+    .. attribute:: encoder
+
+        A :py:class:`json.JSONEncoder` subclass to serialize data types not
+        supported by the standard JSON serializer (e.g. ``datetime.datetime``
+        or :class:`~python:uuid.UUID`). For example, you can use the
+        :class:`~django.core.serializers.json.DjangoJSONEncoder` class.
+
+        Defaults to ``json.JSONEncoder``.
+
+    .. attribute:: decoder
+
+        A :py:class:`json.JSONDecoder` subclass to deserialize the input. Your
+        deserialization may need to account for the fact that you can't be
+        certain of the input type. For example, you run the risk of returning a
+        ``datetime`` that was actually a string that just happened to be in the
+        same format chosen for ``datetime``\s.
+
+        The ``decoder`` can be used to validate the input. If
+        :py:class:`json.JSONDecodeError` is raised during the deserialization,
+        a ``ValidationError`` will be raised.
+
+        Defaults to ``json.JSONDecoder``.
+
+    .. note::
+
+        If you use a :class:`ModelForm <django.forms.ModelForm>`, the
+        ``encoder`` and ``decoder`` from :class:`~django.db.models.JSONField`
+        will be used.
+
+    .. admonition:: User friendly forms
+
+        ``JSONField`` is not particularly user friendly in most cases. However,
+        it is a useful way to format data from a client-side widget for
+        submission to the server.
+
 ``GenericIPAddressField``
 -------------------------
 

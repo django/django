@@ -3,7 +3,9 @@ import uuid
 
 from django.core.checks import Error, Warning as DjangoWarning
 from django.db import connection, models
-from django.test import SimpleTestCase, TestCase, skipIfDBFeature
+from django.test import (
+    SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature,
+)
 from django.test.utils import isolate_apps, override_settings
 from django.utils.functional import lazy
 from django.utils.timezone import now
@@ -791,5 +793,49 @@ class UUIDFieldTests(TestCase):
                     [uuid.UUID('25d405be-4895-4d50-9b2e-d6695359ce47'), 'Other'],
                 ],
             )
+
+        self.assertEqual(Model._meta.get_field('field').check(), [])
+
+
+@isolate_apps('invalid_models_tests')
+@skipUnlessDBFeature('supports_json_field')
+class JSONFieldTests(TestCase):
+    def test_invalid_default(self):
+        class Model(models.Model):
+            field = models.JSONField(default={})
+
+        self.assertEqual(Model._meta.get_field('field').check(), [
+            DjangoWarning(
+                msg=(
+                    "JSONField default should be a callable instead of an "
+                    "instance so that it's not shared between all field "
+                    "instances."
+                ),
+                hint=(
+                    'Use a callable instead, e.g., use `dict` instead of `{}`.'
+                ),
+                obj=Model._meta.get_field('field'),
+                id='fields.E010',
+            )
+        ])
+
+    def test_valid_default(self):
+        class Model(models.Model):
+            field = models.JSONField(default=dict)
+
+        self.assertEqual(Model._meta.get_field('field').check(), [])
+
+    def test_valid_default_none(self):
+        class Model(models.Model):
+            field = models.JSONField(default=None)
+
+        self.assertEqual(Model._meta.get_field('field').check(), [])
+
+    def test_valid_callable_default(self):
+        def callable_default():
+            return {'it': 'works'}
+
+        class Model(models.Model):
+            field = models.JSONField(default=callable_default)
 
         self.assertEqual(Model._meta.get_field('field').check(), [])

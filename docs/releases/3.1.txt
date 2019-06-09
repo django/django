@@ -64,6 +64,21 @@ Asynchronous support should be entirely backwards-compatible and we have tried
 to ensure that it has no speed regressions for your existing, synchronous code.
 It should have no noticeable effect on any existing Django projects.
 
+JSONField for all supported database backends
+---------------------------------------------
+
+Django now includes the :class:`.models.JSONField` and
+:class:`forms.JSONField <django.forms.JSONField>` that can be used on all
+supported database backends. Both fields support the use of custom JSON
+encoders and decoders. The model field supports the introspection, lookups, and
+transforms that were previously PostgreSQL-only.
+
+If your project uses ``django.contrib.postgres.fields.JSONField``, plus the
+related form field and transforms, you should adjust to use the new fields,
+and generate and apply a database migration. For now, the old fields and
+transforms are left as a reference to the new ones and are :ref:`deprecated as
+of this release <deprecated-jsonfield>`.
+
 Minor features
 --------------
 
@@ -549,6 +564,15 @@ backends.
   ``DatabaseOperations.execute_sql_flush()`` is removed. The method now uses
   the database of the called instance.
 
+* Third-party database backends must implement support for ``JSONField`` or set
+  ``DatabaseFeatures.supports_json_field`` to ``False``. If storing primitives
+  is not supported, set ``DatabaseFeatures.supports_primitives_in_json_field``
+  to ``False``. If there is a true datatype for JSON, set
+  ``DatabaseFeatures.has_native_json_field`` to ``True``.
+
+* Third party database backends must implement introspection for ``JSONField``
+  or set ``can_introspect_json_field`` to ``False``.
+
 Dropped support for MariaDB 10.1
 --------------------------------
 
@@ -693,10 +717,34 @@ Miscellaneous
 * The minimum supported version of ``mysqlclient`` is increased from 1.3.13 to
   1.4.0.
 
+* The undocumented ``django.contrib.postgres.forms.InvalidJSONInput`` and
+  ``django.contrib.postgres.forms.JSONString`` are moved to
+  ``django.forms.fields``.
+
+* The undocumented ``django.contrib.postgres.fields.jsonb.JsonAdapter`` class
+  is removed.
+
 .. _deprecated-features-3.1:
 
 Features deprecated in 3.1
 ==========================
+
+.. _deprecated-jsonfield:
+
+PostgreSQL ``JSONField``
+------------------------
+
+``django.contrib.postgres.fields.JSONField`` and
+``django.contrib.postgres.forms.JSONField`` are deprecated in favor of
+:class:`.models.JSONField` and
+:class:`forms.JSONField <django.forms.JSONField>`.
+
+The undocumented ``django.contrib.postgres.fields.jsonb.KeyTransform`` and
+``django.contrib.postgres.fields.jsonb.KeyTextTransform`` are also deprecated
+in favor of the transforms in ``django.db.models.fields.json``.
+
+The new ``JSONField``\s, ``KeyTransform``, and ``KeyTextTransform`` can be used
+on all supported database backends.
 
 Miscellaneous
 -------------

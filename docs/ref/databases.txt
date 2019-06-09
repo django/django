@@ -783,6 +783,22 @@ iterator. Your code must handle this.
 
 .. _`Isolation in SQLite`: https://sqlite.org/isolation.html
 
+.. _sqlite-json1:
+
+Enabling JSON1 extension on SQLite
+----------------------------------
+
+To use :class:`~django.db.models.JSONField` on SQLite, you need to enable the
+`JSON1 extension`_ on Python's :py:mod:`sqlite3` library. If the extension is
+not enabled on your installation, a system error (``fields.E180``) will be
+raised.
+
+To enable the JSON1 extension you can follow the instruction on
+`the wiki page`_.
+
+.. _JSON1 extension: https://www.sqlite.org/json1.html
+.. _the wiki page: https://code.djangoproject.com/wiki/JSON1Extension
+
 .. _oracle-notes:
 
 Oracle notes

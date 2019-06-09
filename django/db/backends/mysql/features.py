@@ -160,3 +160,15 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def supports_default_in_lead_lag(self):
         # To be added in https://jira.mariadb.org/browse/MDEV-12981.
         return not self.connection.mysql_is_mariadb
+
+    @cached_property
+    def supports_json_field(self):
+        if self.connection.mysql_is_mariadb:
+            return self.connection.mysql_version >= (10, 2, 7)
+        return self.connection.mysql_version >= (5, 7, 8)
+
+    @cached_property
+    def can_introspect_json_field(self):
+        if self.connection.mysql_is_mariadb:
+            return self.supports_json_field and self.can_introspect_check_constraints
+        return self.supports_json_field

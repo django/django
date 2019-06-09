@@ -16,8 +16,7 @@ Indexes such as :class:`~django.contrib.postgres.indexes.GinIndex` and
 :class:`~django.contrib.postgres.indexes.GistIndex` are better suited, though
 the index choice is dependent on the queries that you're using. Generally, GiST
 may be a good choice for the :ref:`range fields <range-fields>` and
-:class:`HStoreField`, and GIN may be helpful for :class:`ArrayField` and
-:class:`JSONField`.
+:class:`HStoreField`, and GIN may be helpful for :class:`ArrayField`.
 
 ``ArrayField``
 ==============
@@ -517,96 +516,14 @@ using in conjunction with lookups on
     of the JSON which allows indexing. The trade-off is a small additional cost
     on writing to the ``jsonb`` field. ``JSONField`` uses ``jsonb``.
 
+.. deprecated:: 3.1
+
+    Use :class:`django.db.models.JSONField` instead.
+
 Querying ``JSONField``
 ----------------------
 
-We will use the following example model::
-
-    from django.contrib.postgres.fields import JSONField
-    from django.db import models
-
-    class Dog(models.Model):
-        name = models.CharField(max_length=200)
-        data = JSONField()
-
-        def __str__(self):
-            return self.name
-
-.. fieldlookup:: jsonfield.key
-
-Key, index, and path lookups
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To query based on a given dictionary key, use that key as the lookup name::
-
-    >>> Dog.objects.create(name='Rufus', data={
-    ...     'breed': 'labrador',
-    ...     'owner': {
-    ...         'name': 'Bob',
-    ...         'other_pets': [{
-    ...             'name': 'Fishy',
-    ...         }],
-    ...     },
-    ... })
-    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': None})
-
-    >>> Dog.objects.filter(data__breed='collie')
-    <QuerySet [<Dog: Meg>]>
-
-Multiple keys can be chained together to form a path lookup::
-
-    >>> Dog.objects.filter(data__owner__name='Bob')
-    <QuerySet [<Dog: Rufus>]>
-
-If the key is an integer, it will be interpreted as an index lookup in an
-array::
-
-    >>> Dog.objects.filter(data__owner__other_pets__0__name='Fishy')
-    <QuerySet [<Dog: Rufus>]>
-
-If the key you wish to query by clashes with the name of another lookup, use
-the :lookup:`jsonfield.contains` lookup instead.
-
-If only one key or index is used, the SQL operator ``->`` is used. If multiple
-operators are used then the ``#>`` operator is used.
-
-To query for ``null`` in JSON data, use ``None`` as a value::
-
-    >>> Dog.objects.filter(data__owner=None)
-    <QuerySet [<Dog: Meg>]>
-
-To query for missing keys, use the ``isnull`` lookup::
-
-    >>> Dog.objects.create(name='Shep', data={'breed': 'collie'})
-    >>> Dog.objects.filter(data__owner__isnull=True)
-    <QuerySet [<Dog: Shep>]>
-
-.. warning::
-
-    Since any string could be a key in a JSON object, any lookup other than
-    those listed below will be interpreted as a key lookup. No errors are
-    raised. Be extra careful for typing mistakes, and always check your queries
-    work as you intend.
-
-Containment and key operations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. fieldlookup:: jsonfield.contains
-.. fieldlookup:: jsonfield.contained_by
-.. fieldlookup:: jsonfield.has_key
-.. fieldlookup:: jsonfield.has_any_keys
-.. fieldlookup:: jsonfield.has_keys
-
-:class:`~django.contrib.postgres.fields.JSONField` shares lookups relating to
-containment and keys with :class:`~django.contrib.postgres.fields.HStoreField`.
-
-- :lookup:`contains <hstorefield.contains>` (accepts any JSON rather than
-  just a dictionary of strings)
-- :lookup:`contained_by <hstorefield.contained_by>` (accepts any JSON
-  rather than just a dictionary of strings)
-- :lookup:`has_key <hstorefield.has_key>`
-- :lookup:`has_any_keys <hstorefield.has_any_keys>`
-- :lookup:`has_keys <hstorefield.has_keys>`
+See :ref:`querying-jsonfield` for details.
 
 .. _range-fields:
 

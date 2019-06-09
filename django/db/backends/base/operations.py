@@ -159,6 +159,13 @@ class BaseDatabaseOperations:
         """
         return self.date_extract_sql(lookup_type, field_name)
 
+    def json_cast_text_sql(self, field_name):
+        """Return the SQL to cast a JSON value to text value."""
+        raise NotImplementedError(
+            'subclasses of BaseDatabaseOperations may require a '
+            'json_cast_text_sql() method'
+        )
+
     def deferrable_sql(self):
         """
         Return the SQL to make a constraint "initially deferred" during a

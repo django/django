@@ -121,6 +121,11 @@ class SimpleDatabaseOperationTests(SimpleTestCase):
         with self.assertRaisesMessage(NotImplementedError, self.may_require_msg % 'datetime_extract_sql'):
             self.ops.datetime_extract_sql(None, None, None)
 
+    def test_json_cast_text_sql(self):
+        msg = self.may_require_msg % 'json_cast_text_sql'
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            self.ops.json_cast_text_sql(None)
+
 
 class DatabaseOperationTests(TestCase):
     def setUp(self):

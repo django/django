@@ -1,10 +1,9 @@
-from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 
 from .fields import (
     ArrayField, BigIntegerRangeField, CICharField, CIEmailField, CITextField,
     DateRangeField, DateTimeRangeField, DecimalRangeField, EnumField,
-    HStoreField, IntegerRangeField, JSONField, SearchVectorField,
+    HStoreField, IntegerRangeField, SearchVectorField,
 )
 
 
@@ -68,7 +67,7 @@ class OtherTypesArrayModel(PostgreSQLModel):
     uuids = ArrayField(models.UUIDField(), default=list)
     decimals = ArrayField(models.DecimalField(max_digits=5, decimal_places=2), default=list)
     tags = ArrayField(TagField(), blank=True, null=True)
-    json = ArrayField(JSONField(default=dict), default=list)
+    json = ArrayField(models.JSONField(default=dict), default=list)
     int_ranges = ArrayField(IntegerRangeField(), blank=True, null=True)
     bigint_ranges = ArrayField(BigIntegerRangeField(), blank=True, null=True)
 
@@ -148,11 +147,6 @@ class RangeLookupsModel(PostgreSQLModel):
     date = models.DateField(blank=True, null=True)
     small_integer = models.SmallIntegerField(blank=True, null=True)
     decimal_field = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-
-
-class JSONModel(PostgreSQLModel):
-    field = JSONField(blank=True, null=True)
-    field_custom = JSONField(blank=True, null=True, encoder=DjangoJSONEncoder)
 
 
 class ArrayFieldSubclass(ArrayField):

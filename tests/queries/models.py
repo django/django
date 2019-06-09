@@ -747,3 +747,10 @@ class ReturningModel(models.Model):
 
 class NonIntegerPKReturningModel(models.Model):
     created = CreatedField(editable=False, primary_key=True)
+
+
+class JSONFieldNullable(models.Model):
+    json_field = models.JSONField(blank=True, null=True)
+
+    class Meta:
+        required_db_features = {'supports_json_field'}

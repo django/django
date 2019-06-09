@@ -348,7 +348,7 @@ The default can't be a mutable object (model instance, ``list``, ``set``, etc.),
 as a reference to the same instance of that object would be used as the default
 value in all new model instances. Instead, wrap the desired default in a
 callable. For example, if you want to specify a default ``dict`` for
-:class:`~django.contrib.postgres.fields.JSONField`, use a function::
+:class:`~django.db.models.JSONField`, use a function::
 
     def contact_default():
         return {"email": "to1@example.com"}
@@ -1174,6 +1174,73 @@ are converted to lowercase.
 
 If you allow for blank values, you have to allow for null values since blank
 values are stored as null.
+
+``JSONField``
+-------------
+
+.. class:: JSONField(encoder=None, decoder=None, **options)
+
+.. versionadded:: 3.1
+
+A field for storing JSON encoded data. In Python the data is represented in its
+Python native format: dictionaries, lists, strings, numbers, booleans and
+``None``.
+
+``JSONField`` is supported on MariaDB 10.2.7+, MySQL 5.7.8+, Oracle,
+PostgreSQL, and SQLite 3.9.0+ (with the :ref:`JSON1 extension enabled
+<sqlite-json1>`).
+
+.. attribute:: JSONField.encoder
+
+    An optional :py:class:`json.JSONEncoder` subclass to serialize data types
+    not supported by the standard JSON serializer (e.g. ``datetime.datetime``
+    or :class:`~python:uuid.UUID`). For example, you can use the
+    :class:`~django.core.serializers.json.DjangoJSONEncoder` class.
+
+    Defaults to ``json.JSONEncoder``.
+
+.. attribute:: JSONField.decoder
+
+    An optional :py:class:`json.JSONDecoder` subclass to deserialize the value
+    retrieved from the database. The value will be in the format chosen by the
+    custom encoder (most often a string). Your deserialization may need to
+    account for the fact that you can't be certain of the input type. For
+    example, you run the risk of returning a ``datetime`` that was actually a
+    string that just happened to be in the same format chosen for
+    ``datetime``\s.
+
+    Defaults to ``json.JSONDecoder``.
+
+If you give the field a :attr:`~django.db.models.Field.default`, ensure it's an
+immutable object, such as a ``str``, or a callable object that returns a fresh
+mutable object each time, such as ``dict`` or a function. Providing a mutable
+default object like ``default={}`` or ``default=[]`` shares the one object
+between all model instances.
+
+To query ``JSONField`` in the database, see :ref:`querying-jsonfield`.
+
+.. admonition:: Indexing
+
+    :class:`~django.db.models.Index` and :attr:`.Field.db_index` both create a
+    B-tree index, which isn't particularly helpful when querying ``JSONField``.
+    On PostgreSQL only, you can use
+    :class:`~django.contrib.postgres.indexes.GinIndex` that is better suited.
+
+.. admonition:: PostgreSQL users
+
+    PostgreSQL has two native JSON based data types: ``json`` and ``jsonb``.
+    The main difference between them is how they are stored and how they can be
+    queried. PostgreSQL's ``json`` field is stored as the original string
+    representation of the JSON and must be decoded on the fly when queried
+    based on keys. The ``jsonb`` field is stored based on the actual structure
+    of the JSON which allows indexing. The trade-off is a small additional cost
+    on writing to the ``jsonb`` field. ``JSONField`` uses ``jsonb``.
+
+.. admonition:: Oracle users
+
+    Oracle Database does not support storing JSON scalar values. Only JSON
+    objects and arrays (represented in Python using :py:class:`dict` and
+    :py:class:`list`) are supported.
 
 ``NullBooleanField``
 --------------------
