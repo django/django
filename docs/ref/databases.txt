@@ -778,6 +778,95 @@ iterator. Your code must handle this.
 
 .. _`Isolation in SQLite`: https://sqlite.org/isolation.html
 
+.. _sqlite-json1:
+
+Enabling JSON1 extension on SQLite
+----------------------------------
+
+This document describes how to enable JSON1 extension on Python's
+:py:mod:`sqlite3` library so that :class:`~django.db.models.JSONField` can be
+used. If the extension is not enabled on your installation and there is no
+other database connection that supports ``JSONField``, a system error will be
+raised ("``No database connection that supports JSONField is found.``"). To
+check if the extension is enabled on your installation, you can do a query with
+one of the functions included in the extension, e.g. ``JSON()``. For example::
+
+    >>> import sqlite3
+    >>> conn = sqlite3.connect(':memory:')
+    >>> c = conn.cursor()
+    >>> c.execute("SELECT JSON('123');")
+
+If the query doesn't throw any errors, then the JSON1 extension should already
+be enabled. Otherwise, follow the instructions below according to your
+operating system to set it up correctly.
+
+Linux
+~~~~~
+
+On most major Linux distributions, the JSON1 extension is included in their
+SQLite and/or Python packages and enabled by default. If that's not the case on
+your installation, then do the following:
+
+- Download the `SQLite amalgamation`_,
+  with or without the configuration script.
+- Extract the source code archive and enter the directory of the result.
+- Compile the source code using the ``-DSQLITE_ENABLE_JSON1`` flag to enable
+  the JSON1 extension. For example:
+
+  .. code-block:: console
+
+      gcc -DSQLITE_ENABLE_JSON1 -c -fPIC sqlite3.c
+
+  To enable other extensions, see the `compilation instructions`_.
+- Create a shared library. For example:
+
+  .. code-block:: console
+
+      gcc -shared -o libsqlite3.so -fPIC sqlite3.o -ldl -lpthread
+
+- Place the resulting file (``libsqlite3.so``) in a desired directory, e.g.
+  ``/usr/lib/sqlite3/``.
+- Set the ``LD_PRELOAD`` environment variable to use your compiled SQLite every
+  time you run Django. For example:
+
+  .. code-block:: console
+
+      export LD_PRELOAD=/usr/lib/sqlite3/libsqlite3.so
+
+- Now, the JSON1 extension should be ready to be used in Python and Django.
+
+.. _`SQLite amalgamation`: https://www.sqlite.org/download.html
+.. _`compilation instructions`: https://www.sqlite.org/howtocompile.html
+
+Mac
+~~~
+
+On Mac, follow the instructions for Linux above, but instead of setting the
+``LD_PRELOAD`` environment variable, use ``DYLD_LIBRARY_PATH``. For example:
+
+  .. code-block:: console
+
+      export DYLD_LIBRARY_PATH=/usr/lib/sqlite3
+
+Windows
+~~~~~~~
+
+- Download the `precompiled DLL`_ that matches your Python installation (32-bit
+  or 64-bit).
+- Locate your Python installation. By default, it should be in
+  ``%localappdata%\Programs\Python\PythonXX``, where ``XX`` is the Python
+  version. For example, it's located in
+  ``C:\Users\<username>\AppData\Local\Programs\Python\Python37``. If you added
+  Python installation directory to your ``PATH`` environment variable, you can
+  run the command ``where python`` on a command prompt to locate it.
+- Enter the ``DLLs`` directory in your Python installation.
+- Rename (or delete) ``sqlite3.dll`` inside the ``DLLs`` directory.
+- Extract ``sqlite3.dll`` from the downloaded DLL archive and put it in the
+  ``DLLs`` directory.
+- Now, the JSON1 extension should be ready to be used in Python and Django.
+
+.. _`precompiled DLL`: https://www.sqlite.org/download.html
+
 .. _oracle-notes:
 
 Oracle notes

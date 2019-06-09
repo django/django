@@ -5,6 +5,7 @@ import datetime
 import decimal
 import functools
 import hashlib
+import json
 import math
 import operator
 import re
@@ -100,6 +101,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'BigIntegerField': 'bigint',
         'IPAddressField': 'char(15)',
         'GenericIPAddressField': 'char(39)',
+        'JSONField': 'text',
         'NullBooleanField': 'bool',
         'OneToOneField': 'integer',
         'PositiveBigIntegerField': 'bigint unsigned',
@@ -114,6 +116,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     }
     data_type_check_constraints = {
         'PositiveBigIntegerField': '"%(column)s" >= 0',
+        'JSONField': '(JSON_VALID("%(column)s") OR "%(column)s" IS NULL)',
         'PositiveIntegerField': '"%(column)s" >= 0',
         'PositiveSmallIntegerField': '"%(column)s" >= 0',
     }
@@ -213,6 +216,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function("django_time_diff", 2, _sqlite_time_diff)
         conn.create_function("django_timestamp_diff", 2, _sqlite_timestamp_diff)
         conn.create_function("django_format_dtdelta", 3, _sqlite_format_dtdelta)
+        conn.create_function("django_json_contains", 2, _sqlite_json_contains)
         conn.create_function('regexp', 2, _sqlite_regexp)
         conn.create_function('ACOS', 1, none_guard(math.acos))
         conn.create_function('ASIN', 1, none_guard(math.asin))
@@ -588,3 +592,12 @@ def _sqlite_lpad(text, length, fill_text):
 @none_guard
 def _sqlite_rpad(text, length, fill_text):
     return (text + fill_text * length)[:length]
+
+
+@none_guard
+def _sqlite_json_contains(haystack, needle):
+    target, candidate = json.loads(haystack), json.loads(needle)
+    if isinstance(target, dict) and isinstance(candidate, dict):
+        return target.items() >= candidate.items()
+    else:
+        return target == candidate

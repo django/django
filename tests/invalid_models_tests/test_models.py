@@ -6,7 +6,7 @@ from django.core.checks.model_checks import _check_lazy_references
 from django.db import connection, connections, models
 from django.db.models.functions import Lower
 from django.db.models.signals import post_init
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase
 from django.test.utils import isolate_apps, override_settings, register_lookup
 
 
@@ -1209,6 +1209,18 @@ class OtherModelTests(SimpleTestCase):
                 id='signals.E001',
             ),
         ])
+
+
+@isolate_apps('invalid_models_tests')
+class ModelMetaJSONFieldOrdering(TestCase):
+    def test_ordering_by_json_field_value(self):
+        class JSONModel(models.Model):
+            field = models.JSONField()
+
+            class Meta:
+                ordering = ['field__value']
+
+        self.assertEqual(JSONModel.check(), [])
 
 
 @isolate_apps('invalid_models_tests')

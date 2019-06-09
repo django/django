@@ -118,6 +118,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'BigIntegerField': 'bigint',
         'IPAddressField': 'char(15)',
         'GenericIPAddressField': 'char(39)',
+        'JSONField': 'json',
         'NullBooleanField': 'bool',
         'OneToOneField': 'integer',
         'PositiveBigIntegerField': 'bigint UNSIGNED',
@@ -339,11 +340,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     @cached_property
     def data_type_check_constraints(self):
         if self.features.supports_column_check_constraints:
-            return {
+            check_constraints = {
                 'PositiveBigIntegerField': '`%(column)s` >= 0',
                 'PositiveIntegerField': '`%(column)s` >= 0',
                 'PositiveSmallIntegerField': '`%(column)s` >= 0',
             }
+            if self.mysql_is_mariadb and self.mysql_version < (10, 4, 3):
+                check_constraints['JSONField'] = 'JSON_VALID(`%(column)s`)'
+            return check_constraints
         return {}
 
     @cached_property

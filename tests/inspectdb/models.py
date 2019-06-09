@@ -66,6 +66,8 @@ class ColumnTypes(models.Model):
     time_field = models.TimeField()
     url_field = models.URLField()
     uuid_field = models.UUIDField()
+    json_field = models.JSONField()
+    null_json_field = models.JSONField(blank=True, null=True)
 
 
 class UniqueTogether(models.Model):

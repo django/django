@@ -78,3 +78,4 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_phraseto_tsquery = property(operator.attrgetter('is_postgresql_9_6'))
     has_websearch_to_tsquery = property(operator.attrgetter('is_postgresql_11'))
     supports_table_partitions = property(operator.attrgetter('is_postgresql_10'))
+    can_introspect_json_field = True

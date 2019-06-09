@@ -335,6 +335,14 @@ if Image:
                                   width_field='headshot_width')
 
 
+class JSONModel(models.Model):
+    value = models.JSONField()
+
+
+class NullableJSONModel(models.Model):
+    value = models.JSONField(blank=True, null=True)
+
+
 class AllFieldsModel(models.Model):
     big_integer = models.BigIntegerField()
     binary = models.BinaryField()
@@ -349,6 +357,7 @@ class AllFieldsModel(models.Model):
     floatf = models.FloatField()
     integer = models.IntegerField()
     generic_ip = models.GenericIPAddressField()
+    json = models.JSONField()
     null_boolean = models.NullBooleanField()
     positive_integer = models.PositiveIntegerField()
     positive_small_integer = models.PositiveSmallIntegerField()

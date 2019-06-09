@@ -4,7 +4,7 @@ from django.db import migrations, models
 from ..fields import (
     ArrayField, BigIntegerRangeField, CICharField, CIEmailField, CITextField,
     DateRangeField, DateTimeRangeField, DecimalRangeField, EnumField,
-    HStoreField, IntegerRangeField, JSONField, SearchVectorField,
+    HStoreField, IntegerRangeField, SearchVectorField,
 )
 from ..models import TagField
 
@@ -60,7 +60,7 @@ class Migration(migrations.Migration):
                 ('uuids', ArrayField(models.UUIDField(), size=None, default=list)),
                 ('decimals', ArrayField(models.DecimalField(max_digits=5, decimal_places=2), size=None, default=list)),
                 ('tags', ArrayField(TagField(), blank=True, null=True, size=None)),
-                ('json', ArrayField(JSONField(default={}), default=[])),
+                ('json', ArrayField(models.JSONField(default={}), default=[])),
                 ('int_ranges', ArrayField(IntegerRangeField(), null=True, blank=True)),
                 ('bigint_ranges', ArrayField(BigIntegerRangeField(), null=True, blank=True)),
             ],
@@ -263,8 +263,8 @@ class Migration(migrations.Migration):
             name='JSONModel',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('field', JSONField(null=True, blank=True)),
-                ('field_custom', JSONField(null=True, blank=True, encoder=DjangoJSONEncoder)),
+                ('field', models.JSONField(null=True, blank=True)),
+                ('field_custom', models.JSONField(null=True, blank=True, encoder=DjangoJSONEncoder)),
             ],
             options={
                 'required_db_vendor': 'postgresql',

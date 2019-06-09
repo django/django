@@ -1,4 +1,6 @@
 from django.db.backends.base.features import BaseDatabaseFeatures
+from django.db.utils import OperationalError
+from django.utils.functional import cached_property
 
 from .base import Database
 
@@ -45,3 +47,16 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_frame_range_fixed_distance = Database.sqlite_version_info >= (3, 28, 0)
     supports_aggregate_filter_clause = Database.sqlite_version_info >= (3, 30, 1)
     supports_order_by_nulls_modifier = Database.sqlite_version_info >= (3, 30, 0)
+
+    @cached_property
+    def supports_json_field(self):
+        try:
+            with self.connection.cursor() as cursor:
+                cursor.execute("SELECT JSON('\"test\"')")
+        except OperationalError:
+            return False
+        return True
+
+    @cached_property
+    def can_introspect_json_field(self):
+        return self.supports_json_field

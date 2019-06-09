@@ -27,6 +27,20 @@ officially support the latest release of each series.
 What's new in Django 3.1
 ========================
 
+JSONField for all supported database backends
+---------------------------------------------
+
+Django now includes a :class:`models.JSONField <django.db.models.JSONField>`
+and a :class:`forms.JSONField <django.forms.JSONField>` that work on all
+supported database backends. Both fields support the use of custom JSON encoder
+and decoder. The model field also supports lookups and transforms supported in
+previously
+:class:`PostgreSQL-only JSONField <django.contrib.postgres.fields.JSONField>`.
+
+If your project uses the PostgreSQL ``JSONField`` form and/or model fields, it
+is advised to migrate and use the new fields. For now, the old fields are left
+as a reference to the new ones and are deprecated as of this release.
+
 Minor features
 --------------
 
@@ -421,6 +435,11 @@ Miscellaneous
 
 * ``django.utils.decorators.classproperty()`` decorator is moved to
   ``django.utils.functional.classproperty()``.
+* Third party database backends must implement support for
+  :class:`~django.db.models.JSONField` or set
+  ``DatabaseFeatures.supports_json_field`` to ``False``. If ``JSONField``
+  introspection is also implemented, set
+  ``DatabaseFeatures.can_introspect_json_field`` to ``True``.
 
 * :tfilter:`floatformat` template filter now outputs (positive) ``0`` for
   negative numbers which round to zero.
@@ -453,6 +472,15 @@ Miscellaneous
 
 Features deprecated in 3.1
 ==========================
+
+PostgreSQL ``JSONField``
+------------------------
+
+:class:`django.contrib.postgres.fields.JSONField` and
+:class:`django.contrib.postgres.forms.JSONField` are
+deprecated in favor of the similar fields that work on all supported database
+backends: :class:`models.JSONField <django.db.models.JSONField>` and
+:class:`forms.JSONField <django.forms.JSONField>`.
 
 Miscellaneous
 -------------
