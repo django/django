@@ -34,9 +34,9 @@ from django.utils.translation import (
     LANGUAGE_SESSION_KEY, activate, check_for_language, deactivate,
     get_language, get_language_bidi, get_language_from_request,
     get_language_info, gettext, gettext_lazy, ngettext, ngettext_lazy,
-    npgettext, npgettext_lazy, pgettext, to_language, to_locale, trans_null,
-    trans_real, ugettext, ugettext_lazy, ugettext_noop, ungettext,
-    ungettext_lazy,
+    npgettext, npgettext_lazy, pgettext, round_away_from_one, to_language,
+    to_locale, trans_null, trans_real, ugettext, ugettext_lazy, ugettext_noop,
+    ungettext, ungettext_lazy,
 )
 from django.utils.translation.reloader import (
     translation_file_changed, watch_for_translation_changes,
@@ -1883,3 +1883,31 @@ class TranslationFileChangedTests(SimpleTestCase):
         self.assertEqual(trans_real._translations, {})
         self.assertIsNone(trans_real._default)
         self.assertIsInstance(trans_real._active, _thread._local)
+
+
+class UtilsTests(SimpleTestCase):
+    def test_round_away_from_one(self):
+        tests = [
+            (0, 0),
+            (0., 0),
+            (0.25, 0),
+            (0.5, 0),
+            (0.75, 0),
+            (1, 1),
+            (1., 1),
+            (1.25, 2),
+            (1.5, 2),
+            (1.75, 2),
+            (-0., 0),
+            (-0.25, -1),
+            (-0.5, -1),
+            (-0.75, -1),
+            (-1, -1),
+            (-1., -1),
+            (-1.25, -2),
+            (-1.5, -2),
+            (-1.75, -2),
+        ]
+        for value, expected in tests:
+            with self.subTest(value=value):
+                self.assertEqual(round_away_from_one(value), expected)

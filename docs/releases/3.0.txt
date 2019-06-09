@@ -416,6 +416,9 @@ Miscellaneous
   when ``doseq=False``, rather than iterating them, bringing it into line with
   the standard library :func:`urllib.parse.urlencode` function.
 
+* ``intword`` template filter now translates ``1.0`` as a singular phrase and
+  all other numeric values as plural. This may be incorrect for some languages.
+
 .. _deprecated-features-3.0:
 
 Features deprecated in 3.0
