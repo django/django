@@ -31,10 +31,14 @@ class HumanizeTests(SimpleTestCase):
 
     def humanize_tester(self, test_list, result_list, method, normalize_result_func=escape):
         for test_content, result in zip(test_list, result_list):
-            t = Template('{%% load humanize %%}{{ test_content|%s }}' % method)
-            rendered = t.render(Context(locals())).strip()
-            self.assertEqual(rendered, normalize_result_func(result),
-                             msg="%s test failed, produced '%s', should've produced '%s'" % (method, rendered, result))
+            with self.subTest(test_content):
+                t = Template('{%% load humanize %%}{{ test_content|%s }}' % method)
+                rendered = t.render(Context(locals())).strip()
+                self.assertEqual(
+                    rendered,
+                    normalize_result_func(result),
+                    msg="%s test failed, produced '%s', should've produced '%s'" % (method, rendered, result)
+                )
 
     def test_ordinal(self):
         test_list = ('1', '2', '3', '4', '11', '12',
@@ -289,9 +293,10 @@ class HumanizeTests(SimpleTestCase):
         humanize.datetime = DocumentedMockDateTime
         try:
             for test_time_string, expected_natural_time in test_data:
-                test_time = datetime.datetime.strptime(test_time_string, time_format)
-                natural_time = humanize.naturaltime(test_time).replace('\xa0', ' ')
-                self.assertEqual(expected_natural_time, natural_time)
+                with self.subTest(test_time_string):
+                    test_time = datetime.datetime.strptime(test_time_string, time_format)
+                    natural_time = humanize.naturaltime(test_time).replace('\xa0', ' ')
+                    self.assertEqual(expected_natural_time, natural_time)
         finally:
             humanize.datetime = orig_humanize_datetime
 
