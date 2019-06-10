@@ -1,3 +1,4 @@
+import datetime
 import unittest
 
 from django.db import connection
@@ -5,7 +6,7 @@ from django.db.models.fields import BooleanField, NullBooleanField
 from django.db.utils import DatabaseError
 from django.test import TransactionTestCase
 
-from ..models import Square
+from ..models import NonIntegerAutoField, Square
 
 
 @unittest.skipUnless(connection.vendor == 'oracle', 'Oracle tests')
@@ -95,3 +96,23 @@ class TransactionalTests(TransactionTestCase):
             self.assertIn('ORA-01017', context.exception.args[0].message)
         finally:
             connection.settings_dict['PASSWORD'] = old_password
+
+    def test_non_integer_auto_field(self):
+        with connection.cursor() as cursor:
+            # Create trigger that fill non-integer auto field.
+            cursor.execute("""
+                CREATE OR REPLACE TRIGGER "TRG_FILL_CREATION_DATETIME"
+                BEFORE INSERT ON "BACKENDS_NONINTEGERAUTOFIELD"
+                FOR EACH ROW
+                BEGIN
+                    :NEW.CREATION_DATETIME := SYSTIMESTAMP;
+                END;
+            """)
+        try:
+            NonIntegerAutoField._meta.auto_field = NonIntegerAutoField.creation_datetime
+            obj = NonIntegerAutoField.objects.create()
+            self.assertIsNotNone(obj.creation_datetime)
+            self.assertIsInstance(obj.creation_datetime, datetime.datetime)
+        finally:
+            with connection.cursor() as cursor:
+                cursor.execute('DROP TRIGGER "TRG_FILL_CREATION_DATETIME"')

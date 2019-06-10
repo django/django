@@ -353,6 +353,9 @@ backends.
   :class:`~django.db.models.DateTimeField` in ``datetime_cast_date_sql()``,
   ``datetime_extract_sql()``, etc.
 
+* ``DatabaseOperations.return_insert_id()`` now requires an additional
+  ``field`` argument with the model field.
+
 :mod:`django.contrib.admin`
 ---------------------------
 

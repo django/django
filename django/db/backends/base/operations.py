@@ -311,7 +311,7 @@ class BaseDatabaseOperations:
         """
         return value
 
-    def return_insert_id(self):
+    def return_insert_id(self, field):
         """
         For backends that support returning the last insert ID as part of an
         insert query, return the SQL and params to append to the INSERT query.

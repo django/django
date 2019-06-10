@@ -235,7 +235,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             return cursor.query.decode()
         return None
 
-    def return_insert_id(self):
+    def return_insert_id(self, field):
         return "RETURNING %s", ()
 
     def bulk_insert_sql(self, fields, placeholder_rows):

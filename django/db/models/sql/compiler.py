@@ -1304,7 +1304,7 @@ class SQLInsertCompiler(SQLCompiler):
             if ignore_conflicts_suffix_sql:
                 result.append(ignore_conflicts_suffix_sql)
             col = "%s.%s" % (qn(opts.db_table), qn(opts.pk.column))
-            r_fmt, r_params = self.connection.ops.return_insert_id()
+            r_fmt, r_params = self.connection.ops.return_insert_id(opts.pk)
             # Skip empty r_fmt to allow subclasses to customize behavior for
             # 3rd party backends. Refs #19096.
             if r_fmt:
