@@ -7,6 +7,8 @@ class FunctionTests(SimpleTestCase):
 
     def test_formats(self):
         tests = [
+            (0, '0\xa0bytes'),
+            (1, '1\xa0byte'),
             (1023, '1023\xa0bytes'),
             (1024, '1.0\xa0KB'),
             (10 * 1024, '10.0\xa0KB'),
@@ -28,6 +30,8 @@ class FunctionTests(SimpleTestCase):
 
     def test_localized_formats(self):
         tests = [
+            (0, '0\xa0Bytes'),
+            (1, '1\xa0Byte'),
             (1023, '1023\xa0Bytes'),
             (1024, '1,0\xa0KB'),
             (10 * 1024, '10,0\xa0KB'),
@@ -50,6 +54,7 @@ class FunctionTests(SimpleTestCase):
 
     def test_negative_numbers(self):
         tests = [
+            (-1, '-1\xa0byte'),
             (-100, '-100\xa0bytes'),
             (-1024 * 1024 * 50, '-50.0\xa0MB'),
         ]
