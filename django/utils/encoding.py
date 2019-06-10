@@ -54,6 +54,13 @@ def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
     strings, rather than kept as lazy objects.
 
     If strings_only is True, don't convert (some) non-string-like objects.
+
+    Note: force_text() returns a str object; but not all str
+    objects are valid text. For instance, "\ud800" is valid JSON; but
+    once parsed, you cannot print() it or render it in a template.
+    force_text() will not modify such strings. (To remove Unicode
+    surrogates in raw_str that are valid in JSON but invalid text, use
+    safe_str = re.sub('[\ud800-\udfff]', '\ufffd', raw_str))
     """
     # Handle the common case first for performance reasons.
     if issubclass(type(s), str):

@@ -223,6 +223,13 @@ The functions defined in this module share the following properties:
     If ``strings_only`` is ``True``, don't convert (some) non-string-like
     objects.
 
+    Note: ``force_text()`` returns a ``str`` object; but not all ``str``
+    objects are valid text. For instance, ``"\ud800"`` is valid JSON; but
+    once parsed, you cannot ``print()`` it or render it in a template.
+    ``force_text()`` will not modify such strings. (To remove Unicode
+    surrogates in ``raw_str`` that are valid in JSON but invalid text, use
+    ``safe_str = re.sub('[\ud800-\udfff]', '\ufffd', raw_str)``)
+
 .. function:: smart_bytes(s, encoding='utf-8', strings_only=False, errors='strict')
 
     Returns a bytestring version of arbitrary object ``s``, encoded as
