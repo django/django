@@ -6,12 +6,13 @@ from unittest import mock
 
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
-from django.db import connection
+from django.db import ProgrammingError, connection
 from django.db.models import (
     Avg, Case, Count, DecimalField, F, IntegerField, Max, Q, StdDev, Sum,
     Value, Variance, When,
 )
 from django.db.models.aggregates import Aggregate
+from django.db.utils import OperationalError
 from django.test import (
     TestCase, ignore_warnings, skipUnlessAnyDBFeature, skipUnlessDBFeature,
 )
@@ -110,7 +111,6 @@ class AggregationTests(TestCase):
         for attr, value in kwargs.items():
             self.assertEqual(getattr(obj, attr), value)
 
-    @ignore_warnings(category=RemovedInDjango31Warning)
     def test_annotation_with_value(self):
         values = Book.objects.filter(
             name='Practical Django Projects',
@@ -118,7 +118,7 @@ class AggregationTests(TestCase):
             discount_price=F('price') * 2,
         ).values(
             'discount_price',
-        ).annotate(sum_discount=Sum('discount_price'))
+        ).annotate(sum_discount=Sum('discount_price')).order_by('discount_price')
         self.assertSequenceEqual(
             values,
             [{'discount_price': Decimal('59.38'), 'sum_discount': Decimal('59.38')}]
@@ -1018,6 +1018,16 @@ class AggregationTests(TestCase):
             n_authors=Count("authors")
         ).values_list("pk", flat=True).order_by('name')
         self.assertEqual(list(qs), list(Book.objects.values_list("pk", flat=True)))
+
+    def test_values_annotate_with_non_exist_order_by_column(self):
+        qs = Book.objects.values("name").annotate(n_authors=Count("authors")).order_by('-id')
+        if connection.features.can_use_order_by_even_not_in_group_by:
+            self.assertEqual(
+                (qs[0]['name'], qs[0]['n_authors']),
+                ('Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp', 1))
+        else:
+            with self.assertRaises((ProgrammingError, OperationalError)):
+                list(qs)
 
     def test_having_group_by(self):
         # When a field occurs on the LHS of a HAVING clause that it

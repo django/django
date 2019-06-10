@@ -154,6 +154,9 @@ class BaseDatabaseFeatures:
     # Can the backend introspect the column order (ASC/DESC) for indexes?
     supports_index_column_ordering = True
 
+    # Can use the column in order by even not in group by?
+    can_use_order_by_even_not_in_group_by = False
+
     # Does the backend support introspection of materialized views?
     can_introspect_materialized_views = False
 

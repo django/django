@@ -57,7 +57,7 @@ class GeoExpressionsTests(TestCase):
         )
         qs = City.objects.values('name').annotate(
             distance=Min(functions.Distance('multifields__point', multi_field.city.point)),
-        ).annotate(count=Count('multifields'))
+        ).annotate(count=Count('multifields')).order_by('name')
         self.assertTrue(qs.first())
 
     @skipUnlessDBFeature('has_Translate_function')

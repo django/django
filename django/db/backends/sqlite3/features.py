@@ -21,6 +21,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     introspected_big_auto_field_type = 'AutoField'
     supports_transactions = True
     atomic_transactions = False
+    can_use_order_by_even_not_in_group_by = True
     can_rollback_ddl = True
     supports_atomic_references_rename = Database.sqlite_version_info >= (3, 26, 0)
     can_create_inline_fk = False
