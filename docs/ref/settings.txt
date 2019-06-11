@@ -711,7 +711,7 @@ backend-specific.
 Supported by the PostgreSQL_ (``postgresql``) and MySQL_ (``mysql``) backends.
 
 .. _PostgreSQL: https://www.postgresql.org/docs/current/multibyte.html
-.. _MySQL: https://dev.mysql.com/doc/refman/en/charset-database.html
+.. _MySQL: https://dev.mysql.com/doc/refman/en/charset-charsets.html
 
 .. setting:: TEST_COLLATION
 
