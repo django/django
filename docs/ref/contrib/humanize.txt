@@ -71,7 +71,7 @@ Values up to 10^100 (Googol) are supported.
 e.g. with the ``'de'`` language:
 
 * ``1000000`` becomes ``'1,0 Million'``.
-* ``1200000`` becomes ``'1,2 Million'``.
+* ``1200000`` becomes ``'1,2 Millionen'``.
 * ``1200000000`` becomes ``'1,2 Milliarden'``.
 
 .. templatefilter:: naturalday
