@@ -69,9 +69,20 @@ class DatabaseOperations(BaseDatabaseOperations):
         else:
             return "DATE(%s)" % (field_name)
 
+    def _prepare_tzname_delta(self, tzname):
+        if '+' in tzname:
+            return tzname[tzname.find('+'):]
+        elif '-' in tzname:
+            return tzname[tzname.find('-'):]
+        return tzname
+
     def _convert_field_to_tz(self, field_name, tzname):
         if settings.USE_TZ and self.connection.timezone_name != tzname:
-            field_name = "CONVERT_TZ(%s, '%s', '%s')" % (field_name, self.connection.timezone_name, tzname)
+            field_name = "CONVERT_TZ(%s, '%s', '%s')" % (
+                field_name,
+                self.connection.timezone_name,
+                self._prepare_tzname_delta(tzname),
+            )
         return field_name
 
     def datetime_cast_date_sql(self, field_name, tzname):

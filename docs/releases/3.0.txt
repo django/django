@@ -315,6 +315,13 @@ backends.
   ``can_return_ids_from_bulk_insert`` are renamed to
   ``can_return_columns_from_insert`` and ``can_return_rows_from_bulk_insert``.
 
+* Database functions now handle :class:`datetime.timezone` formats when created
+  using :class:`datetime.timedelta` instances (e.g.
+  ``timezone(timedelta(hours=5))``, which would output ``'UTC+05:00'``).
+  Third-party backends should handle this format when preparing
+  :class:`~django.db.models.DateTimeField` in ``datetime_cast_date_sql()``,
+  ``datetime_extract_sql()``, etc.
+
 :mod:`django.contrib.gis`
 -------------------------
 

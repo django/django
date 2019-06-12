@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone as datetime_timezone
 
 import pytz
 
@@ -988,6 +988,8 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
         end_datetime = timezone.make_aware(end_datetime, is_dst=False)
         self.create_model(start_datetime, end_datetime)
         melb = pytz.timezone('Australia/Melbourne')
+        delta_tzinfo_pos = datetime_timezone(timedelta(hours=5))
+        delta_tzinfo_neg = datetime_timezone(timedelta(hours=-5, minutes=17))
 
         qs = DTModel.objects.annotate(
             day=Extract('start_datetime', 'day'),
@@ -999,6 +1001,9 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
             quarter=ExtractQuarter('start_datetime', tzinfo=melb),
             hour=ExtractHour('start_datetime'),
             hour_melb=ExtractHour('start_datetime', tzinfo=melb),
+            hour_with_delta_pos=ExtractHour('start_datetime', tzinfo=delta_tzinfo_pos),
+            hour_with_delta_neg=ExtractHour('start_datetime', tzinfo=delta_tzinfo_neg),
+            minute_with_delta_neg=ExtractMinute('start_datetime', tzinfo=delta_tzinfo_neg),
         ).order_by('start_datetime')
 
         utc_model = qs.get()
@@ -1011,6 +1016,9 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
         self.assertEqual(utc_model.quarter, 2)
         self.assertEqual(utc_model.hour, 23)
         self.assertEqual(utc_model.hour_melb, 9)
+        self.assertEqual(utc_model.hour_with_delta_pos, 4)
+        self.assertEqual(utc_model.hour_with_delta_neg, 18)
+        self.assertEqual(utc_model.minute_with_delta_neg, 47)
 
         with timezone.override(melb):
             melb_model = qs.get()

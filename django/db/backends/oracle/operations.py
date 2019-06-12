@@ -94,6 +94,13 @@ END;
     # This regexp matches all time zone names from the zoneinfo database.
     _tzname_re = re.compile(r'^[\w/:+-]+$')
 
+    def _prepare_tzname_delta(self, tzname):
+        if '+' in tzname:
+            return tzname[tzname.find('+'):]
+        elif '-' in tzname:
+            return tzname[tzname.find('-'):]
+        return tzname
+
     def _convert_field_to_tz(self, field_name, tzname):
         if not settings.USE_TZ:
             return field_name
@@ -106,7 +113,7 @@ END;
             return "CAST((FROM_TZ(%s, '%s') AT TIME ZONE '%s') AS TIMESTAMP)" % (
                 field_name,
                 self.connection.timezone_name,
-                tzname,
+                self._prepare_tzname_delta(tzname),
             )
         return field_name
 
