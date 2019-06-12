@@ -85,6 +85,9 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         # SELECT ST_AsGeoJson("geoapp_city"."point", 5, 3) FROM "geoapp_city"
         # WHERE "geoapp_city"."name" = 'Chicago';
         # Finally, we set every available keyword.
+        # MariaDB doesn't limit the number of decimals in bbox.
+        if mysql and connection.mysql_is_mariadb:
+            chicago_json['bbox'] = [-87.650175, 41.850385, -87.650175, 41.850385]
         self.assertJSONEqual(
             City.objects.annotate(
                 geojson=functions.AsGeoJSON('point', bbox=True, crs=True, precision=5)
