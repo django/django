@@ -36,10 +36,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
     if not isinstance(viewname, str):
         view = viewname
     else:
-        parts = viewname.split(':')
-        parts.reverse()
-        view = parts[0]
-        path = parts[1:]
+        *path, view = viewname.split(':')
 
         if current_app:
             current_path = current_app.split(':')
@@ -50,8 +47,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
         resolved_path = []
         ns_pattern = ''
         ns_converters = {}
-        while path:
-            ns = path.pop()
+        for ns in path:
             current_ns = current_path.pop() if current_path else None
             # Lookup the name to see if it could be an app identifier.
             try:
