@@ -446,7 +446,7 @@ geometry field as a :class:`~django.contrib.gis.measure.Distance` object.
 .. class:: PointOnSurface(expression, **extra)
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_PointOnSurface.html>`__,
-Oracle, SpatiaLite
+MariaDB, Oracle, SpatiaLite
 
 Accepts a single geographic field or expression and returns a ``Point`` geometry
 guaranteed to lie on the surface of the field; otherwise returns ``None``.

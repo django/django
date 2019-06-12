@@ -59,6 +59,7 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
             'Scale', 'SnapToGrid', 'Transform', 'Translate',
         }
         if self.connection.mysql_is_mariadb:
+            unsupported.remove('PointOnSurface')
             unsupported.update({'GeoHash', 'IsValid'})
             if self.connection.mysql_version < (10, 2, 4):
                 unsupported.add('AsGeoJSON')
