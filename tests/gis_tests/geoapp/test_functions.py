@@ -362,31 +362,9 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
 
     @skipUnlessDBFeature("has_PointOnSurface_function")
     def test_point_on_surface(self):
-        # Reference values.
-        if oracle:
-            # SELECT SDO_UTIL.TO_WKTGEOMETRY(SDO_GEOM.SDO_POINTONSURFACE(GEOAPP_COUNTRY.MPOLY, 0.05))
-            # FROM GEOAPP_COUNTRY;
-            ref = {
-                'New Zealand': fromstr('POINT (174.616364 -36.100861)', srid=4326),
-                'Texas': fromstr('POINT (-103.002434 36.500397)', srid=4326),
-            }
-        elif mysql:
-            ref = {
-                'New Zealand': fromstr('POINT (169.030131 -46.678612)', srid=4326),
-                'Texas': fromstr('POINT (-97.383730 25.840117)', srid=4326),
-            }
-        else:
-            # Using GEOSGeometry to compute the reference point on surface values
-            # -- since PostGIS also uses GEOS these should be the same.
-            ref = {
-                'New Zealand': Country.objects.get(name='New Zealand').mpoly.point_on_surface,
-                'Texas': Country.objects.get(name='Texas').mpoly.point_on_surface
-            }
-
         qs = Country.objects.annotate(point_on_surface=functions.PointOnSurface('mpoly'))
         for country in qs:
-            tol = 0.00001  # SpatiaLite might have WKT-translation-related precision issues
-            self.assertTrue(ref[country.name].equals_exact(country.point_on_surface, tol))
+            self.assertTrue(country.mpoly.intersection(country.point_on_surface))
 
     @skipUnlessDBFeature("has_Reverse_function")
     def test_reverse_geom(self):
