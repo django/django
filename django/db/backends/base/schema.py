@@ -1014,18 +1014,21 @@ class BaseDatabaseSchemaEditor:
         return output
 
     def _get_index_type_kwargs(self, model, field):
-        _kwargs = {}
-        if isinstance(field.db_index, Index):
-            if not field.db_index.name:
-                field.db_index.set_name_with_model(model)
-            _kwargs = {
-                'name': field.db_index.name,
-                'condition': field.db_index.condition,
-                'opclasses': field.db_index.opclasses,
-                'db_tablespace': field.db_index.db_tablespace,
-                'suffix': field.db_index.suffix,
-            }
-        return _kwargs
+        if not field.db_index:
+            return {}
+        elif isinstance(field.db_index, bool):
+            index = field.default_index_class(fields=[field.name])
+        else:
+            index = field.db_index
+        if not index.name:
+            index.set_name_with_model(model)
+        return {
+            'name': index.name,
+            'condition': index.condition,
+            'opclasses': index.opclasses,
+            'db_tablespace': index.db_tablespace,
+            'suffix': index.suffix,
+        }
 
     def _field_indexes_sql(self, model, field):
         """

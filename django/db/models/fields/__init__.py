@@ -722,6 +722,11 @@ class Field(RegisterLookupMixin):
         return self._unique or self.primary_key
 
     @property
+    def default_index_class(self):
+        from django.db.models.indexes import Index
+        return Index
+
+    @property
     def db_tablespace(self):
         return self._db_tablespace or settings.DEFAULT_INDEX_TABLESPACE
 
