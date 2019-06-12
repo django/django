@@ -26,7 +26,6 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
     fixtures = ['initial']
 
     def test_asgeojson(self):
-        # Only PostGIS and SpatiaLite support GeoJSON.
         if not connection.features.has_AsGeoJSON_function:
             with self.assertRaises(NotSupportedError):
                 list(Country.objects.annotate(json=functions.AsGeoJSON('mpoly')))
