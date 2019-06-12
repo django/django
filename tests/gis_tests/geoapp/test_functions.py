@@ -370,6 +370,11 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
                 'New Zealand': fromstr('POINT (174.616364 -36.100861)', srid=4326),
                 'Texas': fromstr('POINT (-103.002434 36.500397)', srid=4326),
             }
+        elif mysql:
+            ref = {
+                'New Zealand': fromstr('POINT (169.030131 -46.678612)', srid=4326),
+                'Texas': fromstr('POINT (-97.383730 25.840117)', srid=4326),
+            }
         else:
             # Using GEOSGeometry to compute the reference point on surface values
             # -- since PostGIS also uses GEOS these should be the same.
