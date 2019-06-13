@@ -716,6 +716,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
                 'utf-8',
                 '=?utf-8?q?A_name?= <to@example.com>',
             ),
+            ('localpartonly', 'ascii', 'localpartonly'),
             # ASCII addresses with display names.
             ('A name <to@example.com>', 'ascii', 'A name <to@example.com>'),
             ('A name <to@example.com>', 'utf-8', '=?utf-8?q?A_name?= <to@example.com>'),
