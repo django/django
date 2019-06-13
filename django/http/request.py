@@ -1,3 +1,5 @@
+import cgi
+import codecs
 import copy
 import re
 from io import BytesIO
@@ -68,6 +70,17 @@ class HttpRequest:
     @cached_property
     def headers(self):
         return HttpHeaders(self.META)
+
+    def _set_content_type_params(self, meta):
+        """Set content_type, content_params, and encoding."""
+        self.content_type, self.content_params = cgi.parse_header(meta.get('CONTENT_TYPE', ''))
+        if 'charset' in self.content_params:
+            try:
+                codecs.lookup(self.content_params['charset'])
+            except LookupError:
+                pass
+            else:
+                self.encoding = self.content_params['charset']
 
     def _get_raw_host(self):
         """
