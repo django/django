@@ -28,6 +28,16 @@ option.
     (including ``name``) each time. Instead, specify the ``constraints`` option
     on subclasses directly, providing a unique name for each constraint.
 
+.. admonition:: Validation of Constraints
+
+    In general constraints are **not** checked during ``full_clean()``, and do
+    not raise ``ValidationError``\s. Rather you'll get a database integrity
+    error on ``save()``. ``UniqueConstraint``\s are different in this regard,
+    in that they leverage the existing ``validate_unique()`` logic, and thus
+    enable two-stage validation. In addition to ``IntegrityError`` on
+    ``save()``, ``ValidationError`` is also raised during model validation when
+    the ``UniqueConstraint`` is violated.
+
 ``CheckConstraint``
 ===================
 
