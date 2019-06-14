@@ -73,6 +73,22 @@ class BasicTestCase(TestCase):
         self.assertTrue(super.is_active)
         self.assertTrue(super.is_staff)
 
+    def test_superuser_no_email_or_password(self):
+        cases = [
+            {},
+            {'email': ''},
+            {'email': None},
+            {'password': None},
+        ]
+        for i, kwargs in enumerate(cases):
+            with self.subTest(**kwargs):
+                superuser = User.objects.create_superuser(
+                    'super{}'.format(i),
+                    **kwargs
+                )
+                self.assertEqual(superuser.email, '')
+                self.assertFalse(superuser.has_usable_password())
+
     def test_get_user_model(self):
         "The current user model can be retrieved"
         self.assertEqual(get_user_model(), User)
