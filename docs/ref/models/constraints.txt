@@ -53,6 +53,11 @@ ensures the age field is never less than 18.
 
 The name of the constraint.
 
+.. note::
+
+    The ``ValidationError`` is not raised during model validation when the
+    ``CheckConstraint`` is violated.
+
 ``UniqueConstraint``
 ====================
 
@@ -95,3 +100,8 @@ ensures that each user only has one draft.
 
 These conditions have the same database restrictions as
 :attr:`Index.condition`.
+
+.. note::
+
+    The ``ValidationError`` is raised during model validation when the
+    ``UniqueConstraint`` is violated.
