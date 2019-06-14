@@ -107,7 +107,7 @@ class SimplifiedURLTests(SimpleTestCase):
         self.assertEqual(match.url_name, 'inner-extra')
         self.assertEqual(match.kwargs, {'extra': 'something'})
 
-    def test_path_inclusion_is_reversable(self):
+    def test_path_inclusion_is_reversible(self):
         url = reverse('inner-extra', kwargs={'extra': 'something'})
         self.assertEqual(url, '/included_urls/extra/something/')
 
