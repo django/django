@@ -900,7 +900,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertRedirects(response, reverse('admin:admin_views_readablepizza_changelist'))
         pizza_ctype = ContentType.objects.get_for_model(ReadablePizza, for_concrete_model=False)
         log = LogEntry.objects.filter(content_type=pizza_ctype, object_id=pizza.pk).first()
-        self.assertEqual(log.get_change_message(), 'Changed toppings.')
+        self.assertEqual(log.get_change_message(), 'Changed Toppings.')
 
     def test_allows_attributeerror_to_bubble_up(self):
         """

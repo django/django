@@ -322,6 +322,12 @@ backends.
   :class:`~django.db.models.DateTimeField` in ``datetime_cast_date_sql()``,
   ``datetime_extract_sql()``, etc.
 
+:mod:`django.contrib.admin`
+---------------------------
+
+* Admin's model history change messages now prefers more readable field labels
+  instead of field names.
+
 :mod:`django.contrib.gis`
 -------------------------
 

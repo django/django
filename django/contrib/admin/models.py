@@ -114,7 +114,7 @@ class LogEntry(models.Model):
 
                 elif 'changed' in sub_message:
                     sub_message['changed']['fields'] = get_text_list(
-                        sub_message['changed']['fields'], gettext('and')
+                        [gettext(field_name) for field_name in sub_message['changed']['fields']], gettext('and')
                     )
                     if 'name' in sub_message['changed']:
                         sub_message['changed']['name'] = gettext(sub_message['changed']['name'])
