@@ -282,10 +282,14 @@ Manager methods
 
         See :ref:`Creating users <topics-auth-creating-users>` for example usage.
 
-    .. method:: create_superuser(username, email, password, **extra_fields)
+    .. method:: create_superuser(username, email=None, password=None, **extra_fields)
 
         Same as :meth:`create_user`, but sets :attr:`~models.User.is_staff` and
         :attr:`~models.User.is_superuser` to ``True``.
+
+        .. versionchanged:: 3.0
+
+            The ``email`` and ``password`` parameters were made optional.
 
 ``AnonymousUser`` object
 ========================

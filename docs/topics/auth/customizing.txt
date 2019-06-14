@@ -746,19 +746,16 @@ providing two additional methods:
                 # create user here
                 ...
 
-    .. method:: models.CustomUserManager.create_superuser(*username_field*, password, **other_fields)
+    .. method:: models.CustomUserManager.create_superuser(*username_field*, password=None, **other_fields)
 
         The prototype of ``create_superuser()`` should accept the username
         field, plus all required fields as arguments. For example, if your user
         model uses ``email`` as the username field, and has ``date_of_birth``
         as a required field, then ``create_superuser`` should be defined as::
 
-            def create_superuser(self, email, date_of_birth, password):
+            def create_superuser(self, email, date_of_birth, password=None):
                 # create superuser here
                 ...
-
-        Unlike ``create_user()``, ``create_superuser()`` *must* require the
-        caller to provide a password.
 
 For a :class:`~.ForeignKey` in :attr:`.USERNAME_FIELD` or
 :attr:`.REQUIRED_FIELDS`, these methods receive the value of the
@@ -1044,7 +1041,7 @@ authentication app::
             user.save(using=self._db)
             return user
 
-        def create_superuser(self, email, date_of_birth, password):
+        def create_superuser(self, email, date_of_birth, password=None):
             """
             Creates and saves a superuser with the given email, date of
             birth and password.
