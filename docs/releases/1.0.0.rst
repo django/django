@@ -110,7 +110,7 @@ Delay Server
 
 A built-in delay server, launched with `manage.py rundelay`, now ships if you
 wish to use it. It needs some extra initial setup and uses a database for
-persistance; see :doc:`/delay` for more information.
+persistence; see :doc:`/delay` for more information.
 
 
 Minor Changes

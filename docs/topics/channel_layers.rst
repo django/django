@@ -11,7 +11,7 @@ to make a basic task queue or to offload tasks - read more in
 
 Channels does not ship with any channel layers you can use out of the box, as
 each one depends on a different way of transporting data across a network. We
-would recommend you use ``channels_redis``, which is an offical Django-maintained
+would recommend you use ``channels_redis``, which is an official Django-maintained
 layer that uses Redis as a transport and what we'll focus the examples on here.
 
 .. note::

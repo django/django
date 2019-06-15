@@ -22,7 +22,7 @@ more protocol-specific routing underneath there.
 
 Channels expects you to be able to define a single *root application*, and
 provide the path to it as the ``ASGI_APPLICATION`` setting (think of this as
-being analagous to the ``ROOT_URLCONF`` setting in Django). There's no fixed
+being analogous to the ``ROOT_URLCONF`` setting in Django). There's no fixed
 rule as to where you need to put the routing and the root application,
 but we recommend putting them in a project-level file called ``routing.py``,
 next to ``urls.py``. You can read more about deploying Channels projects and

@@ -145,7 +145,7 @@ Alternative Web Servers
 There are also alternative `ASGI <http://asgi.readthedocs.io>`_ servers
 that you can use for serving Channels.
 
-To some degree ASGI web servers should be interchangable, they should all have
+To some degree ASGI web servers should be interchangeable, they should all have
 the same basic functionality in terms of serving HTTP and WebSocket requests.
 
 Aspects where servers may differ are in their configuration and defaults,
@@ -167,7 +167,7 @@ Nginx/Supervisor (Ubuntu)
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This example sets up a Django site on an Ubuntu server, using Nginx as the
-main webserver and supervisord to run and manage Daphne. 
+main webserver and supervisord to run and manage Daphne.
 
 First, install Nginx and Supervisor::
 

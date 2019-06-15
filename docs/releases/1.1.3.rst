@@ -17,7 +17,7 @@ Minor Changes & Bugfixes
 * ``enforce_ordering`` now works correctly with the new-style process-specific
   channels
 
-* ASGI channel layer versions are now explicitly checked for version compatability
+* ASGI channel layer versions are now explicitly checked for version compatibility
 
 
 Backwards Incompatible Changes

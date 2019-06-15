@@ -22,7 +22,7 @@ Apologies if this comes off as harsh, but please understand that open source mai
 of time, and if we answered all the issues and support requests there would be no time left to actually work on the code
 itself!
 
-Making bugs reproducable
+Making bugs reproducible
 ------------------------
 
 If you're struggling with an issue that only happens in a production environment and can't get it to reproduce locally
@@ -65,7 +65,7 @@ General support request
     Sorry, but we can't help out with general support requests here - the issue tracker is for reproduceable bugs and
     concrete feature requests only! Please see our support documentation (http://channels.readthedocs.io/en/latest/support.html)
     for more information about where you can get general help.
-    
+
 Non-specific bug/"It doesn't work!"
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -75,11 +75,11 @@ Non-specific bug/"It doesn't work!"
     environment, as they may not be problems in the project itself. Our support documentation
     (http://channels.readthedocs.io/en/latest/support.html) has details about how to take this sort of problem, diagnose it,
     and either fix it yourself, get help from the community, or make it into an actionable issue that we can handle.
-    
+
     Sorry we have to direct you away like this, but we get a lot of support requests every week. If you can reduce the problem
     to a clear set of steps to reproduce or an example project that fails in a fresh environment, please re-open the ticket
     with that information.
-    
+
 Problem in application code
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

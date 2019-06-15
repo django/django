@@ -168,7 +168,7 @@ https://channels.readthedocs.io/en/latest/releases
 * ``enforce_ordering`` now works correctly with the new-style process-specific
   channels
 
-* ASGI channel layer versions are now explicitly checked for version compatability
+* ASGI channel layer versions are now explicitly checked for version compatibility
 
 
 1.1.2 (2017-04-01)
