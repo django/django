@@ -582,3 +582,51 @@ def all_valid(formsets):
     """Validate every formset and return True if all are valid."""
     # List comprehension ensures is_valid() is called for all formsets.
     return all([formset.is_valid() for formset in formsets])
+
+# Declarative FormSet ################################
+
+
+class FormSetMeta(type):
+    """
+    Meta class for creating formsets using Declarative Syntax.
+    """
+
+    def __new__(cls, name, bases, attrs):
+        """
+        Initialize the attributes given to the FormSet class and adds the
+        missing required argument and sets them to default values.
+        """
+        if attrs.get("min_num") is None:
+            attrs["min_num"] = DEFAULT_MIN_NUM
+        if attrs.get("max_num") is None:
+            attrs["max_num"] = DEFAULT_MAX_NUM
+
+        default_attrs = {
+            'form': attrs.get('form') or None,
+            'extra': 1,
+            'can_order': False,
+            'can_delete': False,
+            'min_num': DEFAULT_MIN_NUM,
+            'max_num': DEFAULT_MAX_NUM,
+            'absolute_max': attrs["max_num"] + DEFAULT_MAX_NUM,
+            'validate_min': False,
+            'validate_max': False,
+        }
+
+        for key, value in default_attrs.items():
+            if key not in attrs.keys():
+                attrs.update({key: value})
+
+        new_class = super(FormSetMeta, cls).__new__(cls, name, bases, attrs)
+        return new_class
+
+
+class FormSet(BaseFormSet, metaclass=FormSetMeta):
+    """
+    Base class for which can be used to create formset classes
+    """
+    form = None
+
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, form_kwargs=None):
+        super().__init__(data, files, auto_id, prefix, initial, error_class, form_kwargs)

@@ -10,9 +10,9 @@ from django.forms.formsets import formset_factory
 from django.forms.models import (
     BaseModelFormSet,
     ModelForm,
-    _get_foreign_key,
-    inlineformset_factory,
-    modelformset_factory,
+    InlineFormSet, ModelFormSet, _get_foreign_key,
+   
+    inlineformset_factory, modelformset_factory,
 )
 from django.forms.renderers import DjangoTemplates
 from django.http import QueryDict
@@ -49,8 +49,14 @@ from .models import (
 
 
 class DeletionTests(TestCase):
+    def make_model_formset(self):
+        return modelformset_factory(Poet, fields="__all__", can_delete=True)
+
+    def make_inline_formset(self):
+        return inlineformset_factory(Poet, Poem, fields="__all__", can_delete=True)
+
     def test_deletion(self):
-        PoetFormSet = modelformset_factory(Poet, fields="__all__", can_delete=True)
+        PoetFormSet = self.make_model_formset()
         poet = Poet.objects.create(name="test")
         data = {
             "form-TOTAL_FORMS": "1",
@@ -73,7 +79,7 @@ class DeletionTests(TestCase):
         Make sure that an add form that is filled out, but marked for deletion
         doesn't cause validation errors.
         """
-        PoetFormSet = modelformset_factory(Poet, fields="__all__", can_delete=True)
+        PoetFormSet = self.make_model_formset()
         poet = Poet.objects.create(name="test")
         # One existing untouched and two new unvalid forms
         data = {
@@ -107,7 +113,7 @@ class DeletionTests(TestCase):
         Make sure that a change form that is filled out, but marked for
         deletion doesn't cause validation errors.
         """
-        PoetFormSet = modelformset_factory(Poet, fields="__all__", can_delete=True)
+        PoetFormSet = self.make_model_formset()
         poet = Poet.objects.create(name="test")
         data = {
             "form-TOTAL_FORMS": "1",
@@ -133,9 +139,7 @@ class DeletionTests(TestCase):
         poet = Poet.objects.create(name="test")
         poem = Poem.objects.create(name="Brevity is the soul of wit", poet=poet)
 
-        PoemFormSet = inlineformset_factory(
-            Poet, Poem, fields="__all__", can_delete=True
-        )
+        PoemFormSet = self.make_inline_formset()
 
         # Simulate deletion of an object that doesn't exist in the database
         data = {
@@ -161,6 +165,25 @@ class DeletionTests(TestCase):
         self.assertFalse(Poem.objects.filter(pk=poem.pk + 1).exists())
 
 
+class DeclarativeDeletionTests(DeletionTests):
+    class DeclarativePostFormSet(ModelFormSet):
+        model = Post
+        fields = "__all__"
+        can_delete = True
+
+    class DeclarativeInlinePostFormSet(InlineFormSet):
+        parent_model = Poet
+        model = Poem
+        fields = "__all__"
+        can_delete = True
+
+    def make_model_formset(self):
+        return self.DeclarativePostFormSet
+
+    def make_inline_formset(self):
+        return self.DeclarativeInlinePostFormSet
+
+
 class ModelFormsetTest(TestCase):
     def test_modelformset_factory_without_fields(self):
         """Regression for #19733"""
@@ -171,9 +194,12 @@ class ModelFormsetTest(TestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, message):
             modelformset_factory(Author)
 
+    def make_model_formset(self, model, **kwargs):
+        return modelformset_factory(model, **kwargs)
+
     def test_simple_save(self):
         qs = Author.objects.all()
-        AuthorFormSet = modelformset_factory(Author, fields="__all__", extra=3)
+        AuthorFormSet = self.make_model_formset(Author, fields="__all__", extra=3)
 
         formset = AuthorFormSet(queryset=qs)
         self.assertEqual(len(formset.forms), 3)
@@ -279,7 +305,7 @@ class ModelFormsetTest(TestCase):
         # marked for deletion, make sure we don't save that form.
 
         qs = Author.objects.order_by("name")
-        AuthorFormSet = modelformset_factory(
+        AuthorFormSet = self.make_model_formset(
             Author, fields="__all__", extra=1, can_delete=True
         )
 
@@ -387,7 +413,7 @@ class ModelFormsetTest(TestCase):
 
         author4 = Author.objects.create(name="John Steinbeck")
 
-        AuthorMeetingFormSet = modelformset_factory(
+        AuthorMeetingFormSet = self.make_model_formset(
             AuthorMeeting, fields="__all__", extra=1, can_delete=True
         )
         data = {
@@ -425,36 +451,36 @@ class ModelFormsetTest(TestCase):
 
         qs = Author.objects.order_by("name")
 
-        AuthorFormSet = modelformset_factory(
+        AuthorFormSet = self.make_model_formset(
             Author, fields="__all__", max_num=None, extra=3
         )
         formset = AuthorFormSet(queryset=qs)
         self.assertEqual(len(formset.forms), 6)
         self.assertEqual(len(formset.extra_forms), 3)
 
-        AuthorFormSet = modelformset_factory(
+        AuthorFormSet = self.make_model_formset(
             Author, fields="__all__", max_num=4, extra=3
         )
         formset = AuthorFormSet(queryset=qs)
         self.assertEqual(len(formset.forms), 4)
         self.assertEqual(len(formset.extra_forms), 1)
 
-        AuthorFormSet = modelformset_factory(
+        AuthorFormSet = self.make_model_formset(
             Author, fields="__all__", max_num=0, extra=3
         )
         formset = AuthorFormSet(queryset=qs)
         self.assertEqual(len(formset.forms), 3)
         self.assertEqual(len(formset.extra_forms), 0)
 
-        AuthorFormSet = modelformset_factory(Author, fields="__all__", max_num=None)
+        AuthorFormSet = self.make_model_formset(Author, fields="__all__", max_num=None)
         formset = AuthorFormSet(queryset=qs)
         self.assertSequenceEqual(formset.get_queryset(), [a1, a2, a3])
 
-        AuthorFormSet = modelformset_factory(Author, fields="__all__", max_num=0)
+        AuthorFormSet = self.make_model_formset(Author, fields="__all__", max_num=0)
         formset = AuthorFormSet(queryset=qs)
         self.assertSequenceEqual(formset.get_queryset(), [a1, a2, a3])
 
-        AuthorFormSet = modelformset_factory(Author, fields="__all__", max_num=4)
+        AuthorFormSet = self.make_model_formset(Author, fields="__all__", max_num=4)
         formset = AuthorFormSet(queryset=qs)
         self.assertSequenceEqual(formset.get_queryset(), [a1, a2, a3])
 
@@ -463,17 +489,17 @@ class ModelFormsetTest(TestCase):
         # added to extra.
         qs = Author.objects.none()
 
-        AuthorFormSet = modelformset_factory(Author, fields="__all__", extra=0)
+        AuthorFormSet = self.make_model_formset(Author, fields="__all__", extra=0)
         formset = AuthorFormSet(queryset=qs)
         self.assertEqual(len(formset.forms), 0)
 
-        AuthorFormSet = modelformset_factory(
+        AuthorFormSet = self.make_model_formset(
             Author, fields="__all__", min_num=1, extra=0
         )
         formset = AuthorFormSet(queryset=qs)
         self.assertEqual(len(formset.forms), 1)
 
-        AuthorFormSet = modelformset_factory(
+        AuthorFormSet = self.make_model_formset(
             Author, fields="__all__", min_num=1, extra=1
         )
         formset = AuthorFormSet(queryset=qs)
@@ -484,7 +510,7 @@ class ModelFormsetTest(TestCase):
         Author.objects.create(name="Charles Baudelaire")
         qs = Author.objects.all()
 
-        AuthorFormSet = modelformset_factory(
+        AuthorFormSet = self.make_model_formset(
             Author, fields="__all__", extra=0, min_num=1
         )
         formset = AuthorFormSet(queryset=qs)
@@ -500,7 +526,7 @@ class ModelFormsetTest(TestCase):
                     author.save()
                 return author
 
-        PoetFormSet = modelformset_factory(Poet, fields="__all__", form=PoetForm)
+        PoetFormSet = self.make_model_formset(Poet, fields="__all__", form=PoetForm)
 
         data = {
             "form-TOTAL_FORMS": "3",  # the number of forms rendered
@@ -537,11 +563,11 @@ class ModelFormsetTest(TestCase):
                 model = Post
                 exclude = ("subtitle",)
 
-        PostFormSet = modelformset_factory(Post, form=PostForm1)
+        PostFormSet = self.make_model_formset(Post, form=PostForm1)
         formset = PostFormSet()
         self.assertNotIn("subtitle", formset.forms[0].fields)
 
-        PostFormSet = modelformset_factory(Post, form=PostForm2)
+        PostFormSet = self.make_model_formset(Post, form=PostForm2)
         formset = PostFormSet()
         self.assertNotIn("subtitle", formset.forms[0].fields)
 
@@ -557,14 +583,14 @@ class ModelFormsetTest(TestCase):
                 super().__init__(*args, **kwargs)
                 self.queryset = Author.objects.filter(name__startswith="Charles")
 
-        AuthorFormSet = modelformset_factory(
+        AuthorFormSet = self.make_model_formset(
             Author, fields="__all__", formset=BaseAuthorFormSet
         )
         formset = AuthorFormSet()
         self.assertEqual(len(formset.get_queryset()), 1)
 
     def test_model_inheritance(self):
-        BetterAuthorFormSet = modelformset_factory(BetterAuthor, fields="__all__")
+        BetterAuthorFormSet = self.make_model_formset(BetterAuthor, fields="__all__")
         formset = BetterAuthorFormSet()
         self.assertEqual(len(formset.forms), 1)
         self.assertHTMLEqual(
@@ -1145,7 +1171,7 @@ class ModelFormsetTest(TestCase):
     def test_custom_pk(self):
         # We need to ensure that it is displayed
 
-        CustomPrimaryKeyFormSet = modelformset_factory(
+        CustomPrimaryKeyFormSet = self.make_model_formset(
             CustomPrimaryKey, fields="__all__"
         )
         formset = CustomPrimaryKeyFormSet()
@@ -1261,7 +1287,7 @@ class ModelFormsetTest(TestCase):
 
         # A custom primary key that is a ForeignKey or OneToOneField get
         # rendered for the user to choose.
-        FormSet = modelformset_factory(OwnerProfile, fields="__all__")
+        FormSet = self.make_model_formset(OwnerProfile, fields="__all__")
         formset = FormSet()
         self.assertHTMLEqual(
             formset.forms[0].as_p(),
@@ -1367,7 +1393,7 @@ class ModelFormsetTest(TestCase):
         )
 
     def test_unique_validation(self):
-        FormSet = modelformset_factory(Product, fields="__all__", extra=1)
+        FormSet = self.make_model_formset(Product, fields="__all__", extra=1)
         data = {
             "form-TOTAL_FORMS": "1",
             "form-INITIAL_FORMS": "0",
@@ -1409,7 +1435,7 @@ class ModelFormsetTest(TestCase):
             "form-1-quantity": "2",
         }
 
-        FormSet = modelformset_factory(
+        FormSet = self.make_model_formset(
             Price, fields="__all__", extra=1, max_num=1, validate_max=True
         )
         formset = FormSet(data)
@@ -1418,7 +1444,7 @@ class ModelFormsetTest(TestCase):
 
         # Now test the same thing without the validate_max flag to ensure
         # default behavior is unchanged
-        FormSet = modelformset_factory(Price, fields="__all__", extra=1, max_num=1)
+        FormSet = self.make_model_formset(Price, fields="__all__", extra=1, max_num=1)
         formset = FormSet(data)
         self.assertTrue(formset.is_valid())
 
@@ -1465,7 +1491,7 @@ class ModelFormsetTest(TestCase):
         self.assertEqual(formset.non_form_errors(), ["Please submit at least 2 forms."])
 
     def test_unique_together_validation(self):
-        FormSet = modelformset_factory(Price, fields="__all__", extra=1)
+        FormSet = self.make_model_formset(Price, fields="__all__", extra=1)
         data = {
             "form-TOTAL_FORMS": "1",
             "form-INITIAL_FORMS": "0",
@@ -1732,9 +1758,9 @@ class ModelFormsetTest(TestCase):
         )
 
     def test_model_formset_with_custom_pk(self):
-        # a formset for a Model that has a custom primary key that still needs
-        # to be added to the formset automatically
-        FormSet = modelformset_factory(
+        # a formset for a Model that has a custom primary key that still needs to be
+        # added to the formset automatically
+        FormSet = self.make_model_formset(
             ClassyMexicanRestaurant, fields=["tacos_are_yummy"]
         )
         self.assertEqual(
@@ -1744,7 +1770,7 @@ class ModelFormsetTest(TestCase):
     def test_model_formset_with_initial_model_instance(self):
         # has_changed should compare model instance and primary key
         # see #18898
-        FormSet = modelformset_factory(Poem, fields="__all__")
+        FormSet = self.make_model_formset(Poem, fields="__all__")
         john_milton = Poet(name="John Milton")
         john_milton.save()
         data = {
@@ -1760,7 +1786,7 @@ class ModelFormsetTest(TestCase):
     def test_model_formset_with_initial_queryset(self):
         # has_changed should work with queryset and list of pk's
         # see #18898
-        FormSet = modelformset_factory(AuthorMeeting, fields="__all__")
+        FormSet = self.make_model_formset(AuthorMeeting, fields="__all__")
         Author.objects.create(pk=1, name="Charles Baudelaire")
         data = {
             "form-TOTAL_FORMS": 1,
@@ -1774,7 +1800,7 @@ class ModelFormsetTest(TestCase):
         self.assertFalse(formset.extra_forms[0].has_changed())
 
     def test_prevent_duplicates_from_with_the_same_formset(self):
-        FormSet = modelformset_factory(Product, fields="__all__", extra=2)
+        FormSet = self.make_model_formset(Product, fields="__all__", extra=2)
         data = {
             "form-TOTAL_FORMS": 2,
             "form-INITIAL_FORMS": 0,
@@ -1788,7 +1814,7 @@ class ModelFormsetTest(TestCase):
             formset._non_form_errors, ["Please correct the duplicate data for slug."]
         )
 
-        FormSet = modelformset_factory(Price, fields="__all__", extra=2)
+        FormSet = self.make_model_formset(Price, fields="__all__", extra=2)
         data = {
             "form-TOTAL_FORMS": 2,
             "form-INITIAL_FORMS": 0,
@@ -1811,7 +1837,7 @@ class ModelFormsetTest(TestCase):
         # Only the price field is specified, this should skip any unique
         # checks since the unique_together is not fulfilled. This will fail
         # with a KeyError if broken.
-        FormSet = modelformset_factory(Price, fields=("price",), extra=2)
+        FormSet = self.make_model_formset(Price, fields=("price",), extra=2)
         data = {
             "form-TOTAL_FORMS": "2",
             "form-INITIAL_FORMS": "0",
@@ -1850,7 +1876,7 @@ class ModelFormsetTest(TestCase):
             [{}, {"__all__": ["Please correct the duplicate values below."]}],
         )
 
-        FormSet = modelformset_factory(Post, fields="__all__", extra=2)
+        FormSet = self.make_model_formset(Post, fields="__all__", extra=2)
         data = {
             "form-TOTAL_FORMS": "2",
             "form-INITIAL_FORMS": "0",
@@ -1927,7 +1953,7 @@ class ModelFormsetTest(TestCase):
     def test_prevent_change_outer_model_and_create_invalid_data(self):
         author = Author.objects.create(name="Charles")
         other_author = Author.objects.create(name="Walt")
-        AuthorFormSet = modelformset_factory(Author, fields="__all__")
+        AuthorFormSet = self.make_model_formset(Author, fields="__all__")
         data = {
             "form-TOTAL_FORMS": "2",
             "form-INITIAL_FORMS": "2",
@@ -1949,7 +1975,7 @@ class ModelFormsetTest(TestCase):
         self.assertSequenceEqual(Author.objects.all(), [author, other_author])
 
     def test_validation_without_id(self):
-        AuthorFormSet = modelformset_factory(Author, fields="__all__")
+        AuthorFormSet = self.make_model_formset(Author, fields="__all__")
         data = {
             "form-TOTAL_FORMS": "1",
             "form-INITIAL_FORMS": "1",
@@ -1963,7 +1989,7 @@ class ModelFormsetTest(TestCase):
         )
 
     def test_validation_with_child_model_without_id(self):
-        BetterAuthorFormSet = modelformset_factory(BetterAuthor, fields="__all__")
+        BetterAuthorFormSet = self.make_model_formset(BetterAuthor, fields="__all__")
         data = {
             "form-TOTAL_FORMS": "1",
             "form-INITIAL_FORMS": "1",
@@ -1978,7 +2004,7 @@ class ModelFormsetTest(TestCase):
         )
 
     def test_validation_with_invalid_id(self):
-        AuthorFormSet = modelformset_factory(Author, fields="__all__")
+        AuthorFormSet = self.make_model_formset(Author, fields="__all__")
         data = {
             "form-TOTAL_FORMS": "1",
             "form-INITIAL_FORMS": "1",
@@ -2000,7 +2026,7 @@ class ModelFormsetTest(TestCase):
         )
 
     def test_validation_with_nonexistent_id(self):
-        AuthorFormSet = modelformset_factory(Author, fields="__all__")
+        AuthorFormSet = self.make_model_formset(Author, fields="__all__")
         data = {
             "form-TOTAL_FORMS": "1",
             "form-INITIAL_FORMS": "1",
@@ -2028,7 +2054,7 @@ class ModelFormsetTest(TestCase):
 
     def test_edit_only(self):
         charles = Author.objects.create(name="Charles Baudelaire")
-        AuthorFormSet = modelformset_factory(Author, fields="__all__", edit_only=True)
+        AuthorFormSet = self.make_model_formset(Author, fields="__all__", edit_only=True)
         data = {
             "form-TOTAL_FORMS": "2",
             "form-INITIAL_FORMS": "0",
@@ -2126,6 +2152,37 @@ class ModelFormsetTest(TestCase):
         charles.refresh_from_db()
         self.assertEqual(charles.name, "Shawn Dong")
         self.assertEqual(Author.objects.count(), 2)
+
+
+class DeclarativeModelFormSetTest (ModelFormsetTest):
+
+    def test_modelformset_factory_without_fields(self):
+        """ Regression for #19733 """
+
+        with self.assertRaises(ImproperlyConfigured):
+            type("AuthorFormSet", (ModelFormSet,), {"model": Author})
+
+    def make_model_formset(self, model, **kwargs):
+        DeclarativeModelFormSet = type("DeclarativeModelFormSet", (ModelFormSet,), {"model": model, **kwargs})
+        return DeclarativeModelFormSet
+
+    def test_custom_queryset_init(self):
+        """
+        A queryset can be overridden in the formset's __init__() method.
+        """
+        Author.objects.create(name='Charles Baudelaire')
+        Author.objects.create(name='Paul Verlaine')
+
+        class AuthorFormSet(ModelFormSet):
+            model = Author
+            fields = "__all__"
+
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                self.queryset = Author.objects.filter(name__startswith='Charles')
+
+        formset = AuthorFormSet()
+        self.assertEqual(len(formset.get_queryset()), 1)
 
 
 class TestModelFormsetOverridesTroughFormMeta(TestCase):
