@@ -10,6 +10,7 @@ pylibmc; sys.platform != 'win32'
 python-memcached >= 1.59
 pytz
 pywatchman; sys.platform != 'win32'
+watchdog
 PyYAML
 selenium
 sqlparse
