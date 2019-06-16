@@ -12,6 +12,7 @@ import traceback
 import weakref
 from collections import defaultdict
 from pathlib import Path
+from queue import Queue, Empty
 from types import ModuleType
 from zipimport import zipimporter
 
@@ -39,11 +40,15 @@ try:
 except ImportError:
     termios = None
 
-
 try:
     import pywatchman
 except ImportError:
     pywatchman = None
+
+try:
+    import watchdog
+except ImportError:
+    watchdog = None
 
 
 def check_errors(fn):
@@ -366,6 +371,59 @@ class StatReloader(BaseReloader):
         return True
 
 
+class WatchdogReloader(BaseReloader):
+    QUEUE_WAIT_TIME = 1
+
+    def tick(self):
+        from watchdog.events import FileSystemEventHandler
+        from watchdog.observers import Observer
+
+        watched_files = self.watched_files
+
+        event_queue = Queue()
+
+        class EventHandler(FileSystemEventHandler):
+            def check_file(self, event_file):
+                event_file = Path(event_file)
+                for path in watched_files(include_globs=True):
+                    if path == event_file:
+                        return event_queue.put(path)
+
+            def on_moved(self, event):
+                self.check_file(event.src_path)
+                self.check_file(event.dest_path)
+
+            def on_created(self, event):
+                self.check_file(event.src_path)
+
+            def on_deleted(self, event):
+                self.check_file(event.src_path)
+
+            def on_modified(self, event):
+                if event.is_directory:
+                    return
+                self.check_file(event.src_path)
+
+        observer = Observer()
+        handler = EventHandler()
+
+        for path in common_roots(p.parent for p in self.watched_files(include_globs=True)):
+            observer.schedule(handler, str(path), recursive=True)
+        observer.start()
+        while True:
+            try:
+                changed = event_queue.get(timeout=self.QUEUE_WAIT_TIME)
+            except Empty:
+                pass
+            else:
+                self.notify_file_changed(changed)
+            yield
+
+    @classmethod
+    def check_availability(cls):
+        return watchdog is not None
+
+
 class WatchmanUnavailable(RuntimeError):
     pass
 
@@ -556,6 +614,9 @@ class WatchmanReloader(BaseReloader):
 
 def get_reloader():
     """Return the most suitable reloader for this environment."""
+    if WatchdogReloader.check_availability():
+        return WatchdogReloader()
+
     try:
         WatchmanReloader.check_availability()
     except WatchmanUnavailable:

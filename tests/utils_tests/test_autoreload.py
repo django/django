@@ -686,3 +686,11 @@ class StatReloaderTests(ReloaderTests, IntegrationTests):
             snapshot = list(self.reloader.snapshot_files())
             self.assertEqual(len(snapshot), 1)
             self.assertEqual(snapshot[0][0], self.existing_file)
+
+
+class WatchdogReloaderTests(ReloaderTests, IntegrationTests):
+    RELOADER_CLS = autoreload.WatchdogReloader
+
+    def setUp(self):
+        super().setUp()
+        self.reloader.QUEUE_WAIT_TIME = 0.1
