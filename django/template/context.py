@@ -226,8 +226,6 @@ class RequestContext(Context):
         self._processors_index = len(self.dicts)
 
         # placeholder for context processors output
-        self.update({})
-
         # empty dict for any new modifications
         # (so that context processors don't overwrite them)
         self.update({})
