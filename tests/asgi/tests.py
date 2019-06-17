@@ -1,3 +1,4 @@
+import asyncio
 import sys
 
 from asgiref.sync import async_to_sync
@@ -82,3 +83,85 @@ class ASGITest(SimpleTestCase):
         response_body = await communicator.receive_output()
         self.assertEqual(response_body['type'], 'http.response.body')
         self.assertEqual(response_body['body'], test_file_contents)
+
+    @async_to_sync
+    async def test_headers(self):
+        application = get_asgi_application()
+        communicator = ApplicationCommunicator(
+            application,
+            self._get_scope(
+                path='/meta/',
+                headers=[
+                    [b'content-type', b'text/plain; charset=utf-8'],
+                    [b'content-length', b'77'],
+                    [b'referer', b'Scotland'],
+                    [b'referer', b'Wales'],
+                ],
+            ),
+        )
+        await communicator.send_input({'type': 'http.request'})
+        response_start = await communicator.receive_output()
+        self.assertEqual(response_start['type'], 'http.response.start')
+        self.assertEqual(response_start['status'], 200)
+        self.assertEqual(
+            set(response_start['headers']),
+            {
+                (b'Content-Length', b'19'),
+                (b'Content-Type', b'text/plain; charset=utf-8'),
+            },
+        )
+        response_body = await communicator.receive_output()
+        self.assertEqual(response_body['type'], 'http.response.body')
+        self.assertEqual(response_body['body'], b'From Scotland,Wales')
+
+    @async_to_sync
+    async def test_get_query_string(self):
+        application = get_asgi_application()
+        for query_string in (b'name=Andrew', 'name=Andrew'):
+            with self.subTest(query_string=query_string):
+                communicator = ApplicationCommunicator(
+                    application,
+                    self._get_scope(path='/', query_string=query_string),
+                )
+                await communicator.send_input({'type': 'http.request'})
+                response_start = await communicator.receive_output()
+                self.assertEqual(response_start['type'], 'http.response.start')
+                self.assertEqual(response_start['status'], 200)
+                response_body = await communicator.receive_output()
+                self.assertEqual(response_body['type'], 'http.response.body')
+                self.assertEqual(response_body['body'], b'Hello Andrew!')
+
+    @async_to_sync
+    async def test_disconnect(self):
+        application = get_asgi_application()
+        communicator = ApplicationCommunicator(application, self._get_scope(path='/'))
+        await communicator.send_input({'type': 'http.disconnect'})
+        with self.assertRaises(asyncio.TimeoutError):
+            await communicator.receive_output()
+
+    @async_to_sync
+    async def test_wrong_connection_type(self):
+        application = get_asgi_application()
+        communicator = ApplicationCommunicator(
+            application,
+            self._get_scope(path='/', type='other'),
+        )
+        await communicator.send_input({'type': 'http.request'})
+        msg = 'Django can only handle ASGI/HTTP connections, not other.'
+        with self.assertRaisesMessage(ValueError, msg):
+            await communicator.receive_output()
+
+    @async_to_sync
+    async def test_non_unicode_query_string(self):
+        application = get_asgi_application()
+        communicator = ApplicationCommunicator(
+            application,
+            self._get_scope(path='/', query_string=b'\xff'),
+        )
+        await communicator.send_input({'type': 'http.request'})
+        response_start = await communicator.receive_output()
+        self.assertEqual(response_start['type'], 'http.response.start')
+        self.assertEqual(response_start['status'], 400)
+        response_body = await communicator.receive_output()
+        self.assertEqual(response_body['type'], 'http.response.body')
+        self.assertEqual(response_body['body'], b'')

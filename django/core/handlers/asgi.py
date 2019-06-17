@@ -143,7 +143,7 @@ class ASGIHandler(base.BaseHandler):
         # FIXME: Allow to override this.
         if scope['type'] != 'http':
             raise ValueError(
-                'Django can only handle ASGI/HTTP connections, not %s'
+                'Django can only handle ASGI/HTTP connections, not %s.'
                 % scope['type']
             )
         # Receive the HTTP request body as a stream object.
