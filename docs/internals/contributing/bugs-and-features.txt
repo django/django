@@ -46,13 +46,13 @@ particular:
   include a clear, concise description of the problem, and a set of
   instructions for replicating it. Add as much debug information as you can:
   code snippets, test cases, exception backtraces, screenshots, etc. A nice
-  small test case is the best way to report a bug, as it gives us an easy
-  way to confirm the bug quickly.
+  small test case is the best way to report a bug, as it gives us a
+  helpful way to confirm the bug quickly.
 
-* **Don't** post to |django-developers| just to announce that you have
-  filed a bug report. All the tickets are mailed to another list,
-  |django-updates|, which is tracked by developers and interested
-  community members; we see them as they are filed.
+* **Don't** post to |django-developers| only to announce that you have filed a
+  bug report. All the tickets are mailed to another list, |django-updates|,
+  which is tracked by developers and interested community members; we see them
+  as they are filed.
 
 To understand the lifecycle of your ticket once you have created it, refer to
 :doc:`triaging-tickets`.
@@ -116,8 +116,8 @@ ticket description.
 
 As with most open-source projects, code talks. If you are willing to write the
 code for the feature yourself or, even better, if you've already written it,
-it's much more likely to be accepted. Just fork Django on GitHub, create a
-feature branch, and show us your work!
+it's much more likely to be accepted. Fork Django on GitHub, create a feature
+branch, and show us your work!
 
 See also: :ref:`documenting-new-features`.
 

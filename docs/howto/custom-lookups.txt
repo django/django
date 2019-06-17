@@ -9,10 +9,10 @@ filtering (for example, ``exact`` and ``icontains``). This documentation
 explains how to write custom lookups and how to alter the working of existing
 lookups. For the API references of lookups, see the :doc:`/ref/models/lookups`.
 
-A simple lookup example
-=======================
+A lookup example
+================
 
-Let's start with a simple custom lookup. We will write a custom lookup ``ne``
+Let's start with a small custom lookup. We will write a custom lookup ``ne``
 which works opposite to ``exact``. ``Author.objects.filter(name__ne='Jack')``
 will translate to the SQL:
 
@@ -24,8 +24,7 @@ This SQL is backend independent, so we don't need to worry about different
 databases.
 
 There are two steps to making this work. Firstly we need to implement the
-lookup, then we need to tell Django about it. The implementation is quite
-straightforward::
+lookup, then we need to tell Django about it::
 
   from django.db.models import Lookup
 
@@ -38,10 +37,10 @@ straightforward::
           params = lhs_params + rhs_params
           return '%s <> %s' % (lhs, rhs), params
 
-To register the ``NotEqual`` lookup we will just need to call
-``register_lookup`` on the field class we want the lookup to be available. In
-this case, the lookup makes sense on all ``Field`` subclasses, so we register
-it with ``Field`` directly::
+To register the ``NotEqual`` lookup we will need to call ``register_lookup`` on
+the field class we want the lookup to be available for. In this case, the lookup
+makes sense on all ``Field`` subclasses, so we register it with ``Field``
+directly::
 
   from django.db.models.fields import Field
   Field.register_lookup(NotEqual)
@@ -94,8 +93,8 @@ Finally we combine the parts into an SQL expression with ``<>``, and supply all
 the parameters for the query. We then return a tuple containing the generated
 SQL string and the parameters.
 
-A simple transformer example
-============================
+A transformer example
+=====================
 
 The custom lookup above is great, but in some cases you may want to be able to
 chain lookups together. For example, let's suppose we are building an
@@ -241,10 +240,10 @@ want the transformation to be applied to both the left-hand side and the
 right-hand side. For instance, if you want to filter a queryset based on the
 equality of the left and right-hand side insensitively to some SQL function.
 
-Let's examine the simple example of case-insensitive transformation here. This
-transformation isn't very useful in practice as Django already comes with a bunch
-of built-in case-insensitive lookups, but it will be a nice demonstration of
-bilateral transformations in a database-agnostic way.
+Let's examine case-insensitive transformations here. This transformation isn't
+very useful in practice as Django already comes with a bunch of built-in
+case-insensitive lookups, but it will be a nice demonstration of bilateral
+transformations in a database-agnostic way.
 
 We define an ``UpperCase`` transformer which uses the SQL function ``UPPER()`` to
 transform the values before comparison. We define

@@ -39,7 +39,7 @@ totally fine with GeoDjango. Your mileage may vary.
 
     The GeoDjango interfaces to GEOS, GDAL, and GeoIP may be used
     independently of Django.  In other words, no database or settings file
-    required -- just import them as normal from :mod:`django.contrib.gis`.
+    required -- import them as normal from :mod:`django.contrib.gis`.
 
 .. _PROJ.4: https://github.com/OSGeo/proj.4/wiki/
 __ https://postgis.net/

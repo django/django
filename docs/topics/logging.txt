@@ -122,7 +122,7 @@ Using logging
 
 Once you have configured your loggers, handlers, filters and
 formatters, you need to place logging calls into your code. Using the
-logging framework is very simple. Here's an example::
+logging framework works like this::
 
     # import the logging library
     import logging
@@ -239,7 +239,7 @@ The full documentation for :ref:`dictConfig format <logging-config-dictschema>`
 is the best source of information about logging configuration dictionaries.
 However, to give you a taste of what is possible, here are several examples.
 
-First, here's a simple configuration which writes all logging from the
+First, here's a configuration which writes all logging from the
 :ref:`django-logger` logger to a local file::
 
   .. code-block:: python
@@ -363,8 +363,8 @@ This logging configuration does the following things:
 
 * Defines two formatters:
 
-  * ``simple``, that just outputs the log level name (e.g.,
-    ``DEBUG``) and the log message.
+  * ``simple``, that outputs the log level name (e.g., ``DEBUG``) and the log
+    message.
 
     The ``format`` string is a normal Python formatting string
     describing the details that are to be output on each logging

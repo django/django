@@ -46,8 +46,8 @@ return model instances:
 
 This method takes a raw SQL query, executes it, and returns a
 ``django.db.models.query.RawQuerySet`` instance. This ``RawQuerySet`` instance
-can be iterated over just like a normal
-:class:`~django.db.models.query.QuerySet` to provide object instances.
+can be iterated over like a normal :class:`~django.db.models.query.QuerySet` to
+provide object instances.
 
 This is best illustrated with an example. Suppose you have the following model::
 

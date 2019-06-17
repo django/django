@@ -48,7 +48,7 @@ algorithm the system follows to determine which Python code to execute:
    one that matches the requested URL.
 
 #. Once one of the URL patterns matches, Django imports and calls the given
-   view, which is a simple Python function (or a :doc:`class-based view
+   view, which is a Python function (or a :doc:`class-based view
    </topics/class-based-views/index>`). The view gets passed the following
    arguments:
 
@@ -131,7 +131,7 @@ The following path converters are available by default:
 
 * ``path`` - Matches any non-empty string, including the path separator,
   ``'/'``. This allows you to match against a complete URL path rather than
-  just a segment of a URL path as with ``str``.
+  a segment of a URL path as with ``str``.
 
 .. _registering-custom-path-converters:
 
@@ -679,13 +679,13 @@ instances of an application are deployed. In other words, since multiple
 instances of a single application will share named URLs, namespaces provide a
 way to tell these named URLs apart.
 
-Django applications that make proper use of URL namespacing can be deployed more
-than once for a particular site. For example :mod:`django.contrib.admin` has an
-:class:`~django.contrib.admin.AdminSite` class which allows you to easily
-:ref:`deploy more than one instance of the admin <multiple-admin-sites>`.
-In a later example, we'll discuss the idea of deploying the polls application
-from the tutorial in two different locations so we can serve the same
-functionality to two different audiences (authors and publishers).
+Django applications that make proper use of URL namespacing can be deployed
+more than once for a particular site. For example :mod:`django.contrib.admin`
+has an :class:`~django.contrib.admin.AdminSite` class which allows you to
+:ref:`deploy more than one instance of the admin <multiple-admin-sites>`.  In a
+later example, we'll discuss the idea of deploying the polls application from
+the tutorial in two different locations so we can serve the same functionality
+to two different audiences (authors and publishers).
 
 A URL namespace comes in two parts, both of which are strings:
 

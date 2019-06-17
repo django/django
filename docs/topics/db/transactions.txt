@@ -61,7 +61,7 @@ either all or none of the changes will be committed.
     generating a streaming response, since there's no sensible way to handle
     errors after starting to send the response.
 
-In practice, this feature simply wraps every view function in the :func:`atomic`
+In practice, this feature wraps every view function in the :func:`atomic`
 decorator described below.
 
 Note that only the execution of your view is enclosed in the transactions.
@@ -410,7 +410,7 @@ For instance, if your database connection is dropped because your process was
 killed without a chance to shut down gracefully, your rollback hook will never
 run.
 
-The solution is simple: instead of doing something during the atomic block
+But there is a solution: instead of doing something during the atomic block
 (transaction) and then undoing it if the transaction fails, use
 :func:`on_commit` to delay doing it in the first place until after the
 transaction succeeds. It's a lot easier to undo something you never did in the
@@ -432,8 +432,8 @@ Low-level APIs
 Autocommit
 ----------
 
-Django provides a straightforward API in the :mod:`django.db.transaction`
-module to manage the autocommit state of each database connection.
+Django provides an API in the :mod:`django.db.transaction` module to manage the
+autocommit state of each database connection.
 
 .. function:: get_autocommit(using=None)
 
@@ -622,7 +622,7 @@ Handling exceptions within PostgreSQL transactions
 Inside a transaction, when a call to a PostgreSQL cursor raises an exception
 (typically ``IntegrityError``), all subsequent SQL in the same transaction
 will fail with the error "current transaction is aborted, queries ignored
-until end of transaction block". While simple use of ``save()`` is unlikely
+until end of transaction block". While the basic use of ``save()`` is unlikely
 to raise an exception in PostgreSQL, there are more advanced usage patterns
 which might, such as saving objects with unique fields, saving using the
 force_insert/force_update flag, or invoking custom SQL.

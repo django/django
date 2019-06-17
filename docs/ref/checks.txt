@@ -325,8 +325,8 @@ Security
 
 The security checks do not make your site secure. They do not audit code, do
 intrusion detection, or do anything particularly complex. Rather, they help
-perform an automated, low-hanging-fruit checklist. They help you remember the
-simple things that improve your site's security.
+perform an automated, low-hanging-fruit checklist, that can help you to improve
+your site's security.
 
 Some of these checks may not be appropriate for your particular deployment
 configuration. For instance, if you do your HTTP to HTTPS redirection in a load

@@ -284,10 +284,10 @@ Then distance queries may be performed as follows::
     >>> qs = SouthTexasCity.objects.filter(point__distance_gte=(pnt, D(mi=20)))
     >>> qs = SouthTexasCity.objects.filter(point__distance_gte=(pnt, D(chain=100)))
 
-Raster queries work the same way by simply replacing the geometry field
-``point`` with a raster field, or the ``pnt`` object with a raster object, or
-both. To specify the band index of a raster input on the right hand side, a
-3-tuple can be passed to the lookup as follows::
+Raster queries work the same way by replacing the geometry field ``point`` with
+a raster field, or the ``pnt`` object with a raster object, or both. To specify
+the band index of a raster input on the right hand side, a 3-tuple can be
+passed to the lookup as follows::
 
     >>> qs = SouthTexasCity.objects.filter(point__distance_gte=(rst, 2, D(km=7)))
 

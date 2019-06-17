@@ -833,7 +833,7 @@ Geometry Collections
 Prepared Geometries
 ===================
 
-In order to obtain a prepared geometry, just access the
+In order to obtain a prepared geometry, access the
 :attr:`GEOSGeometry.prepared` property.  Once you have a
 ``PreparedGeometry`` instance its spatial predicate methods, listed below,
 may be used with other ``GEOSGeometry`` objects.  An operation with a prepared
@@ -911,8 +911,8 @@ I/O Objects
 Reader Objects
 --------------
 
-The reader I/O classes simply return a :class:`GEOSGeometry` instance from the
-WKB and/or WKT input given to their ``read(geom)`` method.
+The reader I/O classes return a :class:`GEOSGeometry` instance from the WKB
+and/or WKT input given to their ``read(geom)`` method.
 
 .. class:: WKBReader
 

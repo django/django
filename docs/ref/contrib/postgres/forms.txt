@@ -15,8 +15,7 @@ Fields
 
 .. class:: SimpleArrayField(base_field, delimiter=',', max_length=None, min_length=None)
 
-    A simple field which maps to an array. It is represented by an HTML
-    ``<input>``.
+    A field which maps to an array. It is represented by an HTML ``<input>``.
 
     .. attribute:: base_field
 

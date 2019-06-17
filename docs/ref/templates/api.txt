@@ -5,7 +5,7 @@ The Django template language: for Python programmers
 .. currentmodule:: django.template
 
 This document explains the Django template system from a technical
-perspective -- how it works and how to extend it. If you're just looking for
+perspective -- how it works and how to extend it. If you're looking for
 reference on the language syntax, see :doc:`/ref/templates/language`.
 
 It assumes an understanding of templates, contexts, variables, tags, and
@@ -41,12 +41,12 @@ lower level APIs:
 Configuring an engine
 =====================
 
-If you are simply using the
-:class:`~django.template.backends.django.DjangoTemplates` backend, this
-probably isn't the documentation you're looking for. An instance of the
-``Engine`` class described below is accessible using the ``engine`` attribute
-of that backend and any attribute defaults mentioned below are overridden by
-what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
+If you are using the :class:`~django.template.backends.django.DjangoTemplates`
+backend, this probably isn't the documentation you're looking for. An instance
+of the ``Engine`` class described below is accessible using the ``engine``
+attribute of that backend and any attribute defaults mentioned below are
+overridden by what's passed by
+:class:`~django.template.backends.django.DjangoTemplates`.
 
 .. class:: Engine(dirs=None, app_dirs=False, context_processors=None, debug=False, loaders=None, string_if_invalid='', file_charset='utf-8', libraries=None, builtins=None, autoescape=True)
 
@@ -315,9 +315,8 @@ straight lookups. Here are some things to keep in mind:
 
 .. _alters-data-description:
 
-* Obviously, there can be side effects when calling some variables, and
-  it'd be either foolish or a security hole to allow the template system
-  to access them.
+* There can be side effects when calling some variables, and it'd be either
+  foolish or a security hole to allow the template system to access them.
 
   A good example is the :meth:`~django.db.models.Model.delete` method on
   each Django model object. The template system shouldn't be allowed to do
@@ -754,10 +753,10 @@ variables:
 Writing your own context processors
 -----------------------------------
 
-A context processor has a very simple interface: It's a Python function
-that takes one argument, an :class:`~django.http.HttpRequest` object, and
-returns a dictionary that gets added to the template context. Each context
-processor *must* return a dictionary.
+A context processor has a simple interface: It's a Python function that takes
+one argument, an :class:`~django.http.HttpRequest` object, and returns a
+dictionary that gets added to the template context. Each context processor
+*must* return a dictionary.
 
 Custom context processors can live anywhere in your code base. All Django
 cares about is that your custom context processors are pointed to by the
@@ -859,7 +858,7 @@ loaders that come with Django:
     subdirectory. If the directory exists, Django looks for templates in there.
 
     This means you can store templates with your individual apps. This also
-    makes it easy to distribute Django apps with default templates.
+    helps to distribute Django apps with default templates.
 
     For example, for this setting::
 
@@ -885,8 +884,8 @@ loaders that come with Django:
     it caches a list of which :setting:`INSTALLED_APPS` packages have a
     ``templates`` subdirectory.
 
-    You can enable this loader simply by setting
-    :setting:`APP_DIRS <TEMPLATES-APP_DIRS>` to ``True``::
+    You can enable this loader by setting :setting:`APP_DIRS
+    <TEMPLATES-APP_DIRS>` to ``True``::
 
         TEMPLATES = [{
             'BACKEND': 'django.template.backends.django.DjangoTemplates',

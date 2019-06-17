@@ -88,7 +88,7 @@ mention:
 * You can provide an arbitrary ``filename`` parameter. It'll be used by browsers
   in the "Save as..." dialog.
 
-* Hooking into the ReportLab API is easy: The same buffer passed as the first
+* You can hook into the ReportLab API: The same buffer passed as the first
   argument to ``canvas.Canvas`` can be fed to the
   :class:`~django.http.FileResponse` class.
 

@@ -11,11 +11,10 @@ to serve additional files — such as images, JavaScript, or CSS — necessary t
 render the complete web page. In Django, we refer to these files as "static
 files".
 
-For small projects, this isn't a big deal, because you can just keep the
-static files somewhere your web server can find it. However, in bigger
-projects -- especially those comprised of multiple apps -- dealing with the
-multiple sets of static files provided by each application starts to get
-tricky.
+For small projects, this isn't a big deal, because you can keep the static
+files somewhere your web server can find it. However, in bigger projects --
+especially those comprised of multiple apps -- dealing with the multiple sets
+of static files provided by each application starts to get tricky.
 
 That's what ``django.contrib.staticfiles`` is for: it collects static files
 from each of your applications (and any other places you specify) into a
@@ -39,8 +38,8 @@ Within the ``static`` directory you have just created, create another directory
 called ``polls`` and within that create a file called ``style.css``. In other
 words, your stylesheet should be at ``polls/static/polls/style.css``. Because
 of how the ``AppDirectoriesFinder`` staticfile finder works, you can refer to
-this static file in Django simply as ``polls/style.css``, similar to how you
-reference the path for templates.
+this static file in Django as ``polls/style.css``, similar to how you reference
+the path for templates.
 
 .. admonition:: Static file namespacing
 
@@ -50,8 +49,8 @@ reference the path for templates.
     first static file it finds whose name matches, and if you had a static file
     with the same name in a *different* application, Django would be unable to
     distinguish between them. We need to be able to point Django at the right
-    one, and the easiest way to ensure this is by *namespacing* them. That is,
-    by putting those static files inside *another* directory named for the
+    one, and the best way to ensure this is by *namespacing* them. That is, by
+    putting those static files inside *another* directory named for the
     application itself.
 
 Put the following code in that stylesheet (``polls/static/polls/style.css``):

@@ -36,7 +36,7 @@ development:
   on the `#django-dev IRC channel`_.
 
 * :doc:`Submit patches <writing-code/submitting-patches>` for new and/or
-  fixed behavior. If you're looking for an easy way to start contributing
+  fixed behavior. If you're looking for a way to get started contributing
   to Django read the :doc:`/intro/contributing` tutorial and have a look at the
   `easy pickings`_ tickets. The :ref:`patch-review-checklist` will also be
   helpful.

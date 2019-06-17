@@ -78,9 +78,9 @@ modules to the page via the model's class Admin :ref:`js parameter
 pointing to JavaScript modules that will be included within the admin form via
 a ``<script>`` tag.
 
-If you want more flexibility than simply tweaking the auto-generated forms,
-feel free to write custom views for the admin. The admin is powered by Django
-itself, and you can write custom views that hook into the authentication
+If you want more flexibility than is feasible by tweaking the auto-generated
+forms, feel free to write custom views for the admin. The admin is powered by
+Django itself, and you can write custom views that hook into the authentication
 system, check permissions and do whatever else they need to do.
 
 If you want to customize the look-and-feel of the admin interface, read the

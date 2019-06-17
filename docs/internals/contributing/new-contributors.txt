@@ -13,7 +13,7 @@ to get started? This is the section for you.
 First steps
 ===========
 
-Start with these easy tasks to discover Django's development process.
+Start with these steps to discover Django's development process.
 
 * **Sign the Contributor License Agreement**
 
@@ -45,7 +45,7 @@ Start with these easy tasks to discover Django's development process.
 
   Oftentimes the codebase will change between a patch being submitted and the
   time it gets reviewed. Make sure it still applies cleanly and functions as
-  expected. Simply updating a patch is both useful and important! See more on
+  expected. Updating a patch is both useful and important! See more on
   :doc:`writing-code/submitting-patches`.
 
 * **Write some documentation**

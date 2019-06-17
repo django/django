@@ -3,11 +3,11 @@ Writing your first Django app, part 4
 =====================================
 
 This tutorial begins where :doc:`Tutorial 3 </intro/tutorial03>` left off. We're
-continuing the Web-poll application and will focus on simple form processing and
+continuing the Web-poll application and will focus on form processing and
 cutting down our code.
 
-Write a simple form
-===================
+Write a minimal form
+====================
 
 Let's update our poll detail template ("polls/detail.html") from the last
 tutorial, so that the template contains an HTML ``<form>`` element:
@@ -42,17 +42,17 @@ A quick rundown:
   ``method="get"``) is very important, because the act of submitting this
   form will alter data server-side. Whenever you create a form that alters
   data server-side, use ``method="post"``. This tip isn't specific to
-  Django; it's just good Web development practice.
+  Django; it's good Web development practice in general.
 
 * ``forloop.counter`` indicates how many times the :ttag:`for` tag has gone
   through its loop
 
 * Since we're creating a POST form (which can have the effect of modifying
   data), we need to worry about Cross Site Request Forgeries.
-  Thankfully, you don't have to worry too hard, because Django comes with
-  a very easy-to-use system for protecting against it. In short, all POST
-  forms that are targeted at internal URLs should use the
-  :ttag:`{% csrf_token %}<csrf_token>` template tag.
+  Thankfully, you don't have to worry too hard, because Django comes with a
+  helpful system for protecting against it. In short, all POST forms that are
+  targeted at internal URLs should use the :ttag:`{% csrf_token %}<csrf_token>`
+  template tag.
 
 Now, let's create a Django view that handles the submitted data and does
 something with it. Remember, in :doc:`Tutorial 3 </intro/tutorial03>`, we
@@ -121,8 +121,8 @@ This code includes a few things we haven't covered yet in this tutorial:
 
   As the Python comment above points out, you should always return an
   :class:`~django.http.HttpResponseRedirect` after successfully dealing with
-  POST data. This tip isn't specific to Django; it's just good Web
-  development practice.
+  POST data. This tip isn't specific to Django; it's good Web development
+  practice in general.
 
 * We are using the :func:`~django.urls.reverse` function in the
   :class:`~django.http.HttpResponseRedirect` constructor in this example.
@@ -196,7 +196,7 @@ Use generic views: Less code is better
 ======================================
 
 The ``detail()`` (from :doc:`Tutorial 3 </intro/tutorial03>`) and ``results()``
-views are very simple -- and, as mentioned above, redundant. The ``index()``
+views are very short -- and, as mentioned above, redundant. The ``index()``
 view, which displays a list of polls, is similar.
 
 These views represent a common case of basic Web development: getting data from
@@ -208,8 +208,8 @@ Generic views abstract common patterns to the point where you don't even need
 to write Python code to write an app.
 
 Let's convert our poll app to use the generic views system, so we can delete a
-bunch of our own code. We'll just have to take a few steps to make the
-conversion. We will:
+bunch of our own code. We'll have to take a few steps to make the conversion.
+We will:
 
 #. Convert the URLconf.
 
@@ -331,8 +331,8 @@ However, for ListView, the automatically generated context variable is
 ``question_list``. To override this we provide the ``context_object_name``
 attribute, specifying that we want to use ``latest_question_list`` instead.
 As an alternative approach, you could change your templates to match
-the new default context variables -- but it's a lot easier to just
-tell Django to use the variable you want.
+the new default context variables -- but it's a lot easier to tell Django to
+use the variable you want.
 
 Run the server, and use your new polling app based on generic views.
 

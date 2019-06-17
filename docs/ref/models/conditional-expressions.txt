@@ -96,7 +96,7 @@ A ``Case()`` expression is like the :keyword:`if` ... :keyword:`elif` ...
 truthful value. The ``result`` expression from the matching ``When()`` object
 is returned.
 
-A simple example::
+An example::
 
     >>>
     >>> from datetime import date, timedelta

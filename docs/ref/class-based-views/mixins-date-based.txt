@@ -332,5 +332,5 @@ Date-based mixins
         return the list of years for which ``qs`` has entries. If
         ``date_type`` isn't provided, the result of
         :meth:`~BaseDateListView.get_date_list_period` is used. ``date_type``
-        and ``ordering`` are simply passed to
+        and ``ordering`` are passed to
         :meth:`QuerySet.dates()<django.db.models.query.QuerySet.dates>`.

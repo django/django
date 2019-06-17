@@ -37,10 +37,9 @@ loading in a frame no matter which site made the request.
 
 .. _X-Frame-Options: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options
 
-Django provides a few simple ways to include this header in responses from your
-site:
+Django provides a few ways to include this header in responses from your site:
 
-#. A simple middleware that sets the header in all responses.
+#. A middleware that sets the header in all responses.
 
 #. A set of view decorators that can be used to override the middleware or to
    only set the header for certain views.

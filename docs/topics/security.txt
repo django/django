@@ -66,10 +66,10 @@ this if you know what you are doing. There are other :ref:`limitations
 control.
 
 :ref:`CSRF protection works <how-csrf-works>` by checking for a secret in each
-POST request. This ensures that a malicious user cannot simply "replay" a form
-POST to your website and have another logged in user unwittingly submit that
-form. The malicious user would have to know the secret, which is user specific
-(using a cookie).
+POST request. This ensures that a malicious user cannot "replay" a form POST to
+your website and have another logged in user unwittingly submit that form. The
+malicious user would have to know the secret, which is user specific (using a
+cookie).
 
 When deployed with :ref:`HTTPS <security-recommendation-ssl>`,
 ``CsrfViewMiddleware`` will check that the HTTP referer header is set to a

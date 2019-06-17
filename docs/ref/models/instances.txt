@@ -16,14 +16,14 @@ Throughout this reference we'll use the :ref:`example Weblog models
 Creating objects
 ================
 
-To create a new instance of a model, just instantiate it like any other Python
+To create a new instance of a model, instantiate it like any other Python
 class:
 
 .. class:: Model(**kwargs)
 
-The keyword arguments are simply the names of the fields you've defined on your
-model. Note that instantiating a model in no way touches your database; for
-that, you need to :meth:`~Model.save()`.
+The keyword arguments are the names of the fields you've defined on your model.
+Note that instantiating a model in no way touches your database; for that, you
+need to :meth:`~Model.save()`.
 
 .. note::
 
@@ -116,8 +116,8 @@ are loaded from the database::
         super().save(*args, **kwargs)
 
 The example above shows a full ``from_db()`` implementation to clarify how that
-is done. In this case it would of course be possible to just use ``super()`` call
-in the ``from_db()`` method.
+is done. In this case it would of course be possible to use ``super()`` call in
+the ``from_db()`` method.
 
 Refreshing objects from database
 ================================
@@ -396,8 +396,8 @@ Explicitly specifying auto-primary-key values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If a model has an :class:`~django.db.models.AutoField` but you want to define a
-new object's ID explicitly when saving, just define it explicitly before
-saving, rather than relying on the auto-assignment of the ID::
+new object's ID explicitly when saving, define it explicitly before saving,
+rather than relying on the auto-assignment of the ID::
 
     >>> b3 = Blog(id=3, name='Cheddar Talk', tagline='Thoughts on cheese.')
     >>> b3.id     # Returns 3.
@@ -500,8 +500,8 @@ In some rare circumstances, it's necessary to be able to force the
 doing an ``UPDATE``. Or vice-versa: update, if possible, but not insert a new
 row. In these cases you can pass the ``force_insert=True`` or
 ``force_update=True`` parameters to the :meth:`~Model.save()` method.
-Obviously, passing both parameters is an error: you cannot both insert *and*
-update at the same time!
+Passing both parameters is an error: you cannot both insert *and* update at the
+same time!
 
 It should be very rare that you'll need to use these parameters. Django will
 almost always do the right thing and trying to override that will lead to
@@ -749,9 +749,9 @@ This template code is much better:
     <a href="{{ object.get_absolute_url }}">{{ object.name }}</a>
 
 The logic here is that if you change the URL structure of your objects, even
-for something simple such as correcting a spelling error, you don't want to
-have to track down every place that the URL might be created. Specify it once,
-in ``get_absolute_url()`` and have all your other code call that one place.
+for something small like correcting a spelling error, you don't want to have to
+track down every place that the URL might be created. Specify it once, in
+``get_absolute_url()`` and have all your other code call that one place.
 
 .. note::
     The string you return from ``get_absolute_url()`` **must** contain only

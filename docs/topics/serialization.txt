@@ -15,7 +15,7 @@ serializer to handle any format (text-based or not).
 Serializing data
 ================
 
-At the highest level, serializing data is a very simple operation::
+At the highest level, you can serialize data like this::
 
     from django.core import serializers
     data = serializers.serialize("xml", SomeModel.objects.all())
@@ -74,7 +74,7 @@ Inherited models
 
 If you have a model that is defined using an :ref:`abstract base class
 <abstract-base-classes>`, you don't have to do anything special to serialize
-that model. Just call the serializer on the object (or objects) that you want to
+that model. Call the serializer on the object (or objects) that you want to
 serialize, and the output will be a complete representation of the serialized
 object.
 
@@ -105,7 +105,7 @@ serialize the ``Place`` models as well::
 Deserializing data
 ==================
 
-Deserializing data is also a fairly simple operation::
+Deserializing data is very similar to serializing it::
 
     for obj in serializers.deserialize("xml", data):
         do_something_with(obj)
@@ -114,7 +114,7 @@ As you can see, the ``deserialize`` function takes the same format argument as
 ``serialize``, a string or stream of data, and returns an iterator.
 
 However, here it gets slightly complicated. The objects returned by the
-``deserialize`` iterator *aren't* simple Django objects. Instead, they are
+``deserialize`` iterator *aren't* regular Django objects. Instead, they are
 special ``DeserializedObject`` instances that wrap a created -- but unsaved --
 object and any associated relationship data.
 
@@ -136,7 +136,7 @@ something like::
 
 In other words, the usual use is to examine the deserialized objects to make
 sure that they are "appropriate" for saving before doing so.  Of course, if you
-trust your data source you could just save the object and move on.
+trust your data source you can instead save the object directly and move on.
 
 The Django object itself can be inspected as ``deserialized_object.object``.
 If fields in the serialized data do not exist on a model, a
@@ -170,7 +170,7 @@ Identifier  Information
 XML
 ---
 
-The basic XML serialization format is quite simple::
+The basic XML serialization format looks like this::
 
     <?xml version="1.0" encoding="utf-8"?>
     <django-objects version="1.0">
@@ -247,7 +247,7 @@ with three properties: "pk", "model" and "fields". "fields" is again an object
 containing each field's name and value as property and property-value
 respectively.
 
-Foreign keys just have the PK of the linked object as property value.
+Foreign keys have the PK of the linked object as property value.
 ManyToMany-relations are serialized for the model that defines them and are
 represented as a list of PKs.
 
@@ -313,7 +313,7 @@ again a mapping with the key being name of the field and the value the value::
         model: sessions.session
         pk: 4b678b301dfd8a4e0dad910de3ae245b
 
-Referential fields are again just represented by the PK or sequence of PKs.
+Referential fields are again represented by the PK or sequence of PKs.
 
 .. _topics-serialization-natural-keys:
 

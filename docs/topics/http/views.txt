@@ -2,7 +2,7 @@
 Writing views
 =============
 
-A view function, or *view* for short, is simply a Python function that takes a
+A view function, or *view* for short, is a Python function that takes a
 Web request and returns a Web response. This response can be the HTML contents
 of a Web page, or a redirect, or a 404 error, or an XML document, or an image .
 . . or anything, really. The view itself contains whatever arbitrary logic is
@@ -60,12 +60,12 @@ date and time. To display this view at a particular URL, you'll need to create a
 Returning errors
 ================
 
-Returning HTTP error codes in Django is easy. There are subclasses of
+Django provides help for returning HTTP error codes. There are subclasses of
 :class:`~django.http.HttpResponse` for a number of common HTTP status codes
 other than 200 (which means *"OK"*). You can find the full list of available
 subclasses in the :ref:`request/response <ref-httpresponse-subclasses>`
-documentation.  Just return an instance of one of those subclasses instead of
-a normal :class:`~django.http.HttpResponse` in order to signify an error. For
+documentation. Return an instance of one of those subclasses instead of a
+normal :class:`~django.http.HttpResponse` in order to signify an error. For
 example::
 
     from django.http import HttpResponse, HttpResponseNotFound
@@ -138,9 +138,9 @@ Customizing error views
 =======================
 
 The default error views in Django should suffice for most Web applications,
-but can easily be overridden if you need any custom behavior. Simply specify
-the handlers as seen below in your URLconf (setting them anywhere else will
-have no effect).
+but can easily be overridden if you need any custom behavior. Specify the
+handlers as seen below in your URLconf (setting them anywhere else will have no
+effect).
 
 The :func:`~django.views.defaults.page_not_found` view is overridden by
 :data:`~django.conf.urls.handler404`::

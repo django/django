@@ -13,7 +13,7 @@ the domain names and "verbose" names of your Django-powered sites.
 Use it if your single Django installation powers more than one site and you
 need to differentiate between those sites in some way.
 
-The sites framework is mainly based on a simple model:
+The sites framework is mainly based on this model:
 
 .. class:: models.Site
 
@@ -37,7 +37,7 @@ try to get the current site by comparing the
 the :meth:`request.get_host() <django.http.HttpRequest.get_host>` method.
 
 How you use this is up to you, but Django uses it in a couple of ways
-automatically via simple conventions.
+automatically via a couple of conventions.
 
 Example usage
 =============
@@ -58,10 +58,10 @@ publish the same story twice: once for LJWorld.com and again for Lawrence.com.
 But that's inefficient for site producers, and it's redundant to store
 multiple copies of the same story in the database.
 
-The better solution is simple: Both sites use the same article database, and an
-article is associated with one or more sites. In Django model terminology,
-that's represented by a :class:`~django.db.models.ManyToManyField` in the
-``Article`` model::
+A better solution removes the content duplication: Both sites use the same
+article database, and an article is associated with one or more sites. In
+Django model terminology, that's represented by a
+:class:`~django.db.models.ManyToManyField` in the ``Article`` model::
 
     from django.contrib.sites.models import Site
     from django.db import models
@@ -80,8 +80,8 @@ This accomplishes several things quite nicely:
   database; it only has a single record in the database.
 
 * It lets the site developers use the same Django view code for both sites.
-  The view code that displays a given story just checks to make sure the
-  requested story is on the current site. It looks something like this::
+  The view code that displays a given story checks to make sure the requested
+  story is on the current site. It looks something like this::
 
       from django.contrib.sites.shortcuts import get_current_site
 
@@ -215,7 +215,7 @@ subscribing to LJWorld.com alerts." Same goes for the email's message body.
 Note that an even more flexible (but more heavyweight) way of doing this would
 be to use Django's template system. Assuming Lawrence.com and LJWorld.com have
 different template directories (:setting:`DIRS <TEMPLATES-DIRS>`), you could
-simply farm out to the template system like so::
+farm out to the template system like so::
 
     from django.core.mail import send_mail
     from django.template import Context, loader
@@ -243,7 +243,7 @@ Getting the current domain for full URLs
 Django's ``get_absolute_url()`` convention is nice for getting your objects'
 URL without the domain name, but in some cases you might want to display the
 full URL -- with ``http://`` and the domain and everything -- for an object.
-To do this, you can use the sites framework. A simple example::
+To do this, you can use the sites framework. An example::
 
     >>> from django.contrib.sites.models import Site
     >>> obj = MyModel.objects.get(id=3)
@@ -401,7 +401,7 @@ If you often use this pattern::
         site = Site.objects.get_current()
         ...
 
-there is simple way to avoid repetitions. Add
+To avoid repetitions, add
 :class:`django.contrib.sites.middleware.CurrentSiteMiddleware` to
 :setting:`MIDDLEWARE`. The middleware sets the ``site`` attribute on every
 request object, so you can use ``request.site`` to get the current site.

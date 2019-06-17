@@ -648,8 +648,8 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
     .. method:: authenticate(request, remote_user)
 
         The username passed as ``remote_user`` is considered trusted. This
-        method simply returns the user object with the given username, creating
-        a new user object if :attr:`~RemoteUserBackend.create_unknown_user` is
+        method returns the user object with the given username, creating a new
+        user object if :attr:`~RemoteUserBackend.create_unknown_user` is
         ``True``.
 
         Returns ``None`` if :attr:`~RemoteUserBackend.create_unknown_user` is

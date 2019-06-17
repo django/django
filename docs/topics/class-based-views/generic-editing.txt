@@ -16,7 +16,7 @@ processing.
 Basic forms
 ===========
 
-Given a simple contact form:
+Given a contact form:
 
 .. code-block:: python
     :caption: forms.py
@@ -85,7 +85,7 @@ You don't even need to provide a ``success_url`` for
 :meth:`~django.db.models.Model.get_absolute_url()` on the model object if available.
 
 If you want to use a custom :class:`~django.forms.ModelForm` (for instance to
-add extra validation) simply set
+add extra validation), set
 :attr:`~django.views.generic.edit.FormMixin.form_class` on your view.
 
 .. note::
@@ -132,8 +132,8 @@ here; we don't have to write any logic ourselves:
         success_url = reverse_lazy('author-list')
 
 .. note::
-    We have to use :func:`~django.urls.reverse_lazy` here, not just
-    ``reverse()`` as the urls are not loaded when the file is imported.
+    We have to use :func:`~django.urls.reverse_lazy` instead of
+    ``reverse()``, as the urls are not loaded when the file is imported.
 
 The ``fields`` attribute works the same way as the ``fields`` attribute on the
 inner ``Meta`` class on :class:`~django.forms.ModelForm`. Unless you define the
@@ -225,7 +225,7 @@ handle unauthorized users in :meth:`~.ModelFormMixin.form_valid()`.
 AJAX example
 ============
 
-Here is a simple example showing how you might go about implementing a form that
+Here is an example showing how you might go about implementing a form that
 works for AJAX requests as well as 'normal' form POSTs::
 
     from django.http import JsonResponse

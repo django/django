@@ -569,8 +569,8 @@ Adding additional fields to a formset
 
 If you need to add additional fields to the formset this can be easily
 accomplished. The formset base class provides an ``add_fields`` method. You
-can simply override this method to add your own fields or even redefine the
-default fields/attributes of the order and deletion fields::
+can override this method to add your own fields or even redefine the default
+fields/attributes of the order and deletion fields::
 
     >>> from django.forms import BaseFormSet
     >>> from django.forms import formset_factory
@@ -651,9 +651,9 @@ This is useful if you want to :ref:`use more than one formset in a view
 Using a formset in views and templates
 ======================================
 
-Using a formset inside a view is as easy as using a regular ``Form`` class.
-The only thing you will want to be aware of is making sure to use the
-management form inside the template. Let's look at a sample view::
+Using a formset inside a view is not very different from using a regular
+``Form`` class. The only thing you will want to be aware of is making sure to
+use the management form inside the template. Let's look at a sample view::
 
     from django.forms import formset_factory
     from django.shortcuts import render

@@ -13,9 +13,9 @@ Well, we've always been big fans of learning by doing. At this point you should
 know enough to start a project of your own and start fooling around. As you need
 to learn new tricks, come back to the documentation.
 
-We've put a lot of effort into making Django's documentation useful, easy to
-read and as complete as possible. The rest of this document explains more about
-how the documentation works so that you can get the most out of it.
+We've put a lot of effort into making Django's documentation useful, clear and
+as complete as possible. The rest of this document explains more about how the
+documentation works so that you can get the most out of it.
 
 (Yes, this is documentation about documentation. Rest assured we have no plans
 to write a document about how to read the document about documentation.)
@@ -74,8 +74,8 @@ different needs:
 * Finally, there's some "specialized" documentation not usually relevant to
   most developers. This includes the :doc:`release notes </releases/index>` and
   :doc:`internals documentation </internals/index>` for those who want to add
-  code to Django itself, and a :doc:`few other things that simply don't fit
-  elsewhere </misc/index>`.
+  code to Django itself, and a :doc:`few other things that don't fit elsewhere
+  </misc/index>`.
 
 
 How documentation is updated
@@ -155,7 +155,7 @@ Django document:
 As HTML, locally
 ----------------
 
-You can get a local copy of the HTML documentation following a few easy steps:
+You can get a local copy of the HTML documentation following a few steps:
 
 * Django's documentation uses a system called Sphinx__ to convert from
   plain text to HTML. You'll need to install Sphinx by either downloading
@@ -165,8 +165,7 @@ You can get a local copy of the HTML documentation following a few easy steps:
 
         $ python -m pip install Sphinx
 
-* Then, just use the included ``Makefile`` to turn the documentation into
-  HTML:
+* Then, use the included ``Makefile`` to turn the documentation into HTML:
 
   .. code-block:: console
 

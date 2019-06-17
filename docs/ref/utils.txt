@@ -103,8 +103,8 @@ need to distinguish caches by the ``Accept-language`` header.
 
     The list of headers to use for cache key generation is stored in the same
     cache as the pages themselves. If the cache ages some data out of the
-    cache, this just means that we have to build the response once to get at
-    the Vary header and so at the list of headers to use for the cache key.
+    cache, this means that we have to build the response once to get at the
+    Vary header and so at the list of headers to use for the cache key.
 
 ``django.utils.dateparse``
 ==========================
@@ -491,9 +491,9 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
     As well as offering potential performance advantages, ``@cached_property``
     can ensure that an attribute's value does not change unexpectedly over the
     life of an instance. This could occur with a method whose computation is
-    based on ``datetime.now()``, or simply if a change were saved to the
-    database by some other process in the brief interval between subsequent
-    invocations of a method on the same instance.
+    based on ``datetime.now()``, or if a change were saved to the database by
+    some other process in the brief interval between subsequent invocations of
+    a method on the same instance.
 
     You can make cached properties of methods. For example, if you had an
     expensive ``get_friends()`` method and wanted to allow calling it without
@@ -551,9 +551,9 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
     The ``keep_lazy()`` decorator takes a number of extra arguments (``*args``)
     specifying the type(s) that the original function can return. A common
-    use case is to have functions that return text. For these, you can just
-    pass the ``str`` type to ``keep_lazy`` (or even simpler, use the
-    :func:`keep_lazy_text` decorator described in the next section).
+    use case is to have functions that return text. For these, you can pass the
+    ``str`` type to ``keep_lazy`` (or use the :func:`keep_lazy_text` decorator
+    described in the next section).
 
     Using this decorator means you can write your function and assume that the
     input is a proper string, then add support for lazy translation objects at
@@ -564,7 +564,8 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
     A shortcut for ``keep_lazy(str)(func)``.
 
     If you have a function that returns text and you want to be able to take
-    lazy arguments while delaying their evaluation, simply use this decorator::
+    lazy arguments while delaying their evaluation, you can use this
+    decorator::
 
         from django.utils.functional import keep_lazy, keep_lazy_text
 
@@ -1060,7 +1061,7 @@ functions without the ``u``.
     :func:`django.utils.translation.activate` to fetch the translation object
     for a given language, activates it as the translation object for the
     current thread and reactivates the previous active language on exit.
-    Optionally, it can simply deactivate the temporary translation on exit with
+    Optionally, it can deactivate the temporary translation on exit with
     :func:`django.utils.translation.deactivate` if the ``deactivate`` argument
     is ``True``. If you pass ``None`` as the language argument, a
     ``NullTranslations()`` instance is activated within the context.

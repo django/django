@@ -150,7 +150,7 @@ Authenticating users
 Permissions and Authorization
 =============================
 
-Django comes with a simple permissions system. It provides a way to assign
+Django comes with a built-in permissions system. It provides a way to assign
 permissions to specific users and groups of users.
 
 It's used by the Django admin site, but you're welcome to use it in your own
@@ -473,7 +473,7 @@ Limiting access to logged-in users
 The raw way
 ~~~~~~~~~~~
 
-The simple, raw way to limit access to pages is to check
+The raw way to limit access to pages is to check
 :attr:`request.user.is_authenticated
 <django.contrib.auth.models.User.is_authenticated>` and either redirect to a
 login page::
@@ -615,10 +615,9 @@ Limiting access to logged-in users that pass a test
 To limit access based on certain permissions or some other test, you'd do
 essentially the same thing as described in the previous section.
 
-The simple way is to run your test on :attr:`request.user
-<django.http.HttpRequest.user>` in the view directly. For example, this view
-checks to make sure the user has an email in the desired domain and if not,
-redirects to the login page::
+You can run your test on :attr:`request.user <django.http.HttpRequest.user>` in
+the view directly. For example, this view checks to make sure the user has an
+email in the desired domain and if not, redirects to the login page::
 
     from django.shortcuts import redirect
 
@@ -1015,8 +1014,8 @@ implementation details see :ref:`using-the-views`.
     * ``redirect_field_name``: The name of a ``GET`` field containing the
       URL to redirect to after login. Defaults to ``next``.
 
-    * ``authentication_form``: A callable (typically just a form class) to
-      use for authentication. Defaults to
+    * ``authentication_form``: A callable (typically a form class) to use for
+      authentication. Defaults to
       :class:`~django.contrib.auth.forms.AuthenticationForm`.
 
     * ``extra_context``: A dictionary of context data that will be added to the

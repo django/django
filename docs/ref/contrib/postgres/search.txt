@@ -21,7 +21,7 @@ The ``search`` lookup
 
 .. fieldlookup:: search
 
-The simplest way to use full text search is to search a single term against a
+A common way to use full text search is to search a single term against a
 single column in the database. For example::
 
     >>> Entry.objects.filter(body_text__search='Cheese')
@@ -111,9 +111,9 @@ See :ref:`postgresql-fts-search-configuration` for an explanation of the
 
 .. class:: SearchRank(vector, query, weights=None)
 
-So far, we've just returned the results for which any match between the vector
-and the query are possible. It's likely you may wish to order the results by
-some sort of relevancy. PostgreSQL provides a ranking function which takes into
+So far, we've returned the results for which any match between the vector and
+the query are possible. It's likely you may wish to order the results by some
+sort of relevancy. PostgreSQL provides a ranking function which takes into
 account how often the query terms appear in the document, how close together
 the terms are in the document, and how important the part of the document is
 where they occur. The better the match, the higher the value of the rank. To

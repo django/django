@@ -196,8 +196,8 @@ See the :ref:`cache documentation <cache_key_prefixing>` for more information.
 Default: ``''`` (Empty string)
 
 The location of the cache to use. This might be the directory for a
-file system cache, a host and port for a memcache server, or simply an
-identifying name for a local memory cache. e.g.::
+file system cache, a host and port for a memcache server, or an identifying
+name for a local memory cache. e.g.::
 
     CACHES = {
         'default': {
@@ -2443,8 +2443,8 @@ A list containing the settings for all template engines to be used with
 Django. Each item of the list is a dictionary containing the options for an
 individual engine.
 
-Here's a simple setup that tells the Django template engine to load templates
-from the ``templates`` subdirectory inside each installed application::
+Here's a setup that tells the Django template engine to load templates from the
+``templates`` subdirectory inside each installed application::
 
     TEMPLATES = [
         {
@@ -2657,7 +2657,7 @@ the correct environment.
 Default: ``True``
 
 A boolean that specifies whether Django's translation system should be enabled.
-This provides an easy way to turn it off, for performance. If this is set to
+This provides a way to turn it off, for performance. If this is set to
 ``False``, Django will make some optimizations so as not to load the
 translation machinery.
 
@@ -2759,7 +2759,7 @@ Default: ``None``
 
 The full Python path of the WSGI application object that Django's built-in
 servers (e.g. :djadmin:`runserver`) will use. The :djadmin:`django-admin
-startproject <startproject>` management command will create a simple
+startproject <startproject>` management command will create a standard
 ``wsgi.py`` file with an ``application`` callable in it, and point this setting
 to that ``application``.
 
@@ -3374,7 +3374,7 @@ setting.
 .. note::
 
     When using the ``AppDirectoriesFinder`` finder, make sure your apps
-    can be found by staticfiles. Simply add the app to the
+    can be found by staticfiles by adding the app to the
     :setting:`INSTALLED_APPS` setting of your site.
 
 Static file finders are currently considered a private interface, and this

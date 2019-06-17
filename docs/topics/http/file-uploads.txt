@@ -19,7 +19,7 @@ and in memory, and how to customize the default behavior.
 Basic file uploads
 ==================
 
-Consider a simple form containing a :class:`~django.forms.FileField`:
+Consider a form containing a :class:`~django.forms.FileField`:
 
 .. code-block:: python
     :caption: forms.py
@@ -42,9 +42,8 @@ contain data if the request method was ``POST`` and the ``<form>`` that posted
 the request has the attribute ``enctype="multipart/form-data"``. Otherwise,
 ``request.FILES`` will be empty.
 
-Most of the time, you'll simply pass the file data from ``request`` into the
-form as described in :ref:`binding-uploaded-files`. This would look
-something like:
+Most of the time, you'll pass the file data from ``request`` into the form as
+described in :ref:`binding-uploaded-files`. This would look something like:
 
 .. code-block:: python
     :caption: views.py
@@ -107,9 +106,9 @@ corresponding :class:`~django.db.models.FileField` when calling
             form = ModelFormWithFileField()
         return render(request, 'upload.html', {'form': form})
 
-If you are constructing an object manually, you can simply assign the file
-object from :attr:`request.FILES <django.http.HttpRequest.FILES>` to the file
-field in the model::
+If you are constructing an object manually, you can assign the file object from
+:attr:`request.FILES <django.http.HttpRequest.FILES>` to the file field in the
+model::
 
     from django.http import HttpResponseRedirect
     from django.shortcuts import render
@@ -205,8 +204,8 @@ platform this means you can expect Django to generate a file called something
 like ``/tmp/tmpzfp6I6.upload``. If an upload is large enough, you can watch this
 file grow in size as Django streams the data onto disk.
 
-These specifics -- 2.5 megabytes; ``/tmp``; etc. -- are simply "reasonable
-defaults" which can be customized as described in the next section.
+These specifics -- 2.5 megabytes; ``/tmp``; etc. -- are "reasonable defaults"
+which can be customized as described in the next section.
 
 Changing upload handler behavior
 --------------------------------
@@ -235,7 +234,7 @@ You'd probably want to use ``list.insert()`` in this case (instead of
 ``append()``) because a progress bar handler would need to run *before* any
 other handlers. Remember, the upload handlers are processed in order.
 
-If you want to replace the upload handlers completely, you can just assign a new
+If you want to replace the upload handlers completely, you can assign a new
 list::
 
    request.upload_handlers = [ProgressBarUploadHandler(request)]

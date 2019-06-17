@@ -85,10 +85,9 @@ Which tickets should be claimed?
 Of course, going through the steps of claiming tickets is overkill in some
 cases.
 
-In the case of small changes, such as typos in the documentation or
-small bugs that will only take a few minutes to fix, you don't need to jump
-through the hoops of claiming tickets. Just submit your patch and be done with
-it.
+In the case of small changes, such as typos in the documentation or small bugs
+that will only take a few minutes to fix, you don't need to jump through the
+hoops of claiming tickets. Submit your patch directly and you're done!
 
 Of course, it is *always* acceptable, regardless whether someone has claimed it
 or not, to submit patches to a ticket if you happen to have a patch ready.
@@ -145,14 +144,14 @@ Regardless of the way you submit your work, follow these steps.
 Non-trivial patches
 ===================
 
-A "non-trivial" patch is one that is more than a simple bug fix. It's a patch
+A "non-trivial" patch is one that is more than a small bug fix. It's a patch
 that introduces Django functionality and makes some sort of design decision.
 
 If you provide a non-trivial patch, include evidence that alternatives have
 been discussed on |django-developers|.
 
-If you're not sure whether your patch should be considered non-trivial, just
-ask.
+If you're not sure whether your patch should be considered non-trivial, ask on
+the ticket for opinions.
 
 .. _deprecating-a-feature:
 

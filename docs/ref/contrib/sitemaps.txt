@@ -5,8 +5,8 @@ The sitemap framework
 .. module:: django.contrib.sitemaps
    :synopsis: A framework for generating Google sitemap XML files.
 
-Django comes with a high-level sitemap-generating framework that makes
-creating sitemap_ XML files easy.
+Django comes with a high-level sitemap-generating framework to create sitemap_
+XML files.
 
 .. _sitemap: https://www.sitemaps.org/
 
@@ -22,7 +22,7 @@ The Django sitemap framework automates the creation of this XML file by letting
 you express this information in Python code.
 
 It works much like Django's :doc:`syndication framework
-</ref/contrib/syndication>`. To create a sitemap, just write a
+</ref/contrib/syndication>`. To create a sitemap, write a
 :class:`~django.contrib.sitemaps.Sitemap` class and point to it in your
 :doc:`URLconf </topics/http/urls>`.
 
@@ -76,11 +76,11 @@ a :class:`~django.contrib.sitemaps.Sitemap` class (e.g.,
 ``Sitemap`` classes
 ===================
 
-A :class:`~django.contrib.sitemaps.Sitemap` class is a simple Python
-class that represents a "section" of entries in your sitemap. For example,
-one :class:`~django.contrib.sitemaps.Sitemap` class could represent
-all the entries of your Weblog, while another could represent all of the
-events in your events calendar.
+A :class:`~django.contrib.sitemaps.Sitemap` class is a Python class that
+represents a "section" of entries in your sitemap. For example, one
+:class:`~django.contrib.sitemaps.Sitemap` class could represent all the entries
+of your Weblog, while another could represent all of the events in your events
+calendar.
 
 In the simplest case, all these sections get lumped together into one
 :file:`sitemap.xml`, but it's also possible to use the framework to generate a
@@ -90,8 +90,8 @@ sitemap index that references individual sitemap files, one per section. (See
 :class:`~django.contrib.sitemaps.Sitemap` classes must subclass
 ``django.contrib.sitemaps.Sitemap``. They can live anywhere in your codebase.
 
-A simple example
-================
+An example
+==========
 
 Let's assume you have a blog system, with an ``Entry`` model, and you want your
 sitemap to include all the links to your individual blog entries. Here's how
@@ -116,11 +116,10 @@ Note:
   attributes corresponding to ``<changefreq>`` and ``<priority>`` elements,
   respectively. They can be made callable as functions, as
   :attr:`~Sitemap.lastmod` was in the example.
-* :attr:`~Sitemap.items()` is simply a method that returns a list of
-  objects. The objects returned will get passed to any callable methods
-  corresponding to a sitemap property (:attr:`~Sitemap.location`,
-  :attr:`~Sitemap.lastmod`, :attr:`~Sitemap.changefreq`, and
-  :attr:`~Sitemap.priority`).
+* :attr:`~Sitemap.items()` is a method that returns a list of objects. The
+  objects returned will get passed to any callable methods corresponding to a
+  sitemap property (:attr:`~Sitemap.location`, :attr:`~Sitemap.lastmod`,
+  :attr:`~Sitemap.changefreq`, and :attr:`~Sitemap.priority`).
 * :attr:`~Sitemap.lastmod` should return a :class:`~datetime.datetime`.
 * There is no :attr:`~Sitemap.location` method in this example, but you
   can provide it in order to specify the URL for your object. By default,

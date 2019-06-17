@@ -5,11 +5,10 @@ Sending email
 .. module:: django.core.mail
    :synopsis: Helpers to easily send email.
 
-Although Python makes sending email relatively easy via the :mod:`smtplib`
+Although Python provides a mail sending interface via the :mod:`smtplib`
 module, Django provides a couple of light wrappers over it. These wrappers are
-provided to make sending email extra quick, to make it easy to test email
-sending during development, and to provide support for platforms that can't use
-SMTP.
+provided to make sending email extra quick, to help test email sending during
+development, and to provide support for platforms that can't use SMTP.
 
 The code lives in the ``django.core.mail`` module.
 
@@ -45,8 +44,7 @@ a secure connection is used.
 
 .. function:: send_mail(subject, message, from_email, recipient_list, fail_silently=False, auth_user=None, auth_password=None, connection=None, html_message=None)
 
-The simplest way to send email is using
-``django.core.mail.send_mail()``.
+In most cases, you can send email using ``django.core.mail.send_mail()``.
 
 The ``subject``, ``message``, ``from_email`` and ``recipient_list`` parameters
 are required.
@@ -186,7 +184,7 @@ will not send the email. It's your responsibility to validate all data before
 passing it to the email functions.
 
 If a ``message`` contains headers at the start of the string, the headers will
-simply be printed as the first bit of the email message.
+be printed as the first bit of the email message.
 
 Here's an example view that takes a ``subject``, ``message`` and ``from_email``
 from the request's POST data, sends that to admin@example.com and redirects to
@@ -239,9 +237,9 @@ recipients, file attachments, or multi-part email, you'll need to create
 message itself. The :ref:`email backend <topic-email-backends>` is then
 responsible for sending the email.
 
-For convenience, :class:`~django.core.mail.EmailMessage` provides a simple
-``send()`` method for sending a single email. If you need to send multiple
-messages, the email backend API :ref:`provides an alternative
+For convenience, :class:`~django.core.mail.EmailMessage` provides a ``send()``
+method for sending a single email. If you need to send multiple messages, the
+email backend API :ref:`provides an alternative
 <topics-sending-multiple-emails>`.
 
 ``EmailMessage`` Objects
@@ -360,7 +358,7 @@ The class has the following methods:
 * ``attach_file()`` creates a new attachment using a file from your
   filesystem. Call it with the path of the file to attach and, optionally,
   the MIME type to use for the attachment. If the MIME type is omitted, it
-  will be guessed from the filename. The simplest use would be::
+  will be guessed from the filename. You can use it like this::
 
     message.attach_file('/images/weather_map.png')
 
@@ -672,9 +670,9 @@ anything. Python has a built-in way to accomplish this with a single command::
 
     python -m smtpd -n -c DebuggingServer localhost:1025
 
-This command will start a simple SMTP server listening on port 1025 of
-localhost. This server simply prints to standard output all email headers and
-the email body. You then only need to set the :setting:`EMAIL_HOST` and
+This command will start a minimal SMTP server listening on port 1025 of
+localhost. This server prints to standard output all email headers and the
+email body. You then only need to set the :setting:`EMAIL_HOST` and
 :setting:`EMAIL_PORT` accordingly. For a more detailed discussion of SMTP
 server options, see the Python documentation for the :mod:`smtpd` module.
 

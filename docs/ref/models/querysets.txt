@@ -151,8 +151,8 @@ Here's the formal declaration of a ``QuerySet``:
         The ``query`` parameter to :class:`QuerySet` exists so that specialized
         query subclasses can reconstruct internal query state. The value of the
         parameter is an opaque representation of that query state and is not
-        part of a public API. To put it simply: if you need to ask, you don't
-        need to use it.
+        part of a public API. To put it another way: if you need to ask, you
+        don't need to use it.
 
 .. currentmodule:: django.db.models.query.QuerySet
 
@@ -1943,7 +1943,7 @@ details. The internal implementation has some more error-checking than this and
 handles some extra edge-conditions; if you're interested, read the code.
 
 If you have a field named ``defaults`` and want to use it as an exact lookup in
-``get_or_create()``, just use ``'defaults__exact'``, like so::
+``get_or_create()``, use ``'defaults__exact'``, like so::
 
     Foo.objects.get_or_create(defaults__exact='bar', defaults={'defaults': 'baz'})
 
@@ -2418,8 +2418,8 @@ gains).
 Additionally, if a ``some_queryset`` has not yet been evaluated, but you know
 that it will be at some point, then using ``some_queryset.exists()`` will do
 more overall work (one query for the existence check plus an extra one to later
-retrieve the results) than simply using ``bool(some_queryset)``, which
-retrieves the results and then checks if any were returned.
+retrieve the results) than using ``bool(some_queryset)``, which retrieves the
+results and then checks if any were returned.
 
 ``update()``
 ~~~~~~~~~~~~

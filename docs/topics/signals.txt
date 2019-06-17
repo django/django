@@ -138,7 +138,7 @@ Now, our ``my_callback`` function will be called each time a request finishes.
     submodule of the application they relate to. Signal receivers are
     connected in the :meth:`~django.apps.AppConfig.ready` method of your
     application configuration class. If you're using the :func:`receiver`
-    decorator, simply import the ``signals`` submodule inside
+    decorator, import the ``signals`` submodule inside
     :meth:`~django.apps.AppConfig.ready`.
 
 .. note::

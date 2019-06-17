@@ -82,8 +82,8 @@ backends that follow.
     authenticated user is needed. This effectively means that authentication
     sources are cached on a per-session basis, so if you change
     :setting:`AUTHENTICATION_BACKENDS`, you'll need to clear out session data if
-    you need to force users to re-authenticate using different methods. A simple
-    way to do that is simply to execute ``Session.objects.all().delete()``.
+    you need to force users to re-authenticate using different methods. A
+    simple way to do that is to execute ``Session.objects.all().delete()``.
 
 Writing an authentication backend
 ---------------------------------
@@ -98,7 +98,7 @@ database ID or whatever, but has to be the primary key of your user object --
 and returns a user object or ``None``.
 
 The ``authenticate`` method takes a ``request`` argument and credentials as
-keyword arguments. Most of the time, it'll just look like this::
+keyword arguments. Most of the time, it'll look like this::
 
     from django.contrib.auth.backends import BaseBackend
 
@@ -197,7 +197,7 @@ exception in :meth:`~django.contrib.auth.models.User.has_perm()` or
 :meth:`~django.contrib.auth.models.User.has_module_perms()`, the authorization
 will immediately fail and Django won't check the backends that follow.
 
-A backend could implement permissions for the magic admin fairly simply::
+A backend could implement permissions for the magic admin like this::
 
     from django.contrib.auth.backends import BaseBackend
 
@@ -729,7 +729,7 @@ Writing a manager for a custom user model
 You should also define a custom manager for your user model. If your user model
 defines ``username``, ``email``, ``is_staff``, ``is_active``, ``is_superuser``,
 ``last_login``, and ``date_joined`` fields the same as Django's default user,
-you can just install Django's :class:`~django.contrib.auth.models.UserManager`;
+you can install Django's :class:`~django.contrib.auth.models.UserManager`;
 however, if your user model defines different fields, you'll need to define a
 custom manager that extends :class:`~django.contrib.auth.models.BaseUserManager`
 providing two additional methods:
@@ -793,10 +793,10 @@ Extending Django's default ``User``
 -----------------------------------
 
 If you're entirely happy with Django's :class:`~django.contrib.auth.models.User`
-model and you just want to add some additional profile information, you could
-simply subclass :class:`django.contrib.auth.models.AbstractUser` and add your
-custom profile fields, although we'd recommend a separate model as described in
-the "Model design considerations" note of :ref:`specifying-custom-user-model`.
+model, but you want to add some additional profile information, you could
+subclass :class:`django.contrib.auth.models.AbstractUser` and add your custom
+profile fields, although we'd recommend a separate model as described in the
+"Model design considerations" note of :ref:`specifying-custom-user-model`.
 ``AbstractUser`` provides the full implementation of the default
 :class:`~django.contrib.auth.models.User` as an :ref:`abstract model
 <abstract-base-classes>`.
@@ -835,8 +835,8 @@ to work with a custom user model:
 * :class:`~django.contrib.auth.forms.UserCreationForm`
 * :class:`~django.contrib.auth.forms.UserChangeForm`
 
-If your custom user model is a simple subclass of ``AbstractUser``, then you
-can extend these forms in this manner::
+If your custom user model is a subclass of ``AbstractUser``, then you can
+extend these forms in this manner::
 
     from django.contrib.auth.forms import UserCreationForm
     from myapp.models import CustomUser
@@ -1009,10 +1009,10 @@ A full example
 
 Here is an example of an admin-compliant custom user app. This user model uses
 an email address as the username, and has a required date of birth; it
-provides no permission checking, beyond a simple ``admin`` flag on the user
-account. This model would be compatible with all the built-in auth forms and
-views, except for the user creation forms. This example illustrates how most of
-the components work together, but is not intended to be copied directly into
+provides no permission checking beyond an ``admin`` flag on the user account.
+This model would be compatible with all the built-in auth forms and views,
+except for the user creation forms. This example illustrates how most of the
+components work together, but is not intended to be copied directly into
 projects for production use.
 
 This code would all live in a ``models.py`` file for a custom

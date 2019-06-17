@@ -86,7 +86,7 @@ Get things right from the start
 -------------------------------
 
 Some work in optimization involves tackling performance shortcomings, but some
-of the work can simply be built in to what you'd do anyway, as part of the good
+of the work can be built in to what you'd do anyway, as part of the good
 practices you should adopt even before you start thinking about improving
 performance.
 
@@ -353,7 +353,7 @@ Newer is often - but not always - better
 It's fairly rare for a new release of well-maintained software to be less
 efficient, but the maintainers can't anticipate every possible use-case - so
 while being aware that newer versions are likely to perform better, don't
-simply assume that they always will.
+assume that they always will.
 
 This is true of Django itself. Successive releases have offered a number of
 improvements across the system, but you should still check the real-world

@@ -145,8 +145,8 @@ So these statements are all legal::
 
 This example also pointed out another interesting technique: using multiple
 managers on the same model. You can attach as many ``Manager()`` instances to
-a model as you'd like. This is an easy way to define common "filters" for your
-models.
+a model as you'd like. This is a non-repetitive way to define common "filters"
+for your models.
 
 For example::
 
@@ -396,7 +396,7 @@ manager, you can provide the default manager on the child class::
         default_manager = OtherManager()
 
 Here, ``default_manager`` is the default. The ``objects`` manager is
-still available, since it's inherited. It just isn't used as the default.
+still available, since it's inherited, but isn't used as the default.
 
 Finally for this example, suppose you want to add extra managers to the child
 class, but still use the default from ``AbstractBase``. You can't add the new

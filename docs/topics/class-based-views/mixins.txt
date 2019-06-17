@@ -46,7 +46,7 @@ interface to working with templates in class-based views.
 
     ``render_to_response()`` itself calls
     :meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names`,
-    which by default will just look up
+    which by default will look up
     :attr:`~django.views.generic.base.TemplateResponseMixin.template_name` on
     the class-based view; two other mixins
     (:class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`
@@ -61,8 +61,8 @@ interface to working with templates in class-based views.
     :meth:`~django.views.generic.base.ContextMixin.get_context_data()` passing
     any data they want to ensure is in there as keyword arguments.
     ``get_context_data()`` returns a dictionary; in ``ContextMixin`` it
-    simply returns its keyword arguments, but it is common to override this to
-    add more members to the dictionary. You can also use the
+    returns its keyword arguments, but it is common to override this to add
+    more members to the dictionary. You can also use the
     :attr:`~django.views.generic.base.ContextMixin.extra_context` attribute.
 
 Building up Django's generic class-based views
@@ -142,7 +142,7 @@ and
 :meth:`~django.views.generic.list.MultipleObjectMixin.paginate_queryset`. Unlike
 with :class:`~django.views.generic.detail.SingleObjectMixin`, there's no need
 to key off parts of the URL to figure out the queryset to work with, so the
-default just uses the
+default uses the
 :attr:`~django.views.generic.list.MultipleObjectMixin.queryset` or
 :attr:`~django.views.generic.list.MultipleObjectMixin.model` attribute
 on the view class. A common reason to override
@@ -212,11 +212,10 @@ the box.
 Using ``SingleObjectMixin`` with View
 -------------------------------------
 
-If we want to write a simple class-based view that responds only to
-``POST``, we'll subclass :class:`~django.views.generic.base.View` and
-write a ``post()`` method in the subclass. However if we want our
-processing to work on a particular object, identified from the URL,
-we'll want the functionality provided by
+If we want to write a class-based view that responds only to ``POST``, we'll
+subclass :class:`~django.views.generic.base.View` and write a ``post()`` method
+in the subclass. However if we want our processing to work on a particular
+object, identified from the URL, we'll want the functionality provided by
 :class:`~django.views.generic.detail.SingleObjectMixin`.
 
 We'll demonstrate this with the ``Author`` model we used in the
@@ -249,9 +248,8 @@ In practice you'd probably want to record the interest in a key-value
 store rather than in a relational database, so we've left that bit
 out. The only bit of the view that needs to worry about using
 :class:`~django.views.generic.detail.SingleObjectMixin` is where we want to
-look up the author we're interested in, which it just does with a simple call
-to ``self.get_object()``. Everything else is taken care of for us by the
-mixin.
+look up the author we're interested in, which it does with a call to
+``self.get_object()``. Everything else is taken care of for us by the mixin.
 
 We can hook this into our URLs easily enough:
 
@@ -288,8 +286,8 @@ object. In order to do this, we need to have two different querysets:
 
 ``Book`` queryset for use by :class:`~django.views.generic.list.ListView`
     Since we have access to the ``Publisher`` whose books we want to list, we
-    simply override ``get_queryset()`` and use the ``Publisher``’s
-    :ref:`reverse foreign key manager<backwards-related-objects>`.
+    override ``get_queryset()`` and use the ``Publisher``’s :ref:`reverse
+    foreign key manager<backwards-related-objects>`.
 
 ``Publisher`` queryset for use in :meth:`~django.views.generic.detail.SingleObjectMixin.get_object()`
     We'll rely on the default implementation of ``get_object()`` to fetch the
@@ -476,24 +474,23 @@ Our new ``AuthorDetail`` looks like this::
             # passed in form.cleaned_data['message']
             return super().form_valid(form)
 
-``get_success_url()`` is just providing somewhere to redirect to,
+``get_success_url()`` is provides somewhere to redirect to,
 which gets used in the default implementation of
 ``form_valid()``. We have to provide our own ``post()`` as noted earlier.
 
 A better solution
 -----------------
 
-It should be obvious that the number of subtle interactions between
+The number of subtle interactions between
 :class:`~django.views.generic.edit.FormMixin` and :class:`DetailView` is
 already testing our ability to manage things. It's unlikely you'd want to
 write this kind of class yourself.
 
-In this case, it would be fairly easy to just write the ``post()``
-method yourself, keeping :class:`DetailView` as the only generic
-functionality, although writing :class:`~django.forms.Form` handling code
-involves a lot of duplication.
+In this case, you could write the ``post()`` method yourself, keeping
+:class:`DetailView` as the only generic functionality, although writing
+:class:`~django.forms.Form` handling code involves a lot of duplication.
 
-Alternatively, it would still be easier than the above approach to
+Alternatively, it would still be less work than the above approach to
 have a separate view for processing the form, which could use
 :class:`~django.views.generic.edit.FormView` distinct from
 :class:`DetailView` without concerns.
@@ -529,11 +526,11 @@ write our own ``get_context_data()`` to make the
             context['form'] = AuthorInterestForm()
             return context
 
-Then the ``AuthorInterest`` is a simple :class:`FormView`, but we
-have to bring in :class:`~django.views.generic.detail.SingleObjectMixin` so we
-can find the author we're talking about, and we have to remember to set
-``template_name`` to ensure that form errors will render the same
-template as ``AuthorDisplay`` is using on ``GET``::
+Then the ``AuthorInterest`` is a :class:`FormView`, but we have to bring in
+:class:`~django.views.generic.detail.SingleObjectMixin` so we can find the
+author we're talking about, and we have to remember to set ``template_name`` to
+ensure that form errors will render the same template as ``AuthorDisplay`` is
+using on ``GET``::
 
     from django.http import HttpResponseForbidden
     from django.urls import reverse
@@ -593,7 +590,7 @@ rendered HTML.
 We can create a mixin class to use in all of our views, handling the
 conversion to JSON once.
 
-For example, a simple JSON mixin might look something like this::
+For example, a JSON mixin might look something like this::
 
     from django.http import JsonResponse
 
@@ -628,8 +625,8 @@ For example, a simple JSON mixin might look something like this::
 
 This mixin provides a ``render_to_json_response()`` method with the same signature
 as :func:`~django.views.generic.base.TemplateResponseMixin.render_to_response()`.
-To use it, we simply need to mix it into a ``TemplateView`` for example,
-and override ``render_to_response()`` to call ``render_to_json_response()`` instead::
+To use it, we need to mix it into a ``TemplateView`` for example, and override
+``render_to_response()`` to call ``render_to_json_response()`` instead::
 
     from django.views.generic import TemplateView
 
@@ -657,8 +654,8 @@ same behavior -- except for the format of the response.
 If you want to be really adventurous, you could even mix a
 :class:`~django.views.generic.detail.DetailView` subclass that is able
 to return *both* HTML and JSON content, depending on some property of
-the HTTP request, such as a query argument or a HTTP header. Just mix
-in both the ``JSONResponseMixin`` and a
+the HTTP request, such as a query argument or a HTTP header. Mix in both the
+``JSONResponseMixin`` and a
 :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`,
 and override the implementation of
 :func:`~django.views.generic.base.TemplateResponseMixin.render_to_response()`

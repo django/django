@@ -53,7 +53,7 @@ Use standard DB optimization techniques
 
 * Appropriate use of field types.
 
-We will assume you have done the obvious things above. The rest of this document
+We will assume you have done the things listed above. The rest of this document
 focuses on how to use Django in such a way that you are not doing unnecessary
 work. This document also does not address other optimization techniques that
 apply to all expensive operations, such as :doc:`general purpose caching
@@ -217,7 +217,7 @@ Don't retrieve things you don't need
 Use ``QuerySet.values()`` and ``values_list()``
 -----------------------------------------------
 
-When you just want a ``dict`` or ``list`` of values, and don't need ORM model
+When you only want a ``dict`` or ``list`` of values, and don't need ORM model
 objects, make appropriate usage of
 :meth:`~django.db.models.query.QuerySet.values()`.
 These can be useful for replacing model objects in template code - as long as
@@ -260,7 +260,7 @@ But:
 Don't overuse ``count()`` and ``exists()``
 ------------------------------------------
 
-If you are going to need other data from the QuerySet, just evaluate it.
+If you are going to need other data from the QuerySet, evaluate it immediately.
 
 For example, assuming an Email model that has a ``body`` attribute and a
 many-to-many relation to User, the following template code is optimal:

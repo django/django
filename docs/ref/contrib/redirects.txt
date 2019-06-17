@@ -5,7 +5,7 @@ The redirects app
 .. module:: django.contrib.redirects
    :synopsis: A framework for managing redirects.
 
-Django comes with an optional redirects application. It lets you store simple
+Django comes with an optional redirects application. It lets you store
 redirects in a database and handles the redirecting for you. It uses the HTTP
 response status code ``301 Moved Permanently`` by default.
 
@@ -25,7 +25,7 @@ How it works
 ============
 
 ``manage.py migrate`` creates a ``django_redirect`` table in your database. This
-is a simple lookup table with ``site_id``, ``old_path`` and ``new_path`` fields.
+is a lookup table with ``site_id``, ``old_path`` and ``new_path`` fields.
 
 The :class:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware`
 does all of the work. Each time any Django application raises a 404

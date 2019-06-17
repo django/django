@@ -123,16 +123,16 @@ additional metadata.
    place and automatically derive things from it.
 
    This includes the migrations - unlike in Ruby On Rails, for example, migrations
-   are entirely derived from your models file, and are essentially just a
+   are entirely derived from your models file, and are essentially a
    history that Django can roll through to update your database schema to
    match your current models.
 
-In our simple poll app, we'll create two models: ``Question`` and ``Choice``.
-A ``Question`` has a question and a publication date. A ``Choice`` has two
+In our poll app, we'll create two models: ``Question`` and ``Choice``. A
+``Question`` has a question and a publication date. A ``Choice`` has two
 fields: the text of the choice and a vote tally. Each ``Choice`` is associated
 with a ``Question``.
 
-These concepts are represented by simple Python classes. Edit the
+These concepts are represented by Python classes. Edit the
 :file:`polls/models.py` file so it looks like this:
 
 .. code-block:: python
@@ -151,9 +151,9 @@ These concepts are represented by simple Python classes. Edit the
         choice_text = models.CharField(max_length=200)
         votes = models.IntegerField(default=0)
 
-The code is straightforward. Each model is represented by a class that
-subclasses :class:`django.db.models.Model`. Each model has a number of class
-variables, each of which represents a database field in the model.
+Here, each model is represented by a class that subclasses
+:class:`django.db.models.Model`. Each model has a number of class variables,
+each of which represents a database field in the model.
 
 Each field is represented by an instance of a :class:`~django.db.models.Field`
 class -- e.g., :class:`~django.db.models.CharField` for character fields and
@@ -245,11 +245,11 @@ some changes to your models (in this case, you've made new ones) and that
 you'd like the changes to be stored as a *migration*.
 
 Migrations are how Django stores changes to your models (and thus your
-database schema) - they're just files on disk. You can read the migration
-for your new model if you like; it's the file
-``polls/migrations/0001_initial.py``. Don't worry, you're not expected to read
-them every time Django makes one, but they're designed to be human-editable
-in case you want to manually tweak how Django changes things.
+database schema) - they're files on disk. You can read the migration for your
+new model if you like; it's the file ``polls/migrations/0001_initial.py``.
+Don't worry, you're not expected to read them every time Django makes one, but
+they're designed to be human-editable in case you want to manually tweak how
+Django changes things.
 
 There's a command that will run the migrations for you and manage your database
 schema automatically - that's called :djadmin:`migrate`, and we'll come to it in a
@@ -311,7 +311,7 @@ Note the following:
   (Yes, you can override this, as well.)
 
 * The foreign key relationship is made explicit by a ``FOREIGN KEY``
-  constraint. Don't worry about the ``DEFERRABLE`` parts; that's just telling
+  constraint. Don't worry about the ``DEFERRABLE`` parts; it's telling
   PostgreSQL to not enforce the foreign key until the end of the transaction.
 
 * It's tailored to the database you're using, so database-specific field types
@@ -321,7 +321,7 @@ Note the following:
   single quotes.
 
 * The :djadmin:`sqlmigrate` command doesn't actually run the migration on your
-  database - it just prints it to the screen so that you can see what SQL
+  database - instead, it prints it to the screen so that you can see what SQL
   Django thinks is required. It's useful for checking what Django is going to
   do or if you have database administrators who require SQL scripts for
   changes.
@@ -640,9 +640,9 @@ Make the poll app modifiable in the admin
 
 But where's our poll app? It's not displayed on the admin index page.
 
-Just one thing to do: we need to tell the admin that ``Question``
-objects have an admin interface. To do this, open the :file:`polls/admin.py`
-file, and edit it to look like this:
+Only one more thing to do: we need to tell the admin that ``Question`` objects
+have an admin interface. To do this, open the :file:`polls/admin.py` file, and
+edit it to look like this:
 
 .. code-block:: python
     :caption: polls/admin.py

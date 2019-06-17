@@ -12,8 +12,8 @@ Uploaded files
 
 During file uploads, the actual file data is stored in :attr:`request.FILES
 <django.http.HttpRequest.FILES>`. Each entry in this dictionary is an
-``UploadedFile`` object (or a subclass) -- a simple wrapper around an uploaded
-file. You'll usually use one of these methods to access the uploaded content:
+``UploadedFile`` object (or a subclass) -- a wrapper around an uploaded file.
+You'll usually use one of these methods to access the uploaded content:
 
 .. method:: UploadedFile.read()
 
@@ -33,9 +33,9 @@ file. You'll usually use one of these methods to access the uploaded content:
     A generator returning chunks of the file. If ``multiple_chunks()`` is
     ``True``, you should use this method in a loop instead of ``read()``.
 
-    In practice, it's often easiest simply to use ``chunks()`` all the time.
-    Looping over ``chunks()`` instead of using ``read()`` ensures that large
-    files don't overwhelm your system's memory.
+    In practice, it's often easiest to use ``chunks()`` all the time. Looping
+    over ``chunks()`` instead of using ``read()`` ensures that large files
+    don't overwhelm your system's memory.
 
 Here are some useful attributes of ``UploadedFile``:
 
@@ -72,8 +72,8 @@ Here are some useful attributes of ``UploadedFile``:
 
 .. note::
 
-    Like regular Python files, you can read the file line-by-line simply by
-    iterating over the uploaded file:
+    Like regular Python files, you can read the file line-by-line by iterating
+    over the uploaded file:
 
     .. code-block:: python
 

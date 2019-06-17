@@ -10,9 +10,9 @@ distributing. In this document, we will be building a custom ``closepoll``
 command for the ``polls`` application from the
 :doc:`tutorial</intro/tutorial01>`.
 
-To do this, just add a ``management/commands`` directory to the application.
-Django will register a ``manage.py`` command for each Python module in that
-directory whose name doesn't begin with an underscore. For example::
+To do this, add a ``management/commands`` directory to the application. Django
+will register a ``manage.py`` command for each Python module in that directory
+whose name doesn't begin with an underscore. For example::
 
     polls/
         __init__.py

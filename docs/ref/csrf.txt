@@ -80,7 +80,7 @@ set if you've enabled CSRF protection for your views as outlined above.
 The CSRF token cookie is named ``csrftoken`` by default, but you can control
 the cookie name via the :setting:`CSRF_COOKIE_NAME` setting.
 
-Acquiring the token is straightforward:
+You can acquire the token like this:
 
 .. code-block:: javascript
 
@@ -227,7 +227,7 @@ when, due to a programming error, the CSRF token has not been included with a
 POST form.
 
 The error page, however, is not very friendly, so you may want to provide your
-own view for handling this condition.  To do this, simply set the
+own view for handling this condition.  To do this, set the
 :setting:`CSRF_FAILURE_VIEW` setting.
 
 CSRF failures are logged as warnings to the :ref:`django.security.csrf

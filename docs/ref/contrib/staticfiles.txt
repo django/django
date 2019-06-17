@@ -387,7 +387,7 @@ hashed names of processed files instead of a static manifest file called
 have access to the file system.
 
 If you want to override certain options of the cache backend the storage uses,
-simply specify a custom entry in the :setting:`CACHES` setting named
+specify a custom entry in the :setting:`CACHES` setting named
 ``'staticfiles'``. It falls back to using the ``'default'`` cache backend.
 
 .. warning::

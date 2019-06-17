@@ -213,7 +213,7 @@ specified in your :setting:`USER`, :setting:`PASSWORD`, etc., settings.
 * For SQLite, this runs the ``sqlite3`` command-line client.
 * For Oracle, this runs the ``sqlplus`` command-line client.
 
-This command assumes the programs are on your ``PATH`` so that a simple call to
+This command assumes the programs are on your ``PATH`` so that a call to
 the program name (``psql``, ``mysql``, ``sqlite3``, ``sqlplus``) will find the
 program in the right place. There's no way to specify the location of the
 program manually.
@@ -400,7 +400,7 @@ By default, ``inspectdb`` creates unmanaged models. That is, ``managed = False``
 in the model's ``Meta`` class tells Django not to manage each table's creation,
 modification, and deletion. If you do want to allow Django to manage the
 table's lifecycle, you'll need to change the
-:attr:`~django.db.models.Options.managed` option to ``True`` (or simply remove
+:attr:`~django.db.models.Options.managed` option to ``True`` (or remove
 it because ``True`` is its default value).
 
 Database-specific notes
@@ -537,7 +537,7 @@ raise an exception::
 
     post_save.connect(my_handler, sender=MyModel)
 
-You could also write a simple decorator to encapsulate this logic::
+You could also write a decorator to encapsulate this logic::
 
     from functools import wraps
 
@@ -917,7 +917,7 @@ project for some common errors (see the :djadmin:`check` command). If any
 errors are found, they will be printed to standard output.
 
 You can run as many concurrent servers as you want, as long as they're on
-separate ports. Just execute ``django-admin runserver`` more than once.
+separate ports by executing ``django-admin runserver`` more than once.
 
 Note that the default IP address, ``127.0.0.1``, is not accessible from other
 machines on your network. To make your development server viewable to other
@@ -1729,7 +1729,7 @@ Example usage::
 .. django-admin-option:: --traceback
 
 Displays a full stack trace when a :exc:`~django.core.management.CommandError`
-is raised. By default, ``django-admin`` will show a simple error message when a
+is raised. By default, ``django-admin`` will show an error message when a
 ``CommandError`` occurs and a full stack trace for any other exception.
 
 Example usage::

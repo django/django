@@ -35,7 +35,7 @@ restricted subset of the test client API:
 Example
 -------
 
-The following is a simple unit test using the request factory::
+The following is a unit test using the request factory::
 
     from django.contrib.auth.models import AnonymousUser, User
     from django.test import RequestFactory, TestCase
@@ -79,9 +79,8 @@ Projects that support multitenancy or otherwise alter business logic based on
 the request's host and use custom host names in tests must include those hosts
 in :setting:`ALLOWED_HOSTS`.
 
-The first and simplest option to do so is to add the hosts to your settings
-file. For example, the test suite for docs.djangoproject.com includes the
-following::
+The first option to do so is to add the hosts to your settings file. For
+example, the test suite for docs.djangoproject.com includes the following::
 
     from django.test import TestCase
 

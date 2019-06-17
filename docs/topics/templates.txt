@@ -225,7 +225,7 @@ subdirectories as needed.
 Do this for your own sanity. Storing all templates in the root level of a
 single directory gets messy.
 
-To load a template that's within a subdirectory, just use a slash, like so::
+To load a template that's within a subdirectory, use a slash, like so::
 
     get_template('news/story_detail.html')
 
@@ -439,7 +439,7 @@ adds defaults that differ from Jinja2's for a few options:
     * Using the result multiple times in each template.
 
     Unless all of these conditions are met, passing a function to the template is
-    simpler and more in line with the design of Jinja2.
+    more in line with the design of Jinja2.
 
 The default configuration is purposefully kept to a minimum. If a template is
 rendered with a request (e.g. when using :py:func:`~django.shortcuts.render`),
@@ -478,10 +478,10 @@ Then you could use the following constructs in Jinja2 templates:
 The concepts of tags and filters exist both in the Django template language
 and in Jinja2 but they're used differently. Since Jinja2 supports passing
 arguments to callables in templates, many features that require a template tag
-or filter in Django templates can be achieved simply by calling a function in
-Jinja2 templates, as shown in the example above. Jinja2's global namespace
-removes the need for template context processors. The Django template language
-doesn't have an equivalent of Jinja2 tests.
+or filter in Django templates can be achieved by calling a function in Jinja2
+templates, as shown in the example above. Jinja2's global namespace removes the
+need for template context processors. The Django template language doesn't have
+an equivalent of Jinja2 tests.
 
 Custom backends
 ---------------
@@ -667,9 +667,9 @@ Syntax
     This is an overview of the Django template language's syntax. For details
     see the :doc:`language syntax reference </ref/templates/language>`.
 
-A Django template is simply a text document or a Python string marked-up using
-the Django template language. Some constructs are recognized and interpreted
-by the template engine. The main ones are variables and tags.
+A Django template is a text document or a Python string marked-up using the
+Django template language. Some constructs are recognized and interpreted by the
+template engine. The main ones are variables and tags.
 
 A template is rendered with a context. Rendering replaces variables with their
 values, which are looked up in the context, and executes tags. Everything else
@@ -822,8 +822,8 @@ data to be added to the rendering context.
 Their main use is to add common data shared by all templates to the context
 without repeating code in every view.
 
-Django provides many :ref:`built-in context processors <context-processors>`.
-Implementing a custom context processor is as simple as defining a function.
+Django provides many :ref:`built-in context processors <context-processors>`,
+and you can implement your own additional context processors, too.
 
 .. _Jinja2: http://jinja.pocoo.org/
 .. _DEP 182: https://github.com/django/deps/blob/master/final/0182-multiple-template-engines.rst

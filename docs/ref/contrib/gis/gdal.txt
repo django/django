@@ -36,7 +36,7 @@ The GDAL/OGR tools described here are designed to help you read in
 your geospatial data, in order for most of them to be useful you have
 to have some data to work with.  If you're starting out and don't yet
 have any data of your own to use, GeoDjango tests contain a number of
-simple data sets that you can use for testing. You can download them here::
+data sets that you can use for testing. You can download them here::
 
     $ wget https://raw.githubusercontent.com/django/django/master/tests/gis_tests/data/cities/cities.{shp,prj,shx,dbf}
     $ wget https://raw.githubusercontent.com/django/django/master/tests/gis_tests/data/rasters/raster.tif
@@ -49,7 +49,7 @@ Vector Data Source Objects
 
 :class:`DataSource` is a wrapper for the OGR data source object that
 supports reading data from a variety of OGR-supported geospatial file
-formats and data sources using a simple, consistent interface.  Each
+formats and data sources using a consistent interface.  Each
 data source is represented by a :class:`DataSource` object which contains
 one or more layers of data.  Each layer, represented by a :class:`Layer`
 object, contains some number of geographic features (:class:`Feature`),
@@ -1085,7 +1085,7 @@ Raster Data Objects
 
 :class:`GDALRaster` is a wrapper for the GDAL raster source object that
 supports reading data from a variety of GDAL-supported geospatial file
-formats and data sources using a simple, consistent interface.  Each
+formats and data sources using a consistent interface.  Each
 data source is represented by a :class:`GDALRaster` object which contains
 one or more layers of data named bands.  Each band, represented by a
 :class:`GDALBand` object, contains georeferenced image data. For example, an RGB

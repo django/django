@@ -79,7 +79,7 @@ OK, we have our Question admin page, but a ``Question`` has multiple
 Yet.
 
 There are two ways to solve this problem. The first is to register ``Choice``
-with the admin just as we did with ``Question``. That's easy:
+with the admin just as we did with ``Question``:
 
 .. code-block:: python
     :caption: polls/admin.py
@@ -159,8 +159,8 @@ that you can't remove the original three slots. This image shows an added slot:
 
 One small problem, though. It takes a lot of screen space to display all the
 fields for entering related ``Choice`` objects. For that reason, Django offers a
-tabular way of displaying inline related objects; you just need to change
-the ``ChoiceInline`` declaration to read:
+tabular way of displaying inline related objects. To use it, change the
+``ChoiceInline`` declaration to read:
 
 .. code-block:: python
     :caption: polls/admin.py
@@ -201,8 +201,8 @@ object:
         # ...
         list_display = ('question_text', 'pub_date')
 
-Just for good measure, let's also include the ``was_published_recently()``
-method from :doc:`Tutorial 2 </intro/tutorial02>`:
+For good measure, let's also include the ``was_published_recently()`` method
+from :doc:`Tutorial 2 </intro/tutorial02>`:
 
 .. code-block:: python
     :caption: polls/admin.py
@@ -284,9 +284,8 @@ Customize the admin look and feel
 Clearly, having "Django administration" at the top of each admin page is
 ridiculous. It's just placeholder text.
 
-That's easy to change, though, using Django's template system. The Django admin
-is powered by Django itself, and its interfaces use Django's own template
-system.
+You can change it, though, using Django's template system. The Django admin is
+powered by Django itself, and its interfaces use Django's own template system.
 
 .. _ref-customizing-your-projects-templates:
 
@@ -346,7 +345,7 @@ template directory in the source code of Django itself
 
         $ python -c "import django; print(django.__path__)"
 
-Then, just edit the file and replace
+Then, edit the file and replace
 ``{{ site_header|default:_('Django administration') }}`` (including the curly
 braces) with your own site's name as you see fit. You should end up with
 a section of code like:
@@ -369,9 +368,8 @@ template language will be evaluated to produce the final HTML page, just like
 we saw in :doc:`Tutorial 3 </intro/tutorial03>`.
 
 Note that any of Django's default admin templates can be overridden. To
-override a template, just do the same thing you did with ``base_site.html`` --
-copy it from the default directory into your custom directory, and make
-changes.
+override a template, do the same thing you did with ``base_site.html`` -- copy
+it from the default directory into your custom directory, and make changes.
 
 Customizing your *application's* templates
 ------------------------------------------

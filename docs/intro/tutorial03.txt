@@ -40,16 +40,16 @@ In our poll application, we'll have the following four views:
   question.
 
 In Django, web pages and other content are delivered by views. Each view is
-represented by a simple Python function (or method, in the case of class-based
-views). Django will choose a view by examining the URL that's requested (to be
-precise, the part of the URL after the domain name).
+represented by a Python function (or method, in the case of class-based views).
+Django will choose a view by examining the URL that's requested (to be precise,
+the part of the URL after the domain name).
 
 Now in your time on the web you may have come across such beauties as
 "ME2/Sites/dirmod.asp?sid=&type=gen&mod=Core+Pages&gid=A6CD4967199A42D9B65B1B".
 You will be pleased to know that Django allows us much more elegant
 *URL patterns* than that.
 
-A URL pattern is simply the general form of a URL - for example:
+A URL pattern is the general form of a URL - for example:
 ``/newsarchive/<year>/<month>/``.
 
 To get from a URL to a view, Django uses what are known as 'URLconfs'. A
@@ -181,7 +181,7 @@ directory called ``polls``, and within that create a file called
 ``index.html``. In other words, your template should be at
 ``polls/templates/polls/index.html``. Because of how the ``app_directories``
 template loader works as described above, you can refer to this template within
-Django simply as ``polls/index.html``.
+Django as ``polls/index.html``.
 
 .. admonition:: Template namespacing
 
@@ -190,7 +190,7 @@ Django simply as ``polls/index.html``.
     but it would actually be a bad idea. Django will choose the first template
     it finds whose name matches, and if you had a template with the same name
     in a *different* application, Django would be unable to distinguish between
-    them. We need to be able to point Django at the right one, and the easiest
+    them. We need to be able to point Django at the right one, and the best
     way to ensure this is by *namespacing* them. That is, by putting those
     templates inside *another* directory named for the application itself.
 
@@ -455,4 +455,5 @@ to point at the namespaced detail view:
     <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
 
 When you're comfortable with writing views, read :doc:`part 4 of this tutorial
-</intro/tutorial04>` to learn about simple form processing and generic views.
+</intro/tutorial04>` to learn the basics about form processing and generic
+views.

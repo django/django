@@ -10,9 +10,9 @@ processing-overhead perspective, than your standard
 read-a-file-off-the-filesystem server arrangement.
 
 For most Web applications, this overhead isn't a big deal. Most Web
-applications aren't ``washingtonpost.com`` or ``slashdot.org``; they're simply
-small- to medium-sized sites with so-so traffic. But for medium- to
-high-traffic sites, it's essential to cut as much overhead as possible.
+applications aren't ``washingtonpost.com`` or ``slashdot.org``; they're small-
+to medium-sized sites with so-so traffic. But for medium- to high-traffic
+sites, it's essential to cut as much overhead as possible.
 
 That's where caching comes in.
 
@@ -366,7 +366,7 @@ as reference implementations. You'll find the code in the
 
 Note: Without a really compelling reason, such as a host that doesn't support
 them, you should stick to the cache backends included with Django. They've
-been well-tested and are easy to use.
+been well-tested and are well-documented.
 
 .. _cache_arguments:
 
@@ -556,8 +556,7 @@ The per-view cache
 
 A more granular way to use the caching framework is by caching the output of
 individual views. ``django.views.decorators.cache`` defines a ``cache_page``
-decorator that will automatically cache the view's response for you. It's easy
-to use::
+decorator that will automatically cache the view's response for you::
 
     from django.views.decorators.cache import cache_page
 
@@ -618,8 +617,8 @@ want to use them without being cached. The solution to these problems is to
 specify the per-view cache in the URLconf rather than next to the view functions
 themselves.
 
-Doing so is easy: simply wrap the view function with ``cache_page`` when you
-refer to it in the URLconf. Here's the old URLconf from earlier::
+You can do so by wrapping the view function with ``cache_page`` when you refer
+to it in the URLconf. Here's the old URLconf from earlier::
 
     urlpatterns = [
         path('foo/<int:code>/', my_view),
@@ -697,7 +696,7 @@ equivalent:
     {% cache my_timeout sidebar %} ... {% endcache %}
 
 This feature is useful in avoiding repetition in templates. You can set the
-timeout in a variable, in one place, and just reuse that value.
+timeout in a variable, in one place, and reuse that value.
 
 By default, the cache tag will try to use the cache called "template_fragments".
 If no such cache exists, it will fall back to using the default cache. You may
@@ -743,11 +742,11 @@ per-site or per-view cache strategies offer, because you wouldn't want to
 cache the entire result (since some of the data changes often), but you'd still
 want to cache the results that rarely change.
 
-For cases like this, Django exposes a simple, low-level cache API. You can use
-this API to store objects in the cache with any level of granularity you like.
-You can cache any Python object that can be pickled safely: strings,
-dictionaries, lists of model objects, and so forth. (Most common Python objects
-can be pickled; refer to the Python documentation for more information about
+For cases like this, Django exposes a low-level cache API. You can use this API
+to store objects in the cache with any level of granularity you like.  You can
+cache any Python object that can be pickled safely: strings, dictionaries,
+lists of model objects, and so forth. (Most common Python objects can be
+pickled; refer to the Python documentation for more information about
 pickling.)
 
 Accessing the cache
@@ -840,7 +839,7 @@ check the return value. It will return ``True`` if the value was stored,
 
 If you want to get a key's value or set a value if the key isn't in the cache,
 there is the ``get_or_set()`` method. It takes the same parameters as ``get()``
-but the default is set as the new cache value for that key, rather than simply
+but the default is set as the new cache value for that key, rather than
 returned::
 
     >>> cache.get('my_new_key')  # returns None
@@ -881,8 +880,8 @@ failed to be inserted.
 
 .. method:: cache.delete(key, version=None)
 
-You can delete keys explicitly with ``delete()``. This is an easy way of
-clearing the cache for a particular object::
+You can delete keys explicitly with ``delete()`` to clear the cache for a
+particular object::
 
     >>> cache.delete('a')
 
@@ -1111,11 +1110,11 @@ Many Web pages' contents differ based on authentication and a host of other
 variables, and cache systems that blindly save pages based purely on URLs could
 expose incorrect or sensitive data to subsequent visitors to those pages.
 
-For example, say you operate a Web email system, and the contents of the
-"inbox" page obviously depend on which user is logged in. If an ISP blindly
-cached your site, then the first user who logged in through that ISP would have
-their user-specific inbox page cached for subsequent visitors to the site.
-That's not cool.
+For example, if you operate a Web email system, then the contents of the
+"inbox" page depend on which user is logged in. If an ISP blindly cached your
+site, then the first user who logged in through that ISP would have their
+user-specific inbox page cached for subsequent visitors to the site.  That's
+not cool.
 
 Fortunately, HTTP provides a solution to this problem. A number of HTTP headers
 exist to instruct downstream caches to differ their cache contents depending on

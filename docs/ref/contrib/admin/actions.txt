@@ -9,7 +9,7 @@ then change it." This works well for a majority of use cases. However, if you
 need to make the same change to many objects at once, this workflow can be
 quite tedious.
 
-In these cases, Django's admin lets you write and register "actions" -- simple
+In these cases, Django's admin lets you write and register "actions" --
 functions that get called with a list of objects selected on the change list
 page.
 
@@ -43,7 +43,7 @@ Writing actions
 The easiest way to explain actions is by example, so let's dive in.
 
 A common use case for admin actions is the bulk updating of a model. Imagine a
-simple news application with an ``Article`` model::
+news application with an ``Article`` model::
 
     from django.db import models
 
@@ -71,7 +71,7 @@ Writing action functions
 ------------------------
 
 First, we'll need to write a function that gets called when the action is
-triggered from the admin. Action functions are just regular functions that take
+triggered from the admin. Action functions are regular functions that take
 three arguments:
 
 * The current :class:`ModelAdmin`
@@ -89,7 +89,7 @@ request object, but we will use the queryset::
 
     For the best performance, we're using the queryset's :ref:`update method
     <topics-db-queries-update>`. Other types of actions might need to deal
-    with each object individually; in these cases we'd just iterate over the
+    with each object individually; in these cases we'd iterate over the
     queryset::
 
         for obj in queryset:
@@ -138,7 +138,7 @@ That code will give us an admin change list that looks something like this:
 .. image:: _images/adding-actions-to-the-modeladmin.png
 
 That's really all there is to it! If you're itching to write your own actions,
-you now know enough to get started. The rest of this document just covers more
+you now know enough to get started. The rest of this document covers more
 advanced techniques.
 
 Handling errors in actions
@@ -159,12 +159,12 @@ advanced options.
 Actions as :class:`ModelAdmin` methods
 --------------------------------------
 
-The example above shows the ``make_published`` action defined as a simple
-function. That's perfectly fine, but it's not perfect from a code design point
-of view: since the action is tightly coupled to the ``Article`` object, it
-makes sense to hook the action to the ``ArticleAdmin`` object itself.
+The example above shows the ``make_published`` action defined as a function.
+That's perfectly fine, but it's not perfect from a code design point of view:
+since the action is tightly coupled to the ``Article`` object, it makes sense
+to hook the action to the ``ArticleAdmin`` object itself.
 
-That's easy enough to do::
+You can do it like this::
 
     class ArticleAdmin(admin.ModelAdmin):
         ...
@@ -180,9 +180,9 @@ Notice first that we've moved ``make_published`` into a method and renamed the
 ``'make_published'`` in ``actions`` instead of a direct function reference. This
 tells the :class:`ModelAdmin` to look up the action as a method.
 
-Defining actions as methods gives the action more straightforward, idiomatic
-access to the :class:`ModelAdmin` itself, allowing the action to call any of the
-methods provided by the admin.
+Defining actions as methods gives the action more idiomatic access to the
+:class:`ModelAdmin` itself, allowing the action to call any of the methods
+provided by the admin.
 
 .. _custom-admin-action:
 
@@ -208,17 +208,15 @@ performing an action:
 Actions that provide intermediate pages
 ---------------------------------------
 
-By default, after an action is performed the user is simply redirected back
-to the original change list page. However, some actions, especially more
-complex ones, will need to return intermediate pages. For example, the
-built-in delete action asks for confirmation before deleting the selected
-objects.
+By default, after an action is performed the user is redirected back to the
+original change list page. However, some actions, especially more complex ones,
+will need to return intermediate pages. For example, the built-in delete action
+asks for confirmation before deleting the selected objects.
 
-To provide an intermediary page, simply return an
-:class:`~django.http.HttpResponse` (or subclass) from your action. For
-example, you might write a simple export function that uses Django's
-:doc:`serialization functions </topics/serialization>` to dump some selected
-objects as JSON::
+To provide an intermediary page, return an :class:`~django.http.HttpResponse`
+(or subclass) from your action. For example, you might write a export function
+that uses Django's :doc:`serialization functions </topics/serialization>` to
+dump some selected objects as JSON::
 
     from django.core import serializers
     from django.http import HttpResponse
@@ -236,7 +234,7 @@ This allows you to provide complex interaction logic on the intermediary
 pages. For example, if you wanted to provide a more complete export function,
 you'd want to let the user choose a format, and possibly a list of fields to
 include in the export. The best thing to do would be to write a small action
-that simply redirects to your custom export view::
+that redirects to your custom export view::
 
     from django.contrib import admin
     from django.contrib.contenttypes.models import ContentType
@@ -247,9 +245,9 @@ that simply redirects to your custom export view::
         ct = ContentType.objects.get_for_model(queryset.model)
         return HttpResponseRedirect("/export/?ct=%s&ids=%s" % (ct.pk, ",".join(selected)))
 
-As you can see, the action is the simple part; all the complex logic would
-belong in your export view. This would need to deal with objects of any type,
-hence the business with the ``ContentType``.
+As you can see, the action is rather short; all the complex logic would belong
+in your export view. This would need to deal with objects of any type, hence
+the business with the ``ContentType``.
 
 Writing this view is left as an exercise to the reader.
 
@@ -303,8 +301,7 @@ Disabling a site-wide action
     site-wide.
 
     If, however, you need to re-enable a globally-disabled action for one
-    particular model, simply list it explicitly in your ``ModelAdmin.actions``
-    list::
+    particular model, list it explicitly in your ``ModelAdmin.actions`` list::
 
         # Globally disable delete selected
         admin.site.disable_action('delete_selected')
@@ -323,8 +320,8 @@ Disabling a site-wide action
 Disabling all actions for a particular :class:`ModelAdmin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you want *no* bulk actions available for a given :class:`ModelAdmin`, simply
-set :attr:`ModelAdmin.actions` to ``None``::
+If you want *no* bulk actions available for a given :class:`ModelAdmin`, set
+:attr:`ModelAdmin.actions` to ``None``::
 
     class MyModelAdmin(admin.ModelAdmin):
         actions = None

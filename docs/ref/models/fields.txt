@@ -127,7 +127,7 @@ define a suitably-named constant for each value::
 Though you can define a choices list outside of a model class and then
 refer to it, defining the choices and names for each choice inside the
 model class keeps all of that information with the class that uses it,
-and makes the choices easy to reference (e.g, ``Student.SOPHOMORE``
+and helps reference the choices (e.g, ``Student.SOPHOMORE``
 will work anywhere that the ``Student`` model has been imported).
 
 In addition, Django provides enumeration types that you can subclass to define
@@ -634,10 +634,10 @@ Any combination of these options will result in an error.
     The ``auto_now`` and ``auto_now_add`` options will always use the date in
     the :ref:`default timezone <default-current-time-zone>` at the moment of
     creation or update. If you need something different, you may want to
-    consider simply using your own callable default or overriding ``save()``
-    instead of using ``auto_now`` or ``auto_now_add``; or using a
-    ``DateTimeField`` instead of a ``DateField`` and deciding how to handle the
-    conversion from datetime to date at display time.
+    consider using your own callable default or overriding ``save()`` instead
+    of using ``auto_now`` or ``auto_now_add``; or using a ``DateTimeField``
+    instead of a ``DateField`` and deciding how to handle the conversion from
+    datetime to date at display time.
 
 ``DateTimeField``
 -----------------
@@ -1582,7 +1582,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     if it is a profile model designed specifically for your custom user model.
 
     Setting it to ``False`` does not mean you can reference a swappable model
-    even if it is swapped out - ``False`` just means that the migrations made
+    even if it is swapped out - ``False`` means that the migrations made
     with this ForeignKey will always reference the exact model you specify
     (so it will fail hard if the user tries to run with a User model you don't
     support, for example).

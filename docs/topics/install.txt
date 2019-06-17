@@ -72,10 +72,10 @@ sure a database server is running. Django supports many different database
 servers and is officially supported with PostgreSQL_, MariaDB_, MySQL_, Oracle_
 and SQLite_.
 
-If you are developing a simple project or something you don't plan to deploy
-in a production environment, SQLite is generally the simplest option as it
-doesn't require running a separate server. However, SQLite has many differences
-from other databases, so if you are working on something substantial, it's
+If you are developing a small project or something you don't plan to deploy in
+a production environment, SQLite is generally the best option as it doesn't
+require running a separate server. However, SQLite has many differences from
+other databases, so if you are working on something substantial, it's
 recommended to develop with the same database that you plan on using in
 production.
 
@@ -107,10 +107,10 @@ If you plan to use Django's ``manage.py migrate`` command to automatically
 create database tables for your models (after first installing Django and
 creating a project), you'll need to ensure that Django has permission to create
 and alter tables in the database you're using; if you plan to manually create
-the tables, you can simply grant Django ``SELECT``, ``INSERT``, ``UPDATE`` and
-``DELETE`` permissions. After creating a database user with these
-permissions, you'll specify the details in your project's settings file,
-see :setting:`DATABASES` for details.
+the tables, you can grant Django ``SELECT``, ``INSERT``, ``UPDATE`` and
+``DELETE`` permissions. After creating a database user with these permissions,
+you'll specify the details in your project's settings file, see
+:setting:`DATABASES` for details.
 
 If you're using Django's :doc:`testing framework</topics/testing/index>` to test
 database queries, Django will need permission to create a test database.
@@ -131,8 +131,6 @@ Install the Django code
 Installation instructions are slightly different depending on whether you're
 installing a distribution-specific package, downloading the latest official
 release, or fetching the latest development version.
-
-It's easy, no matter which way you choose.
 
 .. _installing-official-release:
 
@@ -171,7 +169,7 @@ Installing a distribution-specific package
 Check the :doc:`distribution specific notes </misc/distributions>` to see if
 your platform/distribution provides official Django packages/installers.
 Distribution-provided packages will typically allow for automatic installation
-of dependencies and easy upgrade paths; however, these packages will rarely
+of dependencies and supported upgrade paths; however, these packages will rarely
 contain the latest release of Django.
 
 .. _installing-development-version:
@@ -221,8 +219,8 @@ latest bug fixes and improvements, follow these instructions:
    ``django-admin`` utility command available. In other words, you're all
    set!
 
-When you want to update your copy of the Django source code, just run the
-command ``git pull`` from within the ``django`` directory. When you do this,
-Git will automatically download any changes.
+When you want to update your copy of the Django source code, run the command
+``git pull`` from within the ``django`` directory. When you do this, Git will
+download any changes.
 
 .. _Git: https://git-scm.com/

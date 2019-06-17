@@ -98,8 +98,7 @@ into Python memory.
 Instead, Django uses the ``F()`` object to generate an SQL expression that
 describes the required operation at the database level.
 
-This is easiest to understand through an example. Normally, one might do
-something like this::
+Let's try this with an example. Normally, one might do something like this::
 
     # Tintin filed a news story!
     reporter = Reporters.objects.get(name='Tintin')
@@ -167,7 +166,7 @@ Python - update a field's value avoids a *race condition*.
 If two Python threads execute the code in the first example above, one thread
 could retrieve, increment, and save a field's value after the other has
 retrieved it from the database. The value that the second thread saves will be
-based on the original value; the work of the first thread will simply be lost.
+based on the original value; the work of the first thread will be lost.
 
 If the database is responsible for updating the field, the process is more
 robust: it will only ever update the field based on the value of the field in
@@ -443,9 +442,9 @@ into the ``template`` attribute.
 Creating your own Aggregate Functions
 -------------------------------------
 
-Creating your own aggregate is extremely easy. At a minimum, you need
-to define ``function``, but you can also completely customize the
-SQL that is generated. Here's a brief example::
+You can create your own aggregate functions, too. At a minimum, you need to
+define ``function``, but you can also completely customize the SQL that is
+generated. Here's a brief example::
 
     from django.db.models import Aggregate
 
@@ -496,8 +495,8 @@ output value.
 
 .. class:: ExpressionWrapper(expression, output_field)
 
-``ExpressionWrapper`` simply surrounds another expression and provides access
-to properties, such as ``output_field``, that may not be available on other
+``ExpressionWrapper`` surrounds another expression and provides access to
+properties, such as ``output_field``, that may not be available on other
 expressions. ``ExpressionWrapper`` is necessary when using arithmetic on
 ``F()`` expressions with different types as described in
 :ref:`using-f-with-annotations`.
@@ -754,8 +753,8 @@ The ``order_by`` argument accepts a sequence of expressions on which you can
 call :meth:`~django.db.models.Expression.asc` and
 :meth:`~django.db.models.Expression.desc`. The ordering controls the order in
 which the expression is applied. For example, if you sum over the rows in a
-partition, the first result is just the value of the first row, the second is
-the sum of first and second row.
+partition, the first result is the value of the first row, the second is the
+sum of first and second row.
 
 The ``frame`` parameter specifies which other rows that should be used in the
 computation. See :ref:`window-frames` for details.
@@ -773,7 +772,7 @@ the same studio in the same genre and release year::
     >>>     ),
     >>> )
 
-This makes it easy to check if a movie is rated better or worse than its peers.
+This allows you to check if a movie is rated better or worse than its peers.
 
 You may want to apply multiple expressions over the same window, i.e., the
 same partition and frame. For example, you could modify the previous example
@@ -1061,7 +1060,7 @@ We do some basic validation on the parameters, including requiring at least
 the eventual result to.
 
 Now we implement the pre-processing and validation. Since we do not have
-any of our own validation at this point, we just delegate to the nested
+any of our own validation at this point, we delegate to the nested
 expressions::
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):

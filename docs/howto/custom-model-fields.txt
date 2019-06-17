@@ -50,7 +50,7 @@ something like this::
 
 .. _Bridge: https://en.wikipedia.org/wiki/Contract_bridge
 
-This is just an ordinary Python class, with nothing Django-specific about it.
+This is an ordinary Python class, with nothing Django-specific about it.
 We'd like to be able to do things like this in our models (we assume the
 ``hand`` attribute on the model is an instance of ``Hand``)::
 
@@ -81,11 +81,12 @@ Background theory
 Database storage
 ----------------
 
-The simplest way to think of a model field is that it provides a way to take a
-normal Python object -- string, boolean, ``datetime``, or something more
-complex like ``Hand`` -- and convert it to and from a format that is useful
-when dealing with the database (and serialization, but, as we'll see later,
-that falls out fairly naturally once you have the database side under control).
+Let's start with model fields. If you break it down, a model field provides a
+way to take a normal Python object -- string, boolean, ``datetime``, or
+something more complex like ``Hand`` -- and convert it to and from a format
+that is useful when dealing with the database. (Such a format is also useful
+for serialization, but as we'll see later, that is easier once you have the
+database side under control).
 
 Fields in a model must somehow be converted to fit into an existing database
 column type. Different databases provide different sets of valid column types,
@@ -94,8 +95,7 @@ with. Anything you want to store in the database must fit into one of
 those types.
 
 Normally, you're either writing a Django field to match a particular database
-column type, or there's a fairly straightforward way to convert your data to,
-say, a string.
+column type, or you will need a way to convert your data to, say, a string.
 
 For our ``Hand`` example, we could convert the card data to a string of 104
 characters by concatenating all the cards together in a pre-determined order --
@@ -180,16 +180,16 @@ card values plus their suits; 104 characters in total.
     with. For example, you can pass both
     :attr:`~django.db.models.Field.editable` and
     :attr:`~django.db.models.DateField.auto_now` to a
-    :class:`django.db.models.DateField` and it will simply ignore the
+    :class:`django.db.models.DateField` and it will ignore the
     :attr:`~django.db.models.Field.editable` parameter
     (:attr:`~django.db.models.DateField.auto_now` being set implies
     ``editable=False``). No error is raised in this case.
 
     This behavior simplifies the field classes, because they don't need to
-    check for options that aren't necessary. They just pass all the options to
+    check for options that aren't necessary. They pass all the options to
     the parent class and then don't use them later on. It's up to you whether
     you want your fields to be more strict about the options they select, or to
-    use the simpler, more permissive behavior of the current fields.
+    use the more permissive behavior of the current fields.
 
 The ``Field.__init__()`` method takes the following parameters:
 
@@ -241,11 +241,11 @@ then there's no need to write a new ``deconstruct()`` method. If, however,
 you're changing the arguments passed in ``__init__()`` (like we are in
 ``HandField``), you'll need to supplement the values being passed.
 
-The contract of ``deconstruct()`` is simple; it returns a tuple of four items:
-the field's attribute name, the full import path of the field class, the
-positional arguments (as a list), and the keyword arguments (as a dict). Note
-this is different from the ``deconstruct()`` method :ref:`for custom classes
-<custom-deconstruct-method>` which returns a tuple of three things.
+``deconstruct()`` returns a tuple of four items: the field's attribute name,
+the full import path of the field class, the positional arguments (as a list),
+and the keyword arguments (as a dict). Note this is different from the
+``deconstruct()`` method :ref:`for custom classes <custom-deconstruct-method>`
+which returns a tuple of three things.
 
 As a custom field author, you don't need to care about the first two values;
 the base ``Field`` class has all the code to work out the field's attribute
@@ -307,8 +307,8 @@ mind that people will be reconstructing your field from the serialized version
 for quite a while (possibly years), depending how long your migrations live for.
 
 You can see the results of deconstruction by looking in migrations that include
-the field, and you can test deconstruction in unit tests by just deconstructing
-and reconstructing the field::
+the field, and you can test deconstruction in unit tests by deconstructing and
+reconstructing the field::
 
     name, path, args, kwargs = my_field_instance.deconstruct()
     new_instance = MyField(*args, **kwargs)
@@ -349,10 +349,10 @@ As always, you should document your field type, so users will know what it is.
 In addition to providing a docstring for it, which is useful for developers,
 you can also allow users of the admin app to see a short description of the
 field type via the :doc:`django.contrib.admindocs
-</ref/contrib/admin/admindocs>` application. To do this simply provide
-descriptive text in a :attr:`~Field.description` class attribute of your custom
-field. In the above example, the description displayed by the ``admindocs``
-application for a ``HandField`` will be 'A hand of cards (bridge style)'.
+</ref/contrib/admin/admindocs>` application. To do this provide descriptive
+text in a :attr:`~Field.description` class attribute of your custom field. In
+the above example, the description displayed by the ``admindocs`` application
+for a ``HandField`` will be 'A hand of cards (bridge style)'.
 
 In the :mod:`django.contrib.admindocs` display, the field description is
 interpolated with ``field.__dict__`` which allows the description to
@@ -393,8 +393,8 @@ Once you have ``MytypeField``, you can use it in any model, just like any other
 If you aim to build a database-agnostic application, you should account for
 differences in database column types. For example, the date/time column type
 in PostgreSQL is called ``timestamp``, while the same column in MySQL is called
-``datetime``. The simplest way to handle this in a :meth:`~Field.db_type`
-method is to check the ``connection.settings_dict['ENGINE']`` attribute.
+``datetime``. You can handle this in a :meth:`~Field.db_type` method by
+checking the ``connection.settings_dict['ENGINE']`` attribute.
 
 For example::
 
@@ -431,7 +431,7 @@ sense to have a ``CharMaxlength25Field``, shown here::
         my_field = CharMaxlength25Field()
 
 The better way of doing this would be to make the parameter specifiable at run
-time -- i.e., when the class is instantiated. To do that, just implement
+time -- i.e., when the class is instantiated. To do that, implement
 ``Field.__init__()``, like so::
 
     # This is a much more flexible example.
@@ -730,7 +730,7 @@ accessed, and what methods are available. It lives at
 :doc:`file documentation </ref/files/file>`.
 
 Once a subclass of ``File`` is created, the new ``FileField`` subclass must be
-told to use it. To do so, simply assign the new ``File`` subclass to the special
+told to use it. To do so, assign the new ``File`` subclass to the special
 ``attr_class`` attribute of the ``FileField`` subclass.
 
 A few suggestions

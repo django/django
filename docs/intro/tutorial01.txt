@@ -90,9 +90,8 @@ Let's look at what :djadmin:`startproject` created::
 
 These files are:
 
-* The outer :file:`mysite/` root directory is just a container for your
-  project. Its name doesn't matter to Django; you can rename it to anything
-  you like.
+* The outer :file:`mysite/` root directory is a container for your project. Its
+  name doesn't matter to Django; you can rename it to anything you like.
 
 * :file:`manage.py`: A command-line utility that lets you interact with this
   Django project in various ways. You can read all the details about
@@ -207,7 +206,7 @@ rather than creating directories.
 
     What's the difference between a project and an app? An app is a Web
     application that does something -- e.g., a Weblog system, a database of
-    public records or a simple poll app. A project is a collection of
+    public records or a small poll app. A project is a collection of
     configuration and apps for a particular website. A project can contain
     multiple apps. An app can be in multiple projects.
 

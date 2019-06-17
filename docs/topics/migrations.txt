@@ -114,8 +114,8 @@ Django projects without the need for a full database.
 Workflow
 ========
 
-Working with migrations is simple. Make changes to your models - say, add
-a field and remove a model - and then run :djadmin:`makemigrations`::
+Django can create migrations for you. Make changes to your models - say, add a
+field and remove a model - and then run :djadmin:`makemigrations`::
 
     $ python manage.py makemigrations
     Migrations for 'books':
@@ -173,10 +173,10 @@ Dependencies
 ============
 
 While migrations are per-app, the tables and relationships implied by
-your models are too complex to be created for just one app at a time. When
-you make a migration that requires something else to run - for example,
-you add a ``ForeignKey`` in your ``books`` app to your ``authors`` app - the
-resulting migration will contain a dependency on a migration in ``authors``.
+your models are too complex to be created for one app at a time. When you make
+a migration that requires something else to run - for example, you add a
+``ForeignKey`` in your ``books`` app to your ``authors`` app - the resulting
+migration will contain a dependency on a migration in ``authors``.
 
 This means that when you run the migrations, the ``authors`` migration runs
 first and creates the table the ``ForeignKey`` references, and then the migration
@@ -201,8 +201,8 @@ Migration files
 ===============
 
 Migrations are stored as an on-disk format, referred to here as
-"migration files". These files are actually just normal Python files with
-an agreed-upon object layout, written in a declarative style.
+"migration files". These files are actually normal Python files with an
+agreed-upon object layout, written in a declarative style.
 
 A basic migration file looks like this::
 
@@ -286,9 +286,8 @@ Initial migrations
 .. attribute:: Migration.initial
 
 The "initial migrations" for an app are the migrations that create the first
-version of that app's tables. Usually an app will have just one initial
-migration, but in some cases of complex model interdependencies it may have two
-or more.
+version of that app's tables. Usually an app will have one initial migration,
+but in some cases of complex model interdependencies it may have two or more.
 
 Initial migrations are marked with an ``initial = True`` class attribute on the
 migration class. If an ``initial`` class attribute isn't found, a migration
@@ -322,13 +321,12 @@ new migrations until it's fixed. When using multiple databases, you can use the
 Adding migrations to apps
 =========================
 
-Adding migrations to new apps is straightforward - they come preconfigured to
-accept migrations, and so just run :djadmin:`makemigrations` once you've made
-some changes.
+New apps come preconfigured to accept migrations, and so you can add migrations
+by running :djadmin:`makemigrations` once you've made some changes.
 
 If your app already has models and database tables, and doesn't have migrations
 yet (for example, you created it against a previous Django version), you'll
-need to convert it to use migrations; this is a simple process::
+need to convert it to use migrations by running::
 
     $ python manage.py makemigrations your_app_label
 
@@ -390,8 +388,8 @@ classes will need to be kept around for as long as there is a migration
 referencing them. Any :doc:`custom model fields </howto/custom-model-fields>`
 will also need to be kept, since these are imported directly by migrations.
 
-In addition, the base classes of the model are just stored as pointers, so you
-must always keep base classes around for as long as there is a migration that
+In addition, the base classes of the model are stored as pointers, so you must
+always keep base classes around for as long as there is a migration that
 contains a reference to them. On the plus side, methods and managers from these
 base classes inherit normally, so if you absolutely need access to these you
 can opt to move them into a superclass.
@@ -492,10 +490,10 @@ second is a :doc:`SchemaEditor </ref/schema-editor>`, which you can use to
 manually effect database schema changes (but beware, doing this can confuse
 the migration autodetector!)
 
-Let's write a simple migration that populates our new ``name`` field with the
-combined values of ``first_name`` and ``last_name`` (we've come to our senses
-and realized that not everyone has first and last names). All we
-need to do is use the historical model and iterate over the rows::
+Let's write a migration that populates our new ``name`` field with the combined
+values of ``first_name`` and ``last_name`` (we've come to our senses and
+realized that not everyone has first and last names). All we need to do is use
+the historical model and iterate over the rows::
 
     from django.db import migrations
 
@@ -517,8 +515,8 @@ need to do is use the historical model and iterate over the rows::
             migrations.RunPython(combine_names),
         ]
 
-Once that's done, we can just run ``python manage.py migrate`` as normal and
-the data migration will run in place alongside other migrations.
+Once that's done, we can run ``python manage.py migrate`` as normal and the
+data migration will run in place alongside other migrations.
 
 You can pass a second callable to
 :class:`~django.db.migrations.operations.RunPython` to run whatever logic you
@@ -593,18 +591,17 @@ so they can coexist with the old migration files, and Django will intelligently
 switch between them depending where you are in the history. If you're still
 part-way through the set of migrations that you squashed, it will keep using
 them until it hits the end and then switch to the squashed history, while new
-installs will just use the new squashed migration and skip all the old ones.
+installs will use the new squashed migration and skip all the old ones.
 
 This enables you to squash and not mess up systems currently in production
 that aren't fully up-to-date yet. The recommended process is to squash, keeping
 the old files, commit and release, wait until all systems are upgraded with
-the new release (or if you're a third-party project, just ensure your users
-upgrade releases in order without skipping any), and then remove the old files,
-commit and do a second release.
+the new release (or if you're a third-party project, ensure your users upgrade
+releases in order without skipping any), and then remove the old files, commit
+and do a second release.
 
-The command that backs all this is :djadmin:`squashmigrations` - just pass
-it the app label and migration name you want to squash up to, and it'll get to
-work::
+The command that backs all this is :djadmin:`squashmigrations` - pass it the
+app label and migration name you want to squash up to, and it'll get to work::
 
   $ ./manage.py squashmigrations myapp 0004
   Will squash the following migrations:
@@ -660,7 +657,7 @@ You must then transition the squashed migration to a normal migration by:
 Serializing values
 ==================
 
-Migrations are just Python files containing the old definitions of your models
+Migrations are Python files containing the old definitions of your models
 - thus, to write them, Django must take the current state of your models and
 serialize them out into a file.
 

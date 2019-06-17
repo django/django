@@ -438,8 +438,8 @@ Manually selecting a database for a ``QuerySet``
 ------------------------------------------------
 
 You can select the database for a ``QuerySet`` at any point in the
-``QuerySet`` "chain." Just call ``using()`` on the ``QuerySet`` to get
-another ``QuerySet`` that uses the specified database.
+``QuerySet`` "chain." Call ``using()`` on the ``QuerySet`` to get another
+``QuerySet`` that uses the specified database.
 
 ``using()`` takes a single argument: the alias of the database on
 which you want to run the query. For example::

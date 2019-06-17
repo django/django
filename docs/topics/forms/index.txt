@@ -26,11 +26,11 @@ allow a visitor to do things like enter text, select options, manipulate
 objects or controls, and so on, and then send that information back to the
 server.
 
-Some of these form interface elements - text input or checkboxes - are fairly
-simple and are built into HTML itself. Others are much more complex; an
-interface that pops up a date picker or allows you to move a slider or
-manipulate controls will typically use JavaScript and CSS as well as HTML form
-``<input>`` elements to achieve these effects.
+Some of these form interface elements - text input or checkboxes - are built
+into HTML itself. Others are much more complex; an interface that pops up a
+date picker or allows you to move a slider or manipulate controls will
+typically use JavaScript and CSS as well as HTML form ``<input>`` elements to
+achieve these effects.
 
 As well as its ``<input>`` elements, a form must specify two things:
 
@@ -326,8 +326,7 @@ telling it where to go next.
 The template
 ~~~~~~~~~~~~
 
-We don't need to do much in our ``name.html`` template. The simplest example
-is:
+We don't need to do much in our ``name.html`` template:
 
 .. code-block:: html+django
 
@@ -671,8 +670,7 @@ Useful attributes on ``{{ field }}`` include:
     Outputs a ``<ul class="errorlist">`` containing any validation errors
     corresponding to this field. You can customize the presentation of
     the errors with a ``{% for error in field.errors %}`` loop. In this
-    case, each object in the loop is a simple string containing the error
-    message.
+    case, each object in the loop is a string containing the error message.
 
 ``{{ field.is_hidden }}``
     This attribute is ``True`` if the form field is a hidden field and

@@ -710,8 +710,8 @@ If you're getting this error, you can solve it by:
           # ...
       }
 
-  This will simply make SQLite wait a bit longer before throwing "database
-  is locked" errors; it won't really do anything to solve them.
+  This will make SQLite wait a bit longer before throwing "database is locked"
+  errors; it won't really do anything to solve them.
 
 ``QuerySet.select_for_update()`` not supported
 ----------------------------------------------

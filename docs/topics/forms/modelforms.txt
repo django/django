@@ -389,9 +389,8 @@ you've manually saved the instance produced by the form, you can invoke
     >>> f.save_m2m()
 
 Calling ``save_m2m()`` is only required if you use ``save(commit=False)``.
-When you use a simple ``save()`` on a form, all data -- including
-many-to-many data -- is saved without the need for any additional method calls.
-For example:
+When you use a ``save()`` on a form, all data -- including many-to-many data --
+is saved without the need for any additional method calls.  For example:
 
 .. code-block:: python
 
@@ -731,8 +730,8 @@ to make::
     >>> from myapp.models import Book
     >>> BookForm = modelform_factory(Book, fields=("author", "title"))
 
-This can also be used to make simple modifications to existing forms, for
-example by specifying the widgets to be used for a given field::
+This can also be used to make modifications to existing forms, for example by
+specifying the widgets to be used for a given field::
 
     >>> from django.forms import Textarea
     >>> Form = modelform_factory(Book, form=BookForm,
@@ -755,8 +754,8 @@ Model formsets
 .. class:: models.BaseModelFormSet
 
 Like :doc:`regular formsets </topics/forms/formsets>`, Django provides a couple
-of enhanced formset classes that make it easy to work with Django models. Let's
-reuse the ``Author`` model from above::
+of enhanced formset classes to make working with Django models more
+convenient. Let's reuse the ``Author`` model from above::
 
     >>> from django.forms import modelformset_factory
     >>> from myapp.models import Author
@@ -786,8 +785,8 @@ with the ``Author`` model. It works just like a regular formset::
 
     :func:`~django.forms.models.modelformset_factory` uses
     :func:`~django.forms.formsets.formset_factory` to generate formsets. This
-    means that a model formset is just an extension of a basic formset that
-    knows how to interact with a particular model.
+    means that a model formset is an extension of a basic formset that knows
+    how to interact with a particular model.
 
 Changing the queryset
 ---------------------
@@ -952,7 +951,7 @@ extra forms displayed.
 
 Also, ``extra=0`` doesn't prevent creation of new model instances as you can
 :ref:`add additional forms with JavaScript <understanding-the-managementform>`
-or just send additional POST data. Formsets `don't yet provide functionality
+or send additional POST data. Formsets `don't yet provide functionality
 <https://code.djangoproject.com/ticket/26142>`_ for an "edit only" view that
 prevents creation of new instances.
 

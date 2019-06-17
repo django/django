@@ -91,7 +91,7 @@ Related objects reference
 
             # No need to call e.save() at this point -- it's already been saved.
 
-        This is equivalent to (but much simpler than)::
+        This is equivalent to (but simpler than)::
 
             >>> b = Blog.objects.get(id=1)
             >>> e = Entry(

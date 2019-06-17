@@ -34,8 +34,7 @@ which widget is used on which field, see the documentation about
 :ref:`built-in-fields`.
 
 However, if you want to use a different widget for a field, you can
-just use the :attr:`~Field.widget` argument on the field definition. For
-example::
+use the :attr:`~Field.widget` argument on the field definition. For example::
 
     from django import forms
 
@@ -127,7 +126,7 @@ need to specify additional attributes at the time when the widget object is
 instantiated and assigned to a form field (and perhaps add some rules to your
 CSS files).
 
-For example, take the following simple form::
+For example, take the following form::
 
     from django import forms
 
@@ -770,8 +769,8 @@ that specifies the template used to render each choice. For example, for the
         </label>
 
     If you decide not to loop over the radio buttons -- e.g., if your template
-    simply includes ``{{ myform.beatles }}`` -- they'll be output in a ``<ul>``
-    with ``<li>`` tags, as above.
+    includes ``{{ myform.beatles }}`` -- they'll be output in a ``<ul>`` with
+    ``<li>`` tags, as above.
 
     The outer ``<ul>`` container receives the ``id`` attribute of the widget,
     if defined, or :attr:`BoundField.auto_id` otherwise.

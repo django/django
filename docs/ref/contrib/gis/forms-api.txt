@@ -88,7 +88,7 @@ Form widgets
 GeoDjango form widgets allow you to display and edit geographic data on a
 visual map.
 Note that none of the currently available widgets supports 3D geometries, hence
-geometry fields will fallback using a simple ``Textarea`` widget for such data.
+geometry fields will fallback using a ``Textarea`` widget for such data.
 
 Widget attributes
 -----------------

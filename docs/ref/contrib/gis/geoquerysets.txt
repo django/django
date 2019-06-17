@@ -887,8 +887,8 @@ SpatiaLite
 Returns a ``GEOMETRYCOLLECTION`` or a ``MULTI`` geometry object from the geometry
 column. This is analogous to a simplified version of the :class:`Union`
 aggregate, except it can be several orders of magnitude faster than performing
-a union because it simply rolls up geometries into a collection or multi object,
-not caring about dissolving boundaries.
+a union because it rolls up geometries into a collection or multi object, not
+caring about dissolving boundaries.
 
 ``Extent``
 ~~~~~~~~~~

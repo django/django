@@ -144,8 +144,8 @@ A dynamic admin interface: it's not just scaffolding -- it's the whole house
 
 Once your models are defined, Django can automatically create a professional,
 production ready :doc:`administrative interface </ref/contrib/admin/index>` --
-a website that lets authenticated users add, change and delete objects. It's
-as easy as registering your model in the admin site:
+a website that lets authenticated users add, change and delete objects. The
+only step required is to register your model in the admin site:
 
 .. code-block:: python
     :caption: mysite/news/models.py
@@ -169,7 +169,7 @@ as easy as registering your model in the admin site:
 
 The philosophy here is that your site is edited by a staff, or a client, or
 maybe just you -- and you don't want to have to deal with creating backend
-interfaces just to manage content.
+interfaces only to manage content.
 
 One typical workflow in creating Django apps is to create models and get the
 admin sites up and running as fast as possible, so your staff (or clients) can
@@ -183,9 +183,9 @@ application. Django encourages beautiful URL design and doesn't put any cruft
 in URLs, like ``.php`` or ``.asp``.
 
 To design URLs for an app, you create a Python module called a :doc:`URLconf
-</topics/http/urls>`. A table of contents for your app, it contains a simple
-mapping between URL patterns and Python callback functions. URLconfs also serve
-to decouple URLs from Python code.
+</topics/http/urls>`. A table of contents for your app, it contains a mapping
+between URL patterns and Python callback functions. URLconfs also serve to
+decouple URLs from Python code.
 
 Here's what a URLconf might look like for the ``Reporter``/``Article``
 example above:
@@ -315,12 +315,12 @@ Here's what the "base.html" template, including the use of :doc:`static files
     </html>
 
 Simplistically, it defines the look-and-feel of the site (with the site's logo),
-and provides "holes" for child templates to fill. This makes a site redesign as
-easy as changing a single file -- the base template.
+and provides "holes" for child templates to fill. This means that a site redesign
+can be done by changing a single file -- the base template.
 
 It also lets you create multiple versions of a site, with different base
 templates, while reusing child templates. Django's creators have used this
-technique to create strikingly different mobile versions of sites -- simply by
+technique to create strikingly different mobile versions of sites by only
 creating a new base template.
 
 Note that you don't have to use Django's template system if you prefer another
@@ -340,15 +340,14 @@ features:
 * A :doc:`caching framework </topics/cache>` that integrates with memcached
   or other backends.
 
-* A :doc:`syndication framework </ref/contrib/syndication>` that makes
-  creating RSS and Atom feeds as easy as writing a small Python class.
+* A :doc:`syndication framework </ref/contrib/syndication>` that lets you
+  create RSS and Atom feeds by writing a small Python class.
 
 * More attractive automatically-generated admin features -- this overview
   barely scratched the surface.
 
-The next obvious steps are for you to `download Django`_, read :doc:`the
-tutorial </intro/tutorial01>` and join `the community`_. Thanks for your
-interest!
+The next steps are for you to `download Django`_, read :doc:`the tutorial
+</intro/tutorial01>` and join `the community`_. Thanks for your interest!
 
 .. _download Django: https://www.djangoproject.com/download/
 .. _the community: https://www.djangoproject.com/community/

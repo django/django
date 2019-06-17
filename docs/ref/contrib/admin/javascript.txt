@@ -55,9 +55,9 @@ Two points to keep in mind:
   various operations in the change form and we need that to be rendered too.
 
 Sometimes you'll need to work with ``jQuery`` plugins that are not registered
-in the ``django.jQuery`` namespace. To do that, simply change how the code
-listens for events. Instead of wrapping the listener in the ``django.jQuery``
-namespace, just listen to the event triggered from there. For example:
+in the ``django.jQuery`` namespace. To do that, change how the code listens for
+events. Instead of wrapping the listener in the ``django.jQuery`` namespace,
+listen to the event triggered from there. For example:
 
 .. code-block:: html+django
 

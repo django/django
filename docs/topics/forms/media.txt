@@ -16,7 +16,7 @@ Calendar widget. This widget can then be associated with the CSS and
 JavaScript that is required to render the calendar. When the Calendar
 widget is used on a form, Django is able to identify the CSS and
 JavaScript files that are required, and provide the list of file names
-in a form suitable for easy inclusion on your Web page.
+in a form suitable for inclusion on your Web page.
 
 .. admonition:: Assets and Django Admin
 
@@ -49,7 +49,7 @@ The easiest way to define assets is as a static definition. Using this
 method, the declaration is an inner ``Media`` class. The properties of the
 inner class define the requirements.
 
-Here's a simple example::
+Here's an example::
 
     from django import forms
 
@@ -362,8 +362,7 @@ are part of the form::
     <script type="text/javascript" src="http://static.example.com/whizbang.js"></script>
 
 If you want to associate additional assets with a form -- for example,
-CSS for form layout -- simply add a ``Media`` declaration to the
-form::
+CSS for form layout -- add a ``Media`` declaration to the form::
 
     >>> class ContactForm(forms.Form):
     ...     date = DateField(widget=CalendarWidget)

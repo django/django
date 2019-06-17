@@ -20,7 +20,7 @@ Reusability is the way of life in Python. `The Python Package Index (PyPI)
 <https://pypi.org/>`_ has a vast range of packages you can use in your own
 Python programs. Check out `Django Packages <https://djangopackages.org>`_ for
 existing reusable apps you could incorporate in your project. Django itself is
-also just a Python package. This means that you can take existing Python
+also a normal Python package. This means that you can take existing Python
 packages or Django apps and compose them into your own web project. You only
 need to write the parts that make your project unique.
 
@@ -41,8 +41,8 @@ projects and ready to publish for others to install and use.
     bar``. For a directory (like ``polls``) to form a package, it must contain
     a special file ``__init__.py``, even if this file is empty.
 
-    A Django *application* is just a Python package that is specifically
-    intended for use in a Django project. An application may use common Django
+    A Django *application* is a Python package that is specifically intended
+    for use in a Django project. An application may use common Django
     conventions, such as having ``models``, ``tests``, ``urls``, and ``views``
     submodules.
 
@@ -148,8 +148,8 @@ this. For a small app like polls, this process isn't too difficult.
        Polls
        =====
 
-       Polls is a simple Django app to conduct Web-based polls. For each
-       question, visitors can choose between a fixed number of answers.
+       Polls is a Django app to conduct Web-based polls. For each question,
+       visitors can choose between a fixed number of answers.
 
        Detailed documentation is in the "docs" directory.
 
@@ -206,7 +206,7 @@ this. For a small app like polls, this process isn't too difficult.
            packages=find_packages(),
            include_package_data=True,
            license='BSD License',  # example license
-           description='A simple Django app to conduct Web-based polls.',
+           description='A Django app to conduct Web-based polls.',
            long_description=README,
            url='https://www.example.com/',
            author='Your Name',

@@ -71,7 +71,7 @@ if they are not already set by the view and if the request's method is safe
 (``GET`` or ``HEAD``).
 
 Using this feature usefully is probably best explained with an example.
-Suppose you have this pair of models, representing a simple blog system::
+Suppose you have this pair of models, representing a small blog system::
 
     import datetime
     from django.db import models
@@ -205,10 +205,9 @@ every time.
 Comparison with middleware conditional processing
 =================================================
 
-Django provides simple and straightforward conditional ``GET`` handling via
-:class:`django.middleware.http.ConditionalGetMiddleware`. While being easy to
-use and suitable for many situations, the middleware has limitations for
-advanced usage:
+Django provides conditional ``GET`` handling via
+:class:`django.middleware.http.ConditionalGetMiddleware`. While being suitable
+for many situations, the middleware has limitations for advanced usage:
 
 * It's applied globally to all views in your project.
 * It doesn't save you from generating the response, which may be expensive.

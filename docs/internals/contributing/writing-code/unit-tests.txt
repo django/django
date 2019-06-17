@@ -45,10 +45,10 @@ test dependencies. If you don't have an optional dependency installed, the
 tests that require it will be skipped.
 
 Running the tests requires a Django settings module that defines the databases
-to use. To make it easy to get started, Django provides and uses a sample
-settings module that uses the SQLite database. See
-:ref:`running-unit-tests-settings` to learn how to use a different settings
-module to run the tests with a different database.
+to use. To help you get started, Django provides and uses a sample settings
+module that uses the SQLite database. See :ref:`running-unit-tests-settings` to
+learn how to use a different settings module to run the tests with a different
+database.
 
 Having problems? See :ref:`troubleshooting-unit-tests` for some common issues.
 
@@ -199,7 +199,7 @@ internationalization, type:
 How do you find out the names of individual tests? Look in ``tests/`` — each
 directory name there is the name of a test.
 
-If you just want to run a particular class of tests, you can specify a list of
+If you want to run only a particular class of tests, you can specify a list of
 paths to individual test classes. For example, to run the ``TranslationTests``
 of the ``i18n`` module, type:
 

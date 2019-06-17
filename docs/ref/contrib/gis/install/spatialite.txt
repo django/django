@@ -38,7 +38,7 @@ command line interface and enter the following query::
     sqlite> CREATE VIRTUAL TABLE testrtree USING rtree(id,minX,maxX,minY,maxY);
 
 If you obtain an error, you will have to recompile SQLite from source. Otherwise,
-just skip this section.
+skip this section.
 
 To install from sources, download the latest amalgamation source archive from
 the `SQLite download page`__, and extract::

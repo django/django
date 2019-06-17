@@ -20,10 +20,10 @@ manipulation. You can also write your own ``Operation`` classes if you want
 to encapsulate a custom change you commonly make.
 
 If you need an empty migration file to write your own ``Operation`` objects
-into, just use ``python manage.py makemigrations --empty yourappname``,
-but be aware that manually adding schema-altering operations can confuse the
-migration autodetector and make resulting runs of :djadmin:`makemigrations`
-output incorrect code.
+into, use ``python manage.py makemigrations --empty yourappname``, but be aware
+that manually adding schema-altering operations can confuse the migration
+autodetector and make resulting runs of :djadmin:`makemigrations` output
+incorrect code.
 
 All of the core Django operations are available from the
 ``django.db.migrations.operations`` module.
@@ -53,8 +53,8 @@ The field instance should be an unbound field (so just
 ``bases`` is an optional list of other classes to have this model inherit from;
 it can contain both class objects as well as strings in the format
 ``"appname.ModelName"`` if you want to depend on another model (so you inherit
-from the historical version). If it's not supplied, it defaults to just
-inheriting from the standard ``models.Model``.
+from the historical version). If it's not supplied, it defaults to inheriting
+from the standard ``models.Model``.
 
 ``managers`` takes a list of 2-tuples of ``(manager_name, manager_instance)``.
 The first manager in the list will be the default manager for this model during
@@ -318,9 +318,8 @@ The optional ``elidable`` argument determines whether or not the operation will
 be removed (elided) when :ref:`squashing migrations <migration-squashing>`.
 
 You are advised to write the code as a separate function above the ``Migration``
-class in the migration file, and just pass it to ``RunPython``. Here's an
-example of using ``RunPython`` to create some initial objects on a ``Country``
-model::
+class in the migration file, and pass it to ``RunPython``. Here's an example of
+using ``RunPython`` to create some initial objects on a ``Country`` model::
 
     from django.db import migrations
 
@@ -423,8 +422,8 @@ Writing your own
 ================
 
 Operations have a relatively simple API, and they're designed so that you can
-easily write your own to supplement the built-in Django ones. The basic structure
-of an ``Operation`` looks like this::
+easily write your own to supplement the built-in Django ones. The basic
+structure of an ``Operation`` looks like this::
 
     from django.db.migrations.operations.base import Operation
 
@@ -462,21 +461,21 @@ of an ``Operation`` looks like this::
             return "Custom Operation"
 
 You can take this template and work from it, though we suggest looking at the
-built-in Django operations in ``django.db.migrations.operations`` - they're
-easy to read and cover a lot of the example usage of semi-internal aspects
-of the migration framework like ``ProjectState`` and the patterns used to get
-historical models, as well as ``ModelState`` and the patterns used to mutate
-historical models in ``state_forwards()``.
+built-in Django operations in ``django.db.migrations.operations`` - they cover
+a lot of the example usage of semi-internal aspects of the migration framework
+like ``ProjectState`` and the patterns used to get historical models, as well
+as ``ModelState`` and the patterns used to mutate historical models in
+``state_forwards()``.
 
 Some things to note:
 
-* You don't need to learn too much about ``ProjectState`` to just write simple
-  migrations; just know that it has an ``apps`` property that gives access to
-  an app registry (which you can then call ``get_model`` on).
+* You don't need to learn too much about ``ProjectState`` to write migrations;
+  just know that it has an ``apps`` property that gives access to an app
+  registry (which you can then call ``get_model`` on).
 
 * ``database_forwards`` and ``database_backwards`` both get two states passed
-  to them; these just represent the difference the ``state_forwards`` method
-  would have applied, but are given to you for convenience and speed reasons.
+  to them; these represent the difference the ``state_forwards`` method would
+  have applied, but are given to you for convenience and speed reasons.
 
 * If you want to work with model classes or model instances from the
   ``from_state`` argument in ``database_forwards()`` or
@@ -506,9 +505,9 @@ Some things to note:
     for the :class:`~django.db.models.Manager` instances in
     ``ModelState.managers``.
 
-As a simple example, let's make an operation that loads PostgreSQL extensions
-(which contain some of PostgreSQL's more exciting features). It's simple enough;
-there's no model state changes, and all it does is run one command::
+As an example, let's make an operation that loads PostgreSQL extensions (which
+contain some of PostgreSQL's more exciting features). Since there's no model
+state changes, all it does is run one command::
 
     from django.db.migrations.operations.base import Operation
 

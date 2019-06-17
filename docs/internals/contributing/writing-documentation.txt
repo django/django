@@ -201,15 +201,15 @@ documentation:
   This is because Sphinx will generate proper links for the latter, which
   greatly helps readers.
 
-  You can prefix the target with a ``~`` (that's a tilde) to get just the
-  "last bit" of that path. So ``:mod:`~django.contrib.auth``` will just
+  You can prefix the target with a ``~`` (that's a tilde) to get only the
+  "last bit" of that path. So ``:mod:`~django.contrib.auth``` will
   display a link with the title "auth".
 
 * Use :mod:`~sphinx.ext.intersphinx` to reference Python's and Sphinx'
   documentation.
 
 * Add ``.. code-block:: <lang>`` to literal blocks so that they get
-  highlighted. Prefer relying on automatic highlighting simply using ``::``
+  highlighted. Prefer relying on automatic highlighting using ``::``
   (two colons). This has the benefit that if the code contains some invalid
   syntax, it won't be highlighted. Adding ``.. code-block:: python``, for
   example, will force highlighting despite invalid syntax.
@@ -383,8 +383,8 @@ If a function, attribute, etc. is added, it's also okay to use a
 
         An author's middle name.
 
-We can simply remove the ``.. versionadded:: A.B`` annotation without any
-indentation changes when the time comes.
+We can remove the ``.. versionadded:: A.B`` annotation without any indentation
+changes when the time comes.
 
 Minimizing images
 =================

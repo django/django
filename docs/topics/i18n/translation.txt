@@ -91,8 +91,8 @@ string::
         output = _("Welcome to my site.")
         return HttpResponse(output)
 
-Obviously, you could code this without using the alias. This example is
-identical to the previous one::
+You could code this without using the alias. This example is identical to the
+previous one::
 
     from django.http import HttpResponse
     from django.utils.translation import gettext
@@ -439,8 +439,8 @@ strings before passing them to non-Django code::
 
     requests.post('https://example.com/send', data={'body': str(body)})
 
-If you don't like the long ``gettext_lazy`` name, you can just alias it as
-``_`` (underscore), like so::
+If you don't like the long ``gettext_lazy`` name, you can alias it as ``_``
+(underscore), like so::
 
     from django.db import models
     from django.utils.translation import gettext_lazy as _
@@ -928,7 +928,7 @@ view <set_language-redirect-view>` for an example of how to display a language
 selector using ``{% get_language_info_list %}``.
 
 In addition to :setting:`LANGUAGES` style list of tuples,
-``{% get_language_info_list %}`` supports simple lists of language codes.
+``{% get_language_info_list %}`` supports lists of language codes.
 If you do this in your view:
 
 .. code-block:: python
@@ -949,7 +949,7 @@ you can iterate over those languages in the template::
 Template filters
 ~~~~~~~~~~~~~~~~
 
-There are also simple filters available for convenience:
+There are also some filters available for convenience:
 
 * ``{{ LANGUAGE_CODE|language_name }}`` ("German")
 * ``{{ LANGUAGE_CODE|language_name_local }}`` ("Deutsch")
@@ -1048,7 +1048,7 @@ Using the JavaScript translation catalog
 
 .. highlightlang:: javascript
 
-To use the catalog, just pull in the dynamically generated script like this:
+To use the catalog, pull in the dynamically generated script like this:
 
 .. code-block:: html+django
 
@@ -1565,9 +1565,9 @@ multiple times::
 
     If you don't have the ``gettext`` utilities installed,
     :djadmin:`makemessages` will create empty files. If that's the case, either
-    install the ``gettext`` utilities or just copy the English message file
+    install the ``gettext`` utilities or copy the English message file
     (``locale/en/LC_MESSAGES/django.po``) if available and use it as a starting
-    point; it's just an empty translation file.
+    point, which is an empty translation file.
 
 .. admonition:: Working on Windows?
 
@@ -1575,11 +1575,10 @@ multiple times::
    :djadmin:`makemessages` works, see :ref:`gettext_on_windows` for more
    information.
 
-The format of ``.po`` files is straightforward. Each ``.po`` file contains a
-small bit of metadata, such as the translation maintainer's contact
-information, but the bulk of the file is a list of **messages** -- simple
-mappings between translation strings and the actual translated text for the
-particular language.
+Each ``.po`` file contains a small bit of metadata, such as the translation
+maintainer's contact information, but the bulk of the file is a list of
+**messages** -- mappings between translation strings and the actual translated
+text for the particular language.
 
 For example, if your Django app contained a translation string for the text
 ``"Welcome to my site."``, like so::
@@ -1693,7 +1692,7 @@ djangojs`` parameter, like this::
     django-admin makemessages -d djangojs -l de
 
 This would create or update the message file for JavaScript for German. After
-updating message files, just run :djadmin:`django-admin compilemessages
+updating message files, run :djadmin:`django-admin compilemessages
 <compilemessages>` the same way as you do with normal Django message files.
 
 .. _gettext_on_windows:
@@ -1702,9 +1701,9 @@ updating message files, just run :djadmin:`django-admin compilemessages
 ----------------------
 
 This is only needed for people who either want to extract message IDs or compile
-message files (``.po``). Translation work itself just involves editing existing
-files of this type, but if you want to create your own message files, or want to
-test or compile a changed message file, download `a precompiled binary
+message files (``.po``). Translation work itself involves editing existing
+files of this type, but if you want to create your own message files, or want
+to test or compile a changed message file, download `a precompiled binary
 installer <https://mlocati.github.io/articles/gettext-iconv-windows.html>`_.
 
 You may also use ``gettext`` binaries you have obtained elsewhere, so long as
@@ -1935,9 +1934,9 @@ way Django does translation:
 How Django discovers language preference
 ----------------------------------------
 
-Once you've prepared your translations -- or, if you just want to use the
-translations that come with Django -- you'll just need to activate translation
-for your app.
+Once you've prepared your translations -- or, if you want to use the
+translations that come with Django -- you'll need to activate translation for
+your app.
 
 Behind the scenes, Django has a very flexible model of deciding which language
 should be used -- installation-wide, for a particular user, or both.
@@ -2042,7 +2041,7 @@ Notes:
 Once ``LocaleMiddleware`` determines the user's preference, it makes this
 preference available as ``request.LANGUAGE_CODE`` for each
 :class:`~django.http.HttpRequest`. Feel free to read this value in your view
-code. Here's a simple example::
+code. Here's an example::
 
     from django.http import HttpResponse
 
@@ -2098,8 +2097,8 @@ of the generic language. For example, untranslated ``pt_BR`` strings use ``pt``
 translations.
 
 This way, you can write applications that include their own translations, and
-you can override base translations in your project. Or, you can just build
-a big project out of several apps and put all translations into one big common
+you can override base translations in your project. Or, you can build a big
+project out of several apps and put all translations into one big common
 message file specific to the project you are composing. The choice is yours.
 
 All message file repositories are structured the same way. They are:

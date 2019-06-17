@@ -10,8 +10,9 @@ in Django that you'd like to see fixed, or maybe there's a small feature you
 want added.
 
 Contributing back to Django itself is the best way to see your own concerns
-addressed. This may seem daunting at first, but it's really pretty simple.
-We'll walk you through the entire process, so you can learn by example.
+addressed. This may seem daunting at first, but it's a well-traveled path with
+documentation, tooling, and a community to support you. We'll walk you through
+the entire process, so you can learn by example.
 
 Who's this tutorial for?
 ------------------------
@@ -387,7 +388,7 @@ Running Django's test suite for the second time
 ===============================================
 
 Once you've verified that your patch and your test are working correctly, it's
-a good idea to run the entire Django test suite just to verify that your change
+a good idea to run the entire Django test suite to verify that your change
 hasn't introduced any bugs into other areas of Django. While successfully
 passing the entire test suite doesn't guarantee your code is bug free, it does
 help identify many bugs and regressions that might otherwise go unnoticed.
@@ -592,7 +593,7 @@ If you just want to get started already (and nobody would blame you!), try
 taking a look at the list of `easy tickets that need patches`__ and the
 `easy tickets that have patches which need improvement`__. If you're familiar
 with writing tests, you can also look at the list of
-`easy tickets that need tests`__. Just remember to follow the guidelines about
+`easy tickets that need tests`__. Remember to follow the guidelines about
 claiming tickets that were mentioned in the link to Django's documentation on
 :doc:`claiming tickets and submitting patches
 </internals/contributing/writing-code/submitting-patches>`.

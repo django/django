@@ -265,7 +265,7 @@ By default, Django gives each model the following field::
 
 This is an auto-incrementing primary key.
 
-If you'd like to specify a custom primary key, just specify
+If you'd like to specify a custom primary key, specify
 :attr:`primary_key=True <Field.primary_key>` on one of your fields. If Django
 sees you've explicitly set :attr:`Field.primary_key`, it won't add the automatic
 ``id`` column.
@@ -436,8 +436,8 @@ should work; all are optional.
 Extra fields on many-to-many relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When you're only dealing with simple many-to-many relationships such as
-mixing and matching pizzas and toppings, a standard
+When you're only dealing with many-to-many relationships such as mixing and
+matching pizzas and toppings, a standard
 :class:`~django.db.models.ManyToManyField` is all you need. However, sometimes
 you may need to associate data with the relationship between two models.
 
@@ -640,7 +640,7 @@ Models across files
 
 It's perfectly OK to relate a model to one from another app. To do this, import
 the related model at the top of the file where your model is defined. Then,
-just refer to the other model class wherever needed. For example::
+refer to the other model class wherever needed. For example::
 
     from django.db import models
     from geography.models import ZipCode
@@ -1218,7 +1218,7 @@ accessible through ``MyPerson``, and vice-versa::
 
 You could also use a proxy model to define a different default ordering on
 a model. You might not always want to order the ``Person`` model, but regularly
-order by the ``last_name`` attribute when you use the proxy. This is easy::
+order by the ``last_name`` attribute when you use the proxy::
 
     class OrderedPerson(Person):
         class Meta:

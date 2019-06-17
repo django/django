@@ -12,7 +12,7 @@ Introducing automated testing
 What are automated tests?
 -------------------------
 
-Tests are simple routines that check the operation of your code.
+Tests are routines that check the operation of your code.
 
 Testing operates at different levels. Some tests might apply to a tiny detail
 (*does a particular model method return values as expected?*) while others
@@ -51,7 +51,7 @@ interactions between components.
 A change in any of those components could have unexpected consequences on the
 application's behavior. Checking that it still 'seems to work' could mean
 running through your code's functionality with twenty different variations of
-your test data just to make sure you haven't broken something - not a good use
+your test data to make sure you haven't broken something - not a good use
 of your time.
 
 That's especially true when automated tests could do this for you in seconds.
@@ -83,9 +83,9 @@ Tests make your code more attractive
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You might have created a brilliant piece of software, but you will find that
-many other developers will simply refuse to look at it because it lacks tests;
-without tests, they won't trust it. Jacob Kaplan-Moss, one of Django's
-original developers, says "Code without tests is broken by design."
+many other developers will refuse to look at it because it lacks tests; without
+tests, they won't trust it. Jacob Kaplan-Moss, one of Django's original
+developers, says "Code without tests is broken by design."
 
 That other developers want to see tests in your software before they take it
 seriously is yet another reason for you to start writing tests.
@@ -108,7 +108,7 @@ Some programmers follow a discipline called "`test-driven development`_"; they
 actually write their tests before they write their code. This might seem
 counter-intuitive, but in fact it's similar to what most people will often do
 anyway: they describe a problem, then create some code to solve it. Test-driven
-development simply formalizes the problem in a Python test case.
+development formalizes the problem in a Python test case.
 
 More often, a newcomer to testing will create some code and later decide that
 it should have some tests. Perhaps it would have been better to write some
@@ -270,9 +270,9 @@ After identifying a bug, we wrote a test that exposes it and corrected the bug
 in the code so our test passes.
 
 Many other things might go wrong with our application in the future, but we can
-be sure that we won't inadvertently reintroduce this bug, because simply
-running the test will warn us immediately. We can consider this little portion
-of the application pinned down safely forever.
+be sure that we won't inadvertently reintroduce this bug, because running the
+test will warn us immediately. We can consider this little portion of the
+application pinned down safely forever.
 
 More comprehensive tests
 ------------------------
@@ -308,7 +308,7 @@ more comprehensively:
 And now we have three tests that confirm that ``Question.was_published_recently()``
 returns sensible values for past, recent, and future questions.
 
-Again, ``polls`` is a simple application, but however complex it grows in the
+Again, ``polls`` is a minimal application, but however complex it grows in the
 future and whatever other code it interacts with, we now have some guarantee
 that the method we have written tests for will behave in expected ways.
 
@@ -324,8 +324,8 @@ A test for a view
 -----------------
 
 When we fixed the bug above, we wrote the test first and then the code to fix
-it. In fact that was a simple example of test-driven development, but it
-doesn't really matter in which order we do the work.
+it. In fact that was an example of test-driven development, but it doesn't
+really matter in which order we do the work.
 
 In our first test, we focused closely on the internal behavior of the code. For
 this test, we want to check its behavior as it would be experienced by a user

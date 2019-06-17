@@ -123,7 +123,7 @@ You can mix variables and strings::
 
 In some cases you might want to refer to the current value of a cycle
 without advancing to the next value. To do this,
-just give the ``{% cycle %}`` tag a name, using "as", like this::
+give the ``{% cycle %}`` tag a name, using "as", like this::
 
     {% cycle 'row1' 'row2' as rowcolors %}
 
@@ -2182,9 +2182,9 @@ the output will be the string ``"01:23"`` (The ``"TIME_FORMAT"`` format
 specifier for the ``de`` locale as shipped with Django is ``"H:i"``).
 
 The ``time`` filter will only accept parameters in the format string that
-relate to the time of day, not the date (for obvious reasons). If you need to
-format a ``date`` value, use the :tfilter:`date` filter instead (or along
-``time`` if you need to render a full :py:class:`~datetime.datetime` value).
+relate to the time of day, not the date. If you need to format a ``date``
+value, use the :tfilter:`date` filter instead (or along with :tfilter:`time` if
+you need to render a full :py:class:`~datetime.datetime` value).
 
 There is one exception the above rule: When passed a ``datetime`` value with
 attached timezone information (a :ref:`time-zone-aware

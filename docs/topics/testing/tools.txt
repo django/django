@@ -661,7 +661,7 @@ More details are in :ref:`explicitly-setting-the-active-language`.
 Example
 -------
 
-The following is a simple unit test using the test client::
+The following is a unit test using the test client::
 
     import unittest
     from django.test import Client
@@ -702,11 +702,11 @@ Normal Python unit test classes extend a base class of
 
    Hierarchy of Django unit testing classes
 
-Converting a normal :class:`unittest.TestCase` to any of the subclasses is
-easy: change the base class of your test from ``unittest.TestCase`` to the
-subclass. All of the standard Python unit test functionality will be available,
-and it will be augmented with some useful additions as described in each
-section below.
+You can convert a normal :class:`unittest.TestCase` to any of the subclasses:
+change the base class of your test from ``unittest.TestCase`` to the subclass.
+All of the standard Python unit test functionality will be available, and it
+will be augmented with some useful additions as described in each section
+below.
 
 ``SimpleTestCase``
 ------------------
@@ -914,9 +914,9 @@ The live server listens on ``localhost`` and binds to port 0 which uses a free
 port assigned by the operating system. The server's URL can be accessed with
 ``self.live_server_url`` during the tests.
 
-To demonstrate how to use ``LiveServerTestCase``, let's write a simple Selenium
-test. First of all, you need to install the `selenium package`_ into your
-Python path:
+To demonstrate how to use ``LiveServerTestCase``, let's write a Selenium test.
+First of all, you need to install the `selenium package`_ into your Python
+path:
 
 .. console::
 
@@ -1002,10 +1002,10 @@ out the `full reference`_ for more details.
 
     The tricky thing here is that there's really no such thing as a "page load,"
     especially in modern Web apps that generate HTML dynamically after the
-    server generates the initial document. So, simply checking for the presence
-    of ``<body>`` in the response might not necessarily be appropriate for all
-    use cases. Please refer to the `Selenium FAQ`_ and
-    `Selenium documentation`_ for more information.
+    server generates the initial document. So, checking for the presence of
+    ``<body>`` in the response might not necessarily be appropriate for all use
+    cases. Please refer to the `Selenium FAQ`_ and `Selenium documentation`_
+    for more information.
 
     .. _Selenium FAQ: https://web.archive.org/web/20160129132110/http://code.google.com/p/selenium/wiki/FrequentlyAskedQuestions#Q:_WebDriver_fails_to_find_elements_/_Does_not_block_on_page_loa
     .. _Selenium documentation: https://www.seleniumhq.org/docs/04_webdriver_advanced.html#explicit-waits
@@ -1039,7 +1039,7 @@ This means, instead of instantiating a ``Client`` in each test::
             response = client.get('/customer/index/')
             self.assertEqual(response.status_code, 200)
 
-...you can just refer to ``self.client``, like so::
+...you can refer to ``self.client``, like so::
 
     from django.test import TestCase
 
@@ -1268,9 +1268,9 @@ in the ``with`` block and reset its value to the previous state afterwards.
 .. method:: SimpleTestCase.modify_settings()
 
 It can prove unwieldy to redefine settings that contain a list of values. In
-practice, adding or removing values is often sufficient. The
-:meth:`~django.test.SimpleTestCase.modify_settings` context manager makes it
-easy::
+practice, adding or removing values is often sufficient. Django provides the
+:meth:`~django.test.SimpleTestCase.modify_settings` context manager for easier
+settings changes::
 
     from django.test import TestCase
 
@@ -1806,12 +1806,12 @@ Django, such as your machine's mail server, if you're running one.)
 .. data:: django.core.mail.outbox
 
 During test running, each outgoing email is saved in
-``django.core.mail.outbox``. This is a simple list of all
-:class:`~django.core.mail.EmailMessage` instances that have been sent.
-The ``outbox`` attribute is a special attribute that is created *only* when
-the ``locmem`` email backend is used. It doesn't normally exist as part of the
-:mod:`django.core.mail` module and you can't import it directly. The code
-below shows how to access this attribute correctly.
+``django.core.mail.outbox``. This is a list of all
+:class:`~django.core.mail.EmailMessage` instances that have been sent.  The
+``outbox`` attribute is a special attribute that is created *only* when the
+``locmem`` email backend is used. It doesn't normally exist as part of the
+:mod:`django.core.mail` module and you can't import it directly. The code below
+shows how to access this attribute correctly.
 
 Here's an example test that examines ``django.core.mail.outbox`` for length
 and contents::

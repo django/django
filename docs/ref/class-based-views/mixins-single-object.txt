@@ -63,7 +63,7 @@ Single object mixins
         with access to individual objects should be prevented from obtaining
         this list, setting ``query_pk_and_slug`` to ``True`` will help prevent
         the guessing of URLs as each URL will require two correct,
-        non-sequential arguments. Simply using a unique slug may serve the same
+        non-sequential arguments. Using a unique slug may serve the same
         purpose, but this scheme allows you to have non-unique slugs.
 
         .. _insecure direct object reference: https://www.owasp.org/index.php/Top_10_2013-A4-Insecure_Direct_Object_References
@@ -128,7 +128,7 @@ Single object mixins
     .. method:: get_slug_field()
 
         Returns the name of a slug field to be used to look up by slug. By
-        default this simply returns the value of :attr:`slug_field`.
+        default this returns the value of :attr:`slug_field`.
 
 
 ``SingleObjectTemplateResponseMixin``

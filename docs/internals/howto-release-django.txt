@@ -172,7 +172,7 @@ OK, this is the fun part, where we actually push out a release!
 
 #. If this is a security release, merge the appropriate patches from
    ``django-security``. Rebase these patches as necessary to make each one a
-   simple commit on the release branch rather than a merge commit. To ensure
+   plain commit on the release branch rather than a merge commit. To ensure
    this, merge them with the ``--ff-only`` flag; for example::
 
         $ git checkout stable/1.5.x

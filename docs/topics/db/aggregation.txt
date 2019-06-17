@@ -135,9 +135,9 @@ by providing that name when you specify the aggregate clause::
     >>> Book.objects.aggregate(average_price=Avg('price'))
     {'average_price': 34.35}
 
-If you want to generate more than one aggregate, you just add another
-argument to the ``aggregate()`` clause. So, if we also wanted to know
-the maximum and minimum price of all books, we would issue the query::
+If you want to generate more than one aggregate, you add another argument to
+the ``aggregate()`` clause. So, if we also wanted to know the maximum and
+minimum price of all books, we would issue the query::
 
     >>> from django.db.models import Avg, Max, Min
     >>> Book.objects.aggregate(Avg('price'), Max('price'), Min('price'))

@@ -84,7 +84,7 @@ of a larger problem. While we can spend time writing, testing and applying
 lots of little patches, sometimes the right solution is to rebuild. If a
 rebuild or refactor of a particular component has been proposed or is
 underway, you may find that bugs affecting that component will not get as much
-attention. Again, this is just a matter of prioritizing scarce resources. By
+attention. Again, this is a matter of prioritizing scarce resources. By
 concentrating on the rebuild, we can close all the little bugs at once, and
 hopefully prevent other little bugs from appearing in the future.
 
@@ -93,7 +93,7 @@ bug regularly, it doesn't necessarily follow that every single Django user
 will hit the same bug. Different users use Django in different ways, stressing
 different parts of the code under different conditions. When we evaluate the
 relative priorities, we are generally trying to consider the needs of the
-entire community, not just the severity for one particular user. This doesn't
-mean that we think your problem is unimportant -- just that in the limited
-time we have available, we will always err on the side of making 10 people
-happy rather than making 1 person happy.
+entire community, instead of prioritizing the impact on one particular user.
+This doesn't mean that we think your problem is unimportant -- just that in the
+limited time we have available, we will always err on the side of making 10
+people happy rather than making a single person happy.
