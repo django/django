@@ -39,8 +39,8 @@ model system.
 
     Model signals ``sender`` model can be lazily referenced when connecting a
     receiver by specifying its full application label. For example, an
-    ``Answer`` model defined in the ``polls`` application could be referenced
-    as ``'polls.Answer'``. This sort of reference can be quite handy when
+    ``Question`` model defined in the ``polls`` application could be referenced
+    as ``'polls.Question'``. This sort of reference can be quite handy when
     dealing with circular import dependencies and swappable models.
 
 ``pre_init``
