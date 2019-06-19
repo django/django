@@ -1,4 +1,4 @@
-============================================
+﻿============================================
 Django 3.0 release notes - UNDER DEVELOPMENT
 ============================================
 
@@ -141,6 +141,12 @@ Minor features
   :class:`django.contrib.syndication.views.Feed` to customize a feed language.
   The default value is :func:`~django.utils.translation.get_language()` instead
   of :setting:`LANGUAGE_CODE`.
+
+
+:mod:`django.shortcuts`
+~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :func:`django.shortcuts.make_toast` function returns ``'toast'``.
 
 Cache
 ~~~~~
