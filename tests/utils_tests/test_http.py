@@ -74,7 +74,6 @@ class URLEncodeTests(SimpleTestCase):
 
     def test_dict_with_bytearray(self):
         self.assertEqual(urlencode({'a': bytearray(range(2))}, doseq=True), 'a=0&a=1')
-        self.assertEqual(urlencode({'a': bytearray(range(2))}, doseq=False), 'a=bytearray%28b%27%5Cx00%5Cx01%27%29')
 
     def test_generator(self):
         self.assertEqual(urlencode({'a': range(2)}, doseq=True), 'a=0&a=1')
