@@ -23,7 +23,7 @@ from django.db import DEFAULT_DB_ALIAS, NotSupportedError, connections
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import (
-    BaseExpression, Col, F, OuterRef, Ref, SimpleCol,
+    BaseExpression, Col, F, OrderBy, OuterRef, Ref, SimpleCol,
 )
 from django.db.models.fields import Field
 from django.db.models.fields.related_lookups import MultiColSource
@@ -2198,6 +2198,9 @@ def get_order_dir(field, default='ASC'):
     prefix) should sort. The '-' prefix always sorts the opposite way.
     """
     dirn = ORDER_DIR[default]
+    if isinstance(field, OrderBy):
+        return field.expression.name, 'DESC' if field.descending else 'ASC'
+
     if field[0] == '-':
         return field[1:], dirn[1]
     return field, dirn[0]

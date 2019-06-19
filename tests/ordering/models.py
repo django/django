@@ -59,3 +59,7 @@ class Reference(models.Model):
 
     class Meta:
         ordering = ('article',)
+
+
+class SubArticle(Article):
+    pass

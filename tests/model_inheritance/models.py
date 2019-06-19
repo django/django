@@ -91,6 +91,9 @@ class Place(models.Model):
     def __str__(self):
         return "%s the place" % self.name
 
+    class Meta:
+        ordering = [models.F('name').desc(nulls_last=True)]
+
 
 class Rating(models.Model):
     rating = models.IntegerField(null=True, blank=True)
