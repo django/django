@@ -15,6 +15,7 @@ undefined -- not random, just undefined.
 
 from django.db import models
 from django.db.models.expressions import OrderBy
+from django.db.models.functions import Coalesce
 
 
 class Author(models.Model):
@@ -59,3 +60,7 @@ class Reference(models.Model):
 
     class Meta:
         ordering = ('article',)
+
+
+class SubArticle(Article):
+    pass

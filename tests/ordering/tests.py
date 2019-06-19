@@ -9,7 +9,7 @@ from django.db.models.functions import Upper
 from django.test import TestCase
 from django.utils.deprecation import RemovedInDjango31Warning
 
-from .models import Article, Author, OrderedByFArticle, Reference
+from .models import Article, Author, OrderedByFArticle, Reference, SubArticle
 
 
 class OrderingTests(TestCase):
@@ -461,6 +461,12 @@ class OrderingTests(TestCase):
             articles, ['Article 1', 'Article 4', 'Article 3', 'Article 2'],
             attrgetter('headline')
         )
+
+    def test_default_parent_ordering_by_expression(self):
+        sub1 = SubArticle.objects.create(headline='Sub 1', pub_date=datetime(2005, 7, 26))
+        sub2 = SubArticle.objects.create(headline='Sub 2', pub_date=datetime(2005, 7, 27))
+        articles = SubArticle.objects.order_by('article_ptr')
+        self.assertSequenceEqual(articles, [sub2, sub1])
 
     def test_deprecated_values_annotate(self):
         msg = (
