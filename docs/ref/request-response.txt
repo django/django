@@ -858,6 +858,11 @@ Methods
     values you used in ``set_cookie()`` -- otherwise the cookie may not be
     deleted.
 
+.. method:: HttpResponse.close()
+
+    This method is called at the end of the request directly by the WSGI
+    server.
+
 .. method:: HttpResponse.write(content)
 
     This method makes an :class:`HttpResponse` instance a file-like object.
