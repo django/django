@@ -797,8 +797,8 @@ For example::
     >>> p.get_shirt_size_display()
     'Large'
 
-.. method:: Model.get_next_by_FOO(\**kwargs)
-.. method:: Model.get_previous_by_FOO(\**kwargs)
+.. method:: Model.get_next_by_FOO(**kwargs)
+.. method:: Model.get_previous_by_FOO(**kwargs)
 
 For every :class:`~django.db.models.DateField` and
 :class:`~django.db.models.DateTimeField` that does not have :attr:`null=True
