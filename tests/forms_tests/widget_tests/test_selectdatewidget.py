@@ -524,6 +524,21 @@ class SelectDateWidgetTest(WidgetTest):
             '13-08-0001',
         )
 
+    @override_settings(USE_L10N=False, DATE_INPUT_FORMATS=['%d.%m.%Y'])
+    def test_custom_input_format(self):
+        w = SelectDateWidget(years=('0001', '1899', '2009', '2010'))
+        for values, expected in (
+            (('0001', '8', '13'), '13.08.0001'),
+            (('1899', '7', '11'), '11.07.1899'),
+            (('2009', '3', '7'), '07.03.2009'),
+        ):
+            with self.subTest(values=values):
+                data = {
+                    'field_%s' % field: value
+                    for field, value in zip(('year', 'month', 'day'), values)
+                }
+                self.assertEqual(w.value_from_datadict(data, {}, 'field'), expected)
+
     def test_format_value(self):
         valid_formats = [
             '2000-1-1', '2000-10-15', '2000-01-01',
@@ -545,7 +560,7 @@ class SelectDateWidgetTest(WidgetTest):
 
     def test_value_from_datadict(self):
         tests = [
-            (('2000', '12', '1'), '2000-12-1'),
+            (('2000', '12', '1'), '2000-12-01'),
             (('', '12', '1'), '0-12-1'),
             (('2000', '', '1'), '2000-0-1'),
             (('2000', '12', ''), '2000-12-0'),
