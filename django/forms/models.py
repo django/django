@@ -476,7 +476,9 @@ def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
                       labels=None, help_texts=None, error_messages=None,
                       field_classes=None):
     """
-    Return a ModelForm containing form fields for the given model.
+    Return a ModelForm containing form fields for the given model. You can
+    optionally pass a `form` argument to use as a starting point for
+    constructing the ModelForm.
 
     ``fields`` is an optional list of field names. If provided, include only
     the named fields in the returned fields. If omitted or '__all__', use all
