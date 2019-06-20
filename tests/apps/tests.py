@@ -485,6 +485,15 @@ class DjangoSetupTests(SimpleTestCase):
             self.assertEqual(len(slow_configure_logging_calls), 1)
             self.assertTrue(django.is_ready)
 
+            django.is_ready = False
+
+            def looping_configure_logging(*args, **kwars):
+                django.setup()  # Make recursive call to django.setup()
+            django.utils.log.configure_logging = looping_configure_logging
+
+            with self.assertRaisesRegexp(RuntimeError, r"django.setup\(\) isn't reentrant"):
+                django.setup()
+
         finally:  # Protect other tests against failures of this one
             django.is_ready = True
             django.conf.settings = original_settings

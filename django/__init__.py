@@ -9,8 +9,9 @@ __version__ = get_version(VERSION)
 
 # Flag also used to prevent multiple setup() calls
 is_ready = False
+_is_loading = False
 
-_setup_lock = threading.Lock()
+_setup_lock = threading.RLock()
 
 
 def setup(set_prefix=True):
@@ -25,23 +26,37 @@ def setup(set_prefix=True):
     Returns a boolean indicating whether setup occurred for the first time."
     """
 
-    global is_ready
+    global is_ready, _is_loading
 
+    # setup() might be called by multiple threads in parallel, on servers that create threads
+    # before initializing the WSGI callable.
+    # This RLock prevents other threads from entering this section. The "compare and set" operation
+    # it performs is atomic.
     with _setup_lock:
 
         if is_ready:
             return False
 
-        from django.apps import apps
-        from django.conf import settings
-        from django.urls import set_script_prefix
-        from django.utils.log import configure_logging
-        configure_logging(settings.LOGGING_CONFIG, settings.LOGGING)
-        if set_prefix:
-            set_script_prefix(
-                '/' if settings.FORCE_SCRIPT_NAME is None else settings.FORCE_SCRIPT_NAME
-            )
-        apps.populate(settings.INSTALLED_APPS)
+        if _is_loading:
+            # Prevent reentrant calls to avoid running initialization twice.
+            raise RuntimeError("django.setup() isn't reentrant")
+
+        try:
+            _is_loading = True
+
+            from django.apps import apps
+            from django.conf import settings
+            from django.urls import set_script_prefix
+            from django.utils.log import configure_logging
+            configure_logging(settings.LOGGING_CONFIG, settings.LOGGING)
+            if set_prefix:
+                set_script_prefix(
+                    '/' if settings.FORCE_SCRIPT_NAME is None else settings.FORCE_SCRIPT_NAME
+                )
+            apps.populate(settings.INSTALLED_APPS)
+        finally:
+            # Cleanup in case initialization failed
+            _is_loading = False
 
         is_ready = True
         return True
