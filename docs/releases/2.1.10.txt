@@ -1,0 +1,7 @@
+===========================
+Django 2.1.10 release notes
+===========================
+
+*July 1, 2019*
+
+Django 2.1.10 fixes a security issue in 2.1.9.

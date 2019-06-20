@@ -1,0 +1,7 @@
+============================
+Django 1.11.22 release notes
+============================
+
+*July 1, 2019*
+
+Django 1.11.22 fixes a security issue in 1.11.21.
