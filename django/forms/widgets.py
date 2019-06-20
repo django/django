@@ -1070,18 +1070,15 @@ class SelectDateWidget(Widget):
         if y == m == d == '':
             return None
         if y is not None and m is not None and d is not None:
-            if settings.USE_L10N:
-                input_format = get_format('DATE_INPUT_FORMATS')[0]
-                try:
-                    date_value = datetime.date(int(y), int(m), int(d))
-                except ValueError:
-                    pass
-                else:
-                    date_value = datetime_safe.new_date(date_value)
-                    return date_value.strftime(input_format)
-            # Return pseudo-ISO dates with zeros for any unselected values,
-            # e.g. '2017-0-23'.
-            return '%s-%s-%s' % (y or 0, m or 0, d or 0)
+            input_format = get_format('DATE_INPUT_FORMATS')[0]
+            try:
+                date_value = datetime.date(int(y), int(m), int(d))
+            except ValueError:
+                # Return pseudo-ISO dates with zeros for any unselected values,
+                # e.g. '2017-0-23'.
+                return '%s-%s-%s' % (y or 0, m or 0, d or 0)
+            date_value = datetime_safe.new_date(date_value)
+            return date_value.strftime(input_format)
         return data.get(name)
 
     def value_omitted_from_data(self, data, files, name):
