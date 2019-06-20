@@ -41,7 +41,8 @@ class AccessMixin:
     def handle_no_permission(self):
         if self.raise_exception:
             raise PermissionDenied(self.get_permission_denied_message())
-        if self.request.user.is_authenticated and not self.permission_required_redirect:
+        permission_required_redirect = getattr(self, 'permission_required_redirect', False)
+        if self.request.user.is_authenticated and not permission_required_redirect:
             raise PermissionDenied(self.get_permission_denied_message())
         return redirect_to_login(self.request.get_full_path(), self.get_login_url(), self.get_redirect_field_name())
 
