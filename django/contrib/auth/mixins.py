@@ -39,7 +39,9 @@ class AccessMixin:
         return self.redirect_field_name
 
     def handle_no_permission(self):
-        if self.raise_exception or self.request.user.is_authenticated:
+        if self.raise_exception:
+            raise PermissionDenied(self.get_permission_denied_message())
+        if self.request.user.is_authenticated and not self.permission_required_redirect:
             raise PermissionDenied(self.get_permission_denied_message())
         return redirect_to_login(self.request.get_full_path(), self.get_login_url(), self.get_redirect_field_name())
 
@@ -55,7 +57,8 @@ class LoginRequiredMixin(AccessMixin):
 class PermissionRequiredMixin(AccessMixin):
     """Verify that the current user has all specified permissions."""
     permission_required = None
-
+    permission_required_redirect = False
+    
     def get_permission_required(self):
         """
         Override this method to override the permission_required attribute.
