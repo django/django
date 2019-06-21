@@ -1,6 +1,6 @@
-=================
-Formset Functions
-=================
+=======
+Formset
+=======
 
 Formset API reference. For introductory material about formsets, see the
 :doc:`/topics/forms/formsets` topic guide.
@@ -8,11 +8,71 @@ Formset API reference. For introductory material about formsets, see the
 .. module:: django.forms.formsets
    :synopsis: Django's functions for building formsets.
 
+``Making a formset``
+====================
+
+.. note::
+    From 3.0 and onwards, a formset can be made using two ways either
+    by using the `formset_factory` or by using the `FormSet` class both are
+    mentioned below.
+
+
+``FormSet class``
+-----------------
+
+.. class:: FormSet.objects
+
+    The :class:`~django.forms.formsets.FormSet` class is used to create the
+    ``Formset`` from the given ``form`` using a declarative syntax.
+    See the following example which shows how to create AuthorFormSet from
+    AuthorForm::
+
+        from django.forms import formsets
+
+        class AuthorFormSet(formsets.FormSet):
+            # adding a form field is must
+            form = AuthorForm
+
 ``formset_factory``
-===================
+-------------------
 
 .. function:: formset_factory(form, formset=BaseFormSet, extra=1, can_order=False, can_delete=False, max_num=None, validate_max=False, min_num=None, validate_min=False, absolute_max=None, can_delete_extra=True, renderer=None)
 
     Returns a ``FormSet`` class for the given ``form`` class.
 
     See :doc:`formsets </topics/forms/formsets>` for example usage.
+
+``Overriding methods in fromset``
+=================================
+
+.. note::
+    Similar to how the formset can be made using two different ways. Overriding the
+    default behavior of the formset methods can also be done in two different ways.
+    Below are the examples of how to override the default `is_valid` method.
+
+``Overiding using BaseFormSet class``
+-------------------------------------
+
+You can inherit a class from the `BaseFormSet` and then pass that as an argument
+to the `formset_factory` to create a formset with the modified method.
+
+    >>> from django.forms import formsets
+    >>> from django.forms import formset_factory
+    >>> class ArticleBaseFormSet(formsets.BaseFormSet):
+    ...     def is_valid(self):
+    ...         #Your custom conditions may go here
+    ...         return super().is_valid
+    >>> ArticleFormSet = formset_factory(form=ArticleForm, formset=ArticleBaseFormSet)
+
+``Overiding using FormSet class``
+---------------------------------
+
+You can directly insert whatever custom methods you want in the class inherited
+form the `FormSet`
+
+    >>> from django.forms import formsets
+    >>> class ArticleFormset(formsets.FormSet):
+    ...     form = ArticleForm
+    ...     def is_valid(self):
+    ...         #Your custom conditions may go here
+    ...         return super().is_valid

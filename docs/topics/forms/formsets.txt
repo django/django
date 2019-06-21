@@ -53,6 +53,29 @@ created. You can reorder the forms by overriding the default
 :meth:`iteration <object.__iter__>` and
 :meth:`indexing <object.__getitem__>` behavior if needed.
 
+Using ``FormSet`` class to make the formset
+===========================================
+
+.. class:: FormSet
+
+You can use the ``FormSet`` class to declare a formset in same way you declare models.
+This is alternative method to using ``formset_factory`` to make the formset class.
+
+To create a formset out of an ``ArticleForm`` you would do::
+
+    >>> from django.forms import formsets
+    >>> class ArticleFormSet(formsets.FormSet):
+    ...     form = ArticleForm
+
+You now have created a formset named ``ArticleFormSet``, which is similar to how to create
+it using the ``formset_factory``. You can use it in the same way as the previous example::
+
+    >>> formset = ArticleFormSet()
+    >>> for form in formset:
+    ...     print(form.as_table())
+    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title"></td></tr>
+    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date"></td></tr>
+
 .. _formsets-initial-data:
 
 Using initial data with a formset

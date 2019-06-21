@@ -246,6 +246,26 @@ Model form factory functions
 
     See :ref:`model-formsets` for example usage.
 
+``ModelFormSet class reference``
+================================
+
+``objects``
+-----------
+
+.. attribute:: ModelFromSet.objects
+
+    The :class:`~django.forms.models.ModelFormSet` class is used to create the
+    ``Formset`` from the given ``model`` using a declarative syntax.
+    See the following example which shows how to create AuthorFormSet from
+    `Author` model::
+
+        from django.forms import models
+        from myapp.models import Author
+
+        class AuthorFormSet(mdoels.ModelFromSet):
+            model = Author
+            fields = '__all__'
+
 ``inlineformset_factory``
 -------------------------
 
@@ -259,3 +279,24 @@ Model form factory functions
     the ``parent_model``, you must specify a ``fk_name``.
 
     See :ref:`inline-formsets` for example usage.
+
+``InlineFormSet class reference``
+=================================
+
+``objects``
+-----------
+
+.. attribute:: InlineFormSet.objects
+
+    The :class:`~django.forms.models.InlineFormSet` class is used to create the
+    ``Formset`` from the given related ``model`` using a declarative syntax.
+    See the following example which shows how to create BookFormSet from
+    `Book` model which is related to the `AUthor` model::
+
+        from django.forms import models
+        from myapp.models import Author, Book
+
+        class AuthorFormSet(mdoels.ModelFromSet):
+            parent_model = Author
+            model = Book
+            fields = '__all__'
