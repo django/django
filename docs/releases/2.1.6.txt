@@ -10,10 +10,9 @@ CVE-2019-6975: Memory exhaustion in ``django.utils.numberformat.format()``
 --------------------------------------------------------------------------
 
 If ``django.utils.numberformat.format()`` -- used by ``contrib.admin`` as well
-as the the ``floatformat``, ``filesizeformat``, and ``intcomma`` templates
-filters -- received a ``Decimal`` with a large number of digits or a large
-exponent, it could lead to significant memory usage due to a call to
-``'{:f}'.format()``.
+as the ``floatformat``, ``filesizeformat``, and ``intcomma`` templates filters
+-- received a ``Decimal`` with a large number of digits or a large exponent, it
+could lead to significant memory usage due to a call to ``'{:f}'.format()``.
 
 To avoid this, decimals with more than 200 digits are now formatted using
 scientific notation.
