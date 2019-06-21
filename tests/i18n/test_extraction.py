@@ -182,7 +182,7 @@ class BasicExtractorTests(ExtractorTests):
             po_contents = fp.read()
             self.assertMsgId("Non-breaking space\u00a0:", po_contents)
 
-    def test_blocktrans_trimmed(self):
+    def test_blocktranslate_trimmed(self):
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE) as fp:
@@ -255,6 +255,10 @@ class BasicExtractorTests(ExtractorTests):
             self.assertIn("Translatable literal #8c-plural", po_contents)
             self.assertIn('msgctxt "Special blocktrans context #4"', po_contents)
             self.assertMsgId("Translatable literal #8d %(a)s", po_contents)
+
+            # {% translate %} and {% blocktranslate %}
+            self.assertMsgId('translate text', po_contents)
+            self.assertMsgId('blocktranslate text', po_contents)
 
     def test_context_in_single_quotes(self):
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
@@ -528,7 +532,7 @@ class CopyPluralFormsExtractorTests(ExtractorTests):
             found = re.findall(r'^(?P<value>"Plural-Forms.+?\\n")\s*$', po_contents, re.MULTILINE | re.DOTALL)
             self.assertEqual(1, len(found))
 
-    def test_trans_and_plural_blocktrans_collision(self):
+    def test_translate_and_plural_blocktranslate_collision(self):
         """
         Ensures a correct workaround for the gettext bug when handling a literal
         found inside a {% trans %} tag and also in another file inside a
@@ -539,8 +543,8 @@ class CopyPluralFormsExtractorTests(ExtractorTests):
         with open(self.PO_FILE) as fp:
             po_contents = fp.read()
             self.assertNotIn("#-#-#-#-#  django.pot (PACKAGE VERSION)  #-#-#-#-#\\n", po_contents)
-            self.assertMsgId('First `trans`, then `blocktrans` with a plural', po_contents)
-            self.assertMsgIdPlural('Plural for a `trans` and `blocktrans` collision case', po_contents)
+            self.assertMsgId('First `translate`, then `blocktranslate` with a plural', po_contents)
+            self.assertMsgIdPlural('Plural for a `translate` and `blocktranslate` collision case', po_contents)
 
 
 class NoWrapExtractorTests(ExtractorTests):

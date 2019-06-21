@@ -1,3 +1,6 @@
+import inspect
+from functools import partial, wraps
+
 from asgiref.local import Local
 
 from django.template import Context, Template, TemplateSyntaxError
@@ -7,8 +10,33 @@ from django.utils import translation
 from django.utils.safestring import mark_safe
 from django.utils.translation import trans_real
 
-from ...utils import setup
+from ...utils import setup as base_setup
 from .base import MultipleLocaleActivationTestCase, extended_locale_paths
+
+
+def setup(templates, *args, **kwargs):
+    trans_setup = base_setup(templates, *args, **kwargs)
+    translate_setup = base_setup({
+        name: template.replace('{% trans ', '{% translate ')
+        for name, template in templates.items()
+    })
+
+    tags = {
+        'trans': trans_setup,
+        'translate': translate_setup,
+    }
+
+    def decorator(func):
+        @wraps(func)
+        def inner(self, *args):
+            signature = inspect.signature(func)
+            for tag_name, setup_func in tags.items():
+                if 'tag_name' in signature.parameters:
+                    setup_func(partial(func, tag_name=tag_name))(self)
+                else:
+                    setup_func(func)(self)
+        return inner
+    return decorator
 
 
 class I18nTransTagTests(SimpleTestCase):
@@ -84,38 +112,38 @@ class I18nTransTagTests(SimpleTestCase):
         self.assertEqual(output, 'Page not found')
 
     @setup({'template': '{% load i18n %}{% trans %}A}'})
-    def test_syntax_error_no_arguments(self):
-        msg = "'trans' takes at least one argument"
+    def test_syntax_error_no_arguments(self, tag_name):
+        msg = "'{}' takes at least one argument".format(tag_name)
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('template')
 
     @setup({'template': '{% load i18n %}{% trans "Yes" badoption %}'})
-    def test_syntax_error_bad_option(self):
-        msg = "Unknown argument for 'trans' tag: 'badoption'"
+    def test_syntax_error_bad_option(self, tag_name):
+        msg = "Unknown argument for '{}' tag: 'badoption'".format(tag_name)
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('template')
 
     @setup({'template': '{% load i18n %}{% trans "Yes" as %}'})
-    def test_syntax_error_missing_assignment(self):
-        msg = "No argument provided to the 'trans' tag for the as option."
+    def test_syntax_error_missing_assignment(self, tag_name):
+        msg = "No argument provided to the '{}' tag for the as option.".format(tag_name)
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('template')
 
     @setup({'template': '{% load i18n %}{% trans "Yes" as var context %}'})
-    def test_syntax_error_missing_context(self):
-        msg = "No argument provided to the 'trans' tag for the context option."
+    def test_syntax_error_missing_context(self, tag_name):
+        msg = "No argument provided to the '{}' tag for the context option.".format(tag_name)
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('template')
 
     @setup({'template': '{% load i18n %}{% trans "Yes" context as var %}'})
-    def test_syntax_error_context_as(self):
-        msg = "Invalid argument 'as' provided to the 'trans' tag for the context option"
+    def test_syntax_error_context_as(self, tag_name):
+        msg = "Invalid argument 'as' provided to the '{}' tag for the context option".format(tag_name)
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('template')
 
     @setup({'template': '{% load i18n %}{% trans "Yes" context noop %}'})
-    def test_syntax_error_context_noop(self):
-        msg = "Invalid argument 'noop' provided to the 'trans' tag for the context option"
+    def test_syntax_error_context_noop(self, tag_name):
+        msg = "Invalid argument 'noop' provided to the '{}' tag for the context option".format(tag_name)
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('template')
 
@@ -132,6 +160,15 @@ class I18nTransTagTests(SimpleTestCase):
 
 
 class TranslationTransTagTests(SimpleTestCase):
+    tag_name = 'trans'
+
+    def get_template(self, template_string):
+        return Template(
+            template_string.replace(
+                '{{% trans ',
+                '{{% {}'.format(self.tag_name)
+            )
+        )
 
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_template_tags_pgettext(self):
@@ -140,44 +177,57 @@ class TranslationTransTagTests(SimpleTestCase):
         trans_real._translations = {}
         with translation.override('de'):
             # Nonexistent context...
-            t = Template('{% load i18n %}{% trans "May" context "nonexistent" %}')
+            t = self.get_template('{% load i18n %}{% trans "May" context "nonexistent" %}')
             rendered = t.render(Context())
             self.assertEqual(rendered, 'May')
 
             # Existing context... using a literal
-            t = Template('{% load i18n %}{% trans "May" context "month name" %}')
+            t = self.get_template('{% load i18n %}{% trans "May" context "month name" %}')
             rendered = t.render(Context())
             self.assertEqual(rendered, 'Mai')
-            t = Template('{% load i18n %}{% trans "May" context "verb" %}')
+            t = self.get_template('{% load i18n %}{% trans "May" context "verb" %}')
             rendered = t.render(Context())
             self.assertEqual(rendered, 'Kann')
 
             # Using a variable
-            t = Template('{% load i18n %}{% trans "May" context message_context %}')
+            t = self.get_template('{% load i18n %}{% trans "May" context message_context %}')
             rendered = t.render(Context({'message_context': 'month name'}))
             self.assertEqual(rendered, 'Mai')
-            t = Template('{% load i18n %}{% trans "May" context message_context %}')
+            t = self.get_template('{% load i18n %}{% trans "May" context message_context %}')
             rendered = t.render(Context({'message_context': 'verb'}))
             self.assertEqual(rendered, 'Kann')
 
             # Using a filter
-            t = Template('{% load i18n %}{% trans "May" context message_context|lower %}')
+            t = self.get_template('{% load i18n %}{% trans "May" context message_context|lower %}')
             rendered = t.render(Context({'message_context': 'MONTH NAME'}))
             self.assertEqual(rendered, 'Mai')
-            t = Template('{% load i18n %}{% trans "May" context message_context|lower %}')
+            t = self.get_template('{% load i18n %}{% trans "May" context message_context|lower %}')
             rendered = t.render(Context({'message_context': 'VERB'}))
             self.assertEqual(rendered, 'Kann')
 
             # Using 'as'
-            t = Template('{% load i18n %}{% trans "May" context "month name" as var %}Value: {{ var }}')
+            t = self.get_template('{% load i18n %}{% trans "May" context "month name" as var %}Value: {{ var }}')
             rendered = t.render(Context())
             self.assertEqual(rendered, 'Value: Mai')
-            t = Template('{% load i18n %}{% trans "May" as var context "verb" %}Value: {{ var }}')
+            t = self.get_template('{% load i18n %}{% trans "May" as var context "verb" %}Value: {{ var }}')
             rendered = t.render(Context())
             self.assertEqual(rendered, 'Value: Kann')
 
 
+class TranslationTranslateTagTests(TranslationTransTagTests):
+    tag_name = 'translate'
+
+
 class MultipleLocaleActivationTransTagTests(MultipleLocaleActivationTestCase):
+    tag_name = 'trans'
+
+    def get_template(self, template_string):
+        return Template(
+            template_string.replace(
+                '{{% trans ',
+                '{{% {}'.format(self.tag_name)
+            )
+        )
 
     def test_single_locale_activation(self):
         """
@@ -185,25 +235,32 @@ class MultipleLocaleActivationTransTagTests(MultipleLocaleActivationTestCase):
         constructs.
         """
         with translation.override('fr'):
-            self.assertEqual(Template("{% load i18n %}{% trans 'Yes' %}").render(Context({})), 'Oui')
+            self.assertEqual(
+                self.get_template("{% load i18n %}{% trans 'Yes' %}").render(Context({})),
+                'Oui'
+            )
 
     def test_multiple_locale_trans(self):
         with translation.override('de'):
-            t = Template("{% load i18n %}{% trans 'No' %}")
+            t = self.get_template("{% load i18n %}{% trans 'No' %}")
         with translation.override(self._old_language), translation.override('nl'):
             self.assertEqual(t.render(Context({})), 'Nee')
 
     def test_multiple_locale_deactivate_trans(self):
         with translation.override('de', deactivate=True):
-            t = Template("{% load i18n %}{% trans 'No' %}")
+            t = self.get_template("{% load i18n %}{% trans 'No' %}")
         with translation.override('nl'):
             self.assertEqual(t.render(Context({})), 'Nee')
 
     def test_multiple_locale_direct_switch_trans(self):
         with translation.override('de'):
-            t = Template("{% load i18n %}{% trans 'No' %}")
+            t = self.get_template("{% load i18n %}{% trans 'No' %}")
         with translation.override('nl'):
             self.assertEqual(t.render(Context({})), 'Nee')
+
+
+class MultipleLocaleActivationTranslateTagTests(MultipleLocaleActivationTransTagTests):
+    tag_name = 'translate'
 
 
 class LocalizeNodeTests(SimpleTestCase):

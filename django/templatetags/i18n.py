@@ -98,7 +98,8 @@ class TranslateNode(Node):
 class BlockTranslateNode(Node):
 
     def __init__(self, extra_context, singular, plural=None, countervar=None,
-                 counter=None, message_context=None, trimmed=False, asvar=None):
+                 counter=None, message_context=None, trimmed=False, asvar=None,
+                 tag_name='blocktranslate'):
         self.extra_context = extra_context
         self.singular = singular
         self.plural = plural
@@ -107,6 +108,7 @@ class BlockTranslateNode(Node):
         self.message_context = message_context
         self.trimmed = trimmed
         self.asvar = asvar
+        self.tag_name = tag_name
 
     def render_token_list(self, tokens):
         result = []
@@ -163,8 +165,8 @@ class BlockTranslateNode(Node):
             if nested:
                 # Either string is malformed, or it's a bug
                 raise TemplateSyntaxError(
-                    "'blocktrans' is unable to format string returned by gettext: %r using %r"
-                    % (result, data)
+                    '%r is unable to format string returned by gettext: %r '
+                    'using %r' % (self.tag_name, result, data)
                 )
             with translation.override(None):
                 result = self.render(context, nested=True)
@@ -313,6 +315,7 @@ def do_get_current_language_bidi(parser, token):
     return GetCurrentLanguageBidiNode(args[2])
 
 
+@register.tag("translate")
 @register.tag("trans")
 def do_translate(parser, token):
     """
@@ -406,6 +409,7 @@ def do_translate(parser, token):
     return TranslateNode(message_string, noop, asvar, message_context)
 
 
+@register.tag("blocktranslate")
 @register.tag("blocktrans")
 def do_block_translate(parser, token):
     """
@@ -513,19 +517,20 @@ def do_block_translate(parser, token):
             break
     if countervar and counter:
         if token.contents.strip() != 'plural':
-            raise TemplateSyntaxError("'blocktrans' doesn't allow other block tags inside it")
+            raise TemplateSyntaxError("%r doesn't allow other block tags inside it" % bits[0])
         while parser.tokens:
             token = parser.next_token()
             if token.token_type in (TokenType.VAR, TokenType.TEXT):
                 plural.append(token)
             else:
                 break
-    if token.contents.strip() != 'endblocktrans':
-        raise TemplateSyntaxError("'blocktrans' doesn't allow other block tags (seen %r) inside it" % token.contents)
+    end_tag_name = 'end%s' % bits[0]
+    if token.contents.strip() != end_tag_name:
+        raise TemplateSyntaxError("%r doesn't allow other block tags (seen %r) inside it" % (bits[0], token.contents))
 
     return BlockTranslateNode(extra_context, singular, plural, countervar,
                               counter, message_context, trimmed=trimmed,
-                              asvar=asvar)
+                              asvar=asvar, tag_name=bits[0])
 
 
 @register.tag

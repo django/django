@@ -328,8 +328,8 @@ will appear in the ``.po`` file as:
     msgid "May"
     msgstr ""
 
-Contextual markers are also supported by the :ttag:`trans` and
-:ttag:`blocktrans` template tags.
+Contextual markers are also supported by the :ttag:`translate` and
+:ttag:`blocktranslate` template tags.
 
 .. _lazy-translations:
 
@@ -575,21 +575,22 @@ have already loaded the ``i18n`` tag.
     unchanged.
 
 .. templatetag:: trans
+.. templatetag:: translate
 
-``trans`` template tag
-----------------------
+``translate`` template tag
+--------------------------
 
-The ``{% trans %}`` template tag translates either a constant string
+The ``{% translate %}`` template tag translates either a constant string
 (enclosed in single or double quotes) or variable content::
 
-    <title>{% trans "This is the title." %}</title>
-    <title>{% trans myvar %}</title>
+    <title>{% translate "This is the title." %}</title>
+    <title>{% translate myvar %}</title>
 
 If the ``noop`` option is present, variable lookup still takes place but the
 translation is skipped. This is useful when "stubbing out" content that will
 require translation in the future::
 
-    <title>{% trans "myvar" noop %}</title>
+    <title>{% translate "myvar" noop %}</title>
 
 Internally, inline translations use an
 :func:`~django.utils.translation.gettext` call.
@@ -598,15 +599,14 @@ In case a template var (``myvar`` above) is passed to the tag, the tag will
 first resolve such variable to a string at run-time and then look up that
 string in the message catalogs.
 
-It's not possible to mix a template variable inside a string within ``{% trans
-%}``. If your translations require strings with variables (placeholders), use
-:ttag:`{% blocktrans %}<blocktrans>` instead.
-
+It's not possible to mix a template variable inside a string within
+``{% translate %}``. If your translations require strings with variables
+(placeholders), use :ttag:`{% blocktranslate %}<blocktranslate>` instead.
 
 If you'd like to retrieve a translated string without displaying it, you can
 use the following syntax::
 
-    {% trans "This is the title" as the_title %}
+    {% translate "This is the title" as the_title %}
 
     <title>{{ the_title }}</title>
     <meta name="description" content="{{ the_title }}">
@@ -615,12 +615,12 @@ In practice you'll use this to get a string you can use in multiple places in a
 template or so you can use the output as an argument for other template tags or
 filters::
 
-    {% trans "starting point" as start %}
-    {% trans "end point" as end %}
-    {% trans "La Grande Boucle" as race %}
+    {% translate "starting point" as start %}
+    {% translate "end point" as end %}
+    {% translate "La Grande Boucle" as race %}
 
     <h1>
-      <a href="/" title="{% blocktrans %}Back to '{{ race }}' homepage{% endblocktrans %}">{{ race }}</a>
+      <a href="/" title="{% blocktranslate %}Back to '{{ race }}' homepage{% endblocktranslate %}">{{ race }}</a>
     </h1>
     <p>
     {% for stage in tour_stages %}
@@ -628,50 +628,56 @@ filters::
     {% endfor %}
     </p>
 
-``{% trans %}`` also supports :ref:`contextual markers<contextual-markers>`
+``{% translate %}`` also supports :ref:`contextual markers<contextual-markers>`
 using the ``context`` keyword:
 
 .. code-block:: html+django
 
-    {% trans "May" context "month name" %}
+    {% translate "May" context "month name" %}
+
+.. versionchanged:: 3.1
+
+   The ``trans`` tag was renamed to ``translate``.  The ``trans``
+   tag is still supported as an alias for backwards compatibility.
 
 .. templatetag:: blocktrans
+.. templatetag:: blocktranslate
 
-``blocktrans`` template tag
----------------------------
+``blocktranslate`` template tag
+-------------------------------
 
-Contrarily to the :ttag:`trans` tag, the ``blocktrans`` tag allows you to mark
-complex sentences consisting of literals and variable content for translation
-by making use of placeholders::
+Contrarily to the :ttag:`translate` tag, the ``blocktranslate`` tag allows you
+to mark complex sentences consisting of literals and variable content for
+translation by making use of placeholders::
 
-    {% blocktrans %}This string will have {{ value }} inside.{% endblocktrans %}
+    {% blocktranslate %}This string will have {{ value }} inside.{% endblocktranslate %}
 
 To translate a template expression -- say, accessing object attributes or
 using template filters -- you need to bind the expression to a local variable
 for use within the translation block. Examples::
 
-    {% blocktrans with amount=article.price %}
+    {% blocktranslate with amount=article.price %}
     That will cost $ {{ amount }}.
-    {% endblocktrans %}
+    {% endblocktranslate %}
 
-    {% blocktrans with myvar=value|filter %}
+    {% blocktranslate with myvar=value|filter %}
     This will have {{ myvar }} inside.
-    {% endblocktrans %}
+    {% endblocktranslate %}
 
-You can use multiple expressions inside a single ``blocktrans`` tag::
+You can use multiple expressions inside a single ``blocktranslate`` tag::
 
-    {% blocktrans with book_t=book|title author_t=author|title %}
+    {% blocktranslate with book_t=book|title author_t=author|title %}
     This is {{ book_t }} by {{ author_t }}
-    {% endblocktrans %}
+    {% endblocktranslate %}
 
 .. note:: The previous more verbose format is still supported:
-   ``{% blocktrans with book|title as book_t and author|title as author_t %}``
+   ``{% blocktranslate with book|title as book_t and author|title as author_t %}``
 
 Other block tags (for example ``{% for %}`` or ``{% if %}``) are not allowed
-inside a ``blocktrans`` tag.
+inside a ``blocktranslate`` tag.
 
-If resolving one of the block arguments fails, ``blocktrans`` will fall back to
-the default language by deactivating the currently active language
+If resolving one of the block arguments fails, ``blocktranslate`` will fall
+back to the default language by deactivating the currently active language
 temporarily with the :func:`~django.utils.translation.deactivate_all`
 function.
 
@@ -681,43 +687,43 @@ This tag also provides for pluralization. To use it:
   be the one used to select the right plural form.
 
 * Specify both the singular and plural forms separating them with the
-  ``{% plural %}`` tag within the ``{% blocktrans %}`` and
-  ``{% endblocktrans %}`` tags.
+  ``{% plural %}`` tag within the ``{% blocktranslate %}`` and
+  ``{% endblocktranslate %}`` tags.
 
 An example::
 
-    {% blocktrans count counter=list|length %}
+    {% blocktranslate count counter=list|length %}
     There is only one {{ name }} object.
     {% plural %}
     There are {{ counter }} {{ name }} objects.
-    {% endblocktrans %}
+    {% endblocktranslate %}
 
 A more complex example::
 
-    {% blocktrans with amount=article.price count years=i.length %}
+    {% blocktranslate with amount=article.price count years=i.length %}
     That will cost $ {{ amount }} per year.
     {% plural %}
     That will cost $ {{ amount }} per {{ years }} years.
-    {% endblocktrans %}
+    {% endblocktranslate %}
 
 When you use both the pluralization feature and bind values to local variables
-in addition to the counter value, keep in mind that the ``blocktrans``
+in addition to the counter value, keep in mind that the ``blocktranslate``
 construct is internally converted to an ``ngettext`` call. This means the
 same :ref:`notes regarding ngettext variables <pluralization-var-notes>`
 apply.
 
-Reverse URL lookups cannot be carried out within the ``blocktrans`` and should
-be retrieved (and stored) beforehand::
+Reverse URL lookups cannot be carried out within the ``blocktranslate`` and
+should be retrieved (and stored) beforehand::
 
     {% url 'path.to.view' arg arg2 as the_url %}
-    {% blocktrans %}
+    {% blocktranslate %}
     This is a URL: {{ the_url }}
-    {% endblocktrans %}
+    {% endblocktranslate %}
 
 If you'd like to retrieve a translated string without displaying it, you can
 use the following syntax::
 
-    {% blocktrans asvar the_title %}The title is {{ title }}.{% endblocktrans %}
+    {% blocktranslate asvar the_title %}The title is {{ title }}.{% endblocktranslate %}
     <title>{{ the_title }}</title>
     <meta name="description" content="{{ the_title }}">
 
@@ -725,31 +731,37 @@ In practice you'll use this to get a string you can use in multiple places in a
 template or so you can use the output as an argument for other template tags or
 filters.
 
-``{% blocktrans %}`` also supports :ref:`contextual
+``{% blocktranslate %}`` also supports :ref:`contextual
 markers<contextual-markers>` using the ``context`` keyword:
 
 .. code-block:: html+django
 
-    {% blocktrans with name=user.username context "greeting" %}Hi {{ name }}{% endblocktrans %}
+    {% blocktranslate with name=user.username context "greeting" %}Hi {{ name }}{% endblocktranslate %}
 
-Another feature ``{% blocktrans %}`` supports is the ``trimmed`` option. This
-option will remove newline characters from the beginning and the end of the
-content of the ``{% blocktrans %}`` tag, replace any whitespace at the beginning
-and end of a line and merge all lines into one using a space character to
-separate them. This is quite useful for indenting the content of a ``{%
-blocktrans %}`` tag without having the indentation characters end up in the
-corresponding entry in the PO file, which makes the translation process easier.
+Another feature ``{% blocktranslate %}`` supports is the ``trimmed`` option.
+This option will remove newline characters from the beginning and the end of
+the content of the ``{% blocktranslate %}`` tag, replace any whitespace at the
+beginning and end of a line and merge all lines into one using a space
+character to separate them. This is quite useful for indenting the content of a
+``{% blocktranslate %}`` tag without having the indentation characters end up
+in the corresponding entry in the PO file, which makes the translation process
+easier.
 
-For instance, the following ``{% blocktrans %}`` tag::
+For instance, the following ``{% blocktranslate %}`` tag::
 
-    {% blocktrans trimmed %}
+    {% blocktranslate trimmed %}
       First sentence.
       Second paragraph.
-    {% endblocktrans %}
+    {% endblocktranslate %}
 
 will result in the entry ``"First sentence. Second paragraph."`` in the PO file,
 compared to ``"\n  First sentence.\n  Second sentence.\n"``, if the ``trimmed``
 option had not been specified.
+
+.. versionchanged:: 3.1
+
+   The ``blocktrans`` tag was renamed to ``blocktranslate``. The ``blocktrans``
+   tag is still supported as an alias for backwards compatibility.
 
 String literals passed to tags and filters
 ------------------------------------------
@@ -782,21 +794,21 @@ tag:
 .. code-block:: html+django
 
     {% comment %}Translators: View verb{% endcomment %}
-    {% trans "View" %}
+    {% translate "View" %}
 
     {% comment %}Translators: Short intro blurb{% endcomment %}
-    <p>{% blocktrans %}A multiline translatable
-    literal.{% endblocktrans %}</p>
+    <p>{% blocktranslate %}A multiline translatable
+    literal.{% endblocktranslate %}</p>
 
 or with the ``{#`` ... ``#}`` :ref:`one-line comment constructs <template-comments>`:
 
 .. code-block:: html+django
 
     {# Translators: Label of a button that triggers search #}
-    <button type="submit">{% trans "Go" %}</button>
+    <button type="submit">{% translate "Go" %}</button>
 
     {# Translators: This is a text of the base template #}
-    {% blocktrans %}Ambiguous translatable block of text{% endblocktrans %}
+    {% blocktranslate %}Ambiguous translatable block of text{% endblocktranslate %}
 
 .. note:: Just for completeness, these are the corresponding fragments of the
     resulting ``.po`` file:
@@ -841,12 +853,12 @@ If you want to select a language within a template, you can use the
 
     {% get_current_language as LANGUAGE_CODE %}
     <!-- Current language: {{ LANGUAGE_CODE }} -->
-    <p>{% trans "Welcome to our page" %}</p>
+    <p>{% translate "Welcome to our page" %}</p>
 
     {% language 'en' %}
         {% get_current_language as LANGUAGE_CODE %}
         <!-- Current language: {{ LANGUAGE_CODE }} -->
-        <p>{% trans "Welcome to our page" %}</p>
+        <p>{% translate "Welcome to our page" %}</p>
     {% endlanguage %}
 
 While the first occurrence of "Welcome to our page" uses the current language,
@@ -1450,7 +1462,7 @@ template tag. It enables the given language in the enclosed template section:
 
     {% get_available_languages as languages %}
 
-    {% trans "View this category in:" %}
+    {% translate "View this category in:" %}
     {% for lang_code, lang_name in languages %}
         {% language lang_code %}
         <a href="{% url 'category' slug=category.slug %}">{{ lang_name }}</a>

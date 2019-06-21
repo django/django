@@ -85,9 +85,11 @@ continued here.{% endcomment %}
 {% blocktrans context 'Special blocktrans context wrapped in single quotes' %}Translatable literal with context wrapped in single quotes{% endblocktrans %}
 {% blocktrans context "Special blocktrans context wrapped in double quotes" %}Translatable literal with context wrapped in double quotes{% endblocktrans %}
 
+{% blocktranslate %}blocktranslate text{% endblocktranslate %}
+{% translate "translate text" %}
 
-{# BasicExtractorTests.test_blocktrans_trimmed #}
-{% blocktrans %}
+{# BasicExtractorTests.test_blocktranslate_trimmed #}
+{% blocktranslate %}
   Text with a few
   line breaks.
 {% endblocktrans %}
@@ -98,10 +100,10 @@ continued here.{% endcomment %}
 {% endblocktrans %}
 {% trans "Get my line number" %}
 
-{% blocktrans trimmed count counter=mylist|length %}
-First `trans`, then `blocktrans` with a plural
+{% blocktranslate trimmed count counter=mylist|length %}
+First `translate`, then `blocktranslate` with a plural
 {% plural %}
-Plural for a `trans` and `blocktrans` collision case
-{% endblocktrans %}
+Plural for a `translate` and `blocktranslate` collision case
+{% endblocktranslate %}
 
 {% trans "Non-breaking space :" %}

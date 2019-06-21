@@ -260,7 +260,10 @@ Signals
 Templates
 ~~~~~~~~~
 
-* ...
+* The renamed :ttag:`translate` and :ttag:`blocktranslate` template tags are
+  introduced for internationalization in template code. The older :ttag:`trans`
+  and :ttag:`blocktrans` template tags aliases continue to work, and will be
+  retained for the foreseeable future.
 
 Tests
 ~~~~~

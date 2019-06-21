@@ -814,10 +814,10 @@ This would display as "It is the 4th of September".
 
 You can also use the syntax ``{% now "Y" as current_year %}`` to store the
 output (as a string) inside a variable. This is useful if you want to use
-``{% now %}`` inside a template tag like :ttag:`blocktrans` for example::
+``{% now %}`` inside a template tag like :ttag:`blocktranslate` for example::
 
     {% now "Y" as current_year %}
-    {% blocktrans %}Copyright {{ current_year }}{% endblocktrans %}
+    {% blocktranslate %}Copyright {{ current_year }}{% endblocktranslate %}
 
 .. templatetag:: regroup
 
@@ -1200,10 +1200,10 @@ image in the above example will be 88 pixels wide
 (because 175/200 = .875; .875 * 100 = 87.5 which is rounded up to 88).
 
 In some cases you might want to capture the result of ``widthratio`` in a
-variable. It can be useful, for instance, in a :ttag:`blocktrans` like this::
+variable. It can be useful, for instance, in a :ttag:`blocktranslate` like this::
 
     {% widthratio this_value max_value max_width as width %}
-    {% blocktrans %}The width is: {{ width }}{% endblocktrans %}
+    {% blocktranslate %}The width is: {{ width }}{% endblocktranslate %}
 
 .. templatetag:: with
 
@@ -2023,7 +2023,7 @@ Example::
 
     You have {{ num_cherries }} cherr{{ num_cherries|pluralize:"y,ies" }}.
 
-.. note:: Use :ttag:`blocktrans` to pluralize translated strings.
+.. note:: Use :ttag:`blocktranslate` to pluralize translated strings.
 
 .. templatefilter:: pprint
 

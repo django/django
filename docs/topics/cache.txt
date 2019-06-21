@@ -682,7 +682,7 @@ templates to achieve the same result:
     {% get_current_language as LANGUAGE_CODE %}
 
     {% cache 600 welcome LANGUAGE_CODE %}
-        {% trans "Welcome to example.com" %}
+        {% translate "Welcome to example.com" %}
     {% endcache %}
 
 The cache timeout can be a template variable, as long as the template variable

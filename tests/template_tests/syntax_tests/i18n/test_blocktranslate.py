@@ -1,4 +1,6 @@
+import inspect
 import os
+from functools import partial, wraps
 
 from asgiref.local import Local
 
@@ -8,8 +10,37 @@ from django.utils import translation
 from django.utils.safestring import mark_safe
 from django.utils.translation import trans_real
 
-from ...utils import setup
+from ...utils import setup as base_setup
 from .base import MultipleLocaleActivationTestCase, extended_locale_paths, here
+
+
+def setup(templates, *args, **kwargs):
+    blocktrans_setup = base_setup(templates, *args, **kwargs)
+    blocktranslate_setup = base_setup({
+        name: template.replace(
+            '{% blocktrans ', '{% blocktranslate '
+        ).replace(
+            '{% endblocktrans %}', '{% endblocktranslate %}'
+        )
+        for name, template in templates.items()
+    })
+
+    tags = {
+        'blocktrans': blocktrans_setup,
+        'blocktranslate': blocktranslate_setup,
+    }
+
+    def decorator(func):
+        @wraps(func)
+        def inner(self, *args):
+            signature = inspect.signature(func)
+            for tag_name, setup_func in tags.items():
+                if 'tag_name' in signature.parameters:
+                    setup_func(partial(func, tag_name=tag_name))(self)
+                else:
+                    setup_func(func)(self)
+        return inner
+    return decorator
 
 
 class I18nBlockTransTagTests(SimpleTestCase):
@@ -76,8 +107,8 @@ class I18nBlockTransTagTests(SimpleTestCase):
                       '{% blocktrans with berta=anton|escape %}{{ berta }}{% endblocktrans %}'})
     def test_i18n17(self):
         """
-        Escaping inside blocktrans and trans works as if it was directly in the
-        template.
+        Escaping inside blocktranslate and translate works as if it was
+        directly in the template.
         """
         output = self.engine.render_to_string('i18n17', {'anton': 'α & β'})
         self.assertEqual(output, 'α &amp; β')
@@ -224,8 +255,8 @@ class I18nBlockTransTagTests(SimpleTestCase):
         self.assertEqual(output, '>Error: Seite nicht gefunden<')
 
     @setup({'template': '{% load i18n %}{% blocktrans asvar %}Yes{% endblocktrans %}'})
-    def test_blocktrans_syntax_error_missing_assignment(self):
-        msg = "No argument provided to the 'blocktrans' tag for the asvar option."
+    def test_blocktrans_syntax_error_missing_assignment(self, tag_name):
+        msg = "No argument provided to the '{}' tag for the asvar option.".format(tag_name)
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('template')
 
@@ -235,14 +266,14 @@ class I18nBlockTransTagTests(SimpleTestCase):
         self.assertEqual(output, '%s')
 
     @setup({'template': '{% load i18n %}{% blocktrans %}{% block b %} {% endblock %}{% endblocktrans %}'})
-    def test_with_block(self):
-        msg = "'blocktrans' doesn't allow other block tags (seen 'block b') inside it"
+    def test_with_block(self, tag_name):
+        msg = "'{}' doesn't allow other block tags (seen 'block b') inside it".format(tag_name)
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('template')
 
     @setup({'template': '{% load i18n %}{% blocktrans %}{% for b in [1, 2, 3] %} {% endfor %}{% endblocktrans %}'})
-    def test_with_for(self):
-        msg = "'blocktrans' doesn't allow other block tags (seen 'for b in [1, 2, 3]') inside it"
+    def test_with_for(self, tag_name):
+        msg = "'{}' doesn't allow other block tags (seen 'for b in [1, 2, 3]') inside it".format(tag_name)
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('template')
 
@@ -252,14 +283,14 @@ class I18nBlockTransTagTests(SimpleTestCase):
             self.engine.render_to_string('template', {'foo': 'bar'})
 
     @setup({'template': '{% load i18n %}{% blocktrans with %}{% endblocktrans %}'})
-    def test_no_args_with(self):
-        msg = '"with" in \'blocktrans\' tag needs at least one keyword argument.'
+    def test_no_args_with(self, tag_name):
+        msg = '"with" in \'{}\' tag needs at least one keyword argument.'.format(tag_name)
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('template')
 
     @setup({'template': '{% load i18n %}{% blocktrans count a %}{% endblocktrans %}'})
-    def test_count(self):
-        msg = '"count" in \'blocktrans\' tag expected exactly one keyword argument.'
+    def test_count(self, tag_name):
+        msg = '"count" in \'{}\' tag expected exactly one keyword argument.'.format(tag_name)
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('template', {'a': [1, 2, 3]})
 
@@ -268,13 +299,25 @@ class I18nBlockTransTagTests(SimpleTestCase):
         'There is {{ count }} object. {% block a %} {% endblock %}'
         '{% endblocktrans %}'
     )})
-    def test_plural_bad_syntax(self):
-        msg = "'blocktrans' doesn't allow other block tags inside it"
+    def test_plural_bad_syntax(self, tag_name):
+        msg = "'{}' doesn't allow other block tags inside it".format(tag_name)
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('template', {'var': [1, 2, 3]})
 
 
 class TranslationBlockTransTagTests(SimpleTestCase):
+    tag_name = 'blocktrans'
+
+    def get_template(self, template_string):
+        return Template(
+            template_string.replace(
+                '{{% blocktrans ',
+                '{{% {}'.format(self.tag_name)
+            ).replace(
+                '{{% endblocktrans %}}',
+                '{{% end{} %}}'.format(self.tag_name)
+            )
+        )
 
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_template_tags_pgettext(self):
@@ -283,54 +326,58 @@ class TranslationBlockTransTagTests(SimpleTestCase):
         trans_real._translations = {}
         with translation.override('de'):
             # Nonexistent context
-            t = Template('{% load i18n %}{% blocktrans context "nonexistent" %}May{% endblocktrans %}')
+            t = self.get_template('{% load i18n %}{% blocktrans context "nonexistent" %}May{% endblocktrans %}')
             rendered = t.render(Context())
             self.assertEqual(rendered, 'May')
 
             # Existing context...  using a literal
-            t = Template('{% load i18n %}{% blocktrans context "month name" %}May{% endblocktrans %}')
+            t = self.get_template('{% load i18n %}{% blocktrans context "month name" %}May{% endblocktrans %}')
             rendered = t.render(Context())
             self.assertEqual(rendered, 'Mai')
-            t = Template('{% load i18n %}{% blocktrans context "verb" %}May{% endblocktrans %}')
+            t = self.get_template('{% load i18n %}{% blocktrans context "verb" %}May{% endblocktrans %}')
             rendered = t.render(Context())
             self.assertEqual(rendered, 'Kann')
 
             # Using a variable
-            t = Template('{% load i18n %}{% blocktrans context message_context %}May{% endblocktrans %}')
+            t = self.get_template('{% load i18n %}{% blocktrans context message_context %}May{% endblocktrans %}')
             rendered = t.render(Context({'message_context': 'month name'}))
             self.assertEqual(rendered, 'Mai')
-            t = Template('{% load i18n %}{% blocktrans context message_context %}May{% endblocktrans %}')
+            t = self.get_template('{% load i18n %}{% blocktrans context message_context %}May{% endblocktrans %}')
             rendered = t.render(Context({'message_context': 'verb'}))
             self.assertEqual(rendered, 'Kann')
 
             # Using a filter
-            t = Template('{% load i18n %}{% blocktrans context message_context|lower %}May{% endblocktrans %}')
+            t = self.get_template(
+                '{% load i18n %}{% blocktrans context message_context|lower %}May{% endblocktrans %}'
+            )
             rendered = t.render(Context({'message_context': 'MONTH NAME'}))
             self.assertEqual(rendered, 'Mai')
-            t = Template('{% load i18n %}{% blocktrans context message_context|lower %}May{% endblocktrans %}')
+            t = self.get_template(
+                '{% load i18n %}{% blocktrans context message_context|lower %}May{% endblocktrans %}'
+            )
             rendered = t.render(Context({'message_context': 'VERB'}))
             self.assertEqual(rendered, 'Kann')
 
             # Using 'count'
-            t = Template(
+            t = self.get_template(
                 '{% load i18n %}{% blocktrans count number=1 context "super search" %}'
                 '{{ number }} super result{% plural %}{{ number }} super results{% endblocktrans %}'
             )
             rendered = t.render(Context())
             self.assertEqual(rendered, '1 Super-Ergebnis')
-            t = Template(
+            t = self.get_template(
                 '{% load i18n %}{% blocktrans count number=2 context "super search" %}{{ number }}'
                 ' super result{% plural %}{{ number }} super results{% endblocktrans %}'
             )
             rendered = t.render(Context())
             self.assertEqual(rendered, '2 Super-Ergebnisse')
-            t = Template(
+            t = self.get_template(
                 '{% load i18n %}{% blocktrans context "other super search" count number=1 %}'
                 '{{ number }} super result{% plural %}{{ number }} super results{% endblocktrans %}'
             )
             rendered = t.render(Context())
             self.assertEqual(rendered, '1 anderen Super-Ergebnis')
-            t = Template(
+            t = self.get_template(
                 '{% load i18n %}{% blocktrans context "other super search" count number=2 %}'
                 '{{ number }} super result{% plural %}{{ number }} super results{% endblocktrans %}'
             )
@@ -338,13 +385,13 @@ class TranslationBlockTransTagTests(SimpleTestCase):
             self.assertEqual(rendered, '2 andere Super-Ergebnisse')
 
             # Using 'with'
-            t = Template(
+            t = self.get_template(
                 '{% load i18n %}{% blocktrans with num_comments=5 context "comment count" %}'
                 'There are {{ num_comments }} comments{% endblocktrans %}'
             )
             rendered = t.render(Context())
             self.assertEqual(rendered, 'Es gibt 5 Kommentare')
-            t = Template(
+            t = self.get_template(
                 '{% load i18n %}{% blocktrans with num_comments=5 context "other comment count" %}'
                 'There are {{ num_comments }} comments{% endblocktrans %}'
             )
@@ -352,19 +399,19 @@ class TranslationBlockTransTagTests(SimpleTestCase):
             self.assertEqual(rendered, 'Andere: Es gibt 5 Kommentare')
 
             # Using trimmed
-            t = Template(
+            t = self.get_template(
                 '{% load i18n %}{% blocktrans trimmed %}\n\nThere\n\t are 5  '
                 '\n\n   comments\n{% endblocktrans %}'
             )
             rendered = t.render(Context())
             self.assertEqual(rendered, 'There are 5 comments')
-            t = Template(
+            t = self.get_template(
                 '{% load i18n %}{% blocktrans with num_comments=5 context "comment count" trimmed %}\n\n'
                 'There are  \t\n  \t {{ num_comments }} comments\n\n{% endblocktrans %}'
             )
             rendered = t.render(Context())
             self.assertEqual(rendered, 'Es gibt 5 Kommentare')
-            t = Template(
+            t = self.get_template(
                 '{% load i18n %}{% blocktrans context "other super search" count number=2 trimmed %}\n'
                 '{{ number }} super \n result{% plural %}{{ number }} super results{% endblocktrans %}'
             )
@@ -374,12 +421,14 @@ class TranslationBlockTransTagTests(SimpleTestCase):
             # Misuses
             msg = "Unknown argument for 'blocktrans' tag: %r."
             with self.assertRaisesMessage(TemplateSyntaxError, msg % 'month="May"'):
-                Template('{% load i18n %}{% blocktrans context with month="May" %}{{ month }}{% endblocktrans %}')
+                self.get_template(
+                    '{% load i18n %}{% blocktrans context with month="May" %}{{ month }}{% endblocktrans %}'
+                )
             msg = '"context" in %r tag expected exactly one argument.' % 'blocktrans'
             with self.assertRaisesMessage(TemplateSyntaxError, msg):
-                Template('{% load i18n %}{% blocktrans context %}{% endblocktrans %}')
+                self.get_template('{% load i18n %}{% blocktrans context %}{% endblocktrans %}')
             with self.assertRaisesMessage(TemplateSyntaxError, msg):
-                Template(
+                self.get_template(
                     '{% load i18n %}{% blocktrans count number=2 context %}'
                     '{{ number }} super result{% plural %}{{ number }}'
                     ' super results{% endblocktrans %}'
@@ -409,7 +458,23 @@ class TranslationBlockTransTagTests(SimpleTestCase):
             self.assertEqual(rendered, 'My other name is James.')
 
 
+class TranslationBlockTranslationTagTests(TranslationBlockTransTagTests):
+    tag_name = 'blocktranslation'
+
+
 class MultipleLocaleActivationBlockTransTests(MultipleLocaleActivationTestCase):
+    tag_name = 'blocktrans'
+
+    def get_template(self, template_string):
+        return Template(
+            template_string.replace(
+                '{{% blocktrans ',
+                '{{% {}'.format(self.tag_name)
+            ).replace(
+                '{{% endblocktrans %}}',
+                '{{% end{} %}}'.format(self.tag_name)
+            )
+        )
 
     def test_single_locale_activation(self):
         """
@@ -418,35 +483,51 @@ class MultipleLocaleActivationBlockTransTests(MultipleLocaleActivationTestCase):
         """
         with translation.override('fr'):
             self.assertEqual(
-                Template("{% load i18n %}{% blocktrans %}Yes{% endblocktrans %}").render(Context({})),
+                self.get_template("{% load i18n %}{% blocktrans %}Yes{% endblocktrans %}").render(Context({})),
                 'Oui'
             )
 
     def test_multiple_locale_btrans(self):
         with translation.override('de'):
-            t = Template("{% load i18n %}{% blocktrans %}No{% endblocktrans %}")
+            t = self.get_template("{% load i18n %}{% blocktrans %}No{% endblocktrans %}")
         with translation.override(self._old_language), translation.override('nl'):
             self.assertEqual(t.render(Context({})), 'Nee')
 
     def test_multiple_locale_deactivate_btrans(self):
         with translation.override('de', deactivate=True):
-            t = Template("{% load i18n %}{% blocktrans %}No{% endblocktrans %}")
+            t = self.get_template("{% load i18n %}{% blocktrans %}No{% endblocktrans %}")
         with translation.override('nl'):
             self.assertEqual(t.render(Context({})), 'Nee')
 
     def test_multiple_locale_direct_switch_btrans(self):
         with translation.override('de'):
-            t = Template("{% load i18n %}{% blocktrans %}No{% endblocktrans %}")
+            t = self.get_template("{% load i18n %}{% blocktrans %}No{% endblocktrans %}")
         with translation.override('nl'):
             self.assertEqual(t.render(Context({})), 'Nee')
 
 
+class MultipleLocaleActivationBlockTranslationTests(MultipleLocaleActivationBlockTransTests):
+    tag_name = 'blocktranslation'
+
+
 class MiscTests(SimpleTestCase):
+    tag_name = 'blocktranslate'
+
+    def get_template(self, template_string):
+        return Template(
+            template_string.replace(
+                '{{% blocktrans ',
+                '{{% {}'.format(self.tag_name)
+            ).replace(
+                '{{% endblocktrans %}}',
+                '{{% end{} %}}'.format(self.tag_name)
+            )
+        )
 
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_percent_in_translatable_block(self):
-        t_sing = Template("{% load i18n %}{% blocktrans %}The result was {{ percent }}%{% endblocktrans %}")
-        t_plur = Template(
+        t_sing = self.get_template("{% load i18n %}{% blocktrans %}The result was {{ percent }}%{% endblocktrans %}")
+        t_plur = self.get_template(
             "{% load i18n %}{% blocktrans count num as number %}"
             "{{ percent }}% represents {{ num }} object{% plural %}"
             "{{ percent }}% represents {{ num }} objects{% endblocktrans %}"
@@ -457,13 +538,15 @@ class MiscTests(SimpleTestCase):
             self.assertEqual(t_plur.render(Context({'percent': 42, 'num': 4})), '42% stellt 4 Objekte dar')
 
     @override_settings(LOCALE_PATHS=extended_locale_paths)
-    def test_percent_formatting_in_blocktrans(self):
+    def test_percent_formatting_in_blocktranslate(self):
         """
-        Python's %-formatting is properly escaped in blocktrans, singular, or
-        plural.
+        Python's %-formatting is properly escaped in blocktranslate, singular,
+        or plural.
         """
-        t_sing = Template("{% load i18n %}{% blocktrans %}There are %(num_comments)s comments{% endblocktrans %}")
-        t_plur = Template(
+        t_sing = self.get_template(
+            "{% load i18n %}{% blocktrans %}There are %(num_comments)s comments{% endblocktrans %}"
+        )
+        t_plur = self.get_template(
             "{% load i18n %}{% blocktrans count num as number %}"
             "%(percent)s% represents {{ num }} object{% plural %}"
             "%(percent)s% represents {{ num }} objects{% endblocktrans %}"
@@ -473,3 +556,7 @@ class MiscTests(SimpleTestCase):
             self.assertEqual(t_sing.render(Context({'num_comments': 42})), 'There are %(num_comments)s comments')
             self.assertEqual(t_plur.render(Context({'percent': 42, 'num': 1})), '%(percent)s% represents 1 object')
             self.assertEqual(t_plur.render(Context({'percent': 42, 'num': 4})), '%(percent)s% represents 4 objects')
+
+
+class MiscBlockTranslationTests(MiscTests):
+    tag_name = 'blocktrans'

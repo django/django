@@ -19,15 +19,15 @@ def blankout(src, char):
 
 context_re = _lazy_re_compile(r"""^\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?'))\s*""")
 inline_re = _lazy_re_compile(
-    # Match the trans 'some text' part
-    r"""^\s*trans\s+((?:"[^"]*?")|(?:'[^']*?'))"""
+    # Match the trans/translate 'some text' part.
+    r"""^\s*trans(?:late)?\s+((?:"[^"]*?")|(?:'[^']*?'))"""
     # Match and ignore optional filters
     r"""(?:\s*\|\s*[^\s:]+(?::(?:[^\s'":]+|(?:"[^"]*?")|(?:'[^']*?')))?)*"""
     # Match the optional context part
     r"""(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?\s*"""
 )
-block_re = _lazy_re_compile(r"""^\s*blocktrans(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?(?:\s+|$)""")
-endblock_re = _lazy_re_compile(r"""^\s*endblocktrans$""")
+block_re = _lazy_re_compile(r"""^\s*blocktrans(?:late)?(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?(?:\s+|$)""")
+endblock_re = _lazy_re_compile(r"""^\s*endblocktrans(?:late)?$""")
 plural_re = _lazy_re_compile(r"""^\s*plural$""")
 constant_re = _lazy_re_compile(r"""_\(((?:".*?")|(?:'.*?'))\)""")
 
