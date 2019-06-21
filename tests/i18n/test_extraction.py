@@ -255,6 +255,10 @@ class BasicExtractorTests(ExtractorTests):
             self.assertIn('msgctxt "Special blocktrans context #4"', po_contents)
             self.assertMsgId("Translatable literal #8d %(a)s", po_contents)
 
+            # {% translate %} and {% blocktranslate %}
+            self.assertMsgId("translate text", po_contents)
+            self.assertMsgId("blocktranslate text", po_contents)
+
     def test_context_in_single_quotes(self):
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))

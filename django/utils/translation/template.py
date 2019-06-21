@@ -20,14 +20,14 @@ def blankout(src, char):
 context_re = re.compile(r"""^\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?'))\s*""")
 inline_re = re.compile(
     # Match the trans 'some text' part
-    r"""^\s*trans\s+((?:"[^"]*?")|(?:'[^']*?'))"""
+    r"""^\s*trans(?:late)?\s+((?:"[^"]*?")|(?:'[^']*?'))"""
     # Match and ignore optional filters
     r"""(?:\s*\|\s*[^\s:]+(?::(?:[^\s'":]+|(?:"[^"]*?")|(?:'[^']*?')))?)*"""
     # Match the optional context part
     r"""(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?\s*"""
 )
-block_re = re.compile(r"""^\s*blocktrans(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?(?:\s+|$)""")
-endblock_re = re.compile(r"""^\s*endblocktrans$""")
+block_re = re.compile(r"""^\s*blocktrans(?:late)?(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?(?:\s+|$)""")
+endblock_re = re.compile(r"""^\s*endblocktrans(?:late)?$""")
 plural_re = re.compile(r"""^\s*plural$""")
 constant_re = re.compile(r"""_\(((?:".*?")|(?:'.*?'))\)""")
 
