@@ -54,7 +54,7 @@ QUnit.test('add/remove form events', function(assert) {
 
 QUnit.test('existing add button', function(assert) {
     var $ = django.jQuery;
-    $('#qunit-fixture').empty();  // Clear the table added in beforeEach
+    $('#qunit-fixture').empty(); // Clear the table added in beforeEach
     $('#qunit-fixture').append($('#tabular-formset').text());
     this.table = $('table.inline');
     this.inlineRow = this.table.find('tr');
