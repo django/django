@@ -153,9 +153,9 @@ function findPosY(obj) {
         return result;
     };
 
-// ----------------------------------------------------------------------------
-// String object extensions
-// ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
+    // String object extensions
+    // ----------------------------------------------------------------------------
     String.prototype.pad_left = function(pad_length, pad_string) {
         var new_string = this;
         for (var i = 0; new_string.length < pad_length; i++) {
@@ -171,18 +171,18 @@ function findPosY(obj) {
         var day, month, year;
         while (i < split_format.length) {
             switch (split_format[i]) {
-                case "%d":
-                    day = date[i];
-                    break;
-                case "%m":
-                    month = date[i] - 1;
-                    break;
-                case "%Y":
-                    year = date[i];
-                    break;
-                case "%y":
-                    year = date[i];
-                    break;
+            case "%d":
+                day = date[i];
+                break;
+            case "%m":
+                month = date[i] - 1;
+                break;
+            case "%Y":
+                year = date[i];
+                break;
+            case "%y":
+                year = date[i];
+                break;
             }
             ++i;
         }
