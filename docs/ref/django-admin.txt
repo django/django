@@ -1560,9 +1560,23 @@ useful if you need to create an initial superuser account or if you need to
 programmatically generate superuser accounts for your site(s).
 
 When run interactively, this command will prompt for a password for
-the new superuser account. When run non-interactively, no password
-will be set, and the superuser account will not be able to log in until
-a password has been manually set for it.
+the new superuser account. When run non-interactively, you can provide
+a password by setting the ``DJANGO_SUPERUSER_PASSWORD`` environment variable.
+Otherwise, no password will be set, and the superuser account will not be able
+to log in until a password has been manually set for it.
+
+In non-interactive mode, the
+:attr:`~django.contrib.auth.models.CustomUser.USERNAME_FIELD` and required
+fields (listed in
+:attr:`~django.contrib.auth.models.CustomUser.REQUIRED_FIELDS`) fall back to
+``DJANGO_SUPERUSER_<uppercase_field_name>`` environment variables, unless they
+are overridden by a command line argument. For example, to provide an ``email``
+field, you can use ``DJANGO_SUPERUSER_EMAIL`` environment variable.
+
+.. versionchanged:: 3.0
+
+    Support for using ``DJANGO_SUPERUSER_PASSWORD`` and
+    ``DJANGO_SUPERUSER_<uppercase_field_name>`` environment variables was added.
 
 .. django-admin-option:: --username USERNAME
 .. django-admin-option:: --email EMAIL
