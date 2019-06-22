@@ -3051,6 +3051,7 @@ class AdminViewListEditable(TestCase):
         self.client.post(reverse('admin:admin_views_person_changelist'), data)
 
         self.assertIs(Person.objects.get(name="John Mauchly").alive, False)
+
         self.assertEqual(Person.objects.get(name="Grace Hopper").gender, 2)
 
         # test a filtered page
