@@ -1,3 +1,4 @@
+asgiref
 argon2-cffi >= 16.1.0
 bcrypt
 docutils
