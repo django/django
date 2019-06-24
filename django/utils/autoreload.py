@@ -136,11 +136,13 @@ def iter_modules_and_files(modules, extra_files):
         if not filename:
             continue
         path = pathlib.Path(filename)
-        if not path.exists():
+        try:
+            resolved_path = path.resolve(strict=True).absolute()
+        except FileNotFoundError:
             # The module could have been removed, don't fail loudly if this
             # is the case.
             continue
-        results.add(path.resolve().absolute())
+        results.add(resolved_path)
     return frozenset(results)
 
 
@@ -182,14 +184,15 @@ def sys_path_directories():
     """
     for path in sys.path:
         path = Path(path)
-        if not path.exists():
+        try:
+            resolved_path = path.resolve(strict=True).absolute()
+        except FileNotFoundError:
             continue
-        path = path.resolve().absolute()
         # If the path is a file (like a zip file), watch the parent directory.
-        if path.is_file():
-            yield path.parent
+        if resolved_path.is_file():
+            yield resolved_path.parent
         else:
-            yield path
+            yield resolved_path
 
 
 def get_child_arguments():
