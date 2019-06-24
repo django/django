@@ -514,7 +514,7 @@ the intermediate model::
     <QuerySet [<Person: Ringo Starr>, <Person: Paul McCartney>]>
 
 You can also use ``add()``, ``create()``, or ``set()`` to create relationships,
-as long as your specify ``through_defaults`` for any required fields::
+as long as you specify ``through_defaults`` for any required fields::
 
     >>> beatles.members.add(john, through_defaults={'date_joined': date(1960, 8, 1)})
     >>> beatles.members.create(name="George Harrison", through_defaults={'date_joined': date(1960, 8, 1)})
