@@ -99,10 +99,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 JOIN pg_attrdef ad ON ad.oid = d.objid AND d.classid = 'pg_attrdef'::regclass
                 JOIN pg_attribute col ON col.attrelid = ad.adrelid AND col.attnum = ad.adnum
                 JOIN pg_class tbl ON tbl.oid = ad.adrelid
-                JOIN pg_namespace n ON n.oid = tbl.relnamespace
             WHERE s.relkind = 'S'
               AND d.deptype in ('a', 'n')
-              AND n.nspname = 'public'
+              AND pg_catalog.pg_table_is_visible(tbl.oid)
               AND tbl.relname = %s
         """, [table_name])
         return [
@@ -125,7 +124,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             LEFT JOIN pg_class c2 ON con.confrelid = c2.oid
             LEFT JOIN pg_attribute a1 ON c1.oid = a1.attrelid AND a1.attnum = con.conkey[1]
             LEFT JOIN pg_attribute a2 ON c2.oid = a2.attrelid AND a2.attnum = con.confkey[1]
-            WHERE c1.relname = %s AND con.contype = 'f'
+            WHERE
+                c1.relname = %s AND
+                con.contype = 'f' AND
+                c1.relnamespace = c2.relnamespace AND
+                pg_catalog.pg_table_is_visible(c1.oid)
         """, [table_name])
         return cursor.fetchall()
 
@@ -157,9 +160,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 cl.reloptions
             FROM pg_constraint AS c
             JOIN pg_class AS cl ON c.conrelid = cl.oid
-            JOIN pg_namespace AS ns ON cl.relnamespace = ns.oid
-            WHERE ns.nspname = %s AND cl.relname = %s
-        """, ["public", table_name])
+            WHERE cl.relname = %s AND pg_catalog.pg_table_is_visible(cl.oid)
+        """, [table_name])
         for constraint, columns, kind, used_cols, options in cursor.fetchall():
             constraints[constraint] = {
                 "columns": columns,
@@ -198,7 +200,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 LEFT JOIN pg_class c2 ON idx.indexrelid = c2.oid
                 LEFT JOIN pg_am am ON c2.relam = am.oid
                 LEFT JOIN pg_attribute attr ON attr.attrelid = c.oid AND attr.attnum = idx.key
-                WHERE c.relname = %s
+                WHERE c.relname = %s AND pg_catalog.pg_table_is_visible(c.oid)
             ) s2
             GROUP BY indexname, indisunique, indisprimary, amname, exprdef, attoptions;
         """, [table_name])
