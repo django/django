@@ -115,7 +115,7 @@ indexes records with more than 400 pages.
 
 .. admonition:: Restrictions on PostgreSQL
 
-    PostgreSQL requires functions referenced in the condition to be be marked as
+    PostgreSQL requires functions referenced in the condition to be marked as
     IMMUTABLE. Django doesn't validate this but PostgreSQL will error. This
     means that functions such as :ref:`date-functions` and
     :class:`~django.db.models.functions.Concat` aren't accepted. If you store
