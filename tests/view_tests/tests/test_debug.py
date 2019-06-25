@@ -628,7 +628,7 @@ class ExceptionReporterTests(SimpleTestCase):
             'items (application/octet-stream)&gt;</pre></td>',
             html
         )
-        # COOKES
+        # COOKIES
         rf = RequestFactory()
         rf.cookies['items'] = 'Oops'
         request = rf.get('/test_view/')
@@ -773,7 +773,7 @@ class PlainTextReportTests(SimpleTestCase):
         reporter = ExceptionReporter(request, None, None, None)
         text = reporter.get_traceback_text()
         self.assertIn('items = <InMemoryUploadedFile:', text)
-        # COOKES
+        # COOKIES
         rf = RequestFactory()
         rf.cookies['items'] = 'Oops'
         request = rf.get('/test_view/')
