@@ -27,8 +27,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     allows_auto_pk_0 = False
     can_release_savepoints = True
     atomic_transactions = False
-    supports_column_check_constraints = False
-    supports_table_check_constraints = False
     can_clone_databases = True
     supports_temporal_subtraction = True
     supports_select_intersection = False
@@ -88,6 +86,12 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         if self.connection.mysql_is_mariadb:
             return self.connection.mysql_version >= (10, 2)
         return self.connection.mysql_version >= (8, 0, 2)
+
+    @cached_property
+    def supports_column_check_constraints(self):
+        return self.connection.mysql_is_mariadb and self.connection.mysql_version >= (10, 2, 1)
+
+    supports_table_check_constraints = property(operator.attrgetter('supports_column_check_constraints'))
 
     @cached_property
     def has_select_for_update_skip_locked(self):
