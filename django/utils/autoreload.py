@@ -117,7 +117,9 @@ def iter_modules_and_files(modules, extra_files):
             # __main__ (usually manage.py) doesn't always have a __spec__ set.
             # Handle this by falling back to using __file__, resolved below.
             # See https://docs.python.org/reference/import.html#main-spec
-            sys_file_paths.append(module.__file__)
+            # __file__ may not exists, e.g. when running ipdb debugger.
+            if hasattr(module, '__file__'):
+                sys_file_paths.append(module.__file__)
             continue
         if getattr(module, '__spec__', None) is None:
             continue

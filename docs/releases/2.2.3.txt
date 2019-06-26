@@ -12,3 +12,6 @@ Bugfixes
 * Fixed a regression in Django 2.2 where :class:`~django.db.models.Avg`,
   :class:`~django.db.models.StdDev`, and :class:`~django.db.models.Variance`
   crash with ``filter`` argument (:ticket:`30542`).
+
+* Fixed a regression in Django 2.2.2 where auto-reloader crashes with
+  ``AttributeError``, e.g. when using ``ipdb`` (:ticket:`30588`).
