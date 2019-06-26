@@ -229,3 +229,23 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
 
     window.MapWidget = MapWidget;
 })();
+
+(function($) {
+    'use strict';
+
+    function initMapWidgetAfterInlineAdd(event, row, prefix) {
+        var el = row[0];
+        var id_regex = new RegExp("(__prefix__)", "g");
+        var replacement = row.attr('id').substring(row.attr('id').lastIndexOf('-')+1);
+        el.innerHTML = el.innerHTML.replace(id_regex, replacement);
+
+        row.find('div.ol-viewport').remove();
+        row.find('script').each(function() {
+            eval(this.innerHTML);
+        });
+    }
+
+    $(document).ready(function() {
+        $(document).on('formset:added', initMapWidgetAfterInlineAdd);
+    });
+})(django.jQuery);

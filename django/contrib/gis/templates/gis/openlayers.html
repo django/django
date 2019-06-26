@@ -35,6 +35,6 @@
             name: '{{ name }}'
         };
         {% endblock %}
-        var {{ module }} = new MapWidget(options);
+        window.{{ module }} = new MapWidget(options);
     </script>
 </div>
