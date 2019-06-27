@@ -564,6 +564,36 @@ On the other hand, if you are using a plain ``FormSet``, it's up to you to
 handle ``formset.deleted_forms``, perhaps in your formset's ``save()`` method,
 as there's no general notion of what it means to delete a form.
 
+Pagination for formsets
+=======================
+
+You can paginate formsets by simply calling the ``paginator`` function of the
+formset. This function returns a :class:`~django.core.paginator.Paginator`
+object. One can easily manipulate formset using this paginator object.
+
+    >>> from django.forms import formset_factory
+    >>> from myapp.forms import ArticleForm
+    >>> ArticleFormSet = formset_factory(ArticleForm, can_delete=True)
+    >>> formset = ArticleFormSet(initial=[
+    ...     {'title': 'Article #1', 'pub_date': datetime.date(2008, 5, 10)},
+    ...     {'title': 'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
+    ...     {'title': 'Article #3', 'pub_date': datetime.date(2008, 5, 12)},
+    ...     {'title': 'Article #4', 'pub_date': datetime.date(2008, 5, 13)},
+    ...     {'title': 'Article #5', 'pub_date': datetime.date(2008, 5, 14)},
+    ...     {'title': 'Article #6', 'pub_date': datetime.date(2008, 5, 15)},
+    ...     {'title': 'Article #7', 'pub_date': datetime.date(2008, 5, 16)},
+    ...     {'title': 'Article #8', 'pub_date': datetime.date(2008, 5, 17)},
+    ...     {'title': 'Article #9', 'pub_date': datetime.date(2008, 5, 18)},
+    ... ])
+    >>> p = formset.paginator(per_page=5)
+    >>> p.count
+    9
+    >>> p.num_pages
+    2
+
+To know more about how to use this objects, read more on
+:class:`~django.core.paginator.Paginator`.
+
 Adding additional fields to a formset
 =====================================
 

@@ -2,6 +2,7 @@ import datetime
 from collections import Counter
 from unittest import mock
 
+from django.core.paginator import InvalidPage
 from django.forms import (
     BaseForm, CharField, DateField, FileField, Form, IntegerField,
     SplitDateTimeField, ValidationError, formsets,
@@ -9,7 +10,7 @@ from django.forms import (
 from django.forms.formsets import BaseFormSet, all_valid, formset_factory
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase
 
 
 class Choice(Form):
@@ -1313,3 +1314,68 @@ class AllValidTests(SimpleTestCase):
         expected_errors = [{'votes': ['This field is required.']}, {'votes': ['This field is required.']}]
         self.assertEqual(formset1._errors, expected_errors)
         self.assertEqual(formset2._errors, expected_errors)
+
+
+class FormSetPaginationTests(TestCase):
+    """
+    Test pagination with Django formset instances
+    """
+    ChoiceFormSet = formset_factory(Choice, extra=9)
+    choiceformset = ChoiceFormSet()
+
+    def test_first_page(self):
+        self.maxDiff = None
+        paginator = self.choiceformset.paginator(5)
+        p = paginator.page(1)
+        self.assertEqual("<Page 1 of 2>", str(p))
+        self.assertQuerysetEqual(p.object_list, [
+            "<Choice bound=False, valid=Unknown, fields=(choice;votes)>",
+            "<Choice bound=False, valid=Unknown, fields=(choice;votes)>",
+            "<Choice bound=False, valid=Unknown, fields=(choice;votes)>",
+            "<Choice bound=False, valid=Unknown, fields=(choice;votes)>",
+            "<Choice bound=False, valid=Unknown, fields=(choice;votes)>"
+        ])
+        self.assertTrue(p.has_next())
+        self.assertFalse(p.has_previous())
+        self.assertTrue(p.has_other_pages())
+        self.assertEqual(2, p.next_page_number())
+        with self.assertRaises(InvalidPage):
+            p.previous_page_number()
+        self.assertEqual(1, p.start_index())
+        self.assertEqual(5, p.end_index())
+
+    def test_last_page(self):
+        paginator = self.choiceformset.paginator(5)
+        p = paginator.page(2)
+        self.assertEqual("<Page 2 of 2>", str(p))
+        self.assertQuerysetEqual(p.object_list, [
+            "<Choice bound=False, valid=Unknown, fields=(choice;votes)>",
+            "<Choice bound=False, valid=Unknown, fields=(choice;votes)>",
+            "<Choice bound=False, valid=Unknown, fields=(choice;votes)>",
+            "<Choice bound=False, valid=Unknown, fields=(choice;votes)>"
+        ])
+        self.assertFalse(p.has_next())
+        self.assertTrue(p.has_previous())
+        self.assertTrue(p.has_other_pages())
+        with self.assertRaises(InvalidPage):
+            p.next_page_number()
+        self.assertEqual(1, p.previous_page_number())
+        self.assertEqual(6, p.start_index())
+        self.assertEqual(9, p.end_index())
+
+    def test_page_getitem(self):
+        """
+        Tests proper behavior of a paginator page __getitem__ (queryset
+        evaluation, slicing, exception raised).
+        """
+        paginator = self.choiceformset.paginator(5)
+        p = paginator.page(1)
+
+        # Make sure slicing the Page object with numbers and slice objects work.
+        self.assertEqual(p[0], self.choiceformset[0])
+        self.assertQuerysetEqual(p[slice(2)], [
+            "<Choice bound=False, valid=Unknown, fields=(choice;votes)>",
+            "<Choice bound=False, valid=Unknown, fields=(choice;votes)>"
+        ])
+        # After __getitem__ is called, object_list is a list
+        self.assertIsInstance(p.object_list, list)

@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.core.paginator import Paginator
 from django.forms import Form
 from django.forms.fields import BooleanField, IntegerField
 from django.forms.utils import ErrorList
@@ -429,6 +430,9 @@ class BaseFormSet:
         "Return this formset rendered as HTML <li>s."
         forms = ' '.join(form.as_ul() for form in self)
         return mark_safe(str(self.management_form) + '\n' + forms)
+
+    def paginator(self, per_page, orphans=0, allow_empty_first_page=True):
+        return Paginator(self, per_page, orphans=0, allow_empty_first_page=True)
 
 
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
