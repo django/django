@@ -267,6 +267,21 @@ class DateFunctionTests(TestCase):
             1
         )
 
+    @skipUnlessDBFeature('has_native_duration_field')
+    def test_extractyear_duration_lookup(self):
+        start_datetime = datetime(2015, 6, 15, 14)
+        end_datetime = datetime(2016, 6, 16, 14)
+        if settings.USE_TZ:
+            start_datetime = timezone.make_aware(start_datetime, is_dst=False)
+            end_datetime = timezone.make_aware(end_datetime, is_dst=False)
+        self.create_model(start_datetime, end_datetime)
+
+        queryset = DTModel.objects.annotate(delta_year=ExtractYear('duration'))
+        self.assertEqual(queryset.filter(delta_year__lt=0).count(), 0)
+        self.assertEqual(queryset.filter(delta_year__lte=0).count(), 1)
+        self.assertEqual(queryset.filter(delta_year__gt=0).count(), 0)
+        self.assertEqual(queryset.filter(delta_year__gte=0).count(), 1)
+
     @skipIfDBFeature('has_native_duration_field')
     def test_extract_duration_without_native_duration_field(self):
         msg = 'Extract requires native DurationField database support.'

@@ -4,7 +4,9 @@ from copy import copy
 
 from django.core.exceptions import EmptyResultSet
 from django.db.models.expressions import Func, Value
-from django.db.models.fields import DateTimeField, Field, IntegerField
+from django.db.models.fields import (
+    DateField, DateTimeField, Field, IntegerField,
+)
 from django.db.models.query_utils import RegisterLookupMixin
 from django.utils.datastructures import OrderedSet
 from django.utils.functional import cached_property
@@ -487,7 +489,7 @@ class YearLookup(Lookup):
     def as_sql(self, compiler, connection):
         # Avoid the extract operation if the rhs is a direct value to allow
         # indexes to be used.
-        if self.rhs_is_direct_value():
+        if self.rhs_is_direct_value() and isinstance(self.lhs.lhs.output_field, (DateTimeField, DateField)):
             # Skip the extract part by directly using the originating field,
             # that is self.lhs.lhs.
             lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
