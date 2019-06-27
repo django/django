@@ -24,7 +24,7 @@ if HAS_GEOIP2:
     "GeoIP is required along with the GEOIP_PATH setting."
 )
 class GeoIPTest(unittest.TestCase):
-    addr = '128.249.1.1'
+    addr = '75.41.39.1'
     fqdn = 'tmc.edu'
 
     def test01_init(self):
@@ -99,7 +99,7 @@ class GeoIPTest(unittest.TestCase):
     @mock.patch('socket.gethostbyname')
     def test04_city(self, gethostbyname):
         "GeoIP city querying methods."
-        gethostbyname.return_value = '128.249.1.1'
+        gethostbyname.return_value = '75.41.39.1'
         g = GeoIP2(country='<foo>')
 
         for query in (self.fqdn, self.addr):
@@ -122,7 +122,7 @@ class GeoIPTest(unittest.TestCase):
             # City information dictionary.
             d = g.city(query)
             self.assertEqual('US', d['country_code'])
-            self.assertEqual('Houston', d['city'])
+            self.assertEqual('Dallas', d['city'])
             self.assertEqual('TX', d['region'])
 
             geom = g.geos(query)
