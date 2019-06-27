@@ -1613,10 +1613,26 @@ class Query(BaseExpression):
             self.unref_alias(joins.pop())
         return targets, joins[-1], joins
 
+    @classmethod
+    def _gen_col_aliases(cls, exprs):
+        for expr in exprs:
+            if isinstance(expr, Col):
+                yield expr.alias
+            else:
+                yield from cls._gen_col_aliases(expr.get_source_expressions())
+
     def resolve_ref(self, name, allow_joins=True, reuse=None, summarize=False, simple_col=False):
         if not allow_joins and LOOKUP_SEP in name:
             raise FieldError("Joined field references are not permitted in this query")
-        if name in self.annotations:
+        annotation = self.annotations.get(name)
+        if annotation is not None:
+            if not allow_joins:
+                for alias in self._gen_col_aliases([annotation]):
+                    if isinstance(self.alias_map[alias], Join):
+                        raise FieldError(
+                            'Joined field references are not permitted in '
+                            'this query'
+                        )
             if summarize:
                 # Summarize currently means we are doing an aggregate() query
                 # which is executed as a wrapped subquery if any of the
@@ -1624,7 +1640,7 @@ class Query(BaseExpression):
                 # that case we need to return a Ref to the subquery's annotation.
                 return Ref(name, self.annotation_select[name])
             else:
-                return self.annotations[name]
+                return annotation
         else:
             field_list = name.split(LOOKUP_SEP)
             join_info = self.setup_joins(field_list, self.get_meta(), self.get_initial_alias(), can_reuse=reuse)
