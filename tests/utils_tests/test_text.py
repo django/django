@@ -250,7 +250,7 @@ class TestUtilsText(SimpleTestCase):
 
         # The format string can be lazy. (string comes from contrib.admin)
         s = format_lazy(
-            gettext_lazy("Added {name} \"{object}\"."),
+            gettext_lazy('Added {name} “{object}”.'),
             name='article', object='My first try',
         )
         with override('fr'):

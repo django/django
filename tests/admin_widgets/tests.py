@@ -181,7 +181,7 @@ class AdminFormfieldForDBFieldTests(SimpleTestCase):
         f = ma.formfield_for_dbfield(Advisor._meta.get_field('companies'), request=None)
         self.assertEqual(
             f.help_text,
-            'Hold down "Control", or "Command" on a Mac, to select more than one.'
+            'Hold down “Control”, or “Command” on a Mac, to select more than one.'
         )
 
 

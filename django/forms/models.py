@@ -1272,7 +1272,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
         'list': _('Enter a list of values.'),
         'invalid_choice': _('Select a valid choice. %(value)s is not one of the'
                             ' available choices.'),
-        'invalid_pk_value': _('"%(pk)s" is not a valid value.')
+        'invalid_pk_value': _('“%(pk)s” is not a valid value.')
     }
 
     def __init__(self, queryset, **kwargs):

@@ -227,7 +227,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertRedirects(response, reverse('admin:index'))
         self.assertEqual(
             [m.message for m in response.context['messages']],
-            ["""section with ID "abc/<b>" doesn't exist. Perhaps it was deleted?"""]
+            ['section with ID “abc/<b>” doesn’t exist. Perhaps it was deleted?']
         )
 
     def test_basic_edit_GET_old_url_redirect(self):
@@ -248,7 +248,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertRedirects(response, reverse('admin:index'))
         self.assertEqual(
             [m.message for m in response.context['messages']],
-            ["""super villain with ID "abc" doesn't exist. Perhaps it was deleted?"""]
+            ['super villain with ID “abc” doesn’t exist. Perhaps it was deleted?']
         )
 
     def test_basic_add_POST(self):
@@ -1705,7 +1705,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(Article.objects.count(), 4)
         article = Article.objects.latest('pk')
         response = self.client.get(reverse('admin:admin_views_article_change', args=(article.pk,)))
-        self.assertContains(response, '<li class="success">The article "Døm ikke" was added successfully.</li>')
+        self.assertContains(response, '<li class="success">The article “Døm ikke” was added successfully.</li>')
         article.delete()
         self.client.get(reverse('admin:logout'))
 
@@ -2113,7 +2113,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertRedirects(response, reverse('admin:index'))
         self.assertEqual(
             [m.message for m in response.context['messages']],
-            ["""article with ID "nonexistent" doesn't exist. Perhaps it was deleted?"""]
+            ['article with ID “nonexistent” doesn’t exist. Perhaps it was deleted?']
         )
 
     def test_history_view(self):
@@ -2170,7 +2170,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertRedirects(response, reverse('admin:index'))
         self.assertEqual(
             [m.message for m in response.context['messages']],
-            ["""article with ID "foo" doesn't exist. Perhaps it was deleted?"""]
+            ['article with ID “foo” doesn’t exist. Perhaps it was deleted?']
         )
 
     def test_conditionally_show_add_section_link(self):
@@ -2399,7 +2399,7 @@ class AdminViewPermissionsTest(TestCase):
         response = self.client.post(reverse('admin:admin_views_article_add'), post_data, follow=True)
         self.assertContains(
             response,
-            '<li class="success">The article "Fun &amp; games" was added successfully.</li>',
+            '<li class="success">The article “Fun &amp; games” was added successfully.</li>',
             html=True
         )
 
@@ -3689,7 +3689,7 @@ class AdminCustomQuerysetTest(TestCase):
                 self.assertRedirects(response, reverse('admin:index'))
                 self.assertEqual(
                     [m.message for m in response.context['messages']],
-                    ["""empty model with ID "1" doesn't exist. Perhaps it was deleted?"""]
+                    ['empty model with ID “1” doesn’t exist. Perhaps it was deleted?']
                 )
 
     def test_add_model_modeladmin_defer_qs(self):
@@ -3709,8 +3709,8 @@ class AdminCustomQuerysetTest(TestCase):
         pk = CoverLetter.objects.all()[0].pk
         self.assertContains(
             response,
-            '<li class="success">The cover letter "<a href="%s">'
-            'Candidate, Best</a>" was added successfully.</li>' %
+            '<li class="success">The cover letter “<a href="%s">'
+            'Candidate, Best</a>” was added successfully.</li>' %
             reverse('admin:admin_views_coverletter_change', args=(pk,)), html=True
         )
 
@@ -3728,8 +3728,8 @@ class AdminCustomQuerysetTest(TestCase):
         sm = ShortMessage.objects.all()[0]
         self.assertContains(
             response,
-            '<li class="success">The short message "<a href="%s">'
-            '%s</a>" was added successfully.</li>' %
+            '<li class="success">The short message “<a href="%s">'
+            '%s</a>” was added successfully.</li>' %
             (reverse('admin:admin_views_shortmessage_change', args=(sm.pk,)), sm), html=True
         )
 
@@ -3750,8 +3750,8 @@ class AdminCustomQuerysetTest(TestCase):
         pk = Telegram.objects.all()[0].pk
         self.assertContains(
             response,
-            '<li class="success">The telegram "<a href="%s">'
-            'Urgent telegram</a>" was added successfully.</li>' %
+            '<li class="success">The telegram “<a href="%s">'
+            'Urgent telegram</a>” was added successfully.</li>' %
             reverse('admin:admin_views_telegram_change', args=(pk,)), html=True
         )
 
@@ -3769,8 +3769,8 @@ class AdminCustomQuerysetTest(TestCase):
         p = Paper.objects.all()[0]
         self.assertContains(
             response,
-            '<li class="success">The paper "<a href="%s">'
-            '%s</a>" was added successfully.</li>' %
+            '<li class="success">The paper “<a href="%s">'
+            '%s</a>” was added successfully.</li>' %
             (reverse('admin:admin_views_paper_change', args=(p.pk,)), p), html=True
         )
 
@@ -3795,8 +3795,8 @@ class AdminCustomQuerysetTest(TestCase):
         # representation is set by model's __str__()
         self.assertContains(
             response,
-            '<li class="success">The cover letter "<a href="%s">'
-            'John Doe II</a>" was changed successfully.</li>' %
+            '<li class="success">The cover letter “<a href="%s">'
+            'John Doe II</a>” was changed successfully.</li>' %
             reverse('admin:admin_views_coverletter_change', args=(cl.pk,)), html=True
         )
 
@@ -3818,8 +3818,8 @@ class AdminCustomQuerysetTest(TestCase):
         # instance representation is set by __str__().
         self.assertContains(
             response,
-            '<li class="success">The short message "<a href="%s">'
-            '%s</a>" was changed successfully.</li>' %
+            '<li class="success">The short message “<a href="%s">'
+            '%s</a>” was changed successfully.</li>' %
             (reverse('admin:admin_views_shortmessage_change', args=(sm.pk,)), sm), html=True
         )
 
@@ -3843,8 +3843,8 @@ class AdminCustomQuerysetTest(TestCase):
         # representation is set by model's __str__()
         self.assertContains(
             response,
-            '<li class="success">The telegram "<a href="%s">'
-            'Telegram without typo</a>" was changed successfully.</li>' %
+            '<li class="success">The telegram “<a href="%s">'
+            'Telegram without typo</a>” was changed successfully.</li>' %
             reverse('admin:admin_views_telegram_change', args=(t.pk,)), html=True
         )
 
@@ -3865,8 +3865,8 @@ class AdminCustomQuerysetTest(TestCase):
         # instance representation is set by __str__().
         self.assertContains(
             response,
-            '<li class="success">The paper "<a href="%s">'
-            '%s</a>" was changed successfully.</li>' %
+            '<li class="success">The paper “<a href="%s">'
+            '%s</a>” was changed successfully.</li>' %
             (reverse('admin:admin_views_paper_change', args=(p.pk,)), p), html=True
         )
 
@@ -5161,8 +5161,8 @@ class UserAdminTest(TestCase):
         response = self.client.get(new_user_url)
         self.assertContains(
             response,
-            '<li class="success">The user "<a href="%s">'
-            '%s</a>" was added successfully. You may edit it again below.</li>'
+            '<li class="success">The user “<a href="%s">'
+            '%s</a>” was added successfully. You may edit it again below.</li>'
             % (new_user_url, new_user),
             html=True,
         )
@@ -5175,7 +5175,7 @@ class UserAdminTest(TestCase):
         })
         self.assertEqual(response.status_code, 200)
         self.assertFormError(response, 'adminform', 'password', [])
-        self.assertFormError(response, 'adminform', 'password2', ["The two password fields didn't match."])
+        self.assertFormError(response, 'adminform', 'password2', ['The two password fields didn’t match.'])
 
     def test_user_fk_add_popup(self):
         """User addition through a FK popup should return the appropriate JavaScript response."""

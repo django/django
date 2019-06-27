@@ -899,7 +899,7 @@ class StateAdminForm(forms.ModelForm):
     class Meta:
         model = State
         fields = '__all__'
-        labels = {"name": "State name (from form's Meta.labels)"}
+        labels = {'name': 'State name (from form’s Meta.labels)'}
 
     @property
     def changed_data(self):

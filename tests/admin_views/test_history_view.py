@@ -39,7 +39,7 @@ class AdminHistoryViewTests(TestCase):
         logentry = LogEntry.objects.filter(content_type__model__iexact='state').latest('id')
         self.assertEqual(
             logentry.get_change_message(),
-            'Changed State name (from form\'s Meta.labels), '
+            'Changed State name (from form’s Meta.labels), '
             'nolabel_form_field and not_a_form_field. '
-            'Changed City verbose_name for city "%s".' % city
+            'Changed City verbose_name for city “%s”.' % city
         )

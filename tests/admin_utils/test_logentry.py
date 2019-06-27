@@ -131,9 +131,9 @@ class LogEntryTests(TestCase):
         )
         self.assertEqual(
             logentry.get_change_message(),
-            'Changed Domain. Added article "Added article". '
-            'Changed Title and not_a_form_field for article "Changed Title". '
-            'Deleted article "Title second article".'
+            'Changed Domain. Added article “Added article”. '
+            'Changed Title and not_a_form_field for article “Changed Title”. '
+            'Deleted article “Title second article”.'
         )
 
         with translation.override('fr'):

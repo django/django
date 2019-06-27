@@ -251,7 +251,7 @@ class TestValidation(PostgreSQLSimpleTestCase):
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean({'a': 1}, None)
         self.assertEqual(cm.exception.code, 'not_a_string')
-        self.assertEqual(cm.exception.message % cm.exception.params, 'The value of "a" is not a string or null.')
+        self.assertEqual(cm.exception.message % cm.exception.params, 'The value of “a” is not a string or null.')
 
     def test_none_allowed_as_value(self):
         field = HStoreField()

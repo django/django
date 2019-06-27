@@ -620,7 +620,7 @@ def _date_from_string(year, year_format, month='', month_format='', day='', day_
     try:
         return datetime.datetime.strptime(datestr, format).date()
     except ValueError:
-        raise Http404(_("Invalid date string '%(datestr)s' given format '%(format)s'") % {
+        raise Http404(_('Invalid date string “%(datestr)s” given format “%(format)s”') % {
             'datestr': datestr,
             'format': format,
         })

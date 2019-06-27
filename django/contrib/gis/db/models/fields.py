@@ -198,7 +198,7 @@ class GeometryField(BaseSpatialField):
     """
     The base Geometry field -- maps to the OpenGIS Specification Geometry type.
     """
-    description = _("The base Geometry field -- maps to the OpenGIS Specification Geometry type.")
+    description = _('The base Geometry field — maps to the OpenGIS Specification Geometry type.')
     form_class = forms.GeometryField
     # The OpenGIS Geometry name.
     geom_type = 'GEOMETRY'

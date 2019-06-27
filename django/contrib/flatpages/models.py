@@ -15,8 +15,8 @@ class FlatPage(models.Model):
         max_length=70,
         blank=True,
         help_text=_(
-            "Example: 'flatpages/contact_page.html'. If this isn't provided, "
-            "the system will use 'flatpages/default.html'."
+            'Example: “flatpages/contact_page.html”. If this isn’t provided, '
+            'the system will use “flatpages/default.html”.'
         ),
     )
     registration_required = models.BooleanField(

@@ -899,7 +899,7 @@ class AutoField(Field):
 
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("'%(value)s' value must be an integer."),
+        'invalid': _('“%(value)s” value must be an integer.'),
     }
 
     def __init__(self, *args, **kwargs):
@@ -986,8 +986,8 @@ class BigAutoField(AutoField):
 class BooleanField(Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("'%(value)s' value must be either True or False."),
-        'invalid_nullable': _("'%(value)s' value must be either True, False, or None."),
+        'invalid': _('“%(value)s” value must be either True or False.'),
+        'invalid_nullable': _('“%(value)s” value must be either True, False, or None.'),
     }
     description = _("Boolean (Either True or False)")
 
@@ -1143,10 +1143,10 @@ class DateTimeCheckMixin:
 class DateField(DateTimeCheckMixin, Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("'%(value)s' value has an invalid date format. It must be "
-                     "in YYYY-MM-DD format."),
-        'invalid_date': _("'%(value)s' value has the correct format (YYYY-MM-DD) "
-                          "but it is an invalid date."),
+        'invalid': _('“%(value)s” value has an invalid date format. It must be '
+                     'in YYYY-MM-DD format.'),
+        'invalid_date': _('“%(value)s” value has the correct format (YYYY-MM-DD) '
+                          'but it is an invalid date.'),
     }
     description = _("Date (without time)")
 
@@ -1286,13 +1286,13 @@ class DateField(DateTimeCheckMixin, Field):
 class DateTimeField(DateField):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("'%(value)s' value has an invalid format. It must be in "
-                     "YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format."),
-        'invalid_date': _("'%(value)s' value has the correct format "
+        'invalid': _('“%(value)s” value has an invalid format. It must be in '
+                     'YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format.'),
+        'invalid_date': _("“%(value)s” value has the correct format "
                           "(YYYY-MM-DD) but it is an invalid date."),
-        'invalid_datetime': _("'%(value)s' value has the correct format "
-                              "(YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) "
-                              "but it is an invalid date/time."),
+        'invalid_datetime': _('“%(value)s” value has the correct format '
+                              '(YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) '
+                              'but it is an invalid date/time.'),
     }
     description = _("Date (with time)")
 
@@ -1442,7 +1442,7 @@ class DateTimeField(DateField):
 class DecimalField(Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("'%(value)s' value must be a decimal number."),
+        'invalid': _('“%(value)s” value must be a decimal number.'),
     }
     description = _("Decimal number")
 
@@ -1583,8 +1583,8 @@ class DurationField(Field):
     """
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("'%(value)s' value has an invalid format. It must be in "
-                     "[DD] [[HH:]MM:]ss[.uuuuuu] format.")
+        'invalid': _('“%(value)s” value has an invalid format. It must be in '
+                     '[DD] [[HH:]MM:]ss[.uuuuuu] format.')
     }
     description = _("Duration")
 
@@ -1725,7 +1725,7 @@ class FilePathField(Field):
 class FloatField(Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("'%(value)s' value must be a float."),
+        'invalid': _('“%(value)s” value must be a float.'),
     }
     description = _("Floating point number")
 
@@ -1760,7 +1760,7 @@ class FloatField(Field):
 class IntegerField(Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("'%(value)s' value must be an integer."),
+        'invalid': _('“%(value)s” value must be an integer.'),
     }
     description = _("Integer")
 
@@ -1967,8 +1967,8 @@ class GenericIPAddressField(Field):
 
 class NullBooleanField(BooleanField):
     default_error_messages = {
-        'invalid': _("'%(value)s' value must be either None, True or False."),
-        'invalid_nullable': _("'%(value)s' value must be either None, True or False."),
+        'invalid': _('“%(value)s” value must be either None, True or False.'),
+        'invalid_nullable': _('“%(value)s” value must be either None, True or False.'),
     }
     description = _("Boolean (Either True, False or None)")
 
@@ -2099,10 +2099,10 @@ class TextField(Field):
 class TimeField(DateTimeCheckMixin, Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("'%(value)s' value has an invalid format. It must be in "
-                     "HH:MM[:ss[.uuuuuu]] format."),
-        'invalid_time': _("'%(value)s' value has the correct format "
-                          "(HH:MM[:ss[.uuuuuu]]) but it is an invalid time."),
+        'invalid': _('“%(value)s” value has an invalid format. It must be in '
+                     'HH:MM[:ss[.uuuuuu]] format.'),
+        'invalid_time': _('“%(value)s” value has the correct format '
+                          '(HH:MM[:ss[.uuuuuu]]) but it is an invalid time.'),
     }
     description = _("Time")
 
@@ -2317,7 +2317,7 @@ class BinaryField(Field):
 
 class UUIDField(Field):
     default_error_messages = {
-        'invalid': _("'%(value)s' is not a valid UUID."),
+        'invalid': _('“%(value)s” is not a valid UUID.'),
     }
     description = _('Universally unique identifier')
     empty_strings_allowed = False

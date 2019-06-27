@@ -236,14 +236,14 @@ slug_re = _lazy_re_compile(r'^[-a-zA-Z0-9_]+\Z')
 validate_slug = RegexValidator(
     slug_re,
     # Translators: "letters" means latin letters: a-z and A-Z.
-    _("Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."),
+    _('Enter a valid “slug” consisting of letters, numbers, underscores or hyphens.'),
     'invalid'
 )
 
 slug_unicode_re = _lazy_re_compile(r'^[-\w]+\Z')
 validate_unicode_slug = RegexValidator(
     slug_unicode_re,
-    _("Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or hyphens."),
+    _('Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or hyphens.'),
     'invalid'
 )
 
@@ -466,8 +466,8 @@ class DecimalValidator:
 @deconstructible
 class FileExtensionValidator:
     message = _(
-        "File extension '%(extension)s' is not allowed. "
-        "Allowed extensions are: '%(allowed_extensions)s'."
+        'File extension “%(extension)s” is not allowed. '
+        'Allowed extensions are: %(allowed_extensions)s.'
     )
     code = 'invalid_extension'
 
