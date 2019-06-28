@@ -8,7 +8,7 @@ circular import difficulties.
 import copy
 import functools
 import inspect
-from collections import namedtuple
+from collections import ChainMap, namedtuple
 
 from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
@@ -187,10 +187,7 @@ class RegisterLookupMixin:
         Merge dicts in reverse to preference the order of the original list. e.g.,
         merge_dicts([a, b]) will preference the keys in 'a' over those in 'b'.
         """
-        merged = {}
-        for d in reversed(dicts):
-            merged.update(d)
-        return merged
+        return dict(ChainMap(*dicts))
 
     @classmethod
     def _clear_cached_lookups(cls):
