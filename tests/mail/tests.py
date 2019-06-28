@@ -991,6 +991,23 @@ class BaseEmailBackendTests(HeadersCheckMixin):
         mail_managers('hi', 'there')
         self.assertEqual(self.get_mailbox_content(), [])
 
+    def test_wrong_admins_managers(self):
+        tests = (
+            'test@example.com',
+            ('test@example.com',),
+            ['test@example.com', 'other@example.com'],
+            ('test@example.com', 'other@example.com'),
+        )
+        for setting, mail_func in (
+            ('ADMINS', mail_admins),
+            ('MANAGERS', mail_managers),
+        ):
+            msg = 'The %s setting must be a list of 2-tuples.' % setting
+            for value in tests:
+                with self.subTest(setting=setting, value=value), self.settings(**{setting: value}):
+                    with self.assertRaisesMessage(ValueError, msg):
+                        mail_func('subject', 'content')
+
     def test_message_cc_header(self):
         """
         Regression test for #7722
