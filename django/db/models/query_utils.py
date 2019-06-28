@@ -187,7 +187,7 @@ class RegisterLookupMixin:
         Merge dicts in reverse to preference the order of the original list. e.g.,
         merge_dicts([a, b]) will preference the keys in 'a' over those in 'b'.
         """
-        return dict(ChainMap(*dicts))
+        return ChainMap(*dicts)
 
     @classmethod
     def _clear_cached_lookups(cls):
