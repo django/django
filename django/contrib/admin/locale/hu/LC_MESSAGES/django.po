@@ -3,7 +3,7 @@
 # Translators:
 # Ádám Krizsány <krizsany1302@gmail.com>, 2015
 # Akos Zsolt Hochrein <hoch.akos@gmail.com>, 2018
-# András Veres-Szentkirályi, 2016,2018
+# András Veres-Szentkirályi, 2016,2018-2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # János R (Hangya), 2017
 # János R (Hangya), 2014
@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-07-31 07:37+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-04-17 07:35+0000\n"
 "Last-Translator: András Veres-Szentkirályi\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
 "hu/)\n"
@@ -116,7 +116,7 @@ msgid "object id"
 msgstr "objektum id"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "objektum repr"
 
@@ -542,24 +542,8 @@ msgstr "Mutassa mindet"
 msgid "Save"
 msgstr "Mentés"
 
-msgid "Popup closing..."
-msgstr "A popup bezáródik..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Kiválasztott %(model)s szerkesztése"
-
-#, python-format
-msgid "View selected %(model)s"
-msgstr "Kiválasztott %(model)s megtekintése"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Újabb %(model)s hozzáadása"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Kiválasztott %(model)s törlése"
+msgid "Popup closing…"
+msgstr "A popup bezáródik…"
 
 msgid "Search"
 msgstr "Keresés"
@@ -588,6 +572,18 @@ msgstr "Mentés és megtekintés"
 
 msgid "Close"
 msgstr "Bezárás"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Kiválasztott %(model)s szerkesztése"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Újabb %(model)s hozzáadása"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Kiválasztott %(model)s törlése"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Köszönjük hogy egy kis időt eltöltött ma a honlapunkon."

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
 "PO-Revision-Date: 2018-07-31 07:43+0000\n"
 "Last-Translator: András Veres-Szentkirályi\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
@@ -252,8 +252,64 @@ msgstr "tegnap"
 msgid "%(delta)s ago"
 msgstr " %(delta)s ezelőtt"
 
-#. Translators: 'naturaltime-past' strings will be included in
-#. '%(delta)s ago'
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "an hour ago"
+msgid_plural "%(count)s hours ago"
+msgstr[0] "egy órája"
+msgstr[1] "%(count)s órája"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "a minute ago"
+msgid_plural "%(count)s minutes ago"
+msgstr[0] "egy perce"
+msgstr[1] "%(count)s perce"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "a second ago"
+msgid_plural "%(count)s seconds ago"
+msgstr[0] "egy másodperce"
+msgstr[1] "%(count)s másodperce"
+
+msgid "now"
+msgstr "most"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "a second from now"
+msgid_plural "%(count)s seconds from now"
+msgstr[0] "egy másodperc múlva"
+msgstr[1] "%(count)s másodperc múlva"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "a minute from now"
+msgid_plural "%(count)s minutes from now"
+msgstr[0] "egy perc múlva"
+msgstr[1] "%(count)s perc múlva"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "an hour from now"
+msgid_plural "%(count)s hours from now"
+msgstr[0] "egy óra múlva"
+msgstr[1] "%(count)s óra múlva"
+
+#. Translators: delta will contain a string like '2 months' or '1 month, 2
+#. weeks'
+#, python-format
+msgid "%(delta)s from now"
+msgstr "%(delta)s múlva"
+
+#. Translators: 'naturaltime-past' strings will be included in '%(delta)s ago'
 #, python-format
 msgctxt "naturaltime-past"
 msgid "%d year"
@@ -296,41 +352,8 @@ msgid_plural "%d minutes"
 msgstr[0] "%d perccel"
 msgstr[1] "%d perccel"
 
-msgid "now"
-msgstr "most"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "a second ago"
-msgid_plural "%(count)s seconds ago"
-msgstr[0] "egy másodperce"
-msgstr[1] "%(count)s másodperce"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "a minute ago"
-msgid_plural "%(count)s minutes ago"
-msgstr[0] "egy perce"
-msgstr[1] "%(count)s perce"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "an hour ago"
-msgid_plural "%(count)s hours ago"
-msgstr[0] "egy órája"
-msgstr[1] "%(count)s órája"
-
-#. Translators: delta will contain a string like '2 months' or '1 month, 2
-#. weeks'
-#, python-format
-msgid "%(delta)s from now"
-msgstr "%(delta)s múlva"
-
-#. Translators: 'naturaltime-future' strings will be included in
-#. '%(delta)s from now'
+#. Translators: 'naturaltime-future' strings will be included in '%(delta)s
+#. from now'
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%d year"
@@ -372,27 +395,3 @@ msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d perc"
 msgstr[1] "%d perc"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "a second from now"
-msgid_plural "%(count)s seconds from now"
-msgstr[0] "egy másodperc múlva"
-msgstr[1] "%(count)s másodperc múlva"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "a minute from now"
-msgid_plural "%(count)s minutes from now"
-msgstr[0] "egy perc múlva"
-msgstr[1] "%(count)s perc múlva"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "an hour from now"
-msgid_plural "%(count)s hours from now"
-msgstr[0] "egy óra múlva"
-msgstr[1] "%(count)s óra múlva"
