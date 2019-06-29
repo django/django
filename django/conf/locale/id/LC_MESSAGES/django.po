@@ -9,15 +9,15 @@
 # oon arfiandwi <oon.arfiandwi@gmail.com>, 2016
 # rodin <romihardiyanto@gmail.com>, 2011
 # rodin <romihardiyanto@gmail.com>, 2013-2016
-# sage <laymonage@gmail.com>, 2018
+# sage <laymonage@gmail.com>, 2018-2019
 # Sutrisno Efendi <kangfend@gmail.com>, 2015,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-01-26 23:58+0000\n"
-"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
+"PO-Revision-Date: 2019-05-05 04:23+0000\n"
+"Last-Translator: sage <laymonage@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -1229,7 +1229,7 @@ msgid ""
 "target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
 msgstr ""
 "Lihat <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> untuk Django %(version)s"
+"target=\"_blank\" rel=\"noopener\">catatan rilis</a> untuk Django %(version)s"
 
 msgid "The install worked successfully! Congratulations!"
 msgstr "Selamat! Pemasangan berjalan lancar!"
@@ -1241,10 +1241,10 @@ msgid ""
 "\">DEBUG=True</a> is in your settings file and you have not configured any "
 "URLs."
 msgstr ""
-"Anda sedang elihat halaman ini karena <a href=\"https://docs.djangoproject."
+"Anda sedang melihat halaman ini karena <a href=\"https://docs.djangoproject."
 "com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> berada di berkas pengaturan anda dan anda belum "
-"mengkonfigurasi URL apapun."
+"\">DEBUG=True</a> berada di berkas pengaturan Anda dan Anda belum "
+"mengonfigurasi URL apa pun."
 
 msgid "Django Documentation"
 msgstr "Dokumentasi Django"

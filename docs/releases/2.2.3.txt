@@ -4,7 +4,8 @@ Django 2.2.3 release notes
 
 *Expected July 1, 2019*
 
-Django 2.2.3 fixes several bugs in 2.2.2.
+Django 2.2.3 fixes several bugs in 2.2.2. Also, the latest string translations
+from Transifex are incorporated.
 
 Bugfixes
 ========
