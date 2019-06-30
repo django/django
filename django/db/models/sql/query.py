@@ -6,6 +6,7 @@ themselves do not have to (and could be backed by things other than SQL
 databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
+import copy
 import difflib
 import functools
 import inspect
@@ -1348,7 +1349,16 @@ class Query(BaseExpression):
                 )
                 joinpromoter.add_votes(needed_inner)
             if child_clause:
-                target_clause.add(child_clause, connector)
+                for child_clause_child in child_clause.children:
+                    for clause in target_clause.children:
+                        if isinstance(child_clause_child, clause.__class__) and isinstance(clause.rhs, Query):
+                            clone_child = copy.deepcopy(child_clause_child)
+                            clone_child.rhs.where = clause.rhs.where
+                            if clone_child.rhs == clause.rhs:
+                                clause.rhs.where.add(child_clause_child.rhs.where, connector)
+                                child_clause.children.remove(child_clause_child)
+                if len(child_clause.children) > 0:
+                    target_clause.add(child_clause, connector)
         needed_inner = joinpromoter.update_join_types(self)
         return target_clause, needed_inner
 

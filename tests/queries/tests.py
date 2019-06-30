@@ -905,6 +905,18 @@ class Queries1Tests(TestCase):
             Item.objects.filter(Q(tags__name__in=['t4', 't3'])),
             [repr(i) for i in Item.objects.filter(~~Q(tags__name__in=['t4', 't3']))])
 
+    def test_exclude_children_join(self):
+        for exclude, filter, expected_children_len in (
+            (Q(tags__name='t3') | Q(tags__name='t4'), ~Q(tags__name__in=['t4', 't3']), 1),
+            (Q(tags__name='t3') & Q(tags__name__isnull=False), ~Q(tags__name='t3'), 1),
+            (Q(note__note='n3', tags__name='t3', tags__name__isnull=False), ~Q(note__note='n3', tags__name='t3'), 2)
+        ):
+            with self.subTest(exclude=exclude):
+                qs = Item.objects.exclude(exclude)
+                self.assertQuerysetEqual(
+                    qs, [repr(i) for i in Item.objects.filter(filter)])
+                self.assertEqual(len(qs.query.where.children[0].children), expected_children_len)
+
     def test_ticket_10790_1(self):
         # Querying direct fields with isnull should trim the left outer join.
         # It also should not create INNER JOIN.
