@@ -1393,7 +1393,7 @@ class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
 
         # Go ahead and submit the form to make sure it works
         self.selenium.find_element_by_css_selector(save_button_css_selector).click()
-        self.wait_for_text('li.success', 'The profile "changednewuser" was added successfully.')
+        self.wait_for_text('li.success', 'The profile “changednewuser” was added successfully.')
         profiles = Profile.objects.all()
         self.assertEqual(len(profiles), 1)
         self.assertEqual(profiles[0].user.username, username_value)

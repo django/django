@@ -4772,7 +4772,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.find_element_by_id('delete_id_parent').click()
         self.wait_for_popup()
         self.selenium.switch_to.window(self.selenium.window_handles[-1])
-        self.selenium.find_element_by_xpath('//input[@value="Yes, I\'m sure"]').click()
+        self.selenium.find_element_by_xpath('//input[@value="Yes, I’m sure"]').click()
         self.selenium.switch_to.window(self.selenium.window_handles[0])
         select = Select(self.selenium.find_element_by_id('id_parent'))
         self.assertEqual(ParentWithUUIDPK.objects.count(), 0)
