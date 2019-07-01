@@ -397,7 +397,7 @@ class BaseDatabaseWrapper:
         The usual way to start a transaction is to turn autocommit off.
         SQLite does not properly start a transaction when disabling
         autocommit. To avoid this buggy behavior and to actually enter a new
-        transaction, an explcit BEGIN is required. Using
+        transaction, an explicit BEGIN is required. Using
         force_begin_transaction_with_broken_autocommit=True will issue an
         explicit BEGIN with SQLite. This option will be ignored for other
         backends.
