@@ -961,3 +961,16 @@ Versions affected
 * Django 2.2 :commit:`(patch) <afddabf8428ddc89a332f7a78d0d21eaf2b5a673>`
 * Django 2.1 :commit:`(patch) <09186a13d975de6d049f8b3e05484f66b01ece62>`
 * Django 1.11 :commit:`(patch) <c238701859a52d584f349cce15d56c8e8137c52b>`
+
+July 1, 2019 - :cve:`2019-12781`
+--------------------------------
+
+Incorrect HTTP detection with reverse-proxy connecting via HTTPS. `Full
+description <https://www.djangoproject.com/weblog/2019/jul/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 2.2 :commit:`(patch) <77706a3e4766da5d5fb75c4db22a0a59a28e6cd6>`
+* Django 2.1 :commit:`(patch) <1e40f427bb8d0fb37cc9f830096a97c36c97af6f>`
+* Django 1.11 :commit:`(patch) <32124fc41e75074141b05f10fc55a4f01ff7f050>`
