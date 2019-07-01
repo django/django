@@ -2,7 +2,6 @@ import functools
 import itertools
 import logging
 import os
-import pathlib
 import signal
 import subprocess
 import sys
@@ -137,7 +136,7 @@ def iter_modules_and_files(modules, extra_files):
     for filename in itertools.chain(sys_file_paths, extra_files):
         if not filename:
             continue
-        path = pathlib.Path(filename)
+        path = Path(filename)
         try:
             resolved_path = path.resolve(strict=True).absolute()
         except FileNotFoundError:
