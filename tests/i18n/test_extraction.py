@@ -174,6 +174,15 @@ class BasicExtractorTests(ExtractorTests):
                 po_contents
             )
 
+    @override_settings(LOCALE_PATHS=[
+        'locale',
+        ('locale', 'custom_domain')
+    ])
+    def test_custom_domain(self):
+        # Locale paths with custom domains are ignored.
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0)
+        self.assertTrue(os.path.exists(self.PO_FILE))
+
     def test_special_char_extracted(self):
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))

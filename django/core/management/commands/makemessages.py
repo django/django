@@ -350,7 +350,11 @@ class Command(BaseCommand):
             self.invoked_for_django = True
         else:
             if self.settings_available:
-                self.locale_paths.extend(settings.LOCALE_PATHS)
+                self.locale_paths.extend([
+                    path for path in settings.LOCALE_PATHS
+                    # Ignore locale paths with custom domains.
+                    if not isinstance(path, tuple)
+                ])
             # Allow to run makemessages inside an app dir
             if os.path.isdir('locale'):
                 self.locale_paths.append(os.path.abspath('locale'))
