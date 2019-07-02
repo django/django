@@ -4090,7 +4090,7 @@ class AdminInlineTests(TestCase):
         response = self.client.post(collector_url, self.post_data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Widget.objects.count(), 0)
-        # But after adding the permisson it can.
+        # But after adding the permission it can.
         permissionuser.user_permissions.add(get_perm(Widget, get_permission_codename('add', Widget._meta)))
         self.post_data['widget_set-0-name'] = "Widget 1"
         collector_url = reverse('admin:admin_views_collector_change', args=(self.collector.pk,))

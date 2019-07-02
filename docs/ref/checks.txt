@@ -406,7 +406,7 @@ The following checks are run if you use the :option:`check --deploy` option:
 * **security.W017**: :setting:`CSRF_COOKIE_HTTPONLY` is not set to ``True``.
   Using an ``HttpOnly`` CSRF cookie makes it more difficult for cross-site
   scripting attacks to steal the CSRF token. *This check is removed in Django
-  1.11 as the* :setting:`CSRF_COOKIE_HTTPONLY` *setting offers no pratical
+  1.11 as the* :setting:`CSRF_COOKIE_HTTPONLY` *setting offers no practical
   benefit.*
 * **security.W018**: You should not have :setting:`DEBUG` set to ``True`` in
   deployment.

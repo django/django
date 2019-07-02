@@ -274,7 +274,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
                     trail = closing + trail
                     trimmed_something = True
             # Trim trailing punctuation (after trimming wrapping punctuation,
-            # as encoded entities contain ';'). Unescape entites to avoid
+            # as encoded entities contain ';'). Unescape entities to avoid
             # breaking them by removing ';'.
             middle_unescaped = html.unescape(middle)
             stripped = middle_unescaped.rstrip(TRAILING_PUNCTUATION_CHARS)
