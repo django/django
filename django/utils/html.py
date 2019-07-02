@@ -8,6 +8,7 @@ from urllib.parse import (
     parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit,
 )
 
+from django.utils.encoding import punycode
 from django.utils.functional import Promise, keep_lazy, keep_lazy_text
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
 from django.utils.safestring import SafeData, SafeString, mark_safe
@@ -210,7 +211,7 @@ def smart_urlquote(url):
         return unquote_quote(url)
 
     try:
-        netloc = netloc.encode('idna').decode('ascii')  # IDN -> ACE
+        netloc = punycode(netloc)  # IDN -> ACE
     except UnicodeError:  # invalid domain part
         return unquote_quote(url)
 
@@ -319,7 +320,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
             elif ':' not in middle and is_email_simple(middle):
                 local, domain = middle.rsplit('@', 1)
                 try:
-                    domain = domain.encode('idna').decode('ascii')
+                    domain = punycode(domain)
                 except UnicodeError:
                     continue
                 url = 'mailto:%s@%s' % (local, domain)

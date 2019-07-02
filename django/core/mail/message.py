@@ -16,7 +16,7 @@ from pathlib import Path
 
 from django.conf import settings
 from django.core.mail.utils import DNS_NAME
-from django.utils.encoding import force_str
+from django.utils.encoding import force_str, punycode
 
 # Don't BASE64-encode UTF-8 messages so that we avoid unwanted attention from
 # some spam filters.
@@ -102,10 +102,7 @@ def sanitize_address(addr, encoding):
         localpart.encode('ascii')
     except UnicodeEncodeError:
         localpart = Header(localpart, encoding).encode()
-    try:
-        domain.encode('ascii')
-    except UnicodeEncodeError:
-        domain = domain.encode('idna').decode('ascii')
+    domain = punycode(domain)
 
     parsed_address = Address(nm, username=localpart, domain=domain)
     return str(parsed_address)

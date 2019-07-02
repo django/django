@@ -5,6 +5,7 @@ from urllib.parse import urlsplit, urlunsplit
 
 from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
+from django.utils.encoding import punycode
 from django.utils.functional import SimpleLazyObject
 from django.utils.ipv6 import is_valid_ipv6_address
 from django.utils.translation import gettext_lazy as _, ngettext_lazy
@@ -124,7 +125,7 @@ class URLValidator(RegexValidator):
                 except ValueError:  # for example, "Invalid IPv6 URL"
                     raise ValidationError(self.message, code=self.code)
                 try:
-                    netloc = netloc.encode('idna').decode('ascii')  # IDN -> ACE
+                    netloc = punycode(netloc)  # IDN -> ACE
                 except UnicodeError:  # invalid domain part
                     raise e
                 url = urlunsplit((scheme, netloc, path, query, fragment))
@@ -199,7 +200,7 @@ class EmailValidator:
                 not self.validate_domain_part(domain_part)):
             # Try for possible IDN domain-part
             try:
-                domain_part = domain_part.encode('idna').decode('ascii')
+                domain_part = punycode(domain_part)
             except UnicodeError:
                 pass
             else:
