@@ -227,3 +227,20 @@ class AppCompilationTest(ProjectAndAppTests):
         call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
         self.assertTrue(os.path.exists(self.PROJECT_MO_FILE))
         self.assertTrue(os.path.exists(self.APP_MO_FILE))
+
+
+@override_settings(LOCALE_PATHS=[
+    'locale',
+    ('locale', 'custom_domain')
+])
+class AppCompilationCustomDomain(MessageCompilationTests):
+    LOCALE = 'ru'
+
+    def test_custom_domains_locale_compiled(self):
+        call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
+        locale_dir = 'locale/%s/LC_MESSAGES' % self.LOCALE
+        self.assertTrue(os.path.exists(os.path.join(locale_dir, 'django.mo')))
+        self.assertTrue(os.path.exists(os.path.join(locale_dir, 'custom_domain.mo')))
+        with translation.override(self.LOCALE):
+            self.assertEqual(gettext('Lenin'), 'Ленин')
+            self.assertEqual(gettext('Moskwa'), 'Москва')

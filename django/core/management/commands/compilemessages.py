@@ -70,7 +70,11 @@ class Command(BaseCommand):
         basedirs = [os.path.join('conf', 'locale'), 'locale']
         if os.environ.get('DJANGO_SETTINGS_MODULE'):
             from django.conf import settings
-            basedirs.extend(settings.LOCALE_PATHS)
+            for locale_path in settings.LOCALE_PATHS:
+                if isinstance(locale_path, tuple):
+                    basedirs.append(locale_path[0])
+                else:
+                    basedirs.append(locale_path)
 
         # Walk entire tree, looking for locale directories
         for dirpath, dirnames, filenames in os.walk('.', topdown=True):
