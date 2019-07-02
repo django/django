@@ -12,7 +12,10 @@ def watch_for_translation_changes(sender, **kwargs):
     if settings.USE_I18N:
         directories = [Path('locale')]
         directories.extend(Path(config.path) / 'locale' for config in apps.get_app_configs())
-        directories.extend(Path(p) for p in settings.LOCALE_PATHS)
+        for locale_path in settings.LOCALE_PATHS:
+            if isinstance(locale_path, tuple):
+                locale_path = locale_path[0]
+            directories.append(Path(locale_path))
         for path in directories:
             absolute_path = path.absolute()
             sender.watch_dir(absolute_path, '**/*.mo')
