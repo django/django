@@ -74,6 +74,26 @@ page::
     objects such as Django's ``QuerySet`` to use a more efficient ``count()``
     method when available.
 
+Paginating a ``ListView``
+=========================
+
+:class:`django.views.generic.list.ListView` provides a builtin way to paginate
+the displayed list. You can do this by adding
+:attr:`~django.views.generic.list.MultipleObjectMixin.paginate_by` attribute to
+your view class, for example::
+
+    from django.views.generic import ListView
+
+    from myapp.models import Contacts
+
+    class ContactsList(ListView):
+        paginate_by = 2
+        model = Contacts
+
+The only thing your users will be missing is a way to navigate to the next or
+previous page. To achieve this, add links to the next and previous page, like
+shown in the below example ``list.html``.
+
 .. _using-paginator-in-view:
 
 Using ``Paginator`` in a view
