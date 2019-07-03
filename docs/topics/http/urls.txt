@@ -91,6 +91,9 @@ Notes:
   ``<int:name>`` to capture an integer parameter. If a converter isn't included,
   any string, excluding a ``/`` character, is matched.
 
+* ValueError raised by Converter(`Registering custom path converters`_) causes
+  HTTPError 404(`handler404`_).
+
 * There's no need to add a leading slash, because every URL has that. For
   example, it's ``articles``, not ``/articles``.
 
